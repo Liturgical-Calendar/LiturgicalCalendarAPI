@@ -25,10 +25,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `calendar_fixed`
+-- Table structure for table `LITURGY__calendar_fixed`
 --
 
-CREATE TABLE `calendar_fixed` (
+CREATE TABLE `LITURGY__calendar_fixed` (
   `RECURRENCE_ID` int(11) NOT NULL,
   `MONTH` int(11) NOT NULL,
   `DAY` int(11) NOT NULL,
@@ -41,10 +41,10 @@ CREATE TABLE `calendar_fixed` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `calendar_fixed`
+-- Dumping data for table `LITURGY__calendar_fixed`
 --
 
-INSERT INTO `calendar_fixed` (`RECURRENCE_ID`, `MONTH`, `DAY`, `TAG`, `NAME`, `GRADE`, `COMMON`, `CALENDAR`, `COLOR`) VALUES
+INSERT INTO `LITURGY__calendar_fixed` (`RECURRENCE_ID`, `MONTH`, `DAY`, `TAG`, `NAME`, `GRADE`, `COMMON`, `CALENDAR`, `COLOR`) VALUES
 (1, 1, 1, 'MotherGod', 'Holy Mary, Mother of God', 7, 'Proper', 'GENERAL ROMAN', 'white'),
 (2, 1, 2, 'StsBasilGreg', 'Saints Basil the Great and Gregory Nazianzen, bishops and doctors', 3, 'Proper', 'GENERAL ROMAN', 'white'),
 (3, 1, 3, 'NameJesus', 'The Most Holy Name of Jesus', 2, 'Proper', 'GENERAL ROMAN', 'white'),
@@ -262,19 +262,19 @@ INSERT INTO `calendar_fixed` (`RECURRENCE_ID`, `MONTH`, `DAY`, `TAG`, `NAME`, `G
 -- --------------------------------------------------------
 
 --
--- Table structure for table `festivity_grade`
+-- Table structure for table `LITURGY__festivity_grade`
 --
 
-CREATE TABLE `festivity_grade` (
+CREATE TABLE `LITURGY__festivity_grade` (
   `IDX` int(11) NOT NULL,
   `NAME` varchar(60) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `festivity_grade`
+-- Dumping data for table `LITURGY__festivity_grade`
 --
 
-INSERT INTO `festivity_grade` (`IDX`, `NAME`) VALUES
+INSERT INTO `LITURGY__festivity_grade` (`IDX`, `NAME`) VALUES
 (1, 'COMMEMORATION'),
 (2, 'OPTIONAL MEMORIAL'),
 (3, 'MEMORIAL'),
@@ -286,19 +286,19 @@ INSERT INTO `festivity_grade` (`IDX`, `NAME`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `months`
+-- Table structure for table `LITURGY__months`
 --
 
-CREATE TABLE `months` (
+CREATE TABLE `LITURGY__months` (
   `IDX` int(11) NOT NULL,
   `NAME` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `months`
+-- Dumping data for table `LITURGY__months`
 --
 
-INSERT INTO `months` (`IDX`, `NAME`) VALUES
+INSERT INTO `LITURGY__months` (`IDX`, `NAME`) VALUES
 (1, 'JANUARY'),
 (2, 'FEBRUARY'),
 (3, 'MARCH'),
@@ -317,24 +317,24 @@ INSERT INTO `months` (`IDX`, `NAME`) VALUES
 --
 
 --
--- Indexes for table `calendar_fixed`
+-- Indexes for table `LITURGY__calendar_fixed`
 --
-ALTER TABLE `calendar_fixed`
+ALTER TABLE `LITURGY__calendar_fixed`
   ADD PRIMARY KEY (`RECURRENCE_ID`),
   ADD UNIQUE KEY `TAG` (`TAG`),
   ADD KEY `MONTH_NAME` (`MONTH`),
   ADD KEY `FESTIVITY_GRADE` (`GRADE`);
 
 --
--- Indexes for table `festivity_grade`
+-- Indexes for table `LITURGY__festivity_grade`
 --
-ALTER TABLE `festivity_grade`
+ALTER TABLE `LITURGY__festivity_grade`
   ADD PRIMARY KEY (`IDX`);
 
 --
--- Indexes for table `months`
+-- Indexes for table `LITURGY__months`
 --
-ALTER TABLE `months`
+ALTER TABLE `LITURGY__months`
   ADD PRIMARY KEY (`IDX`);
 
 --
@@ -342,20 +342,20 @@ ALTER TABLE `months`
 --
 
 --
--- AUTO_INCREMENT for table `calendar_fixed`
+-- AUTO_INCREMENT for table `LITURGY__calendar_fixed`
 --
-ALTER TABLE `calendar_fixed`
+ALTER TABLE `LITURGY__calendar_fixed`
   MODIFY `RECURRENCE_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=214;
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `calendar_fixed`
+-- Constraints for table `LITURGY__calendar_fixed`
 --
-ALTER TABLE `calendar_fixed`
-  ADD CONSTRAINT `FESTIVITY_GRADE` FOREIGN KEY (`GRADE`) REFERENCES `festivity_grade` (`IDX`),
-  ADD CONSTRAINT `MONTH_NAME` FOREIGN KEY (`MONTH`) REFERENCES `months` (`IDX`);
+ALTER TABLE `LITURGY__calendar_fixed`
+  ADD CONSTRAINT `FESTIVITY_GRADE` FOREIGN KEY (`GRADE`) REFERENCES `LITURGY__festivity_grade` (`IDX`),
+  ADD CONSTRAINT `MONTH_NAME` FOREIGN KEY (`MONTH`) REFERENCES `LITURGY__months` (`IDX`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
