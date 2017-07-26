@@ -445,7 +445,7 @@ else {
 
     //If a Feast (not of the Lord) occurs on a Sunday in Ordinary Time, the Sunday is celebrated.  (e.g., St. Luke, 1992)
     //We will look these up from the MySQL table of festivities of the Roman Calendar
-    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed WHERE GRADE < 6 AND GRADE > 1")){
+    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed WHERE GRADE < 5 AND GRADE > 1")){
         while($row = mysqli_fetch_assoc($result)){
             
             //If it doesn't occur on a Sunday or a Solemnity, then go ahead and create the Festivity
