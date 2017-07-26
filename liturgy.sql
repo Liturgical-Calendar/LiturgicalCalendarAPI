@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.7.1
+-- version 4.7.3
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 25, 2017 at 05:42 PM
--- Server version: 5.7.18-log
--- PHP Version: 7.1.6
+-- Generation Time: Jul 26, 2017 at 12:04 AM
+-- Server version: 5.7.18
+-- PHP Version: 7.1.3
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -45,7 +45,7 @@ CREATE TABLE `LITURGY__calendar_fixed` (
 --
 
 INSERT INTO `LITURGY__calendar_fixed` (`RECURRENCE_ID`, `MONTH`, `DAY`, `TAG`, `NAME`, `GRADE`, `COMMON`, `CALENDAR`, `COLOR`) VALUES
-(1, 1, 1, 'MotherGod', 'Holy Mary, Mother of God', 7, 'Proper', 'GENERAL ROMAN', 'white'),
+(1, 1, 1, 'MotherGod', 'Holy Mary, Mother of God', 6, 'Proper', 'GENERAL ROMAN', 'white'),
 (2, 1, 2, 'StsBasilGreg', 'Saints Basil the Great and Gregory Nazianzen, bishops and doctors', 3, 'Proper', 'GENERAL ROMAN', 'white'),
 (3, 1, 3, 'NameJesus', 'The Most Holy Name of Jesus', 2, 'Proper', 'GENERAL ROMAN', 'white'),
 (4, 1, 7, 'StRayPenyafort', 'Saint Raymond of Penyafort, priest', 2, 'Pastors:For One Pastor', 'GENERAL ROMAN', 'white'),
@@ -61,7 +61,7 @@ INSERT INTO `LITURGY__calendar_fixed` (`RECURRENCE_ID`, `MONTH`, `DAY`, `TAG`, `
 (14, 1, 27, 'StAngelaMerici', 'Saint Angela Merici, virgin', 2, 'Virgins:For One Virgin|Holy Men and Women:For Educators', 'GENERAL ROMAN', 'white'),
 (15, 1, 28, 'StThomasAquinas', 'Saint Thomas Aquinas, priest and doctor', 3, 'Doctors|Pastors:For One Pastor', 'GENERAL ROMAN', 'white'),
 (16, 1, 31, 'StJohnBosco', 'Saint John Bosco, priest', 3, 'Pastors:For One Pastor|Holy Men and Women:For Educators', 'GENERAL ROMAN', 'white'),
-(17, 2, 2, 'Presentation', 'Presentation of the Lord', 6, 'Proper', 'GENERAL ROMAN', 'white'),
+(17, 2, 2, 'Presentation', 'Presentation of the Lord', 5, 'Proper', 'GENERAL ROMAN', 'white'),
 (18, 2, 3, 'StBlase', 'Saint Blase, bishop and martyr', 2, 'Martyrs:For One Martyr|Pastors:For a Bishop', 'GENERAL ROMAN', 'red|white'),
 (19, 2, 3, 'StAnsgar', 'Saint Ansgar, bishop', 2, 'Pastors:For Missionaries|Pastors:For a Bishop', 'GENERAL ROMAN', 'white'),
 (20, 2, 5, 'StAgatha', 'Saint Agatha, virgin and martyr', 3, 'Martyrs:For a Virgin Martyr|Virgins:For One Virgin', 'GENERAL ROMAN', 'red'),
@@ -81,9 +81,9 @@ INSERT INTO `LITURGY__calendar_fixed` (`RECURRENCE_ID`, `MONTH`, `DAY`, `TAG`, `
 (34, 3, 9, 'StFrancesRome', 'Saint Frances of Rome, religious', 2, 'Holy Men and Women:For Holy Women|Holy Men and Women:For Religious', 'GENERAL ROMAN', 'white'),
 (35, 3, 17, 'StPatrick', 'Saint Patrick, bishop', 2, 'Pastors:For Missionaries|Pastors:For a Bishop', 'GENERAL ROMAN', 'white'),
 (36, 3, 18, 'StCyrilJerusalem', 'Saint Cyril of Jerusalem, bishop and doctor', 2, 'Pastors:For a Bishop|Doctors', 'GENERAL ROMAN', 'white'),
-(37, 3, 19, 'StJoseph', 'Saint Joseph Husband of the Blessed Virgin Mary', 7, 'Proper', 'GENERAL ROMAN', 'white'),
+(37, 3, 19, 'StJoseph', 'Saint Joseph Husband of the Blessed Virgin Mary', 6, 'Proper', 'GENERAL ROMAN', 'white'),
 (38, 3, 23, 'StTuribius', 'Saint Turibius of Mogrovejo, bishop', 2, 'Pastors:For a Bishop', 'GENERAL ROMAN', 'white'),
-(39, 3, 25, 'Annunciation', 'Annunciation of the Lord', 7, 'Proper', 'GENERAL ROMAN', 'white'),
+(39, 3, 25, 'Annunciation', 'Annunciation of the Lord', 6, 'Proper', 'GENERAL ROMAN', 'white'),
 (40, 4, 2, 'StFrancisPaola', 'Saint Francis of Paola, hermit', 2, 'Holy Men and Women:For Religious', 'GENERAL ROMAN', 'white'),
 (41, 4, 4, 'StIsidore', 'Saint Isidore, bishop and doctor of the Church', 2, 'Pastors:For a Bishop|Doctors', 'GENERAL ROMAN', 'white'),
 (42, 4, 5, 'StVincentFerrer', 'Saint Vincent Ferrer, priest', 2, 'Pastors:For Missionaries', 'GENERAL ROMAN', 'white'),
@@ -128,10 +128,10 @@ INSERT INTO `LITURGY__calendar_fixed` (`RECURRENCE_ID`, `MONTH`, `DAY`, `TAG`, `
 (81, 6, 21, 'StAloysiusGonzaga', 'Saint Aloysius Gonzaga, religious', 3, 'Proper', 'GENERAL ROMAN', 'white'),
 (82, 6, 22, 'StPaulinusNola', 'Saint Paulinus of Nola, bishop', 2, 'Pastors:For a Bishop', 'GENERAL ROMAN', 'white'),
 (83, 6, 22, 'StsJohnFisherThomasMore', 'Saints John Fisher, bishop and martyr and Thomas More, martyr', 2, 'Martyrs:For Several Martyrs', 'GENERAL ROMAN', 'red'),
-(84, 6, 24, 'NativityJohnBaptist', 'Nativity of Saint John the Baptist', 7, 'Proper', 'GENERAL ROMAN', 'white'),
+(84, 6, 24, 'NativityJohnBaptist', 'Nativity of Saint John the Baptist', 6, 'Proper', 'GENERAL ROMAN', 'white'),
 (85, 6, 27, 'StCyrilAlexandria', 'Saint Cyril of Alexandria, bishop and doctor', 2, 'Pastors:For a Bishop|Doctors', 'GENERAL ROMAN', 'white'),
 (86, 6, 28, 'StIrenaeus', 'Saint Irenaeus, bishop and martyr', 3, 'Proper', 'GENERAL ROMAN', 'red|white'),
-(87, 6, 29, 'StsPeterPaulAp', 'Saints Peter and Paul, Apostles', 7, 'Proper', 'GENERAL ROMAN', 'red'),
+(87, 6, 29, 'StsPeterPaulAp', 'Saints Peter and Paul, Apostles', 6, 'Proper', 'GENERAL ROMAN', 'red'),
 (88, 6, 30, 'FirstMartyrsRome', 'First Martyrs of the Church of Rome', 2, 'Martyrs:For Several Martyrs', 'GENERAL ROMAN', 'red'),
 (89, 7, 3, 'StThomasAp', 'Saint Thomas the Apostle', 4, 'Proper', 'GENERAL ROMAN', 'red'),
 (90, 7, 4, 'StElizabethPortugal', 'Saint Elizabeth of Portugal', 2, 'Holy Men and Women:For Those Who Practiced Works of Mercy', 'GENERAL ROMAN', 'white'),
@@ -158,7 +158,7 @@ INSERT INTO `LITURGY__calendar_fixed` (`RECURRENCE_ID`, `MONTH`, `DAY`, `TAG`, `
 (111, 8, 2, 'StPeterJulianEymard', 'Saint Peter Julian Eymard, priest', 2, 'Holy Men and Women:For Religious|Pastors:For One Pastor', 'GENERAL ROMAN', 'white'),
 (112, 8, 4, 'StJeanVianney', 'Saint Jean Vianney (the Curé of Ars), priest', 3, 'Pastors:For One Pastor', 'GENERAL ROMAN', 'white'),
 (113, 8, 5, 'DedicationStMaryMajor', 'Dedication of the Basilica of Saint Mary Major', 2, 'Blessed Virgin Mary', 'GENERAL ROMAN', 'white'),
-(114, 8, 6, 'Transfiguration', 'Transfiguration of the Lord', 6, 'Proper', 'GENERAL ROMAN', 'white'),
+(114, 8, 6, 'Transfiguration', 'Transfiguration of the Lord', 5, 'Proper', 'GENERAL ROMAN', 'white'),
 (115, 8, 7, 'StSixtusIIPope', 'Saint Sixtus II, pope, and companions, martyrs', 2, 'Martyrs:For Several Martyrs', 'GENERAL ROMAN', 'red'),
 (116, 8, 7, 'StCajetan', 'Saint Cajetan, priest', 2, 'Pastors:For One Pastor|Holy Men and Women:For Religious', 'GENERAL ROMAN', 'white'),
 (117, 8, 8, 'StDominic', 'Saint Dominic, priest', 3, 'Proper', 'GENERAL ROMAN', 'white'),
@@ -168,7 +168,7 @@ INSERT INTO `LITURGY__calendar_fixed` (`RECURRENCE_ID`, `MONTH`, `DAY`, `TAG`, `
 (121, 8, 12, 'StJaneFrancesDeChantal', 'Saint Jane Frances de Chantal, religious', 2, 'Holy Men and Women:For Religious', 'GENERAL ROMAN', 'white'),
 (122, 8, 13, 'StsPontianHippolytus', 'Saints Pontian, pope, and Hippolytus, priest, martyrs', 2, 'Martyrs:For Several Martyrs|Pastors:For Several Pastors', 'GENERAL ROMAN', 'red|white'),
 (123, 8, 14, 'StMaximilianKolbe', 'Saint Maximilian Mary Kolbe, priest and martyr', 3, 'Proper', 'GENERAL ROMAN', 'red|white'),
-(124, 8, 15, 'Assumption', 'Assumption of the Blessed Virgin Mary', 7, 'Proper', 'GENERAL ROMAN', 'white'),
+(124, 8, 15, 'Assumption', 'Assumption of the Blessed Virgin Mary', 6, 'Proper', 'GENERAL ROMAN', 'white'),
 (125, 8, 16, 'StStephenHungary', 'Saint Stephen of Hungary', 2, 'Holy Men and Women:For One Saint', 'GENERAL ROMAN', 'white'),
 (126, 8, 19, 'StJohnEudes', 'Saint John Eudes, priest', 2, 'Pastors:For One Pastor|Holy Men and Women:For Religious', 'GENERAL ROMAN', 'white'),
 (127, 8, 20, 'StBernardClairvaux', 'Saint Bernard of Clairvaux, abbot and doctor of the Church', 3, 'Proper', 'GENERAL ROMAN', 'white'),
@@ -186,7 +186,7 @@ INSERT INTO `LITURGY__calendar_fixed` (`RECURRENCE_ID`, `MONTH`, `DAY`, `TAG`, `
 (139, 9, 9, 'StPeterClaver', 'Saint Peter Claver, priest', 2, 'Pastors:For One Pastor|Holy Men and Women:For Those Who Practiced Works of Mercy', 'GENERAL ROMAN', 'white'),
 (140, 9, 12, 'HolyNameMary', 'Holy Name of the Blessed Virgin Mary', 2, 'Proper', 'GENERAL ROMAN', 'white'),
 (141, 9, 13, 'StJohnChrysostom', 'Saint John Chrysostom, bishop and doctor', 3, 'Proper', 'GENERAL ROMAN', 'white'),
-(142, 9, 14, 'ExaltationCross', 'Exaltation of the Holy Cross', 6, 'Proper', 'GENERAL ROMAN', 'red'),
+(142, 9, 14, 'ExaltationCross', 'Exaltation of the Holy Cross', 5, 'Proper', 'GENERAL ROMAN', 'red'),
 (143, 9, 15, 'LadySorrows', 'Our Lady of Sorrows', 3, 'Proper', 'GENERAL ROMAN', 'white'),
 (144, 9, 16, 'StsCorneliusCyprian', 'Saints Cornelius, pope, and Cyprian, bishop, martyrs', 3, 'Martyrs:For Several Martyrs|Pastors:For a Bishop', 'GENERAL ROMAN', 'red|white'),
 (145, 9, 17, 'StRobertBellarmine', 'Saint Robert Bellarmine, bishop and doctor', 2, 'Pastors:For a Bishop|Doctors', 'GENERAL ROMAN', 'white'),
@@ -220,8 +220,8 @@ INSERT INTO `LITURGY__calendar_fixed` (`RECURRENCE_ID`, `MONTH`, `DAY`, `TAG`, `
 (173, 10, 23, 'StJohnCapistrano', 'Saint John of Capistrano, priest', 2, 'Pastors:For Missionaries|Holy Men and Women:For Religious', 'GENERAL ROMAN', 'white'),
 (174, 10, 24, 'StAnthonyMaryClaret', 'Saint Anthony Mary Claret, bishop', 2, 'Pastors:For Missionaries|Pastors:For a Bishop', 'GENERAL ROMAN', 'white'),
 (175, 10, 28, 'StSimonStJudeAp', 'Saint Simon and Saint Jude, apostles', 4, 'Proper', 'GENERAL ROMAN', 'red'),
-(176, 11, 1, 'AllSaints', 'All Saints\' Day', 7, 'Proper', 'GENERAL ROMAN', 'white'),
-(177, 11, 2, 'AllSouls', 'Commemoration of all the Faithful Departed (All Souls\' Day)', 7, 'Proper', 'GENERAL ROMAN', 'purple'),
+(176, 11, 1, 'AllSaints', 'All Saints\' Day', 6, 'Proper', 'GENERAL ROMAN', 'white'),
+(177, 11, 2, 'AllSouls', 'Commemoration of all the Faithful Departed (All Souls\' Day)', 6, 'Proper', 'GENERAL ROMAN', 'purple'),
 (178, 11, 3, 'StMartinPorres', 'Saint Martin de Porres, religious', 2, 'Holy Men and Women:For Religious', 'GENERAL ROMAN', 'white'),
 (179, 11, 4, 'StCharlesBorromeo', 'Saint Charles Borromeo, bishop', 3, 'Pastors:For a Bishop', 'GENERAL ROMAN', 'white'),
 (180, 11, 9, 'DedicationLateran', 'Dedication of the Lateran basilica', 4, 'Proper', 'GENERAL ROMAN', 'white'),
@@ -244,7 +244,7 @@ INSERT INTO `LITURGY__calendar_fixed` (`RECURRENCE_ID`, `MONTH`, `DAY`, `TAG`, `
 (197, 12, 4, 'StJohnDamascene', 'Saint John Damascene, priest and doctor', 2, 'Pastors:For One Pastor|Doctors', 'GENERAL ROMAN', 'white'),
 (198, 12, 6, 'StNicholas', 'Saint Nicholas, bishop', 2, 'Pastors:For a Bishop', 'GENERAL ROMAN', 'white'),
 (199, 12, 7, 'StAmbrose', 'Saint Ambrose, bishop and doctor', 3, 'Proper', 'GENERAL ROMAN', 'white'),
-(200, 12, 8, 'ImmaculateConception', 'Immaculate Conception of the Blessed Virgin Mary', 7, 'Proper', 'GENERAL ROMAN', 'white'),
+(200, 12, 8, 'ImmaculateConception', 'Immaculate Conception of the Blessed Virgin Mary', 6, 'Proper', 'GENERAL ROMAN', 'white'),
 (201, 12, 9, 'StJuanDiego', 'Saint Juan Diego', 2, 'Holy Men and Women:For One Saint', 'GENERAL ROMAN', 'white'),
 (202, 12, 11, 'StDamasusIPope', 'Saint Damasus I, pope', 2, 'Pastors:For a Pope', 'GENERAL ROMAN', 'white'),
 (203, 12, 12, 'LadyGuadalupe', 'Our Lady of Guadalupe', 2, '', 'GENERAL ROMAN', 'white'),
@@ -252,7 +252,7 @@ INSERT INTO `LITURGY__calendar_fixed` (`RECURRENCE_ID`, `MONTH`, `DAY`, `TAG`, `
 (205, 12, 14, 'StJohnCross', 'Saint John of the Cross, priest and doctor', 3, 'Proper', 'GENERAL ROMAN', 'white'),
 (206, 12, 21, 'StPeterCanisius', 'Saint Peter Canisius, priest and doctor', 2, 'Pastors:For One Pastor|Doctors', 'GENERAL ROMAN', 'white'),
 (207, 12, 23, 'StJohnKanty', 'Saint John of Kanty, priest', 2, 'Pastors:For One Pastor|Holy Men and Women:For Those Who Practiced Works of Mercy', 'GENERAL ROMAN', 'white'),
-(208, 12, 25, 'Christmas', 'Nativity of the Lord', 7, 'Proper', 'GENERAL ROMAN', 'white'),
+(208, 12, 25, 'Christmas', 'Nativity of the Lord', 6, 'Proper', 'GENERAL ROMAN', 'white'),
 (209, 12, 26, 'StStephenProtomartyr', 'Saint Stephen, the first martyr', 4, 'Proper', 'GENERAL ROMAN', 'red'),
 (210, 12, 27, 'StJohnEvangelist', 'Saint John, Apostle and Evangelist', 4, 'Proper', 'GENERAL ROMAN', 'white'),
 (211, 12, 28, 'HolyInnnocents', 'Holy Innocents, martyrs', 4, 'Proper', 'GENERAL ROMAN', 'red'),
@@ -279,9 +279,9 @@ INSERT INTO `LITURGY__festivity_grade` (`IDX`, `NAME`) VALUES
 (2, 'OPTIONAL MEMORIAL'),
 (3, 'MEMORIAL'),
 (4, 'FEAST'),
-(5, 'HOLY DAY OF OBLIGATION'),
-(6, 'FEAST OF THE LORD'),
-(7, 'SOLEMNITY');
+(5, 'FEAST OF THE LORD'),
+(6, 'SOLEMNITY'),
+(7, 'HOLY DAY OF OBLIGATION');
 
 -- --------------------------------------------------------
 
