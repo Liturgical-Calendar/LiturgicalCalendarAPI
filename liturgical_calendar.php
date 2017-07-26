@@ -1,11 +1,12 @@
 <?php
 /**
  * Liturgical Calendar PHP script
- * Author: John Romano D'Orazio
+ * Author: John Romano D'Orazio 
+ * Email: priest@johnromanodorazio.com
  * Licensed under the Apache 2.0 License
  * Version 1.0
  * Date Created: 25 July 2017
- *
+ * Note: it is necessary to set up the MySQL liturgy tables prior to using this script
  */
 
 
