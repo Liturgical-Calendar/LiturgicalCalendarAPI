@@ -1,4 +1,13 @@
 <?php
+/**
+ * Liturgical Calendar PHP engine script
+ * Author: John Romano D'Orazio 
+ * Email: priest@johnromanodorazio.com
+ * Licensed under the Apache 2.0 License
+ * Version 2.0
+ * Date Created: 27 December 2017
+ * Note: it is necessary to set up the MySQL liturgy tables prior to using this script
+ */
 
 define("LITURGYAPP","AMDG"); //definition needed to allow inclusion of liturgy_config.php, otherwise will fail
 //this is a security to prevent liturgy_config.php from being accessed directly
