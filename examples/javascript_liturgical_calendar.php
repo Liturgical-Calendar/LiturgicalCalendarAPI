@@ -97,7 +97,7 @@
         $.ajax({
             method: 'POST',
             data: $Settings,
-            url: 'LitCalEngine.php',
+            url: '../LitCalEngine.php',
             success: function(LitCalData){
                 console.log(LitCalData);
                 
