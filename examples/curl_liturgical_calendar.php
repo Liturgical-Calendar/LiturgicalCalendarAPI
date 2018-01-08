@@ -257,6 +257,9 @@
         }
     }
 
+    // Closing
+    curl_close($ch);
+    
 
     // Gather the json results from the server into $LitCal array similar to the PHP Engine
     $LitCal = array();    
@@ -268,9 +271,6 @@
         die("We do not have enough information. Returned data has no LitCal property:" . var_dump($LitCalData) );
     }
 
-    // Closing
-    curl_close($ch);
-    
     foreach($LitCal as $key => $value){
         // retransform each entry from an associative array to a Festivity class object
         $LitCal[$key] = new Festivity($LitCal[$key]["name"],$LitCal[$key]["date"],$LitCal[$key]["color"],$LitCal[$key]["type"],$LitCal[$key]["grade"],$LitCal[$key]["common"]);
