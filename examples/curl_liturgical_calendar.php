@@ -159,7 +159,7 @@ ini_set('display_errors', 1);
 <?php
     
     echo '<h1 style="text-align:center;">Liturgical Calendar Calculation for a Given Year ('.$YEAR.')</h1>';
-    echo '<h2 style="text-align:center;">HTML presentation elaborated by JAVASCRIPT using an AJAX request to a <a href="../LitCalEngine.php">PHP engine</a></h2>';
+    echo '<h2 style="text-align:center;">HTML presentation elaborated by PHP using a CURL request to a <a href="../LitCalEngine.php">PHP engine</a></h2>';
     
     if($YEAR < 1969){
         echo '<div style="text-align:center;border:3px ridge Green;background-color:LightBlue;width:75%;margin:10px auto;padding:10px;">';
