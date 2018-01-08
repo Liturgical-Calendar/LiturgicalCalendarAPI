@@ -139,28 +139,25 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     								//     WEEKDAYS OF CHRISTMAS, FROM JANUARY 2nd UNTIL THE SATURDAY AFTER EPIPHANY
     								//     WEEKDAYS OF THE EASTER SEASON, FROM THE MONDAY AFTER THE OCTAVE OF EASTER UNTIL THE SATURDAY BEFORE PENTECOST
     								//     WEEKDAYS OF ORDINARY TIME
-    								
-    $GRADE = array("","COMMEMORATION","OPTIONAL MEMORIAL","MEMORIAL","FEAST","FEAST OF THE LORD","SOLEMNITY","HOLY DAY OF OBLIGATION");
-    
-    $SUNDAY_CYCLE = array("A","B","C");
-    $WEEKDAY_CYCLE = array("I","II");
-    
+    								    
     class Festivity implements JsonSerializable {
         public $name;
         public $date;
-        public $color;
-        public $type;
+        public $color; //"green","purple","white","red","pink"
+        public $type;  //"mobile" or "fixed"
         public $grade; //1=Optional memorial,2=Obligatory memorial,3=Feast,4=Holy Day of Obligation,5=Feast of the Lord,6=Solemnity
-        public $common;
-    
+        public $common;//"Proper" or specified common(s) of saints...
+    	private static $liturgical_colors = array("green","purple","white","red","pink");
+	private static $feast_type = array("fixed","mobile");
+	    
         function __construct($name,$date,$color,$type,$grade=0,$common='') 
         {
-            $this->name = $name;
-            $this->date = $date;
-            $this->color = $color;
-            $this->type = $type;
-            $this->grade = $grade;
-            $this->common = $common;
+            $this->name = (string) $name;
+            $this->date = (object) $date;
+            $this->color = in_array((string) strtolower($color),self::$liturgical_colors) ? (string) strtolower($color) : "???";
+            $this->type = in_array((string) strtolower($type),self::$feast_type) ? (string) strtolower($type) : "???";
+            $this->grade = (int) $grade;
+            $this->common = (string) $common;
         }
     
         /* * * * * * * * * * * * * * * * * * * * * * * * *
@@ -188,7 +185,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 'type'      => $this->type,
                 'grade'     => $this->grade,
                 'common'    => $this->common,
-                'date'      => $this->date->format('U') //serialize the DateTime object as a timestamp
+                'date'      => $this->date->format('U') //serialize the DateTime object as a PHP timestamp
             ];
         }
 
