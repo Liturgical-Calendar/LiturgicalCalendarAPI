@@ -8,9 +8,6 @@
  * Date Created: 27 December 2017
  */
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-    
     /**************************
      * BEGIN DISPLAY LOGIC
      * 
