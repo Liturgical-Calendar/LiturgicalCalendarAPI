@@ -34,21 +34,44 @@
      *  AND DOES NOT IMPLEMENT JSONSERIALIZABLE OR COMPARATOR FUNCTION
      **/
     class Festivity {
+        /**
+         * @var string
+         */
         public $name;
+        
+        /**
+         * @var DateTime
+         */
         public $date;
+        
+        /**
+         * @var string
+         */
         public $color;
+        
+        /**
+         * @var int
+         */
         public $type;
+        
+        /**
+         * @var int
+         */
         public $grade;
+        
+        /**
+         * @var string
+         */
         public $common;
     
         function __construct($name,$date,$color,$type,$grade=0,$common='') 
         {
-            $this->name = $name;
+            $this->name = (string) $name;
             $this->date = DateTime::createFromFormat('U', $date);
-            $this->color = $color;
-            $this->type = $type;
-            $this->grade = $grade;
-            $this->common = $common;
+            $this->color = (string) $color;
+            $this->type = (int) $type;
+            $this->grade = (int) $grade;
+            $this->common = (string) $common;
         }            
     }
 
