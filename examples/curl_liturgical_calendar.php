@@ -135,7 +135,6 @@ ini_set('display_errors', 1);
     curl_close($ch);
     
     foreach($LitCal as $key => $value){
-        //$LitCal[$key]->date = new DateTime('@' . $LitCal[$key]->date);
         $LitCal[$key] = new Festivity($LitCal[$key]["name"],$LitCal[$key]["date"],$LitCal[$key]["color"],$LitCal[$key]["type"],$LitCal[$key]["grade"],$LitCal[$key]["common"]);
     }
 ?>
@@ -153,14 +152,14 @@ ini_set('display_errors', 1);
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="easter-egg-5-72-279148.png">    
     <link rel="apple-touch-icon-precomposed" href="easter-egg-5-57-279148.png">
     <link rel="icon" href="/path/to/easter-egg-5-32-279148.png" sizes="32x32">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
 </head>
 <body>
 
 <?php
     
     echo '<h1 style="text-align:center;">Liturgical Calendar Calculation for a Given Year ('.$YEAR.')</h1>';
-    echo '<h2 style="text-align:center;">HTML presentation elaborated by JAVASCRIPT using AJAX requests to a <a href="LitCalEngine.php">PHP engine</a></h2>';
+    echo '<h2 style="text-align:center;">HTML presentation elaborated by JAVASCRIPT using an AJAX request to a <a href="../LitCalEngine.php">PHP engine</a></h2>';
     
     if($YEAR < 1969){
         echo '<div style="text-align:center;border:3px ridge Green;background-color:LightBlue;width:75%;margin:10px auto;padding:10px;">';
