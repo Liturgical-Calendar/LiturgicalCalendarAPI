@@ -12,19 +12,6 @@
      * BEGIN DISPLAY LOGIC
      * 
      *************************/
-    /*
-    function countSameDayEvents($currentKeyIndex,$EventsArray,&$cc){
-      $Keys = array_keys($EventsArray);
-      $currentFestivity = $EventsArray[$Keys[$currentKeyIndex]];
-      if($currentKeyIndex < count($Keys)-1){
-          $nextFestivity = $EventsArray[$Keys[$currentKeyIndex+1]];          
-          if( $nextFestivity->date == $currentFestivity->date ){
-            $cc++;
-            countSameDayEvents($currentKeyIndex+1,$EventsArray,$cc);
-          }
-      }
-    }
-    */
     $YEAR = (isset($_GET["year"]) && is_numeric($_GET["year"]) && ctype_digit($_GET["year"]) && strlen($_GET["year"])===4) ? (int)$_GET["year"] : (int)date("Y");
     
     $EPIPHANY = (isset($_GET["epiphany"]) && ($_GET["epiphany"] === "JAN6" || $_GET["epiphany"] === "SUNDAY_JAN2_JAN8") ) ? $_GET["epiphany"] : "JAN6";
@@ -109,20 +96,6 @@
                 if(LitCalData.hasOwnProperty("LitCal")){
                     var $LitCal = LitCalData.LitCal;
                     
-                    /*
-                    var LitCalTmp = LitCalData.LitCal; //TODO: maybe better to check hasOwnProperty
-                    var $LitCal = LitCalTmp.map(function(obj){
-                        var rObj = {};
-                        rObj.name   = obj.name;
-                        rObj.color  = obj.color;
-                        rObj.type   = obj.type;
-                        rObj.grade  = obj.grade;
-                        rObj.common = obj.common;
-                        rObj.timestamp = obj.date * 1000;
-                        rObj.date   = new Date(obj.date * 1000); //transform PHP timestamp to javascript date object
-                        return rObj;
-                    });
-                    */
                     for(var key in $LitCal){
                         if($LitCal.hasOwnProperty(key)){
                             $LitCal[key].date = new Date($LitCal[key].date * 1000); //transform PHP timestamp to javascript date object
@@ -285,101 +258,6 @@
     echo '<thead><tr><th>Date in Gregorian Calendar</th><th>General Roman Calendar Festivity</th><th>Grade of the Festivity</th></tr></thead>';
     echo '<tbody>';
     
-    /*
-    $dayCnt = 0;
-    //for($i=1997;$i<=2037;$i++){
-    $highContrast = array('purple','red','green');
-    
-    $LitCalKeys = array_keys($LitCal);
-    //print_r($LitCalKeys);
-    //echo count($LitCalKeys);
-    for($keyindex=0; $keyindex < count($LitCalKeys); $keyindex++){
-      $dayCnt++;
-      $keyname = $LitCalKeys[$keyindex];
-      $festivity = $LitCal[$keyname];
-      
-      //LET'S CALCULATE THE LITURGICAL YEAR CYCLE
-      $currentCycle = '';
-      //if we're dealing with a Sunday or a Solemnity or a Feast of the Lord, then we calculate the Sunday/Festive Cycle
-      if((int)$festivity->date->format('N') === 7 || $festivity->grade > 4){
-        if($festivity->date >= DateTime::createFromFormat('!j-n-Y', '1-1-'.$YEAR) && $festivity->date <= $LitCal["ChristKing"]->date){
-            $currentCycle = "YEAR ".($SUNDAY_CYCLE[($YEAR-1) % 3]);
-        }
-        else if($festivity->date >= $LitCal["Advent1"]->date && $festivity->date <= DateTime::createFromFormat('!j-n-Y', '31-12-'.$YEAR)){
-            $currentCycle = "YEAR ".($SUNDAY_CYCLE[$YEAR % 3]);
-        }
-      }
-      //otherwise we calculate the weekday cycle
-      else{
-        if($festivity->date >= DateTime::createFromFormat('!j-n-Y', '1-1-'.$YEAR) && $festivity->date <= $LitCal["ChristKing"]->date){
-            $currentCycle = "YEAR ".($WEEKDAY_CYCLE[($YEAR-1) % 2]);
-        }
-        else if($festivity->date >= $LitCal["Advent1"]->date && $festivity->date <= DateTime::createFromFormat('!j-n-Y', '31-12-'.$YEAR)){
-            $currentCycle = "YEAR ".($WEEKDAY_CYCLE[$YEAR % 2]);
-        }      
-      }
-      
-      
-      //Let's check if we have more than one event on the same day, such as optional memorials...
-      $cc = 0; 
-      countSameDayEvents($keyindex,$LitCal,$cc);
-      if($cc>0){
-      
-        for($ev=0;$ev<=$cc;$ev++){
-            $keyname = $LitCalKeys[$keyindex];
-            $festivity = $LitCal[$keyname];
-            // LET'S DO SOME MORE MANIPULATION ON THE FESTIVITY->COMMON STRINGS AND THE FESTIVITY->COLOR...
-            if($festivity->common !== "" && $festivity->common !== "Proper"){
-              $commons = explode("|",$festivity->common);
-              $commons = array_map(function($txt){ $txt = str_replace(":",": ",$txt); return "from the Common of ".$txt; },$commons);
-              $festivity->common = implode("; or ",$commons);
-            }
-            $festivity->color = explode("|",$festivity->color)[0];
-           
-            //check which liturgical season we are in, to use the right color for that season...
-            $color = "green";
-            if(($festivity->date > $LitCal["Advent1"]->date  && $festivity->date < $LitCal["Christmas"]->date) || ($festivity->date > $LitCal["AshWednesday"]->date && $festivity->date < $LitCal["Easter"]->date )){
-                $color = "purple";
-            }
-            else if($festivity->date > $LitCal["Easter"]->date && $festivity->date < $LitCal["Pentecost"]->date){
-                $color = "white";
-            }
-            else if($festivity->date > $LitCal["Christmas"]->date || $festivity->date < $LitCal["BaptismLord"]->date ){
-                $color = "white";
-            }
-            
-            
-            echo '<tr style="background-color:'.$color.';'.(in_array($color,$highContrast)?'color:white;':'').'">';
-            if($ev==0){
-                $rwsp = $cc+1;
-                echo '<td rowspan="'.$rwsp.'" style="font-family:\'DejaVu Sans Mono\';font-size:.7em;font-weight:bold;">'.$festivity->date->format('D, F jS, Y').'</td>';
-            }
-            echo '<td>'.$festivity->name.' ('.$currentCycle.') - <i>'.$festivity->color.'</i><br /><i>'.$festivity->common.'</i></td>';
-            echo '<td>'.$GRADE[$festivity->grade].'</td>';
-            echo '</tr>';
-            $keyindex++;        
-        }
-        $keyindex--;
-      }
-      
-      else{
-        // LET'S DO SOME MORE MANIPULATION ON THE FESTIVITY->COMMON STRINGS AND THE FESTIVITY->COLOR...
-        if($festivity->common !== "" && $festivity->common !== "Proper"){
-          $commons = explode("|",$festivity->common);
-          $commons = array_map(function($txt){ $txt = str_replace(":",": ",$txt); return "From the Common of ".$txt; },$commons);
-          $festivity->common = implode("; or ",$commons);
-        }
-        $festivity->color = explode("|",$festivity->color)[0];
-        echo '<tr style="background-color:'.$festivity->color.';'.(in_array($festivity->color,$highContrast)?'color:white;':'').'">';
-        echo '<td style="font-family:\'DejaVu Sans Mono\';font-size:.7em;font-weight:bold;">'.$festivity->date->format('D, F jS, Y').'</td>';
-        echo '<td>'.$festivity->name.' ('.$currentCycle.') - <i>'.$festivity->color.'</i><br /><i>'.$festivity->common.'</i></td>';
-        echo '<td>'.$GRADE[$festivity->grade].'</td>';
-        echo '</tr>';      
-      }
-     
-      
-    }
-    */
     echo '</tbody></table>';
     
     //echo '<div style="text-align:center;border:3px ridge Green;background-color:LightBlue;width:75%;margin:10px auto;padding:10px;">'.$dayCnt.' event days created</div>';
