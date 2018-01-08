@@ -154,9 +154,11 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         {
             $this->name = (string) $name;
             $this->date = (object) $date;
-            $this->color = in_array((string) strtolower($color),self::$liturgical_colors) ? (string) strtolower($color) : "???";
+            $_color = (string) strtolower($color);
+            //the color string can contain multiple colors separated by a pipe character, which correspond with the multiple commons to choose from for that festivity
+            $this->color = strpos($_color,"|") && empty( array_diff( explode("|",$_color), self::$liturgical_colors ) ) ? $_color : (in_array($_color,self::$liturgical_colors) ? $_color : "???");
             $this->type = in_array((string) strtolower($type),self::$feast_type) ? (string) strtolower($type) : "???";
-            $this->grade = (int) $grade;
+            $this->grade = (int) $grade >= 0 && (int) $grade <= 6 ? (int) $grade : -1;
             $this->common = (string) $common;
         }
     
