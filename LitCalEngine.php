@@ -127,19 +127,8 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     						//     WEEKDAYS OF ORDINARY TIME
     								    
 
-
-    function ordSuffix($ord) {
-		$ord_suffix = ''; //st, nd, rd, th
-		if(       $ord===1 || ($ord % 10 === 1  && $ord <> 11) ){ $ord_suffix = 'st'; }
-		else if(  $ord===2 || ($ord % 10 === 2  && $ord <> 12) ){ $ord_suffix = 'nd'; }
-		else if(  $ord===3 || ($ord % 10 === 3  && $ord <> 13) ){ $ord_suffix = 'rd'; }
-		else { $ord_suffix = 'th'; }
-		return $ord_suffix;
-    }
-    
-    
     $LitCal = array();
-	$FIXED_DATE_SOLEMNITIES = array();
+    $FIXED_DATE_SOLEMNITIES = array();
     //Let's create a Weekdays of Epiphany array, so that later on when we add our Memorials, we can remove a weekday of Epiphany that is overriden by a memorial
     $WeekdaysOfEpiphany = array();
 
