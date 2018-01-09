@@ -145,15 +145,16 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         public $date;
         public $color; //"green","purple","white","red","pink"
         public $type;  //"mobile" or "fixed"
-        public $grade; //1=Optional memorial,2=Obligatory memorial,3=Feast,4=Holy Day of Obligation,5=Feast of the Lord,6=Solemnity
+        public $grade; //0=Weekday,1=Commemoration,2=Optional memorial,3=Obligatory memorial,4=Feast,5=Feast of the Lord,6=Solemnity,7=Holy Day of Obligation
         public $common;//"Proper" or specified common(s) of saints...
     	private static $liturgical_colors = array("green","purple","white","red","pink");
 	private static $feast_type = array("fixed","mobile");
 	    
         function __construct($name,$date,$color,$type,$grade=0,$common='') 
         {
+            //enforce typecasting
             $this->name = (string) $name;
-            $this->date = (object) $date;
+            $this->date = (object) $date; //DateTime object
             $_color = (string) strtolower($color);
             //the color string can contain multiple colors separated by a pipe character, which correspond with the multiple commons to choose from for that festivity
             $this->color = strpos($_color,"|") && empty( array_diff( explode("|",$_color), self::$liturgical_colors ) ) ? $_color : (in_array($_color,self::$liturgical_colors) ? $_color : "???");
@@ -194,7 +195,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
 
-	function ordSuffix($ord) {
+function ordSuffix($ord) {
 		$ord_suffix = ''; //st, nd, rd, th
 		if(       $ord===1 || ($ord % 10 === 1  && $ord <> 11) ){ $ord_suffix = 'st'; }
 		else if(  $ord===2 || ($ord % 10 === 2  && $ord <> 12) ){ $ord_suffix = 'nd'; }
