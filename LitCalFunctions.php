@@ -44,6 +44,36 @@
 		return $ord_suffix;
     }
     
+    /**
+     * Database Connection function
+    */
+    define("LITURGYAPP","AMDG"); //definition needed to allow inclusion of liturgy_config.php, otherwise will fail
+    //this is a security to prevent liturgy_config.php from being accessed directly
+    //access is allowed only if this constant is defined
+    include "LitCalConfig.php"; //this is where database connection info is defined
+
+    function databaseConnect(){
+
+	$retObject = new stdClass();
+	$retObject->retString = "";
+	$retObject->mysqli = new mysqli(DB_SERVER,DB_USER,DB_PASSWORD,DB_NAME);
+
+	if ($retObject->mysqli->connect_errno) {
+		$retObject->retString .= "Failed to connect to MySQL: (" . $retObject->mysqli->connect_errno . ") " . $retObject->mysqli->connect_error . PHP_EOL;
+		return $retObject;
+	}
+	else{
+		$retObject->retString .= sprintf("Connected to MySQL Database: %s\n", DB_NAME);
+	}
+	if (!$retObject->mysqli->set_charset(DB_CHARSET)) {
+	  $retObject->retString .= sprintf("Error loading character set utf8: %s\n", $retObject->mysqli->error);
+	} 
+	else {
+	  $retObject->retString .= sprintf("Current character set: %s\n", $retObject->mysqli->character_set_name());
+	}
+	
+	return $retObject;
     
+    }
 
 ?>
