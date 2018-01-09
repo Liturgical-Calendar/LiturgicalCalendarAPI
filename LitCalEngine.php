@@ -9,33 +9,20 @@
  * Note: it is necessary to set up the MySQL liturgy tables prior to using this script
  */
 
-define("LITURGYAPP","AMDG"); //definition needed to allow inclusion of liturgy_config.php, otherwise will fail
-//this is a security to prevent liturgy_config.php from being accessed directly
-//access is allowed only if this constant is defined
-
 include "Festivity.php"; //this defines a "Festivity" class that can hold all the useful information about a single celebration
 
 include "LitCalFunctions.php"; //a few useful functions e.g. calculate Easter...
 
-include "LitCalConfig.php"; //this is where database connection info is defined
-$mysqli = new mysqli(DB_SERVER,DB_USER,DB_PASSWORD,DB_NAME);
-
-if ($mysqli->connect_errno) {
-  print("Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error . PHP_EOL);
+// Initiate connection to the Database (function defined in LitCalFunctions.php)
+// If connection succeeds, the function will return the mysqli connection resource
+//    in a mysqli property of the returned object
+$dbConnect = databaseConnect();
+if($dbConnect->retString != "" && preg_match("/^Connected to MySQL Database:/",$dbConnect->retString) == 0){
+	die("There was an error in the database connection: \n" . $dbConnect->retString);
 }
-/*
 else{
-  printf("Connected to MySQL Database: %s\n", DB_NAME);
+	$mysqli = $dbConnect->mysqli;
 }
-*/
-if (!$mysqli->set_charset(DB_CHARSET)) {
-  printf("Error loading character set utf8: %s\n", $mysqli->error);
-} 
-/*
-else {
-  printf("Current character set: %s\n", $mysqli->character_set_name());
-}
-*/
 
 //SETUP CONFIGURATION RULES
 //$allowed_returntypes = array("JSON","XML","HTML");
