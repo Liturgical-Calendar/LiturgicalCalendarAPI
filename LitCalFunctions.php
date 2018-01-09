@@ -2,6 +2,7 @@
 /**
  * Useful functions for LitCalEngine.php
  * @Author: John Romano D'Orazio
+ * @Date:   2017-2018
  */
 
     // https://en.wikipedia.org/wiki/Computus#Anonymous_Gregorian_algorithm
@@ -27,4 +28,22 @@
       
       return $dateObj;
     }
+
+    /** 
+     * Ordinal Suffix function
+     * Useful for choosing the correct suffix for ordinal numbers
+     * in the English language
+     * @Author: John Romano D'Orazio
+    */
+    function ordSuffix($ord) {
+		$ord_suffix = ''; //st, nd, rd, th
+		if(       $ord===1 || ($ord % 10 === 1  && $ord <> 11) ){ $ord_suffix = 'st'; }
+		else if(  $ord===2 || ($ord % 10 === 2  && $ord <> 12) ){ $ord_suffix = 'nd'; }
+		else if(  $ord===3 || ($ord % 10 === 3  && $ord <> 13) ){ $ord_suffix = 'rd'; }
+		else { $ord_suffix = 'th'; }
+		return $ord_suffix;
+    }
+    
+    
+
 ?>
