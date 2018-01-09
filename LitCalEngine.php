@@ -67,7 +67,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
      ****************************************************/
 
 	// 				I.
-    define("HOLYDAYOBL",7);			// "SUPER" SOLEMNITIES, THAT HAVE PRECEDENCE OVER ALL OTHERS:
+    define("HIGHERSOLEMNITY",7);		// HIGHER RANKING SOLEMNITIES, THAT HAVE PRECEDENCE OVER ALL OTHERS:
 						// 1. EASTER TRIDUUM
 						// 2. CHRISTMAS, EPIPHANY, ASCENSION, PENTECOST
 						//    SUNDAYS OF ADVENT, LENT AND EASTER
@@ -389,11 +389,11 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     //FEASTS NOT OF THE LORD, MEMORIALS AND OPTIONAL MEMORIALS
 
     //If a Feast (not of the Lord) occurs on a Sunday in Ordinary Time, the Sunday is celebrated.  (e.g., St. Luke, 1992)
-    //We will look these up from the MySQL table of festivities of the Roman Calendar
-    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed WHERE GRADE < 5 AND GRADE > 1")){
+    //We will look up Feasts, Memorials and Optional Memorials from the MySQL table of festivities of the Roman Calendar
+    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed WHERE GRADE < ".FEASTLORD." AND GRADE > ".COMMEMORATION)){
         while($row = mysqli_fetch_assoc($result)){
             
-            //If it doesn't occur on a Sunday or a Solemnity, then go ahead and create the Festivity
+            //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Festivity
             $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"].'-'.$row["MONTH"].'-'.$YEAR);
             if((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate,$FIXED_DATE_SOLEMNITIES) ){
                 $LitCal[$row["TAG"]] = new Festivity($row["NAME"],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
@@ -498,7 +498,8 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     //Now this is interesting because in the same YEAR we are dealing with two separate liturgical years for the Christmas season
     //From Jan. 1st until Epiphany is Christmas time of one liturgical year, 
     //while from Christmas day until December 31st is Christmas time of the next liturgical year
-    //However we all really need to deal with days from Christmas to New Year, since those following are already dealt with by Epiphany
+    //However all we really need to deal with is days from Christmas to New Year, 
+    //since those following New Year are already dealt with by Epiphany
     $weekdayChristmas = DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR);
     $weekdayChristmasCnt = 1;
     while($weekdayChristmas >= $LitCal["Christmas"]->date && $weekdayChristmas < DateTime::createFromFormat('!j-n-Y', '31-12-'.$YEAR)){
