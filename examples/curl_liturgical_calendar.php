@@ -250,7 +250,9 @@
 
     $prefix = $_SERVER['HTTPS'] ? 'https://' : 'http://';
     $domain = $_SERVER['HTTP_HOST'];
-    $URL =  $prefix . $domain . "/" . basename(dirname(__FILE__,2)) . "/LitCalEngine.php";
+    $query = $_SERVER['PHP_SELF'];
+    $path_info = pathinfo( $query );    
+    $URL =  $prefix . $domain . "/" . dirname($path_info['dirname']) . "/LitCalEngine.php";
 
     // Disable SSL verification
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
