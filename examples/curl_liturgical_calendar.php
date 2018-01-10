@@ -40,7 +40,7 @@
         public $name;
         
         /**
-         * @var DateTime
+         * @var DateTime object
          */
         public $date;
         
@@ -50,7 +50,7 @@
         public $color;
         
         /**
-         * @var int
+         * @var string
          */
         public $type;
         
@@ -67,9 +67,9 @@
         function __construct($name,$date,$color,$type,$grade=0,$common='') 
         {
             $this->name = (string) $name;
-            $this->date = DateTime::createFromFormat('U', $date);
+            $this->date = (object) DateTime::createFromFormat('U', $date);
             $this->color = (string) $color;
-            $this->type = (int) $type;
+            $this->type = (string) $type;
             $this->grade = (int) $grade;
             $this->common = (string) $common;
         }            
