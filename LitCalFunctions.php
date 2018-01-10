@@ -91,7 +91,4 @@
                 $object->addChild($key, $value);
             }   
         }   
-    }   
-        
-
-?>
+    }
