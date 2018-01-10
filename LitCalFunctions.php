@@ -76,4 +76,22 @@
     
     }
 
+    function convertArray2XML(SimpleXMLElement $object, array $data)
+    {   
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $new_object = $object->addChild($key);
+                convertArray2XML($new_object, $value);
+            } else {
+                // if the key is a number, it needs text with it to actually work
+                if (is_numeric($key)) {
+                    $key = "numeric_$key";
+                }
+    
+                $object->addChild($key, $value);
+            }   
+        }   
+    }   
+        
+
 ?>
