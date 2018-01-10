@@ -287,9 +287,16 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $LitCal["Annunciation"]->date->add(new DateInterval('P1D'));
     }
     //If the Annunciation (Mar 25) falls on Palm Sunday, it is celebrated on the Saturday preceding.
+    //Actually this seems not to be the case, it seems to simply be a tradition of some German churches:
+    //In some German churches it was the custom to keep its office the Saturday before Palm Sunday if the 25th of March fell in Holy Week.
+    //source: http://www.newadvent.org/cathen/01542a.htm
     else if($LitCal["Annunciation"]->date == $LitCal["PalmSun"]->date){
+        $LitCal["Annunciation"]->date->add(new DateInterval('P15D'));
+    /*
         $LitCal["Annunciation"]->date->sub(new DateInterval('P1D'));
+    */
     }
+    
     //If it falls during Holy Week or within the Octave of Easter, the Annunciation is transferred to the Monday of the Second Week of Easter.
     else if($LitCal["Annunciation"]->date > $LitCal["PalmSun"]->date && $LitCal["Annunciation"]->date <= $LitCal["Easter2"]->date){
         $LitCal["Annunciation"]->date = calcGregEaster($YEAR)->add(new DateInterval('P8D'));
