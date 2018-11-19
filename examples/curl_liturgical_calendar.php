@@ -377,19 +377,19 @@
       $currentCycle = '';
       //if we're dealing with a Sunday or a Solemnity or a Feast of the Lord, then we calculate the Sunday/Festive Cycle
       if((int)$festivity->date->format('N') === 7 || $festivity->grade > 4){
-        if($festivity->date >= DateTime::createFromFormat('!j-n-Y', '1-1-'.$YEAR) && $festivity->date <= $LitCal["ChristKing"]->date){
+        if($festivity->date < $LitCal["Advent1"]->date){ //$festivity->date >= DateTime::createFromFormat('!j-n-Y', '1-1-'.$YEAR) && 
             $currentCycle = "YEAR ".($SUNDAY_CYCLE[($YEAR-1) % 3]);
         }
-        else if($festivity->date >= $LitCal["Advent1"]->date && $festivity->date <= DateTime::createFromFormat('!j-n-Y', '31-12-'.$YEAR)){
+        else if($festivity->date >= $LitCal["Advent1"]->date){ // && $festivity->date <= DateTime::createFromFormat('!j-n-Y', '31-12-'.$YEAR)
             $currentCycle = "YEAR ".($SUNDAY_CYCLE[$YEAR % 3]);
         }
       }
       //otherwise we calculate the weekday cycle
       else{
-        if($festivity->date >= DateTime::createFromFormat('!j-n-Y', '1-1-'.$YEAR) && $festivity->date <= $LitCal["ChristKing"]->date){
+        if($festivity->date < $LitCal["Advent1"]->date){ //$festivity->date >= DateTime::createFromFormat('!j-n-Y', '1-1-'.$YEAR) && 
             $currentCycle = "YEAR ".($WEEKDAY_CYCLE[($YEAR-1) % 2]);
         }
-        else if($festivity->date >= $LitCal["Advent1"]->date && $festivity->date <= DateTime::createFromFormat('!j-n-Y', '31-12-'.$YEAR)){
+        else if($festivity->date >= $LitCal["Advent1"]->date){ // && $festivity->date <= DateTime::createFromFormat('!j-n-Y', '31-12-'.$YEAR)
             $currentCycle = "YEAR ".($WEEKDAY_CYCLE[$YEAR % 2]);
         }      
       }
