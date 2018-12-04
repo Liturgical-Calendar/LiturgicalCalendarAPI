@@ -10,17 +10,38 @@
  */
 
 
+/**********************************************************************************
+ *                          ABBREVIATIONS                                         *
+ * CB     Cerimonial of Bishops                                                   *
+ * CCL    Code of Canon Law                                                       *
+ * IM     General Instruction of the Roman Missal                                 *
+ * IH     General Instruction of the Liturgy of the Hours                         *
+ * LH     Liturgy of the Hours                                                    *
+ * LY     Universal Norms for the Liturgical Year and the Calendar (Roman Missal) *
+ * OM     Order of Matrimony                                                      *
+ * PC     Instruction regarding Proper Calendars                                  *
+ * RM     Roman Missal                                                            *
+ * SC     Sacrosanctum Concilium, Conciliar Constitution on the Sacred Liturgy    *
+ *                                                                                *
+ *********************************************************************************/
 
 include "Festivity.php"; //this defines a "Festivity" class that can hold all the useful information about a single celebration
+
+/**
+ *  THE ENTIRE LITURGICAL CALENDAR DEPENDS MAINLY ON THE DATE OF EASTER
+ *  THE FOLLOWING LITCALFUNCTIONS.PHP DEFINES AMONG OTHER THINGS THE FUNCTION 
+ *  FOR CALCULATING GREGORIAN EASTER FOR A GIVEN YEAR AS USED BY THE LATIN RITE
+ */
 
 include "LitCalFunctions.php"; //a few useful functions e.g. calculate Easter...
 
 /**
  * INITIATE CONNECTION TO THE DATABASE 
- * CHECKING FOR CONNECTION ERRORS
- * DATABASECONNECT() FUNCTION DEFINED IN LITCALFUNCTIONS.PHP WHICH ALSO LOADED DATABASE CONNECTION INFORMATION
- * If connection succeeds, the function will return the mysqli connection resource
- * in a mysqli property of the returned object
+ * AND CHECK FOR CONNECTION ERRORS
+ * THE DATABASECONNECT() FUNCTION IS DEFINED IN LITCALFUNCTIONS.PHP 
+ * WHICH IN TURN LOADS DATABASE CONNECTION INFORMATION FROM LITCALCONFIG.PHP
+ * IF THE CONNECTION SUCCEEDS, THE FUNCTION WILL RETURN THE MYSQLI CONNECTION RESOURCE
+ * IN THE MYSQLI PROPERTY OF THE RETURNED OBJECT
  */
 
 $dbConnect = databaseConnect();
@@ -79,15 +100,9 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     //define(CORPUSCHRISTI,"SUNDAY");
 
 
-/**
- *  THE ENTIRE LITURGICAL CALENDAR DEPENDS MAINLY ON EASTER
- *  HERE WE DEFINE THE FUNCTION FOR CALCULATING GREGORIAN EASTER FOR A GIVEN YEAR
- *  AS USED BY THE LATIN RITE
- *
- */
     /**
      *	DEFINE THE ORDER OF PRECEDENCE OF THE LITURGICAL DAYS AS INDICATED IN THE
-     *  UNIVERSAL NORMS ON THE LITURGICAL YEAR AND THE GENERAL ROMAN CALENDAR
+     *  UNIVERSAL NORMS FOR THE LITURGICAL YEAR AND THE GENERAL ROMAN CALENDAR
      *  PROMULGATED BY THE MOTU PROPRIO "MYSTERII PASCHALIS" BY POPE PAUL VI ON FEBRUARY 14 1969
      *	https://w2.vatican.va/content/paul-vi/en/motu_proprio/documents/hf_p-vi_motu-proprio_19690214_mysterii-paschalis.html
      *  A COPY OF THE DOCUMENT IS INCLUDED ALONGSIDE THIS ENGINE, SEEING THAT THERE IS NO DIRECT ONLINE LINK TO THE ACTUAL NORMS
@@ -106,10 +121,10 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 						//    DAYS OF THE HOLY WEEK, FROM MONDAY TO THURSDAY
 						//    DAYS OF THE OCTAVE OF EASTER
 									
-    define("SOLEMNITY",6);			// 3. SOLEMNITIES OF THE LORD, OF THE BLESSED VIRGIN MARY, OF THE SAINTS
-    						//    		COMMEMORATION OF THE FAITHFUL DEPARTED
+    define("SOLEMNITY",6);			// 3. SOLEMNITIES OF THE LORD, OF THE BLESSED VIRGIN MARY, OF THE SAINTS LISTED IN THE GENERAL CALENDAR
+    						//    COMMEMORATION OF THE FAITHFUL DEPARTED
     						// 4. PARTICULAR SOLEMNITIES:	
-						//		a) PATRON OF THE PLACE, OF THE COUNTRY OR OF THE CITY;
+						//		a) PATRON OF THE PLACE, OF THE COUNTRY OR OF THE CITY (CELEBRATION REQUIRED ALSO FOR RELIGIOUS COMMUNITIES);
     						//		b) SOLEMNITY OF THE DEDICATION AND OF THE ANNIVERSARY OF THE DEDICATION OF A CHURCH
     						//		c) SOLEMNITY OF THE TITLE OF A CHURCH
     						//		d) SOLEMNITY OF THE TITLE OR OF THE FOUNDER OR OF THE MAIN PATRON OF AN ORDER OR OF A CONGREGATION
@@ -144,19 +159,41 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     						//     WEEKDAYS OF THE EASTER SEASON, FROM THE MONDAY AFTER THE OCTAVE OF EASTER UNTIL THE SATURDAY BEFORE PENTECOST
     						//     WEEKDAYS OF ORDINARY TIME
     								    
+    //TODO: implement interface for adding Proper feasts and memorials...
+
+
+    /**
+     *  LET'S DEFINE SOME GLOBAL VARIABLES
+     *  THAT WILL BE NEEDED THROUGHOUT THE ENGINE
+     */
 
     $LitCal = array();
+
     $FIXED_DATE_SOLEMNITIES = array();
-    //Let's create a Weekdays of Epiphany array, so that later on when we add our Memorials, we can remove a weekday of Epiphany that is overriden by a memorial
+
+    //Let's create a Weekdays of Epiphany array 
+    //so that later on when we add our Memorials 
+    //we can remove a weekday of Epiphany that is overriden by a memorial
     $WeekdaysOfEpiphany = array();
 
 	
+    /**
+     *  START FILLING OUR FESTIVITY OBJECT BASED ON THE ORDER OF PRECEDENCE OF LITURGICAL DAYS (LY 59)
+     */
     
+// I.
+    //1. Easter Triduum of the Lord's Passion and Resurrection
+    $LitCal["HolyThurs"]        = new Festivity("Holy Thursday",                      calcGregEaster($YEAR)->sub(new DateInterval('P3D')),            "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["GoodFri"]          = new Festivity("Good Friday",                        calcGregEaster($YEAR)->sub(new DateInterval('P2D')),            "red",      "mobile", HIGHERSOLEMNITY);
+    $LitCal["EasterVigil"]      = new Festivity("Easter Vigil",                       calcGregEaster($YEAR)->sub(new DateInterval('P1D')),            "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["Easter"]           = new Festivity("Easter Sunday",                      calcGregEaster($YEAR),                                          "white",    "mobile", HIGHERSOLEMNITY);
     
+    //2. Christmas, Epiphany, Ascension, and Pentecost
+    $LitCal["Christmas"]        = new Festivity("Christmas",                          DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR),           "white",    "fixed", HIGHERSOLEMNITY);
     
     if(EPIPHANY === "JAN6"){
 
-        $LitCal["Epiphany"]     = new Festivity("Epiphany",                           DateTime::createFromFormat('!j-n-Y', '6-1-'.$YEAR),             "white",    "fixed", SOLEMNITY);
+        $LitCal["Epiphany"]     = new Festivity("Epiphany",                           DateTime::createFromFormat('!j-n-Y', '6-1-'.$YEAR),             "white",    "fixed", HIGHERSOLEMNITY);
         
         //If a Sunday occurs on a day from Jan. 2 through Jan. 5, it is called the "Second Sunday of Christmas"
         //Weekdays from Jan. 2 through Jan. 5 are called "*day before Epiphany"
@@ -220,67 +257,71 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         
     }
     
-    
-
-    $LitCal["Christmas"]        = new Festivity("Christmas",                          DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR),           "white",    "fixed", SOLEMNITY);
-    $LitCal["Advent4"]          = new Festivity("Fourth Sunday of Advent",            DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday'),                                          "purple",   "mobile");
-    $LitCal["Advent3"]          = new Festivity("Third Sunday of Advent / Gaudete",   DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P7D')),            "pink",     "mobile");
-    $LitCal["Advent2"]          = new Festivity("Second Sunday of Advent",            DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P'.(2*7).'D')),    "purple",   "mobile");
-    $LitCal["Advent1"]          = new Festivity("First Sunday of Advent",             DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P'.(3*7).'D')),    "purple",   "mobile");
-                
-    $LitCal["AshWednesday"]     = new Festivity("Ash Wednesday",                      calcGregEaster($YEAR)->sub(new DateInterval('P46D')),           "purple",   "mobile");
-    $LitCal["Lent1"]            = new Festivity("First Sunday of Lent",               calcGregEaster($YEAR)->sub(new DateInterval('P'.(6*7).'D')),    "purple",   "mobile");
-    $LitCal["Lent2"]            = new Festivity("Second Sunday of Lent",              calcGregEaster($YEAR)->sub(new DateInterval('P'.(5*7).'D')),    "purple",   "mobile");
-    $LitCal["Lent3"]            = new Festivity("Third Sunday of Lent",               calcGregEaster($YEAR)->sub(new DateInterval('P'.(4*7).'D')),    "purple",   "mobile");
-    $LitCal["Lent4"]            = new Festivity("Fourth Sunday of Lent (Laetare)",    calcGregEaster($YEAR)->sub(new DateInterval('P'.(3*7).'D')),    "pink",     "mobile");
-    $LitCal["Lent5"]            = new Festivity("Fifth Sunday of Lent",               calcGregEaster($YEAR)->sub(new DateInterval('P'.(2*7).'D')),    "purple",   "mobile");
-    $LitCal["PalmSun"]          = new Festivity("Palm Sunday",                        calcGregEaster($YEAR)->sub(new DateInterval('P7D')),            "red",      "mobile");
-    $LitCal["MonHolyWeek"]      = new Festivity("Monday of Holy Week",                calcGregEaster($YEAR)->sub(new DateInterval('P6D')),            "purple",   "mobile");
-    $LitCal["TueHolyWeek"]      = new Festivity("Tuesday of Holy Week",               calcGregEaster($YEAR)->sub(new DateInterval('P5D')),            "purple",   "mobile");
-    $LitCal["WedHolyWeek"]      = new Festivity("Wednesday of Holy Week",             calcGregEaster($YEAR)->sub(new DateInterval('P4D')),            "purple",   "mobile");
-    $LitCal["HolyThurs"]        = new Festivity("Holy Thursday",                      calcGregEaster($YEAR)->sub(new DateInterval('P3D')),            "white",    "mobile");
-    $LitCal["GoodFri"]          = new Festivity("Good Friday",                        calcGregEaster($YEAR)->sub(new DateInterval('P2D')),            "red",      "mobile");
-    $LitCal["EasterVigil"]      = new Festivity("Easter Vigil",                       calcGregEaster($YEAR)->sub(new DateInterval('P1D')),            "white",    "mobile");
-    $LitCal["Easter"]           = new Festivity("Easter Sunday",                      calcGregEaster($YEAR),                                          "white",    "mobile", SOLEMNITY);
-    $LitCal["MonOctaveEaster"]  = new Festivity("Monday of the Octave of Easter",     calcGregEaster($YEAR)->add(new DateInterval('P1D')),            "white",    "mobile", SOLEMNITY);
-    $LitCal["TueOctaveEaster"]  = new Festivity("Tuesday of the Octave of Easter",    calcGregEaster($YEAR)->add(new DateInterval('P2D')),            "white",    "mobile", SOLEMNITY);
-    $LitCal["WedOctaveEaster"]  = new Festivity("Wednesday of the Octave of Easter",  calcGregEaster($YEAR)->add(new DateInterval('P3D')),            "white",    "mobile", SOLEMNITY);
-    $LitCal["ThuOctaveEaster"]  = new Festivity("Thursday of the Octave of Easter",   calcGregEaster($YEAR)->add(new DateInterval('P4D')),            "white",    "mobile", SOLEMNITY);
-    $LitCal["FriOctaveEaster"]  = new Festivity("Friday of the Octave of Easter",     calcGregEaster($YEAR)->add(new DateInterval('P5D')),            "white",    "mobile", SOLEMNITY);
-    $LitCal["SatOctaveEaster"]  = new Festivity("Saturday of the Octave of Easter",   calcGregEaster($YEAR)->add(new DateInterval('P6D')),            "white",    "mobile", SOLEMNITY);
-    $LitCal["Easter2"]          = new Festivity("Second Sunday of Easter",            calcGregEaster($YEAR)->add(new DateInterval('P7D')),            "white",    "mobile", SOLEMNITY);
-    $LitCal["Easter3"]          = new Festivity("Third Sunday of Easter",             calcGregEaster($YEAR)->add(new DateInterval('P'.(7*2).'D')),    "white",    "mobile");
-    $LitCal["Easter4"]          = new Festivity("Fourth Sunday of Easter",            calcGregEaster($YEAR)->add(new DateInterval('P'.(7*3).'D')),    "white",    "mobile");
-    $LitCal["Easter5"]          = new Festivity("Fifth Sunday of Easter",             calcGregEaster($YEAR)->add(new DateInterval('P'.(7*4).'D')),    "white",    "mobile");
-    $LitCal["Easter6"]          = new Festivity("Sixth Sunday of Easter",             calcGregEaster($YEAR)->add(new DateInterval('P'.(7*5).'D')),    "white",    "mobile");
     if(ASCENSION === "THURSDAY"){
-        $LitCal["Ascension"]    = new Festivity("Ascension",                          calcGregEaster($YEAR)->add(new DateInterval('P39D')),           "white",    "mobile", SOLEMNITY);
-        $LitCal["Easter7"]      = new Festivity("Seventh Sunday of Easter",           calcGregEaster($YEAR)->add(new DateInterval('P'.(7*6).'D')),    "white",    "mobile");
+        $LitCal["Ascension"]    = new Festivity("Ascension",                          calcGregEaster($YEAR)->add(new DateInterval('P39D')),           "white",    "mobile", HIGHERSOLEMNITY);
+        $LitCal["Easter7"]      = new Festivity("Seventh Sunday of Easter",           calcGregEaster($YEAR)->add(new DateInterval('P'.(7*6).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
     }
     else if(ASCENSION === "SUNDAY"){
-        $LitCal["Ascension"]    = new Festivity("Ascension",                          calcGregEaster($YEAR)->add(new DateInterval('P'.(7*6).'D')),    "white",    "mobile", SOLEMNITY);
+        $LitCal["Ascension"]    = new Festivity("Ascension",                          calcGregEaster($YEAR)->add(new DateInterval('P'.(7*6).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
     }
-    $LitCal["Pentecost"]        = new Festivity("Pentecost",                          calcGregEaster($YEAR)->add(new DateInterval('P'.(7*7).'D')),    "red",      "mobile", SOLEMNITY);
-    $LitCal["Trinity"]          = new Festivity("Holy Trinity Sunday",                calcGregEaster($YEAR)->add(new DateInterval('P'.(7*8).'D')),    "white",    "mobile", SOLEMNITY);
+    $LitCal["Pentecost"]        = new Festivity("Pentecost",                          calcGregEaster($YEAR)->add(new DateInterval('P'.(7*7).'D')),    "red",      "mobile", HIGHERSOLEMNITY);
+    
+    //Sundays of Advent, Lent, and Easter Time
+    $LitCal["Advent4"]          = new Festivity("Fourth Sunday of Advent",            DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday'),                                          "purple",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["Advent3"]          = new Festivity("Third Sunday of Advent / Gaudete",   DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P7D')),            "pink",     "mobile", HIGHERSOLEMNITY);
+    $LitCal["Advent2"]          = new Festivity("Second Sunday of Advent",            DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P'.(2*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["Advent1"]          = new Festivity("First Sunday of Advent",             DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P'.(3*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["Lent1"]            = new Festivity("First Sunday of Lent",               calcGregEaster($YEAR)->sub(new DateInterval('P'.(6*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["Lent2"]            = new Festivity("Second Sunday of Lent",              calcGregEaster($YEAR)->sub(new DateInterval('P'.(5*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["Lent3"]            = new Festivity("Third Sunday of Lent",               calcGregEaster($YEAR)->sub(new DateInterval('P'.(4*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["Lent4"]            = new Festivity("Fourth Sunday of Lent (Laetare)",    calcGregEaster($YEAR)->sub(new DateInterval('P'.(3*7).'D')),    "pink",     "mobile", HIGHERSOLEMNITY);
+    $LitCal["Lent5"]            = new Festivity("Fifth Sunday of Lent",               calcGregEaster($YEAR)->sub(new DateInterval('P'.(2*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["PalmSun"]          = new Festivity("Palm Sunday",                        calcGregEaster($YEAR)->sub(new DateInterval('P7D')),            "red",      "mobile", HIGHERSOLEMNITY);
+    $LitCal["Easter2"]          = new Festivity("Second Sunday of Easter",            calcGregEaster($YEAR)->add(new DateInterval('P7D')),            "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["Easter3"]          = new Festivity("Third Sunday of Easter",             calcGregEaster($YEAR)->add(new DateInterval('P'.(7*2).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["Easter4"]          = new Festivity("Fourth Sunday of Easter",            calcGregEaster($YEAR)->add(new DateInterval('P'.(7*3).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["Easter5"]          = new Festivity("Fifth Sunday of Easter",             calcGregEaster($YEAR)->add(new DateInterval('P'.(7*4).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["Easter6"]          = new Festivity("Sixth Sunday of Easter",             calcGregEaster($YEAR)->add(new DateInterval('P'.(7*5).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["Trinity"]          = new Festivity("Holy Trinity Sunday",                calcGregEaster($YEAR)->add(new DateInterval('P'.(7*8).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
     if(CORPUSCHRISTI === "THURSDAY"){
-        $LitCal["CorpusChristi"]= new Festivity("Corpus Christi",                     calcGregEaster($YEAR)->add(new DateInterval('P'.(7*8+4).'D')),  "white",    "mobile", SOLEMNITY);
+        $LitCal["CorpusChristi"]= new Festivity("Corpus Christi",                     calcGregEaster($YEAR)->add(new DateInterval('P'.(7*8+4).'D')),  "white",    "mobile", HIGHERSOLEMNITY);
     }
     else if(CORPUSCHRISTI === "SUNDAY"){
-        $LitCal["CorpusChristi"]= new Festivity("Corpus Christi",                     calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9).'D')),    "white",    "mobile", SOLEMNITY);
+        $LitCal["CorpusChristi"]= new Festivity("Corpus Christi",                     calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
     }
-    $LitCal["SacredHeart"]      = new Festivity("Sacred Heart of Jesus",              calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+5).'D')),  "red",      "mobile", SOLEMNITY);
+                
+    //Ash Wednesday
+    $LitCal["AshWednesday"]     = new Festivity("Ash Wednesday",                      calcGregEaster($YEAR)->sub(new DateInterval('P46D')),           "purple",   "mobile", HIGHERSOLEMNITY);
+
+    //Weekdays of Holy Week from Monday to Thursday inclusive (that is, thursday morning chrism mass... the In Coena Domini mass begins the Easter Triduum)
+    $LitCal["MonHolyWeek"]      = new Festivity("Monday of Holy Week",                calcGregEaster($YEAR)->sub(new DateInterval('P6D')),            "purple",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["TueHolyWeek"]      = new Festivity("Tuesday of Holy Week",               calcGregEaster($YEAR)->sub(new DateInterval('P5D')),            "purple",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["WedHolyWeek"]      = new Festivity("Wednesday of Holy Week",             calcGregEaster($YEAR)->sub(new DateInterval('P4D')),            "purple",   "mobile", HIGHERSOLEMNITY);
+    
+    //Days within the octave of Easter
+    $LitCal["MonOctaveEaster"]  = new Festivity("Monday of the Octave of Easter",     calcGregEaster($YEAR)->add(new DateInterval('P1D')),            "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["TueOctaveEaster"]  = new Festivity("Tuesday of the Octave of Easter",    calcGregEaster($YEAR)->add(new DateInterval('P2D')),            "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["WedOctaveEaster"]  = new Festivity("Wednesday of the Octave of Easter",  calcGregEaster($YEAR)->add(new DateInterval('P3D')),            "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["ThuOctaveEaster"]  = new Festivity("Thursday of the Octave of Easter",   calcGregEaster($YEAR)->add(new DateInterval('P4D')),            "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["FriOctaveEaster"]  = new Festivity("Friday of the Octave of Easter",     calcGregEaster($YEAR)->add(new DateInterval('P5D')),            "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["SatOctaveEaster"]  = new Festivity("Saturday of the Octave of Easter",   calcGregEaster($YEAR)->add(new DateInterval('P6D')),            "white",    "mobile", HIGHERSOLEMNITY);
+    
 
     array_push($FIXED_DATE_SOLEMNITIES,$LitCal["Advent1"]->date,$LitCal["Christmas"]->date);
     array_push($FIXED_DATE_SOLEMNITIES,$LitCal["AshWednesday"]->date,$LitCal["HolyThurs"]->date,$LitCal["GoodFri"]->date,$LitCal["EasterVigil"]->date);
     array_push($FIXED_DATE_SOLEMNITIES,$LitCal["MonOctaveEaster"]->date,$LitCal["TueOctaveEaster"]->date,$LitCal["WedOctaveEaster"]->date,$LitCal["ThuOctaveEaster"]->date,$LitCal["FriOctaveEaster"]->date,$LitCal["SatOctaveEaster"]->date);
-    array_push($FIXED_DATE_SOLEMNITIES,$LitCal["Ascension"]->date,$LitCal["Pentecost"]->date,$LitCal["Trinity"]->date,$LitCal["CorpusChristi"]->date,$LitCal["SacredHeart"]->date);
+    array_push($FIXED_DATE_SOLEMNITIES,$LitCal["Ascension"]->date,$LitCal["Pentecost"]->date,$LitCal["Trinity"]->date,$LitCal["CorpusChristi"]->date);
     
+    
+    //3. Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar
+    $LitCal["SacredHeart"]      = new Festivity("Sacred Heart of Jesus",              calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+5).'D')),  "red",      "mobile", SOLEMNITY);
+
     //depends on first sunday of advent
     $LitCal["ChristKing"]       = new Festivity("Christ the King",                    DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P'.(4*7).'D')),    "red",  "mobile", SOLEMNITY);
-    array_push($FIXED_DATE_SOLEMNITIES,$LitCal["ChristKing"]->date);
-    //END SOLEMNITIES
+    array_push($FIXED_DATE_SOLEMNITIES,$LitCal["SacredHeart"]->date,$LitCal["ChristKing"]->date);
+    //END MOBILE SOLEMNITIES
     
-    
+    //START FIXED SOLEMNITIES
     $LitCal["MotherGod"]        = new Festivity("Mary, Mother of God",                DateTime::createFromFormat('!j-n-Y', '1-1-'.$YEAR),             "white",    "fixed", SOLEMNITY);
     $LitCal["StJoseph"]         = new Festivity("Joseph, Husband of Mary",            DateTime::createFromFormat('!j-n-Y', '19-3-'.$YEAR),            "white",    "fixed", SOLEMNITY);
     $LitCal["Annunciation"]     = new Festivity("Annunciation",                       DateTime::createFromFormat('!j-n-Y', '25-3-'.$YEAR),            "white",    "fixed", SOLEMNITY);
@@ -292,9 +333,11 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $LitCal["Assumption"]       = new Festivity("Assumption",                         DateTime::createFromFormat('!j-n-Y', '15-8-'.$YEAR),            "white",    "fixed", SOLEMNITY);
     $LitCal["AllSaints"]        = new Festivity("All Saints",                         DateTime::createFromFormat('!j-n-Y', '1-11-'.$YEAR),            "white",    "fixed", SOLEMNITY);
     
-    //All Souls is treated like a Solemnity in that in can over-rank a Sunday of Ordinary Time
+    //All Souls is treated like a Solemnity, in that in can over-rank a Sunday of Ordinary Time
     $LitCal["AllSouls"]        = new Festivity("All Souls",                           DateTime::createFromFormat('!j-n-Y', '2-11-'.$YEAR),            "purple",   "fixed", SOLEMNITY);
 
+
+    
     //ENFORCE RULES FOR FIXED DATE SOLEMNITIES
     
     //If a fixed date Solemnity occurs on a Sunday of Lent or Advent, the Solemnity is transferred to the following Monday.  
@@ -335,14 +378,18 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     array_push($FIXED_DATE_SOLEMNITIES,$LitCal["BirthJohnBapt"]->date,$LitCal["PeterPaulAp"]->date,$LitCal["Assumption"]->date,$LitCal["AllSaints"]->date,$LitCal["AllSouls"]->date);
     array_push($FIXED_DATE_SOLEMNITIES,$LitCal["StJoseph"]->date,$LitCal["Annunciation"]->date,$LitCal["ImmConception"]->date);
     
+    //4. Proper solemnities
+    //TODO: Intregrate proper solemnities
+    // END SOLEMNITIES, BOTH MOBILE AND FIXED
+
     if(!in_array(calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+6).'D')),$FIXED_DATE_SOLEMNITIES) ){
         $LitCal["ImmaculateHeart"]  = new Festivity("Immaculate Heart of Mary",       calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+6).'D')),  "red",      "mobile", MEMORIAL);
         //In years when this memorial coincides with another obligatory memorial, as happened in 2014 [28 June, Saint Irenaeus] and 2015 [13 June, Saint Anthony of Padua], both must be considered optional for that year
         //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
     }
     
-        
-    //FEASTS OF OUR LORD
+    //II.
+    //5. FEASTS OF THE LORD IN THE GENERAL CALENDAR
     
     //Baptism of the Lord is celebrated the Sunday after Epiphany, for exceptions see immediately below... 
     $BaptismLordFmt = '6-1-'.$YEAR;
@@ -383,7 +430,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 
     
-    //SUNDAYS OF ORDINARY TIME
+    //6. SUNDAYS OF CHRISTMAS TIME AND SUNDAYS IN ORDINARY TIME
     
     //Sundays of Ordinary Time in the First part of the year are numbered from after the Baptism of the Lord (which begins the 1st week of Ordinary Time) until Ash Wednesday
     $firstOrdinary = DateTime::createFromFormat('!j-n-Y', $BaptismLordFmt)->modify($BaptismLordMod);
@@ -420,10 +467,12 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
     }
 
-    //END SUNDAYS OF ORDINARY TIME
+    //END SUNDAYS OF CHRISTMAS TIME AND SUNDAYS IN ORDINARY TIME
     
     
-    //FEASTS NOT OF THE LORD, MEMORIALS AND OPTIONAL MEMORIALS
+    //7. FEASTS OF THE BLESSED VIRGIN MARY AND OF THE SAINTS IN THE GENERAL CALENDAR
+    
+    //MEMORIALS AND OPTIONAL MEMORIALS
 
     //If a Feast (not of the Lord) occurs on a Sunday in Ordinary Time, the Sunday is celebrated.  (e.g., St. Luke, 1992)
     //We will look up Feasts, Memorials and Optional Memorials from the MySQL table of festivities of the Roman Calendar
@@ -462,7 +511,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         
     //END FEASTS NOT OF THE LORD, MEMORIALS AND OPTIONAL MEMORIALS
 
-    //WEEKDAYS of ADVENT
+    //9. WEEKDAYS of ADVENT FROM 17 DECEMBER TO 24 DECEMBER INCLUSIVE
     
     $DoMAdvent1 = $LitCal["Advent1"]->date->format('j');
     $MonthAdvent1 = $LitCal["Advent1"]->date->format('n');    
@@ -483,7 +532,8 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $weekdayAdventCnt++;
     }
     
-    
+    //DAYS WITHIN THE OCTAVE OF CHRISTMAS
+
     //WEEKDAYS of LENT
     
     $DoMAshWednesday = $LitCal["AshWednesday"]->date->format('j');
