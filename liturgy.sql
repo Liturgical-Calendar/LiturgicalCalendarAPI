@@ -281,7 +281,7 @@ INSERT INTO `LITURGY__festivity_grade` (`IDX`, `NAME`) VALUES
 (4, 'FEAST'),
 (5, 'FEAST OF THE LORD'),
 (6, 'SOLEMNITY'),
-(7, 'HOLY DAY OF OBLIGATION');
+(7, 'HIGHER SOLEMNITY');
 
 -- --------------------------------------------------------
 
