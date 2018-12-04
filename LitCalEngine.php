@@ -9,13 +9,20 @@
  * Note: it is necessary to set up the MySQL liturgy tables prior to using this script
  */
 
+
+
 include "Festivity.php"; //this defines a "Festivity" class that can hold all the useful information about a single celebration
 
 include "LitCalFunctions.php"; //a few useful functions e.g. calculate Easter...
 
-// Initiate connection to the Database (function defined in LitCalFunctions.php)
-// If connection succeeds, the function will return the mysqli connection resource
-//    in a mysqli property of the returned object
+/**
+ * INITIATE CONNECTION TO THE DATABASE 
+ * CHECKING FOR CONNECTION ERRORS
+ * DATABASECONNECT() FUNCTION DEFINED IN LITCALFUNCTIONS.PHP WHICH ALSO LOADED DATABASE CONNECTION INFORMATION
+ * If connection succeeds, the function will return the mysqli connection resource
+ * in a mysqli property of the returned object
+ */
+
 $dbConnect = databaseConnect();
 if($dbConnect->retString != "" && preg_match("/^Connected to MySQL Database:/",$dbConnect->retString) == 0){
 	die("There was an error in the database connection: \n" . $dbConnect->retString);
@@ -24,8 +31,19 @@ else{
 	$mysqli = $dbConnect->mysqli;
 }
 
-//SETUP CONFIGURATION RULES
-//$allowed_returntypes = array("JSON","XML","HTML");
+
+
+
+/**
+ *  ONCE WE HAVE A SUCCESSFUL CONNECTION TO THE DATABASE
+ *  WE SET UP SOME CONFIGURATION RULES
+ *  WE CHECK IF ANY PARAMETERS ARE BEING SENT TO THE ENGINE TO INSTRUCT IT HOW TO PROCESS CERTAIN CASES
+ *  SUCH AS EPIPHANY, ASCENSION, CORPUS CHRISTI
+ *  EACH EPISCOPAL CONFERENCE HAS THE FACULTY OF CHOOSING SUNDAY BETWEEN JAN 2 AND JAN 8 INSTEAD OF JAN 6 FOR EPIPHANY, AND SUNDAY INSTEAD OF THURSDAY FOR ASCENSION AND CORPUS CHRISTI
+ *  DEFAULTS TO UNIVERSAL ROMAN CALENDAR: EPIPHANY = JAN 6, ASCENSION = THURSDAY, CORPUS CHRISTI = THURSDAY
+ *  AND IN WHICH FORMAT TO RETURN THE PROCESSED DATA (JSON OR XML)
+ */
+
 $allowed_returntypes = array("JSON","XML");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -61,6 +79,19 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     //define(CORPUSCHRISTI,"SUNDAY");
 
 
+/**
+ *  THE ENTIRE LITURGICAL CALENDAR DEPENDS MAINLY ON EASTER
+ *  HERE WE DEFINE THE FUNCTION FOR CALCULATING GREGORIAN EASTER FOR A GIVEN YEAR
+ *  AS USED BY THE LATIN RITE
+ *
+ */
+    /**
+     *	DEFINE THE ORDER OF PRECEDENCE OF THE LITURGICAL DAYS AS INDICATED IN THE
+     *  UNIVERSAL NORMS ON THE LITURGICAL YEAR AND THE GENERAL ROMAN CALENDAR
+     *  PROMULGATED BY THE MOTU PROPRIO "MYSTERII PASCHALIS" BY POPE PAUL VI ON FEBRUARY 14 1969
+     *	https://w2.vatican.va/content/paul-vi/en/motu_proprio/documents/hf_p-vi_motu-proprio_19690214_mysterii-paschalis.html
+     *  A COPY OF THE DOCUMENT IS INCLUDED ALONGSIDE THIS ENGINE, SEEING THAT THERE IS NO DIRECT ONLINE LINK TO THE ACTUAL NORMS
+     */
     
     /*****************************************************
      * DEFINE THE ORDER OF IMPORTANCE OF THE FESTIVITIES *
