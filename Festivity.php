@@ -4,7 +4,7 @@
         public $date;
         public $color; //"green","purple","white","red","pink"
         public $type;  //"mobile" or "fixed"
-        public $grade; //0=Weekday,1=Commemoration,2=Optional memorial,3=Obligatory memorial,4=Feast,5=Feast of the Lord,6=Solemnity,7=Holy Day of Obligation
+        public $grade; //0=Weekday,1=Commemoration,2=Optional memorial,3=Obligatory memorial,4=Feast,5=Feast of the Lord,6=Solemnity,7=Higher Solemnity
         public $common;//"Proper" or specified common(s) of saints...
     	private static $liturgical_colors = array("green","purple","white","red","pink");
 	private static $feast_type = array("fixed","mobile");
