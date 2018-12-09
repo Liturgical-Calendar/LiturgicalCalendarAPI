@@ -223,12 +223,12 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     else if (EPIPHANY === "SUNDAY_JAN2_JAN8"){
         //If January 2nd is a Sunday, then go with Jan 2nd
         if((int)DateTime::createFromFormat('!j-n-Y', '2-1-'.$YEAR)->format('N') === 7){
-            $LitCal["Epiphany"] = new Festivity("Epiphany",                           DateTime::createFromFormat('!j-n-Y', '2-1-'.$YEAR),             "white",    "mobile", SOLEMNITY);        
+            $LitCal["Epiphany"] = new Festivity("Epiphany",                           DateTime::createFromFormat('!j-n-Y', '2-1-'.$YEAR),             "white",    "mobile", HIGHERSOLEMNITY);        
         }
         //otherwise find the Sunday following Jan 2nd
         else{
             $SundayOfEpiphany = DateTime::createFromFormat('!j-n-Y', '2-1-'.$YEAR)->modify('next Sunday');
-            $LitCal["Epiphany"] = new Festivity("Epiphany",                           $SundayOfEpiphany,                                              "white",    "mobile", SOLEMNITY);
+            $LitCal["Epiphany"] = new Festivity("Epiphany",                           $SundayOfEpiphany,                                              "white",    "mobile", HIGHERSOLEMNITY);
             
             //Weekdays from Jan. 2 until the following Sunday are called "*day before Epiphany"
             //echo $SundayOfEpiphany->format('j');
