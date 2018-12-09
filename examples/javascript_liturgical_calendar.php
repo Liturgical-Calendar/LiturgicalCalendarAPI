@@ -76,7 +76,7 @@
 			return ord_suffix;
 		}
         
-        var $GRADE = ["","COMMEMORATION","OPTIONAL MEMORIAL","MEMORIAL","FEAST","FEAST OF THE LORD","SOLEMNITY","HOLY DAY OF OBLIGATION"];
+        var $GRADE = ["","COMMEMORATION","OPTIONAL MEMORIAL","MEMORIAL","FEAST","FEAST OF THE LORD","SOLEMNITY","HIGHER RANKING SOLEMNITY"];
         
         var $SUNDAY_CYCLE = ["A","B","C"];
         var $WEEKDAY_CYCLE = ["I","II"];
