@@ -391,12 +391,6 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     //TODO: Intregrate proper solemnities
     
     // END SOLEMNITIES, BOTH MOBILE AND FIXED
-
-    if(!in_array(calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+6).'D')),$FIXED_DATE_SOLEMNITIES) ){
-        $LitCal["ImmaculateHeart"]  = new Festivity("Immaculate Heart of Mary",       calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+6).'D')),  "red",      "mobile", MEMORIAL);
-        //In years when this memorial coincides with another obligatory memorial, as happened in 2014 [28 June, Saint Irenaeus] and 2015 [13 June, Saint Anthony of Padua], both must be considered optional for that year
-        //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
-    }
     
     //II.
     //5. FEASTS OF THE LORD IN THE GENERAL CALENDAR
@@ -510,7 +504,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     if(false !== $key = array_search($LitCal[$row["TAG"]]->date,$WeekdaysOfEpiphany) ){
                         unset($LitCal[$key]);
                     }
-                    //Also while we're at it, in years when the memorial of the Immaculate Heart of Mary coincides with another obligatory memorial, 
+                    //IMMACULATEHEART: Also while we're at it, in years when the memorial of the Immaculate Heart of Mary coincides with another obligatory memorial, 
                     //as happened in 2014 [28 June, Saint Irenaeus] and 2015 [13 June, Saint Anthony of Padua], both must be considered optional for that year
                     //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
                     if(isset($LitCal["ImmaculateHeart"]) && $currentFeastDate == $LitCal["ImmaculateHeart"]->date){
@@ -585,6 +579,13 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
     //III.
     //10. Obligatory memorials in the General Calendar * already dealt with above !!! should we instead deal with them here???
+
+    if(!in_array(calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+6).'D')),$FIXED_DATE_SOLEMNITIES) ){
+        $LitCal["ImmaculateHeart"]  = new Festivity("Immaculate Heart of Mary",       calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+6).'D')),  "red",      "mobile", MEMORIAL);
+        //In years when this memorial coincides with another obligatory memorial, as happened in 2014 [28 June, Saint Irenaeus] and 2015 [13 June, Saint Anthony of Padua], both must be considered optional for that year
+        //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
+	//This is taken care of in the code cycle that produces the output of the calendar, see tag IMMACULATEHEART: in the code comments ahead
+    }
     
     //TODO: implement number 11 !!!
     //11. Proper obligatory memorials, and that is:
