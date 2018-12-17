@@ -169,8 +169,9 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $LitCal = array();
 
-    $FIXED_DATE_SOLEMNITIES = array(); //will index defined solemnities and feasts
-    $OBLIGATORY_MEMORIALS = array(); //will index obligatory memorials that suppress or influence other lesser liturgical recurrences...
+    $SOLEMNITIES = array(); //will index defined solemnities and feasts of the Lord
+    $FEASTS_MEMORIALS = array(); //will index obligatory memorials that suppress or influence other lesser liturgical recurrences...
+    $WEEKDAYS_ADVENT_CHRISTMAS_LENT = array();
 
     //Let's create a Weekdays of Epiphany array 
     //so that later on when we add our Memorials 
@@ -308,10 +309,10 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $LitCal["SatOctaveEaster"]  = new Festivity("Saturday of the Octave of Easter",   calcGregEaster($YEAR)->add(new DateInterval('P6D')),            "white",    "mobile", HIGHERSOLEMNITY);
     
 
-    array_push($FIXED_DATE_SOLEMNITIES,$LitCal["Advent1"]->date,$LitCal["Christmas"]->date);
-    array_push($FIXED_DATE_SOLEMNITIES,$LitCal["AshWednesday"]->date,$LitCal["HolyThurs"]->date,$LitCal["GoodFri"]->date,$LitCal["EasterVigil"]->date);
-    array_push($FIXED_DATE_SOLEMNITIES,$LitCal["MonOctaveEaster"]->date,$LitCal["TueOctaveEaster"]->date,$LitCal["WedOctaveEaster"]->date,$LitCal["ThuOctaveEaster"]->date,$LitCal["FriOctaveEaster"]->date,$LitCal["SatOctaveEaster"]->date);
-    array_push($FIXED_DATE_SOLEMNITIES,$LitCal["Ascension"]->date,$LitCal["Pentecost"]->date,$LitCal["Trinity"]->date,$LitCal["CorpusChristi"]->date);
+    array_push($SOLEMNITIES,$LitCal["Advent1"]->date,$LitCal["Christmas"]->date);
+    array_push($SOLEMNITIES,$LitCal["AshWednesday"]->date,$LitCal["HolyThurs"]->date,$LitCal["GoodFri"]->date,$LitCal["EasterVigil"]->date);
+    array_push($SOLEMNITIES,$LitCal["MonOctaveEaster"]->date,$LitCal["TueOctaveEaster"]->date,$LitCal["WedOctaveEaster"]->date,$LitCal["ThuOctaveEaster"]->date,$LitCal["FriOctaveEaster"]->date,$LitCal["SatOctaveEaster"]->date);
+    array_push($SOLEMNITIES,$LitCal["Ascension"]->date,$LitCal["Pentecost"]->date,$LitCal["Trinity"]->date,$LitCal["CorpusChristi"]->date);
     
     
     //3. Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar
@@ -319,7 +320,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     //Christ the King is calculated backwards from the first sunday of advent
     $LitCal["ChristKing"]       = new Festivity("Christ the King",                    DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P'.(4*7).'D')),    "red",  "mobile", SOLEMNITY);
-    array_push($FIXED_DATE_SOLEMNITIES,$LitCal["SacredHeart"]->date,$LitCal["ChristKing"]->date);
+    array_push($SOLEMNITIES,$LitCal["SacredHeart"]->date,$LitCal["ChristKing"]->date);
     //END MOBILE SOLEMNITIES
     
     //START FIXED SOLEMNITIES
@@ -385,8 +386,8 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $LitCal["Annunciation"]->date = calcGregEaster($YEAR)->add(new DateInterval('P8D'));
     }
 
-    array_push($FIXED_DATE_SOLEMNITIES,$LitCal["BirthJohnBapt"]->date,$LitCal["PeterPaulAp"]->date,$LitCal["Assumption"]->date,$LitCal["AllSaints"]->date,$LitCal["AllSouls"]->date);
-    array_push($FIXED_DATE_SOLEMNITIES,$LitCal["StJoseph"]->date,$LitCal["Annunciation"]->date,$LitCal["ImmConception"]->date);
+    array_push($SOLEMNITIES,$LitCal["BirthJohnBapt"]->date,$LitCal["PeterPaulAp"]->date,$LitCal["Assumption"]->date,$LitCal["AllSaints"]->date,$LitCal["AllSouls"]->date);
+    array_push($SOLEMNITIES,$LitCal["StJoseph"]->date,$LitCal["Annunciation"]->date,$LitCal["ImmConception"]->date);
     
     //4. Proper solemnities
     //TODO: Intregrate proper solemnities
@@ -431,7 +432,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
     //If a fixed date Solemnity occurs on a Sunday of Ordinary Time or on a Sunday of Christmas, the Solemnity is celebrated in place of the Sunday. (e.g., Birth of John the Baptist, 1990)
     //If a fixed date Feast of the Lord occurs on a Sunday in Ordinary Time, the feast is celebrated in place of the Sunday
-    array_push($FIXED_DATE_SOLEMNITIES,$LitCal["Presentation"]->date,$LitCal["Transfiguration"]->date,$LitCal["HolyCross"]->date);
+    array_push($SOLEMNITIES,$LitCal["Presentation"]->date,$LitCal["Transfiguration"]->date,$LitCal["HolyCross"]->date);
 
 
     
@@ -446,10 +447,10 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     while($firstOrdinary >= $LitCal["BaptismLord"]->date && $firstOrdinary < $firstOrdinaryLimit){
         $firstOrdinary = DateTime::createFromFormat('!j-n-Y', $BaptismLordFmt)->modify($BaptismLordMod)->modify('next Sunday')->add(new DateInterval('P'.(($ordSun-1)*7).'D'));
         $ordSun++;
-        if(!in_array($firstOrdinary,$FIXED_DATE_SOLEMNITIES) ){
+        if(!in_array($firstOrdinary,$SOLEMNITIES) ){
             $LitCal["OrdSunday".$ordSun] = new Festivity($ordSun.ordSuffix($ordSun)." Sunday of Ordinary Time",$firstOrdinary,"green","mobile");
             //add Sundays to our priority list for next checking against ordinary Feasts not of Our Lord
-            array_push($FIXED_DATE_SOLEMNITIES,$firstOrdinary);
+            array_push($SOLEMNITIES,$firstOrdinary);
         }
     }
     
@@ -465,54 +466,28 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     while($lastOrdinary <= $LitCal["ChristKing"]->date && $lastOrdinary > $lastOrdinaryLowerLimit){
         $lastOrdinary = DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P'.(++$ordSunCycle * 7).'D'));
         $ordSun--;
-        if(!in_array($lastOrdinary,$FIXED_DATE_SOLEMNITIES) ){
+        if(!in_array($lastOrdinary,$SOLEMNITIES) ){
             $LitCal["OrdSunday".$ordSun] = new Festivity($ordSun.ordSuffix($ordSun)." Sunday of Ordinary Time",$lastOrdinary,"green","mobile");
             //add Sundays to our priority list for next checking against ordinary Feasts not of Our Lord
-            array_push($FIXED_DATE_SOLEMNITIES,$lastOrdinary);
+            array_push($SOLEMNITIES,$lastOrdinary);
         }
     }
 
     //END SUNDAYS OF CHRISTMAS TIME AND SUNDAYS IN ORDINARY TIME
     
     
-    //7. FEASTS OF THE BLESSED VIRGIN MARY AND OF THE SAINTS IN THE GENERAL CALENDAR (MEMORIALS AND OPTIONAL MEMORIALS)
-	//TODO: in the table of precedence of liturgical days, memorials and optional memorials would come after:
-	//      Proper Feasts and Weekdays of Advent from 17 to 24 included, Days of the Octave of Christmas, Weekdays of Lent
-	//	Does it make a difference whether we treat with Memorials and Optional Memorials now?
-	//	Or must we treat with them after taking into consideration the above mentioned categories?
+    //7. FEASTS OF THE BLESSED VIRGIN MARY AND OF THE SAINTS IN THE GENERAL CALENDAR
 
-    //If a Feast (not of the Lord) occurs on a Sunday in Ordinary Time, the Sunday is celebrated.  (e.g., St. Luke, 1992)
     //We will look up Feasts from the MySQL table of festivities of the Roman Calendar
-    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed WHERE GRADE > ".MEMORIAL." AND GRADE < ".FEASTLORD)){
+    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed WHERE GRADE = ".FEAST)){
         while($row = mysqli_fetch_assoc($result)){
             
-            //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Festivity
+            //If a Feast (not of the Lord) occurs on a Sunday in Ordinary Time, the Sunday is celebrated.  (e.g., St. Luke, 1992)
+	    //obviously solemnities also have precedence
             $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"].'-'.$row["MONTH"].'-'.$YEAR);
-            if((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate,$FIXED_DATE_SOLEMNITIES) ){
+            if((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate,$SOLEMNITIES) ){
                 $LitCal[$row["TAG"]] = new Festivity($row["NAME"],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
-                
-                //If a fixed date Memorial or Optional Memorial falls within the Lenten season, it is reduced in rank to a Commemoration.                
-                if($currentFeastDate > $LitCal["AshWednesday"]->date && $currentFeastDate < $LitCal["HolyThurs"]->date ){
-                    $LitCal[$row["TAG"]]->grade = COMMEMORATION;
-                }
-                
-                //We can now add, for logical reasons, Feasts and Memorials to the $FIXED_DATE_SOLEMNITIES array
-		//obviously not that they be considered as solemnities but simply because they will override the weekdays of ordinary time
-		//and we have finished dealing with solemnities at this point in any case
-                if($LitCal[$row["TAG"]]->grade > MEMORIALOPT){
-                    array_push($OBLIGATORY_MEMORIALS,$currentFeastDate);
-                    //Also, while we're add it, let's remove the weekdays of Epiphany that get overriden by memorials
-                    if(false !== $key = array_search($LitCal[$row["TAG"]]->date,$WeekdaysOfEpiphany) ){
-                        unset($LitCal[$key]);
-                    }
-                    //IMMACULATEHEART: Also while we're at it, in years when the memorial of the Immaculate Heart of Mary coincides with another obligatory memorial, 
-                    //as happened in 2014 [28 June, Saint Irenaeus] and 2015 [13 June, Saint Anthony of Padua], both must be considered optional for that year
-                    //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
-                    if(isset($LitCal["ImmaculateHeart"]) && $currentFeastDate == $LitCal["ImmaculateHeart"]->date){
-                        $LitCal["ImmaculateHeart"]->grade = MEMORIALOPT;
-                        $LitCal[$row["TAG"]]->grade = MEMORIALOPT;
-                    }
-                }
+		array_push($FEASTS_MEMORIALS,$currentFeastDate);                
             }
         }
     }
@@ -529,7 +504,9 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 	//f) other feasts inscribed in the calendar of a diocese or of a religious order or congregation
 
     //9. WEEKDAYS of ADVENT FROM 17 DECEMBER TO 24 DECEMBER INCLUSIVE
-    //TODO: actually here we are just calculating all weekdays of Advent !!! are there cases where it makes a difference?
+    //  Here we are calculating all weekdays of Advent, but we are giving a certain importance to the following cases
+    //	On the weekdays of Advent from 17 Dec. to 24 Dec., weekdays of the Octave of Christmas and weekdays of Lent, 
+    //  obligatory memorials can only be celebrated in partial form
     
     $DoMAdvent1 = $LitCal["Advent1"]->date->format('j');
     $MonthAdvent1 = $LitCal["Advent1"]->date->format('n');    
@@ -538,13 +515,17 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     while($weekdayAdvent >= $LitCal["Advent1"]->date && $weekdayAdvent < $LitCal["Christmas"]->date){
         $weekdayAdvent = DateTime::createFromFormat('!j-n-Y', $DoMAdvent1.'-'.$MonthAdvent1.'-'.$YEAR)->add(new DateInterval('P'.$weekdayAdventCnt.'D'));
         
-        if(!in_array($weekdayAdvent,$FIXED_DATE_SOLEMNITIES) && (int)$weekdayAdvent->format('N') !== 7 ){
+        //if we're not dealing with a sunday or a solemnity, then create the weekday
+	if(!in_array($weekdayAdvent,$SOLEMNITIES) && (int)$weekdayAdvent->format('N') !== 7 ){
             $upper = (int)$weekdayAdvent->format('z');
             $diff = $upper - (int)$LitCal["Advent1"]->date->format('z'); //day count between current day and First Sunday of Advent
             $currentAdvWeek = (($diff - $diff % 7) / 7) + 1; //week count between current day and First Sunday of Advent
         
             $LitCal["AdventWeekday".$weekdayAdventCnt] = new Festivity($weekdayAdvent->format('l')." of the ".$currentAdvWeek.ordSuffix($currentAdvWeek)." Week of Advent",$weekdayAdvent,"purple","mobile");
-            
+            // Weekday of Advent from 17 to 24 Dec.
+	    if($LitCal["AdventWeekday".$weekdayAdventCnt]->date->format('j') >= 17 && $LitCal["AdventWeekday".$weekdayAdventCnt]->date->format('j') <= 24){
+		array_push($WEEKDAYS_ADVENT_CHRISTMAS_LENT,$LitCal["AdventWeekday".$weekdayAdventCnt]->date);
+	    }
         }  
         
         $weekdayAdventCnt++;
@@ -561,7 +542,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     while($weekdayLent >= $LitCal["AshWednesday"]->date && $weekdayLent < $LitCal["PalmSun"]->date){
         $weekdayLent = DateTime::createFromFormat('!j-n-Y', $DoMAshWednesday.'-'.$MonthAshWednesday.'-'.$YEAR)->add(new DateInterval('P'.$weekdayLentCnt.'D'));
         
-        if(!in_array($weekdayLent,$FIXED_DATE_SOLEMNITIES) && (int)$weekdayLent->format('N') !== 7 ){
+        if(!in_array($weekdayLent,$SOLEMNITIES) && (int)$weekdayLent->format('N') !== 7 ){
             
             if($weekdayLent > $LitCal["Lent1"]->date){
               $upper = (int)$weekdayLent->format('z');
@@ -585,7 +566,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             
             //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Festivity
             $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"].'-'.$row["MONTH"].'-'.$YEAR);
-            if((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate,$FIXED_DATE_SOLEMNITIES) ){
+            if((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate,$SOLEMNITIES) ){
                 $LitCal[$row["TAG"]] = new Festivity($row["NAME"],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
                 
                 //If a fixed date Memorial or Optional Memorial falls within the Lenten season, it is reduced in rank to a Commemoration.                
@@ -593,7 +574,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     $LitCal[$row["TAG"]]->grade = COMMEMORATION;
                 }
                 
-                //We can now add, for logical reasons, Feasts and Memorials to the $FIXED_DATE_SOLEMNITIES array
+                //We can now add, for logical reasons, Feasts and Memorials to the $SOLEMNITIES array
 		//obviously not that they be considered as solemnities but simply because they will override the weekdays of ordinary time
 		//and we have finished dealing with solemnities at this point in any case
                 if($LitCal[$row["TAG"]]->grade > MEMORIALOPT){
@@ -614,7 +595,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
     }
 
-    if(!in_array(calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+6).'D')),$FIXED_DATE_SOLEMNITIES) ){
+    if(!in_array(calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+6).'D')),$SOLEMNITIES) ){
         $LitCal["ImmaculateHeart"]  = new Festivity("Immaculate Heart of Mary",       calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+6).'D')),  "red",      "mobile", MEMORIAL);
         //In years when this memorial coincides with another obligatory memorial, as happened in 2014 [28 June, Saint Irenaeus] and 2015 [13 June, Saint Anthony of Padua], both must be considered optional for that year
         //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
@@ -641,7 +622,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     while($weekdayEaster >= $LitCal["Easter"]->date && $weekdayEaster < $LitCal["Pentecost"]->date){
         $weekdayEaster = DateTime::createFromFormat('!j-n-Y', $DoMEaster.'-'.$MonthEaster.'-'.$YEAR)->add(new DateInterval('P'.$weekdayEasterCnt.'D'));
         
-        if(!in_array($weekdayEaster,$FIXED_DATE_SOLEMNITIES) && (int)$weekdayEaster->format('N') !== 7 ){
+        if(!in_array($weekdayEaster,$SOLEMNITIES) && (int)$weekdayEaster->format('N') !== 7 ){
             
             $upper = (int)$weekdayEaster->format('z');
             $diff = $upper - (int)$LitCal["Easter"]->date->format('z'); //day count between current day and Easter Sunday
@@ -664,7 +645,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     while($weekdayChristmas >= $LitCal["Christmas"]->date && $weekdayChristmas < DateTime::createFromFormat('!j-n-Y', '31-12-'.$YEAR)){
         $weekdayChristmas = DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->add(new DateInterval('P'.$weekdayChristmasCnt.'D'));
         
-        if(!in_array($weekdayChristmas,$FIXED_DATE_SOLEMNITIES) && (int)$weekdayChristmas->format('N') !== 7 ){
+        if(!in_array($weekdayChristmas,$SOLEMNITIES) && (int)$weekdayChristmas->format('N') !== 7 ){
             
             //$upper = (int)$weekdayChristmas->format('z');
             //$diff = $upper - (int)$LitCal["Easter"]->date->format('z'); //day count between current day and Easter Sunday
@@ -691,7 +672,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     while($firstOrdinary >= $FirstWeekdaysLowerLimit && $firstOrdinary < $FirstWeekdaysUpperLimit){
         $firstOrdinary = DateTime::createFromFormat('!j-n-Y', $BaptismLordFmt)->modify($BaptismLordMod)->add(new DateInterval('P'.$ordWeekday.'D'));
-        if(!in_array($firstOrdinary,$FIXED_DATE_SOLEMNITIES) ){
+        if(!in_array($firstOrdinary,$SOLEMNITIES) ){
             //The Baptism of the Lord is the First Sunday, so the weekdays following are of the First Week of Ordinary Time
             //After the Second Sunday, let's calculate which week of Ordinary Time we're in
             if($firstOrdinary > $firstSunday){
@@ -701,7 +682,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             }
             $LitCal["FirstOrdWeekday".$ordWeekday] = new Festivity($firstOrdinary->format('l')." of the ".$currentOrdWeek.ordSuffix($currentOrdWeek)." Week of Ordinary Time",$firstOrdinary,"green","mobile");
             //add Sundays to our priority list for next checking against ordinary Feasts not of Our Lord
-            //array_push($FIXED_DATE_SOLEMNITIES,$firstOrdinary);
+            //array_push($SOLEMNITIES,$firstOrdinary);
         }
         $ordWeekday++;
     }
@@ -719,7 +700,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     while($lastOrdinary >= $SecondWeekdaysLowerLimit && $lastOrdinary < $SecondWeekdaysUpperLimit){
         $lastOrdinary = calcGregEaster($YEAR)->add(new DateInterval('P'.(7*7+$ordWeekday).'D'));
-        if(!in_array($lastOrdinary,$FIXED_DATE_SOLEMNITIES) ){
+        if(!in_array($lastOrdinary,$SOLEMNITIES) ){
             $lower = (int) $lastOrdinary->format('z');
             $diff = $dayLastSunday - $lower; //day count between current day and Christ the King Sunday
             $weekDiff = (($diff - $diff % 7) / 7); //week count between current day and Christ the King Sunday;
@@ -727,7 +708,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 
             $LitCal["LastOrdWeekday".$ordWeekday] = new Festivity($lastOrdinary->format('l')." of the ".$currentOrdWeek.ordSuffix($currentOrdWeek)." Week of Ordinary Time",$lastOrdinary,"green","mobile");
             //add Sundays to our priority list for next checking against ordinary Feasts not of Our Lord
-            //array_push($FIXED_DATE_SOLEMNITIES,$firstOrdinary);
+            //array_push($SOLEMNITIES,$firstOrdinary);
         }
         $ordWeekday++;
     }
