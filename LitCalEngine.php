@@ -482,8 +482,8 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 	//	Or must we treat with them after taking into consideration the above mentioned categories?
 
     //If a Feast (not of the Lord) occurs on a Sunday in Ordinary Time, the Sunday is celebrated.  (e.g., St. Luke, 1992)
-    //We will look up Feasts, Memorials and Optional Memorials from the MySQL table of festivities of the Roman Calendar
-    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed WHERE GRADE > ".COMMEMORATION." AND GRADE < ".FEASTLORD)){
+    //We will look up Feasts from the MySQL table of festivities of the Roman Calendar
+    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed WHERE GRADE > ".MEMORIAL." AND GRADE < ".FEASTLORD)){
         while($row = mysqli_fetch_assoc($result)){
             
             //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Festivity
@@ -517,7 +517,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
     }
         
-    //END FEASTS OF THE BLESSED VIRGIN MARY AND OF THE SAINTS IN THE GENERAL CALENDR (MEMORIALS AND OPTIONAL MEMORIALS)
+    //END FEASTS OF THE BLESSED VIRGIN MARY AND OF THE SAINTS IN THE GENERAL CALENDAR
 
     //TODO: implement the following section 8
     //8. PROPER FEASTS:
@@ -579,7 +579,40 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
     
     //III.
-    //10. Obligatory memorials in the General Calendar * already dealt with above !!! should we instead deal with them here???
+    //10. Obligatory memorials in the General Calendar
+    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed WHERE GRADE = ".MEMORIAL)){
+        while($row = mysqli_fetch_assoc($result)){
+            
+            //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Festivity
+            $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"].'-'.$row["MONTH"].'-'.$YEAR);
+            if((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate,$FIXED_DATE_SOLEMNITIES) ){
+                $LitCal[$row["TAG"]] = new Festivity($row["NAME"],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
+                
+                //If a fixed date Memorial or Optional Memorial falls within the Lenten season, it is reduced in rank to a Commemoration.                
+                if($currentFeastDate > $LitCal["AshWednesday"]->date && $currentFeastDate < $LitCal["HolyThurs"]->date ){
+                    $LitCal[$row["TAG"]]->grade = COMMEMORATION;
+                }
+                
+                //We can now add, for logical reasons, Feasts and Memorials to the $FIXED_DATE_SOLEMNITIES array
+		//obviously not that they be considered as solemnities but simply because they will override the weekdays of ordinary time
+		//and we have finished dealing with solemnities at this point in any case
+                if($LitCal[$row["TAG"]]->grade > MEMORIALOPT){
+                    array_push($OBLIGATORY_MEMORIALS,$currentFeastDate);
+                    //Also, while we're add it, let's remove the weekdays of Epiphany that get overriden by memorials
+                    if(false !== $key = array_search($LitCal[$row["TAG"]]->date,$WeekdaysOfEpiphany) ){
+                        unset($LitCal[$key]);
+                    }
+                    //IMMACULATEHEART: Also while we're at it, in years when the memorial of the Immaculate Heart of Mary coincides with another obligatory memorial, 
+                    //as happened in 2014 [28 June, Saint Irenaeus] and 2015 [13 June, Saint Anthony of Padua], both must be considered optional for that year
+                    //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
+                    if(isset($LitCal["ImmaculateHeart"]) && $currentFeastDate == $LitCal["ImmaculateHeart"]->date){
+                        $LitCal["ImmaculateHeart"]->grade = MEMORIALOPT;
+                        $LitCal[$row["TAG"]]->grade = MEMORIALOPT;
+                    }
+                }
+            }
+        }
+    }
 
     if(!in_array(calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+6).'D')),$FIXED_DATE_SOLEMNITIES) ){
         $LitCal["ImmaculateHeart"]  = new Festivity("Immaculate Heart of Mary",       calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+6).'D')),  "red",      "mobile", MEMORIAL);
