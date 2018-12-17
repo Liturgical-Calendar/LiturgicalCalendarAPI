@@ -169,7 +169,8 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $LitCal = array();
 
-    $FIXED_DATE_SOLEMNITIES = array();
+    $FIXED_DATE_SOLEMNITIES = array(); //will index defined solemnities and feasts
+    $OBLIGATORY_MEMORIALS = array(); //will index obligatory memorials that suppress or influence other lesser liturgical recurrences...
 
     //Let's create a Weekdays of Epiphany array 
     //so that later on when we add our Memorials 
@@ -482,7 +483,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     //If a Feast (not of the Lord) occurs on a Sunday in Ordinary Time, the Sunday is celebrated.  (e.g., St. Luke, 1992)
     //We will look up Feasts, Memorials and Optional Memorials from the MySQL table of festivities of the Roman Calendar
-    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed WHERE GRADE < ".FEASTLORD." AND GRADE > ".COMMEMORATION)){
+    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed WHERE GRADE > ".COMMEMORATION." AND GRADE < ".FEASTLORD)){
         while($row = mysqli_fetch_assoc($result)){
             
             //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Festivity
@@ -499,7 +500,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 		//obviously not that they be considered as solemnities but simply because they will override the weekdays of ordinary time
 		//and we have finished dealing with solemnities at this point in any case
                 if($LitCal[$row["TAG"]]->grade > MEMORIALOPT){
-                    array_push($FIXED_DATE_SOLEMNITIES,$currentFeastDate);
+                    array_push($OBLIGATORY_MEMORIALS,$currentFeastDate);
                     //Also, while we're add it, let's remove the weekdays of Epiphany that get overriden by memorials
                     if(false !== $key = array_search($LitCal[$row["TAG"]]->date,$WeekdaysOfEpiphany) ){
                         unset($LitCal[$key]);
