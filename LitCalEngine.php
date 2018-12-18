@@ -614,7 +614,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                         $LitCal["ImmaculateHeart"]->grade = MEMORIALOPT;
                         $LitCal[$row["TAG"]]->grade = MEMORIALOPT;
                     }
-		    else if(isset($LitCal["ImmaculateHeart"])){
+		    elseif(isset($LitCal["ImmaculateHeart"])){
 		        array_push($FEASTS_MEMORIALS,$LitCal["ImmaculateHeart"]->date);
 		    }
                 }
