@@ -717,7 +717,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     while($lastOrdinary >= $SecondWeekdaysLowerLimit && $lastOrdinary < $SecondWeekdaysUpperLimit){
         $lastOrdinary = calcGregEaster($YEAR)->add(new DateInterval('P'.(7*7+$ordWeekday).'D'));
-        if(!in_array($lastOrdinary,$SOLEMNITIES) ){
+        if(!in_array($lastOrdinary,$SOLEMNITIES) && !in_array($firstOrdinary,$FEASTS_MEMORIALS) ){
             $lower = (int) $lastOrdinary->format('z');
             $diff = $dayLastSunday - $lower; //day count between current day and Christ the King Sunday
             $weekDiff = (($diff - $diff % 7) / 7); //week count between current day and Christ the King Sunday;
