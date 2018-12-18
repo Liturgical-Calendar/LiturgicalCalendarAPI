@@ -360,16 +360,8 @@
 <head>
     <title>Generate Roman Calendar</title>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <!-- <link rel="icon" type="image/x-icon" href="../favicon.ico"> -->
     <meta name="msapplication-TileColor" content="#ffffff" />
-    <meta name="msapplication-TileImage" content="../easter-egg-5-144-279148.png">
-    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../easter-egg-5-152-279148.png">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../easter-egg-5-144-279148.png">
-    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="../easter-egg-5-120-279148.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../easter-egg-5-114-279148.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../easter-egg-5-72-279148.png">    
-    <link rel="apple-touch-icon-precomposed" href="../easter-egg-5-57-279148.png">
-    <link rel="icon" href="../easter-egg-5-32-279148.png" sizes="32x32">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
