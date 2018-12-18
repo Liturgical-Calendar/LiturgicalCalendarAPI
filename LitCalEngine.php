@@ -84,6 +84,11 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $CORPUSCHRISTI = (isset($_GET["corpuschristi"]) && ($_GET["corpuschristi"] === "THURSDAY" || $_GET["corpuschristi"] === "SUNDAY") ) ? $_GET["corpuschristi"] : "SUNDAY";
 
     $returntype = isset($_GET["returntype"]) && in_array(strtoupper($_GET["returntype"]), $allowed_returntypes) ? strtoupper($_GET["returntype"]) : $allowed_returntypes[0]; // default to JSON
+
+    if(isset($_GET["debug"]) && $_GET["debug"] == "true"){
+        error_reporting(E_ALL);
+        ini_set('display_errors', 1);    	
+    }
 }
 
 
