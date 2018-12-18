@@ -689,7 +689,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     while($firstOrdinary >= $FirstWeekdaysLowerLimit && $firstOrdinary < $FirstWeekdaysUpperLimit){
         $firstOrdinary = DateTime::createFromFormat('!j-n-Y', $BaptismLordFmt)->modify($BaptismLordMod)->add(new DateInterval('P'.$ordWeekday.'D'));
-        if(!in_array($firstOrdinary,$SOLEMNITIES) ){
+        if(!in_array($firstOrdinary,$SOLEMNITIES) && !in_array($firstOrdinary,$FEASTS_MEMORIALS) ){
             //The Baptism of the Lord is the First Sunday, so the weekdays following are of the First Week of Ordinary Time
             //After the Second Sunday, let's calculate which week of Ordinary Time we're in
             if($firstOrdinary > $firstSunday){
