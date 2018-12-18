@@ -580,6 +580,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     //10. Obligatory memorials in the General Calendar
     if(!in_array(calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+6).'D')),$SOLEMNITIES) ){
         $LitCal["ImmaculateHeart"]  = new Festivity("Immaculate Heart of Mary",       calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+6).'D')),  "red",      "mobile", MEMORIAL);
+        array_push($FEASTS_MEMORIALS,$LitCal["ImmaculateHeart"]->date);
         //In years when this memorial coincides with another obligatory memorial, as happened in 2014 [28 June, Saint Irenaeus] and 2015 [13 June, Saint Anthony of Padua], both must be considered optional for that year
         //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
 	//This is taken care of in the next code cycle, see tag IMMACULATEHEART: in the code comments ahead
@@ -613,10 +614,8 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     if(isset($LitCal["ImmaculateHeart"]) && $currentFeastDate == $LitCal["ImmaculateHeart"]->date){
                         $LitCal["ImmaculateHeart"]->grade = MEMORIALOPT;
                         $LitCal[$row["TAG"]]->grade = MEMORIALOPT;
+			//unset($LitCal[$key]); $FEASTS_MEMORIALS ImmaculateHeart
                     }
-		    elseif(isset($LitCal["ImmaculateHeart"])){
-		        array_push($FEASTS_MEMORIALS,$LitCal["ImmaculateHeart"]->date);
-		    }
                 }
             }
         }
@@ -717,7 +716,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     while($lastOrdinary >= $SecondWeekdaysLowerLimit && $lastOrdinary < $SecondWeekdaysUpperLimit){
         $lastOrdinary = calcGregEaster($YEAR)->add(new DateInterval('P'.(7*7+$ordWeekday).'D'));
-        if(!in_array($lastOrdinary,$SOLEMNITIES) && !in_array($firstOrdinary,$FEASTS_MEMORIALS) ){
+        if(!in_array($lastOrdinary,$SOLEMNITIES) && !in_array($lastOrdinary,$FEASTS_MEMORIALS) ){
             $lower = (int) $lastOrdinary->format('z');
             $diff = $dayLastSunday - $lower; //day count between current day and Christ the King Sunday
             $weekDiff = (($diff - $diff % 7) / 7); //week count between current day and Christ the King Sunday;
