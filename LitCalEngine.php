@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ASCENSION = (isset($_POST["ascension"]) && ($_POST["ascension"] === "THURSDAY" || $_POST["ascension"] === "SUNDAY") ) ? $_POST["ascension"] : "SUNDAY";
     $CORPUSCHRISTI = (isset($_POST["corpuschristi"]) && ($_POST["corpuschristi"] === "THURSDAY" || $_POST["corpuschristi"] === "SUNDAY") ) ? $_POST["corpuschristi"] : "SUNDAY";
     
-    $LOCALE = isset($_POST["locale"]) ? $_POST["locale"] : "la"; //default to latin if not otherwise indicated
+    $LOCALE = isset($_POST["locale"]) ? strtoupper($_POST["locale"]) : "LA"; //default to latin if not otherwise indicated
     $returntype = isset($_POST["returntype"]) && in_array(strtoupper($_POST["returntype"]), $allowed_returntypes) ? strtoupper($_POST["returntype"]) : $allowed_returntypes[0]; // default to JSON
 }
 else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -84,7 +84,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $ASCENSION = (isset($_GET["ascension"]) && ($_GET["ascension"] === "THURSDAY" || $_GET["ascension"] === "SUNDAY") ) ? $_GET["ascension"] : "SUNDAY";
     $CORPUSCHRISTI = (isset($_GET["corpuschristi"]) && ($_GET["corpuschristi"] === "THURSDAY" || $_GET["corpuschristi"] === "SUNDAY") ) ? $_GET["corpuschristi"] : "SUNDAY";
 
-    $LOCALE = isset($_GET["locale"]) ? $_POST["locale"] : "la"; //default to latin if not otherwise indicated
+    $LOCALE = isset($_GET["locale"]) ? strtoupper($_POST["locale"]) : "LA"; //default to latin if not otherwise indicated
     $returntype = isset($_GET["returntype"]) && in_array(strtoupper($_GET["returntype"]), $allowed_returntypes) ? strtoupper($_GET["returntype"]) : $allowed_returntypes[0]; // default to JSON
 
     if(isset($_GET["debug"]) && $_GET["debug"] == "true"){
