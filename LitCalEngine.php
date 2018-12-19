@@ -481,7 +481,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 	    //obviously solemnities also have precedence
             $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"].'-'.$row["MONTH"].'-'.$YEAR);
             if((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate,$SOLEMNITIES) ){
-                $LitCal[$row["TAG"]] = new Festivity($row["NAME".$LOCALE],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
+                $LitCal[$row["TAG"]] = new Festivity($row["NAME_".$LOCALE],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
 		array_push($FEASTS_MEMORIALS,$currentFeastDate);                
             }
         }
@@ -586,7 +586,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Festivity
             $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"].'-'.$row["MONTH"].'-'.$YEAR);
             if((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate,$SOLEMNITIES) ){
-                $LitCal[$row["TAG"]] = new Festivity($row["NAME".$LOCALE],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
+                $LitCal[$row["TAG"]] = new Festivity($row["NAME_".$LOCALE],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
                 
                 //If a fixed date Memorial falls within the Lenten season, it is reduced in rank to a Commemoration.                
                 if($currentFeastDate > $LitCal["AshWednesday"]->date && $currentFeastDate < $LitCal["HolyThurs"]->date ){
@@ -630,7 +630,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord or a Feast or an obligatory memorial, then go ahead and create the Optional Memorial
             $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"].'-'.$row["MONTH"].'-'.$YEAR);
             if((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate,$SOLEMNITIES) && !in_array($currentFeastDate,$FEASTS_MEMORIALS) ){
-                $LitCal[$row["TAG"]] = new Festivity($row["NAME".$LOCALE],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
+                $LitCal[$row["TAG"]] = new Festivity($row["NAME_".$LOCALE],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
                 
                 //If a fixed date Optional Memorial falls between 17 Dec. to 24 Dec., the Octave of Christmas or weekdays of the Lenten season,
 		//it is reduced in rank to a Commemoration (only the collect can be used            
