@@ -74,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ASCENSION = (isset($_POST["ascension"]) && ($_POST["ascension"] === "THURSDAY" || $_POST["ascension"] === "SUNDAY") ) ? $_POST["ascension"] : "SUNDAY";
     $CORPUSCHRISTI = (isset($_POST["corpuschristi"]) && ($_POST["corpuschristi"] === "THURSDAY" || $_POST["corpuschristi"] === "SUNDAY") ) ? $_POST["corpuschristi"] : "SUNDAY";
     
+    $LOCALE = isset($_POST["locale"]) ? $_POST["locale"] : "la"; //default to latin if not otherwise indicated
     $returntype = isset($_POST["returntype"]) && in_array(strtoupper($_POST["returntype"]), $allowed_returntypes) ? strtoupper($_POST["returntype"]) : $allowed_returntypes[0]; // default to JSON
 }
 else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -83,6 +84,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $ASCENSION = (isset($_GET["ascension"]) && ($_GET["ascension"] === "THURSDAY" || $_GET["ascension"] === "SUNDAY") ) ? $_GET["ascension"] : "SUNDAY";
     $CORPUSCHRISTI = (isset($_GET["corpuschristi"]) && ($_GET["corpuschristi"] === "THURSDAY" || $_GET["corpuschristi"] === "SUNDAY") ) ? $_GET["corpuschristi"] : "SUNDAY";
 
+    $LOCALE = isset($_GET["locale"]) ? $_POST["locale"] : "la"; //default to latin if not otherwise indicated
     $returntype = isset($_GET["returntype"]) && in_array(strtoupper($_GET["returntype"]), $allowed_returntypes) ? strtoupper($_GET["returntype"]) : $allowed_returntypes[0]; // default to JSON
 
     if(isset($_GET["debug"]) && $_GET["debug"] == "true"){
@@ -92,17 +94,9 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 
-    define("EPIPHANY",$EPIPHANY);
-    //define(EPIPHANY,"SUNDAY_JAN2_JAN8");
-    //define(EPIPHANY,"JAN6");
-
-    define("ASCENSION",$ASCENSION);
-    //define(ASCENSION,"THURSDAY");
-    //define(ASCENSION,"SUNDAY");
-
-    define("CORPUSCHRISTI",$CORPUSCHRISTI);
-    //define(CORPUSCHRISTI,"THURSDAY");
-    //define(CORPUSCHRISTI,"SUNDAY");
+    define("EPIPHANY",$EPIPHANY); //possible values "SUNDAY_JAN2_JAN8" and "JAN6"
+    define("ASCENSION",$ASCENSION); //possible values "THURSDAY" and "SUNDAY"
+    define("CORPUSCHRISTI",$CORPUSCHRISTI); //possible values "THURSDAY" and "SUNDAY"
 
 
     /**
@@ -487,7 +481,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 	    //obviously solemnities also have precedence
             $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"].'-'.$row["MONTH"].'-'.$YEAR);
             if((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate,$SOLEMNITIES) ){
-                $LitCal[$row["TAG"]] = new Festivity($row["NAME"],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
+                $LitCal[$row["TAG"]] = new Festivity($row["NAME".$LOCALE],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
 		array_push($FEASTS_MEMORIALS,$currentFeastDate);                
             }
         }
@@ -592,7 +586,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Festivity
             $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"].'-'.$row["MONTH"].'-'.$YEAR);
             if((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate,$SOLEMNITIES) ){
-                $LitCal[$row["TAG"]] = new Festivity($row["NAME"],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
+                $LitCal[$row["TAG"]] = new Festivity($row["NAME".$LOCALE],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
                 
                 //If a fixed date Memorial falls within the Lenten season, it is reduced in rank to a Commemoration.                
                 if($currentFeastDate > $LitCal["AshWednesday"]->date && $currentFeastDate < $LitCal["HolyThurs"]->date ){
@@ -636,7 +630,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord or a Feast or an obligatory memorial, then go ahead and create the Optional Memorial
             $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"].'-'.$row["MONTH"].'-'.$YEAR);
             if((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate,$SOLEMNITIES) && !in_array($currentFeastDate,$FEASTS_MEMORIALS) ){
-                $LitCal[$row["TAG"]] = new Festivity($row["NAME"],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
+                $LitCal[$row["TAG"]] = new Festivity($row["NAME".$LOCALE],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
                 
                 //If a fixed date Optional Memorial falls between 17 Dec. to 24 Dec., the Octave of Christmas or weekdays of the Lenten season,
 		//it is reduced in rank to a Commemoration (only the collect can be used            
