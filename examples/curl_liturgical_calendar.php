@@ -388,7 +388,7 @@
     echo '<td><label>CORPUS CHRISTI (CORPUS DOMINI): <select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" '.(CORPUSCHRISTI==="THURSDAY"?" SELECTED":"").'>Thursday</option><option value="SUNDAY" '.(CORPUSCHRISTI==="SUNDAY"?" SELECTED":"").'>Sunday</option></select></label></td>';
     echo '<td><label>LOCALE: <select name="locale" id="locale"><option value="EN" '.($LOCALE==="EN"?" SELECTED":"").'>EN</option><option value="IT" '.($LOCALE==="IT"?" SELECTED":"").'>IT</option><option value="LA" '.($LOCALE==="LA"?" SELECTED":"").'>LA</option></select></label></td>';
     echo '</tr><tr>';
-    echo '<td colspan="5"><input type="SUBMIT" value="GENERATE CALENDAR" /></td>';
+    echo '<td colspan="5" style="text-align:center;"><input type="SUBMIT" value="GENERATE CALENDAR" /></td>';
     echo '</tr></table>';
     echo '</form>';
     echo '</fieldset>';
@@ -396,7 +396,7 @@
     echo '<div style="text-align:center;border:2px groove White;border-radius:6px;width:60%;margin:0px auto;padding-bottom:6px;">';
 
     echo '<h3>Configurations being used to generate this calendar:</h3>';
-    echo '<span>YEAR = '.$YEAR.', EPIPHANY = '.EPIPHANY.', ASCENSION = '.ASCENSION.', CORPUS CHRISTI = '.CORPUSCHRISTI.'</span>';
+    echo '<span>YEAR = '.$YEAR.', EPIPHANY = '.EPIPHANY.', ASCENSION = '.ASCENSION.', CORPUS CHRISTI = '.CORPUSCHRISTI.', LOCALE = '.$LOCALE.'</span>';
     
     echo '</div>';
     
