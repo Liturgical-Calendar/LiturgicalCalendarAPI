@@ -93,6 +93,11 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 }
 
+    //we cannot accept a year any earlier than 1970, since this engine is based on the liturgical reform from Vatican II
+    //with the Prima Editio Typica of the Roman Missal and the General Norms promulgated with the Motu Proprio "Mysterii Paschali" in 1969
+    if($YEAR<1970){ 
+    	die();
+    }
 
     define("EPIPHANY",$EPIPHANY); //possible values "SUNDAY_JAN2_JAN8" and "JAN6"
     define("ASCENSION",$ASCENSION); //possible values "THURSDAY" and "SUNDAY"
@@ -594,8 +599,6 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 }
                 
                 //We can now add, for logical reasons, Feasts and Memorials to the $FEASTS_MEMORIALS array
-		//obviously not that they be considered as solemnities but simply because they will override the weekdays of ordinary time
-		//and we have finished dealing with solemnities at this point in any case
                 if($LitCal[$row["TAG"]]->grade > MEMORIALOPT){
                     array_push($FEASTS_MEMORIALS,$currentFeastDate);
                     //Also, while we're add it, let's remove the weekdays of Epiphany that get overriden by memorials
@@ -615,6 +618,46 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
     }
 
+    /*if we are dealing with a calendar from the year 2002 onwards we need to add the obligatory memorials from the Tertia Editio Typica:
+	14 augusti:  S. Maximiliani Mariae Kolbe, presbyteri et martyris; 
+	20 septembris:  Ss. Andreae Kim Taegon, presbyteri, et Pauli Chong Hasang et sociorum, martyrum; 
+	24 novembris:  Ss. Andreae Dung-Lac, presbyteri, et sociorum, martyrum.
+	source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html
+    */
+    if($YEAR >= 2002){
+    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed_2002 WHERE GRADE = ".MEMORIAL)){
+        while($row = mysqli_fetch_assoc($result)){
+            
+            //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Festivity
+            $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"].'-'.$row["MONTH"].'-'.$YEAR);
+            if((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate,$SOLEMNITIES) ){
+                $LitCal[$row["TAG"]] = new Festivity($row["NAME_".$LOCALE],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
+                
+                //If a fixed date Memorial falls within the Lenten season, it is reduced in rank to a Commemoration.                
+                if($currentFeastDate > $LitCal["AshWednesday"]->date && $currentFeastDate < $LitCal["HolyThurs"]->date ){
+                    $LitCal[$row["TAG"]]->grade = COMMEMORATION;
+                }
+                
+                //We can now add, for logical reasons, Feasts and Memorials to the $FEASTS_MEMORIALS array
+                if($LitCal[$row["TAG"]]->grade > MEMORIALOPT){
+                    array_push($FEASTS_MEMORIALS,$currentFeastDate);
+                    //Also, while we're add it, let's remove the weekdays of Epiphany that get overriden by memorials
+                    if(false !== $key = array_search($LitCal[$row["TAG"]]->date,$WEEKDAYS_EPIPHANY) ){
+                        unset($LitCal[$key]);
+                    }
+                    //IMMACULATEHEART: in years when the memorial of the Immaculate Heart of Mary coincides with another obligatory memorial, 
+                    //as happened in 2014 [28 June, Saint Irenaeus] and 2015 [13 June, Saint Anthony of Padua], both must be considered optional for that year
+                    //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
+                    if(isset($LitCal["ImmaculateHeart"]) && $currentFeastDate == $LitCal["ImmaculateHeart"]->date){
+                        $LitCal["ImmaculateHeart"]->grade = MEMORIALOPT;
+                        $LitCal[$row["TAG"]]->grade = MEMORIALOPT;
+			//unset($LitCal[$key]); $FEASTS_MEMORIALS ImmaculateHeart
+                    }
+                }
+            }
+        }
+    }
+    }
     
     //TODO: implement number 11 !!!
     //11. Proper obligatory memorials, and that is:
@@ -641,6 +684,45 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
     }
 
+    /*if we are dealing with a calendar from the year 2002 onwards we need to add the optional memorials from the Tertia Editio Typica:
+	23 aprilis:  S. Adalberti, episcopi et martyris
+	28 aprilis:  S. Ludovici Mariae Grignion de Montfort, presbyteri
+	2 augusti:  S. Petri Iuliani Eymard, presbyteri
+	9 septembris:  S. Petri Claver, presbyteri
+	28 septembris:  Ss. Laurentii Ruiz et sociorum, martyrum
+	
+	11 new celebrations (I believe all considered optional memorials?)
+	3 ianuarii:  SS.mi Nominis Iesu
+	8 februarii:  S. Iosephinae Bakhita, virginis
+	13 maii:  Beatae Mariae Virginis de Fatima
+	21 maii:  Ss. Christophori Magallanes, presbyteri, et sociorum, martyrum
+	22 maii:  S. Ritae de Cascia, religiosae
+	9 iulii:  Ss. Augustini Zhao Rong, presbyteri et sociorum, martyrum
+	20 iulii:  S. Apollinaris, episcopi et martyris
+	24 iulii:  S. Sarbelii Makhluf, presbyteri
+	9 augusti:  S. Teresiae Benedictae a Cruce, virginis et martyris
+	12 septembris:  SS.mi Nominis Mariae
+	25 novembris:  S. Catharinae Alexandrinae, virginis et martyris
+	source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html
+    */
+    if($YEAR >= 2002){
+    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed_2002 WHERE GRADE = ".MEMORIALOPT)){
+        while($row = mysqli_fetch_assoc($result)){
+            
+            //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord or a Feast or an obligatory memorial, then go ahead and create the Optional Memorial
+            $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"].'-'.$row["MONTH"].'-'.$YEAR);
+            if((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate,$SOLEMNITIES) && !in_array($currentFeastDate,$FEASTS_MEMORIALS) ){
+                $LitCal[$row["TAG"]] = new Festivity($row["NAME_".$LOCALE],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
+                
+                //If a fixed date Optional Memorial falls between 17 Dec. to 24 Dec., the Octave of Christmas or weekdays of the Lenten season,
+		//it is reduced in rank to a Commemoration (only the collect can be used            
+                if( in_array($currentFeastDate,$WEEKDAYS_ADVENT_CHRISTMAS_LENT) ){
+                    $LitCal[$row["TAG"]]->grade = COMMEMORATION;
+                }                
+            }
+        }
+    }
+    }
     //13. Weekdays of Advent up until Dec. 16 included (already calculated and defined together with weekdays 17 Dec. - 24 Dec.)
     //    Weekdays of Christmas season from 2 Jan. until the Saturday after Epiphany
     //    Weekdays of the Easter season, from the Monday after the Octave of Easter to the Saturday before Pentecost
