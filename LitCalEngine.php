@@ -325,10 +325,10 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
     
     //3. Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar
-    $LitCal["SacredHeart"]      = new Festivity("Sacred Heart of Jesus",              calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+5).'D')),  "red",      "mobile", SOLEMNITY);
+    $LitCal["SacredHeart"]      = new Festivity($PROPRIUM_DE_TEMPORE["SacredHeart"]["NAME_".$LOCALE],    calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+5).'D')),  "red",      "mobile", SOLEMNITY);
 
     //Christ the King is calculated backwards from the first sunday of advent
-    $LitCal["ChristKing"]       = new Festivity("Christ the King",                    DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P'.(4*7).'D')),    "red",  "mobile", SOLEMNITY);
+    $LitCal["ChristKing"]       = new Festivity($PROPRIUM_DE_TEMPORE["ChristKing"]["NAME_".$LOCALE],     DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P'.(4*7).'D')),    "red",  "mobile", SOLEMNITY);
     array_push($SOLEMNITIES,$LitCal["SacredHeart"]->date,$LitCal["ChristKing"]->date);
     //END MOBILE SOLEMNITIES
     
