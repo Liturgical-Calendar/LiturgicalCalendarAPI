@@ -454,7 +454,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $firstOrdinary = DateTime::createFromFormat('!j-n-Y', $BaptismLordFmt)->modify($BaptismLordMod)->modify('next Sunday')->add(new DateInterval('P'.(($ordSun-1)*7).'D'));
         $ordSun++;
         if(!in_array($firstOrdinary,$SOLEMNITIES) ){
-            $LitCal["OrdSunday".$ordSun] = new Festivity($ordSun.ordSuffix($ordSun)." Sunday of Ordinary Time",$firstOrdinary,"green","mobile");
+            $LitCal["OrdSunday".$ordSun] = new Festivity($PROPRIUM_DE_TEMPORE["OrdSunday".$ordSun]["NAME_".$LOCALE],$firstOrdinary,"green","mobile");
             //add Sundays to our priority list for next checking against ordinary Feasts not of Our Lord
             array_push($SOLEMNITIES,$firstOrdinary);
         }
@@ -473,7 +473,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $lastOrdinary = DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P'.(++$ordSunCycle * 7).'D'));
         $ordSun--;
         if(!in_array($lastOrdinary,$SOLEMNITIES) ){
-            $LitCal["OrdSunday".$ordSun] = new Festivity($ordSun.ordSuffix($ordSun)." Sunday of Ordinary Time",$lastOrdinary,"green","mobile");
+            $LitCal["OrdSunday".$ordSun] = new Festivity($PROPRIUM_DE_TEMPORE["OrdSunday".$ordSun]["NAME_".$LOCALE],$lastOrdinary,"green","mobile");
             //add Sundays to our priority list for next checking against ordinary Feasts not of Our Lord
             array_push($SOLEMNITIES,$lastOrdinary);
         }
