@@ -414,28 +414,31 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $BaptismLordMod = 'next Monday';
         }
     }
-    $LitCal["BaptismLord"]      = new Festivity("Baptism of the Lord",                DateTime::createFromFormat('!j-n-Y', $BaptismLordFmt)->modify($BaptismLordMod),"white","mobile", FEASTLORD);
+    $LitCal["BaptismLord"]      = new Festivity($PROPRIUM_DE_TEMPORE["BaptismLord"]["NAME_".$LOCALE], DateTime::createFromFormat('!j-n-Y', $BaptismLordFmt)->modify($BaptismLordMod),"white","mobile", FEASTLORD);
 
-
-
+    //the other feasts of the Lord (Presentation, Transfiguration and Triumph of the Holy Cross) are fixed date feasts
+    //and are found in the Proprium de Sanctis
+    //so we will look them up in the MySQL table of festivities of the Roman Calendar from the Proper of Saints
+    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = ".FEASTLORD)){
+        while($row = mysqli_fetch_assoc($result)){
+            $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"].'-'.$row["MONTH"].'-'.$YEAR);
+	    $LitCal[$row["TAG"]] = new Festivity($row["NAME_".$LOCALE],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
+        }
+    }
     
-    $LitCal["Presentation"]     = new Festivity("Presentation of the Lord",           DateTime::createFromFormat('!j-n-Y', '2-2-'.$YEAR),             "white",    "fixed", FEASTLORD);
-    $LitCal["Transfiguration"]  = new Festivity("Transfiguration of the Lord",        DateTime::createFromFormat('!j-n-Y', '6-8-'.$YEAR),             "white",    "fixed", FEASTLORD);
-    $LitCal["HolyCross"]        = new Festivity("Triumph of the Cross",               DateTime::createFromFormat('!j-n-Y', '14-9-'.$YEAR),            "red",      "fixed", FEASTLORD);
-    
-    //Holy Family is celebrated the Sunday after Christmas, unless Christmas fall on a Sunday, in which case it is celebrated Dec. 30
+    //Holy Family is celebrated the Sunday after Christmas, unless Christmas falls on a Sunday, in which case it is celebrated Dec. 30
     if((int)DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->format('N') === 7){
-        $LitCal["HolyFamily"]   = new Festivity("Holy Family",                        DateTime::createFromFormat('!j-n-Y', '30-12-'.$YEAR),           "white",    "mobile", FEASTLORD);
+        $LitCal["HolyFamily"]   = new Festivity($PROPRIUM_DE_TEMPORE["HolyFamily"]["NAME_".$LOCALE], DateTime::createFromFormat('!j-n-Y', '30-12-'.$YEAR),           "white",    "mobile", FEASTLORD);
     }
     else{
-        $LitCal["HolyFamily"]   = new Festivity("Holy Family",                        DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('next Sunday'),                                          "white","mobile", FEASTLORD);
+        $LitCal["HolyFamily"]   = new Festivity($PROPRIUM_DE_TEMPORE["HolyFamily"]["NAME_".$LOCALE], DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('next Sunday'),                                          "white","mobile", FEASTLORD);
     }
     //END FEASTS OF OUR LORD
     
     
     //If a fixed date Solemnity occurs on a Sunday of Ordinary Time or on a Sunday of Christmas, the Solemnity is celebrated in place of the Sunday. (e.g., Birth of John the Baptist, 1990)
     //If a fixed date Feast of the Lord occurs on a Sunday in Ordinary Time, the feast is celebrated in place of the Sunday
-    array_push($SOLEMNITIES,$LitCal["Presentation"]->date,$LitCal["Transfiguration"]->date,$LitCal["HolyCross"]->date);
+    array_push($SOLEMNITIES,$LitCal["BaptismLord"]->date,$LitCal["Presentation"]->date,$LitCal["Transfiguration"]->date,$LitCal["HolyCross"]->date,$LitCal["HolyFamily"]->date);
 
 
     
