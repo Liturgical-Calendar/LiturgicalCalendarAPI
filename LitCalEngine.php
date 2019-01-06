@@ -184,7 +184,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
      */	    
     if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdetempore WHERE GRADE = ".HIGHERSOLEMNITY)){
         while($row = mysqli_fetch_assoc($result)){
-            $HIGHERSOLEMNITIES[$row["TAG"]] = $row;
+            $HIGHERSOLEMNITIES[$row["TAG"]] = array("COLOR"=>$row["COLOR"],"GRADE"=>$row["GRADE"],"NAME_".$LOCALE=>$row["NAME_".$LOCALE]);
         }
     }
     
@@ -194,7 +194,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
 // I.
     //1. Easter Triduum of the Lord's Passion and Resurrection
-    $LitCal["HolyThurs"]        = new Festivity($HIGHERSOLEMNITIES["HolyThurs"]["NAME_".$LOCALE], calcGregEaster($YEAR)->sub(new DateInterval('P3D')), $HIGHERSOLEMNITIES["HolyThurs"]["COLOR"],    "mobile", HIGHERSOLEMNITY);
+    $LitCal["HolyThurs"]        = new Festivity($HIGHERSOLEMNITIES["HolyThurs"]["NAME_".$LOCALE], calcGregEaster($YEAR)->sub(new DateInterval('P3D')), $HIGHERSOLEMNITIES["HolyThurs"]["COLOR"],    "mobile", $HIGHERSOLEMNITIES["HolyThurs"]["COLOR"]["GRADE"]);
     $LitCal["GoodFri"]          = new Festivity("Good Friday",                        calcGregEaster($YEAR)->sub(new DateInterval('P2D')),            "red",      "mobile", HIGHERSOLEMNITY);
     $LitCal["EasterVigil"]      = new Festivity("Easter Vigil",                       calcGregEaster($YEAR)->sub(new DateInterval('P1D')),            "white",    "mobile", HIGHERSOLEMNITY);
     $LitCal["Easter"]           = new Festivity("Easter Sunday",                      calcGregEaster($YEAR),                                          "white",    "mobile", HIGHERSOLEMNITY);
