@@ -173,7 +173,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $LitCal = array();
 
-    $HIGHERSOLEMNITIES = array(); //will retrieve translated info from Proprium de Tempore table
+    $PTSOLEMNITIES = array(); //will retrieve translated info for Solemnities from the Proprium de Tempore table
     $SOLEMNITIES = array(); //will index defined solemnities and feasts of the Lord
     $FEASTS_MEMORIALS = array(); //will index feasts and obligatory memorials that suppress or influence other lesser liturgical recurrences...
     $WEEKDAYS_ADVENT_CHRISTMAS_LENT = array(); //will index weekdays of advent from 17 Dec. to 24 Dec., of the Octave of Christmas and weekdays of Lent
@@ -182,9 +182,9 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     /**
      * Retrieve Higher Ranking Solemnities from Proprium de Tempore
      */	    
-    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdetempore WHERE GRADE = ".HIGHERSOLEMNITY)){
+    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdetempore")){
         while($row = mysqli_fetch_assoc($result)){
-            $HIGHERSOLEMNITIES[$row["TAG"]] = array("COLOR"=>$row["COLOR"],"GRADE"=>$row["GRADE"],"NAME_".$LOCALE=>$row["NAME_".$LOCALE]);
+            $HSOLEMNITIES[$row["TAG"]] = array("NAME_".$LOCALE=>$row["NAME_".$LOCALE]);
         }
     }
     
@@ -194,17 +194,17 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
 // I.
     //1. Easter Triduum of the Lord's Passion and Resurrection
-    $LitCal["HolyThurs"]        = new Festivity($HIGHERSOLEMNITIES["HolyThurs"]["NAME_".$LOCALE], calcGregEaster($YEAR)->sub(new DateInterval('P3D')), $HIGHERSOLEMNITIES["HolyThurs"]["COLOR"],    "mobile", $HIGHERSOLEMNITIES["HolyThurs"]["COLOR"]["GRADE"]);
-    $LitCal["GoodFri"]          = new Festivity("Good Friday",                        calcGregEaster($YEAR)->sub(new DateInterval('P2D')),            "red",      "mobile", HIGHERSOLEMNITY);
-    $LitCal["EasterVigil"]      = new Festivity("Easter Vigil",                       calcGregEaster($YEAR)->sub(new DateInterval('P1D')),            "white",    "mobile", HIGHERSOLEMNITY);
-    $LitCal["Easter"]           = new Festivity("Easter Sunday",                      calcGregEaster($YEAR),                                          "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["HolyThurs"]        = new Festivity($PTSOLEMNITIES["HolyThurs"]["NAME_".$LOCALE],    calcGregEaster($YEAR)->sub(new DateInterval('P3D')), "white", "mobile", HIGHERSOLEMNITY);
+    $LitCal["GoodFri"]          = new Festivity($PTSOLEMNITIES["GoodFri"]["NAME_".$LOCALE],      calcGregEaster($YEAR)->sub(new DateInterval('P2D')), "red",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["EasterVigil"]      = new Festivity($PTSOLEMNITIES["EasterVigil"]["NAME_".$LOCALE],  calcGregEaster($YEAR)->sub(new DateInterval('P1D')), "white", "mobile", HIGHERSOLEMNITY);
+    $LitCal["Easter"]           = new Festivity($PTSOLEMNITIES["Easter"]["NAME_".$LOCALE],       calcGregEaster($YEAR),                               "white", "mobile", HIGHERSOLEMNITY);
     
     //2. Christmas, Epiphany, Ascension, and Pentecost
-    $LitCal["Christmas"]        = new Festivity("Christmas",                          DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR),           "white",    "fixed", HIGHERSOLEMNITY);
+    $LitCal["Christmas"]        = new Festivity($PTSOLEMNITIES["Christmas"]["NAME_".$LOCALE],    DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR),"white", "fixed",  HIGHERSOLEMNITY);
     
     if(EPIPHANY === "JAN6"){
 
-        $LitCal["Epiphany"]     = new Festivity("Epiphany",                           DateTime::createFromFormat('!j-n-Y', '6-1-'.$YEAR),             "white",    "fixed", HIGHERSOLEMNITY);
+        $LitCal["Epiphany"]     = new Festivity($PTSOLEMNITIES["Epiphany"]["NAME_".$LOCALE],     DateTime::createFromFormat('!j-n-Y', '6-1-'.$YEAR),  "white", "fixed",  HIGHERSOLEMNITY);
         
         //If a Sunday occurs on a day from Jan. 2 through Jan. 5, it is called the "Second Sunday of Christmas"
         //Weekdays from Jan. 2 through Jan. 5 are called "*day before Epiphany"
@@ -234,12 +234,12 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     else if (EPIPHANY === "SUNDAY_JAN2_JAN8"){
         //If January 2nd is a Sunday, then go with Jan 2nd
         if((int)DateTime::createFromFormat('!j-n-Y', '2-1-'.$YEAR)->format('N') === 7){
-            $LitCal["Epiphany"] = new Festivity("Epiphany",                           DateTime::createFromFormat('!j-n-Y', '2-1-'.$YEAR),             "white",    "mobile", HIGHERSOLEMNITY);        
+            $LitCal["Epiphany"] = new Festivity($PTSOLEMNITIES["Epiphany"]["NAME_".$LOCALE],      DateTime::createFromFormat('!j-n-Y', '2-1-'.$YEAR), "white",    "mobile",    HIGHERSOLEMNITY);
         }
         //otherwise find the Sunday following Jan 2nd
         else{
             $SundayOfEpiphany = DateTime::createFromFormat('!j-n-Y', '2-1-'.$YEAR)->modify('next Sunday');
-            $LitCal["Epiphany"] = new Festivity("Epiphany",                           $SundayOfEpiphany,                                              "white",    "mobile", HIGHERSOLEMNITY);
+            $LitCal["Epiphany"] = new Festivity($HSOLEMNITIES["Epiphany"]["NAME_".$LOCALE],      $SundayOfEpiphany,                                    "white",    "mobile",    HIGHERSOLEMNITY);
             
             //Weekdays from Jan. 2 until the following Sunday are called "*day before Epiphany"
             //echo $SundayOfEpiphany->format('j');
@@ -333,7 +333,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     //END MOBILE SOLEMNITIES
     
     //START FIXED SOLEMNITIES
-    $LitCal["MotherGod"]        = new Festivity("Mary, Mother of God",                DateTime::createFromFormat('!j-n-Y', '1-1-'.$YEAR),             "white",    "fixed", SOLEMNITY);
+    $LitCal["MotherGod"]        = new Festivity($PTSOLEMNITIES["MotherGod"]["NAME_".$LOCALE], DateTime::createFromFormat('!j-n-Y', '1-1-'.$YEAR),      "white",    "fixed", SOLEMNITY);
     $LitCal["StJoseph"]         = new Festivity("Joseph, Husband of Mary",            DateTime::createFromFormat('!j-n-Y', '19-3-'.$YEAR),            "white",    "fixed", SOLEMNITY);
     $LitCal["Annunciation"]     = new Festivity("Annunciation",                       DateTime::createFromFormat('!j-n-Y', '25-3-'.$YEAR),            "white",    "fixed", SOLEMNITY);
     
