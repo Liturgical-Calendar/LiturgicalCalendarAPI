@@ -173,19 +173,28 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $LitCal = array();
 
+    $HIGHERSOLEMNITIES = array(); //will retrieve translated info from Proprium de Tempore table
     $SOLEMNITIES = array(); //will index defined solemnities and feasts of the Lord
     $FEASTS_MEMORIALS = array(); //will index feasts and obligatory memorials that suppress or influence other lesser liturgical recurrences...
     $WEEKDAYS_ADVENT_CHRISTMAS_LENT = array(); //will index weekdays of advent from 17 Dec. to 24 Dec., of the Octave of Christmas and weekdays of Lent
     $WEEKDAYS_EPIPHANY = array(); //useful to be able to remove a weekday of Epiphany that is overriden by a memorial
 
-	
+    /**
+     * Retrieve Higher Ranking Solemnities from Proprium de Tempore
+     */	    
+    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdetempore WHERE GRADE = ".HIGHERSOLEMNITY)){
+        while($row = mysqli_fetch_assoc($result)){
+            $HIGHERSOLEMNITIES[$row["TAG"]] = $row;
+        }
+    }
+    
     /**
      *  START FILLING OUR FESTIVITY OBJECT BASED ON THE ORDER OF PRECEDENCE OF LITURGICAL DAYS (LY 59)
      */
     
 // I.
     //1. Easter Triduum of the Lord's Passion and Resurrection
-    $LitCal["HolyThurs"]        = new Festivity("Holy Thursday",                      calcGregEaster($YEAR)->sub(new DateInterval('P3D')),            "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["HolyThurs"]        = new Festivity($HIGHERSOLEMNITIES["HolyThurs"]["NAME_".$LOCALE], calcGregEaster($YEAR)->sub(new DateInterval('P3D')), $HIGHERSOLEMNITIES["HolyThurs"]["COLOR"],    "mobile", HIGHERSOLEMNITY);
     $LitCal["GoodFri"]          = new Festivity("Good Friday",                        calcGregEaster($YEAR)->sub(new DateInterval('P2D')),            "red",      "mobile", HIGHERSOLEMNITY);
     $LitCal["EasterVigil"]      = new Festivity("Easter Vigil",                       calcGregEaster($YEAR)->sub(new DateInterval('P1D')),            "white",    "mobile", HIGHERSOLEMNITY);
     $LitCal["Easter"]           = new Festivity("Easter Sunday",                      calcGregEaster($YEAR),                                          "white",    "mobile", HIGHERSOLEMNITY);
