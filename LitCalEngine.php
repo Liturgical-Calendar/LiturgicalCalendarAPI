@@ -333,21 +333,17 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     //END MOBILE SOLEMNITIES
     
     //START FIXED SOLEMNITIES
+    //even though Mary Mother of God is a fixed date solemnity, however it is found in the Proprium de Tempore and not in the Proprium de Sanctis
     $LitCal["MotherGod"]        = new Festivity($PROPRIUM_DE_TEMPORE["MotherGod"]["NAME_".$LOCALE], DateTime::createFromFormat('!j-n-Y', '1-1-'.$YEAR),      "white",    "fixed", SOLEMNITY);
-    $LitCal["StJoseph"]         = new Festivity("Joseph, Husband of Mary",            DateTime::createFromFormat('!j-n-Y', '19-3-'.$YEAR),            "white",    "fixed", SOLEMNITY);
-    $LitCal["Annunciation"]     = new Festivity("Annunciation",                       DateTime::createFromFormat('!j-n-Y', '25-3-'.$YEAR),            "white",    "fixed", SOLEMNITY);
-    
-    $LitCal["ImmConception"]    = new Festivity("Immaculate Conception",              DateTime::createFromFormat('!j-n-Y', '8-12-'.$YEAR),            "white",    "fixed", SOLEMNITY);
-    
-    $LitCal["BirthJohnBapt"]    = new Festivity("Birth of John the Baptist",          DateTime::createFromFormat('!j-n-Y', '24-6-'.$YEAR),            "white",    "fixed", SOLEMNITY);
-    $LitCal["PeterPaulAp"]      = new Festivity("Peter and Paul, Ap",                 DateTime::createFromFormat('!j-n-Y', '29-6-'.$YEAR),            "red",      "fixed", SOLEMNITY);
-    $LitCal["Assumption"]       = new Festivity("Assumption",                         DateTime::createFromFormat('!j-n-Y', '15-8-'.$YEAR),            "white",    "fixed", SOLEMNITY);
-    $LitCal["AllSaints"]        = new Festivity("All Saints",                         DateTime::createFromFormat('!j-n-Y', '1-11-'.$YEAR),            "white",    "fixed", SOLEMNITY);
-    
-    //All Souls is treated like a Solemnity, in that in can over-rank a Sunday of Ordinary Time
-    $LitCal["AllSouls"]        = new Festivity("All Souls",                           DateTime::createFromFormat('!j-n-Y', '2-11-'.$YEAR),            "purple",   "fixed", SOLEMNITY);
 
-
+    //all the other fixed date solemnities are found in the Proprium de Sanctis
+    //so we will look them up in the MySQL table of festivities of the Roman Calendar from the Proper of Saints
+    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = ".SOLEMNITY)){
+        while($row = mysqli_fetch_assoc($result)){
+            $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"].'-'.$row["MONTH"].'-'.$YEAR);
+	    $LitCal[$row["TAG"]] = new Festivity($row["NAME_".$LOCALE],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
+        }
+    }
     
     //ENFORCE RULES FOR FIXED DATE SOLEMNITIES
     
@@ -371,16 +367,6 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if($LitCal["Annunciation"]->date == $LitCal["Lent2"]->date || $LitCal["Annunciation"]->date == $LitCal["Lent3"]->date || $LitCal["Annunciation"]->date == $LitCal["Lent4"]->date || $LitCal["Annunciation"]->date == $LitCal["Lent5"]->date){
         $LitCal["Annunciation"]->date->add(new DateInterval('P1D'));
     }
-    //If the Annunciation (Mar 25) falls on Palm Sunday, it is celebrated on the Saturday preceding.
-    //Actually this seems not to be the case, it seems to simply be a tradition of some German churches:
-    //In some German churches it was the custom to keep its office the Saturday before Palm Sunday if the 25th of March fell in Holy Week.
-    //source: http://www.newadvent.org/cathen/01542a.htm
-    /*
-    else if($LitCal["Annunciation"]->date == $LitCal["PalmSun"]->date){
-        $LitCal["Annunciation"]->date->add(new DateInterval('P15D'));
-        //$LitCal["Annunciation"]->date->sub(new DateInterval('P1D'));
-    }
-    */
     
     //A Solemnity impeded in any given year is transferred to the nearest day following designated in nn. 1-8 of the Tables given above (LY 60)
     //However if a solemnity is impeded by a Sunday of Advent, Lent or Easter Time, the solemnity is transferred to the Monday following,
@@ -394,8 +380,16 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     else if($LitCal["Annunciation"]->date >= $LitCal["PalmSun"]->date && $LitCal["Annunciation"]->date <= $LitCal["Easter2"]->date){
         $LitCal["Annunciation"]->date = calcGregEaster($YEAR)->add(new DateInterval('P8D'));
     }
+		    //In some German churches it was the custom to keep the office of the Annunciation on the Saturday before Palm Sunday if the 25th of March fell in Holy Week.
+		    //source: http://www.newadvent.org/cathen/01542a.htm
+		    /*
+		    else if($LitCal["Annunciation"]->date == $LitCal["PalmSun"]->date){
+			$LitCal["Annunciation"]->date->add(new DateInterval('P15D'));
+			//$LitCal["Annunciation"]->date->sub(new DateInterval('P1D'));
+		    }
+		    */
 
-    array_push($SOLEMNITIES,$LitCal["BirthJohnBapt"]->date,$LitCal["PeterPaulAp"]->date,$LitCal["Assumption"]->date,$LitCal["AllSaints"]->date,$LitCal["AllSouls"]->date);
+    array_push($SOLEMNITIES,$LitCal["MotherGod"]->date,$LitCal["BirthJohnBapt"]->date,$LitCal["PeterPaulAp"]->date,$LitCal["Assumption"]->date,$LitCal["AllSaints"]->date,$LitCal["AllSouls"]->date);
     array_push($SOLEMNITIES,$LitCal["StJoseph"]->date,$LitCal["Annunciation"]->date,$LitCal["ImmConception"]->date);
     
     //4. Proper solemnities
