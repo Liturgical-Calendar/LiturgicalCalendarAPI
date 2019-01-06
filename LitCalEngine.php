@@ -488,7 +488,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     //7. FEASTS OF THE BLESSED VIRGIN MARY AND OF THE SAINTS IN THE GENERAL CALENDAR
 
     //We will look up Feasts from the MySQL table of festivities of the Roman Calendar
-    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed WHERE GRADE = ".FEAST)){
+    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = ".FEAST)){
         while($row = mysqli_fetch_assoc($result)){
             
             //If a Feast (not of the Lord) occurs on a Sunday in Ordinary Time, the Sunday is celebrated.  (e.g., St. Luke, 1992)
@@ -594,7 +594,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 	//This is taken care of in the next code cycle, see tag IMMACULATEHEART: in the code comments ahead
     }
 
-    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed WHERE GRADE = ".MEMORIAL)){
+    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = ".MEMORIAL)){
         while($row = mysqli_fetch_assoc($result)){
             
             //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Festivity
@@ -634,7 +634,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 	source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html
     */
     if($YEAR >= 2002){
-    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed_2002 WHERE GRADE = ".MEMORIAL)){
+    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis_2002 WHERE GRADE = ".MEMORIAL)){
         while($row = mysqli_fetch_assoc($result)){
             
             //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Festivity
@@ -676,7 +676,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     //12. Optional memorials (a proper memorial is to be preferred to a general optional memorial (PC, 23 c) )
     //	which however can be celebrated even in those days listed at n. 9, 
     //  in the special manner described by the General Instructions of the Roman Missal and of the Liturgy of the Hours (cf pp. 26-27, n. 10)
-    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed WHERE GRADE = ".MEMORIALOPT)){
+    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = ".MEMORIALOPT)){
         while($row = mysqli_fetch_assoc($result)){
             
             //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord or a Feast or an obligatory memorial, then go ahead and create the Optional Memorial
@@ -715,7 +715,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 	source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html
     */
     if($YEAR >= 2002){
-    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_fixed_2002 WHERE GRADE = ".MEMORIALOPT)){
+    if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis_2002 WHERE GRADE = ".MEMORIALOPT)){
         while($row = mysqli_fetch_assoc($result)){
             
             //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord or a Feast or an obligatory memorial, then go ahead and create the Optional Memorial
