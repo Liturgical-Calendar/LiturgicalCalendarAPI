@@ -173,7 +173,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $LitCal = array();
 
-    $PTSOLEMNITIES = array(); //will retrieve translated info for Solemnities from the Proprium de Tempore table
+    $PROPRIUM_DE_TEMPORE = array(); //will retrieve translated info for recurrences in the Proprium de Tempore table
     $SOLEMNITIES = array(); //will index defined solemnities and feasts of the Lord
     $FEASTS_MEMORIALS = array(); //will index feasts and obligatory memorials that suppress or influence other lesser liturgical recurrences...
     $WEEKDAYS_ADVENT_CHRISTMAS_LENT = array(); //will index weekdays of advent from 17 Dec. to 24 Dec., of the Octave of Christmas and weekdays of Lent
@@ -184,7 +184,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
      */	    
     if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdetempore")){
         while($row = mysqli_fetch_assoc($result)){
-            $HSOLEMNITIES[$row["TAG"]] = array("NAME_".$LOCALE=>$row["NAME_".$LOCALE]);
+            $PROPRIUM_DE_TEMPORE[$row["TAG"]] = array("NAME_".$LOCALE=>$row["NAME_".$LOCALE]);
         }
     }
     
@@ -194,24 +194,24 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
 // I.
     //1. Easter Triduum of the Lord's Passion and Resurrection
-    $LitCal["HolyThurs"]        = new Festivity($PTSOLEMNITIES["HolyThurs"]["NAME_".$LOCALE],    calcGregEaster($YEAR)->sub(new DateInterval('P3D')), "white", "mobile", HIGHERSOLEMNITY);
-    $LitCal["GoodFri"]          = new Festivity($PTSOLEMNITIES["GoodFri"]["NAME_".$LOCALE],      calcGregEaster($YEAR)->sub(new DateInterval('P2D')), "red",   "mobile", HIGHERSOLEMNITY);
-    $LitCal["EasterVigil"]      = new Festivity($PTSOLEMNITIES["EasterVigil"]["NAME_".$LOCALE],  calcGregEaster($YEAR)->sub(new DateInterval('P1D')), "white", "mobile", HIGHERSOLEMNITY);
-    $LitCal["Easter"]           = new Festivity($PTSOLEMNITIES["Easter"]["NAME_".$LOCALE],       calcGregEaster($YEAR),                               "white", "mobile", HIGHERSOLEMNITY);
+    $LitCal["HolyThurs"]        = new Festivity($PROPRIUM_DE_TEMPORE["HolyThurs"]["NAME_".$LOCALE],    calcGregEaster($YEAR)->sub(new DateInterval('P3D')), "white", "mobile", HIGHERSOLEMNITY);
+    $LitCal["GoodFri"]          = new Festivity($PROPRIUM_DE_TEMPORE["GoodFri"]["NAME_".$LOCALE],      calcGregEaster($YEAR)->sub(new DateInterval('P2D')), "red",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["EasterVigil"]      = new Festivity($PROPRIUM_DE_TEMPORE["EasterVigil"]["NAME_".$LOCALE],  calcGregEaster($YEAR)->sub(new DateInterval('P1D')), "white", "mobile", HIGHERSOLEMNITY);
+    $LitCal["Easter"]           = new Festivity($PROPRIUM_DE_TEMPORE["Easter"]["NAME_".$LOCALE],       calcGregEaster($YEAR),                               "white", "mobile", HIGHERSOLEMNITY);
     
     //2. Christmas, Epiphany, Ascension, and Pentecost
-    $LitCal["Christmas"]        = new Festivity($PTSOLEMNITIES["Christmas"]["NAME_".$LOCALE],    DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR),"white", "fixed",  HIGHERSOLEMNITY);
+    $LitCal["Christmas"]        = new Festivity($PROPRIUM_DE_TEMPORE["Christmas"]["NAME_".$LOCALE],    DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR),"white", "fixed",  HIGHERSOLEMNITY);
     
     if(EPIPHANY === "JAN6"){
 
-        $LitCal["Epiphany"]     = new Festivity($PTSOLEMNITIES["Epiphany"]["NAME_".$LOCALE],     DateTime::createFromFormat('!j-n-Y', '6-1-'.$YEAR),  "white", "fixed",  HIGHERSOLEMNITY);
+        $LitCal["Epiphany"]     = new Festivity($PROPRIUM_DE_TEMPORE["Epiphany"]["NAME_".$LOCALE],     DateTime::createFromFormat('!j-n-Y', '6-1-'.$YEAR),  "white", "fixed",  HIGHERSOLEMNITY);
         
         //If a Sunday occurs on a day from Jan. 2 through Jan. 5, it is called the "Second Sunday of Christmas"
         //Weekdays from Jan. 2 through Jan. 5 are called "*day before Epiphany"
         $nth=0;
         for($i=2;$i<=5;$i++){
             if((int)DateTime::createFromFormat('!j-n-Y', $i.'-1-'.$YEAR)->format('N') === 7){
-                $LitCal["Christmas2"] = new Festivity($PTSOLEMNITIES["Christmas2"]["NAME_".$LOCALE], DateTime::createFromFormat('!j-n-Y', $i.'-1-'.$YEAR), "white",     "mobile", FEAST);
+                $LitCal["Christmas2"] = new Festivity($PROPRIUM_DE_TEMPORE["Christmas2"]["NAME_".$LOCALE], DateTime::createFromFormat('!j-n-Y', $i.'-1-'.$YEAR), "white",     "mobile", FEAST);
             }
             else{
                 $nth++;
@@ -234,12 +234,12 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     else if (EPIPHANY === "SUNDAY_JAN2_JAN8"){
         //If January 2nd is a Sunday, then go with Jan 2nd
         if((int)DateTime::createFromFormat('!j-n-Y', '2-1-'.$YEAR)->format('N') === 7){
-            $LitCal["Epiphany"] = new Festivity($PTSOLEMNITIES["Epiphany"]["NAME_".$LOCALE],      DateTime::createFromFormat('!j-n-Y', '2-1-'.$YEAR), "white",    "mobile",    HIGHERSOLEMNITY);
+            $LitCal["Epiphany"] = new Festivity($PROPRIUM_DE_TEMPORE["Epiphany"]["NAME_".$LOCALE],      DateTime::createFromFormat('!j-n-Y', '2-1-'.$YEAR), "white",    "mobile",    HIGHERSOLEMNITY);
         }
         //otherwise find the Sunday following Jan 2nd
         else{
             $SundayOfEpiphany = DateTime::createFromFormat('!j-n-Y', '2-1-'.$YEAR)->modify('next Sunday');
-            $LitCal["Epiphany"] = new Festivity($HSOLEMNITIES["Epiphany"]["NAME_".$LOCALE],      $SundayOfEpiphany,                                    "white",    "mobile",    HIGHERSOLEMNITY);
+            $LitCal["Epiphany"] = new Festivity($PROPRIUM_DE_TEMPORE["Epiphany"]["NAME_".$LOCALE],      $SundayOfEpiphany,                                    "white",    "mobile",    HIGHERSOLEMNITY);
             
             //Weekdays from Jan. 2 until the following Sunday are called "*day before Epiphany"
             //echo $SundayOfEpiphany->format('j');
@@ -269,30 +269,30 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
     
     if(ASCENSION === "THURSDAY"){
-        $LitCal["Ascension"]    = new Festivity($PTSOLEMNITIES["Ascension"]["NAME_".$LOCALE],    calcGregEaster($YEAR)->add(new DateInterval('P39D')),           "white",    "mobile", HIGHERSOLEMNITY);
-        $LitCal["Easter7"]      = new Festivity($PTSOLEMNITIES["Easter7"]["NAME_".$LOCALE],      calcGregEaster($YEAR)->add(new DateInterval('P'.(7*6).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
+        $LitCal["Ascension"]    = new Festivity($PROPRIUM_DE_TEMPORE["Ascension"]["NAME_".$LOCALE],    calcGregEaster($YEAR)->add(new DateInterval('P39D')),           "white",    "mobile", HIGHERSOLEMNITY);
+        $LitCal["Easter7"]      = new Festivity($PROPRIUM_DE_TEMPORE["Easter7"]["NAME_".$LOCALE],      calcGregEaster($YEAR)->add(new DateInterval('P'.(7*6).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
     }
     else if(ASCENSION === "SUNDAY"){
-        $LitCal["Ascension"]    = new Festivity($PTSOLEMNITIES["Ascension"]["NAME_".$LOCALE],    calcGregEaster($YEAR)->add(new DateInterval('P'.(7*6).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
+        $LitCal["Ascension"]    = new Festivity($PROPRIUM_DE_TEMPORE["Ascension"]["NAME_".$LOCALE],    calcGregEaster($YEAR)->add(new DateInterval('P'.(7*6).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
     }
-    $LitCal["Pentecost"]        = new Festivity($PTSOLEMNITIES["Pentecost"]["NAME_".$LOCALE],    calcGregEaster($YEAR)->add(new DateInterval('P'.(7*7).'D')),    "red",      "mobile", HIGHERSOLEMNITY);
+    $LitCal["Pentecost"]        = new Festivity($PROPRIUM_DE_TEMPORE["Pentecost"]["NAME_".$LOCALE],    calcGregEaster($YEAR)->add(new DateInterval('P'.(7*7).'D')),    "red",      "mobile", HIGHERSOLEMNITY);
     
     //Sundays of Advent, Lent, and Easter Time
-    $LitCal["Advent1"]          = new Festivity($PTSOLEMNITIES["Advent1"]["NAME_".$LOCALE],      DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P'.(3*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
-    $LitCal["Advent2"]          = new Festivity($PTSOLEMNITIES["Advent2"]["NAME_".$LOCALE],      DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P'.(2*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
-    $LitCal["Advent3"]          = new Festivity($PTSOLEMNITIES["Advent3"]["NAME_".$LOCALE],      DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P7D')),            "pink",     "mobile", HIGHERSOLEMNITY);
-    $LitCal["Advent4"]          = new Festivity($PTSOLEMNITIES["Advent4"]["NAME_".$LOCALE],      DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday'),                                          "purple",   "mobile", HIGHERSOLEMNITY);
-    $LitCal["Lent1"]            = new Festivity($PTSOLEMNITIES["Lent1"]["NAME_".$LOCALE],        calcGregEaster($YEAR)->sub(new DateInterval('P'.(6*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
-    $LitCal["Lent2"]            = new Festivity($PTSOLEMNITIES["Lent2"]["NAME_".$LOCALE],        calcGregEaster($YEAR)->sub(new DateInterval('P'.(5*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
-    $LitCal["Lent3"]            = new Festivity($PTSOLEMNITIES["Lent3"]["NAME_".$LOCALE],        calcGregEaster($YEAR)->sub(new DateInterval('P'.(4*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
-    $LitCal["Lent4"]            = new Festivity($PTSOLEMNITIES["Lent4"]["NAME_".$LOCALE],        calcGregEaster($YEAR)->sub(new DateInterval('P'.(3*7).'D')),    "pink",     "mobile", HIGHERSOLEMNITY);
-    $LitCal["Lent5"]            = new Festivity($PTSOLEMNITIES["Lent5"]["NAME_".$LOCALE],        calcGregEaster($YEAR)->sub(new DateInterval('P'.(2*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
-    $LitCal["PalmSun"]          = new Festivity($PTSOLEMNITIES["PalmSun"]["NAME_".$LOCALE],      calcGregEaster($YEAR)->sub(new DateInterval('P7D')),            "red",      "mobile", HIGHERSOLEMNITY);
-    $LitCal["Easter2"]          = new Festivity($PTSOLEMNITIES["Easter2"]["NAME_".$LOCALE],      calcGregEaster($YEAR)->add(new DateInterval('P7D')),            "white",    "mobile", HIGHERSOLEMNITY);
-    $LitCal["Easter3"]          = new Festivity($PTSOLEMNITIES["Easter3"]["NAME_".$LOCALE],      calcGregEaster($YEAR)->add(new DateInterval('P'.(7*2).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
-    $LitCal["Easter4"]          = new Festivity($PTSOLEMNITIES["Easter4"]["NAME_".$LOCALE],      calcGregEaster($YEAR)->add(new DateInterval('P'.(7*3).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
-    $LitCal["Easter5"]          = new Festivity($PTSOLEMNITIES["Easter5"]["NAME_".$LOCALE],      calcGregEaster($YEAR)->add(new DateInterval('P'.(7*4).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
-    $LitCal["Easter6"]          = new Festivity($PTSOLEMNITIES["Easter6"]["NAME_".$LOCALE],      calcGregEaster($YEAR)->add(new DateInterval('P'.(7*5).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["Advent1"]          = new Festivity($PROPRIUM_DE_TEMPORE["Advent1"]["NAME_".$LOCALE],      DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P'.(3*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["Advent2"]          = new Festivity($PROPRIUM_DE_TEMPORE["Advent2"]["NAME_".$LOCALE],      DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P'.(2*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["Advent3"]          = new Festivity($PROPRIUM_DE_TEMPORE["Advent3"]["NAME_".$LOCALE],      DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday')->sub(new DateInterval('P7D')),            "pink",     "mobile", HIGHERSOLEMNITY);
+    $LitCal["Advent4"]          = new Festivity($PROPRIUM_DE_TEMPORE["Advent4"]["NAME_".$LOCALE],      DateTime::createFromFormat('!j-n-Y', '25-12-'.$YEAR)->modify('last Sunday'),                                          "purple",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["Lent1"]            = new Festivity($PROPRIUM_DE_TEMPORE["Lent1"]["NAME_".$LOCALE],        calcGregEaster($YEAR)->sub(new DateInterval('P'.(6*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["Lent2"]            = new Festivity($PROPRIUM_DE_TEMPORE["Lent2"]["NAME_".$LOCALE],        calcGregEaster($YEAR)->sub(new DateInterval('P'.(5*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["Lent3"]            = new Festivity($PROPRIUM_DE_TEMPORE["Lent3"]["NAME_".$LOCALE],        calcGregEaster($YEAR)->sub(new DateInterval('P'.(4*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["Lent4"]            = new Festivity($PROPRIUM_DE_TEMPORE["Lent4"]["NAME_".$LOCALE],        calcGregEaster($YEAR)->sub(new DateInterval('P'.(3*7).'D')),    "pink",     "mobile", HIGHERSOLEMNITY);
+    $LitCal["Lent5"]            = new Festivity($PROPRIUM_DE_TEMPORE["Lent5"]["NAME_".$LOCALE],        calcGregEaster($YEAR)->sub(new DateInterval('P'.(2*7).'D')),    "purple",   "mobile", HIGHERSOLEMNITY);
+    $LitCal["PalmSun"]          = new Festivity($PROPRIUM_DE_TEMPORE["PalmSun"]["NAME_".$LOCALE],      calcGregEaster($YEAR)->sub(new DateInterval('P7D')),            "red",      "mobile", HIGHERSOLEMNITY);
+    $LitCal["Easter2"]          = new Festivity($PROPRIUM_DE_TEMPORE["Easter2"]["NAME_".$LOCALE],      calcGregEaster($YEAR)->add(new DateInterval('P7D')),            "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["Easter3"]          = new Festivity($PROPRIUM_DE_TEMPORE["Easter3"]["NAME_".$LOCALE],      calcGregEaster($YEAR)->add(new DateInterval('P'.(7*2).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["Easter4"]          = new Festivity($PROPRIUM_DE_TEMPORE["Easter4"]["NAME_".$LOCALE],      calcGregEaster($YEAR)->add(new DateInterval('P'.(7*3).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["Easter5"]          = new Festivity($PROPRIUM_DE_TEMPORE["Easter5"]["NAME_".$LOCALE],      calcGregEaster($YEAR)->add(new DateInterval('P'.(7*4).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
+    $LitCal["Easter6"]          = new Festivity($PROPRIUM_DE_TEMPORE["Easter6"]["NAME_".$LOCALE],      calcGregEaster($YEAR)->add(new DateInterval('P'.(7*5).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
     $LitCal["Trinity"]          = new Festivity("Holy Trinity Sunday",                calcGregEaster($YEAR)->add(new DateInterval('P'.(7*8).'D')),    "white",    "mobile", HIGHERSOLEMNITY);
     if(CORPUSCHRISTI === "THURSDAY"){
         $LitCal["CorpusChristi"]= new Festivity("Corpus Christi",                     calcGregEaster($YEAR)->add(new DateInterval('P'.(7*8+4).'D')),  "white",    "mobile", HIGHERSOLEMNITY);
