@@ -25,6 +25,18 @@
  *                                                                                *
  *********************************************************************************/
 
+
+/**********************************************************************************
+ *         EDITIONS OF THE ROMAN MISSAL AND OF THE GENERAL ROMAN CALENDAR         *
+ *                                                                                *
+ * Editio typica, 1970                                                            *
+ * Reimpressio emendata, 1971                                                     *
+ * Editio typica secunda, 1975                                                    *
+ * Editio typica tertia, 2002                                                     *
+ *                                                                                *
+ *********************************************************************************/
+
+
 include "Festivity.php"; //this defines a "Festivity" class that can hold all the useful information about a single celebration
 
 /**
