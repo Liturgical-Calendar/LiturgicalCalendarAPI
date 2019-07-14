@@ -33,6 +33,7 @@
  * Reimpressio emendata, 1971                                                     *
  * Editio typica secunda, 1975                                                    *
  * Editio typica tertia, 2002                                                     *
+ * Reimpressio emendata, 2008                                                     *
  *                                                                                *
  *********************************************************************************/
 
