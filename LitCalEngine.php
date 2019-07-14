@@ -780,6 +780,20 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 	    //so did not make it for the Calendar of the 2002 editio typica III
 	    //check if his memorial was inserted in the 2008 editio typica III emendata
 	    //StPadrePio:
+	    
+	    //After the canonization of Pope Saint John XXIII and Pope Saint John Paul II
+	    //with decree of May 29 2014 the Congregation for Divine Worship
+	    //inserted the optional memorials for each in the Universal Calendar
+	    //on October 11 and October 22 respectively
+	    //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_en.html
+	    if($YEAR >= 2014){
+		$StJohnXXIII_tag = array("LA"=>"S. Ioannis XXIII, papae","IT"=>"San Giovanni XXIII, papa","EN"=>"Saint John XXIII, pope");
+	    	$StJohnXXIII_date = DateTime::createFromFormat('!j-n-Y', '11-10-'.$YEAR);
+		$StJohnPaulII_tag = array("LA"=>"S. Ioannis Pauli II, papae","IT"=>"San Giovanni Paolo II, papa","EN"=>"Saint John Paul II, pope");
+	    	$StJohnPaulII_date = DateTime::createFromFormat('!j-n-Y', '22-10-'.$YEAR);
+		$LitCal["StJohnXXIII"] = new Festivity($StJohnXXIII_tag[$LOCALE],$StJohnXXIII_date,"white","fixed",MEMORIALOPT,"Pastors:For a Pope");
+		$LitCal["StJohnPaulII"] = new Festivity($StJohnPaulII_tag[$LOCALE],$StJohnPaulII_date,"white","fixed",MEMORIALOPT,"Pastors:For a Pope");
+	    }
     }
     //13. Weekdays of Advent up until Dec. 16 included (already calculated and defined together with weekdays 17 Dec. - 24 Dec.)
     //    Weekdays of Christmas season from 2 Jan. until the Saturday after Epiphany
