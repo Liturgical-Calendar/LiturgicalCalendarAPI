@@ -765,6 +765,16 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             }
         }
     }
+	    //Also, Saint Jane Frances de Chantal was moved from December 12 to August 12, 
+	    //probably to allow local bishop's conferences to insert Our Lady of Guadalupe as an optional memorial on December 12
+	    //seeing that with the decree of March 25th 1999 of the Congregation of Divine Worship
+	    //Our Lady of Guadalupe was granted as a Feast day for all dioceses and territories of the Americas
+	    //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_lt.html
+	    //TODO: check if Our Lady of Guadalupe became an optional memorial in the Universal Calendar in the 2008 edition of the Roman Missal
+	    $StJaneFrancesNewDate = DateTime::createFromFormat('!j-n-Y', '12-8-'.$YEAR);
+	    if(array_key_exists($LitCal,"StJaneFrancesDeChantal") && (int)$StJaneFrancesNewDate->format('N') !== 7 && !in_array($StJaneFrancesNewDate,$SOLEMNITIES) && !in_array($StJaneFrancesNewDate,$FEASTS_MEMORIALS) ){
+	    	$LitCal["StJaneFrancesDeChantal"]->date = $StJaneFrancesNewDate;
+	    }
     }
     //13. Weekdays of Advent up until Dec. 16 included (already calculated and defined together with weekdays 17 Dec. - 24 Dec.)
     //    Weekdays of Christmas season from 2 Jan. until the Saturday after Epiphany
