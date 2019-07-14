@@ -787,9 +787,9 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 	    //on October 11 and October 22 respectively
 	    //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_en.html
 	    if($YEAR >= 2014){
-		$StJohnXXIII_tag = array("LA"=>"S. Ioannis XXIII, papae","IT"=>"San Giovanni XXIII, papa","EN"=>"Saint John XXIII, pope");
+		$StJohnXXIII_tag = array("LA"=>"S. Ioannis XXIII, papæ","IT"=>"San Giovanni XXIII, papa","EN"=>"Saint John XXIII, pope");
 	    	$StJohnXXIII_date = DateTime::createFromFormat('!j-n-Y', '11-10-'.$YEAR);
-		$StJohnPaulII_tag = array("LA"=>"S. Ioannis Pauli II, papae","IT"=>"San Giovanni Paolo II, papa","EN"=>"Saint John Paul II, pope");
+		$StJohnPaulII_tag = array("LA"=>"S. Ioannis Pauli II, papæ","IT"=>"San Giovanni Paolo II, papa","EN"=>"Saint John Paul II, pope");
 	    	$StJohnPaulII_date = DateTime::createFromFormat('!j-n-Y', '22-10-'.$YEAR);
 		$LitCal["StJohnXXIII"] = new Festivity($StJohnXXIII_tag[$LOCALE],$StJohnXXIII_date,"white","fixed",MEMORIALOPT,"Pastors:For a Pope");
 		$LitCal["StJohnPaulII"] = new Festivity($StJohnPaulII_tag[$LOCALE],$StJohnPaulII_date,"white","fixed",MEMORIALOPT,"Pastors:For a Pope");
