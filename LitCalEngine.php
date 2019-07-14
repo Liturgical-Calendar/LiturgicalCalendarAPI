@@ -484,7 +484,8 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
     //7. FEASTS OF THE BLESSED VIRGIN MARY AND OF THE SAINTS IN THE GENERAL CALENDAR
 
-    //We will look up Feasts from the MySQL table of festivities of the Roman Calendar
+    //We will look up Feasts from the MySQL table of festivities of the General Roman Calendar
+    //First we get the Calendarium Romanum Generale from the Missale Romanum Editio Typica 1970
     if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = ".FEAST)){
         while($row = mysqli_fetch_assoc($result)){
             
@@ -497,7 +498,13 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             }
         }
     }
-        
+
+	//With the decree Apostolorum Apostola (June 3rd 2016), the Congregation for Divine Worship 
+	//with the approval of Pope Francis elevated the memorial of Saint Mary Magdalen to a Feast
+	//source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf
+	//This is taken care of ahead when the memorials are created, see comment tag MARYMAGDALEN:
+
+
     //END FEASTS OF THE BLESSED VIRGIN MARY AND OF THE SAINTS IN THE GENERAL CALENDAR
 
     //TODO: implement the following section 8
@@ -505,7 +512,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 	//a) feast of the principal patron of the Diocese - for pastoral reasons can be celebrated as a solemnity (PC 8, 9)
 	//b) feast of the anniversary of the Dedication of the cathedral church
 	//c) feast of the principal Patron of the region or province, of a nation or a wider territory - for pastoral reasons can be celebrated as a solemnity (PC 8, 9)
-	//d) feast of the titular, of the founeder, of the principal patron of an Order or Congregation and of the religious province, without prejudice to the prescriptions of n. 4 d
+	//d) feast of the titular, of the founder, of the principal patron of an Order or Congregation and of the religious province, without prejudice to the prescriptions of n. 4 d
 	//e) other feasts proper to an individual church
 	//f) other feasts inscribed in the calendar of a diocese or of a religious order or congregation
 
@@ -599,7 +606,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = ".MEMORIAL)){
         while($row = mysqli_fetch_assoc($result)){
             
-            //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Festivity
+            //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Memorial
             $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"].'-'.$row["MONTH"].'-'.$YEAR);
             if((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate,$SOLEMNITIES) ){
                 $LitCal[$row["TAG"]] = new Festivity($row["NAME_".$LOCALE],$currentFeastDate,$row["COLOR"],"fixed",$row["GRADE"],$row["COMMON"]);
@@ -627,9 +634,21 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 }
             }
         }
+	    
+	//MARYMAGDALEN: With the decree Apostolorum Apostola (June 3rd 2016), the Congregation for Divine Worship 
+	//with the approval of Pope Francis elevated the memorial of Saint Mary Magdalen to a Feast
+	//source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf
+	if($YEAR >= 2016){
+		if(array_key_exists($LitCal,"StMaryMagdalene")){
+		    if($LitCal["StMaryMagdalene"]->grade == MEMORIAL){
+		    	$LitCal["StMaryMagdalene"]->grade = FEAST;
+		    }
+		}
+	}
+	    
     }
 
-    /*if we are dealing with a calendar from the year 2002 onwards we need to add the obligatory memorials from the Tertia Editio Typica:
+    /*if we are dealing with a calendar from the year 2002 onwards we need to add the new obligatory memorials from the Tertia Editio Typica:
 	14 augusti:  S. Maximiliani Mariae Kolbe, presbyteri et martyris; 
 	20 septembris:  Ss. Andreae Kim Taegon, presbyteri, et Pauli Chong Hasang et sociorum, martyrum; 
 	24 novembris:  Ss. Andreae Dung-Lac, presbyteri, et sociorum, martyrum.
