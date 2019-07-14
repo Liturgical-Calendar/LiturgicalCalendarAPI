@@ -584,7 +584,12 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     //III.
     //10. Obligatory memorials in the General Calendar
     if(!in_array(calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+6).'D')),$SOLEMNITIES) ){
-        $LitCal["ImmaculateHeart"]  = new Festivity("Immaculate Heart of Mary",       calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+6).'D')),  "red",      "mobile", MEMORIAL);
+        //Immaculate Heart of Mary fixed on the Saturday following the second Sunday after Pentecost
+	//(see Calendarium Romanum Generale in Missale Romanum Editio Typica 1970) 
+	//Pentecost = calcGregEaster($YEAR)->add(new DateInterval('P'.(7*7).'D'))
+	//Second Sunday after Pentecost = calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9).'D'))
+	//Following Saturday = calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+6).'D'))
+	$LitCal["ImmaculateHeart"]  = new Festivity("Immaculate Heart of Mary",       calcGregEaster($YEAR)->add(new DateInterval('P'.(7*9+6).'D')),  "red",      "mobile", MEMORIAL);
         array_push($FEASTS_MEMORIALS,$LitCal["ImmaculateHeart"]->date);
         //In years when this memorial coincides with another obligatory memorial, as happened in 2014 [28 June, Saint Irenaeus] and 2015 [13 June, Saint Anthony of Padua], both must be considered optional for that year
         //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
