@@ -775,6 +775,11 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 	    if(array_key_exists($LitCal,"StJaneFrancesDeChantal") && (int)$StJaneFrancesNewDate->format('N') !== 7 && !in_array($StJaneFrancesNewDate,$SOLEMNITIES) && !in_array($StJaneFrancesNewDate,$FEASTS_MEMORIALS) ){
 	    	$LitCal["StJaneFrancesDeChantal"]->date = $StJaneFrancesNewDate;
 	    }
+	    
+	    //TODO: Saint Pio of Pietrelcina "Padre Pio" was canonized on June 16 2002, 
+	    //so did not make it for the Calendar of the 2002 editio typica III
+	    //check if his memorial was inserted in the 2008 editio typica III emendata
+	    //StPadrePio:
     }
     //13. Weekdays of Advent up until Dec. 16 included (already calculated and defined together with weekdays 17 Dec. - 24 Dec.)
     //    Weekdays of Christmas season from 2 Jan. until the Saturday after Epiphany
