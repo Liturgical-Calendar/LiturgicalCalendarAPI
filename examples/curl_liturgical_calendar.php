@@ -227,6 +227,9 @@
     $ASCENSION = (isset($_GET["ascension"]) && ($_GET["ascension"] === "THURSDAY" || $_GET["ascension"] === "SUNDAY") ) ? $_GET["ascension"] : "SUNDAY";
     $CORPUSCHRISTI = (isset($_GET["corpuschristi"]) && ($_GET["corpuschristi"] === "THURSDAY" || $_GET["corpuschristi"] === "SUNDAY") ) ? $_GET["corpuschristi"] : "SUNDAY";
     $LOCALE = isset($_GET["locale"]) ? strtoupper($_GET["locale"]) : "LA"; //default to latin
+    ini_set('date.timezone', 'Europe/Vatican');
+    //ini_set('intl.default_locale', strtolower($LOCALE) . '_' . $LOCALE);
+    setlocale(LC_TIME, strtolower($LOCALE) . '_' . $LOCALE);
 
     define("EPIPHANY",$EPIPHANY);
     //define(EPIPHANY,"SUNDAY_JAN2_JAN8");
@@ -343,38 +346,141 @@
 	    if(isset($LitCalData["Settings"]) ){ $YEAR = $LitCalData["Settings"]["YEAR"]; }
 	    if(isset($LitCalData["LitCal"]) ){ $LitCal = $LitCalData["LitCal"]; }
 	    else{
-		die("We do not have enough information. Returned data has no LitCal property:" . var_dump($LitCalData) );
+		    die("We do not have enough information. Returned data has no LitCal property:" . var_dump($LitCalData) );
 	    }
 
 	    foreach($LitCal as $key => $value){
-		// retransform each entry from an associative array to a Festivity class object
-		$LitCal[$key] = new Festivity($LitCal[$key]["name"],$LitCal[$key]["date"],$LitCal[$key]["color"],$LitCal[$key]["type"],$LitCal[$key]["grade"],$LitCal[$key]["common"]);
+		    // retransform each entry from an associative array to a Festivity class object
+		    $LitCal[$key] = new Festivity($LitCal[$key]["name"],$LitCal[$key]["date"],$LitCal[$key]["color"],$LitCal[$key]["type"],$LitCal[$key]["grade"],$LitCal[$key]["common"]);
 	    }
     }
+
+    $messages = [
+        "Generate Roman Calendar" => array(
+            "en" => "Generate Roman Calendar",
+            "it" => "Genera Calendario Romano",
+            "la" => "Calendarium Romanum Generare"
+        ),
+        "Liturgical Calendar Calculation for a Given Year" => array(
+            "en" => "Liturgical Calendar Calculation for a Given Year",
+            "it" => "Calcolo del Calendario Liturgico per un dato anno",
+            "la" => "Computus Calendarii Liturgici pro anno dedi"
+        ),
+        "HTML presentation elaborated by PHP using a CURL request to a %s" => array(
+            "en" => "HTML presentation elaborated by PHP using a CURL request to a %s",
+            "it" => "Presentazione HTML elaborata con PHP usando una richiesta CURL al motore PHP %s",
+            "la" => "Repraesentatio HTML elaborata cum PHP utendo petitionem CURL ad machinam PHP %s"
+        ),
+        "You are requesting a year prior to 1970: it is not possible to request years prior to 1970." => array(
+            "en" => "You are requesting a year prior to 1970: it is not possible to request years prior to 1970.",
+            "it" => "Stai effettuando una richiesta per un anno che è precedente al 1970: non è possibile richiedere anni precedenti al 1970."
+        ),
+        "Configurations being used to generate this calendar:" => array(
+            "en" => "Configurations being used to generate this calendar:",
+            "it" => "Configurazioni utilizzate per la generazione di questo calendario:"
+        ),
+        "Date in Gregorian Calendar" => array(
+            "en" => "Date in Gregorian Calendar",
+            "it" => "Data nel Calendario Gregoriano",
+            "la" => "Dies in Calendario Gregoriano"
+        ),
+        "General Roman Calendar Festivity" => array(
+            "en" => "General Roman Calendar Festivity",
+            "it" => "Festività nel Calendario Romano Generale",
+            "la" => "Festivitas in Calendario Romano Generale"
+        ),
+        "Grade of the Festivity" => array(
+            "en" => "Grade of the Festivity",
+            "it" => "Grado della Festività",
+            "la" => "Gradum Festivitatis"
+        ),
+        "YEAR" => array(
+            "en" => "YEAR",
+            "it" => "ANNO",
+            "la" => "ANNUM"
+        ),
+        "EPIPHANY" => array(
+            "en" => "EPIPHANY",
+            "it" => "EPIFANIA",
+            "la" => "EPIPHANIA"
+        ),
+        "ASCENSION" => array(
+            "en" => "ASCENSION",
+            "it" => "ASCENSIONE",
+            "la" => "ASCENSIO",
+        )
+    ];
+
+    $daysOfTheWeek = [
+        "dies Solis",
+        "dies Lunae",
+        "dies Martis",
+        "dies Mercurii",
+        "dies Iovis",
+        "dies Veneris",
+        "dies Saturni"
+    ];
+
+    $months = [
+        "",
+        "Ianuarius",
+        "Februarius",
+        "Martius",
+        "Aprilis",
+        "Maius",
+        "Iunius",
+        "Iulius",
+        "Augustus",
+        "September",
+        "October",
+        "November",
+        "December"
+    ];
+
     /**************************
      * BEGIN DISPLAY LOGIC
      * 
      *************************/
-    
+    function __($key,$locale){
+        global $messages;
+        $lcl = strtolower($locale);
+        if(isset($messages)){
+            if(isset($messages[$key])){
+                if(isset($messages[$key][$lcl])){
+                    return $messages[$key][$lcl];
+                }
+                else{
+                    return $messages[$key]["en"];
+                }
+            }
+            else{
+                return $key;
+            }    
+        }
+        else{
+            return $key;
+        }
+    }
+
+
 ?>
 <!doctype html>
 <head>
-    <title>Generate Roman Calendar</title>
+    <title><?php echo __("Generate Roman Calendar",$LOCALE) ?></title>
     <meta charset="UTF-8">
     <!-- <link rel="icon" type="image/x-icon" href="../favicon.ico"> -->
-    <meta name="msapplication-TileColor" content="#ffffff" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
 
 <?php
     
-    echo '<h1 style="text-align:center;">Liturgical Calendar Calculation for a Given Year ('.$YEAR.')</h1>';
-    echo '<h2 style="text-align:center;">HTML presentation elaborated by PHP using a CURL request to a <a href="../LitCalEngine.php">PHP engine</a></h2>';
+    echo '<h1 style="text-align:center;">' . __("Liturgical Calendar Calculation for a Given Year",$LOCALE) . ' ('.$YEAR.')</h1>';
+    echo '<h2 style="text-align:center;">' . sprintf(__("HTML presentation elaborated by PHP using a CURL request to a %s",$LOCALE),'<a href="../LitCalEngine.php">PHP engine</a>') . '</h2>';
     
     if($YEAR < 1970){
         echo '<div style="text-align:center;border:3px ridge Green;background-color:LightBlue;width:75%;margin:10px auto;padding:10px;">';
-        echo 'You are requesting a year prior to 1970: it is not possible to request years prior to 1970.';
+        echo __('You are requesting a year prior to 1970: it is not possible to request years prior to 1970.',$LOCALE);
         echo '</div>';        
     }
 
@@ -382,9 +488,9 @@
     echo '<fieldset style="margin-bottom:6px;"><legend>Customize options for generating the Roman Calendar</legend>';
     echo '<form method="GET">';
     echo '<table style="width:100%;"><tr>';
-    echo '<td><label>YEAR: <input type="number" name="year" id="year" min="1969" value="'.$YEAR.'" /></label></td>';
-    echo '<td><label>EPIPHANY: <select name="epiphany" id="epiphany"><option value="JAN6" '.(EPIPHANY==="JAN6"?" SELECTED":"").'>January 6</option><option value="SUNDAY_JAN2_JAN8" '.(EPIPHANY==="SUNDAY_JAN2_JAN8"?" SELECTED":"").'>Sunday between January 2 and January 8</option></select></label></td>';
-    echo '<td><label>ASCENSION: <select name="ascension" id="ascension"><option value="THURSDAY" '.(ASCENSION==="THURSDAY"?" SELECTED":"").'>Thursday</option><option value="SUNDAY" '.(ASCENSION==="SUNDAY"?" SELECTED":"").'>Sunday</option></select></label></td>';
+    echo '<td><label>' . __('YEAR',$LOCALE) . ': <input type="number" name="year" id="year" min="1969" value="'.$YEAR.'" /></label></td>';
+    echo '<td><label>' . __('EPIPHANY',$LOCALE) . ': <select name="epiphany" id="epiphany"><option value="JAN6" '.(EPIPHANY==="JAN6"?" SELECTED":"").'>January 6</option><option value="SUNDAY_JAN2_JAN8" '.(EPIPHANY==="SUNDAY_JAN2_JAN8"?" SELECTED":"").'>Sunday between January 2 and January 8</option></select></label></td>';
+    echo '<td><label>' . __('ASCENSION',$LOCALE) . ': <select name="ascension" id="ascension"><option value="THURSDAY" '.(ASCENSION==="THURSDAY"?" SELECTED":"").'>Thursday</option><option value="SUNDAY" '.(ASCENSION==="SUNDAY"?" SELECTED":"").'>Sunday</option></select></label></td>';
     echo '<td><label>CORPUS CHRISTI (CORPUS DOMINI): <select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" '.(CORPUSCHRISTI==="THURSDAY"?" SELECTED":"").'>Thursday</option><option value="SUNDAY" '.(CORPUSCHRISTI==="SUNDAY"?" SELECTED":"").'>Sunday</option></select></label></td>';
     echo '<td><label>LOCALE: <select name="locale" id="locale"><option value="EN" '.($LOCALE==="EN"?" SELECTED":"").'>EN</option><option value="IT" '.($LOCALE==="IT"?" SELECTED":"").'>IT</option><option value="LA" '.($LOCALE==="LA"?" SELECTED":"").'>LA</option></select></label></td>';
     echo '</tr><tr>';
@@ -395,14 +501,14 @@
 
     echo '<div style="text-align:center;border:2px groove White;border-radius:6px;width:60%;margin:0px auto;padding-bottom:6px;">';
 
-    echo '<h3>Configurations being used to generate this calendar:</h3>';
-    echo '<span>YEAR = '.$YEAR.', EPIPHANY = '.EPIPHANY.', ASCENSION = '.ASCENSION.', CORPUS CHRISTI = '.CORPUSCHRISTI.', LOCALE = '.$LOCALE.'</span>';
+    echo '<h3>' . __('Configurations being used to generate this calendar:',$LOCALE) . '</h3>';
+    echo '<span>' . __('YEAR',$LOCALE) . ' = '.$YEAR.', ' . __('EPIPHANY',$LOCALE) . ' = '.EPIPHANY.', ' . __('ASCENSION',$LOCALE) . ' = '.ASCENSION.', CORPUS CHRISTI = '.CORPUSCHRISTI.', LOCALE = '.$LOCALE.'</span>';
     
     echo '</div>';
     
     if($YEAR >= 1970){
 	    echo '<table id="LitCalTable" style="width:75%;margin:30px auto;border:1px solid Blue;border-radius: 6px; padding:10px;background:LightBlue;">';
-	    echo '<thead><tr><th>Date in Gregorian Calendar</th><th>General Roman Calendar Festivity</th><th>Grade of the Festivity</th></tr></thead>';
+	    echo '<thead><tr><th>' . __("Date in Gregorian Calendar",$LOCALE) . '</th><th>' . __("General Roman Calendar Festivity",$LOCALE) . '</th><th>' . __("Grade of the Festivity",$LOCALE) . '</th></tr></thead>';
 	    echo '<tbody>';
 
 
@@ -472,7 +578,22 @@
 		    echo '<tr style="background-color:'.$color.';'.(in_array($color,$highContrast)?'color:white;':'').'">';
 		    if($ev==0){
 			$rwsp = $cc+1;
-			echo '<td rowspan="'.$rwsp.'" style="font-family:\'DejaVu Sans Mono\';font-size:.7em;font-weight:bold;">'.$festivity->date->format('D, F jS, Y').'</td>';
+            $dateString = "";
+            switch($LOCALE){
+                case "LA":
+                    $dayOfTheWeek = (int)$festivity->date->format('w'); //w = 0-Sunday to 6-Saturday
+                    $dayOfTheWeekLatin = $daysOfTheWeek[$dayOfTheWeek];
+                    $month = (int)$festivity->date->format('n'); //n = 1-January to 12-December
+                    $monthLatin = $months[$month];
+                    $dateString = $dayOfTheWeekLatin . ' ' . $festivity->date->format('j') . ' ' . $monthLatin . ' ' . $festivity->date->format('Y');
+                break;
+                case "EN":
+                    $dateString = $festivity->date->format('D, F jS, Y');
+                break;
+                default:
+                    $dateString = utf8_encode(strftime('%A %e %B %Y',$festivity->date->format('U')));
+            }
+                echo '<td rowspan="'.$rwsp.'" style="font-family:\'DejaVu Sans Mono\';font-size:.7em;font-weight:bold;">'.$dateString.'</td>';
 		    }
 		    echo '<td>'.$festivity->name.' ('.$currentCycle.') - <i>'.$festivity->color.'</i><br /><i>'.$festivity->common.'</i></td>';
 		    echo '<td>'.$GRADE[$festivity->grade].'</td>';
@@ -491,7 +612,25 @@
 		}
 		$festivity->color = explode("|",$festivity->color)[0];
 		echo '<tr style="background-color:'.$festivity->color.';'.(in_array($festivity->color,$highContrast)?'color:white;':'').'">';
-		echo '<td style="font-family:\'DejaVu Sans Mono\';font-size:.7em;font-weight:bold;">'.$festivity->date->format('D, F jS, Y').'</td>';
+        
+        $dateString = "";
+        switch($LOCALE){
+            case "LA":
+                $dayOfTheWeek = (int)$festivity->date->format('w'); //w = 0-Sunday to 6-Saturday
+                $dayOfTheWeekLatin = $daysOfTheWeek[$dayOfTheWeek];
+                $month = (int)$festivity->date->format('n'); //n = 1-January to 12-December
+                $monthLatin = $months[$month];
+                $dateString = $dayOfTheWeekLatin . ' ' . $festivity->date->format('j') . ' ' . $monthLatin . ' ' . $festivity->date->format('Y');
+            break;
+        case "EN":
+                $dateString = $festivity->date->format('D, F jS, Y');
+            break;
+            default:
+                $dateString = utf8_encode(strftime('%A %e %B %Y',$festivity->date->format('U')));
+        }
+                
+        
+        echo '<td style="font-family:\'DejaVu Sans Mono\';font-size:.7em;font-weight:bold;">'.$dateString.'</td>';
 		echo '<td>'.$festivity->name.' ('.$currentCycle.') - <i>'.$festivity->color.'</i><br /><i>'.$festivity->common.'</i></td>';
 		echo '<td>'.$GRADE[$festivity->grade].'</td>';
 		echo '</tr>';      
