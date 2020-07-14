@@ -581,6 +581,31 @@ $messages = [
         "en" => "Proper",
         "it" => "Proprio",
         "la" => "Proprium"
+    ),
+    "green" => array(
+        "en" => "green",
+        "it" => "verde",
+        "la" => "viridis"
+    ),
+    "purple" => array(
+        "en" => "purple",
+        "it" => "viola",
+        "la" => "purpura"
+    ),
+    "white" => array(
+        "en" => "white",
+        "it" => "bianco",
+        "la" => "albus"
+    ),
+    "red" => array(
+        "en" => "red",
+        "it" => "rosso",
+        "la" => "ruber"
+    ),
+    "pink" => array(
+        "en" => "pink",
+        "it" => "rosa",
+        "la" => "rosea"
     )
 ];
 
@@ -790,7 +815,7 @@ function __($key, $locale)
                         }
                         echo '<td rowspan="' . $rwsp . '" style="font-family:\'DejaVu Sans Mono\';font-size:.7em;font-weight:bold;">' . $dateString . '</td>';
                     }
-                    echo '<td>' . $festivity->name . ' (' . $currentCycle . ') - <i>' . $festivity->color . '</i><br /><i>' . $festivity->common . '</i></td>';
+                    echo '<td>' . $festivity->name . ' (' . $currentCycle . ') - <i>' . __($festivity->color,$LOCALE) . '</i><br /><i>' . $festivity->common . '</i></td>';
                     echo '<td>' . $GRADE[$festivity->grade] . '</td>';
                     echo '</tr>';
                     $keyindex++;
@@ -850,7 +875,7 @@ function __($key, $locale)
 
 
                 echo '<td style="font-family:\'DejaVu Sans Mono\';font-size:.7em;font-weight:bold;">' . $dateString . '</td>';
-                echo '<td>' . $festivity->name . ' (' . $currentCycle . ') - <i>' . $festivity->color . '</i><br /><i>' . $festivity->common . '</i></td>';
+                echo '<td>' . $festivity->name . ' (' . $currentCycle . ') - <i>' . __($festivity->color,$LOCALE) . '</i><br /><i>' . $festivity->common . '</i></td>';
                 echo '<td>' . $GRADE[$festivity->grade] . '</td>';
                 echo '</tr>';
             }
