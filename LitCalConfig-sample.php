@@ -17,10 +17,10 @@
         ***REMOVED***
         ***REMOVED***
 	}
-	else{ //REMOTE HOST INSTALLATION
+    else{ //REMOTE HOST INSTALLATION
         define("DB_USER","");
         define("DB_PASSWORD","");
         define("DB_NAME","liturgy");
         ***REMOVED***
         ***REMOVED***
-	}
+    }
