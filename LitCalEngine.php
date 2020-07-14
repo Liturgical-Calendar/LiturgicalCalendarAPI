@@ -47,6 +47,7 @@ include "Festivity.php"; //this defines a "Festivity" class that can hold all th
  */
 
 include "LitCalFunctions.php"; //a few useful functions e.g. calculate Easter...
+include "LitCalMessages.php";
 
 /**
  * INITIATE CONNECTION TO THE DATABASE 
