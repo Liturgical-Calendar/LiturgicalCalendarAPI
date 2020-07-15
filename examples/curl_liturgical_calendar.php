@@ -5,7 +5,7 @@
  * Author: John Romano D'Orazio 
  * Email: priest@johnromanodorazio.com
  * Licensed under the Apache 2.0 License
- * Version 2.0
+ * Version 2.3
  * Date Created: 27 December 2017
  */
 
@@ -154,7 +154,7 @@ class StatusCodes
     const HTTP_GATEWAY_TIMEOUT                 = 504;
     const HTTP_VERSION_NOT_SUPPORTED           = 505;
 
-    private static $messages = array(
+    private static $messages = [
         // [Informational 1xx]
         100 => '100 Continue',
         101 => '101 Switching Protocols',
@@ -205,7 +205,7 @@ class StatusCodes
         503 => '503 Service Unavailable',
         504 => '504 Gateway Timeout',
         505 => '505 HTTP Version Not Supported'
-    );
+    ];
 
     public static function httpHeaderFor($code)
     {
@@ -307,10 +307,10 @@ define("WEEKDAY", 0);            // 13. WEEKDAYS OF ADVENT UNTIL DECEMBER 16th
 
 //TODO: implement interface for adding Proper feasts and memorials...
 
-$GRADE = array("", "COMMEMORATION", "OPTIONAL MEMORIAL", "MEMORIAL", "FEAST", "FEAST OF THE LORD", "SOLEMNITY", "HIGHER RANKING SOLEMNITY");
+$GRADE = ["", "COMMEMORATION", "OPTIONAL MEMORIAL", "MEMORIAL", "FEAST", "FEAST OF THE LORD", "SOLEMNITY", "HIGHER RANKING SOLEMNITY"];
 
-$SUNDAY_CYCLE = array("A", "B", "C");
-$WEEKDAY_CYCLE = array("I", "II");
+$SUNDAY_CYCLE = ["A", "B", "C"];
+$WEEKDAY_CYCLE = ["I", "II"];
 
 if ($YEAR >= 1970) {
     //  Initiate curl for communication with the LitCal server
@@ -331,7 +331,7 @@ if ($YEAR >= 1970) {
     // Set request method to POST
     curl_setopt($ch, CURLOPT_POST, 1);
     // Define the POST field data    
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array("year" => $YEAR, "epiphany" => $EPIPHANY, "ascension" => $ASCENSION, "corpuschristi" => $CORPUSCHRISTI, "locale" => $LOCALE)));
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(["year" => $YEAR, "epiphany" => $EPIPHANY, "ascension" => $ASCENSION, "corpuschristi" => $CORPUSCHRISTI, "locale" => $LOCALE]));
     // Execute
     $result = curl_exec($ch);
 
@@ -374,250 +374,250 @@ if ($YEAR >= 1970) {
 }
 
 $messages = [
-    "Generate Roman Calendar" => array(
+    "Generate Roman Calendar" => [
         "en" => "Generate Roman Calendar",
         "it" => "Genera Calendario Romano",
         "la" => "Calendarium Romanum Generare"
-    ),
-    "Liturgical Calendar Calculation for a Given Year" => array(
+    ],
+    "Liturgical Calendar Calculation for a Given Year" => [
         "en" => "Liturgical Calendar Calculation for a Given Year",
         "it" => "Calcolo del Calendario Liturgico per un dato anno",
         "la" => "Computus Calendarii Liturgici pro anno dedi"
-    ),
-    "HTML presentation elaborated by PHP using a CURL request to a %s" => array(
+    ],
+    "HTML presentation elaborated by PHP using a CURL request to a %s" => [
         "en" => "HTML presentation elaborated by PHP using a CURL request to a %s",
         "it" => "Presentazione HTML elaborata con PHP usando una richiesta CURL al motore PHP %s",
         "la" => "Repraesentatio HTML elaborata cum PHP utendo petitionem CURL ad machinam PHP %s"
-    ),
-    "You are requesting a year prior to 1970: it is not possible to request years prior to 1970." => array(
+    ],
+    "You are requesting a year prior to 1970: it is not possible to request years prior to 1970." => [
         "en" => "You are requesting a year prior to 1970: it is not possible to request years prior to 1970.",
         "it" => "Stai effettuando una richiesta per un anno che è precedente al 1970: non è possibile richiedere anni precedenti al 1970."
-    ),
-    "Configurations being used to generate this calendar:" => array(
+    ],
+    "Configurations being used to generate this calendar:" => [
         "en" => "Configurations being used to generate this calendar:",
         "it" => "Configurazioni utilizzate per la generazione di questo calendario:"
-    ),
-    "Date in Gregorian Calendar" => array(
+    ],
+    "Date in Gregorian Calendar" => [
         "en" => "Date in Gregorian Calendar",
         "it" => "Data nel Calendario Gregoriano",
         "la" => "Dies in Calendario Gregoriano"
-    ),
-    "General Roman Calendar Festivity" => array(
+    ],
+    "General Roman Calendar Festivity" => [
         "en" => "General Roman Calendar Festivity",
         "it" => "Festività nel Calendario Romano Generale",
         "la" => "Festivitas in Calendario Romano Generale"
-    ),
-    "Grade of the Festivity" => array(
+    ],
+    "Grade of the Festivity" => [
         "en" => "Grade of the Festivity",
         "it" => "Grado della Festività",
         "la" => "Gradum Festivitatis"
-    ),
-    "YEAR" => array(
+    ],
+    "YEAR" => [
         "en" => "YEAR",
         "it" => "ANNO",
         "la" => "ANNUM"
-    ),
-    "EPIPHANY" => array(
+    ],
+    "EPIPHANY" => [
         "en" => "EPIPHANY",
         "it" => "EPIFANIA",
         "la" => "EPIPHANIA"
-    ),
-    "ASCENSION" => array(
+    ],
+    "ASCENSION" => [
         "en" => "ASCENSION",
         "it" => "ASCENSIONE",
         "la" => "ASCENSIO",
-    ),
-    "From the Common" => array(
+    ],
+    "From the Common" => [
         "en" => "From the Common",
         "it" => "Dal Comune",
         "la" => "De Communi"
-    ),
-    "of (SING_MASC)" => array(
+    ],
+    "of (SING_MASC)" => [
         "en" => "of",
         "it" => "del",
         "la" => ""
-    ),
-    "of (SING_FEMM)" => array(
+    ],
+    "of (SING_FEMM)" => [
         "en" => "of the",
         "it" => "della",
         "la" => ""
-    ),
-    "of (PLUR_MASC)" => array(
+    ],
+    "of (PLUR_MASC)" => [
         "en" => "of",
         "it" => "dei",
         "la" => ""
-    ),
-    "of (PLUR_MASC_ALT)" => array(
+    ],
+    "of (PLUR_MASC_ALT)" => [
         "en" => "of",
         "it" => "degli",
         "la" => ""
-    ),
-    "of (PLUR_FEMM)" => array(
+    ],
+    "of (PLUR_FEMM)" => [
         "en" => "of",
         "it" => "delle",
         "la" => ""
-    ),
+    ],
     /*translators: in reference to the Common of the Blessed Virgin Mary */
-    "Blessed Virgin Mary" => array(
+    "Blessed Virgin Mary" => [
         "en" => "Blessed Virgin Mary",
         "it" => "Beata Vergine Maria",
         "la" => "Beatæ Virginis Mariæ"
-    ),
-    "Martyrs" => array(
+    ],
+    "Martyrs" => [
         "en" => "Martyrs",
         "it" => "Martiri",
         "la" => "Martyrum"
-    ),
-    "Pastors" => array(
+    ],
+    "Pastors" => [
         "en" => "Pastors",
         "it" => "Pastori",
         "la" => "Pastorum"
-    ),
-    "Doctors" => array(
+    ],
+    "Doctors" => [
         "en" => "Doctors",
         "it" => "Dottori della Chiesa",
         "la" => "Doctorum Ecclesiae"
-    ),
-    "Virgins" => array(
+    ],
+    "Virgins" => [
         "en" => "Virgins",
         "it" => "Vergini",
         "la" => "Virginum"
-    ),
-    "Holy Men and Women" => array(
+    ],
+    "Holy Men and Women" => [
         "en" => "Holy Men and Women",
         "it" => "Santi e delle Sante",
         "la" => "Sanctorum et Sanctarum"
-    ),
-    "For One Martyr" => array(
+    ],
+    "For One Martyr" => [
         "en" => "For One Martyr",
         "it" => "Per un martire",
         "la" => "Pro uno martyre"
-    ),
-    "For Several Martyrs" => array(
+    ],
+    "For Several Martyrs" => [
         "en" => "For Several Martyrs",
         "it" => "Per più martiri",
         "la" => "Pro pluribus martyribus"
-    ),
-    "For Missionary Martyrs" => array(
+    ],
+    "For Missionary Martyrs" => [
         "en" => "For Missionary Martyrs",
         "it" => "Per i martiri missionari",
         "la" => "Pro missionariis martyribus"
-    ),
-    "For a Virgin Martyr" => array(
+    ],
+    "For a Virgin Martyr" => [
         "en" => "For a Virgin Martyr",
         "it" => "Per una vergine martire",
         "la" => "Pro virgine martyre"
-    ),
-    "For Several Pastors" => array(
+    ],
+    "For Several Pastors" => [
         "en" => "For Several Pastors",
         "it" => "Per i pastori",
         "la" => "Pro Pastoribus"
-    ),
-    "For a Pope" => array(
+    ],
+    "For a Pope" => [
         "en" => "For a Pope",
         "it" => "Per i papi",
         "la" => "Pro Papa"
-    ),
-    "For a Bishop" => array(
+    ],
+    "For a Bishop" => [
         "en" => "For a Bishop",
         "it" => "Per i vescovi",
         "la" => "Pro Episcopo"
-    ),
-    "For One Pastor" => array(
+    ],
+    "For One Pastor" => [
         "en" => "For One Pastor",
         "it" => "Per un Pastore",
         "la" => "Pro Pastoribus"
-    ),
-    "For Missionaries" => array(
+    ],
+    "For Missionaries" => [
         "en" => "For Missionaries",
         "it" => "Per i missionari",
         "la" => "Pro missionariis"
-    ),
-    "For One Virgin" => array(
+    ],
+    "For One Virgin" => [
         "en" => "For One Virgin",
         "it" => "Per una vergine",
         "la" => "Pro una virgine"
-    ),
-    "For Several Virgins" => array(
+    ],
+    "For Several Virgins" => [
         "en" => "For Several Virgins",
         "it" => "Per più vergini",
         "la" => "Pro pluribus virginibus"
-    ),
-    "For Religious" => array(
+    ],
+    "For Religious" => [
         "en" => "For Religious",
         "it" => "Per i religiosi",
         "la" => "Pro Religiosis"
-    ),
-    "For Those Who Practiced Works of Mercy" => array(
+    ],
+    "For Those Who Practiced Works of Mercy" => [
         "en" => "For Those Who Practiced Works of Mercy",
         "it" => "Per gli operatori di misericordia",
         "la" => "Pro iis qui opera Misericordiæ Exercuerunt"
-    ),
-    "For an Abbot" => array(
+    ],
+    "For an Abbot" => [
         "en" => "For an Abbot",
         "it" => "Per un abate",
         "la" => "Pro abbate"
-    ),
-    "For a Monk" => array(
+    ],
+    "For a Monk" => [
         "en" => "For a Monk",
         "it" => "Per un monaco",
         "la" => "Pro monacho"
-    ),
-    "For a Nun" => array(
+    ],
+    "For a Nun" => [
         "en" => "For a Nun",
         "it" => "Per i religiosi",
         "la" => "Pro moniali"
-    ),
-    "For Educators" => array(
+    ],
+    "For Educators" => [
         "en" => "For Educators",
         "it" => "Per gli educatori",
         "la" => "Pro Educatoribus"
-    ),
-    "For Holy Women" => array(
+    ],
+    "For Holy Women" => [
         "en" => "For Holy Women",
         "it" => "Per le sante",
         "la" => "Pro Sanctis Mulieribus"
-    ),
-    "For One Saint" => array(
+    ],
+    "For One Saint" => [
         "en" => "For One Saint",
         "it" => "Per un Santo",
         "la" => "Pro uno Sancto"
-    ),
-    "or" => array(
+    ],
+    "or" => [
         "en" => "or",
         "it" => "oppure",
-        "la" => "aut"
-    ),
-    "Proper" => array(
+        "la" => "vel"
+    ],
+    "Proper" => [
         "en" => "Proper",
         "it" => "Proprio",
         "la" => "Proprium"
-    ),
-    "green" => array(
+    ],
+    "green" => [
         "en" => "green",
         "it" => "verde",
         "la" => "viridis"
-    ),
-    "purple" => array(
+    ],
+    "purple" => [
         "en" => "purple",
         "it" => "viola",
         "la" => "purpura"
-    ),
-    "white" => array(
+    ],
+    "white" => [
         "en" => "white",
         "it" => "bianco",
         "la" => "albus"
-    ),
-    "red" => array(
+    ],
+    "red" => [
         "en" => "red",
         "it" => "rosso",
         "la" => "ruber"
-    ),
-    "pink" => array(
+    ],
+    "pink" => [
         "en" => "pink",
         "it" => "rosa",
         "la" => "rosea"
-    )
+    ]
 ];
 
 $daysOfTheWeek = [
@@ -723,7 +723,7 @@ function __($key, $locale)
 
         $dayCnt = 0;
         //for($i=1997;$i<=2037;$i++){
-        $highContrast = array('purple', 'red', 'green');
+        $highContrast = ['purple', 'red', 'green'];
 
         $LitCalKeys = array_keys($LitCal);
         //print_r($LitCalKeys);

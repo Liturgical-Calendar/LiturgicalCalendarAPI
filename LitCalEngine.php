@@ -5,7 +5,7 @@
  * Author: John Romano D'Orazio 
  * Email: priest@johnromanodorazio.com
  * Licensed under the Apache 2.0 License
- * Version 2.2
+ * Version 2.3
  * Date Created: 27 December 2017
  * Note: it is necessary to set up the MySQL liturgy tables prior to using this script
  */
@@ -560,7 +560,7 @@ while ($weekdayAdvent >= $LitCal["Advent1"]->date && $weekdayAdvent < $LitCal["C
         $currentAdvWeek = (($diff - $diff % 7) / 7) + 1; //week count between current day and First Sunday of Advent
 
         $ordinal = ucfirst(getOrdinal($currentAdvWeek,$LOCALE,$formatterFem,$LATIN_ORDINAL_FEM_GEN));
-        $LitCal["AdventWeekday" . $weekdayAdventCnt] = new Festivity($weekdayAdvent->format('l') . " " . sprintf(__("of the %s Week of Advent",$LOCALE),$ordinal), $weekdayAdvent, "purple", "mobile");
+        $LitCal["AdventWeekday" . $weekdayAdventCnt] = new Festivity(($LOCALE == 'LA' ? $LATIN_DAYOFTHEWEEK[$weekdayAdvent->format('w')] : ucfirst(utf8_encode(strftime('%A',$weekdayAdvent->format('U'))))) . " " . sprintf(__("of the %s Week of Advent",$LOCALE),$ordinal), $weekdayAdvent, "purple", "mobile");
         // Weekday of Advent from 17 to 24 Dec.
         if ($LitCal["AdventWeekday" . $weekdayAdventCnt]->date->format('j') >= 17 && $LitCal["AdventWeekday" . $weekdayAdventCnt]->date->format('j') <= 24) {
             array_push($WEEKDAYS_ADVENT_CHRISTMAS_LENT, $LitCal["AdventWeekday" . $weekdayAdventCnt]->date);
@@ -607,9 +607,9 @@ while ($weekdayLent >= $LitCal["AshWednesday"]->date && $weekdayLent < $LitCal["
             $diff = $upper - (int)$LitCal["Lent1"]->date->format('z'); //day count between current day and First Sunday of Lent
             $currentLentWeek = (($diff - $diff % 7) / 7) + 1; //week count between current day and First Sunday of Lent
             $ordinal = ucfirst(getOrdinal($currentLentWeek,$LOCALE,$formatterFem,$LATIN_ORDINAL_FEM_GEN));
-            $LitCal["LentWeekday" . $weekdayLentCnt] = new Festivity($weekdayLent->format('l') . " ".  sprintf(__("of the %s Week of Lent"),$ordinal), $weekdayLent, "purple", "mobile");
+            $LitCal["LentWeekday" . $weekdayLentCnt] = new Festivity(($LOCALE == 'LA' ? $LATIN_DAYOFTHEWEEK[$weekdayLent->format('w')] : ucfirst(utf8_encode(strftime('%A',$weekdayLent->format('U'))))) . " ".  sprintf(__("of the %s Week of Lent",$LOCALE),$ordinal), $weekdayLent, "purple", "mobile");
         } else {
-            $LitCal["LentWeekday" . $weekdayLentCnt] = new Festivity($weekdayLent->format('l') . " after Ash Wednesday", $weekdayLent, "purple", "mobile");
+            $LitCal["LentWeekday" . $weekdayLentCnt] = new Festivity(($LOCALE == 'LA' ? $LATIN_DAYOFTHEWEEK[$weekdayLent->format('w')] : ucfirst(utf8_encode(strftime('%A',$weekdayLent->format('U'))))) . " ". __("after Ash Wednesday",$LOCALE), $weekdayLent, "purple", "mobile");
         }
         array_push($WEEKDAYS_ADVENT_CHRISTMAS_LENT, $LitCal["LentWeekday" . $weekdayLentCnt]->date);
     }
@@ -668,7 +668,7 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
     //with the approval of Pope Francis elevated the memorial of Saint Mary Magdalen to a Feast
     //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf
     if ($YEAR >= 2016) {
-        if (array_key_exists($LitCal, "StMaryMagdalene")) {
+        if (array_key_exists("StMaryMagdalene",$LitCal)) {
             if ($LitCal["StMaryMagdalene"]->grade == MEMORIAL) {
                 $LitCal["StMaryMagdalene"]->grade = FEAST;
             }
@@ -787,7 +787,7 @@ if ($YEAR >= 2002) {
     //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_lt.html
     //TODO: check if Our Lady of Guadalupe became an optional memorial in the Universal Calendar in the 2008 edition of the Roman Missal
     $StJaneFrancesNewDate = DateTime::createFromFormat('!j-n-Y', '12-8-' . $YEAR, new DateTimeZone('UTC'));
-    if (array_key_exists($LitCal, "StJaneFrancesDeChantal") && (int)$StJaneFrancesNewDate->format('N') !== 7 && !in_array($StJaneFrancesNewDate, $SOLEMNITIES) && !in_array($StJaneFrancesNewDate, $FEASTS_MEMORIALS)) {
+    if (array_key_exists("StJaneFrancesDeChantal",$LitCal) && (int)$StJaneFrancesNewDate->format('N') !== 7 && !in_array($StJaneFrancesNewDate, $SOLEMNITIES) && !in_array($StJaneFrancesNewDate, $FEASTS_MEMORIALS)) {
         $LitCal["StJaneFrancesDeChantal"]->date = $StJaneFrancesNewDate;
     }
 
@@ -829,7 +829,7 @@ while ($weekdayEaster >= $LitCal["Easter"]->date && $weekdayEaster < $LitCal["Pe
         $diff = $upper - (int)$LitCal["Easter"]->date->format('z'); //day count between current day and Easter Sunday
         $currentEasterWeek = (($diff - $diff % 7) / 7) + 1;         //week count between current day and Easter Sunday
         $ordinal = ucfirst(getOrdinal($currentEasterWeek,$LOCALE,$formatterFem,$LATIN_ORDINAL_FEM_GEN));
-        $LitCal["EasterWeekday" . $weekdayEasterCnt] = new Festivity(ucfirst(utf8_encode(strftime('%A',$weekdayEaster->format('U')))) . " " . sprintf(__("of the %s Week of Easter",$LOCALE),$ordinal), $weekdayEaster, "white", "mobile");
+        $LitCal["EasterWeekday" . $weekdayEasterCnt] = new Festivity(($LOCALE == 'LA' ? $LATIN_DAYOFTHEWEEK[$weekdayEaster->format('w')] : ucfirst(utf8_encode(strftime('%A',$weekdayEaster->format('U'))))) . " " . sprintf(__("of the %s Week of Easter",$LOCALE),$ordinal), $weekdayEaster, "white", "mobile");
     }
 
     $weekdayEasterCnt++;
