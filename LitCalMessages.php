@@ -34,6 +34,21 @@ $MESSAGES = [
         "en" => "of the %s Week of Easter",
         "it" => "della %s Settimana di Pasqua",
         "la" => "Hebdomadæ %s Tempi Paschali"
+    ],
+    "of the %s Week of Advent" => [
+        "en" => "of the %s Week of Advent",
+        "it" => "della %s Settimana dell'Avvento",
+        "la" => "Hebdomadæ %s Adventus"
+    ],
+    "%s Day of the Octave of Christmas" => [
+        "en" => "%s Day of the Octave of Christmas",
+        "it" => "%s Giorno dell'Ottava di Natale",
+        "la" => "Dies %s Octavæ Nativitatis"
+    ],
+    "of the %s Week of Lent" => [
+        "en" => "of the %s Week of Lent",
+        "it" => "della %s Settimana di Quaresima",
+        "la" => "Hebdomadæ %s Quadragesimæ"
     ]
 ];
 
