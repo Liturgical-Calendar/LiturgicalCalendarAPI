@@ -67,10 +67,21 @@ class Festivity
      */
     public $common;
 
+    /**
+     * @var int
+     */
+    //public $hourOffset;
+
     function __construct($name, $date, $color, $type, $grade = 0, $common = '')
     {
         $this->name = (string) $name;
-        $this->date = (object) DateTime::createFromFormat('U', $date);
+        $this->date = (object) DateTime::createFromFormat('U', $date, new DateTimeZone('UTC')); //
+        //$hour = (int) $this->date->format('G');
+        //if($hour !== 0){
+        //    $this->hourOffset = $this->date->format('O'); //explode(':',
+            //$this->date->add(new DateInterval("PT{$hourOffset}H"));
+        //}
+        //$this->date->setTime(0, 0);
         $this->color = (string) $color;
         $this->type = (string) $type;
         $this->grade = (int) $grade;
@@ -759,27 +770,26 @@ function __($key, $locale)
                             $commonGeneral = __($common[0], $LOCALE);
                             $commonSpecific = isset($common[1]) && $common[1] != "" ? __($common[1], $LOCALE) : "";
                             //$txt = str_replace(":", ": ", $txt);
-                            switch($commonGeneral){
-                                case __("Blessed Virgin Mary",$LOCALE):
+                            switch ($commonGeneral) {
+                                case __("Blessed Virgin Mary", $LOCALE):
                                     $commonKey = "of (SING_FEMM)";
-                                break;
-                                case __("Virgins",$LOCALE):
+                                    break;
+                                case __("Virgins", $LOCALE):
                                     $commonKey = "of (PLUR_FEMM)";
-                                break;
-                                case __("Martyrs",$LOCALE):
-                                case __("Pastors",$LOCALE):
-                                case __("Doctors",$LOCALE):
-                                case __("Holy Men and Women",$LOCALE):
+                                    break;
+                                case __("Martyrs", $LOCALE):
+                                case __("Pastors", $LOCALE):
+                                case __("Doctors", $LOCALE):
+                                case __("Holy Men and Women", $LOCALE):
                                     $commonKey = "of (PLUR_MASC)";
-                                break;
+                                    break;
                                 default:
                                     $commonKey = "of (SING_MASC)";
                             }
-                            return __("From the Common", $LOCALE) . " " . __($commonKey,$LOCALE) . " " . $commonGeneral . ($commonSpecific != "" ? ": " . $commonSpecific : "");
+                            return __("From the Common", $LOCALE) . " " . __($commonKey, $LOCALE) . " " . $commonGeneral . ($commonSpecific != "" ? ": " . $commonSpecific : "");
                         }, $commons);
-                        $festivity->common = implode("; " . __("or",$LOCALE) . " ", $commons);
-                    }
-                    else if ($festivity->common == "Proper"){
+                        $festivity->common = implode("; " . __("or", $LOCALE) . " ", $commons);
+                    } else if ($festivity->common == "Proper") {
                         $festivity->common = __("Proper", $LOCALE);
                     }
                     $festivity->color = explode("|", $festivity->color)[0];
@@ -808,14 +818,14 @@ function __($key, $locale)
                                 $dateString = $dayOfTheWeekLatin . ' ' . $festivity->date->format('j') . ' ' . $monthLatin . ' ' . $festivity->date->format('Y');
                                 break;
                             case "EN":
-                                $dateString = $festivity->date->format('D, F jS, Y');
+                                $dateString = $festivity->date->format('D, F jS, Y'); // G:i:s e') . "offset = " . $festivity->hourOffset;
                                 break;
                             default:
                                 $dateString = utf8_encode(strftime('%A %e %B %Y', $festivity->date->format('U')));
                         }
                         echo '<td rowspan="' . $rwsp . '" style="font-family:\'DejaVu Sans Mono\';font-size:.7em;font-weight:bold;">' . $dateString . '</td>';
                     }
-                    echo '<td>' . $festivity->name . ' (' . $currentCycle . ') - <i>' . __($festivity->color,$LOCALE) . '</i><br /><i>' . $festivity->common . '</i></td>';
+                    echo '<td>' . $festivity->name . ' (' . $currentCycle . ') - <i>' . __($festivity->color, $LOCALE) . '</i><br /><i>' . $festivity->common . '</i></td>';
                     echo '<td>' . $GRADE[$festivity->grade] . '</td>';
                     echo '</tr>';
                     $keyindex++;
@@ -831,30 +841,29 @@ function __($key, $locale)
                         $commonGeneral = __($common[0], $LOCALE);
                         $commonSpecific = isset($common[1]) && $common[1] != "" ? __($common[1], $LOCALE) : "";
                         //$txt = str_replace(":", ": ", $txt);
-                        switch($commonGeneral){
-                            case __("Blessed Virgin Mary",$LOCALE):
+                        switch ($commonGeneral) {
+                            case __("Blessed Virgin Mary", $LOCALE):
                                 $commonKey = "of (SING_FEMM)";
-                            break;
-                            case __("Virgins",$LOCALE):
+                                break;
+                            case __("Virgins", $LOCALE):
                                 $commonKey = "of (PLUR_FEMM)";
-                            break;
-                            case __("Martyrs",$LOCALE):
-                            case __("Pastors",$LOCALE):
-                            case __("Doctors",$LOCALE):
-                            case __("Holy Men and Women",$LOCALE):
+                                break;
+                            case __("Martyrs", $LOCALE):
+                            case __("Pastors", $LOCALE):
+                            case __("Doctors", $LOCALE):
+                            case __("Holy Men and Women", $LOCALE):
                                 $commonKey = "of (PLUR_MASC)";
-                            break;
+                                break;
                             default:
                                 $commonKey = "of (SING_MASC)";
                         }
-                        return __("From the Common", $LOCALE) . " " . __($commonKey,$LOCALE) . " " . $commonGeneral . ($commonSpecific != "" ? ": " . $commonSpecific : "");
+                        return __("From the Common", $LOCALE) . " " . __($commonKey, $LOCALE) . " " . $commonGeneral . ($commonSpecific != "" ? ": " . $commonSpecific : "");
                     }, $commons);
-                    $festivity->common = implode("; " . __("or",$LOCALE) . " ", $commons);
-                }
-                else if ($festivity->common == "Proper"){
+                    $festivity->common = implode("; " . __("or", $LOCALE) . " ", $commons);
+                } else if ($festivity->common == "Proper") {
                     $festivity->common = __("Proper", $LOCALE);
                 }
-            $festivity->color = explode("|", $festivity->color)[0];
+                $festivity->color = explode("|", $festivity->color)[0];
                 echo '<tr style="background-color:' . $festivity->color . ';' . (in_array($festivity->color, $highContrast) ? 'color:white;' : '') . '">';
 
                 $dateString = "";
@@ -867,7 +876,7 @@ function __($key, $locale)
                         $dateString = $dayOfTheWeekLatin . ' ' . $festivity->date->format('j') . ' ' . $monthLatin . ' ' . $festivity->date->format('Y');
                         break;
                     case "EN":
-                        $dateString = $festivity->date->format('D, F jS, Y');
+                        $dateString = $festivity->date->format('D, F jS, Y'); //  G:i:s e') . "offset = " . $festivity->hourOffset;
                         break;
                     default:
                         $dateString = utf8_encode(strftime('%A %e %B %Y', $festivity->date->format('U')));
@@ -875,7 +884,7 @@ function __($key, $locale)
 
 
                 echo '<td style="font-family:\'DejaVu Sans Mono\';font-size:.7em;font-weight:bold;">' . $dateString . '</td>';
-                echo '<td>' . $festivity->name . ' (' . $currentCycle . ') - <i>' . __($festivity->color,$LOCALE) . '</i><br /><i>' . $festivity->common . '</i></td>';
+                echo '<td>' . $festivity->name . ' (' . $currentCycle . ') - <i>' . __($festivity->color, $LOCALE) . '</i><br /><i>' . $festivity->common . '</i></td>';
                 echo '<td>' . $GRADE[$festivity->grade] . '</td>';
                 echo '</tr>';
             }
