@@ -49,6 +49,11 @@ $MESSAGES = [
         "en" => "of the %s Week of Lent",
         "it" => "della %s Settimana di Quaresima",
         "la" => "Hebdomadæ %s Quadragesimæ"
+    ],
+    "after Ash Wednesday" => [
+        "en" => "after Ash Wednesday",
+        "it" => "dopo il Mercoledì delle Ceneri",
+        "la" => "post Feria IV Cinerum"
     ]
 ];
 
@@ -129,13 +134,13 @@ $LATIN_ORDINAL_FEM_GEN = [
 ];
 
 $LATIN_DAYOFTHEWEEK = [
-    "Feria II",
-    "Feria III",
-    "Feria IV",
-    "Feria V",
-    "Feria VI",
-    "Feria VII",
-    "Feria I"
+    "Feria I",     //0=Sunday
+    "Feria II",    //1=Monday
+    "Feria III",   //2=Tuesday
+    "Feria IV",    //3=Wednesday
+    "Feria V",     //4=Thursday
+    "Feria VI",    //5=Friday
+    "Feria VII"    //6=Saturday
 ];
 
 
