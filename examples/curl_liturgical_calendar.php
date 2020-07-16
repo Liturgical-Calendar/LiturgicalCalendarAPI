@@ -29,6 +29,20 @@ function countSameDayEvents($currentKeyIndex, $EventsArray, &$cc)
     }
 }
 
+function countSameMonthEvents($currentKeyIndex, $EventsArray, &$cm)
+{
+    $Keys = array_keys($EventsArray);
+    $currentFestivity = $EventsArray[$Keys[$currentKeyIndex]];
+    if ($currentKeyIndex < count($Keys) - 1) {
+        $nextFestivity = $EventsArray[$Keys[$currentKeyIndex + 1]];
+        if ($nextFestivity->date->format('n') == $currentFestivity->date->format('n')) {
+            $cm++;
+            countSameMonthEvents($currentKeyIndex + 1, $EventsArray, $cm);
+        }
+    }
+
+}
+
 /** 
  *  CLASS FESTIVITY
  *  SIMILAR TO THE CLASS USED IN THE LITCAL PHP ENGINE, 
@@ -624,6 +638,11 @@ $messages = [
         "en" => "pink",
         "it" => "rosa",
         "la" => "rosea"
+    ],
+    "Month" => [
+        "en" => "Month",
+        "it" => "Mese",
+        "la" => "Mensis"
     ]
 ];
 
@@ -684,6 +703,28 @@ function __($key, $locale)
     <title><?php echo __("Generate Roman Calendar", $LOCALE) ?></title>
     <meta charset="UTF-8">
     <!-- <link rel="icon" type="image/x-icon" href="../favicon.ico"> -->
+    <style>
+        td.rotate {
+            width: 1.5em;
+            white-space: nowrap;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        td.rotate div{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.8em;
+            font-weight:bold;
+            writing-mode: vertical-rl;
+            transform: rotate(180.0deg);
+        }
+
+        .dateEntry {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size:.7em;
+            font-weight:bold;
+        }
+    </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 
@@ -724,7 +765,7 @@ function __($key, $locale)
 
     if ($YEAR >= 1970) {
         echo '<table id="LitCalTable" style="width:75%;margin:30px auto;border:1px solid Blue;border-radius: 6px; padding:10px;background:LightBlue;">';
-        echo '<thead><tr><th>' . __("Date in Gregorian Calendar", $LOCALE) . '</th><th>' . __("General Roman Calendar Festivity", $LOCALE) . '</th><th>' . __("Grade of the Festivity", $LOCALE) . '</th></tr></thead>';
+        echo '<thead><tr><th>' . __("Month",$LOCALE) . '</th><th>' . __("Date in Gregorian Calendar", $LOCALE) . '</th><th>' . __("General Roman Calendar Festivity", $LOCALE) . '</th><th>' . __("Grade of the Festivity", $LOCALE) . '</th></tr></thead>';
         echo '<tbody>';
 
 
@@ -733,6 +774,10 @@ function __($key, $locale)
         $highContrast = ['purple', 'red', 'green'];
 
         $LitCalKeys = array_keys($LitCal);
+
+        $currentMonth = 0; //1=January, ... 12=December
+        $newMonth = false;
+
         //print_r($LitCalKeys);
         //echo count($LitCalKeys);
         for ($keyindex = 0; $keyindex < count($LitCalKeys); $keyindex++) {
@@ -759,6 +804,14 @@ function __($key, $locale)
                 }
             }
 
+            //If we are at the start of a new month, count how many events we have in that same month, so we can display the Month table cell
+            if((int) $festivity->date->format('n') !== $currentMonth){
+                $newMonth = true;
+                $currentMonth = (int) $festivity->date->format('n');
+                $cm = 0;
+                countSameMonthEvents($keyindex, $LitCal, $cm);
+            }
+            
 
             //Let's check if we have more than one event on the same day, such as optional memorials...
             $cc = 0;
@@ -813,6 +866,11 @@ function __($key, $locale)
 
 
                     echo '<tr style="background-color:' . $color . ';' . (in_array($color, $highContrast) ? 'color:white;' : '') . '">';
+                    if($newMonth){
+                        $monthRwsp = $cm + 1;
+                        echo '<td class="rotate" rowspan = "' . $monthRwsp . '"><div>' . ($LOCALE === 'LA' ? strtoupper($months[(int)$festivity->date->format('n')]) : strtoupper(utf8_encode(strftime('%B', $festivity->date->format('U'))))) . '</div></td>';
+                        $newMonth = false;
+                    }
                     if ($ev == 0) {
                         $rwsp = $cc + 1;
                         $dateString = "";
@@ -830,10 +888,10 @@ function __($key, $locale)
                             default:
                                 $dateString = utf8_encode(strftime('%A %e %B %Y', $festivity->date->format('U')));
                         }
-                        echo '<td rowspan="' . $rwsp . '" style="font-family:\'DejaVu Sans Mono\';font-size:.7em;font-weight:bold;">' . $dateString . '</td>';
+                        echo '<td rowspan="' . $rwsp . '" class="dateEntry">' . $dateString . '</td>';
                     }
-                    echo '<td>' . $festivity->name . ' (' . $currentCycle . ') - <i>' . __($festivity->color, $LOCALE) . '</i><br /><i>' . $festivity->common . '</i></td>';
-                    echo '<td>' . $GRADE[$festivity->grade] . '</td>';
+                    echo '<td style="background-color:' . $festivity->color . ';' . (in_array($festivity->color, $highContrast) ? 'color:white;' : 'color:black;') . '">' . $festivity->name . ' (' . $currentCycle . ') - <i>' . __($festivity->color, $LOCALE) . '</i><br /><i>' . $festivity->common . '</i></td>';
+                    echo '<td style="background-color:' . $festivity->color . ';' . (in_array($festivity->color, $highContrast) ? 'color:white;' : 'color:black;') . '">' . $GRADE[$festivity->grade] . '</td>';
                     echo '</tr>';
                     $keyindex++;
                 }
@@ -872,7 +930,11 @@ function __($key, $locale)
                 }
                 $festivity->color = explode("|", $festivity->color)[0];
                 echo '<tr style="background-color:' . $festivity->color . ';' . (in_array($festivity->color, $highContrast) ? 'color:white;' : '') . '">';
-
+                if($newMonth){
+                    $monthRwsp = $cm +1;
+                    echo '<td class="rotate" rowspan = "' . $monthRwsp . '"><div>' . ($LOCALE === 'LA' ? strtoupper($months[(int)$festivity->date->format('n')]) : strtoupper(utf8_encode(strftime('%B', $festivity->date->format('U'))))) . '</div></td>';
+                    $newMonth = false;
+                }
                 $dateString = "";
                 switch ($LOCALE) {
                     case "LA":
@@ -890,7 +952,7 @@ function __($key, $locale)
                 }
 
 
-                echo '<td style="font-family:\'DejaVu Sans Mono\';font-size:.7em;font-weight:bold;">' . $dateString . '</td>';
+                echo '<td class="dateEntry">' . $dateString . '</td>';
                 echo '<td>' . $festivity->name . ' (' . $currentCycle . ') - <i>' . __($festivity->color, $LOCALE) . '</i><br /><i>' . $festivity->common . '</i></td>';
                 echo '<td>' . $GRADE[$festivity->grade] . '</td>';
                 echo '</tr>';

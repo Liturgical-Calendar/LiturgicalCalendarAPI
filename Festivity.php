@@ -7,11 +7,12 @@ class Festivity implements JsonSerializable
     public $color; //"green","purple","white","red","pink"
     public $type;  //"mobile" or "fixed"
     public $grade; //0=Weekday,1=Commemoration,2=Optional memorial,3=Obligatory memorial,4=Feast,5=Feast of the Lord,6=Solemnity,7=Higher Solemnity
+    //public $displayGrade;
     public $common; //"Proper" or specified common(s) of saints...
     private static $liturgical_colors = array("green", "purple", "white", "red", "pink");
     private static $feast_type = array("fixed", "mobile");
 
-    function __construct($name, $date, $color, $type, $grade = 0, $common = '')
+    function __construct($name, $date, $color, $type, $grade = 0, $common = '') //, $displayGrade
     {
         //enforce typecasting
         $this->name = (string) $name;
@@ -21,6 +22,7 @@ class Festivity implements JsonSerializable
         $this->color = strpos($_color, "|") && empty(array_diff(explode("|", $_color), self::$liturgical_colors)) ? $_color : (in_array($_color, self::$liturgical_colors) ? $_color : "???");
         $this->type = in_array((string) strtolower($type), self::$feast_type) ? (string) strtolower($type) : "???";
         $this->grade = (int) $grade >= 0 && (int) $grade <= 7 ? (int) $grade : -1;
+        //$this->displayGrade = (string) $displayGrade;
         $this->common = (string) $common;
     }
 
