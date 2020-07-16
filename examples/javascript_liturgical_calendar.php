@@ -55,11 +55,18 @@ $messages = [
     ],
     "You are requesting a year prior to 1970: it is not possible to request years prior to 1970." => [
         "en" => "You are requesting a year prior to 1970: it is not possible to request years prior to 1970.",
-        "it" => "Stai effettuando una richiesta per un anno che è precedente al 1970: non è possibile richiedere anni precedenti al 1970."
+        "it" => "Stai effettuando una richiesta per un anno che è precedente al 1970: non è possibile richiedere anni precedenti al 1970.",
+        "la" => "Rogavisti annum ante 1970: non potest rogare annos ante annum 1970."
+    ],
+    "Customize options for generating the Roman Calendar" => [
+        "en" => "Customize options for generating the Roman Calendar",
+        "it" => "Personalizzare le opzioni per la generazione del Calendario Romano",
+        "la" => "Eligere optiones per generationem Calendarii Romani"
     ],
     "Configurations being used to generate this calendar:" => [
         "en" => "Configurations being used to generate this calendar:",
-        "it" => "Configurazioni utilizzate per la generazione di questo calendario:"
+        "it" => "Configurazioni utilizzate per la generazione di questo calendario:",
+        "la" => "Optiones electuus ut generare hic calendarium:"
     ],
     "Date in Gregorian Calendar" => [
         "en" => "Date in Gregorian Calendar",
@@ -253,7 +260,7 @@ function __($key, $locale)
                                         }
                                         return __("From the Common", $LOCALE) + " " + __($commonKey, $LOCALE) + " " + $commonGeneral + ($commonSpecific != "" ? ": " + $commonSpecific : "");
                                     });
-                                    $festivity.common = $commons.join("; or ");
+                                    $festivity.common = $commons.join("; " + __("or", $LOCALE) + " ");
                                 }
                                 else if ($festivity.common == "Proper"){
                                     $festivity.common = __($festivity.common,$LOCALE);
@@ -313,7 +320,7 @@ function __($key, $locale)
                                     }
                                     return __("From the Common", $LOCALE) + " " + __($commonKey, $LOCALE) + " " + $commonGeneral + ($commonSpecific != "" ? ": " + $commonSpecific : "");
                                 });
-                                $festivity.common = $commons.join("; "+ __("or",$LOCALE) + " ");
+                                $festivity.common = $commons.join("; " + __("or",$LOCALE) + " ");
                             }
                             else if($festivity.common == "Proper"){
                                 $festivity.common = __($festivity.common,$LOCALE);
@@ -597,7 +604,7 @@ function __($key, $locale)
 
     <?php
 
-    echo '<h1 style="text-align:center;">' . __('Liturgical Calendar Calculation for a Given Year', $LOCALE) . '(' . $YEAR . ')</h1>';
+    echo '<h1 style="text-align:center;">' . __('Liturgical Calendar Calculation for a Given Year', $LOCALE) . ' (' . $YEAR . ')</h1>';
     echo '<h2 style="text-align:center;">' . sprintf(__('HTML presentation elaborated by JAVASCRIPT using an AJAX request to a %s', $LOCALE), '<a href="../LitCalEngine.php">PHP engine</a>') . '</h2>';
 
     if ($YEAR < 1969) {
@@ -607,7 +614,7 @@ function __($key, $locale)
     }
 
 
-    echo '<fieldset style="margin-bottom:6px;"><legend>Customize options for generating the Roman Calendar</legend>';
+    echo '<fieldset style="margin-bottom:6px;"><legend>' . __('Customize options for generating the Roman Calendar',$LOCALE) . '</legend>';
     echo '<form method="GET">';
     echo '<table style="width:100%;"><tr>';
     echo '<td><label>' . __('YEAR', $LOCALE) . ': <input type="number" name="year" id="year" min="1969" value="' . $YEAR . '" /></label></td>';
