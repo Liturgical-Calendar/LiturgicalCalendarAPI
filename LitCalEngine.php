@@ -329,7 +329,7 @@ if (CORPUSCHRISTI === "THURSDAY") {
 }
 
 //Ash Wednesday
-$LitCal["AshWednesday"]     = new Festivity($PROPRIUM_DE_TEMPORE["CorpusChristi"]["NAME_" . $LOCALE], calcGregEaster($YEAR)->sub(new DateInterval('P46D')),           "purple",   "mobile", HIGHERSOLEMNITY);
+$LitCal["AshWednesday"]     = new Festivity($PROPRIUM_DE_TEMPORE["AshWednesday"]["NAME_" . $LOCALE], calcGregEaster($YEAR)->sub(new DateInterval('P46D')),           "purple",   "mobile", HIGHERSOLEMNITY);
 
 //Weekdays of Holy Week from Monday to Thursday inclusive (that is, thursday morning chrism mass... the In Coena Domini mass begins the Easter Triduum)
 $LitCal["MonHolyWeek"]      = new Festivity($PROPRIUM_DE_TEMPORE["MonHolyWeek"]["NAME_" . $LOCALE], calcGregEaster($YEAR)->sub(new DateInterval('P6D')),            "purple",   "mobile", HIGHERSOLEMNITY);
