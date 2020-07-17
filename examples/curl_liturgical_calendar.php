@@ -9,12 +9,14 @@
  * Date Created: 27 December 2017
  */
 
+ini_set('error_reporting', E_ALL);
+ini_set("display_errors", 1);
+
 /**************************
  * DEFINE USEFUL FUNCTIONS
  * AND ARRAYS
  * 
  *************************/
-
 
 function countSameDayEvents($currentKeyIndex, $EventsArray, &$cc)
 {
@@ -321,8 +323,6 @@ define("WEEKDAY", 0);            // 13. WEEKDAYS OF ADVENT UNTIL DECEMBER 16th
 
 //TODO: implement interface for adding Proper feasts and memorials...
 
-$GRADE = ["", "COMMEMORATION", "OPTIONAL MEMORIAL", "MEMORIAL", "FEAST", "FEAST OF THE LORD", "SOLEMNITY", "HIGHER RANKING SOLEMNITY"];
-
 $SUNDAY_CYCLE = ["A", "B", "C"];
 $WEEKDAY_CYCLE = ["I", "II"];
 
@@ -384,6 +384,25 @@ if ($YEAR >= 1970) {
     foreach ($LitCal as $key => $value) {
         // retransform each entry from an associative array to a Festivity class object
         $LitCal[$key] = new Festivity($LitCal[$key]["name"], $LitCal[$key]["date"], $LitCal[$key]["color"], $LitCal[$key]["type"], $LitCal[$key]["grade"], $LitCal[$key]["common"]);
+    }
+}
+
+function __($key, $locale)
+{
+    global $messages;
+    $lcl = strtolower($locale);
+    if (isset($messages)) {
+        if (isset($messages[$key])) {
+            if (isset($messages[$key][$lcl])) {
+                return $messages[$key][$lcl];
+            } else {
+                return $messages[$key]["en"];
+            }
+        } else {
+            return $key;
+        }
+    } else {
+        return $key;
     }
 }
 
@@ -643,8 +662,58 @@ $messages = [
         "en" => "Month",
         "it" => "Mese",
         "la" => "Mensis"
+    ],
+    "FERIA" => [
+        "en" => "<i>weekday</i>",
+        "it" => "<i>feria</i>",
+        "la" => "<i>feria</i>"
+    ],
+    "COMMEMORATION" => [
+        "en" => "Commemoration",
+        "it" => "Commemorazione",
+        "la" => "Commemoratio"
+    ],
+    "OPTIONAL MEMORIAL" => [
+        "en" => "Optional memorial",
+        "it" => "Memoria facoltativa",
+        "la" => "Memoria facoltativa"
+    ],
+    "MEMORIAL" => [
+        "en" => "Memorial",
+        "it" => "Memoria",
+        "la" => "Memoria"
+    ],
+    "FEAST" => [
+        "en" => "Feast",
+        "it" => "Festa",
+        "la" => "Festa"
+    ],
+    "FEAST OF THE LORD" => [
+        "en" => "Feast of the Lord",
+        "it" => "Festa del Signore",
+        "la" => "Festa Domini"
+    ],
+    "SOLEMNITY" => [
+        "en" => "Solemnity",
+        "it" => "Solennità",
+        "la" => "Solemnitas"
+    ],
+    "HIGHER RANKING SOLEMNITY" => [
+        "en" => "<i>precedence over solemnities</i>",
+        "it" => "<i>precedenza sulle solennità</i>",
+        "la" => "<i>praecellentia ante solemnitates</i>"
     ]
 ];
+
+$GRADE = array();
+$GRADE[0] = __("FERIA",$LOCALE);
+$GRADE[1] = __("COMMEMORATION",$LOCALE);
+$GRADE[2] = __("OPTIONAL MEMORIAL",$LOCALE);
+$GRADE[3] = __("MEMORIAL",$LOCALE);
+$GRADE[4] = __("FEAST",$LOCALE);
+$GRADE[5] = __("FEAST OF THE LORD",$LOCALE);
+$GRADE[6] = __("SOLEMNITY",$LOCALE);
+$GRADE[7] = __("HIGHER RANKING SOLEMNITY",$LOCALE);
 
 $daysOfTheWeek = [
     "dies Solis",
@@ -676,24 +745,6 @@ $months = [
  * BEGIN DISPLAY LOGIC
  * 
  *************************/
-function __($key, $locale)
-{
-    global $messages;
-    $lcl = strtolower($locale);
-    if (isset($messages)) {
-        if (isset($messages[$key])) {
-            if (isset($messages[$key][$lcl])) {
-                return $messages[$key][$lcl];
-            } else {
-                return $messages[$key]["en"];
-            }
-        } else {
-            return $key;
-        }
-    } else {
-        return $key;
-    }
-}
 
 
 ?>
@@ -704,6 +755,11 @@ function __($key, $locale)
     <meta charset="UTF-8">
     <!-- <link rel="icon" type="image/x-icon" href="../favicon.ico"> -->
     <style>
+        
+        #LitCalTable td {
+            padding: 8px 6px;
+        }
+        
         td.rotate {
             width: 1.5em;
             white-space: nowrap;
@@ -891,7 +947,7 @@ function __($key, $locale)
                         echo '<td rowspan="' . $rwsp . '" class="dateEntry">' . $dateString . '</td>';
                     }
                     echo '<td style="background-color:' . $festivity->color . ';' . (in_array($festivity->color, $highContrast) ? 'color:white;' : 'color:black;') . '">' . $festivity->name . ' (' . $currentCycle . ') - <i>' . __($festivity->color, $LOCALE) . '</i><br /><i>' . $festivity->common . '</i></td>';
-                    echo '<td style="background-color:' . $festivity->color . ';' . (in_array($festivity->color, $highContrast) ? 'color:white;' : 'color:black;') . '">' . $GRADE[$festivity->grade] . '</td>';
+                    echo '<td style="background-color:' . $festivity->color . ';' . (in_array($festivity->color, $highContrast) ? 'color:white;' : 'color:black;') . '">' . ($keyname === 'AllSouls' ? __("COMMEMORATION",$LOCALE) : $GRADE[$festivity->grade]) . '</td>';
                     echo '</tr>';
                     $keyindex++;
                 }
@@ -954,7 +1010,7 @@ function __($key, $locale)
 
                 echo '<td class="dateEntry">' . $dateString . '</td>';
                 echo '<td>' . $festivity->name . ' (' . $currentCycle . ') - <i>' . __($festivity->color, $LOCALE) . '</i><br /><i>' . $festivity->common . '</i></td>';
-                echo '<td>' . $GRADE[$festivity->grade] . '</td>';
+                echo '<td>' . ($keyname === 'AllSouls' ? __("COMMEMORATION",$LOCALE) : $GRADE[$festivity->grade]) . '</td>';
                 echo '</tr>';
             }
         }
