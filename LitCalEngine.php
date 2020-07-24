@@ -5,7 +5,7 @@
  * Author: John Romano D'Orazio 
  * Email: priest@johnromanodorazio.com
  * Licensed under the Apache 2.0 License
- * Version 2.3
+ * Version 2.4
  * Date Created: 27 December 2017
  * Note: it is necessary to set up the MySQL liturgy tables prior to using this script
  */
@@ -37,6 +37,8 @@
  * Editio typica tertia emendata, 2008                                            *
  *                                                                                *
  *********************************************************************************/
+
+define("VERSION","2.4");
 
 
 include "Festivity.php"; //this defines a "Festivity" class that can hold all the useful information about a single celebration
@@ -79,7 +81,7 @@ if ($dbConnect->retString != "" && preg_match("/^Connected to MySQL Database:/",
  *  AND IN WHICH FORMAT TO RETURN THE PROCESSED DATA (JSON OR XML)
  */
 
-$allowed_returntypes = array("JSON", "XML");
+$allowed_returntypes = array("JSON", "XML", "ICS");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $YEAR = (isset($_POST["year"]) && is_numeric($_POST["year"]) && ctype_digit($_POST["year"]) && strlen($_POST["year"]) === 4) ? (int)$_POST["year"] : (int)date("Y");
@@ -379,8 +381,8 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
 //It is not possible for a fixed date Solemnity to fall on a Sunday of Easter. 
 //(See the special case of a Solemnity during Holy Week below.)
 
-if ($LitCal["ImmConception"]->date == $LitCal["Advent2"]->date) {
-    $LitCal["ImmConception"]->date->add(new DateInterval('P1D'));
+if ($LitCal["ImmaculateConception"]->date == $LitCal["Advent2"]->date) {
+    $LitCal["ImmaculateConception"]->date->add(new DateInterval('P1D'));
 }
 
 if ($LitCal["StJoseph"]->date == $LitCal["Lent1"]->date || $LitCal["StJoseph"]->date == $LitCal["Lent2"]->date || $LitCal["StJoseph"]->date == $LitCal["Lent3"]->date || $LitCal["StJoseph"]->date == $LitCal["Lent4"]->date || $LitCal["StJoseph"]->date == $LitCal["Lent5"]->date) {
@@ -416,8 +418,8 @@ else if ($LitCal["Annunciation"]->date >= $LitCal["PalmSun"]->date && $LitCal["A
 		    }
 		    */
 
-array_push($SOLEMNITIES, $LitCal["MotherGod"]->date, $LitCal["BirthJohnBapt"]->date, $LitCal["PeterPaulAp"]->date, $LitCal["Assumption"]->date, $LitCal["AllSaints"]->date, $LitCal["AllSouls"]->date);
-array_push($SOLEMNITIES, $LitCal["StJoseph"]->date, $LitCal["Annunciation"]->date, $LitCal["ImmConception"]->date);
+array_push($SOLEMNITIES, $LitCal["MotherGod"]->date, $LitCal["NativityJohnBaptist"]->date, $LitCal["StsPeterPaulAp"]->date, $LitCal["Assumption"]->date, $LitCal["AllSaints"]->date, $LitCal["AllSouls"]->date);
+array_push($SOLEMNITIES, $LitCal["StJoseph"]->date, $LitCal["Annunciation"]->date, $LitCal["ImmaculateConception"]->date);
 
 //4. Proper solemnities
 //TODO: Intregrate proper solemnities
@@ -463,7 +465,7 @@ if ((int)DateTime::createFromFormat('!j-n-Y', '25-12-' . $YEAR, new DateTimeZone
 
 //If a fixed date Solemnity occurs on a Sunday of Ordinary Time or on a Sunday of Christmas, the Solemnity is celebrated in place of the Sunday. (e.g., Birth of John the Baptist, 1990)
 //If a fixed date Feast of the Lord occurs on a Sunday in Ordinary Time, the feast is celebrated in place of the Sunday
-array_push($SOLEMNITIES, $LitCal["BaptismLord"]->date, $LitCal["Presentation"]->date, $LitCal["Transfiguration"]->date, $LitCal["HolyCross"]->date, $LitCal["HolyFamily"]->date);
+array_push($SOLEMNITIES, $LitCal["BaptismLord"]->date, $LitCal["Presentation"]->date, $LitCal["Transfiguration"]->date, $LitCal["ExaltationCross"]->date, $LitCal["HolyFamily"]->date);
 
 
 
@@ -554,7 +556,7 @@ while ($weekdayAdvent >= $LitCal["Advent1"]->date && $weekdayAdvent < $LitCal["C
     $weekdayAdvent = DateTime::createFromFormat('!j-n-Y', $DoMAdvent1 . '-' . $MonthAdvent1 . '-' . $YEAR, new DateTimeZone('UTC'))->add(new DateInterval('P' . $weekdayAdventCnt . 'D'));
 
     //if we're not dealing with a sunday or a solemnity, then create the weekday
-    if (!in_array($weekdayAdvent, $SOLEMNITIES) && (int)$weekdayAdvent->format('N') !== 7) {
+    if (!in_array($weekdayAdvent, $SOLEMNITIES) && !in_array($weekdayAdvent, $FEASTS_MEMORIALS) && (int)$weekdayAdvent->format('N') !== 7) {
         $upper = (int)$weekdayAdvent->format('z');
         $diff = $upper - (int)$LitCal["Advent1"]->date->format('z'); //day count between current day and First Sunday of Advent
         $currentAdvWeek = (($diff - $diff % 7) / 7) + 1; //week count between current day and First Sunday of Advent
@@ -576,7 +578,7 @@ $weekdayChristmasCnt = 1;
 while ($weekdayChristmas >= $LitCal["Christmas"]->date && $weekdayChristmas < DateTime::createFromFormat('!j-n-Y', '31-12-' . $YEAR, new DateTimeZone('UTC'))) {
     $weekdayChristmas = DateTime::createFromFormat('!j-n-Y', '25-12-' . $YEAR, new DateTimeZone('UTC'))->add(new DateInterval('P' . $weekdayChristmasCnt . 'D'));
 
-    if (!in_array($weekdayChristmas, $SOLEMNITIES) && (int)$weekdayChristmas->format('N') !== 7) {
+    if (!in_array($weekdayChristmas, $SOLEMNITIES) && !in_array($weekdayChristmas, $FEASTS_MEMORIALS) && (int)$weekdayChristmas->format('N') !== 7) {
 
         //$upper = (int)$weekdayChristmas->format('z');
         //$diff = $upper - (int)$LitCal["Easter"]->date->format('z'); //day count between current day and Easter Sunday
@@ -619,7 +621,7 @@ while ($weekdayLent >= $LitCal["AshWednesday"]->date && $weekdayLent < $LitCal["
 
 //III.
 //10. Obligatory memorials in the General Calendar
-if (!in_array(calcGregEaster($YEAR)->add(new DateInterval('P' . (7 * 9 + 6) . 'D')), $SOLEMNITIES)) {
+if (!in_array(calcGregEaster($YEAR)->add(new DateInterval('P' . (7 * 9 + 6) . 'D')), $SOLEMNITIES) && !in_array(calcGregEaster($YEAR)->add(new DateInterval('P' . (7 * 9 + 6) . 'D')), $FEASTS_MEMORIALS) ) {
     //Immaculate Heart of Mary fixed on the Saturday following the second Sunday after Pentecost
     //(see Calendarium Romanum Generale in Missale Romanum Editio Typica 1970) 
     //Pentecost = calcGregEaster($YEAR)->add(new DateInterval('P'.(7*7).'D'))
@@ -637,7 +639,7 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
 
         //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Memorial
         $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"] . '-' . $row["MONTH"] . '-' . $YEAR, new DateTimeZone('UTC'));
-        if ((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate, $SOLEMNITIES)) {
+        if ((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate, $SOLEMNITIES) && !in_array($currentFeastDate, $FEASTS_MEMORIALS) ) {
             $LitCal[$row["TAG"]] = new Festivity($row["NAME_" . $LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"]);
 
             //If a fixed date Memorial falls within the Lenten season, it is reduced in rank to a Commemoration.                
@@ -688,7 +690,7 @@ if ($YEAR >= 2002) {
 
             //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Festivity
             $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"] . '-' . $row["MONTH"] . '-' . $YEAR, new DateTimeZone('UTC'));
-            if ((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate, $SOLEMNITIES)) {
+            if ((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate, $SOLEMNITIES) && !in_array($currentFeastDate, $FEASTS_MEMORIALS) ) {
                 $LitCal[$row["TAG"]] = new Festivity($row["NAME_" . $LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"]);
 
                 //If a fixed date Memorial falls within the Lenten season, it is reduced in rank to a Commemoration.                
@@ -823,7 +825,7 @@ $weekdayEasterCnt = 1;
 while ($weekdayEaster >= $LitCal["Easter"]->date && $weekdayEaster < $LitCal["Pentecost"]->date) {
     $weekdayEaster = DateTime::createFromFormat('!j-n-Y', $DoMEaster . '-' . $MonthEaster . '-' . $YEAR, new DateTimeZone('UTC'))->add(new DateInterval('P' . $weekdayEasterCnt . 'D'));
 
-    if (!in_array($weekdayEaster, $SOLEMNITIES) && (int)$weekdayEaster->format('N') !== 7) {
+    if (!in_array($weekdayEaster, $SOLEMNITIES) && !in_array($weekdayEaster, $FEASTS_MEMORIALS) && (int)$weekdayEaster->format('N') !== 7) {
 
         $upper = (int)$weekdayEaster->format('z');
         $diff = $upper - (int)$LitCal["Easter"]->date->format('z'); //day count between current day and Easter Sunday
@@ -861,8 +863,6 @@ while ($firstOrdinary >= $FirstWeekdaysLowerLimit && $firstOrdinary < $FirstWeek
         }
         $ordinal = ucfirst(getOrdinal($currentOrdWeek,$LOCALE,$formatterFem,$LATIN_ORDINAL_FEM_GEN));
         $LitCal["FirstOrdWeekday" . $ordWeekday] = new Festivity(($LOCALE == 'LA' ? $LATIN_DAYOFTHEWEEK[$firstOrdinary->format('w')] : ucfirst(utf8_encode(strftime('%A',$firstOrdinary->format('U')))) ) . " " . sprintf(__("of the %s Week of Ordinary Time",$LOCALE), $ordinal ), $firstOrdinary, "green", "mobile");
-        //add Sundays to our priority list for next checking against ordinary Feasts not of Our Lord
-        //array_push($SOLEMNITIES,$firstOrdinary);
     }
     $ordWeekday++;
 }
@@ -888,8 +888,6 @@ while ($lastOrdinary >= $SecondWeekdaysLowerLimit && $lastOrdinary < $SecondWeek
 
         $ordinal = ucfirst(getOrdinal($currentOrdWeek,$LOCALE,$formatterFem,$LATIN_ORDINAL_FEM_GEN));
         $LitCal["LastOrdWeekday" . $ordWeekday] = new Festivity(($LOCALE == 'LA' ? $LATIN_DAYOFTHEWEEK[$lastOrdinary->format('w')] : ucfirst(utf8_encode(strftime('%A',$lastOrdinary->format('U')))) ) . " " . sprintf(__("of the %s Week of Ordinary Time",$LOCALE), $ordinal ), $lastOrdinary, "green", "mobile");
-        //add Sundays to our priority list for next checking against ordinary Feasts not of Our Lord
-        //array_push($SOLEMNITIES,$firstOrdinary);
     }
     $ordWeekday++;
 }
@@ -927,6 +925,68 @@ switch ($returntype) {
             header("Content-type: text/html");
             break;
         */
+    case "ICS":
+        $GithubReleasesAPI = "https://api.github.com/repos/JohnRDOrazio/LiturgicalCalendar/releases/latest";
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $GithubReleasesAPI);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'LiturgicalCalendar');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $currentVersionForDownload = curl_exec($ch);
+        if (curl_errno($ch)) {
+          $error_msg = curl_error($ch);
+          curl_close($ch);
+          echo 'Could not get info about latest release from github: '.$error_msg;
+          exit(0);
+        }
+        else{
+          curl_close($ch);
+        }
+        $GitHubReleasesObj = json_decode($currentVersionForDownload);
+        if(json_last_error() === JSON_ERROR_NONE){
+            $publishDate = $GitHubReleasesObj->published_at;
+            $ical = "BEGIN:VCALENDAR\r\n";
+            $ical .= "PRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\r\n";
+            $ical .= "VERSION:2.0\r\n";
+            $ical .= "CALSCALE:GREGORIAN\r\n";
+            $ical .= "METHOD:PUBLISH\r\n";
+            $ical .= "X-WR-CALNAME:Roman Catholic Universal Liturgical Calendar\r\n";
+            $ical .= "X-WR-TIMEZONE:Europe/Rome\r\n"; //perhaps allow this to be set through a GET or POST?
+            foreach($SerializeableLitCal->LitCal as $FestivityKey => $CalEvent){
+                $description = _C($CalEvent->common,$LOCALE);
+                $description .=  '\n\n' . _G($CalEvent->grade,$LOCALE,false);
+                $description .= $CalEvent->color != "" ? '\n\n' . __($CalEvent->color,$LOCALE) : "";
+                $htmlDescription = _C($CalEvent->common,$LOCALE);
+                $htmlDescription .=  '<br>' . _G($CalEvent->grade,$LOCALE,true);
+                $htmlDescription .= $CalEvent->color != "" ? '<br>' . "<i>".__($CalEvent->color,$LOCALE)."</i>" : "";
+                $ical .= "BEGIN:VEVENT\r\n";
+                $ical .= "DTSTART;VALUE=DATE:" . $CalEvent->date->format('Ymd') . "\r\n";// . "T" . $CalEvent->date->format('His') . "Z\r\n";
+                //$CalEvent->date->add(new DateInterval('P1D'));
+                //$ical .= "DTEND:" . $CalEvent->date->format('Ymd') . "T" . $CalEvent->date->format('His') . "Z\r\n";
+                $ical .= "DTSTAMP:" . date('Ymd') . "T" . date('His') . "Z\r\n";
+                $ical .= "UID:" . md5("LITCAL-" . $FestivityKey) . "\r\n";
+                $ical .= "CREATED:" . str_replace(':' , '', str_replace('-', '', $publishDate)) . "\r\n";
+                $ical .= "DESCRIPTION:" . str_replace(',','\,',(strlen($description) > 63 ? rtrim(chunk_split($description,63,"\r\n\t")) . "\r\n" : "$description\r\n"));
+                $ical .= "LAST-MODIFIED:" . str_replace(':' , '', str_replace('-', '', $publishDate)) . "\r\n";
+                $ical .= "SUMMARY:" . str_replace(',','\,',(strlen($CalEvent->name) > 67 ? rtrim(chunk_split($CalEvent->name,67,"\r\n\t")) . "\r\n" : "$CalEvent->name\r\n"));
+                $ical .= "TRANSP:TRANSPARENT\r\n";
+                $ical .= "X-MICROSOFT-CDO-ALLDAYEVENT:TRUE\r\n";
+                $ical .= "X-MICROSOFT-DISALLOW-COUNTER:TRUE\r\n";
+                $ical .= 'X-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 3.2'."\r\n\t".'//EN""><HTML><BODY style="background-color:'.$CalEvent->color.';">\n'."\r\n\t";
+                $ical .= str_replace(',','\,',(strlen($htmlDescription) > 75 ? chunk_split($htmlDescription,75,"\r\n\t") : "$htmlDescription\r\n\t"));
+                $ical .= '\n</BODY></HTML>' . "\r\n";
+                $ical .= "END:VEVENT\r\n";
+            }
+            $ical .= "END:VCALENDAR";
+      
+            header('Content-Type: text/calendar; charset=UTF-8');
+            header('Content-Disposition: attachment; filename="LiturgicalCalendar.ics"');
+            echo $ical;
+        }
+        else{
+            echo 'Could not parse info received from github about latest release: '.json_last_error_msg();
+            exit(0);
+        }
+        break;
     default:
         header('Content-Type: application/json');
         echo json_encode($SerializeableLitCal);

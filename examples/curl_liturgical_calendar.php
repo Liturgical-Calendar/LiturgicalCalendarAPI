@@ -503,6 +503,7 @@ $messages = [
         "it" => "Beata Vergine Maria",
         "la" => "Beatæ Virginis Mariæ"
     ],
+    /*translators: all of the following are in the genitive case, in reference to "from the Common of %s" */
     "Martyrs" => [
         "en" => "Martyrs",
         "it" => "Martiri",
@@ -561,7 +562,7 @@ $messages = [
     "For a Bishop" => [
         "en" => "For a Bishop",
         "it" => "Per i vescovi",
-        "la" => "Pro Episcopo"
+        "la" => "Pro Episcopis"
     ],
     "For One Pastor" => [
         "en" => "For One Pastor",
@@ -686,7 +687,7 @@ $messages = [
     "FEAST" => [
         "en" => "Feast",
         "it" => "Festa",
-        "la" => "Festa"
+        "la" => "Festum"
     ],
     "FEAST OF THE LORD" => [
         "en" => "Feast of the Lord",
