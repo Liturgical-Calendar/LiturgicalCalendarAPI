@@ -949,31 +949,53 @@ switch ($returntype) {
             $ical .= "VERSION:2.0\r\n";
             $ical .= "CALSCALE:GREGORIAN\r\n";
             $ical .= "METHOD:PUBLISH\r\n";
-            $ical .= "X-WR-CALNAME:Roman Catholic Universal Liturgical Calendar\r\n";
-            $ical .= "X-WR-TIMEZONE:Europe/Rome\r\n"; //perhaps allow this to be set through a GET or POST?
+            $ical .= "X-MS-OLK-FORCEINSPECTOROPEN:FALSE\r\n";
+            $ical .= "X-WR-CALNAME:Roman Catholic Universal Liturgical Calendar " . strtoupper($LOCALE) . "\r\n";
+            $ical .= "X-WR-TIMEZONE:Europe/Vatican\r\n"; //perhaps allow this to be set through a GET or POST?
+            $ical .= "X-PUBLISHED-TTL:PT1D\r\n";
             foreach($SerializeableLitCal->LitCal as $FestivityKey => $CalEvent){
                 $description = _C($CalEvent->common,$LOCALE);
-                $description .=  '\n\n' . _G($CalEvent->grade,$LOCALE,false);
-                $description .= $CalEvent->color != "" ? '\n\n' . __($CalEvent->color,$LOCALE) : "";
-                $htmlDescription = _C($CalEvent->common,$LOCALE);
-                $htmlDescription .=  '<br>' . _G($CalEvent->grade,$LOCALE,true);
-                $htmlDescription .= $CalEvent->color != "" ? '<br>' . "<i>".__($CalEvent->color,$LOCALE)."</i>" : "";
+                $description .=  '\n' . _G($CalEvent->grade,$LOCALE,false);
+                $description .= $CalEvent->color != "" ? '\n' . __($CalEvent->color,$LOCALE) : "";
+                $htmlDescription = "<P DIR=LTR>" . _C($CalEvent->common,$LOCALE);
+                $htmlDescription .=  '<BR>' . _G($CalEvent->grade,$LOCALE,true);
+                $calEventColor = "";
+                if(strpos($CalEvent->color,"|")){
+                    $colors = explode("|",$CalEvent->color);
+                    $colors = array_map(function($txt) use ($LOCALE){
+                        return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . ColorToHex($txt) . '">' . __($txt,$LOCALE) . '</FONT></SPAN></I></B>';
+                    },$colors);
+                    $calEventColor = implode(' <I><FONT FACE="Calibri">' . __("or",$LOCALE) . "</FONT></I> ", $colors);
+                }
+                else{
+                    $calEventColor = $CalEvent->color !== "" ? '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . ColorToHex($CalEvent->color) . '">' . __($CalEvent->color,$LOCALE) . '</FONT></SPAN></I></B>' : "";
+                }
+                $htmlDescription .= "<br>" . $calEventColor . "</P>";
                 $ical .= "BEGIN:VEVENT\r\n";
+                $ical .= "CLASS:PUBLIC\r\n";
                 $ical .= "DTSTART;VALUE=DATE:" . $CalEvent->date->format('Ymd') . "\r\n";// . "T" . $CalEvent->date->format('His') . "Z\r\n";
                 //$CalEvent->date->add(new DateInterval('P1D'));
                 //$ical .= "DTEND:" . $CalEvent->date->format('Ymd') . "T" . $CalEvent->date->format('His') . "Z\r\n";
                 $ical .= "DTSTAMP:" . date('Ymd') . "T" . date('His') . "Z\r\n";
-                $ical .= "UID:" . md5("LITCAL-" . $FestivityKey) . "\r\n";
+                /** The event created in the calendar is specific to this year, next year it may be different. 
+                 *  So UID must take into account the year 
+                 *  Next year's event should not cancel this year's event, they are different events 
+                 **/
+                $ical .= "UID:" . md5("LITCAL-" . $FestivityKey . '-' . $CalEvent->date->format('Y')) . "\r\n";
                 $ical .= "CREATED:" . str_replace(':' , '', str_replace('-', '', $publishDate)) . "\r\n";
-                $ical .= "DESCRIPTION:" . str_replace(',','\,',(strlen($description) > 63 ? rtrim(chunk_split($description,63,"\r\n\t")) . "\r\n" : "$description\r\n"));
+                $desc = "DESCRIPTION:" . str_replace(',','\,',$description);
+                $ical .= strlen($desc) > 75 ? rtrim(utf8_encode(chunk_split(utf8_decode($desc),71,"\r\n\t"))) . "\r\n" : "$desc\r\n";
                 $ical .= "LAST-MODIFIED:" . str_replace(':' , '', str_replace('-', '', $publishDate)) . "\r\n";
-                $ical .= "SUMMARY:" . str_replace(',','\,',(strlen($CalEvent->name) > 67 ? rtrim(chunk_split($CalEvent->name,67,"\r\n\t")) . "\r\n" : "$CalEvent->name\r\n"));
+                $summaryLang = ";LANGUAGE=" . strtolower($LOCALE); //strtolower($LOCALE) === "la" ? "" : 
+                $summary = "SUMMARY".$summaryLang.":" . str_replace(',','\,',$CalEvent->name);
+                $ical .= strlen($summary) > 75 ? rtrim(utf8_encode(chunk_split(utf8_decode($summary),75,"\r\n\t"))) . "\r\n" : $summary . "\r\n";
                 $ical .= "TRANSP:TRANSPARENT\r\n";
                 $ical .= "X-MICROSOFT-CDO-ALLDAYEVENT:TRUE\r\n";
                 $ical .= "X-MICROSOFT-DISALLOW-COUNTER:TRUE\r\n";
-                $ical .= 'X-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 3.2'."\r\n\t".'//EN""><HTML><BODY style="background-color:'.$CalEvent->color.';">\n'."\r\n\t";
-                $ical .= str_replace(',','\,',(strlen($htmlDescription) > 75 ? chunk_split($htmlDescription,75,"\r\n\t") : "$htmlDescription\r\n\t"));
-                $ical .= '\n</BODY></HTML>' . "\r\n";
+                $xAltDesc = 'X-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">\n<HTML>\n<BODY>\n\n';
+                $xAltDesc .= str_replace(',','\,',$htmlDescription);
+                $xAltDesc .= '\n\n</BODY>\n</HTML>';
+                $ical .= strlen($xAltDesc) > 75 ? rtrim(utf8_encode(chunk_split(utf8_decode($xAltDesc),71,"\r\n\t"))) . "\r\n" : "$xAltDesc\r\n";
                 $ical .= "END:VEVENT\r\n";
             }
             $ical .= "END:VCALENDAR";

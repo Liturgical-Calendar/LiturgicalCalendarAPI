@@ -59,11 +59,10 @@ function _C($common,$locale="la"){
     $locale = strtolower($locale);
     if ($common !== "" && $common !== "Proper") {
         $commons = explode("|", $common);
-        $commons = array_map(function ($txt) {
-            global $locale;
-            $common = explode(":", $txt);
-            $commonGeneral = __($common[0], $locale);
-            $commonSpecific = isset($common[1]) && $common[1] != "" ? __($common[1], $locale) : "";
+        $commons = array_map(function ($txt) use ($locale) {
+            $commonArr = explode(":", $txt);
+            $commonGeneral = __($commonArr[0], $locale);
+            $commonSpecific = isset($commonArr[1]) && $commonArr[1] != "" ? __($commonArr[1], $locale) : "";
             //$txt = str_replace(":", ": ", $txt);
             switch ($commonGeneral) {
                 case __("Blessed Virgin Mary", $locale):
@@ -88,6 +87,30 @@ function _C($common,$locale="la"){
         $common = __("Proper", $locale);
     }
     return $common;
+}
+
+function ColorToHex($color){
+    $hex = "#";
+    switch($color){
+        case "red":
+            $hex .= "FF0000";
+        break;
+        case "green":
+            $hex .= "00AA00";
+        break;
+        case "white":
+            $hex .= "AAAAAA";
+        break;
+        case "purple":
+            $hex .= "AA00AA";
+        break;
+        case "pink":
+            $hex .= "FFAAAA";
+        break;
+        default:
+            $hex .= "000000";
+    }
+    return $hex;
 }
 
 $MESSAGES = [
@@ -338,14 +361,14 @@ $MESSAGES = [
         "la" => "Mensis"
     ],
     "FERIA" => [
-        "en" => "<i>weekday</i>",
-        "it" => "<i>feria</i>",
-        "la" => "<i>feria</i>"
+        "en" => "<I>weekday</I>",
+        "it" => "<I>feria</I>",
+        "la" => "<I>feria</I>"
     ],
     "COMMEMORATION" => [
-        "en" => "<i>Commemoration</i>",
-        "it" => "<i>Commemorazione</i>",
-        "la" => "<i>Commemoratio</i>"
+        "en" => "<I>Commemoration</I>",
+        "it" => "<I>Commemorazione</I>",
+        "la" => "<I>Commemoratio</I>"
     ],
     "OPTIONAL MEMORIAL" => [
         "en" => "Optional memorial",
@@ -363,19 +386,19 @@ $MESSAGES = [
         "la" => "FESTUM"
     ],
     "FEAST OF THE LORD" => [
-        "en" => "<b>FEAST OF THE LORD</b>",
-        "it" => "<b>FESTA DEL SIGNORE</b>",
-        "la" => "<b>FESTUM DOMINI</b>"
+        "en" => "<B>FEAST OF THE LORD</B>",
+        "it" => "<B>FESTA DEL SIGNORE</B>",
+        "la" => "<B>FESTUM DOMINI</B>"
     ],
     "SOLEMNITY" => [
-        "en" => "<b>SOLEMNITY</b>",
-        "it" => "<b>SOLENNITÀ</b>",
-        "la" => "<b>SOLEMNITAS</b>"
+        "en" => "<B>SOLEMNITY</B>",
+        "it" => "<B>SOLENNITÀ</B>",
+        "la" => "<B>SOLEMNITAS</B>"
     ],
     "HIGHER RANKING SOLEMNITY" => [
-        "en" => "<b><i>precedence over solemnities</i></b>",
-        "it" => "<b><i>precedenza sulle solennità</i></b>",
-        "la" => "<b><i>praecellentia ante solemnitates</i></b>"
+        "en" => "<B><I>precedence over solemnities</I></B>",
+        "it" => "<B><I>precedenza sulle solennità</I></B>",
+        "la" => "<B><I>praecellentia ante solemnitates</I></B>"
     ]
 ];
 
