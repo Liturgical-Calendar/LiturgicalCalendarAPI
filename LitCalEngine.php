@@ -956,21 +956,10 @@ switch ($returntype) {
             foreach($SerializeableLitCal->LitCal as $FestivityKey => $CalEvent){
                 $description = _C($CalEvent->common,$LOCALE);
                 $description .=  '\n' . _G($CalEvent->grade,$LOCALE,false);
-                $description .= $CalEvent->color != "" ? '\n' . __($CalEvent->color,$LOCALE) : "";
+                $description .= $CalEvent->color != "" ? '\n' . ParseColorString($CalEvent->color,$LOCALE,false) : "";
                 $htmlDescription = "<P DIR=LTR>" . _C($CalEvent->common,$LOCALE);
                 $htmlDescription .=  '<BR>' . _G($CalEvent->grade,$LOCALE,true);
-                $calEventColor = "";
-                if(strpos($CalEvent->color,"|")){
-                    $colors = explode("|",$CalEvent->color);
-                    $colors = array_map(function($txt) use ($LOCALE){
-                        return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . ColorToHex($txt) . '">' . __($txt,$LOCALE) . '</FONT></SPAN></I></B>';
-                    },$colors);
-                    $calEventColor = implode(' <I><FONT FACE="Calibri">' . __("or",$LOCALE) . "</FONT></I> ", $colors);
-                }
-                else{
-                    $calEventColor = $CalEvent->color !== "" ? '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . ColorToHex($CalEvent->color) . '">' . __($CalEvent->color,$LOCALE) . '</FONT></SPAN></I></B>' : "";
-                }
-                $htmlDescription .= "<br>" . $calEventColor . "</P>";
+                $htmlDescription .= $CalEvent->color != "" ? "<BR>" . ParseColorString($CalEvent->color,$LOCALE,true) . "</P>" : "</P>";
                 $ical .= "BEGIN:VEVENT\r\n";
                 $ical .= "CLASS:PUBLIC\r\n";
                 $ical .= "DTSTART;VALUE=DATE:" . $CalEvent->date->format('Ymd') . "\r\n";// . "T" . $CalEvent->date->format('His') . "Z\r\n";
