@@ -48,7 +48,7 @@ Both **POST** and **GET** requests can be made.
 # CHANGELOG
 
 ## [v2.5](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v2.5) (July 25th 2020)
- * make sure all endpoint parameters can have either uppercase or lowercase characters
+ * make sure all endpoint parameters can have values with either uppercase or lowercase characters
  * fix a few small issues with the ICS data generation
 
 ## [v2.4](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v2.4) (July 24th 2020)
