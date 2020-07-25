@@ -5,7 +5,7 @@
  * Author: John Romano D'Orazio 
  * Email: priest@johnromanodorazio.com
  * Licensed under the Apache 2.0 License
- * Version 2.4
+ * Version 2.5
  * Date Created: 27 December 2017
  * Note: it is necessary to set up the MySQL liturgy tables prior to using this script
  */
@@ -86,28 +86,28 @@ $allowed_returntypes = array("JSON", "XML", "ICS");
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $YEAR = (isset($_POST["year"]) && is_numeric($_POST["year"]) && ctype_digit($_POST["year"]) && strlen($_POST["year"]) === 4) ? (int)$_POST["year"] : (int)date("Y");
 
-    $EPIPHANY = (isset($_POST["epiphany"]) && ($_POST["epiphany"] === "JAN6" || $_POST["epiphany"] === "SUNDAY_JAN2_JAN8")) ? $_POST["epiphany"] : "JAN6";
-    $ASCENSION = (isset($_POST["ascension"]) && ($_POST["ascension"] === "THURSDAY" || $_POST["ascension"] === "SUNDAY")) ? $_POST["ascension"] : "SUNDAY";
-    $CORPUSCHRISTI = (isset($_POST["corpuschristi"]) && ($_POST["corpuschristi"] === "THURSDAY" || $_POST["corpuschristi"] === "SUNDAY")) ? $_POST["corpuschristi"] : "SUNDAY";
+    $EPIPHANY = (isset($_POST["epiphany"]) && (strtoupper($_POST["epiphany"]) === "JAN6" || strtoupper($_POST["epiphany"]) === "SUNDAY_JAN2_JAN8")) ? strtoupper($_POST["epiphany"]) : "JAN6";
+    $ASCENSION = (isset($_POST["ascension"]) && (strtoupper($_POST["ascension"]) === "THURSDAY" || strtoupper($_POST["ascension"]) === "SUNDAY")) ? strtoupper($_POST["ascension"]) : "SUNDAY";
+    $CORPUSCHRISTI = (isset($_POST["corpuschristi"]) && (strtoupper($_POST["corpuschristi"]) === "THURSDAY" || strtoupper($_POST["corpuschristi"]) === "SUNDAY")) ? strtoupper($_POST["corpuschristi"]) : "SUNDAY";
 
     $LOCALE = isset($_POST["locale"]) ? strtoupper($_POST["locale"]) : "LA"; //default to latin if not otherwise indicated
     $returntype = isset($_POST["returntype"]) && in_array(strtoupper($_POST["returntype"]), $allowed_returntypes) ? strtoupper($_POST["returntype"]) : $allowed_returntypes[0]; // default to JSON
 
-    if (isset($_POST["debug"]) && $_POST["debug"] == "true") {
+    if (isset($_POST["debug"]) && strtoupper($_POST["debug"] == "TRUE")) {
         error_reporting(E_ALL);
         ini_set('display_errors', 1);
     }
 } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $YEAR = (isset($_GET["year"]) && is_numeric($_GET["year"]) && ctype_digit($_GET["year"]) && strlen($_GET["year"]) === 4) ? (int)$_GET["year"] : (int)date("Y");
 
-    $EPIPHANY = (isset($_GET["epiphany"]) && ($_GET["epiphany"] === "JAN6" || $_GET["epiphany"] === "SUNDAY_JAN2_JAN8")) ? $_GET["epiphany"] : "JAN6";
-    $ASCENSION = (isset($_GET["ascension"]) && ($_GET["ascension"] === "THURSDAY" || $_GET["ascension"] === "SUNDAY")) ? $_GET["ascension"] : "SUNDAY";
-    $CORPUSCHRISTI = (isset($_GET["corpuschristi"]) && ($_GET["corpuschristi"] === "THURSDAY" || $_GET["corpuschristi"] === "SUNDAY")) ? $_GET["corpuschristi"] : "SUNDAY";
+    $EPIPHANY = (isset($_GET["epiphany"]) && (strtoupper($_GET["epiphany"]) === "JAN6" || strtoupper($_GET["epiphany"]) === "SUNDAY_JAN2_JAN8")) ? strtoupper($_GET["epiphany"]) : "JAN6";
+    $ASCENSION = (isset($_GET["ascension"]) && (strtoupper($_GET["ascension"]) === "THURSDAY" || strtoupper($_GET["ascension"]) === "SUNDAY")) ? strtoupper($_GET["ascension"]) : "SUNDAY";
+    $CORPUSCHRISTI = (isset($_GET["corpuschristi"]) && (strtoupper($_GET["corpuschristi"]) === "THURSDAY" || strtoupper($_GET["corpuschristi"]) === "SUNDAY")) ? strtoupper($_GET["corpuschristi"]) : "SUNDAY";
 
     $LOCALE = isset($_GET["locale"]) ? strtoupper($_GET["locale"]) : "LA"; //default to latin if not otherwise indicated
     $returntype = isset($_GET["returntype"]) && in_array(strtoupper($_GET["returntype"]), $allowed_returntypes) ? strtoupper($_GET["returntype"]) : $allowed_returntypes[0]; // default to JSON
 
-    if (isset($_GET["debug"]) && $_GET["debug"] == "true") {
+    if (isset($_GET["debug"]) && strtoupper($_GET["debug"] == "TRUE")) {
         error_reporting(E_ALL);
         ini_set('display_errors', 1);
     }
