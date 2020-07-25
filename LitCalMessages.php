@@ -113,6 +113,34 @@ function ColorToHex($color){
     return $hex;
 }
 
+function ParseColorString($string,$LOCALE,$html=false){
+    if($html === true){
+        if(strpos($string,"|")){
+            $colors = explode("|",$string);
+            $colors = array_map(function($txt) use ($LOCALE){
+                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . ColorToHex($txt) . '">' . __($txt,$LOCALE) . '</FONT></SPAN></I></B>';
+            },$colors);
+            return implode(' <I><FONT FACE="Calibri">' . __("or",$LOCALE) . "</FONT></I> ", $colors);
+        }
+        else{
+            return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . ColorToHex($string) . '">' . __($string,$LOCALE) . '</FONT></SPAN></I></B>';
+        }    
+    }
+    else{
+        if(strpos($string,"|")){
+            $colors = explode("|",$string);
+            $colors = array_map(function($txt) use ($LOCALE){
+                return __($txt,$LOCALE);
+            },$colors);
+            return implode(" " . __("or",$LOCALE) . " ",$colors);
+        }
+        else{
+            return __($string,$LOCALE);
+        }
+    }
+    return $string; //should never get here
+}
+
 $MESSAGES = [
     "%s day before Epiphany" => [
         "en" => "%s day before Epiphany",
@@ -373,7 +401,7 @@ $MESSAGES = [
     "OPTIONAL MEMORIAL" => [
         "en" => "Optional memorial",
         "it" => "Memoria facoltativa",
-        "la" => "Memoria facoltativa"
+        "la" => "Memoria ad libitum"
     ],
     "MEMORIAL" => [
         "en" => "Memorial",
