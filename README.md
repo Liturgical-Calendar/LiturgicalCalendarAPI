@@ -47,18 +47,18 @@ Both **POST** and **GET** requests can be made.
 
 # CHANGELOG
 
-## [v2.5 July 25th 2020](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v2.5)
+## [v2.5](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v2.5) (July 25th 2020)
  * make sure all endpoint parameters can have either uppercase or lowercase characters
  * fix a few small issues with the ICS data generation
 
-## [v2.4 July 24th 2020](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v2.4)
+## [v2.4](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v2.4) (July 24th 2020)
  * move as many festivities as possible to the MySQL tables to allow for localization (mobile feasts will be calculated in the script, but still need to be localized)
  * add ICS data generation (requires more localization strings, because it is already a form of final display of the data)
 
-## [v2.0 January 8th 2018](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/1.0)
+## [v2.0](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/1.0) (January 8th 2018)
  * separate the display logic from the engine, so that the engine can act as an endpoint
  * make the engine return JSON or XML data that the display logic can use to generate a user-friendly representation of the data
 
-## [v1.0 July 26th 2017](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/1.0)
+## [v1.0](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/1.0) (July 26th 2017)
  * proof of concept for the correct generation of a liturgical calendar
  * create MySQL table for the Proper of the Saints
