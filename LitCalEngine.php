@@ -86,7 +86,7 @@ $allowed_returntypes = array("JSON", "XML", "ICS");
 $allowed_accept_headers = array("application/json", "application/xml", "text/calendar");
 
 $requestHeaders = getallheaders();
-$acceptHeader = isset($requestHeaders["Accept"]) && in_array($requestHeaders["Accept"],$allowed_accept_headers) ? $requestHeaders["Accept"] : "";
+$acceptHeader = isset($requestHeaders["Accept"]) && in_array($requestHeaders["Accept"],$allowed_accept_headers) ? $allowed_returntypes[array_search($requestHeaders["Accept"],$allowed_accept_headers)] : "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $YEAR = (isset($_POST["year"]) && is_numeric($_POST["year"]) && ctype_digit($_POST["year"]) && strlen($_POST["year"]) === 4) ? (int)$_POST["year"] : (int)date("Y");
