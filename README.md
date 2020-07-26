@@ -15,7 +15,7 @@ Some characteristics of this endpoint:
 
 # How to setup the endpoint yourself
 1. **Setup the database tables**
-  Included is an SQL dump **liturgy.sql** which contains database tables with fixed date festivities, memorials and optional memorials of the General Roman Calendar. The PHP script aids itself with these tables to generate the liturgical calendar along with the localized translations of the festivities. The tables themselved do not necessarily define the dates of all festivities, for example movable feasts are necessarily are calculated in the script itself, in this case the tables server only for localization purposes.
+  Included is an SQL dump **liturgy.sql** which contains database tables with fixed date festivities, memorials and optional memorials of the General Roman Calendar. The PHP script aids itself with these tables to generate the liturgical calendar along with the localized translations of the festivities. The tables themselves do not necessarily define the dates of all festivities, for example movable feasts are necessarily calculated in the script itself, in this case the tables serve only for localization purposes.
 2. **Edit the configuration file for access to the database**
   Once the tables are set up in a database, the `LitCalConfig-sample.php` file must be renamed to `LitCalConfig.php` and populated with the credentials to access the database. Seeing that this file will be renamed for production, it will not be overwritten when the scripts get updated from a new release or a `git pull`.
 
