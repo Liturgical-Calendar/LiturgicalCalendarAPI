@@ -5,7 +5,7 @@
  * Author: John Romano D'Orazio 
  * Email: priest@johnromanodorazio.com
  * Licensed under the Apache 2.0 License
- * Version 2.5
+ * Version 2.6
  * Date Created: 27 December 2017
  * Note: it is necessary to set up the MySQL liturgy tables prior to using this script
  */
@@ -38,7 +38,7 @@
  *                                                                                *
  *********************************************************************************/
 
-define("VERSION","2.4");
+define("VERSION","2.6");
 
 
 include "Festivity.php"; //this defines a "Festivity" class that can hold all the useful information about a single celebration
@@ -78,10 +78,15 @@ if ($dbConnect->retString != "" && preg_match("/^Connected to MySQL Database:/",
  *  SUCH AS EPIPHANY, ASCENSION, CORPUS CHRISTI
  *  EACH EPISCOPAL CONFERENCE HAS THE FACULTY OF CHOOSING SUNDAY BETWEEN JAN 2 AND JAN 8 INSTEAD OF JAN 6 FOR EPIPHANY, AND SUNDAY INSTEAD OF THURSDAY FOR ASCENSION AND CORPUS CHRISTI
  *  DEFAULTS TO UNIVERSAL ROMAN CALENDAR: EPIPHANY = JAN 6, ASCENSION = THURSDAY, CORPUS CHRISTI = THURSDAY
- *  AND IN WHICH FORMAT TO RETURN THE PROCESSED DATA (JSON OR XML)
+ *  AND IN WHICH FORMAT TO RETURN THE PROCESSED DATA (JSON, XML, OR ICS)
+ *  WE ALSO CHECK AGAINST HEADERS BEING SENT TO HELP DETERMINE THE FORMAT IN WHICH TO RETURN THE PROCESSED DATA (JSON, XML, OR ICS)
  */
 
 $allowed_returntypes = array("JSON", "XML", "ICS");
+$allowed_accept_headers = array("application/json", "application/xml", "text/calendar");
+
+$requestHeaders = getallheaders();
+$acceptHeader = isset($requestHeaders["Accept"]) && in_array($requestHeaders["Accept"],$allowed_accept_headers) ? $requestHeaders["Accept"] : "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $YEAR = (isset($_POST["year"]) && is_numeric($_POST["year"]) && ctype_digit($_POST["year"]) && strlen($_POST["year"]) === 4) ? (int)$_POST["year"] : (int)date("Y");
@@ -91,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $CORPUSCHRISTI = (isset($_POST["corpuschristi"]) && (strtoupper($_POST["corpuschristi"]) === "THURSDAY" || strtoupper($_POST["corpuschristi"]) === "SUNDAY")) ? strtoupper($_POST["corpuschristi"]) : "SUNDAY";
 
     $LOCALE = isset($_POST["locale"]) ? strtoupper($_POST["locale"]) : "LA"; //default to latin if not otherwise indicated
-    $returntype = isset($_POST["returntype"]) && in_array(strtoupper($_POST["returntype"]), $allowed_returntypes) ? strtoupper($_POST["returntype"]) : $allowed_returntypes[0]; // default to JSON
+    $returntype = isset($_POST["returntype"]) && in_array(strtoupper($_POST["returntype"]), $allowed_returntypes) ? strtoupper($_POST["returntype"]) : ($acceptHeader !== "" ? $acceptHeader : $allowed_returntypes[0]); // default to JSON
 
     if (isset($_POST["debug"]) && strtoupper($_POST["debug"] == "TRUE")) {
         error_reporting(E_ALL);
@@ -105,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $CORPUSCHRISTI = (isset($_GET["corpuschristi"]) && (strtoupper($_GET["corpuschristi"]) === "THURSDAY" || strtoupper($_GET["corpuschristi"]) === "SUNDAY")) ? strtoupper($_GET["corpuschristi"]) : "SUNDAY";
 
     $LOCALE = isset($_GET["locale"]) ? strtoupper($_GET["locale"]) : "LA"; //default to latin if not otherwise indicated
-    $returntype = isset($_GET["returntype"]) && in_array(strtoupper($_GET["returntype"]), $allowed_returntypes) ? strtoupper($_GET["returntype"]) : $allowed_returntypes[0]; // default to JSON
+    $returntype = isset($_GET["returntype"]) && in_array(strtoupper($_GET["returntype"]), $allowed_returntypes) ? strtoupper($_GET["returntype"]) : ($acceptHeader !== "" ? $acceptHeader : $allowed_returntypes[0]); // default to JSON
 
     if (isset($_GET["debug"]) && strtoupper($_GET["debug"] == "TRUE")) {
         error_reporting(E_ALL);
@@ -128,7 +133,8 @@ switch($LOCALE){
         $formatterFem->setTextAttribute(NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal-feminine");    
 }
 
-//we cannot accept a year any earlier than 1970, since this engine is based on the liturgical reform from Vatican II
+
+//for the time being, we cannot accept a year any earlier than 1970, since this engine is based on the liturgical reform from Vatican II
 //with the Prima Editio Typica of the Roman Missal and the General Norms promulgated with the Motu Proprio "Mysterii Paschali" in 1969
 if ($YEAR < 1970) {
     die();
@@ -892,9 +898,33 @@ while ($lastOrdinary >= $SecondWeekdaysLowerLimit && $lastOrdinary < $SecondWeek
     $ordWeekday++;
 }
 
-
 //END WEEKDAYS of ORDINARY TIME
 
+//LAST WE CYCLE THROUGH ALL EVENTS CREATED TO CALCULATE THE LITURGICAL YEAR, WHETHER FESTIVE (A,B,C) OR WEEKDAY (I,II)
+//This property will only be set if we're dealing with a Sunday, a Solemnity, a Feast of the Lord, or a weekday
+//In all other cases it is not needed because there aren't choices of liturgical texts
+$SUNDAY_CYCLE = ["A", "B", "C"];
+$WEEKDAY_CYCLE = ["I", "II"];
+foreach($LitCal as $key => $festivity){
+    //first let's deal with weekdays we calculate the weekday cycle
+    if ((int)$festivity->grade === WEEKDAY) {
+        if ($festivity->date < $LitCal["Advent1"]->date) { 
+            $LitCal[$key]->liturgicalyear = __("YEAR", $LOCALE) . " " . ($WEEKDAY_CYCLE[($YEAR - 1) % 2]);
+        } else if ($festivity->date >= $LitCal["Advent1"]->date) { 
+            $LitCal[$key]->liturgicalyear = __("YEAR", $LOCALE) . " " . ($WEEKDAY_CYCLE[$YEAR % 2]);
+        }
+    }
+    //if we're dealing with a Sunday or a Solemnity or a Feast of the Lord, then we calculate the Sunday/Festive Cycle
+    else if((int)$festivity->date->format('N') === 7 || (int)$festivity->grade > FEAST) {
+        if ($festivity->date < $LitCal["Advent1"]->date) { 
+            $LitCal[$key]->liturgicalyear = __("YEAR", $LOCALE) . " " . ($SUNDAY_CYCLE[($YEAR - 1) % 3]);
+        } else if ($festivity->date >= $LitCal["Advent1"]->date) {
+            $LitCal[$key]->liturgicalyear = __("YEAR", $LOCALE) . " " . ($SUNDAY_CYCLE[$YEAR % 3]);
+        }
+    }
+}
+//$LitCal variable is an associative array, who's keys are a string that identifies the event created (ex. ImmaculateConception)
+//So in order to sort by date we have to be sure to maintain the association with the proper key, uasort allows us to do this
 uasort($LitCal, array("Festivity", "comp_date"));
 
 $SerializeableLitCal = new StdClass();
@@ -943,6 +973,7 @@ switch ($returntype) {
         }
         $GitHubReleasesObj = json_decode($currentVersionForDownload);
         if(json_last_error() === JSON_ERROR_NONE){
+            
             $publishDate = $GitHubReleasesObj->published_at;
             $ical = "BEGIN:VCALENDAR\r\n";
             $ical .= "PRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\r\n";

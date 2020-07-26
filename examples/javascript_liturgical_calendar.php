@@ -125,6 +125,42 @@ function __($key, $locale)
 <head>
     <title><?php echo __("Generate Roman Calendar", $LOCALE) ?></title>
     <meta charset="UTF-8">
+    <style>
+        
+        #LitCalTable {
+            width:75%;
+            margin:30px auto;
+            border:1px solid Blue;
+            border-radius: 6px;
+            padding:10px;
+            background:LightBlue;
+        }
+
+        #LitCalTable td {
+            padding: 8px 6px;
+        }
+        
+        td.rotate {
+            width: 1.5em;
+            white-space: nowrap;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        td.rotate div{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.8em;
+            font-weight:bold;
+            writing-mode: vertical-rl;
+            transform: rotate(180.0deg);
+        }
+
+        .dateEntry {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size:.7em;
+            font-weight:bold;
+        }
+    </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript">
         let $Settings = JSON.parse('<?php echo $Settings; ?>');
@@ -137,20 +173,38 @@ function __($key, $locale)
             day: 'numeric'
         };
 
+        let IntlMonthFmt = {
+            month: 'long'
+        };
+
         let countSameDayEvents = function($currentKeyIndex, $EventsArray, $cc) {
             let $Keys = Object.keys($EventsArray);
             let $currentFestivity = $EventsArray[$Keys[$currentKeyIndex]];
-            console.log("currentFestivity: " + $currentFestivity.name + " | " + $currentFestivity.date);
+            //console.log("currentFestivity: " + $currentFestivity.name + " | " + $currentFestivity.date);
             if ($currentKeyIndex < $Keys.length - 1) {
                 let $nextFestivity = $EventsArray[$Keys[$currentKeyIndex + 1]];
-                console.log("nextFestivity: " + $nextFestivity.name + " | " + $nextFestivity.date);
+                //console.log("nextFestivity: " + $nextFestivity.name + " | " + $nextFestivity.date);
                 if ($nextFestivity.date.getTime() === $currentFestivity.date.getTime()) {
-                    console.log("We have an occurrence!");
+                    //console.log("We have an occurrence!");
                     $cc.count++;
                     countSameDayEvents($currentKeyIndex + 1, $EventsArray, $cc);
                 }
             }
         }
+
+
+        let countSameMonthEvents = function($currentKeyIndex, $EventsArray, $cm) {
+            let $Keys = Object.keys($EventsArray);
+            let $currentFestivity = $EventsArray[$Keys[$currentKeyIndex]];
+            if ($currentKeyIndex < $Keys.length - 1) {
+                let $nextFestivity = $EventsArray[$Keys[$currentKeyIndex + 1]];
+                if ($nextFestivity.date.getMonth() == $currentFestivity.date.getMonth()) {
+                    $cm.count++;
+                    countSameMonthEvents($currentKeyIndex + 1, $EventsArray, $cm);
+                }
+            }
+        }
+
 
         let ordSuffix = function(ord) {
             var ord_suffix = ''; //st, nd, rd, th
@@ -168,8 +222,8 @@ function __($key, $locale)
 
         const $GRADE = ["", "COMMEMORATION", "OPTIONAL MEMORIAL", "MEMORIAL", "FEAST", "FEAST OF THE LORD", "SOLEMNITY", "HIGHER RANKING SOLEMNITY"];
 
-        const $SUNDAY_CYCLE = ["A", "B", "C"];
-        const $WEEKDAY_CYCLE = ["I", "II"];
+        //const $SUNDAY_CYCLE = ["A", "B", "C"];
+        //const $WEEKDAY_CYCLE = ["I", "II"];
 
         $.ajax({
             method: 'POST',
@@ -192,15 +246,20 @@ function __($key, $locale)
                         }
                     }
 
-                    $dayCnt = 0;
-                    $highContrast = ['purple', 'red', 'green'];
-                    $LitCalKeys = Object.keys($LitCal);
+                    let $dayCnt = 0;
+                    const $highContrast = ['purple', 'red', 'green'];
+                    let $LitCalKeys = Object.keys($LitCal);
+
+                    let $currentMonth = -1;
+                    let $newMonth = false;
+                    let $cm = { count: 0 };
+                    let $cc = { count: 0 };
                     for (let $keyindex = 0; $keyindex < $LitCalKeys.length; $keyindex++) {
                         $dayCnt++;
                         let $keyname = $LitCalKeys[$keyindex];
                         let $festivity = $LitCal[$keyname];
                         let dy = ($festivity.date.getDay() === 0 ? 7 : $festivity.date.getDay()); // get the day of the week
-
+                        /*
                         //LET'S CALCULATE THE LITURGICAL YEAR CYCLE
                         let $currentCycle = '';
 
@@ -220,14 +279,21 @@ function __($key, $locale)
                                 $currentCycle = "YEAR " + ($WEEKDAY_CYCLE[$YEAR % 2]);
                             }
                         }
+                        */
+                        
+                        //If we are at the start of a new month, count how many events we have in that same month, so we can display the Month table cell
+                        if($festivity.date.getMonth() !== $currentMonth ){
+                            $newMonth = true;
+                            $currentMonth = $festivity.date.getMonth();
+                            $cm.count = 0;
+                            countSameMonthEvents($keyindex, $LitCal, $cm);
+                        }
 
                         //Let's check if we have more than one event on the same day, such as optional memorials...
-                        let $cc = {
-                            count: 0
-                        };
+                        $cc.count = 0;
                         countSameDayEvents($keyindex, $LitCal, $cc);
-                        console.log($festivity.name);
-                        console.log($cc);
+                        //console.log($festivity.name);
+                        //console.log($cc);
                         if ($cc.count > 0) {
                             console.log("we have an occurrence of multiple festivities on same day");
                             for (let $ev = 0; $ev <= $cc.count; $ev++) {
@@ -279,13 +345,20 @@ function __($key, $locale)
 
 
                                 strHTML += '<tr style="background-color:' + $color + ';' + ($highContrast.indexOf($color) != -1 ? 'color:white;' : '') + '">';
+                                if($newMonth){
+                                    let $monthRwsp = $cm.count + 1;
+                                    strHTML += '<td class="rotate" rowspan = "' + $monthRwsp + '"><div>' + ($LOCALE === 'LA' ? $months[$festivity.date.getMonth()].toUpperCase() : new Intl.DateTimeFormat($LOCALE.toLowerCase(), IntlMonthFmt).format($festivity.date).toUpperCase() ) + '</div></td>';
+                                    $newMonth = false;
+                                }
+                                
                                 if ($ev == 0) {
                                     let $rwsp = $cc.count + 1;
                                     let $festivity_date_str = $LOCALE == 'LA' ? getLatinDateStr($festivity.date) : new Intl.DateTimeFormat($LOCALE.toLowerCase(), IntlDTOptions).format($festivity.date);
 
-                                    strHTML += '<td rowspan="' + $rwsp + '" style="font-family:\'DejaVu Sans Mono\';font-size:.7em;font-weight:bold;">' + $festivity_date_str + '</td>';
+                                    strHTML += '<td rowspan="' + $rwsp + '" class="dateEntry">' + $festivity_date_str + '</td>';
                                 }
-                                strHTML += '<td>' + $festivity.name + ' (' + $currentCycle + ') - <i>' + __($festivity.color, $LOCALE) + '</i><br /><i>' + $festivity.common + '</i></td>';
+                                $currentCycle = ($festivity.hasOwnProperty("liturgicalyear") ? ' (' + $festivity.liturgicalyear + ')' : "" );
+                                strHTML += '<td>' + $festivity.name + $currentCycle + ' - <i>' + __($festivity.color, $LOCALE) + '</i><br /><i>' + $festivity.common + '</i></td>';
                                 strHTML += '<td>' + $GRADE[$festivity.grade] + '</td>';
                                 strHTML += '</tr>';
                                 $keyindex++;
@@ -327,6 +400,11 @@ function __($key, $locale)
                             }
                             $festivity.color = $festivity.color.split("|")[0];
                             strHTML += '<tr style="background-color:' + $festivity.color + ';' + ($highContrast.indexOf($festivity.color) != -1 ? 'color:white;' : '') + '">';
+                            if($newMonth){
+                                let $monthRwsp = $cm.count + 1;
+                                strHTML += '<td class="rotate" rowspan = "' + $monthRwsp + '"><div>' + ($LOCALE === 'LA' ? $months[$festivity.date.getMonth()].toUpperCase() : new Intl.DateTimeFormat($LOCALE.toLowerCase(), IntlMonthFmt).format($festivity.date).toUpperCase() ) + '</div></td>';
+                                $newMonth = false;
+                            }
 
                             let $festivity_date_str = $LOCALE == 'LA' ? getLatinDateStr($festivity.date) : new Intl.DateTimeFormat($LOCALE.toLowerCase(), IntlDTOptions).format($festivity.date);
                             // $festivity_date_str += ', ';
@@ -337,8 +415,9 @@ function __($key, $locale)
                             // $festivity_date_str += ', ';
                             // $festivity_date_str += $festivity.date.getFullYear();
 
-                            strHTML += '<td style="font-family:\'DejaVu Sans Mono\';font-size:.7em;font-weight:bold;">' + $festivity_date_str + '</td>';
-                            strHTML += '<td>' + $festivity.name + ' (' + $currentCycle + ') - <i>' + __($festivity.color,$LOCALE) + '</i><br /><i>' + $festivity.common + '</i></td>';
+                            strHTML += '<td class="dateEntry">' + $festivity_date_str + '</td>';
+                            $currentCycle = ($festivity.hasOwnProperty("liturgicalyear") ? ' (' + $festivity.liturgicalyear + ')' : "" );
+                            strHTML += '<td>' + $festivity.name + $currentCycle + ' - <i>' + __($festivity.color,$LOCALE) + '</i><br /><i>' + $festivity.common + '</i></td>';
                             strHTML += '<td>' + $GRADE[$festivity.grade] + '</td>';
                             strHTML += '</tr>';
                         }
@@ -635,8 +714,8 @@ function __($key, $locale)
 
     echo '</div>';
 
-    echo '<table id="LitCalTable" style="width:75%;margin:30px auto;border:1px solid Blue;border-radius: 6px; padding:10px;background:LightBlue;">';
-    echo '<thead><tr><th>' . __("Date in Gregorian Calendar", $LOCALE) . '</th><th>' . __("General Roman Calendar Festivity", $LOCALE) . '</th><th>' . __("Grade of the Festivity", $LOCALE) . '</th></tr></thead>';
+    echo '<table id="LitCalTable">';
+    echo '<thead><tr><th>' . __("Month", $LOCALE) . '</th><th>' . __("Date in Gregorian Calendar", $LOCALE) . '</th><th>' . __("General Roman Calendar Festivity", $LOCALE) . '</th><th>' . __("Grade of the Festivity", $LOCALE) . '</th></tr></thead>';
     echo '<tbody>';
 
     echo '</tbody></table>';

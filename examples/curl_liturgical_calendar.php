@@ -42,7 +42,6 @@ function countSameMonthEvents($currentKeyIndex, $EventsArray, &$cm)
             countSameMonthEvents($currentKeyIndex + 1, $EventsArray, $cm);
         }
     }
-
 }
 
 /** 
@@ -84,24 +83,21 @@ class Festivity
     public $common;
 
     /**
-     * @var int
+     * @var string
      */
-    //public $hourOffset;
+    public $liturgicalyear;
 
-    function __construct($name, $date, $color, $type, $grade = 0, $common = '')
+    function __construct($name, $date, $color, $type, $grade = 0, $common = '', $liturgicalyear = null)
     {
         $this->name = (string) $name;
         $this->date = (object) DateTime::createFromFormat('U', $date, new DateTimeZone('UTC')); //
-        //$hour = (int) $this->date->format('G');
-        //if($hour !== 0){
-        //    $this->hourOffset = $this->date->format('O'); //explode(':',
-            //$this->date->add(new DateInterval("PT{$hourOffset}H"));
-        //}
-        //$this->date->setTime(0, 0);
         $this->color = (string) $color;
         $this->type = (string) $type;
         $this->grade = (int) $grade;
         $this->common = (string) $common;
+        if($liturgicalyear !== null){
+            $this->liturgicalyear = (string) $liturgicalyear;
+        }
     }
 }
 
@@ -383,7 +379,7 @@ if ($YEAR >= 1970) {
 
     foreach ($LitCal as $key => $value) {
         // retransform each entry from an associative array to a Festivity class object
-        $LitCal[$key] = new Festivity($LitCal[$key]["name"], $LitCal[$key]["date"], $LitCal[$key]["color"], $LitCal[$key]["type"], $LitCal[$key]["grade"], $LitCal[$key]["common"]);
+        $LitCal[$key] = new Festivity($LitCal[$key]["name"], $LitCal[$key]["date"], $LitCal[$key]["color"], $LitCal[$key]["type"], $LitCal[$key]["grade"], $LitCal[$key]["common"], (isset($LitCal[$key]["liturgicalyear"]) ? $LitCal[$key]["liturgicalyear"] : null) );
     }
 }
 
@@ -757,6 +753,15 @@ $months = [
     <!-- <link rel="icon" type="image/x-icon" href="../favicon.ico"> -->
     <style>
         
+        #LitCalTable {
+            width:75%;
+            margin:30px auto;
+            border:1px solid Blue;
+            border-radius: 6px;
+            padding:10px;
+            background:LightBlue;
+        }
+
         #LitCalTable td {
             padding: 8px 6px;
         }
@@ -821,7 +826,7 @@ $months = [
     echo '</div>';
 
     if ($YEAR >= 1970) {
-        echo '<table id="LitCalTable" style="width:75%;margin:30px auto;border:1px solid Blue;border-radius: 6px; padding:10px;background:LightBlue;">';
+        echo '<table id="LitCalTable">';
         echo '<thead><tr><th>' . __("Month",$LOCALE) . '</th><th>' . __("Date in Gregorian Calendar", $LOCALE) . '</th><th>' . __("General Roman Calendar Festivity", $LOCALE) . '</th><th>' . __("Grade of the Festivity", $LOCALE) . '</th></tr></thead>';
         echo '<tbody>';
 
@@ -841,7 +846,7 @@ $months = [
             $dayCnt++;
             $keyname = $LitCalKeys[$keyindex];
             $festivity = $LitCal[$keyname];
-
+            /*
             //LET'S CALCULATE THE LITURGICAL YEAR CYCLE
             $currentCycle = '';
             //if we're dealing with a Sunday or a Solemnity or a Feast of the Lord, then we calculate the Sunday/Festive Cycle
@@ -860,7 +865,7 @@ $months = [
                     $currentCycle = __("YEAR", $LOCALE) . " " . ($WEEKDAY_CYCLE[$YEAR % 2]);
                 }
             }
-
+            */
             //If we are at the start of a new month, count how many events we have in that same month, so we can display the Month table cell
             if((int) $festivity->date->format('n') !== $currentMonth){
                 $newMonth = true;
@@ -881,8 +886,7 @@ $months = [
                     // LET'S DO SOME MORE MANIPULATION ON THE FESTIVITY->COMMON STRINGS AND THE FESTIVITY->COLOR...
                     if ($festivity->common !== "" && $festivity->common !== "Proper") {
                         $commons = explode("|", $festivity->common);
-                        $commons = array_map(function ($txt) {
-                            global $LOCALE;
+                        $commons = array_map(function ($txt) use ($LOCALE) {
                             $common = explode(":", $txt);
                             $commonGeneral = __($common[0], $LOCALE);
                             $commonSpecific = isset($common[1]) && $common[1] != "" ? __($common[1], $LOCALE) : "";
@@ -947,7 +951,8 @@ $months = [
                         }
                         echo '<td rowspan="' . $rwsp . '" class="dateEntry">' . $dateString . '</td>';
                     }
-                    echo '<td style="background-color:' . $festivity->color . ';' . (in_array($festivity->color, $highContrast) ? 'color:white;' : 'color:black;') . '">' . $festivity->name . ' (' . $currentCycle . ') - <i>' . __($festivity->color, $LOCALE) . '</i><br /><i>' . $festivity->common . '</i></td>';
+                    $currentCycle = property_exists($festivity, "liturgicalyear") && $festivity->liturgicalyear !== null && $festivity->liturgicalyear !== "" ? " (" . $festivity->liturgicalyear . ")" : "";
+                    echo '<td style="background-color:' . $festivity->color . ';' . (in_array($festivity->color, $highContrast) ? 'color:white;' : 'color:black;') . '">' . $festivity->name . $currentCycle . ' - <i>' . __($festivity->color, $LOCALE) . '</i><br /><i>' . $festivity->common . '</i></td>';
                     echo '<td style="background-color:' . $festivity->color . ';' . (in_array($festivity->color, $highContrast) ? 'color:white;' : 'color:black;') . '">' . ($keyname === 'AllSouls' ? __("COMMEMORATION",$LOCALE) : $GRADE[$festivity->grade]) . '</td>';
                     echo '</tr>';
                     $keyindex++;
@@ -957,8 +962,7 @@ $months = [
                 // LET'S DO SOME MORE MANIPULATION ON THE FESTIVITY->COMMON STRINGS AND THE FESTIVITY->COLOR...
                 if ($festivity->common !== "" && $festivity->common !== "Proper") {
                     $commons = explode("|", $festivity->common);
-                    $commons = array_map(function ($txt) {
-                        global $LOCALE;
+                    $commons = array_map(function ($txt) use ($LOCALE) {
                         $common = explode(":", $txt);
                         $commonGeneral = __($common[0], $LOCALE);
                         $commonSpecific = isset($common[1]) && $common[1] != "" ? __($common[1], $LOCALE) : "";
@@ -1010,7 +1014,8 @@ $months = [
 
 
                 echo '<td class="dateEntry">' . $dateString . '</td>';
-                echo '<td>' . $festivity->name . ' (' . $currentCycle . ') - <i>' . __($festivity->color, $LOCALE) . '</i><br /><i>' . $festivity->common . '</i></td>';
+                $currentCycle = property_exists($festivity, "liturgicalyear") && $festivity->liturgicalyear !== null && $festivity->liturgicalyear !== "" ? " (" . $festivity->liturgicalyear . ")" : "";
+                echo '<td>' . $festivity->name . $currentCycle . ' - <i>' . __($festivity->color, $LOCALE) . '</i><br /><i>' . $festivity->common . '</i></td>';
                 echo '<td>' . ($keyname === 'AllSouls' ? __("COMMEMORATION",$LOCALE) : $GRADE[$festivity->grade]) . '</td>';
                 echo '</tr>';
             }
