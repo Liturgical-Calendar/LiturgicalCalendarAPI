@@ -934,6 +934,8 @@ $SerializeableLitCal->Settings->YEAR = $YEAR;
 $SerializeableLitCal->Settings->EPIPHANY = EPIPHANY;
 $SerializeableLitCal->Settings->ASCENSION = ASCENSION;
 $SerializeableLitCal->Settings->CORPUSCHRISTI = CORPUSCHRISTI;
+$SerializeableLitCal->Settings->LOCALE = $LOCALE;
+$SerializeableLitCal->Settings->returntype = $returntype;
 
 switch ($returntype) {
     case "JSON":
