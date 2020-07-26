@@ -990,9 +990,11 @@ switch ($returntype) {
                 $description = _C($CalEvent->common,$LOCALE);
                 $description .=  '\n' . _G($CalEvent->grade,$LOCALE,false);
                 $description .= $CalEvent->color != "" ? '\n' . ParseColorString($CalEvent->color,$LOCALE,false) : "";
+                $description .= property_exists($CalEvent,'liturgicalyear') && $CalEvent->liturgicalyear !== null && $CalEvent->liturgicalyear != "" ? '\n' . $CalEvent->liturgicalyear : "";
                 $htmlDescription = "<P DIR=LTR>" . _C($CalEvent->common,$LOCALE);
                 $htmlDescription .=  '<BR>' . _G($CalEvent->grade,$LOCALE,true);
-                $htmlDescription .= $CalEvent->color != "" ? "<BR>" . ParseColorString($CalEvent->color,$LOCALE,true) . "</P>" : "</P>";
+                $htmlDescription .= $CalEvent->color != "" ? "<BR>" . ParseColorString($CalEvent->color,$LOCALE,true) : "";
+                $htmlDescription .= property_exists($CalEvent,'liturgicalyear') && $CalEvent->liturgicalyear !== null && $CalEvent->liturgicalyear != "" ? '<BR>' . $CalEvent->liturgicalyear . "</P>" : "</P>";
                 $ical .= "BEGIN:VEVENT\r\n";
                 $ical .= "CLASS:PUBLIC\r\n";
                 $ical .= "DTSTART;VALUE=DATE:" . $CalEvent->date->format('Ymd') . "\r\n";// . "T" . $CalEvent->date->format('His') . "Z\r\n";
