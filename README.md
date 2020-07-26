@@ -97,6 +97,7 @@ Each of the events generated is represented as an object whose key => value pair
     - within each possible common, there are multiple choices of texts according to the specific category of persons. The common and the specific category will be separated by a colon `:`
   An example value of the `common` property: `"Pastors:For a Bishop|Doctors"`. This means that it is possible to choose the liturgical texts either from the *Common of Pastors* or from the *Common of Doctors*; in the former case, the liturgical texts should be taken from the specific category *For a Bishop*. A textual representation ready for display would be something like this: *From the common of Pastors: For a Bishop; or from the Common of Doctors*. Please refer to the example scripts, whether the PHP example or the Javascript example, in order to understand better how to handle the interpretation and localization of these values, with all possible cases. 
   * `date`   : a PHP style unix timestamp in UTC time. The actual time (hours, minutes, seconds) should be a zero value seeing that we deal only with all day events, and time is not of importance. For use in **Javascript**, multiply this value by 1000, because Javascript uses `milliseconds` whereas **PHP** uses `seconds` as a base for a UNIX timestamp. The timestamp value should be dealt with accordingly in each programming language used: as is if the language uses seconds as a base, or multiplying by 1000 if it uses milliseconds as a base.
+  * `liturgicalyear` : the cycle of liturgical years that this event corresponds to. This property will only be present for events where it is applicable (Sundays and Weekdays of Ordinary or those liturgical events whose texts are based on the liturgical cycle). When present, it will have a localized value of `YEAR A`, `YEAR B`, or `YEAR C` for festive events or a value of `YEAR I`, `YEAR II` for weekday events (if an application makes a request for the Italian language, the values will contain `ANNO` instead of `YEAR`, and likewise for any localization requested).
 2. **`Settings`**: has a value which is an object who's key => value pairs reflect the settings used in the request to produce this specific calendar. These are useful more or less just as feedback so that we can be sure that the calendar was effectively produced with the requesting settings. Example value of the `Settings` key:
 ```javascript
   "Settings":{
@@ -112,7 +113,7 @@ Each of the events generated is represented as an object whose key => value pair
 # CHANGELOG
 
 ## [v2.6]() (July 26th 2020)
- * integrate the calculation of the liturgical cycle (YEAR A,B for festivities and YEAR I,II,II for weekdays) directly into the engine, so that applications that take care of elaborating the data for display don't have to worry about it
+ * integrate the calculation of the liturgical cycle (YEAR A,B,C for festivities and YEAR I,II for weekdays) directly into the engine, so that applications that take care of elaborating the data for display don't have to worry about it
  * update both examples, PHP and Javascript, to use the new `liturgicalyear` property returned in the JSON data, and bring Javascript example up to par with the PHP example (add month cell that spans all events for that month)
 
 ## [v2.5](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v2.5) (July 25th 2020)
