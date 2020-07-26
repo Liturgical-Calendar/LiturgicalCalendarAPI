@@ -11,6 +11,7 @@ class Festivity implements JsonSerializable
     public $common; //"Proper" or specified common(s) of saints...
     private static $liturgical_colors = array("green", "purple", "white", "red", "pink");
     private static $feast_type = array("fixed", "mobile");
+    public $liturgicalyear; //not used in construction, but added afterwards
 
     function __construct($name, $date, $color, $type, $grade = 0, $common = '') //, $displayGrade
     {
@@ -46,13 +47,17 @@ class Festivity implements JsonSerializable
     /* Per trasformare i dati in JSON, dobbiamo indicare come trasformare soprattutto l'oggetto DateTime */
     public function jsonSerialize()
     {
-        return [
+        $returnArr = [
             'name'      => $this->name,
             'color'     => $this->color,
             'type'      => $this->type,
             'grade'     => $this->grade,
             'common'    => $this->common,
-            'date'      => $this->date->format('U') //serialize the DateTime object as a PHP timestamp
+            'date'      => $this->date->format('U'), //serialize the DateTime object as a PHP timestamp
         ];
+        if($this->liturgicalyear !== null){
+            $returnArr['liturgicalyear'] = $this->liturgicalyear;
+        }
+        return $returnArr;
     }
 }
