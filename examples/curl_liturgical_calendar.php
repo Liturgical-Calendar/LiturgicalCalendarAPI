@@ -9,8 +9,8 @@
  * Date Created: 27 December 2017
  */
 
-ini_set('error_reporting', E_ALL);
-ini_set("display_errors", 1);
+//ini_set('error_reporting', E_ALL);
+//ini_set("display_errors", 1);
 
 /**************************
  * DEFINE USEFUL FUNCTIONS
@@ -416,7 +416,7 @@ $messages = [
     "HTML presentation elaborated by PHP using a CURL request to a %s" => [
         "en" => "HTML presentation elaborated by PHP using a CURL request to a %s",
         "it" => "Presentazione HTML elaborata con PHP usando una richiesta CURL al motore PHP %s",
-        "la" => "Repraesentatio HTML elaborata cum PHP utendo petitionem CURL ad machinam PHP %s"
+        "la" => "Repræsentatio HTML elaborata cum PHP utendo petitionem CURL ad machinam PHP %s"
     ],
     "You are requesting a year prior to 1970: it is not possible to request years prior to 1970." => [
         "en" => "You are requesting a year prior to 1970: it is not possible to request years prior to 1970.",
@@ -513,7 +513,7 @@ $messages = [
     "Doctors" => [
         "en" => "Doctors",
         "it" => "Dottori della Chiesa",
-        "la" => "Doctorum Ecclesiae"
+        "la" => "Doctorum Ecclesiæ"
     ],
     "Virgins" => [
         "en" => "Virgins",
@@ -698,7 +698,7 @@ $messages = [
     "HIGHER RANKING SOLEMNITY" => [
         "en" => "<i>precedence over solemnities</i>",
         "it" => "<i>precedenza sulle solennità</i>",
-        "la" => "<i>praecellentia ante solemnitates</i>"
+        "la" => "<i>præcellentia ante solemnitates</i>"
     ]
 ];
 
@@ -714,7 +714,7 @@ $GRADE[7] = __("HIGHER RANKING SOLEMNITY",$LOCALE);
 
 $daysOfTheWeek = [
     "dies Solis",
-    "dies Lunae",
+    "dies Lunæ",
     "dies Martis",
     "dies Mercurii",
     "dies Iovis",
@@ -760,6 +760,28 @@ $months = [
             border-radius: 6px;
             padding:10px;
             background:LightBlue;
+        }
+
+        #LitCalMessages {
+            width: 75%;
+            margin:30px auto;
+            border:1px solid darkslategray;
+            padding:10px;
+            background: lightgray;
+        }
+
+        #LitCalMessages th {
+            font-size: 1.3em;
+            padding: 10px;
+        }
+
+        #LitCalMessages td {
+            padding: 5px;
+            border-bottom: 1px solid White;
+        }
+
+        #LitCalMessages td:first-child {
+            border-right: 1px groove White;
         }
 
         #LitCalTable td {
@@ -813,7 +835,7 @@ $months = [
     echo '<td><label>CORPUS CHRISTI (CORPUS DOMINI): <select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" ' . (CORPUSCHRISTI === "THURSDAY" ? " SELECTED" : "") . '>Thursday</option><option value="SUNDAY" ' . (CORPUSCHRISTI === "SUNDAY" ? " SELECTED" : "") . '>Sunday</option></select></label></td>';
     echo '<td><label>LOCALE: <select name="locale" id="locale"><option value="EN" ' . ($LOCALE === "EN" ? " SELECTED" : "") . '>EN</option><option value="IT" ' . ($LOCALE === "IT" ? " SELECTED" : "") . '>IT</option><option value="LA" ' . ($LOCALE === "LA" ? " SELECTED" : "") . '>LA</option></select></label></td>';
     echo '</tr><tr>';
-    echo '<td colspan="5" style="text-align:center;"><input type="SUBMIT" value="GENERATE CALENDAR" /></td>';
+    echo '<td colspan="5" style="text-align:center;padding:15px;"><input type="SUBMIT" value="' . strtoupper(__("Generate Roman Calendar", $LOCALE)) . '" /></td>';
     echo '</tr></table>';
     echo '</form>';
     echo '</fieldset>';
@@ -913,20 +935,31 @@ $months = [
                     } else if ($festivity->common == "Proper") {
                         $festivity->common = __("Proper", $LOCALE);
                     }
-                    $festivity->color = explode("|", $festivity->color)[0];
-
-                    //check which liturgical season we are in, to use the right color for that season...
-                    $color = "green";
+                    
+                    //check which liturgical season we are in, to apply color for the season to the row
+                    $SeasonColor = "green";
                     if (($festivity->date > $LitCal["Advent1"]->date  && $festivity->date < $LitCal["Christmas"]->date) || ($festivity->date > $LitCal["AshWednesday"]->date && $festivity->date < $LitCal["Easter"]->date)) {
-                        $color = "purple";
+                        $SeasonColor = "purple";
                     } else if ($festivity->date > $LitCal["Easter"]->date && $festivity->date < $LitCal["Pentecost"]->date) {
-                        $color = "white";
+                        $SeasonColor = "white";
                     } else if ($festivity->date > $LitCal["Christmas"]->date || $festivity->date < $LitCal["BaptismLord"]->date) {
-                        $color = "white";
+                        $SeasonColor = "white";
                     }
 
+                    //We will apply the color for the single festivity only to it's own table cells
+                    $possibleColors = explode("|", $festivity->color);
+                    $CSScolor = $possibleColors[0];
+                    $festivityColorString = "";
+                    if(count($possibleColors) === 1){
+                        $festivityColorString = __($possibleColors[0],$LOCALE);
+                    } else if (count($possibleColors) > 1){
+                        $possibleColors = array_map(function($txt) use ($LOCALE){
+                            return __($txt,$LOCALE);
+                        },$possibleColors);
+                        $festivityColorString = implode("</i> " . __("or",$LOCALE) . " <i>",$possibleColors);
+                    }
 
-                    echo '<tr style="background-color:' . $color . ';' . (in_array($color, $highContrast) ? 'color:white;' : '') . '">';
+                    echo '<tr style="background-color:' . $SeasonColor . ';' . (in_array($SeasonColor, $highContrast) ? 'color:white;' : '') . '">';
                     if($newMonth){
                         $monthRwsp = $cm + 1;
                         echo '<td class="rotate" rowspan = "' . $monthRwsp . '"><div>' . ($LOCALE === 'LA' ? strtoupper($months[(int)$festivity->date->format('n')]) : strtoupper(utf8_encode(strftime('%B', $festivity->date->format('U'))))) . '</div></td>';
@@ -952,8 +985,8 @@ $months = [
                         echo '<td rowspan="' . $rwsp . '" class="dateEntry">' . $dateString . '</td>';
                     }
                     $currentCycle = property_exists($festivity, "liturgicalyear") && $festivity->liturgicalyear !== null && $festivity->liturgicalyear !== "" ? " (" . $festivity->liturgicalyear . ")" : "";
-                    echo '<td style="background-color:' . $festivity->color . ';' . (in_array($festivity->color, $highContrast) ? 'color:white;' : 'color:black;') . '">' . $festivity->name . $currentCycle . ' - <i>' . __($festivity->color, $LOCALE) . '</i><br /><i>' . $festivity->common . '</i></td>';
-                    echo '<td style="background-color:' . $festivity->color . ';' . (in_array($festivity->color, $highContrast) ? 'color:white;' : 'color:black;') . '">' . ($keyname === 'AllSouls' ? __("COMMEMORATION",$LOCALE) : $GRADE[$festivity->grade]) . '</td>';
+                    echo '<td style="background-color:' . $CSScolor . ';' . (in_array($CSScolor, $highContrast) ? 'color:white;' : 'color:black;') . '">' . $festivity->name . $currentCycle . ' - <i>' . $festivityColorString . '</i><br /><i>' . $festivity->common . '</i></td>';
+                    echo '<td style="background-color:' . $CSScolor . ';' . (in_array($CSScolor, $highContrast) ? 'color:white;' : 'color:black;') . '">' . ($keyname === 'AllSouls' ? __("COMMEMORATION",$LOCALE) : $GRADE[$festivity->grade]) . '</td>';
                     echo '</tr>';
                     $keyindex++;
                 }
@@ -989,8 +1022,20 @@ $months = [
                 } else if ($festivity->common == "Proper") {
                     $festivity->common = __("Proper", $LOCALE);
                 }
-                $festivity->color = explode("|", $festivity->color)[0];
-                echo '<tr style="background-color:' . $festivity->color . ';' . (in_array($festivity->color, $highContrast) ? 'color:white;' : '') . '">';
+
+                //We will apply the color for the single festivity only to it's own table cells
+                $possibleColors = explode("|", $festivity->color);
+                $CSScolor = $possibleColors[0];
+                $festivityColorString = "";
+                if(count($possibleColors) === 1){
+                    $festivityColorString = __($possibleColors[0],$LOCALE);
+                } else if (count($possibleColors) > 1){
+                    $possibleColors = array_map(function($txt) use ($LOCALE){
+                        return __($txt,$LOCALE);
+                    },$possibleColors);
+                    $festivityColorString = implode("</i> " . __("or",$LOCALE) . " <i>",$possibleColors);
+                }
+                echo '<tr style="background-color:' . $CSScolor . ';' . (in_array($CSScolor, $highContrast) ? 'color:white;' : '') . '">';
                 if($newMonth){
                     $monthRwsp = $cm +1;
                     echo '<td class="rotate" rowspan = "' . $monthRwsp . '"><div>' . ($LOCALE === 'LA' ? strtoupper($months[(int)$festivity->date->format('n')]) : strtoupper(utf8_encode(strftime('%B', $festivity->date->format('U'))))) . '</div></td>';
@@ -1012,10 +1057,9 @@ $months = [
                         $dateString = utf8_encode(strftime('%A %e %B %Y', $festivity->date->format('U')));
                 }
 
-
                 echo '<td class="dateEntry">' . $dateString . '</td>';
                 $currentCycle = property_exists($festivity, "liturgicalyear") && $festivity->liturgicalyear !== null && $festivity->liturgicalyear !== "" ? " (" . $festivity->liturgicalyear . ")" : "";
-                echo '<td>' . $festivity->name . $currentCycle . ' - <i>' . __($festivity->color, $LOCALE) . '</i><br /><i>' . $festivity->common . '</i></td>';
+                echo '<td>' . $festivity->name . $currentCycle . ' - <i>' . $festivityColorString . '</i><br /><i>' . $festivity->common . '</i></td>';
                 echo '<td>' . ($keyname === 'AllSouls' ? __("COMMEMORATION",$LOCALE) : $GRADE[$festivity->grade]) . '</td>';
                 echo '</tr>';
             }
@@ -1025,6 +1069,16 @@ $months = [
 
         echo '<div style="text-align:center;border:3px ridge Green;background-color:LightBlue;width:75%;margin:10px auto;padding:10px;">' . $dayCnt . ' event days created</div>';
     }
+
+    if (isset($LitCalData["Messages"]) && is_array($LitCalData["Messages"]) && count($LitCalData["Messages"]) > 0 ) {
+        echo '<table id="LitCalMessages"><thead><tr><th colspan=2 style="text-align:center;">Information about the current calculation of the Liturgical Year</th></tr></thead>';
+        echo '<tbody>';
+        foreach($LitCalData["Messages"] as $idx => $message){
+            echo "<tr><td>{$idx}</td><td>{$message}</td></tr>";
+        }
+        echo '</tbody></table>';
+    }
+
 
     ?>
 </body>
