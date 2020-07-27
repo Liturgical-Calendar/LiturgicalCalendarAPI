@@ -155,12 +155,12 @@ $MESSAGES = [
     "of the %s Week of Ordinary Time" => [
         "en" => "of the %s Week of Ordinary Time",
         "it" => "della %s Settimana del Tempo Ordinario",
-        "la" => "Hebdomadæ %s Tempi Ordinarii"
+        "la" => "Hebdomadæ %s Temporis Ordinarii"
     ],
     "of the %s Week of Easter" => [
         "en" => "of the %s Week of Easter",
         "it" => "della %s Settimana di Pasqua",
-        "la" => "Hebdomadæ %s Tempi Paschali"
+        "la" => "Hebdomadæ %s Temporis Paschali"
     ],
     "of the %s Week of Advent" => [
         "en" => "of the %s Week of Advent",
@@ -241,7 +241,7 @@ $MESSAGES = [
     "Doctors" => [
         "en" => "Doctors",
         "it" => "Dottori della Chiesa",
-        "la" => "Doctorum Ecclesiae"
+        "la" => "Doctorum Ecclesiæ"
     ],
     "Virgins" => [
         "en" => "Virgins",
@@ -426,7 +426,102 @@ $MESSAGES = [
     "HIGHER RANKING SOLEMNITY" => [
         "en" => "<B><I>precedence over solemnities</I></B>",
         "it" => "<B><I>precedenza sulle solennità</I></B>",
-        "la" => "<B><I>praecellentia ante solemnitates</I></B>"
+        "la" => "<B><I>præcellentia ante sollemnitates</I></B>"
+    ],
+    "Decree of the Congregation for Divine Worship" => [
+        "en" => "Decree of the Congregation for Divine Worship",
+        "it" => "Decreto della Congregazione per il Culto Divino",
+        "la" => "Decretum Congregationis pro Cultu Divino"
+    ],
+    "Only years from 1970 and after are supported. You tried requesting the year %d." => [
+        "en" => "Only years from 1970 and after are supported. You tried requesting the year %d.",
+        "it" => "Soltanto anni dal 1970 in poi sono supportati. Hai provato a richiedere l'anno %d.",
+        "la" => "Tantum ab anno MCMLXX et ultra præsto sunt. Tu anno %d conatus est petere."
+    ],
+    "The Solemnity '%s' falls on the Second Sunday of Advent in the year %d, the celebration has been transferred to the following Monday (%s)." => [
+        "en" => "The Solemnity <i>'%s'</i> falls on the Second Sunday of Advent in the year %d, the celebration has been transferred to the following Monday (%s).",
+        "it" => "La Solennità <i>'%s'</i> coincide con la Seconda Domenica d'Avvento nell'anno %d, pertanto la celebrazione è stata trasferita al lunedì seguente (%s).",
+        "la" => "Coincidit enim Sollemnitas <i>'%s'</i> cum Dominica Secunda Temporis Adventi in anno %d, ergo translata est celebratio ad diem Lunæ proximum (%s)."
+    ],
+    "The Solemnity '%s' falls on a Sunday of Lent in the year %d, the celebration has been transferred to the following Monday (%s)." => [
+        "en" => "The Solemnity <i>'%s'</i> falls on a Sunday of Lent in the year %d, the celebration has been transferred to the following Monday (%s).",
+        "it" => "La Solennità <i>'%s'</i> coincide con una Domenica di Quaresima nell'anno %d, pertanto la celebrazione è stata trasferita al lunedì seguente (%s).",
+        "la" => "Coincidit enim Sollemnitas <i>'%s'</i> cum Dominica Temporis Quadragesimæ in anno %d, ergo traslata est celebratio ad diem Lunæ proximum (%s)."
+    ],
+    "The Solemnity '%s' falls either on Palm Sunday or during Holy Week in the year %d, the celebration has been transferred to the Saturday preceding Palm Sunday (%s)." => [
+        "en" => "The Solemnity <i>'%s'</i> falls either on Palm Sunday or during Holy Week in the year %d, the celebration has been transferred to the Saturday preceding Palm Sunday (%s).",
+        "it" => "La Solennità <i>'%s'</i> o coincide con la Domenica delle Palme, o cade durante la Settimana Santa nell'anno %d, pertanto la celebrazione è stata trasferita al sabato che precede la Domenica delle Palme (%s).",
+        "la" => "Aut enim coincidit Sollemnitas <i>'%s'</i> cum Dominica in Palmis aut coincidit cum Hebdomada Sancta in anno %d, ergo traslata est celebratio ad diem Saturni ante Dominicam in Palmis (%s)."
+    ],
+    "The Solemnity '%s' falls either on Palm Sunday or during Holy Week in the year %d, the celebration has been transferred to the Monday following the Second Sunday of Easter (%s)." => [
+        "en" => "The Solemnity <i>'%s'</i> falls either on Palm Sunday or during Holy Week in the year %d, the celebration has been transferred to the Monday following the Second Sunday of Easter (%s).",
+        "it" => "La Solennità <i>'%s'</i> o coincide con la Domenica delle Palme, o cade durante la Settimana Santa nell'anno %d, pertanto la celebrazione è stata trasferita al lunedì che segue la Seconda Domenica di Pasqua (%s).",
+        "la" => "Aut enim coincidit Sollemnitas <i>'%s'</i> cum Dominica in Palmis aut coincidit cum Hebdomada Sancta in anno %d, ergo traslata est celebratio ad diem Lunæ post Dominicam Secundam Paschæ (%s)."
+    ],
+    "'%s' falls on a Sunday in the year %d, therefore the Feast '%s' is celebrated on %s rather than on the Sunday after Christmas." => [
+        "en" => "'%s' falls on a Sunday in the year %d, therefore the Feast <i>'%s'</i> is celebrated on %s rather than on the Sunday after Christmas.",
+        "it" => "'%s' coincide con una Domenica nell'anno %d, pertanto la Festa <i>'%s'</i> viene celebrata il %s anziché la Domenica dopo Natale.",
+        "la" => "'%s' coincidit cum Dominica in anno %d, ergo Festum <i>'%s'</i> celebrentur die %s quam Dominica post Nativitate."
+    ],
+    "'%s' is superseded by a Solemnity in the year %d." => [
+        "en" => "<i>'%s'</i> is superseded by a Solemnity in the year %d.",
+        "it" => "<i>'%s'</i> è soppiantata da una Solennità nell'anno %d.",
+        "la" => "<i>'%s'</i> subplantata est ab Sollemnitate in anno %d."
+    ],
+    "The Feast '%s', usually celebrated on %s, is suppressed by a Sunday or a Solemnity in the year %d." => [
+        "en" => "The Feast <i>'%s'</i>, usually celebrated on %s, is suppressed by a Sunday or a Solemnity in the year %d.",
+        "it" => "La Festa  <i>'%s'</i>, che di solito sarebbe celebrata il giorno %s, viene soppiantata da una Domenica o una Solennità nell'anno %d.",
+        "la" => "Festum <i>'%s'</i> quo plerumque celebratur in die %s subplantata est ab Dominica aut Sollemnitate in anno %d."
+    ],
+    "The Memorial '%s', which would have been celebrated on %s, is suppressed by a Solemnity or Feast Day in the year %d." => [
+        "en" => "The Memorial <i>'%s'</i>, which would have been celebrated on %s, is suppressed by a Solemnity or Feast Day in the year %d.",
+        "it" => "La Memoria obbligatoria <i>'%s'</i> che sarebbe stata celebrata il giorno %s, è stata soppiantata da una Solennità o una Festa nell'anno %d.",
+        "la" => "Memoria <i>'%s'</i> qua celebrata fuisset in die %s subplantata est ab Sollemnitate aut ab Festu in anno %d."
+    ],
+    "The Memorial '%s' falls within the Lenten season in the year %d, rank reduced to Commemoration." => [
+        "en" => "The Memorial <i>'%s'</i> falls within the Lenten season in the year %d, rank reduced to Commemoration.",
+        "it" => "La Memoria obbligatoria <i>'%s'</i> cade nel periodo della Quaresima nell'anno %d, pertanto è stata ridotta di grado a Commemorazione.",
+        "la" => "Accidit Memoria <i>'%s'</i> in temporis Quadragesimæ in anno %d, ergo reductus est gradus ad Commemorationem."
+    ],
+    "'%s' is superseded by the Memorial '%s' in the year %d." => [
+        "en" => "<i>'%s'</i> is superseded the Memorial <i>'%s'</i> in the year %d.",
+        "it" => "<i>'%s'</i> è soppiantata dalla Memoria obbligatoria <i>'%s'</i> nell'anno %d.",
+        "la" => "<i>'%s'</i> subplantata est ab Memoria <i>'%s'</i> in anno %d."
+    ],
+    "The Memorial '%s' coincides with another Memorial '%s' in the year %d. They are both reduced in rank to Optional Memorials (%s)." => [
+        "en" => "The Memorial <i>'%s'</i> coincides with another Memorial <i>'%s'</i> in the year %d. They are both reduced in rank to Optional Memorials (%s).",
+        "it" => "La Memoria obbligatoria <i>'%s'</i> coincide con l'altra Memoria obbligatoria <i>'%s'</i> nell'anno %d. Pertanto tutte e due sono ridotte di grado a Memoria facoltativa (%s).",
+        "la" => "Memoria <i>'%s'</i> coincidit cum alia Memoria <i>'%s'</i> in anno %d. Ergo ambo simul redunctur in gradu Memoriæ ad libitum (%s)."
+    ],
+    "The Memorial '%s', usually celebrated on %s, is suppressed by a Solemnity or Feast Day in the year %d." => [
+        "en" => "The Memorial <i>'%s'</i>, usually celebrated on %s, is suppressed by a Solemnity or Feast Day in the year %d.",
+        "it" => "La Memoria obbligatoria <i>'%s'</i>, celebrata solitamente il giorno %s, è soppiantata da una Solennità o da una Festa nell'anno %d.",
+        "la" => "Memoria <i>'%s'</i> qua plerumque celebrata est in die %s subplantata est ab Sollemnitate aut ab Festu in anno %d."
+    ],
+    "The Memorial '%s' has been raised to the rank of Feast since the year 2016, applicable to the year %d (%s)." => [
+        "en" => "The Memorial <i>'%s'</i> has been raised to the rank of Feast since the year 2016, applicable to the year %d (%s).",
+        "it" => "La Memoria obbligatoria <i>'%s'</i> è stata elevata al grado di Festa dall'anno 2016, applicabile pertanto all'anno %d (%s).",
+        "la" => "Memoria <i>'%s'</i> elevata est in gradu Festuus ab anno 2016, ergo applicatur ad anno %d (%s)."
+    ],
+    "The Memorial '%s' was added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s), applicable for the year %d." => [
+        "en" => "The Memorial <i>'%s'</i> was added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s), applicable for the year %d.",
+        "it" => "La Memoria obbligatoria <i>'%s'</i> è stata aggiunta nella Terza Edizione Tipica del Messale Romano dall'anno 2002 (%s), applicabile pertanto all'anno %d.",
+        "la" => "Memoria <i>'%s'</i> aggregata est ab Tertia Editione Typica Missalis Romani ab anno 2002 (%s), ergo applicatur ad anno %d."
+    ],
+    "The Memorial '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s), falls within the Lenten season in the year %d, rank reduced to Commemoration." => [
+        "en" => "The Memorial <i>'%s'</i>, added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s), falls within the Lenten season in the year %d, rank reduced to Commemoration.",
+        "it" => "La Memoria obbligatoria <i>'%s'</i>, aggiunta nella Terza Edizione Tipica del Messale Romano dall'anno 2002 (%s), cade nel periodo quaresimale nell'anno %d, pertanto è stata ridotta di grado a Commemorazione.",
+        "la" => "Memoria <i>'%s'</i> aggregata in Editione Typica Tertia Missalis Romani ab anno 2002 (%s) accidit in tempore Quadragesimæ in anno %d. Reducta est in gradu Commemorationis."
+    ],
+    "In the year %d '%s' is superseded by the Memorial '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s)." => [
+        "en" => "In the year %d <i>'%s'</i> is superseded by the Memorial <i>'%s'</i>, added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s).",
+        "it" => "Nell'anno %d, <i>'%s'</i> è soppiantata dalla Memoria obbligatoria <i>'%s'</i>, aggiunta nella Terza Edizione Tipica del Messale Romano dall'anno 2002 (%s).",
+        "la" => "In anno %d <i>'%s'</i> subplantata est ab Memoria <i>'%s'</i> aggregata in Editione Typica Tertia Missalis Romani ab anno 2002 (%s)."
+    ],
+    "The Memorial '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by a Sunday or a Solemnity in the year %d." => [
+        "en" => "The Memorial <i>'%s'</i>, added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by a Sunday or a Solemnity in the year %d.",
+        "it" => "La Memoria obbligatoria <i>'%s'</i>, aggiunta nella Terza Edizione Tipica del Messale Romano dall'anno 2002 (%s) e celebrata solitamente il giorno %s, è soppressa da una Domenica o da una Solennità nell'anno %d.",
+        "la" => "Memoria <i>'%s'</i> aggregata in Editione Typica Tertia Missalis Romani ab anno 2002 (%s) et plerumque celebrata in die %s subplantata est ab Dominica aut ab Sollemnitate in anno %d."
     ]
 ];
 
@@ -516,5 +611,20 @@ $LATIN_DAYOFTHEWEEK = [
     "Feria VII"    //6=Saturday
 ];
 
+$LATIN_MONTHS = [
+    "",
+    "Ianuarius",
+    "Februarius",
+    "Martius",
+    "Aprilis",
+    "Maius",
+    "Iunius",
+    "Iulius",
+    "Augustus",
+    "September",
+    "October",
+    "November",
+    "December"
+];
 
 ?>
