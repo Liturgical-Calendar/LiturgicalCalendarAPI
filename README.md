@@ -110,6 +110,25 @@ Each of the events generated is represented as an object whose key => value pair
   }
 ```
 
+3. **`Messages`**: has a value which is an array containing all of the significant operations done in the calculation of the requested Liturgical Calendar, with links to the Decrees of the Congregation for Divine Worship where applicable. Useful for understanding how or why the calculations were done, and what changes have been applied in the generation of the Calendar. A small sample portion of data that can be returned:
+
+```Javascript
+"Messages": [
+    "<i>'4th Sunday of Ordinary Time'<\/i> is superseded by a Solemnity in the year 2020.",
+    "<i>'31st Sunday of Ordinary Time'<\/i> is superseded by a Solemnity in the year 2020.",
+    "<i>'11th Sunday of Ordinary Time'<\/i> is superseded by a Solemnity in the year 2020.",
+    "The Feast <i>'Saints Philip and James, Apostles'<\/i>, usually celebrated on May 3rd, is suppressed by a Sunday or a Solemnity in the year 2020.",
+    "The Feast <i>'Visitation of the Blessed Virgin Mary'<\/i>, usually celebrated on May 31st, is suppressed by a Sunday or a Solemnity in the year 2020.",
+    "The Feast <i>'Saint Luke the Evangelist'<\/i>, usually celebrated on October 18th, is suppressed by a Sunday or a Solemnity in the year 2020.",
+    "The Feast <i>'Saint John, Apostle and Evangelist'<\/i>, usually celebrated on December 27th, is suppressed by a Sunday or a Solemnity in the year 2020.",
+    "<i>'First day before Epiphany'<\/i> is superseded the Memorial <i>'Saints Basil the Great and Gregory Nazianzen, bishops and doctors'<\/i> in the year 2020.",
+    "The Memorial <i>'Saints Timothy and Titus, bishops'<\/i>, usually celebrated on January 26th, is suppressed by a Sunday, a Solemnity or a Feast in the year 2020.",
+    "The Memorial <i>'Saint Polycarp, bishop and martyr'<\/i>, usually celebrated on February 23rd, is suppressed by a Sunday, a Solemnity or a Feast in the year 2020.",
+    "The Memorial <i>'Saints Perpetua and Felicity, martyrs'<\/i> falls within the Lenten season in the year 2020, rank reduced to Commemoration.",
+    "The Memorial <i>'Saint John Baptist de la Salle, priest'<\/i> falls within the Lenten season in the year 2020, rank reduced to Commemoration."
+]
+```
+
 # CHANGELOG
 
 ## [v2.6]() (July 26th 2020)
