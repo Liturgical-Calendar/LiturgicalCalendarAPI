@@ -960,10 +960,10 @@ if ($YEAR >= 2002) {
             if ((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate, $SOLEMNITIES) && !in_array($currentFeastDate, $FEASTS_MEMORIALS)) {
                 $LitCal[$row["TAG"]] = new Festivity($row["NAME_" . $LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"]);
                 $Messages[] = sprintf(
-                    __("The Optional Memorial '%s' was added in the Tertia Editio Typica of the Roman Missal since the year 2002, applicable for the year %d (%s).",$LOCALE),
+                    __("The Optional Memorial '%s' was added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s), applicable for the year %d.",$LOCALE),
                     $row["NAME_" . $LOCALE],
-                    $YEAR,
-                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html">' . __('Decree of the Congregation for Divine Worship', $LOCALE) . '</a>'
+                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html">' . __('Decree of the Congregation for Divine Worship', $LOCALE) . '</a>',
+                    $YEAR
                 );
 
                 //If a fixed date Optional Memorial falls between 17 Dec. to 24 Dec., the Octave of Christmas or weekdays of the Lenten season,
