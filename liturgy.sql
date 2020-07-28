@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: vps94844.ovh.net
--- Generation Time: Jul 28, 2020 at 11:11 PM
+-- Generation Time: Jul 28, 2020 at 11:16 PM
 -- Server version: 5.7.25
 -- PHP Version: 7.4.8
 
@@ -26,6 +26,9 @@ SET time_zone = "+00:00";
 --
 -- Table structure for table `LITURGY__calendar_propriumdesanctis`
 --
+-- Creation: Jan 06, 2019 at 06:34 PM
+-- Last update: Jul 27, 2020 at 11:14 PM
+--
 
 CREATE TABLE `LITURGY__calendar_propriumdesanctis` (
   `RECURRENCE_ID` int(11) NOT NULL,
@@ -40,6 +43,14 @@ CREATE TABLE `LITURGY__calendar_propriumdesanctis` (
   `CALENDAR` varchar(50) NOT NULL,
   `COLOR` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- RELATIONSHIPS FOR TABLE `LITURGY__calendar_propriumdesanctis`:
+--   `GRADE`
+--       `LITURGY__festivity_grade` -> `IDX`
+--   `MONTH`
+--       `LITURGY__months` -> `IDX`
+--
 
 --
 -- Dumping data for table `LITURGY__calendar_propriumdesanctis`
@@ -239,6 +250,9 @@ INSERT INTO `LITURGY__calendar_propriumdesanctis` (`RECURRENCE_ID`, `MONTH`, `DA
 --
 -- Table structure for table `LITURGY__calendar_propriumdesanctis_2002`
 --
+-- Creation: Jan 06, 2019 at 06:39 PM
+-- Last update: Jul 14, 2020 at 09:14 AM
+--
 
 CREATE TABLE `LITURGY__calendar_propriumdesanctis_2002` (
   `RECURRENCE_ID` int(11) NOT NULL,
@@ -253,6 +267,14 @@ CREATE TABLE `LITURGY__calendar_propriumdesanctis_2002` (
   `CALENDAR` varchar(50) NOT NULL,
   `COLOR` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='reflects the new festivities added to the general calendar in the 2002 edition of the Roman Missal';
+
+--
+-- RELATIONSHIPS FOR TABLE `LITURGY__calendar_propriumdesanctis_2002`:
+--   `GRADE`
+--       `LITURGY__festivity_grade` -> `IDX`
+--   `MONTH`
+--       `LITURGY__months` -> `IDX`
+--
 
 --
 -- Dumping data for table `LITURGY__calendar_propriumdesanctis_2002`
@@ -284,6 +306,9 @@ INSERT INTO `LITURGY__calendar_propriumdesanctis_2002` (`RECURRENCE_ID`, `MONTH`
 --
 -- Table structure for table `LITURGY__calendar_propriumdetempore`
 --
+-- Creation: Jan 06, 2019 at 04:29 PM
+-- Last update: Jul 27, 2020 at 11:19 PM
+--
 
 CREATE TABLE `LITURGY__calendar_propriumdetempore` (
   `RECURRENCE_ID` int(11) NOT NULL,
@@ -292,6 +317,10 @@ CREATE TABLE `LITURGY__calendar_propriumdetempore` (
   `NAME_EN` varchar(200) NOT NULL,
   `NAME_IT` varchar(200) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- RELATIONSHIPS FOR TABLE `LITURGY__calendar_propriumdetempore`:
+--
 
 --
 -- Dumping data for table `LITURGY__calendar_propriumdetempore`
@@ -380,6 +409,8 @@ INSERT INTO `LITURGY__calendar_propriumdetempore` (`RECURRENCE_ID`, `TAG`, `NAME
 --
 -- Table structure for table `LITURGY__colors`
 --
+-- Creation: Jan 06, 2019 at 03:10 PM
+--
 
 CREATE TABLE `LITURGY__colors` (
   `COLOR_EN` varchar(10) NOT NULL,
@@ -389,6 +420,10 @@ CREATE TABLE `LITURGY__colors` (
   `COLOR_FR` varchar(10) NOT NULL,
   `COLOR_DE` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- RELATIONSHIPS FOR TABLE `LITURGY__colors`:
+--
 
 --
 -- Dumping data for table `LITURGY__colors`
@@ -406,11 +441,17 @@ INSERT INTO `LITURGY__colors` (`COLOR_EN`, `COLOR_LA`, `COLOR_IT`, `COLOR_ES`, `
 --
 -- Table structure for table `LITURGY__festivity_grade`
 --
+-- Creation: Jul 25, 2017 at 03:47 PM
+--
 
 CREATE TABLE `LITURGY__festivity_grade` (
   `IDX` int(11) NOT NULL,
   `NAME` varchar(60) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- RELATIONSHIPS FOR TABLE `LITURGY__festivity_grade`:
+--
 
 --
 -- Dumping data for table `LITURGY__festivity_grade`
@@ -431,11 +472,17 @@ INSERT INTO `LITURGY__festivity_grade` (`IDX`, `NAME`) VALUES
 --
 -- Table structure for table `LITURGY__months`
 --
+-- Creation: Jul 25, 2017 at 03:48 PM
+--
 
 CREATE TABLE `LITURGY__months` (
   `IDX` int(11) NOT NULL,
   `NAME` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- RELATIONSHIPS FOR TABLE `LITURGY__months`:
+--
 
 --
 -- Dumping data for table `LITURGY__months`
