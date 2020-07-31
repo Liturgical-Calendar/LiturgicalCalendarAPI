@@ -693,12 +693,17 @@ $messages = [
     "SOLEMNITY" => [
         "en" => "Solemnity",
         "it" => "Solennità",
-        "la" => "Solemnitas"
+        "la" => "Sollemnitas"
     ],
     "HIGHER RANKING SOLEMNITY" => [
         "en" => "<i>precedence over solemnities</i>",
         "it" => "<i>precedenza sulle solennità</i>",
         "la" => "<i>præcellentia ante solemnitates</i>"
+    ],
+    "Information about the current calculation of the Liturgical Year" => [
+        "en" => "Information about the current calculation of the Liturgical Year",
+        "it" => "Informazioni sull'attuale calcolo dell'Anno Liturgico",
+        "la" => "Notitiæ de computatione præsente Anni Liturgici"
     ]
 ];
 
@@ -750,9 +755,35 @@ $months = [
 <head>
     <title><?php echo __("Generate Roman Calendar", $LOCALE) ?></title>
     <meta charset="UTF-8">
-    <!-- <link rel="icon" type="image/x-icon" href="../favicon.ico"> -->
-    <style>
-        
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta name="msapplication-TileImage" content="easter-egg-5-144-279148.png">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../easter-egg-5-152-279148.png">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../easter-egg-5-144-279148.png">
+    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="../easter-egg-5-120-279148.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../easter-egg-5-114-279148.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../easter-egg-5-72-279148.png">    
+    <link rel="apple-touch-icon-precomposed" href="../easter-egg-5-57-279148.png">
+    <link rel="icon" href="../easter-egg-5-32-279148.png" sizes="32x32">
+    <style>        
+        .backNav {
+            background-color:yellow;
+            font-size:1.1em;
+            text-align:center;
+            cursor:pointer;
+            text-decoration:none;
+            width:95%;
+            margin:0px auto;
+            border-bottom:2px outset LightBlue;
+            display:block;
+            padding: 12px 24px;
+            font-weight: bold;
+        }
+        .backNav:hover {
+            background-color: gold;
+            color: DarkBlue;
+        }
+
         #LitCalTable {
             width:75%;
             margin:30px auto;
@@ -813,6 +844,7 @@ $months = [
 </head>
 
 <body>
+    <div><a class="backNav" href="/LiturgicalCalendar">↩      Go back      ↩</a></div>
 
     <?php
 
@@ -1071,7 +1103,7 @@ $months = [
     }
 
     if (isset($LitCalData["Messages"]) && is_array($LitCalData["Messages"]) && count($LitCalData["Messages"]) > 0 ) {
-        echo '<table id="LitCalMessages"><thead><tr><th colspan=2 style="text-align:center;">Information about the current calculation of the Liturgical Year</th></tr></thead>';
+        echo '<table id="LitCalMessages"><thead><tr><th colspan=2 style="text-align:center;">' . __("Information about the current calculation of the Liturgical Year",$LOCALE) . '</th></tr></thead>';
         echo '<tbody>';
         foreach($LitCalData["Messages"] as $idx => $message){
             echo "<tr><td>{$idx}</td><td>{$message}</td></tr>";
