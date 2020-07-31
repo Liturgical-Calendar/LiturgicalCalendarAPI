@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: vps94844.ovh.net
--- Generation Time: Jul 24, 2020 at 06:12 PM
+-- Generation Time: Jul 28, 2020 at 11:16 PM
 -- Server version: 5.7.25
 -- PHP Version: 7.4.8
 
@@ -27,7 +27,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `LITURGY__calendar_propriumdesanctis`
 --
 -- Creation: Jan 06, 2019 at 06:34 PM
--- Last update: Jul 20, 2020 at 07:41 AM
+-- Last update: Jul 27, 2020 at 11:14 PM
 --
 
 CREATE TABLE `LITURGY__calendar_propriumdesanctis` (
@@ -57,11 +57,11 @@ CREATE TABLE `LITURGY__calendar_propriumdesanctis` (
 --
 
 INSERT INTO `LITURGY__calendar_propriumdesanctis` (`RECURRENCE_ID`, `MONTH`, `DAY`, `TAG`, `NAME_LA`, `NAME_EN`, `NAME_IT`, `GRADE`, `COMMON`, `CALENDAR`, `COLOR`) VALUES
-(2, 1, 2, 'StsBasilGreg', 'Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiae doctorum', 'Saints Basil the Great and Gregory Nazianzen, bishops and doctors', 'Santi Basilio Magno e Gregorio Nazianzeno, vescovi e dottori', 3, 'Proper', 'GENERAL ROMAN', 'white'),
+(2, 1, 2, 'StsBasilGreg', 'Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum', 'Saints Basil the Great and Gregory Nazianzen, bishops and doctors', 'Santi Basilio Magno e Gregorio Nazianzeno, vescovi e dottori', 3, 'Proper', 'GENERAL ROMAN', 'white'),
 (4, 1, 7, 'StRayPenyafort', 'Sancti Raimundi de Penyafort, presbyteri', 'Saint Raymond of Penyafort, priest', 'San Raimondo di Peñafort, sacerdote', 2, 'Pastors:For One Pastor', 'GENERAL ROMAN', 'white'),
 (5, 1, 13, 'StHilaryPoitiers', 'Sancti Hilarii, episcopi et Ecclesiæ doctoris', 'Saint Hilary of Poitiers, bishop and doctor', 'Sant\'Ilario di Poitiers, vescovo e dottore', 2, 'Pastors:For a Bishop|Doctors', 'GENERAL ROMAN', 'white'),
 (6, 1, 17, 'StAnthonyEgypt', 'Sancti Antonii, abbatis', 'Saint Anthony of Egypt, abbot', 'Sant\'Antonio di Egitto, abate', 3, 'Proper', 'GENERAL ROMAN', 'white'),
-(7, 1, 20, 'StFabianPope', 'Sancti Fabiani, papae et martyris', 'Saint Fabian, pope and martyr', 'San Fabiano, papa e martire', 2, 'Martyrs:For One Martyr|Pastors:For a Pope', 'GENERAL ROMAN', 'red|white'),
+(7, 1, 20, 'StFabianPope', 'Sancti Fabiani, papæ et martyris', 'Saint Fabian, pope and martyr', 'San Fabiano, papa e martire', 2, 'Martyrs:For One Martyr|Pastors:For a Pope', 'GENERAL ROMAN', 'red|white'),
 (8, 1, 20, 'StSebastian', 'Sancti Sebastiani, martyris', 'Saint Sebastian, martyr', 'San Sebastiano, martire', 2, 'Martyrs:For One Martyr', 'GENERAL ROMAN', 'red'),
 (9, 1, 21, 'StAgnes', 'S. Agnetis, virginis et martyris', 'Saint Agnes, virgin and martyr', 'Sant\'Agnese, vergine e martire', 3, 'Martyrs:For a Virgin Martyr|Virgins:For One Virgin', 'GENERAL ROMAN', 'red|white'),
 (10, 1, 22, 'StVincentDeacon', 'S. Vincentii, diaconi et martyris', 'Saint Vincent, deacon and martyr', 'San Vincenzo, diacono e martire', 2, 'Martyrs:For One Martyr', 'GENERAL ROMAN', 'red'),
@@ -74,7 +74,7 @@ INSERT INTO `LITURGY__calendar_propriumdesanctis` (`RECURRENCE_ID`, `MONTH`, `DA
 (17, 2, 2, 'Presentation', 'In Præsentatione Domini', 'Presentation of the Lord', 'Presentazione del Signore', 5, 'Proper', 'GENERAL ROMAN', 'white'),
 (18, 2, 3, 'StBlase', 'S. Blasii, episcopi et martyris', 'Saint Blase, bishop and martyr', 'San Biagio, vescovo e martire', 2, 'Martyrs:For One Martyr|Pastors:For a Bishop', 'GENERAL ROMAN', 'red|white'),
 (19, 2, 3, 'StAnsgar', 'S. Ansgarii, episcopi', 'Saint Ansgar, bishop', 'Sant\'Oscar, vescovo', 2, 'Pastors:For Missionaries|Pastors:For a Bishop', 'GENERAL ROMAN', 'white'),
-(20, 2, 5, 'StAgatha', 'S. Agathæ, virginis et martyris', 'Saint Agatha, virgin and martyr', 'Sant\'Agata, vergine e martire', 3, 'Martyrs:For a Virgin Martyr|Virgins:For One Virgin', 'GENERAL ROMAN', 'red'),
+(20, 2, 5, 'StAgatha', 'S. Agathæ, virginis et martyris', 'Saint Agatha, virgin and martyr', 'Sant\'Agata, vergine e martire', 3, 'Martyrs:For a Virgin Martyr|Virgins:For One Virgin', 'GENERAL ROMAN', 'red|white'),
 (21, 2, 6, 'StsPaulMiki', 'Ss. Pauli Miki et sociorum, martyrum', 'Saints Paul Miki and companions, martyrs', 'Santi Paolo Miki e soci, martiri', 3, 'Martyrs:For Several Martyrs', 'GENERAL ROMAN', 'red'),
 (22, 2, 8, 'StJeromeEmiliani', 'S. Hieronymi Emiliani', 'Saint Jerome Emiliani, priest', 'San Girolamo Emiliani', 2, 'Holy Men and Women:For Educators', 'GENERAL ROMAN', 'white'),
 (24, 2, 10, 'StScholastica', 'S. Scholasticæ, virginis', 'Saint Scholastica, virgin', 'Santa Scolastica, vergine', 3, 'Virgins:For One Virgin|Holy Men and Women:For a Nun', 'GENERAL ROMAN', 'white'),
@@ -99,8 +99,8 @@ INSERT INTO `LITURGY__calendar_propriumdesanctis` (`RECURRENCE_ID`, `MONTH`, `DA
 (43, 4, 7, 'StJohnBaptistDeLaSalle', 'S. Ioannis Baptistæ de la Salle, presbyteri', 'Saint John Baptist de la Salle, priest', 'San Giovanni Battista de la Salle, sacerdote', 3, 'Pastors:For One Pastor|Holy Men and Women:For Educators', 'GENERAL ROMAN', 'white'),
 (44, 4, 11, 'StStanislaus', 'S. Stanislai, episcopi et martyris', 'Saint Stanislaus, bishop and martyr', 'San Stanislao, vescovo e martire', 3, 'Martyrs:For One Martyr|Pastors:For a Bishop', 'GENERAL ROMAN', 'red|white'),
 (45, 4, 13, 'StMartinPope', 'S. Martini I, papæ et martyris', 'Saint Martin I, pope and martyr', 'San Martino I, papa e martire', 2, 'Martyrs:For One Martyr|Pastors:For a Pope', 'GENERAL ROMAN', 'red|white'),
-(46, 4, 21, 'StAnselm', 'S. Anselmi, episcopi et Ecclesiæ doctoris', 'Saint Anselm of Canterbury, bishop and doctor of the Church', 'Sant\'Anselmo di Canterbury, vescovo e dottore della Chiesa', 2, 'Pastors:For a Bishop|Doctors', 'GENERAL ROMAN', 'red|white'),
-(47, 4, 23, 'StGeorge', 'S. Georgii, martyris', 'Saint George, martyr', 'San Giorgio, martire', 2, 'Martyrs:For One Martyr', 'GENERAL ROMAN', 'red|white'),
+(46, 4, 21, 'StAnselm', 'S. Anselmi, episcopi et Ecclesiæ doctoris', 'Saint Anselm of Canterbury, bishop and doctor of the Church', 'Sant\'Anselmo di Canterbury, vescovo e dottore della Chiesa', 2, 'Pastors:For a Bishop|Doctors', 'GENERAL ROMAN', 'white'),
+(47, 4, 23, 'StGeorge', 'S. Georgii, martyris', 'Saint George, martyr', 'San Giorgio, martire', 2, 'Martyrs:For One Martyr', 'GENERAL ROMAN', 'red'),
 (49, 4, 24, 'StFidelisSigmaringen', 'S. Fidelis de Sigmaringen, presbyteri et martyris', 'Saint Fidelis of Sigmaringen, priest and martyr', 'San Fedele di Sigmaringen, sacerdote e martire', 2, 'Martyrs:For One Martyr|Pastors:For One Pastor', 'GENERAL ROMAN', 'red|white'),
 (50, 4, 25, 'StMarkEvangelist', 'S. Marci, evangelistæ', 'Saint Mark the Evangelist', 'San Marco Evangelista', 4, 'Proper', 'GENERAL ROMAN', 'red'),
 (51, 4, 28, 'StPeterChanel', 'S. Petri Chanel, presbyteri et martyris', 'Saint Peter Chanel, priest and martyr', 'San Pietro Chanel, sacerdote e martire', 2, 'Martyrs:For One Martyr|Pastors:For Missionaries', 'GENERAL ROMAN', 'red|white'),
@@ -307,6 +307,7 @@ INSERT INTO `LITURGY__calendar_propriumdesanctis_2002` (`RECURRENCE_ID`, `MONTH`
 -- Table structure for table `LITURGY__calendar_propriumdetempore`
 --
 -- Creation: Jan 06, 2019 at 04:29 PM
+-- Last update: Jul 27, 2020 at 11:19 PM
 --
 
 CREATE TABLE `LITURGY__calendar_propriumdetempore` (
@@ -326,16 +327,16 @@ CREATE TABLE `LITURGY__calendar_propriumdetempore` (
 --
 
 INSERT INTO `LITURGY__calendar_propriumdetempore` (`RECURRENCE_ID`, `TAG`, `NAME_LA`, `NAME_EN`, `NAME_IT`) VALUES
-(1, 'HolyThurs', 'Feria V Hebdomadae Sanctae', 'Holy Thursday', 'Giovedì Santo'),
+(1, 'HolyThurs', 'Feria V Hebdomadæ Sanctæ', 'Holy Thursday', 'Giovedì Santo'),
 (2, 'GoodFri', 'Feria VI in Passione Domini', 'Good Friday', 'Venerdì Santo'),
 (3, 'EasterVigil', 'Vigilia Paschalis', 'Easter Vigil', 'Vigilia Pasquale'),
-(4, 'Easter', 'Dominica Paschae in Resurrectione Domini', 'Easter Sunday', 'Domenica di Pasqua'),
+(4, 'Easter', 'Dominica Paschæ in Resurrectione Domini', 'Easter Sunday', 'Domenica di Pasqua'),
 (5, 'Christmas', 'In Nativitate Domini', 'Christmas', 'Natale'),
 (6, 'MotherGod', 'SOLLEMNITAS SANCTAE DEI GENITRICIS MARIAE', 'Mary, Mother of God', 'Maria Ss.ma Madre di Dio'),
 (7, 'Epiphany', 'in Epiphania Domini', 'Epiphany', 'Epifania'),
 (8, 'Ascension', 'In Ascensione Domini', 'Ascension', 'Ascensione'),
 (9, 'Pentecost', 'Dominica Pentecostes', 'Pentecost', 'Pentecoste'),
-(10, 'Easter7', 'Dominica VII Paschae', 'Seventh Sunday of Easter', 'Settima Domenica della Pasqua'),
+(10, 'Easter7', 'Dominica VII Paschæ', 'Seventh Sunday of Easter', 'Settima Domenica della Pasqua'),
 (11, 'Christmas2', 'Dominica II Post Nativitatem', '2nd Sunday after Christmas', 'Seconda Domenica dopo Natale'),
 (12, 'Advent1', 'Dominica Prima Adventus', 'First Sunday of Advent', 'Prima Domenica dell\'Avvento'),
 (13, 'Advent2', 'Dominica Secunda Adventus', 'Second Sunday of Advent', 'Seconda Domenica dell\'Avvento'),
@@ -347,27 +348,27 @@ INSERT INTO `LITURGY__calendar_propriumdetempore` (`RECURRENCE_ID`, `TAG`, `NAME
 (19, 'Lent4', 'Dominica IV in Quadragesima', 'Fourth Sunday of Lent', 'Quarta Domenica della Quaresima'),
 (20, 'Lent5', 'Dominica V in Quadragesima', 'Fifth Sunday of Lent', 'Quinta Domenica della Quaresima'),
 (21, 'PalmSun', 'Dominica in Palmis', 'Palm Sunday', 'Domenica delle Palme'),
-(22, 'Easter2', 'Dominica II in Paschae', 'Second Sunday of Easter', 'Seconda Domenica della Pasqua'),
-(23, 'Easter3', 'Dominica III in Paschae', 'Third Sunday of Easter', 'Terza Domenica della Pasqua'),
-(24, 'Easter4', 'Dominica IV in Paschae', 'Fourth Sunday of Easter', 'Quarta Domenica della Pasqua'),
-(25, 'Easter5', 'Dominica V in Paschae', 'Fifth Sunday of Easter', 'Quinta Domenica della Pasqua'),
-(26, 'Easter6', 'Dominica VI in Paschae', 'Sixth Sunday of Easter', 'Sesta Domenica della Pasqua'),
-(27, 'Trinity', 'Dominica post Pentecostem Sanctissimae Trinitatis', 'Holy Trinity Sunday', 'Domenica della Santissima Trinità'),
+(22, 'Easter2', 'Dominica II in Paschæ', 'Second Sunday of Easter', 'Seconda Domenica della Pasqua'),
+(23, 'Easter3', 'Dominica III in Paschæ', 'Third Sunday of Easter', 'Terza Domenica della Pasqua'),
+(24, 'Easter4', 'Dominica IV in Paschæ', 'Fourth Sunday of Easter', 'Quarta Domenica della Pasqua'),
+(25, 'Easter5', 'Dominica V in Paschæ', 'Fifth Sunday of Easter', 'Quinta Domenica della Pasqua'),
+(26, 'Easter6', 'Dominica VI in Paschæ', 'Sixth Sunday of Easter', 'Sesta Domenica della Pasqua'),
+(27, 'Trinity', 'Dominica post Pentecostem Sanctissimæ Trinitatis', 'Holy Trinity Sunday', 'Domenica della Santissima Trinità'),
 (28, 'CorpusChristi', 'Ss.mi Corporis et Sanguinis Christi', 'Corpus Christi', 'Santissimo Corpo e Sangue di Cristo'),
 (29, 'AshWednesday', 'Feria IV Cinerum', 'Ash Wednesday', 'Mercoledì delle Ceneri'),
-(30, 'MonHolyWeek', 'Feria II Hebdomadae Sanctae', 'Monday of Holy Week', 'Lunedì della Settimana Santa'),
-(31, 'TueHolyWeek', 'Feria III Hebdomadae Sanctae', 'Tuesday of Holy Week', 'Martedì della Settimana Santa'),
-(32, 'WedHolyWeek', 'Feria IV Hebdomadae Sanctae', 'Wednesday of Holy Week', 'Mercoledì della Settimana Santa'),
-(33, 'MonOctaveEaster', 'Feria II infra Octavam Paschae', 'Monday of the Octave of Easter', 'Lunedì dell\'Ottava di Pasqua'),
-(34, 'TueOctaveEaster', 'Feria III infra Octavam Paschae', 'Tuesday of the Octave of Easter', 'Martedì dell\'Ottava di Pasqua'),
-(35, 'WedOctaveEaster', 'Feria IV infra Octavam Paschae', 'Wednesday of the Octave of Easter', 'Mercoledì dell\'Ottava di Pasqua'),
-(36, 'ThuOctaveEaster', 'Feria V infra Octavam Paschae', 'Thursday of the Octave of Easter', 'Giovedì dell\'Ottava di Pasqua'),
-(37, 'FriOctaveEaster', 'Feria VI infra Octavam Paschae', 'Friday of the Octave of Easter', 'Venerdì dell\'Ottava di Pasqua'),
-(38, 'SatOctaveEaster', 'Sabbato infra Octavam Paschae', 'Saturday of the Octave of Easter', 'Sabato dell\'Ottava di Pasqua'),
+(30, 'MonHolyWeek', 'Feria II Hebdomadæ Sanctæ', 'Monday of Holy Week', 'Lunedì della Settimana Santa'),
+(31, 'TueHolyWeek', 'Feria III Hebdomadæ Sanctæ', 'Tuesday of Holy Week', 'Martedì della Settimana Santa'),
+(32, 'WedHolyWeek', 'Feria IV Hebdomadæ Sanctæ', 'Wednesday of Holy Week', 'Mercoledì della Settimana Santa'),
+(33, 'MonOctaveEaster', 'Feria II infra Octavam Paschæ', 'Monday of the Octave of Easter', 'Lunedì dell\'Ottava di Pasqua'),
+(34, 'TueOctaveEaster', 'Feria III infra Octavam Paschæ', 'Tuesday of the Octave of Easter', 'Martedì dell\'Ottava di Pasqua'),
+(35, 'WedOctaveEaster', 'Feria IV infra Octavam Paschæ', 'Wednesday of the Octave of Easter', 'Mercoledì dell\'Ottava di Pasqua'),
+(36, 'ThuOctaveEaster', 'Feria V infra Octavam Paschæ', 'Thursday of the Octave of Easter', 'Giovedì dell\'Ottava di Pasqua'),
+(37, 'FriOctaveEaster', 'Feria VI infra Octavam Paschæ', 'Friday of the Octave of Easter', 'Venerdì dell\'Ottava di Pasqua'),
+(38, 'SatOctaveEaster', 'Sabbato infra Octavam Paschæ', 'Saturday of the Octave of Easter', 'Sabato dell\'Ottava di Pasqua'),
 (39, 'SacredHeart', 'Sacratissimi Cordis Iesu', 'Most Sacred Heart of Jesus', 'Sacratissimi Cordis Iesu'),
 (40, 'ChristKing', 'Domini Nostri Iesu Christi Universorum Regis', 'Christ the King', 'Cristo Re dell\'Universo'),
 (41, 'BaptismLord', 'In Festo Baptismatis Domini', 'Baptism of the Lord', 'Battesimo del Signore'),
-(42, 'HolyFamily', 'S. Familiae Iesu, Mariae et Joseph', 'Holy Family of Jesus, Mary and Joseph', 'Sacra Famiglia di Gesù, Maria e Giuseppe'),
+(42, 'HolyFamily', 'S. Familiæ Iesu, Mariæ et Joseph', 'Holy Family of Jesus, Mary and Joseph', 'Sacra Famiglia di Gesù, Maria e Giuseppe'),
 (43, 'OrdSunday2', 'Dominica II «Per Annum»', '2nd Sunday of Ordinary Time', 'II Domenica del Tempo Ordinario'),
 (44, 'OrdSunday3', 'Dominica III «Per Annum»', '3rd Sunday of Ordinary Time', 'III Domenica del Tempo Ordinario'),
 (45, 'OrdSunday4', 'Dominica IV «Per Annum»', '4th Sunday of Ordinary Time', 'IV Domenica del Tempo Ordinario'),
@@ -400,7 +401,8 @@ INSERT INTO `LITURGY__calendar_propriumdetempore` (`RECURRENCE_ID`, `TAG`, `NAME
 (72, 'OrdSunday31', 'Dominica XXXI «Per Annum»', '31st Sunday of Ordinary Time', 'XXXI Domenica del Tempo Ordinario'),
 (73, 'OrdSunday32', 'Dominica XXXII «Per Annum»', '32nd Sunday of Ordinary Time', 'XXXII Domenica del Tempo Ordinario'),
 (74, 'OrdSunday33', 'Dominica XXXIII «Per Annum»', '33rd Sunday of Ordinary Time', 'XXXIII Domenica del Tempo Ordinario'),
-(75, 'OrdSunday34', 'Dominica XXXIV «Per Annum»', '34th Sunday of Ordinary Time', 'XXXIV Domenica del Tempo Ordinario');
+(75, 'OrdSunday34', 'Dominica XXXIV «Per Annum»', '34th Sunday of Ordinary Time', 'XXXIV Domenica del Tempo Ordinario'),
+(76, 'ImmaculateHeart', 'Immaculati Cordis B. Mariæ Virginis', 'The Immaculate Heart of the Blessed Virgin Mary', 'Cuore Immacolato della Betata Vergine Maria');
 
 -- --------------------------------------------------------
 
@@ -567,7 +569,7 @@ ALTER TABLE `LITURGY__calendar_propriumdesanctis_2002`
 -- AUTO_INCREMENT for table `LITURGY__calendar_propriumdetempore`
 --
 ALTER TABLE `LITURGY__calendar_propriumdetempore`
-  MODIFY `RECURRENCE_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
+  MODIFY `RECURRENCE_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
 
 --
 -- Constraints for dumped tables
