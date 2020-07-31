@@ -783,7 +783,7 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
             }
         } else {
             $Messages[] = sprintf(
-                __("The Memorial '%s', usually celebrated on %s, is suppressed by a Solemnity or Feast Day in the year %d.",$LOCALE),
+                __("The Memorial '%s', usually celebrated on %s, is suppressed by a Sunday, a Solemnity or a Feast in the year %d.",$LOCALE),
                 $row["NAME_" . $LOCALE],
                 $LOCALE === 'LA' ? ( $currentFeastDate->format('j') . ' ' . $LATIN_MONTHS[(int)$currentFeastDate->format('n')] ) : 
                     ( $LOCALE === 'EN' ? $currentFeastDate->format('F jS') : 
@@ -829,8 +829,8 @@ if ($YEAR >= 2002) {
                 $Messages[] = sprintf(
                     __("The Memorial '%s' was added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s), applicable for the year %d.",$LOCALE),
                     $row["NAME_" . $LOCALE],
-                    $YEAR,
-                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html">' . __('Decree of the Congregation for Divine Worship', $LOCALE) . '</a>'
+                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html">' . __('Decree of the Congregation for Divine Worship', $LOCALE) . '</a>',
+                    $YEAR
                 );
 
                 //If a fixed date Memorial falls within the Lenten season, it is reduced in rank to a Commemoration.                

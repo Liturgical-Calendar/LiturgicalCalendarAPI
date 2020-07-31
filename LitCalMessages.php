@@ -493,10 +493,10 @@ $MESSAGES = [
         "it" => "La Memoria obbligatoria <i>'%s'</i> coincide con l'altra Memoria obbligatoria <i>'%s'</i> nell'anno %d. Pertanto tutte e due sono ridotte di grado a Memoria facoltativa (%s).",
         "la" => "Memoria <i>'%s'</i> coincidit cum alia Memoria <i>'%s'</i> in anno %d. Ergo ambo simul redunctur in gradu Memoriæ ad libitum (%s)."
     ],
-    "The Memorial '%s', usually celebrated on %s, is suppressed by a Solemnity or Feast Day in the year %d." => [
-        "en" => "The Memorial <i>'%s'</i>, usually celebrated on %s, is suppressed by a Solemnity or Feast Day in the year %d.",
-        "it" => "La Memoria obbligatoria <i>'%s'</i>, celebrata solitamente il giorno %s, è soppiantata da una Solennità o da una Festa nell'anno %d.",
-        "la" => "Memoria <i>'%s'</i> qua plerumque celebrata est in die %s subplantata est ab Sollemnitate aut ab Festu in anno %d."
+    "The Memorial '%s', usually celebrated on %s, is suppressed by a Sunday, a Solemnity or a Feast in the year %d." => [
+        "en" => "The Memorial <i>'%s'</i>, usually celebrated on %s, is suppressed by a Sunday, a Solemnity or a Feast in the year %d.",
+        "it" => "La Memoria obbligatoria <i>'%s'</i>, celebrata solitamente il giorno %s, è soppiantata da una Domenica, una Solennità o una Festa nell'anno %d.",
+        "la" => "Memoria <i>'%s'</i> qua plerumque celebrata est in die %s subplantata est ab Dominica aut ab Sollemnitate aut ab Festu in anno %d."
     ],
     "The Memorial '%s' has been raised to the rank of Feast since the year 2016, applicable to the year %d (%s)." => [
         "en" => "The Memorial <i>'%s'</i> has been raised to the rank of Feast since the year 2016, applicable to the year %d (%s).",

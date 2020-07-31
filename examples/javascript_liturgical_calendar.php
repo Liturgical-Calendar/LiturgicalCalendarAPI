@@ -125,8 +125,36 @@ function __($key, $locale)
 <head>
     <title><?php echo __("Generate Roman Calendar", $LOCALE) ?></title>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta name="msapplication-TileImage" content="easter-egg-5-144-279148.png">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../easter-egg-5-152-279148.png">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../easter-egg-5-144-279148.png">
+    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="../easter-egg-5-120-279148.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../easter-egg-5-114-279148.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../easter-egg-5-72-279148.png">    
+    <link rel="apple-touch-icon-precomposed" href="../easter-egg-5-57-279148.png">
+    <link rel="icon" href="../easter-egg-5-32-279148.png" sizes="32x32">
     <style>
-        
+
+        .backNav {
+            background-color:yellow;
+            font-size:1.1em;
+            text-align:center;
+            cursor:pointer;
+            text-decoration:none;
+            width:95%;
+            margin:0px auto;
+            border-bottom:2px outset LightBlue;
+            display:block;
+            padding: 12px 24px;
+            font-weight: bold;
+        }
+        .backNav:hover {
+            background-color: gold;
+            color: DarkBlue;
+        }
+
         #LitCalTable {
             width:75%;
             margin:30px auto;
@@ -680,6 +708,7 @@ function __($key, $locale)
 </head>
 
 <body>
+    <div><a class="backNav" href="/LiturgicalCalendar">↩      Go back      ↩</a></div>
 
     <?php
 
