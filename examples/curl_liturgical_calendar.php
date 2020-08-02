@@ -1088,11 +1088,17 @@ $months = [
                     default:
                         $dateString = utf8_encode(strftime('%A %e %B %Y', $festivity->date->format('U')));
                 }
-
+                $displayGrade = "";
+                if($keyname === 'AllSouls'){
+                    $displayGrade = __("COMMEMORATION",$LOCALE);
+                }
+                else if((int)$festivity->date->format('N') !== 7){
+                    $displayGrade = $GRADE[$festivity->grade];
+                }
                 echo '<td class="dateEntry">' . $dateString . '</td>';
                 $currentCycle = property_exists($festivity, "liturgicalyear") && $festivity->liturgicalyear !== null && $festivity->liturgicalyear !== "" ? " (" . $festivity->liturgicalyear . ")" : "";
                 echo '<td>' . $festivity->name . $currentCycle . ' - <i>' . $festivityColorString . '</i><br /><i>' . $festivity->common . '</i></td>';
-                echo '<td>' . ($keyname === 'AllSouls' ? __("COMMEMORATION",$LOCALE) : $GRADE[$festivity->grade]) . '</td>';
+                echo '<td>' . $displayGrade . '</td>';
                 echo '</tr>';
             }
         }

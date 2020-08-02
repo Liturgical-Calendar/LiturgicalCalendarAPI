@@ -1169,7 +1169,7 @@ $SUNDAY_CYCLE = ["A", "B", "C"];
 $WEEKDAY_CYCLE = ["I", "II"];
 foreach($LitCal as $key => $festivity){
     //first let's deal with weekdays we calculate the weekday cycle
-    if ((int)$festivity->grade === WEEKDAY) {
+    if ((int)$festivity->grade === WEEKDAY && (int)$festivity->date->format('N') !== 7) {
         if ($festivity->date < $LitCal["Advent1"]->date) { 
             $LitCal[$key]->liturgicalyear = __("YEAR", $LOCALE) . " " . ($WEEKDAY_CYCLE[($YEAR - 1) % 2]);
         } else if ($festivity->date >= $LitCal["Advent1"]->date) { 
@@ -1212,7 +1212,7 @@ function GenerateResponseToRequest($LitCal,$LOCALE,$returntype,$YEAR,$Messages){
             header('Content-Type: application/xml; charset=utf-8');
             $jsonStr = json_encode($SerializeableLitCal);
             $jsonObj = json_decode($jsonStr, true);
-            $root = "<?xml version=\"1.0\" encoding=\"UTF-8\"?" . "><LitCalRoot/>";
+            $root = "<?xml version=\"1.0\" encoding=\"UTF-8\"?" . "><LitCal/>";
             $xml = new SimpleXMLElement($root);
             convertArray2XML($xml, $jsonObj);
             print $xml->asXML();
@@ -1252,12 +1252,23 @@ function GenerateResponseToRequest($LitCal,$LOCALE,$returntype,$YEAR,$Messages){
                 $ical .= "X-WR-TIMEZONE:Europe/Vatican\r\n"; //perhaps allow this to be set through a GET or POST?
                 $ical .= "X-PUBLISHED-TTL:PT1D\r\n";
                 foreach($SerializeableLitCal->LitCal as $FestivityKey => $CalEvent){
+                    $displayGrade = "";
+                    $displayGradeHTML = "";
+                    if($FestivityKey === 'AllSouls'){
+                        $displayGrade = strip_tags(__("COMMEMORATION",$LOCALE));
+                        $displayGradeHTML = __("COMMEMORATION",$LOCALE);
+                    }
+                    else if((int)$CalEvent->date->format('N') !==7 ){
+                        $displayGrade = _G($CalEvent->grade,$LOCALE,false);
+                        $displayGradeHTML = _G($CalEvent->grade,$LOCALE,true);
+                    }
+                    
                     $description = _C($CalEvent->common,$LOCALE);
-                    $description .=  '\n' . _G($CalEvent->grade,$LOCALE,false);
+                    $description .=  '\n' . $displayGrade;
                     $description .= $CalEvent->color != "" ? '\n' . ParseColorString($CalEvent->color,$LOCALE,false) : "";
                     $description .= property_exists($CalEvent,'liturgicalyear') && $CalEvent->liturgicalyear !== null && $CalEvent->liturgicalyear != "" ? '\n' . $CalEvent->liturgicalyear : "";
                     $htmlDescription = "<P DIR=LTR>" . _C($CalEvent->common,$LOCALE);
-                    $htmlDescription .=  '<BR>' . _G($CalEvent->grade,$LOCALE,true);
+                    $htmlDescription .=  '<BR>' . $displayGradeHTML;
                     $htmlDescription .= $CalEvent->color != "" ? "<BR>" . ParseColorString($CalEvent->color,$LOCALE,true) : "";
                     $htmlDescription .= property_exists($CalEvent,'liturgicalyear') && $CalEvent->liturgicalyear !== null && $CalEvent->liturgicalyear != "" ? '<BR>' . $CalEvent->liturgicalyear . "</P>" : "</P>";
                     $ical .= "BEGIN:VEVENT\r\n";
