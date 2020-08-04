@@ -143,20 +143,32 @@ let today = new Date(),
                                 } else if ($festivity.common == "Proper") {
                                     $festivity.common = __($festivity.common, $Settings.locale);
                                 }
-                                $festivity.color = $festivity.color.split("|")[0];
+                                //$festivity.color = $festivity.color.split("|")[0];
 
                                 //check which liturgical season we are in, to use the right color for that season...
-                                let $color = "green";
-                                if (($festivity.date.getTime() > $LitCal["Advent1"].date.getTime() && $festivity.date.getTime() < $LitCal["Christmas"].date.getTime()) || ($festivity.date.getTime() > $LitCal["AshWednesday"].date.getTime() && $festivity.date.getTime() < $LitCal["Easter"].date.getTime())) {
-                                    $color = "purple";
-                                } else if ($festivity.date.getTime() > $LitCal["Easter"].date.getTime() && $festivity.date.getTime() < $LitCal["Pentecost"].date.getTime()) {
-                                    $color = "white";
-                                } else if ($festivity.date.getTime() > $LitCal["Christmas"].date.getTime() || $festivity.date.getTime() < $LitCal["BaptismLord"].date.getTime()) {
-                                    $color = "white";
+                                let $SeasonColor = "green";
+                                if (($festivity.date.getTime() >= $LitCal["Advent1"].date.getTime() && $festivity.date.getTime() < $LitCal["Christmas"].date.getTime()) || ($festivity.date.getTime() >= $LitCal["AshWednesday"].date.getTime() && $festivity.date.getTime() < $LitCal["Easter"].date.getTime())) {
+                                    $SeasonColor = "purple";
+                                } else if ($festivity.date.getTime() >= $LitCal["Easter"].date.getTime() && $festivity.date.getTime() <= $LitCal["Pentecost"].date.getTime()) {
+                                    $SeasonColor = "white";
+                                } else if ($festivity.date.getTime() >= $LitCal["Christmas"].date.getTime() || $festivity.date.getTime() <= $LitCal["BaptismLord"].date.getTime()) {
+                                    $SeasonColor = "white";
                                 }
 
+                                //We will apply the color for the single festivity only to it's own table cells
+                                let $possibleColors =  $festivity.color.split("|");
+                                let $CSScolor = $possibleColors[0];
+                                let $festivityColorString = "";
+                                if($possibleColors.length === 1){
+                                    $festivityColorString = __($possibleColors[0],$Settings.locale);
+                                } else if ($possibleColors.length > 1){
+                                    $possibleColors = $possibleColors.map(function($txt) {
+                                        return __($txt,$Settings.locale);
+                                    });
+                                    $festivityColorString = $possibleColors.join("</i> " + __("or",$Settings.locale) + " <i>");
+                                }
 
-                                strHTML += '<tr style="background-color:' + $color + ';' + ($highContrast.indexOf($color) != -1 ? 'color:white;' : '') + '">';
+                                strHTML += '<tr style="background-color:' + $SeasonColor + ';' + ($highContrast.indexOf($SeasonColor) != -1 ? 'color:white;' : '') + '">';
                                 if ($newMonth) {
                                     let $monthRwsp = $cm.count + 1;
                                     strHTML += '<td class="rotate" rowspan = "' + $monthRwsp + '"><div>' + ($Settings.locale === 'LA' ? $months[$festivity.date.getMonth()].toUpperCase() : new Intl.DateTimeFormat($Settings.locale.toLowerCase(), IntlMonthFmt).format($festivity.date).toUpperCase()) + '</div></td>';
@@ -177,8 +189,8 @@ let today = new Date(),
                                 else if($festivity.grade > 3){
                                     $festivityGrade = ($keyname === 'AllSouls' ? __("COMMEMORATION",$Settings.locale) : $GRADE[$festivity.grade]);
                                 }              
-                                strHTML += '<td>' + $festivity.name + $currentCycle + ' - <i>' + __($festivity.color, $Settings.locale) + '</i><br /><i>' + $festivity.common + '</i></td>';
-                                strHTML += '<td>' + $festivityGrade + '</td>';
+                                strHTML += '<td style="background-color:'+$CSScolor+';' + ($highContrast.indexOf($CSScolor) != -1 ? 'color:white;' : 'color:black;') + '">' + $festivity.name + $currentCycle + ' - <i>' + __($festivity.color, $Settings.locale) + '</i><br /><i>' + $festivity.common + '</i></td>';
+                                strHTML += '<td style="background-color:'+$CSScolor+';' + ($highContrast.indexOf($CSScolor) != -1 ? 'color:white;' : 'color:black;') + '">' + $festivityGrade + '</td>';
                                 strHTML += '</tr>';
                                 $keyindex++;
                             }
@@ -216,8 +228,31 @@ let today = new Date(),
                             } else if ($festivity.common == "Proper") {
                                 $festivity.common = __($festivity.common, $Settings.locale);
                             }
-                            $festivity.color = $festivity.color.split("|")[0];
-                            strHTML += '<tr style="background-color:' + $festivity.color + ';' + ($highContrast.indexOf($festivity.color) != -1 ? 'color:white;' : '') + '">';
+                            //$festivity.color = $festivity.color.split("|")[0];
+
+                            //check which liturgical season we are in, to use the right color for that season...
+                            let $SeasonColor = "green";
+                            if (($festivity.date.getTime() >= $LitCal["Advent1"].date.getTime() && $festivity.date.getTime() < $LitCal["Christmas"].date.getTime()) || ($festivity.date.getTime() >= $LitCal["AshWednesday"].date.getTime() && $festivity.date.getTime() < $LitCal["Easter"].date.getTime())) {
+                                $SeasonColor = "purple";
+                            } else if ($festivity.date.getTime() >= $LitCal["Easter"].date.getTime() && $festivity.date.getTime() <= $LitCal["Pentecost"].date.getTime()) {
+                                $SeasonColor = "white";
+                            } else if ($festivity.date.getTime() >= $LitCal["Christmas"].date.getTime() || $festivity.date.getTime() <= $LitCal["BaptismLord"].date.getTime()) {
+                                $SeasonColor = "white";
+                            }
+
+                            //We will apply the color for the single festivity only to it's own table cells
+                            let $possibleColors =  $festivity.color.split("|");
+                            let $CSScolor = $possibleColors[0];
+                            let $festivityColorString = "";
+                            if($possibleColors.length === 1){
+                                $festivityColorString = __($possibleColors[0],$Settings.locale);
+                            } else if ($possibleColors.length > 1){
+                                $possibleColors = $possibleColors.map(function($txt) {
+                                    return __($txt,$Settings.locale);
+                                });
+                                $festivityColorString = $possibleColors.join("</i> " + __("or",$Settings.locale) + " <i>");
+                            }
+                            strHTML += '<tr style="background-color:' + $SeasonColor + ';' + ($highContrast.indexOf($SeasonColor) != -1 ? 'color:white;' : 'color:black;') + '">';
                             if ($newMonth) {
                                 let $monthRwsp = $cm.count + 1;
                                 strHTML += '<td class="rotate" rowspan = "' + $monthRwsp + '"><div>' + ($Settings.locale === 'LA' ? $months[$festivity.date.getMonth()].toUpperCase() : new Intl.DateTimeFormat($Settings.locale.toLowerCase(), IntlMonthFmt).format($festivity.date).toUpperCase()) + '</div></td>';
@@ -235,8 +270,8 @@ let today = new Date(),
                             else if($festivity.grade > 3){
                                 $festivityGrade = ($keyname === 'AllSouls' ? __("COMMEMORATION",$Settings.locale) : $GRADE[$festivity.grade]);
                             }              
-                            strHTML += '<td>' + $festivity.name + $currentCycle + ' - <i>' + __($festivity.color, $Settings.locale) + '</i><br /><i>' + $festivity.common + '</i></td>';
-                            strHTML += '<td>' + $festivityGrade + '</td>';
+                            strHTML += '<td style="background-color:'+$CSScolor+';' + ($highContrast.indexOf($CSScolor) != -1 ? 'color:white;' : 'color:black;') + '">' + $festivity.name + $currentCycle + ' - <i>' + __($festivity.color, $Settings.locale) + '</i><br /><i>' + $festivity.common + '</i></td>';
+                            strHTML += '<td style="background-color:'+$CSScolor+';' + ($highContrast.indexOf($CSScolor) != -1 ? 'color:white;' : 'color:black;') + '">' + $festivityGrade + '</td>';
                             strHTML += '</tr>';
                         }
 
