@@ -1,101 +1,333 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta charset='utf-8' />
-<link href='../lib/main.css' rel='stylesheet' />
-<script src='../lib/main.js'></script>
-<script>
+  <meta charset='utf-8' />
+  <title>{TITLE PLACEHOLDER}</title>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="../../../favicon.ico">
+  <meta name="msapplication-TileColor" content="#ffffff" />
+  <meta name="msapplication-TileImage" content="../../../assets/easter-egg-5-144-279148.png">
+  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../../../assets/easter-egg-5-152-279148.png">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../../../assets/easter-egg-5-144-279148.png">
+  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="../../../assets/easter-egg-5-120-279148.png">
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../../../assets/easter-egg-5-114-279148.png">
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../../../assets/easter-egg-5-72-279148.png">
+  <link rel="apple-touch-icon-precomposed" href="../../../assets/easter-egg-5-57-279148.png">
+  <link rel="icon" href="../../../assets/easter-egg-5-32-279148.png" sizes="32x32">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+  <link href='../lib/main.css' rel='stylesheet' />
+  <script src='../lib/main.js'></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+  <script>
+    let today = new Date(),
+      $Settings = {
+        "year": today.getFullYear(),
+        "epiphany": "JAN6",
+        "ascension": "SUNDAY",
+        "corpuschristi": "SUNDAY",
+        "locale": "LA",
+        "returntype": "JSON"
+      },
+      $events = [],
+      pad = function (n) { return n < 10 ? '0' + n : n },
+      genLitCal = function ($Settings) {
+        $.ajax({
+          method: 'POST',
+          data: $Settings,
+          url: '../../../LitCalEngine.php',
+          success: function (LitCalData) {
+            console.log(LitCalData);
+            if (LitCalData.hasOwnProperty("LitCal")) {
+              let $LitCal = LitCalData.LitCal;
+              let calendarEl = document.getElementById('calendar');
 
-  document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
+              let calendar = new FullCalendar.Calendar(calendarEl, {
+                //initialDate: '2020-06-12',
+                //editable: false,
+                //selectable: false,
+                //businessHours: false,
+                dayMaxEvents: true, // allow "more" link when too many events
+              });
 
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-      initialDate: '2020-06-12',
-      editable: true,
-      selectable: true,
-      businessHours: true,
-      dayMaxEvents: true, // allow "more" link when too many events
-      events: [
-        {
-          title: 'All Day Event',
-          start: '2020-06-01'
-        },
-        {
-          title: 'Long Event',
-          start: '2020-06-07',
-          end: '2020-06-10'
-        },
-        {
-          groupId: 999,
-          title: 'Repeating Event',
-          start: '2020-06-09T16:00:00'
-        },
-        {
-          groupId: 999,
-          title: 'Repeating Event',
-          start: '2020-06-16T16:00:00'
-        },
-        {
-          title: 'Conference',
-          start: '2020-06-11',
-          end: '2020-06-13'
-        },
-        {
-          title: 'Meeting',
-          start: '2020-06-12T10:30:00',
-          end: '2020-06-12T12:30:00'
-        },
-        {
-          title: 'Lunch',
-          start: '2020-06-12T12:00:00'
-        },
-        {
-          title: 'Meeting',
-          start: '2020-06-12T14:30:00'
-        },
-        {
-          title: 'Happy Hour',
-          start: '2020-06-12T17:30:00'
-        },
-        {
-          title: 'Dinner',
-          start: '2020-06-12T20:00:00'
-        },
-        {
-          title: 'Birthday Party',
-          start: '2020-06-13T07:00:00'
-        },
-        {
-          title: 'Click for Google',
-          url: 'http://google.com/',
-          start: '2020-06-28'
-        }
-      ]
+              calendar.render();
+
+              for (const key in $LitCal) {
+                if ($LitCal.hasOwnProperty(key)) {
+                  $LitCal[key].date = new Date($LitCal[key].date * 1000); //transform PHP timestamp to javascript date object
+                }
+              }
+              let $LitCalKeys = Object.keys($LitCal);
+              for (let $keyindex = 0; $keyindex < $LitCalKeys.length; $keyindex++) {
+                let $keyname = $LitCalKeys[$keyindex];
+                let $festivity = $LitCal[$keyname];
+                let $possibleColors = $festivity.color.split("|");
+                let $CSScolor = $possibleColors[0];
+                let $textColor = ($CSScolor === 'white' ? 'black' : 'white');
+                $events[$keyindex] = {
+                  title: $festivity.name,
+                  start: $festivity.date.getUTCFullYear() + '-' + pad($festivity.date.getUTCMonth() + 1) + '-' + pad($festivity.date.getUTCDate()),
+                  backgroundColor: $CSScolor,
+                  textColor: $textColor
+                };
+                calendar.addEvent($events[$keyindex]);
+                if ($keyindex === $LitCalKeys.length - 1) {
+                  $('#spinnerWrapper').fadeOut('slow');
+                }
+              }
+            }
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            console.log(errorThrown + ':' + textStatus);
+          }
+        });
+      };
+    document.addEventListener('DOMContentLoaded', function () {
+      genLitCal($Settings);
     });
 
-    calendar.render();
-  });
+  </script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+      font-size: 14px;
+    }
 
-</script>
-<style>
+    #calendar {
+      max-width: 1200px;
+      margin: 40px auto;
+    }
 
-  body {
-    margin: 40px 10px;
-    padding: 0;
-    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-    font-size: 14px;
-  }
+    .backNav {
+      background-color: yellow;
+      font-size: 1.1em;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+      width: 95%;
+      margin: 0px auto;
+      border-bottom: 2px outset LightBlue;
+      display: block;
+      padding: 12px 24px;
+      font-weight: bold;
+    }
 
-  #calendar {
-    max-width: 1100px;
-    margin: 0 auto;
-  }
+    .backNav:hover {
+      background-color: gold;
+      color: DarkBlue;
+    }
 
-</style>
+    .lds-roller {
+      display: inline-block;
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      top: 50%;
+      left: 50%;
+      margin-left: -40px;
+      margin-right: -40px;
+    }
+
+    .lds-roller div {
+      animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+      transform-origin: 40px 40px;
+    }
+
+    .lds-roller div:after {
+      content: " ";
+      display: block;
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #fff;
+      margin: -4px 0 0 -4px;
+    }
+
+    .lds-roller div:nth-child(1) {
+      animation-delay: -0.036s;
+    }
+
+    .lds-roller div:nth-child(1):after {
+      top: 63px;
+      left: 63px;
+    }
+
+    .lds-roller div:nth-child(2) {
+      animation-delay: -0.072s;
+    }
+
+    .lds-roller div:nth-child(2):after {
+      top: 68px;
+      left: 56px;
+    }
+
+    .lds-roller div:nth-child(3) {
+      animation-delay: -0.108s;
+    }
+
+    .lds-roller div:nth-child(3):after {
+      top: 71px;
+      left: 48px;
+    }
+
+    .lds-roller div:nth-child(4) {
+      animation-delay: -0.144s;
+    }
+
+    .lds-roller div:nth-child(4):after {
+      top: 72px;
+      left: 40px;
+    }
+
+    .lds-roller div:nth-child(5) {
+      animation-delay: -0.18s;
+    }
+
+    .lds-roller div:nth-child(5):after {
+      top: 71px;
+      left: 32px;
+    }
+
+    .lds-roller div:nth-child(6) {
+      animation-delay: -0.216s;
+    }
+
+    .lds-roller div:nth-child(6):after {
+      top: 68px;
+      left: 24px;
+    }
+
+    .lds-roller div:nth-child(7) {
+      animation-delay: -0.252s;
+    }
+
+    .lds-roller div:nth-child(7):after {
+      top: 63px;
+      left: 17px;
+    }
+
+    .lds-roller div:nth-child(8) {
+      animation-delay: -0.288s;
+    }
+
+    .lds-roller div:nth-child(8):after {
+      top: 56px;
+      left: 12px;
+    }
+
+    @keyframes lds-roller {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    #spinnerWrapper {
+      background-color: Black;
+      opacity: 80%;
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      width: 100%;
+      height: 100%;
+    }
+
+    #calSettings {
+      width: 70%;
+      margin: 0px auto;
+      border-collapse: collapse;
+    }
+
+    #calSettings tr:first-child {
+      border-bottom: 1px groove White;
+    }
+
+    #calSettings tr:last-child {
+      border-top: 1px groove White;
+    }
+
+    #calSettings tr td {
+      padding: 12px;
+    }
+
+    #calSettings tr td:first-child {
+      text-align: right;
+      padding-right: 18px;
+    }
+
+    #calSettings tr td:nth-child(3) {
+      border-left: 1px groove white;
+      padding-left: 18px;
+      text-align: right;
+    }
+
+    #openSettings {
+      position: absolute;
+      display: block;
+      top: 70px;
+      right: 24px;
+      color: steelblue;
+      cursor: pointer;
+      background-color: palegoldenrod;
+      padding: 6px;
+      border: 1px groove white;
+    }
+
+    #openSettings:hover {
+      color: darkslategray;
+      background-color: lightyellow;
+    }
+
+    #LitCalMessages {
+      width: 75%;
+      margin: 30px auto;
+      border: 1px solid darkslategray;
+      padding: 10px;
+      background: lightgray;
+    }
+
+    #LitCalMessages th {
+      font-size: 1.3em;
+      padding: 10px;
+    }
+
+    #LitCalMessages td {
+      padding: 5px;
+      border-bottom: 1px solid White;
+    }
+
+    #LitCalMessages td:first-child {
+      border-right: 1px groove White;
+    }
+  </style>
 </head>
+
 <body>
+  <div id="spinnerWrapper">
+    <div class="lds-roller">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+  <div><a class="backNav" href="/LiturgicalCalendar">↩ Go back ↩</a></div>
+  <span class="material-icons" id="openSettings">settings</span>
 
   <div id='calendar'></div>
 
 </body>
+
 </html>
