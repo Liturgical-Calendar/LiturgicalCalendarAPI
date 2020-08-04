@@ -851,6 +851,10 @@ $months = [
     echo '<h1 style="text-align:center;">' . __("Liturgical Calendar Calculation for a Given Year", $LOCALE) . ' (' . $YEAR . ')</h1>';
     echo '<h2 style="text-align:center;">' . sprintf(__("HTML presentation elaborated by PHP using a CURL request to a %s", $LOCALE), '<a href="../LitCalEngine.php">PHP engine</a>') . '</h2>';
 
+    if($YEAR > 9999){
+        $YEAR = 9999;
+    }
+    
     if ($YEAR < 1970) {
         echo '<div style="text-align:center;border:3px ridge Green;background-color:LightBlue;width:75%;margin:10px auto;padding:10px;">';
         echo __('You are requesting a year prior to 1970: it is not possible to request years prior to 1970.', $LOCALE);
@@ -861,7 +865,7 @@ $months = [
     echo '<fieldset style="margin-bottom:6px;"><legend>' . __('Customize options for generating the Roman Calendar',$LOCALE) . '</legend>';
     echo '<form method="GET">';
     echo '<table style="width:100%;"><tr>';
-    echo '<td><label>' . __('YEAR', $LOCALE) . ': <input type="number" name="year" id="year" min="1969" value="' . $YEAR . '" /></label></td>';
+    echo '<td><label>' . __('YEAR', $LOCALE) . ': <input type="number" name="year" id="year" min="1969" max="9999" value="' . $YEAR . '" /></label></td>';
     echo '<td><label>' . __('EPIPHANY', $LOCALE) . ': <select name="epiphany" id="epiphany"><option value="JAN6" ' . (EPIPHANY === "JAN6" ? " SELECTED" : "") . '>January 6</option><option value="SUNDAY_JAN2_JAN8" ' . (EPIPHANY === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "") . '>Sunday between January 2 and January 8</option></select></label></td>';
     echo '<td><label>' . __('ASCENSION', $LOCALE) . ': <select name="ascension" id="ascension"><option value="THURSDAY" ' . (ASCENSION === "THURSDAY" ? " SELECTED" : "") . '>Thursday</option><option value="SUNDAY" ' . (ASCENSION === "SUNDAY" ? " SELECTED" : "") . '>Sunday</option></select></label></td>';
     echo '<td><label>CORPUS CHRISTI (CORPUS DOMINI): <select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" ' . (CORPUSCHRISTI === "THURSDAY" ? " SELECTED" : "") . '>Thursday</option><option value="SUNDAY" ' . (CORPUSCHRISTI === "SUNDAY" ? " SELECTED" : "") . '>Sunday</option></select></label></td>';

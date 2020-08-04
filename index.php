@@ -37,8 +37,8 @@
 ?>
     <div class="container" style="width: 80%; margin:30px auto;border:1px solid Blue;background-color:LightBlue;">
         <div class="button_wrap"><a href="easter.php"><button>Calculate Date of Easter, both Gregorian and Julian, from 1583 (year of the adoption of the Gregorian Calendar) to 9999 (max date calculation in 64bit PHP)</button></a></div>
-        <div class="button_wrap"><a href="examples/curl_liturgical_calendar.php"><button>HTML presentation elaborated by PHP using a CURL request</button></a></div>
-        <div class="button_wrap"><a href="examples/javascript_liturgical_calendar.php"><button>HTML presentation elaborated by JAVASCRIPT using an AJAX request</button></a></div>
+        <div class="button_wrap"><a href="examples/php/"><button>HTML presentation elaborated by PHP using a CURL request</button></a></div>
+        <div class="button_wrap"><a href="examples/javascript/"><button>HTML presentation elaborated by JAVASCRIPT using an AJAX request</button></a></div>
     </div>
 
 </body>
