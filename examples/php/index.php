@@ -9,8 +9,8 @@
  * Date Created: 27 December 2017
  */
 
-//ini_set('error_reporting', E_ALL);
-//ini_set("display_errors", 1);
+ini_set('error_reporting', E_ALL);
+ini_set("display_errors", 1);
 
 /**************************
  * DEFINE USEFUL FUNCTIONS
@@ -330,7 +330,8 @@ if ($YEAR >= 1970) {
     $domain = $_SERVER['HTTP_HOST'];
     $query = $_SERVER['PHP_SELF'];
     $path_info = pathinfo($query);
-    $URL =  $prefix . $domain . "/" . dirname($path_info['dirname']) . "/LitCalEngine.php";
+    $dir_level = explode("/",dirname($path_info['dirname']));
+    $URL =  $prefix . $domain . "/" . $dir_level[1] . "/LitCalEngine.php";
 
     // Disable SSL verification
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -425,7 +426,7 @@ $messages = [
     ],
     "Customize options for generating the Roman Calendar" => [
         "en" => "Customize options for generating the Roman Calendar",
-        "it" => "Personalizzare le opzioni per la generazione del Calendario Romano",
+        "it" => "Personalizza le opzioni per la generazione del Calendario Romano",
         "la" => "Eligere optiones per generationem Calendarii Romani"
     ],
     "Configurations being used to generate this calendar:" => [
@@ -755,91 +756,17 @@ $months = [
 <head>
     <title><?php echo __("Generate Roman Calendar", $LOCALE) ?></title>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <link rel="icon" type="image/x-icon" href="../../favicon.ico">
     <meta name="msapplication-TileColor" content="#ffffff" />
     <meta name="msapplication-TileImage" content="easter-egg-5-144-279148.png">
-    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../easter-egg-5-152-279148.png">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../easter-egg-5-144-279148.png">
-    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="../easter-egg-5-120-279148.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../easter-egg-5-114-279148.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../easter-egg-5-72-279148.png">    
-    <link rel="apple-touch-icon-precomposed" href="../easter-egg-5-57-279148.png">
-    <link rel="icon" href="../easter-egg-5-32-279148.png" sizes="32x32">
-    <style>        
-        .backNav {
-            background-color:yellow;
-            font-size:1.1em;
-            text-align:center;
-            cursor:pointer;
-            text-decoration:none;
-            width:95%;
-            margin:0px auto;
-            border-bottom:2px outset LightBlue;
-            display:block;
-            padding: 12px 24px;
-            font-weight: bold;
-        }
-        .backNav:hover {
-            background-color: gold;
-            color: DarkBlue;
-        }
-
-        #LitCalTable {
-            width:75%;
-            margin:30px auto;
-            border:1px solid Blue;
-            border-radius: 6px;
-            padding:10px;
-            background:LightBlue;
-        }
-
-        #LitCalMessages {
-            width: 75%;
-            margin:30px auto;
-            border:1px solid darkslategray;
-            padding:10px;
-            background: lightgray;
-        }
-
-        #LitCalMessages th {
-            font-size: 1.3em;
-            padding: 10px;
-        }
-
-        #LitCalMessages td {
-            padding: 5px;
-            border-bottom: 1px solid White;
-        }
-
-        #LitCalMessages td:first-child {
-            border-right: 1px groove White;
-        }
-
-        #LitCalTable td {
-            padding: 8px 6px;
-        }
-        
-        td.rotate {
-            width: 1.5em;
-            white-space: nowrap;
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        td.rotate div{
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 1.8em;
-            font-weight:bold;
-            writing-mode: vertical-rl;
-            transform: rotate(180.0deg);
-        }
-
-        .dateEntry {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size:.7em;
-            font-weight:bold;
-        }
-    </style>
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../../easter-egg-5-152-279148.png">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../../easter-egg-5-144-279148.png">
+    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="../../easter-egg-5-120-279148.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../../easter-egg-5-114-279148.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../../easter-egg-5-72-279148.png">    
+    <link rel="apple-touch-icon-precomposed" href="../../easter-egg-5-57-279148.png">
+    <link rel="icon" href="../../easter-egg-5-32-279148.png" sizes="32x32">
+    <link rel="stylesheet" type="text/css" href="styles.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 
@@ -849,7 +776,7 @@ $months = [
     <?php
 
     echo '<h1 style="text-align:center;">' . __("Liturgical Calendar Calculation for a Given Year", $LOCALE) . ' (' . $YEAR . ')</h1>';
-    echo '<h2 style="text-align:center;">' . sprintf(__("HTML presentation elaborated by PHP using a CURL request to a %s", $LOCALE), '<a href="../LitCalEngine.php">PHP engine</a>') . '</h2>';
+    echo '<h2 style="text-align:center;">' . sprintf(__("HTML presentation elaborated by PHP using a CURL request to a %s", $LOCALE), '<a href="../../LitCalEngine.php">PHP engine</a>') . '</h2>';
 
     if($YEAR > 9999){
         $YEAR = 9999;
