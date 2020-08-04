@@ -132,42 +132,43 @@ function __($key, $locale)
     <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../easter-egg-5-144-279148.png">
     <link rel="apple-touch-icon-precomposed" sizes="120x120" href="../easter-egg-5-120-279148.png">
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../easter-egg-5-114-279148.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../easter-egg-5-72-279148.png">    
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../easter-egg-5-72-279148.png">
     <link rel="apple-touch-icon-precomposed" href="../easter-egg-5-57-279148.png">
     <link rel="icon" href="../easter-egg-5-32-279148.png" sizes="32x32">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-
         .backNav {
-            background-color:yellow;
-            font-size:1.1em;
-            text-align:center;
-            cursor:pointer;
-            text-decoration:none;
-            width:95%;
-            margin:0px auto;
-            border-bottom:2px outset LightBlue;
-            display:block;
+            background-color: yellow;
+            font-size: 1.1em;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+            width: 95%;
+            margin: 0px auto;
+            border-bottom: 2px outset LightBlue;
+            display: block;
             padding: 12px 24px;
             font-weight: bold;
         }
+
         .backNav:hover {
             background-color: gold;
             color: DarkBlue;
         }
 
         #LitCalTable {
-            width:75%;
-            margin:30px auto;
-            border:1px solid Blue;
+            width: 75%;
+            margin: 30px auto;
+            border: 1px solid Blue;
             border-radius: 6px;
-            padding:10px;
-            background:LightBlue;
+            padding: 10px;
+            background: LightBlue;
         }
 
         #LitCalTable td {
             padding: 8px 6px;
         }
-        
+
         td.rotate {
             width: 1.5em;
             white-space: nowrap;
@@ -175,21 +176,183 @@ function __($key, $locale)
             vertical-align: middle;
         }
 
-        td.rotate div{
+        td.rotate div {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-size: 1.8em;
-            font-weight:bold;
+            font-weight: bold;
             writing-mode: vertical-rl;
             transform: rotate(180.0deg);
         }
 
         .dateEntry {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size:.7em;
-            font-weight:bold;
+            font-size: .7em;
+            font-weight: bold;
+        }
+
+        .lds-roller {
+            display: inline-block;
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            top: 50%;
+            left: 50%;
+            margin-left: -40px;
+            margin-right: -40px;
+        }
+
+        .lds-roller div {
+            animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            transform-origin: 40px 40px;
+        }
+
+        .lds-roller div:after {
+            content: " ";
+            display: block;
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #fff;
+            margin: -4px 0 0 -4px;
+        }
+
+        .lds-roller div:nth-child(1) {
+            animation-delay: -0.036s;
+        }
+
+        .lds-roller div:nth-child(1):after {
+            top: 63px;
+            left: 63px;
+        }
+
+        .lds-roller div:nth-child(2) {
+            animation-delay: -0.072s;
+        }
+
+        .lds-roller div:nth-child(2):after {
+            top: 68px;
+            left: 56px;
+        }
+
+        .lds-roller div:nth-child(3) {
+            animation-delay: -0.108s;
+        }
+
+        .lds-roller div:nth-child(3):after {
+            top: 71px;
+            left: 48px;
+        }
+
+        .lds-roller div:nth-child(4) {
+            animation-delay: -0.144s;
+        }
+
+        .lds-roller div:nth-child(4):after {
+            top: 72px;
+            left: 40px;
+        }
+
+        .lds-roller div:nth-child(5) {
+            animation-delay: -0.18s;
+        }
+
+        .lds-roller div:nth-child(5):after {
+            top: 71px;
+            left: 32px;
+        }
+
+        .lds-roller div:nth-child(6) {
+            animation-delay: -0.216s;
+        }
+
+        .lds-roller div:nth-child(6):after {
+            top: 68px;
+            left: 24px;
+        }
+
+        .lds-roller div:nth-child(7) {
+            animation-delay: -0.252s;
+        }
+
+        .lds-roller div:nth-child(7):after {
+            top: 63px;
+            left: 17px;
+        }
+
+        .lds-roller div:nth-child(8) {
+            animation-delay: -0.288s;
+        }
+
+        .lds-roller div:nth-child(8):after {
+            top: 56px;
+            left: 12px;
+        }
+
+        @keyframes lds-roller {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #spinnerWrapper {
+            background-color: Black;
+            opacity: 80%;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+        }
+
+        #calSettings {
+            width: 70%;
+            margin: 0px auto;
+            border-collapse: collapse;
+        }
+
+        #calSettings tr td {
+            padding: 12px;
+        }
+
+        #calSettings tr:first-child {
+            border-bottom: 1px groove White;
+        }
+
+        #calSettings tr td:first-child {
+            text-align: right;
+            padding-right: 18px;
+        }
+        #calSettings tr td:nth-child(3) {
+            border-left: 1px groove white;
+            padding-left: 18px;
+            text-align: right;
+        }
+
+        #openSettings {
+            position: absolute;
+            display: block;
+            top: 70px;
+            right: 24px;
+            color: steelblue;
+            cursor: pointer;
+            background-color: palegoldenrod;
+            padding: 6px;
+            border: 1px groove white;
+        }
+
+        #openSettings:hover {
+            color: darkslategray;
+            background-color: lightyellow;
         }
     </style>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script type="text/javascript">
         let $Settings = JSON.parse('<?php echo $Settings; ?>');
         $Settings.returntype = "JSON";
@@ -250,83 +413,152 @@ function __($key, $locale)
 
         const $GRADE = ["", "COMMEMORATION", "OPTIONAL MEMORIAL", "MEMORIAL", "FEAST", "FEAST OF THE LORD", "SOLEMNITY", "HIGHER RANKING SOLEMNITY"];
 
-        //const $SUNDAY_CYCLE = ["A", "B", "C"];
-        //const $WEEKDAY_CYCLE = ["I", "II"];
+        let genLitCal = function($Settings) {
 
-        $.ajax({
-            method: 'POST',
-            data: $Settings,
-            url: '../LitCalEngine.php',
-            success: function(LitCalData) {
-                console.log(LitCalData);
+            $.ajax({
+                method: 'POST',
+                data: $Settings,
+                url: '../LitCalEngine.php',
+                success: function(LitCalData) {
+                    console.log(LitCalData);
 
-                let strHTML = '';
-                let $YEAR = 0;
-                if (LitCalData.hasOwnProperty("Settings")) {
-                    $YEAR = LitCalData.Settings.YEAR;
-                }
-                if (LitCalData.hasOwnProperty("LitCal")) {
-                    let $LitCal = LitCalData.LitCal;
-
-                    for (const key in $LitCal) {
-                        if ($LitCal.hasOwnProperty(key)) {
-                            $LitCal[key].date = new Date($LitCal[key].date * 1000); //transform PHP timestamp to javascript date object
-                        }
+                    let strHTML = '';
+                    let $YEAR = 0;
+                    if (LitCalData.hasOwnProperty("Settings")) {
+                        $YEAR = LitCalData.Settings.YEAR;
                     }
+                    if (LitCalData.hasOwnProperty("LitCal")) {
+                        let $LitCal = LitCalData.LitCal;
 
-                    let $dayCnt = 0;
-                    const $highContrast = ['purple', 'red', 'green'];
-                    let $LitCalKeys = Object.keys($LitCal);
-
-                    let $currentMonth = -1;
-                    let $newMonth = false;
-                    let $cm = { count: 0 };
-                    let $cc = { count: 0 };
-                    for (let $keyindex = 0; $keyindex < $LitCalKeys.length; $keyindex++) {
-                        $dayCnt++;
-                        let $keyname = $LitCalKeys[$keyindex];
-                        let $festivity = $LitCal[$keyname];
-                        let dy = ($festivity.date.getDay() === 0 ? 7 : $festivity.date.getDay()); // get the day of the week
-                        /*
-                        //LET'S CALCULATE THE LITURGICAL YEAR CYCLE
-                        let $currentCycle = '';
-
-                        //if we're dealing with a Sunday or a Solemnity or a Feast of the Lord, then we calculate the Sunday/Festive Cycle
-                        if (dy === 7 || $festivity.grade > 4) {
-                            if ($festivity.date.getTime() < $LitCal["Advent1"].date.getTime()) { //$festivity.date.getTime() >= Date.parse('1-1-'+$YEAR) && 
-                                $currentCycle = "YEAR " + ($SUNDAY_CYCLE[($YEAR - 1) % 3]);
-                            } else if ($festivity.date.getTime() >= $LitCal["Advent1"].date.getTime()) { // && $festivity.date.getTime() <= Date.parse('31-12-'+$YEAR)
-                                $currentCycle = "YEAR " + ($SUNDAY_CYCLE[$YEAR % 3]);
+                        for (const key in $LitCal) {
+                            if ($LitCal.hasOwnProperty(key)) {
+                                $LitCal[key].date = new Date($LitCal[key].date * 1000); //transform PHP timestamp to javascript date object
                             }
                         }
-                        //otherwise we calculate the weekday cycle
-                        else {
-                            if ($festivity.date.getTime() < $LitCal["Advent1"].date.getTime()) { //$festivity.date.getTime() >= Date.parse('1-1-'+$YEAR) && 
-                                $currentCycle = "YEAR " + ($WEEKDAY_CYCLE[($YEAR - 1) % 2]);
-                            } else if ($festivity.date.getTime() >= $LitCal["Advent1"].date.getTime()) { // && $festivity.date.getTime() <= Date.parse('31-12-'+$YEAR)
-                                $currentCycle = "YEAR " + ($WEEKDAY_CYCLE[$YEAR % 2]);
-                            }
-                        }
-                        */
-                        
-                        //If we are at the start of a new month, count how many events we have in that same month, so we can display the Month table cell
-                        if($festivity.date.getMonth() !== $currentMonth ){
-                            $newMonth = true;
-                            $currentMonth = $festivity.date.getMonth();
-                            $cm.count = 0;
-                            countSameMonthEvents($keyindex, $LitCal, $cm);
-                        }
 
-                        //Let's check if we have more than one event on the same day, such as optional memorials...
-                        $cc.count = 0;
-                        countSameDayEvents($keyindex, $LitCal, $cc);
-                        //console.log($festivity.name);
-                        //console.log($cc);
-                        if ($cc.count > 0) {
-                            console.log("we have an occurrence of multiple festivities on same day");
-                            for (let $ev = 0; $ev <= $cc.count; $ev++) {
-                                $keyname = $LitCalKeys[$keyindex];
-                                $festivity = $LitCal[$keyname];
+                        let $dayCnt = 0;
+                        const $highContrast = ['purple', 'red', 'green'];
+                        let $LitCalKeys = Object.keys($LitCal);
+
+                        let $currentMonth = -1;
+                        let $newMonth = false;
+                        let $cm = {
+                            count: 0
+                        };
+                        let $cc = {
+                            count: 0
+                        };
+                        for (let $keyindex = 0; $keyindex < $LitCalKeys.length; $keyindex++) {
+                            $dayCnt++;
+                            let $keyname = $LitCalKeys[$keyindex];
+                            let $festivity = $LitCal[$keyname];
+                            let dy = ($festivity.date.getDay() === 0 ? 7 : $festivity.date.getDay()); // get the day of the week
+                            /*
+                            //LET'S CALCULATE THE LITURGICAL YEAR CYCLE
+                            let $currentCycle = '';
+
+                            //if we're dealing with a Sunday or a Solemnity or a Feast of the Lord, then we calculate the Sunday/Festive Cycle
+                            if (dy === 7 || $festivity.grade > 4) {
+                                if ($festivity.date.getTime() < $LitCal["Advent1"].date.getTime()) { //$festivity.date.getTime() >= Date.parse('1-1-'+$YEAR) && 
+                                    $currentCycle = "YEAR " + ($SUNDAY_CYCLE[($YEAR - 1) % 3]);
+                                } else if ($festivity.date.getTime() >= $LitCal["Advent1"].date.getTime()) { // && $festivity.date.getTime() <= Date.parse('31-12-'+$YEAR)
+                                    $currentCycle = "YEAR " + ($SUNDAY_CYCLE[$YEAR % 3]);
+                                }
+                            }
+                            //otherwise we calculate the weekday cycle
+                            else {
+                                if ($festivity.date.getTime() < $LitCal["Advent1"].date.getTime()) { //$festivity.date.getTime() >= Date.parse('1-1-'+$YEAR) && 
+                                    $currentCycle = "YEAR " + ($WEEKDAY_CYCLE[($YEAR - 1) % 2]);
+                                } else if ($festivity.date.getTime() >= $LitCal["Advent1"].date.getTime()) { // && $festivity.date.getTime() <= Date.parse('31-12-'+$YEAR)
+                                    $currentCycle = "YEAR " + ($WEEKDAY_CYCLE[$YEAR % 2]);
+                                }
+                            }
+                            */
+
+                            //If we are at the start of a new month, count how many events we have in that same month, so we can display the Month table cell
+                            if ($festivity.date.getMonth() !== $currentMonth) {
+                                $newMonth = true;
+                                $currentMonth = $festivity.date.getMonth();
+                                $cm.count = 0;
+                                countSameMonthEvents($keyindex, $LitCal, $cm);
+                            }
+
+                            //Let's check if we have more than one event on the same day, such as optional memorials...
+                            $cc.count = 0;
+                            countSameDayEvents($keyindex, $LitCal, $cc);
+                            //console.log($festivity.name);
+                            //console.log($cc);
+                            if ($cc.count > 0) {
+                                console.log("we have an occurrence of multiple festivities on same day");
+                                for (let $ev = 0; $ev <= $cc.count; $ev++) {
+                                    $keyname = $LitCalKeys[$keyindex];
+                                    $festivity = $LitCal[$keyname];
+                                    // LET'S DO SOME MORE MANIPULATION ON THE FESTIVITY->COMMON STRINGS AND THE FESTIVITY->COLOR...
+                                    if ($festivity.common !== "" && $festivity.common !== "Proper") {
+                                        $commons = $festivity.common.split("|");
+                                        $commons = $commons.map(function($txt) {
+                                            let $common = $txt.split(":");
+                                            let $commonGeneral = __($common[0], $LOCALE);
+                                            let $commonSpecific = (typeof $common[1] !== 'undefined' && $common[1] != "") ? __($common[1], $LOCALE) : "";
+                                            let $commonKey = '';
+                                            //$txt = str_replace(":", ": ", $txt);
+                                            switch ($commonGeneral) {
+                                                case __("Blessed Virgin Mary", $LOCALE):
+                                                    $commonKey = "of (SING_FEMM)";
+                                                    break;
+                                                case __("Virgins", $LOCALE):
+                                                    $commonKey = "of (PLUR_FEMM)";
+                                                    break;
+                                                case __("Martyrs", $LOCALE):
+                                                case __("Pastors", $LOCALE):
+                                                case __("Doctors", $LOCALE):
+                                                case __("Holy Men and Women", $LOCALE):
+                                                    $commonKey = "of (PLUR_MASC)";
+                                                    break;
+                                                default:
+                                                    $commonKey = "of (SING_MASC)";
+                                            }
+                                            return __("From the Common", $LOCALE) + " " + __($commonKey, $LOCALE) + " " + $commonGeneral + ($commonSpecific != "" ? ": " + $commonSpecific : "");
+                                        });
+                                        $festivity.common = $commons.join("; " + __("or", $LOCALE) + " ");
+                                    } else if ($festivity.common == "Proper") {
+                                        $festivity.common = __($festivity.common, $LOCALE);
+                                    }
+                                    $festivity.color = $festivity.color.split("|")[0];
+
+                                    //check which liturgical season we are in, to use the right color for that season...
+                                    let $color = "green";
+                                    if (($festivity.date.getTime() > $LitCal["Advent1"].date.getTime() && $festivity.date.getTime() < $LitCal["Christmas"].date.getTime()) || ($festivity.date.getTime() > $LitCal["AshWednesday"].date.getTime() && $festivity.date.getTime() < $LitCal["Easter"].date.getTime())) {
+                                        $color = "purple";
+                                    } else if ($festivity.date.getTime() > $LitCal["Easter"].date.getTime() && $festivity.date.getTime() < $LitCal["Pentecost"].date.getTime()) {
+                                        $color = "white";
+                                    } else if ($festivity.date.getTime() > $LitCal["Christmas"].date.getTime() || $festivity.date.getTime() < $LitCal["BaptismLord"].date.getTime()) {
+                                        $color = "white";
+                                    }
+
+
+                                    strHTML += '<tr style="background-color:' + $color + ';' + ($highContrast.indexOf($color) != -1 ? 'color:white;' : '') + '">';
+                                    if ($newMonth) {
+                                        let $monthRwsp = $cm.count + 1;
+                                        strHTML += '<td class="rotate" rowspan = "' + $monthRwsp + '"><div>' + ($LOCALE === 'LA' ? $months[$festivity.date.getMonth()].toUpperCase() : new Intl.DateTimeFormat($LOCALE.toLowerCase(), IntlMonthFmt).format($festivity.date).toUpperCase()) + '</div></td>';
+                                        $newMonth = false;
+                                    }
+
+                                    if ($ev == 0) {
+                                        let $rwsp = $cc.count + 1;
+                                        let $festivity_date_str = $LOCALE == 'LA' ? getLatinDateStr($festivity.date) : new Intl.DateTimeFormat($LOCALE.toLowerCase(), IntlDTOptions).format($festivity.date);
+
+                                        strHTML += '<td rowspan="' + $rwsp + '" class="dateEntry">' + $festivity_date_str + '</td>';
+                                    }
+                                    $currentCycle = ($festivity.hasOwnProperty("liturgicalyear") ? ' (' + $festivity.liturgicalyear + ')' : "");
+                                    strHTML += '<td>' + $festivity.name + $currentCycle + ' - <i>' + __($festivity.color, $LOCALE) + '</i><br /><i>' + $festivity.common + '</i></td>';
+                                    strHTML += '<td>' + $GRADE[$festivity.grade] + '</td>';
+                                    strHTML += '</tr>';
+                                    $keyindex++;
+                                }
+                                $keyindex--;
+
+                            } else {
                                 // LET'S DO SOME MORE MANIPULATION ON THE FESTIVITY->COMMON STRINGS AND THE FESTIVITY->COLOR...
                                 if ($festivity.common !== "" && $festivity.common !== "Proper") {
                                     $commons = $festivity.common.split("|");
@@ -355,109 +587,42 @@ function __($key, $locale)
                                         return __("From the Common", $LOCALE) + " " + __($commonKey, $LOCALE) + " " + $commonGeneral + ($commonSpecific != "" ? ": " + $commonSpecific : "");
                                     });
                                     $festivity.common = $commons.join("; " + __("or", $LOCALE) + " ");
-                                }
-                                else if ($festivity.common == "Proper"){
-                                    $festivity.common = __($festivity.common,$LOCALE);
+                                } else if ($festivity.common == "Proper") {
+                                    $festivity.common = __($festivity.common, $LOCALE);
                                 }
                                 $festivity.color = $festivity.color.split("|")[0];
-
-                                //check which liturgical season we are in, to use the right color for that season...
-                                let $color = "green";
-                                if (($festivity.date.getTime() > $LitCal["Advent1"].date.getTime() && $festivity.date.getTime() < $LitCal["Christmas"].date.getTime()) || ($festivity.date.getTime() > $LitCal["AshWednesday"].date.getTime() && $festivity.date.getTime() < $LitCal["Easter"].date.getTime())) {
-                                    $color = "purple";
-                                } else if ($festivity.date.getTime() > $LitCal["Easter"].date.getTime() && $festivity.date.getTime() < $LitCal["Pentecost"].date.getTime()) {
-                                    $color = "white";
-                                } else if ($festivity.date.getTime() > $LitCal["Christmas"].date.getTime() || $festivity.date.getTime() < $LitCal["BaptismLord"].date.getTime()) {
-                                    $color = "white";
-                                }
-
-
-                                strHTML += '<tr style="background-color:' + $color + ';' + ($highContrast.indexOf($color) != -1 ? 'color:white;' : '') + '">';
-                                if($newMonth){
+                                strHTML += '<tr style="background-color:' + $festivity.color + ';' + ($highContrast.indexOf($festivity.color) != -1 ? 'color:white;' : '') + '">';
+                                if ($newMonth) {
                                     let $monthRwsp = $cm.count + 1;
-                                    strHTML += '<td class="rotate" rowspan = "' + $monthRwsp + '"><div>' + ($LOCALE === 'LA' ? $months[$festivity.date.getMonth()].toUpperCase() : new Intl.DateTimeFormat($LOCALE.toLowerCase(), IntlMonthFmt).format($festivity.date).toUpperCase() ) + '</div></td>';
+                                    strHTML += '<td class="rotate" rowspan = "' + $monthRwsp + '"><div>' + ($LOCALE === 'LA' ? $months[$festivity.date.getMonth()].toUpperCase() : new Intl.DateTimeFormat($LOCALE.toLowerCase(), IntlMonthFmt).format($festivity.date).toUpperCase()) + '</div></td>';
                                     $newMonth = false;
                                 }
-                                
-                                if ($ev == 0) {
-                                    let $rwsp = $cc.count + 1;
-                                    let $festivity_date_str = $LOCALE == 'LA' ? getLatinDateStr($festivity.date) : new Intl.DateTimeFormat($LOCALE.toLowerCase(), IntlDTOptions).format($festivity.date);
 
-                                    strHTML += '<td rowspan="' + $rwsp + '" class="dateEntry">' + $festivity_date_str + '</td>';
-                                }
-                                $currentCycle = ($festivity.hasOwnProperty("liturgicalyear") ? ' (' + $festivity.liturgicalyear + ')' : "" );
+                                let $festivity_date_str = $LOCALE == 'LA' ? getLatinDateStr($festivity.date) : new Intl.DateTimeFormat($LOCALE.toLowerCase(), IntlDTOptions).format($festivity.date);
+                                // $festivity_date_str += ', ';
+                                // $festivity_date_str += new Intl.DateTimeFormat($LOCALE.toLowerCase(), IntlDTOptions).format($festivity.date);
+                                // $festivity_date_str += ' ';
+                                // $festivity_date_str += $festivity.date.getDate();
+                                // $festivity_date_str += ordSuffix($festivity.date.getDate());
+                                // $festivity_date_str += ', ';
+                                // $festivity_date_str += $festivity.date.getFullYear();
+
+                                strHTML += '<td class="dateEntry">' + $festivity_date_str + '</td>';
+                                $currentCycle = ($festivity.hasOwnProperty("liturgicalyear") ? ' (' + $festivity.liturgicalyear + ')' : "");
                                 strHTML += '<td>' + $festivity.name + $currentCycle + ' - <i>' + __($festivity.color, $LOCALE) + '</i><br /><i>' + $festivity.common + '</i></td>';
                                 strHTML += '<td>' + $GRADE[$festivity.grade] + '</td>';
                                 strHTML += '</tr>';
-                                $keyindex++;
-                            }
-                            $keyindex--;
-
-                        } else {
-                            // LET'S DO SOME MORE MANIPULATION ON THE FESTIVITY->COMMON STRINGS AND THE FESTIVITY->COLOR...
-                            if ($festivity.common !== "" && $festivity.common !== "Proper") {
-                                $commons = $festivity.common.split("|");
-                                $commons = $commons.map(function($txt) {
-                                    let $common = $txt.split(":");
-                                    let $commonGeneral = __($common[0], $LOCALE);
-                                    let $commonSpecific = (typeof $common[1] !== 'undefined' && $common[1] != "") ? __($common[1], $LOCALE) : "";
-                                    let $commonKey = '';
-                                    //$txt = str_replace(":", ": ", $txt);
-                                    switch ($commonGeneral) {
-                                        case __("Blessed Virgin Mary", $LOCALE):
-                                            $commonKey = "of (SING_FEMM)";
-                                            break;
-                                        case __("Virgins", $LOCALE):
-                                            $commonKey = "of (PLUR_FEMM)";
-                                            break;
-                                        case __("Martyrs", $LOCALE):
-                                        case __("Pastors", $LOCALE):
-                                        case __("Doctors", $LOCALE):
-                                        case __("Holy Men and Women", $LOCALE):
-                                            $commonKey = "of (PLUR_MASC)";
-                                            break;
-                                        default:
-                                            $commonKey = "of (SING_MASC)";
-                                    }
-                                    return __("From the Common", $LOCALE) + " " + __($commonKey, $LOCALE) + " " + $commonGeneral + ($commonSpecific != "" ? ": " + $commonSpecific : "");
-                                });
-                                $festivity.common = $commons.join("; " + __("or",$LOCALE) + " ");
-                            }
-                            else if($festivity.common == "Proper"){
-                                $festivity.common = __($festivity.common,$LOCALE);
-                            }
-                            $festivity.color = $festivity.color.split("|")[0];
-                            strHTML += '<tr style="background-color:' + $festivity.color + ';' + ($highContrast.indexOf($festivity.color) != -1 ? 'color:white;' : '') + '">';
-                            if($newMonth){
-                                let $monthRwsp = $cm.count + 1;
-                                strHTML += '<td class="rotate" rowspan = "' + $monthRwsp + '"><div>' + ($LOCALE === 'LA' ? $months[$festivity.date.getMonth()].toUpperCase() : new Intl.DateTimeFormat($LOCALE.toLowerCase(), IntlMonthFmt).format($festivity.date).toUpperCase() ) + '</div></td>';
-                                $newMonth = false;
                             }
 
-                            let $festivity_date_str = $LOCALE == 'LA' ? getLatinDateStr($festivity.date) : new Intl.DateTimeFormat($LOCALE.toLowerCase(), IntlDTOptions).format($festivity.date);
-                            // $festivity_date_str += ', ';
-                            // $festivity_date_str += new Intl.DateTimeFormat($LOCALE.toLowerCase(), IntlDTOptions).format($festivity.date);
-                            // $festivity_date_str += ' ';
-                            // $festivity_date_str += $festivity.date.getDate();
-                            // $festivity_date_str += ordSuffix($festivity.date.getDate());
-                            // $festivity_date_str += ', ';
-                            // $festivity_date_str += $festivity.date.getFullYear();
-
-                            strHTML += '<td class="dateEntry">' + $festivity_date_str + '</td>';
-                            $currentCycle = ($festivity.hasOwnProperty("liturgicalyear") ? ' (' + $festivity.liturgicalyear + ')' : "" );
-                            strHTML += '<td>' + $festivity.name + $currentCycle + ' - <i>' + __($festivity.color,$LOCALE) + '</i><br /><i>' + $festivity.common + '</i></td>';
-                            strHTML += '<td>' + $GRADE[$festivity.grade] + '</td>';
-                            strHTML += '</tr>';
                         }
-
+                        $('#LitCalTable tbody').append(strHTML);
+                        $('#dayCnt').text($dayCnt);
+                        $('#spinnerWrapper').fadeOut('slow');
                     }
-                    $('#LitCalTable tbody').append(strHTML);
-                    $('#dayCnt').text($dayCnt);
 
                 }
-
-            }
-        });
+            });
+        }
 
         let $messages = {
                 "From the Common": {
@@ -703,38 +868,94 @@ function __($key, $locale)
                 // $festivity_date_str += ordSuffix($festivity.date.getDate());
                 // $festivity_date_str += ', ';
                 return $festivity_date_str;
+            };
+
+        $(document).ready(function() {
+            $('#settingsWrapper').dialog({
+                title: '<?php echo __('Customize options for generating the Roman Calendar', $LOCALE) ?>',
+                modal: true,
+                width: '80%',
+                show: {
+                    effect: 'fade',
+                    duration: 500
+                },
+                hide: {
+                    effect: 'fade',
+                    duration: 500
+                },
+                //autoOpen: false
+            });
+            $(document).on('click', '#openSettings', function() {
+                $('#settingsWrapper').dialog("open");
+            });
+            $('#generateLitCal').button();
+            $('#calSettingsForm').on("submit", function( event ) {
+                event.preventDefault();
+                let $Settings = $(this).serialize();
+                $Settings.returntype = 'JSON';
+                $('#settingsWrapper').dialog("close");
+                genLitCal($Settings);
+            });
+
+            if($('#nationalpreset').find('select').val() !== "ITALY"){
+                $('#diocesanpreset').find('select').prop('disabled',true);
             }
+
+            $(document).on('change','#nationalpreset select',function(){
+                if($(this).val() === "ITALY" ){
+                    $('#diocesanpreset').find('select').prop('disabled',false).val("DIOCESIROMA");
+                }
+                else{
+                    $('#diocesanpreset').find('select').prop('disabled',true).val("");
+                }
+            });
+
+        });
     </script>
 </head>
 
 <body>
-    <div><a class="backNav" href="/LiturgicalCalendar">↩      Go back      ↩</a></div>
-
+    <div id="spinnerWrapper">
+        <div class="lds-roller">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    <div><a class="backNav" href="/LiturgicalCalendar">↩ Go back ↩</a></div>
+    <span class="material-icons" id="openSettings">settings</span>
     <?php
 
     echo '<h1 style="text-align:center;">' . __('Liturgical Calendar Calculation for a Given Year', $LOCALE) . ' (' . $YEAR . ')</h1>';
     echo '<h2 style="text-align:center;">' . sprintf(__('HTML presentation elaborated by JAVASCRIPT using an AJAX request to a %s', $LOCALE), '<a href="../LitCalEngine.php">PHP engine</a>') . '</h2>';
 
+    if ($YEAR > 9999) {
+        $YEAR = 9999;
+    }
     if ($YEAR < 1969) {
         echo '<div style="text-align:center;border:3px ridge Green;background-color:LightBlue;width:75%;margin:10px auto;padding:10px;">';
         echo 'You are viewing a year prior to 1969: the calendar produced will not reflect the calendar used that year, but rather how the current Roman calendar would have been applied in that year.';
         echo '</div>';
     }
 
-
-    echo '<fieldset style="margin-bottom:6px;"><legend>' . __('Customize options for generating the Roman Calendar',$LOCALE) . '</legend>';
-    echo '<form method="GET">';
-    echo '<table style="width:100%;"><tr>';
-    echo '<td><label>' . __('YEAR', $LOCALE) . ': <input type="number" name="year" id="year" min="1969" value="' . $YEAR . '" /></label></td>';
-    echo '<td><label>' . __('EPIPHANY', $LOCALE) . ': <select name="epiphany" id="epiphany"><option value="JAN6" ' . (EPIPHANY === "JAN6" ? " SELECTED" : "") . '>January 6</option><option value="SUNDAY_JAN2_JAN8" ' . (EPIPHANY === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "") . '>Sunday between January 2 and January 8</option></select></label></td>';
-    echo '<td><label>' . __('ASCENSION', $LOCALE) . ': <select name="ascension" id="ascension"><option value="THURSDAY" ' . (ASCENSION === "THURSDAY" ? " SELECTED" : "") . '>Thursday</option><option value="SUNDAY" ' . (ASCENSION === "SUNDAY" ? " SELECTED" : "") . '>Sunday</option></select></label></td>';
-    echo '<td><label>CORPUS CHRISTI (CORPUS DOMINI): <select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" ' . (CORPUSCHRISTI === "THURSDAY" ? " SELECTED" : "") . '>Thursday</option><option value="SUNDAY" ' . (CORPUSCHRISTI === "SUNDAY" ? " SELECTED" : "") . '>Sunday</option></select></label></td>';
-    echo '<td><label>LOCALE: <select name="locale" id="locale"><option value="EN" ' . ($LOCALE === "EN" ? " SELECTED" : "") . '>EN</option><option value="IT" ' . ($LOCALE === "IT" ? " SELECTED" : "") . '>IT</option><option value="LA" ' . ($LOCALE === "LA" ? " SELECTED" : "") . '>LA</option></select></label></td>';
-    echo '</tr><tr>';
-    echo '<td colspan="5" style="text-align:center;"><input type="SUBMIT" value="GENERATE CALENDAR" /></td>';
+    echo '<div id="settingsWrapper">';
+    echo '<form id="calSettingsForm">';
+    echo '<table id="calSettings">';
+    echo '<tr><td colspan="2"><label>' . __('YEAR', $LOCALE) . ': </td><td colspan="2"><input type="number" name="year" id="year" min="1969" max="9999" value="' . $YEAR . '" /></label></td></tr>';
+    echo '<tr><td><label>LOCALE: </td><td><select name="locale" id="locale"><option value="EN" ' . ($LOCALE === "EN" ? " SELECTED" : "") . '>ENGLISH</option><option value="IT" ' . ($LOCALE === "IT" ? " SELECTED" : "") . '>ITALIANO</option><option value="LA" ' . ($LOCALE === "LA" ? " SELECTED" : "") . '>LATINO</option></select></label></td><td>NATIONAL PRESET: </td><td id="nationalpreset"><select><option value="VATICAN">Vatican</option><option value="ITALY">Italy</option><option value="USA">USA</option></select></td></tr>';
+    echo '<tr><td><label>' . __('EPIPHANY', $LOCALE) . ': </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ' . (EPIPHANY === "JAN6" ? " SELECTED" : "") . '>January 6</option><option value="SUNDAY_JAN2_JAN8" ' . (EPIPHANY === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "") . '>Sunday Jan 2↔Jan 8</option></select></label></td><td>DIOCESAN PRESET: </td><td id="diocesanpreset"><select><option value=""></option><option value="DIOCESIROMA">Diocesi di Roma</option><option value="DIOCESILAZIO">Le diocesi del Lazio</option></select></td></tr>';
+    echo '<tr><td><label>' . __('ASCENSION', $LOCALE) . ': </td><td><select name="ascension" id="ascension"><option value="THURSDAY" ' . (ASCENSION === "THURSDAY" ? " SELECTED" : "") . '>Thursday</option><option value="SUNDAY" ' . (ASCENSION === "SUNDAY" ? " SELECTED" : "") . '>Sunday</option></select></label></td><td></td><td></td></tr>';
+    echo '<tr><td><label>CORPUS CHRISTI: </td><td><select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" ' . (CORPUSCHRISTI === "THURSDAY" ? " SELECTED" : "") . '>Thursday</option><option value="SUNDAY" ' . (CORPUSCHRISTI === "SUNDAY" ? " SELECTED" : "") . '>Sunday</option></select></label></td><td></td><td></td></tr>';
+    echo '<tr>';
+    echo '<td colspan="4" style="text-align:center;"><input type="submit" id="generateLitCal" value="Generate Calendar" /></td>';
     echo '</tr></table>';
     echo '</form>';
-    echo '</fieldset>';
+    echo '</div>';
 
     echo '<div style="text-align:center;border:2px groove White;border-radius:6px;width:60%;margin:0px auto;padding-bottom:6px;">';
 
