@@ -1,20 +1,12 @@
-<?php
+<!--  
+  Liturgical Calendar display script using AJAX and Javascript
+  Author: John Romano D'Orazio 
+  Email: priest@johnromanodorazio.com
+  Licensed under the Apache 2.0 License
+  Version 2.3
+  Date Created: 27 December 2017
+-->
 
-/**
- * Liturgical Calendar display script using AJAX and Javascript
- * Author: John Romano D'Orazio 
- * Email: priest@johnromanodorazio.com
- * Licensed under the Apache 2.0 License
- * Version 2.3
- * Date Created: 27 December 2017
- */
-
-/**************************
- * BEGIN DISPLAY LOGIC
- * 
- *************************/
-
-?>
 <!doctype html>
 
 <head>
