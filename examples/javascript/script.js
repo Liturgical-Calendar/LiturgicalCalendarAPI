@@ -276,7 +276,7 @@ let today = new Date(),
                         }
 
                     }
-                    createHeader($Settings,__);
+                    createHeader();
                     $('#LitCalTable tbody').html(strHTML);
                     $('#dayCnt').text($dayCnt);
                     $('#LitCalMessages thead').html(`<tr><th colspan=2 style="text-align:center;">${__("Information about the current calculation of the Liturgical Year",$Settings.locale)}</th></tr>`);
@@ -650,7 +650,9 @@ let today = new Date(),
         $festivity_date_str += $date.getFullYear();
         return $festivity_date_str;
     },
-    createHeader = function($Settings,__){
+    createHeader = function(){
+        document.title = __("Generate Roman Calendar",$Settings.locale);
+        $('#settingsWrapper').dialog("destroy").remove();
         $('header').empty();
         let templateStr = __('HTML presentation elaborated by JAVASCRIPT using an AJAX request to a %s', $Settings.locale);
         templateStr = templateStr.replace('%s','<a href="../../LitCalEngine.php">PHP engine</a>');
@@ -691,7 +693,7 @@ let today = new Date(),
 
 $(document).ready(function() {
     document.title = __("Generate Roman Calendar",$Settings.locale);
-    createHeader($Settings,__);
+    createHeader();
     $(document).on('click', '#openSettings', function() {
         $('#settingsWrapper').dialog("open");
     });
