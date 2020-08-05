@@ -116,13 +116,15 @@
         $settingsDialog = `<div id="settingsWrapper"><form id="calSettingsForm"><table id="calSettings">
         <tr><td colspan="2"><label>${__('YEAR', $Settings.locale)}: </td><td colspan="2"><input type="number" name="year" id="year" min="1969" max="9999" value="${$Settings.year}" /></label></td></tr>
         <tr><td><label>LOCALE: </td><td><select name="locale" id="locale"><option value="EN" ${($Settings.locale === "EN" ? " SELECTED" : "")}>ENGLISH</option><option value="IT" ${($Settings.locale === "IT" ? " SELECTED" : "")}>ITALIANO</option><option value="LA" ${($Settings.locale === "LA" ? " SELECTED" : "")}>LATINO</option></select></label></td><td>NATIONAL PRESET: </td><td id="nationalpreset"><select><option value="VATICAN">Vatican</option><option value="ITALY">Italy</option><option value="USA">USA</option></select></td></tr>
-        <tr><td><label>${__('EPIPHANY', $Settings.locale)}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>January 6</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>Sunday Jan 2↔Jan 8</option></select></label></td><td>DIOCESAN PRESET: </td><td id="diocesanpreset"><select><option value=""></option><option value="DIOCESIROMA">Diocesi di Roma</option><option value="DIOCESILAZIO">Le diocesi del Lazio</option></select></td></tr>
+        <tr><td><label>${__('EPIPHANY', $Settings.locale)}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>January 6</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>Sunday Jan 2↔Jan 8</option></select></label></td><td>DIOCESAN PRESET: </td><td id="diocesanpreset"><select disabled><option value=""></option><option value="DIOCESIROMA">Diocesi di Roma</option><option value="DIOCESILAZIO">Le diocesi del Lazio</option></select></td></tr>
         <tr><td><label>${__('ASCENSION', $Settings.locale)}: </td><td><select name="ascension" id="ascension"><option value="THURSDAY" ${($Settings.ascension === "THURSDAY" ? " SELECTED" : "")}>Thursday</option><option value="SUNDAY" ${($Settings.ascension === "SUNDAY" ? " SELECTED" : "")}>Sunday</option></select></label></td><td></td><td></td></tr>
         <tr><td><label>CORPUS CHRISTI: </td><td><select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" ${($Settings.corpuschristi === "THURSDAY" ? " SELECTED" : "")}>Thursday</option><option value="SUNDAY" ${($Settings.corpuschristi === "SUNDAY" ? " SELECTED" : "")}>Sunday</option></select></label></td><td></td><td></td></tr>
         <tr><td colspan="4" style="text-align:center;"><input type="submit" id="generateLitCal" value="${__("Generate Roman Calendar",$Settings.locale)}" /></td></tr>
         </table></form></div>`;
         $('header').html($header);
         $('#LitCalTable thead').html($tbheader);
+        
+        $('#generateLitCal').button();
 
         $($settingsDialog).dialog({
             title: __('Customize options for generating the Roman Calendar', $Settings.locale),
@@ -473,7 +475,6 @@
           $('#settingsWrapper').dialog("open");
       });
 
-      $('#generateLitCal').button();
       $(document).on("submit",'#calSettingsForm', function( event ) {
           event.preventDefault();
           let formValues = $(this).serializeArray();
