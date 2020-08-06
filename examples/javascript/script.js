@@ -117,31 +117,31 @@ let today = new Date(),
                                     $commons = $festivity.common.split("|");
                                     $commons = $commons.map(function($txt) {
                                         let $common = $txt.split(":");
-                                        let $commonGeneral = __($common[0], $Settings.locale);
-                                        let $commonSpecific = (typeof $common[1] !== 'undefined' && $common[1] != "") ? __($common[1], $Settings.locale) : "";
+                                        let $commonGeneral = __($common[0]);
+                                        let $commonSpecific = (typeof $common[1] !== 'undefined' && $common[1] != "") ? __($common[1]) : "";
                                         let $commonKey = '';
                                         //$txt = str_replace(":", ": ", $txt);
                                         switch ($commonGeneral) {
-                                            case __("Blessed Virgin Mary", $Settings.locale):
+                                            case __("Blessed Virgin Mary"):
                                                 $commonKey = "of (SING_FEMM)";
                                                 break;
-                                            case __("Virgins", $Settings.locale):
+                                            case __("Virgins"):
                                                 $commonKey = "of (PLUR_FEMM)";
                                                 break;
-                                            case __("Martyrs", $Settings.locale):
-                                            case __("Pastors", $Settings.locale):
-                                            case __("Doctors", $Settings.locale):
-                                            case __("Holy Men and Women", $Settings.locale):
+                                            case __("Martyrs"):
+                                            case __("Pastors"):
+                                            case __("Doctors"):
+                                            case __("Holy Men and Women"):
                                                 $commonKey = "of (PLUR_MASC)";
                                                 break;
                                             default:
                                                 $commonKey = "of (SING_MASC)";
                                         }
-                                        return __("From the Common", $Settings.locale) + " " + __($commonKey, $Settings.locale) + " " + $commonGeneral + ($commonSpecific != "" ? ": " + $commonSpecific : "");
+                                        return __("From the Common") + " " + __($commonKey) + " " + $commonGeneral + ($commonSpecific != "" ? ": " + $commonSpecific : "");
                                     });
-                                    $festivity.common = $commons.join("; " + __("or", $Settings.locale) + " ");
+                                    $festivity.common = $commons.join("; " + __("or") + " ");
                                 } else if ($festivity.common == "Proper") {
-                                    $festivity.common = __($festivity.common, $Settings.locale);
+                                    $festivity.common = __($festivity.common);
                                 }
                                 //$festivity.color = $festivity.color.split("|")[0];
 
@@ -160,12 +160,12 @@ let today = new Date(),
                                 let $CSScolor = $possibleColors[0];
                                 let $festivityColorString = "";
                                 if($possibleColors.length === 1){
-                                    $festivityColorString = __($possibleColors[0],$Settings.locale);
+                                    $festivityColorString = __($possibleColors[0]);
                                 } else if ($possibleColors.length > 1){
                                     $possibleColors = $possibleColors.map(function($txt) {
-                                        return __($txt,$Settings.locale);
+                                        return __($txt);
                                     });
-                                    $festivityColorString = $possibleColors.join("</i> " + __("or",$Settings.locale) + " <i>");
+                                    $festivityColorString = $possibleColors.join("</i> " + __("or") + " <i>");
                                 }
 
                                 strHTML += '<tr style="background-color:' + $SeasonColor + ';' + ($highContrast.indexOf($SeasonColor) != -1 ? 'color:white;' : '') + '">';
@@ -184,12 +184,12 @@ let today = new Date(),
                                 $currentCycle = ($festivity.hasOwnProperty("liturgicalyear") ? ' (' + $festivity.liturgicalyear + ')' : "");
                                 $festivityGrade = '';
                                 if(dy !== 7){
-                                    $festivityGrade = ($keyname === 'AllSouls' ? __("COMMEMORATION",$Settings.locale) : $GRADE[$festivity.grade]);
+                                    $festivityGrade = ($keyname === 'AllSouls' ? __("COMMEMORATION") : $GRADE[$festivity.grade]);
                                 }
                                 else if($festivity.grade > 3){
-                                    $festivityGrade = ($keyname === 'AllSouls' ? __("COMMEMORATION",$Settings.locale) : $GRADE[$festivity.grade]);
+                                    $festivityGrade = ($keyname === 'AllSouls' ? __("COMMEMORATION") : $GRADE[$festivity.grade]);
                                 }              
-                                strHTML += '<td style="background-color:'+$CSScolor+';' + ($highContrast.indexOf($CSScolor) != -1 ? 'color:white;' : 'color:black;') + '">' + $festivity.name + $currentCycle + ' - <i>' + __($festivity.color, $Settings.locale) + '</i><br /><i>' + $festivity.common + '</i></td>';
+                                strHTML += '<td style="background-color:'+$CSScolor+';' + ($highContrast.indexOf($CSScolor) != -1 ? 'color:white;' : 'color:black;') + '">' + $festivity.name + $currentCycle + ' - <i>' + __($festivity.color) + '</i><br /><i>' + $festivity.common + '</i></td>';
                                 strHTML += '<td style="background-color:'+$CSScolor+';' + ($highContrast.indexOf($CSScolor) != -1 ? 'color:white;' : 'color:black;') + '">' + $festivityGrade + '</td>';
                                 strHTML += '</tr>';
                                 $keyindex++;
@@ -202,31 +202,31 @@ let today = new Date(),
                                 $commons = $festivity.common.split("|");
                                 $commons = $commons.map(function($txt) {
                                     let $common = $txt.split(":");
-                                    let $commonGeneral = __($common[0], $Settings.locale);
-                                    let $commonSpecific = (typeof $common[1] !== 'undefined' && $common[1] != "") ? __($common[1], $Settings.locale) : "";
+                                    let $commonGeneral = __($common[0]);
+                                    let $commonSpecific = (typeof $common[1] !== 'undefined' && $common[1] != "") ? __($common[1]) : "";
                                     let $commonKey = '';
                                     //$txt = str_replace(":", ": ", $txt);
                                     switch ($commonGeneral) {
-                                        case __("Blessed Virgin Mary", $Settings.locale):
+                                        case __("Blessed Virgin Mary"):
                                             $commonKey = "of (SING_FEMM)";
                                             break;
-                                        case __("Virgins", $Settings.locale):
+                                        case __("Virgins"):
                                             $commonKey = "of (PLUR_FEMM)";
                                             break;
-                                        case __("Martyrs", $Settings.locale):
-                                        case __("Pastors", $Settings.locale):
-                                        case __("Doctors", $Settings.locale):
-                                        case __("Holy Men and Women", $Settings.locale):
+                                        case __("Martyrs"):
+                                        case __("Pastors"):
+                                        case __("Doctors"):
+                                        case __("Holy Men and Women"):
                                             $commonKey = "of (PLUR_MASC)";
                                             break;
                                         default:
                                             $commonKey = "of (SING_MASC)";
                                     }
-                                    return __("From the Common", $Settings.locale) + " " + __($commonKey, $Settings.locale) + " " + $commonGeneral + ($commonSpecific != "" ? ": " + $commonSpecific : "");
+                                    return __("From the Common") + " " + __($commonKey) + " " + $commonGeneral + ($commonSpecific != "" ? ": " + $commonSpecific : "");
                                 });
-                                $festivity.common = $commons.join("; " + __("or", $Settings.locale) + " ");
+                                $festivity.common = $commons.join("; " + __("or") + " ");
                             } else if ($festivity.common == "Proper") {
-                                $festivity.common = __($festivity.common, $Settings.locale);
+                                $festivity.common = __($festivity.common);
                             }
                             //$festivity.color = $festivity.color.split("|")[0];
 
@@ -245,12 +245,12 @@ let today = new Date(),
                             let $CSScolor = $possibleColors[0];
                             let $festivityColorString = "";
                             if($possibleColors.length === 1){
-                                $festivityColorString = __($possibleColors[0],$Settings.locale);
+                                $festivityColorString = __($possibleColors[0]);
                             } else if ($possibleColors.length > 1){
                                 $possibleColors = $possibleColors.map(function($txt) {
-                                    return __($txt,$Settings.locale);
+                                    return __($txt);
                                 });
-                                $festivityColorString = $possibleColors.join("</i> " + __("or",$Settings.locale) + " <i>");
+                                $festivityColorString = $possibleColors.join("</i> " + __("or") + " <i>");
                             }
                             strHTML += '<tr style="background-color:' + $SeasonColor + ';' + ($highContrast.indexOf($SeasonColor) != -1 ? 'color:white;' : 'color:black;') + '">';
                             if ($newMonth) {
@@ -265,12 +265,12 @@ let today = new Date(),
                             $currentCycle = ($festivity.hasOwnProperty("liturgicalyear") ? ' (' + $festivity.liturgicalyear + ')' : "");
                             $festivityGrade = '';
                             if(dy !== 7){
-                                $festivityGrade = ($keyname === 'AllSouls' ? __("COMMEMORATION",$Settings.locale) : $GRADE[$festivity.grade]);
+                                $festivityGrade = ($keyname === 'AllSouls' ? __("COMMEMORATION") : $GRADE[$festivity.grade]);
                             }
                             else if($festivity.grade > 3){
-                                $festivityGrade = ($keyname === 'AllSouls' ? __("COMMEMORATION",$Settings.locale) : $GRADE[$festivity.grade]);
+                                $festivityGrade = ($keyname === 'AllSouls' ? __("COMMEMORATION") : $GRADE[$festivity.grade]);
                             }              
-                            strHTML += '<td style="background-color:'+$CSScolor+';' + ($highContrast.indexOf($CSScolor) != -1 ? 'color:white;' : 'color:black;') + '">' + $festivity.name + $currentCycle + ' - <i>' + __($festivity.color, $Settings.locale) + '</i><br /><i>' + $festivity.common + '</i></td>';
+                            strHTML += '<td style="background-color:'+$CSScolor+';' + ($highContrast.indexOf($CSScolor) != -1 ? 'color:white;' : 'color:black;') + '">' + $festivity.name + $currentCycle + ' - <i>' + __($festivity.color) + '</i><br /><i>' + $festivity.common + '</i></td>';
                             strHTML += '<td style="background-color:'+$CSScolor+';' + ($highContrast.indexOf($CSScolor) != -1 ? 'color:white;' : 'color:black;') + '">' + $festivityGrade + '</td>';
                             strHTML += '</tr>';
                         }
@@ -279,7 +279,7 @@ let today = new Date(),
                     createHeader();
                     $('#LitCalTable tbody').html(strHTML);
                     $('#dayCnt').text($dayCnt);
-                    $('#LitCalMessages thead').html(`<tr><th colspan=2 style="text-align:center;">${__("Information about the current calculation of the Liturgical Year",$Settings.locale)}</th></tr>`);
+                    $('#LitCalMessages thead').html(`<tr><th colspan=2 style="text-align:center;">${__("Information about the current calculation of the Liturgical Year")}</th></tr>`);
                     $('#spinnerWrapper').fadeOut('slow');
                 }
                 if(LitCalData.hasOwnProperty('Messages')){
@@ -624,8 +624,8 @@ let today = new Date(),
         "December"
     ],
     $GRADE = [],
-    __ = function($key, $locale) {
-        $lcl = $locale.toLowerCase();
+    __ = function($key) {
+        $lcl = $Settings.locale.toLowerCase();
         if ($messages !== null && typeof $messages == 'object') {
             if ($messages.hasOwnProperty($key) && typeof $messages[$key] == 'object') {
                 if ($messages[$key].hasOwnProperty($lcl)) {
@@ -651,32 +651,32 @@ let today = new Date(),
         return $festivity_date_str;
     },
     createHeader = function(){
-        document.title = __("Generate Roman Calendar",$Settings.locale);
+        document.title = __("Generate Roman Calendar");
         $('#settingsWrapper').dialog("destroy").remove();
         $('header').empty();
-        let templateStr = __('HTML presentation elaborated by JAVASCRIPT using an AJAX request to a %s', $Settings.locale);
+        let templateStr = __('HTML presentation elaborated by JAVASCRIPT using an AJAX request to a %s');
         templateStr = templateStr.replace('%s','<a href="../../LitCalEngine.php">PHP engine</a>');
         let $header = `
-            <h1 style="text-align:center;">${__('Liturgical Calendar Calculation for a Given Year', $Settings.locale)} (${$Settings.year})</h1>
+            <h1 style="text-align:center;">${__('Liturgical Calendar Calculation for a Given Year')} (${$Settings.year})</h1>
             <h2 style="text-align:center;">${templateStr}</h2>
             <div style="text-align:center;border:2px groove White;border-radius:6px;width:60%;margin:0px auto;padding-bottom:6px;">
-            <h3>${__('Configurations being used to generate this calendar:', $Settings.locale)}</h3>
-            <span>${__('YEAR', $Settings.locale)} = ${$Settings.year}, ${__('EPIPHANY', $Settings.locale)} = ${$Settings.epiphany}, ${__('ASCENSION', $Settings.locale)} = ${$Settings.ascension}, CORPUS CHRISTI = ${$Settings.corpuschristi}, LOCALE = ${$Settings.locale}</span>
+            <h3>${__('Configurations being used to generate this calendar:')}</h3>
+            <span>${__('YEAR')} = ${$Settings.year}, ${__('EPIPHANY')} = ${$Settings.epiphany}, ${__('ASCENSION')} = ${$Settings.ascension}, CORPUS CHRISTI = ${$Settings.corpuschristi}, LOCALE = ${$Settings.locale}</span>
             </div>`,
-        $tbheader = `<tr><th>${__("Month", $Settings.locale)}</th><th>${__("Date in Gregorian Calendar", $Settings.locale)}</th><th>${__("General Roman Calendar Festivity", $Settings.locale)}</th><th>${__("Grade of the Festivity", $Settings.locale)}</th></tr>`,
+        $tbheader = `<tr><th>${__("Month")}</th><th>${__("Date in Gregorian Calendar")}</th><th>${__("General Roman Calendar Festivity")}</th><th>${__("Grade of the Festivity")}</th></tr>`,
         $settingsDialog = `<div id="settingsWrapper"><form id="calSettingsForm"><table id="calSettings">
-        <tr><td colspan="2"><label>${__('YEAR', $Settings.locale)}: </td><td colspan="2"><input type="number" name="year" id="year" min="1969" max="9999" value="${$Settings.year}" /></label></td></tr>
+        <tr><td colspan="2"><label>${__('YEAR')}: </td><td colspan="2"><input type="number" name="year" id="year" min="1969" max="9999" value="${$Settings.year}" /></label></td></tr>
         <tr><td><label>LOCALE: </td><td><select name="locale" id="locale"><option value="EN" ${($Settings.locale === "EN" ? " SELECTED" : "")}>ENGLISH</option><option value="IT" ${($Settings.locale === "IT" ? " SELECTED" : "")}>ITALIANO</option><option value="LA" ${($Settings.locale === "LA" ? " SELECTED" : "")}>LATINO</option></select></label></td><td>NATIONAL PRESET: </td><td id="nationalpreset"><select><option value="VATICAN">Vatican</option><option value="ITALY">Italy</option><option value="USA">USA</option></select></td></tr>
-        <tr><td><label>${__('EPIPHANY', $Settings.locale)}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>January 6</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>Sunday Jan 2↔Jan 8</option></select></label></td><td>DIOCESAN PRESET: </td><td id="diocesanpreset"><select><option value=""></option><option value="DIOCESIROMA">Diocesi di Roma</option><option value="DIOCESILAZIO">Le diocesi del Lazio</option></select></td></tr>
-        <tr><td><label>${__('ASCENSION', $Settings.locale)}: </td><td><select name="ascension" id="ascension"><option value="THURSDAY" ${($Settings.ascension === "THURSDAY" ? " SELECTED" : "")}>Thursday</option><option value="SUNDAY" ${($Settings.ascension === "SUNDAY" ? " SELECTED" : "")}>Sunday</option></select></label></td><td></td><td></td></tr>
+        <tr><td><label>${__('EPIPHANY')}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>January 6</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>Sunday Jan 2↔Jan 8</option></select></label></td><td>DIOCESAN PRESET: </td><td id="diocesanpreset"><select><option value=""></option><option value="DIOCESIROMA">Diocesi di Roma</option><option value="DIOCESILAZIO">Le diocesi del Lazio</option></select></td></tr>
+        <tr><td><label>${__('ASCENSION')}: </td><td><select name="ascension" id="ascension"><option value="THURSDAY" ${($Settings.ascension === "THURSDAY" ? " SELECTED" : "")}>Thursday</option><option value="SUNDAY" ${($Settings.ascension === "SUNDAY" ? " SELECTED" : "")}>Sunday</option></select></label></td><td></td><td></td></tr>
         <tr><td><label>CORPUS CHRISTI: </td><td><select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" ${($Settings.corpuschristi === "THURSDAY" ? " SELECTED" : "")}>Thursday</option><option value="SUNDAY" ${($Settings.corpuschristi === "SUNDAY" ? " SELECTED" : "")}>Sunday</option></select></label></td><td></td><td></td></tr>
-        <tr><td colspan="4" style="text-align:center;"><input type="submit" id="generateLitCal" value="${__("Generate Roman Calendar",$Settings.locale)}" /></td></tr>
+        <tr><td colspan="4" style="text-align:center;"><input type="submit" id="generateLitCal" value="${__("Generate Roman Calendar")}" /></td></tr>
         </table></form></div>`;
         $('header').html($header);
         $('#LitCalTable thead').html($tbheader);
 
         $($settingsDialog).dialog({
-            title: __('Customize options for generating the Roman Calendar', $Settings.locale),
+            title: __('Customize options for generating the Roman Calendar'),
             modal: true,
             width: '80%',
             show: {
@@ -692,7 +692,7 @@ let today = new Date(),
     };
 
 $(document).ready(function() {
-    document.title = __("Generate Roman Calendar",$Settings.locale);
+    document.title = __("Generate Roman Calendar");
     createHeader();
     $(document).on('click', '#openSettings', function() {
         $('#settingsWrapper').dialog("open");
@@ -709,14 +709,14 @@ $(document).ready(function() {
         console.log($Settings);
 
         $GRADE = [
-            __("FERIA",$Settings.locale),
-            __("COMMEMORATION",$Settings.locale),
-            __("OPTIONAL MEMORIAL",$Settings.locale),
-            __("MEMORIAL",$Settings.locale),
-            __("FEAST",$Settings.locale),
-            __("FEAST OF THE LORD",$Settings.locale),
-            __("SOLEMNITY",$Settings.locale),
-            __("HIGHER RANKING SOLEMNITY",$Settings.locale)    
+            __("FERIA"),
+            __("COMMEMORATION"),
+            __("OPTIONAL MEMORIAL"),
+            __("MEMORIAL"),
+            __("FEAST"),
+            __("FEAST OF THE LORD"),
+            __("SOLEMNITY"),
+            __("HIGHER RANKING SOLEMNITY")    
         ];
         $('#settingsWrapper').dialog("close");
         genLitCal($Settings);

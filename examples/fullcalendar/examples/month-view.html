@@ -17,8 +17,350 @@
   <link rel="icon" href="../../../assets/easter-egg-5-32-279148.png" sizes="32x32">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
-  <link href='../lib/main.css' rel='stylesheet' />
-  <script src='../lib/main.js'></script>
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.2.0/main.min.css' rel='stylesheet' />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+      font-size: 14px;
+    }
+
+    #calendar {
+      max-width: 1200px;
+      margin: 40px auto;
+    }
+
+    .backNav {
+      background-color: yellow;
+      font-size: 1.1em;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+      width: 95%;
+      margin: 0px auto;
+      border-bottom: 2px outset LightBlue;
+      display: block;
+      padding: 12px 24px;
+      font-weight: bold;
+    }
+
+    .backNav:hover {
+      background-color: gold;
+      color: DarkBlue;
+    }
+
+    .lds-roller {
+      display: inline-block;
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      top: 50%;
+      left: 50%;
+      margin-left: -40px;
+      margin-right: -40px;
+    }
+
+    .lds-roller div {
+      animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+      transform-origin: 40px 40px;
+    }
+
+    .lds-roller div:after {
+      content: " ";
+      display: block;
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #fff;
+      margin: -4px 0 0 -4px;
+    }
+
+    .lds-roller div:nth-child(1) {
+      animation-delay: -0.036s;
+    }
+
+    .lds-roller div:nth-child(1):after {
+      top: 63px;
+      left: 63px;
+    }
+
+    .lds-roller div:nth-child(2) {
+      animation-delay: -0.072s;
+    }
+
+    .lds-roller div:nth-child(2):after {
+      top: 68px;
+      left: 56px;
+    }
+
+    .lds-roller div:nth-child(3) {
+      animation-delay: -0.108s;
+    }
+
+    .lds-roller div:nth-child(3):after {
+      top: 71px;
+      left: 48px;
+    }
+
+    .lds-roller div:nth-child(4) {
+      animation-delay: -0.144s;
+    }
+
+    .lds-roller div:nth-child(4):after {
+      top: 72px;
+      left: 40px;
+    }
+
+    .lds-roller div:nth-child(5) {
+      animation-delay: -0.18s;
+    }
+
+    .lds-roller div:nth-child(5):after {
+      top: 71px;
+      left: 32px;
+    }
+
+    .lds-roller div:nth-child(6) {
+      animation-delay: -0.216s;
+    }
+
+    .lds-roller div:nth-child(6):after {
+      top: 68px;
+      left: 24px;
+    }
+
+    .lds-roller div:nth-child(7) {
+      animation-delay: -0.252s;
+    }
+
+    .lds-roller div:nth-child(7):after {
+      top: 63px;
+      left: 17px;
+    }
+
+    .lds-roller div:nth-child(8) {
+      animation-delay: -0.288s;
+    }
+
+    .lds-roller div:nth-child(8):after {
+      top: 56px;
+      left: 12px;
+    }
+
+    @keyframes lds-roller {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    #spinnerWrapper {
+      background-color: Black;
+      opacity: 80%;
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      width: 100%;
+      height: 100%;
+    }
+
+    #calSettings {
+      width: 70%;
+      margin: 0px auto;
+      border-collapse: collapse;
+    }
+
+    #calSettings tr:first-child {
+      border-bottom: 1px groove White;
+    }
+
+    #calSettings tr:last-child {
+      border-top: 1px groove White;
+    }
+
+    #calSettings tr td {
+      padding: 12px;
+    }
+
+    #calSettings tr td:first-child {
+      text-align: right;
+      padding-right: 18px;
+    }
+
+    #calSettings tr td:nth-child(3) {
+      border-left: 1px groove white;
+      padding-left: 18px;
+      text-align: right;
+    }
+
+    #openSettings {
+      position: absolute;
+      display: block;
+      top: 70px;
+      right: 24px;
+      color: steelblue;
+      cursor: pointer;
+      background-color: palegoldenrod;
+      padding: 6px;
+      border: 1px groove white;
+    }
+
+    #openSettings:hover {
+      color: darkslategray;
+      background-color: lightyellow;
+    }
+
+    #LitCalMessages {
+      width: 75%;
+      margin: 30px auto;
+      border: 1px solid darkslategray;
+      padding: 10px;
+      background: lightgray;
+    }
+
+    #LitCalMessages th {
+      font-size: 1.3em;
+      padding: 10px;
+    }
+
+    #LitCalMessages td {
+      padding: 5px;
+      border-bottom: 1px solid White;
+    }
+
+    #LitCalMessages td:first-child {
+      border-right: 1px groove White;
+    }
+
+    .popper,
+    .tooltip {
+      position: absolute;
+      z-index: 9999;
+      background: #FFC107;
+      color: black;
+      width: 150px;
+      border-radius: 3px;
+      box-shadow: 0 0 2px rgba(0,0,0,0.5);
+      padding: 10px;
+      text-align: center;
+    }
+    .style5 .tooltip {
+      background: #1E252B;
+      color: #FFFFFF;
+      max-width: 200px;
+      width: auto;
+      font-size: .8rem;
+      padding: .5em 1em;
+    }
+    .popper .popper__arrow,
+    .tooltip .tooltip-arrow {
+      width: 0;
+      height: 0;
+      border-style: solid;
+      position: absolute;
+      margin: 5px;
+    }
+
+    .tooltip .tooltip-arrow,
+    .popper .popper__arrow {
+      border-color: #FFC107;
+    }
+    .style5 .tooltip .tooltip-arrow {
+      border-color: #1E252B;
+    }
+    .popper[x-placement^="top"],
+    .tooltip[x-placement^="top"] {
+      margin-bottom: 5px;
+    }
+    .popper[x-placement^="top"] .popper__arrow,
+    .tooltip[x-placement^="top"] .tooltip-arrow {
+      border-width: 5px 5px 0 5px;
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-bottom-color: transparent;
+      bottom: -5px;
+      left: calc(50% - 5px);
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    .popper[x-placement^="bottom"],
+    .tooltip[x-placement^="bottom"] {
+      margin-top: 5px;
+    }
+    .tooltip[x-placement^="bottom"] .tooltip-arrow,
+    .popper[x-placement^="bottom"] .popper__arrow {
+      border-width: 0 5px 5px 5px;
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-top-color: transparent;
+      top: -5px;
+      left: calc(50% - 5px);
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    .tooltip[x-placement^="right"],
+    .popper[x-placement^="right"] {
+      margin-left: 5px;
+    }
+    .popper[x-placement^="right"] .popper__arrow,
+    .tooltip[x-placement^="right"] .tooltip-arrow {
+      border-width: 5px 5px 5px 0;
+      border-left-color: transparent;
+      border-top-color: transparent;
+      border-bottom-color: transparent;
+      left: -5px;
+      top: calc(50% - 5px);
+      margin-left: 0;
+      margin-right: 0;
+    }
+    .popper[x-placement^="left"],
+    .tooltip[x-placement^="left"] {
+      margin-right: 5px;
+    }
+    .popper[x-placement^="left"] .popper__arrow,
+    .tooltip[x-placement^="left"] .tooltip-arrow {
+      border-width: 5px 0 5px 5px;
+      border-top-color: transparent;
+      border-right-color: transparent;
+      border-bottom-color: transparent;
+      right: -5px;
+      top: calc(50% - 5px);
+      margin-left: 0;
+      margin-right: 0;
+    }    
+  </style>
+</head>
+
+<body>
+  <div id="spinnerWrapper">
+    <div class="lds-roller">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+  <div><a class="backNav" href="/LiturgicalCalendar">↩ Go back ↩</a></div>
+  <span class="material-icons" id="openSettings">settings</span>
+  <header>
+  </header>
+
+  <div id='calendar'></div>
+
+  <table id="LitCalMessages">
+    <thead></thead>
+    <tbody></tbody>
+  </table>
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.2.0/main.min.js'></script>
   <script src='../lib/locales/es.js'></script>
   <script src='../lib/locales/fr.js'></script>
   <script src='../lib/locales/de.js'></script>
@@ -26,6 +368,8 @@
   <script src='../lib/locales/la.js'></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+  <script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
+  <script src="https://unpkg.com/tooltip.js/dist/umd/tooltip.min.js"></script>
   <script>
     let today = new Date(),
       $Settings = {
@@ -61,11 +405,13 @@
                 let $possibleColors = $festivity.color.split("|");
                 let $CSScolor = $possibleColors[0];
                 let $textColor = ($CSScolor === 'white' || $CSScolor === 'pink' ? 'black' : 'white');
+                let $description = _G($festivity.grade) + '<br>' + _C($festivity.common) + ($festivity.hasOwnProperty('liturgicalyear') ? '<br>' + $festivity.liturgicalyear : '');
                 $events[$keyindex] = {
                   title: $festivity.name,
                   start: $festivity.date.getUTCFullYear() + '-' + pad($festivity.date.getUTCMonth() + 1) + '-' + pad($festivity.date.getUTCDate()),
                   backgroundColor: $CSScolor,
-                  textColor: $textColor
+                  textColor: $textColor,
+                  description: $description
                 };
                 
                 if ($keyindex === $LitCalKeys.length - 1) {
@@ -76,35 +422,52 @@
               let calendarEl = document.getElementById('calendar'),
                   fullCalendarSettings = {
                     dayMaxEvents: true, // allow "more" link when too many events
-                    events: $events
+                    events: $events,
+                    firstDay: 0,
+                    eventDidMount: function(info) {
+                      var tooltip = new Tooltip(info.el, {
+                        title: info.event.extendedProps.description,
+                        placement: 'top',
+                        trigger: 'hover',
+                        container: 'body'
+                      });
+                    }
                   };
               if($Settings.locale.toLowerCase() !== 'en'){
                 fullCalendarSettings.locale = $Settings.locale.toLowerCase();
               }
               if($Settings.locale.toLowerCase() === 'la'){
-                fullCalendarSettings.dayNames = ['Dies Solis','Dies Lunae','Dies Martis','Dies Mercurii','Dies Iovis','Dies Veneris','Dies Saturni'];
-                fullCalendarSettings.dayNamesShort = ['Sol','Lun','Mart','Merc','Iov','Ven','Sat'];
-
+                //fullCalendarSettings.dayNames = ['Dies Solis','Dies Lunae','Dies Martis','Dies Mercurii','Dies Iovis','Dies Veneris','Dies Saturni'];
+                //fullCalendarSettings.dayNamesShort = ['Sol','Lun','Mart','Merc','Iov','Ven','Sat'];
               }
-              if($Settings.year !== today.getFullYear()){
+              if( parseInt($Settings.year) !== today.getFullYear()){
                 fullCalendarSettings.initialDate = $Settings.year + '-01-01';
               }
               let calendar = new FullCalendar.Calendar(calendarEl, fullCalendarSettings);
 
               calendar.render();
             }
+            if(LitCalData.hasOwnProperty('Messages')){
+              $('#LitCalMessages tbody').empty();
+              LitCalData.Messages.forEach(function(message,idx){
+                  $('#LitCalMessages tbody').append(`<tr><td>${idx}</td><td>${message}</td></tr>`);
+              });
+            }
+
           },
           error: function (jqXHR, textStatus, errorThrown) {
-            console.log(errorThrown + ':' + textStatus);
+            console.log('(' + textStatus + ') ' + errorThrown);
+            console.log(jqXHR.getAllResponseHeaders);
+            console.log(jqXHR.responseText);
           }
         });
       },
       createHeader = function(){
-        document.title = __("Generate Roman Calendar",$Settings.locale);
+        document.title = __("Generate Roman Calendar");
         $('#settingsWrapper').dialog("destroy").remove();
         $('header').empty();
         let templateStr = __('HTML presentation elaborated by JAVASCRIPT using an AJAX request to a %s', $Settings.locale);
-        templateStr = templateStr.replace('%s','<a href="../../LitCalEngine.php">PHP engine</a>');
+        templateStr = templateStr.replace('%s','<a href="../../../LitCalEngine.php">PHP engine</a>');
         let $header = `
             <h1 style="text-align:center;">${__('Liturgical Calendar Calculation for a Given Year', $Settings.locale)} (${$Settings.year})</h1>
             <h2 style="text-align:center;">${templateStr}</h2>
@@ -115,15 +478,15 @@
         $tbheader = `<tr><th>${__("Month", $Settings.locale)}</th><th>${__("Date in Gregorian Calendar", $Settings.locale)}</th><th>${__("General Roman Calendar Festivity", $Settings.locale)}</th><th>${__("Grade of the Festivity", $Settings.locale)}</th></tr>`,
         $settingsDialog = `<div id="settingsWrapper"><form id="calSettingsForm"><table id="calSettings">
         <tr><td colspan="2"><label>${__('YEAR', $Settings.locale)}: </td><td colspan="2"><input type="number" name="year" id="year" min="1969" max="9999" value="${$Settings.year}" /></label></td></tr>
-        <tr><td><label>LOCALE: </td><td><select name="locale" id="locale"><option value="EN" ${($Settings.locale === "EN" ? " SELECTED" : "")}>ENGLISH</option><option value="IT" ${($Settings.locale === "IT" ? " SELECTED" : "")}>ITALIANO</option><option value="LA" ${($Settings.locale === "LA" ? " SELECTED" : "")}>LATINO</option></select></label></td><td>NATIONAL PRESET: </td><td id="nationalpreset"><select><option value="VATICAN">Vatican</option><option value="ITALY">Italy</option><option value="USA">USA</option></select></td></tr>
-        <tr><td><label>${__('EPIPHANY', $Settings.locale)}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>January 6</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>Sunday Jan 2↔Jan 8</option></select></label></td><td>DIOCESAN PRESET: </td><td id="diocesanpreset"><select disabled><option value=""></option><option value="DIOCESIROMA">Diocesi di Roma</option><option value="DIOCESILAZIO">Le diocesi del Lazio</option></select></td></tr>
+        <tr><td><label>LOCALE: </td><td><select name="locale" id="locale"><option value="EN" ${($Settings.locale === "EN" ? " SELECTED" : "")}>ENGLISH</option><option value="IT" ${($Settings.locale === "IT" ? " SELECTED" : "")}>ITALIANO</option><option value="LA" ${($Settings.locale === "LA" ? " SELECTED" : "")}>LATINO</option></select></label></td><td>NATIONAL PRESET: </td><td><select id="nationalpreset" name="nationalpreset"><option value=""></option><option value="VATICAN">Vatican</option><option value="ITALY">Italy</option><option value="USA">USA</option></select></td></tr>
+        <tr><td><label>${__('EPIPHANY', $Settings.locale)}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>January 6</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>Sunday Jan 2↔Jan 8</option></select></label></td><td>DIOCESAN PRESET: </td><td><select id="diocesanpreset" name="diocesanpreset" disabled><option value=""></option><option value="DIOCESIROMA">Diocesi di Roma</option><option value="DIOCESILAZIO">Le diocesi del Lazio</option></select></td></tr>
         <tr><td><label>${__('ASCENSION', $Settings.locale)}: </td><td><select name="ascension" id="ascension"><option value="THURSDAY" ${($Settings.ascension === "THURSDAY" ? " SELECTED" : "")}>Thursday</option><option value="SUNDAY" ${($Settings.ascension === "SUNDAY" ? " SELECTED" : "")}>Sunday</option></select></label></td><td></td><td></td></tr>
         <tr><td><label>CORPUS CHRISTI: </td><td><select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" ${($Settings.corpuschristi === "THURSDAY" ? " SELECTED" : "")}>Thursday</option><option value="SUNDAY" ${($Settings.corpuschristi === "SUNDAY" ? " SELECTED" : "")}>Sunday</option></select></label></td><td></td><td></td></tr>
-        <tr><td colspan="4" style="text-align:center;"><input type="submit" id="generateLitCal" value="${__("Generate Roman Calendar",$Settings.locale)}" /></td></tr>
+        <tr><td colspan="4" style="text-align:center;"><input type="submit" id="generateLitCal" value="${__("Generate Roman Calendar")}" /></td></tr>
         </table></form></div>`;
         $('header').html($header);
         $('#LitCalTable thead').html($tbheader);
-        
+        $('#LitCalMessages thead').html(`<tr><th colspan=2 style="text-align:center;">${__("Information about the current calculation of the Liturgical Year")}</th></tr>`);
         $('#generateLitCal').button();
 
         $($settingsDialog).dialog({
@@ -141,8 +504,8 @@
             autoOpen: false
         });        
       },
-      __ = function($key, $locale) {
-        $lcl = $locale.toLowerCase();
+      __ = function($key) {
+        $lcl = $Settings.locale.toLowerCase();
         if ($messages !== null && typeof $messages == 'object') {
             if ($messages.hasOwnProperty($key) && typeof $messages[$key] == 'object') {
                 if ($messages[$key].hasOwnProperty($lcl)) {
@@ -156,6 +519,69 @@
         } else {
             return $key;
         }
+    },
+    _G = function($key,$html=true){
+        $key = parseInt($key);
+        $grade = __("FERIA");
+        switch($key){
+            case 0: 
+                $grade = __("FERIA");
+            break;
+            case 1: 
+                $grade = __("COMMEMORATION");
+            break;
+            case 2: 
+                $grade = __("OPTIONAL MEMORIAL");
+            break;
+            case 3: 
+                $grade = __("MEMORIAL");
+            break;
+            case 4: 
+                $grade = __("FEAST");
+            break;
+            case 5: 
+                $grade = __("FEAST OF THE LORD");
+            break;
+            case 6: 
+                $grade = __("SOLEMNITY");
+            break;
+            case 7: 
+                $grade = __("HIGHER RANKING SOLEMNITY");
+            break;
+        }
+        return $html === true ? $grade : strip_tags($grade);
+    },
+    _C = function($common){
+        if ($common !== "" && $common !== "Proper") {
+            $commons = $common.split("|");
+            $commons = $commons.map(function($txt) {
+                $commonArr = $txt.split(":");
+                $commonGeneral = __($commonArr[0]);
+                $commonSpecific = $commonArr.length>1 && $commonArr[1] != "" ? __($commonArr[1]) : "";
+                //$txt = str_replace(":", ": ", $txt);
+                switch ($commonGeneral) {
+                    case __("Blessed Virgin Mary"):
+                        $commonKey = "of (SING_FEMM)";
+                        break;
+                    case __("Virgins"):
+                        $commonKey = "of (PLUR_FEMM)";
+                        break;
+                    case __("Martyrs"):
+                    case __("Pastors"):
+                    case __("Doctors"):
+                    case __("Holy Men and Women"):
+                        $commonKey = "of (PLUR_MASC)";
+                        break;
+                    default:
+                        $commonKey = "of (SING_MASC)";
+                }
+                return __("From the Common") + " " + __($commonKey) + " " + $commonGeneral + ($commonSpecific != "" ? ": " + $commonSpecific : "");
+            });
+            $common = $commons.join("; " + __("or") + " ");
+        } else if ($common == "Proper") {
+            $common = __("Proper");
+        }
+        return $common;
     },
     $messages = {
         "From the Common": {
@@ -468,7 +894,7 @@
 
 
     $(document).ready(function () {
-      document.title = __("Generate Roman Calendar",$Settings.locale);
+      document.title = __("Generate Roman Calendar");
       createHeader();
       genLitCal();
       $(document).on('click', '#openSettings', function() {
@@ -485,277 +911,63 @@
           console.log('$Settings = ');
           console.log($Settings);
 
-          $GRADE = [
-              __("FERIA",$Settings.locale),
-              __("COMMEMORATION",$Settings.locale),
-              __("OPTIONAL MEMORIAL",$Settings.locale),
-              __("MEMORIAL",$Settings.locale),
-              __("FEAST",$Settings.locale),
-              __("FEAST OF THE LORD",$Settings.locale),
-              __("SOLEMNITY",$Settings.locale),
-              __("HIGHER RANKING SOLEMNITY",$Settings.locale)    
-          ];
           $('#settingsWrapper').dialog("close");
           genLitCal();
           return false;
       });
 
-      if($('#nationalpreset').find('select').val() !== "ITALY"){
-          $('#diocesanpreset').find('select').prop('disabled',true);
+      if($('#nationalpreset').val() !== "ITALY"){
+          $('#diocesanpreset').prop('disabled',true);
       }
 
-      $(document).on('change','#nationalpreset select',function(){
-          if($(this).val() === "ITALY" ){
-              $('#diocesanpreset').find('select').prop('disabled',false).val("DIOCESIROMA");
-          }
-          else{
-              $('#diocesanpreset').find('select').prop('disabled',true).val("");
+      $(document).on('change','#nationalpreset',function(){
+          switch($(this).val()){
+            case "VATICAN":
+              $('#locale').val('LA');
+              $('#epiphany').val('JAN6');
+              $('#ascension').val('THURSDAY');
+              $('#corpuschristi').val('THURSDAY');
+              $('#diocesanpreset').val("");
+              $Settings.locale = 'LA';
+              $Settings.epiphany = 'JAN6';
+              $Settings.ascension = 'THURSDAY';
+              $Settings.corpuschristi = 'THURSDAY';
+
+              $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
+            break;
+            case "ITALY":
+              $('#locale').val('IT');
+              $('#epiphany').val('JAN6');
+              $('#ascension').val('SUNDAY');
+              $('#corpuschristi').val('SUNDAY');
+              $('#diocesanpreset').prop('disabled',false).val("DIOCESIROMA");
+              $Settings.locale = 'IT';
+              $Settings.epiphany = 'JAN6';
+              $Settings.ascension = 'SUNDAY';
+              $Settings.corpuschristi = 'SUNDAY';
+              $('#calSettingsForm :input').not('#diocesanpreset').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
+            break;
+            case "USA":
+              $('#locale').val('EN');
+              $('#epiphany').val('SUNDAY_JAN2_JAN8');
+              $('#ascension').val('SUNDAY');
+              $('#corpuschristi').val('SUNDAY');
+              $('#diocesanpreset').val("");
+              $Settings.locale = 'EN';
+              $Settings.epiphany = 'SUNDAY_JAN2_JAN8';
+              $Settings.ascension = 'SUNDAY';
+              $Settings.corpuschristi = 'SUNDAY';
+              $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
+            break;
+            default:
+              $('#calSettingsForm :input').prop('disabled',false);
+              $('#diocesanpreset').val("").prop('disabled',true);
           }
       });
 
     });
 
   </script>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-      font-size: 14px;
-    }
-
-    #calendar {
-      max-width: 1200px;
-      margin: 40px auto;
-    }
-
-    .backNav {
-      background-color: yellow;
-      font-size: 1.1em;
-      text-align: center;
-      cursor: pointer;
-      text-decoration: none;
-      width: 95%;
-      margin: 0px auto;
-      border-bottom: 2px outset LightBlue;
-      display: block;
-      padding: 12px 24px;
-      font-weight: bold;
-    }
-
-    .backNav:hover {
-      background-color: gold;
-      color: DarkBlue;
-    }
-
-    .lds-roller {
-      display: inline-block;
-      position: absolute;
-      width: 80px;
-      height: 80px;
-      top: 50%;
-      left: 50%;
-      margin-left: -40px;
-      margin-right: -40px;
-    }
-
-    .lds-roller div {
-      animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-      transform-origin: 40px 40px;
-    }
-
-    .lds-roller div:after {
-      content: " ";
-      display: block;
-      position: absolute;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #fff;
-      margin: -4px 0 0 -4px;
-    }
-
-    .lds-roller div:nth-child(1) {
-      animation-delay: -0.036s;
-    }
-
-    .lds-roller div:nth-child(1):after {
-      top: 63px;
-      left: 63px;
-    }
-
-    .lds-roller div:nth-child(2) {
-      animation-delay: -0.072s;
-    }
-
-    .lds-roller div:nth-child(2):after {
-      top: 68px;
-      left: 56px;
-    }
-
-    .lds-roller div:nth-child(3) {
-      animation-delay: -0.108s;
-    }
-
-    .lds-roller div:nth-child(3):after {
-      top: 71px;
-      left: 48px;
-    }
-
-    .lds-roller div:nth-child(4) {
-      animation-delay: -0.144s;
-    }
-
-    .lds-roller div:nth-child(4):after {
-      top: 72px;
-      left: 40px;
-    }
-
-    .lds-roller div:nth-child(5) {
-      animation-delay: -0.18s;
-    }
-
-    .lds-roller div:nth-child(5):after {
-      top: 71px;
-      left: 32px;
-    }
-
-    .lds-roller div:nth-child(6) {
-      animation-delay: -0.216s;
-    }
-
-    .lds-roller div:nth-child(6):after {
-      top: 68px;
-      left: 24px;
-    }
-
-    .lds-roller div:nth-child(7) {
-      animation-delay: -0.252s;
-    }
-
-    .lds-roller div:nth-child(7):after {
-      top: 63px;
-      left: 17px;
-    }
-
-    .lds-roller div:nth-child(8) {
-      animation-delay: -0.288s;
-    }
-
-    .lds-roller div:nth-child(8):after {
-      top: 56px;
-      left: 12px;
-    }
-
-    @keyframes lds-roller {
-      0% {
-        transform: rotate(0deg);
-      }
-
-      100% {
-        transform: rotate(360deg);
-      }
-    }
-
-    #spinnerWrapper {
-      background-color: Black;
-      opacity: 80%;
-      position: absolute;
-      left: 0px;
-      top: 0px;
-      width: 100%;
-      height: 100%;
-    }
-
-    #calSettings {
-      width: 70%;
-      margin: 0px auto;
-      border-collapse: collapse;
-    }
-
-    #calSettings tr:first-child {
-      border-bottom: 1px groove White;
-    }
-
-    #calSettings tr:last-child {
-      border-top: 1px groove White;
-    }
-
-    #calSettings tr td {
-      padding: 12px;
-    }
-
-    #calSettings tr td:first-child {
-      text-align: right;
-      padding-right: 18px;
-    }
-
-    #calSettings tr td:nth-child(3) {
-      border-left: 1px groove white;
-      padding-left: 18px;
-      text-align: right;
-    }
-
-    #openSettings {
-      position: absolute;
-      display: block;
-      top: 70px;
-      right: 24px;
-      color: steelblue;
-      cursor: pointer;
-      background-color: palegoldenrod;
-      padding: 6px;
-      border: 1px groove white;
-    }
-
-    #openSettings:hover {
-      color: darkslategray;
-      background-color: lightyellow;
-    }
-
-    #LitCalMessages {
-      width: 75%;
-      margin: 30px auto;
-      border: 1px solid darkslategray;
-      padding: 10px;
-      background: lightgray;
-    }
-
-    #LitCalMessages th {
-      font-size: 1.3em;
-      padding: 10px;
-    }
-
-    #LitCalMessages td {
-      padding: 5px;
-      border-bottom: 1px solid White;
-    }
-
-    #LitCalMessages td:first-child {
-      border-right: 1px groove White;
-    }
-  </style>
-</head>
-
-<body>
-  <div id="spinnerWrapper">
-    <div class="lds-roller">
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>
-  </div>
-  <div><a class="backNav" href="/LiturgicalCalendar">↩ Go back ↩</a></div>
-  <span class="material-icons" id="openSettings">settings</span>
-  <header>
-  </header>
-
-  <div id='calendar'></div>
 
 </body>
 
