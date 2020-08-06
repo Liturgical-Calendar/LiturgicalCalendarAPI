@@ -320,6 +320,11 @@
 
               let calendarEl = document.getElementById('calendar'),
                   fullCalendarSettings = {
+                    headerToolbar: {
+                      left: 'prev,next today',
+                      center: 'title',
+                      right: 'dayGridMonth,listMonth'
+                    },
                     dayMaxEvents: true, // allow "more" link when too many events
                     events: $events,
                     firstDay: 0,
@@ -338,10 +343,6 @@
                   };
               if($Settings.locale.toLowerCase() !== 'en'){
                 fullCalendarSettings.locale = $Settings.locale.toLowerCase();
-              }
-              if($Settings.locale.toLowerCase() === 'la'){
-                //fullCalendarSettings.dayNames = ['Dies Solis','Dies Lunae','Dies Martis','Dies Mercurii','Dies Iovis','Dies Veneris','Dies Saturni'];
-                //fullCalendarSettings.dayNamesShort = ['Sol','Lun','Mart','Merc','Iov','Ven','Sat'];
               }
               if( parseInt($Settings.year) !== today.getFullYear()){
                 fullCalendarSettings.initialDate = $Settings.year + '-01-01';
@@ -792,8 +793,10 @@
             "en": "Information about the current calculation of the Liturgical Year",
             "it": "Informazioni sull'attuale calcolo dell'Anno Liturgico",
             "la": "Notitiæ de computatione præsente Anni Liturgici"
-        }
-    };
+        },
+      },
+      dayNames = ['Dies Solis','Dies Lunae','Dies Martis','Dies Mercurii','Dies Iovis','Dies Veneris','Dies Saturni'],
+      dayNamesShort = ['Sol','Lun','Mart','Merc','Iov','Ven','Sat'];
 
 
     $(document).ready(function () {
@@ -874,6 +877,13 @@
           return decodeURI($(this).attr('data-tooltip'))
         }
       });
+
+      if($Settings.locale.toLowerCase() === 'la'){
+        $('.fc-day').each(function(idx){
+          $(this).find('a.fc-col-header-cell-cushion').text(dayNamesShort[idx]);
+          console.log($(this).find('a.fc-col-header-cell-cushion').text());
+        });
+      }
 
     });
 
