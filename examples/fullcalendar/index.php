@@ -1,3 +1,13 @@
+<!DOCTYPE html>
+<head>
+
+</head>
+<body>
+    <ul>
 <?php
-phpinfo();
+foreach (glob("examples/*.html") as $filename) {
+    echo '<li><a href="' . $filename . '">' . $filename . '</a></li>';
+}
 ?>
+</ul>
+</body>
