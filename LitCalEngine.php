@@ -107,6 +107,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $LITSETTINGS->NATIONAL = isset($_POST["nationalpreset"]) && in_array(strtoupper($_POST["nationalpreset"]), $supportedNationalPresets) ? strtoupper($_POST["nationalpreset"]) : false;
 
+    $LITSETTINGS->DIOCESAN = isset($_POST["diocesanpreest"]) ? strtoupper($_POST["diocesanpreset"]) : false;
+
 } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $LITSETTINGS->YEAR = (isset($_GET["year"]) && is_numeric($_GET["year"]) && ctype_digit($_GET["year"]) && strlen($_GET["year"]) === 4) ? (int)$_GET["year"] : (int)date("Y");
 
@@ -118,6 +120,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $LITSETTINGS->RETURNTYPE = isset($_GET["returntype"]) && in_array(strtoupper($_GET["returntype"]), $allowed_returntypes) ? strtoupper($_GET["returntype"]) : ($acceptHeader !== "" ? $acceptHeader : $allowed_returntypes[0]); // default to JSON
 
     $LITSETTINGS->NATIONAL = isset($_GET["nationalpreset"]) && in_array(strtoupper($_GET["nationalpreset"]), $supportedNationalPresets) ? strtoupper($_GET["nationalpreset"]) : false;
+
+    $LITSETTINGS->DIOCESAN = isset($_GET["diocesanpreest"]) ? strtoupper($_GET["diocesanpreset"]) : false;
 
 }
 
@@ -382,19 +386,32 @@ $LitCal["ThuOctaveEaster"]  = new Festivity($PROPRIUM_DE_TEMPORE["ThuOctaveEaste
 $LitCal["FriOctaveEaster"]  = new Festivity($PROPRIUM_DE_TEMPORE["FriOctaveEaster"]["NAME_" . $LITSETTINGS->LOCALE], calcGregEaster($LITSETTINGS->YEAR)->add(new DateInterval('P5D')),            "white",    "mobile", HIGHERSOLEMNITY);
 $LitCal["SatOctaveEaster"]  = new Festivity($PROPRIUM_DE_TEMPORE["SatOctaveEaster"]["NAME_" . $LITSETTINGS->LOCALE], calcGregEaster($LITSETTINGS->YEAR)->add(new DateInterval('P6D')),            "white",    "mobile", HIGHERSOLEMNITY);
 
-
-array_push($SOLEMNITIES, $LitCal["Advent1"]->date, $LitCal["Christmas"]->date, $LitCal["Epiphany"]->date);
-array_push($SOLEMNITIES, $LitCal["AshWednesday"]->date, $LitCal["HolyThurs"]->date, $LitCal["GoodFri"]->date, $LitCal["EasterVigil"]->date);
-array_push($SOLEMNITIES, $LitCal["MonOctaveEaster"]->date, $LitCal["TueOctaveEaster"]->date, $LitCal["WedOctaveEaster"]->date, $LitCal["ThuOctaveEaster"]->date, $LitCal["FriOctaveEaster"]->date, $LitCal["SatOctaveEaster"]->date);
-array_push($SOLEMNITIES, $LitCal["Ascension"]->date, $LitCal["Pentecost"]->date, $LitCal["Trinity"]->date, $LitCal["CorpusChristi"]->date);
-
+$SOLEMNITIES["Advent1"]         = $LitCal["Advent1"]->date;
+$SOLEMNITIES["Christmas"]       = $LitCal["Christmas"]->date;
+$SOLEMNITIES["Epiphany"]        = $LitCal["Epiphany"]->date;
+$SOLEMNITIES["AshWednesday"]    = $LitCal["AshWednesday"]->date;
+$SOLEMNITIES["HolyThurs"]       = $LitCal["HolyThurs"]->date;
+$SOLEMNITIES["GoodFri"]         = $LitCal["GoodFri"]->date;
+$SOLEMNITIES["EasterVigil"]     = $LitCal["EasterVigil"]->date;
+$SOLEMNITIES["MonOctaveEaster"] = $LitCal["MonOctaveEaster"]->date;
+$SOLEMNITIES["TueOctaveEaster"] = $LitCal["TueOctaveEaster"]->date;
+$SOLEMNITIES["WedOctaveEaster"] = $LitCal["WedOctaveEaster"]->date;
+$SOLEMNITIES["ThuOctaveEaster"] = $LitCal["ThuOctaveEaster"]->date;
+$SOLEMNITIES["FriOctaveEaster"] = $LitCal["FriOctaveEaster"]->date;
+$SOLEMNITIES["SatOctaveEaster"] = $LitCal["SatOctaveEaster"]->date;
+$SOLEMNITIES["Ascension"]       = $LitCal["Ascension"]->date;
+$SOLEMNITIES["Pentecost"]       = $LitCal["Pentecost"]->date;
+$SOLEMNITIES["Trinity"]         = $LitCal["Trinity"]->date;
+$SOLEMNITIES["CorpusChristi"]   = $LitCal["CorpusChristi"]->date;
 
 //3. Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar
 $LitCal["SacredHeart"]      = new Festivity($PROPRIUM_DE_TEMPORE["SacredHeart"]["NAME_" . $LITSETTINGS->LOCALE],    calcGregEaster($LITSETTINGS->YEAR)->add(new DateInterval('P' . (7 * 9 + 5) . 'D')),  "red",      "mobile", SOLEMNITY);
+$SOLEMNITIES["SacredHeart"] = $LitCal["SacredHeart"]->date;
 
 //Christ the King is calculated backwards from the first sunday of advent
 $LitCal["ChristKing"]       = new Festivity($PROPRIUM_DE_TEMPORE["ChristKing"]["NAME_" . $LITSETTINGS->LOCALE],     DateTime::createFromFormat('!j-n-Y', '25-12-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'))->modify('last Sunday')->sub(new DateInterval('P' . (4 * 7) . 'D')),    "red",  "mobile", SOLEMNITY);
-array_push($SOLEMNITIES, $LitCal["SacredHeart"]->date, $LitCal["ChristKing"]->date);
+$SOLEMNITIES["ChristKing"]  = $LitCal["ChristKing"]->date;
+
 //END MOBILE SOLEMNITIES
 
 //START FIXED SOLEMNITIES
@@ -407,6 +424,30 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
     while ($row = mysqli_fetch_assoc($result)) {
         $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"] . '-' . $row["MONTH"] . '-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
         $LitCal[$row["TAG"]] = new Festivity($row["NAME_" . $LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"]);
+        //check if by chance any of these coincides with a mobile solemnity already defined
+        if(in_array($currentFeastDate,$SOLEMNITIES)){
+            $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                __("The Solemnity '%s' coincides with the Solemnity '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!", $LITSETTINGS->LOCALE),
+                $row["NAME_" . $LITSETTINGS->LOCALE],
+                $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name,
+                $LITSETTINGS->YEAR
+            );
+
+            //In the year 2022, the Solemnity Nativity of John the Baptist coincides with the Solemnity of the Sacred Heart
+            //Nativity of John the Baptist anticipated by one day to June 23 
+            //(except in cases where John the Baptist is patron of a nation, diocese, city or religious community, then the Sacred Heart can be anticipated by one day to June 23)
+            //http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html
+            if($LITSETTINGS->YEAR === 2022 && $row["TAG"] === "NativityJohnBaptist" && array_search($currentFeastDate,$SOLEMNITIES) === "SacredHeart" ){
+                $LitCal["NativityJohnBaptist"]->date->sub(new DateInterval('P1D'));
+                $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                    __("Seeing that the Solemnity '%s' coincides with the Solemnity '%s' in the year %d, it has been anticipated by one day as per %s.", $LITSETTINGS->LOCALE),
+                    $LitCal["NativityJohnBaptist"]->name,
+                    $LitCal["SacredHeart"]->name,
+                    $LITSETTINGS->YEAR,
+                    '<a href="http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>'
+                );
+            }
+        }
     }
 }
 
@@ -499,8 +540,15 @@ else if ($LitCal["Annunciation"]->date >= $LitCal["PalmSun"]->date && $LitCal["A
 		    }
 		    */
 
-array_push($SOLEMNITIES, $LitCal["MotherGod"]->date, $LitCal["NativityJohnBaptist"]->date, $LitCal["StsPeterPaulAp"]->date, $LitCal["Assumption"]->date, $LitCal["AllSaints"]->date, $LitCal["AllSouls"]->date);
-array_push($SOLEMNITIES, $LitCal["StJoseph"]->date, $LitCal["Annunciation"]->date, $LitCal["ImmaculateConception"]->date);
+$SOLEMNITIES["MotherGod"]           = $LitCal["MotherGod"]->date;
+$SOLEMNITIES["NativityJohnBaptist"] = $LitCal["NativityJohnBaptist"]->date;
+$SOLEMNITIES["StsPeterPaulAp"]      = $LitCal["StsPeterPaulAp"]->date;
+$SOLEMNITIES["Assumption"]          = $LitCal["Assumption"]->date;
+$SOLEMNITIES["AllSaints"]           = $LitCal["AllSaints"]->date;
+$SOLEMNITIES["AllSouls"]            = $LitCal["AllSouls"]->date;
+$SOLEMNITIES["StJoseph"]            = $LitCal["StJoseph"]->date;
+$SOLEMNITIES["Annunciation"]        = $LitCal["Annunciation"]->date;
+$SOLEMNITIES["ImmaculateConception"]= $LitCal["ImmaculateConception"]->date;
 
 //4. Proper solemnities
 //TODO: Intregrate proper solemnities
@@ -556,8 +604,11 @@ if ((int)DateTime::createFromFormat('!j-n-Y', '25-12-' . $LITSETTINGS->YEAR, new
 
 //If a fixed date Solemnity occurs on a Sunday of Ordinary Time or on a Sunday of Christmas, the Solemnity is celebrated in place of the Sunday. (e.g., Birth of John the Baptist, 1990)
 //If a fixed date Feast of the Lord occurs on a Sunday in Ordinary Time, the feast is celebrated in place of the Sunday
-array_push($SOLEMNITIES, $LitCal["BaptismLord"]->date, $LitCal["Presentation"]->date, $LitCal["Transfiguration"]->date, $LitCal["ExaltationCross"]->date, $LitCal["HolyFamily"]->date);
-
+$SOLEMNITIES["BaptismLord"]     = $LitCal["BaptismLord"]->date;
+$SOLEMNITIES["Presentation"]    = $LitCal["Presentation"]->date;
+$SOLEMNITIES["Transfiguration"] = $LitCal["Transfiguration"]->date;
+$SOLEMNITIES["ExaltationCross"] = $LitCal["ExaltationCross"]->date;
+$SOLEMNITIES["HolyFamily"]      = $LitCal["HolyFamily"]->date;
 
 
 //6. SUNDAYS OF CHRISTMAS TIME AND SUNDAYS IN ORDINARY TIME
@@ -574,7 +625,8 @@ while ($firstOrdinary >= $LitCal["BaptismLord"]->date && $firstOrdinary < $first
     if (!in_array($firstOrdinary, $SOLEMNITIES)) {
         $LitCal["OrdSunday" . $ordSun] = new Festivity($PROPRIUM_DE_TEMPORE["OrdSunday" . $ordSun]["NAME_" . $LITSETTINGS->LOCALE], $firstOrdinary, "green", "mobile");
         //add Sundays to our priority list for next checking against ordinary Feasts not of Our Lord
-        array_push($SOLEMNITIES, $firstOrdinary);
+        $SOLEMNITIES["OrdSunday" . $ordSun]      = $firstOrdinary;
+
     } else {
         $Messages[] = sprintf(
             __("'%s' is superseded by a Solemnity in the year %d.",$LITSETTINGS->LOCALE),
@@ -599,7 +651,7 @@ while ($lastOrdinary <= $LitCal["ChristKing"]->date && $lastOrdinary > $lastOrdi
     if (!in_array($lastOrdinary, $SOLEMNITIES)) {
         $LitCal["OrdSunday" . $ordSun] = new Festivity($PROPRIUM_DE_TEMPORE["OrdSunday" . $ordSun]["NAME_" . $LITSETTINGS->LOCALE], $lastOrdinary, "green", "mobile");
         //add Sundays to our priority list for next checking against ordinary Feasts not of Our Lord
-        array_push($SOLEMNITIES, $lastOrdinary);
+        $SOLEMNITIES["OrdSunday" . $ordSun]      = $lastOrdinary;
     } else {
         $Messages[] = sprintf(
             __("'%s' is superseded by a Solemnity in the year %d.",$LITSETTINGS->LOCALE),
@@ -624,7 +676,7 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
         $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"] . '-' . $row["MONTH"] . '-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
         if ((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate, $SOLEMNITIES)) {
             $LitCal[$row["TAG"]] = new Festivity($row["NAME_" . $LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"]);
-            array_push($FEASTS_MEMORIALS, $currentFeastDate);
+            $FEASTS_MEMORIALS[$row["TAG"]]      = $currentFeastDate;
         } else {
             $Messages[] = sprintf(
                 __("The Feast '%s', usually celebrated on %s, is suppressed by a Sunday or a Solemnity in the year %d.",$LITSETTINGS->LOCALE),
@@ -740,8 +792,9 @@ if (!in_array(calcGregEaster($LITSETTINGS->YEAR)->add(new DateInterval('P' . (7 
     //Pentecost = calcGregEaster($LITSETTINGS->YEAR)->add(new DateInterval('P'.(7*7).'D'))
     //Second Sunday after Pentecost = calcGregEaster($LITSETTINGS->YEAR)->add(new DateInterval('P'.(7*9).'D'))
     //Following Saturday = calcGregEaster($LITSETTINGS->YEAR)->add(new DateInterval('P'.(7*9+6).'D'))
-    $LitCal["ImmaculateHeart"]  = new Festivity($PROPRIUM_DE_TEMPORE["ImmaculateHeart"]["NAME_" . $LITSETTINGS->LOCALE],       calcGregEaster($LITSETTINGS->YEAR)->add(new DateInterval('P' . (7 * 9 + 6) . 'D')),  "red",      "mobile", MEMORIAL);
-    array_push($FEASTS_MEMORIALS, $LitCal["ImmaculateHeart"]->date);
+    $LitCal["ImmaculateHeart"]  = new Festivity($PROPRIUM_DE_TEMPORE["ImmaculateHeart"]["NAME_" . $LITSETTINGS->LOCALE],       calcGregEaster($LITSETTINGS->YEAR)->add(new DateInterval('P' . (7 * 9 + 6) . 'D')),  "white",      "mobile", MEMORIAL);
+    $FEASTS_MEMORIALS["ImmaculateHeart"]      = $LitCal["ImmaculateHeart"]->date;
+
     //In years when this memorial coincides with another obligatory memorial, as happened in 2014 [28 June, Saint Irenaeus] and 2015 [13 June, Saint Anthony of Padua], both must be considered optional for that year
     //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
     //This is taken care of in the next code cycle, see tag IMMACULATEHEART: in the code comments ahead
@@ -777,7 +830,8 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
 
             //We can now add, for logical reasons, Feasts and Memorials to the $FEASTS_MEMORIALS array
             if ($LitCal[$row["TAG"]]->grade > MEMORIALOPT) {
-                array_push($FEASTS_MEMORIALS, $currentFeastDate);
+                $FEASTS_MEMORIALS[$row["TAG"]]      = $currentFeastDate;
+
                 //Also, while we're add it, let's remove the weekdays of Epiphany that get overriden by memorials
                 if (false !== $key = array_search($LitCal[$row["TAG"]]->date, $WEEKDAYS_EPIPHANY)) {
                     $Messages[] = sprintf(
@@ -869,7 +923,8 @@ if ($LITSETTINGS->YEAR >= 2002) {
 
                 //We can now add, for logical reasons, Feasts and Memorials to the $FEASTS_MEMORIALS array
                 if ($LitCal[$row["TAG"]]->grade > MEMORIALOPT) {
-                    array_push($FEASTS_MEMORIALS, $currentFeastDate);
+                    $FEASTS_MEMORIALS[$row["TAG"]]      = $currentFeastDate;
+
                     //Also, while we're add it, let's remove the weekdays of Epiphany that get overriden by memorials
                     if (false !== $key = array_search($LitCal[$row["TAG"]]->date, $WEEKDAYS_EPIPHANY)) {
                         $Messages[] = sprintf(
@@ -934,15 +989,9 @@ if($LITSETTINGS->YEAR >= 2018){
     }
     else if (in_array($MaryMotherChurch_date,$FEASTS_MEMORIALS) ){
         //we have to find out what it coincides with. If it's a feast, it is superseded by the feast. If a memorial, it will suppress the memorial
-        $coincidingFestivity;
-        $coincidingFestivityKey;
-        foreach($LitCal as $key => $festivity){
-            if($festivity->date == $MaryMotherChurch_date){
-                $coincidingFestivity = $festivity;
-                $coincidingFestivityKey = $key;
-                break;
-            }
-        }
+        $coincidingFestivityKey = array_search($MaryMotherChurch_date,$FEASTS_MEMORIALS);
+        $coincidingFestivity = $LitCal[$coincidingFestivityKey];
+
         if($coincidingFestivity->grade <= MEMORIAL){
             $LitCal["MaryMotherChurch"] = new Festivity($MaryMotherChurch_tag[$LITSETTINGS->LOCALE], $MaryMotherChurch_date, "white", "mobile", MEMORIAL, "proper");
             $Messages[] = sprintf(
@@ -1445,6 +1494,68 @@ while ($lastOrdinary >= $SecondWeekdaysLowerLimit && $lastOrdinary < $SecondWeek
 if($LITSETTINGS->NATIONAL !== false){
     switch($LITSETTINGS->NATIONAL){
         case 'ITALY':
+            
+            //Insert or elevate the Patron Saints of Italy
+            if(array_key_exists("CaterinaSiena",$LitCal)){
+                $LitCal["CaterinaSiena"]->grade = FEAST;
+                $LitCal["CaterinaSiena"]->name .= ", patrona principale d'Italia";
+            }
+            else{
+                //check what's going on, for example, if it's a Sunday or Solemnity
+                $currentFeastDate = DateTime::createFromFormat('!j-n-Y', '29-4-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+                if(in_array($currentFeastDate,$SOLEMNITIES)){
+                    //let's find out which Solemnity we are dealing with
+                    $solemnityKey = array_search($currentFeastDate,$SOLEMNITIES);
+                    $Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                        "La Festa della patrona d'Italia Santa Caterina da Siena è soppressa nell'anno %d da una celebrazione più importante, %s.",
+                        $LITSETTINGS->YEAR,
+                        $LitCal[$solemnityKey]->name
+                    );
+    
+                }                
+            }
+
+            if(array_key_exists("StFrancisAssisi",$LitCal)){
+                $LitCal["StFrancisAssisi"]->grade = FEAST;
+                $LitCal["StFrancisAssisi"]->name .= ", patrono principale d'Italia";
+            }
+            else{
+                //check what's going on, for example, if it's a Sunday or Solemnity
+                $currentFeastDate = DateTime::createFromFormat('!j-n-Y', '29-4-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+                if(in_array($currentFeastDate,$SOLEMNITIES)){
+                    //let's find out which Solemnity we are dealing with
+                    $solemnityKey = array_search($currentFeastDate,$SOLEMNITIES);
+                    $Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                        "La Festa del patrono d'Italia San Francesco d'Assisi è soppressa nell'anno %d da una celebrazione più importante, %s.",
+                        $LITSETTINGS->YEAR,
+                        $LitCal[$solemnityKey]->name
+                    );
+                }                
+            }
+            
+            //The extra liturgical events found in the 1983 edition of the Roman Missal in Italian,
+            //were then incorporated into the Latin edition in 2002 (effectively being incorporated into the General Roman Calendar)
+            //so when dealing with Italy, we only need to add them from 1983 until 2002, after which it's taken care of by the General Calendar
+            if($LITSETTINGS->YEAR >= 1983 && $LITSETTINGS->YEAR < 2002){
+                if ($result = $mysqli->query("SELECT * FROM LITURGY__ITALY_calendar_propriumdesanctis_1983")) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row['DAY'] . '-' . $row['MONTH'] . '-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+                        if(!in_array($currentFeastDate,$SOLEMNITIES)){
+                            $LitCal[$row["TAG"]] = new Festivity("[ITALIA] " . $row["NAME_" . $LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"], $row["DISPLAYGRADE"]);
+                        }
+                        else{
+                            $Messages[] = sprintf(
+                                "ITALIA: la %s '%s' (%s), aggiunta al calendario nell'edizione del Messale Romano del 1983 pubblicata dalla CEI, è soppressa da una Domenica o una Solennità nell'anno %d",
+                                $row["DISPLAYGRADE"] !== "" ? $row["DISPLAYGRADE"] : _G($row["GRADE"],$LITSETTINGS->LOCALE,false),
+                                '<i>' . $row["NAME_" . $LITSETTINGS->LOCALE] . '</i>',
+                                trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U')))),
+                                $LITSETTINGS->YEAR
+                            );
+                        }
+                    }
+                }
+            }
+
         break;
         case 'USA':
             
@@ -1610,6 +1721,32 @@ if($LITSETTINGS->NATIONAL !== false){
             
         break;
         case 'VATICAN':
+        break;
+    }
+}
+
+if($LITSETTINGS->DIOCESAN !== false){
+    switch($LITSETTINGS->DIOCESAN){
+        case "DIOCESIDIROMA":
+            if($LITSETTINGS->YEAR >= 1973){
+                if ($result = $mysqli->query("SELECT * FROM LITURGY__DIOCESIDIROMA_calendar_propriumdesanctis_1973")) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row['DAY'] . '-' . $row['MONTH'] . '-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+                        if($row["GRADE"] < FEAST && !in_array($currentFeastDate,$SOLEMNITIES)){
+                            $LitCal["DIOCESIDIROMA_".$row["TAG"]] = new Festivity("[Diocesi di Roma] " . $row["NAME_" . $LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"], $row["DISPLAYGRADE"]);
+                        }
+                        else{
+                            $Messages[] = sprintf(
+                                "DIOCESIDIROMA: la %s '%s' (%s), propria del calendario della Diocesi di Roma pubblicato nel 1973, è soppressa da una Domenica o una Solennità nell'anno %d",
+                                $row["DISPLAYGRADE"] !== "" ? $row["DISPLAYGRADE"] : _G($row["GRADE"],$LITSETTINGS->LOCALE,false),
+                                '<i>' . $row["NAME_" . $LITSETTINGS->LOCALE] . '</i>',
+                                trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U')))),
+                                $LITSETTINGS->YEAR
+                            );
+                        }
+                    }
+                }
+            }
         break;
     }
 }
