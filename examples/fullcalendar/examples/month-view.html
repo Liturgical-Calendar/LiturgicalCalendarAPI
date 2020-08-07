@@ -304,7 +304,7 @@
                 let $possibleColors = $festivity.color.split("|");
                 let $CSScolor = $possibleColors[0];
                 let $textColor = ($CSScolor === 'white' || $CSScolor === 'pink' ? 'black' : 'white');
-                let $description = _G($festivity.grade) + '<br>' + _C($festivity.common) + ($festivity.hasOwnProperty('liturgicalyear') ? '<br>' + $festivity.liturgicalyear : '');
+                let $description = '<b>' + $festivity.name + '</b><br>' + _G($festivity.grade) + ', <i>' + _CC($festivity.color, true) + '</i><br><i style="font-size:.8em;">' + _C($festivity.common) + '</i>' + ($festivity.hasOwnProperty('liturgicalyear') ? '<br>' + $festivity.liturgicalyear : '');
                 $events[$keyindex] = {
                   title: $festivity.name,
                   start: $festivity.date.getUTCFullYear() + '-' + pad($festivity.date.getUTCMonth() + 1) + '-' + pad($festivity.date.getUTCDate()),
@@ -329,16 +329,7 @@
                     events: $events,
                     firstDay: 0,
                     eventDidMount: function(info) {
-                      //console.log(info.el);
                       $(info.el).attr('data-tooltip', encodeURI(info.event.extendedProps.description));
-                      /*
-                      var tooltip = new Tooltip(info.el, {
-                        title: info.event.extendedProps.description,
-                        placement: 'top',
-                        trigger: 'hover',
-                        container: 'body'
-                      });
-                      */
                     }
                   };
               if($Settings.locale.toLowerCase() !== 'en'){
@@ -457,7 +448,7 @@
     },
     _C = function($common){
         if ($common !== "" && $common !== "Proper") {
-            $commons = $common.split("|");
+            let $commons = $common.split("|");
             $commons = $commons.map(function($txt) {
                 $commonArr = $txt.split(":");
                 $commonGeneral = __($commonArr[0]);
@@ -486,6 +477,33 @@
             $common = __("Proper");
         }
         return $common;
+    },
+    _CC = function($colorstr,html){
+      if(html === true){
+        if($colorstr.indexOf('|') !== -1){
+            let $colors = $colorstr.split("|");
+            $colors = $colors.map(function($txt){
+              $clr = $txt === 'white' ? 'gray' : $txt;  
+              return '<span style="color:'+$clr+';">' +  __($txt) + '</span>';
+            });
+            return $colors.join(" " + __("or") + " ");
+        }
+        else{
+            return '<span style="color:'+($colorstr==='white' ? 'gray' : $colorstr)+';">' +  __($colorstr) + '</span>';
+        }
+      }
+      else{
+        if($colorstr.indexOf('|') !== -1){
+            let $colors = $colorstr.split("|");
+            $colors = $colors.map(function($txt){
+                return __($txt);
+            });
+            return $colors.join(" " + __("or") + " ");
+        }
+        else{
+            return __($colorstr);
+        }
+      }
     },
     $messages = {
         "From the Common": {

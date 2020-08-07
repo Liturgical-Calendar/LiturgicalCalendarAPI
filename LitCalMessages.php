@@ -441,27 +441,27 @@ $MESSAGES = [
     "The Solemnity '%s' falls on the Second Sunday of Advent in the year %d, the celebration has been transferred to the following Monday (%s)." => [
         "en" => "The Solemnity <i>'%s'</i> falls on the Second Sunday of Advent in the year %d, the celebration has been transferred to the following Monday (%s).",
         "it" => "La Solennità <i>'%s'</i> coincide con la Seconda Domenica d'Avvento nell'anno %d, pertanto la celebrazione è stata trasferita al lunedì seguente (%s).",
-        "la" => "Coincidit enim Sollemnitas <i>'%s'</i> cum Dominica Secunda Temporis Adventi in anno %d, ergo translata est celebratio ad diem Lunæ proximum (%s)."
+        "la" => "Coincidet enim Sollemnitas <i>'%s'</i> cum Dominica Secunda Temporis Adventi in anno %d, ergo translata est celebratio ad diem Lunæ proximum (%s)."
     ],
     "The Solemnity '%s' falls on a Sunday of Lent in the year %d, the celebration has been transferred to the following Monday (%s)." => [
         "en" => "The Solemnity <i>'%s'</i> falls on a Sunday of Lent in the year %d, the celebration has been transferred to the following Monday (%s).",
         "it" => "La Solennità <i>'%s'</i> coincide con una Domenica di Quaresima nell'anno %d, pertanto la celebrazione è stata trasferita al lunedì seguente (%s).",
-        "la" => "Coincidit enim Sollemnitas <i>'%s'</i> cum Dominica Temporis Quadragesimæ in anno %d, ergo traslata est celebratio ad diem Lunæ proximum (%s)."
+        "la" => "Coincidet enim Sollemnitas <i>'%s'</i> cum Dominica Temporis Quadragesimæ in anno %d, ergo traslata est celebratio ad diem Lunæ proximum (%s)."
     ],
     "The Solemnity '%s' falls either on Palm Sunday or during Holy Week in the year %d, the celebration has been transferred to the Saturday preceding Palm Sunday (%s)." => [
         "en" => "The Solemnity <i>'%s'</i> falls either on Palm Sunday or during Holy Week in the year %d, the celebration has been transferred to the Saturday preceding Palm Sunday (%s).",
         "it" => "La Solennità <i>'%s'</i> o coincide con la Domenica delle Palme, o cade durante la Settimana Santa nell'anno %d, pertanto la celebrazione è stata trasferita al sabato che precede la Domenica delle Palme (%s).",
-        "la" => "Aut enim coincidit Sollemnitas <i>'%s'</i> cum Dominica in Palmis aut coincidit cum Hebdomada Sancta in anno %d, ergo traslata est celebratio ad diem Saturni ante Dominicam in Palmis (%s)."
+        "la" => "Aut enim coincidet Sollemnitas <i>'%s'</i> cum Dominica in Palmis aut coincidet cum Hebdomada Sancta in anno %d, ergo traslata est celebratio ad diem Saturni ante Dominicam in Palmis (%s)."
     ],
     "The Solemnity '%s' falls either on Palm Sunday or during Holy Week in the year %d, the celebration has been transferred to the Monday following the Second Sunday of Easter (%s)." => [
         "en" => "The Solemnity <i>'%s'</i> falls either on Palm Sunday or during Holy Week in the year %d, the celebration has been transferred to the Monday following the Second Sunday of Easter (%s).",
         "it" => "La Solennità <i>'%s'</i> o coincide con la Domenica delle Palme, o cade durante la Settimana Santa nell'anno %d, pertanto la celebrazione è stata trasferita al lunedì che segue la Seconda Domenica di Pasqua (%s).",
-        "la" => "Aut enim coincidit Sollemnitas <i>'%s'</i> cum Dominica in Palmis aut coincidit cum Hebdomada Sancta in anno %d, ergo traslata est celebratio ad diem Lunæ post Dominicam Secundam Paschæ (%s)."
+        "la" => "Aut enim coincidet Sollemnitas <i>'%s'</i> cum Dominica in Palmis aut coincidet cum Hebdomada Sancta in anno %d, ergo traslata est celebratio ad diem Lunæ post Dominicam Secundam Paschæ (%s)."
     ],
     "'%s' falls on a Sunday in the year %d, therefore the Feast '%s' is celebrated on %s rather than on the Sunday after Christmas." => [
         "en" => "'%s' falls on a Sunday in the year %d, therefore the Feast <i>'%s'</i> is celebrated on %s rather than on the Sunday after Christmas.",
         "it" => "'%s' coincide con una Domenica nell'anno %d, pertanto la Festa <i>'%s'</i> viene celebrata il %s anziché la Domenica dopo Natale.",
-        "la" => "'%s' coincidit cum Dominica in anno %d, ergo Festum <i>'%s'</i> celebrentur die %s quam Dominica post Nativitate."
+        "la" => "'%s' coincidet cum Dominica in anno %d, ergo Festum <i>'%s'</i> celebrentur die %s quam Dominica post Nativitate."
     ],
     "'%s' is superseded by a Solemnity in the year %d." => [
         "en" => "<i>'%s'</i> is superseded by a Solemnity in the year %d.",
@@ -491,7 +491,7 @@ $MESSAGES = [
     "The Memorial '%s' coincides with another Memorial '%s' in the year %d. They are both reduced in rank to optional memorials (%s)." => [
         "en" => "The Memorial <i>'%s'</i> coincides with another Memorial <i>'%s'</i> in the year %d. They are both reduced in rank to optional memorials (%s).",
         "it" => "La Memoria obbligatoria <i>'%s'</i> coincide con l'altra Memoria obbligatoria <i>'%s'</i> nell'anno %d. Pertanto tutte e due sono ridotte di grado a Memoria facoltativa (%s).",
-        "la" => "Memoria <i>'%s'</i> coincidit cum alia Memoria <i>'%s'</i> in anno %d. Ergo ambo simul redunctur in gradu Memoriæ ad libitum (%s)."
+        "la" => "Memoria <i>'%s'</i> coincidet cum alia Memoria <i>'%s'</i> in anno %d. Ergo ambo simul redunctur in gradu Memoriæ ad libitum (%s)."
     ],
     "The Memorial '%s', usually celebrated on %s, is suppressed by a Sunday, a Solemnity or a Feast in the year %d." => [
         "en" => "The Memorial <i>'%s'</i>, usually celebrated on %s, is suppressed by a Sunday, a Solemnity or a Feast in the year %d.",
@@ -592,6 +592,16 @@ $MESSAGES = [
         "en" => "The %s '%s' has been suppressed by the Memorial %s, added on %s since the year %d (%s).",
         "it" => "La %s '%s' è stata soppressa dalla Memoria %s, aggiunta %s a partire dall'anno %d (%s).",
         "la" => "%s '%s' subplantata est ab Memoria %s, aggregata in %s ab anno %d (%s)."
+    ],
+    "The Solemnity '%s' coincides with the Solemnity '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!" => [
+        "en" => "The Solemnity <i>'%s'</i> coincides with the Solemnity <i>'%s'</i> in the year %d. We should ask the Congregation for Divine Worship what to do about this!",
+        "it" => "La Solennità <i>'%s'</i> coincide con la Solennità <i>'%s'</i> nell'anno %d. Dovremmo chiedere alla Congregazione del Culto Divino cosa fare a riguardo!",
+        "la" => "Sollemnitas <i>'%s'</i> coincidet cum Sollemnitate <i>'%s'</i> in anno %d. Oportet quaerere a Congregatione Cultu Divino quid facere!"
+    ],
+    "Seeing that the Solemnity '%s' coincides with the Solemnity '%s' in the year %d, it has been anticipated by one day as per %s." => [
+        "en" => "Seeing that the Solemnity <i>'%s'</i> coincides with the Solemnity <i>'%s'</i> in the year %d, the prior has been moved forward by one day as per %s.",
+        "it" => "Visto che la Solennità <i>'%s'</i> coincide con la Solennità <i>'%s'</i> nell'anno %d, la prima è stata anticipata di un giorno per %s.",
+        "la" => "Quod ratione Sollemnitas <i>'%s'</i> coincidet cum Sollemnitate <i>'%s'</i> in anno %d, sollemnitas prima ??? anticipata est ab uno die ??? (%s)"
     ]
 ];
 
