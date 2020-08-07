@@ -55,7 +55,7 @@ Both **POST** and **GET** requests can be made.
 ## Structure of the data returned by requests to the endpoint
 For simplicity we will only take into consideration the structure of a response with JSON data.
 Two object keys are returned:
-1. **`LitCal`**: has a value which is an object who's key => value pairs reflect the liturgical events generated for the calendar requested. Example value of the `LitCal' key (limited to two of the generated events):
+1. **`LitCal`**: has a value which is an object who's key => value pairs reflect the liturgical events generated for the calendar requested. Example value of the `LitCal` key (limited to two of the generated events):
 ```javascript
   "LitCal":{
     "MotherGod":{
