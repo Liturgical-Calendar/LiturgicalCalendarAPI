@@ -108,7 +108,12 @@ function convertArray2XML(SimpleXMLElement $object, array $data)
 {
   foreach ($data as $key => $value) {
     if (is_array($value)) {
-      $new_object = $object->addChild($key);
+      if($key === 'LitCal' || $key === 'Settings' || $key === 'Messages'){
+        $new_object = $object->addChild($key);
+      } else {
+        $new_object = $object->addChild("LitCalEvent");
+        $new_object->addAttribute("eventkey",$key);  
+      }
       convertArray2XML($new_object, $value);
     } else {
       // if the key is a number, it needs text with it to actually work
