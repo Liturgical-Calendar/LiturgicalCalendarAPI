@@ -82,14 +82,14 @@ Each of the events generated is represented as an object whose key => value pair
   * `color`  : The liturgical color associated with this liturgical event. Some events might have multiple possible liturgical colors, for examples memorials of saints where there is a choice between Commons. In these cases, the multiple possible colors are separated by a pipe character `|` in the same order as the relative possible Commons indicated in the `common` property. The color value is always in English, so that it can be used as is for generation of CSS styling rules especially if used as inline styles. Localization of these values is up to the requesting application which is in charge of creating the display, for example a value of `red|white` can be split on the pipe character and these values used for CSS styling, and a string could be created in Latin for display purposes: `'ruber vel album'`
   * `type`   : The type of celebration, whether *fixed* or *mobile* (*fixed* celebrations have the same date every year, *mobile* celebrations are calculated either based on the date of Easter or because they always fall on the same day of the week within a specific time frame)
   * `grade`  : The logical importance of the celebration, represented as a number from 0 to 7, used to calculate precedence compared to other possible events. The importance or precedence value will determine whether one event may suppress another event or have it moved to the next possible open slot according to certain criteria. A general association with liturgical terminology could be something like this:
-    - 0 = WEEKDAY
-    - 1 = COMMEMORATION
-    - 2 = OPTIONAL MEMORIAL
-    - 3 = MEMORIAL
-    - 4 = FEAST
-    - 5 = FEAST OF THE LORD
-    - 6 = SOLEMNITY
-    - 7 = event that has precedence over a solemnity
+    - `0` = WEEKDAY
+    - `1` = COMMEMORATION
+    - `2` = OPTIONAL MEMORIAL
+    - `3` = MEMORIAL
+    - `4` = FEAST
+    - `5` = FEAST OF THE LORD
+    - `6` = SOLEMNITY
+    - `7` = event that has precedence over a solemnity
     
   However this association is not suitable for displaying the actual *grade* (or *'rank'*) of the festivity in liturgical terms, because some events have a logical importance that does not correspond with their portrayed grade, for example "All Souls Day" is called a "Commemoration" and yet it is given the same importance as a solemnity. Thus "All Souls Day" will have a grade of 6, but should be displayed as "Commemoration" rather than as "Solemnity". Perhaps a future update to the engine will add a "displayGrade" property with the actual liturgical grade associated with the event, suitable for display.
   * `common` : Indicates whether the liturgical texts for the celebration (in the case of memorials of saints) can be found in the Proper of Saints in the Roman Missal, or whether in the various Commons. In the former case the value will be simply `Proper`, in the latter case there will be a more complex construct:
