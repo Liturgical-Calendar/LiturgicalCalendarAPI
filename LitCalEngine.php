@@ -1802,7 +1802,7 @@ function GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages){
             header('Content-Type: application/xml; charset=utf-8');
             $jsonStr = json_encode($SerializeableLitCal);
             $jsonObj = json_decode($jsonStr, true);
-            $root = "<?xml version=\"1.0\" encoding=\"UTF-8\"?" . "><LitCal/>";
+            $root = "<?xml version=\"1.0\" encoding=\"UTF-8\"?" . "><LiturgicalCalendar xmlns=\"https://www.bibleget.io/catholicliturgy\"/>";
             $xml = new SimpleXMLElement($root);
             convertArray2XML($xml, $jsonObj);
             print $xml->asXML();
