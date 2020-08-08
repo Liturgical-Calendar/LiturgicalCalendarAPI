@@ -1191,7 +1191,7 @@ if ($LITSETTINGS->YEAR >= 2002) {
         $StPioPietrelcina_tag = array("LA" => "S. Pii de Pietrelcina, presbyteri", "IT" => "San Pio da Pietrelcina, presbitero", "EN" => "Saint Pius of Pietrelcina, Priest");
         $StPioPietrelcina_date = DateTime::createFromFormat('!j-n-Y', '23-9-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
         if(!in_array($StPioPietrelcina_date,$SOLEMNITIES) && !in_array($StPioPietrelcina_date,$FEASTS_MEMORIALS)){
-            $LitCal["StPioPietrelcina"] = new Festivity($StPioPietrelcina_tag[$LITSETTINGS->LOCALE], $StPioPietrelcina_date, "white", "fixed", MEMORIALOPT, "Pastors:For One Pastor|Holy Men and Women:For Religious");
+            $LitCal["StPioPietrelcina"] = new Festivity($StPioPietrelcina_tag[$LITSETTINGS->LOCALE], $StPioPietrelcina_date, "white", "fixed", MEMORIALOPT, "Pastors:For One Pastor,Holy Men and Women:For Religious");
             $Messages[] = sprintf(
                 __("The optional memorial '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
                 $LitCal["StPioPietrelcina"]->name,
@@ -1870,8 +1870,13 @@ function GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages){
                         $displayGradeHTML = __("COMMEMORATION",$LITSETTINGS->LOCALE);
                     }
                     else if((int)$CalEvent->date->format('N') !==7 ){
-                        $displayGrade = _G($CalEvent->grade,$LITSETTINGS->LOCALE,false);
-                        $displayGradeHTML = _G($CalEvent->grade,$LITSETTINGS->LOCALE,true);
+                        if(property_exists($CalEvent->displayGrade) && $CalEvent->displayGrade !== ""){
+                            $displayGrade = $CalEvent->displayGrade;
+                            $displayGradeHTML = '<B>' . $CalEvent->displayGrade . '</B>';
+                        } else {
+                            $displayGrade = _G($CalEvent->grade,$LITSETTINGS->LOCALE,false);
+                            $displayGradeHTML = _G($CalEvent->grade,$LITSETTINGS->LOCALE,true);    
+                        }
                     }
                     
                     $description = _C($CalEvent->common,$LITSETTINGS->LOCALE);
