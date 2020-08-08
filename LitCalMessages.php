@@ -1,6 +1,6 @@
 <?php
 
-function __($key,$locale="la"){
+function __($key,$locale="LA"){
     global $MESSAGES;
     $locale = strtolower($locale);
     if(isset($MESSAGES[$key])){
@@ -18,7 +18,7 @@ function __($key,$locale="la"){
  * Function _G
  * Returns a translated string with the Grade (Rank) of the Festivity
  */
-function _G($key,$locale="la",$html=true){
+function _G($key,$locale="LA",$html=true){
     $locale = strtolower($locale);
     $key = (int)$key;
     $grade = __("FERIA",$locale);
@@ -463,15 +463,10 @@ $MESSAGES = [
         "it" => "'%s' coincide con una Domenica nell'anno %d, pertanto la Festa <i>'%s'</i> viene celebrata il %s anziché la Domenica dopo Natale.",
         "la" => "'%s' coincidet cum Dominica in anno %d, ergo Festum <i>'%s'</i> celebrentur die %s quam Dominica post Nativitate."
     ],
-    "'%s' is superseded by the Solemnity '%s' in the year %d." => [
-        "en" => "<i>'%s'</i> is superseded by the Solemnity or Feast of the Lord <i>'%s'</i> in the year %d.",
-        "it" => "<i>'%s'</i> è soppiantata dalla Solennità or Feast of the Lord <i>'%s'</i> nell'anno %d.",
-        "la" => "<i>'%s'</i> subplantata est ab Sollemnitate <i>'%s'</i> in anno %d."
-    ],
-    "The Feast '%s', usually celebrated on %s, is suppressed by a Sunday or a Solemnity '%s' in the year %d." => [
-        "en" => "The Feast <i>'%s'</i>, usually celebrated on %s, is suppressed by a Sunday or a Solemnity <i>'%s'</i> in the year %d.",
-        "it" => "La Festa  <i>'%s'</i>, che di solito sarebbe celebrata il giorno %s, viene soppiantata da una Domenica o una Solennità <i>'%s'</i> nell'anno %d.",
-        "la" => "Festum <i>'%s'</i> quo plerumque celebratur in die %s subplantata est ab Dominica aut Sollemnitate <i>'%s'</i> in anno %d."
+    "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d." => [
+        "en" => "The %s <i>'%s'</i>, usually celebrated on %s, is suppressed by the %s <i>'%s'</i> in the year %d.",
+        "it" => "La %s  <i>'%s'</i>, che di solito sarebbe celebrata il giorno %s, viene soppiantata dalla %s <i>'%s'</i> nell'anno %d.",
+        "la" => "%s <i>'%s'</i> quo plerumque celebratur in die %s subplantata est ab %s <i>'%s'</i> in anno %d."
     ],
     "The Memorial '%s', which would have been celebrated on %s, is suppressed by a Solemnity or Feast Day '%s' in the year %d." => [
         "en" => "The Memorial <i>'%s'</i>, which would have been celebrated on %s, is suppressed by a Solemnity or Feast Day <i>'%s'</i> in the year %d.",
@@ -483,20 +478,15 @@ $MESSAGES = [
         "it" => "La Memoria obbligatoria <i>'%s'</i> cade nel periodo della Quaresima nell'anno %d, pertanto è stata ridotta di grado a Commemorazione.",
         "la" => "Accidit Memoria <i>'%s'</i> in temporis Quadragesimæ in anno %d, ergo reductus est gradus ad Commemorationem."
     ],
-    "'%s' is superseded by the Memorial '%s' in the year %d." => [
-        "en" => "<i>'%s'</i> is superseded by the Memorial <i>'%s'</i> in the year %d.",
-        "it" => "<i>'%s'</i> è soppiantata dalla Memoria obbligatoria <i>'%s'</i> nell'anno %d.",
-        "la" => "<i>'%s'</i> subplantata est ab Memoria <i>'%s'</i> in anno %d."
+    "'%s' is superseded by the %s '%s' in the year %d." => [
+        "en" => "<i>'%s'</i> is superseded by the %s <i>'%s'</i> in the year %d.",
+        "it" => "<i>'%s'</i> è soppiantata dalla %s <i>'%s'</i> nell'anno %d.",
+        "la" => "<i>'%s'</i> subplantata est ab %s <i>'%s'</i> in anno %d."
     ],
     "The Memorial '%s' coincides with another Memorial '%s' in the year %d. They are both reduced in rank to optional memorials (%s)." => [
         "en" => "The Memorial <i>'%s'</i> coincides with another Memorial <i>'%s'</i> in the year %d. They are both reduced in rank to optional memorials (%s).",
         "it" => "La Memoria obbligatoria <i>'%s'</i> coincide con l'altra Memoria obbligatoria <i>'%s'</i> nell'anno %d. Pertanto tutte e due sono ridotte di grado a Memoria facoltativa (%s).",
         "la" => "Memoria <i>'%s'</i> coincidet cum alia Memoria <i>'%s'</i> in anno %d. Ergo ambo simul redunctur in gradu Memoriæ ad libitum (%s)."
-    ],
-    "The Memorial '%s', usually celebrated on %s, is suppressed by a Sunday, a Solemnity or a Feast '%s' in the year %d." => [
-        "en" => "The Memorial <i>'%s'</i>, usually celebrated on %s, is suppressed by a Sunday, a Solemnity or a Feast <i>'%s'</i> in the year %d.",
-        "it" => "La Memoria obbligatoria <i>'%s'</i>, celebrata solitamente il giorno %s, è soppiantata da una Domenica, una Solennità o una Festa <i>'%s'</i> nell'anno %d.",
-        "la" => "Memoria <i>'%s'</i> qua plerumque celebrata est in die %s subplantata est ab Dominica aut ab Sollemnitate aut ab Festu <i>'%s'</i> in anno %d."
     ],
     "The Memorial '%s' has been raised to the rank of Feast since the year 2016, applicable to the year %d (%s)." => [
         "en" => "The Memorial <i>'%s'</i> has been raised to the rank of Feast since the year 2016, applicable to the year %d (%s).",
@@ -527,11 +517,6 @@ $MESSAGES = [
         "en" => "The optional memorial <i>'%s'</i> either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration.",
         "it" => "La memoria facoltativa <i>'%s'</i> cade o tra il 17 Dic. e il 24 Dic., o durante l'Ottava di Natale, o tra le ferie della Quaresima nell'anno %d, pertanto il grado è stato ridotto a Commemorazione.",
         "la" => "Memoria ad libitum <i>'%s'</i> accidit aut infra 17 Dec. et 24 Dec. aut infra Octavam Nativitatis aut infra feriae Quadragesimae in anno %d, ergo reductus est gradus ad Commemorationem."
-    ],
-    "The optional memorial '%s', usually celebrated on %s, is suppressed by a Sunday, a Solemnity, a Feast or a Memorial '%s' in the year %d." => [
-        "en" => "The optional memorial <i>'%s'</i>, usually celebrated on %s, is suppressed by a Sunday, a Solemnity, a Feast or a Memorial <i>'%s'</i> in the year %d.",
-        "it" => "La memoria facoltativa <i>'%s'</i>, celebrata solitamente il giorno %s, è stata soppressa da una Domenica, una Solennità, una Festa o una Memoria <i>'%s'</i> nell'anno %d.",
-        "la" => "Memoria ad libitum <i>'%s'</i> plerumque celebrata in die %s subplantata est ab Dominica aut Sollemnitate aut Festu aut Memoria <i>'%s'</i> in anno %d."
     ],
     "The optional memorial '%s' was added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s), applicable for the year %d." => [
         "en" => "The optional memorial <i>'%s'</i> was added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s), applicable for the year %d.",
