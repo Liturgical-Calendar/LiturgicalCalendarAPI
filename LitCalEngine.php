@@ -669,7 +669,7 @@ while ($firstOrdinary >= $LitCal["BaptismLord"]->date && $firstOrdinary < $first
         $Messages[] = sprintf(
             __("'%s' is superseded by the %s '%s' in the year %d.",$LITSETTINGS->LOCALE),
             $PROPRIUM_DE_TEMPORE["OrdSunday" . $ordSun]["NAME_" . $LITSETTINGS->LOCALE],
-            _G($LitCal[array_search($firstOrdinary,$SOLEMNITIES)]->grade,$LITSETTINGS->LOCALE,false),
+            $LitCal[array_search($firstOrdinary,$SOLEMNITIES)]->grade > SOLEMNITY ? '<i>' . _G($LitCal[array_search($firstOrdinary,$SOLEMNITIES)]->grade,$LITSETTINGS->LOCALE,false) . '</i>' : _G($LitCal[array_search($firstOrdinary,$SOLEMNITIES)]->grade,$LITSETTINGS->LOCALE,false),
             $LitCal[array_search($firstOrdinary,$SOLEMNITIES)]->name,
             $LITSETTINGS->YEAR
         );
@@ -696,7 +696,7 @@ while ($lastOrdinary <= $LitCal["ChristKing"]->date && $lastOrdinary > $lastOrdi
         $Messages[] = sprintf(
             __("'%s' is superseded by the %s '%s' in the year %d.",$LITSETTINGS->LOCALE),
             $PROPRIUM_DE_TEMPORE["OrdSunday" . $ordSun]["NAME_" . $LITSETTINGS->LOCALE],
-            _G($LitCal[array_search($lastOrdinary,$SOLEMNITIES)]->grade,$LITSETTINGS->LOCALE,false),
+            $LitCal[array_search($lastOrdinary,$SOLEMNITIES)]->grade > SOLEMNITY ? '<i>' . _G($LitCal[array_search($lastOrdinary,$SOLEMNITIES)]->grade,$LITSETTINGS->LOCALE,false) . '</i>' : _G($LitCal[array_search($lastOrdinary,$SOLEMNITIES)]->grade,$LITSETTINGS->LOCALE,false),
             $LitCal[array_search($lastOrdinary,$SOLEMNITIES)]->name,
             $LITSETTINGS->YEAR
         );
@@ -1043,7 +1043,7 @@ if ($LITSETTINGS->YEAR >= 2002) {
                 } else if (in_array($currentFeastDate, $SOLEMNITIES)){
                     //it's a Feast of the Lord or a Solemnity
                     $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
-                    $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
+                    $coincidingFestivity_grade = ($coincidingFestivity->grade > SOLEMNITY ? '<i>' . _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false) . '</i>' : _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false));
                 } else if(in_array($currentFeastDate, $FEASTS_MEMORIALS)){
                     $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
                     $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
@@ -1174,7 +1174,7 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
             } else if (in_array($currentFeastDate, $SOLEMNITIES)){
                 //it's a Feast of the Lord or a Solemnity
                 $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
-                $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
+                $coincidingFestivity_grade = ($coincidingFestivity->grade > SOLEMNITY ? '<i>' . _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false) . '</i>' : _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false));
             } else if(in_array($currentFeastDate, $FEASTS_MEMORIALS)){
                 $coincidingFestivity = $LitCal[array_search($currentFeastDate,$FEASTS_MEMORIALS)];
                 $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
@@ -1252,7 +1252,7 @@ if ($LITSETTINGS->YEAR >= 2002) {
                 } else if (in_array($currentFeastDate, $SOLEMNITIES)){
                     //it's a Feast of the Lord or a Solemnity
                     $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
-                    $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
+                    $coincidingFestivity_grade = ($coincidingFestivity->grade > SOLEMNITY ? '<i>' . _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false) . '</i>' : _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false));
                 } else if(in_array($currentFeastDate, $FEASTS_MEMORIALS)){
                     $coincidingFestivity = $LitCal[array_search($currentFeastDate,$FEASTS_MEMORIALS)];
                     $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
@@ -1932,6 +1932,7 @@ if($LITSETTINGS->DIOCESAN !== false){
     switch($LITSETTINGS->DIOCESAN){
         case "DIOCESIDIROMA":
             if($LITSETTINGS->YEAR >= 1973){
+
                 if ($result = $mysqli->query("SELECT * FROM LITURGY__DIOCESILAZIO_calendar_propriumdesanctis_1973 WHERE CALENDAR = 'DIOCESIDIROMA'")) {
                     while ($row = mysqli_fetch_assoc($result)) {
                         $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row['DAY'] . '-' . $row['MONTH'] . '-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
