@@ -319,7 +319,8 @@
                   start: $festivity.date.getUTCFullYear() + '-' + pad($festivity.date.getUTCMonth() + 1) + '-' + pad($festivity.date.getUTCDate()),
                   backgroundColor: $CSScolor,
                   textColor: $textColor,
-                  description: $description
+                  description: $description,
+                  idx: $keyindex
                 };
                 
                 if ($keyindex === $LitCalKeys.length - 1) {
@@ -337,6 +338,7 @@
                     dayMaxEvents: true, // allow "more" link when too many events
                     events: $events,
                     firstDay: 0,
+                    eventOrder: 'idx',
                     eventDidMount: function(info) {
                       $(info.el).attr('data-tooltip', encodeURI(info.event.extendedProps.description));
                     }
@@ -868,6 +870,7 @@
               $Settings.epiphany = 'JAN6';
               $Settings.ascension = 'THURSDAY';
               $Settings.corpuschristi = 'THURSDAY';
+              $Settings.diocesanpreset = '';
 
               $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
             break;
@@ -893,6 +896,7 @@
               $Settings.epiphany = 'SUNDAY_JAN2_JAN8';
               $Settings.ascension = 'SUNDAY';
               $Settings.corpuschristi = 'SUNDAY';
+              $Settings.diocesanpreset = '';
               $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
             break;
             default:
