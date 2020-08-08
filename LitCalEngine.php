@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $LITSETTINGS->NATIONAL = isset($_POST["nationalpreset"]) && in_array(strtoupper($_POST["nationalpreset"]), $supportedNationalPresets) ? strtoupper($_POST["nationalpreset"]) : false;
 
-    $LITSETTINGS->DIOCESAN = isset($_POST["diocesanpreest"]) ? strtoupper($_POST["diocesanpreset"]) : false;
+    $LITSETTINGS->DIOCESAN = isset($_POST["diocesanpreset"]) ? strtoupper($_POST["diocesanpreset"]) : false;
 
 } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $LITSETTINGS->YEAR = (isset($_GET["year"]) && is_numeric($_GET["year"]) && ctype_digit($_GET["year"]) && strlen($_GET["year"]) === 4) ? (int)$_GET["year"] : (int)date("Y");
@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $LITSETTINGS->NATIONAL = isset($_GET["nationalpreset"]) && in_array(strtoupper($_GET["nationalpreset"]), $supportedNationalPresets) ? strtoupper($_GET["nationalpreset"]) : false;
 
-    $LITSETTINGS->DIOCESAN = isset($_GET["diocesanpreest"]) ? strtoupper($_GET["diocesanpreset"]) : false;
+    $LITSETTINGS->DIOCESAN = isset($_GET["diocesanpreset"]) ? strtoupper($_GET["diocesanpreset"]) : false;
 
 }
 
