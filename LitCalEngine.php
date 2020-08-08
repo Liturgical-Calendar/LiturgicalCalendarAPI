@@ -1724,12 +1724,12 @@ if($LITSETTINGS->NATIONAL !== false){
             }
             else{
                 //check what's going on, for example, if it's a Sunday or Solemnity
-                $currentFeastDate = DateTime::createFromFormat('!j-n-Y', '29-4-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+                $currentFeastDate = DateTime::createFromFormat('!j-n-Y', '4-10-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
                 if(in_array($currentFeastDate,$SOLEMNITIES)){
                     //let's find out which Solemnity we are dealing with
                     $solemnityKey = array_search($currentFeastDate,$SOLEMNITIES);
                     $Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                        "La Festa del patrono d'Italia San Francesco d'Assisi è soppressa nell'anno %d da una celebrazione più importante, %s.",
+                        "La Festa del patrono d'Italia <i>'San Francesco d'Assisi'</i> è soppressa nell'anno %d da una celebrazione più importante, %s.",
                         $LITSETTINGS->YEAR,
                         $LitCal[$solemnityKey]->name
                     );
