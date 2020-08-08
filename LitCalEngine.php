@@ -727,7 +727,7 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
                 $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
             } else{
                 //it's a Feast of the Lord or a Solemnity
-                $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
+                $coincidingFestivity_grade = ($coincidingFestivity->grade > SOLEMNITY ? '<i>' . _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false) . '</i>' : _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false));
             }
 
             $Messages[] = sprintf(
@@ -924,19 +924,18 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
                 }
             }
         } else {
-            $NameCoincidingFeast =  '';
             $coincidingFestivity_grade = '';
-            if((int)$currentFeastDate->format('N') === 7 && $coincidingFestivity->grade < FEASTLORD ){
+            if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < FEASTLORD ){
                 //it's a Sunday
+                $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
                 $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
-                $NameCoincidingFeast = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name;
             } else if (in_array($currentFeastDate, $SOLEMNITIES)){
                 //it's a Feast of the Lord or a Solemnity
-                $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
-                $NameCoincidingFeast = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name;
+                $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
+                $coincidingFestivity_grade = ($coincidingFestivity->grade > SOLEMNITY ? '<i>' . _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false) . '</i>' : _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false));
             } else if(in_array($currentFeastDate, $FEASTS_MEMORIALS)){
+                $coincidingFestivity = $LitCal[array_search($currentFeastDate,$FEASTS_MEMORIALS)];
                 $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
-                $NameCoincidingFeast = $LitCal[array_search($currentFeastDate,$FEASTS_MEMORIALS)]->name;
             }
 
             $Messages[] = sprintf(
@@ -948,7 +947,7 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
                         trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U'))))
                     ),
                 $coincidingFestivity_grade,
-                $NameCoincidingFeast,
+                $coincidingFestivity->name,
                 $LITSETTINGS->YEAR
             );        
         }
@@ -1036,42 +1035,31 @@ if ($LITSETTINGS->YEAR >= 2002) {
                     }
                 }
             } else {
-                $NameCoincidingFeast =  '';
                 $coincidingFestivity_grade = '';
-                if((int)$currentFeastDate->format('N') === 7 && $coincidingFestivity->grade < FEASTLORD ){
+                if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < FEASTLORD ){
                     //it's a Sunday
+                    $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
                     $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
-                    $NameCoincidingFeast = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name;
                 } else if (in_array($currentFeastDate, $SOLEMNITIES)){
                     //it's a Feast of the Lord or a Solemnity
+                    $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
                     $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
-                    $NameCoincidingFeast = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name;
                 } else if(in_array($currentFeastDate, $FEASTS_MEMORIALS)){
+                    $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
                     $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
-                    $NameCoincidingFeast = $LitCal[array_search($currentFeastDate,$FEASTS_MEMORIALS)]->name;
                 }
 
                 $Messages[] = sprintf(
-                    __("The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d.",$LITSETTINGS->LOCALE),
+                    __("The %s '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d.",$LITSETTINGS->LOCALE),
                     _G($row["GRADE"],$LITSETTINGS->LOCALE,false),
-                    $row["NAME_" . $LITSETTINGS->LOCALE],
-                    $LITSETTINGS->LOCALE === 'LA' ? ( $currentFeastDate->format('j') . ' ' . $LATIN_MONTHS[(int)$currentFeastDate->format('n')] ) : 
-                        ( $LITSETTINGS->LOCALE === 'EN' ? $currentFeastDate->format('F jS') : 
-                            trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U'))))
-                        ),
-                    $coincidingFestivity_grade,
-                    $NameCoincidingFeast,
-                    $LITSETTINGS->YEAR
-                );        
-                $Messages[] = sprintf(
-                    __("The Memorial '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by a Sunday or a Solemnity or a Feast Day '%s' in the year %d.",$LITSETTINGS->LOCALE),
                     $row["NAME_" . $LITSETTINGS->LOCALE],
                     '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
                     $LITSETTINGS->LOCALE === 'LA' ? ( $currentFeastDate->format('j') . ' ' . $LATIN_MONTHS[(int)$currentFeastDate->format('n')] ) : 
                         ( $LITSETTINGS->LOCALE === 'EN' ? $currentFeastDate->format('F jS') : 
                             trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U'))))
                         ),
-                    $NameCoincidingFeast,
+                    $coincidingFestivity_grade,
+                    $coincidingFestivity->name,
                     $LITSETTINGS->YEAR
                 );    
             }
@@ -1178,19 +1166,18 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
                 );                    
             }
         } else {
-            $NameCoincidingFeast =  '';
             $coincidingFestivity_grade = '';
-            if((int)$currentFeastDate->format('N') === 7 && $coincidingFestivity->grade < FEASTLORD ){
+            if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < FEASTLORD ){
                 //it's a Sunday
+                $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
                 $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
-                $NameCoincidingFeast = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name;
             } else if (in_array($currentFeastDate, $SOLEMNITIES)){
                 //it's a Feast of the Lord or a Solemnity
+                $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
                 $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
-                $NameCoincidingFeast = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name;
             } else if(in_array($currentFeastDate, $FEASTS_MEMORIALS)){
+                $coincidingFestivity = $LitCal[array_search($currentFeastDate,$FEASTS_MEMORIALS)];
                 $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
-                $NameCoincidingFeast = $LitCal[array_search($currentFeastDate,$FEASTS_MEMORIALS)]->name;
             }
 
             $Messages[] = sprintf(
@@ -1202,7 +1189,7 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
                         trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U'))))
                     ),
                 $coincidingFestivity_grade,
-                $NameCoincidingFeast,
+                $coincidingFestivity->name,
                 $LITSETTINGS->YEAR
             );
         }
@@ -1257,21 +1244,29 @@ if ($LITSETTINGS->YEAR >= 2002) {
                     );
                 }
             } else {
-                if(in_array($currentFeastDate,$SOLEMNITIES) ){
-                    $coincidingFestivityKey = array_search($currentFeastDate,$SOLEMNITIES);
+                $coincidingFestivity_grade = '';
+                if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < FEASTLORD ){
+                    //it's a Sunday
+                    $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
+                    $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
+                } else if (in_array($currentFeastDate, $SOLEMNITIES)){
+                    //it's a Feast of the Lord or a Solemnity
+                    $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
+                    $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
+                } else if(in_array($currentFeastDate, $FEASTS_MEMORIALS)){
+                    $coincidingFestivity = $LitCal[array_search($currentFeastDate,$FEASTS_MEMORIALS)];
+                    $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
                 }
-                else if(in_array($currentFeastDate,$FEASTS_MEMORIALS) ){
-                    $coincidingFestivityKey = array_search($currentFeastDate,$FEASTS_MEMORIALS);
-                }
-                $coincidingFestivity = $LitCal[$coincidingFestivityKey];        
                 $Messages[] = sprintf(
-                    __("The optional memorial '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by a Sunday, a Solemnity, a Feast or a Memorial '%s' in the year %d.",$LITSETTINGS->LOCALE),
+                    __("The %s '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by %s '%s' in the year %d.",$LITSETTINGS->LOCALE),
+                    _G($row["GRADE"],$LITSETTINGS->LOCALE,false),
                     $row["NAME_" . $LITSETTINGS->LOCALE],
                     '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
                     $LITSETTINGS->LOCALE === 'LA' ? ( $currentFeastDate->format('j') . ' ' . $LATIN_MONTHS[(int)$currentFeastDate->format('n')] ) : 
                         ( $LITSETTINGS->LOCALE === 'EN' ? $currentFeastDate->format('F jS') : 
                             trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U'))))
                         ),
+                    $coincidingFestivity_grade,
                     $coincidingFestivity->name,
                     $LITSETTINGS->YEAR
                 );    
@@ -1704,9 +1699,9 @@ if($LITSETTINGS->NATIONAL !== false){
         case 'ITALY':
             
             //Insert or elevate the Patron Saints of Italy
-            if(array_key_exists("CaterinaSiena",$LitCal)){
-                $LitCal["CaterinaSiena"]->grade = FEAST;
-                $LitCal["CaterinaSiena"]->name .= ", patrona principale d'Italia";
+            if(array_key_exists("StCatherineSiena",$LitCal)){
+                $LitCal["StCatherineSiena"]->grade = FEAST;
+                $LitCal["StCatherineSiena"]->name .= ", patrona principale d'Italia";
             }
             else{
                 //check what's going on, for example, if it's a Sunday or Solemnity

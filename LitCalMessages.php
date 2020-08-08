@@ -508,10 +508,10 @@ $MESSAGES = [
         "it" => "Nell'anno %d, <i>'%s'</i> è soppiantata dalla Memoria obbligatoria <i>'%s'</i>, aggiunta nella Terza Edizione Tipica del Messale Romano dall'anno 2002 (%s).",
         "la" => "In anno %d <i>'%s'</i> subplantata est ab Memoria <i>'%s'</i> aggregata in Editione Typica Tertia Missalis Romani ab anno 2002 (%s)."
     ],
-    "The Memorial '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by a Sunday or a Solemnity or a Feast Day '%s' in the year %d." => [
-        "en" => "The Memorial <i>'%s'</i>, added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by a Sunday or a Solemnity or a Feast Day <i>'%s'</i> in the year %d.",
-        "it" => "La Memoria obbligatoria <i>'%s'</i>, aggiunta nella Terza Edizione Tipica del Messale Romano dall'anno 2002 (%s) e celebrata solitamente il giorno %s, è soppressa da una Domenica o da una Solennità o da una Festa <i>'%s'</i> nell'anno %d.",
-        "la" => "Memoria <i>'%s'</i> aggregata in Editione Typica Tertia Missalis Romani ab anno 2002 (%s) et plerumque celebrata in die %s subplantata est ab Dominica aut ab Sollemnitate aut ab Festu <i>'%s'</i> in anno %d."
+    "The %s '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d." => [
+        "en" => "The %s <i>'%s'</i>, added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by the %s <i>'%s'</i> in the year %d.",
+        "it" => "La %s <i>'%s'</i>, aggiunta nella Terza Edizione Tipica del Messale Romano dall'anno 2002 (%s) e celebrata solitamente il giorno %s, è soppressa dalla %s <i>'%s'</i> nell'anno %d.",
+        "la" => "%s <i>'%s'</i> aggregata in Editione Typica Tertia Missalis Romani ab anno 2002 (%s) et plerumque celebrata in die %s subplantata est ab %s <i>'%s'</i> in anno %d."
     ],
     "The optional memorial '%s' either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration." => [
         "en" => "The optional memorial <i>'%s'</i> either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration.",
@@ -527,11 +527,6 @@ $MESSAGES = [
         "en" => "The optional memorial <i>'%s'</i>, added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s), either falls between 17 Dec. and 24 Dec., during the Octave of Christmas, or on a weekday of the Lenten season in the year %d, rank reduced to Commemoration.",
         "it" => "La memoria facoltativa <i>'%s'</i>, aggiunta nella Terza Edizione Tipica del Messale Romano dall'anno 2002 (%s), cade o tra il 17 Dic. e il 24 Dic., o durante l'Ottava di Natale, o tra le ferie della Quaresima nell'anno %d, il grado è stato pertanto ridotto a Commemorazione.",
         "la" => "Memoria ad libitum <i>'%s'</i> aggregata in Editione Typica Tertia Missalis Romani ab anno 2002 (%s) accidit aut infra 17 Dec. et 24 Dec. aut infra Octavam Nativitatis aut infra feriae Quadragesimae in anno %d, ergo reductus est gradus ad Commemorationem."
-    ],
-    "The optional memorial '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by a Sunday, a Solemnity, a Feast or a Memorial '%s' in the year %d." => [
-        "en" => "The optional memorial <i>'%s'</i>, added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by a Sunday, a Solemnity, a Feast or a Memorial <i>'%s'</i> in the year %d.",
-        "it" => "La memoria facoltativa <i>'%s'</i>, aggiunta nella Terza Edizione Tipica del Messale Romano dall'anno 2002 (%s), celebrata solitamente il giorno %s, è stata soppressa da una Domenica, una Solennità, una Festa o una Memoria <i>'%s'</i> nell'anno %d.",
-        "la" => "Memoria ad libitum <i>'%s'</i> aggregata in Editione Typica Tertia Missalis Romani ab anno 2002 (%s) plerumque celebrata in die %s subplantata est ab Dominica aut Sollemnitate aut Festu aut Memoria <i>'%s'</i> in anno %d."
     ],
     "The optional memorial '%s' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%s), applicable to the year %d." => [
         "en" => "The optional memorial <i>'%s'</i> has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%s), applicable to the year %d.",
