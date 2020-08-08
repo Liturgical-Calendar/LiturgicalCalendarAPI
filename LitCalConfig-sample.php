@@ -14,13 +14,13 @@
         define("DB_USER","");
         define("DB_PASSWORD","");
         define("DB_NAME","liturgy");
-        ***REMOVED***
-        ***REMOVED***
+        define("DB_CHARSET","utf8");
+        define("DB_SERVER","localhost");
 	}
     else{ //REMOTE HOST INSTALLATION
         define("DB_USER","");
         define("DB_PASSWORD","");
         define("DB_NAME","liturgy");
-        ***REMOVED***
-        ***REMOVED***
+        define("DB_CHARSET","utf8");
+        define("DB_SERVER","localhost");
     }
