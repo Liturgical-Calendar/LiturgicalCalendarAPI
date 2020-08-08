@@ -1729,20 +1729,41 @@ if($LITSETTINGS->DIOCESAN !== false){
     switch($LITSETTINGS->DIOCESAN){
         case "DIOCESIDIROMA":
             if($LITSETTINGS->YEAR >= 1973){
-                if ($result = $mysqli->query("SELECT * FROM LITURGY__DIOCESIDIROMA_calendar_propriumdesanctis_1973")) {
+                if ($result = $mysqli->query("SELECT * FROM LITURGY__DIOCESILAZIO_calendar_propriumdesanctis_1973 WHERE CALENDAR = 'DIOCESIDIROMA'")) {
                     while ($row = mysqli_fetch_assoc($result)) {
                         $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row['DAY'] . '-' . $row['MONTH'] . '-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-                        if($row["GRADE"] < FEAST && !in_array($currentFeastDate,$SOLEMNITIES)){
-                            $LitCal["DIOCESIDIROMA_".$row["TAG"]] = new Festivity("[Diocesi di Roma] " . $row["NAME_" . $LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"], $row["DISPLAYGRADE"]);
+                        if($row["GRADE"] <= FEAST){
+                            if(!in_array($currentFeastDate,$SOLEMNITIES)){
+                                $LitCal["DIOCESIDIROMA_".$row["TAG"]] = new Festivity("[Diocesi di Roma] " . $row["NAME_" . $LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"], $row["DISPLAYGRADE"]);
+                            } else {
+                                $Messages[] = sprintf(
+                                    "DIOCESIDIROMA: la %s '%s', propria del calendario della Diocesi di Roma pubblicato nel 1973 e prevista per il giorno %s, è soppressa dalla Domenica o dalla Solennità %s nell'anno %d",
+                                    $row["DISPLAYGRADE"] !== "" ? $row["DISPLAYGRADE"] : _G($row["GRADE"],$LITSETTINGS->LOCALE,false),
+                                    '<i>' . $row["NAME_" . $LITSETTINGS->LOCALE] . '</i>',
+                                    '<b>' . trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U')))) . '</b>',
+                                    '<i>' . $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name . '</i>',
+                                    $LITSETTINGS->YEAR
+                                );    
+                            }
                         }
-                        else{
-                            $Messages[] = sprintf(
-                                "DIOCESIDIROMA: la %s '%s' (%s), propria del calendario della Diocesi di Roma pubblicato nel 1973, è soppressa da una Domenica o una Solennità nell'anno %d",
-                                $row["DISPLAYGRADE"] !== "" ? $row["DISPLAYGRADE"] : _G($row["GRADE"],$LITSETTINGS->LOCALE,false),
-                                '<i>' . $row["NAME_" . $LITSETTINGS->LOCALE] . '</i>',
-                                trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U')))),
-                                $LITSETTINGS->YEAR
-                            );
+                        else{ //GRADE IS SOLEMNITY
+                            //Let's create it in any case, so we can maybe implement a useable interface to fix this in an intuitive manner?
+                            $LitCal["DIOCESIDIROMA_".$row["TAG"]] = new Festivity("[Diocesi di Roma] " . $row["NAME_" . $LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"], $row["DISPLAYGRADE"]);
+                            if(in_array($currentFeastDate,$SOLEMNITIES) && $row['TAG'] != array_search($currentFeastDate,$SOLEMNITIES) ){
+                                //there seems to be a coincidence with a different Solemnity on the same day!
+                                //Let's attempt to move to the next open
+                                $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                    "DIOCESIDIROMA: la Solennità '%s', propria del calendario della Diocesi di Roma pubblicato nel 1973 e prevista per il giorno %s, coincide con la Domenica o la Solennità '%s' nell'anno %d! Come ci dobbiamo comportare?",
+                                    '<i>' . $row["NAME_" . $LITSETTINGS->LOCALE] . '</i>',
+                                    '<b>' . trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U')))) . '</b>',
+                                    '<i>' . $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name . '</i>',
+                                    $LITSETTINGS->YEAR
+                                );    
+                            } else{
+                                //This is the sure case in which we know we can create the Solemnity, but we've already done so anyways
+                                // so it should show up in a calendar even in a conflicting case, to allow for solving through the interface...
+                                //$LitCal["DIOCESIDIROMA_".$row["TAG"]] = new Festivity("[Diocesi di Roma] " . $row["NAME_" . $LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"], $row["DISPLAYGRADE"]);
+                            }
                         }
                     }
                 }

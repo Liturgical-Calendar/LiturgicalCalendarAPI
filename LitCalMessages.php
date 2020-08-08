@@ -58,7 +58,7 @@ function _G($key,$locale="la",$html=true){
 function _C($common,$locale="la"){
     $locale = strtolower($locale);
     if ($common !== "" && $common !== "Proper") {
-        $commons = explode("|", $common);
+        $commons = explode(",", $common);
         $commons = array_map(function ($txt) use ($locale) {
             $commonArr = explode(":", $txt);
             $commonGeneral = __($commonArr[0], $locale);
@@ -115,8 +115,8 @@ function ColorToHex($color){
 
 function ParseColorString($string,$LOCALE,$html=false){
     if($html === true){
-        if(strpos($string,"|")){
-            $colors = explode("|",$string);
+        if(strpos($string,",")){
+            $colors = explode(",",$string);
             $colors = array_map(function($txt) use ($LOCALE){
                 return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . ColorToHex($txt) . '">' . __($txt,$LOCALE) . '</FONT></SPAN></I></B>';
             },$colors);
@@ -127,8 +127,8 @@ function ParseColorString($string,$LOCALE,$html=false){
         }    
     }
     else{
-        if(strpos($string,"|")){
-            $colors = explode("|",$string);
+        if(strpos($string,",")){
+            $colors = explode(",",$string);
             $colors = array_map(function($txt) use ($LOCALE){
                 return __($txt,$LOCALE);
             },$colors);
