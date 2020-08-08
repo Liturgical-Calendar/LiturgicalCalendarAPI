@@ -301,7 +301,7 @@
               for (let $keyindex = 0; $keyindex < $LitCalKeys.length; $keyindex++) {
                 let $keyname = $LitCalKeys[$keyindex];
                 let $festivity = $LitCal[$keyname];
-                let $possibleColors = $festivity.color.split("|");
+                let $possibleColors = $festivity.color.split(",");
                 let $CSScolor = $possibleColors[0];
                 let $textColor = ($CSScolor === 'white' || $CSScolor === 'pink' ? 'black' : 'white');
                 let $description = '<b>' + $festivity.name + '</b><br>' + _G($festivity.grade) + ', <i>' + _CC($festivity.color, true) + '</i><br><i style="font-size:.8em;">' + _C($festivity.common) + '</i>' + ($festivity.hasOwnProperty('liturgicalyear') ? '<br>' + $festivity.liturgicalyear : '');
@@ -374,7 +374,7 @@
         $settingsDialog = `<div id="settingsWrapper"><form id="calSettingsForm"><table id="calSettings">
         <tr><td colspan="2"><label>${__('YEAR', $Settings.locale)}: </td><td colspan="2"><input type="number" name="year" id="year" min="1969" max="9999" value="${$Settings.year}" /></label></td></tr>
         <tr><td><label>LOCALE: </td><td><select name="locale" id="locale"><option value="EN" ${($Settings.locale === "EN" ? " SELECTED" : "")}>ENGLISH</option><option value="IT" ${($Settings.locale === "IT" ? " SELECTED" : "")}>ITALIANO</option><option value="LA" ${($Settings.locale === "LA" ? " SELECTED" : "")}>LATINO</option></select></label></td><td>NATIONAL PRESET: </td><td><select id="nationalpreset" name="nationalpreset"><option value=""></option><option value="VATICAN">Vatican</option><option value="ITALY">Italy</option><option value="USA">USA</option></select></td></tr>
-        <tr><td><label>${__('EPIPHANY', $Settings.locale)}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>January 6</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>Sunday Jan 2↔Jan 8</option></select></label></td><td>DIOCESAN PRESET: </td><td><select id="diocesanpreset" name="diocesanpreset" disabled><option value=""></option><option value="DIOCESIROMA">Diocesi di Roma</option><option value="DIOCESILAZIO">Le diocesi del Lazio</option></select></td></tr>
+        <tr><td><label>${__('EPIPHANY', $Settings.locale)}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>January 6</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>Sunday Jan 2↔Jan 8</option></select></label></td><td>DIOCESAN PRESET: </td><td><select id="diocesanpreset" name="diocesanpreset" disabled><option value=""></option><option value="DIOCESIDIROMA">Diocesi di Roma</option><option value="DIOCESILAZIO">Le diocesi del Lazio</option></select></td></tr>
         <tr><td><label>${__('ASCENSION', $Settings.locale)}: </td><td><select name="ascension" id="ascension"><option value="THURSDAY" ${($Settings.ascension === "THURSDAY" ? " SELECTED" : "")}>Thursday</option><option value="SUNDAY" ${($Settings.ascension === "SUNDAY" ? " SELECTED" : "")}>Sunday</option></select></label></td><td></td><td></td></tr>
         <tr><td><label>CORPUS CHRISTI: </td><td><select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" ${($Settings.corpuschristi === "THURSDAY" ? " SELECTED" : "")}>Thursday</option><option value="SUNDAY" ${($Settings.corpuschristi === "SUNDAY" ? " SELECTED" : "")}>Sunday</option></select></label></td><td></td><td></td></tr>
         <tr><td colspan="4" style="text-align:center;"><input type="submit" id="generateLitCal" value="${__("Generate Roman Calendar")}" /></td></tr>
@@ -448,7 +448,7 @@
     },
     _C = function($common){
         if ($common !== "" && $common !== "Proper") {
-            let $commons = $common.split("|");
+            let $commons = $common.split(",");
             $commons = $commons.map(function($txt) {
                 $commonArr = $txt.split(":");
                 $commonGeneral = __($commonArr[0]);
@@ -480,8 +480,9 @@
     },
     _CC = function($colorstr,html){
       if(html === true){
-        if($colorstr.indexOf('|') !== -1){
-            let $colors = $colorstr.split("|");
+        if($colorstr.indexOf(',') !== -1){
+            console.log($colorstr);
+            let $colors = $colorstr.split(",");
             $colors = $colors.map(function($txt){
               $clr = $txt === 'white' ? 'gray' : $txt;  
               return '<span style="color:'+$clr+';">' +  __($txt) + '</span>';
@@ -493,8 +494,9 @@
         }
       }
       else{
-        if($colorstr.indexOf('|') !== -1){
-            let $colors = $colorstr.split("|");
+        if($colorstr.indexOf(',') !== -1){
+            console.log($colorstr);
+            let $colors = $colorstr.split(",");
             $colors = $colors.map(function($txt){
                 return __($txt);
             });
