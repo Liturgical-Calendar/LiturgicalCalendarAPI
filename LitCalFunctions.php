@@ -108,7 +108,7 @@ function convertArray2XML(SimpleXMLElement $object, array $data)
 {
   foreach ($data as $key => $value) {
     if (is_array($value)) {
-      if($key === 'LitCal' || $key === 'Settings' || $key === 'Messages'){
+      if($key === 'LitCal' || $key === 'Settings' || $key === 'Messages' || $key === 'Metadata'  || $key === 'SOLEMNITIES' || $key === 'FEASTS_MEMORIALS'){
         $new_object = $object->addChild($key);
       } else {
         $new_object = $object->addChild("LitCalEvent");

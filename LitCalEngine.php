@@ -5,7 +5,7 @@
  * Author: John Romano D'Orazio 
  * Email: priest@johnromanodorazio.com
  * Licensed under the Apache 2.0 License
- * Version 2.7
+ * Version 2.8
  * Date Created: 27 December 2017
  * Note: it is necessary to set up the MySQL liturgy tables prior to using this script
  */
@@ -41,7 +41,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-define("VERSION","2.7");
+define("VERSION","2.8");
 
 
 include "Festivity.php"; //this defines a "Festivity" class that can hold all the useful information about a single celebration
@@ -259,7 +259,7 @@ $Messages = array();
 //with the Prima Editio Typica of the Roman Missal and the General Norms promulgated with the Motu Proprio "Mysterii Paschali" in 1969
 if ($LITSETTINGS->YEAR < 1970) {
     $Messages[] = sprintf(__("Only years from 1970 and after are supported. You tried requesting the year %d.",$LITSETTINGS->LOCALE),$LITSETTINGS->YEAR);
-    GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages);
+    GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages,$SOLEMNITIES,$FEASTS_MEMORIALS);
 }
 
 
@@ -1258,7 +1258,7 @@ if ($LITSETTINGS->YEAR >= 2002) {
                     $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
                 }
                 $Messages[] = sprintf(
-                    __("The %s '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by %s '%s' in the year %d.",$LITSETTINGS->LOCALE),
+                    __("The %s '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d.",$LITSETTINGS->LOCALE),
                     _G($row["GRADE"],$LITSETTINGS->LOCALE,false),
                     $row["NAME_" . $LITSETTINGS->LOCALE],
                     '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
@@ -1698,6 +1698,42 @@ if($LITSETTINGS->NATIONAL !== false){
     switch($LITSETTINGS->NATIONAL){
         case 'ITALY':
             
+            //Insert or elevate the Patron Saints of Europe
+            if(array_key_exists("StEdithStein",$LitCal) ){
+                $LitCal["StEdithStein"]->grade = FEAST;
+                $LitCal["StEdithStein"]->name = ", Compatrona d'Europa";
+            } else {
+                //check what's going on, for example, if it's a Sunday or Solemnity
+                $currentFeastDate = DateTime::createFromFormat('!j-n-Y', '9-8-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+                if(in_array($currentFeastDate,$SOLEMNITIES) || in_array($currentFeastDate,$FEASTS_MEMORIALS) || (int)$currentFeastDate->format('N') === 7 ){
+                    $coincidingFestivity_grade = '';
+                    if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < FEASTLORD ){
+                        //it's a Sunday
+                        $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
+                        $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
+                    } else if (in_array($currentFeastDate, $SOLEMNITIES)){
+                        //it's a Feast of the Lord or a Solemnity
+                        $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
+                        $coincidingFestivity_grade = ($coincidingFestivity->grade > SOLEMNITY ? '<i>' . _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false) . '</i>' : _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false));
+                    } else if(in_array($currentFeastDate, $FEASTS_MEMORIALS)){
+                        //we should probably be able to create it anyways in this case?
+                        $result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis_2002 WHERE TAG = 'StEdithStein'");
+                        $row = mysqli_fetch_assoc($result);
+                        $LitCal["StEdithStein"] = new Festivity($row["NAME_" . $LITSETTINGS->LOCALE], $currentFeastDate,"white","fixed",FEAST);
+                        $coincidingFestivity = $LitCal[array_search($currentFeastDate,$FEASTS_MEMORIALS)];
+                        $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
+                    }
+
+                    $Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                        "La Festa della compatrona d'Europa <i>'Santa Edith Stein'</i> è soppressa nell'anno %d dalla %s <i>'%s'</i>.",
+                        $LITSETTINGS->YEAR,
+                        $coincidingFestivity_grade,
+                        $coincidingFestivity->name
+                    );
+    
+                }
+            }
+
             //Insert or elevate the Patron Saints of Italy
             if(array_key_exists("StCatherineSiena",$LitCal)){
                 $LitCal["StCatherineSiena"]->grade = FEAST;
@@ -2004,9 +2040,9 @@ foreach($LitCal as $key => $festivity){
 //So in order to sort by date we have to be sure to maintain the association with the proper key, uasort allows us to do this
 uasort($LitCal, array("Festivity", "comp_date"));
 
-GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages);
+GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages,$SOLEMNITIES,$FEASTS_MEMORIALS);
 
-function GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages){
+function GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages,$SOLEMNITIES,$FEASTS_MEMORIALS){
         $SerializeableLitCal = new StdClass();
         $SerializeableLitCal->LitCal = $LitCal;
         $SerializeableLitCal->Settings = new stdClass();
@@ -2015,7 +2051,11 @@ function GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages){
         $SerializeableLitCal->Settings->ASCENSION = ASCENSION;
         $SerializeableLitCal->Settings->CORPUSCHRISTI = CORPUSCHRISTI;
         $SerializeableLitCal->Settings->LOCALE = $LITSETTINGS->LOCALE;
-        $SerializeableLitCal->Settings->returntype = $LITSETTINGS->RETURNTYPE;
+        $SerializeableLitCal->Settings->RETURNTYPE = $LITSETTINGS->RETURNTYPE;
+        $SerializeableLitCal->Metadata = new stdClass();
+        $SerializeableLitCal->Metadata->SOLEMNITIES = $SOLEMNITIES;
+        $SerializeableLitCal->Metadata->FEASTS_MEMORIALS = $FEASTS_MEMORIALS;
+
         $SerializeableLitCal->Messages = $Messages;
         switch ($LITSETTINGS->RETURNTYPE) {
         case "JSON":
