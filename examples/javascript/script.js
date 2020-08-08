@@ -54,7 +54,7 @@ let today = new Date(),
         }
         return ord_suffix;
     },
-    genLitCal = function($Settings) {
+    genLitCal = function() {
         $.ajax({
             method: 'POST',
             data: $Settings,
@@ -114,7 +114,7 @@ let today = new Date(),
                                 $festivity = $LitCal[$keyname];
                                 // LET'S DO SOME MORE MANIPULATION ON THE FESTIVITY->COMMON STRINGS AND THE FESTIVITY->COLOR...
                                 if ($festivity.common !== "" && $festivity.common !== "Proper") {
-                                    $commons = $festivity.common.split("|");
+                                    $commons = $festivity.common.split(",");
                                     $commons = $commons.map(function($txt) {
                                         let $common = $txt.split(":");
                                         let $commonGeneral = __($common[0]);
@@ -143,7 +143,7 @@ let today = new Date(),
                                 } else if ($festivity.common == "Proper") {
                                     $festivity.common = __($festivity.common);
                                 }
-                                //$festivity.color = $festivity.color.split("|")[0];
+                                //$festivity.color = $festivity.color.split(",")[0];
 
                                 //check which liturgical season we are in, to use the right color for that season...
                                 let $SeasonColor = "green";
@@ -156,7 +156,7 @@ let today = new Date(),
                                 }
 
                                 //We will apply the color for the single festivity only to it's own table cells
-                                let $possibleColors =  $festivity.color.split("|");
+                                let $possibleColors =  $festivity.color.split(",");
                                 let $CSScolor = $possibleColors[0];
                                 let $festivityColorString = "";
                                 if($possibleColors.length === 1){
@@ -188,7 +188,10 @@ let today = new Date(),
                                 }
                                 else if($festivity.grade > 3){
                                     $festivityGrade = ($keyname === 'AllSouls' ? __("COMMEMORATION") : $GRADE[$festivity.grade]);
-                                }              
+                                }
+                                if($festivity.hasOwnProperty('displaygrade') && $festivity.displaygrade !== ''){
+                                    $festivityGrade = $festivity.displaygrade;
+                                }         
                                 strHTML += '<td style="background-color:'+$CSScolor+';' + ($highContrast.indexOf($CSScolor) != -1 ? 'color:white;' : 'color:black;') + '">' + $festivity.name + $currentCycle + ' - <i>' + __($festivity.color) + '</i><br /><i>' + $festivity.common + '</i></td>';
                                 strHTML += '<td style="background-color:'+$CSScolor+';' + ($highContrast.indexOf($CSScolor) != -1 ? 'color:white;' : 'color:black;') + '">' + $festivityGrade + '</td>';
                                 strHTML += '</tr>';
@@ -199,7 +202,7 @@ let today = new Date(),
                         } else {
                             // LET'S DO SOME MORE MANIPULATION ON THE FESTIVITY->COMMON STRINGS AND THE FESTIVITY->COLOR...
                             if ($festivity.common !== "" && $festivity.common !== "Proper") {
-                                $commons = $festivity.common.split("|");
+                                $commons = $festivity.common.split(",");
                                 $commons = $commons.map(function($txt) {
                                     let $common = $txt.split(":");
                                     let $commonGeneral = __($common[0]);
@@ -228,7 +231,7 @@ let today = new Date(),
                             } else if ($festivity.common == "Proper") {
                                 $festivity.common = __($festivity.common);
                             }
-                            //$festivity.color = $festivity.color.split("|")[0];
+                            //$festivity.color = $festivity.color.split(",")[0];
 
                             //check which liturgical season we are in, to use the right color for that season...
                             let $SeasonColor = "green";
@@ -241,7 +244,7 @@ let today = new Date(),
                             }
 
                             //We will apply the color for the single festivity only to it's own table cells
-                            let $possibleColors =  $festivity.color.split("|");
+                            let $possibleColors =  $festivity.color.split(",");
                             let $CSScolor = $possibleColors[0];
                             let $festivityColorString = "";
                             if($possibleColors.length === 1){
@@ -270,6 +273,9 @@ let today = new Date(),
                             else if($festivity.grade > 3){
                                 $festivityGrade = ($keyname === 'AllSouls' ? __("COMMEMORATION") : $GRADE[$festivity.grade]);
                             }              
+                            if($festivity.hasOwnProperty('displaygrade') && $festivity.displaygrade !== ''){
+                                $festivityGrade = $festivity.displaygrade;
+                            }         
                             strHTML += '<td style="background-color:'+$CSScolor+';' + ($highContrast.indexOf($CSScolor) != -1 ? 'color:white;' : 'color:black;') + '">' + $festivity.name + $currentCycle + ' - <i>' + __($festivity.color) + '</i><br /><i>' + $festivity.common + '</i></td>';
                             strHTML += '<td style="background-color:'+$CSScolor+';' + ($highContrast.indexOf($CSScolor) != -1 ? 'color:white;' : 'color:black;') + '">' + $festivityGrade + '</td>';
                             strHTML += '</tr>';
@@ -665,10 +671,10 @@ let today = new Date(),
             </div>`,
         $tbheader = `<tr><th>${__("Month")}</th><th>${__("Date in Gregorian Calendar")}</th><th>${__("General Roman Calendar Festivity")}</th><th>${__("Grade of the Festivity")}</th></tr>`,
         $settingsDialog = `<div id="settingsWrapper"><form id="calSettingsForm"><table id="calSettings">
-        <tr><td colspan="2"><label>${__('YEAR')}: </td><td colspan="2"><input type="number" name="year" id="year" min="1969" max="9999" value="${$Settings.year}" /></label></td></tr>
-        <tr><td><label>LOCALE: </td><td><select name="locale" id="locale"><option value="EN" ${($Settings.locale === "EN" ? " SELECTED" : "")}>ENGLISH</option><option value="IT" ${($Settings.locale === "IT" ? " SELECTED" : "")}>ITALIANO</option><option value="LA" ${($Settings.locale === "LA" ? " SELECTED" : "")}>LATINO</option></select></label></td><td>NATIONAL PRESET: </td><td id="nationalpreset"><select><option value="VATICAN">Vatican</option><option value="ITALY">Italy</option><option value="USA">USA</option></select></td></tr>
-        <tr><td><label>${__('EPIPHANY')}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>January 6</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>Sunday Jan 2↔Jan 8</option></select></label></td><td>DIOCESAN PRESET: </td><td id="diocesanpreset"><select><option value=""></option><option value="DIOCESIROMA">Diocesi di Roma</option><option value="DIOCESILAZIO">Le diocesi del Lazio</option></select></td></tr>
-        <tr><td><label>${__('ASCENSION')}: </td><td><select name="ascension" id="ascension"><option value="THURSDAY" ${($Settings.ascension === "THURSDAY" ? " SELECTED" : "")}>Thursday</option><option value="SUNDAY" ${($Settings.ascension === "SUNDAY" ? " SELECTED" : "")}>Sunday</option></select></label></td><td></td><td></td></tr>
+        <tr><td colspan="2"><label>${__('YEAR', $Settings.locale)}: </td><td colspan="2"><input type="number" name="year" id="year" min="1969" max="9999" value="${$Settings.year}" /></label></td></tr>
+        <tr><td><label>LOCALE: </td><td><select name="locale" id="locale"><option value="EN" ${($Settings.locale === "EN" ? " SELECTED" : "")}>ENGLISH</option><option value="IT" ${($Settings.locale === "IT" ? " SELECTED" : "")}>ITALIANO</option><option value="LA" ${($Settings.locale === "LA" ? " SELECTED" : "")}>LATINO</option></select></label></td><td>NATIONAL PRESET: </td><td><select id="nationalpreset" name="nationalpreset"><option value=""></option><option value="VATICAN">Vatican</option><option value="ITALY">Italy</option><option value="USA">USA</option></select></td></tr>
+        <tr><td><label>${__('EPIPHANY', $Settings.locale)}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>January 6</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>Sunday Jan 2↔Jan 8</option></select></label></td><td>DIOCESAN PRESET: </td><td><select id="diocesanpreset" name="diocesanpreset" disabled><option value=""></option><option value="DIOCESIDIROMA">Diocesi di Roma</option><option value="DIOCESILAZIO">Le diocesi del Lazio</option></select></td></tr>
+        <tr><td><label>${__('ASCENSION', $Settings.locale)}: </td><td><select name="ascension" id="ascension"><option value="THURSDAY" ${($Settings.ascension === "THURSDAY" ? " SELECTED" : "")}>Thursday</option><option value="SUNDAY" ${($Settings.ascension === "SUNDAY" ? " SELECTED" : "")}>Sunday</option></select></label></td><td></td><td></td></tr>
         <tr><td><label>CORPUS CHRISTI: </td><td><select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" ${($Settings.corpuschristi === "THURSDAY" ? " SELECTED" : "")}>Thursday</option><option value="SUNDAY" ${($Settings.corpuschristi === "SUNDAY" ? " SELECTED" : "")}>Sunday</option></select></label></td><td></td><td></td></tr>
         <tr><td colspan="4" style="text-align:center;"><input type="submit" id="generateLitCal" value="${__("Generate Roman Calendar")}" /></td></tr>
         </table></form></div>`;
@@ -719,20 +725,57 @@ $(document).ready(function() {
             __("HIGHER RANKING SOLEMNITY")    
         ];
         $('#settingsWrapper').dialog("close");
-        genLitCal($Settings);
+        genLitCal();
     });
 
-    if($('#nationalpreset').find('select').val() !== "ITALY"){
-        $('#diocesanpreset').find('select').prop('disabled',true);
+    if($('#nationalpreset').val() !== "ITALY"){
+        $('#diocesanpreset').prop('disabled',true);
     }
 
-    $(document).on('change','#nationalpreset select',function(){
-        if($(this).val() === "ITALY" ){
-            $('#diocesanpreset').find('select').prop('disabled',false).val("DIOCESIROMA");
-        }
-        else{
-            $('#diocesanpreset').find('select').prop('disabled',true).val("");
+    $(document).on('change','#nationalpreset',function(){
+        switch($(this).val()){
+          case "VATICAN":
+            $('#locale').val('LA');
+            $('#epiphany').val('JAN6');
+            $('#ascension').val('THURSDAY');
+            $('#corpuschristi').val('THURSDAY');
+            $('#diocesanpreset').val("");
+            $Settings.locale = 'LA';
+            $Settings.epiphany = 'JAN6';
+            $Settings.ascension = 'THURSDAY';
+            $Settings.corpuschristi = 'THURSDAY';
+
+            $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
+          break;
+          case "ITALY":
+            $('#locale').val('IT');
+            $('#epiphany').val('JAN6');
+            $('#ascension').val('SUNDAY');
+            $('#corpuschristi').val('SUNDAY');
+            $('#diocesanpreset').prop('disabled',false).val("DIOCESIROMA");
+            $Settings.locale = 'IT';
+            $Settings.epiphany = 'JAN6';
+            $Settings.ascension = 'SUNDAY';
+            $Settings.corpuschristi = 'SUNDAY';
+            $('#calSettingsForm :input').not('#diocesanpreset').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
+          break;
+          case "USA":
+            $('#locale').val('EN');
+            $('#epiphany').val('SUNDAY_JAN2_JAN8');
+            $('#ascension').val('SUNDAY');
+            $('#corpuschristi').val('SUNDAY');
+            $('#diocesanpreset').val("");
+            $Settings.locale = 'EN';
+            $Settings.epiphany = 'SUNDAY_JAN2_JAN8';
+            $Settings.ascension = 'SUNDAY';
+            $Settings.corpuschristi = 'SUNDAY';
+            $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
+          break;
+          default:
+            $('#calSettingsForm :input').prop('disabled',false);
+            $('#diocesanpreset').val("").prop('disabled',true);
         }
     });
+
     $('#settingsWrapper').dialog("open");
 });

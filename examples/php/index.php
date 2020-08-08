@@ -80,6 +80,11 @@ class Festivity
     /**
      * @var string
      */
+    public $displayGrade;
+
+    /**
+     * @var string
+     */
     public $common;
 
     /**
@@ -87,7 +92,7 @@ class Festivity
      */
     public $liturgicalyear;
 
-    function __construct($name, $date, $color, $type, $grade = 0, $common = '', $liturgicalyear = null)
+    function __construct($name, $date, $color, $type, $grade = 0, $common = '', $liturgicalyear = null, $displayGrade)
     {
         $this->name = (string) $name;
         $this->date = (object) DateTime::createFromFormat('U', $date, new DateTimeZone('UTC')); //
@@ -98,6 +103,7 @@ class Festivity
         if($liturgicalyear !== null){
             $this->liturgicalyear = (string) $liturgicalyear;
         }
+        $this->displayGrade = (string) $displayGrade;
     }
 }
 
@@ -380,7 +386,7 @@ if ($YEAR >= 1970) {
 
     foreach ($LitCal as $key => $value) {
         // retransform each entry from an associative array to a Festivity class object
-        $LitCal[$key] = new Festivity($LitCal[$key]["name"], $LitCal[$key]["date"], $LitCal[$key]["color"], $LitCal[$key]["type"], $LitCal[$key]["grade"], $LitCal[$key]["common"], (isset($LitCal[$key]["liturgicalyear"]) ? $LitCal[$key]["liturgicalyear"] : null) );
+        $LitCal[$key] = new Festivity($LitCal[$key]["name"], $LitCal[$key]["date"], $LitCal[$key]["color"], $LitCal[$key]["type"], $LitCal[$key]["grade"], $LitCal[$key]["common"], (isset($LitCal[$key]["liturgicalyear"]) ? $LitCal[$key]["liturgicalyear"] : null), $LitCal[$key]["displaygrade"] );
     }
 }
 
@@ -870,7 +876,7 @@ $months = [
                     $festivity = $LitCal[$keyname];
                     // LET'S DO SOME MORE MANIPULATION ON THE FESTIVITY->COMMON STRINGS AND THE FESTIVITY->COLOR...
                     if ($festivity->common !== "" && $festivity->common !== "Proper") {
-                        $commons = explode("|", $festivity->common);
+                        $commons = explode(",", $festivity->common);
                         $commons = array_map(function ($txt) use ($LOCALE) {
                             $common = explode(":", $txt);
                             $commonGeneral = __($common[0], $LOCALE);
@@ -910,7 +916,7 @@ $months = [
                     }
 
                     //We will apply the color for the single festivity only to it's own table cells
-                    $possibleColors = explode("|", $festivity->color);
+                    $possibleColors = explode(",", $festivity->color);
                     $CSScolor = $possibleColors[0];
                     $festivityColorString = "";
                     if(count($possibleColors) === 1){
@@ -949,7 +955,7 @@ $months = [
                     }
                     $currentCycle = property_exists($festivity, "liturgicalyear") && $festivity->liturgicalyear !== null && $festivity->liturgicalyear !== "" ? " (" . $festivity->liturgicalyear . ")" : "";
                     echo '<td style="background-color:' . $CSScolor . ';' . (in_array($CSScolor, $highContrast) ? 'color:white;' : 'color:black;') . '">' . $festivity->name . $currentCycle . ' - <i>' . $festivityColorString . '</i><br /><i>' . $festivity->common . '</i></td>';
-                    echo '<td style="background-color:' . $CSScolor . ';' . (in_array($CSScolor, $highContrast) ? 'color:white;' : 'color:black;') . '">' . ($keyname === 'AllSouls' ? __("COMMEMORATION",$LOCALE) : $GRADE[$festivity->grade]) . '</td>';
+                    echo '<td style="background-color:' . $CSScolor . ';' . (in_array($CSScolor, $highContrast) ? 'color:white;' : 'color:black;') . '">' . ($keyname === 'AllSouls' ? __("COMMEMORATION",$LOCALE) : ($festivity->displayGrade !== "" ? $festivity->displayGrade : $GRADE[$festivity->grade] ) ) . '</td>';
                     echo '</tr>';
                     $keyindex++;
                 }
@@ -957,7 +963,7 @@ $months = [
             } else {
                 // LET'S DO SOME MORE MANIPULATION ON THE FESTIVITY->COMMON STRINGS AND THE FESTIVITY->COLOR...
                 if ($festivity->common !== "" && $festivity->common !== "Proper") {
-                    $commons = explode("|", $festivity->common);
+                    $commons = explode(",", $festivity->common);
                     $commons = array_map(function ($txt) use ($LOCALE) {
                         $common = explode(":", $txt);
                         $commonGeneral = __($common[0], $LOCALE);
@@ -987,7 +993,7 @@ $months = [
                 }
 
                 //We will apply the color for the single festivity only to it's own table cells
-                $possibleColors = explode("|", $festivity->color);
+                $possibleColors = explode(",", $festivity->color);
                 $CSScolor = $possibleColors[0];
                 $festivityColorString = "";
                 if(count($possibleColors) === 1){
