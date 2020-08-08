@@ -183,15 +183,12 @@ let today = new Date(),
                                 }
                                 $currentCycle = ($festivity.hasOwnProperty("liturgicalyear") ? ' (' + $festivity.liturgicalyear + ')' : "");
                                 $festivityGrade = '';
-                                if(dy !== 7){
-                                    $festivityGrade = ($keyname === 'AllSouls' ? __("COMMEMORATION") : $GRADE[$festivity.grade]);
-                                }
-                                else if($festivity.grade > 3){
-                                    $festivityGrade = ($keyname === 'AllSouls' ? __("COMMEMORATION") : $GRADE[$festivity.grade]);
-                                }
                                 if($festivity.hasOwnProperty('displaygrade') && $festivity.displaygrade !== ''){
                                     $festivityGrade = $festivity.displaygrade;
                                 }         
+                                else if(dy !== 7 || $festivity.grade > 3){
+                                    $festivityGrade = $GRADE[$festivity.grade];
+                                }
                                 strHTML += '<td style="background-color:'+$CSScolor+';' + ($highContrast.indexOf($CSScolor) != -1 ? 'color:white;' : 'color:black;') + '">' + $festivity.name + $currentCycle + ' - <i>' + __($festivity.color) + '</i><br /><i>' + $festivity.common + '</i></td>';
                                 strHTML += '<td style="background-color:'+$CSScolor+';' + ($highContrast.indexOf($CSScolor) != -1 ? 'color:white;' : 'color:black;') + '">' + $festivityGrade + '</td>';
                                 strHTML += '</tr>';

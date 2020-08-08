@@ -301,10 +301,19 @@
               for (let $keyindex = 0; $keyindex < $LitCalKeys.length; $keyindex++) {
                 let $keyname = $LitCalKeys[$keyindex];
                 let $festivity = $LitCal[$keyname];
+                let dy = ($festivity.date.getDay() === 0 ? 7 : $festivity.date.getDay()); // get the day of the week
                 let $possibleColors = $festivity.color.split(",");
                 let $CSScolor = $possibleColors[0];
                 let $textColor = ($CSScolor === 'white' || $CSScolor === 'pink' ? 'black' : 'white');
-                let $description = '<b>' + $festivity.name + '</b><br>' + ($festivity.displaygrade !== '' ? $festivity.displaygrade : _G($festivity.grade)) + ', <i>' + _CC($festivity.color, true) + '</i><br><i style="font-size:.8em;">' + _C($festivity.common) + '</i>' + ($festivity.hasOwnProperty('liturgicalyear') ? '<br>' + $festivity.liturgicalyear : '');
+                $festivityGrade = '';
+                if($festivity.hasOwnProperty('displaygrade') && $festivity.displaygrade !== ''){
+                    $festivityGrade = $festivity.displaygrade + ', ';
+                }         
+                else if(dy !== 7 || $festivity.grade > 3){
+                    $festivityGrade = _G($festivity.grade) + ', ';
+                }
+
+                let $description = '<b>' + $festivity.name + '</b><br>' + $festivityGrade + '<i>' + _CC($festivity.color, true) + '</i><br><i style="font-size:.8em;">' + _C($festivity.common) + '</i>' + ($festivity.hasOwnProperty('liturgicalyear') ? '<br>' + $festivity.liturgicalyear : '');
                 $events[$keyindex] = {
                   title: $festivity.name,
                   start: $festivity.date.getUTCFullYear() + '-' + pad($festivity.date.getUTCMonth() + 1) + '-' + pad($festivity.date.getUTCDate()),
@@ -490,7 +499,8 @@
             return $colors.join(" " + __("or") + " ");
         }
         else{
-            return '<span style="color:'+($colorstr==='white' ? 'gray' : $colorstr)+';">' +  __($colorstr) + '</span>';
+            $highlightColor = $colorstr=== 'pink' ? 'text-shadow:1px 1px 3px DarkGray;' : '';
+            return '<span style="color:'+($colorstr==='white' ? 'gray' : $colorstr)+';' + $highlightColor + '">' +  __($colorstr) + '</span>';
         }
       }
       else{
