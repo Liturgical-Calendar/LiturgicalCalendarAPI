@@ -270,6 +270,8 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
   <script>
+    "use strict";
+
     let today = new Date(),
       $Settings = {
         "year": today.getFullYear(),
@@ -292,7 +294,7 @@
               createHeader();
               let $LitCal = LitCalData.LitCal;
 
-              for (const key in $LitCal) {
+              for (let key in $LitCal) {
                 if ($LitCal.hasOwnProperty(key)) {
                   $LitCal[key].date = new Date($LitCal[key].date * 1000); //transform PHP timestamp to javascript date object
                 }
@@ -305,7 +307,7 @@
                 let $possibleColors = $festivity.color.split(",");
                 let $CSScolor = $possibleColors[0];
                 let $textColor = ($CSScolor === 'white' || $CSScolor === 'pink' ? 'black' : 'white');
-                $festivityGrade = '';
+                let $festivityGrade = '';
                 if($festivity.hasOwnProperty('displaygrade') && $festivity.displaygrade !== ''){
                     $festivityGrade = $festivity.displaygrade + ', ';
                 }         
@@ -372,22 +374,22 @@
         document.title = __("Generate Roman Calendar");
         $('#settingsWrapper').dialog("destroy").remove();
         $('header').empty();
-        let templateStr = __('HTML presentation elaborated by JAVASCRIPT using an AJAX request to a %s', $Settings.locale);
+        let templateStr = __('HTML presentation elaborated by JAVASCRIPT using an AJAX request to a %s');
         templateStr = templateStr.replace('%s','<a href="../../../LitCalEngine.php">PHP engine</a>');
         let $header = `
-            <h1 style="text-align:center;">${__('Liturgical Calendar Calculation for a Given Year', $Settings.locale)} (${$Settings.year})</h1>
+            <h1 style="text-align:center;">${__('Liturgical Calendar Calculation for a Given Year')} (${$Settings.year})</h1>
             <h2 style="text-align:center;">${templateStr}</h2>
             <div style="text-align:center;border:2px groove White;border-radius:6px;width:60%;margin:0px auto;padding-bottom:6px;">
-            <h3>${__('Configurations being used to generate this calendar:', $Settings.locale)}</h3>
-            <span>${__('YEAR', $Settings.locale)} = ${$Settings.year}, ${__('EPIPHANY', $Settings.locale)} = ${$Settings.epiphany}, ${__('ASCENSION', $Settings.locale)} = ${$Settings.ascension}, CORPUS CHRISTI = ${$Settings.corpuschristi}, LOCALE = ${$Settings.locale}</span>
+            <h3>${__('Configurations being used to generate this calendar:')}</h3>
+            <span>${__('YEAR')} = ${$Settings.year}, ${__('EPIPHANY')} = ${$Settings.epiphany}, ${__('ASCENSION')} = ${$Settings.ascension}, CORPUS CHRISTI = ${$Settings.corpuschristi}, LOCALE = ${$Settings.locale}</span>
             </div>`,
-        $tbheader = `<tr><th>${__("Month", $Settings.locale)}</th><th>${__("Date in Gregorian Calendar", $Settings.locale)}</th><th>${__("General Roman Calendar Festivity", $Settings.locale)}</th><th>${__("Grade of the Festivity", $Settings.locale)}</th></tr>`,
+        $tbheader = `<tr><th>${__("Month")}</th><th>${__("Date in Gregorian Calendar")}</th><th>${__("General Roman Calendar Festivity")}</th><th>${__("Grade of the Festivity")}</th></tr>`,
         $settingsDialog = `<div id="settingsWrapper"><form id="calSettingsForm"><table id="calSettings">
-        <tr><td colspan="2"><label>${__('YEAR', $Settings.locale)}: </td><td colspan="2"><input type="number" name="year" id="year" min="1969" max="9999" value="${$Settings.year}" /></label></td></tr>
-        <tr><td><label>LOCALE: </td><td><select name="locale" id="locale"><option value="EN" ${($Settings.locale === "EN" ? " SELECTED" : "")}>ENGLISH</option><option value="IT" ${($Settings.locale === "IT" ? " SELECTED" : "")}>ITALIANO</option><option value="LA" ${($Settings.locale === "LA" ? " SELECTED" : "")}>LATINO</option></select></label></td><td>NATIONAL PRESET: </td><td><select id="nationalpreset" name="nationalpreset"><option value=""></option><option value="VATICAN">Vatican</option><option value="ITALY">Italy</option><option value="USA">USA</option></select></td></tr>
-        <tr><td><label>${__('EPIPHANY', $Settings.locale)}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>January 6</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>Sunday Jan 2↔Jan 8</option></select></label></td><td>DIOCESAN PRESET: </td><td><select id="diocesanpreset" name="diocesanpreset" disabled><option value=""></option><option value="DIOCESIDIROMA">Diocesi di Roma</option><option value="DIOCESILAZIO">Le diocesi del Lazio</option></select></td></tr>
-        <tr><td><label>${__('ASCENSION', $Settings.locale)}: </td><td><select name="ascension" id="ascension"><option value="THURSDAY" ${($Settings.ascension === "THURSDAY" ? " SELECTED" : "")}>Thursday</option><option value="SUNDAY" ${($Settings.ascension === "SUNDAY" ? " SELECTED" : "")}>Sunday</option></select></label></td><td></td><td></td></tr>
-        <tr><td><label>CORPUS CHRISTI: </td><td><select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" ${($Settings.corpuschristi === "THURSDAY" ? " SELECTED" : "")}>Thursday</option><option value="SUNDAY" ${($Settings.corpuschristi === "SUNDAY" ? " SELECTED" : "")}>Sunday</option></select></label></td><td></td><td></td></tr>
+        <tr><td colspan="2"><label>${__('YEAR')}: </td><td colspan="2"><input type="number" name="year" id="year" min="1969" max="9999" value="${$Settings.year}" /></label></td></tr>
+        <tr><td><label>${__('LOCALE')}: </td><td><select name="locale" id="locale"><option value="EN" ${($Settings.locale === "EN" ? " SELECTED" : "")}>ENGLISH</option><option value="IT" ${($Settings.locale === "IT" ? " SELECTED" : "")}>ITALIANO</option><option value="LA" ${($Settings.locale === "LA" ? " SELECTED" : "")}>LATINO</option></select></label></td><td>${__('NATIONAL PRESET')}: </td><td><select id="nationalpreset" name="nationalpreset"><option value=""></option><option value="VATICAN">${__('Vatican')}</option><option value="ITALY">${__('Italy')}</option><option value="USA">USA</option></select></td></tr>
+        <tr><td><label>${__('EPIPHANY')}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>${__('January 6')}</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>${__('Sunday Jan 2↔Jan 8')}</option></select></label></td><td>${__('DIOCESAN PRESET')}: </td><td><select id="diocesanpreset" name="diocesanpreset" disabled><option value=""></option><option value="DIOCESIDIROMA">Diocesi di Roma</option><option value="DIOCESILAZIO">Le diocesi del Lazio</option></select></td></tr>
+        <tr><td><label>${__('ASCENSION')}: </td><td><select name="ascension" id="ascension"><option value="THURSDAY" ${($Settings.ascension === "THURSDAY" ? " SELECTED" : "")}>${__('Thursday')}</option><option value="SUNDAY" ${($Settings.ascension === "SUNDAY" ? " SELECTED" : "")}>${__('Sunday')}</option></select></label></td><td></td><td></td></tr>
+        <tr><td><label>CORPUS CHRISTI: </td><td><select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" ${($Settings.corpuschristi === "THURSDAY" ? " SELECTED" : "")}>${__('Thursday')}</option><option value="SUNDAY" ${($Settings.corpuschristi === "SUNDAY" ? " SELECTED" : "")}>${__('Sunday')}</option></select></label></td><td></td><td></td></tr>
         <tr><td colspan="4" style="text-align:center;"><input type="submit" id="generateLitCal" value="${__("Generate Roman Calendar")}" /></td></tr>
         </table></form></div>`;
         $('header').html($header);
@@ -396,7 +398,7 @@
         $('#generateLitCal').button();
 
         $($settingsDialog).dialog({
-            title: __('Customize options for generating the Roman Calendar', $Settings.locale),
+            title: __('Customize options for generating the Roman Calendar'),
             modal: true,
             width: '80%',
             show: {
@@ -411,7 +413,7 @@
         });        
       },
       __ = function($key) {
-        $lcl = $Settings.locale.toLowerCase();
+        let $lcl = $Settings.locale.toLowerCase();
         if ($messages !== null && typeof $messages == 'object') {
             if ($messages.hasOwnProperty($key) && typeof $messages[$key] == 'object') {
                 if ($messages[$key].hasOwnProperty($lcl)) {
@@ -428,7 +430,7 @@
     },
     _G = function($key,$html=true){
         $key = parseInt($key);
-        $grade = __("FERIA");
+        let $grade = __("FERIA");
         switch($key){
             case 0: 
                 $grade = __("FERIA");
@@ -461,9 +463,10 @@
         if ($common !== "" && $common !== "Proper") {
             let $commons = $common.split(",");
             $commons = $commons.map(function($txt) {
-                $commonArr = $txt.split(":");
-                $commonGeneral = __($commonArr[0]);
-                $commonSpecific = $commonArr.length>1 && $commonArr[1] != "" ? __($commonArr[1]) : "";
+                let $commonArr = $txt.split(":");
+                let $commonGeneral = __($commonArr[0]);
+                let $commonSpecific = $commonArr.length>1 && $commonArr[1] != "" ? __($commonArr[1]) : "";
+                let $commonKey = '';
                 //$txt = str_replace(":", ": ", $txt);
                 switch ($commonGeneral) {
                     case __("Blessed Virgin Mary"):
@@ -495,13 +498,13 @@
             console.log($colorstr);
             let $colors = $colorstr.split(",");
             $colors = $colors.map(function($txt){
-              $clr = $txt === 'white' ? 'gray' : $txt;  
+              let $clr = $txt === 'white' ? 'gray' : $txt;  
               return '<span style="color:'+$clr+';">' +  __($txt) + '</span>';
             });
             return $colors.join(" " + __("or") + " ");
         }
         else{
-            $highlightColor = $colorstr=== 'pink' ? 'text-shadow:1px 1px 3px DarkGray;' : '';
+            let $highlightColor = $colorstr=== 'pink' ? 'text-shadow:1px 1px 3px DarkGray;' : '';
             return '<span style="color:'+($colorstr==='white' ? 'gray' : $colorstr)+';' + $highlightColor + '">' +  __($colorstr) + '</span>';
         }
       }
@@ -826,6 +829,51 @@
             "it": "Informazioni sull'attuale calcolo dell'Anno Liturgico",
             "la": "Notitiæ de computatione præsente Anni Liturgici"
         },
+        "LOCALE": {
+            "en": "LANGUAGE",
+            "it": "LINGUA",
+            "la": "LINGUA"
+        },
+        "NATIONAL PRESET": {
+          "en": "NATIONAL PRESET",
+          "it": "NAZIONE",
+          "la": "PATRIA"
+        },
+        "DIOCESAN PRESET": {
+          "en": "DIOCESAN PRESET",
+          "it": "DIOCESI",
+          "la": "DIOECESIS"
+        },
+        "Sunday" : {
+          "en": "Sunday",
+          "it": "Domenica",
+          "la": "Dies Domini"
+        },
+        "Thursday": {
+          "en": "Thursday",
+          "it": "Giovedì",
+          "la": "Dies Iovis"
+        },
+        "January 6": {
+          "en": "January 6",
+          "it": "6 Gennaio",
+          "la": "6 Ianuarii"
+        },
+        "Sunday Jan 2↔Jan 8": {
+          "en": "Sunday Jan 2↔Jan 8",
+          "it": "Domenica 2 Gen↔8 Gen",
+          "la": "Dies Iovis 2 Ian↔8 Ian"
+        },
+        "Italy": {
+          "en": "Italy",
+          "it": "Italia",
+          "la": "Italia"
+        },
+        "Vatican": {
+          "en": "Vatican",
+          "it": "Vaticano",
+          "la": "Vaticanum"
+        }
       },
       dayNames = ['Dies Solis','Dies Lunae','Dies Martis','Dies Mercurii','Dies Iovis','Dies Veneris','Dies Saturni'],
       dayNamesShort = ['Sol','Lun','Mart','Merc','Iov','Ven','Sat'];
@@ -842,7 +890,7 @@
       $(document).on("submit",'#calSettingsForm', function( event ) {
           event.preventDefault();
           let formValues = $(this).serializeArray();
-          for(const obj of formValues){
+          for(let obj of formValues){
               $Settings[obj.name] = obj.value;
           }
 

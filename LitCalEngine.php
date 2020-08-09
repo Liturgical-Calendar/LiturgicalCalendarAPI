@@ -536,7 +536,7 @@ else if ($LitCal["StJoseph"]->date >= $LitCal["PalmSun"]->date && $LitCal["StJos
 if ($LitCal["Annunciation"]->date == $LitCal["Lent2"]->date || $LitCal["Annunciation"]->date == $LitCal["Lent3"]->date || $LitCal["Annunciation"]->date == $LitCal["Lent4"]->date || $LitCal["Annunciation"]->date == $LitCal["Lent5"]->date) {
     $LitCal["Annunciation"]->date->add(new DateInterval('P1D'));
     $Messages[] = sprintf(
-        __("The Solemnity '%s' falls on a Sunday of Lent in the year %d, so the celebration has been transferred to the following Monday (%s).", $LITSETTINGS->LOCALE),
+        __("The Solemnity '%s' falls on a Sunday of Lent in the year %d, the celebration has been transferred to the following Monday (%s).", $LITSETTINGS->LOCALE),
         $LitCal["Annunciation"]->name,
         $LITSETTINGS->YEAR,
         $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["Annunciation"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["Annunciation"]->date->format('n')] ) : 
@@ -1114,7 +1114,7 @@ if($LITSETTINGS->YEAR >= 2018){
         }else{
             $Messages[] = sprintf(
                 __("The Memorial '%s', added on %s since the year %d (%s), is however superseded by a Solemnity or a Feast '%s' in the year %d.", $LITSETTINGS->LOCALE),
-                $LitCal["MaryMotherChurch"]->name,
+                $MaryMotherChurch_tag[$LITSETTINGS->LOCALE],
                 __('the Monday after Pentecost',$LITSETTINGS->LOCALE),
                 2018,
                 '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20180211_decreto-mater-ecclesiae_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
@@ -1513,10 +1513,10 @@ if ($LITSETTINGS->YEAR >= 2002) {
             $coincidingFestivity = $LitCal[$coincidingFestivityKey];        
             $Messages[] = sprintf(
                 __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
-                $LitCal["LadyLoreto"]->name,
-                $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["LadyLoreto"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["LadyLoreto"]->date->format('n')] ) : 
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["LadyLoreto"]->date->format('F jS') : 
-                        trim(utf8_encode(strftime('%e %B', $LitCal["LadyLoreto"]->date->format('U'))))
+                $LadyLoreto_tag[$LITSETTINGS->LOCALE],
+                $LITSETTINGS->LOCALE === 'LA' ? ( $LadyLoreto_date->format('j') . ' ' . $LATIN_MONTHS[(int)$LadyLoreto_date->format('n')] ) : 
+                    ( $LITSETTINGS->LOCALE === 'EN' ? $LadyLoreto_date->format('F jS') : 
+                        trim(utf8_encode(strftime('%e %B', $LadyLoreto_date->format('U'))))
                     ),
                 2019,
                 '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
