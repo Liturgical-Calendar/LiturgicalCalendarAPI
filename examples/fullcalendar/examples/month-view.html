@@ -504,7 +504,7 @@
             return $colors.join(" " + __("or") + " ");
           }
           else {
-            let $highlightColor = $colorstr === 'pink' ? 'text-shadow:1px 1px 3px DarkGray;' : '';
+            let $highlightColor = $colorstr === 'pink' ? 'text-shadow:1px 1px 3px Black;font-weight:bold;' : '';
             return '<span style="color:' + ($colorstr === 'white' ? 'gray' : $colorstr) + ';' + $highlightColor + '">' + __($colorstr) + '</span>';
           }
         }

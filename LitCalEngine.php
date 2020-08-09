@@ -770,7 +770,7 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
 //	(the same will be true of the Octave of Christmas and weekdays of Lent)
 //  on which days obligatory memorials can only be celebrated in partial form
 
-$DoMAdvent1 = $LitCal["Advent1"]->date->format('j');
+$DoMAdvent1 = $LitCal["Advent1"]->date->format('j'); //DoM == Day of Month
 $MonthAdvent1 = $LitCal["Advent1"]->date->format('n');
 $weekdayAdvent = DateTime::createFromFormat('!j-n-Y', $DoMAdvent1 . '-' . $MonthAdvent1 . '-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
 $weekdayAdventCnt = 1;
@@ -1339,7 +1339,85 @@ if ($LITSETTINGS->YEAR >= 2002) {
             }
         }    
     }
-
+    
+    //Sure seems to me that both Our Lady of Guadalupe and Saint Juan Diego were added as Optional memorials in the Universal Calendar
+    //the USA Missal 2011 has Juan Diego as optional memorial without specifying "USA", so it seems universal
+    //also the ORDO (Guida-liturgico pastorale) della Diocesi di Roma has both Juan Diego and Guadalupe as optional memorials, without specifying "ROME"
+    $Guadalupe_tag = ["LA" => "Beatæ Mariæ Virginis Guadalupensis", "EN" => "Our Lady of Guadalupe", "IT" => "Beata Vergine Maria di Guadalupe"];
+    $Guadalupe_date = DateTime::createFromFormat('!j-n-Y', '12-12-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+    
+    if ( (int)$Guadalupe_date->format('N') !== 7 && !in_array($Guadalupe_date, $SOLEMNITIES) && !in_array($Guadalupe_date, $FEASTS_MEMORIALS) ) {
+        $LitCal["LadyGuadalupe"] = new Festivity( $Guadalupe_tag[$LITSETTINGS->LOCALE], $Guadalupe_date, 'white', 'fixed', MEMORIALOPT, "Blessed Virgin Mary" );
+        $Messages[] = sprintf(
+            __("The optional memorial '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
+            $LitCal["LadyGuadalupe"]->name,
+            $LITSETTINGS->LOCALE === 'LA' ? ( $Guadalupe_date->format('j') . ' ' . $LATIN_MONTHS[(int)$Guadalupe_date->format('n')] ) : 
+                ( $LITSETTINGS->LOCALE === 'EN' ? $Guadalupe_date->format('F jS') : 
+                    trim(utf8_encode(strftime('%e %B', $Guadalupe_date->format('U'))))
+                ),
+            2002,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $LITSETTINGS->YEAR
+        );
+    } else {
+        if(in_array($Guadalupe_date,$SOLEMNITIES) ){
+            $coincidingFestivityKey = array_search($Guadalupe_date,$SOLEMNITIES);
+        }
+        else if(in_array($Guadalupe_date,$FEASTS_MEMORIALS) ){
+            $coincidingFestivityKey = array_search($Guadalupe_date,$FEASTS_MEMORIALS);
+        }
+        $coincidingFestivity = $LitCal[$coincidingFestivityKey];        
+        $Messages[] = sprintf(
+            __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
+            $Guadalupe_tag[$LITSETTINGS->LOCALE],
+            $LITSETTINGS->LOCALE === 'LA' ? ( $Guadalupe_date->format('j') . ' ' . $LATIN_MONTHS[(int)$Guadalupe_date->format('n')] ) : 
+                ( $LITSETTINGS->LOCALE === 'EN' ? $Guadalupe_date->format('F jS') : 
+                    trim(utf8_encode(strftime('%e %B', $Guadalupe_date->format('U'))))
+                ),
+            2002,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $coincidingFestivity->name,
+            $LITSETTINGS->YEAR
+        );
+    }
+    
+    $JuanDiego_tag = ["LA" => "Sancti Ioannis Didaci Cuauhtlatoatzin", "EN" => "Saint Juan Diego Cuauhtlatoatzin", "IT" => "San Juan Diego Cuauhtlatouatzin"];
+    $JuanDiego_date = DateTime::createFromFormat('!j-n-Y', '9-12-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+    if ( (int)$JuanDiego_date->format('N') !== 7 && !in_array($JuanDiego_date, $SOLEMNITIES) && !in_array($JuanDiego_date, $FEASTS_MEMORIALS) ) {
+        $LitCal["JuanDiego"] = new Festivity( $JuanDiego_tag[$LITSETTINGS->LOCALE], $JuanDiego_date, 'white', 'fixed', MEMORIALOPT, "Holy Men and Women:For One Saint" );
+        $Messages[] = sprintf(
+            __("The optional memorial '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
+            $LitCal["JuanDiego"]->name,
+            $LITSETTINGS->LOCALE === 'LA' ? ( $JuanDiego_date->format('j') . ' ' . $LATIN_MONTHS[(int)$JuanDiego_date->format('n')] ) : 
+                ( $LITSETTINGS->LOCALE === 'EN' ? $JuanDiego_date->format('F jS') : 
+                    trim(utf8_encode(strftime('%e %B', $JuanDiego_date->format('U'))))
+                ),
+            2002,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $LITSETTINGS->YEAR
+        );
+    } else {
+        if(in_array($JuanDiego_date,$SOLEMNITIES) ){
+            $coincidingFestivityKey = array_search($JuanDiego_date,$SOLEMNITIES);
+        }
+        else if(in_array($JuanDiego_date,$FEASTS_MEMORIALS) ){
+            $coincidingFestivityKey = array_search($JuanDiego_date,$FEASTS_MEMORIALS);
+        }
+        $coincidingFestivity = $LitCal[$coincidingFestivityKey];        
+        $Messages[] = sprintf(
+            __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
+            $JuanDiego_tag[$LITSETTINGS->LOCALE],
+            $LITSETTINGS->LOCALE === 'LA' ? ( $JuanDiego_date->format('j') . ' ' . $LATIN_MONTHS[(int)$JuanDiego_date->format('n')] ) : 
+                ( $LITSETTINGS->LOCALE === 'EN' ? $JuanDiego_date->format('F jS') : 
+                    trim(utf8_encode(strftime('%e %B', $JuanDiego_date->format('U'))))
+                ),
+            2002,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $coincidingFestivity->name,
+            $LITSETTINGS->YEAR
+        );
+    }
+    
     //TODO: Saint Pio of Pietrelcina "Padre Pio" was canonized on June 16 2002, 
     //so did not make it for the Calendar of the 2002 editio typica III
     //check if his memorial added in the 2008 editio typica III emendata
