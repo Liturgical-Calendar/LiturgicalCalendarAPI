@@ -462,13 +462,15 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
         $LitCal[$row["TAG"]] = new Festivity($row["NAME_" . $LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"]);
         //check if by chance any of these coincides with a mobile solemnity already defined
         if(in_array($currentFeastDate,$SOLEMNITIES)){
-            $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                __("The Solemnity '%s' coincides with the Solemnity '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!", $LITSETTINGS->LOCALE),
-                $row["NAME_" . $LITSETTINGS->LOCALE],
-                $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name,
-                $LITSETTINGS->YEAR
-            );
-
+            //let's not make a big deal out of the Annunciation, it happens often
+            if(!in_array($row["TAG"],["Annunciation","StJoseph","ImmaculateConception"]) || ( in_array($row["TAG"],["Annunciation","StJoseph","ImmaculateConception"]) && (int)$LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->date->format('N') !== 7 ) ){
+                $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                    __("The Solemnity '%s' coincides with the Solemnity '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!", $LITSETTINGS->LOCALE),
+                    $row["NAME_" . $LITSETTINGS->LOCALE],
+                    $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name,
+                    $LITSETTINGS->YEAR
+                );
+            }
             //In the year 2022, the Solemnity Nativity of John the Baptist coincides with the Solemnity of the Sacred Heart
             //Nativity of John the Baptist anticipated by one day to June 23 
             //(except in cases where John the Baptist is patron of a nation, diocese, city or religious community, then the Sacred Heart can be anticipated by one day to June 23)
@@ -1795,6 +1797,13 @@ if($LITSETTINGS->NATIONAL !== false){
                 }
             }
 
+            //At least in Italy, according to the ORDO (Guida Liturgico-Pastorale) della Diocesi di Roma, Saint Pio is an obligatory memorial throughout Italy
+            //I guess we'll see in the upcoming edition of the Missal in September 2020...
+            if( array_key_exists("StPioPietrelcina",$LitCal) ){
+                $LitCal["StPioPietrelcina"]->grade = MEMORIAL;
+                $LitCal["StPioPietrelcina"]->common = "Proper";
+            }
+
         break;
         case 'USA':
             
@@ -1967,6 +1976,14 @@ if($LITSETTINGS->NATIONAL !== false){
 if($LITSETTINGS->DIOCESAN !== false){
     switch($LITSETTINGS->DIOCESAN){
         case "DIOCESIDIROMA":
+            
+            if(array_key_exists("StJohnPaulII",$LitCal) ){
+                //In the diocese of Rome, StJohnPaulII is celebrated as a Memorial instead of an optional memorial
+                $LitCal["DIOCESIDIROMA_StJohnPaulII"] = clone($LitCal["StJohnPaulII"]);
+                $LitCal["DIOCESIDIROMA_StJohnPaulII"]->grade = MEMORIAL;
+                $LitCal["DIOCESIDIROMA_StJohnPaulII"]->name = "[DIOCESI DI ROMA] " . $LitCal["DIOCESIDIROMA_StJohnPaulII"]->name;
+            }
+            
             if($LITSETTINGS->YEAR >= 1973){
 
                 if ($result = $mysqli->query("SELECT * FROM LITURGY__DIOCESILAZIO_calendar_propriumdesanctis_1973 WHERE CALENDAR = 'DIOCESIDIROMA'")) {

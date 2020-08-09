@@ -236,7 +236,6 @@
     #LitCalMessages td:first-child {
       border-right: 1px groove White;
     }
-
   </style>
 </head>
 
@@ -295,9 +294,7 @@
               let $LitCal = LitCalData.LitCal;
 
               for (let key in $LitCal) {
-                if ($LitCal.hasOwnProperty(key)) {
-                  $LitCal[key].date = new Date($LitCal[key].date * 1000); //transform PHP timestamp to javascript date object
-                }
+                $LitCal[key].date = new Date($LitCal[key].date * 1000); //transform PHP timestamp to javascript date object
               }
               let $LitCalKeys = Object.keys($LitCal);
               for (let $keyindex = 0; $keyindex < $LitCalKeys.length; $keyindex++) {
@@ -308,11 +305,11 @@
                 let $CSScolor = $possibleColors[0];
                 let $textColor = ($CSScolor === 'white' || $CSScolor === 'pink' ? 'black' : 'white');
                 let $festivityGrade = '';
-                if($festivity.hasOwnProperty('displaygrade') && $festivity.displaygrade !== ''){
-                    $festivityGrade = $festivity.displaygrade + ', ';
-                }         
-                else if(dy !== 7 || $festivity.grade > 3){
-                    $festivityGrade = _G($festivity.grade) + ', ';
+                if ($festivity.hasOwnProperty('displaygrade') && $festivity.displaygrade !== '') {
+                  $festivityGrade = $festivity.displaygrade + ', ';
+                }
+                else if (dy !== 7 || $festivity.grade > 3) {
+                  $festivityGrade = _G($festivity.grade) + ', ';
                 }
 
                 let $description = '<b>' + $festivity.name + '</b><br>' + $festivityGrade + '<i>' + _CC($festivity.color, true) + '</i><br><i style="font-size:.8em;">' + _C($festivity.common) + '</i>' + ($festivity.hasOwnProperty('liturgicalyear') ? '<br>' + $festivity.liturgicalyear : '');
@@ -322,43 +319,43 @@
                   backgroundColor: $CSScolor,
                   textColor: $textColor,
                   description: $description,
-                  idx: $keyindex
+                  idx: $festivity.eventidx
                 };
-                
+
                 if ($keyindex === $LitCalKeys.length - 1) {
                   $('#spinnerWrapper').fadeOut('slow');
                 }
               }
 
               let calendarEl = document.getElementById('calendar'),
-                  fullCalendarSettings = {
-                    headerToolbar: {
-                      left: 'prev,next today',
-                      center: 'title',
-                      right: 'dayGridMonth,listMonth'
-                    },
-                    dayMaxEvents: true, // allow "more" link when too many events
-                    events: $events,
-                    firstDay: 0,
-                    eventOrder: 'idx',
-                    eventDidMount: function(info) {
-                      $(info.el).attr('data-tooltip', encodeURI(info.event.extendedProps.description));
-                    }
-                  };
-              if($Settings.locale.toLowerCase() !== 'en'){
+                fullCalendarSettings = {
+                  headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,listMonth'
+                  },
+                  dayMaxEvents: true, // allow "more" link when too many events
+                  events: $events,
+                  firstDay: 0,
+                  eventOrder: 'idx',
+                  eventDidMount: function (info) {
+                    $(info.el).attr('data-tooltip', encodeURI(info.event.extendedProps.description));
+                  }
+                };
+              if ($Settings.locale.toLowerCase() !== 'en') {
                 fullCalendarSettings.locale = $Settings.locale.toLowerCase();
               }
-              if( parseInt($Settings.year) !== today.getFullYear()){
+              if (parseInt($Settings.year) !== today.getFullYear()) {
                 fullCalendarSettings.initialDate = $Settings.year + '-01-01';
               }
               let calendar = new FullCalendar.Calendar(calendarEl, fullCalendarSettings);
 
               calendar.render();
             }
-            if(LitCalData.hasOwnProperty('Messages')){
+            if (LitCalData.hasOwnProperty('Messages')) {
               $('#LitCalMessages tbody').empty();
-              LitCalData.Messages.forEach(function(message,idx){
-                  $('#LitCalMessages tbody').append(`<tr><td>${idx}</td><td>${message}</td></tr>`);
+              LitCalData.Messages.forEach(function (message, idx) {
+                $('#LitCalMessages tbody').append(`<tr><td>${idx}</td><td>${message}</td></tr>`);
               });
             }
 
@@ -370,12 +367,12 @@
           }
         });
       },
-      createHeader = function(){
+      createHeader = function () {
         document.title = __("Generate Roman Calendar");
         $('#settingsWrapper').dialog("destroy").remove();
         $('header').empty();
         let templateStr = __('HTML presentation elaborated by JAVASCRIPT using an AJAX request to a %s');
-        templateStr = templateStr.replace('%s','<a href="../../../LitCalEngine.php">PHP engine</a>');
+        templateStr = templateStr.replace('%s', '<a href="../../../LitCalEngine.php">PHP engine</a>');
         let $header = `
             <h1 style="text-align:center;">${__('Liturgical Calendar Calculation for a Given Year')} (${$Settings.year})</h1>
             <h2 style="text-align:center;">${templateStr}</h2>
@@ -383,11 +380,11 @@
             <h3>${__('Configurations being used to generate this calendar:')}</h3>
             <span>${__('YEAR')} = ${$Settings.year}, ${__('EPIPHANY')} = ${$Settings.epiphany}, ${__('ASCENSION')} = ${$Settings.ascension}, CORPUS CHRISTI = ${$Settings.corpuschristi}, LOCALE = ${$Settings.locale}</span>
             </div>`,
-        $tbheader = `<tr><th>${__("Month")}</th><th>${__("Date in Gregorian Calendar")}</th><th>${__("General Roman Calendar Festivity")}</th><th>${__("Grade of the Festivity")}</th></tr>`,
-        $settingsDialog = `<div id="settingsWrapper"><form id="calSettingsForm"><table id="calSettings">
+          $tbheader = `<tr><th>${__("Month")}</th><th>${__("Date in Gregorian Calendar")}</th><th>${__("General Roman Calendar Festivity")}</th><th>${__("Grade of the Festivity")}</th></tr>`,
+          $settingsDialog = `<div id="settingsWrapper"><form id="calSettingsForm"><table id="calSettings">
         <tr><td colspan="2"><label>${__('YEAR')}: </td><td colspan="2"><input type="number" name="year" id="year" min="1969" max="9999" value="${$Settings.year}" /></label></td></tr>
-        <tr><td><label>${__('LOCALE')}: </td><td><select name="locale" id="locale"><option value="EN" ${($Settings.locale === "EN" ? " SELECTED" : "")}>ENGLISH</option><option value="IT" ${($Settings.locale === "IT" ? " SELECTED" : "")}>ITALIANO</option><option value="LA" ${($Settings.locale === "LA" ? " SELECTED" : "")}>LATINO</option></select></label></td><td>${__('NATIONAL PRESET')}: </td><td><select id="nationalpreset" name="nationalpreset"><option value=""></option><option value="VATICAN">${__('Vatican')}</option><option value="ITALY">${__('Italy')}</option><option value="USA">USA</option></select></td></tr>
-        <tr><td><label>${__('EPIPHANY')}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>${__('January 6')}</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>${__('Sunday Jan 2↔Jan 8')}</option></select></label></td><td>${__('DIOCESAN PRESET')}: </td><td><select id="diocesanpreset" name="diocesanpreset" disabled><option value=""></option><option value="DIOCESIDIROMA">Diocesi di Roma</option><option value="DIOCESILAZIO">Le diocesi del Lazio</option></select></td></tr>
+        <tr><td><label>${__('LOCALE')}: </td><td><select name="locale" id="locale"><option value="EN" ${($Settings.locale === "EN" ? " SELECTED" : "")}>ENGLISH</option><option value="IT" ${($Settings.locale === "IT" ? " SELECTED" : "")}>ITALIANO</option><option value="LA" ${($Settings.locale === "LA" ? " SELECTED" : "")}>LATINO</option></select></label></td><td>${__('NATIONAL PRESET')}: </td><td><select id="nationalpreset" name="nationalpreset"><option value=""></option><option value="VATICAN" ${($Settings.nationalpreset === "VATICAN" ? " SELECTED" : "")}>${__('Vatican')}</option><option value="ITALY" ${($Settings.nationalpreset === "ITALY" ? " SELECTED" : "")}>${__('Italy')}</option><option value="USA" ${($Settings.nationalpreset === "USA" ? " SELECTED" : "")}>USA</option></select></td></tr>
+        <tr><td><label>${__('EPIPHANY')}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>${__('January 6')}</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>${__('Sunday Jan 2↔Jan 8')}</option></select></label></td><td>${__('DIOCESAN PRESET')}: </td><td><select id="diocesanpreset" name="diocesanpreset" disabled><option value=""></option><option value="DIOCESIDIROMA" ${($Settings.diocesanpreset === "DIOCESIDIROMA" ? " SELECTED" : "")}>Diocesi di Roma</option><option value="DIOCESILAZIO" ${($Settings.diocesanpreset === "DIOCESILAZIO" ? " SELECTED" : "")}>Le diocesi del Lazio</option></select></td></tr>
         <tr><td><label>${__('ASCENSION')}: </td><td><select name="ascension" id="ascension"><option value="THURSDAY" ${($Settings.ascension === "THURSDAY" ? " SELECTED" : "")}>${__('Thursday')}</option><option value="SUNDAY" ${($Settings.ascension === "SUNDAY" ? " SELECTED" : "")}>${__('Sunday')}</option></select></label></td><td></td><td></td></tr>
         <tr><td><label>CORPUS CHRISTI: </td><td><select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" ${($Settings.corpuschristi === "THURSDAY" ? " SELECTED" : "")}>${__('Thursday')}</option><option value="SUNDAY" ${($Settings.corpuschristi === "SUNDAY" ? " SELECTED" : "")}>${__('Sunday')}</option></select></label></td><td></td><td></td></tr>
         <tr><td colspan="4" style="text-align:center;"><input type="submit" id="generateLitCal" value="${__("Generate Roman Calendar")}" /></td></tr>
@@ -398,441 +395,449 @@
         $('#generateLitCal').button();
 
         $($settingsDialog).dialog({
-            title: __('Customize options for generating the Roman Calendar'),
-            modal: true,
-            width: '80%',
-            show: {
-                effect: 'fade',
-                duration: 500
-            },
-            hide: {
-                effect: 'fade',
-                duration: 500
-            },
-            autoOpen: false
-        });        
+          title: __('Customize options for generating the Roman Calendar'),
+          modal: true,
+          width: '80%',
+          show: {
+            effect: 'fade',
+            duration: 500
+          },
+          hide: {
+            effect: 'fade',
+            duration: 500
+          },
+          autoOpen: false
+        });
       },
-      __ = function($key) {
+      __ = function ($key) {
         let $lcl = $Settings.locale.toLowerCase();
         if ($messages !== null && typeof $messages == 'object') {
-            if ($messages.hasOwnProperty($key) && typeof $messages[$key] == 'object') {
-                if ($messages[$key].hasOwnProperty($lcl)) {
-                    return $messages[$key][$lcl];
-                } else {
-                    return $messages[$key]["en"];
-                }
+          if ($messages.hasOwnProperty($key) && typeof $messages[$key] == 'object') {
+            if ($messages[$key].hasOwnProperty($lcl)) {
+              return $messages[$key][$lcl];
             } else {
-                return $key;
+              return $messages[$key]["en"];
             }
-        } else {
+          } else {
             return $key;
+          }
+        } else {
+          return $key;
         }
-    },
-    _G = function($key,$html=true){
+      },
+      _G = function ($key, $html = true) {
         $key = parseInt($key);
         let $grade = __("FERIA");
-        switch($key){
-            case 0: 
-                $grade = __("FERIA");
+        switch ($key) {
+          case 0:
+            $grade = __("FERIA");
             break;
-            case 1: 
-                $grade = __("COMMEMORATION");
+          case 1:
+            $grade = __("COMMEMORATION");
             break;
-            case 2: 
-                $grade = __("OPTIONAL MEMORIAL");
+          case 2:
+            $grade = __("OPTIONAL MEMORIAL");
             break;
-            case 3: 
-                $grade = __("MEMORIAL");
+          case 3:
+            $grade = __("MEMORIAL");
             break;
-            case 4: 
-                $grade = __("FEAST");
+          case 4:
+            $grade = __("FEAST");
             break;
-            case 5: 
-                $grade = __("FEAST OF THE LORD");
+          case 5:
+            $grade = __("FEAST OF THE LORD");
             break;
-            case 6: 
-                $grade = __("SOLEMNITY");
+          case 6:
+            $grade = __("SOLEMNITY");
             break;
-            case 7: 
-                $grade = __("HIGHER RANKING SOLEMNITY");
+          case 7:
+            $grade = __("HIGHER RANKING SOLEMNITY");
             break;
         }
         return $html === true ? $grade : strip_tags($grade);
-    },
-    _C = function($common){
+      },
+      _C = function ($common) {
         if ($common !== "" && $common !== "Proper") {
-            let $commons = $common.split(",");
-            $commons = $commons.map(function($txt) {
-                let $commonArr = $txt.split(":");
-                let $commonGeneral = __($commonArr[0]);
-                let $commonSpecific = $commonArr.length>1 && $commonArr[1] != "" ? __($commonArr[1]) : "";
-                let $commonKey = '';
-                //$txt = str_replace(":", ": ", $txt);
-                switch ($commonGeneral) {
-                    case __("Blessed Virgin Mary"):
-                        $commonKey = "of (SING_FEMM)";
-                        break;
-                    case __("Virgins"):
-                        $commonKey = "of (PLUR_FEMM)";
-                        break;
-                    case __("Martyrs"):
-                    case __("Pastors"):
-                    case __("Doctors"):
-                    case __("Holy Men and Women"):
-                        $commonKey = "of (PLUR_MASC)";
-                        break;
-                    default:
-                        $commonKey = "of (SING_MASC)";
-                }
-                return __("From the Common") + " " + __($commonKey) + " " + $commonGeneral + ($commonSpecific != "" ? ": " + $commonSpecific : "");
-            });
-            $common = $commons.join("; " + __("or") + " ");
+          let $commons = $common.split(",");
+          $commons = $commons.map(function ($txt) {
+            let $commonArr = $txt.split(":");
+            let $commonGeneral = __($commonArr[0]);
+            let $commonSpecific = $commonArr.length > 1 && $commonArr[1] != "" ? __($commonArr[1]) : "";
+            let $commonKey = '';
+            //$txt = str_replace(":", ": ", $txt);
+            switch ($commonGeneral) {
+              case __("Dedication of a Church"):
+                $commonKey = "of (SING_FEMM)";
+                break;
+              case __("Blessed Virgin Mary"):
+                $commonKey = "of (SING_FEMM)";
+                break;
+              case __("Virgins"):
+                $commonKey = "of (PLUR_FEMM)";
+                break;
+              case __("Martyrs"):
+              case __("Pastors"):
+              case __("Doctors"):
+              case __("Holy Men and Women"):
+                $commonKey = "of (PLUR_MASC)";
+                break;
+              default:
+                $commonKey = "of (SING_MASC)";
+            }
+            return __("From the Common") + " " + __($commonKey) + " " + $commonGeneral + ($commonSpecific != "" ? ": " + $commonSpecific : "");
+          });
+          $common = $commons.join("; " + __("or") + " ");
         } else if ($common == "Proper") {
-            $common = __("Proper");
+          $common = __("Proper");
         }
         return $common;
-    },
-    _CC = function($colorstr,html){
-      if(html === true){
-        if($colorstr.indexOf(',') !== -1){
+      },
+      _CC = function ($colorstr, html) {
+        if (html === true) {
+          if ($colorstr.indexOf(',') !== -1) {
             console.log($colorstr);
             let $colors = $colorstr.split(",");
-            $colors = $colors.map(function($txt){
-              let $clr = $txt === 'white' ? 'gray' : $txt;  
-              return '<span style="color:'+$clr+';">' +  __($txt) + '</span>';
+            $colors = $colors.map(function ($txt) {
+              let $clr = $txt === 'white' ? 'gray' : $txt;
+              return '<span style="color:' + $clr + ';">' + __($txt) + '</span>';
             });
             return $colors.join(" " + __("or") + " ");
+          }
+          else {
+            let $highlightColor = $colorstr === 'pink' ? 'text-shadow:1px 1px 3px DarkGray;' : '';
+            return '<span style="color:' + ($colorstr === 'white' ? 'gray' : $colorstr) + ';' + $highlightColor + '">' + __($colorstr) + '</span>';
+          }
         }
-        else{
-            let $highlightColor = $colorstr=== 'pink' ? 'text-shadow:1px 1px 3px DarkGray;' : '';
-            return '<span style="color:'+($colorstr==='white' ? 'gray' : $colorstr)+';' + $highlightColor + '">' +  __($colorstr) + '</span>';
-        }
-      }
-      else{
-        if($colorstr.indexOf(',') !== -1){
+        else {
+          if ($colorstr.indexOf(',') !== -1) {
             console.log($colorstr);
             let $colors = $colorstr.split(",");
-            $colors = $colors.map(function($txt){
-                return __($txt);
+            $colors = $colors.map(function ($txt) {
+              return __($txt);
             });
             return $colors.join(" " + __("or") + " ");
-        }
-        else{
+          }
+          else {
             return __($colorstr);
+          }
         }
-      }
-    },
-    $messages = {
+      },
+      $messages = {
         "From the Common": {
-            "en": "From the Common",
-            "it": "Dal Comune",
-            "la": "De Communi"
+          "en": "From the Common",
+          "it": "Dal Comune",
+          "la": "De Communi"
         },
         "of (SING_MASC)": {
-            "en": "of",
-            "it": "del",
-            "la": ""
+          "en": "of",
+          "it": "del",
+          "la": ""
         },
         "of (SING_FEMM)": {
-            "en": "of the",
-            "it": "della",
-            "la": ""
+          "en": "of the",
+          "it": "della",
+          "la": ""
         },
         "of (PLUR_MASC)": {
-            "en": "of",
-            "it": "dei",
-            "la": ""
+          "en": "of",
+          "it": "dei",
+          "la": ""
         },
         "of (PLUR_MASC_ALT)": {
-            "en": "of",
-            "it": "degli",
-            "la": ""
+          "en": "of",
+          "it": "degli",
+          "la": ""
         },
         "of (PLUR_FEMM)": {
-            "en": "of",
-            "it": "delle",
-            "la": ""
+          "en": "of",
+          "it": "delle",
+          "la": ""
+        },
+        "Dedication of a Church": {
+          "en": "Dedication of a Church",
+          "it": "Dedicazione di una Chiesa",
+          "la": "Dedicationis ecclesiæ"
         },
         /*translators: in reference to the Common of the Blessed Virgin Mary */
         "Blessed Virgin Mary": {
-            "en": "Blessed Virgin Mary",
-            "it": "Beata Vergine Maria",
-            "la": "Beatæ Virginis Mariæ"
+          "en": "Blessed Virgin Mary",
+          "it": "Beata Vergine Maria",
+          "la": "Beatæ Virginis Mariæ"
         },
         "Martyrs": {
-            "en": "Martyrs",
-            "it": "Martiri",
-            "la": "Martyrum"
+          "en": "Martyrs",
+          "it": "Martiri",
+          "la": "Martyrum"
         },
         "Pastors": {
-            "en": "Pastors",
-            "it": "Pastori",
-            "la": "Pastorum"
+          "en": "Pastors",
+          "it": "Pastori",
+          "la": "Pastorum"
         },
         "Doctors": {
-            "en": "Doctors",
-            "it": "Dottori della Chiesa",
-            "la": "Doctorum Ecclesiae"
+          "en": "Doctors",
+          "it": "Dottori della Chiesa",
+          "la": "Doctorum Ecclesiae"
         },
         "Virgins": {
-            "en": "Virgins",
-            "it": "Vergini",
-            "la": "Virginum"
+          "en": "Virgins",
+          "it": "Vergini",
+          "la": "Virginum"
         },
         "Holy Men and Women": {
-            "en": "Holy Men and Women",
-            "it": "Santi e delle Sante",
-            "la": "Sanctorum et Sanctarum"
+          "en": "Holy Men and Women",
+          "it": "Santi e delle Sante",
+          "la": "Sanctorum et Sanctarum"
         },
         "For One Martyr": {
-            "en": "For One Martyr",
-            "it": "Per un martire",
-            "la": "Pro uno martyre"
+          "en": "For One Martyr",
+          "it": "Per un martire",
+          "la": "Pro uno martyre"
         },
         "For Several Martyrs": {
-            "en": "For Several Martyrs",
-            "it": "Per più martiri",
-            "la": "Pro pluribus martyribus"
+          "en": "For Several Martyrs",
+          "it": "Per più martiri",
+          "la": "Pro pluribus martyribus"
         },
         "For Missionary Martyrs": {
-            "en": "For Missionary Martyrs",
-            "it": "Per i martiri missionari",
-            "la": "Pro missionariis martyribus"
+          "en": "For Missionary Martyrs",
+          "it": "Per i martiri missionari",
+          "la": "Pro missionariis martyribus"
         },
         "For a Virgin Martyr": {
-            "en": "For a Virgin Martyr",
-            "it": "Per una vergine martire",
-            "la": "Pro virgine martyre"
+          "en": "For a Virgin Martyr",
+          "it": "Per una vergine martire",
+          "la": "Pro virgine martyre"
         },
         "For Several Pastors": {
-            "en": "For Several Pastors",
-            "it": "Per i pastori",
-            "la": "Pro Pastoribus"
+          "en": "For Several Pastors",
+          "it": "Per i pastori",
+          "la": "Pro Pastoribus"
         },
         "For a Pope": {
-            "en": "For a Pope",
-            "it": "Per i papi",
-            "la": "Pro Papa"
+          "en": "For a Pope",
+          "it": "Per i papi",
+          "la": "Pro Papa"
         },
         "For a Bishop": {
-            "en": "For a Bishop",
-            "it": "Per i vescovi",
-            "la": "Pro Episcopo"
+          "en": "For a Bishop",
+          "it": "Per i vescovi",
+          "la": "Pro Episcopo"
         },
         "For One Pastor": {
-            "en": "For One Pastor",
-            "it": "Per un Pastore",
-            "la": "Pro Pastoribus"
+          "en": "For One Pastor",
+          "it": "Per un Pastore",
+          "la": "Pro Pastoribus"
         },
         "For Missionaries": {
-            "en": "For Missionaries",
-            "it": "Per i missionari",
-            "la": "Pro missionariis"
+          "en": "For Missionaries",
+          "it": "Per i missionari",
+          "la": "Pro missionariis"
         },
         "For One Virgin": {
-            "en": "For One Virgin",
-            "it": "Per una vergine",
-            "la": "Pro una virgine"
+          "en": "For One Virgin",
+          "it": "Per una vergine",
+          "la": "Pro una virgine"
         },
         "For Several Virgins": {
-            "en": "For Several Virgins",
-            "it": "Per più vergini",
-            "la": "Pro pluribus virginibus"
+          "en": "For Several Virgins",
+          "it": "Per più vergini",
+          "la": "Pro pluribus virginibus"
         },
         "For Religious": {
-            "en": "For Religious",
-            "it": "Per i religiosi",
-            "la": "Pro Religiosis"
+          "en": "For Religious",
+          "it": "Per i religiosi",
+          "la": "Pro Religiosis"
         },
         "For Those Who Practiced Works of Mercy": {
-            "en": "For Those Who Practiced Works of Mercy",
-            "it": "Per gli operatori di misericordia",
-            "la": "Pro iis qui opera Misericordiæ Exercuerunt"
+          "en": "For Those Who Practiced Works of Mercy",
+          "it": "Per gli operatori di misericordia",
+          "la": "Pro iis qui opera Misericordiæ Exercuerunt"
         },
         "For an Abbot": {
-            "en": "For an Abbot",
-            "it": "Per un abate",
-            "la": "Pro abbate"
+          "en": "For an Abbot",
+          "it": "Per un abate",
+          "la": "Pro abbate"
         },
         "For a Monk": {
-            "en": "For a Monk",
-            "it": "Per un monaco",
-            "la": "Pro monacho"
+          "en": "For a Monk",
+          "it": "Per un monaco",
+          "la": "Pro monacho"
         },
         "For a Nun": {
-            "en": "For a Nun",
-            "it": "Per i religiosi",
-            "la": "Pro moniali"
+          "en": "For a Nun",
+          "it": "Per i religiosi",
+          "la": "Pro moniali"
         },
         "For Educators": {
-            "en": "For Educators",
-            "it": "Per gli educatori",
-            "la": "Pro Educatoribus"
+          "en": "For Educators",
+          "it": "Per gli educatori",
+          "la": "Pro Educatoribus"
         },
         "For Holy Women": {
-            "en": "For Holy Women",
-            "it": "Per le sante",
-            "la": "Pro Sanctis Mulieribus"
+          "en": "For Holy Women",
+          "it": "Per le sante",
+          "la": "Pro Sanctis Mulieribus"
         },
         "For One Saint": {
-            "en": "For One Saint",
-            "it": "Per un Santo",
-            "la": "Pro uno Sancto"
+          "en": "For One Saint",
+          "it": "Per un Santo",
+          "la": "Pro uno Sancto"
         },
         "or": {
-            "en": "or",
-            "it": "oppure",
-            "la": "vel"
+          "en": "or",
+          "it": "oppure",
+          "la": "vel"
         },
         "Proper": {
-            "en": "Proper",
-            "it": "Proprio",
-            "la": "Proprium"
+          "en": "Proper",
+          "it": "Proprio",
+          "la": "Proprium"
         },
         "green": {
-            "en": "green",
-            "it": "verde",
-            "la": "viridis"
+          "en": "green",
+          "it": "verde",
+          "la": "viridis"
         },
         "purple": {
-            "en": "purple",
-            "it": "viola",
-            "la": "purpura"
+          "en": "purple",
+          "it": "viola",
+          "la": "purpura"
         },
         "white": {
-            "en": "white",
-            "it": "bianco",
-            "la": "albus"
+          "en": "white",
+          "it": "bianco",
+          "la": "albus"
         },
         "red": {
-            "en": "red",
-            "it": "rosso",
-            "la": "ruber"
+          "en": "red",
+          "it": "rosso",
+          "la": "ruber"
         },
         "pink": {
-            "en": "pink",
-            "it": "rosa",
-            "la": "rosea"
+          "en": "pink",
+          "it": "rosa",
+          "la": "rosea"
         },
         "Customize options for generating the Roman Calendar": {
-            "en": "Customize options for generating the Roman Calendar",
-            "it": "Personalizza le opzioni per la generazione del Calendario Romano",
-            "la": "Elige optiones per generationem Calendarii Romani"
+          "en": "Customize options for generating the Roman Calendar",
+          "it": "Personalizza le opzioni per la generazione del Calendario Romano",
+          "la": "Elige optiones per generationem Calendarii Romani"
         },
         "Generate Roman Calendar": {
-            "en": "Generate Roman Calendar",
-            "it": "Genera Calendario Romano",
-            "la": "Calendarium Romanum Generare"
+          "en": "Generate Roman Calendar",
+          "it": "Genera Calendario Romano",
+          "la": "Calendarium Romanum Generare"
         },
         "Liturgical Calendar Calculation for a Given Year": {
-            "en": "Liturgical Calendar Calculation for a Given Year",
-            "it": "Calcolo del Calendario Liturgico per un dato anno",
-            "la": "Computus Calendarii Liturgici pro anno dedi"
+          "en": "Liturgical Calendar Calculation for a Given Year",
+          "it": "Calcolo del Calendario Liturgico per un dato anno",
+          "la": "Computus Calendarii Liturgici pro anno dedi"
         },
         "HTML presentation elaborated by JAVASCRIPT using an AJAX request to a %s": {
-            "en": "HTML presentation elaborated by JAVASCRIPT using an AJAX request to a %s",
-            "it": "Presentazione HTML elaborata con JAVASCRIPT usando una richiesta AJAX al motore PHP %s",
-            "la": "Repraesentatio HTML elaborata cum JAVASCRIPT utendo petitionem AJAX ad machinam PHP %s"
+          "en": "HTML presentation elaborated by JAVASCRIPT using an AJAX request to a %s",
+          "it": "Presentazione HTML elaborata con JAVASCRIPT usando una richiesta AJAX al motore PHP %s",
+          "la": "Repraesentatio HTML elaborata cum JAVASCRIPT utendo petitionem AJAX ad machinam PHP %s"
         },
         "You are requesting a year prior to 1970: it is not possible to request years prior to 1970.": {
-            "en": "You are requesting a year prior to 1970: it is not possible to request years prior to 1970.",
-            "it": "Stai effettuando una richiesta per un anno che è precedente al 1970: non è possibile richiedere anni precedenti al 1970.",
-            "la": "Rogavisti annum ante 1970: non potest rogare annos ante annum 1970."
+          "en": "You are requesting a year prior to 1970: it is not possible to request years prior to 1970.",
+          "it": "Stai effettuando una richiesta per un anno che è precedente al 1970: non è possibile richiedere anni precedenti al 1970.",
+          "la": "Rogavisti annum ante 1970: non potest rogare annos ante annum 1970."
         },
         "Customize options for generating the Roman Calendar": {
-            "en": "Customize options for generating the Roman Calendar",
-            "it": "Personalizzare le opzioni per la generazione del Calendario Romano",
-            "la": "Eligere optiones per generationem Calendarii Romani"
+          "en": "Customize options for generating the Roman Calendar",
+          "it": "Personalizzare le opzioni per la generazione del Calendario Romano",
+          "la": "Eligere optiones per generationem Calendarii Romani"
         },
         "Configurations being used to generate this calendar:": {
-            "en": "Configurations being used to generate this calendar:",
-            "it": "Configurazioni utilizzate per la generazione di questo calendario:",
-            "la": "Optiones electuus ut generare hic calendarium:"
+          "en": "Configurations being used to generate this calendar:",
+          "it": "Configurazioni utilizzate per la generazione di questo calendario:",
+          "la": "Optiones electuus ut generare hic calendarium:"
         },
         "Date in Gregorian Calendar": {
-            "en": "Date in Gregorian Calendar",
-            "it": "Data nel Calendario Gregoriano",
-            "la": "Dies in Calendario Gregoriano"
+          "en": "Date in Gregorian Calendar",
+          "it": "Data nel Calendario Gregoriano",
+          "la": "Dies in Calendario Gregoriano"
         },
         "General Roman Calendar Festivity": {
-            "en": "General Roman Calendar Festivity",
-            "it": "Festività nel Calendario Romano Generale",
-            "la": "Festivitas in Calendario Romano Generale"
+          "en": "General Roman Calendar Festivity",
+          "it": "Festività nel Calendario Romano Generale",
+          "la": "Festivitas in Calendario Romano Generale"
         },
         "Grade of the Festivity": {
-            "en": "Grade of the Festivity",
-            "it": "Grado della Festività",
-            "la": "Gradum Festivitatis"
+          "en": "Grade of the Festivity",
+          "it": "Grado della Festività",
+          "la": "Gradum Festivitatis"
         },
         "YEAR": {
-            "en": "YEAR",
-            "it": "ANNO",
-            "la": "ANNUM"
+          "en": "YEAR",
+          "it": "ANNO",
+          "la": "ANNUM"
         },
         "EPIPHANY": {
-            "en": "EPIPHANY",
-            "it": "EPIFANIA",
-            "la": "EPIPHANIA"
+          "en": "EPIPHANY",
+          "it": "EPIFANIA",
+          "la": "EPIPHANIA"
         },
         "ASCENSION": {
-            "en": "ASCENSION",
-            "it": "ASCENSIONE",
-            "la": "ASCENSIO",
+          "en": "ASCENSION",
+          "it": "ASCENSIONE",
+          "la": "ASCENSIO",
         },
         "Month": {
-            "en": "Month",
-            "it": "Mese",
-            "la": "Mensis"
+          "en": "Month",
+          "it": "Mese",
+          "la": "Mensis"
         },
         "FERIA": {
-            "en": "<i>weekday</i>",
-            "it": "<i>feria</i>",
-            "la": "<i>feria</i>"
+          "en": "<i>weekday</i>",
+          "it": "<i>feria</i>",
+          "la": "<i>feria</i>"
         },
         "COMMEMORATION": {
-            "en": "Commemoration",
-            "it": "Commemorazione",
-            "la": "Commemoratio"
+          "en": "Commemoration",
+          "it": "Commemorazione",
+          "la": "Commemoratio"
         },
         "OPTIONAL MEMORIAL": {
-            "en": "Optional memorial",
-            "it": "Memoria facoltativa",
-            "la": "Memoria facoltativa"
+          "en": "Optional memorial",
+          "it": "Memoria facoltativa",
+          "la": "Memoria facoltativa"
         },
         "MEMORIAL": {
-            "en": "Memorial",
-            "it": "Memoria",
-            "la": "Memoria"
+          "en": "Memorial",
+          "it": "Memoria",
+          "la": "Memoria"
         },
         "FEAST": {
-            "en": "Feast",
-            "it": "Festa",
-            "la": "Festum"
+          "en": "Feast",
+          "it": "Festa",
+          "la": "Festum"
         },
         "FEAST OF THE LORD": {
-            "en": "Feast of the Lord",
-            "it": "Festa del Signore",
-            "la": "Festa Domini"
+          "en": "Feast of the Lord",
+          "it": "Festa del Signore",
+          "la": "Festa Domini"
         },
         "SOLEMNITY": {
-            "en": "Solemnity",
-            "it": "Solennità",
-            "la": "Sollemnitas"
+          "en": "Solemnity",
+          "it": "Solennità",
+          "la": "Sollemnitas"
         },
         "HIGHER RANKING SOLEMNITY": {
-            "en": "<i>precedence over solemnities</i>",
-            "it": "<i>precedenza sulle solennità</i>",
-            "la": "<i>præcellentia ante solemnitates</i>"
+          "en": "<i>precedence over solemnities</i>",
+          "it": "<i>precedenza sulle solennità</i>",
+          "la": "<i>præcellentia ante solemnitates</i>"
         },
         "Information about the current calculation of the Liturgical Year": {
-            "en": "Information about the current calculation of the Liturgical Year",
-            "it": "Informazioni sull'attuale calcolo dell'Anno Liturgico",
-            "la": "Notitiæ de computatione præsente Anni Liturgici"
+          "en": "Information about the current calculation of the Liturgical Year",
+          "it": "Informazioni sull'attuale calcolo dell'Anno Liturgico",
+          "la": "Notitiæ de computatione præsente Anni Liturgici"
         },
         "LOCALE": {
-            "en": "LANGUAGE",
-            "it": "LINGUA",
-            "la": "LINGUA"
+          "en": "LANGUAGE",
+          "it": "LINGUA",
+          "la": "LINGUA"
         },
         "NATIONAL PRESET": {
           "en": "NATIONAL PRESET",
@@ -844,7 +849,7 @@
           "it": "DIOCESI",
           "la": "DIOECESIS"
         },
-        "Sunday" : {
+        "Sunday": {
           "en": "Sunday",
           "it": "Domenica",
           "la": "Dies Domini"
@@ -875,93 +880,101 @@
           "la": "Vaticanum"
         }
       },
-      dayNames = ['Dies Solis','Dies Lunae','Dies Martis','Dies Mercurii','Dies Iovis','Dies Veneris','Dies Saturni'],
-      dayNamesShort = ['Sol','Lun','Mart','Merc','Iov','Ven','Sat'];
+      dayNames = ['Dies Solis', 'Dies Lunae', 'Dies Martis', 'Dies Mercurii', 'Dies Iovis', 'Dies Veneris', 'Dies Saturni'],
+      dayNamesShort = ['Sol', 'Lun', 'Mart', 'Merc', 'Iov', 'Ven', 'Sat'];
 
 
     $(document).ready(function () {
       document.title = __("Generate Roman Calendar");
       createHeader();
       genLitCal();
-      $(document).on('click', '#openSettings', function() {
-          $('#settingsWrapper').dialog("open");
+      $(document).on('click', '#openSettings', function () {
+        $('#settingsWrapper').dialog("open");
       });
 
-      $(document).on("submit",'#calSettingsForm', function( event ) {
-          event.preventDefault();
-          let formValues = $(this).serializeArray();
-          for(let obj of formValues){
-              $Settings[obj.name] = obj.value;
-          }
+      $(document).on("submit", '#calSettingsForm', function (event) {
+        event.preventDefault();
+        let formValues = $(this).serializeArray();
+        for (let obj of formValues) {
+          $Settings[obj.name] = obj.value;
+        }
 
-          console.log('$Settings = ');
-          console.log($Settings);
+        console.log('$Settings = ');
+        console.log($Settings);
 
-          $('#settingsWrapper').dialog("close");
-          genLitCal();
-          return false;
+        $('#settingsWrapper').dialog("close");
+        genLitCal();
+        return false;
       });
 
-      if($('#nationalpreset').val() !== "ITALY"){
-          $('#diocesanpreset').prop('disabled',true);
+      if ($('#nationalpreset').val() !== "ITALY") {
+        $('#diocesanpreset').prop('disabled', true);
       }
 
-      $(document).on('change','#nationalpreset',function(){
-          switch($(this).val()){
-            case "VATICAN":
-              $('#locale').val('LA');
-              $('#epiphany').val('JAN6');
-              $('#ascension').val('THURSDAY');
-              $('#corpuschristi').val('THURSDAY');
-              $('#diocesanpreset').val("");
-              $Settings.locale = 'LA';
-              $Settings.epiphany = 'JAN6';
-              $Settings.ascension = 'THURSDAY';
-              $Settings.corpuschristi = 'THURSDAY';
-              $Settings.diocesanpreset = '';
+      $(document).on('change', '#nationalpreset', function () {
+        switch ($(this).val()) {
+          case "VATICAN":
+            $('#locale').val('LA');
+            $('#epiphany').val('JAN6');
+            $('#ascension').val('THURSDAY');
+            $('#corpuschristi').val('THURSDAY');
+            $('#diocesanpreset').val("");
+            $Settings.locale = 'LA';
+            $Settings.epiphany = 'JAN6';
+            $Settings.ascension = 'THURSDAY';
+            $Settings.corpuschristi = 'THURSDAY';
+            $Settings.diocesanpreset = '';
+            $Settings.nationalpreset = 'VATICAN';
 
-              $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
+            $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled', true);
             break;
-            case "ITALY":
-              $('#locale').val('IT');
-              $('#epiphany').val('JAN6');
-              $('#ascension').val('SUNDAY');
-              $('#corpuschristi').val('SUNDAY');
-              $('#diocesanpreset').prop('disabled',false).val("DIOCESIROMA");
-              $Settings.locale = 'IT';
-              $Settings.epiphany = 'JAN6';
-              $Settings.ascension = 'SUNDAY';
-              $Settings.corpuschristi = 'SUNDAY';
-              $('#calSettingsForm :input').not('#diocesanpreset').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
+          case "ITALY":
+            $('#locale').val('IT');
+            $('#epiphany').val('JAN6');
+            $('#ascension').val('SUNDAY');
+            $('#corpuschristi').val('SUNDAY');
+            $('#diocesanpreset').prop('disabled', false).val("DIOCESIROMA");
+            $Settings.locale = 'IT';
+            $Settings.epiphany = 'JAN6';
+            $Settings.ascension = 'SUNDAY';
+            $Settings.corpuschristi = 'SUNDAY';
+            $Settings.nationalpreset = 'ITALY';
+            $('#calSettingsForm :input').not('#diocesanpreset').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled', true);
             break;
-            case "USA":
-              $('#locale').val('EN');
-              $('#epiphany').val('SUNDAY_JAN2_JAN8');
-              $('#ascension').val('SUNDAY');
-              $('#corpuschristi').val('SUNDAY');
-              $('#diocesanpreset').val("");
-              $Settings.locale = 'EN';
-              $Settings.epiphany = 'SUNDAY_JAN2_JAN8';
-              $Settings.ascension = 'SUNDAY';
-              $Settings.corpuschristi = 'SUNDAY';
-              $Settings.diocesanpreset = '';
-              $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
+          case "USA":
+            $('#locale').val('EN');
+            $('#epiphany').val('SUNDAY_JAN2_JAN8');
+            $('#ascension').val('SUNDAY');
+            $('#corpuschristi').val('SUNDAY');
+            $('#diocesanpreset').val("");
+            $Settings.locale = 'EN';
+            $Settings.epiphany = 'SUNDAY_JAN2_JAN8';
+            $Settings.ascension = 'SUNDAY';
+            $Settings.corpuschristi = 'SUNDAY';
+            $Settings.diocesanpreset = '';
+            $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled', true);
+            $Settings.nationalpreset = 'USA';
             break;
-            default:
-              $('#calSettingsForm :input').prop('disabled',false);
-              $('#diocesanpreset').val("").prop('disabled',true);
-          }
+          default:
+            $('#calSettingsForm :input').prop('disabled', false);
+            $('#diocesanpreset').val("").prop('disabled', true);
+            $Settings.nationalpreset = '';
+        }
+      });
+
+      $(document).on('change', '#diocesanpreset', function () {
+        $Settings.diocesanpreset = $(this).val();
       });
 
       $(document).tooltip({
         items: "[data-tooltip",
-        content: function(){
+        content: function () {
           return decodeURI($(this).attr('data-tooltip'))
         }
       });
 
-      if($Settings.locale.toLowerCase() === 'la'){
-        $('.fc-day').each(function(idx){
+      if ($Settings.locale.toLowerCase() === 'la') {
+        $('.fc-day').each(function (idx) {
           $(this).find('a.fc-col-header-cell-cushion').text(dayNamesShort[idx]);
           console.log($(this).find('a.fc-col-header-cell-cushion').text());
         });

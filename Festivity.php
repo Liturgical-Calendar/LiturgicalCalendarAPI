@@ -12,6 +12,8 @@ class Festivity implements JsonSerializable
     private static $liturgical_colors = array("green", "purple", "white", "red", "pink");
     private static $feast_type = array("fixed", "mobile");
     public $liturgicalyear; //not used in construction, but added externally, from the program using the current class
+    public static $eventIdx = 0;
+    public $idx;
 
     function __construct(string $name, DateTime $date, string $color, string $type, int $grade = 0, string $common = '', string $displayGrade='')
     {
@@ -25,6 +27,7 @@ class Festivity implements JsonSerializable
         $this->grade = (int) $grade >= 0 && (int) $grade <= 7 ? (int) $grade : -1;
         $this->common = (string) $common;
         $this->displayGrade = (string) $displayGrade;
+        $this->idx = self::$eventIdx++;
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * *
@@ -54,7 +57,8 @@ class Festivity implements JsonSerializable
             'grade'     => $this->grade,
             'common'    => $this->common,
             'date'      => $this->date->format('U'), //serialize the DateTime object as a PHP timestamp
-            'displaygrade' => $this->displayGrade
+            'displaygrade' => $this->displayGrade,
+            'eventidx'  => $this->idx
         ];
         if($this->liturgicalyear !== null){
             $returnArr['liturgicalyear'] = $this->liturgicalyear;

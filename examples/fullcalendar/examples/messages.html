@@ -295,9 +295,7 @@
                             let $LitCal = LitCalData.LitCal;
 
                             for (let key in $LitCal) {
-                                if ($LitCal.hasOwnProperty(key)) {
-                                    $LitCal[key].date = new Date($LitCal[key].date * 1000); //transform PHP timestamp to javascript date object
-                                }
+                                $LitCal[key].date = new Date($LitCal[key].date * 1000); //transform PHP timestamp to javascript date object
                             }
                             let $LitCalKeys = Object.keys($LitCal);
                             for (let $keyindex = 0; $keyindex < $LitCalKeys.length; $keyindex++) {
@@ -322,7 +320,7 @@
                                     backgroundColor: $CSScolor,
                                     textColor: $textColor,
                                     description: $description,
-                                    idx: $keyindex
+                                    idx: $festivity.eventidx
                                 };
 
                                 if ($keyindex === $LitCalKeys.length - 1) {
@@ -469,6 +467,9 @@
                         let $commonKey = '';
                         //$txt = str_replace(":", ": ", $txt);
                         switch ($commonGeneral) {
+                            case __("Dedication of a Church"):
+                                $commonKey = "of (SING_FEMM)";
+                                break;
                             case __("Blessed Virgin Mary"):
                                 $commonKey = "of (SING_FEMM)";
                                 break;
@@ -552,6 +553,11 @@
                     "en": "of",
                     "it": "delle",
                     "la": ""
+                },
+                "Dedication of a Church": {
+                    "en": "Dedication of a Church",
+                    "it": "Dedicazione di una Chiesa",
+                    "la": "Dedicationis ecclesiæ"
                 },
                 /*translators: in reference to the Common of the Blessed Virgin Mary */
                 "Blessed Virgin Mary": {
@@ -920,6 +926,7 @@
                         $Settings.ascension = 'THURSDAY';
                         $Settings.corpuschristi = 'THURSDAY';
                         $Settings.diocesanpreset = '';
+                        $Settings.nationalpreset = 'VATICAN';
 
                         $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled', true);
                         break;
@@ -933,6 +940,7 @@
                         $Settings.epiphany = 'JAN6';
                         $Settings.ascension = 'SUNDAY';
                         $Settings.corpuschristi = 'SUNDAY';
+                        $Settings.nationalpreset = 'ITALY';
                         $('#calSettingsForm :input').not('#diocesanpreset').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled', true);
                         break;
                     case "USA":
@@ -947,10 +955,12 @@
                         $Settings.corpuschristi = 'SUNDAY';
                         $Settings.diocesanpreset = '';
                         $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled', true);
+                        $Settings.nationalpreset = 'USA';
                         break;
                     default:
                         $('#calSettingsForm :input').prop('disabled', false);
                         $('#diocesanpreset').val("").prop('disabled', true);
+                        $Settings.nationalpreset = '';
                 }
             });
 
