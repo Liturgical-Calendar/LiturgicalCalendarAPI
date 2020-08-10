@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: vps94844.ovh.net
--- Generation Time: Aug 08, 2020 at 08:09 PM
+-- Generation Time: Aug 10, 2020 at 09:45 PM
 -- Server version: 5.7.25
 -- PHP Version: 7.4.8
 
@@ -442,7 +442,7 @@ INSERT INTO `LITURGY__colors` (`COLOR_EN`, `COLOR_LA`, `COLOR_IT`, `COLOR_ES`, `
 -- Table structure for table `LITURGY__DIOCESILAZIO_calendar_propriumdesanctis_1973`
 --
 -- Creation: Aug 08, 2020 at 05:14 AM
--- Last update: Aug 08, 2020 at 07:57 PM
+-- Last update: Aug 09, 2020 at 03:04 PM
 --
 
 CREATE TABLE `LITURGY__DIOCESILAZIO_calendar_propriumdesanctis_1973` (
@@ -501,7 +501,8 @@ INSERT INTO `LITURGY__DIOCESILAZIO_calendar_propriumdesanctis_1973` (`RECURRENCE
 (30, 11, 23, 'StClementIPope', 'San Clemente I, papa e martire', 3, '', 'Martyrs:For One Martyr,Pastors:For a Pope', 'DIOCESIDIROMA', 'white,red'),
 (31, 11, 26, 'StSiricio', 'San Siricio, papa', 2, '', 'Pastors:For a Pope', 'DIOCESIDIROMA', 'white'),
 (32, 11, 26, 'StLeonardoPMaurizio', 'San Leonardo da Porto Maurizio, sacerdote', 2, '', 'Holy Men and Women:For Religious', 'DIOCESIDIROMA', 'white'),
-(33, 12, 11, 'StDamasusIPope', 'San Damaso I, papa', 3, '', 'Pastors:For a Pope', 'DIOCESIDIROMA', 'white');
+(33, 12, 11, 'StDamasusIPope', 'San Damaso I, papa', 3, '', 'Pastors:For a Pope', 'DIOCESIDIROMA', 'white'),
+(34, 11, 9, 'DedicationLateran', 'Dedicazione della Basilica Papale del SS. Salvatore, Cattedrale di Roma', 4, 'in Basilica: Solennità', 'Dedication of a Church', 'DIOCESIDIROMA', 'white');
 
 -- --------------------------------------------------------
 
@@ -619,7 +620,7 @@ INSERT INTO `LITURGY__months` (`IDX`, `NAME`) VALUES
 -- Table structure for table `LITURGY__USA_calendar_propriumdesanctis_2011`
 --
 -- Creation: Aug 08, 2020 at 01:58 AM
--- Last update: Aug 08, 2020 at 02:06 AM
+-- Last update: Aug 09, 2020 at 10:26 PM
 --
 
 CREATE TABLE `LITURGY__USA_calendar_propriumdesanctis_2011` (
@@ -663,8 +664,7 @@ INSERT INTO `LITURGY__USA_calendar_propriumdesanctis_2011` (`RECURRENCE_ID`, `MO
 (15, 11, 13, 'StFrancesXCabrini', 'Saint Frances Xavier Cabrini, Virgin', 3, '', 'Virgins:For One Virgin,Holy Men and Women:For Those Who Practiced Works of Mercy', '', 'white'),
 (16, 11, 18, 'StRoseDuchesne', 'Saint Rose Philippine Duchesne, Virgin', 2, '', 'Virgins:For One Virgin', '', 'white'),
 (17, 11, 23, 'MiguelPro', 'Blessed Miguel Agustín Pro, Priest and Martyr', 2, '', 'Martyrs:For One Martyr,Pastors:For One Pastor', '', 'white,red'),
-(18, 12, 12, 'LadyGuadalupe', 'Our Lady of Guadalupe', 4, '', 'Proper', '', 'white'),
-(19, 12, 9, 'JuanDiego', 'Saint Juan Diego Cuauhtlatoatzin', 2, '', 'Holy Men and Women:For One Saint', '', 'white');
+(18, 12, 12, 'LadyGuadalupe', 'Our Lady of Guadalupe', 4, '', 'Proper', '', 'white');
 
 --
 -- Indexes for dumped tables
@@ -766,7 +766,7 @@ ALTER TABLE `LITURGY__calendar_propriumdetempore`
 -- AUTO_INCREMENT for table `LITURGY__DIOCESILAZIO_calendar_propriumdesanctis_1973`
 --
 ALTER TABLE `LITURGY__DIOCESILAZIO_calendar_propriumdesanctis_1973`
-  MODIFY `RECURRENCE_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `RECURRENCE_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `LITURGY__ITALY_calendar_propriumdesanctis_1983`
