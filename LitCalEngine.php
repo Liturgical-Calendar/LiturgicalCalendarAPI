@@ -252,6 +252,7 @@ $SOLEMNITIES = array(); //will index defined solemnities and feasts of the Lord
 $FEASTS_MEMORIALS = array(); //will index feasts and obligatory memorials that suppress or influence other lesser liturgical recurrences...
 $WEEKDAYS_ADVENT_CHRISTMAS_LENT = array(); //will index weekdays of advent from 17 Dec. to 24 Dec., of the Octave of Christmas and weekdays of Lent
 $WEEKDAYS_EPIPHANY = array(); //useful to be able to remove a weekday of Epiphany that is overriden by a memorial
+$SUNDAYS_ADVENT_LENT_EASTER = array();
 
 $Messages = array();
 
@@ -402,7 +403,22 @@ $SOLEMNITIES["Easter4"]         = $LitCal["Easter4"]->date;
 $SOLEMNITIES["Easter5"]         = $LitCal["Easter5"]->date;
 $SOLEMNITIES["Easter6"]         = $LitCal["Easter6"]->date;
 $SOLEMNITIES["Trinity"]         = $LitCal["Trinity"]->date;
-
+array_push( $SUNDAYS_ADVENT_LENT_EASTER,
+    $LitCal["Advent1"]->date,
+    $LitCal["Advent2"]->date,
+    $LitCal["Advent3"]->date,
+    $LitCal["Advent4"]->date,
+    $LitCal["Lent1"]->date,
+    $LitCal["Lent2"]->date,
+    $LitCal["Lent3"]->date,
+    $LitCal["Lent4"]->date,
+    $LitCal["Lent5"]->date,
+    $LitCal["Easter2"]->date,
+    $LitCal["Easter3"]->date,
+    $LitCal["Easter4"]->date,
+    $LitCal["Easter5"]->date,
+    $LitCal["Easter6"]->date
+);
 
 if (CORPUSCHRISTI === "THURSDAY") {
     $LitCal["CorpusChristi"] = new Festivity($PROPRIUM_DE_TEMPORE["CorpusChristi"]["NAME_" . $LITSETTINGS->LOCALE], calcGregEaster($LITSETTINGS->YEAR)->add(new DateInterval('P' . (7 * 8 + 4) . 'D')),  "white",    "mobile", HIGHERSOLEMNITY);
@@ -460,10 +476,92 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
     while ($row = mysqli_fetch_assoc($result)) {
         $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"] . '-' . $row["MONTH"] . '-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
         $LitCal[$row["TAG"]] = new Festivity($row["NAME_" . $LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"]);
-        //check if by chance any of these coincides with a mobile solemnity already defined
+
+        //A Solemnity impeded in any given year is transferred to the nearest day following designated in nn. 1-8 of the Tables given above (LY 60)
+        //However if a solemnity is impeded by a Sunday of Advent, Lent or Easter Time, the solemnity is transferred to the Monday following,
+        //or to the nearest free day, as laid down by the General Norms. 
+        //This affects Joseph, Husband of Mary (Mar 19), Annunciation (Mar 25), and Immaculate Conception (Dec 8).  
+        //It is not possible for a fixed date Solemnity to fall on a Sunday of Easter. 
+
+        //However, if a solemnity is impeded by Palm Sunday or by Easter Sunday, it is transferred to the first free day (Monday?)
+        //after the Second Sunday of Easter (decision of the Congregation of Divine Worship, dated 22 April 1990, in Notitiæ 26 [1990] vol. 3/4, p. 160, Prot. CD 500/89).
+        //Any other celebrations that are impeded are omitted for that year.
+
+        /**
+         * << 
+         *   Quando vero sollemnitates in his dominicis (i.e. Adventus, Quadragesimae et Paschae), iuxta n.5 "Normarum universalium de anno liturgico et de calendario" 
+         * sabbato anticipari debent. Experientia autem pastoralis ostendit quod solutio huiusmodi nonnullas praebet difficultates praesertim quoad occurrentiam 
+         * celebrationis Missae vespertinae et II Vesperarum Liturgiae Horarum cuiusdam sollemnitatis cum celebratione Missae vespertinae et I Vesperarum diei dominicae.
+         * [... Perciò facciamo la seguente modifica al n. 5 delle norme universali: ] 
+         * Sollemnitates autem in his dominicis occurrentes ad feriam secundam sequentem transferuntur, nisi agatur de occurrentia in Dominica in Palmis 
+         * aut in Dominica Resurrectionis Domini.
+         *  >>
+         * http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/1990/284-285.html
+         */
+
         if(in_array($currentFeastDate,$SOLEMNITIES)){
-            //let's not make a big deal out of the Annunciation, it happens often
-            if(!in_array($row["TAG"],["Annunciation","StJoseph","ImmaculateConception"]) || ( in_array($row["TAG"],["Annunciation","StJoseph","ImmaculateConception"]) && (int)$LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->date->format('N') !== 7 ) ){
+            
+            //if Joseph, Husband of Mary (Mar 19) falls on Palm Sunday or during Holy Week, it is moved to the Saturday preceding Palm Sunday 
+            //this is correct and the reason for this is that, in this case, Annunciation will also fall during Holy Week, 
+            //and the Annunciation will be transferred to the Monday following the Second Sunday of Easter
+            //http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html
+            if($row["TAG"] === "StJoseph" && $currentFeastDate >= $LitCal["PalmSun"]->date && $currentFeastDate <= $LitCal["Easter"]->date){
+                $LitCal["StJoseph"]->date = calcGregEaster($LITSETTINGS->YEAR)->sub(new DateInterval('P8D'));
+                $Messages[] = sprintf(
+                    __("The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to the Saturday preceding Palm Sunday (%s) as per the %s.", $LITSETTINGS->LOCALE),
+                    $LitCal["StJoseph"]->name,
+                    $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name,
+                    $LITSETTINGS->YEAR,
+                    $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StJoseph"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StJoseph"]->date->format('n')] ) : 
+                        ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StJoseph"]->date->format('F jS') : 
+                            trim(utf8_encode(strftime('%e %B', $LitCal["StJoseph"]->date->format('U'))))
+                        ),
+                    '<a href="http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>'
+                );            
+            }
+            else if($row["TAG"] === "Annunciation" && $currentFeastDate >= $LitCal["PalmSun"]->date && $currentFeastDate <= $LitCal["Easter2"]->date){
+                //If the Annunciation which falls during Holy Week or within the Octave of Easter
+                //it is transferred to the Monday after the Second Sunday of Easter.
+                $LitCal["Annunciation"]->date = calcGregEaster($LITSETTINGS->YEAR)->add(new DateInterval('P8D'));
+                $Messages[] = sprintf(
+                    __("The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to the Monday following the Second Sunday of Easter (%s) as per the %s.", $LITSETTINGS->LOCALE),
+                    $LitCal["Annunciation"]->name,
+                    $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name,
+                    $LITSETTINGS->YEAR,
+                    $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["Annunciation"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["Annunciation"]->date->format('n')] ) : 
+                        ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["Annunciation"]->date->format('F jS') : 
+                            trim(utf8_encode(strftime('%e %B', $LitCal["Annunciation"]->date->format('U'))))
+                        ),
+                    '<a href="http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>'
+                );
+
+                //In some German churches it was the custom to keep the office of the Annunciation on the Saturday before Palm Sunday if the 25th of March fell in Holy Week.
+                //source: http://www.newadvent.org/cathen/01542a.htm
+                /*
+                    else if($LitCal["Annunciation"]->date == $LitCal["PalmSun"]->date){
+                    $LitCal["Annunciation"]->date->add(new DateInterval('P15D'));
+                    //$LitCal["Annunciation"]->date->sub(new DateInterval('P1D'));
+                    }
+                */
+            
+            }
+            else if(in_array($row["TAG"],["Annunciation","StJoseph","ImmaculateConception"]) && in_array($currentFeastDate,$SUNDAYS_ADVENT_LENT_EASTER)){
+                $LitCal[$row["TAG"]]->date = clone($currentFeastDate);
+                $LitCal[$row["TAG"]]->date->add(new DateInterval('P1D'));
+                $Messages[] = sprintf(
+                    __("The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to the following Monday (%s) as per the %s.", $LITSETTINGS->LOCALE),
+                    $LitCal[$row["TAG"]]->name,
+                    $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name,
+                    $LITSETTINGS->YEAR,
+                    $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal[$row["TAG"]]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal[$row["TAG"]]->date->format('n')] ) : 
+                        ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal[$row["TAG"]]->date->format('F jS') : 
+                            trim(utf8_encode(strftime('%e %B', $LitCal[$row["TAG"]]->date->format('U'))))
+                        ),
+                    '<a href="http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/1990/284-285.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>'
+                );                
+            }
+            else{
+                //In all other cases, let's make a note of what's happening and ask the Congegation for Divine Worship
                 $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                     __("The Solemnity '%s' coincides with the Solemnity '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!", $LITSETTINGS->LOCALE),
                     $row["NAME_" . $LITSETTINGS->LOCALE],
@@ -471,6 +569,7 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
                     $LITSETTINGS->YEAR
                 );
             }
+            
             //In the year 2022, the Solemnity Nativity of John the Baptist coincides with the Solemnity of the Sacred Heart
             //Nativity of John the Baptist anticipated by one day to June 23 
             //(except in cases where John the Baptist is patron of a nation, diocese, city or religious community, then the Sacred Heart can be anticipated by one day to June 23)
@@ -489,94 +588,6 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
     }
 }
 
-//ENFORCE RULES FOR FIXED DATE SOLEMNITIES
-
-//If a fixed date Solemnity occurs on a Sunday of Lent or Advent, the Solemnity is transferred to the following Monday.  
-//This affects Joseph, Husband of Mary (Mar 19), Annunciation (Mar 25), and Immaculate Conception (Dec 8).  
-//It is not possible for a fixed date Solemnity to fall on a Sunday of Easter. 
-//(See the special case of a Solemnity during Holy Week below.)
-
-if ($LitCal["ImmaculateConception"]->date == $LitCal["Advent2"]->date) {
-    $LitCal["ImmaculateConception"]->date->add(new DateInterval('P1D'));
-    $Messages[] = sprintf(
-        __("The Solemnity '%s' falls on the Second Sunday of Advent in the year %d, the celebration has been transferred to the following Monday (%s).", $LITSETTINGS->LOCALE),
-        $LitCal["ImmaculateConception"]->name,
-        $LITSETTINGS->YEAR,
-        $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["ImmaculateConception"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["ImmaculateConception"]->date->format('n')] ) : 
-            ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["ImmaculateConception"]->date->format('F jS') : 
-                trim(utf8_encode(strftime('%e %B', $LitCal["ImmaculateConception"]->date->format('U'))))
-            )
-    );
-}
-
-if ($LitCal["StJoseph"]->date == $LitCal["Lent1"]->date || $LitCal["StJoseph"]->date == $LitCal["Lent2"]->date || $LitCal["StJoseph"]->date == $LitCal["Lent3"]->date || $LitCal["StJoseph"]->date == $LitCal["Lent4"]->date || $LitCal["StJoseph"]->date == $LitCal["Lent5"]->date) {
-    $LitCal["StJoseph"]->date->add(new DateInterval('P1D'));
-    $Messages[] = sprintf(
-        __("The Solemnity '%s' falls on a Sunday of Lent in the year %d, the celebration has been transferred to the following Monday (%s).", $LITSETTINGS->LOCALE),
-        $LitCal["StJoseph"]->name,
-        $LITSETTINGS->YEAR,
-        $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StJoseph"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StJoseph"]->date->format('n')] ) : 
-            ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StJoseph"]->date->format('F jS') : 
-                trim(utf8_encode(strftime('%e %B', $LitCal["StJoseph"]->date->format('U'))))
-            )
-    );
-}
-//If Joseph, Husband of Mary (Mar 19) falls on Palm Sunday or during Holy Week, it is moved to the Saturday preceding Palm Sunday.
-else if ($LitCal["StJoseph"]->date >= $LitCal["PalmSun"]->date && $LitCal["StJoseph"]->date <= $LitCal["Easter"]->date) {
-    $LitCal["StJoseph"]->date = calcGregEaster($LITSETTINGS->YEAR)->sub(new DateInterval('P8D'));
-    $Messages[] = sprintf(
-        __("The Solemnity '%s' falls either on Palm Sunday or during Holy Week in the year %d, the celebration has been transferred to the Saturday preceding Palm Sunday (%s).", $LITSETTINGS->LOCALE),
-        $LitCal["StJoseph"]->name,
-        $LITSETTINGS->YEAR,
-        $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StJoseph"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StJoseph"]->date->format('n')] ) : 
-            ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StJoseph"]->date->format('F jS') : 
-                trim(utf8_encode(strftime('%e %B', $LitCal["StJoseph"]->date->format('U'))))
-            )
-    );
-}
-
-if ($LitCal["Annunciation"]->date == $LitCal["Lent2"]->date || $LitCal["Annunciation"]->date == $LitCal["Lent3"]->date || $LitCal["Annunciation"]->date == $LitCal["Lent4"]->date || $LitCal["Annunciation"]->date == $LitCal["Lent5"]->date) {
-    $LitCal["Annunciation"]->date->add(new DateInterval('P1D'));
-    $Messages[] = sprintf(
-        __("The Solemnity '%s' falls on a Sunday of Lent in the year %d, the celebration has been transferred to the following Monday (%s).", $LITSETTINGS->LOCALE),
-        $LitCal["Annunciation"]->name,
-        $LITSETTINGS->YEAR,
-        $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["Annunciation"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["Annunciation"]->date->format('n')] ) : 
-            ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["Annunciation"]->date->format('F jS') : 
-                trim(utf8_encode(strftime('%e %B', $LitCal["Annunciation"]->date->format('U'))))
-            )
-    );
-}
-
-//A Solemnity impeded in any given year is transferred to the nearest day following designated in nn. 1-8 of the Tables given above (LY 60)
-//However if a solemnity is impeded by a Sunday of Advent, Lent or Easter Time, the solemnity is transferred to the Monday following,
-//or to the nearest free day, as laid down by the General Norms. 
-//However, if a solemnity is impeded by Palm Sunday or by Easter Sunday, it is transferred to the first free day 
-//after the Second Sunday of Easter (decision of the Congregation of Divine Worship, dated 22 April 1990, in Notitiæ 26 [1990] 160).
-//Any other celebrations that are impeded are omitted for that year.
-
-//This is the case for the Annunciation which can fall during Holy Week or within the Octave of Easter
-//in which case it transferred to the Monday after the Second Sunday of Easter.
-else if ($LitCal["Annunciation"]->date >= $LitCal["PalmSun"]->date && $LitCal["Annunciation"]->date <= $LitCal["Easter2"]->date) {
-    $LitCal["Annunciation"]->date = calcGregEaster($LITSETTINGS->YEAR)->add(new DateInterval('P8D'));
-    $Messages[] = sprintf(
-        __("The Solemnity '%s' falls either on Palm Sunday or during Holy Week in the year %d, the celebration has been transferred to the Monday following the Second Sunday of Easter (%s).", $LITSETTINGS->LOCALE),
-        $LitCal["Annunciation"]->name,
-        $LITSETTINGS->YEAR,
-        $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["Annunciation"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["Annunciation"]->date->format('n')] ) : 
-            ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["Annunciation"]->date->format('F jS') : 
-                trim(utf8_encode(strftime('%e %B', $LitCal["Annunciation"]->date->format('U'))))
-            )
-    );
-}
-//In some German churches it was the custom to keep the office of the Annunciation on the Saturday before Palm Sunday if the 25th of March fell in Holy Week.
-//source: http://www.newadvent.org/cathen/01542a.htm
-/*
-		    else if($LitCal["Annunciation"]->date == $LitCal["PalmSun"]->date){
-			$LitCal["Annunciation"]->date->add(new DateInterval('P15D'));
-			//$LitCal["Annunciation"]->date->sub(new DateInterval('P1D'));
-		    }
-		    */
 
 $SOLEMNITIES["NativityJohnBaptist"] = $LitCal["NativityJohnBaptist"]->date;
 $SOLEMNITIES["StsPeterPaulAp"]      = $LitCal["StsPeterPaulAp"]->date;
