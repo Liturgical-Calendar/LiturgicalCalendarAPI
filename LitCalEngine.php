@@ -2222,7 +2222,7 @@ function GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages,$SOLEMNITIES,$
                         $displayGradeHTML = __("COMMEMORATION",$LITSETTINGS->LOCALE);
                     }
                     else if((int)$CalEvent->date->format('N') !==7 ){
-                        if(property_exists('displayGrade',$CalEvent) && $CalEvent->displayGrade !== ""){
+                        if(property_exists($CalEvent,'displayGrade') && $CalEvent->displayGrade !== ""){
                             $displayGrade = $CalEvent->displayGrade;
                             $displayGradeHTML = '<B>' . $CalEvent->displayGrade . '</B>';
                         } else {
@@ -2231,7 +2231,7 @@ function GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages,$SOLEMNITIES,$
                         }
                     }
                     else if((int)$CalEvent->grade > MEMORIAL ){
-                        if(property_exists('displayGrade',$CalEvent) && $CalEvent->displayGrade !== ""){
+                        if(property_exists($CalEvent,'displayGrade') && $CalEvent->displayGrade !== ""){
                             $displayGrade = $CalEvent->displayGrade;
                             $displayGradeHTML = '<B>' . $CalEvent->displayGrade . '</B>';
                         } else {
