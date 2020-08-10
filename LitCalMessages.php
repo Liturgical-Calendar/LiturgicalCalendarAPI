@@ -438,20 +438,10 @@ $MESSAGES = [
         "it" => "Soltanto anni dal 1970 in poi sono supportati. Hai provato a richiedere l'anno %d.",
         "la" => "Tantum ab anno MCMLXX et ultra præsto sunt. Tu anno %d conatus est petere."
     ],
-    "The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to the following Monday (%s) as per the %s." => [
-        "en" => "The Solemnity <i>'%s'</i> falls on <b>%s</b> in the year %d, the celebration has been transferred to the following Monday (%s) as per the %s.",
-        "it" => "La Solennità <i>'%s'</i> coincide con <b>%s</b> nell'anno %d, pertanto la celebrazione è stata trasferita al lunedì seguente (%s) in accordo con il %s.",
-        "la" => "Coincidet enim Sollemnitas <i>'%s'</i> cum <b>%s</b> in anno %d, ergo traslata est celebratio ad diem Lunæ proximum (%s) secundum %s."
-    ],
-    "The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to the Saturday preceding Palm Sunday (%s) as per the %s." => [
-        "en" => "The Solemnity <i>'%s'</i> falls on <b>%s</b> in the year %d, the celebration has been transferred to the Saturday preceding Palm Sunday (%s) as per the %s.",
-        "it" => "La Solennità <i>'%s'</i> coincide con <b>%s</b> nell'anno %d, pertanto la celebrazione è stata trasferita al sabato che precede la Domenica delle Palme (%s) in accordo con il %s.",
-        "la" => "Aut enim coincidet Sollemnitas <i>'%s'</i> cum <b>%s</b> in anno %d, ergo traslata est celebratio ad diem Saturni ante Dominicam in Palmis (%s) secundum %s."
-    ],
-    "The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to the Monday following the Second Sunday of Easter (%s) as per the %s." => [
-        "en" => "The Solemnity <i>'%s'</i> falls on <b>%s</b> in the year %d, the celebration has been transferred to the Monday following the Second Sunday of Easter (%s) as per the %s.",
-        "it" => "La Solennità <i>'%s'</i> coincide con <b>%s</b> nell'anno %d, pertanto la celebrazione è stata trasferita al lunedì che segue la Seconda Domenica di Pasqua (%s) in accordo con il %s.",
-        "la" => "Aut enim coincidet Sollemnitas <i>'%s'</i> cum <b>%s</b> in anno %d, ergo traslata est celebratio ad diem Lunæ post Dominicam Secundam Paschæ (%s) secundum %s."
+    "The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to %s (%s) as per the %s." => [
+        "en" => "The Solemnity <i>'%s'</i> falls on <b>%s</b> in the year %d, the celebration has been transferred to %s (%s) as per the %s.",
+        "it" => "La Solennità <i>'%s'</i> coincide con <b>%s</b> nell'anno %d, pertanto la celebrazione è stata trasferita al %s (%s) in accordo con il %s.",
+        "la" => "Coincidet enim Sollemnitas <i>'%s'</i> cum <b>%s</b> in anno %d, ergo traslata est celebratio ad %s (%s) secundum %s."
     ],
     "'%s' falls on a Sunday in the year %d, therefore the Feast '%s' is celebrated on %s rather than on the Sunday after Christmas." => [
         "en" => "'%s' falls on a Sunday in the year %d, therefore the Feast <i>'%s'</i> is celebrated on %s rather than on the Sunday after Christmas.",
@@ -577,6 +567,21 @@ $MESSAGES = [
         "en" => "Seeing that the Solemnity <i>'%s'</i> coincides with the Solemnity <i>'%s'</i> in the year %d, the prior has been moved forward by one day as per %s.",
         "it" => "Visto che la Solennità <i>'%s'</i> coincide con la Solennità <i>'%s'</i> nell'anno %d, la prima è stata anticipata di un giorno per %s.",
         "la" => "Quod ratione Sollemnitas <i>'%s'</i> coincidet cum Sollemnitate <i>'%s'</i> in anno %d, sollemnitas prima ??? anticipata est ab uno die ??? (%s)"
+    ],
+    "the following Monday" => [
+        "en" => "the following Monday",
+        "it" => "lunedì seguente",
+        "la" => "diem Lunæ proximum"
+    ],
+    "the Saturday preceding Palm Sunday" => [
+        "en" => "the Saturday preceding Palm Sunday",
+        "it" => "sabato che precede la Domenica delle Palme",
+        "la" => "sabbatum ante Dominicam in Palmis"
+    ],
+    "the Monday following the Second Sunday of Easter" => [
+        "en" => "the Monday following the Second Sunday of Easter",
+        "it" => "lunedì che segue la Seconda Domenica di Pasqua",
+        "la" => "diem Lunæ post Dominicam Secundam Paschæ"
     ]
 ];
 

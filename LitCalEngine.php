@@ -508,10 +508,11 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
             if($row["TAG"] === "StJoseph" && $currentFeastDate >= $LitCal["PalmSun"]->date && $currentFeastDate <= $LitCal["Easter"]->date){
                 $LitCal["StJoseph"]->date = calcGregEaster($LITSETTINGS->YEAR)->sub(new DateInterval('P8D'));
                 $Messages[] = sprintf(
-                    __("The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to the Saturday preceding Palm Sunday (%s) as per the %s.", $LITSETTINGS->LOCALE),
+                    __("The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to %s (%s) as per the %s.", $LITSETTINGS->LOCALE),
                     $LitCal["StJoseph"]->name,
                     $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name,
                     $LITSETTINGS->YEAR,
+                    __("the Saturday preceding Palm Sunday",$LITSETTINGS->LOCALE),
                     $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StJoseph"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StJoseph"]->date->format('n')] ) : 
                         ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StJoseph"]->date->format('F jS') : 
                             trim(utf8_encode(strftime('%e %B', $LitCal["StJoseph"]->date->format('U'))))
@@ -520,14 +521,14 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
                 );            
             }
             else if($row["TAG"] === "Annunciation" && $currentFeastDate >= $LitCal["PalmSun"]->date && $currentFeastDate <= $LitCal["Easter2"]->date){
-                //If the Annunciation which falls during Holy Week or within the Octave of Easter
-                //it is transferred to the Monday after the Second Sunday of Easter.
+                //if the Annunciation falls during Holy Week or within the Octave of Easter, it is transferred to the Monday after the Second Sunday of Easter.
                 $LitCal["Annunciation"]->date = calcGregEaster($LITSETTINGS->YEAR)->add(new DateInterval('P8D'));
                 $Messages[] = sprintf(
-                    __("The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to the Monday following the Second Sunday of Easter (%s) as per the %s.", $LITSETTINGS->LOCALE),
+                    __("The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to %s (%s) as per the %s.", $LITSETTINGS->LOCALE),
                     $LitCal["Annunciation"]->name,
                     $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name,
                     $LITSETTINGS->YEAR,
+                    __('the Monday following the Second Sunday of Easter',$LITSETTINGS->LOCALE),
                     $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["Annunciation"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["Annunciation"]->date->format('n')] ) : 
                         ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["Annunciation"]->date->format('F jS') : 
                             trim(utf8_encode(strftime('%e %B', $LitCal["Annunciation"]->date->format('U'))))
@@ -549,10 +550,11 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
                 $LitCal[$row["TAG"]]->date = clone($currentFeastDate);
                 $LitCal[$row["TAG"]]->date->add(new DateInterval('P1D'));
                 $Messages[] = sprintf(
-                    __("The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to the following Monday (%s) as per the %s.", $LITSETTINGS->LOCALE),
+                    __("The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to %s (%s) as per the %s.", $LITSETTINGS->LOCALE),
                     $LitCal[$row["TAG"]]->name,
                     $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name,
                     $LITSETTINGS->YEAR,
+                    __("the following Monday",$LITSETTINGS->LOCALE),
                     $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal[$row["TAG"]]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal[$row["TAG"]]->date->format('n')] ) : 
                         ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal[$row["TAG"]]->date->format('F jS') : 
                             trim(utf8_encode(strftime('%e %B', $LitCal[$row["TAG"]]->date->format('U'))))
