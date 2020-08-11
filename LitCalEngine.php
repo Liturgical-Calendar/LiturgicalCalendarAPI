@@ -989,16 +989,16 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
     if ($LITSETTINGS->YEAR >= 2016) {
         if (array_key_exists("StMaryMagdalene",$LitCal)) {
             if ($LitCal["StMaryMagdalene"]->grade == MEMORIAL) {
-                $LitCal["StMaryMagdalene"]->grade = FEAST;
                 $Messages[] = sprintf(
                     __("The %s '%s' has been raised to the rank of %s since the year %d, applicable to the year %d (%s).",$LITSETTINGS->LOCALE),
                     _G($LitCal["StMaryMagdalene"]->grade,$LITSETTINGS->LOCALE),
                     $LitCal["StMaryMagdalene"]->name,
-                    _G("FEAST",$LITSETTINGS->LOCALE),
+                    _G(FEAST,$LITSETTINGS->LOCALE),
                     2016,
                     $LITSETTINGS->YEAR,
                     '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf">' . __("Decree of the Congregation for Divine Worship", $LITSETTINGS->LOCALE) . '</a>'
                 );
+                $LitCal["StMaryMagdalene"]->grade = FEAST;
             }
         }
     }
@@ -1127,7 +1127,7 @@ if($LITSETTINGS->YEAR >= 2018){
     $MaryMotherChurch_date = calcGregEaster($LITSETTINGS->YEAR)->add(new DateInterval('P' . (7 * 7 + 1) . 'D'));
     //The Memorial is superseded by Solemnities and Feasts, but not by Memorials of Saints
     if(!in_array($MaryMotherChurch_date,$SOLEMNITIES) && !in_array($MaryMotherChurch_date,$FEASTS_MEMORIALS)){
-        $LitCal["MaryMotherChurch"] = new Festivity($MaryMotherChurch_tag[$LITSETTINGS->LOCALE], $MaryMotherChurch_date, "white", "mobile", MEMORIAL, "proper");
+        $LitCal["MaryMotherChurch"] = new Festivity($MaryMotherChurch_tag[$LITSETTINGS->LOCALE], $MaryMotherChurch_date, "white", "mobile", MEMORIAL, "Proper");
         $Messages[] = sprintf(
             __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
             _G($LitCal["MaryMotherChurch"]->grade,$LITSETTINGS->LOCALE),
@@ -1144,7 +1144,7 @@ if($LITSETTINGS->YEAR >= 2018){
         $coincidingFestivity = $LitCal[$coincidingFestivityKey];
 
         if($coincidingFestivity->grade <= MEMORIAL){
-            $LitCal["MaryMotherChurch"] = new Festivity($MaryMotherChurch_tag[$LITSETTINGS->LOCALE], $MaryMotherChurch_date, "white", "mobile", MEMORIAL, "proper");
+            $LitCal["MaryMotherChurch"] = new Festivity($MaryMotherChurch_tag[$LITSETTINGS->LOCALE], $MaryMotherChurch_date, "white", "mobile", MEMORIAL, "Proper");
             $Messages[] = sprintf(
                 __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
                 _G($LitCal["MaryMotherChurch"]->grade,$LITSETTINGS->LOCALE),

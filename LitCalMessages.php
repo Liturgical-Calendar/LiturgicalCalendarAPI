@@ -424,9 +424,9 @@ $MESSAGES = [
         "la" => "<B>SOLEMNITAS</B>"
     ],
     "HIGHER RANKING SOLEMNITY" => [
-        "en" => "<B><I>precedence over solemnities</I></B>",
-        "it" => "<B><I>precedenza sulle solennità</I></B>",
-        "la" => "<B><I>præcellentia ante sollemnitates</I></B>"
+        "en" => "<B><I>celebration with precedence over solemnities</I></B>",
+        "it" => "<B><I>celebrazione con precedenza sulle solennità</I></B>",
+        "la" => "<B><I>celebratione cum præcellentiam super sollemnitates</I></B>"
     ],
     "Decree of the Congregation for Divine Worship" => [
         "en" => "Decree of the Congregation for Divine Worship",
