@@ -5,7 +5,7 @@
  * Author: John Romano D'Orazio 
  * Email: priest@johnromanodorazio.com
  * Licensed under the Apache 2.0 License
- * Version 2.8
+ * Version 2.9
  * Date Created: 27 December 2017
  * Note: it is necessary to set up the MySQL liturgy tables prior to using this script
  */
@@ -41,7 +41,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-define("VERSION","2.8");
+define("VERSION","2.9");
 
 
 include "Festivity.php"; //this defines a "Festivity" class that can hold all the useful information about a single celebration
@@ -253,6 +253,7 @@ $FEASTS_MEMORIALS = array(); //will index feasts and obligatory memorials that s
 $WEEKDAYS_ADVENT_CHRISTMAS_LENT = array(); //will index weekdays of advent from 17 Dec. to 24 Dec., of the Octave of Christmas and weekdays of Lent
 $WEEKDAYS_EPIPHANY = array(); //useful to be able to remove a weekday of Epiphany that is overriden by a memorial
 $SUNDAYS_ADVENT_LENT_EASTER = array();
+$SOLEMNITIES_LORD_BVM = array();
 
 $Messages = array();
 
@@ -470,6 +471,7 @@ $SOLEMNITIES["ChristKing"]  = $LitCal["ChristKing"]->date;
 $LitCal["MotherGod"]        = new Festivity($PROPRIUM_DE_TEMPORE["MotherGod"]["NAME_" . $LITSETTINGS->LOCALE], DateTime::createFromFormat('!j-n-Y', '1-1-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC')),      "white",    "fixed", SOLEMNITY);
 $SOLEMNITIES["MotherGod"]           = $LitCal["MotherGod"]->date;
 
+
 //all the other fixed date solemnities are found in the Proprium de Sanctis
 //so we will look them up in the MySQL table of festivities of the Roman Calendar from the Proper of Saints
 if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = " . SOLEMNITY)) {
@@ -608,6 +610,23 @@ $SOLEMNITIES["ImmaculateConception"]= $LitCal["ImmaculateConception"]->date;
 
 //let's add a displayGrade property for AllSouls so applications don't have to worry about fixing it
 $LitCal["AllSouls"]->displayGrade = strip_tags(__("COMMEMORATION",$LITSETTINGS->LOCALE));
+
+$SOLEMNITIES_LORD_BVM = [
+    "Easter",
+    "Christmas",
+    "Ascension",
+    "Pentecost",
+    "Trinity",
+    "CorpusChristi",
+    "SacredHeart",
+    "ChristKing",
+    "MotherGod",
+    "Annunciation",
+    "ImmaculateConception",
+    "Assumption",
+    "StJoseph",
+    "NativityJohnBaptist"
+];
 
 //4. Proper solemnities
 //TODO: Intregrate proper solemnities
@@ -2293,6 +2312,97 @@ foreach($LitCal as $key => $festivity){
         } else if ($festivity->date >= $LitCal["Advent1"]->date) {
             $LitCal[$key]->liturgicalyear = __("YEAR", $LITSETTINGS->LOCALE) . " " . ($SUNDAY_CYCLE[$LITSETTINGS->YEAR % 3]);
         }
+
+        //Let's calculate Vigil Masses while we're at it
+        //TODO: For now we are creating new events, but perhaps we should be adding metadata to the festivities themselves? hasVigilMass = true/false?
+        //perhaps we can even do both for the time being...
+        $VigilDate = clone($festivity->date);
+        $VigilDate->sub(new DateInterval('P1D'));
+
+        $festivityGrade = '';
+        if((int)$festivity->date->format('N') === 7 && $coincidingFestivity->grade < FEASTLORD ){
+            $festivityGrade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$festivity->date->format('U'))));
+        } else {
+            $festivityGrade = ($festivity->grade > SOLEMNITY ? '<i>' . _G($festivity->grade,$LITSETTINGS->LOCALE,false) . '</i>' : _G($festivity->grade,$LITSETTINGS->LOCALE,false));
+        }
+
+        //conditions for which the festivity SHOULD have a vigil
+        if(true === ($festivity->grade >= SOLEMNITY) || true ===  ((int)$festivity->date->format('N') === 7) ){ 
+            //filter out cases in which the festivity should NOT have a vigil
+            if(
+                false === ($key === 'AllSouls') 
+                && false === ($key === 'AshWednesday')
+                && false === ($festivity->date > $LitCal["PalmSun"]->date && $festivity->date < $LitCal["Easter"]->date) 
+                && false === ($festivity->date > $LitCal["Easter"]->date && $festivity->date < $LitCal["Easter2"]->date)
+            ){
+                $LitCal[$key . "_vigil"] = new Festivity($festivity->name . " " . __("Vigil Mass",$LITSETTINGS->LOCALE), $VigilDate, $festivity->color, $festivity->type, $festivity->grade, $festivity->common );
+                $LitCal[$key]->hasVigilMass = true;
+                $LitCal[$key]->hasVesperI = true;
+                $LitCal[$key]->hasVesperII = true;
+                $LitCal[$key . "_vigil"]->liturgicalyear = $LitCal[$key]->liturgicalyear;
+                //if however the Vigil coincides with another Solemnity let's make a note of it!
+                if(in_array($VigilDate,$SOLEMNITIES)){
+                    $coincidingFestivity_grade = '';
+                    $coincidingFestivityKey = array_search($VigilDate,$SOLEMNITIES);
+                    $coincidingFestivity = $LitCal[$coincidingFestivityKey];
+                    if((int)$VigilDate->format('N') === 7 && $coincidingFestivity->grade < FEASTLORD ){
+                        //it's a Sunday
+                        $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$VigilDate->format('U'))));
+                    } else{
+                        //it's a Feast of the Lord or a Solemnity
+                        $coincidingFestivity_grade = ($coincidingFestivity->grade > SOLEMNITY ? '<i>' . _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false) . '</i>' : _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false));
+                    }
+                    
+                    //suppress warning messages for known situations, like the Octave of Easter
+                    if($festivity->grade !== HIGHERSOLEMNITY){
+                        if(in_array($key,$SOLEMNITIES_LORD_BVM) && !in_array($coincidingFestivityKey,$SOLEMNITIES_LORD_BVM) ){
+                            $festivity->hasVigilMass = true;
+                            $festivity->hasVesperI = true;
+                            $coincidingFestivity->hasVesperII = false;
+                            $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                __("The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass.", $LITSETTINGS->LOCALE),
+                                $festivityGrade,
+                                $festivity->name,
+                                $coincidingFestivity_grade,
+                                $coincidingFestivity->name,
+                                $LITSETTINGS->YEAR
+                            );
+                        }
+                        else if(in_array($coincidingFestivityKey,$SOLEMNITIES_LORD_BVM) && !in_array($key,$SOLEMNITIES_LORD_BVM) ){
+                            $coincidingFestivity->hasVesperII = true;
+                            $festivity->hasVesperI = false;
+                            $festivity->hasVigilMass = false;
+                            unset($LitCal[$key . "_vigil"]);
+                            $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                __("The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while  the first Solemnity will not have a Vigil Mass or Vespers I.", $LITSETTINGS->LOCALE),
+                                $festivityGrade,
+                                $festivity->name,
+                                $coincidingFestivity_grade,
+                                $coincidingFestivity->name,
+                                $LITSETTINGS->YEAR
+                            );
+                        } else {
+
+                            $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                __("The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!", $LITSETTINGS->LOCALE),
+                                $festivityGrade,
+                                $festivity->name,
+                                $coincidingFestivity_grade,
+                                $coincidingFestivity->name,
+                                $LITSETTINGS->YEAR
+                            );
+    
+                        }
+                    }
+                    //TODO: which festivity prevails for Vespers, II Vesper of the preceding Solemnity of I Vesper of the following Solemnity?
+                }
+            } else {
+                $LitCal[$key]->hasVigilMass = false;
+                $LitCal[$key]->hasVesperI = false;
+            }
+        }
+
+
     }
 }
 //$LitCal variable is an associative array, who's keys are a string that identifies the event created (ex. ImmaculateConception)
@@ -2314,6 +2424,7 @@ function GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages,$SOLEMNITIES,$
         $SerializeableLitCal->Metadata = new stdClass();
         $SerializeableLitCal->Metadata->SOLEMNITIES = $SOLEMNITIES;
         $SerializeableLitCal->Metadata->FEASTS_MEMORIALS = $FEASTS_MEMORIALS;
+        $SerializeableLitCal->Metadata->VERSION = VERSION;
 
         $SerializeableLitCal->Messages = $Messages;
         switch ($LITSETTINGS->RETURNTYPE) {
@@ -2415,7 +2526,7 @@ function GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages,$SOLEMNITIES,$
                     $ical .= strlen($desc) > 75 ? rtrim(utf8_encode(chunk_split(utf8_decode($desc),71,"\r\n\t"))) . "\r\n" : "$desc\r\n";
                     $ical .= "LAST-MODIFIED:" . str_replace(':' , '', str_replace('-', '', $publishDate)) . "\r\n";
                     $summaryLang = ";LANGUAGE=" . strtolower($LITSETTINGS->LOCALE); //strtolower($LITSETTINGS->LOCALE) === "la" ? "" : 
-                    $summary = "SUMMARY".$summaryLang.":" . str_replace(',','\,',$CalEvent->name);
+                    $summary = "SUMMARY".$summaryLang.":" . str_replace(',','\,',str_replace("\r\n"," ",$CalEvent->name));
                     $ical .= strlen($summary) > 75 ? rtrim(utf8_encode(chunk_split(utf8_decode($summary),75,"\r\n\t"))) . "\r\n" : $summary . "\r\n";
                     $ical .= "TRANSP:TRANSPARENT\r\n";
                     $ical .= "X-MICROSOFT-CDO-ALLDAYEVENT:TRUE\r\n";

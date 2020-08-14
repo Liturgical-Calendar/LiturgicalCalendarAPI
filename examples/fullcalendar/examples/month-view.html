@@ -270,7 +270,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
   <script>
     "use strict";
-
+    let noticeShown = false;
     let today = new Date(),
       $Settings = {
         "year": today.getFullYear(),
@@ -340,7 +340,11 @@
                   eventOrder: 'idx',
                   eventDidMount: function (info) {
                     $(info.el).attr('data-tooltip', encodeURI(info.event.extendedProps.description));
-                  }
+                  }//,
+                  //monthNames: ["januari", "februari", "maart", "april", "mei", "juni","juli", "augustus", "september", "oktober", "november", "december"],
+                  //monthNamesShort: ["jan", "feb", "maa", "apr", "mei", "jun", "jul", "aug","sep", "okt", "nov", "dec"],
+                  //dayNames: ['zondag', 'maandag', 'dinsdag', 'woensdag','donderdag', 'vrijdag', 'zaterdag'],
+                  //dayNamesShort: ["zo", "ma", "di", "wo", "do", "vr", "za", "zo"]
                 };
               if ($Settings.locale.toLowerCase() !== 'en') {
                 fullCalendarSettings.locale = $Settings.locale.toLowerCase();
@@ -352,11 +356,40 @@
 
               calendar.render();
             }
+
             if (LitCalData.hasOwnProperty('Messages')) {
               $('#LitCalMessages tbody').empty();
               LitCalData.Messages.forEach(function (message, idx) {
                 $('#LitCalMessages tbody').append(`<tr><td>${idx}</td><td>${message}</td></tr>`);
               });
+            }
+
+            if(LitCalData.hasOwnProperty('Metadata')) {
+              if(!noticeShown){
+                //let's check the current version against the latest stable version published
+                $.ajax({
+                  method: "GET",
+                  url: "https://api.github.com/repos/JohnRDOrazio/LiturgicalCalendar/releases/latest",
+                  headers: { 
+                      Accept : "application/vnd.github.v3+json"
+                  },
+                  success: function(MetaData){
+                    console.log('data received from github:');
+                    console.log(MetaData);
+                    if(typeof MetaData ==='object' && MetaData.hasOwnProperty('tag_name')){
+                      let $latestStable = parseFloat(MetaData.tag_name.replace('v',''));
+                      let $currentVersion = parseFloat(LitCalData.Metadata.VERSION);
+                      if($currentVersion > $latestStable){
+                        $('<div>',{ 
+                          id:'noticeExperimentalVersion', 
+                          html:'This example page is using a development version of the LiturgicalCalendar endpoint.<br>The latest <b>stable</b> version is <b>'+$latestStable+'</b>, this page is using version <b>'+$currentVersion+'</b>. There may be features that have not yet been fully tested.'
+                        }).dialog({modal:true,title:"Notice Experimental Version",width:'40%'});
+                        noticeShown = true;
+                      }
+                    }
+                  }
+                });
+              }
             }
 
           },
