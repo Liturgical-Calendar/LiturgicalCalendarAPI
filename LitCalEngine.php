@@ -2355,7 +2355,20 @@ foreach($LitCal as $key => $festivity){
                     
                     //suppress warning messages for known situations, like the Octave of Easter
                     if($festivity->grade !== HIGHERSOLEMNITY ){
-                        if( $festivity->grade === SOLEMNITY && $coincidingFestivity->grade < SOLEMNITY ){
+                        if( $festivity->grade < $coincidingFestivity->grade ){
+                            $festivity->hasVigilMass = false;
+                            $festivity->hasVesperI = false;
+                            $coincidingFestivity->hasVesperII = true;
+                            $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                __("The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while  the first Solemnity will not have a Vigil Mass or Vespers I.", $LITSETTINGS->LOCALE),
+                                $festivityGrade,
+                                $festivity->name,
+                                $coincidingFestivity_grade,
+                                $coincidingFestivity->name,
+                                $LITSETTINGS->YEAR
+                            );
+                        }
+                        else if( $festivity->grade > $coincidingFestivity->grade ){
                             $festivity->hasVigilMass = true;
                             $festivity->hasVesperI = true;
                             $coincidingFestivity->hasVesperII = false;
