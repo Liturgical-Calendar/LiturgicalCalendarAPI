@@ -576,12 +576,17 @@ $MESSAGES = [
     "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass." => [
         "en" => "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass.",
         "it" => "La Messa nella Vigilia per la %s <i>'%s'</i> coincide con la %s <i>'%s'</i> nell'anno %d. Dato che la prima ha la precedenza, avrà i Vespri I e una Messa di vigilia, mentre l'ultima non avrà né i Vespri II né una Messa serale.",
-        "la" => "Missa Vigiliæ (de %s <i>'%s'</i>) coincidet cum (%s <i>'%s'</i>) in anno %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers I or an evening Mass."
+        "la" => "Missa Vigiliæ (de %s <i>'%s'</i>) coincidet cum (%s <i>'%s'</i>) in anno %d. Quia Sollemnitas prima præcellentiam habet super secundam, I Vesperas haberet et Missam vigiliæ, cum Sollemnitas ultima necque II Vesperas nec Missam ad vesperam haberet."
     ],
     "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while  the first Solemnity will not have a Vigil Mass or Vespers I." => [
         "en" => "The Vigil Mass for the %s <i>'%s'</i> coincides with the %s <i>'%s'</i> in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while  the first Solemnity will not have a Vigil Mass or Vespers I.",
         "it" => "La Messa nella Vigilia per la %s <i>'%s'</i> coincide con la %s <i>'%s'</i> nell'anno %d. Dato che quest'ultima ha la precedenza, manterrà i Vespri II e una Messa serale, mentre la prima non avrà né una Messa di vigilia né i Vespri I.",
-        "la" => "Missa Vigiliæ (de %s <i>'%s'</i>) coincidet cum (%s <i>'%s'</i>) in anno %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while  the first Solemnity will not have a Vigil Mass or Vespers I."
+        "la" => "Missa Vigiliæ (de %s <i>'%s'</i>) coincidet cum (%s <i>'%s'</i>) in anno %d. Sollemnitas ultima præcellentiam habet super primam, ergo II Vesperas et Missam ad vesperam haberet, cum Sollemnitas prima necque I Vesperas nec Missam vigiliæ haberet."
+    ],
+    "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As per %s, the first has precedence, therefore the Vigil Mass is confirmed as are I Vespers." => [
+        "en" => "The Vigil Mass for the %s <i>'%s'</i> coincides with the %s '%s' in the year %d. As per %s, the first has precedence, therefore the Vigil Mass is confirmed as are I Vespers.",
+        "it" => "La Messa nella Vigilia per la %s <i>'%s'</i> coincide con la %s <i>'%s'</i> nell'anno %d. Secondo il %s, la prima ha la precedenza, pertanto avrà i Vespri I e una Messa di vigilia, mentre l'ultima non avrà né i Vespri II né una Messa serale.",
+        "la" => "Missa Vigiliæ (de %s <i>'%s'</i>) coincidet cum (%s <i>'%s'</i>) in anno %d. Secundum %s, prima præcellentiam habet, ergo I Vesperas haberet et Missam vigiliæ, cum Sollemnitas ultima necque II Vesperas nec Missam ad vesperam haberet."
     ]
 ];
 

@@ -303,7 +303,7 @@ if (EPIPHANY === "JAN6") {
     $nth = 0;
     for ($i = 2; $i <= 5; $i++) {
         if ((int)DateTime::createFromFormat('!j-n-Y', $i . '-1-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'))->format('N') === 7) {
-            $LitCal["Christmas2"]       = new Festivity($PROPRIUM_DE_TEMPORE["Christmas2"]["NAME_" . $LITSETTINGS->LOCALE], DateTime::createFromFormat('!j-n-Y', $i . '-1-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC')), "white",     "mobile", FEAST);
+            $LitCal["Christmas2"]       = new Festivity($PROPRIUM_DE_TEMPORE["Christmas2"]["NAME_" . $LITSETTINGS->LOCALE], DateTime::createFromFormat('!j-n-Y', $i . '-1-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC')), "white",     "mobile", FEASTLORD);
             $SOLEMNITIES["Christmas2"]  = $LitCal["Christmas2"]->date;
         } else {
             $nth++;
@@ -701,7 +701,7 @@ while ($firstOrdinary >= $LitCal["BaptismLord"]->date && $firstOrdinary < $first
     $firstOrdinary = DateTime::createFromFormat('!j-n-Y', $BaptismLordFmt, new DateTimeZone('UTC'))->modify($BaptismLordMod)->modify('next Sunday')->add(new DateInterval('P' . (($ordSun - 1) * 7) . 'D'));
     $ordSun++;
     if (!in_array($firstOrdinary, $SOLEMNITIES)) {
-        $LitCal["OrdSunday" . $ordSun] = new Festivity($PROPRIUM_DE_TEMPORE["OrdSunday" . $ordSun]["NAME_" . $LITSETTINGS->LOCALE], $firstOrdinary, "green", "mobile");
+        $LitCal["OrdSunday" . $ordSun] = new Festivity($PROPRIUM_DE_TEMPORE["OrdSunday" . $ordSun]["NAME_" . $LITSETTINGS->LOCALE], $firstOrdinary, "green", "mobile", FEASTLORD);
         //add Sundays to our priority list for next checking against ordinary Feasts not of Our Lord
         $SOLEMNITIES["OrdSunday" . $ordSun]      = $firstOrdinary;
 
@@ -729,7 +729,7 @@ while ($lastOrdinary <= $LitCal["ChristKing"]->date && $lastOrdinary > $lastOrdi
     $lastOrdinary = DateTime::createFromFormat('!j-n-Y', '25-12-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'))->modify('last Sunday')->sub(new DateInterval('P' . (++$ordSunCycle * 7) . 'D'));
     $ordSun--;
     if (!in_array($lastOrdinary, $SOLEMNITIES)) {
-        $LitCal["OrdSunday" . $ordSun] = new Festivity($PROPRIUM_DE_TEMPORE["OrdSunday" . $ordSun]["NAME_" . $LITSETTINGS->LOCALE], $lastOrdinary, "green", "mobile");
+        $LitCal["OrdSunday" . $ordSun] = new Festivity($PROPRIUM_DE_TEMPORE["OrdSunday" . $ordSun]["NAME_" . $LITSETTINGS->LOCALE], $lastOrdinary, "green", "mobile", FEASTLORD);
         //add Sundays to our priority list for next checking against ordinary Feasts not of Our Lord
         $SOLEMNITIES["OrdSunday" . $ordSun]      = $lastOrdinary;
     } else {
@@ -762,7 +762,7 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
         } else {
             $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
             $coincidingFestivity_grade = '';
-            if((int)$currentFeastDate->format('N') === 7 && $coincidingFestivity->grade < FEASTLORD ){
+            if((int)$currentFeastDate->format('N') === 7 && $coincidingFestivity->grade < SOLEMNITY ){
                 //it's a Sunday
                 $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
             } else{
@@ -898,7 +898,7 @@ if (!in_array($ImmaculateHeart_date, $SOLEMNITIES) && !in_array($ImmaculateHeart
     $coincidingFeast_grade = '';
     if(in_array($ImmaculateHeart_date, $SOLEMNITIES)){
         $coincidingFeast = $LitCal[array_search($ImmaculateHeart_date,$SOLEMNITIES)];
-        if((int)$ImmaculateHeart_date->format('N') === 7 && $coincidingFeast->grade < FEASTLORD ){
+        if((int)$ImmaculateHeart_date->format('N') === 7 && $coincidingFeast->grade < SOLEMNITY ){
             $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
         } else {
             $coincidingFeast_grade = _G($coincidingFeast->grade,$LITSETTINGS->LOCALE);
@@ -974,7 +974,7 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
             }
         } else {
             $coincidingFestivity_grade = '';
-            if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < FEASTLORD ){
+            if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < SOLEMNITY ){
                 //it's a Sunday
                 $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
                 $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
@@ -1106,7 +1106,7 @@ if ($LITSETTINGS->YEAR >= 2002) {
                 }
             } else {
                 $coincidingFestivity_grade = '';
-                if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < FEASTLORD ){
+                if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < SOLEMNITY ){
                     //it's a Sunday
                     $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
                     $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
@@ -1239,7 +1239,7 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
             }
         } else {
             $coincidingFestivity_grade = '';
-            if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < FEASTLORD ){
+            if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < SOLEMNITY ){
                 //it's a Sunday
                 $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
                 $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
@@ -1332,7 +1332,7 @@ if ($LITSETTINGS->YEAR >= 2002) {
                 }
             } else {
                 $coincidingFestivity_grade = '';
-                if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < FEASTLORD ){
+                if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < SOLEMNITY ){
                     //it's a Sunday
                     $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
                     $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
@@ -1952,7 +1952,7 @@ if($LITSETTINGS->NATIONAL !== false){
                 $currentFeastDate = DateTime::createFromFormat('!j-n-Y', '9-8-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
                 if(in_array($currentFeastDate,$SOLEMNITIES) || in_array($currentFeastDate,$FEASTS_MEMORIALS) || (int)$currentFeastDate->format('N') === 7 ){
                     $coincidingFestivity_grade = '';
-                    if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < FEASTLORD ){
+                    if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < SOLEMNITY ){
                         //it's a Sunday
                         $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
                         $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
@@ -2008,7 +2008,7 @@ if($LITSETTINGS->NATIONAL !== false){
                 $currentFeastDate = DateTime::createFromFormat('!j-n-Y', '4-10-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
                 if(in_array($currentFeastDate,$SOLEMNITIES) || in_array($currentFeastDate,$FEASTS_MEMORIALS) || (int)$currentFeastDate->format('N') === 7 ){
                     $coincidingFestivity_grade = '';
-                    if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < FEASTLORD ){
+                    if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < SOLEMNITY ){
                         //it's a Sunday
                         $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
                         $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
@@ -2320,7 +2320,7 @@ foreach($LitCal as $key => $festivity){
         $VigilDate->sub(new DateInterval('P1D'));
 
         $festivityGrade = '';
-        if((int)$festivity->date->format('N') === 7 && $coincidingFestivity->grade < FEASTLORD ){
+        if((int)$festivity->date->format('N') === 7 && $coincidingFestivity->grade < SOLEMNITY ){
             $festivityGrade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$festivity->date->format('U'))));
         } else {
             $festivityGrade = ($festivity->grade > SOLEMNITY ? '<i>' . _G($festivity->grade,$LITSETTINGS->LOCALE,false) . '</i>' : _G($festivity->grade,$LITSETTINGS->LOCALE,false));
@@ -2345,7 +2345,7 @@ foreach($LitCal as $key => $festivity){
                     $coincidingFestivity_grade = '';
                     $coincidingFestivityKey = array_search($VigilDate,$SOLEMNITIES);
                     $coincidingFestivity = $LitCal[$coincidingFestivityKey];
-                    if((int)$VigilDate->format('N') === 7 && $coincidingFestivity->grade < FEASTLORD ){
+                    if((int)$VigilDate->format('N') === 7 && $coincidingFestivity->grade < SOLEMNITY ){
                         //it's a Sunday
                         $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$VigilDate->format('U'))));
                     } else{
@@ -2354,8 +2354,21 @@ foreach($LitCal as $key => $festivity){
                     }
                     
                     //suppress warning messages for known situations, like the Octave of Easter
-                    if($festivity->grade !== HIGHERSOLEMNITY){
-                        if(in_array($key,$SOLEMNITIES_LORD_BVM) && !in_array($coincidingFestivityKey,$SOLEMNITIES_LORD_BVM) ){
+                    if($festivity->grade !== HIGHERSOLEMNITY ){
+                        if( $festivity->grade === SOLEMNITY && $coincidingFestivity->grade < SOLEMNITY ){
+                            $festivity->hasVigilMass = true;
+                            $festivity->hasVesperI = true;
+                            $coincidingFestivity->hasVesperII = false;
+                            $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                __("The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass.", $LITSETTINGS->LOCALE),
+                                $festivityGrade,
+                                $festivity->name,
+                                $coincidingFestivity_grade,
+                                $coincidingFestivity->name,
+                                $LITSETTINGS->YEAR
+                            );
+                        }
+                        else if(in_array($key,$SOLEMNITIES_LORD_BVM) && !in_array($coincidingFestivityKey,$SOLEMNITIES_LORD_BVM) ){
                             $festivity->hasVigilMass = true;
                             $festivity->hasVesperI = true;
                             $coincidingFestivity->hasVesperII = false;
@@ -2382,19 +2395,53 @@ foreach($LitCal as $key => $festivity){
                                 $LITSETTINGS->YEAR
                             );
                         } else {
-
+                            if($LITSETTINGS->YEAR === 2022){
+                                if($key === 'SacredHeart' || $key === 'Lent3' || $key === 'Assumption'){
+                                    $coincidingFestivity->hasVesperII = false;
+                                    $festivity->hasVesperI = true;
+                                    $festivity->hasVigilMass = true;
+                                    $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                        __("The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As per %s, the first has precedence, therefore the Vigil Mass is confirmed as are I Vespers.", $LITSETTINGS->LOCALE),
+                                        $festivityGrade,
+                                        $festivity->name,
+                                        $coincidingFestivity_grade,
+                                        $coincidingFestivity->name,
+                                        $LITSETTINGS->YEAR,
+                                        '<a href="http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html">' . __("Decree of the Congregation for Divine Worship",$LITSETTINGS->LOCALE) . '</a>'
+                                    );
+                                }
+                            }
+                            else {
+                                $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                    __("The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!", $LITSETTINGS->LOCALE),
+                                    $festivityGrade,
+                                    $festivity->name,
+                                    $coincidingFestivity_grade,
+                                    $coincidingFestivity->name,
+                                    $LITSETTINGS->YEAR
+                                );
+                            }
+    
+                        }
+                    } else {
+                        if(
+                            //false === ($key === 'AllSouls') 
+                            //&& false === ($key === 'AshWednesday')
+                            false === ($coincidingFestivity->date > $LitCal["PalmSun"]->date && $coincidingFestivity->date < $LitCal["Easter"]->date) 
+                            && false === ($coincidingFestivity->date > $LitCal["Easter"]->date && $coincidingFestivity->date < $LitCal["Easter2"]->date)
+                        ){
+            
                             $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                __("The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!", $LITSETTINGS->LOCALE),
+                                __("The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass.", $LITSETTINGS->LOCALE),
                                 $festivityGrade,
                                 $festivity->name,
                                 $coincidingFestivity_grade,
                                 $coincidingFestivity->name,
                                 $LITSETTINGS->YEAR
                             );
-    
                         }
                     }
-                    //TODO: which festivity prevails for Vespers, II Vesper of the preceding Solemnity of I Vesper of the following Solemnity?
+                    
                 }
             } else {
                 $LitCal[$key]->hasVigilMass = false;
