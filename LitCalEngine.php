@@ -972,6 +972,24 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
                     );        
                 }
             }
+
+            //St Therese of the Child Jesus was proclaimed a Doctor of the Church in 1998
+            if(array_key_exists("StThereseChildJesus",$LitCal) && $LITSETTINGS->YEAR >= 1998){
+                $etDoctor = '';
+                switch($LITSETTINGS->LOCALE){
+                    case 'LA': 
+                        $etDoctor = " et doctoris";
+                    break;
+                    case 'EN':
+                        $etDoctor = " and doctor of the Church";
+                    break;
+                    case 'IT':
+                        $etDoctor = " e dottore della Chiesa";
+                    break;
+                }
+                $LitCal['StThereseChildJesus']->name .= $etDoctor;
+            }
+
         } else {
             $coincidingFestivity_grade = '';
             if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < SOLEMNITY ){
@@ -1944,9 +1962,83 @@ if($LITSETTINGS->NATIONAL !== false){
         case 'ITALY':
             
             //Insert or elevate the Patron Saints of Europe
+
+            if(array_key_exists("StBenedict",$LitCal) ){
+                $LitCal["StBenedict"]->grade = FEAST;
+                $LitCal["StBenedict"]->name .= ", patrono d'Europa";
+                $LitCal["StBenedict"]->common = "Proper";
+            } else {
+                //check what's going on, for example, if it's a Sunday or Solemnity
+                $currentFeastDate = DateTime::createFromFormat('!j-n-Y', '11-7-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+                if(in_array($currentFeastDate,$SOLEMNITIES) || in_array($currentFeastDate,$FEASTS_MEMORIALS) || (int)$currentFeastDate->format('N') === 7 ){
+                    $coincidingFestivity_grade = '';
+                    if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < SOLEMNITY ){
+                        //it's a Sunday
+                        $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
+                        $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
+                    } else if (in_array($currentFeastDate, $SOLEMNITIES)){
+                        //it's a Feast of the Lord or a Solemnity
+                        $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
+                        $coincidingFestivity_grade = ($coincidingFestivity->grade > SOLEMNITY ? '<i>' . _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false) . '</i>' : _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false));
+                    } else if(in_array($currentFeastDate, $FEASTS_MEMORIALS)){
+                        //we should probably be able to create it anyways in this case?
+                        $result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StBenedict'");
+                        $row = mysqli_fetch_assoc($result);
+                        $LitCal["StBenedict"] = new Festivity($row["NAME_" . $LITSETTINGS->LOCALE] . ", patrono d'Europa", $currentFeastDate,"white","fixed",FEAST,"Proper");
+                        $coincidingFestivity = $LitCal[array_search($currentFeastDate,$FEASTS_MEMORIALS)];
+                        $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
+                    }
+
+                    $Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                        "La Festa del patrono d'Europa <i>'San Benedetto abate'</i> è soppressa nell'anno %d dalla %s <i>'%s'</i>.",
+                        $LITSETTINGS->YEAR,
+                        $coincidingFestivity_grade,
+                        $coincidingFestivity->name
+                    );
+    
+                }
+            }
+
+            if(array_key_exists("StBridget",$LitCal) ){
+                $LitCal["StBridget"]->grade = FEAST;
+                $LitCal["StBridget"]->name .= ", patrona d'Europa";
+                $LitCal["StBridget"]->common = "Proper";
+            } else {
+                //check what's going on, for example, if it's a Sunday or Solemnity
+                $currentFeastDate = DateTime::createFromFormat('!j-n-Y', '23-7-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+                if(in_array($currentFeastDate,$SOLEMNITIES) || in_array($currentFeastDate,$FEASTS_MEMORIALS) || (int)$currentFeastDate->format('N') === 7 ){
+                    $coincidingFestivity_grade = '';
+                    if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < SOLEMNITY ){
+                        //it's a Sunday
+                        $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
+                        $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
+                    } else if (in_array($currentFeastDate, $SOLEMNITIES)){
+                        //it's a Feast of the Lord or a Solemnity
+                        $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
+                        $coincidingFestivity_grade = ($coincidingFestivity->grade > SOLEMNITY ? '<i>' . _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false) . '</i>' : _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false));
+                    } else if(in_array($currentFeastDate, $FEASTS_MEMORIALS)){
+                        //we should probably be able to create it anyways in this case?
+                        $result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StBridget'");
+                        $row = mysqli_fetch_assoc($result);
+                        $LitCal["StBridget"] = new Festivity($row["NAME_" . $LITSETTINGS->LOCALE] . ", patrona d'Europa", $currentFeastDate,"white","fixed",FEAST,"Proper");
+                        $coincidingFestivity = $LitCal[array_search($currentFeastDate,$FEASTS_MEMORIALS)];
+                        $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
+                    }
+
+                    $Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                        "La Festa della patrona d'Europa <i>'Santa Brigida'</i> è soppressa nell'anno %d dalla %s <i>'%s'</i>.",
+                        $LITSETTINGS->YEAR,
+                        $coincidingFestivity_grade,
+                        $coincidingFestivity->name
+                    );
+    
+                }
+            }
+            
             if(array_key_exists("StEdithStein",$LitCal) ){
                 $LitCal["StEdithStein"]->grade = FEAST;
-                $LitCal["StEdithStein"]->name = ", Compatrona d'Europa";
+                $LitCal["StEdithStein"]->name .= ", patrona d'Europa";
+                $LitCal["StEdithStein"]->common = "Proper";
             } else {
                 //check what's going on, for example, if it's a Sunday or Solemnity
                 $currentFeastDate = DateTime::createFromFormat('!j-n-Y', '9-8-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
@@ -1964,13 +2056,49 @@ if($LITSETTINGS->NATIONAL !== false){
                         //we should probably be able to create it anyways in this case?
                         $result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis_2002 WHERE TAG = 'StEdithStein'");
                         $row = mysqli_fetch_assoc($result);
-                        $LitCal["StEdithStein"] = new Festivity($row["NAME_" . $LITSETTINGS->LOCALE], $currentFeastDate,"white","fixed",FEAST);
+                        $LitCal["StEdithStein"] = new Festivity($row["NAME_" . $LITSETTINGS->LOCALE] . ", patrona d'Europa", $currentFeastDate,"white","fixed",FEAST,"Proper");
                         $coincidingFestivity = $LitCal[array_search($currentFeastDate,$FEASTS_MEMORIALS)];
                         $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
                     }
 
                     $Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                        "La Festa della compatrona d'Europa <i>'Santa Edith Stein'</i> è soppressa nell'anno %d dalla %s <i>'%s'</i>.",
+                        "La Festa della patrona d'Europa <i>'Santa Edith Stein'</i> è soppressa nell'anno %d dalla %s <i>'%s'</i>.",
+                        $LITSETTINGS->YEAR,
+                        $coincidingFestivity_grade,
+                        $coincidingFestivity->name
+                    );
+    
+                }
+            }
+
+            if(array_key_exists("StsCyrilMethodius",$LitCal) ){
+                $LitCal["StsCyrilMethodius"]->grade = FEAST;
+                $LitCal["StsCyrilMethodius"]->name .= ", patroni d'Europa";
+                $LitCal["StsCyrilMethodius"]->common = "Proper";
+            } else {
+                //check what's going on, for example, if it's a Sunday or Solemnity
+                $currentFeastDate = DateTime::createFromFormat('!j-n-Y', '14-2-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+                if(in_array($currentFeastDate,$SOLEMNITIES) || in_array($currentFeastDate,$FEASTS_MEMORIALS) || (int)$currentFeastDate->format('N') === 7 ){
+                    $coincidingFestivity_grade = '';
+                    if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < SOLEMNITY ){
+                        //it's a Sunday
+                        $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
+                        $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
+                    } else if (in_array($currentFeastDate, $SOLEMNITIES)){
+                        //it's a Feast of the Lord or a Solemnity
+                        $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
+                        $coincidingFestivity_grade = ($coincidingFestivity->grade > SOLEMNITY ? '<i>' . _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false) . '</i>' : _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false));
+                    } else if(in_array($currentFeastDate, $FEASTS_MEMORIALS)){
+                        //we should probably be able to create it anyways in this case?
+                        $result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StsCyrilMethodius'");
+                        $row = mysqli_fetch_assoc($result);
+                        $LitCal["StsCyrilMethodius"] = new Festivity($row["NAME_" . $LITSETTINGS->LOCALE] . ", patroni d'Europa", $currentFeastDate,"white","fixed",FEAST,"Proper");
+                        $coincidingFestivity = $LitCal[array_search($currentFeastDate,$FEASTS_MEMORIALS)];
+                        $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
+                    }
+
+                    $Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                        "La Festa dei patroni d'Europa <i>'Santi Cirillo e Metodio'</i> è soppressa nell'anno %d dalla %s <i>'%s'</i>.",
                         $LITSETTINGS->YEAR,
                         $coincidingFestivity_grade,
                         $coincidingFestivity->name
@@ -1982,26 +2110,62 @@ if($LITSETTINGS->NATIONAL !== false){
             //Insert or elevate the Patron Saints of Italy
             if(array_key_exists("StCatherineSiena",$LitCal)){
                 $LitCal["StCatherineSiena"]->grade = FEAST;
-                $LitCal["StCatherineSiena"]->name .= ", patrona principale d'Italia";
+                //Nel 1999, Papa Giovanni Paolo II elevò Caterina da Siena a patrona d'Europa oltre che d'Italia
+                if($LITSETTINGS->YEAR >= 1999){
+                    $LitCal["StCatherineSiena"]->name .= ", patrona d'Italia e d'Europa";
+                } else {
+                    $LitCal["StCatherineSiena"]->name .= ", patrona d'Italia";
+                }
+                $LitCal["StCatherineSiena"]->common = "Proper";
             }
             else{
                 //check what's going on, for example, if it's a Sunday or Solemnity
                 $currentFeastDate = DateTime::createFromFormat('!j-n-Y', '29-4-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-                if(in_array($currentFeastDate,$SOLEMNITIES)){
-                    //let's find out which Solemnity we are dealing with
-                    $solemnityKey = array_search($currentFeastDate,$SOLEMNITIES);
+                if(in_array($currentFeastDate,$SOLEMNITIES) || in_array($currentFeastDate,$FEASTS_MEMORIALS) || (int)$currentFeastDate->format('N') === 7 ){
+                    $coincidingFestivity_grade = '';
+                    if((int)$currentFeastDate->format('N') === 7 && $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->grade < SOLEMNITY ){
+                        //it's a Sunday
+                        $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
+                        $coincidingFestivity_grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
+                    } else if (in_array($currentFeastDate, $SOLEMNITIES)){
+                        //it's a Feast of the Lord or a Solemnity
+                        $coincidingFestivity = $LitCal[array_search($currentFeastDate,$SOLEMNITIES)];
+                        $coincidingFestivity_grade = ($coincidingFestivity->grade > SOLEMNITY ? '<i>' . _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false) . '</i>' : _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false));
+                    } else if(in_array($currentFeastDate, $FEASTS_MEMORIALS)){
+                        //we should probably be able to create it anyways in this case?
+                        $result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StCatherineSiena'");
+                        $row = mysqli_fetch_assoc($result);
+                        $LitCal["StCatherineSiena"] = new Festivity($row["NAME_" . $LITSETTINGS->LOCALE], $currentFeastDate,"white","fixed",FEAST,"Proper");
+                        if($LITSETTINGS->YEAR >= 1999){
+                            $LitCal["StCatherineSiena"]->name .= ", patrona d'Italia e d'Europa";
+                        } else {
+                            $LitCal["StCatherineSiena"]->name .= ", patrona d'Italia";
+                        }
+                        $coincidingFestivity = $LitCal[array_search($currentFeastDate,$FEASTS_MEMORIALS)];
+                        $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
+                    }
+
+                    $StCatherineSienaName = 'Santa Caterina da Siena';
+                    if($LITSETTINGS->YEAR >= 1999){
+                        $StCatherineSienaName .= ", patrona d'Italia e d'Europa";
+                    } else {
+                        $StCatherineSienaName .= ", patrona d'Italia";
+                    }
                     $Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                        "La Festa della patrona d'Italia Santa Caterina da Siena è soppressa nell'anno %d da una celebrazione più importante, %s.",
+                        "La Festa di <i>'%s'</i> è soppressa nell'anno %d dalla %s <i>'%s'</i>.",
+                        $StCatherineSienaName,
                         $LITSETTINGS->YEAR,
-                        $LitCal[$solemnityKey]->name
+                        $coincidingFestivity_grade,
+                        $coincidingFestivity->name
                     );
     
-                }                
+                }
             }
 
             if(array_key_exists("StFrancisAssisi",$LitCal)){
                 $LitCal["StFrancisAssisi"]->grade = FEAST;
-                $LitCal["StFrancisAssisi"]->name .= ", patrono principale d'Italia";
+                $LitCal["StFrancisAssisi"]->name .= ", patrono d'Italia";
+                $LitCal["StFrancisAssisi"]->common = "Proper";
             }
             else{
                 //check what's going on, for example, if it's a Sunday or Solemnity
@@ -2020,7 +2184,7 @@ if($LITSETTINGS->NATIONAL !== false){
                         //we should probably be able to create it anyways in this case?
                         $result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StFrancisAssisi'");
                         $row = mysqli_fetch_assoc($result);
-                        $LitCal["StFrancisAssisi"] = new Festivity($row["NAME_" . $LITSETTINGS->LOCALE], $currentFeastDate,"white","fixed",FEAST);
+                        $LitCal["StFrancisAssisi"] = new Festivity($row["NAME_" . $LITSETTINGS->LOCALE] . ", patrono d'Italia", $currentFeastDate,"white","fixed",FEAST,"Proper");
                         $coincidingFestivity = $LitCal[array_search($currentFeastDate,$FEASTS_MEMORIALS)];
                         $coincidingFestivity_grade = _G($coincidingFestivity->grade,$LITSETTINGS->LOCALE,false);
                     }
@@ -2059,10 +2223,10 @@ if($LITSETTINGS->NATIONAL !== false){
             }
 
             //At least in Italy, according to the ORDO (Guida Liturgico-Pastorale) della Diocesi di Roma, Saint Pio is an obligatory memorial throughout Italy
-            //I guess we'll see in the upcoming edition of the Missal in September 2020...
+            //The September 2020 edition of the Roman Missal in Italian confirms this
             if( array_key_exists("StPioPietrelcina",$LitCal) ){
                 $LitCal["StPioPietrelcina"]->grade = MEMORIAL;
-                $LitCal["StPioPietrelcina"]->common = "Proper";
+                $LitCal["StPioPietrelcina"]->common = "Pastors:For One Pastor";
             }
 
         break;

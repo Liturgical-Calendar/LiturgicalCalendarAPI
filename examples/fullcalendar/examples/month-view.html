@@ -382,7 +382,7 @@
                       if($currentVersion > $latestStable){
                         $('<div>',{ 
                           id:'noticeExperimentalVersion', 
-                          html:'This example page is using a development version of the LiturgicalCalendar endpoint.<br>The latest <b>stable</b> version is <b>'+$latestStable+'</b>, this page is using version <b>'+$currentVersion+'</b>. There may be features that have not yet been fully tested.'
+                          html:__('This example page is using a development version of the LiturgicalCalendar endpoint.<br>The latest <b>stable</b> version is <b>{0}</b>, this page is using version <b>{1}</b>. There may be features that have not yet been fully tested.').format('<a href="'+MetaData.html_url+'">'+$latestStable+'</a>',$currentVersion)
                         }).dialog({modal:true,title:"Notice Experimental Version",width:'40%'});
                         noticeShown = true;
                       }
@@ -911,6 +911,11 @@
           "en": "Vatican",
           "it": "Vaticano",
           "la": "Vaticanum"
+        },
+        "This example page is using a development version of the LiturgicalCalendar endpoint.<br>The latest <b>stable</b> version is <b>{0}</b>, this page is using version <b>{1}</b>. There may be features that have not yet been fully tested.": {
+          "en": "This example page is using a development version of the LiturgicalCalendar endpoint.<br>The latest <b>stable</b> version is <b>{0}</b>, this page is using version <b>{1}</b>. There may be features that have not yet been fully tested.",
+          "it": "Questa pagina di esempio utilizza una versione di sviluppo delle API del Calendario Liturgico.<br>L'ultima versione <b>stabile</b> è <b>{0}</b>, questa pagina però sta usando la versione <b>{1}</b>. Potrebbero esserci delle caratteristiche non ancora pienamente testate.",
+          "la": "Questa pagina di esempio utilizza una versione di sviluppo delle API del Calendario Liturgico.<br>L'ultima versione <b>stabile</b> è <b>{0}</b>, questa pagina però sta usando la versione <b>{1}</b>. Potrebbero esserci delle caratteristiche non ancora pienamente testate."
         }
       },
       dayNames = ['Dies Solis', 'Dies Lunae', 'Dies Martis', 'Dies Mercurii', 'Dies Iovis', 'Dies Veneris', 'Dies Saturni'],
@@ -1015,6 +1020,18 @@
 
     });
 
+  // First, checks if it isn't implemented yet.
+  if (!String.prototype.format) {
+    String.prototype.format = function() {
+      var args = arguments;
+      return this.replace(/{(\d+)}/g, function(match, number) { 
+        return typeof args[number] != 'undefined'
+          ? args[number]
+          : match
+        ;
+      });
+    };
+  }
   </script>
 
 </body>
