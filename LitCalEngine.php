@@ -973,22 +973,6 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
                 }
             }
 
-            //St Therese of the Child Jesus was proclaimed a Doctor of the Church in 1998
-            if(array_key_exists("StThereseChildJesus",$LitCal) && $LITSETTINGS->YEAR >= 1998){
-                $etDoctor = '';
-                switch($LITSETTINGS->LOCALE){
-                    case 'LA': 
-                        $etDoctor = " et doctoris";
-                    break;
-                    case 'EN':
-                        $etDoctor = " and doctor of the Church";
-                    break;
-                    case 'IT':
-                        $etDoctor = " e dottore della Chiesa";
-                    break;
-                }
-                $LitCal['StThereseChildJesus']->name .= $etDoctor;
-            }
 
         } else {
             $coincidingFestivity_grade = '';
@@ -1019,27 +1003,45 @@ if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis 
             );        
         }
     }
+}
 
-    //MARYMAGDALEN: With the decree Apostolorum Apostola (June 3rd 2016), the Congregation for Divine Worship 
-    //with the approval of Pope Francis elevated the memorial of Saint Mary Magdalen to a Feast
-    //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf
-    if ($LITSETTINGS->YEAR >= 2016) {
-        if (array_key_exists("StMaryMagdalene",$LitCal)) {
-            if ($LitCal["StMaryMagdalene"]->grade == MEMORIAL) {
-                $Messages[] = sprintf(
-                    __("The %s '%s' has been raised to the rank of %s since the year %d, applicable to the year %d (%s).",$LITSETTINGS->LOCALE),
-                    _G($LitCal["StMaryMagdalene"]->grade,$LITSETTINGS->LOCALE),
-                    $LitCal["StMaryMagdalene"]->name,
-                    _G(FEAST,$LITSETTINGS->LOCALE),
-                    2016,
-                    $LITSETTINGS->YEAR,
-                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf">' . __("Decree of the Congregation for Divine Worship", $LITSETTINGS->LOCALE) . '</a>'
-                );
-                $LitCal["StMaryMagdalene"]->grade = FEAST;
-            }
+//MARYMAGDALEN: With the decree Apostolorum Apostola (June 3rd 2016), the Congregation for Divine Worship 
+//with the approval of Pope Francis elevated the memorial of Saint Mary Magdalen to a Feast
+//source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf
+if ($LITSETTINGS->YEAR >= 2016) {
+    if (array_key_exists("StMaryMagdalene",$LitCal)) {
+        if ($LitCal["StMaryMagdalene"]->grade == MEMORIAL) {
+            $Messages[] = sprintf(
+                __("The %s '%s' has been raised to the rank of %s since the year %d, applicable to the year %d (%s).",$LITSETTINGS->LOCALE),
+                _G($LitCal["StMaryMagdalene"]->grade,$LITSETTINGS->LOCALE),
+                $LitCal["StMaryMagdalene"]->name,
+                _G(FEAST,$LITSETTINGS->LOCALE),
+                2016,
+                $LITSETTINGS->YEAR,
+                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf">' . __("Decree of the Congregation for Divine Worship", $LITSETTINGS->LOCALE) . '</a>'
+            );
+            $LitCal["StMaryMagdalene"]->grade = FEAST;
         }
     }
 }
+
+//St Therese of the Child Jesus was proclaimed a Doctor of the Church in 1998
+if(array_key_exists("StThereseChildJesus",$LitCal) && $LITSETTINGS->YEAR >= 1998){
+    $etDoctor = '';
+    switch($LITSETTINGS->LOCALE){
+        case 'LA': 
+            $etDoctor = " et doctoris";
+        break;
+        case 'EN':
+            $etDoctor = " and doctor of the Church";
+        break;
+        case 'IT':
+            $etDoctor = " e dottore della Chiesa";
+        break;
+    }
+    $LitCal['StThereseChildJesus']->name .= $etDoctor;
+}
+
 
 /*if we are dealing with a calendar from the year 2002 onwards we need to add the new obligatory memorials from the Tertia Editio Typica:
 	14 augusti:  S. Maximiliani Mariæ Kolbe, presbyteri et martyris; 

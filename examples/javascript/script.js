@@ -1,6 +1,6 @@
 let today = new Date(),
     $Settings = {
-        "year": today.getFullYear(),
+        "year": today.getUTCFullYear(),
         "epiphany": "JAN6",
         "ascension": "SUNDAY",
         "corpuschristi": "SUNDAY",
@@ -11,10 +11,12 @@ let today = new Date(),
         weekday: 'short',
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: 'numeric',
+        timeZone: 'UTC'
     },
     IntlMonthFmt = {
-        month: 'long'
+        month: 'long',
+        timeZone: 'UTC'
     },
     countSameDayEvents = function($currentKeyIndex, $EventsArray, $cc) {
         let $Keys = Object.keys($EventsArray);
@@ -35,7 +37,7 @@ let today = new Date(),
         let $currentFestivity = $EventsArray[$Keys[$currentKeyIndex]];
         if ($currentKeyIndex < $Keys.length - 1) {
             let $nextFestivity = $EventsArray[$Keys[$currentKeyIndex + 1]];
-            if ($nextFestivity.date.getMonth() == $currentFestivity.date.getMonth()) {
+            if ($nextFestivity.date.getUTCMonth() == $currentFestivity.date.getUTCMonth()) {
                 $cm.count++;
                 countSameMonthEvents($currentKeyIndex + 1, $EventsArray, $cm);
             }
@@ -92,12 +94,12 @@ let today = new Date(),
                         $dayCnt++;
                         let $keyname = $LitCalKeys[$keyindex];
                         let $festivity = $LitCal[$keyname];
-                        let dy = ($festivity.date.getDay() === 0 ? 7 : $festivity.date.getDay()); // get the day of the week
+                        let dy = ($festivity.date.getUTCDay() === 0 ? 7 : $festivity.date.getUTCDay()); // get the day of the week
 
                         //If we are at the start of a new month, count how many events we have in that same month, so we can display the Month table cell
-                        if ($festivity.date.getMonth() !== $currentMonth) {
+                        if ($festivity.date.getUTCMonth() !== $currentMonth) {
                             $newMonth = true;
-                            $currentMonth = $festivity.date.getMonth();
+                            $currentMonth = $festivity.date.getUTCMonth();
                             $cm.count = 0;
                             countSameMonthEvents($keyindex, $LitCal, $cm);
                         }
@@ -171,7 +173,7 @@ let today = new Date(),
                                 strHTML += '<tr style="background-color:' + $SeasonColor + ';' + ($highContrast.indexOf($SeasonColor) != -1 ? 'color:white;' : '') + '">';
                                 if ($newMonth) {
                                     let $monthRwsp = $cm.count + 1;
-                                    strHTML += '<td class="rotate" rowspan = "' + $monthRwsp + '"><div>' + ($Settings.locale === 'LA' ? $months[$festivity.date.getMonth()].toUpperCase() : new Intl.DateTimeFormat($Settings.locale.toLowerCase(), IntlMonthFmt).format($festivity.date).toUpperCase()) + '</div></td>';
+                                    strHTML += '<td class="rotate" rowspan = "' + $monthRwsp + '"><div>' + ($Settings.locale === 'LA' ? $months[$festivity.date.getUTCMonth()].toUpperCase() : new Intl.DateTimeFormat($Settings.locale.toLowerCase(), IntlMonthFmt).format($festivity.date).toUpperCase()) + '</div></td>';
                                     $newMonth = false;
                                 }
 
@@ -255,7 +257,7 @@ let today = new Date(),
                             strHTML += '<tr style="background-color:' + $SeasonColor + ';' + ($highContrast.indexOf($SeasonColor) != -1 ? 'color:white;' : 'color:black;') + '">';
                             if ($newMonth) {
                                 let $monthRwsp = $cm.count + 1;
-                                strHTML += '<td class="rotate" rowspan = "' + $monthRwsp + '"><div>' + ($Settings.locale === 'LA' ? $months[$festivity.date.getMonth()].toUpperCase() : new Intl.DateTimeFormat($Settings.locale.toLowerCase(), IntlMonthFmt).format($festivity.date).toUpperCase()) + '</div></td>';
+                                strHTML += '<td class="rotate" rowspan = "' + $monthRwsp + '"><div>' + ($Settings.locale === 'LA' ? $months[$festivity.date.getUTCMonth()].toUpperCase() : new Intl.DateTimeFormat($Settings.locale.toLowerCase(), IntlMonthFmt).format($festivity.date).toUpperCase()) + '</div></td>';
                                 $newMonth = false;
                             }
 
@@ -292,8 +294,13 @@ let today = new Date(),
                     });
                 }
 
-            }
-        });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log('(' + textStatus + ') ' + errorThrown);
+                console.log(jqXHR.getAllResponseHeaders);
+                console.log(jqXHR.responseText);
+              }
+            });
     },
     $messages = {
         "From the Common": {
@@ -644,13 +651,13 @@ let today = new Date(),
         }
     },
     getLatinDateStr = function($date) {
-        $festivity_date_str = $daysOfTheWeek[$date.getDay()];
+        $festivity_date_str = $daysOfTheWeek[$date.getUTCDay()];
         $festivity_date_str += ', ';
-        $festivity_date_str += $date.getDate();
+        $festivity_date_str += $date.getUTCDate();
         $festivity_date_str += ' ';
-        $festivity_date_str += $months[$date.getMonth()];
+        $festivity_date_str += $months[$date.getUTCMonth()];
         $festivity_date_str += ' ';
-        $festivity_date_str += $date.getFullYear();
+        $festivity_date_str += $date.getUTCFullYear();
         return $festivity_date_str;
     },
     createHeader = function(){
@@ -668,11 +675,11 @@ let today = new Date(),
             </div>`,
         $tbheader = `<tr><th>${__("Month")}</th><th>${__("Date in Gregorian Calendar")}</th><th>${__("General Roman Calendar Festivity")}</th><th>${__("Grade of the Festivity")}</th></tr>`,
         $settingsDialog = `<div id="settingsWrapper"><form id="calSettingsForm"><table id="calSettings">
-        <tr><td colspan="2"><label>${__('YEAR', $Settings.locale)}: </td><td colspan="2"><input type="number" name="year" id="year" min="1969" max="9999" value="${$Settings.year}" /></label></td></tr>
-        <tr><td><label>LOCALE: </td><td><select name="locale" id="locale"><option value="EN" ${($Settings.locale === "EN" ? " SELECTED" : "")}>ENGLISH</option><option value="IT" ${($Settings.locale === "IT" ? " SELECTED" : "")}>ITALIANO</option><option value="LA" ${($Settings.locale === "LA" ? " SELECTED" : "")}>LATINO</option></select></label></td><td>NATIONAL PRESET: </td><td><select id="nationalpreset" name="nationalpreset"><option value=""></option><option value="VATICAN">Vatican</option><option value="ITALY">Italy</option><option value="USA">USA</option></select></td></tr>
-        <tr><td><label>${__('EPIPHANY', $Settings.locale)}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>January 6</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>Sunday Jan 2↔Jan 8</option></select></label></td><td>DIOCESAN PRESET: </td><td><select id="diocesanpreset" name="diocesanpreset" disabled><option value=""></option><option value="DIOCESIDIROMA">Diocesi di Roma</option><option value="DIOCESILAZIO">Le diocesi del Lazio</option></select></td></tr>
-        <tr><td><label>${__('ASCENSION', $Settings.locale)}: </td><td><select name="ascension" id="ascension"><option value="THURSDAY" ${($Settings.ascension === "THURSDAY" ? " SELECTED" : "")}>Thursday</option><option value="SUNDAY" ${($Settings.ascension === "SUNDAY" ? " SELECTED" : "")}>Sunday</option></select></label></td><td></td><td></td></tr>
-        <tr><td><label>CORPUS CHRISTI: </td><td><select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" ${($Settings.corpuschristi === "THURSDAY" ? " SELECTED" : "")}>Thursday</option><option value="SUNDAY" ${($Settings.corpuschristi === "SUNDAY" ? " SELECTED" : "")}>Sunday</option></select></label></td><td></td><td></td></tr>
+        <tr><td colspan="2"><label>${__('YEAR')}: </td><td colspan="2"><input type="number" name="year" id="year" min="1969" max="9999" value="${$Settings.year}" /></label></td></tr>
+        <tr><td><label>${__('LOCALE')}: </td><td><select name="locale" id="locale"><option value="EN" ${($Settings.locale === "EN" ? " SELECTED" : "")}>ENGLISH</option><option value="IT" ${($Settings.locale === "IT" ? " SELECTED" : "")}>ITALIANO</option><option value="LA" ${($Settings.locale === "LA" ? " SELECTED" : "")}>LATINO</option></select></label></td><td>${__('NATIONAL PRESET')}: </td><td><select id="nationalpreset" name="nationalpreset"><option value=""></option><option value="VATICAN" ${($Settings.nationalpreset === "VATICAN" ? " SELECTED" : "")}>${__('Vatican')}</option><option value="ITALY" ${($Settings.nationalpreset === "ITALY" ? " SELECTED" : "")}>${__('Italy')}</option><option value="USA" ${($Settings.nationalpreset === "USA" ? " SELECTED" : "")}>USA</option></select></td></tr>
+        <tr><td><label>${__('EPIPHANY')}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>${__('January 6')}</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>${__('Sunday Jan 2↔Jan 8')}</option></select></label></td><td>${__('DIOCESAN PRESET')}: </td><td><select id="diocesanpreset" name="diocesanpreset" disabled><option value=""></option><option value="DIOCESIDIROMA" ${($Settings.diocesanpreset === "DIOCESIDIROMA" ? " SELECTED" : "")}>Diocesi di Roma</option><option value="DIOCESILAZIO" ${($Settings.diocesanpreset === "DIOCESILAZIO" ? " SELECTED" : "")}>Le diocesi del Lazio</option></select></td></tr>
+        <tr><td><label>${__('ASCENSION')}: </td><td><select name="ascension" id="ascension"><option value="THURSDAY" ${($Settings.ascension === "THURSDAY" ? " SELECTED" : "")}>${__('Thursday')}</option><option value="SUNDAY" ${($Settings.ascension === "SUNDAY" ? " SELECTED" : "")}>${__('Sunday')}</option></select></label></td><td></td><td></td></tr>
+        <tr><td><label>CORPUS CHRISTI: </td><td><select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" ${($Settings.corpuschristi === "THURSDAY" ? " SELECTED" : "")}>${__('Thursday')}</option><option value="SUNDAY" ${($Settings.corpuschristi === "SUNDAY" ? " SELECTED" : "")}>${__('Sunday')}</option></select></label></td><td></td><td></td></tr>
         <tr><td colspan="4" style="text-align:center;"><input type="submit" id="generateLitCal" value="${__("Generate Roman Calendar")}" /></td></tr>
         </table></form></div>`;
         $('header').html($header);
@@ -701,7 +708,7 @@ $(document).ready(function() {
         $('#settingsWrapper').dialog("open");
     });
     $('#generateLitCal').button();
-    $('#calSettingsForm').on("submit", function( event ) {
+    $(document).on("submit", "#calSettingsForm", function( event ) {
         event.preventDefault();
         let formValues = $(this).serializeArray();
         for(const obj of formValues){
@@ -719,10 +726,11 @@ $(document).ready(function() {
             __("FEAST"),
             __("FEAST OF THE LORD"),
             __("SOLEMNITY"),
-            __("HIGHER RANKING SOLEMNITY")    
+            __("HIGHER RANKING SOLEMNITY")
         ];
         $('#settingsWrapper').dialog("close");
         genLitCal();
+        return false;
     });
 
     if($('#nationalpreset').val() !== "ITALY"){
@@ -741,6 +749,8 @@ $(document).ready(function() {
             $Settings.epiphany = 'JAN6';
             $Settings.ascension = 'THURSDAY';
             $Settings.corpuschristi = 'THURSDAY';
+            $Settings.diocesanpreset = '';
+            $Settings.nationalpreset = 'VATICAN';
 
             $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
           break;
@@ -766,12 +776,19 @@ $(document).ready(function() {
             $Settings.epiphany = 'SUNDAY_JAN2_JAN8';
             $Settings.ascension = 'SUNDAY';
             $Settings.corpuschristi = 'SUNDAY';
+            $Settings.diocesanpreset = '';
             $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
+            $Settings.nationalpreset = 'USA';
           break;
           default:
             $('#calSettingsForm :input').prop('disabled',false);
             $('#diocesanpreset').val("").prop('disabled',true);
+            $Settings.nationalpreset = '';
         }
+    });
+
+    $(document).on('change', '#diocesanpreset', function () {
+        $Settings.diocesanpreset = $(this).val();
     });
 
     $('#settingsWrapper').dialog("open");
