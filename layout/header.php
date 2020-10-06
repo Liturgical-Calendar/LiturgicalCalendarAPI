@@ -5,7 +5,7 @@
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
         <!-- Sidebar - Brand -->
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/LiturgicalCalendar">
             <div class="sidebar-brand-text mx-3">Liturgical Calendar Project</sup></div>
         </a>
 
@@ -28,29 +28,34 @@
         </div>
 
         <li class="nav-item">
+            <a class="nav-link" href="LitCalEngine.php">
+                <i class="fas fa-fw fa-folder"></i>
+                <span>API endpoint</span></a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" href="easter.php">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>Easter</span></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="easter.php">
+            <a class="nav-link" href="examples/php/">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>PHP + cURL</span></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="easter.php">
-                <i class="fas fa-fw fa-folder"></i>
-                <span>Easter</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="easter.php">
+            <a class="nav-link" href="examples/javascript/">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>HTML + AJAX</span></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="easter.php">
+            <a class="nav-link" href="examples/fullcalendar/examples/month-view.html">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>Full Calendar</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="examples/fullcalendar/examples/messages.html">
+                <i class="fas fa-fw fa-folder"></i>
+                <span>Full Calendar (messages first)</span></a>
         </li>
 
         <!-- Divider -->
