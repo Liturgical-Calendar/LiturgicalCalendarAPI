@@ -13,36 +13,43 @@
         <p class="mb-4">Liturgical Calendar engine with algorithm to generate the Universal or General Roman
             Calendar for any given year</p>
 
+        <!-- Page Heading -->
+        <h3 class="h3 mb-2 text-gray-800">SCRIPTS</h3>
+    
         <!-- Content Row -->
         <div class="row">
-            <div class="col">
+            <div class="col-md-6">
                 <div class="card shadow m-2">
                     <div class="card-header py-3">
                         <h6 class="m-0 font-weight-bold text-primary">Data Generation Endpoint</h6>
                     </div>
                     <div class="card-body">
-                        <p>A sample request to the endpoint could look like this:</p>
-                        <code>/LitCalEngine.php?year=2020&epiphany=SUNDAY_JAN2_JAN8&ascension=SUNDAY&corpuschristi=SUNDAY&returntype=JSON&locale=EN</code>
                         <div><a href="LitCalEngine.php" class="btn btn-primary mt-2">View Data Example</a></div>
+                        <p><i>A sample request to the endpoint could look like this:</i></p>
+                        <code>/LitCalEngine.php?year=2020&epiphany=SUNDAY_JAN2_JAN8&ascension=SUNDAY&corpuschristi=SUNDAY&returntype=JSON&locale=EN</code>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="row">
+            
             <div class="col-md-6">
                 <div class="card shadow m-2">
                     <div class="card-header py-3">
                         <h6 class="m-0 font-weight-bold text-primary">Easter</h6>
                     </div>
                     <div class="card-body">
-                        <p>Calculate Date of Easter, both Gregorian and Julian, from 1583
+                        <p>Calculation of the Date of Easter, both Gregorian and Julian, from 1583
                             (year of the adoption of the Gregorian Calendar) to 9999 (max date calculation in
                             64bit PHP)</p>
                         <div><a href="easter.php" class="btn btn-primary">View Easter Example</a></div>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Page Heading -->
+        <h3 class="h3 mb-2 text-gray-800">EXAMPLES</h3>
+
+        <div class="row">
 
             <div class="col-md-6">
                 <div class="card shadow m-2">
