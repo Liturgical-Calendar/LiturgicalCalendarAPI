@@ -24,7 +24,8 @@
                         <h6 class="m-0 font-weight-bold text-primary">Data Generation Endpoint</h6>
                     </div>
                     <div class="card-body">
-                        <div><a href="LitCalEngine.php" class="btn btn-primary mt-2">View Data Example</a></div>
+                        <div><a href="LitCalEngine.php" class="btn btn-primary">View Data Example</a></div>
+                        <div><a href="dist/" class="btn btn-primary">Swagger / Open API Documentation</a></div>
                         <p><i>A sample request to the endpoint could look like this:</i></p>
                         <code>/LitCalEngine.php?year=2020&epiphany=SUNDAY_JAN2_JAN8&ascension=SUNDAY&corpuschristi=SUNDAY&returntype=JSON&locale=EN</code>
                     </div>
