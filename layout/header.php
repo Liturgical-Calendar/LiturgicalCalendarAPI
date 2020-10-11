@@ -24,7 +24,7 @@
 
         <!-- Heading -->
         <div class="sidebar-heading">
-            Examples
+            Scripts
         </div>
 
         <li class="nav-item">
@@ -37,6 +37,12 @@
                 <i class="fas fa-fw fa-folder"></i>
                 <span>Easter</span></a>
         </li>
+
+        <!-- Heading -->
+        <div class="sidebar-heading">
+            Examples
+        </div>
+    
         <li class="nav-item">
             <a class="nav-link" href="examples/php/">
                 <i class="fas fa-fw fa-folder"></i>
