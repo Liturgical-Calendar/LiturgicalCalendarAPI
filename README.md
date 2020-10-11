@@ -21,7 +21,7 @@ Some characteristics of this endpoint:
   Once the tables are set up in a database, the `LitCalConfig-sample.php` file must be renamed to `LitCalConfig.php` and populated with the credentials to access the database. Seeing that this file will be renamed for production, it will not be overwritten when the scripts get updated from a new release or a `git pull`.
 
 # How to use the endpoint
-There are two examples of usage of the endpoint at https://johnromanodorazio.com/LiturgicalCalendar/, in this case for generating an HTML representation of the Liturgical Calendar.
+There are a few proof of concept example applications for usage of the endpoint at https://johnromanodorazio.com/LiturgicalCalendar/, which demonstrate generating an HTML representation of the Liturgical Calendar.
 
 * The [first example](https://www.johnromanodorazio.com/LiturgicalCalendar/examples/php/) uses cURL in PHP to make a request to the endpoint and handle the results. 
 * The [second example](https://www.johnromanodorazio.com/LiturgicalCalendar/examples/javascript/) uses AJAX in Javascript to make the request to the endpoint and handle the results.
