@@ -5,4 +5,4 @@
 *(please make a summary of the changes in this PR, if not already clearly indicated in the commit message)*
 
 # Mentions of persons or teams responsible for reviewing proposed changes
-*(if there is more than one person to be credited for this change, or to get the attention of a reviewer, mention them using the [at] character )*
+*(if there is more than one person to be credited for this change, or to get the attention of a reviewer, mention them using the @ character followed by their username)*
