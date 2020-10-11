@@ -32,10 +32,17 @@
                 <i class="fas fa-fw fa-folder"></i>
                 <span>API endpoint</span></a>
         </li>
+    
+        <li class="nav-item">
+            <a class="nav-link" href="dist/">
+                <i class="fas fa-fw fa-folder"></i>
+                <span>Swagger / Open API Docs</span></a>
+        </li>
+    
         <li class="nav-item">
             <a class="nav-link" href="easter.php">
                 <i class="fas fa-fw fa-folder"></i>
-                <span>Easter</span></a>
+                <span>Date of Easter</span></a>
         </li>
 
         <!-- Divider -->
