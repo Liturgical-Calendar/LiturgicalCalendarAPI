@@ -1892,7 +1892,7 @@ if ($LITSETTINGS->YEAR >= 2002) {
 $lastSatDT = new DateTime("last Saturday December $LITSETTINGS->YEAR",new DateTimeZone('UTC'));
 $currentSaturday = new DateTime("first Saturday January $LITSETTINGS->YEAR",new DateTimeZone('UTC'));
 $SatMemBVM_cnt = 0;
-while($currentSaturday->date <= $lastSatDT->date){
+while($currentSaturday <= $lastSatDT){
     if(!in_array($currentSaturday, $SOLEMNITIES) && !in_array( $currentSaturday, $FEASTS_MEMORIALS)){
         $memID = "SatMemBVM" . ++$SatMemBVM_cnt;
         $LitCal[$memID] = new Festivity(__("Saturday Memorial of the Blessed Virgin Mary",$LITSETTINGS->LOCALE), $currentSaturday, "white", "mobile" );
