@@ -109,28 +109,14 @@
                 <div class="container-fluid h-100">
                     <div class="row align-items-center justify-content-between h-100">
                         <div class="col text-right">
-                            <a class="btn btn-transparent-dark btn-sm mr-2" href="#" target="_self" title="English">
-                                English
-                            </a>
-                            <a class="btn btn-transparent-dark btn-sm mr-2" href="#" target="_self" title="French">
-                                French
-                            </a>
-                            <a class="btn btn-transparent-dark btn-sm mr-2" href="#" target="_self" title="German">
-                                German
-                            </a>
-                            <a class="btn btn-transparent-dark btn-sm mr-2" href="#" target="_self" title="Italian">
-                                Italian
-                            </a>
-                            <a class="btn btn-transparent-dark btn-sm mr-2" href="#" target="_self" title="Latin">
-                                Latin
-                            </a>
-                            <a class="btn btn-transparent-dark btn-sm mr-2" href="#" target="_self" title="Portuguese">
-                                Portuguese
-                            </a>
-                            <a class="btn btn-transparent-dark btn-sm mr-2" href="#" target="_self" title="Spanish">
-                                Spanish
-                            </a>
-                            <a class="btn btn-transparent-dark btn-sm mr-2"
+                            <button class="btn btn-transparent-dark bg-gray-700 text-gray-100">English</button>
+                            <button class="btn btn-transparent-dark bg-gray-400">French</button>
+                            <button class="btn btn-transparent-dark bg-gray-400">German</button>
+                            <button class="btn btn-transparent-dark bg-gray-400">Italian</button>
+                            <button class="btn btn-transparent-dark bg-gray-400">Latin</button>
+                            <button class="btn btn-transparent-dark bg-gray-400">Portuguese</button>
+                            <button class="btn btn-transparent-dark bg-gray-400">Spanish</button>
+                            <a class="btn btn-transparent-dark mr-2"
                                 href="https://github.com/JohnRDOrazio/LiturgicalCalendar" target="_blank"
                                 title="Fork me on GitHub">
                                 <i class="fab fa-github"></i>
