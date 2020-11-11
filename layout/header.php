@@ -10,7 +10,7 @@
             </a></li>
 
         <!-- Divider -->
-        <li><hr class="sidebar-divider my-0"></li>
+        <li><hr class="sidebar-divider my-0" /></li>
 
         <!-- Nav Item - Dashboard -->
         <li class="nav-item active">
