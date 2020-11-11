@@ -1897,7 +1897,7 @@ while($currentSaturday <= $lastSatDT){
     $currentSaturday = DateTime::createFromFormat('!j-n-Y', $currentSaturday->format('j-n-Y'),new DateTimeZone('UTC'))->modify('next Saturday');
     if(!in_array($currentSaturday, $SOLEMNITIES) && !in_array( $currentSaturday, $FEASTS_MEMORIALS)){
         $memID = "SatMemBVM" . ++$SatMemBVM_cnt;
-        $LitCal[$memID] = new Festivity(__("Saturday Memorial of the Blessed Virgin Mary",$LITSETTINGS->LOCALE), $currentSaturday, "white", "mobile" );
+        $LitCal[$memID] = new Festivity(__("Saturday Memorial of the Blessed Virgin Mary",$LITSETTINGS->LOCALE), $currentSaturday, "white", "mobile", MEMORIALOPT, "Blessed Virgin Mary" );
     }
 }
 
