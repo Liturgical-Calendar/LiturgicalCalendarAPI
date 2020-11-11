@@ -11,7 +11,7 @@ function __($key,$locale="LA"){
             return $key;
         }
     }
-    else return $key;
+    return $key;
 }
 
 /**
