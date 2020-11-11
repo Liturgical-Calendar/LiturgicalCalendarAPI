@@ -5,12 +5,12 @@
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
         <!-- Sidebar - Brand -->
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/LiturgicalCalendar">
-            <div class="sidebar-brand-text mx-3">Liturgical Calendar Project</sup></div>
-        </a>
+        <li><a class="sidebar-brand d-flex align-items-center justify-content-center" href="/LiturgicalCalendar">
+            <div class="sidebar-brand-text mx-3">Liturgical Calendar Project</div>
+            </a></li>
 
         <!-- Divider -->
-        <hr class="sidebar-divider my-0">
+        <li><hr class="sidebar-divider my-0"></li>
 
         <!-- Nav Item - Dashboard -->
         <li class="nav-item active">
@@ -20,12 +20,12 @@
         </li>
 
         <!-- Divider -->
-        <hr class="sidebar-divider">
+        <li><hr class="sidebar-divider"></li>
 
         <!-- Heading -->
-        <div class="sidebar-heading">
+        <li><div class="sidebar-heading">
             Scripts
-        </div>
+            </div></li>
 
         <li class="nav-item">
             <a class="nav-link" href="LitCalEngine.php">
@@ -46,12 +46,12 @@
         </li>
 
         <!-- Divider -->
-        <hr class="sidebar-divider">
+        <li><hr class="sidebar-divider"></li>
     
         <!-- Heading -->
-        <div class="sidebar-heading">
+        <li><div class="sidebar-heading">
             Examples
-        </div>
+            </div></li>
     
         <li class="nav-item">
             <a class="nav-link" href="examples/php/">
@@ -75,12 +75,12 @@
         </li>
 
         <!-- Divider -->
-        <hr class="sidebar-divider d-none d-md-block">
+        <li><hr class="sidebar-divider d-none d-md-block"></li>
 
         <!-- Sidebar Toggler (Sidebar) -->
-        <div class="text-center d-none d-md-inline">
+        <li><div class="text-center d-none d-md-inline">
             <button class="rounded-circle border-0" id="sidebarToggle"></button>
-        </div>
+            </div></li>
     </ul>
     <!-- End of Sidebar -->
 
