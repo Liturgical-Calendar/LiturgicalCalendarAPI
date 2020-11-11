@@ -191,7 +191,8 @@ define("CORPUSCHRISTI", $LITSETTINGS->CORPUSCHRISTI); //possible values "THURSDA
  ****************************************************/
 
 // 				I.
-define("HIGHERSOLEMNITY", 7);        // HIGHER RANKING SOLEMNITIES, THAT HAVE PRECEDENCE OVER ALL OTHERS:
+define("HIGHERSOLEMNITY", 7);
+// HIGHER RANKING SOLEMNITIES, THAT HAVE PRECEDENCE OVER ALL OTHERS:
 // 1. EASTER TRIDUUM
 // 2. CHRISTMAS, EPIPHANY, ASCENSION, PENTECOST
 //    SUNDAYS OF ADVENT, LENT AND EASTER
@@ -199,7 +200,8 @@ define("HIGHERSOLEMNITY", 7);        // HIGHER RANKING SOLEMNITIES, THAT HAVE PR
 //    DAYS OF THE HOLY WEEK, FROM MONDAY TO THURSDAY
 //    DAYS OF THE OCTAVE OF EASTER
 
-define("SOLEMNITY", 6);            // 3. SOLEMNITIES OF THE LORD, OF THE BLESSED VIRGIN MARY, OF THE SAINTS LISTED IN THE GENERAL CALENDAR
+define("SOLEMNITY", 6);
+// 3. SOLEMNITIES OF THE LORD, OF THE BLESSED VIRGIN MARY, OF THE SAINTS LISTED IN THE GENERAL CALENDAR
 //    COMMEMORATION OF THE FAITHFUL DEPARTED
 // 4. PARTICULAR SOLEMNITIES:	
 //		a) PATRON OF THE PLACE, OF THE COUNTRY OR OF THE CITY (CELEBRATION REQUIRED ALSO FOR RELIGIOUS COMMUNITIES);
@@ -208,9 +210,11 @@ define("SOLEMNITY", 6);            // 3. SOLEMNITIES OF THE LORD, OF THE BLESSED
 //		d) SOLEMNITY OF THE TITLE OR OF THE FOUNDER OR OF THE MAIN PATRON OF AN ORDER OR OF A CONGREGATION
 
 // 				II.    								
-define("FEASTLORD", 5);            // 5. FEASTS OF THE LORD LISTED IN THE GENERAL CALENDAR
+define("FEASTLORD", 5);
+// 5. FEASTS OF THE LORD LISTED IN THE GENERAL CALENDAR
 // 6. SUNDAYS OF CHRISTMAS AND OF ORDINARY TIME
-define("FEAST", 4);                // 7. FEASTS OF THE BLESSED VIRGIN MARY AND OF THE SAINTS IN THE GENERAL CALENDAR
+define("FEAST", 4);
+// 7. FEASTS OF THE BLESSED VIRGIN MARY AND OF THE SAINTS IN THE GENERAL CALENDAR
 // 8. PARTICULAR FEASTS:	
 //		a) MAIN PATRON OF THE DIOCESE
 //		b) FEAST OF THE ANNIVERSARY OF THE DEDICATION OF THE CATHEDRAL
@@ -223,16 +227,20 @@ define("FEAST", 4);                // 7. FEASTS OF THE BLESSED VIRGIN MARY AND O
 //    WEEKDAYS OF LENT 
 
 // 				III.    								
-define("MEMORIAL", 3);            // 10. MEMORIALS OF THE GENERAL CALENDAR
+define("MEMORIAL", 3);
+// 10. MEMORIALS OF THE GENERAL CALENDAR
 // 11. PARTICULAR MEMORIALS:	
 //		a) MEMORIALS OF THE SECONDARY PATRON OF A PLACE, OF A DIOCESE, OF A REGION OR A RELIGIOUS PROVINCE
 //		b) OTHER MEMORIALS LISTED IN THE CALENDAR OF EACH DIOCESE, ORDER OR CONGREGATION
-define("MEMORIALOPT", 2);            // 12. OPTIONAL MEMORIALS, WHICH CAN HOWEVER BE OBSERVED IN DAYS INDICATED AT N. 9, 
+define("MEMORIALOPT", 2);
+// 12. OPTIONAL MEMORIALS, WHICH CAN HOWEVER BE OBSERVED IN DAYS INDICATED AT N. 9, 
 //     ACCORDING TO THE NORMS DESCRIBED IN "PRINCIPLES AND NORMS" FOR THE LITURGY OF THE HOURS AND THE USE OF THE MISSAL
 
-define("COMMEMORATION", 1);            //     SIMILARLY MEMORIALS CAN BE OBSERVED AS OPTIONAL MEMORIALS THAT SHOULD FALL DURING THE WEEKDAYS OF LENT
+define("COMMEMORATION", 1);
+//     SIMILARLY MEMORIALS CAN BE OBSERVED AS OPTIONAL MEMORIALS THAT SHOULD FALL DURING THE WEEKDAYS OF LENT
 
-define("WEEKDAY", 0);            // 13. WEEKDAYS OF ADVENT UNTIL DECEMBER 16th
+define("WEEKDAY", 0);
+// 13. WEEKDAYS OF ADVENT UNTIL DECEMBER 16th
 //     WEEKDAYS OF CHRISTMAS, FROM JANUARY 2nd UNTIL THE SATURDAY AFTER EPIPHANY
 //     WEEKDAYS OF THE EASTER SEASON, FROM THE MONDAY AFTER THE OCTAVE OF EASTER UNTIL THE SATURDAY BEFORE PENTECOST
 //     WEEKDAYS OF ORDINARY TIME
@@ -1447,7 +1455,7 @@ if ($LITSETTINGS->YEAR >= 2002) {
     
     //Sure seems to me that both Our Lady of Guadalupe and Saint Juan Diego were added as Optional memorials in the Universal Calendar
     //the USA Missal 2011 has Juan Diego as optional memorial without specifying "USA", so it seems universal
-    //also the ORDO (Guida-liturgico pastorale) della Diocesi di Roma has both Juan Diego and Guadalupe as optional memorials, without specifying "ROME"
+    //also the ORDO (Guida-liturgico pastorale) of the Diocese of Rome has both Juan Diego and Guadalupe as optional memorials, without specifying "ROME"
     $Guadalupe_tag = ["LA" => "Beatæ Mariæ Virginis Guadalupensis", "EN" => "Our Lady of Guadalupe", "IT" => "Beata Vergine Maria di Guadalupe"];
     $Guadalupe_date = DateTime::createFromFormat('!j-n-Y', '12-12-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
     
@@ -1875,7 +1883,23 @@ if ($LITSETTINGS->YEAR >= 2002) {
     }
 
 
+} //END LITSETTINGS->YEAR > 2002
+
+//    From the General Norms for the Liturgical Year and the Calendar (issued on Feb. 14 1969)
+//    15. On Saturdays in Ordinary Time when there is no obligatory memorial, an optional memorial of the Blessed Virgin Mary is allowed. 
+//    So we have to cycle through all Saturdays of the year checking if there isn't an obligatory memorial
+//    First we'll find the first Saturday of the year, and then continue adding seven days until we reach the end of the year
+$lastSatDT = new DateTime("last Saturday December $LITSETTINGS->YEAR",new DateTimeZone('UTC'));
+$currentSaturday = new DateTime("first Saturday January $LITSETTINGS->YEAR",new DateTimeZone('UTC'));
+$SatMemBVM_cnt = 0;
+while($currentSaturday->date <= $lastSatDT->date){
+    if(!in_array($currentSaturday, $SOLEMNITIES) && !in_array( $currentSaturday, $FEASTS_MEMORIALS)){
+        $memID = "SatMemBVM" . ++$SatMemBVM_cnt;
+        $LitCal[$memID] = new Festivity(__("Saturday Memorial of the Blessed Virgin Mary",$LITSETTINGS->LOCALE), $currentSaturday, "white", "mobile" );
+    }
+    $currentSaturday = $currentSaturday->modify('next Saturday');
 }
+
 //13. Weekdays of Advent up until Dec. 16 included (already calculated and defined together with weekdays 17 Dec. - 24 Dec.)
 //    Weekdays of Christmas season from 2 Jan. until the Saturday after Epiphany
 //    Weekdays of the Easter season, from the Monday after the Octave of Easter to the Saturday before Pentecost

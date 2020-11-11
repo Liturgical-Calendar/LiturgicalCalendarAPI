@@ -410,7 +410,7 @@ error_reporting(E_ALL);
     $EasterTableContainer .= '<tbody>';
     //$Y = (int)date("Y");
     //for($i=1997;$i<=2037;$i++){
-    $last_coindidence = "";
+    $last_coincidence = "";
     for($i=1583;$i<=9999;$i++){
       $gregorian_easter = calcGregEaster($i); 
       $julian_easter = calcJulianEaster($i);
