@@ -94,6 +94,41 @@
                 <!-- Topbar Navbar -->
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item no-arrow">
+                        <a class="nav-link" href="#" target="_self" title="English">
+                            English
+                        </a>
+                    </li>
+                    <li class="nav-item no-arrow">
+                        <a class="nav-link" href="#" target="_self" title="French">
+                            French
+                        </a>
+                    </li>
+                    <li class="nav-item no-arrow">
+                        <a class="nav-link" href="#" target="_self" title="German">
+                            German
+                        </a>
+                    </li>
+                    <li class="nav-item no-arrow">
+                        <a class="nav-link" href="#" target="_self" title="Italian">
+                            Italian
+                        </a>
+                    </li>
+                    <li class="nav-item no-arrow">
+                        <a class="nav-link" href="#" target="_self" title="Latin">
+                            Latin
+                        </a>
+                    </li>
+                    <li class="nav-item no-arrow">
+                        <a class="nav-link" href="#" target="_self" title="Portuguese">
+                            Portuguese
+                        </a>
+                    </li>
+                    <li class="nav-item no-arrow">
+                        <a class="nav-link" href="#" target="_self" title="Spanish">
+                            Spanish
+                        </a>
+                    </li>
+                    <li class="nav-item no-arrow">
                         <a class="nav-link" href="https://github.com/JohnRDOrazio/LiturgicalCalendar" target="_blank" title="Fork me on GitHub">
                             <i class="fab fa-github"></i>
                         </a>
