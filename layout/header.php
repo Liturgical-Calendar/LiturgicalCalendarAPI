@@ -20,7 +20,7 @@
         </li>
 
         <!-- Divider -->
-        <li><hr class="sidebar-divider"></li>
+        <li><hr class="sidebar-divider" /></li>
 
         <!-- Heading -->
         <li><div class="sidebar-heading">
@@ -46,7 +46,7 @@
         </li>
 
         <!-- Divider -->
-        <li><hr class="sidebar-divider"></li>
+        <li><hr class="sidebar-divider" /></li>
     
         <!-- Heading -->
         <li><div class="sidebar-heading">
@@ -75,7 +75,7 @@
         </li>
 
         <!-- Divider -->
-        <li><hr class="sidebar-divider d-none d-md-block"></li>
+        <li><hr class="sidebar-divider d-none d-md-block" /></li>
 
         <!-- Sidebar Toggler (Sidebar) -->
         <li><div class="text-center d-none d-md-inline">
