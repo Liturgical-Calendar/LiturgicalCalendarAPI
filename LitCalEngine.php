@@ -1889,11 +1889,12 @@ if ($LITSETTINGS->YEAR >= 2002) {
 //    15. On Saturdays in Ordinary Time when there is no obligatory memorial, an optional memorial of the Blessed Virgin Mary is allowed. 
 //    So we have to cycle through all Saturdays of the year checking if there isn't an obligatory memorial
 //    First we'll find the first Saturday of the year, and then continue adding seven days until we reach the end of the year
-$currentSaturday = new DateTime("last Saturday December " . --$LITSETTINGS->YEAR,new DateTimeZone('UTC'));
+$lastYear = $LITSETTINGS->YEAR - 1;
+$currentSaturday = new DateTime("last Saturday December $lastYear",new DateTimeZone('UTC'));
 $lastSatDT = new DateTime("last Saturday December $LITSETTINGS->YEAR",new DateTimeZone('UTC'));
 $SatMemBVM_cnt = 0;
 while($currentSaturday <= $lastSatDT){
-    $currentSaturday = DateTime::createFromFormat('!-j-n-Y', $currentSaturday->format('j-n-Y'),new DateTimeZone('UTC'))->modify('next Saturday');
+    $currentSaturday = DateTime::createFromFormat('!j-n-Y', $currentSaturday->format('j-n-Y'),new DateTimeZone('UTC'))->modify('next Saturday');
     if(!in_array($currentSaturday, $SOLEMNITIES) && !in_array( $currentSaturday, $FEASTS_MEMORIALS)){
         $memID = "SatMemBVM" . ++$SatMemBVM_cnt;
         $LitCal[$memID] = new Festivity(__("Saturday Memorial of the Blessed Virgin Mary",$LITSETTINGS->LOCALE), $currentSaturday, "white", "mobile" );
