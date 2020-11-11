@@ -1888,7 +1888,9 @@ if ($LITSETTINGS->YEAR >= 2002) {
 //    From the General Norms for the Liturgical Year and the Calendar (issued on Feb. 14 1969)
 //    15. On Saturdays in Ordinary Time when there is no obligatory memorial, an optional memorial of the Blessed Virgin Mary is allowed.
 //    So we have to cycle through all Saturdays of the year checking if there isn't an obligatory memorial
-//    First we'll find the first Saturday of the year, and then continue adding seven days until we reach the end of the year
+//    First we'll find the first Saturday of the year (to do this we actually have to find the last Saturday of the previous year,
+//      so that our cycle using "next Saturday" logic will actually start from the first Saturday of the year),
+//    and then continue for every next Saturday until we reach the last Saturday of the year
 $currentSaturday = new DateTime("previous Saturday January $LITSETTINGS->YEAR",new DateTimeZone('UTC'));
 $lastSatDT = new DateTime("last Saturday December $LITSETTINGS->YEAR",new DateTimeZone('UTC'));
 $SatMemBVM_cnt = 0;
