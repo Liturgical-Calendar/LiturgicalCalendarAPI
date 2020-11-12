@@ -27,7 +27,7 @@
                         <div><a href="LitCalEngine.php" class="btn btn-primary">View Data Example</a></div>
                         <div><a href="dist/" class="btn btn-primary mt-2">Swagger / Open API Documentation</a></div>
                         <p><i>A sample request to the endpoint could look like this:</i></p>
-                        <code>/LitCalEngine.php?year=2020&epiphany=SUNDAY_JAN2_JAN8&ascension=SUNDAY&corpuschristi=SUNDAY&returntype=JSON&locale=EN</code>
+                        <code>/LitCalEngine.php?year=2020&amp;epiphany=SUNDAY_JAN2_JAN8&amp;ascension=SUNDAY&amp;corpuschristi=SUNDAY&amp;returntype=JSON&amp;locale=EN</code>
                     </div>
                 </div>
             </div>

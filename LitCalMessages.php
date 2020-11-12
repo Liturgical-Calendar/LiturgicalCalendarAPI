@@ -11,7 +11,7 @@ function __($key,$locale="LA"){
             return $key;
         }
     }
-    else return $key;
+    return $key;
 }
 
 /**
@@ -182,9 +182,15 @@ $MESSAGES = [
         "it" => "dopo il Mercoledì delle Ceneri",
         "la" => "post Feria IV Cinerum"
     ],
+    "Saturday Memorial of the Blessed Virgin Mary" => [
+        "en" => "Saturday Memorial of the Blessed Virgin Mary",
+        "it" => "Memoria di Santa Maria in sabato",
+        "la" => "Memoria Sanctæ Mariæ in Sabbato"
+    ],
     /* The following strings would usually be used by a user-facing application, 
      *  however I decided to add them here seeing they are just as useful for generating
-     *  the ICS calendar output, which is pretty final as it is...
+     *  the ICS calendar output, which is pretty final as it is, 
+     *  there are no client applications that take care of localization...
      */
     "YEAR" => [
         "en" => "YEAR",

@@ -680,7 +680,7 @@ $messages = [
     "OPTIONAL MEMORIAL" => [
         "en" => "Optional memorial",
         "it" => "Memoria facoltativa",
-        "la" => "Memoria facoltativa"
+        "la" => "Memoria ad libitum"
     ],
     "MEMORIAL" => [
         "en" => "Memorial",
