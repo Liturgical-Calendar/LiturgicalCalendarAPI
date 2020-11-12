@@ -137,6 +137,11 @@ Each of the events generated is represented as an object whose key => value pair
 
 # CHANGELOG
 
+## [v2.9](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v2.9) (November 12th 2020)
+ * adds Vigil Masses for Sundays and Solemnities, including occasional notes by the Congregation for Divine Worship
+ * add Patron Saints of Europe, applicable for Italian Calendar (and eventually any other national calendar in Europe that may be added in the future)
+ * add Saturday Memorial of the Blessed Virgin Mary
+
 ## [v2.8](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v2.8) (August 11th 2020)
  * adds `diocesanpreset` and `nationalpreset` parameters with relative calendar data
  * adds all of the data from the recent Decrees of the Congregation for Divine Worship and verifies integrity with past Decrees
