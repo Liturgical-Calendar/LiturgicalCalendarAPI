@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: vps94844.ovh.net
--- Generation Time: Aug 10, 2020 at 09:45 PM
+-- Generation Time: Nov 12, 2020 at 08:23 AM
 -- Server version: 5.7.25
--- PHP Version: 7.4.8
+-- PHP Version: 7.4.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -27,7 +27,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `LITURGY__calendar_propriumdesanctis`
 --
 -- Creation: Aug 08, 2020 at 01:48 AM
--- Last update: Aug 08, 2020 at 05:14 PM
+-- Last update: Oct 29, 2020 at 04:03 PM
 --
 
 CREATE TABLE `LITURGY__calendar_propriumdesanctis` (
@@ -73,9 +73,9 @@ INSERT INTO `LITURGY__calendar_propriumdesanctis` (`RECURRENCE_ID`, `MONTH`, `DA
 (16, 1, 31, 'StJohnBosco', 'Sancti Ioannis Bosco, presbyteri', 'Saint John Bosco, priest', 'San Giovanni Bosco, sacerdote', 3, 'Pastors:For One Pastor,Holy Men and Women:For Educators', 'GENERAL ROMAN', 'white'),
 (17, 2, 2, 'Presentation', 'In Præsentatione Domini', 'Presentation of the Lord', 'Presentazione del Signore', 5, 'Proper', 'GENERAL ROMAN', 'white'),
 (18, 2, 3, 'StBlase', 'Sancti Blasii, episcopi et martyris', 'Saint Blase, bishop and martyr', 'San Biagio, vescovo e martire', 2, 'Martyrs:For One Martyr,Pastors:For a Bishop', 'GENERAL ROMAN', 'white,red'),
-(19, 2, 3, 'StAnsgar', 'Sancti Ansgarii, episcopi', 'Saint Ansgar, bishop', 'Sant\'Oscar, vescovo', 2, 'Pastors:For a Bishop,Pastors:For Missionaries', 'GENERAL ROMAN', 'white'),
+(19, 2, 3, 'StAnsgar', 'Sancti Ansgarii, episcopi', 'Saint Ansgar, bishop', 'Sant\'Ansgario (Oscar), vescovo', 2, 'Pastors:For a Bishop,Pastors:For Missionaries', 'GENERAL ROMAN', 'white'),
 (20, 2, 5, 'StAgatha', 'Sanctæ Agathæ, virginis et martyris', 'Saint Agatha, virgin and martyr', 'Sant\'Agata, vergine e martire', 3, 'Martyrs:For a Virgin Martyr,Virgins:For One Virgin', 'GENERAL ROMAN', 'white,red'),
-(21, 2, 6, 'StsPaulMiki', 'Sanctorum Pauli Miki et sociorum, martyrum', 'Saints Paul Miki and companions, martyrs', 'Santi Paolo Miki e soci, martiri', 3, 'Martyrs:For Several Martyrs', 'GENERAL ROMAN', 'red'),
+(21, 2, 6, 'StsPaulMiki', 'Sanctorum Pauli Miki et sociorum, martyrum', 'Saints Paul Miki and companions, martyrs', 'Santi Paolo Miki e compagni, martiri', 3, 'Martyrs:For Several Martyrs', 'GENERAL ROMAN', 'red'),
 (22, 2, 8, 'StJeromeEmiliani', 'Sancti Hieronymi Emiliani', 'Saint Jerome Emiliani, priest', 'San Girolamo Emiliani', 2, 'Holy Men and Women:For Educators', 'GENERAL ROMAN', 'white'),
 (24, 2, 10, 'StScholastica', 'Sanctæ Scholasticæ, virginis', 'Saint Scholastica, virgin', 'Santa Scolastica, vergine', 3, 'Virgins:For One Virgin,Holy Men and Women:For a Nun', 'GENERAL ROMAN', 'white'),
 (25, 2, 11, 'LadyLourdes', 'Beatæ Mariæ Virginis de Lourdes', 'Our Lady of Lourdes', 'Beata Maria Vergine di Lourdes', 2, 'Blessed Virgin Mary', 'GENERAL ROMAN', 'white'),
@@ -193,7 +193,7 @@ INSERT INTO `LITURGY__calendar_propriumdesanctis` (`RECURRENCE_ID`, `MONTH`, `DA
 (152, 9, 28, 'StWenceslaus', 'Sancti Venceslai, martyris', 'Saint Wenceslaus, martyr', 'San Venceslao, martire', 2, 'Martyrs:For One Martyr', 'GENERAL ROMAN', 'red'),
 (154, 9, 29, 'StsArchangels', 'Sanctorum Michælis, Gabrielis et Raphælis, archangelorum', 'Saints Michael, Gabriel and Raphael, Archangels', 'Santi Michele, Gabriele e Raffaele, arcangeli', 4, 'Proper', 'GENERAL ROMAN', 'white'),
 (155, 9, 30, 'StJerome', 'Sancti Hieronymi, presbyteri et Ecclesiæ doctoris', 'Saint Jerome, priest and doctor', 'San Girolamo, sacerdote e dottore', 3, 'Proper', 'GENERAL ROMAN', 'white'),
-(156, 10, 1, 'StThereseChildJesus', 'Sanctæ Teresiæ a Iesu Infante, virginis', 'Saint Thérèse of the Child Jesus, virgin and doctor', 'Santa Teresa del Bambino Gesù, vergine e dottore', 3, 'Proper', 'GENERAL ROMAN', 'white'),
+(156, 10, 1, 'StThereseChildJesus', 'Sanctæ Teresiæ a Iesu Infante, virginis', 'Saint Thérèse of the Child Jesus, virgin', 'Santa Teresa di Gesù Bambino, vergine', 3, 'Proper', 'GENERAL ROMAN', 'white'),
 (157, 10, 2, 'GuardianAngels', 'Sanctorum Angelorum Custodum', 'Guardian Angels', 'Santi Angeli Custodi', 3, 'Proper', 'GENERAL ROMAN', 'white'),
 (158, 10, 4, 'StFrancisAssisi', 'Sancti Francisci Assisiensis', 'Saint Francis of Assisi', 'San Francesco d\'Assisi', 3, 'Proper', 'GENERAL ROMAN', 'white'),
 (159, 10, 6, 'StBruno', 'Sancti Brunonis, presbyteri', 'Saint Bruno, priest', 'San Bruno, sacerdote', 2, 'Pastors:For One Pastor,Holy Men and Women:For a Monk', 'GENERAL ROMAN', 'white'),
@@ -210,7 +210,7 @@ INSERT INTO `LITURGY__calendar_propriumdesanctis` (`RECURRENCE_ID`, `MONTH`, `DA
 (171, 10, 19, 'StPaulCross', 'Sancti Pauli a Cruce, presbyteri', 'Saint Paul of the Cross, Priest', 'San Paolo della Croce, sacerdote', 2, 'Proper', 'GENERAL ROMAN', 'white'),
 (173, 10, 23, 'StJohnCapistrano', 'Sancti Ioannis de Capestrano, presbyteri', 'Saint John of Capistrano, priest', 'San Giovanni da Capestrano, sacerdote', 2, 'Pastors:For Missionaries,Holy Men and Women:For Religious', 'GENERAL ROMAN', 'white'),
 (174, 10, 24, 'StAnthonyMaryClaret', 'Sancti Antonii Mariæ Claret, episcopi', 'Saint Anthony Mary Claret, bishop', 'Sant\'Antonio Maria Claret, vescovo', 2, 'Pastors:For a Bishop,Pastors:For Missionaries', 'GENERAL ROMAN', 'white'),
-(175, 10, 28, 'StSimonStJudeAp', 'Sancotrum Simonis et Iudæ, apostolorum', 'Saint Simon and Saint Jude, apostles', 'Santi Simone e Giuda, apostoli', 4, 'Proper', 'GENERAL ROMAN', 'red'),
+(175, 10, 28, 'StSimonStJudeAp', 'Sanctorum Simonis et Iudæ, apostolorum', 'Saint Simon and Saint Jude, apostles', 'Santi Simone e Giuda, apostoli', 4, 'Proper', 'GENERAL ROMAN', 'red'),
 (176, 11, 1, 'AllSaints', 'Omnium Sanctorum', 'All Saints Day', 'Tutti i Santi', 6, 'Proper', 'GENERAL ROMAN', 'white'),
 (177, 11, 2, 'AllSouls', 'In Commemoratione Omnium Fidelium Defunctorum', 'Commemoration of all the Faithful Departed (All Souls\' Day)', 'Commemorazione di tutti i defunti', 6, 'Proper', 'GENERAL ROMAN', 'purple'),
 (178, 11, 3, 'StMartinPorres', 'Sancti Martini de Porres, religiosi', 'Saint Martin de Porres, religious', 'San Martino de Porres, religioso', 2, 'Holy Men and Women:For Religious', 'GENERAL ROMAN', 'white'),
@@ -251,7 +251,6 @@ INSERT INTO `LITURGY__calendar_propriumdesanctis` (`RECURRENCE_ID`, `MONTH`, `DA
 -- Table structure for table `LITURGY__calendar_propriumdesanctis_2002`
 --
 -- Creation: Aug 08, 2020 at 01:12 AM
--- Last update: Aug 08, 2020 at 01:12 AM
 --
 
 CREATE TABLE `LITURGY__calendar_propriumdesanctis_2002` (
@@ -307,7 +306,6 @@ INSERT INTO `LITURGY__calendar_propriumdesanctis_2002` (`RECURRENCE_ID`, `MONTH`
 -- Table structure for table `LITURGY__calendar_propriumdetempore`
 --
 -- Creation: Jan 06, 2019 at 04:29 PM
--- Last update: Aug 07, 2020 at 10:10 PM
 --
 
 CREATE TABLE `LITURGY__calendar_propriumdetempore` (
@@ -442,7 +440,6 @@ INSERT INTO `LITURGY__colors` (`COLOR_EN`, `COLOR_LA`, `COLOR_IT`, `COLOR_ES`, `
 -- Table structure for table `LITURGY__DIOCESILAZIO_calendar_propriumdesanctis_1973`
 --
 -- Creation: Aug 08, 2020 at 05:14 AM
--- Last update: Aug 09, 2020 at 03:04 PM
 --
 
 CREATE TABLE `LITURGY__DIOCESILAZIO_calendar_propriumdesanctis_1973` (
@@ -541,7 +538,6 @@ INSERT INTO `LITURGY__festivity_grade` (`IDX`, `NAME`) VALUES
 -- Table structure for table `LITURGY__ITALY_calendar_propriumdesanctis_1983`
 --
 -- Creation: Aug 08, 2020 at 01:13 AM
--- Last update: Aug 08, 2020 at 01:13 AM
 --
 
 CREATE TABLE `LITURGY__ITALY_calendar_propriumdesanctis_1983` (
@@ -620,7 +616,6 @@ INSERT INTO `LITURGY__months` (`IDX`, `NAME`) VALUES
 -- Table structure for table `LITURGY__USA_calendar_propriumdesanctis_2011`
 --
 -- Creation: Aug 08, 2020 at 01:58 AM
--- Last update: Aug 09, 2020 at 10:26 PM
 --
 
 CREATE TABLE `LITURGY__USA_calendar_propriumdesanctis_2011` (
@@ -772,13 +767,13 @@ ALTER TABLE `LITURGY__DIOCESILAZIO_calendar_propriumdesanctis_1973`
 -- AUTO_INCREMENT for table `LITURGY__ITALY_calendar_propriumdesanctis_1983`
 --
 ALTER TABLE `LITURGY__ITALY_calendar_propriumdesanctis_1983`
-  MODIFY `RECURRENCE_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `RECURRENCE_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `LITURGY__USA_calendar_propriumdesanctis_2011`
 --
 ALTER TABLE `LITURGY__USA_calendar_propriumdesanctis_2011`
-  MODIFY `RECURRENCE_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `RECURRENCE_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- Constraints for dumped tables
