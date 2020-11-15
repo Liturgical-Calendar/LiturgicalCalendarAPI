@@ -10,7 +10,8 @@
       $('#langChoiceSpanish').text( languageNames.of('es') );
       $('#langChoicePortuguese').text( languageNames.of('pt') );
       $('#langChoiceLatin').text( languageNames.of('lat') );
-      $(document).on('click','#langChoicesDropdownItems .dropdown-item',function(){
+      $(document).on('click','#langChoicesDropdownItems .dropdown-item',function(event){
+        event.preventDefault();
         switch( $(this).attr('id') ){
             case 'langChoiceEnglish':
                 Cookies.set('currentLocale','en');
