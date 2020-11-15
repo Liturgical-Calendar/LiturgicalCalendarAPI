@@ -104,25 +104,34 @@
         <!-- Main Content -->
         <div id="content">
             <!-- Topbar -->
-            <nav class="preview-bar bg-light topbar mb-4 static-top shadow">
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                <!-- Sidebar Toggle (Topbar) -->
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+
                 <!-- Topbar Navbar -->
-                <div class="container-fluid h-100">
-                    <div class="row align-items-center justify-content-between h-100">
-                        <div class="col text-right">
-                            <button class="btn btn-transparent-dark bg-gray-700 text-gray-100">English</button>
-                            <button class="btn btn-transparent-dark bg-gray-400">French</button>
-                            <button class="btn btn-transparent-dark bg-gray-400">German</button>
-                            <button class="btn btn-transparent-dark bg-gray-400">Italian</button>
-                            <button class="btn btn-transparent-dark bg-gray-400">Latin</button>
-                            <button class="btn btn-transparent-dark bg-gray-400">Portuguese</button>
-                            <button class="btn btn-transparent-dark bg-gray-400">Spanish</button>
-                            <a class="btn btn-transparent-dark mr-2"
-                                href="https://github.com/JohnRDOrazio/LiturgicalCalendar" target="_blank"
-                                title="Fork me on GitHub">
-                                <i class="fab fa-github"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Language
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="navbarDropdown">
+                          <a class="dropdown-item" href="#">English</a>
+                          <a class="dropdown-item" href="#">German</a>
+                          <a class="dropdown-item" href="#">Italian</a>
+                          <a class="dropdown-item" href="#">Latin</a>
+                          <a class="dropdown-item" href="#">Portuguese</a>
+                          <a class="dropdown-item" href="#">Spanish</a>
+                         </div>
+                      </li>
+                </ul>
+
+                <a class="btn btn-transparent-dark mr-2"
+                    href="https://github.com/JohnRDOrazio/LiturgicalCalendar" target="_blank"
+                    title="Fork me on GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
             </nav>
             <div class="container-fluid">
