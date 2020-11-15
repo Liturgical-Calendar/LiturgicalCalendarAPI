@@ -29,3 +29,21 @@
 
 <!-- Custom scripts for all pages-->
 <script src="assets/js/sb-admin-2.min.js"></script>
+
+<!-- assets/vendor/jscookie/v3.0.0-rc.1 -->
+<script type="module" src="/path/to/js.cookie.mjs"></script>
+<script type="module">
+  import Cookies from '/path/to/js.cookie.mjs'
+  if(Cookies.get("currentLocale") === undefined){
+    Cookies.set("currentLocale", navigator.language );
+  }
+</script>
+
+<script nomodule defer src="/path/to/js.cookie.js"></script>
+<script nomodule defer>
+  if(Cookies.get("currentLocale") === undefined){
+    Cookies.set("currentLocale", navigator.language );
+  }
+</script>
+
+<script src="assets/js/homepage.js"></script>
