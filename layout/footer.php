@@ -31,9 +31,9 @@
 <script src="assets/js/sb-admin-2.min.js"></script>
 
 <!-- assets/vendor/jscookie/v3.0.0-rc.1 -->
-<script type="module" src="assets/vendor/jscookie/v3.0.0-rc.1/js.cookie.mjs"></script>
+<script type="module" src="./assets/vendor/jscookie/v3.0.0-rc.1/js.cookie.mjs"></script>
 <script type="module">
-  import Cookies from 'assets/vendor/jscookie/v3.0.0-rc.1/js.cookie.mjs'
+  import Cookies from './assets/vendor/jscookie/v3.0.0-rc.1/js.cookie.mjs'
   if(Cookies.get("currentLocale") === undefined){
     Cookies.set("currentLocale", navigator.language );
   }
