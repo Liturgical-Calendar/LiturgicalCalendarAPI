@@ -34,6 +34,7 @@
                 Cookies.set('currentLocale','lat');
                 break;
         }
+        location.reload();
       });
     });
 })(jQuery);
