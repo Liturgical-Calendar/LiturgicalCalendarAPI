@@ -118,7 +118,7 @@
                         <a class="nav-link dropdown-toggle" href="#" id="langChoicesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                           English
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="langChoicesDropdown">
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="langChoicesDropdown" id="langChoicesDropdownItems">
                           <a class="dropdown-item" id="langChoiceEnglish" href="#">English</a>
                           <a class="dropdown-item" id="langChoiceFrench" href="#">French</a>
                           <a class="dropdown-item" id="langChoiceGerman" href="#">German</a>
@@ -126,7 +126,7 @@
                           <a class="dropdown-item" id="langChoiceLatin" href="#">Latin</a>
                           <a class="dropdown-item" id="langChoicePortuguese" href="#">Portuguese</a>
                           <a class="dropdown-item" id="langChoiceSpanish" href="#">Spanish</a>
-                         </div>
+                        </div>
                       </li>
                 </ul>
 
