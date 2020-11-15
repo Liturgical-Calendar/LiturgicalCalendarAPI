@@ -9,7 +9,7 @@
       $('#langChoiceItalian').text( languageNames.of('it') );
       $('#langChoiceSpanish').text( languageNames.of('es') );
       $('#langChoicePortuguese').text( languageNames.of('pt') );
-      //$('#langChoiceLatin').text( languageNames.of('en') );
+      $('#langChoiceLatin').text( languageNames.of('lat') );
       $(document).on('click','#langChoicesDropdownItems .dropdown-item',function(){
         switch( $(this).attr('id') ){
             case 'langChoiceEnglish':
@@ -31,7 +31,7 @@
                 Cookies.set('currentLocale','pt');
                 break;
             case 'langChoiceLatin':
-                Cookies.set('currentLocale','lt');
+                Cookies.set('currentLocale','lat');
                 break;
         }
       });
