@@ -12,6 +12,7 @@
       $('#langChoiceLatin').text( languageNames.of('lat') );
       $(document).on('click','#langChoicesDropdownItems .dropdown-item',function(event){
         event.preventDefault();
+        let oldLocale = Cookies.get('currentLocale');
         switch( $(this).attr('id') ){
             case 'langChoiceEnglish':
                 Cookies.set('currentLocale','en');
@@ -35,7 +36,10 @@
                 Cookies.set('currentLocale','lat');
                 break;
         }
-        location.reload();
+        //only reload if the value has changed
+        if(Cookies.get('currentLocale') != oldLocale){
+            location.reload();
+        }
       });
     });
 })(jQuery);
