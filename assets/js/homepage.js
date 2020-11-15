@@ -10,5 +10,30 @@
       $('#langChoiceSpanish').text( languageNames.of('es') );
       $('#langChoicePortuguese').text( languageNames.of('pt') );
       //$('#langChoiceLatin').text( languageNames.of('en') );
+      $(document).on('click','#langChoicesDropdownItems .dropdown-item',function(){
+        switch( $(this).attr('id') ){
+            case 'langChoiceEnglish':
+                Cookies.set('currentLocale','en');
+                break;
+            case 'langChoiceFrench':
+                Cookies.set('currentLocale','fr');
+                break;
+            case 'langChoiceGerman':
+                Cookies.set('currentLocale','de');
+                break;
+            case 'langChoiceItalian':
+                Cookies.set('currentLocale','it');
+                break;
+            case 'langChoiceSpanish':
+                Cookies.set('currentLocale','es');
+                break;
+            case 'langChoicePortuguese':
+                Cookies.set('currentLocale','pt');
+                break;
+            case 'langChoiceLatin':
+                Cookies.set('currentLocale','lt');
+                break;
+        }
+      });
     });
 })(jQuery);
