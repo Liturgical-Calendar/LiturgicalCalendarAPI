@@ -114,16 +114,18 @@
                 <!-- Topbar Navbar -->
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          Language
+                        <!-- this should contain the value of the currently selected language, based on a cookie -->
+                        <a class="nav-link dropdown-toggle" href="#" id="langChoicesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          English
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="navbarDropdown">
-                          <a class="dropdown-item" href="#">English</a>
-                          <a class="dropdown-item" href="#">German</a>
-                          <a class="dropdown-item" href="#">Italian</a>
-                          <a class="dropdown-item" href="#">Latin</a>
-                          <a class="dropdown-item" href="#">Portuguese</a>
-                          <a class="dropdown-item" href="#">Spanish</a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="langChoicesDropdown">
+                          <a class="dropdown-item" id="langChoiceEnglish" href="#">English</a>
+                          <a class="dropdown-item" id="langChoiceFrench" href="#">French</a>
+                          <a class="dropdown-item" id="langChoiceGerman" href="#">German</a>
+                          <a class="dropdown-item" id="langChoiceItalian" href="#">Italian</a>
+                          <a class="dropdown-item" id="langChoiceLatin" href="#">Latin</a>
+                          <a class="dropdown-item" id="langChoicePortuguese" href="#">Portuguese</a>
+                          <a class="dropdown-item" id="langChoiceSpanish" href="#">Spanish</a>
                          </div>
                       </li>
                 </ul>
