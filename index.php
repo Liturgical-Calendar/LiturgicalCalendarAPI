@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Generate Roman Calendar</title>
+    <title>General Roman Calendar</title>
     <?php echo  file_get_contents('layout/head.php'); ?>
 </head>
 <body>
@@ -9,9 +9,8 @@
     <?php echo  file_get_contents('layout/header.php'); ?>
 
         <!-- Page Heading -->
-        <h1 class="h3 mb-2 text-gray-800">Liturgical Calendar Project</h1>
-        <p class="mb-4">Liturgical Calendar engine with algorithm to generate the Universal or General Roman
-            Calendar for any given year</p>
+        <h1 class="h3 mb-2 text-gray-800">Catholic Liturgical Calendar</h1>
+        <p class="mb-4">An API for the Liturgical Calendar for any given year, based on the Universal or General Roman Calendar and for derived National and Diocesan calendars</p>
 
         <!-- Page Heading -->
         <h3 class="h3 mb-2 text-gray-800">SCRIPTS</h3>
