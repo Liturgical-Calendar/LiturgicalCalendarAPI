@@ -116,6 +116,7 @@
                     <li class="nav-item active" id="topNavBar_API"><a class="nav-link" href="#">API</a></li>
                     <li class="nav-item" id="topNavBar_Usage"><a class="nav-link" href="#">Usage</a></li>
                     <li class="nav-item" id="topNavBar_Extending"><a class="nav-link" href="#">Extending the API</a></li>
+                    <li class="nav-item" id="topNavBar_AboutUs"><a class="nav-link">About us</a></li>
                 </ul>                
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item dropdown">
