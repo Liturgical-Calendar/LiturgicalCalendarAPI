@@ -6,7 +6,7 @@
 
         <!-- Sidebar - Brand -->
         <li><a class="sidebar-brand d-flex align-items-center justify-content-center" href="/LiturgicalCalendar">
-                <div class="sidebar-brand-text mx-3">Liturgical Calendar Project</div>
+                <div class="sidebar-brand-text mx-3">Catholic Liturgical Calendar</div>
             </a></li>
 
         <!-- Divider -->
