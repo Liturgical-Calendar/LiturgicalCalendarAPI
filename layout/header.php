@@ -113,7 +113,7 @@
 
                 <!-- Topbar Navbar -->
                 <ul class="navbar-nav">
-                    <li class="nav-item active" href="#" id="topNavBar_API"><a class="nav-link">API</a></li>
+                    <li class="nav-item active" id="topNavBar_API"><a class="nav-link" href="#">API</a></li>
                     <li class="nav-item" id="topNavBar_Usage"><a class="nav-link" href="#">Usage</a></li>
                     <li class="nav-item" id="topNavBar_Extending"><a class="nav-link" href="#">Extending the API</a></li>
                 </ul>                
