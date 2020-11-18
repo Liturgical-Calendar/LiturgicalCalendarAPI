@@ -37,19 +37,19 @@
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="LitCalEngine.php">
+            <a class="nav-link" href="/LiturgicalCalendar/LitCalEngine.php">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>API endpoint</span></a>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="dist/">
+            <a class="nav-link" href="/LiturgicalCalendar/dist/">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>Swagger / Open API Docs</span></a>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="easter.php">
+            <a class="nav-link" href="/LiturgicalCalendar/easter.php">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>Date of Easter</span></a>
         </li>
@@ -67,22 +67,22 @@
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="examples/php/">
+            <a class="nav-link" href="/LiturgicalCalendar/examples/php/">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>PHP + cURL</span></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="examples/javascript/">
+            <a class="nav-link" href="/LiturgicalCalendar/examples/javascript/">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>HTML + AJAX</span></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="examples/fullcalendar/examples/month-view.html">
+            <a class="nav-link" href="/LiturgicalCalendar/examples/fullcalendar/examples/month-view.html">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>Full Calendar</span></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="examples/fullcalendar/examples/messages.html">
+            <a class="nav-link" href="/LiturgicalCalendar/examples/fullcalendar/examples/messages.html">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>Full Calendar (messages first)</span></a>
         </li>
