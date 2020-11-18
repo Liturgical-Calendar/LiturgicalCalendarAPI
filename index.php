@@ -1,7 +1,47 @@
+<?php
+/**
+ * Translation function __()
+ */
+
+function __($key, $locale)
+{
+    global $messages;
+    $lcl = strtolower($locale);
+    if (isset($messages)) {
+        if (isset($messages[$key])) {
+            if (isset($messages[$key][$lcl])) {
+                return $messages[$key][$lcl];
+            } else {
+                return $messages[$key]["en"];
+            }
+        } else {
+            return $key;
+        }
+    } else {
+        return $key;
+    }
+}
+
+/**
+ * Define our translation strings
+*/
+$messages = [
+    "General Roman Calendar" => [
+        "de" => "Allgemeiner Römischer Kalender",
+        "en" => "General Roman Calendar",
+        "es" => "Calendario Romano General",
+        "fr" => "Calendrier Général Romain",
+        "it" => "Calendario Romano Generale",
+        "pt" => "Calendário Romano Geral",
+    ]
+];
+
+?>
+
 <!doctype html>
 <html lang="en">
 <head>
-    <title>General Roman Calendar</title>
+    <title><?php __("General Roman Calendar") ?></title>
     <?php echo  file_get_contents('layout/head.php'); ?>
 </head>
 <body>
