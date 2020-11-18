@@ -57,7 +57,7 @@ $messages = [
 <!doctype html>
 <html lang="en">
 <head>
-    <title><?php __("General Roman Calendar") ?></title>
+    <title><?php __("General Roman Calendar",LITCAL_LOCALE) ?></title>
     <?php echo  file_get_contents('layout/head.php'); ?>
 </head>
 <body>
