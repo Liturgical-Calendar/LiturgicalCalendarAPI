@@ -1,11 +1,11 @@
 <?php
 
-include_once("../i18n.php");
+include_once("./i18n.php");
 
 /**
  * Define our translation strings
 */
-$messages = [
+$messages = array_merge($messages, [
     "General Roman Calendar" => [
         "de" => "Allgemeiner Römischer Kalender",
         "en" => "General Roman Calendar",
@@ -30,23 +30,23 @@ $messages = [
         "it" => "Una API per il Calendario Liturgico, da cui estrarre i dati degli eventi liturgici di un qualsiasi anno dal 1970 in poi, sia per il Calendario Romano Universale che per i calendari nazionali e diocesani derivati",
         "pt" => "Uma API para o calendário litúrgico do qual você pode recuperar dados para os eventos litúrgicos de qualquer ano a partir de 1970, seja para o calendário romano universal ou geral ou para calendários nacionais e diocesanos derivados"
     ]
-];
+]);
 
 ?>
 
 <!doctype html>
 <html lang="<?php echo LITCAL_LOCALE; ?>">
 <head>
-    <title><?php _e("General Roman Calendar",LITCAL_LOCALE) ?></title>
-    <?php include_once('layout/head.php'); ?>
+    <title><?php _e("General Roman Calendar") ?></title>
+    <?php include_once('./layout/head.php'); ?>
 </head>
 <body>
 
-    <?php include_once('layout/header.php'); ?>
+    <?php include_once('./layout/header.php'); ?>
 
         <!-- Page Heading -->
-        <h1 class="h3 mb-2 text-gray-800"><?php _e("Catholic Liturgical Calendar",LITCAL_LOCALE); ?></h1>
-        <p class="mb-4"><?php _e("API_DESCRIPTION",LITCAL_LOCALE) ?></p>
+        <h1 class="h3 mb-2 text-gray-800"><?php _e("Catholic Liturgical Calendar"); ?></h1>
+        <p class="mb-4"><?php _e("API_DESCRIPTION") ?></p>
 
         <!-- Page Heading -->
         <h3 class="h3 mb-2 text-gray-800">SCRIPTS</h3>
@@ -128,7 +128,7 @@ $messages = [
         </div>
         <!-- /.row -->
 
-    <?php include_once('layout/footer.php'); ?>
+    <?php include_once('./layout/footer.php'); ?>
 
 </body>
 </html>

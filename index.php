@@ -5,7 +5,7 @@ include_once("./i18n.php");
 /**
  * Define our translation strings
 */
-$messages = [
+$messages = array_merge($messages, [
     "General Roman Calendar" => [
         "de" => "Allgemeiner Römischer Kalender",
         "en" => "General Roman Calendar",
@@ -30,7 +30,7 @@ $messages = [
         "it" => "Una API per il Calendario Liturgico, da cui estrarre i dati degli eventi liturgici di un qualsiasi anno dal 1970 in poi, sia per il Calendario Romano Universale che per i calendari nazionali e diocesani derivati",
         "pt" => "Uma API para o calendário litúrgico do qual você pode recuperar dados para os eventos litúrgicos de qualquer ano a partir de 1970, seja para o calendário romano universal ou geral ou para calendários nacionais e diocesanos derivados"
     ]
-];
+]);
 
 ?>
 

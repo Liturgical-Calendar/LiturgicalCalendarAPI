@@ -22,7 +22,7 @@ define("LITCAL_LOCALE", $LOCALE );
  * Translation function __()
  */
 
-function __($key, $locale)
+function __($key, $locale = LITCAL_LOCALE)
 {
     global $messages;
     $lcl = strtolower($locale);
@@ -45,7 +45,7 @@ function __($key, $locale)
  * Translation function _e()
  */
 
-function _e($key, $locale)
+function _e($key, $locale = LITCAL_LOCALE)
 {
     global $messages;
     $lcl = strtolower($locale);
@@ -63,5 +63,33 @@ function _e($key, $locale)
         echo $key;
     }
 }
+
+$messages = [
+    "Usage" => [
+        "de" => "Verwendung",
+        "en" => "Usage",
+        "es" => "Uso",
+        "fr" => "Usage",
+        "it" => "Utilizzo",
+        "pt" => "Uso"
+    ],
+    "Extending the API" => [
+        "de" => "API erweitern",
+        "en" => "Extending the API",
+        "es" => "Ampliando la API",
+        "fr" => "Extension de l'API",
+        "it" => "Estendere l'API",
+        "pt" => "Extensão da API"
+    ],
+    "About us" => [
+        "de" => "Wer wir sind",
+        "en" => "About us",
+        "es" => "Quienes somos",
+        "fr" => "Qui nous sommes",
+        "it" => "Chi siamo",
+        "pt" => "Quem nós somos"
+    ]
+];
+
 
 ?>
