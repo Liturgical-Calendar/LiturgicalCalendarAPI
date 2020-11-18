@@ -1,4 +1,9 @@
 <?php
+//turn on error reporting for the staging site
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 $LOCALE = Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
 if($LOCALE !== null){
     //we only need the two letter ISO code, not the national extension
