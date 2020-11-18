@@ -1,6 +1,6 @@
 <?php
 
-include_once("./i18n.php");
+include_once("../i18n.php");
 
 /**
  * Define our translation strings

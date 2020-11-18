@@ -116,10 +116,10 @@
 
                 <!-- Topbar Navbar -->
                 <ul class="navbar-nav">
-                    <li class="nav-item active" id="topNavBar_API"><a class="nav-link" href="#">API</a></li>
-                    <li class="nav-item" id="topNavBar_Usage"><a class="nav-link" href="#">Usage</a></li>
-                    <li class="nav-item" id="topNavBar_Extending"><a class="nav-link" href="#">Extending the API</a></li>
-                    <li class="nav-item" id="topNavBar_AboutUs"><a class="nav-link" href="#">About us</a></li>
+                    <li class="nav-item active" id="topNavBar_API"><a class="nav-link" href="index.php">API</a></li>
+                    <li class="nav-item" id="topNavBar_Usage"><a class="nav-link" href="usage.php">Usage</a></li>
+                    <li class="nav-item" id="topNavBar_Extending"><a class="nav-link" href="extending.php">Extending the API</a></li>
+                    <li class="nav-item" id="topNavBar_AboutUs"><a class="nav-link" href="about.php">About us</a></li>
                 </ul>                
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item dropdown">
