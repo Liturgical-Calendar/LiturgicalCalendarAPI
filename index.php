@@ -1,4 +1,15 @@
 <?php
+$LOCALE = Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+if($LOCALE !== null){
+    //we only need the two letter ISO code, not the national extension
+    if(strpos($LOCALE,"_")){
+        $LOCALE = explode("_", $LOCALE)[0];
+    }
+} else {
+    $LOCALE = "en";
+}
+define("LITCAL_LOCALE", isset($_COOKIE("currentLocale")) ? $_COOKIE("currentLocale") : $LOCALE );
+
 /**
  * Translation function __()
  */
