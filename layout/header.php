@@ -1,3 +1,7 @@
+<?php 
+$currentPage = basename($_SERVER["SCRIPT_FILENAME"], '.php');
+?>
+
 <!-- Page Wrapper -->
 <div id="wrapper">
 
@@ -107,7 +111,7 @@
         <!-- Main Content -->
         <div id="content">
             <!-- Topbar -->
-            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+            <nav class="navbar navbar-expand navbar-light bg-white mb-4 static-top shadow">
 
                 <!-- Sidebar Toggle (Topbar) -->
                 <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
@@ -116,10 +120,16 @@
 
                 <!-- Topbar Navbar -->
                 <ul class="navbar-nav">
-                    <li class="nav-item active" id="topNavBar_API"><a class="nav-link" href="index.php">API</a></li>
-                    <li class="nav-item" id="topNavBar_Usage"><a class="nav-link" href="./usage.php"><?php _e("Usage",LITCAL_LOCALE); ?></a></li>
-                    <li class="nav-item" id="topNavBar_Extending"><a class="nav-link" href="./extending.php"><?php _e("Extending the API",LITCAL_LOCALE); ?></a></li>
-                    <li class="nav-item" id="topNavBar_AboutUs"><a class="nav-link" href="./about.php"><?php _e("About us",LITCAL_LOCALE); ?></a></li>
+                    <li class="nav-item<?php echo $currentPage=="index" || $currentPage == "" ? " active" : ""; ?>" id="topNavBar_API"><a class="nav-link<?php echo $currentPage=="index" || $currentPage == "" ? " font-weight-bold" : ""; ?>" href="./index.php">API</a></li>
+                    <li class="nav-item<?php echo $currentPage=="usage" ? " active" : ""; ?>" id="topNavBar_Usage"><a class="nav-link<?php echo $currentPage=="usage" ? " font-weight-bold" : ""; ?>" href="./usage.php"><?php _e("Usage"); ?></a></li>
+                    <li class="nav-item dropdown<?php echo $currentPage=="extending" ? " active" : ""; ?>" id="topNavBar_Extending">
+                        <a class="nav-link dropdown-toggle<?php echo $currentPage=="extending" ? " font-weight-bold" : ""; ?>" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="extendingChoicesDropdown"><?php _e("Extending the API"); ?></a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="extendingChoicesDropdown" id="extendingChoicesDropdownItems">
+                            <a class="dropdown-item<?php echo isset($_GET["choice"]) && $_GET["choice"]=="national"?" active":"" ?>" id="extendingChoiceNationalCalendar" href="./extending.php?choice=national"><?php _e("Create a National Calendar"); ?></a>
+                            <a class="dropdown-item<?php echo isset($_GET["choice"]) && $_GET["choice"]=="diocesan"?" active":"" ?>" id="extendingChoiceDiocesanCalendar" href="./extending.php?choice=diocesan"><?php _e("Create a Diocesan Calendar"); ?></a>
+                        </div>
+                    </li>
+                    <li class="nav-item<?php echo $currentPage=="about" ? " active" : ""; ?>" id="topNavBar_AboutUs"><a class="nav-link<?php echo $currentPage=="about" ? " font-weight-bold" : ""; ?>" href="./about.php"><?php _e("About us"); ?></a></li>
                 </ul>                
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item dropdown">
@@ -128,13 +138,13 @@
                           English
                         </a>
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="langChoicesDropdown" id="langChoicesDropdownItems">
-                          <a class="dropdown-item" id="langChoiceEnglish" href="#">English</a>
-                          <a class="dropdown-item" id="langChoiceFrench" href="#">French</a>
-                          <a class="dropdown-item" id="langChoiceGerman" href="#">German</a>
-                          <a class="dropdown-item" id="langChoiceItalian" href="#">Italian</a>
-                          <a class="dropdown-item" id="langChoiceLatin" href="#">Latin</a>
-                          <a class="dropdown-item" id="langChoicePortuguese" href="#">Portuguese</a>
-                          <a class="dropdown-item" id="langChoiceSpanish" href="#">Spanish</a>
+                          <a class="dropdown-item<?php echo LITCAL_LOCALE=="en" ? " active" : "" ?>" id="langChoiceEnglish" href="#">English</a>
+                          <a class="dropdown-item<?php echo LITCAL_LOCALE=="fr" ? " active" : "" ?>" id="langChoiceFrench" href="#">French</a>
+                          <a class="dropdown-item<?php echo LITCAL_LOCALE=="de" ? " active" : "" ?>" id="langChoiceGerman" href="#">German</a>
+                          <a class="dropdown-item<?php echo LITCAL_LOCALE=="it" ? " active" : "" ?>" id="langChoiceItalian" href="#">Italian</a>
+                          <a class="dropdown-item<?php echo LITCAL_LOCALE=="lat" ? " active" : "" ?>" id="langChoiceLatin" href="#">Latin</a>
+                          <a class="dropdown-item<?php echo LITCAL_LOCALE=="pt" ? " active" : "" ?>" id="langChoicePortuguese" href="#">Portuguese</a>
+                          <a class="dropdown-item<?php echo LITCAL_LOCALE=="es" ? " active" : "" ?>" id="langChoiceSpanish" href="#">Spanish</a>
                         </div>
                       </li>
                 </ul>

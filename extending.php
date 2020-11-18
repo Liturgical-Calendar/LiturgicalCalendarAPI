@@ -63,58 +63,95 @@ $messages = array_merge($messages, [
         <!-- Page Heading -->
         <h1 class="h3 mb-2 text-gray-800"><?php _e("Extend the General Roman Calendar with National or Diocesan data"); ?></h1>
         <p class="mb-4"><?php _e("API_EXTEND_HOWTO") ?></p>
-
-        <!-- Content Row -->
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card border-left-primary shadow m-2">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Generate National Calendar"); ?></h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center"></div>
-                        <div class="col-auto">
-                            <i class="fas fa-flag fa-2x text-gray-300"></i>
+<?php
+    if(isset($_GET["choice"])){
+        switch($_GET["choice"]){
+            case "national":
+                ?>
+                <div class="col-md-6">
+                    <div class="card border-left-primary shadow m-2">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary"><?php _e("Generate National Calendar"); ?></h6>
                         </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-6">
-                <div class="card border-left-primary shadow m-2">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Generate Diocesan Calendar"); ?></h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <form>
-                                    <h4><?php _e("Define the Solemnities"); ?>:</h4>
-                                    <label><?php _e("Patron of the Place"); ?><br><input type="text" id="diocesanPatronSolemnity" /></label>
-                                    <label><?php _e("Dedication of the Cathedral"); ?><br><input type="text" id="diocesanCathedralSolemnity" /></label>
-
-                                    <h4><?php _e("Define the Feasts"); ?>:</h4>
-                                    <label><?php _e("Patron of the Diocese"); ?><br><input type="text" id="diocesanPatronFeast" /></label>
-                                    <label><?php _e("Dedication of the Cathedral"); ?><br><input type="text" id="diocesanCathedralFeast" /></label>
-                                    <label><?php _e("Patron of the Region or Province or Territory"); ?><br><input type="text" id="diocesanCathedralFeast" /></label>
-                                    <label><?php _e("Other Feast"); ?><br><input type="text" id="diocesanCathedralFeast" /></label>
-                                    
-                                    <h4><?php _e("Define the Memorials"); ?>:</h4>
-                                    <label><?php _e("Secondary patron of the place, the diocese, the region"); ?><br><input type="text" id="diocesanPatronFeast" /></label>
-                                    <label><?php _e("Other Memorial"); ?><br><input type="text" id="diocesanCathedralFeast" /></label>
-                                </form>
-                            </div>
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center"></div>
                             <div class="col-auto">
-                                <i class="fas fa-place-of-worship fa-2x text-gray-300"></i>
+                                <i class="fas fa-flag fa-2x text-gray-300"></i>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+                <?php
+            break;
+            case "diocesan":
+                ?>
+                <nav aria-label="Diocesan calendar definition">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true"><< Previous</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">Solemnities</a></li>
+                    <li class="page-item"><a class="page-link" href="#">Feasts</a></li>
+                    <li class="page-item"><a class="page-link" href="#">Memorials</a></li>
+                    <li class="page-item"><a class="page-link" href="#">Optional Memorials</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next >></a>
+                    </li>
+                </ul>
+                </nav>
+                <div class="container-fluid">
+                    <div class="card border-left-primary shadow m-2">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary"><?php _e("Generate Diocesan Calendar"); ?></h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <form>
+                                        <h4><?php _e("Define the Solemnities"); ?>:</h4>
+                                        <label><?php _e("Patron of the Place"); ?><br><input type="text" id="diocesanPatronSolemnity" /></label>
+                                        <label><?php _e("Dedication of the Cathedral"); ?><br><input type="text" id="diocesanCathedralSolemnity" /></label>
 
-
-    <?php include_once('./layout/footer.php'); ?>
+                                        <h4><?php _e("Define the Feasts"); ?>:</h4>
+                                        <label><?php _e("Patron of the Diocese"); ?><br><input type="text" id="diocesanPatronFeast" /></label>
+                                        <label><?php _e("Dedication of the Cathedral"); ?><br><input type="text" id="diocesanCathedralFeast" /></label>
+                                        <label><?php _e("Patron of the Region or Province or Territory"); ?><br><input type="text" id="diocesanCathedralFeast" /></label>
+                                        <label><?php _e("Other Feast"); ?><br><input type="text" id="diocesanCathedralFeast" /></label>
+                                        
+                                        <h4><?php _e("Define the Memorials"); ?>:</h4>
+                                        <label><?php _e("Secondary patron of the place, the diocese, the region"); ?><br><input type="text" id="diocesanPatronFeast" /></label>
+                                        <label><?php _e("Other Memorial"); ?><br><input type="text" id="diocesanCathedralFeast" /></label>
+                                    </form>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-place-of-worship fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <form>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Email address</label>
+                        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Password</label>
+                        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                        <label class="form-check-label" for="exampleCheck1">Check me out</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>                
+                <?php
+            break;
+        }
+    }
+?>
+<?php include_once('./layout/footer.php'); ?>
 
 </body>
 </html>
