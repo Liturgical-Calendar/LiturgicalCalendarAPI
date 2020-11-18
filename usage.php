@@ -45,45 +45,7 @@ $messages = array_merge($messages, [
     <?php include_once('./layout/header.php'); ?>
 
         <!-- Page Heading -->
-        <h1 class="h3 mb-2 text-gray-800"><?php _e("Catholic Liturgical Calendar"); ?></h1>
-        <p class="mb-4"><?php _e("API_DESCRIPTION") ?></p>
-
-        <!-- Page Heading -->
-        <h3 class="h3 mb-2 text-gray-800">SCRIPTS</h3>
-    
-        <!-- Content Row -->
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card shadow m-2">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Data Generation Endpoint</h6>
-                    </div>
-                    <div class="card-body">
-                        <div><a href="LitCalEngine.php" class="btn btn-primary">View Data Example</a></div>
-                        <div><a href="dist/" class="btn btn-primary mt-2">Swagger / Open API Documentation</a></div>
-                        <p><i>A sample request to the endpoint could look like this:</i></p>
-                        <code>/LitCalEngine.php?year=2020&amp;epiphany=SUNDAY_JAN2_JAN8&amp;ascension=SUNDAY&amp;corpuschristi=SUNDAY&amp;returntype=JSON&amp;locale=EN</code>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-6">
-                <div class="card shadow m-2">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Easter</h6>
-                    </div>
-                    <div class="card-body">
-                        <p>Calculation of the Date of Easter, both Gregorian and Julian, from 1583
-                            (year of the adoption of the Gregorian Calendar) to 9999 (max date calculation in
-                            64bit PHP)</p>
-                        <div><a href="easter.php" class="btn btn-primary">View Easter Example</a></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Page Heading -->
-        <h3 class="h3 mb-2 text-gray-800">EXAMPLES</h3>
+        <h3 class="h3 mb-2 text-gray-800">EXAMPLE USAGE OF THE API</h3>
 
         <div class="row">
 

@@ -64,19 +64,55 @@ $messages = array_merge($messages, [
         <h1 class="h3 mb-2 text-gray-800"><?php _e("Extend the General Roman Calendar with National or Diocesan data"); ?></h1>
         <p class="mb-4"><?php _e("API_EXTEND_HOWTO") ?></p>
 
-        <a href="#" class="btn btn-primary btn-icon-split">
-            <span class="icon text-white-50">
-                <i class="fas fa-flag"></i>
-            </span>
-            <span class="text"><?php _e("Generate National Calendar"); ?></span>
-        </a>
+        <!-- Content Row -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card border-left-primary shadow m-2">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Generate National Calendar"); ?></h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center"></div>
+                        <div class="col-auto">
+                            <i class="fas fa-flag fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card border-left-primary shadow m-2">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Generate Diocesan Calendar"); ?></h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <form>
+                                    <h4><?php _e("Define the Solemnities"); ?>:</h4>
+                                    <label><?php _e("Patron of the Place"); ?><br><input type="text" id="diocesanPatronSolemnity" /></label>
+                                    <label><?php _e("Dedication of the Cathedral"); ?><br><input type="text" id="diocesanCathedralSolemnity" /></label>
 
-        <a href="#" class="btn btn-primary btn-icon-split">
-            <span class="icon text-white-50">
-                <i class="fas fa-place-of-worship"></i>
-            </span>
-            <span class="text"><?php _e("Generate Diocesan Calendar"); ?></span>
-        </a>
+                                    <h4><?php _e("Define the Feasts"); ?>:</h4>
+                                    <label><?php _e("Patron of the Diocese"); ?><br><input type="text" id="diocesanPatronFeast" /></label>
+                                    <label><?php _e("Dedication of the Cathedral"); ?><br><input type="text" id="diocesanCathedralFeast" /></label>
+                                    <label><?php _e("Patron of the Region or Province or Territory"); ?><br><input type="text" id="diocesanCathedralFeast" /></label>
+                                    <label><?php _e("Other Feast"); ?><br><input type="text" id="diocesanCathedralFeast" /></label>
+                                    
+                                    <h4><?php _e("Define the Memorials"); ?>:</h4>
+                                    <label><?php _e("Secondary patron of the place, the diocese, the region"); ?><br><input type="text" id="diocesanPatronFeast" /></label>
+                                    <label><?php _e("Other Memorial"); ?><br><input type="text" id="diocesanCathedralFeast" /></label>
+                                </form>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-place-of-worship fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
     <?php include_once('./layout/footer.php'); ?>
 

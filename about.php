@@ -6,29 +6,45 @@ include_once("./i18n.php");
  * Define our translation strings
 */
 $messages = array_merge($messages, [
-    "General Roman Calendar" => [
-        "de" => "Allgemeiner Römischer Kalender",
-        "en" => "General Roman Calendar",
-        "es" => "Calendario Romano General",
-        "fr" => "Calendrier Général Romain",
-        "it" => "Calendario Romano Generale",
-        "pt" => "Calendário Romano Geral",
+    "Liturgical Calendar - About us" => [
+        "de" => "Liturgischer Kalender - Über uns",
+        "en" => "Liturgical Calendar - About us",
+        "es" => "Calendario litúrgico - Sobre nosotros",
+        "fr" => "Calendrier liturgique - À propos de nous",
+        "it" => "Calendario liturgico - Chi siamo",
+        "pt" => "Calendário litúrgico - Sobre nós",
     ],
-    "Catholic Liturgical Calendar" => [
-        "de" => "Katholischer Liturgischer Kalender",
-        "en" => "Catholic Liturgical Calendar",
-        "es" => "Calendario Litúrgico Católico",
-        "fr" => "Calendrier Liturgique Catholique",
-        "it" => "Calendario Liturgico Cattolico",
-        "pt" => "Calendário Litúrgico Católico",
+    "DONJOHN" => [
+        "de" => "<a href=\"https://www.johnromanodorazio.com\">Rev. John Romano D'Orazio</a> - Priester in der Diözese Rom, Autodidakt Programmierer, Autor des BibleGet-Projekts",
+        "en" => "<a href=\"https://www.johnromanodorazio.com\">Fr. John Romano D'Orazio</a> - priest in the Diocese of Rome, self-taught programmer, author of the BibleGet project",
+        "es" => "<a href=\"https://www.johnromanodorazio.com\">Rev. John Romano D'Orazio</a> - sacerdote de la diócesis de Roma, programador autodidacta, autor del proyecto BibleGet",
+        "fr" => "<a href=\"https://www.johnromanodorazio.com\">Rev. John Romano D'Orazio</a> - prêtre du diocèse de Rome, programmeur autodidacte, auteur du projet BibleGet",
+        "it" => "<a href=\"https://www.johnromanodorazio.com\">don John Romano D'Orazio</a> - sacerdote della Diocesi di Roma, programmatore auto-didatta, autore del progetto BibleGet",
+        "pt" => "<a href=\"https://www.johnromanodorazio.com\">Rev. John Romano D'Orazio</a> - sacerdote da Diocese de Roma, programador autodidata, autor do projeto BibleGet"
     ],
-    "API_DESCRIPTION" => [
-        "de" => "Eine API für den liturgischen Kalender, aus der Sie Daten für die liturgischen Ereignisse eines bestimmten Jahres ab 1970 abrufen können, sei es für den universellen oder allgemeinen römischen Kalender oder für abgeleitete nationale und diözesane Kalender",
-        "en" => "A Liturgical Calendar API from which you can retrieve data for the Liturgical events of any given year from 1970 onwards, whether for the Universal or General Roman Calendar or for derived National and Diocesan calendars",
-        "es" => "Una API para el Calendario Litúrgico del cual puede recuperar datos para los eventos litúrgicos de cualquier año desde 1970 en adelante, ya sea para el Calendario Romano General o Universal o para los calendarios nacionales y diocesanos derivados.",
-        "fr" => "Une API pour le calendrier liturgique à partir de laquelle vous pouvez récupérer des données pour les événements liturgiques d'une année donnée à partir de 1970, que ce soit pour le calendrier romain universel ou général ou pour les calendriers nationaux et diocésains dérivés",
-        "it" => "Una API per il Calendario Liturgico, da cui estrarre i dati degli eventi liturgici di un qualsiasi anno dal 1970 in poi, sia per il Calendario Romano Universale che per i calendari nazionali e diocesani derivati",
-        "pt" => "Uma API para o calendário litúrgico do qual você pode recuperar dados para os eventos litúrgicos de qualquer ano a partir de 1970, seja para o calendário romano universal ou geral ou para calendários nacionais e diocesanos derivados"
+    "MIKETRUSO" => [
+        "de" => "<a href=\"https://www.miketruso.com/\">Mike Truso</a> - Softwareentwickler mit Sitz in St. Paul, MN (USA), Mitbegründer bei JobPost, Computeringenieur bei Agile Orbit, Gründer der Guild of Saint Isidore für katholische IT-Profis",
+        "en" => "<a href=\"https://www.miketruso.com/\">Mike Truso</a> - Software Developer based in St. Paul, MN (USA), Co-Founder at JobPost, Senior Software Engineer at Agile Orbit, founder of the St. Isidore Guild for Catholic IT Professionals",
+        "es" => "<a href=\"https://www.miketruso.com/\">Mike Truso</a> - Desarrollador de software con sede en St. Paul, MN (USA), Co-Fundador en JobPost, Ingeniero en Computación en Agile Orbit, Fundador del Gremio de San Isidoro para profesionales católicos de TI",
+        "fr" => "<a href=\"https://www.miketruso.com/\">Mike Truso</a> - Développeur logiciel basé à St.Paul, MN (USA), Co-Fondateur chez JobPost, Software Engineer chez Agile Orbit, Fondateur de la Guilde de Saint Isidore pour les Professionnels Informatiques Catholiques",
+        "it" => "<a href=\"https://www.miketruso.com/\">Mike Truso</a> - Sviluppatore software con sede a St. Paul, MN (USA), Co-Fondatore presso JobPost, Ingegnere Informatico presso Agile Orbit, Fondatore della Gilda di Sant'Isidoro per Professionisti IT Cattolici",
+        "pt" => "<a href=\"https://www.miketruso.com/\">Mike Truso</a> - Desenvolvedor de software baseado em St. Paul, MN (USA), Cofundador da JobPost, engenheiro de computação da Agile Orbit, Fundador da Guilda de Santo Isidoro para Profissionais Católicos de TI"
+    ],
+    "MICHAELSHELTON" => [
+        "de" => "Michael Shelton - Full-Stack-Webentwickler",
+        "en" => "Michael Shelton - Full stack web developer",
+        "es" => "Michael Shelton - Desarrollador web full stack",
+        "fr" => "Michael Shelton - Développeur web full stack",
+        "it" => "Michael Shelton - Sviluppatore web full stack",
+        "pt" => "Michael Shelton - Desenvolvedor web full stack"
+    ],
+    "ABOUT_US" => [
+        "de" => "Das liturgische Kalenderprojekt wird von einer Gruppe freiwilliger katholischer Programmierer kuratiert, die der Kirche dienen möchten.",
+        "en" => "The Liturgical Calendar project is curated by a group of volunteer catholic programmers, seeking to serve the Church.",
+        "es" => "El proyecto del Calendario Litúrgico está comisariado por un grupo de programadores católicos voluntarios que buscan servir a la Iglesia.",
+        "fr" => "Le projet du calendrier liturgique est organisé par un groupe de programmeurs catholiques bénévoles, cherchant à servir l'Église.",
+        "it" => "Il progetto del Calendario liturgico è curato da un gruppo di programmatori cattolici volontari, che cercano di servire la Chiesa.",
+        "pt" => "O projeto do Calendário Litúrgico é organizado por um grupo de programadores católicos voluntários, que buscam servir a Igreja."
     ]
 ]);
 
@@ -46,8 +62,83 @@ $messages = array_merge($messages, [
 
         <!-- Page Heading -->
         <h1 class="h3 mb-2 text-gray-800"><?php _e("Liturgical Calendar - About us"); ?></h1>
-        <p class="mb-4"><?php _e("API_DESCRIPTION") ?></p>
+        <p><?php _e("ABOUT_US"); ?></p>
 
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card border-left-success shadow m-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col-auto mr-2"><img class="img-profile rounded-circle mx-auto img-fluid" src="./assets/img/donjohn_125x125.jpg"></div>
+                                    <div class="col"><?php _e("DONJOHN") ?></div>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-cross fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-left-success shadow m-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col-auto mr-2"><img class="img-profile rounded-circle mx-auto img-fluid" src="./assets/img/miketruso_125x125.jpg"></div>
+                                    <div class="col"><?php _e("MIKETRUSO") ?></div>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-code fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card border-left-success shadow m-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col-auto mr-2"><img class="img-profile rounded-circle mx-auto img-fluid" src="./assets/img/michaelshelton_125x125.jpg"></div>
+                                    <div class="col"><?php _e("MICHAELSHELTON") ?></div>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-code fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-left-success shadow m-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col-auto mr-2"><img class="img-profile rounded-circle mx-auto img-fluid" src="./assets/img/easter-egg-5-120-279148.png"></div>
+                                    <div class="col"><?php _e("ANOTHERVOLUNTEER") ?></div>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-code fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
 
     <?php include_once('./layout/footer.php'); ?>
 

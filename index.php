@@ -82,52 +82,6 @@ $messages = array_merge($messages, [
             </div>
         </div>
 
-        <!-- Page Heading -->
-        <h3 class="h3 mb-2 text-gray-800">EXAMPLES</h3>
-
-        <div class="row">
-
-            <div class="col-md-6">
-                <div class="card shadow m-2">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">PHP</h6>
-                    </div>
-                    <div class="card-body">
-                        <p>HTML presentation elaborated by PHP using a CURL request</p>
-                        <div><a href="examples/php/" class="btn btn-primary">View PHP Example</a></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="card shadow m-2">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">JavaScript</h6>
-                    </div>
-                    <div class="card-body">
-                        <p>HTML presentation elaborated by JAVASCRIPT using an AJAX
-                            request</p>
-                        <div><a href="examples/javascript/" class="btn btn-primary">View JavaScript Example</a></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="card shadow m-2">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Calendar</h6>
-                    </div>
-                    <div class="card-body">
-                        <p>Fullcalendar representation
-                            elaborated by JAVASCRIPT using an AJAX request</p>
-                        <div><a href="examples/fullcalendar/examples/month-view.html" class="btn btn-primary">View Full Calendar</a></div>
-                        <div><a href="examples/fullcalendar/examples/messages.html" class="btn btn-primary mt-2">View Full Calendar (messages first)</a></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- /.row -->
-
     <?php include_once('layout/footer.php'); ?>
 
 </body>
