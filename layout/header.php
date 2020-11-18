@@ -5,9 +5,11 @@
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
         <!-- Sidebar - Brand -->
-        <li><a class="sidebar-brand d-flex align-items-center justify-content-center" href="/LiturgicalCalendar">
+        <li>
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/LiturgicalCalendar-staging">
                 <div class="sidebar-brand-text mx-3">Catholic Liturgical Calendar</div>
-            </a></li>
+            </a>
+        </li>
 
         <!-- Divider -->
         <li>
@@ -16,9 +18,10 @@
 
         <!-- Nav Item - Dashboard -->
         <li class="nav-item active">
-            <a class="nav-link" href="/LiturgicalCalendar">
+            <a class="nav-link" href="/LiturgicalCalendar-staging">
                 <i class="fas fa-fw fa-cross"></i>
-                <span>Home</span></a>
+                <span>Home</span>
+            </a>
         </li>
 
         <!-- Divider -->
