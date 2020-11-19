@@ -43,42 +43,26 @@ ini_set('display_errors', 1);
 
 define("VERSION","2.9");
 
-
-include "Festivity.php"; //this defines a "Festivity" class that can hold all the useful information about a single celebration
-
-/**
- *  THE ENTIRE LITURGICAL CALENDAR DEPENDS MAINLY ON THE DATE OF EASTER
- *  THE FOLLOWING LITCALFUNCTIONS.PHP DEFINES AMONG OTHER THINGS THE FUNCTION
- *  FOR CALCULATING GREGORIAN EASTER FOR A GIVEN YEAR AS USED BY THE LATIN RITE
- */
-
-include "LitCalFunctions.php"; //a few useful functions e.g. calculate Easter...
-include "LitCalMessages.php";  //translation strings and functions
-
-/**
- * INITIATE CONNECTION TO THE DATABASE
- * AND CHECK FOR CONNECTION ERRORS
- * THE DATABASECONNECT() FUNCTION IS DEFINED IN LITCALFUNCTIONS.PHP
- * WHICH IN TURN LOADS DATABASE CONNECTION INFORMATION FROM LITCALCONFIG.PHP
- * IF THE CONNECTION SUCCEEDS, THE FUNCTION WILL RETURN THE MYSQLI CONNECTION RESOURCE
- * IN THE MYSQLI PROPERTY OF THE RETURNED OBJECT
- */
-
-$dbConnect = databaseConnect();
-if ($dbConnect->retString != "" && preg_match("/^Connected to MySQL Database:/", $dbConnect->retString) == 0) {
-    die("There was an error in the database connection: \n" . $dbConnect->retString);
-} else {
-    $mysqli = $dbConnect->mysqli;
+define("CACHEDURATION","MONTH"); //possible values: DAY, WEEK, MONTH, YEAR
+$CacheDurationID;
+switch(CACHEDURATION){
+    case "DAY":
+        $CacheDurationID = "_" . CACHEDURATION . date("z"); //The day of the year (starting from 0 through 365)
+    break;
+    case "WEEK":
+        $CacheDurationID = "_" . CACHEDURATION . date("W"); //ISO-8601 week number of year, weeks starting on Monday
+    break;
+    case "MONTH":
+        $CacheDurationID = "_" . CACHEDURATION . date("m"); //Numeric representation of a month, with leading zeros
+    break;
+    case "YEAR":
+        $CacheDurationID = "_" . CACHEDURATION . date("Y"); //A full numeric representation of a year, 4 digits
+    break;
 }
 
-
-
-
 /**
- *  ONCE WE HAVE A SUCCESSFUL CONNECTION TO THE DATABASE
- *  WE SET UP SOME CONFIGURATION RULES
- *  WE CHECK IF ANY PARAMETERS ARE BEING SENT TO THE ENGINE TO INSTRUCT IT HOW TO PROCESS CERTAIN CASES
- *  SUCH AS EPIPHANY, ASCENSION, CORPUS CHRISTI
+ *  CHECK PARAMETERS REQUESTED SO AS TO PROCESS THE CORRECT REPONSE
+ *  SUCH AS THOSE REGARDING EPIPHANY, ASCENSION, CORPUS CHRISTI
  *  EACH EPISCOPAL CONFERENCE HAS THE FACULTY OF CHOOSING SUNDAY BETWEEN JAN 2 AND JAN 8 INSTEAD OF JAN 6 FOR EPIPHANY, AND SUNDAY INSTEAD OF THURSDAY FOR ASCENSION AND CORPUS CHRISTI
  *  DEFAULTS TO UNIVERSAL ROMAN CALENDAR: EPIPHANY = JAN 6, ASCENSION = THURSDAY, CORPUS CHRISTI = THURSDAY
  *  AND IN WHICH FORMAT TO RETURN THE PROCESSED DATA (JSON, XML, OR ICS)
@@ -156,6 +140,54 @@ if($LITSETTINGS->NATIONAL !== false){
         break;
     }
 }
+
+$cacheFile = md5(serialize($LITSETTINGS)) . $CacheDurationID . "." . strtolower($LITSETTINGS->RETURNTYPE);
+if(file_exists("engineCache/v" . str_replace(".","_",VERSION) . "/" . $cacheFile)){
+    switch($LITSETTINGS->RETURNTYPE){
+        case "JSON":
+            header('Content-Type: application/json');
+        break;
+        case "XML":
+            header('Content-Type: application/xml; charset=utf-8');
+        break;
+        case "ICS":
+            header('Content-Type: text/calendar; charset=UTF-8');
+            header('Content-Disposition: attachment; filename="LiturgicalCalendar.ics"');
+        break;
+    }
+    echo file_get_contents("engineCache/v" . str_replace(".","_",VERSION) . "/" . $cacheFile);
+    die();
+}
+
+include "Festivity.php"; //this defines a "Festivity" class that can hold all the useful information about a single celebration
+
+/**
+ *  THE ENTIRE LITURGICAL CALENDAR DEPENDS MAINLY ON THE DATE OF EASTER
+ *  THE FOLLOWING LITCALFUNCTIONS.PHP DEFINES AMONG OTHER THINGS THE FUNCTION
+ *  FOR CALCULATING GREGORIAN EASTER FOR A GIVEN YEAR AS USED BY THE LATIN RITE
+ */
+
+include "LitCalFunctions.php"; //a few useful functions e.g. calculate Easter...
+include "LitCalMessages.php";  //translation strings and functions
+
+/**
+ * INITIATE CONNECTION TO THE DATABASE
+ * AND CHECK FOR CONNECTION ERRORS
+ * THE DATABASECONNECT() FUNCTION IS DEFINED IN LITCALFUNCTIONS.PHP
+ * WHICH IN TURN LOADS DATABASE CONNECTION INFORMATION FROM LITCALCONFIG.PHP
+ * IF THE CONNECTION SUCCEEDS, THE FUNCTION WILL RETURN THE MYSQLI CONNECTION RESOURCE
+ * IN THE MYSQLI PROPERTY OF THE RETURNED OBJECT
+ */
+
+$dbConnect = databaseConnect();
+if ($dbConnect->retString != "" && preg_match("/^Connected to MySQL Database:/", $dbConnect->retString) == 0) {
+    die("There was an error in the database connection: \n" . $dbConnect->retString);
+} else {
+    $mysqli = $dbConnect->mysqli;
+}
+
+
+
 
 ini_set('date.timezone', 'Europe/Vatican');
 //ini_set('intl.default_locale', strtolower($LITSETTINGS->LOCALE) . '_' . $LITSETTINGS->LOCALE);
@@ -2664,34 +2696,43 @@ uasort($LitCal, array("Festivity", "comp_date"));
 GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages,$SOLEMNITIES,$FEASTS_MEMORIALS);
 
 function GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages,$SOLEMNITIES,$FEASTS_MEMORIALS){
-        $SerializeableLitCal = new StdClass();
-        $SerializeableLitCal->LitCal = $LitCal;
-        $SerializeableLitCal->Settings = new stdClass();
-        $SerializeableLitCal->Settings->YEAR = $LITSETTINGS->YEAR;
-        $SerializeableLitCal->Settings->EPIPHANY = EPIPHANY;
-        $SerializeableLitCal->Settings->ASCENSION = ASCENSION;
-        $SerializeableLitCal->Settings->CORPUSCHRISTI = CORPUSCHRISTI;
-        $SerializeableLitCal->Settings->LOCALE = $LITSETTINGS->LOCALE;
-        $SerializeableLitCal->Settings->RETURNTYPE = $LITSETTINGS->RETURNTYPE;
-        $SerializeableLitCal->Metadata = new stdClass();
-        $SerializeableLitCal->Metadata->SOLEMNITIES = $SOLEMNITIES;
-        $SerializeableLitCal->Metadata->FEASTS_MEMORIALS = $FEASTS_MEMORIALS;
-        $SerializeableLitCal->Metadata->VERSION = VERSION;
+    global $cacheFile;
+    $SerializeableLitCal = new StdClass();
+    $SerializeableLitCal->LitCal = $LitCal;
+    $SerializeableLitCal->Settings = new stdClass();
+    $SerializeableLitCal->Settings->YEAR = $LITSETTINGS->YEAR;
+    $SerializeableLitCal->Settings->EPIPHANY = EPIPHANY;
+    $SerializeableLitCal->Settings->ASCENSION = ASCENSION;
+    $SerializeableLitCal->Settings->CORPUSCHRISTI = CORPUSCHRISTI;
+    $SerializeableLitCal->Settings->LOCALE = $LITSETTINGS->LOCALE;
+    $SerializeableLitCal->Settings->RETURNTYPE = $LITSETTINGS->RETURNTYPE;
+    $SerializeableLitCal->Metadata = new stdClass();
+    $SerializeableLitCal->Metadata->SOLEMNITIES = $SOLEMNITIES;
+    $SerializeableLitCal->Metadata->FEASTS_MEMORIALS = $FEASTS_MEMORIALS;
+    $SerializeableLitCal->Metadata->VERSION = VERSION;
 
-        $SerializeableLitCal->Messages = $Messages;
-        switch ($LITSETTINGS->RETURNTYPE) {
+    $SerializeableLitCal->Messages = $Messages;
+
+    //make sure we have an engineCache folder for the current Version
+    if(realpath("engineCache/v" . str_replace(".","_",VERSION)) === false){
+        mkdir("engineCache/v" . str_replace(".","_",VERSION),0755,true);
+    }
+
+    switch ($LITSETTINGS->RETURNTYPE) {
         case "JSON":
+            file_put_contents("engineCache/v" . str_replace(".","_",VERSION) . "/" . $cacheFile,json_encode($SerializeableLitCal));
             header('Content-Type: application/json');
             echo json_encode($SerializeableLitCal);
             break;
         case "XML":
             //header("Content-type: text/html");
-            header('Content-Type: application/xml; charset=utf-8');
             $jsonStr = json_encode($SerializeableLitCal);
             $jsonObj = json_decode($jsonStr, true);
             $root = "<?xml version=\"1.0\" encoding=\"UTF-8\"?" . "><LiturgicalCalendar xmlns=\"https://www.bibleget.io/catholicliturgy\"/>";
             $xml = new SimpleXMLElement($root);
             convertArray2XML($xml, $jsonObj);
+            file_put_contents("engineCache/v" . str_replace(".","_",VERSION) . "/" . $cacheFile,$xml->asXML());
+            header('Content-Type: application/xml; charset=utf-8');
             print $xml->asXML();
             break;
             /*
@@ -2790,7 +2831,8 @@ function GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages,$SOLEMNITIES,$
                     $ical .= "END:VEVENT\r\n";
                 }
                 $ical .= "END:VCALENDAR";
-
+                file_put_contents("engineCache/v" . str_replace(".","_",VERSION) . "/" . $cacheFile,$ical);
+    
                 header('Content-Type: text/calendar; charset=UTF-8');
                 header('Content-Disposition: attachment; filename="LiturgicalCalendar.ics"');
                 echo $ical;
