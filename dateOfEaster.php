@@ -1,4 +1,11 @@
 <?php
+    $LOCALE = isset($_GET["locale"]) ? strtoupper($_GET["locale"]) : "LA"; //default to latin
+
+    if(file_exists('engineCache/easter/' . $LOCALE . '.json') ){
+        header('Content-Type: application/json');
+        echo file_get_contents('engineCache/easter/' . $LOCALE . '.json');
+        die();
+    }
 
     $EasterDates = new stdClass();
     $EasterDates->DatesArray = [];
@@ -237,7 +244,6 @@
         return $result;
     }
 
-    $LOCALE = isset($_GET["locale"]) ? strtoupper($_GET["locale"]) : "LA"; //default to latin
     ini_set('date.timezone', 'Europe/Vatican');
     //ini_set('intl.default_locale', strtolower($LOCALE) . '_' . $LOCALE);
     setlocale(LC_TIME, strtolower($LOCALE) . '_' . $LOCALE);
@@ -294,6 +300,8 @@
 
     $EasterDates->lastCoincidenceString = $dateLastCoincidence->format('l, F jS, Y');
     $EasterDates->lastCoincidence = $dateLastCoincidence->format('U');
+
+    file_put_contents('engineCache/easter/' . $LOCALE . '.json',json_encode($EasterDates));
 
     header('Content-Type: application/json');
     echo json_encode($EasterDates);
