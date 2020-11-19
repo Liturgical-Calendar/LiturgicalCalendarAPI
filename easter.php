@@ -3,88 +3,6 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-    // https://en.wikipedia.org/wiki/Computus#Anonymous_Gregorian_algorithm
-    // aka Meeus/Jones/Butcher algorithm
-    
-    function calcGregEaster($Y){
-      $a = $Y % 19;
-      $b = floor($Y/100);
-      $c = $Y % 100;
-      $d = floor($b / 4);
-      $e = $b % 4;
-      $f = floor( ($b+8) / 25 );
-      $g = floor( ($b-$f+1) / 3 );
-      $h = (19*$a + $b - $d - $g + 15) % 30;
-      $i = floor($c/4);
-      $k = $c % 4;
-      $l = (32 + 2*$e + 2*$i - $h - $k) % 7;
-      $m = floor( ($a+11*$h+22*$l) / 451 );
-      $month = floor( ($h + $l - 7*$m + 114) / 31 );
-      $day = ( ($h + $l - 7*$m + 114) % 31) + 1;
-  
-      $dateObj   = DateTime::createFromFormat('!j-n-Y', $day.'-'.$month.'-'.$Y);
-      return $dateObj;
-      //return $dateObj->format('l, F jS, Y');// $day . " " . $monthName . " " . $Y;
-    }
-    
-    
-    //https://en.wikipedia.org/wiki/Computus#Meeus.27_Julian_algorithm
-    //Meeus' Julian algorithm
-    
-    function calcJulianEaster($Y,$gregCal=false){
-        $a = $Y % 4;
-        $b = $Y % 7;
-        $c = $Y % 19;
-        $d = (19*$c + 15) % 30;
-        $e = (2*$a + 4*$b - $d + 34) % 7;
-        $month = floor( ($d + $e + 114) / 31 );
-        $day = ( ($d + $e + 114) % 31 ) + 1;
-  
-        $dateObj   = DateTime::createFromFormat('!j-n-Y', $day.'-'.$month.'-'.$Y);
-        if($gregCal){
-            //from February 29th 2100 Julian (March 14th 2100 Gregorian), 
-            //the difference between the Julian and Gregorian calendars will increase to 14 days
-            /*
-            $dateDiff = 'P' . floor((intval(substr($Y,0,2)) / .75) - 1.25) . 'D';
-            $dateObj->add(new DateInterval($dateDiff));
-            */
-            $GregDateDiff = array();
-            $GregDateDiff[0] = [DateTime::createFromFormat('!j-n-Y', '4-10-1582'),"P10D"]; //add 10 == GREGORIAN CUTOVER DATE
-            $idx = 0;
-            $cc = 10;
-            for($cent = 17;$cent <= 99; $cent++){
-                if($cent % 4 > 0){
-                    $GregDateDiff[++$idx] = [DateTime::createFromFormat('!j-n-Y', '28-2-'.$cent.'00'),"P" . ++$cc . "D"];
-                }
-            }
-
-            for ($i = count($GregDateDiff); $i>0; $i--){
-                if($dateObj > $GregDateDiff[$i-1][0]){
-                    $dateObj->add(new DateInterval($GregDateDiff[$i-1][1]));
-                    break;
-                }
-            }
-            /*
-            $GregDateDiff[1] = DateTime::createFromFormat('!j-n-Y', '28-2-1700'); //add 11 (1600 was a leap year)
-            $GregDateDiff[2] = DateTime::createFromFormat('!j-n-Y', '28-2-1800'); //add 12
-            $GregDateDiff[3] = DateTime::createFromFormat('!j-n-Y', '28-2-1900'); //add 13
-            $GregDateDiff[4] = DateTime::createFromFormat('!j-n-Y', '28-2-2100'); //add 14 (2000 was a leap year)
-            $GregDateDiff[5] = DateTime::createFromFormat('!j-n-Y', '28-2-2200'); //add 15
-            $GregDateDiff[6] = DateTime::createFromFormat('!j-n-Y', '28-2-2300'); //add 16
-            $GregDateDiff[7] = DateTime::createFromFormat('!j-n-Y', '28-2-2500'); //add 17 (2400 will be a leap year)
-            $GregDateDiff[8] = DateTime::createFromFormat('!j-n-Y', '28-2-2600'); //add 18 
-            $GregDateDiff[9] = DateTime::createFromFormat('!j-n-Y', '28-2-2700'); //add 19 
-            $GregDateDiff[10] = DateTime::createFromFormat('!j-n-Y', '28-2-2900'); //add 20 (2800 will be a leap year)
-            $GregDateDiff[11] = DateTime::createFromFormat('!j-n-Y', '28-2-3000'); //add 21 
-            $GregDateDiff[12] = DateTime::createFromFormat('!j-n-Y', '28-2-3100'); //add 22 
-            */
-        }
-        return $dateObj;
-    }
-    
-    //Also many javascript examples can be found here:
-    //https://web.archive.org/web/20150227133210/http://www.merlyn.demon.co.uk/estralgs.txt
-
     function ordinal($number) {
         $ends = array('th','st','nd','rd','th','th','th','th','th','th');
         if ((($number % 100) >= 11) && (($number%100) <= 13))
@@ -242,7 +160,24 @@ error_reporting(E_ALL);
     ini_set('date.timezone', 'Europe/Vatican');
     //ini_set('intl.default_locale', strtolower($LOCALE) . '_' . $LOCALE);
     setlocale(LC_TIME, strtolower($LOCALE) . '_' . $LOCALE);
-        
+    $error_msg = "";
+    $ch = curl_init();
+
+    $prefix = $_SERVER['HTTPS'] ? 'https://' : 'http://';
+    $domain = $_SERVER['HTTP_HOST'];
+    $query = $_SERVER['PHP_SELF'];
+    $path_info = pathinfo($query);
+    //$dir_level = explode("/",dirname($path_info['dirname']));
+    $URL =  $prefix . $domain . $path_info['dirname'] . "/dateOfEaster.php?locale=".$LOCALE;
+    curl_setopt($ch, CURLOPT_URL, $URL);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($ch);
+    if (curl_errno($ch)) {
+        $error_msg = curl_error($ch);
+    }
+    curl_close($ch);
+    $DatesOfEaster = json_decode($response);
+
 ?>
 <!DOCTYPE html>
 <head>
@@ -410,49 +345,18 @@ error_reporting(E_ALL);
     $EasterTableContainer .= '<tbody>';
     //$Y = (int)date("Y");
     //for($i=1997;$i<=2037;$i++){
-    $last_coincidence = "";
     for($i=1583;$i<=9999;$i++){
-      $gregorian_easter = calcGregEaster($i); 
-      $julian_easter = calcJulianEaster($i);
-      $western_julian_easter = calcJulianEaster($i,true);
-      $same_easter = false;
-      if($gregorian_easter->format('l, F jS, Y') === $western_julian_easter->format('l, F jS, Y')){
-        $same_easter = true;
-        $last_coincidence = $gregorian_easter->format('l, F jS, Y');
-      }
-      $gregDateString = "";
-      $julianDateString = "";
-      $westernJulianDateString = "";
-      switch ($LOCALE) {
-          case "LA":
-              $month = (int)$gregorian_easter->format('n'); //n = 1-January to 12-December
-              $monthLatin = $monthsLatin[$month];
-              $gregDateString = 'Dies Domini, ' . $gregorian_easter->format('j') . ' ' . $monthLatin . ' ' . $gregorian_easter->format('Y');
-              $month = (int)$julian_easter->format('n'); //n = 1-January to 12-December
-              $monthLatin = $monthsLatin[$month];
-              $julianDateString = 'Dies Domini, ' . $julian_easter->format('j') . ' ' . $monthLatin . ' ' . $julian_easter->format('Y');
-              $month = (int)$western_julian_easter->format('n'); //n = 1-January to 12-December
-              $monthLatin = $monthsLatin[$month];
-              $westernJulianDateString = 'Dies Domini, ' . $western_julian_easter->format('j') . ' ' . $monthLatin . ' ' . $western_julian_easter->format('Y');
-              break;
-          case "EN":
-              $gregDateString = $gregorian_easter->format('l, F jS, Y');
-              $julianDateString = __('Sunday') . $julian_easter->format(', F jS, Y');
-              $westernJulianDateString = $western_julian_easter->format('l, F jS, Y');
-              break;
-          default:
-              $gregDateString = utf8_encode(strftime('%A %e %B %Y', $gregorian_easter->format('U')));
-              $julianDateString = strtolower(__('Sunday')) . utf8_encode(strftime(' %e %B %Y', $julian_easter->format('U')));
-              $westernJulianDateString = utf8_encode(strftime('%A %e %B %Y', $western_julian_easter->format('U')));
-      }
+        $gregDateString = $DatesOfEaster->DatesArray[$i-1583]->gregorianDateString;
+        $julianDateString = $DatesOfEaster->DatesArray[$i-1583]->julianDateString;
+        $westernJulianDateString = $DatesOfEaster->DatesArray[$i-1583]->westernJulianDateString;
 
-      $style_str = $same_easter ? ' style="background-color:Yellow;font-weight:bold;color:Blue;"' : '';
-      $EasterTableContainer .= '<tr'.$style_str.'><td width="300">'.$gregDateString.'</td><td width="300">' . $julianDateString . '</td><td width="300">'.$westernJulianDateString.'</td></tr>';
+        $style_str = $DatesOfEaster->DatesArray[$i-1583]->coinciding ? ' style="background-color:Yellow;font-weight:bold;color:Blue;"' : '';
+        $EasterTableContainer .= '<tr'.$style_str.'><td width="300">'.$gregDateString.'</td><td width="300">' . $julianDateString . '</td><td width="300">'.$westernJulianDateString.'</td></tr>';
     }
     $EasterTableContainer .= '</tbody></table>';
     $EasterTableContainer .= '</div>';
 
-    echo '<div style="text-align:center;width:40%;margin:0px auto;font-size:.7em;z-index:10;position:relative;"><i>The last coinciding Easter will be: ' . $last_coincidence . '</i></div>';
+    echo '<div style="text-align:center;width:40%;margin:0px auto;font-size:.7em;z-index:10;position:relative;"><i>The last coinciding Easter will be: ' . $DatesOfEaster->lastCoincidenceString . '</i></div>';
     echo $EasterTableContainer;
 ?>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
