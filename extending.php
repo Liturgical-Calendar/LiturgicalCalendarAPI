@@ -241,7 +241,7 @@ $messages = array_merge($messages, [
                             <div class="container">
                                 <div class="card border-left-primary m-5">
                                     <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-2"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Optional Memorials"); ?></h6>
+                                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Optional Memorials"); ?></h6>
                                     </div>
                                     <div class="card-body">
                                         <div class="row no-gutters align-items-center">
