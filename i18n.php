@@ -88,7 +88,124 @@ $messages = [
         "fr" => "Qui nous sommes",
         "it" => "Chi siamo",
         "pt" => "Quem nós somos"
-    ]
+    ],
+    "green" => [
+        "de" => "grün",
+        "en" => "green",
+        "es" => "verde",
+        "fr" => "vert",
+        "it" => "verde",
+        "lat" => "viridis",
+        "pt" => "verde"
+    ],
+    "purple" => [
+        "de" => "violett",
+        "en" => "purple",
+        "es" => "violeta",
+        "fr" => "violet",
+        "it" => "viola",
+        "lat" => "purpura",
+        "pt" => "violeta"
+    ],
+    "white" => [
+        "de" => "weiß",
+        "en" => "white",
+        "es" => "blanco",
+        "fr" => "blanc",
+        "it" => "bianco",
+        "lat" => "albus",
+        "pt" => "branco"
+    ],
+    "red" => [
+        "de" => "rot",
+        "en" => "red",
+        "es" => "rojo",
+        "fr" => "rouge",
+        "it" => "rosso",
+        "lat" => "ruber",
+        "pt" => "vermelho"
+    ],
+    "pink" => [
+        "de" => "rosa",
+        "en" => "pink",
+        "es" => "rosa",
+        "fr" => "rose",
+        "it" => "rosa",
+        "lat" => "rosea",
+        "pt" => "rosa"
+    ],
+    "Month" => [
+        "de" => "Monat",
+        "en" => "Month",
+        "es" => "Mes",
+        "fr" => "Mois",
+        "it" => "Mese",
+        "lat" => "Mensis",
+        "pt" => "Mês"
+    ],
+    "Day" => [
+        "de" => "Tag",
+        "en" => "Day",
+        "es" => "Día",
+        "fr" => "Jour",
+        "it" => "Giorno",
+        "lat" => "Dies",
+        "pt" => "Dia"
+    ],
+    "Name" => [
+        "de" => "Name",
+        "en" => "Name",
+        "es" => "Nombre",
+        "fr" => "Nom",
+        "it" => "Nome",
+        "lat" => "Nomen",
+        "pt" => "Nome"
+    ],
+    "Liturgical color" => [
+        "de" => "Liturgische Farbe",
+        "en" => "Liturgical color",
+        "es" => "Color litúrgico",
+        "fr" => "Couleur liturgique",
+        "it" => "Colore liturgico",
+        "lat" => "Color liturgicum",
+        "pt" => "Cor litúrgica"
+    ],
+    "Solemnities" => [
+        "de" => "Feierlichkeiten",
+        "en" => "Solemnities",
+        "es" => "Solemnidades",
+        "fr" => "Solennités",
+        "it" => "Solennità",
+        "lat" => "Sollemnitates",
+        "pt" => "Solenidades"
+    ],
+    "Feasts" => [
+        "de" => "Feste",
+        "en" => "Feasts",
+        "es" => "Fiestas",
+        "fr" => "Fêtes",
+        "it" => "Feste",
+        "lat" => "Festuum",
+        "pt" => "Festas"
+    ],
+    "Memorials" => [
+        "de" => "Gedenkfeiern",
+        "en" => "Memorials",
+        "es" => "Memorias",
+        "fr" => "Mémoires",
+        "it" => "Memorie obbligatorie",
+        "lat" => "Memoriae",
+        "pt" => "Memórias"
+    ],
+    "Optional memorials" => [
+        "de" => "Optionale Gedenkfeiers",
+        "en" => "Optional memorials",
+        "es" => "Memorias opcionales",
+        "fr" => "Mémoires optionnelles",
+        "it" => "Memorie facoltative",
+        "lat" => "Memoriae ad libitum",
+        "pt" => "Memórias opcionais"
+    ],
 ];
 
 

@@ -1,7 +1,7 @@
 <?php
 
 include_once("./i18n.php");
-
+include_once("./layout/formcontrols.php");
 /**
  * Define our translation strings
 */
@@ -85,19 +85,19 @@ $messages = array_merge($messages, [
             break;
             case "diocesan":
                 ?>
-                <nav aria-label="Diocesan calendar definition">
-                <ul class="pagination pagination-lg justify-content-center">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true" aria-labeled="Previous"><span aria-hidden="true">&laquo;</span></a>
-                    </li>
-                    <li class="page-item active"><a class="page-link" href="#">Solemnities</a></li>
-                    <li class="page-item"><a class="page-link" href="#">Feasts</a></li>
-                    <li class="page-item"><a class="page-link" href="#">Memorials</a></li>
-                    <li class="page-item"><a class="page-link" href="#">Optional Memorials</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
-                    </li>
-                </ul>
+                <nav aria-label="Diocesan calendar definition" id="diocesanCalendarDefinitionCardLinks">
+                    <ul class="pagination pagination-lg justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link diocesan-carousel-prev" href="#" tabindex="-1" aria-disabled="true" aria-labeled="Previous"><span aria-hidden="true">&laquo;</span></a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#" data-slide-to="0"><?php _e("Solemnities"); ?></a></li>
+                        <li class="page-item"><a class="page-link" href="#" data-slide-to="1"><?php _e("Feasts"); ?></a></li>
+                        <li class="page-item"><a class="page-link" href="#" data-slide-to="2"><?php _e("Memorials"); ?></a></li>
+                        <li class="page-item"><a class="page-link" href="#" data-slide-to="3"><?php _e("Optional memorials"); ?></a></li>
+                        <li class="page-item">
+                            <a class="page-link diocesan-carousel-next" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+                        </li>
+                    </ul>
                 </nav>
 
                 <div id="carouselExampleIndicators" class="carousel slide" data-interval="false">
@@ -108,7 +108,7 @@ $messages = array_merge($messages, [
                         <li data-target="#carouselExampleIndicators" data-slide-to="3" class=""></li>
                     </ol>
                     <div class="carousel-inner">
-                        <div class="carousel-item active">
+                        <div class="carousel-item active" id="carouselItemSolemnities">
                             <div class="container">
                                 <div class="card border-left-primary m-5">
                                     <div class="card-header py-3">
@@ -118,76 +118,8 @@ $messages = array_merge($messages, [
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
                                                 <form>
-                                                    <h4><?php _e("Principal Patron(s) of the Place, Diocese, Region, Province or Territory"); ?></h4>
-                                                    <div class="form-row">
-                                                        <div class="form-group col-sm-5">
-                                                            <label for="diocesanPatronSolemnityName">Name</label><input type="text" class="form-control" id="diocesanPatronSolemnityName" />
-                                                        </div>
-                                                        <div class="form-group col-sm-1">
-                                                            <label for="diocesanPatronSolemnityDay">Day</label><input type="number" min=1 max=31 value=1 class="form-control" id="diocesanPatronSolemnityDay" />
-                                                        </div>
-                                                        <div class="form-group col-sm-2">
-                                                            <label for="diocesanPatronSolemnityDay">Month</label>
-                                                            <select class="form-control" id="diocesanPatronSolemnityMonth">
-                                                                <option value=1>January</option>
-                                                                <option value=2>February</option>
-                                                                <option value=3>March</option>
-                                                                <option value=4>April</option>
-                                                                <option value=5>May</option>
-                                                                <option value=6>June</option>
-                                                                <option value=7>July</option>
-                                                                <option value=8>August</option>
-                                                                <option value=9>September</option>
-                                                                <option value=10>October</option>
-                                                                <option value=11>November</option>
-                                                                <option value=12>December</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="form-group col-sm-3">
-                                                            <label for="diocesanPatronSolemnityColor">Liturgical color</label>
-                                                            <select class="form-control" id="diocesanPatronSolemnityColor" />
-                                                                <option value="WHITE">WHITE</option>
-                                                                <option value="RED">RED</option>
-                                                                <option value="PURPLE">PURPLE</option>
-                                                                <option value="GREEN">GREEN</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <h4><?php _e("Dedication of the Cathedral"); ?></h4>
-                                                    <div class="form-row">
-                                                        <div class="form-group col-sm-5">
-                                                            <label for="diocesanCathedralSolemnityName">Name</label><input type="text" class="form-control" id="diocesanCathedralSolemnityName" />
-                                                        </div>
-                                                        <div class="form-group col-sm-1">
-                                                            <label for="diocesanCathedralSolemnityDay">Day</label><input type="number" min=1 max=31 value=1 class="form-control" id="diocesanCathedralSolemnityDay" />
-                                                        </div>
-                                                        <div class="form-group col-sm-2">
-                                                            <label for="diocesanCathedralSolemnityMonth">Month</label>
-                                                            <select class="form-control" id="diocesanCathedralSolemnityMonth">
-                                                                <option value=1>January</option>
-                                                                <option value=2>February</option>
-                                                                <option value=3>March</option>
-                                                                <option value=4>April</option>
-                                                                <option value=5>May</option>
-                                                                <option value=6>June</option>
-                                                                <option value=7>July</option>
-                                                                <option value=8>August</option>
-                                                                <option value=9>September</option>
-                                                                <option value=10>October</option>
-                                                                <option value=11>November</option>
-                                                                <option value=12>December</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="form-group col-sm-3">
-                                                            <label for="diocesanCathedralSolemnityColor">Liturgical color</label>
-                                                            <select class="form-control" id="diocesanCathedralSolemnityColor" disabled />
-                                                                <option value="WHITE" selected>WHITE</option>
-                                                                <option value="RED">RED</option>
-                                                                <option value="PURPLE">PURPLE</option>
-                                                                <option value="GREEN">GREEN</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
+                                                    <?php FormControls::CreateFestivityRow(__("Principal Patron(s) of the Place, Diocese, Region, Province or Territory")) ?>
+                                                    <?php FormControls::CreateFestivityRow(__("Dedication of the Cathedral")) ?>
                                                 </form>
                                             </div>
                                         </div>
@@ -195,7 +127,7 @@ $messages = array_merge($messages, [
                                 </div>
                             </div>
                         </div>
-                        <div class="carousel-item">
+                        <div class="carousel-item" id="carouselItemFeasts">
                             <div class="container">
                                 <div class="card border-left-primary m-5">
                                     <div class="card-header py-3">
@@ -291,7 +223,35 @@ $messages = array_merge($messages, [
 <?php include_once('./layout/footer.php'); ?>
 <script>
     jQuery(document).ready(function(){
-        $('.carousel').carousel();
+        let $carousel = $('.carousel').carousel();
+        $(document).on('click','#diocesanCalendarDefinitionCardLinks a.page-link', function(event){
+            event.preventDefault();
+            $('#diocesanCalendarDefinitionCardLinks li').removeClass('active');
+            //console.log("you clicked " + $(this).text());
+            if( $(this).hasClass('diocesan-carousel-next') ){
+                $carousel.carousel('next');
+            } else if ( $(this).hasClass('diocesan-carousel-prev') ){
+                $carousel.carousel('prev');
+            } else {
+                $(this).parent('li').addClass('active');
+                $carousel.carousel(parseInt( $(this).attr('data-slide-to') ));
+            }
+        });
+
+        $carousel.on('slide.bs.carousel', function(event){
+            $('#diocesanCalendarDefinitionCardLinks li').removeClass('active');
+            if(event.to == 0){
+                $('#diocesanCalendarDefinitionCardLinks li:first-child').addClass('disabled');
+                $('#diocesanCalendarDefinitionCardLinks li:last-child').removeClass('disabled');
+            } else if (event.to == 3){
+                $('#diocesanCalendarDefinitionCardLinks li:last-child').addClass('disabled');
+                $('#diocesanCalendarDefinitionCardLinks li:first-child').removeClass('disabled');
+            } else {
+                $('#diocesanCalendarDefinitionCardLinks li:first-child').removeClass('disabled');
+                $('#diocesanCalendarDefinitionCardLinks li:last-child').removeClass('disabled');
+            }
+            $('#diocesanCalendarDefinitionCardLinks li').find('[data-slide-to='+event.to+']').parent('li').addClass('active');
+        });
     });
 </script>
 </body>
