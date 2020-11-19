@@ -85,6 +85,24 @@ $messages = array_merge($messages, [
             break;
             case "diocesan":
                 ?>
+                <div class="container">
+                    <form class="row justify-content-center">
+                        <div class="form-group col col-md-3">
+                            <label for="diocesanCalendarNationalDependency" class="font-weight-bold">Depends on national calendar:</label>
+                            <select class="form-control" id="diocesanCalendarNationalDependency" aria-describedby="emailHelp" required>
+                                <option value=""></option>
+                                <option value="ITALIA">Italy</option>
+                                <option value="USA">USA</option>
+                            </select>
+                            <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+                        </div>
+                        <div class="form-group col col-md-4">
+                            <label for="diocesanCalendarBehaviour" class="font-weight-bold">Overwrites universal / national calendar</label>
+                            <input type="checkbox" class="form-control" data-toggle="toggle" id="diocesanCalendarBehaviour" aria-describedby="diocesanCalendarBehaviourHelp">
+                            <small id="diocesanCalendarBehaviourHelp" class="form-text text-muted">The default behaviour for a diocesan calendar is to juxtapose the local celebrations alongside those of the universal and the national calendar. If instead the diocesan calendar should override the universal calendar, turn this option on.</small>
+                        </div>
+                    </form>
+                </div>
                 <nav aria-label="Diocesan calendar definition" id="diocesanCalendarDefinitionCardLinks">
                     <ul class="pagination pagination-lg justify-content-center">
                         <li class="page-item disabled">
@@ -137,11 +155,9 @@ $messages = array_merge($messages, [
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
                                                 <form>
-                                                    <h4>:</h4>
-                                                    <label><?php _e("Patron of the Diocese"); ?><br><input type="text" id="diocesanPatronFeast" /></label>
-                                                    <label><?php _e("Dedication of the Cathedral"); ?><br><input type="text" id="diocesanCathedralFeast" /></label>
-                                                    <label><?php _e("Patron of the Region or Province or Territory"); ?><br><input type="text" id="diocesanCathedralFeast" /></label>
-                                                    <label><?php _e("Other Feast"); ?><br><input type="text" id="diocesanCathedralFeast" /></label>
+                                                    <?php FormControls::CreateFestivityRow(__("Patron(s) of the Place, Diocese, Region, Province or Territory")) ?>
+                                                    <?php FormControls::CreateFestivityRow(__("Dedication of the Cathedral")) ?>
+                                                    <?php FormControls::CreateFestivityRow(__("Other Feast")) ?>
                                                 </form>
                                             </div>
                                         </div>
@@ -159,9 +175,8 @@ $messages = array_merge($messages, [
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
                                                 <form>
-                                                    <h4>:</h4>
-                                                    <label><?php _e("Secondary patron of the place, the diocese, the region"); ?><br><input type="text" id="diocesanPatronMemorial" /></label>
-                                                    <label><?php _e("Other Memorial"); ?><br><input type="text" id="diocesanOtherMemorial" /></label>
+                                                    <?php FormControls::CreateFestivityRow(__("Secondary patron(s) of the Place, Diocese, Region, Province or Territory")) ?>
+                                                    <?php FormControls::CreateFestivityRow(__("Other Memorial")) ?>
                                                 </form>
                                             </div>
                                         </div>
@@ -179,9 +194,8 @@ $messages = array_merge($messages, [
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
                                                 <form>
-                                                    <h4>:</h4>
-                                                    <label><?php _e("Saints the veneration of which is local to the place, the diocese, the region"); ?><br><input type="text" id="diocesanOptMemorial" /></label>
-                                                    <label><?php _e("Other Optional Memorial"); ?><br><input type="text" id="diocesanOtherOptMemorial" /></label>
+                                                    <?php FormControls::CreateFestivityRow(__("Saints whos veneration is local to the Place, Diocese, Region, Province or Territory")) ?>
+                                                    <?php FormControls::CreateFestivityRow(__("Other Optional Memorial")) ?>
                                                 </form>
                                             </div>
                                         </div>

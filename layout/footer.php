@@ -29,18 +29,7 @@
 
 <!-- Custom scripts for all pages-->
 <script src="assets/js/sb-admin-2.min.js"></script>
-
-<!-- assets/vendor/jscookie/v3.0.0-rc.1 -->
-<!-- Failed to load module script: The server responded with a non-JavaScript MIME type of "". Strict MIME type checking is enforced for module scripts per HTML spec.
-<script type="module" src="./assets/vendor/jscookie/v3.0.0-rc.1/js.cookie.min.mjs"></script>
-<script type="module">
-  import Cookies from './assets/vendor/jscookie/v3.0.0-rc.1/js.cookie.min.mjs'
-  if(Cookies.get("currentLocale") === undefined){
-    Cookies.set("currentLocale", navigator.language );
-  }
-</script>
--->
-<!-- nomodule defer  -->
+<script src="assets/js/bootstrap4-toggle.min.js"></script>
 <script src="assets/vendor/jscookie/v3.0.0-rc.1/js.cookie.min.js"></script>
 <script>
   if(Cookies.get("currentLocale") === undefined){
