@@ -145,78 +145,80 @@ $messages = array_merge($messages, [
                     </ol>
                     <div class="carousel-inner">
                         <div class="carousel-item active" id="carouselItemSolemnities">
-                            <div class="container">
+                            <div class="container-fluid">
                                 <div class="card border-left-primary m-5">
                                     <div class="card-header py-3">
                                         <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Solemnities"); ?></h6>
                                     </div>
                                     <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
+                                        <!--<div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">-->
                                                 <form>
+                                                    <?php FormControls::setOption("properField",false) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Principal Patron(s) of the Place, Diocese, Region, Province or Territory")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Dedication of the Cathedral")) ?>
                                                 </form>
-                                            </div>
-                                        </div>
+                                            <!--</div>
+                                        </div>-->
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="carousel-item" id="carouselItemFeasts">
-                            <div class="container">
+                            <div class="container-fluid">
                                 <div class="card border-left-primary m-5">
                                     <div class="card-header py-3">
                                         <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Feasts"); ?></h6>
                                     </div>
                                     <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
+                                        <!--<div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">-->
                                                 <form>
                                                     <?php FormControls::CreateFestivityRow(__("Patron(s) of the Place, Diocese, Region, Province or Territory")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Dedication of the Cathedral")) ?>
+                                                    <?php FormControls::setOption("properField",true) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Other Feast")) ?>
                                                 </form>
-                                            </div>
-                                        </div>
+                                            <!--</div>
+                                        </div>-->
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="carousel-item">
-                            <div class="container">
+                            <div class="container-fluid">
                                 <div class="card border-left-primary m-5">
                                     <div class="card-header py-3">
                                         <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Memorials"); ?></h6>
                                     </div>
                                     <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
+                                        <!--<div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">-->
                                                 <form>
                                                     <?php FormControls::CreateFestivityRow(__("Secondary patron(s) of the Place, Diocese, Region, Province or Territory")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Other Memorial")) ?>
                                                 </form>
-                                            </div>
-                                        </div>
+                                            <!--</div>
+                                        </div>-->
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="carousel-item">
-                            <div class="container">
+                            <div class="container-fluid">
                                 <div class="card border-left-primary m-5">
                                     <div class="card-header py-3">
                                         <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Optional Memorials"); ?></h6>
                                     </div>
                                     <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
+                                        <!--<div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">-->
                                                 <form>
                                                     <?php FormControls::CreateFestivityRow(__("Saints whos veneration is local to the Place, Diocese, Region, Province or Territory")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Other Optional Memorial")) ?>
                                                 </form>
-                                            </div>
-                                        </div>
+                                            <!--</div>
+                                        </div>-->
                                     </div>
                                 </div>
                             </div>
