@@ -67,10 +67,30 @@ class FormControls {
             "<option value=\"PROPER\" selected>" . __("Proper") . "</option>" .
             "<option value=\"COMMONBVM\">" . __("Common of the Blessed Virgin Mary") . "</option>" .
             "<option value=\"COMMONMARTYRS\">" . __("Common of Martyrs") . "</option>" .
+            "<option value=\"COMMONMARTYRS_ONE\">" . __("Common of Martyrs: For One Martyr") . "</option>" .
+            "<option value=\"COMMONMARTYRS_SEVERAL\">" . __("Common of Martyrs: For Several Martyrs") . "</option>" .
+            "<option value=\"COMMONMARTYRS_MISSIONARY\">" . __("Common of Martyrs: For Missionary Martyrs") . "</option>" .
+            "<option value=\"COMMONMARTYRS_VIRGIN\">" . __("Common of Martyrs: For a Virgin Martyr") . "</option>" .
             "<option value=\"COMMONPASTORS\">" . __("Common of Pastors") . "</option>" .
+            "<option value=\"COMMONPASTORS_POPE\">" . __("Common of Pastors: For a Pope") . "</option>" .
+            "<option value=\"COMMONPASTORS_BISHOP\">" . __("Common of Pastors: For a Bishop") . "</option>" .
+            "<option value=\"COMMONPASTORS_ONE\">" . __("Common of Pastors: For One Pastor") . "</option>" .
+            "<option value=\"COMMONPASTORS_SEVERAL\">" . __("Common of Pastors: For Several Pastors") . "</option>" .
+            "<option value=\"COMMONPASTORS_MISSIONARY\">" . __("Common of Pastors: For Missionaries") . "</option>" .
             "<option value=\"COMMONDOCTORS\">" . __("Common of Doctors") . "</option>" .
             "<option value=\"COMMONVIRGINS\">" . __("Common of Virgins") . "</option>" .
+            "<option value=\"COMMONVIRGINS_ONE\">" . __("Common of Virgins: For One Virgin") . "</option>" .
+            "<option value=\"COMMONVIRGINS_SEVERAL\">" . __("Common of Virgins: For Several Virgins") . "</option>" .
             "<option value=\"COMMONHOLYMENWOMEN\">" . __("Common of Holy Men and Women") . "</option>" .
+            "<option value=\"COMMONHOLYMENWOMEN_ONE\">" . __("Common of Holy Men and Women: For One Saint") . "</option>" .
+            "<option value=\"COMMONHOLYMENWOMEN_RELIGIOUS\">" . __("Common of Holy Men and Women: For Religious") . "</option>" .
+            "<option value=\"COMMONHOLYMENWOMEN_ABBOT\">" . __("Common of Holy Men and Women: For an Abbot") . "</option>" .
+            "<option value=\"COMMONHOLYMENWOMEN_MONK\">" . __("Common of Holy Men and Women: For a Monk") . "</option>" .
+            "<option value=\"COMMONHOLYMENWOMEN_NUN\">" . __("Common of Holy Men and Women: For a Nun") . "</option>" .
+            "<option value=\"COMMONHOLYMENWOMEN_EDUCATORS\">" . __("Common of Holy Men and Women: For Educators") . "</option>" .
+            "<option value=\"COMMONHOLYMENWOMEN_WOMEN\">" . __("Common of Holy Men and Women: For Holy Women") . "</option>" .
+            "<option value=\"COMMONHOLYMENWOMEN_MERCY\">" . __("Common of Holy Men and Women: For Those Who Practiced Works of Mercy") . "</option>" .
+            "<option value=\"DEDICATION_CHURCH\">" . __("Common of the Dedication of a Church") . "</option>" .
             "</select>" .
             "</div>";
         }

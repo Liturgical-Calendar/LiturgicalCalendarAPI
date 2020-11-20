@@ -57,7 +57,145 @@ $messages = array_merge($messages, [
         "fr" => "Génére un calendrier diocésain",
         "it" => "Genera calendario diocesano",
         "pt" => "Gera calendário diocesano"
-    ]
+    ],
+    "Depends on national calendar" => [
+        "de" => "Hängt vom nationalen Kalender ab",
+        "en" => "Depends on national calendar",
+        "es" => "Depende del calendario nacional",
+        "fr" => "Dépend du calendrier national",
+        "it" => "Dipende dal calendario nazionale",
+        "pt" => "Depende do calendário nacional"
+    ],
+    "Diocese" => [
+        "de" => "Diözese",
+        "en" => "Diocese",
+        "es" => "Diócesis",
+        "fr" => "Diocèse",
+        "it" => "Diocesi",
+        "pt" => "Diocese"
+    ],
+    "Overwrites universal / national calendar" => [
+        "de" => "Überschreibt den universellen / nationalen Kalender",
+        "en" => "Overwrites universal / national calendar",
+        "es" => "Sobrescribe el calendario nacional / universal",
+        "fr" => "Remplace le calendrier universel / national",
+        "it" => "Sovrascrive il calendario universale / nazionale",
+        "pt" => "Substitui o calendário universal / nacional"
+    ],
+    "Define the Solemnities" => [
+        "de" => "Definieren Sie die Feierlichkeiten",
+        "en" => "Define the Solemnities",
+        "es" => "Definir las Solemnidades",
+        "fr" => "Définissez les Solennités",
+        "it" => "Definisci le Solennità",
+        "pt" => "Defina as Solenidades"
+    ],
+    "Define the Feasts" => [
+        "de" => "Definieren Sie die Feste",
+        "en" => "Define the Feasts",
+        "es" => "Definir las Fiestas",
+        "fr" => "Définissez les Fêtes",
+        "it" => "Definisci le Feste",
+        "pt" => "Defina as Festas"
+    ],
+    "Define the Memorials" => [
+        "de" => "Definieren Sie die Gedenkfeiern",
+        "en" => "Define the Memorials",
+        "es" => "Definir las Memoriales",
+        "fr" => "Définissez les Mémoriaux",
+        "it" => "Definisci le Memorie",
+        "pt" => "Defina as Memoriais"
+    ],
+    "Define the Optional Memorials" => [
+        "de" => "Definieren Sie die Optionale Gedenkfeiern",
+        "en" => "Define the Optional Memorials",
+        "es" => "Definir las Memoriales opcionales",
+        "fr" => "Définissez les Mémoriaux facultatifs",
+        "it" => "Definisci le Memorie facoltative",
+        "pt" => "Defina as Memoriais opcionais"
+    ],
+    "Principal Patron(s) of the Place, Diocese, Region, Province or Territory" => [
+        "de" => "",
+        "en" => "Principal Patron(s) of the Place, Diocese, Region, Province or Territory",
+        "es" => "",
+        "fr" => "",
+        "it" => "Patrono/i Principale/i del Luogo, Diocesi, Regione, Provincia o Territorio",
+        "pt" => ""
+    ],
+    "Patron(s) of the Place, Diocese, Region, Province or Territory" => [
+        "de" => "",
+        "en" => "Patron(s) of the Place, Diocese, Region, Province or Territory",
+        "es" => "",
+        "fr" => "",
+        "it" => "Patrono/i del Luogo, Diocesi, Regione, Provincia o Territorio",
+        "pt" => ""
+    ],
+    "Secondary Patron(s) of the Place, Diocese, Region, Province or Territory" => [
+        "de" => "",
+        "en" => "Secondary Patron(s) of the Place, Diocese, Region, Province or Territory",
+        "es" => "",
+        "fr" => "",
+        "it" => "Patrono/i Secondario/i del Luogo, Diocesi, Regione, Provincia o Territorio",
+        "pt" => ""
+    ],
+    "Dedication of the Cathedral" => [
+        "de" => "",
+        "en" => "Dedication of the Cathedral",
+        "es" => "",
+        "fr" => "",
+        "it" => "Dedicazione della Cattedrale",
+        "pt" => ""
+    ],
+    "Other Feast" => [
+        "de" => "",
+        "en" => "Other Feast",
+        "es" => "",
+        "fr" => "",
+        "it" => "Altra Festa",
+        "pt" => ""
+    ],
+    "Other Memorial" => [
+        "de" => "",
+        "en" => "Other Memorial",
+        "es" => "",
+        "fr" => "",
+        "it" => "Altra Memoria",
+        "pt" => ""
+    ],
+    "Other Optional Memorial" => [
+        "de" => "",
+        "en" => "Other Optional Memorial",
+        "es" => "",
+        "fr" => "",
+        "it" => "Altra Memoria Facoltativa",
+        "pt" => ""
+    ],
+    "Saints whos veneration is local to the Place, Diocese, Region, Province or Territory" => [
+        "de" => "Heilige, deren Verehrung für den Ort, die Diözese, die Region, die Provinz oder das Territorium gilt",
+        "en" => "Saints whos veneration is local to the Place, Diocese, Region, Province or Territory",
+        "es" => "Santos cuya veneración es local del lugar, diócesis, región, provincia o territorio",
+        "fr" => "Saints dont la vénération est locale au lieu, au diocèse, à la région, à la province ou au territoire",
+        "it" => "Santi la venerazione dei quali è locale al Luogo, Diocesi, Regione, Provincia o Territorio",
+        "pt" => "Santos cuja veneração é local no lugar, diocese, região, província ou território"
+    ],
+    "Common (or Proper)" => [
+        "de" => "Common (oder Proper)",
+        "en" => "Common (or Proper)",
+        "es" => "Común (o Propio)",
+        "fr" => "Commun (ou Propre)",
+        "it" => "Comune (o Proprio)",
+        "pt" => "Comum (ou Próprio)"
+    ],
+/*
+    "" => [
+        "de" => "",
+        "en" => "",
+        "es" => "",
+        "fr" => "",
+        "it" => "",
+        "pt" => ""
+    ],
+*/
 ]);
 
 ?>
@@ -100,7 +238,7 @@ $messages = array_merge($messages, [
                 <div class="container">
                     <form class="row justify-content-center">
                         <div class="form-group col col-md-3">
-                            <label for="diocesanCalendarNationalDependency" class="font-weight-bold">Depends on national calendar:</label>
+                            <label for="diocesanCalendarNationalDependency" class="font-weight-bold"><?php _e("Depends on national calendar"); ?>:</label>
                             <select class="form-control" id="diocesanCalendarNationalDependency" required>
                                 <option value=""></option>
                                 <option value="ITALIA">Italy</option>
@@ -108,14 +246,14 @@ $messages = array_merge($messages, [
                             </select>
                         </div>
                         <div class="form-group col col-md-3">
-                            <label for="diocesanCalendarDioceseName" class="font-weight-bold">Diocese:</label>
+                            <label for="diocesanCalendarDioceseName" class="font-weight-bold"><?php _e("Diocese"); ?>:</label>
                             <input list="DiocesesList" class="form-control" id="diocesanCalendarDioceseName" required>
                             <datalist id="DiocesesList">
                                 <option value=""></option>
                             </datalist>
                         </div>
                         <div class="form-group col col-md-4">
-                            <label for="diocesanCalendarBehaviour" class="font-weight-bold">Overwrites universal / national calendar</label>
+                            <label for="diocesanCalendarBehaviour" class="font-weight-bold"><?php _e("Overwrites universal / national calendar"); ?></label>
                             <input type="checkbox" class="form-control" data-toggle="toggle" id="diocesanCalendarBehaviour" aria-describedby="diocesanCalendarBehaviourHelp">
                             <small id="diocesanCalendarBehaviourHelp" class="form-text text-muted">The default behaviour for a diocesan calendar is to juxtapose the local celebrations alongside those of the universal and the national calendar. If instead the diocesan calendar should override the universal calendar, turn this option on.</small>
                         </div>
@@ -154,7 +292,6 @@ $messages = array_merge($messages, [
                                         <!--<div class="row no-gutters align-items-center">
                                             <div class="col mr-2">-->
                                                 <form>
-                                                    <?php FormControls::setOption("properField",false) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Principal Patron(s) of the Place, Diocese, Region, Province or Territory")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Dedication of the Cathedral")) ?>
                                                 </form>
@@ -176,7 +313,6 @@ $messages = array_merge($messages, [
                                                 <form>
                                                     <?php FormControls::CreateFestivityRow(__("Patron(s) of the Place, Diocese, Region, Province or Territory")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Dedication of the Cathedral")) ?>
-                                                    <?php FormControls::setOption("properField",true) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Other Feast")) ?>
                                                 </form>
                                             <!--</div>
@@ -195,7 +331,7 @@ $messages = array_merge($messages, [
                                         <!--<div class="row no-gutters align-items-center">
                                             <div class="col mr-2">-->
                                                 <form>
-                                                    <?php FormControls::CreateFestivityRow(__("Secondary patron(s) of the Place, Diocese, Region, Province or Territory")) ?>
+                                                    <?php FormControls::CreateFestivityRow(__("Secondary Patron(s) of the Place, Diocese, Region, Province or Territory")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Other Memorial")) ?>
                                                 </form>
                                             <!--</div>
