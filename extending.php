@@ -146,6 +146,14 @@ $messages = array_merge($messages, [
         "it" => "Dedicazione della Cattedrale",
         "pt" => ""
     ],
+    "Other Solemnity" => [
+        "de" => "",
+        "en" => "Other Solemnity",
+        "es" => "",
+        "fr" => "",
+        "it" => "Altra Solennità",
+        "pt" => ""
+    ],
     "Other Feast" => [
         "de" => "",
         "en" => "Other Feast",
@@ -251,6 +259,7 @@ $messages = array_merge($messages, [
                             <datalist id="DiocesesList">
                                 <option value=""></option>
                             </datalist>
+                            <div class="col text-center"><button class="btn btn-primary m-2 disabled">Retrieve existing data</button></div>
                         </div>
                         <div class="form-group col col-md-4">
                             <label for="diocesanCalendarBehaviour" class="font-weight-bold"><?php _e("Overwrites universal / national calendar"); ?></label>
@@ -260,7 +269,7 @@ $messages = array_merge($messages, [
                     </form>
                 </div>
                 <nav aria-label="Diocesan calendar definition" id="diocesanCalendarDefinitionCardLinks">
-                    <ul class="pagination pagination-lg justify-content-center">
+                    <ul class="pagination pagination-lg justify-content-center m-1">
                         <li class="page-item disabled">
                             <a class="page-link diocesan-carousel-prev" href="#" tabindex="-1" aria-disabled="true" aria-labeled="Previous"><span aria-hidden="true">&laquo;</span></a>
                         </li>
@@ -284,9 +293,9 @@ $messages = array_merge($messages, [
                     <div class="carousel-inner">
                         <div class="carousel-item active" id="carouselItemSolemnities">
                             <div class="container-fluid">
-                                <div class="card border-left-primary m-5">
+                                <div class="card border-left-primary mr-5 mx-5">
                                     <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Solemnities"); ?></h6>
+                                        <h4 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Solemnities"); ?></h4>
                                     </div>
                                     <div class="card-body">
                                         <!--<div class="row no-gutters align-items-center">
@@ -294,6 +303,7 @@ $messages = array_merge($messages, [
                                                 <form>
                                                     <?php FormControls::CreateFestivityRow(__("Principal Patron(s) of the Place, Diocese, Region, Province or Territory")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Dedication of the Cathedral")) ?>
+                                                    <?php FormControls::CreateFestivityRow(__("Other Solemnity")) ?>
                                                 </form>
                                             <!--</div>
                                         </div>-->
@@ -303,9 +313,9 @@ $messages = array_merge($messages, [
                         </div>
                         <div class="carousel-item" id="carouselItemFeasts">
                             <div class="container-fluid">
-                                <div class="card border-left-primary m-5">
+                                <div class="card border-left-primary mr-5 mx-5">
                                     <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Feasts"); ?></h6>
+                                        <h4 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Feasts"); ?></h4>
                                     </div>
                                     <div class="card-body">
                                         <!--<div class="row no-gutters align-items-center">
@@ -323,15 +333,16 @@ $messages = array_merge($messages, [
                         </div>
                         <div class="carousel-item" id="carouselItemMemorials">
                             <div class="container-fluid">
-                                <div class="card border-left-primary m-5">
+                                <div class="card border-left-primary mr-5 mx-5">
                                     <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Memorials"); ?></h6>
+                                        <h4 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Memorials"); ?></h4>
                                     </div>
                                     <div class="card-body">
                                         <!--<div class="row no-gutters align-items-center">
                                             <div class="col mr-2">-->
                                                 <form>
                                                     <?php FormControls::CreateFestivityRow(__("Secondary Patron(s) of the Place, Diocese, Region, Province or Territory")) ?>
+                                                    <?php FormControls::CreateFestivityRow(__("Other Memorial")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Other Memorial")) ?>
                                                 </form>
                                             <!--</div>
@@ -342,15 +353,16 @@ $messages = array_merge($messages, [
                         </div>
                         <div class="carousel-item" id="carouselItemOptionalMemorials">
                             <div class="container-fluid">
-                                <div class="card border-left-primary m-5">
+                                <div class="card border-left-primary mr-5 mx-5">
                                     <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Optional Memorials"); ?></h6>
+                                        <h4 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Optional Memorials"); ?></h4>
                                     </div>
                                     <div class="card-body">
                                         <!--<div class="row no-gutters align-items-center">
                                             <div class="col mr-2">-->
                                                 <form>
                                                     <?php FormControls::CreateFestivityRow(__("Saints whos veneration is local to the Place, Diocese, Region, Province or Territory")) ?>
+                                                    <?php FormControls::CreateFestivityRow(__("Other Optional Memorial")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Other Optional Memorial")) ?>
                                                 </form>
                                             <!--</div>
@@ -368,8 +380,15 @@ $messages = array_merge($messages, [
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="sr-only">Next</span>
                     </a>
-                </div>                
-                <form>
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col text-center">
+                            <button class="btn btn-lg btn-primary m-1" id="saveDiocesanCalendar_btn">SAVE DIOCESAN CALENDAR</button>
+                        </div>
+                    </div>
+                </div>
+                <!--<form>
                     <div class="form-group">
                         <label for="exampleInputEmail1">Email address</label>
                         <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
@@ -384,7 +403,7 @@ $messages = array_merge($messages, [
                         <label class="form-check-label" for="exampleCheck1">Check me out</label>
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
+                </form>-->
                 <?php
             break;
         }
@@ -402,13 +421,14 @@ $messages = array_merge($messages, [
     $ITALYDiocesesArr = ["Acerenza","Acerra","Acireale","Acqui","Adria - Rovigo","Agrigento","Alba","Albano","Albenga - Imperia","Ales - Terralba","Alessandria","Alghero - Bosa","Alife - Caiazzo","Altamura - Gravina - Acquaviva delle Fonti","Amalfi - Cava de' Tirreni","Anagni - Alatri","Ancona - Osimo","Andria","Aosta","Arezzo - Cortona - Sansepolcro","Ariano Irpino - Lacedonia","Ascoli Piceno","Assisi - Nocera Umbra - Gualdo Tadino","Asti","Avellino","Aversa","Avezzano","Bari - Bitonto","Belluno - Feltre","Benevento","Bergamo","Biella","Bologna","Bolzano - Bressanone, Bozen - Brixen","Brescia","Brindisi - Ostuni","Cagliari","Caltagirone","Caltanissetta","Camerino - San Severino Marche","Campobasso - Boiano","Capua","Carpi","Casale Monferrato","Caserta","Cassano all'Jonio","Castellaneta","Catania","Catanzaro - Squillace","Cefalù","Cerignola - Ascoli Satriano","Cerreto Sannita - Telese - Sant'Agata de' Goti","Cesena - Sarsina","Chiavari","Chieti - Vasto","Chioggia","Città di Castello","Civita Castellana","Civitavecchia - Tarquinia","Como","Concordia - Pordenone","Conversano - Monopoli","Cosenza - Bisignano","Crema","Cremona","Crotone - Santa Severina","Cuneo","Esarcato Apostolico per i fedeli cattolici ucraini di rito bizantino residenti in Italia","Fabriano - Matelica","Faenza - Modigliana","Fano - Fossombrone - Cagli - Pergola","Fermo","Ferrara - Comacchio","Fidenza","Fiesole","Firenze","Foggia - Bovino","Foligno","Forlì - Bertinoro","Fossano","Frascati","Frosinone - Veroli - Ferentino","Gaeta","Genova","Gorizia","Grosseto","Gubbio","Iglesias","Imola","Ischia","Isernia - Venafro","Ivrea","Jesi","La Spezia - Sarzana - Brugnato","Lamezia Terme","Lanciano - Ortona","Lanusei","L'Aquila","Latina - Terracina - Sezze - Priverno","Lecce","Livorno","Locri - Gerace","Lodi","Loreto","Lucca","Lucera - Troia","Lungro","Macerata - Tolentino - Recanati - Cingoli - Treia","Manfredonia - Vieste - San Giovanni Rotondo","Mantova","Massa Carrara - Pontremoli","Massa Marittima - Piombino","Matera - Irsina","Mazara del Vallo","Melfi - Rapolla - Venosa","Messina - Lipari - Santa Lucia del Mela","Milano","Mileto - Nicotera - Tropea","Modena - Nonantola","Molfetta - Ruvo - Giovinazzo - Terlizzi","Mondovì","Monreale","Monte Oliveto Maggiore","Montecassino","Montepulciano - Chiusi - Pienza","Montevergine","Napoli","Nardò - Gallipoli","Nicosia","Nocera Inferiore - Sarno","Nola","Noto","Novara","Nuoro","Oppido Mamertina - Palmi","Ordinariato Militare","Oria","Oristano","Orvieto - Todi","Ostia","Otranto","Ozieri","Padova","Palermo","Palestrina","Parma","Patti","Pavia","Perugia - Città della Pieve","Pesaro","Pescara - Penne","Pescia","Piacenza - Bobbio","Piana degli Albanesi","Piazza Armerina","Pinerolo","Pisa","Pistoia","Pitigliano - Sovana - Orbetello","Pompei","Porto - Santa Rufina","Potenza - Muro Lucano - Marsico Nuovo","Pozzuoli","Prato","Ragusa","Ravenna - Cervia","Reggio Calabria - Bova","Reggio Emilia - Guastalla","Rieti","Rimini","Roma","Rossano - Cariati","Sabina - Poggio Mirteto","Salerno - Campagna - Acerno","Saluzzo","San Benedetto del Tronto - Ripatransone - Montalto","San Marco Argentano - Scalea","San Marino - Montefeltro","San Miniato","San Severo","Santa Maria di Grottaferrata","Sant'Angelo dei Lombardi - Conza - Nusco - Bisaccia","Santissima Trinità di Cava de' Tirreni","Sassari","Savona - Noli","Senigallia","Sessa Aurunca","Siena - Colle di Val d'Elsa - Montalcino","Siracusa","Sora - Cassino - Aquino - Pontecorvo","Sorrento - Castellammare di Stabia","Spoleto - Norcia","Subiaco","Sulmona - Valva","Susa","Taranto","Teano - Calvi","Teggiano - Policastro","Tempio - Ampurias","Teramo - Atri","Termoli - Larino","Terni - Narni - Amelia","Tivoli","Torino","Tortona","Trani - Barletta - Bisceglie","Trapani","Trento","Treviso","Tricarico","Trieste","Trivento","Tursi - Lagonegro","Udine","Ugento - Santa Maria di Leuca","Urbino - Urbania - Sant'Angelo in Vado","Vallo della Lucania","Velletri - Segni","Venezia","Ventimiglia - San Remo","Vercelli","Verona","Vicenza","Vigevano","Viterbo","Vittorio Veneto","Volterra"];
 
     class litEvent {
-        constructor(name="",color="",grade=0,common="",day=1,month=1){
+        constructor(name="",color="",grade=0,common="",day=1,month=1,formRowNum=-1){
             this.name = name;
             this.color = color;
             this.grade = grade;
             this.common = common;
             this.day = day;
             this.month = month;
+            this.formRowNum = formRowNum;
         }
     }
 
@@ -460,6 +480,7 @@ $messages = array_merge($messages, [
 
         $(document).on('change','.litEvent',function(event){
             $row = $(this).closest('.form-row');
+            $card = $(this).closest('.card-body');
             if($(this).hasClass('litEventName')){
                 if($(this).val() == ''){
                     //empty value probably means we are trying to delete an already defined event
@@ -488,6 +509,7 @@ $messages = array_merge($messages, [
                         $CALENDAR.LitCal[eventKey].month = parseInt($row.find('.litEventMonth').val());
                         $CALENDAR.LitCal[eventKey].color = $row.find('.litEventColor').val();
                         $CALENDAR.LitCal[eventKey].common = $row.find('.litEventProper').val();
+                        $CALENDAR.LitCal[eventKey].formRowNum = $card.find('.form-row').index($row);
                         $(this).attr('data-valuewas',eventKey);
                         $(this).removeClass('is-invalid');
                     } else if ( $(this).attr('data-valuewas') != '' ) {
@@ -551,6 +573,28 @@ $messages = array_merge($messages, [
                 }
             }
         });
+
+        $(document).on('click','#saveDiocesanCalendar_btn', function(){
+            $data = JSON.stringify($CALENDAR);
+            $nation = $('#diocesanCalendarNationalDependency').val();
+            $diocese = $('#diocesanCalendarDioceseName').val();
+            console.log('save button was clicked for NATION = ' + $nation + ', DIOCESE = ' + $diocese);
+            $.ajax({
+                url: './writeDiocesanCalendar.php',
+                method: 'post',
+                data: { calendar: $data, diocese: $diocese, nation: $nation },
+                success: function(data){
+                    console.log('data returned from save action: ');
+                    console.log(data);
+                    $('<div class="toast" role="alert" aria-live="assertive" aria-atomic="true"><div class="toast-header"><img src="..." class="rounded mr-2" alt="..."><strong class="mr-auto">Bootstrap</strong><small class="text-muted">just now</small><button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="toast-body">See? Just like this.</div></div>').toast();
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                    console.log(textStatus + ': ' + errorThrown);
+                    alert('there was an error!');
+                }
+            });
+        });
+
 
     });
 </script>
