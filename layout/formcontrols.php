@@ -23,20 +23,21 @@ class FormControls {
 
         if(self::$settings["nameField"]){
             $formRow .= "<div class=\"form-group col-sm-4\">" .
-            "<label for=\"{$uniqid}Name\">" . __("Name") . "</label><input type=\"text\" class=\"form-control\" id=\"{$uniqid}Name\" />" .
+            "<label for=\"{$uniqid}Name\">" . __("Name") . "</label><input type=\"text\" class=\"form-control litEvent litEventName\" id=\"{$uniqid}Name\" data-valuewas=\"\" />" .
+            "<div class=\"invalid-feedback\">This same celebration was already defined elsewhere. Please remove it first where it is defined, then you can define it here.</div>" .
             "</div>";
         }
 
         if(self::$settings["dayField"]){
             $formRow .= "<div class=\"form-group col-sm-1\">" .
-            "<label for=\"{$uniqid}Day\">" . __("Day") . "</label><input type=\"number\" min=1 max=31 value=1 class=\"form-control\" id=\"{$uniqid}Day\" />" .
+            "<label for=\"{$uniqid}Day\">" . __("Day") . "</label><input type=\"number\" min=1 max=31 value=1 class=\"form-control litEvent litEventDay\" id=\"{$uniqid}Day\" />" .
             "</div>";
         }
 
         if(self::$settings["monthField"]){
             $formRow .= "<div class=\"form-group col-sm-2\">" .
             "<label for=\"{$uniqid}Month\">" . __("Month") . "</label>" .
-            "<select class=\"form-control\" id=\"{$uniqid}Month\">";
+            "<select class=\"form-control litEvent litEventMonth\" id=\"{$uniqid}Month\">";
             $formatter = new IntlDateFormatter(LITCAL_LOCALE, IntlDateFormatter::FULL, IntlDateFormatter::NONE);
             $formatter->setPattern("MMMM");
             for($i=1;$i<=12;$i++){
@@ -51,7 +52,7 @@ class FormControls {
         if(self::$settings["colorField"]){
             $formRow .= "<div class=\"form-group col-sm-2\">" .
             "<label for=\"{$uniqid}Color\">" . __("Liturgical color") . "</label>" .
-            "<select class=\"form-control\" id=\"{$uniqid}Color\" />" .
+            "<select class=\"form-control litEvent litEventColor\" id=\"{$uniqid}Color\" />" .
             "<option value=\"WHITE\" selected>" . strtoupper(__("white") ) . "</option>" .
             "<option value=\"RED\">" . strtoupper(__("red") ) . "</option>" .
             "<option value=\"PURPLE\">" . strtoupper(__("purple") ) . "</option>" .
@@ -63,7 +64,7 @@ class FormControls {
         if(self::$settings["properField"]){
             $formRow .= "<div class=\"form-group col-sm-3\">" .
             "<label for=\"{$uniqid}Proper\">" . __("Common (or Proper)") . "</label>" .
-            "<select class=\"form-control\" id=\"{$uniqid}Proper\" />" .
+            "<select class=\"form-control litEvent litEventProper\" id=\"{$uniqid}Proper\" />" .
             "<option value=\"PROPER\" selected>" . __("Proper") . "</option>" .
             "<option value=\"COMMONBVM\">" . __("Common of the Blessed Virgin Mary") . "</option>" .
             "<option value=\"COMMONMARTYRS\">" . __("Common of Martyrs") . "</option>" .

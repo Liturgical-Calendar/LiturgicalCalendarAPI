@@ -321,7 +321,7 @@ $messages = array_merge($messages, [
                                 </div>
                             </div>
                         </div>
-                        <div class="carousel-item">
+                        <div class="carousel-item" id="carouselItemMemorials">
                             <div class="container-fluid">
                                 <div class="card border-left-primary m-5">
                                     <div class="card-header py-3">
@@ -340,7 +340,7 @@ $messages = array_merge($messages, [
                                 </div>
                             </div>
                         </div>
-                        <div class="carousel-item">
+                        <div class="carousel-item" id="carouselItemOptionalMemorials">
                             <div class="container-fluid">
                                 <div class="card border-left-primary m-5">
                                     <div class="card-header py-3">
@@ -401,6 +401,19 @@ $messages = array_merge($messages, [
     }
     $ITALYDiocesesArr = ["Acerenza","Acerra","Acireale","Acqui","Adria - Rovigo","Agrigento","Alba","Albano","Albenga - Imperia","Ales - Terralba","Alessandria","Alghero - Bosa","Alife - Caiazzo","Altamura - Gravina - Acquaviva delle Fonti","Amalfi - Cava de' Tirreni","Anagni - Alatri","Ancona - Osimo","Andria","Aosta","Arezzo - Cortona - Sansepolcro","Ariano Irpino - Lacedonia","Ascoli Piceno","Assisi - Nocera Umbra - Gualdo Tadino","Asti","Avellino","Aversa","Avezzano","Bari - Bitonto","Belluno - Feltre","Benevento","Bergamo","Biella","Bologna","Bolzano - Bressanone, Bozen - Brixen","Brescia","Brindisi - Ostuni","Cagliari","Caltagirone","Caltanissetta","Camerino - San Severino Marche","Campobasso - Boiano","Capua","Carpi","Casale Monferrato","Caserta","Cassano all'Jonio","Castellaneta","Catania","Catanzaro - Squillace","Cefalù","Cerignola - Ascoli Satriano","Cerreto Sannita - Telese - Sant'Agata de' Goti","Cesena - Sarsina","Chiavari","Chieti - Vasto","Chioggia","Città di Castello","Civita Castellana","Civitavecchia - Tarquinia","Como","Concordia - Pordenone","Conversano - Monopoli","Cosenza - Bisignano","Crema","Cremona","Crotone - Santa Severina","Cuneo","Esarcato Apostolico per i fedeli cattolici ucraini di rito bizantino residenti in Italia","Fabriano - Matelica","Faenza - Modigliana","Fano - Fossombrone - Cagli - Pergola","Fermo","Ferrara - Comacchio","Fidenza","Fiesole","Firenze","Foggia - Bovino","Foligno","Forlì - Bertinoro","Fossano","Frascati","Frosinone - Veroli - Ferentino","Gaeta","Genova","Gorizia","Grosseto","Gubbio","Iglesias","Imola","Ischia","Isernia - Venafro","Ivrea","Jesi","La Spezia - Sarzana - Brugnato","Lamezia Terme","Lanciano - Ortona","Lanusei","L'Aquila","Latina - Terracina - Sezze - Priverno","Lecce","Livorno","Locri - Gerace","Lodi","Loreto","Lucca","Lucera - Troia","Lungro","Macerata - Tolentino - Recanati - Cingoli - Treia","Manfredonia - Vieste - San Giovanni Rotondo","Mantova","Massa Carrara - Pontremoli","Massa Marittima - Piombino","Matera - Irsina","Mazara del Vallo","Melfi - Rapolla - Venosa","Messina - Lipari - Santa Lucia del Mela","Milano","Mileto - Nicotera - Tropea","Modena - Nonantola","Molfetta - Ruvo - Giovinazzo - Terlizzi","Mondovì","Monreale","Monte Oliveto Maggiore","Montecassino","Montepulciano - Chiusi - Pienza","Montevergine","Napoli","Nardò - Gallipoli","Nicosia","Nocera Inferiore - Sarno","Nola","Noto","Novara","Nuoro","Oppido Mamertina - Palmi","Ordinariato Militare","Oria","Oristano","Orvieto - Todi","Ostia","Otranto","Ozieri","Padova","Palermo","Palestrina","Parma","Patti","Pavia","Perugia - Città della Pieve","Pesaro","Pescara - Penne","Pescia","Piacenza - Bobbio","Piana degli Albanesi","Piazza Armerina","Pinerolo","Pisa","Pistoia","Pitigliano - Sovana - Orbetello","Pompei","Porto - Santa Rufina","Potenza - Muro Lucano - Marsico Nuovo","Pozzuoli","Prato","Ragusa","Ravenna - Cervia","Reggio Calabria - Bova","Reggio Emilia - Guastalla","Rieti","Rimini","Roma","Rossano - Cariati","Sabina - Poggio Mirteto","Salerno - Campagna - Acerno","Saluzzo","San Benedetto del Tronto - Ripatransone - Montalto","San Marco Argentano - Scalea","San Marino - Montefeltro","San Miniato","San Severo","Santa Maria di Grottaferrata","Sant'Angelo dei Lombardi - Conza - Nusco - Bisaccia","Santissima Trinità di Cava de' Tirreni","Sassari","Savona - Noli","Senigallia","Sessa Aurunca","Siena - Colle di Val d'Elsa - Montalcino","Siracusa","Sora - Cassino - Aquino - Pontecorvo","Sorrento - Castellammare di Stabia","Spoleto - Norcia","Subiaco","Sulmona - Valva","Susa","Taranto","Teano - Calvi","Teggiano - Policastro","Tempio - Ampurias","Teramo - Atri","Termoli - Larino","Terni - Narni - Amelia","Tivoli","Torino","Tortona","Trani - Barletta - Bisceglie","Trapani","Trento","Treviso","Tricarico","Trieste","Trivento","Tursi - Lagonegro","Udine","Ugento - Santa Maria di Leuca","Urbino - Urbania - Sant'Angelo in Vado","Vallo della Lucania","Velletri - Segni","Venezia","Ventimiglia - San Remo","Vercelli","Verona","Vicenza","Vigevano","Viterbo","Vittorio Veneto","Volterra"];
 
+    class litEvent {
+        constructor(name="",color="",grade=0,common="",day=1,month=1){
+            this.name = name;
+            this.color = color;
+            this.grade = grade;
+            this.common = common;
+            this.day = day;
+            this.month = month;
+        }
+    }
+
+    $CALENDAR = {LitCal:{}};
+
     jQuery(document).ready(function(){
         let $carousel = $('.carousel').carousel();
         $(document).on('click','#diocesanCalendarDefinitionCardLinks a.page-link', function(event){
@@ -442,6 +455,100 @@ $messages = array_merge($messages, [
                     $('#DiocesesList').empty();
                     $USDiocesesArr.forEach(diocese => $('#DiocesesList').append('<option data-value="' + diocese.replace(/[^a-zA-Z]/gi, '') + '" value="' + diocese + '">') );
                     break;
+            }
+        });
+
+        $(document).on('change','.litEvent',function(event){
+            $row = $(this).closest('.form-row');
+            if($(this).hasClass('litEventName')){
+                if($(this).val() == ''){
+                    //empty value probably means we are trying to delete an already defined event
+                    //so let's find the key and remove it
+                    oldEventKey = $(this).attr('data-valuewas');
+                    if($CALENDAR.LitCal.hasOwnProperty(oldEventKey)){
+                        delete $CALENDAR.LitCal[oldEventKey];
+                    }
+                    /*
+                    //so let's go back over all the name fields and recreate a clean LitCal object
+                    $CALENDAR = {LitCal:{}};
+                    $('#carouselItemSolemnities .form-row').each(function(idx,el){
+                        if($(el).find('.litEventName').val() != ''){
+                            eventKey = $(el).find('.litEventName').val().replace(/[^a-zA-Z]/gi, '');
+
+                        }
+                    });
+                    */
+                } else {
+                    eventKey = $(this).val().replace(/[^a-zA-Z]/gi, '');
+                    if( $(this).attr('data-valuewas') == '' && $CALENDAR.LitCal.hasOwnProperty(eventKey) === false ){
+                        $CALENDAR.LitCal[eventKey] = new litEvent();
+                        $CALENDAR.LitCal[eventKey].name = $(this).val();
+                        //let's initialize defaults just in case the default input values happen to be correct, so no change events are fired
+                        $CALENDAR.LitCal[eventKey].day = parseInt($row.find('.litEventDay').val());
+                        $CALENDAR.LitCal[eventKey].month = parseInt($row.find('.litEventMonth').val());
+                        $CALENDAR.LitCal[eventKey].color = $row.find('.litEventColor').val();
+                        $CALENDAR.LitCal[eventKey].common = $row.find('.litEventProper').val();
+                        $(this).attr('data-valuewas',eventKey);
+                        $(this).removeClass('is-invalid');
+                    } else if ( $(this).attr('data-valuewas') != '' ) {
+                        oldEventKey = $(this).attr('data-valuewas');
+                        if($CALENDAR.LitCal.hasOwnProperty(oldEventKey)){
+                            if (oldEventKey !== eventKey) {
+                                Object.defineProperty($CALENDAR.LitCal, eventKey,
+                                    Object.getOwnPropertyDescriptor($CALENDAR.LitCal, oldEventKey));
+                                delete $CALENDAR.LitCal[oldEventKey];
+                                $(this).attr('data-valuewas',eventKey);
+                                $(this).removeClass('is-invalid');
+                            }
+                        }
+                    } else if ( $CALENDAR.LitCal.hasOwnProperty(eventKey) ){
+                        //this exact same festivity name was already defined elsewhere!
+                        $(this).val('');
+                        $(this).addClass('is-invalid');
+                    }
+                    switch($(this).closest('.carousel-item').attr('id')){
+                        case 'carouselItemSolemnities':
+                            $CALENDAR.LitCal[eventKey].grade = 6;
+                            break;
+                        case 'carouselItemFeasts':
+                            $CALENDAR.LitCal[eventKey].grade = 4;
+                            break;
+                        case 'carouselItemMemorials':
+                            $CALENDAR.LitCal[eventKey].grade = 3;
+                            break;
+                        case 'carouselItemOptionalMemorials':
+                            $CALENDAR.LitCal[eventKey].grade = 2;
+                            break;
+                    }
+                }
+            } else if ($(this).hasClass('litEventDay')) {
+                if($row.find('.litEventName').val() != ""){
+                    eventKey = $row.find('.litEventName').val().replace(/[^a-zA-Z]/gi, '');
+                    if( $CALENDAR.LitCal.hasOwnProperty(eventKey) ){
+                        $CALENDAR.LitCal[eventKey].day = parseInt($(this).val());
+                    }
+                }
+            } else if ($(this).hasClass('litEventMonth')) {
+                if($row.find('.litEventName').val() != ""){
+                    eventKey = $row.find('.litEventName').val().replace(/[^a-zA-Z]/gi, '');
+                    if( $CALENDAR.LitCal.hasOwnProperty(eventKey) ){
+                        $CALENDAR.LitCal[eventKey].month = parseInt($(this).val());
+                    }
+                }
+            } else if ($(this).hasClass('litEventColor')) {
+                if($row.find('.litEventName').val() != ""){
+                    eventKey = $row.find('.litEventName').val().replace(/[^a-zA-Z]/gi, '');
+                    if( $CALENDAR.LitCal.hasOwnProperty(eventKey) ){
+                        $CALENDAR.LitCal[eventKey].color = $(this).val();
+                    }
+                }
+            } else if ($(this).hasClass('litEventProper')) {
+                if($row.find('.litEventName').val() != ""){
+                    eventKey = $row.find('.litEventName').val().replace(/[^a-zA-Z]/gi, '');
+                    if( $CALENDAR.LitCal.hasOwnProperty(eventKey) ){
+                        $CALENDAR.LitCal[eventKey].common = $(this).val();
+                    }
+                }
             }
         });
 
