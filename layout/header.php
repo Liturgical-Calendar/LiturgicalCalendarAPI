@@ -1,5 +1,6 @@
 <?php 
 $currentPage = basename($_SERVER["SCRIPT_FILENAME"], '.php');
+$isStaging = (strpos(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),"-staging") !== false);
 ?>
 
 <!-- Page Wrapper -->
@@ -10,7 +11,7 @@ $currentPage = basename($_SERVER["SCRIPT_FILENAME"], '.php');
 
         <!-- Sidebar - Brand -->
         <li>
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/LiturgicalCalendar-staging">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/LiturgicalCalendar<?php echo $isStaging ? "-staging" : "" ?>">
                 <div class="sidebar-brand-text mx-3">Catholic Liturgical Calendar</div>
             </a>
         </li>
@@ -22,7 +23,7 @@ $currentPage = basename($_SERVER["SCRIPT_FILENAME"], '.php');
 
         <!-- Nav Item - Dashboard -->
         <li class="nav-item active">
-            <a class="nav-link" href="/LiturgicalCalendar-staging">
+            <a class="nav-link" href="/LiturgicalCalendar<?php echo $isStaging ? "-staging" : "" ?>">
                 <i class="fas fa-fw fa-cross"></i>
                 <span>Home</span>
             </a>
@@ -41,19 +42,19 @@ $currentPage = basename($_SERVER["SCRIPT_FILENAME"], '.php');
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="/LiturgicalCalendar/LitCalEngine.php">
+            <a class="nav-link" href="/LiturgicalCalendar<?php echo $isStaging ? "-staging" : "" ?>/LitCalEngine.php">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>API endpoint</span></a>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="/LiturgicalCalendar/dist/">
+            <a class="nav-link" href="/LiturgicalCalendar<?php echo $isStaging ? "-staging" : "" ?>/dist/">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>Swagger / Open API Docs</span></a>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="/LiturgicalCalendar/easter.php">
+            <a class="nav-link" href="/LiturgicalCalendar<?php echo $isStaging ? "-staging" : "" ?>/easter.php">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>Date of Easter</span></a>
         </li>
@@ -71,22 +72,22 @@ $currentPage = basename($_SERVER["SCRIPT_FILENAME"], '.php');
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="/LiturgicalCalendar/examples/php/">
+            <a class="nav-link" href="/LiturgicalCalendar<?php echo $isStaging ? "-staging" : "" ?>/examples/php/">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>PHP + cURL</span></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="/LiturgicalCalendar/examples/javascript/">
+            <a class="nav-link" href="/LiturgicalCalendar<?php echo $isStaging ? "-staging" : "" ?>/examples/javascript/">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>HTML + AJAX</span></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="/LiturgicalCalendar/examples/fullcalendar/examples/month-view.html">
+            <a class="nav-link" href="/LiturgicalCalendar<?php echo $isStaging ? "-staging" : "" ?>/examples/fullcalendar/examples/month-view.html">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>Full Calendar</span></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="/LiturgicalCalendar/examples/fullcalendar/examples/messages.html">
+            <a class="nav-link" href="/LiturgicalCalendar<?php echo $isStaging ? "-staging" : "" ?>/examples/fullcalendar/examples/messages.html">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>Full Calendar (messages first)</span></a>
         </li>

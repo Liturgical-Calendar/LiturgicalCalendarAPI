@@ -698,11 +698,32 @@ let today = new Date(),
                 duration: 500
             },
             autoOpen: false
-        });        
-    };
+        });
+    },
+    $index = {},
+    $DiocesesUSA,
+    $DiocesesITALY,
+    isStaging = window.location.pathname.includes('-staging');
+
+    jQuery.ajax({
+        url: "../../nations/index.json",
+        dataType: 'json',
+        statusCode: {
+            404: function() {
+                console.log('The JSON definition "nations/index.json" does not exist yet.');
+            }
+        },
+        success: function(data){
+            console.log('retrieved data from index file:');
+            console.log(data);
+            $index = data;
+        }
+    });
+
 
 $(document).ready(function() {
     document.title = __("Generate Roman Calendar");
+    if(isStaging){ $('.backNav').attr('href','/LiturgicalCalendar-staging/usage.php'); }
     createHeader();
     $(document).on('click', '#openSettings', function() {
         $('#settingsWrapper').dialog("open");
@@ -779,7 +800,19 @@ $(document).ready(function() {
             $Settings.diocesanpreset = '';
             $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
             $Settings.nationalpreset = 'USA';
-          break;
+            
+            $('#diocesanpreset').empty();
+            $DiocesesUSA = Object.filter($index, key => key.nation == "USA");
+            if(Object.keys($DiocesesUSA).length > 0){
+              $('#diocesanpreset').prop('disabled', false);
+              for(const [key, value] of Object.entries($DiocesesUSA)){
+                $('#diocesanpreset').append('<option value="' + key + '">' + value.diocese + '</option>');
+              }
+            } else {
+              $('#diocesanpreset').prop('disabled', true);
+            }
+
+            break;
           default:
             $('#calSettingsForm :input').prop('disabled',false);
             $('#diocesanpreset').val("").prop('disabled',true);
@@ -793,3 +826,9 @@ $(document).ready(function() {
 
     $('#settingsWrapper').dialog("open");
 });
+
+Object.filter = (obj, predicate) => 
+Object.keys(obj)
+      .filter( key => predicate(obj[key]) )
+      .reduce( (res, key) => (res[key] = obj[key], res), {} );
+

@@ -12,7 +12,7 @@ foreach($USStates as $state => $arr){
 }
 sort($USDioceses);
 
-$ITALYDioceses = ["Acerenza","Acerra","Acireale","Acqui","Adria - Rovigo","Agrigento","Alba","Albano","Albenga - Imperia","Ales - Terralba","Alessandria","Alghero - Bosa","Alife - Caiazzo","Altamura - Gravina - Acquaviva delle Fonti","Amalfi - Cava de' Tirreni","Anagni - Alatri","Ancona - Osimo","Andria","Aosta","Arezzo - Cortona - Sansepolcro","Ariano Irpino - Lacedonia","Ascoli Piceno","Assisi - Nocera Umbra - Gualdo Tadino","Asti","Avellino","Aversa","Avezzano","Bari - Bitonto","Belluno - Feltre","Benevento","Bergamo","Biella","Bologna","Bolzano - Bressanone, Bozen - Brixen","Brescia","Brindisi - Ostuni","Cagliari","Caltagirone","Caltanissetta","Camerino - San Severino Marche","Campobasso - Boiano","Capua","Carpi","Casale Monferrato","Caserta","Cassano all'Jonio","Castellaneta","Catania","Catanzaro - Squillace","Cefalù","Cerignola - Ascoli Satriano","Cerreto Sannita - Telese - Sant'Agata de' Goti","Cesena - Sarsina","Chiavari","Chieti - Vasto","Chioggia","Città di Castello","Civita Castellana","Civitavecchia - Tarquinia","Como","Concordia - Pordenone","Conversano - Monopoli","Cosenza - Bisignano","Crema","Cremona","Crotone - Santa Severina","Cuneo","Esarcato Apostolico per i fedeli cattolici ucraini di rito bizantino residenti in Italia","Fabriano - Matelica","Faenza - Modigliana","Fano - Fossombrone - Cagli - Pergola","Fermo","Ferrara - Comacchio","Fidenza","Fiesole","Firenze","Foggia - Bovino","Foligno","Forlì - Bertinoro","Fossano","Frascati","Frosinone - Veroli - Ferentino","Gaeta","Genova","Gorizia","Grosseto","Gubbio","Iglesias","Imola","Ischia","Isernia - Venafro","Ivrea","Jesi","La Spezia - Sarzana - Brugnato","Lamezia Terme","Lanciano - Ortona","Lanusei","L'Aquila","Latina - Terracina - Sezze - Priverno","Lecce","Livorno","Locri - Gerace","Lodi","Loreto","Lucca","Lucera - Troia","Lungro","Macerata - Tolentino - Recanati - Cingoli - Treia","Manfredonia - Vieste - San Giovanni Rotondo","Mantova","Massa Carrara - Pontremoli","Massa Marittima - Piombino","Matera - Irsina","Mazara del Vallo","Melfi - Rapolla - Venosa","Messina - Lipari - Santa Lucia del Mela","Milano","Mileto - Nicotera - Tropea","Modena - Nonantola","Molfetta - Ruvo - Giovinazzo - Terlizzi","Mondovì","Monreale","Monte Oliveto Maggiore","Montecassino","Montepulciano - Chiusi - Pienza","Montevergine","Napoli","Nardò - Gallipoli","Nicosia","Nocera Inferiore - Sarno","Nola","Noto","Novara","Nuoro","Oppido Mamertina - Palmi","Ordinariato Militare","Oria","Oristano","Orvieto - Todi","Ostia","Otranto","Ozieri","Padova","Palermo","Palestrina","Parma","Patti","Pavia","Perugia - Città della Pieve","Pesaro","Pescara - Penne","Pescia","Piacenza - Bobbio","Piana degli Albanesi","Piazza Armerina","Pinerolo","Pisa","Pistoia","Pitigliano - Sovana - Orbetello","Pompei","Porto - Santa Rufina","Potenza - Muro Lucano - Marsico Nuovo","Pozzuoli","Prato","Ragusa","Ravenna - Cervia","Reggio Calabria - Bova","Reggio Emilia - Guastalla","Rieti","Rimini","Roma","Rossano - Cariati","Sabina - Poggio Mirteto","Salerno - Campagna - Acerno","Saluzzo","San Benedetto del Tronto - Ripatransone - Montalto","San Marco Argentano - Scalea","San Marino - Montefeltro","San Miniato","San Severo","Santa Maria di Grottaferrata","Sant'Angelo dei Lombardi - Conza - Nusco - Bisaccia","Santissima Trinità di Cava de' Tirreni","Sassari","Savona - Noli","Senigallia","Sessa Aurunca","Siena - Colle di Val d'Elsa - Montalcino","Siracusa","Sora - Cassino - Aquino - Pontecorvo","Sorrento - Castellammare di Stabia","Spoleto - Norcia","Subiaco","Sulmona - Valva","Susa","Taranto","Teano - Calvi","Teggiano - Policastro","Tempio - Ampurias","Teramo - Atri","Termoli - Larino","Terni - Narni - Amelia","Tivoli","Torino","Tortona","Trani - Barletta - Bisceglie","Trapani","Trento","Treviso","Tricarico","Trieste","Trivento","Tursi - Lagonegro","Udine","Ugento - Santa Maria di Leuca","Urbino - Urbania - Sant'Angelo in Vado","Vallo della Lucania","Velletri - Segni","Venezia","Ventimiglia - San Remo","Vercelli","Verona","Vicenza","Vigevano","Viterbo","Vittorio Veneto","Volterra"];
+$ITALYDioceses = ["Acerenza","Acerra","Acireale","Acqui","Adria - Rovigo","Agrigento","Alba","Albano","Albenga - Imperia","Ales - Terralba","Alessandria","Alghero - Bosa","Alife - Caiazzo","Altamura - Gravina - Acquaviva delle Fonti","Amalfi - Cava de' Tirreni","Anagni - Alatri","Ancona - Osimo","Andria","Aosta","Arezzo - Cortona - Sansepolcro","Ariano Irpino - Lacedonia","Ascoli Piceno","Assisi - Nocera Umbra - Gualdo Tadino","Asti","Avellino","Aversa","Avezzano","Bari - Bitonto","Belluno - Feltre","Benevento","Bergamo","Biella","Bologna","Bolzano - Bressanone, Bozen - Brixen","Brescia","Brindisi - Ostuni","Cagliari","Caltagirone","Caltanissetta","Camerino - San Severino Marche","Campobasso - Boiano","Capua","Carpi","Casale Monferrato","Caserta","Cassano all'Jonio","Castellaneta","Catania","Catanzaro - Squillace","Cefalù","Cerignola - Ascoli Satriano","Cerreto Sannita - Telese - Sant'Agata de' Goti","Cesena - Sarsina","Chiavari","Chieti - Vasto","Chioggia","Città di Castello","Civita Castellana","Civitavecchia - Tarquinia","Como","Concordia - Pordenone","Conversano - Monopoli","Cosenza - Bisignano","Crema","Cremona","Crotone - Santa Severina","Cuneo","Esarcato Apostolico per i fedeli cattolici ucraini di rito bizantino residenti in ITALY","Fabriano - Matelica","Faenza - Modigliana","Fano - Fossombrone - Cagli - Pergola","Fermo","Ferrara - Comacchio","Fidenza","Fiesole","Firenze","Foggia - Bovino","Foligno","Forlì - Bertinoro","Fossano","Frascati","Frosinone - Veroli - Ferentino","Gaeta","Genova","Gorizia","Grosseto","Gubbio","Iglesias","Imola","Ischia","Isernia - Venafro","Ivrea","Jesi","La Spezia - Sarzana - Brugnato","Lamezia Terme","Lanciano - Ortona","Lanusei","L'Aquila","Latina - Terracina - Sezze - Priverno","Lecce","Livorno","Locri - Gerace","Lodi","Loreto","Lucca","Lucera - Troia","Lungro","Macerata - Tolentino - Recanati - Cingoli - Treia","Manfredonia - Vieste - San Giovanni Rotondo","Mantova","Massa Carrara - Pontremoli","Massa Marittima - Piombino","Matera - Irsina","Mazara del Vallo","Melfi - Rapolla - Venosa","Messina - Lipari - Santa Lucia del Mela","Milano","Mileto - Nicotera - Tropea","Modena - Nonantola","Molfetta - Ruvo - Giovinazzo - Terlizzi","Mondovì","Monreale","Monte Oliveto Maggiore","Montecassino","Montepulciano - Chiusi - Pienza","Montevergine","Napoli","Nardò - Gallipoli","Nicosia","Nocera Inferiore - Sarno","Nola","Noto","Novara","Nuoro","Oppido Mamertina - Palmi","Ordinariato Militare","Oria","Oristano","Orvieto - Todi","Ostia","Otranto","Ozieri","Padova","Palermo","Palestrina","Parma","Patti","Pavia","Perugia - Città della Pieve","Pesaro","Pescara - Penne","Pescia","Piacenza - Bobbio","Piana degli Albanesi","Piazza Armerina","Pinerolo","Pisa","Pistoia","Pitigliano - Sovana - Orbetello","Pompei","Porto - Santa Rufina","Potenza - Muro Lucano - Marsico Nuovo","Pozzuoli","Prato","Ragusa","Ravenna - Cervia","Reggio Calabria - Bova","Reggio Emilia - Guastalla","Rieti","Rimini","Roma","Rossano - Cariati","Sabina - Poggio Mirteto","Salerno - Campagna - Acerno","Saluzzo","San Benedetto del Tronto - Ripatransone - Montalto","San Marco Argentano - Scalea","San Marino - Montefeltro","San Miniato","San Severo","Santa Maria di Grottaferrata","Sant'Angelo dei Lombardi - Conza - Nusco - Bisaccia","Santissima Trinità di Cava de' Tirreni","Sassari","Savona - Noli","Senigallia","Sessa Aurunca","Siena - Colle di Val d'Elsa - Montalcino","Siracusa","Sora - Cassino - Aquino - Pontecorvo","Sorrento - Castellammare di Stabia","Spoleto - Norcia","Subiaco","Sulmona - Valva","Susa","Taranto","Teano - Calvi","Teggiano - Policastro","Tempio - Ampurias","Teramo - Atri","Termoli - Larino","Terni - Narni - Amelia","Tivoli","Torino","Tortona","Trani - Barletta - Bisceglie","Trapani","Trento","Treviso","Tricarico","Trieste","Trivento","Tursi - Lagonegro","Udine","Ugento - Santa Maria di Leuca","Urbino - Urbania - Sant'Angelo in Vado","Vallo della Lucania","Velletri - Segni","Venezia","Ventimiglia - San Remo","Vercelli","Verona","Vicenza","Vigevano","Viterbo","Vittorio Veneto","Volterra"];
 
 /**
  * Define our translation strings
@@ -57,7 +57,161 @@ $messages = array_merge($messages, [
         "fr" => "Génére un calendrier diocésain",
         "it" => "Genera calendario diocesano",
         "pt" => "Gera calendário diocesano"
-    ]
+    ],
+    "Depends on national calendar" => [
+        "de" => "Hängt vom nationalen Kalender ab",
+        "en" => "Depends on national calendar",
+        "es" => "Depende del calendario nacional",
+        "fr" => "Dépend du calendrier national",
+        "it" => "Dipende dal calendario nazionale",
+        "pt" => "Depende do calendário nacional"
+    ],
+    "Diocese" => [
+        "de" => "Diözese",
+        "en" => "Diocese",
+        "es" => "Diócesis",
+        "fr" => "Diocèse",
+        "it" => "Diocesi",
+        "pt" => "Diocese"
+    ],
+    "Overwrites universal / national calendar" => [
+        "de" => "Überschreibt den universellen / nationalen Kalender",
+        "en" => "Overwrites universal / national calendar",
+        "es" => "Sobrescribe el calendario nacional / universal",
+        "fr" => "Remplace le calendrier universel / national",
+        "it" => "Sovrascrive il calendario universale / nazionale",
+        "pt" => "Substitui o calendário universal / nacional"
+    ],
+    "Define the Solemnities" => [
+        "de" => "Definieren Sie die Feierlichkeiten",
+        "en" => "Define the Solemnities",
+        "es" => "Definir las Solemnidades",
+        "fr" => "Définissez les Solennités",
+        "it" => "Definisci le Solennità",
+        "pt" => "Defina as Solenidades"
+    ],
+    "Define the Feasts" => [
+        "de" => "Definieren Sie die Feste",
+        "en" => "Define the Feasts",
+        "es" => "Definir las Fiestas",
+        "fr" => "Définissez les Fêtes",
+        "it" => "Definisci le Feste",
+        "pt" => "Defina as Festas"
+    ],
+    "Define the Memorials" => [
+        "de" => "Definieren Sie die Gedenkfeiern",
+        "en" => "Define the Memorials",
+        "es" => "Definir las Memoriales",
+        "fr" => "Définissez les Mémoriaux",
+        "it" => "Definisci le Memorie",
+        "pt" => "Defina as Memoriais"
+    ],
+    "Define the Optional Memorials" => [
+        "de" => "Definieren Sie die Optionale Gedenkfeiern",
+        "en" => "Define the Optional Memorials",
+        "es" => "Definir las Memoriales opcionales",
+        "fr" => "Définissez les Mémoriaux facultatifs",
+        "it" => "Definisci le Memorie facoltative",
+        "pt" => "Defina as Memoriais opcionais"
+    ],
+    "Principal Patron(s) of the Place, Diocese, Region, Province or Territory" => [
+        "de" => "Hauptpatron des Ortes, der Diözese, der Region, der Provinz oder des Territoriums",
+        "en" => "Principal Patron(s) of the Place, Diocese, Region, Province or Territory",
+        "es" => "Patrono(s) principal(es) del lugar, diócesis, región, provincia o territorio",
+        "fr" => "Principal(s) patron(s) du lieu, du diocèse, de la région, de la province ou du territoire",
+        "it" => "Patrono/i Principale/i del Luogo, Diocesi, Regione, Provincia o Territorio",
+        "pt" => "Patrono(s) Principal(is) do Lugar, Diocese, Região, Província ou Território"
+    ],
+    "Patron(s) of the Place, Diocese, Region, Province or Territory" => [
+        "de" => "Patron des Ortes, der Diözese, der Region, der Provinz oder des Territoriums",
+        "en" => "Patron(s) of the Place, Diocese, Region, Province or Territory",
+        "es" => "Patrono(s) del lugar, diócesis, región, provincia o territorio",
+        "fr" => "Patron(s) du lieu, du diocèse, de la région, de la province ou du territoire",
+        "it" => "Patrono/i del Luogo, Diocesi, Regione, Provincia o Territorio",
+        "pt" => "Patrono(s) do Lugar, Diocese, Região, Província ou Território"
+    ],
+    "Secondary Patron(s) of the Place, Diocese, Region, Province or Territory" => [
+        "de" => "Sekundärpatron des Ortes, der Diözese, der Region, der Provinz oder des Territoriums",
+        "en" => "Secondary Patron(s) of the Place, Diocese, Region, Province or Territory",
+        "es" => "Patrono(s) secundario(s) del lugar, diócesis, región, provincia o territorio",
+        "fr" => "Patron(s) secondaire(s) du lieu, du diocèse, de la région, de la province ou du territoire",
+        "it" => "Patrono/i Secondario/i del Luogo, Diocesi, Regione, Provincia o Territorio",
+        "pt" => "Patrono(s) secundário(s) do lugar, diocese, região, província ou território"
+    ],
+    "Dedication of the Cathedral" => [
+        "de" => "Einweihung der Kathedrale",
+        "en" => "Dedication of the Cathedral",
+        "es" => "Dedicación de la Catedral",
+        "fr" => "Dédicace de la cathédrale",
+        "it" => "Dedicazione della Cattedrale",
+        "pt" => "Dedicação da Catedral"
+    ],
+    "Other Solemnity" => [
+        "de" => "Andere Feierlichkeit",
+        "en" => "Other Solemnity",
+        "es" => "Otra solemnidad",
+        "fr" => "Autre solennité",
+        "it" => "Altra Solennità",
+        "pt" => "Outra Solenidade"
+    ],
+    "Other Feast" => [
+        "de" => "Anderes Fest",
+        "en" => "Other Feast",
+        "es" => "Otra fiesta",
+        "fr" => "Autre fête",
+        "it" => "Altra Festa",
+        "pt" => "Outra Festa"
+    ],
+    "Other Memorial" => [
+        "de" => "Anderes Denkmal",
+        "en" => "Other Memorial",
+        "es" => "Otro Memorial",
+        "fr" => "Autre mémorial",
+        "it" => "Altra Memoria",
+        "pt" => "Outro Memorial"
+    ],
+    "Other Optional Memorial" => [
+        "de" => "Anderes optionales Denkmal",
+        "en" => "Other Optional Memorial",
+        "es" => "Otro Memorial Opcional",
+        "fr" => "Autre mémorial facultatif",
+        "it" => "Altra Memoria Facoltativa",
+        "pt" => "Outro Memorial Opcional"
+    ],
+    "Saints whos veneration is local to the Place, Diocese, Region, Province or Territory" => [
+        "de" => "Heilige, deren Verehrung für den Ort, die Diözese, die Region, die Provinz oder das Territorium gilt",
+        "en" => "Saints whos veneration is local to the Place, Diocese, Region, Province or Territory",
+        "es" => "Santos cuya veneración es local del lugar, diócesis, región, provincia o territorio",
+        "fr" => "Saints dont la vénération est locale au lieu, au diocèse, à la région, à la province ou au territoire",
+        "it" => "Santi la venerazione dei quali è locale al Luogo, Diocesi, Regione, Provincia o Territorio",
+        "pt" => "Santos cuja veneração é local no lugar, diocese, região, província ou território"
+    ],
+    "Common (or Proper)" => [
+        "de" => "Common (oder Proper)",
+        "en" => "Common (or Proper)",
+        "es" => "Común (o Propio)",
+        "fr" => "Commun (ou Propre)",
+        "it" => "Comune (o Proprio)",
+        "pt" => "Comum (ou Próprio)"
+    ],
+    "This diocese does not seem to exist? Please choose from a value in the list." => [
+        "de" => "Diese Diözese scheint nicht zu existieren? Bitte wählen Sie aus einem Wert in der Liste.",
+        "en" => "This diocese does not seem to exist? Please choose from a value in the list.",
+        "es" => "¿Esta diócesis no parece existir? Elija un valor de la lista.",
+        "fr" => "Ce diocèse ne semble pas exister? Veuillez choisir parmi une valeur dans la liste.",
+        "it" => "Questa diocesi non sembra valida? Scegli un valore dalla lista.",
+        "pt" => "Esta diocese parece não existir? Escolha um valor da lista."
+    ],
+/*
+    "" => [
+        "de" => "",
+        "en" => "",
+        "es" => "",
+        "fr" => "",
+        "it" => "",
+        "pt" => ""
+    ],
+*/
 ]);
 
 ?>
@@ -98,31 +252,33 @@ $messages = array_merge($messages, [
             case "diocesan":
                 ?>
                 <div class="container">
-                    <form class="row justify-content-center">
+                    <form class="row justify-content-center needs-validation" novalidate>
                         <div class="form-group col col-md-3">
-                            <label for="diocesanCalendarNationalDependency" class="font-weight-bold">Depends on national calendar:</label>
+                            <label for="diocesanCalendarNationalDependency" class="font-weight-bold"><?php _e("Depends on national calendar"); ?>:</label>
                             <select class="form-control" id="diocesanCalendarNationalDependency" required>
                                 <option value=""></option>
-                                <option value="ITALIA">Italy</option>
+                                <option value="ITALY">Italy</option>
                                 <option value="USA">USA</option>
                             </select>
                         </div>
                         <div class="form-group col col-md-3">
-                            <label for="diocesanCalendarDioceseName" class="font-weight-bold">Diocese:</label>
+                            <label for="diocesanCalendarDioceseName" class="font-weight-bold"><?php _e("Diocese"); ?>:</label>
                             <input list="DiocesesList" class="form-control" id="diocesanCalendarDioceseName" required>
+                            <div class="invalid-feedback"><?php _e("This diocese does not seem to exist? Please choose from a value in the list."); ?></div>
                             <datalist id="DiocesesList">
                                 <option value=""></option>
                             </datalist>
+                            <div class="col text-center"><button class="btn btn-primary m-2" id="retrieveExistingDiocesanData" disabled>Retrieve existing data</button></div>
                         </div>
                         <div class="form-group col col-md-4">
-                            <label for="diocesanCalendarBehaviour" class="font-weight-bold">Overwrites universal / national calendar</label>
+                            <label for="diocesanCalendarBehaviour" class="font-weight-bold"><?php _e("Overwrites universal / national calendar"); ?></label>
                             <input type="checkbox" class="form-control" data-toggle="toggle" id="diocesanCalendarBehaviour" aria-describedby="diocesanCalendarBehaviourHelp">
                             <small id="diocesanCalendarBehaviourHelp" class="form-text text-muted">The default behaviour for a diocesan calendar is to juxtapose the local celebrations alongside those of the universal and the national calendar. If instead the diocesan calendar should override the universal calendar, turn this option on.</small>
                         </div>
                     </form>
                 </div>
                 <nav aria-label="Diocesan calendar definition" id="diocesanCalendarDefinitionCardLinks">
-                    <ul class="pagination pagination-lg justify-content-center">
+                    <ul class="pagination pagination-lg justify-content-center m-1">
                         <li class="page-item disabled">
                             <a class="page-link diocesan-carousel-prev" href="#" tabindex="-1" aria-disabled="true" aria-labeled="Previous"><span aria-hidden="true">&laquo;</span></a>
                         </li>
@@ -145,78 +301,81 @@ $messages = array_merge($messages, [
                     </ol>
                     <div class="carousel-inner">
                         <div class="carousel-item active" id="carouselItemSolemnities">
-                            <div class="container">
-                                <div class="card border-left-primary m-5">
+                            <div class="container-fluid">
+                                <div class="card border-left-primary mr-5 mx-5">
                                     <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Solemnities"); ?></h6>
+                                        <h4 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Solemnities"); ?></h4>
                                     </div>
                                     <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
-                                                <form>
+                                        <!--<div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">-->
+                                                <form class="needs-validation" novalidate>
                                                     <?php FormControls::CreateFestivityRow(__("Principal Patron(s) of the Place, Diocese, Region, Province or Territory")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Dedication of the Cathedral")) ?>
+                                                    <?php FormControls::CreateFestivityRow(__("Other Solemnity")) ?>
                                                 </form>
-                                            </div>
-                                        </div>
+                                            <!--</div>
+                                        </div>-->
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="carousel-item" id="carouselItemFeasts">
-                            <div class="container">
-                                <div class="card border-left-primary m-5">
+                            <div class="container-fluid">
+                                <div class="card border-left-primary mr-5 mx-5">
                                     <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Feasts"); ?></h6>
+                                        <h4 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Feasts"); ?></h4>
                                     </div>
                                     <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
-                                                <form>
+                                        <!--<div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">-->
+                                                <form class="needs-validation" novalidate>
                                                     <?php FormControls::CreateFestivityRow(__("Patron(s) of the Place, Diocese, Region, Province or Territory")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Dedication of the Cathedral")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Other Feast")) ?>
                                                 </form>
-                                            </div>
-                                        </div>
+                                            <!--</div>
+                                        </div>-->
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="carousel-item">
-                            <div class="container">
-                                <div class="card border-left-primary m-5">
+                        <div class="carousel-item" id="carouselItemMemorials">
+                            <div class="container-fluid">
+                                <div class="card border-left-primary mr-5 mx-5">
                                     <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Memorials"); ?></h6>
+                                        <h4 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Memorials"); ?></h4>
                                     </div>
                                     <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
-                                                <form>
-                                                    <?php FormControls::CreateFestivityRow(__("Secondary patron(s) of the Place, Diocese, Region, Province or Territory")) ?>
+                                        <!--<div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">-->
+                                                <form class="needs-validation" novalidate>
+                                                    <?php FormControls::CreateFestivityRow(__("Secondary Patron(s) of the Place, Diocese, Region, Province or Territory")) ?>
+                                                    <?php FormControls::CreateFestivityRow(__("Other Memorial")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Other Memorial")) ?>
                                                 </form>
-                                            </div>
-                                        </div>
+                                            <!--</div>
+                                        </div>-->
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="carousel-item">
-                            <div class="container">
-                                <div class="card border-left-primary m-5">
+                        <div class="carousel-item" id="carouselItemOptionalMemorials">
+                            <div class="container-fluid">
+                                <div class="card border-left-primary mr-5 mx-5">
                                     <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Optional Memorials"); ?></h6>
+                                        <h4 class="m-0 font-weight-bold text-primary"><i class="fas fa-place-of-worship fa-2x text-gray-300 mr-4"></i><?php _e("Generate Diocesan Calendar"); ?>: <?php _e("Define the Optional Memorials"); ?></h4>
                                     </div>
                                     <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
-                                                <form>
+                                        <!--<div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">-->
+                                                <form class="needs-validation" novalidate>
                                                     <?php FormControls::CreateFestivityRow(__("Saints whos veneration is local to the Place, Diocese, Region, Province or Territory")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Other Optional Memorial")) ?>
+                                                    <?php FormControls::CreateFestivityRow(__("Other Optional Memorial")) ?>
                                                 </form>
-                                            </div>
-                                        </div>
+                                            <!--</div>
+                                        </div>-->
                                     </div>
                                 </div>
                             </div>
@@ -230,8 +389,15 @@ $messages = array_merge($messages, [
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="sr-only">Next</span>
                     </a>
-                </div>                
-                <form>
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col text-center">
+                            <button class="btn btn-lg btn-primary m-1" id="saveDiocesanCalendar_btn">SAVE DIOCESAN CALENDAR</button>
+                        </div>
+                    </div>
+                </div>
+                <!--<form>
                     <div class="form-group">
                         <label for="exampleInputEmail1">Email address</label>
                         <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
@@ -246,7 +412,7 @@ $messages = array_merge($messages, [
                         <label class="form-check-label" for="exampleCheck1">Check me out</label>
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
+                </form>-->
                 <?php
             break;
         }
@@ -255,13 +421,52 @@ $messages = array_merge($messages, [
 <?php include_once('./layout/footer.php'); ?>
 <script>
 
+    const RANK = {
+        HIGHERSOLEMNITY: 7,
+        SOLEMNITY: 6,
+        FEASTLORD: 5,
+        FEAST: 4,
+        MEMORIAL: 3,
+        OPTIONALMEMORIAL: 2,
+        WEEKDAY: 1
+    }
+
     $USDiocesesObj = <?php echo $USDiocesesJSON; ?>;
     $USDiocesesArr = [];
     var c=0;
     for(const [state, arr] of Object.entries($USDiocesesObj)){
         arr.forEach(diocese => $USDiocesesArr[c++] = diocese + " (" + state + ")");
     }
-    $ITALYDiocesesArr = ["Acerenza","Acerra","Acireale","Acqui","Adria - Rovigo","Agrigento","Alba","Albano","Albenga - Imperia","Ales - Terralba","Alessandria","Alghero - Bosa","Alife - Caiazzo","Altamura - Gravina - Acquaviva delle Fonti","Amalfi - Cava de' Tirreni","Anagni - Alatri","Ancona - Osimo","Andria","Aosta","Arezzo - Cortona - Sansepolcro","Ariano Irpino - Lacedonia","Ascoli Piceno","Assisi - Nocera Umbra - Gualdo Tadino","Asti","Avellino","Aversa","Avezzano","Bari - Bitonto","Belluno - Feltre","Benevento","Bergamo","Biella","Bologna","Bolzano - Bressanone, Bozen - Brixen","Brescia","Brindisi - Ostuni","Cagliari","Caltagirone","Caltanissetta","Camerino - San Severino Marche","Campobasso - Boiano","Capua","Carpi","Casale Monferrato","Caserta","Cassano all'Jonio","Castellaneta","Catania","Catanzaro - Squillace","Cefalù","Cerignola - Ascoli Satriano","Cerreto Sannita - Telese - Sant'Agata de' Goti","Cesena - Sarsina","Chiavari","Chieti - Vasto","Chioggia","Città di Castello","Civita Castellana","Civitavecchia - Tarquinia","Como","Concordia - Pordenone","Conversano - Monopoli","Cosenza - Bisignano","Crema","Cremona","Crotone - Santa Severina","Cuneo","Esarcato Apostolico per i fedeli cattolici ucraini di rito bizantino residenti in Italia","Fabriano - Matelica","Faenza - Modigliana","Fano - Fossombrone - Cagli - Pergola","Fermo","Ferrara - Comacchio","Fidenza","Fiesole","Firenze","Foggia - Bovino","Foligno","Forlì - Bertinoro","Fossano","Frascati","Frosinone - Veroli - Ferentino","Gaeta","Genova","Gorizia","Grosseto","Gubbio","Iglesias","Imola","Ischia","Isernia - Venafro","Ivrea","Jesi","La Spezia - Sarzana - Brugnato","Lamezia Terme","Lanciano - Ortona","Lanusei","L'Aquila","Latina - Terracina - Sezze - Priverno","Lecce","Livorno","Locri - Gerace","Lodi","Loreto","Lucca","Lucera - Troia","Lungro","Macerata - Tolentino - Recanati - Cingoli - Treia","Manfredonia - Vieste - San Giovanni Rotondo","Mantova","Massa Carrara - Pontremoli","Massa Marittima - Piombino","Matera - Irsina","Mazara del Vallo","Melfi - Rapolla - Venosa","Messina - Lipari - Santa Lucia del Mela","Milano","Mileto - Nicotera - Tropea","Modena - Nonantola","Molfetta - Ruvo - Giovinazzo - Terlizzi","Mondovì","Monreale","Monte Oliveto Maggiore","Montecassino","Montepulciano - Chiusi - Pienza","Montevergine","Napoli","Nardò - Gallipoli","Nicosia","Nocera Inferiore - Sarno","Nola","Noto","Novara","Nuoro","Oppido Mamertina - Palmi","Ordinariato Militare","Oria","Oristano","Orvieto - Todi","Ostia","Otranto","Ozieri","Padova","Palermo","Palestrina","Parma","Patti","Pavia","Perugia - Città della Pieve","Pesaro","Pescara - Penne","Pescia","Piacenza - Bobbio","Piana degli Albanesi","Piazza Armerina","Pinerolo","Pisa","Pistoia","Pitigliano - Sovana - Orbetello","Pompei","Porto - Santa Rufina","Potenza - Muro Lucano - Marsico Nuovo","Pozzuoli","Prato","Ragusa","Ravenna - Cervia","Reggio Calabria - Bova","Reggio Emilia - Guastalla","Rieti","Rimini","Roma","Rossano - Cariati","Sabina - Poggio Mirteto","Salerno - Campagna - Acerno","Saluzzo","San Benedetto del Tronto - Ripatransone - Montalto","San Marco Argentano - Scalea","San Marino - Montefeltro","San Miniato","San Severo","Santa Maria di Grottaferrata","Sant'Angelo dei Lombardi - Conza - Nusco - Bisaccia","Santissima Trinità di Cava de' Tirreni","Sassari","Savona - Noli","Senigallia","Sessa Aurunca","Siena - Colle di Val d'Elsa - Montalcino","Siracusa","Sora - Cassino - Aquino - Pontecorvo","Sorrento - Castellammare di Stabia","Spoleto - Norcia","Subiaco","Sulmona - Valva","Susa","Taranto","Teano - Calvi","Teggiano - Policastro","Tempio - Ampurias","Teramo - Atri","Termoli - Larino","Terni - Narni - Amelia","Tivoli","Torino","Tortona","Trani - Barletta - Bisceglie","Trapani","Trento","Treviso","Tricarico","Trieste","Trivento","Tursi - Lagonegro","Udine","Ugento - Santa Maria di Leuca","Urbino - Urbania - Sant'Angelo in Vado","Vallo della Lucania","Velletri - Segni","Venezia","Ventimiglia - San Remo","Vercelli","Verona","Vicenza","Vigevano","Viterbo","Vittorio Veneto","Volterra"];
+    $ITALYDiocesesArr = ["Acerenza","Acerra","Acireale","Acqui","Adria - Rovigo","Agrigento","Alba","Albano","Albenga - Imperia","Ales - Terralba","Alessandria","Alghero - Bosa","Alife - Caiazzo","Altamura - Gravina - Acquaviva delle Fonti","Amalfi - Cava de' Tirreni","Anagni - Alatri","Ancona - Osimo","Andria","Aosta","Arezzo - Cortona - Sansepolcro","Ariano Irpino - Lacedonia","Ascoli Piceno","Assisi - Nocera Umbra - Gualdo Tadino","Asti","Avellino","Aversa","Avezzano","Bari - Bitonto","Belluno - Feltre","Benevento","Bergamo","Biella","Bologna","Bolzano - Bressanone, Bozen - Brixen","Brescia","Brindisi - Ostuni","Cagliari","Caltagirone","Caltanissetta","Camerino - San Severino Marche","Campobasso - Boiano","Capua","Carpi","Casale Monferrato","Caserta","Cassano all'Jonio","Castellaneta","Catania","Catanzaro - Squillace","Cefalù","Cerignola - Ascoli Satriano","Cerreto Sannita - Telese - Sant'Agata de' Goti","Cesena - Sarsina","Chiavari","Chieti - Vasto","Chioggia","Città di Castello","Civita Castellana","Civitavecchia - Tarquinia","Como","Concordia - Pordenone","Conversano - Monopoli","Cosenza - Bisignano","Crema","Cremona","Crotone - Santa Severina","Cuneo","Esarcato Apostolico per i fedeli cattolici ucraini di rito bizantino residenti in ITALY","Fabriano - Matelica","Faenza - Modigliana","Fano - Fossombrone - Cagli - Pergola","Fermo","Ferrara - Comacchio","Fidenza","Fiesole","Firenze","Foggia - Bovino","Foligno","Forlì - Bertinoro","Fossano","Frascati","Frosinone - Veroli - Ferentino","Gaeta","Genova","Gorizia","Grosseto","Gubbio","Iglesias","Imola","Ischia","Isernia - Venafro","Ivrea","Jesi","La Spezia - Sarzana - Brugnato","Lamezia Terme","Lanciano - Ortona","Lanusei","L'Aquila","Latina - Terracina - Sezze - Priverno","Lecce","Livorno","Locri - Gerace","Lodi","Loreto","Lucca","Lucera - Troia","Lungro","Macerata - Tolentino - Recanati - Cingoli - Treia","Manfredonia - Vieste - San Giovanni Rotondo","Mantova","Massa Carrara - Pontremoli","Massa Marittima - Piombino","Matera - Irsina","Mazara del Vallo","Melfi - Rapolla - Venosa","Messina - Lipari - Santa Lucia del Mela","Milano","Mileto - Nicotera - Tropea","Modena - Nonantola","Molfetta - Ruvo - Giovinazzo - Terlizzi","Mondovì","Monreale","Monte Oliveto Maggiore","Montecassino","Montepulciano - Chiusi - Pienza","Montevergine","Napoli","Nardò - Gallipoli","Nicosia","Nocera Inferiore - Sarno","Nola","Noto","Novara","Nuoro","Oppido Mamertina - Palmi","Ordinariato Militare","Oria","Oristano","Orvieto - Todi","Ostia","Otranto","Ozieri","Padova","Palermo","Palestrina","Parma","Patti","Pavia","Perugia - Città della Pieve","Pesaro","Pescara - Penne","Pescia","Piacenza - Bobbio","Piana degli Albanesi","Piazza Armerina","Pinerolo","Pisa","Pistoia","Pitigliano - Sovana - Orbetello","Pompei","Porto - Santa Rufina","Potenza - Muro Lucano - Marsico Nuovo","Pozzuoli","Prato","Ragusa","Ravenna - Cervia","Reggio Calabria - Bova","Reggio Emilia - Guastalla","Rieti","Rimini","Roma","Rossano - Cariati","Sabina - Poggio Mirteto","Salerno - Campagna - Acerno","Saluzzo","San Benedetto del Tronto - Ripatransone - Montalto","San Marco Argentano - Scalea","San Marino - Montefeltro","San Miniato","San Severo","Santa Maria di Grottaferrata","Sant'Angelo dei Lombardi - Conza - Nusco - Bisaccia","Santissima Trinità di Cava de' Tirreni","Sassari","Savona - Noli","Senigallia","Sessa Aurunca","Siena - Colle di Val d'Elsa - Montalcino","Siracusa","Sora - Cassino - Aquino - Pontecorvo","Sorrento - Castellammare di Stabia","Spoleto - Norcia","Subiaco","Sulmona - Valva","Susa","Taranto","Teano - Calvi","Teggiano - Policastro","Tempio - Ampurias","Teramo - Atri","Termoli - Larino","Terni - Narni - Amelia","Tivoli","Torino","Tortona","Trani - Barletta - Bisceglie","Trapani","Trento","Treviso","Tricarico","Trieste","Trivento","Tursi - Lagonegro","Udine","Ugento - Santa Maria di Leuca","Urbino - Urbania - Sant'Angelo in Vado","Vallo della Lucania","Velletri - Segni","Venezia","Ventimiglia - San Remo","Vercelli","Verona","Vicenza","Vigevano","Viterbo","Vittorio Veneto","Volterra"];
+
+    class litEvent {
+        constructor(name="",color="",grade=0,common="",day=1,month=1,formRowNum=-1){
+            this.name = name;
+            this.color = color;
+            this.grade = grade;
+            this.common = common;
+            this.day = day;
+            this.month = month;
+            this.formRowNum = formRowNum;
+        }
+    }
+
+    $CALENDAR = {LitCal:{}};
+    $index = {};
+    jQuery.ajax({
+        url: "nations/index.json",
+        dataType: 'json',
+        statusCode: {
+            404: function() {
+                console.log('The JSON definition "nations/index.json" does not exist yet.');
+            }
+        },
+        success: function(data){
+            console.log('retrieved data from index file:');
+            console.log(data);
+            $index = data;
+        }
+    });
 
     jQuery(document).ready(function(){
         let $carousel = $('.carousel').carousel();
@@ -295,16 +500,208 @@ $messages = array_merge($messages, [
         });
 
         $('#diocesanCalendarNationalDependency').on('change',function(){
+            $('#diocesanCalendarDioceseName').val('');
+            $('#retrieveExistingDiocesanData').prop('disabled',true);
             switch($(this).val()){
-                case "ITALIA":
+                case "ITALY":
                     $('#DiocesesList').empty();
                     $ITALYDiocesesArr.forEach(diocese => $('#DiocesesList').append('<option data-value="' + diocese.replace(/[^a-zA-Z]/gi, '') + '" value="' + diocese + '">') );
                     break;
                 case "USA":
                     $('#DiocesesList').empty();
-                    $USDiocesesArr.forEach(diocese => $('#DiocesesList').append('<option data-value="' + diocese.replace(/[^a-zA-Z]/gi, '') + '" value="' + diocese + '">') );
+                    $USDiocesesArr.forEach(diocese => $('#DiocesesList').append('<option data-value="' + diocese.replace(/[^a-zA-Z]/gi, '').toUpperCase() + '" value="' + diocese + '">') );
                     break;
+                default:
+                    $('#DiocesesList').empty();
             }
+        });
+
+        $('#diocesanCalendarDioceseName').on('change',function(){
+            //first we'll enforce only values from the current datalist
+            if($('#DiocesesList').find('option[value="' + $(this).val() + '"]').length > 0){
+                $(this).removeClass('is-invalid');
+                $key = $('#DiocesesList').find('option[value="' + $(this).val() + '"]').attr('data-value').toUpperCase();
+                console.log('selected diocese with key = ' + $key);
+                if($index.hasOwnProperty($key)){
+                    $('#retrieveExistingDiocesanData').prop('disabled',false);
+                    console.log('we have an existing entry for this diocese!');
+                } else {
+                    $('#retrieveExistingDiocesanData').prop('disabled',true);
+                    console.log('no existing entry for this diocese');
+                }
+            } else {
+                $(this).addClass('is-invalid');
+            }
+        });
+
+        $(document).on('change','.litEvent',function(event){
+            $row = $(this).closest('.form-row');
+            $card = $(this).closest('.card-body');
+            if($(this).hasClass('litEventName')){
+                if($(this).val() == ''){
+                    //empty value probably means we are trying to delete an already defined event
+                    //so let's find the key and remove it
+                    oldEventKey = $(this).attr('data-valuewas');
+                    if($CALENDAR.LitCal.hasOwnProperty(oldEventKey)){
+                        delete $CALENDAR.LitCal[oldEventKey];
+                    }
+                    /*
+                    //so let's go back over all the name fields and recreate a clean LitCal object
+                    $CALENDAR = {LitCal:{}};
+                    $('#carouselItemSolemnities .form-row').each(function(idx,el){
+                        if($(el).find('.litEventName').val() != ''){
+                            eventKey = $(el).find('.litEventName').val().replace(/[^a-zA-Z]/gi, '');
+
+                        }
+                    });
+                    */
+                } else {
+                    eventKey = $(this).val().replace(/[^a-zA-Z]/gi, '');
+                    if( $(this).attr('data-valuewas') == '' && $CALENDAR.LitCal.hasOwnProperty(eventKey) === false ){
+                        $CALENDAR.LitCal[eventKey] = new litEvent();
+                        $CALENDAR.LitCal[eventKey].name = $(this).val();
+                        //let's initialize defaults just in case the default input values happen to be correct, so no change events are fired
+                        $CALENDAR.LitCal[eventKey].day = parseInt($row.find('.litEventDay').val());
+                        $CALENDAR.LitCal[eventKey].month = parseInt($row.find('.litEventMonth').val());
+                        $CALENDAR.LitCal[eventKey].color = $row.find('.litEventColor').val();
+                        $CALENDAR.LitCal[eventKey].common = $row.find('.litEventProper').val();
+                        $CALENDAR.LitCal[eventKey].formRowNum = $card.find('.form-row').index($row);
+                        $(this).attr('data-valuewas',eventKey);
+                        $(this).removeClass('is-invalid');
+                    } else if ( $(this).attr('data-valuewas') != '' ) {
+                        oldEventKey = $(this).attr('data-valuewas');
+                        if($CALENDAR.LitCal.hasOwnProperty(oldEventKey)){
+                            if (oldEventKey !== eventKey) {
+                                Object.defineProperty($CALENDAR.LitCal, eventKey,
+                                    Object.getOwnPropertyDescriptor($CALENDAR.LitCal, oldEventKey));
+                                delete $CALENDAR.LitCal[oldEventKey];
+                                $(this).attr('data-valuewas',eventKey);
+                                $(this).removeClass('is-invalid');
+                            }
+                        }
+                    } else if ( $CALENDAR.LitCal.hasOwnProperty(eventKey) ){
+                        //this exact same festivity name was already defined elsewhere!
+                        $(this).val('');
+                        $(this).addClass('is-invalid');
+                    }
+                    switch($(this).closest('.carousel-item').attr('id')){
+                        case 'carouselItemSolemnities':
+                            $CALENDAR.LitCal[eventKey].grade = 6;
+                            break;
+                        case 'carouselItemFeasts':
+                            $CALENDAR.LitCal[eventKey].grade = 4;
+                            break;
+                        case 'carouselItemMemorials':
+                            $CALENDAR.LitCal[eventKey].grade = 3;
+                            break;
+                        case 'carouselItemOptionalMemorials':
+                            $CALENDAR.LitCal[eventKey].grade = 2;
+                            break;
+                    }
+                }
+            } else if ($(this).hasClass('litEventDay')) {
+                if($row.find('.litEventName').val() != ""){
+                    eventKey = $row.find('.litEventName').val().replace(/[^a-zA-Z]/gi, '');
+                    if( $CALENDAR.LitCal.hasOwnProperty(eventKey) ){
+                        $CALENDAR.LitCal[eventKey].day = parseInt($(this).val());
+                    }
+                }
+            } else if ($(this).hasClass('litEventMonth')) {
+                if($row.find('.litEventName').val() != ""){
+                    eventKey = $row.find('.litEventName').val().replace(/[^a-zA-Z]/gi, '');
+                    if( $CALENDAR.LitCal.hasOwnProperty(eventKey) ){
+                        $CALENDAR.LitCal[eventKey].month = parseInt($(this).val());
+                    }
+                }
+            } else if ($(this).hasClass('litEventColor')) {
+                if($row.find('.litEventName').val() != ""){
+                    eventKey = $row.find('.litEventName').val().replace(/[^a-zA-Z]/gi, '');
+                    if( $CALENDAR.LitCal.hasOwnProperty(eventKey) ){
+                        $CALENDAR.LitCal[eventKey].color = $(this).val();
+                    }
+                }
+            } else if ($(this).hasClass('litEventProper')) {
+                if($row.find('.litEventName').val() != ""){
+                    eventKey = $row.find('.litEventName').val().replace(/[^a-zA-Z]/gi, '');
+                    if( $CALENDAR.LitCal.hasOwnProperty(eventKey) ){
+                        $CALENDAR.LitCal[eventKey].common = $(this).val();
+                    }
+                }
+            }
+        });
+
+        $(document).on('click','#saveDiocesanCalendar_btn', function(){
+            $nation = $('#diocesanCalendarNationalDependency').val();
+            $diocese = $('#diocesanCalendarDioceseName').val();
+            //$CALENDAR.Nation = $nation;
+            //$CALENDAR.Diocese = $diocese;
+            $data = JSON.stringify($CALENDAR);
+            console.log('save button was clicked for NATION = ' + $nation + ', DIOCESE = ' + $diocese);
+            let formsValid = true;
+            $('form').each(function(idx){
+                if(this.checkValidity() === false){
+                    formsValid = false;
+                }
+                $(this).addClass('was-validated');
+            });
+            if(formsValid){
+                $.ajax({
+                    url: './writeDiocesanCalendar.php',
+                    method: 'post',
+                    data: { calendar: $data, diocese: $diocese, nation: $nation },
+                    success: function(data){
+                        console.log('data returned from save action: ');
+                        console.log(data);
+                        $('<div class="toast" role="alert" aria-live="assertive" aria-atomic="true"><div class="toast-header"><img src="..." class="rounded mr-2" alt="..."><strong class="mr-auto">Bootstrap</strong><small class="text-muted">just now</small><button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="toast-body">See? Just like this.</div></div>').toast();
+                    },
+                    error: function(jqXHR, textStatus, errorThrown){
+                        console.log(textStatus + ': ' + errorThrown);
+                        alert('there was an error!');
+                    }
+                });
+            } else {
+                alert('Nation / Diocese cannot be empty');
+            }
+        });
+
+        $(document).on('click','#retrieveExistingDiocesanData',function(evt){
+            evt.preventDefault();
+            let diocese = $('#diocesanCalendarDioceseName').val();
+            let dioceseKey = $('#DiocesesList').find('option[value="' + diocese + '"]').attr('data-value').toUpperCase();
+            let $diocesanCalendar;
+            jQuery.ajax({
+                url: $index[dioceseKey].path,
+                dataType: 'json',
+                statusCode: {
+                    404: function() {
+                        console.log('The JSON definition ' + $index[dioceseKey].path + ' does not exist yet.');
+                    }
+                },
+                success: function(data){
+                    for(const [key,litevent] of Object.entries(data.LitCal)){
+                        let $row;
+                        switch(litevent.grade){
+                            case RANK.SOLEMNITY:
+                                $row = $('#carouselItemSolemnities form .form-row').eq(litevent.formRowNum);
+                                break;
+                            case RANK.FEAST: 
+                                $row = $('#carouselItemFeasts form .form-row').eq(litevent.formRowNum);
+                                break;
+                            case RANK.MEMORIAL:
+                                $row = $('#carouselItemMemorials form .form-row').eq(litevent.formRowNum);
+                                break;
+                            case RANK.OPTIONALMEMORIAL:
+                                $row = $('#carouselItemOptionalMemorials form .form-row').eq(litevent.formRowNum);
+                                break;
+                        }
+                        $row.find('.litEventName').val(litevent.name);
+                        $row.find('.litEventDay').val(litevent.day);
+                        $row.find('.litEventMonth').val(litevent.month);
+                        $row.find('.litEventColor').val(litevent.color);
+                        $row.find('.litEventProper').val(litevent.common);
+                    };
+                }
+            });
         });
 
     });

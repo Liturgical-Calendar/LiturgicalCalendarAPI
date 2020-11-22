@@ -5,6 +5,10 @@
     background-color: #444;
 }
 
+.carousel-control-next, .carousel-control-prev {
+    width: 5%;
+}
+
 .carousel .carousel-control-prev-icon, .carousel .carousel-control-next-icon {
     background-color: rgba(70,70,120,.5);
     width: 30px;
