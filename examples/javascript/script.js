@@ -723,7 +723,7 @@ let today = new Date(),
 
 $(document).ready(function() {
     document.title = __("Generate Roman Calendar");
-    if(isStaging){ $('.backNav').attr('href','/LiturgicalCalendar-staging'); }
+    if(isStaging){ $('.backNav').attr('href','/LiturgicalCalendar-staging/usage.php'); }
     createHeader();
     $(document).on('click', '#openSettings', function() {
         $('#settingsWrapper').dialog("open");

@@ -252,7 +252,7 @@
             <div></div>
         </div>
     </div>
-    <div><a class="backNav" href="/LiturgicalCalendar">↩ Go back ↩</a></div>
+    <div><a class="backNav" href="/LiturgicalCalendar/usage.php">↩ Go back ↩</a></div>
     <span class="material-icons" id="openSettings">settings</span>
     <header>
     </header>
@@ -889,7 +889,7 @@
             isStaging = window.location.pathname.includes('-staging');
 
         jQuery.ajax({
-            url: "../../nations/index.json",
+            url: "../../../nations/index.json",
             dataType: 'json',
             statusCode: {
                 404: function() {
@@ -906,7 +906,7 @@
 
         $(document).ready(function () {
             document.title = __("Generate Roman Calendar");
-            if(isStaging){ $('.backNav').attr('href','/LiturgicalCalendar-staging'); }
+            if(isStaging){ $('.backNav').attr('href','/LiturgicalCalendar-staging/usage.php'); }
             createHeader();
             genLitCal();
             $(document).on('click', '#openSettings', function () {
@@ -1014,6 +1014,10 @@
             }
 
         });
+    Object.filter = (obj, predicate) => 
+        Object.keys(obj)
+            .filter( key => predicate(obj[key]) )
+            .reduce( (res, key) => (res[key] = obj[key], res), {} );
 
     </script>
 
