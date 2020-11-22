@@ -882,11 +882,31 @@
                 }
             },
             dayNames = ['Dies Solis', 'Dies Lunae', 'Dies Martis', 'Dies Mercurii', 'Dies Iovis', 'Dies Veneris', 'Dies Saturni'],
-            dayNamesShort = ['Sol', 'Lun', 'Mart', 'Merc', 'Iov', 'Ven', 'Sat'];
+            dayNamesShort = ['Sol', 'Lun', 'Mart', 'Merc', 'Iov', 'Ven', 'Sat'],
+            $index = {},
+            $DiocesesUSA,
+            $DiocesesITALY,
+            isStaging = window.location.pathname.includes('-staging');
+
+        jQuery.ajax({
+            url: "../../nations/index.json",
+            dataType: 'json',
+            statusCode: {
+                404: function() {
+                    console.log('The JSON definition "nations/index.json" does not exist yet.');
+                }
+            },
+            success: function(data){
+                console.log('retrieved data from index file:');
+                console.log(data);
+                $index = data;
+            }
+        });
 
 
         $(document).ready(function () {
             document.title = __("Generate Roman Calendar");
+            if(isStaging){ $('.backNav').attr('href','/LiturgicalCalendar-staging'); }
             createHeader();
             genLitCal();
             $(document).on('click', '#openSettings', function () {
@@ -956,6 +976,17 @@
                         $Settings.diocesanpreset = '';
                         $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled', true);
                         $Settings.nationalpreset = 'USA';
+
+                        $('#diocesanpreset').empty();
+                        $DiocesesUSA = Object.filter($index, key => key.nation == "USA");
+                        if(Object.keys($DiocesesUSA).length > 0){
+                        $('#diocesanpreset').prop('disabled', false);
+                        for(const [key, value] of Object.entries($DiocesesUSA)){
+                            $('#diocesanpreset').append('<option value="' + key + '">' + value.diocese + '</option>');
+                        }
+                        } else {
+                        $('#diocesanpreset').prop('disabled', true);
+                        }
                         break;
                     default:
                         $('#calSettingsForm :input').prop('disabled', false);

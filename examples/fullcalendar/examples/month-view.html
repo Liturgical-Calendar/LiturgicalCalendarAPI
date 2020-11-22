@@ -270,6 +270,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
   <script>
     "use strict";
+    let isStaging = window.location.pathname.includes('-staging');
     let noticeShown = false;
     let today = new Date(),
       $Settings = {
@@ -942,6 +943,7 @@
 
     $(document).ready(function () {
       document.title = __("Generate Roman Calendar");
+      if(isStaging){ $('.backNav').attr('href','/LiturgicalCalendar-staging'); }
       createHeader();
       genLitCal();
       $(document).on('click', '#openSettings', function () {

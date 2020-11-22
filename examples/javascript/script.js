@@ -702,20 +702,28 @@ let today = new Date(),
     },
     $index = {},
     $DiocesesUSA,
-    $DiocesesITALY;
+    $DiocesesITALY,
+    isStaging = window.location.pathname.includes('-staging');
 
-    //if the index.json file has not been created, this will return a 404 error in the browser console
-    //there is no way of catching that with jQuery.getJSON but it's not a problem, we only use the data if it exists
-    //if we want to avoid the 404 error from showing in the broswer console we would have to use jQuery.ajax instead
-    jQuery.getJSON("../../nations/index.json",function(data){
-        $index = data;
-        console.log('retrieved data from index file:');
-        console.log(data);
+    jQuery.ajax({
+        url: "../../nations/index.json",
+        dataType: 'json',
+        statusCode: {
+            404: function() {
+                console.log('The JSON definition "nations/index.json" does not exist yet.');
+            }
+        },
+        success: function(data){
+            console.log('retrieved data from index file:');
+            console.log(data);
+            $index = data;
+        }
     });
 
 
 $(document).ready(function() {
     document.title = __("Generate Roman Calendar");
+    if(isStaging){ $('.backNav').attr('href','/LiturgicalCalendar-staging'); }
     createHeader();
     $(document).on('click', '#openSettings', function() {
         $('#settingsWrapper').dialog("open");
