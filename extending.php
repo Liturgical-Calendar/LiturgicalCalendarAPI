@@ -202,6 +202,14 @@ $messages = array_merge($messages, [
         "it" => "Questa diocesi non sembra valida? Scegli un valore dalla lista.",
         "pt" => "Esta diocese parece não existir? Escolha um valor da lista."
     ],
+    "SAVE DIOCESAN CALENDAR" => [
+        "de" => "DIÖZESAN-KALENDER SPEICHERN",
+        "en" => "SAVE DIOCESAN CALENDAR",
+        "es" => "GUARDAR CALENDARIO DIOCESANO",
+        "fr" => "ENREGISTRER LE CALENDRIER DIOCÉSAIN",
+        "it" => "SALVA IL CALENDARIO DIOCESANO",
+        "pt" => "SALVAR CALENDÁRIO DIOCESANO"
+    ],
 /*
     "" => [
         "de" => "",
@@ -393,7 +401,7 @@ $messages = array_merge($messages, [
                 <div class="container">
                     <div class="row">
                         <div class="col text-center">
-                            <button class="btn btn-lg btn-primary m-1" id="saveDiocesanCalendar_btn">SAVE DIOCESAN CALENDAR</button>
+                            <button class="btn btn-lg btn-primary m-1" id="saveDiocesanCalendar_btn"><?php _e("SAVE DIOCESAN CALENDAR") ?></button>
                         </div>
                     </div>
                 </div>
@@ -648,6 +656,7 @@ $messages = array_merge($messages, [
                 $.ajax({
                     url: './writeDiocesanCalendar.php',
                     method: 'post',
+                    dataType: 'json',
                     data: { calendar: $data, diocese: $diocese, nation: $nation },
                     success: function(data){
                         console.log('data returned from save action: ');
@@ -678,6 +687,7 @@ $messages = array_merge($messages, [
                     }
                 },
                 success: function(data){
+                    $CALENDAR = data;
                     for(const [key,litevent] of Object.entries(data.LitCal)){
                         let $row;
                         switch(litevent.grade){
