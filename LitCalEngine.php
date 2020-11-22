@@ -109,13 +109,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 }
 
+$DiocesanData = null;
+$index = null;
 if($LITSETTINGS->DIOCESAN !== false){
     switch($LITSETTINGS->DIOCESAN){
         case 'DIOCESIDIROMA':
         case 'DIOCESILAZIO':
             $LITSETTINGS->NATIONAL = "ITALY";
         break;
+        default:
+            //since a Diocesan calendar is being requested, we need to retrieve the JSON data
+            //first we need to discover the path, so let's retrieve our index file
+            if(file_exists("nations/index.json")){
+                $index = json_decode(file_get_contents("nations/index.json"));
+                if(property_exists($index,$LITSETTINGS->DIOCESAN)){
+                    $diocesanDataFile = $index->{$LITSETTINGS->DIOCESAN}->path;
+                    $LITSETTINGS->NATIONAL = $index->{$LITSETTINGS->DIOCESAN}->nation;
+                    if(file_exists($diocesanDataFile) ){
+                        $DiocesanData = json_decode(file_get_contents($diocesanDataFile));
+                    }
+                }
+            }
+        break;
     }
+
 }
 
 if($LITSETTINGS->NATIONAL !== false){
@@ -2315,25 +2332,28 @@ if($LITSETTINGS->NATIONAL !== false){
                         '<i>' . $LitCal["StsJeanBrebeuf"]->name . '</i>',
                         $LITSETTINGS->YEAR
                     );
-                    $LitCal["StPaulCross"]->date->add(new DateInterval('P1D'));
-                    if(in_array($LitCal["StPaulCross"]->date,$SOLEMNITIES) || in_array($LitCal["StPaulCross"]->date,$FEASTS_MEMORIALS)){
-                        $Messages[] = sprintf(
-                            "USA: The optional memorial '%s' is transferred from Oct 19 to Oct 20 as per the 2011 Roman Missal issued by the USCCB, to make room for '%s' elevated to the rank of Memorial, however in the year %d it is superseded by a higher ranking liturgical event",
-                            '<i>' . $LitCal["StPaulCross"]->name . '</i>',
-                            '<i>' . $LitCal["StsJeanBrebeuf"]->name . '</i>',
-                            $LITSETTINGS->YEAR
-                        );
-                        unset($LitCal["StPaulCross"]);
-                    }else{
-                        $Messages[] = sprintf(
-                            "USA: The optional memorial '%s' is transferred from Oct 19 to Oct 20 as per the 2011 Roman Missal issued by the USCCB, to make room for '%s' elevated to the rank of Memorial, applicable to the year %d",
-                            '<i>' . $LitCal["StPaulCross"]->name . '</i>',
-                            '<i>' . $LitCal["StsJeanBrebeuf"]->name . '</i>',
-                            $LITSETTINGS->YEAR
-                        );
-                    }
                     $LitCal["StsJeanBrebeuf"]->name = "[USA] " . $LitCal["StsJeanBrebeuf"]->name;
-                    $LitCal["StPaulCross"]->name = "[USA] " . $LitCal["StPaulCross"]->name;
+                    
+                    if(array_key_exists("StPaulCross",$LitCal)){ //of course it will exist if StsJeanBrebeuf exists, they are originally on the same day
+                        $LitCal["StPaulCross"]->date->add(new DateInterval('P1D'));
+                        if(in_array($LitCal["StPaulCross"]->date,$SOLEMNITIES) || in_array($LitCal["StPaulCross"]->date,$FEASTS_MEMORIALS)){
+                            $Messages[] = sprintf(
+                                "USA: The optional memorial '%s' is transferred from Oct 19 to Oct 20 as per the 2011 Roman Missal issued by the USCCB, to make room for '%s' elevated to the rank of Memorial, however in the year %d it is superseded by a higher ranking liturgical event",
+                                '<i>' . $LitCal["StPaulCross"]->name . '</i>',
+                                '<i>' . $LitCal["StsJeanBrebeuf"]->name . '</i>',
+                                $LITSETTINGS->YEAR
+                            );
+                            unset($LitCal["StPaulCross"]);
+                        }else{
+                            $Messages[] = sprintf(
+                                "USA: The optional memorial '%s' is transferred from Oct 19 to Oct 20 as per the 2011 Roman Missal issued by the USCCB, to make room for '%s' elevated to the rank of Memorial, applicable to the year %d",
+                                '<i>' . $LitCal["StPaulCross"]->name . '</i>',
+                                '<i>' . $LitCal["StsJeanBrebeuf"]->name . '</i>',
+                                $LITSETTINGS->YEAR
+                            );
+                            $LitCal["StPaulCross"]->name = "[USA] " . $LitCal["StPaulCross"]->name;
+                        }
+                    }
                 }
                 else{
                     //if Oct 19 is a Sunday or Solemnity, Saint Paul of the Cross won't exist. But it still needs to be moved to Oct 20 so we must create it again
@@ -2511,6 +2531,37 @@ if($LITSETTINGS->DIOCESAN !== false){
                 }
             }
         break;
+        default:
+            if($DiocesanData !== null){
+                foreach($DiocesanData->LitCal as $key => $obj){
+                    $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $obj->day . '-' . $obj->month . '-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+                    if($obj->grade > FEAST){
+                        $LitCal[$LITSETTINGS->DIOCESAN . "_" . $key] = new Festivity("[" . $index->{$LITSETTINGS->DIOCESAN}->diocese . "] " . $obj->name, $currentFeastDate, strtolower($obj->color), "fixed", $obj->grade, $obj->common);
+                        if(in_array($currentFeastDate,$SOLEMNITIES) && $key != array_search($currentFeastDate,$SOLEMNITIES)){
+                            //there seems to be a coincidence with a different Solemnity on the same day!
+                            //should we attempt to move to the next open slot?
+                            $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                $LITSETTINGS->DIOCESAN . ": the Solemnity '%s', proper to the calendar of the " . $index->{$LITSETTINGS->DIOCESAN}->diocese . " and usually celebrated on %s, coincides with the Sunday or Solemnity '%s' in the year %d! Does something need to be done about this?",
+                                '<i>' . $obj->name . '</i>',
+                                '<b>' . trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U')))) . '</b>',
+                                '<i>' . $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name . '</i>',
+                                $LITSETTINGS->YEAR
+                            );
+                        }
+                    } else if ($obj->grade <= FEAST && !in_array($currentFeastDate,$SOLEMNITIES)){
+                        $LitCal[$LITSETTINGS->DIOCESAN . "_" . $key] = new Festivity("[" . $index->{$LITSETTINGS->DIOCESAN}->diocese . "] " . $obj->name, $currentFeastDate, strtolower($obj->color), "fixed", $obj->grade, $obj->common);
+                    } else {
+                        $Messages[] = sprintf(
+                            $LITSETTINGS->DIOCESAN . ": the %s '%s', proper to the calendar of the " . $index->{$LITSETTINGS->DIOCESAN}->diocese . " and usually celebrated on %s, is suppressed by the Sunday or Solemnity %s in the year %d",
+                            _G($obj->grade,$LITSETTINGS->LOCALE,false),
+                            '<i>' . $obj->name . '</i>',
+                            '<b>' . trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U')))) . '</b>',
+                            '<i>' . $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name . '</i>',
+                            $LITSETTINGS->YEAR
+                        );
+                    }
+                }
+            }
     }
 }
 
@@ -2706,6 +2757,12 @@ function GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages,$SOLEMNITIES,$
     $SerializeableLitCal->Settings->CORPUSCHRISTI = CORPUSCHRISTI;
     $SerializeableLitCal->Settings->LOCALE = $LITSETTINGS->LOCALE;
     $SerializeableLitCal->Settings->RETURNTYPE = $LITSETTINGS->RETURNTYPE;
+    if($LITSETTINGS->NATIONAL !== false){
+        $SerializeableLitCal->Settings->NATIONALCALENDAR = $LITSETTINGS->NATIONAL;
+    }
+    if($LITSETTINGS->DIOCESAN !== false){
+        $SerializeableLitCal->Settings->DIOCESANCALENDAR = $LITSETTINGS->DIOCESAN;
+    }
     $SerializeableLitCal->Metadata = new stdClass();
     $SerializeableLitCal->Metadata->SOLEMNITIES = $SOLEMNITIES;
     $SerializeableLitCal->Metadata->FEASTS_MEMORIALS = $FEASTS_MEMORIALS;

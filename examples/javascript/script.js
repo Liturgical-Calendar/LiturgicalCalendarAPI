@@ -698,8 +698,21 @@ let today = new Date(),
                 duration: 500
             },
             autoOpen: false
-        });        
-    };
+        });
+    },
+    $index = {},
+    $DiocesesUSA,
+    $DiocesesITALY;
+
+    //if the index.json file has not been created, this will return a 404 error in the browser console
+    //there is no way of catching that with jQuery.getJSON but it's not a problem, we only use the data if it exists
+    //if we want to avoid the 404 error from showing in the broswer console we would have to use jQuery.ajax instead
+    jQuery.getJSON("../../nations/index.json",function(data){
+        $index = data;
+        console.log('retrieved data from index file:');
+        console.log(data);
+    });
+
 
 $(document).ready(function() {
     document.title = __("Generate Roman Calendar");
@@ -779,7 +792,19 @@ $(document).ready(function() {
             $Settings.diocesanpreset = '';
             $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
             $Settings.nationalpreset = 'USA';
-          break;
+            
+            $('#diocesanpreset').empty();
+            $DiocesesUSA = Object.filter($index, key => key.nation == "USA");
+            if(Object.keys($DiocesesUSA).length > 0){
+              $('#diocesanpreset').prop('disabled', false);
+              for(const [key, value] of Object.entries($DiocesesUSA)){
+                $('#diocesanpreset').append('<option value="' + key + '">' + value.diocese + '</option>');
+              }
+            } else {
+              $('#diocesanpreset').prop('disabled', true);
+            }
+
+            break;
           default:
             $('#calSettingsForm :input').prop('disabled',false);
             $('#diocesanpreset').val("").prop('disabled',true);
@@ -793,3 +818,9 @@ $(document).ready(function() {
 
     $('#settingsWrapper').dialog("open");
 });
+
+Object.filter = (obj, predicate) => 
+Object.keys(obj)
+      .filter( key => predicate(obj[key]) )
+      .reduce( (res, key) => (res[key] = obj[key], res), {} );
+

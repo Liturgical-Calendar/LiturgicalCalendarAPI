@@ -18,11 +18,29 @@ if(!isset($_POST['calendar']) || !isset($_POST['diocese']) || !isset($_POST['nat
         mkdir($path,0755,true);
     }
     
-    file_put_contents($path . "/{$CalData->Diocese}.json",$CalData->Calendar);
+    file_put_contents($path . "/{$CalData->Diocese}.json",$CalData->Calendar . PHP_EOL);
+
+    $index = null;
+    //let's check if the index file exists
+    //if not, create it
+    //if yes, update it
+    if(file_exists("nations/index.json") ){
+        $index = json_decode(file_get_contents("nations/index.json"));
+    } else {
+        $index = new stdClass();
+    }
+    $key = strtoupper(preg_replace("/[^a-zA-Z]/","",$CalData->Diocese));
+    
+    $index->$key = new stdClass();
+    $index->$key->path = $path . "/{$CalData->Diocese}.json";
+    $index->$key->nation = $CalData->Nation;
+    $index->$key->diocese = $CalData->Diocese;
+
+    file_put_contents("nations/index.json",json_encode($index) . PHP_EOL);
 
     header('Content-Type: application/json');
     echo json_encode($CalData);
 }
-die();
+//die();
 
 ?>
