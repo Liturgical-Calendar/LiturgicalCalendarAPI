@@ -56,7 +56,7 @@ $messages = array_merge($messages, [
                     </div>
                     <div class="card-body">
                         <p>HTML presentation elaborated by PHP using a CURL request</p>
-                        <div><a href="examples/php/" class="btn btn-primary">View PHP Example</a></div>
+                        <div class="text-center"><a href="examples/php/" class="btn btn-primary">View PHP Example</a></div>
                     </div>
                 </div>
             </div>
@@ -69,7 +69,7 @@ $messages = array_merge($messages, [
                     <div class="card-body">
                         <p>HTML presentation elaborated by JAVASCRIPT using an AJAX
                             request</p>
-                        <div><a href="examples/javascript/" class="btn btn-primary">View JavaScript Example</a></div>
+                        <div class="text-center"><a href="examples/javascript/" class="btn btn-primary">View JavaScript Example</a></div>
                     </div>
                 </div>
             </div>
@@ -82,8 +82,8 @@ $messages = array_merge($messages, [
                     <div class="card-body">
                         <p>Fullcalendar representation
                             elaborated by JAVASCRIPT using an AJAX request</p>
-                        <div><a href="examples/fullcalendar/examples/month-view.html" class="btn btn-primary">View Full Calendar</a></div>
-                        <div><a href="examples/fullcalendar/examples/messages.html" class="btn btn-primary mt-2">View Full Calendar (messages first)</a></div>
+                        <div class="text-center"><a href="examples/fullcalendar/examples/month-view.html" class="btn btn-primary">View Full Calendar</a></div>
+                        <div class="text-center"><a href="examples/fullcalendar/examples/messages.html" class="btn btn-primary mt-2">View Full Calendar (messages first)</a></div>
                     </div>
                 </div>
             </div>
