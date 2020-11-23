@@ -2521,11 +2521,11 @@ if($LITSETTINGS->DIOCESAN !== false){
                                     '<i>' . $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name . '</i>',
                                     $LITSETTINGS->YEAR
                                 );
-                            } else{
+                            }/* else{
                                 //This is the sure case in which we know we can create the Solemnity, but we've already done so anyways
                                 // so it should show up in a calendar even in a conflicting case, to allow for solving through the interface...
                                 //$LitCal["DIOCESIDIROMA_".$row["TAG"]] = new Festivity("[Diocesi di Roma] " . $row["NAME_" . $LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"], $row["DISPLAYGRADE"]);
-                            }
+                            }*/
                         }
                     }
                 }
