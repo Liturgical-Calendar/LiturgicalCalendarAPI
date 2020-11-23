@@ -43,7 +43,7 @@ let today = new Date(),
             }
         }
     },
-    ordSuffix = function(ord) {
+    /*ordSuffix = function(ord) {
         var ord_suffix = ''; //st, nd, rd, th
         if (ord === 1 || (ord % 10 === 1 && ord != 11)) {
             ord_suffix = 'st';
@@ -55,7 +55,7 @@ let today = new Date(),
             ord_suffix = 'th';
         }
         return ord_suffix;
-    },
+    },*/
     genLitCal = function() {
         $.ajax({
             method: 'POST',
@@ -65,10 +65,12 @@ let today = new Date(),
                 console.log(LitCalData);
 
                 let strHTML = '';
+                /*
                 let $YEAR = 0;
                 if (LitCalData.hasOwnProperty("Settings")) {
                     $YEAR = LitCalData.Settings.YEAR;
                 }
+                */
                 if (LitCalData.hasOwnProperty("LitCal")) {
                     let $LitCal = LitCalData.LitCal;
 
@@ -160,6 +162,7 @@ let today = new Date(),
                                 //We will apply the color for the single festivity only to it's own table cells
                                 let $possibleColors =  $festivity.color.split(",");
                                 let $CSScolor = $possibleColors[0];
+                                /*
                                 let $festivityColorString = "";
                                 if($possibleColors.length === 1){
                                     $festivityColorString = __($possibleColors[0]);
@@ -169,7 +172,7 @@ let today = new Date(),
                                     });
                                     $festivityColorString = $possibleColors.join("</i> " + __("or") + " <i>");
                                 }
-
+                                */
                                 strHTML += '<tr style="background-color:' + $SeasonColor + ';' + ($highContrast.indexOf($SeasonColor) != -1 ? 'color:white;' : '') + '">';
                                 if ($newMonth) {
                                     let $monthRwsp = $cm.count + 1;
@@ -245,6 +248,7 @@ let today = new Date(),
                             //We will apply the color for the single festivity only to it's own table cells
                             let $possibleColors =  $festivity.color.split(",");
                             let $CSScolor = $possibleColors[0];
+                            /*
                             let $festivityColorString = "";
                             if($possibleColors.length === 1){
                                 $festivityColorString = __($possibleColors[0]);
@@ -254,6 +258,7 @@ let today = new Date(),
                                 });
                                 $festivityColorString = $possibleColors.join("</i> " + __("or") + " <i>");
                             }
+                            */
                             strHTML += '<tr style="background-color:' + $SeasonColor + ';' + ($highContrast.indexOf($SeasonColor) != -1 ? 'color:white;' : 'color:black;') + '">';
                             if ($newMonth) {
                                 let $monthRwsp = $cm.count + 1;
@@ -519,11 +524,6 @@ let today = new Date(),
             "it": "Stai effettuando una richiesta per un anno che è precedente al 1970: non è possibile richiedere anni precedenti al 1970.",
             "la": "Rogavisti annum ante 1970: non potest rogare annos ante annum 1970."
         },
-        "Customize options for generating the Roman Calendar": {
-            "en": "Customize options for generating the Roman Calendar",
-            "it": "Personalizzare le opzioni per la generazione del Calendario Romano",
-            "la": "Eligere optiones per generationem Calendarii Romani"
-        },
         "Configurations being used to generate this calendar:": {
             "en": "Configurations being used to generate this calendar:",
             "it": "Configurazioni utilizzate per la generazione di questo calendario:",
@@ -702,7 +702,7 @@ let today = new Date(),
     },
     $index = {},
     $DiocesesUSA,
-    $DiocesesITALY,
+    //$DiocesesITALY,
     isStaging = window.location.pathname.includes('-staging');
 
     jQuery.ajax({
