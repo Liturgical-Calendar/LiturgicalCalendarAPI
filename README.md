@@ -1,3 +1,5 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/johnrdorazio/liturgicalcalendar/badge/development)](https://www.codefactor.io/repository/github/johnrdorazio/liturgicalcalendar/overview/development)
+
 # Liturgical Calendar
 A PHP script that will generate the liturgical calendar for any given year, based on the General Roman Calendar, calculating the mobile festivities and the precedence of solemnities, feasts, memorials... This script serves as a data endpoint, which will generate the data for the General Roman Calendar in a data exchange format, such as JSON, XML, or ICS. An example of the endpoint can be found at https://johnromanodorazio.com/LiturgicalCalendar/, at the first link on the page [*data generation endpoint here*](https://johnromanodorazio.com/LiturgicalCalendar/LitCalEngine.php).
 
