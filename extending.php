@@ -525,6 +525,8 @@ $messages = array_merge($messages, [
         });
 
         $('#diocesanCalendarDioceseName').on('change',function(){
+            $CALENDAR = {LitCal:{}};
+            $('.carousel-item form').each(function(){ this.reset(); });
             //first we'll enforce only values from the current datalist
             if($('#DiocesesList').find('option[value="' + $(this).val() + '"]').length > 0){
                 $(this).removeClass('is-invalid');
