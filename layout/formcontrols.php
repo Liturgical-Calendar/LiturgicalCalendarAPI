@@ -7,7 +7,8 @@ class FormControls {
         "dayField"      => true,
         "monthField"    => true,
         "colorField"    => true,
-        "properField"   => true
+        "properField"   => true,
+        "fromYearField" => true
     ];
 
     //public function __construct()
@@ -22,7 +23,7 @@ class FormControls {
         $formRow .= "<div class=\"form-row\">";
 
         if(self::$settings["nameField"]){
-            $formRow .= "<div class=\"form-group col-sm-4\">" .
+            $formRow .= "<div class=\"form-group col-sm-3\">" .
             "<label for=\"{$uniqid}Name\">" . __("Name") . "</label><input type=\"text\" class=\"form-control litEvent litEventName\" id=\"{$uniqid}Name\" data-valuewas=\"\" />" .
             "<div class=\"invalid-feedback\">This same celebration was already defined elsewhere. Please remove it first where it is defined, then you can define it here.</div>" .
             "</div>";
@@ -93,6 +94,13 @@ class FormControls {
             "<option value=\"COMMONHOLYMENWOMEN_MERCY\">" . __("Common of Holy Men and Women: For Those Who Practiced Works of Mercy") . "</option>" .
             "<option value=\"DEDICATION_CHURCH\">" . __("Common of the Dedication of a Church") . "</option>" .
             "</select>" .
+            "</div>";
+        }
+
+        if(self::$settings["fromYearField"]){
+            $formRow .= "<div class=\"form-group col-sm-1\">" .
+            "<label for=\"{$uniqid}FromYear\">" . __("Since") . "</label>" .
+            "<input type=\"number\" min=1970 max=9999 class=\"form-control litEvent litEventFromYear\" id=\"{$uniqid}FromYear\" value=1970 />" .
             "</div>";
         }
 

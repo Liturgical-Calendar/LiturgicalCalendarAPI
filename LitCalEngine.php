@@ -2533,32 +2533,37 @@ if($LITSETTINGS->DIOCESAN !== false){
         break;
         default:
             if($DiocesanData !== null){
+                
                 foreach($DiocesanData->LitCal as $key => $obj){
-                    $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $obj->day . '-' . $obj->month . '-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-                    if($obj->grade > FEAST){
-                        $LitCal[$LITSETTINGS->DIOCESAN . "_" . $key] = new Festivity("[" . $index->{$LITSETTINGS->DIOCESAN}->diocese . "] " . $obj->name, $currentFeastDate, strtolower($obj->color), "fixed", $obj->grade, $obj->common);
-                        if(in_array($currentFeastDate,$SOLEMNITIES) && $key != array_search($currentFeastDate,$SOLEMNITIES)){
-                            //there seems to be a coincidence with a different Solemnity on the same day!
-                            //should we attempt to move to the next open slot?
-                            $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                $LITSETTINGS->DIOCESAN . ": the Solemnity '%s', proper to the calendar of the " . $index->{$LITSETTINGS->DIOCESAN}->diocese . " and usually celebrated on %s, coincides with the Sunday or Solemnity '%s' in the year %d! Does something need to be done about this?",
+                    //if sinceYear is undefined or null or empty, let's go ahead and create the event in any case
+                    //creation will be restricted only if explicitly defined by the sinceYear property
+                    if($LITSETTINGS->YEAR >= $obj->sinceYear || $obj->sinceYear === null || $obj->sinceYear == ''){
+                        $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $obj->day . '-' . $obj->month . '-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+                        if($obj->grade > FEAST){
+                            $LitCal[$LITSETTINGS->DIOCESAN . "_" . $key] = new Festivity("[" . $index->{$LITSETTINGS->DIOCESAN}->diocese . "] " . $obj->name, $currentFeastDate, strtolower($obj->color), "fixed", $obj->grade, $obj->common);
+                            if(in_array($currentFeastDate,$SOLEMNITIES) && $key != array_search($currentFeastDate,$SOLEMNITIES)){
+                                //there seems to be a coincidence with a different Solemnity on the same day!
+                                //should we attempt to move to the next open slot?
+                                $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                    $LITSETTINGS->DIOCESAN . ": the Solemnity '%s', proper to the calendar of the " . $index->{$LITSETTINGS->DIOCESAN}->diocese . " and usually celebrated on %s, coincides with the Sunday or Solemnity '%s' in the year %d! Does something need to be done about this?",
+                                    '<i>' . $obj->name . '</i>',
+                                    '<b>' . trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U')))) . '</b>',
+                                    '<i>' . $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name . '</i>',
+                                    $LITSETTINGS->YEAR
+                                );
+                            }
+                        } else if ($obj->grade <= FEAST && !in_array($currentFeastDate,$SOLEMNITIES)){
+                            $LitCal[$LITSETTINGS->DIOCESAN . "_" . $key] = new Festivity("[" . $index->{$LITSETTINGS->DIOCESAN}->diocese . "] " . $obj->name, $currentFeastDate, strtolower($obj->color), "fixed", $obj->grade, $obj->common);
+                        } else {
+                            $Messages[] = sprintf(
+                                $LITSETTINGS->DIOCESAN . ": the %s '%s', proper to the calendar of the " . $index->{$LITSETTINGS->DIOCESAN}->diocese . " and usually celebrated on %s, is suppressed by the Sunday or Solemnity %s in the year %d",
+                                _G($obj->grade,$LITSETTINGS->LOCALE,false),
                                 '<i>' . $obj->name . '</i>',
                                 '<b>' . trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U')))) . '</b>',
                                 '<i>' . $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name . '</i>',
                                 $LITSETTINGS->YEAR
                             );
                         }
-                    } else if ($obj->grade <= FEAST && !in_array($currentFeastDate,$SOLEMNITIES)){
-                        $LitCal[$LITSETTINGS->DIOCESAN . "_" . $key] = new Festivity("[" . $index->{$LITSETTINGS->DIOCESAN}->diocese . "] " . $obj->name, $currentFeastDate, strtolower($obj->color), "fixed", $obj->grade, $obj->common);
-                    } else {
-                        $Messages[] = sprintf(
-                            $LITSETTINGS->DIOCESAN . ": the %s '%s', proper to the calendar of the " . $index->{$LITSETTINGS->DIOCESAN}->diocese . " and usually celebrated on %s, is suppressed by the Sunday or Solemnity %s in the year %d",
-                            _G($obj->grade,$LITSETTINGS->LOCALE,false),
-                            '<i>' . $obj->name . '</i>',
-                            '<b>' . trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U')))) . '</b>',
-                            '<i>' . $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name . '</i>',
-                            $LITSETTINGS->YEAR
-                        );
                     }
                 }
             }
