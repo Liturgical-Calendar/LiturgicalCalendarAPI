@@ -64,15 +64,17 @@ class FormControls {
 
         if(self::$settings["properField"]){
             $formRow .= "<div class=\"form-group col-sm-3\">" .
-            "<label for=\"{$uniqid}Proper\">" . __("Common (or Proper)") . "</label>" .
-            "<select class=\"form-control litEvent litEventProper\" id=\"{$uniqid}Proper\" />" .
+            "<label style=\"display:block;\" for=\"{$uniqid}Proper\">" . __("Common (or Proper)") . "</label>" .
+            "<select class=\"form-control litEvent litEventProper\" id=\"{$uniqid}Proper\" multiple=\"multiple\" />" .
             "<option value=\"PROPER\" selected>" . __("Proper") . "</option>" .
             "<option value=\"COMMONBVM\">" . __("Common of the Blessed Virgin Mary") . "</option>" .
+            //"<optgroup label=\"" . __("Common of Martyrs") . "\">" .
             "<option value=\"COMMONMARTYRS\">" . __("Common of Martyrs") . "</option>" .
             "<option value=\"COMMONMARTYRS_ONE\">" . __("Common of Martyrs: For One Martyr") . "</option>" .
             "<option value=\"COMMONMARTYRS_SEVERAL\">" . __("Common of Martyrs: For Several Martyrs") . "</option>" .
             "<option value=\"COMMONMARTYRS_MISSIONARY\">" . __("Common of Martyrs: For Missionary Martyrs") . "</option>" .
             "<option value=\"COMMONMARTYRS_VIRGIN\">" . __("Common of Martyrs: For a Virgin Martyr") . "</option>" .
+            //"<optgroup label=\"" . __("Common of Pastors") . "\">" .
             "<option value=\"COMMONPASTORS\">" . __("Common of Pastors") . "</option>" .
             "<option value=\"COMMONPASTORS_POPE\">" . __("Common of Pastors: For a Pope") . "</option>" .
             "<option value=\"COMMONPASTORS_BISHOP\">" . __("Common of Pastors: For a Bishop") . "</option>" .
@@ -80,9 +82,11 @@ class FormControls {
             "<option value=\"COMMONPASTORS_SEVERAL\">" . __("Common of Pastors: For Several Pastors") . "</option>" .
             "<option value=\"COMMONPASTORS_MISSIONARY\">" . __("Common of Pastors: For Missionaries") . "</option>" .
             "<option value=\"COMMONDOCTORS\">" . __("Common of Doctors") . "</option>" .
+            //"<optgroup label=\"" . __("Common of Virgins") . "\">" .
             "<option value=\"COMMONVIRGINS\">" . __("Common of Virgins") . "</option>" .
             "<option value=\"COMMONVIRGINS_ONE\">" . __("Common of Virgins: For One Virgin") . "</option>" .
             "<option value=\"COMMONVIRGINS_SEVERAL\">" . __("Common of Virgins: For Several Virgins") . "</option>" .
+            //"<optgroup label=\"" . __("Common of Holy Men and Women") . "\">" .
             "<option value=\"COMMONHOLYMENWOMEN\">" . __("Common of Holy Men and Women") . "</option>" .
             "<option value=\"COMMONHOLYMENWOMEN_ONE\">" . __("Common of Holy Men and Women: For One Saint") . "</option>" .
             "<option value=\"COMMONHOLYMENWOMEN_RELIGIOUS\">" . __("Common of Holy Men and Women: For Religious") . "</option>" .
@@ -92,7 +96,7 @@ class FormControls {
             "<option value=\"COMMONHOLYMENWOMEN_EDUCATORS\">" . __("Common of Holy Men and Women: For Educators") . "</option>" .
             "<option value=\"COMMONHOLYMENWOMEN_WOMEN\">" . __("Common of Holy Men and Women: For Holy Women") . "</option>" .
             "<option value=\"COMMONHOLYMENWOMEN_MERCY\">" . __("Common of Holy Men and Women: For Those Who Practiced Works of Mercy") . "</option>" .
-            "<option value=\"DEDICATION_CHURCH\">" . __("Common of the Dedication of a Church") . "</option>" .
+            "<option value=\"COMMONDEDICATIONCHURCH\">" . __("Common of the Dedication of a Church") . "</option>" .
             "</select>" .
             "</div>";
         }

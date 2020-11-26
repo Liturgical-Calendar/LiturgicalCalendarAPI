@@ -38,3 +38,12 @@
 </script>
 
 <script src="assets/js/homepage.js"></script>
+<!-- current PHP script detected as: <?php echo basename($_SERVER["SCRIPT_FILENAME"], '.php') ?> -->
+<?php 
+    //some assets are only needed on certain pages
+    switch(basename($_SERVER["SCRIPT_FILENAME"], '.php')){
+        case 'extending':
+            echo '<script src="assets/js/bootstrap-multiselect.js"></script>';
+        break;
+    }
+?>

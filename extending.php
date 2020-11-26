@@ -322,6 +322,7 @@ $messages = array_merge($messages, [
                                                     <?php FormControls::CreateFestivityRow(__("Dedication of the Cathedral")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Other Solemnity")) ?>
                                                 </form>
+                                                <div class="text-center"><button class="btn btn-lg btn-primary m-3 onTheFlyEventRow" id="addSolemnity">+</button></div>
                                             <!--</div>
                                         </div>-->
                                     </div>
@@ -342,6 +343,7 @@ $messages = array_merge($messages, [
                                                     <?php FormControls::CreateFestivityRow(__("Dedication of the Cathedral")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Other Feast")) ?>
                                                 </form>
+                                                <div class="text-center"><button class="btn btn-lg btn-primary m-3 onTheFlyEventRow" id="addFeast">+</button></div>
                                             <!--</div>
                                         </div>-->
                                     </div>
@@ -362,6 +364,7 @@ $messages = array_merge($messages, [
                                                     <?php FormControls::CreateFestivityRow(__("Other Memorial")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Other Memorial")) ?>
                                                 </form>
+                                                <div class="text-center"><button class="btn btn-lg btn-primary m-3 onTheFlyEventRow" id="addMemorial">+</button></div>
                                             <!--</div>
                                         </div>-->
                                     </div>
@@ -382,6 +385,7 @@ $messages = array_merge($messages, [
                                                     <?php FormControls::CreateFestivityRow(__("Other Optional Memorial")) ?>
                                                     <?php FormControls::CreateFestivityRow(__("Other Optional Memorial")) ?>
                                                 </form>
+                                                <div class="text-center"><button class="btn btn-lg btn-primary m-3 onTheFlyEventRow" id="addOptionalMemorial">+</button></div>
                                             <!--</div>
                                         </div>-->
                                     </div>
@@ -438,6 +442,8 @@ $messages = array_merge($messages, [
         OPTIONALMEMORIAL: 2,
         WEEKDAY: 1
     }
+
+    const LITCAL_LOCALE = '<?php echo LITCAL_LOCALE; ?>';
 
     $USDiocesesObj = <?php echo $USDiocesesByState; ?>;
     $USDiocesesArr = [];
@@ -708,15 +714,27 @@ $messages = array_merge($messages, [
                         let $row;
                         switch(litevent.grade){
                             case RANK.SOLEMNITY:
+                                if(litevent.formRowNum > 2){
+                                    $('.carousel-item').eq(0).find('form').append($(FormControls.CreateFestivityRow('Other Solemnity')));
+                                }
                                 $row = $('#carouselItemSolemnities form .form-row').eq(litevent.formRowNum);
                                 break;
                             case RANK.FEAST: 
+                                if(litevent.formRowNum > 2){
+                                    $('.carousel-item').eq(1).find('form').append($(FormControls.CreateFestivityRow('Other Feast')));
+                                }
                                 $row = $('#carouselItemFeasts form .form-row').eq(litevent.formRowNum);
                                 break;
                             case RANK.MEMORIAL:
+                                if(litevent.formRowNum > 2){
+                                    $('.carousel-item').eq(2).find('form').append($(FormControls.CreateFestivityRow('Other Memorial')));
+                                }
                                 $row = $('#carouselItemMemorials form .form-row').eq(litevent.formRowNum);
                                 break;
                             case RANK.OPTIONALMEMORIAL:
+                                if(litevent.formRowNum > 2){
+                                    $('.carousel-item').eq(3).find('form').append($(FormControls.CreateFestivityRow('Other Optional Memorial')));
+                                }
                                 $row = $('#carouselItemOptionalMemorials form .form-row').eq(litevent.formRowNum);
                                 break;
                         }
@@ -731,7 +749,169 @@ $messages = array_merge($messages, [
             });
         });
 
+        $(document).on('click','.onTheFlyEventRow',function(){
+            switch(this.id){
+                case "addSolemnity":
+                    $('.carousel-item').first().find('form').append($(FormControls.CreateFestivityRow('Other Solemnity')));
+                    break;
+                case "addFeast":
+                    $('.carousel-item').eq(1).find('form').append($(FormControls.CreateFestivityRow('Other Feast')));
+                    break;
+                case "addMemorial":
+                    $('.carousel-item').eq(2).find('form').append($(FormControls.CreateFestivityRow('Other Memorial')));
+                    break;
+                case "addOptionalMemorial":
+                    $('.carousel-item').eq(3).find('form').append($(FormControls.CreateFestivityRow('Other Optional Memorial')));
+                    break;
+            }
+        });
+
+       // $('.litEventProper').each(function(){$(this).multiselect()});
+       $('.litEventProper').multiselect({
+            buttonWidth: '100%',
+            maxHeight: 200,
+            enableCollapsibleOptGroups: true,
+            collapseOptGroupsByDefault: true,
+            enableCaseInsensitiveFiltering: true
+        });
+
     });
+
+    let __ = function($key) {
+        $lcl = LITCAL_LOCALE.toLowerCase();
+        if ($messages !== undefined && $messages !== null && typeof $messages == 'object') {
+            if ($messages.hasOwnProperty($key) && typeof $messages[$key] == 'object') {
+                if ($messages[$key].hasOwnProperty($lcl)) {
+                    return $messages[$key][$lcl];
+                } else {
+                    return $messages[$key]["en"];
+                }
+            } else {
+                return $key;
+            }
+        } else {
+            return $key;
+        }
+    },
+    $messages = {
+        "Name": {
+            "en":"Name",
+            "es":"Nombre",
+            "fr":"Nom",
+            "de":"Name",
+            "it":"Nome"
+        }
+    };
+
+    class FormControls {
+        static uniqid = 0;
+        static settings = {
+            nameField: true,
+            dayField: true,
+            monthField: true,
+            colorField: true,
+            properField: true,
+            fromYearField: true
+        }
+
+        static CreateFestivityRow(title=null){
+            let formRow = '';
+
+            if(title !== null){
+                formRow += `<h4>${title}</h4>`;
+            }
+
+            formRow += `<div class="form-row">`;
+
+            if(FormControls.settings.nameField){
+                formRow += `<div class="form-group col-sm-3">
+                <label for="onTheFly${FormControls.uniqid}Name">${__("Name")}</label><input type="text" class="form-control litEvent litEventName" id="onTheFly${FormControls.uniqid}Name" data-valuewas="" />
+                <div class="invalid-feedback">This same celebration was already defined elsewhere. Please remove it first where it is defined, then you can define it here.</div>
+                </div>`;
+            }
+
+            if(FormControls.settings.dayField){
+                formRow += `<div class="form-group col-sm-1">
+                <label for="onTheFly${FormControls.uniqid}Day">${__("Day")}</label><input type="number" min=1 max=31 value=1 class="form-control litEvent litEventDay" id="onTheFly${FormControls.uniqid}Day" />
+                </div>`;
+            }
+
+            if(FormControls.settings.monthField){
+                formRow += `<div class="form-group col-sm-2">
+                <label for="onTheFly${FormControls.uniqid}Month">${__("Month")}</label>
+                <select class="form-control litEvent litEventMonth" id="onTheFly${FormControls.uniqid}Month">`;
+
+                let formatter = new Intl.DateTimeFormat(LITCAL_LOCALE, { month: 'long' });
+                for(let i=0;i<12;i++){
+                    let month = new Date(Date.UTC(0, i, 2, 0, 0, 0));
+                    formRow += `<option value=${i}>${formatter.format(month)}</option>`;
+                }
+        
+                formRow += `</select>
+                </div>`;
+            }
+
+            if(FormControls.settings.colorField){
+                formRow += `<div class="form-group col-sm-2">
+                <label for="onTheFly${FormControls.uniqid}Color">${__("Liturgical color")}</label>
+                <select class="form-control litEvent litEventColor" id="onTheFly${FormControls.uniqid}Color" />
+                <option value="WHITE" selected>${__("white").toUpperCase()}</option>
+                <option value="RED">${__("red").toUpperCase()}</option>
+                <option value="PURPLE">${__("purple").toUpperCase()}</option>
+                <option value="GREEN">${__("green").toUpperCase()}</option>
+                </select>
+                </div>`;
+            }
+
+            if(FormControls.settings.properField){
+                formRow += `<div class="form-group col-sm-3">
+                <label style="display:block;" for="onTheFly${FormControls.uniqid}Proper">${__("Common (or Proper)")}</label>
+                <select class="form-control litEvent litEventProper" id="{$uniqid}Proper" />
+                <option value="PROPER" selected>${__("Proper")}</option>
+                <option value="COMMONBVM">${__("Common of the Blessed Virgin Mary")}</option>
+                <option value="COMMONMARTYRS">${__("Common of Martyrs")}</option>
+                <option value="COMMONMARTYRS_ONE">${__("Common of Martyrs: For One Martyr")}</option>
+                <option value="COMMONMARTYRS_SEVERAL">${__("Common of Martyrs: For Several Martyrs")}</option>
+                <option value="COMMONMARTYRS_MISSIONARY">${__("Common of Martyrs: For Missionary Martyrs")}</option>
+                <option value="COMMONMARTYRS_VIRGIN">${__("Common of Martyrs: For a Virgin Martyr")}</option>
+                <option value="COMMONPASTORS">${__("Common of Pastors")}</option>
+                <option value="COMMONPASTORS_POPE">${__("Common of Pastors: For a Pope")}</option>
+                <option value="COMMONPASTORS_BISHOP">${__("Common of Pastors: For a Bishop")}</option>
+                <option value="COMMONPASTORS_ONE">${__("Common of Pastors: For One Pastor")}</option>
+                <option value="COMMONPASTORS_SEVERAL">${__("Common of Pastors: For Several Pastors")}</option>
+                <option value="COMMONPASTORS_MISSIONARY">${__("Common of Pastors: For Missionaries")}</option>
+                <option value="COMMONDOCTORS">${__("Common of Doctors")}</option>
+                <option value="COMMONVIRGINS">${__("Common of Virgins")}</option>
+                <option value="COMMONVIRGINS_ONE">${__("Common of Virgins: For One Virgin")}</option>
+                <option value="COMMONVIRGINS_SEVERAL">${__("Common of Virgins: For Several Virgins")}</option>
+                <option value="COMMONHOLYMENWOMEN">${__("Common of Holy Men and Women")}</option>
+                <option value="COMMONHOLYMENWOMEN_ONE">${__("Common of Holy Men and Women: For One Saint")}</option>
+                <option value="COMMONHOLYMENWOMEN_RELIGIOUS">${__("Common of Holy Men and Women: For Religious")}</option>
+                <option value="COMMONHOLYMENWOMEN_ABBOT">${__("Common of Holy Men and Women: For an Abbot")}</option>
+                <option value="COMMONHOLYMENWOMEN_MONK">${__("Common of Holy Men and Women: For a Monk")}</option>
+                <option value="COMMONHOLYMENWOMEN_NUN">${__("Common of Holy Men and Women: For a Nun")}</option>
+                <option value="COMMONHOLYMENWOMEN_EDUCATORS">${__("Common of Holy Men and Women: For Educators")}</option>
+                <option value="COMMONHOLYMENWOMEN_WOMEN">${__("Common of Holy Men and Women: For Holy Women")}</option>
+                <option value="COMMONHOLYMENWOMEN_MERCY">${__("Common of Holy Men and Women: For Those Who Practiced Works of Mercy")}</option>
+                <option value="DEDICATION_CHURCH">${__("Common of the Dedication of a Church")}</option>
+                </select>
+                </div>`;
+            }
+
+            if(FormControls.settings.fromYearField){
+                formRow += `<div class="form-group col-sm-1">
+                <label for="onTheFly${FormControls.uniqid}FromYear">${__("Since")}</label>
+                <input type="number" min=1970 max=9999 class="form-control litEvent litEventFromYear" id="onTheFly${FormControls.uniqid}FromYear" value=1970 />
+                </div>`;
+            }
+
+            formRow += `</div>`;
+            ++FormControls.uniqid;
+
+            return formRow;
+
+        }
+    }
 </script>
 </body>
 </html>
