@@ -54,6 +54,7 @@ if(in_array($_SERVER["HTTP_REFERER"],$allowedDomains) ){
     }
     header('Content-Type: application/json');
     echo json_encode($CalData);
+    exit;
 } else {
     $CalData->ERROR = "request not issued from the allowed domain";
     $CalData->XRequestedWith = $_SERVER['HTTP_X_REQUESTED_WITH'];
@@ -61,7 +62,7 @@ if(in_array($_SERVER["HTTP_REFERER"],$allowedDomains) ){
     $CalData->Nation = $_POST["nation"];
     $CalData->Diocese = $_POST['diocese'];
     $CalData->Calendar = $_POST['calendar'];
-header('Content-Type: application/json');
+    header('Content-Type: application/json');
     echo json_encode($CalData);
     exit;
 }

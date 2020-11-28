@@ -44,6 +44,8 @@
     switch(basename($_SERVER["SCRIPT_FILENAME"], '.php')){
         case 'extending':
             echo '<script src="assets/js/bootstrap-multiselect.js"></script>';
+            //echo '<script src="assets/js/i18n.js"></script>';
+            echo '<script src="assets/js/extending.js"></script>';
         break;
     }
 ?>
