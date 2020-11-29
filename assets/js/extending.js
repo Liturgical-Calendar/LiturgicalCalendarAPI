@@ -120,7 +120,7 @@ class FormControls {
             let formatter = new Intl.DateTimeFormat(LITCAL_LOCALE, { month: 'long' });
             for(let i=0;i<12;i++){
                 let month = new Date(Date.UTC(0, i, 2, 0, 0, 0));
-                formRow += `<option value=${i}>${formatter.format(month)}</option>`;
+                formRow += `<option value=${i+1}>${formatter.format(month)}</option>`;
             }
     
             formRow += `</select>
@@ -244,7 +244,7 @@ $(document).on('change','.litEvent',function(event){
                 $CALENDAR.LitCal[eventKey].day = parseInt($row.find('.litEventDay').val());
                 $CALENDAR.LitCal[eventKey].month = parseInt($row.find('.litEventMonth').val());
                 $CALENDAR.LitCal[eventKey].color = $row.find('.litEventColor').val();
-                $CALENDAR.LitCal[eventKey].common = $row.find('.litEventProper').val();
+                $CALENDAR.LitCal[eventKey].common = $row.find('.litEventProper').val().join(',');
                 $CALENDAR.LitCal[eventKey].sinceYear = $row.find('.litEventFromYear').val();
                 $CALENDAR.LitCal[eventKey].formRowNum = $card.find('.form-row').index($row);
                 $(this).attr('data-valuewas',eventKey);
