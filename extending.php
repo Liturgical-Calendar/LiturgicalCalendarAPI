@@ -192,7 +192,8 @@ $messages = array_merge($messages, [
         "es" => "Común (o Propio)",
         "fr" => "Commun (ou Propre)",
         "it" => "Comune (o Proprio)",
-        "pt" => "Comum (ou Próprio)"
+        "pt" => "Comum (ou Próprio)",
+        "lat" => "Commune (vel Proprium)"
     ],
     "This diocese does not seem to exist? Please choose from a value in the list." => [
         "de" => "Diese Diözese scheint nicht zu existieren? Bitte wählen Sie aus einem Wert in der Liste.",
@@ -209,13 +210,6 @@ $messages = array_merge($messages, [
         "fr" => "ENREGISTRER LE CALENDRIER DIOCÉSAIN",
         "it" => "SALVA IL CALENDARIO DIOCESANO",
         "pt" => "SALVAR CALENDÁRIO DIOCESANO"
-    ],
-    "Name" => [
-        "en" => "Name",
-        "es" => "Nombre",
-        "fr" => "Nom",
-        "de" => "Name",
-        "it" => "Nome"
     ]
 /*
     "" => [
