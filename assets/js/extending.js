@@ -108,7 +108,7 @@ class FormControls {
 
         if(FormControls.settings.dayField){
             formRow += `<div class="form-group col-sm-1">
-            <label for="onTheFly${FormControls.uniqid}Day">${__("Day")}</label><input type="number" min=1 max=31 value=1 class="form-control litEvent litEventDay" id="onTheFly${FormControls.uniqid}Day" />
+            <label for="onTheFly${FormControls.uniqid}Day">${__("Day")}</label><input type="number" min="1" max="31" value="1" class="form-control litEvent litEventDay" id="onTheFly${FormControls.uniqid}Day" />
             </div>`;
         }
 
@@ -184,7 +184,7 @@ class FormControls {
         if(FormControls.settings.fromYearField){
             formRow += `<div class="form-group col-sm-1">
             <label for="onTheFly${FormControls.uniqid}FromYear">${__("Since")}</label>
-            <input type="number" min=1970 max=9999 class="form-control litEvent litEventFromYear" id="onTheFly${FormControls.uniqid}FromYear" value=1970 />
+            <input type="number" min="1970" max="9999" class="form-control litEvent litEventFromYear" id="onTheFly${FormControls.uniqid}FromYear" value="1970" />
             </div>`;
         }
 
@@ -474,9 +474,16 @@ $(document).on('click','.onTheFlyEventRow',function(){
     $row.find('.litEventProper').multiselect({
         buttonWidth: '100%',
         maxHeight: 200,
-        enableCollapsibleOptGroups: true,
-        collapseOptGroupsByDefault: true,
-        enableCaseInsensitiveFiltering: true
+        //enableCollapsibleOptGroups: true,
+        //collapseOptGroupsByDefault: true,
+        enableCaseInsensitiveFiltering: true,
+        onChange: function(option, checked, select) {
+            if($(option).val() != 'Proper' && checked === true && $(option).parent().val().includes('Proper') ){
+                $(option).parent().multiselect('deselect','Proper');
+            } else if($(option).val() == 'Proper' && checked === true){
+                $(option).parent().multiselect('deselectAll',false).multiselect('select','Proper');
+            }
+        }
     });
 
     $row.find('.litEventColor').multiselect({
@@ -546,7 +553,14 @@ jQuery(document).ready(function(){
         maxHeight: 200,
         //enableCollapsibleOptGroups: true,
         //collapseOptGroupsByDefault: true,
-        enableCaseInsensitiveFiltering: true
+        enableCaseInsensitiveFiltering: true,
+        onChange: function(option, checked, select) {
+            if($(option).val() != 'Proper' && checked === true && $(option).parent().val().includes('Proper') ){
+                $(option).parent().multiselect('deselect','Proper');
+            } else if($(option).val() == 'Proper' && checked === true){
+                $(option).parent().multiselect('deselectAll',false).multiselect('select','Proper');
+            }
+        }
     });
     $('.litEventColor').multiselect({
         buttonWidth: '100%'
