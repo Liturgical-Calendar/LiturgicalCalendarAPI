@@ -112,27 +112,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $DiocesanData = null;
 $index = null;
 if($LITSETTINGS->DIOCESAN !== false){
-    switch($LITSETTINGS->DIOCESAN){
-        case 'DIOCESIDIROMA':
-        case 'DIOCESILAZIO':
-            $LITSETTINGS->NATIONAL = "ITALY";
-        break;
-        default:
-            //since a Diocesan calendar is being requested, we need to retrieve the JSON data
-            //first we need to discover the path, so let's retrieve our index file
-            if(file_exists("nations/index.json")){
-                $index = json_decode(file_get_contents("nations/index.json"));
-                if(property_exists($index,$LITSETTINGS->DIOCESAN)){
-                    $diocesanDataFile = $index->{$LITSETTINGS->DIOCESAN}->path;
-                    $LITSETTINGS->NATIONAL = $index->{$LITSETTINGS->DIOCESAN}->nation;
-                    if(file_exists($diocesanDataFile) ){
-                        $DiocesanData = json_decode(file_get_contents($diocesanDataFile));
-                    }
-                }
+    //since a Diocesan calendar is being requested, we need to retrieve the JSON data
+    //first we need to discover the path, so let's retrieve our index file
+    if(file_exists("nations/index.json")){
+        $index = json_decode(file_get_contents("nations/index.json"));
+        if(property_exists($index,$LITSETTINGS->DIOCESAN)){
+            $diocesanDataFile = $index->{$LITSETTINGS->DIOCESAN}->path;
+            $LITSETTINGS->NATIONAL = $index->{$LITSETTINGS->DIOCESAN}->nation;
+            if(file_exists($diocesanDataFile) ){
+                $DiocesanData = json_decode(file_get_contents($diocesanDataFile));
             }
-        break;
+        }
     }
-
 }
 
 if($LITSETTINGS->NATIONAL !== false){
@@ -2480,6 +2471,7 @@ if($LITSETTINGS->NATIONAL !== false){
 
 if($LITSETTINGS->DIOCESAN !== false){
     switch($LITSETTINGS->DIOCESAN){
+        /*
         case "DIOCESIDIROMA":
 
             if(array_key_exists("StJohnPaulII",$LitCal) ){
@@ -2521,16 +2513,17 @@ if($LITSETTINGS->DIOCESAN !== false){
                                     '<i>' . $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name . '</i>',
                                     $LITSETTINGS->YEAR
                                 );
-                            }/* else{
+                            } else{
                                 //This is the sure case in which we know we can create the Solemnity, but we've already done so anyways
                                 // so it should show up in a calendar even in a conflicting case, to allow for solving through the interface...
                                 //$LitCal["DIOCESIDIROMA_".$row["TAG"]] = new Festivity("[Diocesi di Roma] " . $row["NAME_" . $LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"], $row["DISPLAYGRADE"]);
-                            }*/
+                            }
                         }
                     }
                 }
             }
         break;
+        */
         default:
             if($DiocesanData !== null){
                 

@@ -210,6 +210,14 @@ $messages = array_merge($messages, [
         "fr" => "ENREGISTRER LE CALENDRIER DIOCÉSAIN",
         "it" => "SALVA IL CALENDARIO DIOCESANO",
         "pt" => "SALVAR CALENDÁRIO DIOCESANO"
+    ],
+    "Retrieve existing data" => [
+        "de" => "Laden Sie vorhandene Daten",
+        "en" => "Retrieve existing data",
+        "es" => "Carga datos existentes",
+        "fr" => "Charge les données existantes",
+        "it" => "Carica i dati esistenti",
+        "pt" => "Carrega dados existentes"
     ]
 /*
     "" => [
@@ -277,7 +285,7 @@ $messages = array_merge($messages, [
                             <datalist id="DiocesesList">
                                 <option value=""></option>
                             </datalist>
-                            <div class="col text-center"><button class="btn btn-primary m-2" id="retrieveExistingDiocesanData" disabled>Retrieve existing data</button></div>
+                            <div class="col text-center"><button class="btn btn-primary m-2" id="retrieveExistingDiocesanData" disabled><?php _e("Retrieve existing data"); ?></button></div>
                         </div>
                         <div class="form-group col col-md-4">
                             <label for="diocesanCalendarBehaviour" class="font-weight-bold"><?php _e("Overwrites universal / national calendar"); ?></label>

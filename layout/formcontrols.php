@@ -42,7 +42,7 @@ class FormControls {
             $formatter = new IntlDateFormatter(LITCAL_LOCALE, IntlDateFormatter::FULL, IntlDateFormatter::NONE);
             $formatter->setPattern("MMMM");
             for($i=1;$i<=12;$i++){
-                $month = DateTime::createFromFormat("n",$i, new DateTimeZone('UTC') );
+                $month = DateTime::createFromFormat("n j",$i . " 15", new DateTimeZone('UTC') );
                 $formRow .= "<option value={$i}>" . $formatter->format($month) . "</option>";
             }
     
