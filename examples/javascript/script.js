@@ -702,7 +702,7 @@ let today = new Date(),
     },
     $index = {},
     $DiocesesUSA,
-    //$DiocesesITALY,
+    $DiocesesItaly,
     isStaging = window.location.pathname.includes('-staging');
 
     jQuery.ajax({
@@ -717,6 +717,8 @@ let today = new Date(),
             console.log('retrieved data from index file:');
             console.log(data);
             $index = data;
+            $DiocesesUSA = Object.filter($index, key => key.nation == "USA");
+            $DiocesesItaly = Object.filter($index, key => key.nation == "ITALY");
         }
     });
 
@@ -780,38 +782,54 @@ $(document).ready(function() {
             $('#epiphany').val('JAN6');
             $('#ascension').val('SUNDAY');
             $('#corpuschristi').val('SUNDAY');
-            $('#diocesanpreset').prop('disabled',false).val("DIOCESIROMA");
             $Settings.locale = 'IT';
             $Settings.epiphany = 'JAN6';
             $Settings.ascension = 'SUNDAY';
             $Settings.corpuschristi = 'SUNDAY';
+            $Settings.diocesanpreset = '';
+            $Settings.nationalpreset = 'ITALY';
             $('#calSettingsForm :input').not('#diocesanpreset').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
+            $('#diocesanpreset').empty();
+            if(Object.keys($DiocesesItaly).length > 0){
+              $('#diocesanpreset').prop('disabled', false);
+              $('#diocesanpreset').append('<option value=""></option>');
+              for(const [key, value] of Object.entries($DiocesesItaly)){
+                $('#diocesanpreset').append('<option value="' + key + '">' + value.diocese + '</option>');
+              }
+            } else {
+              $('#diocesanpreset').prop('disabled', true);
+            }
           break;
           case "USA":
             $('#locale').val('EN');
             $('#epiphany').val('SUNDAY_JAN2_JAN8');
             $('#ascension').val('SUNDAY');
             $('#corpuschristi').val('SUNDAY');
-            $('#diocesanpreset').val("");
             $Settings.locale = 'EN';
             $Settings.epiphany = 'SUNDAY_JAN2_JAN8';
             $Settings.ascension = 'SUNDAY';
             $Settings.corpuschristi = 'SUNDAY';
             $Settings.diocesanpreset = '';
-            $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
             $Settings.nationalpreset = 'USA';
+            $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
             
+            //TODO: once the data for the Diocese of Rome has been define through the UI interface
+            //      and the relative JSON file created, the following operation should be abstracted for any nation in the list
+            //      and not applied here with the hardcoded value "USA"
+            //      The logic has been started up above, before the 'switch'
+            //      However we have to keep in mind that Rome groups together the celebrations for the whole Lazio region in a single booklet
+            //      This would mean that we have to create the ability of creating groups, to group together the data from more than one diocese
+            //      Perhaps another value can be added to the index, to indicate a group definition, such that all the diocesan calendars belonging to that group can be pulled...
             $('#diocesanpreset').empty();
-            $DiocesesUSA = Object.filter($index, key => key.nation == "USA");
             if(Object.keys($DiocesesUSA).length > 0){
               $('#diocesanpreset').prop('disabled', false);
+              $('#diocesanpreset').append('<option value=""></option>');
               for(const [key, value] of Object.entries($DiocesesUSA)){
                 $('#diocesanpreset').append('<option value="' + key + '">' + value.diocese + '</option>');
               }
             } else {
               $('#diocesanpreset').prop('disabled', true);
             }
-
             break;
           default:
             $('#calSettingsForm :input').prop('disabled',false);

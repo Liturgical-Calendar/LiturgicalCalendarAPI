@@ -27,6 +27,9 @@ if(in_array($_SERVER["HTTP_REFERER"],$allowedDomains) ){
         $CalData->Nation = $_POST["nation"];
         $CalData->Diocese = $_POST['diocese'];
         $CalData->Calendar = $_POST['calendar'];
+        if(isset($_POST['group'])){
+            $CalData->Group = $_POST['group'];
+        }
         $path = "nations/{$CalData->Nation}";
         if(!file_exists($path) ){
             mkdir($path,0755,true);
@@ -49,6 +52,9 @@ if(in_array($_SERVER["HTTP_REFERER"],$allowedDomains) ){
         $index->$key->path = $path . "/{$CalData->Diocese}.json";
         $index->$key->nation = $CalData->Nation;
         $index->$key->diocese = $CalData->Diocese;
+        if(property_exists($CalData,'Group')){
+            $index->$key->group = $CalData->Group;
+        }
 
         file_put_contents("nations/index.json",json_encode($index) . PHP_EOL);
     }
@@ -56,12 +62,15 @@ if(in_array($_SERVER["HTTP_REFERER"],$allowedDomains) ){
     echo json_encode($CalData);
     exit;
 } else {
-    $CalData->ERROR = "request not issued from the allowed domain";
+    $CalData->ERROR = "request not issued from a whitelisted domain";
     $CalData->XRequestedWith = $_SERVER['HTTP_X_REQUESTED_WITH'];
     $CalData->HTTPReferer = $_SERVER["HTTP_REFERER"];
     $CalData->Nation = $_POST["nation"];
     $CalData->Diocese = $_POST['diocese'];
     $CalData->Calendar = $_POST['calendar'];
+    if(isset($_POST['group'])){
+        $CalData->Group = $_POST['group'];
+    }
     header('Content-Type: application/json');
     echo json_encode($CalData);
     exit;

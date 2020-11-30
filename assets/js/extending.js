@@ -642,12 +642,15 @@ $(document).on('change', '.litEvent', function (event) {
 });
 
 $(document).on('click', '#saveDiocesanCalendar_btn', function () {
+    $data = JSON.stringify($CALENDAR);
     $nation = $('#diocesanCalendarNationalDependency').val();
     $diocese = $('#diocesanCalendarDioceseName').val();
-    //$CALENDAR.Nation = $nation;
-    //$CALENDAR.Diocese = $diocese;
-    $data = JSON.stringify($CALENDAR);
     console.log('save button was clicked for NATION = ' + $nation + ', DIOCESE = ' + $diocese);
+    let saveObj = {calendar: $data, diocese: $diocese, nation: $nation};
+    if($('#diocesanCalendarGroup').val() != ''){
+        saveObj.group = $('#diocesanCalendarGroup').val();
+    }
+
     let formsValid = true;
     $('form').each(function () {
         if (this.checkValidity() === false) {
@@ -660,7 +663,7 @@ $(document).on('click', '#saveDiocesanCalendar_btn', function () {
             url: './writeDiocesanCalendar.php',
             method: 'post',
             dataType: 'json',
-            data: { calendar: $data, diocese: $diocese, nation: $nation },
+            data: saveObj,
             success: function (data) {
                 console.log('data returned from save action: ');
                 console.log(data);
@@ -829,6 +832,9 @@ $(document).on('change', '#diocesanCalendarDioceseName', function () {
         console.log('selected diocese with key = ' + $key);
         if ($index.hasOwnProperty($key)) {
             $('#retrieveExistingDiocesanData').prop('disabled', false);
+            if($index[$key].hasOwnProperty('group')){
+                $('#diocesanCalendarGroup').val($index[$key].group);
+            }
             console.log('we have an existing entry for this diocese!');
         } else {
             $('#retrieveExistingDiocesanData').prop('disabled', true);

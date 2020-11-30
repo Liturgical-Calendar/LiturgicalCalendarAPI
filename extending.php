@@ -218,6 +218,22 @@ $messages = array_merge($messages, [
         "fr" => "Charge les données existantes",
         "it" => "Carica i dati esistenti",
         "pt" => "Carrega dados existentes"
+    ],
+    "Diocesan group" => [
+        "de" => "Gruppe von Diözesen",
+        "en" => "Diocesan group",
+        "es" => "Grupo de diócesis",
+        "fr" => "Groupe de diocèses",
+        "it" => "Gruppo di Diocesi",
+        "pt" => "Grupo de dioceses"
+    ],
+    "DioceseGroupHelp" => [
+        "de" => "",
+        "en" => "If a group of dioceses decides to pool their Liturgical Calendar data, for example to print out one single yearly calendar with the data for all the dioceses in the group, the group can be defined or set here.",
+        "es" => "",
+        "fr" => "",
+        "it" => "Se un gruppo di più diocesi decide di unire i dati dei propri calendari liturgici, per esempio per stampare un solo calendario annuale con i dati di tutte le diocesi del gruppo, questo gruppo lo si può definire (se non ancora esistente) o impostare (se già esistente) qui.",
+        "pt" => ""
     ]
 /*
     "" => [
@@ -287,11 +303,16 @@ $messages = array_merge($messages, [
                             </datalist>
                             <div class="col text-center"><button class="btn btn-primary m-2" id="retrieveExistingDiocesanData" disabled><?php _e("Retrieve existing data"); ?></button></div>
                         </div>
-                        <div class="form-group col col-md-4">
+                        <div class="form-group col col-md-3">
+                            <label for="diocesanCalendarGroup" class="font-weight-bold"><?php _e("Diocesan group"); ?>:</label>
+                            <input type="text" class="form-control" id="diocesanCalendarGroup" aria-describedby="diocesanCalendarGroupHelp">
+                            <small id="diocesanCalendarGroupHelp" class="form-text text-muted"><?php _e("DioceseGroupHelp"); ?></small>
+                        </div>
+                        <!-- <div class="form-group col col-md-4">
                             <label for="diocesanCalendarBehaviour" class="font-weight-bold"><?php _e("Overwrites universal / national calendar"); ?></label>
                             <input type="checkbox" class="form-control" data-toggle="toggle" id="diocesanCalendarBehaviour" aria-describedby="diocesanCalendarBehaviourHelp">
                             <small id="diocesanCalendarBehaviourHelp" class="form-text text-muted">The default behaviour for a diocesan calendar is to juxtapose the local celebrations alongside those of the universal and the national calendar. If instead the diocesan calendar should override the universal calendar, turn this option on.</small>
-                        </div>
+                        </div> -->
                     </form>
                 </div>
                 <nav aria-label="Diocesan calendar definition" id="diocesanCalendarDefinitionCardLinks">
