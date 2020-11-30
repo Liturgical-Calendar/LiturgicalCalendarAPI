@@ -417,7 +417,7 @@
           $settingsDialog = `<div id="settingsWrapper"><form id="calSettingsForm"><table id="calSettings">
         <tr><td colspan="2"><label>${__('YEAR')}: </td><td colspan="2"><input type="number" name="year" id="year" min="1969" max="9999" value="${$Settings.year}" /></label></td></tr>
         <tr><td><label>${__('LOCALE')}: </td><td><select name="locale" id="locale"><option value="EN" ${($Settings.locale === "EN" ? " SELECTED" : "")}>ENGLISH</option><option value="IT" ${($Settings.locale === "IT" ? " SELECTED" : "")}>ITALIANO</option><option value="LA" ${($Settings.locale === "LA" ? " SELECTED" : "")}>LATINO</option></select></label></td><td>${__('NATIONAL PRESET')}: </td><td><select id="nationalpreset" name="nationalpreset"><option value=""></option><option value="VATICAN" ${($Settings.nationalpreset === "VATICAN" ? " SELECTED" : "")}>${__('Vatican')}</option><option value="ITALY" ${($Settings.nationalpreset === "ITALY" ? " SELECTED" : "")}>${__('Italy')}</option><option value="USA" ${($Settings.nationalpreset === "USA" ? " SELECTED" : "")}>USA</option></select></td></tr>
-        <tr><td><label>${__('EPIPHANY')}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>${__('January 6')}</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>${__('Sunday Jan 2↔Jan 8')}</option></select></label></td><td>${__('DIOCESAN PRESET')}: </td><td><select id="diocesanpreset" name="diocesanpreset" disabled></select></td></tr>
+        <tr><td><label>${__('EPIPHANY')}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>${__('January 6')}</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>${__('Sunday Jan 2↔Jan 8')}</option></select></label></td><td>${__('DIOCESAN PRESET')}: </td><td><select id="diocesanpreset" name="diocesanpreset" ${($Settings.nationalpreset == '' || $Settings.nationalpreset == 'VATICAN' ) ? 'disabled' : ''}></select></td></tr>
         <tr><td><label>${__('ASCENSION')}: </td><td><select name="ascension" id="ascension"><option value="THURSDAY" ${($Settings.ascension === "THURSDAY" ? " SELECTED" : "")}>${__('Thursday')}</option><option value="SUNDAY" ${($Settings.ascension === "SUNDAY" ? " SELECTED" : "")}>${__('Sunday')}</option></select></label></td><td></td><td></td></tr>
         <tr><td><label>CORPUS CHRISTI: </td><td><select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" ${($Settings.corpuschristi === "THURSDAY" ? " SELECTED" : "")}>${__('Thursday')}</option><option value="SUNDAY" ${($Settings.corpuschristi === "SUNDAY" ? " SELECTED" : "")}>${__('Sunday')}</option></select></label></td><td></td><td></td></tr>
         <tr><td colspan="4" style="text-align:center;"><input type="submit" id="generateLitCal" value="${__("Generate Roman Calendar")}" /></td></tr>
@@ -441,6 +441,29 @@
           },
           autoOpen: false
         });
+
+        if($Settings.nationalpreset === 'USA'){
+            if(Object.keys($DiocesesUSA).length > 0){
+                $('#diocesanpreset').prop('disabled', false);
+                $('#diocesanpreset').append('<option value=""></option>');
+                for(const [key, value] of Object.entries($DiocesesUSA)){
+                    $('#diocesanpreset').append('<option value="' + key + '">' + value.diocese + '</option>');
+                }
+            } else {
+                $('#diocesanpreset').prop('disabled', true);
+            }
+        } else if ($Settings.nationalpreset === 'ITALY'){
+            if(Object.keys($DiocesesItaly).length > 0){
+                $('#diocesanpreset').prop('disabled', false);
+                $('#diocesanpreset').append('<option value=""></option>');
+                for(const [key, value] of Object.entries($DiocesesItaly)){
+                    $('#diocesanpreset').append('<option value="' + key + '">' + value.diocese + '</option>');
+                }
+            } else {
+                $('#diocesanpreset').prop('disabled', true);
+            }
+        }
+
       },
       __ = function ($key) {
         let $lcl = $Settings.locale.toLowerCase();
