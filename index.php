@@ -80,13 +80,13 @@ $messages = array_merge($messages, [
         "it" => "Endpoint di generazione dei dati",
         "pt" => "Ponto final de geração de dados"
     ],
-    "View API endpoint" => [
-        "de" => "Zeigen Sie den API-Endpunkt an",
-        "en" => "Data Generation Endpoint",
-        "es" => "Ispecciona el punto final de la API",
-        "fr" => "Affiche le point de terminaison de l'API",
-        "it" => "Visualizza l'endpoint dell'API",
-        "pt" => "Veja o endpoint da API"
+    "Liturgical Calendar API endpoint" => [
+        "de" => "Liturgischer Kalender API-Endpunkt",
+        "en" => "Liturgical Calendar API endpoint",
+        "es" => "API del Calendario litúrgico",
+        "fr" => "API du calendrier liturgique",
+        "it" => "Endpoint dell'API del calendario liturgico",
+        "pt" => "Endpoint da API do Calendário Litúrgico"
     ],
     "Date of Easter API endpoint" => [
         "de" => "Osterdatum API-Endpunkt",
@@ -126,15 +126,15 @@ $messages = array_merge($messages, [
             <div class="col-md-6">
                 <div class="card shadow m-2">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Data Generation Endpoint"); ?></h6>
+                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Data Generation Endpoint"); ?><i class="fas fa-code float-right fa-2x text-gray-300"></i></h6>
                     </div>
                     <div class="card-body">
                         <p class="mb-4"><?php _e("API_DESCRIPTION") ?></p>
-                        <div class="text-center"><a href="LitCalEngine.php" class="btn btn-primary"><?php _e("View API endpoint"); ?></a></div>
-                        <p>
+                        <div class="text-center"><a href="LitCalEngine.php" class="btn btn-primary m-2"><?php _e("Liturgical Calendar API endpoint"); ?></a></div>
+                        <small class="text-muted">
                             <i>A sample request to the endpoint could look like this:</i>
                             <code>/LitCalEngine.php?year=2020&amp;epiphany=SUNDAY_JAN2_JAN8&amp;ascension=SUNDAY&amp;corpuschristi=SUNDAY&amp;returntype=JSON&amp;locale=EN</code>
-                        </p>
+                        </small>
                     </div>
                 </div>
             </div>
@@ -142,18 +142,20 @@ $messages = array_merge($messages, [
             <div class="col-md-6">
                 <div class="card shadow m-2">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Calculation of the Date of Easter"); ?></h6>
+                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Calculation of the Date of Easter"); ?><i class="fas fa-code float-right fa-2x text-gray-300"></i></h6>
                     </div>
                     <div class="card-body">
                         <p><?php _e("EASTER_CALCULATOR_API"); ?></p>
                         <div class="text-center"><a href="dateOfEaster.php" class="btn btn-primary m-2"><?php _e("Date of Easter API endpoint"); ?></a></div>
-                        <p><i>Currently the data can be requested with the following localizations:</i></p>
-                        <ul>
-                            <li><b>English</b>: <code>/dateOfEaster.php?locale=EN</code></li>
-                            <li><b>Italian</b>: <code>/dateOfEaster.php?locale=IT</code></li>
-                            <li><b>Latin</b>: <code>/dateOfEaster.php?locale=LA</code></li>
-                        </ul>
-                        <p><i>In any case, since the API returns a UNIX timestamp for each date of Easter, localizations can be done in a client application just as well.</i></p>
+                        <small class="text-muted">
+                            <i>Currently the data can be requested with the following localizations:</i>
+                            <ul>
+                                <li><b>English</b>: <code>/dateOfEaster.php?locale=EN</code></li>
+                                <li><b>Italian</b>: <code>/dateOfEaster.php?locale=IT</code></li>
+                                <li><b>Latin</b>: <code>/dateOfEaster.php?locale=LA</code></li>
+                            </ul>
+                            <i>In any case, since the API returns a UNIX timestamp for each date of Easter, localizations can be done in a client application just as well.</i>
+                        </small>
                     </div>
                 </div>
             </div>
@@ -163,7 +165,7 @@ $messages = array_merge($messages, [
             <div class="col-md-6">
                 <div class="card shadow m-2">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Data Generation Endpoint"); ?></h6>
+                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Data Generation Endpoint"); ?><i class="fas fa-file-code float-right fa-2x text-gray-300"></i></h6>
                     </div>
                     <div class="card-body">
                         <div class="text-center"><a href="dist/" class="btn btn-primary mt-2">Swagger / Open API Documentation</a></div>
@@ -174,7 +176,7 @@ $messages = array_merge($messages, [
             <div class="col-md-6">
                 <div class="card shadow m-2">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Calculation of the Date of Easter"); ?></h6>
+                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Calculation of the Date of Easter"); ?><i class="fas fa-poll-h float-right fa-2x text-gray-300"></i></h6>
                     </div>
                     <div class="card-body">
                         <p><?php _e("EASTER_CALCULATOR_EXAMPLE"); ?></p>
