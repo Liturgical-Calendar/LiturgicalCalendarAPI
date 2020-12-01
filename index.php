@@ -120,7 +120,6 @@ $messages = array_merge($messages, [
 
         <!-- Page Heading -->
         <h1 class="h3 mb-2 text-gray-800"><?php _e("Catholic Liturgical Calendar"); ?></h1>
-        <p class="mb-4"><?php _e("API_DESCRIPTION") ?></p>
 
         <!-- Content Row -->
         <div class="row">
@@ -130,9 +129,12 @@ $messages = array_merge($messages, [
                         <h6 class="m-0 font-weight-bold text-primary"><?php _e("Data Generation Endpoint"); ?></h6>
                     </div>
                     <div class="card-body">
-                        <p><i>A sample request to the endpoint could look like this:</i>
-                        <code>/LitCalEngine.php?year=2020&amp;epiphany=SUNDAY_JAN2_JAN8&amp;ascension=SUNDAY&amp;corpuschristi=SUNDAY&amp;returntype=JSON&amp;locale=EN</code></p>
+                        <p class="mb-4"><?php _e("API_DESCRIPTION") ?></p>
                         <div class="text-center"><a href="LitCalEngine.php" class="btn btn-primary"><?php _e("View API endpoint"); ?></a></div>
+                        <p>
+                            <i>A sample request to the endpoint could look like this:</i>
+                            <code>/LitCalEngine.php?year=2020&amp;epiphany=SUNDAY_JAN2_JAN8&amp;ascension=SUNDAY&amp;corpuschristi=SUNDAY&amp;returntype=JSON&amp;locale=EN</code>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -145,6 +147,13 @@ $messages = array_merge($messages, [
                     <div class="card-body">
                         <p><?php _e("EASTER_CALCULATOR_API"); ?></p>
                         <div class="text-center"><a href="dateOfEaster.php" class="btn btn-primary m-2"><?php _e("Date of Easter API endpoint"); ?></a></div>
+                        <p><i>Currently the data can be requested with the following localizations:</i></p>
+                        <ul>
+                            <li><b>English</b>: <code>/dateOfEaster.php?locale=EN</code></li>
+                            <li><b>Italian</b>: <code>/dateOfEaster.php?locale=IT</code></li>
+                            <li><b>Latin</b>: <code>/dateOfEaster.php?locale=LA</code></li>
+                        </ul>
+                        <p><i>In any case, since the API returns a UNIX timestamp for each date of Easter, localizations can be done in a client application just as well.</i></p>
                     </div>
                 </div>
             </div>
