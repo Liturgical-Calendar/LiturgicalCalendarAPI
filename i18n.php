@@ -20,6 +20,7 @@ define("LITCAL_LOCALE", $LOCALE );
 
 /**
  * Translation function __()
+ * Returns the translated string
  */
 
 function __($key, $locale = LITCAL_LOCALE)
@@ -43,6 +44,7 @@ function __($key, $locale = LITCAL_LOCALE)
 
 /**
  * Translation function _e()
+ * Echos out the translated string
  */
 
 function _e($key, $locale = LITCAL_LOCALE)
@@ -130,6 +132,22 @@ $messages = [
         "fr" => "Qui nous sommes",
         "it" => "Chi siamo",
         "pt" => "Quem nós somos"
+    ],
+    "Create a Diocesan Calendar" => [
+        "de" => "Erstellen Sie einen Diözesankalender",
+        "en" => "Create a Diocesan Calendar",
+        "es" => "Crea un calendario diocesano",
+        "fr" => "Créer un calendrier diocésain",
+        "it" => "Crea un calendario diocesano",
+        "pt" => "Crie um calendário diocesano"
+    ],
+    "Create a National Calendar" => [
+        "de" => "Erstellen Sie einen nationalen Kalender",
+        "en" => "Create a National Calendar",
+        "es" => "Crea un calendario nacional",
+        "fr" => "Créer un calendrier national",
+        "it" => "Crea un calendario nazionale",
+        "pt" => "Crie um calendário nacional"
     ],
     "green" => [
         "de" => "grün",
