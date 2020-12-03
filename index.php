@@ -139,7 +139,7 @@ $messages = array_merge($messages, [
                     <div class="card-body">
                         <p class="mb-4"><?php _e("API_DESCRIPTION") ?></p>
                         <div class="form-row">
-                            <div class="form-group col-sm-8">
+                            <div class="form-group col-sm-7">
                                 <label for="APICalendarSelect"><?php _e("Calendar to retrieve from the API"); ?>:</label>
                                 <select id="APICalendarSelect" class="form-control">
                                     <option value="">---</option>
@@ -148,6 +148,15 @@ $messages = array_merge($messages, [
                             </div>
                             <div class="form-group col-sm-3">
                                 <label>year</label><input id="RequestOptionYear" class="form-control" type="number" min=1970 max=9999 value=<?php echo date("Y"); ?> />                                
+                            </div>
+                            <div class="form-group col-sm-2">
+                                <label>returntype</label>
+                                <select id="RequestOptionReturnType" class="form-control">
+                                    <option value="">--</option>
+                                    <option value="JSON">JSON</option>
+                                    <option value="XML">XML</option>
+                                    <option value="ICS">ICS (ICAL feed)</option>
+                                </select>
                             </div>
                         </div>
                         <div class="text-center"><a id="RequestURLButton" href="LitCalEngine.php?year=<?php echo date("Y"); ?>&amp;epiphany=SUNDAY_JAN2_JAN8&amp;ascension=SUNDAY&amp;corpuschristi=SUNDAY&amp;returntype=JSON&amp;locale=EN" class="btn btn-primary m-2"><?php _e("Liturgical Calendar API endpoint"); ?></a></div>
@@ -158,7 +167,6 @@ $messages = array_merge($messages, [
                             <div class="form-group col-sm-3"><label>ascension</label><select id="RequestOptionAscension" class="form-control requestOption"><option value="">--</option><option value="SUNDAY">SUNDAY</option><option value="THURSDAY">THURSDAY</option></select></div>
                             <div class="form-group col-sm-3"><label>corpuschristi</label><select id="RequestOptionCorpusChristi" class="form-control requestOption"><option value="">--</option><option value="SUNDAY">SUNDAY</option><option value="THURSDAY">THURSDAY</option></select></div>
                             <div class="form-group col-sm-3"><label>locale</label><select id="RequestOptionLocale" class="form-control requestOption"><option value="">--</option><option value="EN">English</option><option value="IT">Italian</option><option value="LA">Latin</option></select></div>
-                            <div class="form-group col-sm-3"><label>returntype</label><select id="RequestOptionReturnType" class="form-control requestOption"><option value="">--</option><option value="JSON">JSON</option><option value="XML">XML</option><option value="ICS">ICS (ICAL feed)</option></select></div>
                         </div>
                         <small class="text-muted">
                             <p><i>URL for the API request based on selected options (the above button is set to this URL):</i></p>
