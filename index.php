@@ -46,7 +46,7 @@ $messages = array_merge($messages, [
         "it" => "Calcola la data della Pasqua",
         "pt" => "Calcule a data da Páscoa",
     ],
-    "EASTER_CALCULATOR" => [
+    "EASTER_CALCULATOR_API" => [
         "de" => "Ein einfacher API-Endpunkt, der Daten zum Osterdatum zurückgibt, sowohl Gregorianisch als auch Julianisch, " .
                 "aus dem Jahr 1583 (Jahr der Annahme des Gregorianischen Kalenders) bis 9999 (maximal mögliche Datumsberechnung in 64-Bit-PHP) " .
                 "unter Verwendung einer PHP-Anpassung des Meeus / Jones / Butcher-Algorithmus für Gregorianische Ostern (beobachtet von der römisch-katholischen Kirche) " .
@@ -64,7 +64,7 @@ $messages = array_merge($messages, [
                 "en utilisant une adaptation PHP de l'algorithme Meeus / Jones / Butcher pour les Pâques grégoriens (observé par l'église catholique romaine) " .
                 "et de l'algorithme Meeus pour les Pâques de Julian (observé par les églises orthodoxes)",
         "it" => "Una API che semplicemente restituisce dati riguardo alla data della Pasqua, sia Gregoriana che Giuliana, " .
-                "dall'anno 1583 (anno di adozione del Calendario Gregoriano) al 1999 (massima data calcolabile nel PHP a 64 bit), " .
+                "dall'anno 1583 (anno di adozione del Calendario Gregoriano) al 9999 (massima data calcolabile nel PHP a 64 bit), " .
                 "utilizzando un adattamento PHP dell'algoritmo Meeus/Jones/Butcher per il calcolo della Pasqua Gregoriana (celebrata dalla Chiesa Romana) " .
                 "e dell'algoritmo di Meeus per il calcolo della Pasqua Giuliana (celebrata dalle chiese ortodosse)",
         "pt" => "Um endpoint de API simples que retorna dados sobre a data da Páscoa, tanto Gregoriana quanto Juliana, " .
@@ -80,13 +80,29 @@ $messages = array_merge($messages, [
         "it" => "Endpoint di generazione dei dati",
         "pt" => "Ponto final de geração de dados"
     ],
-    "View API endpoint" => [
-        "de" => "Zeigen Sie den API-Endpunkt an",
-        "en" => "Data Generation Endpoint",
-        "es" => "Ispecciona el punto final de la API",
-        "fr" => "Affiche le point de terminaison de l'API",
-        "it" => "Visualizza l'endpoint dell'API",
-        "pt" => "Veja o endpoint da API"
+    "Liturgical Calendar API endpoint" => [
+        "de" => "Liturgischer Kalender API-Endpunkt",
+        "en" => "Liturgical Calendar API endpoint",
+        "es" => "API del Calendario litúrgico",
+        "fr" => "API du calendrier liturgique",
+        "it" => "Endpoint dell'API del calendario liturgico",
+        "pt" => "Endpoint da API do Calendário Litúrgico"
+    ],
+    "Date of Easter API endpoint" => [
+        "de" => "Osterdatum API-Endpunkt",
+        "en" => "Date of Easter API endpoint",
+        "es" => "Fecha de Pascua API",
+        "fr" => "Date de Pâques API",
+        "it" => "API per la Data della Pasqua",
+        "pt" => "Data da Páscoa API"
+    ],
+    "EASTER_CALCULATOR_EXAMPLE" => [
+        "de" => "Beispielanzeige des Osterdatums von 1583 bis 9999",
+        "en" => "Example display of the date of Easter from 1583 to 9999",
+        "es" => "Ejemplo de visualización de la fecha de Pascua de 1583 a 9999",
+        "fr" => "Exemple d'affichage de la date de Pâques de 1583 à 9999",
+        "it" => "Esempio di visualizzazione della Data di Pasqua dal 1583 al 9999",
+        "pt" => "Exemplo de exibição da data da Páscoa de 1583 a 9999"
     ]
 ]);
 
@@ -104,19 +120,21 @@ $messages = array_merge($messages, [
 
         <!-- Page Heading -->
         <h1 class="h3 mb-2 text-gray-800"><?php _e("Catholic Liturgical Calendar"); ?></h1>
-        <p class="mb-4"><?php _e("API_DESCRIPTION") ?></p>
 
         <!-- Content Row -->
         <div class="row">
             <div class="col-md-6">
                 <div class="card shadow m-2">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Data Generation Endpoint"); ?></h6>
+                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Data Generation Endpoint"); ?><i class="fas fa-code float-right fa-2x text-gray-300"></i></h6>
                     </div>
                     <div class="card-body">
-                        <p><i>A sample request to the endpoint could look like this:</i>
-                        <code>/LitCalEngine.php?year=2020&amp;epiphany=SUNDAY_JAN2_JAN8&amp;ascension=SUNDAY&amp;corpuschristi=SUNDAY&amp;returntype=JSON&amp;locale=EN</code></p>
-                        <div class="text-center"><a href="LitCalEngine.php" class="btn btn-primary"><?php _e("View API endpoint"); ?></a></div>
+                        <p class="mb-4"><?php _e("API_DESCRIPTION") ?></p>
+                        <div class="text-center"><a href="LitCalEngine.php" class="btn btn-primary m-2"><?php _e("Liturgical Calendar API endpoint"); ?></a></div>
+                        <small class="text-muted">
+                            <i>A sample request to the endpoint could look like this:</i>
+                            <code>/LitCalEngine.php?year=2020&amp;epiphany=SUNDAY_JAN2_JAN8&amp;ascension=SUNDAY&amp;corpuschristi=SUNDAY&amp;returntype=JSON&amp;locale=EN</code>
+                        </small>
                     </div>
                 </div>
             </div>
@@ -124,11 +142,20 @@ $messages = array_merge($messages, [
             <div class="col-md-6">
                 <div class="card shadow m-2">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Calculation of the Date of Easter"); ?></h6>
+                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Calculation of the Date of Easter"); ?><i class="fas fa-code float-right fa-2x text-gray-300"></i></h6>
                     </div>
                     <div class="card-body">
-                        <p><?php _e("EASTER_CALCULATOR"); ?></p>
-                        <div class="text-center"><a href="easter.php" class="btn btn-primary"><?php _e("Calculate the Date of Easter"); ?></a></div>
+                        <p><?php _e("EASTER_CALCULATOR_API"); ?></p>
+                        <div class="text-center"><a href="dateOfEaster.php" class="btn btn-primary m-2"><?php _e("Date of Easter API endpoint"); ?></a></div>
+                        <small class="text-muted">
+                            <i>Currently the data can be requested with the following localizations:</i>
+                            <ul>
+                                <li><b>English</b>: <code>/dateOfEaster.php?locale=EN</code></li>
+                                <li><b>Italian</b>: <code>/dateOfEaster.php?locale=IT</code></li>
+                                <li><b>Latin</b>: <code>/dateOfEaster.php?locale=LA</code></li>
+                            </ul>
+                            <i>In any case, since the API returns a UNIX timestamp for each date of Easter, localizations can be done in a client application just as well.</i>
+                        </small>
                     </div>
                 </div>
             </div>
@@ -138,7 +165,7 @@ $messages = array_merge($messages, [
             <div class="col-md-6">
                 <div class="card shadow m-2">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Data Generation Endpoint"); ?></h6>
+                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Data Generation Endpoint"); ?><i class="fas fa-file-code float-right fa-2x text-gray-300"></i></h6>
                     </div>
                     <div class="card-body">
                         <div class="text-center"><a href="dist/" class="btn btn-primary mt-2">Swagger / Open API Documentation</a></div>
@@ -146,6 +173,17 @@ $messages = array_merge($messages, [
                 </div>
             </div>
             
+            <div class="col-md-6">
+                <div class="card shadow m-2">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Calculation of the Date of Easter"); ?><i class="fas fa-poll-h float-right fa-2x text-gray-300"></i></h6>
+                    </div>
+                    <div class="card-body">
+                        <p><?php _e("EASTER_CALCULATOR_EXAMPLE"); ?></p>
+                        <div class="text-center"><a href="easter.php" class="btn btn-primary m-2"><?php _e("Calculate the Date of Easter"); ?></a></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
     <?php include_once('layout/footer.php'); ?>

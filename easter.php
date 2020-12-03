@@ -365,8 +365,10 @@ error_reporting(E_ALL);
         const scale = (num, in_min, in_max, out_min, out_max) => {
             return (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
         }
+        const isStaging = window.location.pathname.includes('-staging');
 
         $(document).ready(function(){
+            if(isStaging){ $('.backNav').attr('href','/LiturgicalCalendar-staging/'); }
             let tableH = $('#EasterTableContainer table').height();
             let timelineH = $("#TimelineCenturiesContainer").children().last().offset().top - $("#TimelineCenturiesContainer").children().first().offset().top;
             timelineH /= 2;

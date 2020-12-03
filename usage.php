@@ -52,7 +52,7 @@ $messages = array_merge($messages, [
             <div class="col-md-6">
                 <div class="card shadow m-2">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">PHP</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">PHP<i class="fab fa-php float-right text-gray-600"></i></h6>
                     </div>
                     <div class="card-body">
                         <p>HTML presentation elaborated by PHP using a CURL request</p>
@@ -64,7 +64,7 @@ $messages = array_merge($messages, [
             <div class="col-md-6">
                 <div class="card shadow m-2">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">JavaScript</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">JavaScript<i class="fab fa-js float-right text-gray-600"></i></h6>
                     </div>
                     <div class="card-body">
                         <p>HTML presentation elaborated by JAVASCRIPT using an AJAX
@@ -77,7 +77,7 @@ $messages = array_merge($messages, [
             <div class="col-md-6">
                 <div class="card shadow m-2">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Calendar</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">Calendar<i class="far fa-calendar float-right text-gray-600"></i></h6>
                     </div>
                     <div class="card-body">
                         <p>Fullcalendar representation

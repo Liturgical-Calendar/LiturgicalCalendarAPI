@@ -20,3 +20,11 @@
 <link href="assets/css/sb-admin-2.min.css" rel="stylesheet">
 <link href="assets/css/bootstrap4-toggle.css" rel="stylesheet">
 <link href="assets/css/liturgicalcalendar.css" rel="stylesheet">
+<?php 
+    //some assets are only needed on certain pages
+    switch(basename($_SERVER["SCRIPT_FILENAME"], '.php')){
+        case 'extending':
+            ?><link href="assets/css/bootstrap-multiselect.css" rel="stylesheet"><?php
+        break;
+    }
+?>

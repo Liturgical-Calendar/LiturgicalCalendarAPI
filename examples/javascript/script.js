@@ -43,7 +43,7 @@ let today = new Date(),
             }
         }
     },
-    ordSuffix = function(ord) {
+    /*ordSuffix = function(ord) {
         var ord_suffix = ''; //st, nd, rd, th
         if (ord === 1 || (ord % 10 === 1 && ord != 11)) {
             ord_suffix = 'st';
@@ -55,7 +55,7 @@ let today = new Date(),
             ord_suffix = 'th';
         }
         return ord_suffix;
-    },
+    },*/
     genLitCal = function() {
         $.ajax({
             method: 'POST',
@@ -65,10 +65,12 @@ let today = new Date(),
                 console.log(LitCalData);
 
                 let strHTML = '';
+                /*
                 let $YEAR = 0;
                 if (LitCalData.hasOwnProperty("Settings")) {
                     $YEAR = LitCalData.Settings.YEAR;
                 }
+                */
                 if (LitCalData.hasOwnProperty("LitCal")) {
                     let $LitCal = LitCalData.LitCal;
 
@@ -160,6 +162,7 @@ let today = new Date(),
                                 //We will apply the color for the single festivity only to it's own table cells
                                 let $possibleColors =  $festivity.color.split(",");
                                 let $CSScolor = $possibleColors[0];
+                                /*
                                 let $festivityColorString = "";
                                 if($possibleColors.length === 1){
                                     $festivityColorString = __($possibleColors[0]);
@@ -169,7 +172,7 @@ let today = new Date(),
                                     });
                                     $festivityColorString = $possibleColors.join("</i> " + __("or") + " <i>");
                                 }
-
+                                */
                                 strHTML += '<tr style="background-color:' + $SeasonColor + ';' + ($highContrast.indexOf($SeasonColor) != -1 ? 'color:white;' : '') + '">';
                                 if ($newMonth) {
                                     let $monthRwsp = $cm.count + 1;
@@ -245,6 +248,7 @@ let today = new Date(),
                             //We will apply the color for the single festivity only to it's own table cells
                             let $possibleColors =  $festivity.color.split(",");
                             let $CSScolor = $possibleColors[0];
+                            /*
                             let $festivityColorString = "";
                             if($possibleColors.length === 1){
                                 $festivityColorString = __($possibleColors[0]);
@@ -254,6 +258,7 @@ let today = new Date(),
                                 });
                                 $festivityColorString = $possibleColors.join("</i> " + __("or") + " <i>");
                             }
+                            */
                             strHTML += '<tr style="background-color:' + $SeasonColor + ';' + ($highContrast.indexOf($SeasonColor) != -1 ? 'color:white;' : 'color:black;') + '">';
                             if ($newMonth) {
                                 let $monthRwsp = $cm.count + 1;
@@ -519,11 +524,6 @@ let today = new Date(),
             "it": "Stai effettuando una richiesta per un anno che è precedente al 1970: non è possibile richiedere anni precedenti al 1970.",
             "la": "Rogavisti annum ante 1970: non potest rogare annos ante annum 1970."
         },
-        "Customize options for generating the Roman Calendar": {
-            "en": "Customize options for generating the Roman Calendar",
-            "it": "Personalizzare le opzioni per la generazione del Calendario Romano",
-            "la": "Eligere optiones per generationem Calendarii Romani"
-        },
         "Configurations being used to generate this calendar:": {
             "en": "Configurations being used to generate this calendar:",
             "it": "Configurazioni utilizzate per la generazione di questo calendario:",
@@ -677,7 +677,7 @@ let today = new Date(),
         $settingsDialog = `<div id="settingsWrapper"><form id="calSettingsForm"><table id="calSettings">
         <tr><td colspan="2"><label>${__('YEAR')}: </td><td colspan="2"><input type="number" name="year" id="year" min="1969" max="9999" value="${$Settings.year}" /></label></td></tr>
         <tr><td><label>${__('LOCALE')}: </td><td><select name="locale" id="locale"><option value="EN" ${($Settings.locale === "EN" ? " SELECTED" : "")}>ENGLISH</option><option value="IT" ${($Settings.locale === "IT" ? " SELECTED" : "")}>ITALIANO</option><option value="LA" ${($Settings.locale === "LA" ? " SELECTED" : "")}>LATINO</option></select></label></td><td>${__('NATIONAL PRESET')}: </td><td><select id="nationalpreset" name="nationalpreset"><option value=""></option><option value="VATICAN" ${($Settings.nationalpreset === "VATICAN" ? " SELECTED" : "")}>${__('Vatican')}</option><option value="ITALY" ${($Settings.nationalpreset === "ITALY" ? " SELECTED" : "")}>${__('Italy')}</option><option value="USA" ${($Settings.nationalpreset === "USA" ? " SELECTED" : "")}>USA</option></select></td></tr>
-        <tr><td><label>${__('EPIPHANY')}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>${__('January 6')}</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>${__('Sunday Jan 2↔Jan 8')}</option></select></label></td><td>${__('DIOCESAN PRESET')}: </td><td><select id="diocesanpreset" name="diocesanpreset" disabled><option value=""></option><option value="DIOCESIDIROMA" ${($Settings.diocesanpreset === "DIOCESIDIROMA" ? " SELECTED" : "")}>Diocesi di Roma</option><option value="DIOCESILAZIO" ${($Settings.diocesanpreset === "DIOCESILAZIO" ? " SELECTED" : "")}>Le diocesi del Lazio</option></select></td></tr>
+        <tr><td><label>${__('EPIPHANY')}: </td><td><select name="epiphany" id="epiphany"><option value="JAN6" ${($Settings.epiphany === "JAN6" ? " SELECTED" : "")}>${__('January 6')}</option><option value="SUNDAY_JAN2_JAN8" ${($Settings.epiphany === "SUNDAY_JAN2_JAN8" ? " SELECTED" : "")}>${__('Sunday Jan 2↔Jan 8')}</option></select></label></td><td>${__('DIOCESAN PRESET')}: </td><td><select id="diocesanpreset" name="diocesanpreset" ${($Settings.nationalpreset == '' || $Settings.nationalpreset == 'VATICAN' ) ? 'disabled' : ''}></select></td></tr>
         <tr><td><label>${__('ASCENSION')}: </td><td><select name="ascension" id="ascension"><option value="THURSDAY" ${($Settings.ascension === "THURSDAY" ? " SELECTED" : "")}>${__('Thursday')}</option><option value="SUNDAY" ${($Settings.ascension === "SUNDAY" ? " SELECTED" : "")}>${__('Sunday')}</option></select></label></td><td></td><td></td></tr>
         <tr><td><label>CORPUS CHRISTI: </td><td><select name="corpuschristi" id="corpuschristi"><option value="THURSDAY" ${($Settings.corpuschristi === "THURSDAY" ? " SELECTED" : "")}>${__('Thursday')}</option><option value="SUNDAY" ${($Settings.corpuschristi === "SUNDAY" ? " SELECTED" : "")}>${__('Sunday')}</option></select></label></td><td></td><td></td></tr>
         <tr><td colspan="4" style="text-align:center;"><input type="submit" id="generateLitCal" value="${__("Generate Roman Calendar")}" /></td></tr>
@@ -699,10 +699,33 @@ let today = new Date(),
             },
             autoOpen: false
         });
+
+        if($Settings.nationalpreset === 'USA'){
+            if(Object.keys($DiocesesUSA).length > 0){
+                $('#diocesanpreset').prop('disabled', false);
+                $('#diocesanpreset').append('<option value=""></option>');
+                for(const [key, value] of Object.entries($DiocesesUSA)){
+                    $('#diocesanpreset').append('<option value="' + key + '">' + value.diocese + '</option>');
+                }
+            } else {
+                $('#diocesanpreset').prop('disabled', true);
+            }
+        } else if ($Settings.nationalpreset === 'ITALY'){
+            if(Object.keys($DiocesesItaly).length > 0){
+                $('#diocesanpreset').prop('disabled', false);
+                $('#diocesanpreset').append('<option value=""></option>');
+                for(const [key, value] of Object.entries($DiocesesItaly)){
+                    $('#diocesanpreset').append('<option value="' + key + '">' + value.diocese + '</option>');
+                }
+            } else {
+                $('#diocesanpreset').prop('disabled', true);
+            }
+        }
+
     },
     $index = {},
     $DiocesesUSA,
-    $DiocesesITALY,
+    $DiocesesItaly,
     isStaging = window.location.pathname.includes('-staging');
 
     jQuery.ajax({
@@ -717,6 +740,8 @@ let today = new Date(),
             console.log('retrieved data from index file:');
             console.log(data);
             $index = data;
+            $DiocesesUSA = Object.filter($index, key => key.nation == "USA");
+            $DiocesesItaly = Object.filter($index, key => key.nation == "ITALY");
         }
     });
 
@@ -780,38 +805,54 @@ $(document).ready(function() {
             $('#epiphany').val('JAN6');
             $('#ascension').val('SUNDAY');
             $('#corpuschristi').val('SUNDAY');
-            $('#diocesanpreset').prop('disabled',false).val("DIOCESIROMA");
             $Settings.locale = 'IT';
             $Settings.epiphany = 'JAN6';
             $Settings.ascension = 'SUNDAY';
             $Settings.corpuschristi = 'SUNDAY';
+            $Settings.diocesanpreset = '';
+            $Settings.nationalpreset = 'ITALY';
             $('#calSettingsForm :input').not('#diocesanpreset').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
+            $('#diocesanpreset').empty();
+            if(Object.keys($DiocesesItaly).length > 0){
+              $('#diocesanpreset').prop('disabled', false);
+              $('#diocesanpreset').append('<option value=""></option>');
+              for(const [key, value] of Object.entries($DiocesesItaly)){
+                $('#diocesanpreset').append('<option value="' + key + '">' + value.diocese + '</option>');
+              }
+            } else {
+              $('#diocesanpreset').prop('disabled', true);
+            }
           break;
           case "USA":
             $('#locale').val('EN');
             $('#epiphany').val('SUNDAY_JAN2_JAN8');
             $('#ascension').val('SUNDAY');
             $('#corpuschristi').val('SUNDAY');
-            $('#diocesanpreset').val("");
             $Settings.locale = 'EN';
             $Settings.epiphany = 'SUNDAY_JAN2_JAN8';
             $Settings.ascension = 'SUNDAY';
             $Settings.corpuschristi = 'SUNDAY';
             $Settings.diocesanpreset = '';
-            $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
             $Settings.nationalpreset = 'USA';
+            $('#calSettingsForm :input').not('#nationalpreset').not('#year').not('#generateLitCal').prop('disabled',true);
             
+            //TODO: once the data for the Diocese of Rome has been define through the UI interface
+            //      and the relative JSON file created, the following operation should be abstracted for any nation in the list
+            //      and not applied here with the hardcoded value "USA"
+            //      The logic has been started up above, before the 'switch'
+            //      However we have to keep in mind that Rome groups together the celebrations for the whole Lazio region in a single booklet
+            //      This would mean that we have to create the ability of creating groups, to group together the data from more than one diocese
+            //      Perhaps another value can be added to the index, to indicate a group definition, such that all the diocesan calendars belonging to that group can be pulled...
             $('#diocesanpreset').empty();
-            $DiocesesUSA = Object.filter($index, key => key.nation == "USA");
             if(Object.keys($DiocesesUSA).length > 0){
               $('#diocesanpreset').prop('disabled', false);
+              $('#diocesanpreset').append('<option value=""></option>');
               for(const [key, value] of Object.entries($DiocesesUSA)){
                 $('#diocesanpreset').append('<option value="' + key + '">' + value.diocese + '</option>');
               }
             } else {
               $('#diocesanpreset').prop('disabled', true);
             }
-
             break;
           default:
             $('#calSettingsForm :input').prop('disabled',false);

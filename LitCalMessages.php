@@ -77,6 +77,9 @@ function _C($common,$locale="la"){
                 case __("Holy Men and Women", $locale):
                     $commonKey = "of (PLUR_MASC)";
                     break;
+                case __("Dedication of a Church", $locale):
+                    $commonKey = "of (SING_FEMM)";
+                    break;
                 default:
                     $commonKey = "of (SING_MASC)";
             }
@@ -274,15 +277,25 @@ $MESSAGES = [
         "it" => "Per i martiri missionari",
         "la" => "Pro missionariis martyribus"
     ],
+    "For One Missionary Martyr" => [
+        "en" => "For One Missionary Martyr",
+        "it" => "Per un martire missionario",
+        "la" => "Pro uno missionario martyre"
+    ],
+    "For Several Missionary Martyrs" => [
+        "en" => "For Several Missionary Martyrs",
+        "it" => "Per più martiri missionari",
+        "la" => "Pro pluribus missionariis martyribus"
+    ],
     "For a Virgin Martyr" => [
         "en" => "For a Virgin Martyr",
         "it" => "Per una vergine martire",
         "la" => "Pro virgine martyre"
     ],
-    "For Several Pastors" => [
-        "en" => "For Several Pastors",
-        "it" => "Per i pastori",
-        "la" => "Pro Pastoribus"
+    "For a Holy Woman Martyr" => [
+        "en" => "For a Holy Woman Martyr",
+        "it" => "Per una santa martire",
+        "la" => "Pro una martyre muliere",
     ],
     "For a Pope" => [
         "en" => "For a Pope",
@@ -296,8 +309,28 @@ $MESSAGES = [
     ],
     "For One Pastor" => [
         "en" => "For One Pastor",
-        "it" => "Per un Pastore",
+        "it" => "Per un pastore",
         "la" => "Pro Pastoribus"
+    ],
+    "For Several Pastors" => [
+        "en" => "For Several Pastors",
+        "it" => "Per i pastori",
+        "la" => "Pro Pastoribus"
+    ],
+    "For Founders of a Church" => [
+        "en" => "For Founders of a Church",
+        "it" => "Per i fondatori delle chiese",
+        "la" => "Pro Fundatoribus ecclesiarum"
+    ],
+    "For One Founder" => [
+        "en" => "For One Founder",
+        "it" => "Per un fondatore",
+        "la" => "Pro Uno Fundatore"
+    ],
+    "For Several Founders" => [
+        "en" => "For Several Founders",
+        "it" => "Per più fondatori",
+        "la" => "Pro Pluribus Fundatoribus"
     ],
     "For Missionaries" => [
         "en" => "For Missionaries",
@@ -353,6 +386,11 @@ $MESSAGES = [
         "en" => "For One Saint",
         "it" => "Per un Santo",
         "la" => "Pro uno Sancto"
+    ],
+    "For Several Saints" => [
+        "en" => "For Several Saints",
+        "it" => "Per più Santi",
+        "la" => "Pro pluribus Sanctos"
     ],
     "or" => [
         "en" => "or",

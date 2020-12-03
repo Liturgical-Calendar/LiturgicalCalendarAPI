@@ -5,7 +5,7 @@
     cursor: pointer;
     text-decoration: none;
     width: 95%;
-    margin: 0px auto;
+    margin: 0 auto;
     border-bottom: 2px outset LightBlue;
     display: block;
     padding: 12px 24px;
@@ -164,15 +164,15 @@ td.rotate div {
     background-color: Black;
     opacity: 80%;
     position: absolute;
-    left: 0px;
-    top: 0px;
+    left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
 }
 
 #calSettings {
     width: 70%;
-    margin: 0px auto;
+    margin: 0 auto;
     border-collapse: collapse;
 }
 
