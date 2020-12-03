@@ -159,7 +159,7 @@ $messages = array_merge($messages, [
                                 </select>
                             </div>
                         </div>
-                        <div class="text-center"><a id="RequestURLButton" href="LitCalEngine.php?year=<?php echo date("Y"); ?>&amp;epiphany=SUNDAY_JAN2_JAN8&amp;ascension=SUNDAY&amp;corpuschristi=SUNDAY&amp;returntype=JSON&amp;locale=EN" class="btn btn-primary m-2"><?php _e("Liturgical Calendar API endpoint"); ?></a></div>
+                        <div class="text-center"><a id="RequestURLButton" href="LitCalEngine.php" class="btn btn-primary m-2"><?php _e("Liturgical Calendar API endpoint"); ?></a></div>
                         <p>If a national or diocesan calendar is requested, these calendars will automatically set the specific options in the API request. 
                             If instead no national or diocesan calendar is requested (i.e. the Universal Calendar is requested) then the more specific options can be requested:</p>
                         <div class="form-row">
@@ -170,7 +170,7 @@ $messages = array_merge($messages, [
                         </div>
                         <small class="text-muted">
                             <p><i>URL for the API request based on selected options (the above button is set to this URL):</i></p>
-                            <div id="RequestURLExampleWrapper"><code id="RequestURLExample">LitCalEngine.php?year=2020&amp;epiphany=SUNDAY_JAN2_JAN8&amp;ascension=SUNDAY&amp;corpuschristi=SUNDAY&amp;returntype=JSON&amp;locale=EN</code></div>
+                            <div id="RequestURLExampleWrapper"><code id="RequestURLExample">LitCalEngine.php</code></div>
                         </small>
                     </div>
                 </div>
