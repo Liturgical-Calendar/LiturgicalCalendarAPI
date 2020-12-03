@@ -1,5 +1,5 @@
 
-$USDiocesesByState = {
+let $USDiocesesByState = {
     "Alabama": ["Archdiocese of Mobile", "Diocese of Birmingham"],
     "Alaska": ["Archdiocese of Anchorage-Juneau", "Diocese of Fairbanks"],
     "Arizona": ["Holy Protection of Mary Byzantine Catholic Eparchy of Phoenix", "Diocese of Phoenix", "Diocese of Tucson"],
@@ -53,12 +53,12 @@ $USDiocesesByState = {
     "Wisconsin": ["Archdiocese of Milwaukee", "Diocese of Green Bay", "Diocese of La Crosse", "Diocese of Madison", "Diocese of Superior"],
     "Wyoming": ["Diocese of Cheyenne"]
 };
-$USDiocesesArr = [];
-var c = 0;
+let $USDiocesesArr = [];
+let c = 0;
 for (const [state, arr] of Object.entries($USDiocesesByState)) {
     arr.forEach(diocese => $USDiocesesArr[c++] = diocese + " (" + state + ")");
 }
-$ITALYDiocesesArr = [
+let $ITALYDiocesesArr = [
     "Arcidiocesi di Acerenza",
     "Diocesi di Acerra",
     "Diocesi di Acireale",
@@ -326,8 +326,9 @@ class litEvent {
     }
 }
 
-$CALENDAR = { LitCal: {} };
-$index = {};
+let $CALENDAR = { LitCal: {} };
+let $index = {};
+
 jQuery.ajax({
     url: "nations/index.json",
     dataType: 'json',
@@ -343,22 +344,7 @@ jQuery.ajax({
     }
 });
 
-let __ = function ($key) {
-    $lcl = LITCAL_LOCALE.toLowerCase();
-    if ($messages !== undefined && $messages !== null && typeof $messages == 'object') {
-        if ($messages.hasOwnProperty($key) && typeof $messages[$key] == 'object') {
-            if ($messages[$key].hasOwnProperty($lcl)) {
-                return $messages[$key][$lcl];
-            } else {
-                return $messages[$key]["en"];
-            }
-        } else {
-            return $key;
-        }
-    } else {
-        return $key;
-    }
-};
+const { LITCAL_LOCALE, __, COUNTRIES } = i18n;
 
 class FormControls {
     static uniqid = 0;

@@ -23,12 +23,12 @@ $messages = array_merge($messages, [
         "pt" => "Calendário Litúrgico Católico",
     ],
     "API_DESCRIPTION" => [
-        "de" => "Eine API für den liturgischen Kalender, aus der Sie Daten für die liturgischen Ereignisse eines bestimmten Jahres ab 1970 abrufen können, sei es für den universellen oder allgemeinen römischen Kalender oder für abgeleitete nationale und diözesane Kalender",
-        "en" => "A Liturgical Calendar API from which you can retrieve data for the Liturgical events of any given year from 1970 onwards, whether for the Universal or General Roman Calendar or for derived National and Diocesan calendars",
-        "es" => "Una API para el Calendario Litúrgico del cual puede recuperar datos para los eventos litúrgicos de cualquier año desde 1970 en adelante, ya sea para el Calendario Romano General o Universal o para los calendarios nacionales y diocesanos derivados.",
-        "fr" => "Une API pour le calendrier liturgique à partir de laquelle vous pouvez récupérer des données pour les événements liturgiques d'une année donnée à partir de 1970, que ce soit pour le calendrier romain universel ou général ou pour les calendriers nationaux et diocésains dérivés",
-        "it" => "Una API per il Calendario Liturgico, da cui estrarre i dati degli eventi liturgici di un qualsiasi anno dal 1970 in poi, sia per il Calendario Romano Universale che per i calendari nazionali e diocesani derivati",
-        "pt" => "Uma API para o calendário litúrgico do qual você pode recuperar dados para os eventos litúrgicos de qualquer ano a partir de 1970, seja para o calendário romano universal ou geral ou para calendários nacionais e diocesanos derivados"
+        "de" => "Eine API für den liturgischen Kalender, aus der Sie Daten für die liturgischen Ereignisse eines bestimmten Jahres von 1970 bis 9999, sei es für den universellen oder allgemeinen römischen Kalender oder für abgeleitete nationale und diözesane Kalender",
+        "en" => "A Liturgical Calendar API from which you can retrieve data for the Liturgical events of any given year from 1970 to 9999, whether for the Universal or General Roman Calendar or for derived National and Diocesan calendars",
+        "es" => "Una API para el Calendario Litúrgico del cual puede recuperar datos para los eventos litúrgicos de cualquier año a partir de 1970 hasta 9999, ya sea para el Calendario Romano General o Universal o para los calendarios nacionales y diocesanos derivados.",
+        "fr" => "Une API pour le calendrier liturgique à partir de laquelle vous pouvez récupérer des données pour les événements liturgiques d'une année donnée à partir de 1970 jusqu'à 9999, que ce soit pour le calendrier romain universel ou général ou pour les calendriers nationaux et diocésains dérivés",
+        "it" => "Una API per il Calendario Liturgico, da cui estrarre i dati degli eventi liturgici di un qualsiasi anno dal 1970 fino al 9999, sia per il Calendario Romano Universale che per i calendari nazionali e diocesani derivati",
+        "pt" => "Uma API para o calendário litúrgico do qual você pode recuperar dados para os eventos litúrgicos de qualquer ano a partir de 1970 até 9999, seja para o calendário romano universal ou geral ou para calendários nacionais e diocesanos derivados"
     ],
     "Calculation of the Date of Easter" => [
         "de" => "Berechnung des Osterdatums",
@@ -103,6 +103,14 @@ $messages = array_merge($messages, [
         "fr" => "Exemple d'affichage de la date de Pâques de 1583 à 9999",
         "it" => "Esempio di visualizzazione della Data di Pasqua dal 1583 al 9999",
         "pt" => "Exemplo de exibição da data da Páscoa de 1583 a 9999"
+    ],
+    "DEFINITION" => [
+        "de" => "Definition",
+        "en" => "Definition",
+        "es" => "Definición",
+        "fr" => "Définition",
+        "it" => "Definizione",
+        "pt" => "Definição"
     ]
 ]);
 
@@ -130,10 +138,31 @@ $messages = array_merge($messages, [
                     </div>
                     <div class="card-body">
                         <p class="mb-4"><?php _e("API_DESCRIPTION") ?></p>
-                        <div class="text-center"><a href="LitCalEngine.php" class="btn btn-primary m-2"><?php _e("Liturgical Calendar API endpoint"); ?></a></div>
+                        <div class="form-row">
+                            <div class="form-group col-sm-8">
+                                <label for="APICalendarSelect"><?php _e("Calendar to retrieve from the API"); ?>:</label>
+                                <select id="APICalendarSelect" class="form-control">
+                                    <option value="">---</option>
+                                    <option value="VATICAN">Vatican (Universal Roman Calendar)</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-sm-3">
+                                <label>year</label><input id="RequestOptionYear" class="form-control" type="number" min=1970 max=9999 value=<?php echo date("Y"); ?> />                                
+                            </div>
+                        </div>
+                        <div class="text-center"><a id="RequestURLButton" href="LitCalEngine.php?year=<?php echo date("Y"); ?>&amp;epiphany=SUNDAY_JAN2_JAN8&amp;ascension=SUNDAY&amp;corpuschristi=SUNDAY&amp;returntype=JSON&amp;locale=EN" class="btn btn-primary m-2"><?php _e("Liturgical Calendar API endpoint"); ?></a></div>
+                        <p>If a national or diocesan calendar is requested, these calendars will automatically set the specific options in the API request. 
+                            If instead no national or diocesan calendar is requested (i.e. the Universal Calendar is requested) then the more specific options can be requested:</p>
+                        <div class="form-row">
+                            <div class="form-group col-sm-3"><label>epiphany</label><select id="RequestOptionEpiphany" class="form-control requestOption"><option value="">--</option><option value="SUNDAY_JAN2_JAN8">SUNDAY_JAN2_JAN8</option><option value="JAN6">JAN6</option></select></div>
+                            <div class="form-group col-sm-3"><label>ascension</label><select id="RequestOptionAscension" class="form-control requestOption"><option value="">--</option><option value="SUNDAY">SUNDAY</option><option value="THURSDAY">THURSDAY</option></select></div>
+                            <div class="form-group col-sm-3"><label>corpuschristi</label><select id="RequestOptionCorpusChristi" class="form-control requestOption"><option value="">--</option><option value="SUNDAY">SUNDAY</option><option value="THURSDAY">THURSDAY</option></select></div>
+                            <div class="form-group col-sm-3"><label>locale</label><select id="RequestOptionLocale" class="form-control requestOption"><option value="">--</option><option value="EN">English</option><option value="IT">Italian</option><option value="LA">Latin</option></select></div>
+                            <div class="form-group col-sm-3"><label>returntype</label><select id="RequestOptionReturnType" class="form-control requestOption"><option value="">--</option><option value="JSON">JSON</option><option value="XML">XML</option><option value="ICS">ICS (ICAL feed)</option></select></div>
+                        </div>
                         <small class="text-muted">
-                            <i>A sample request to the endpoint could look like this:</i>
-                            <code>/LitCalEngine.php?year=2020&amp;epiphany=SUNDAY_JAN2_JAN8&amp;ascension=SUNDAY&amp;corpuschristi=SUNDAY&amp;returntype=JSON&amp;locale=EN</code>
+                            <p><i>URL for the API request based on selected options (the above button is set to this URL):</i></p>
+                            <div id="RequestURLExampleWrapper"><code id="RequestURLExample">LitCalEngine.php?year=2020&amp;epiphany=SUNDAY_JAN2_JAN8&amp;ascension=SUNDAY&amp;corpuschristi=SUNDAY&amp;returntype=JSON&amp;locale=EN</code></div>
                         </small>
                     </div>
                 </div>
@@ -165,7 +194,7 @@ $messages = array_merge($messages, [
             <div class="col-md-6">
                 <div class="card shadow m-2">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Data Generation Endpoint"); ?><i class="fas fa-file-code float-right fa-2x text-gray-300"></i></h6>
+                        <h6 class="m-0 font-weight-bold text-primary"><?php _e("Data Generation Endpoint"); ?>: <?php  _e("DEFINITION") ?><i class="fas fa-file-code float-right fa-2x text-gray-300"></i></h6>
                     </div>
                     <div class="card-body">
                         <div class="text-center"><a href="dist/" class="btn btn-primary mt-2">Swagger / Open API Documentation</a></div>
@@ -186,7 +215,11 @@ $messages = array_merge($messages, [
             </div>
         </div>
 
-    <?php include_once('layout/footer.php'); ?>
+<script>
+const messages = <?php echo json_encode($messages); ?>;
+</script>
+
+<?php include_once('layout/footer.php'); ?>
 
 </body>
 </html>

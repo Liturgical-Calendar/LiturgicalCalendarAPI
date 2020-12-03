@@ -461,8 +461,7 @@ $messages = array_merge($messages, [
     }
 ?>
 <script>
-const LITCAL_LOCALE = '<?php echo LITCAL_LOCALE; ?>';
-const $messages = <?php echo json_encode($messages); ?>;
+const messages = <?php echo json_encode($messages); ?>;
 </script>
 <?php include_once('./layout/footer.php'); ?>
 </body>
