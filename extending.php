@@ -219,6 +219,14 @@ $messages = array_merge($messages, [
         "it" => "Carica i dati esistenti",
         "pt" => "Carrega dados existentes"
     ],
+    "Remove existing data" => [
+        "de" => "Vorhandene Daten entfernen",
+        "en" => "Remove existing data",
+        "es" => "Quita datos existentes",
+        "fr" => "Supprimer les données existantes",
+        "it" => "Rimuovi i dati esistenti",
+        "pt" => "Remover dados existentes"
+    ],
     "Diocesan group" => [
         "de" => "Gruppe von Diözesen",
         "en" => "Diocesan group",
@@ -302,6 +310,7 @@ $messages = array_merge($messages, [
                                 <option value=""></option>
                             </datalist>
                             <div class="col text-center"><button class="btn btn-primary m-2" id="retrieveExistingDiocesanData" disabled><?php _e("Retrieve existing data"); ?></button></div>
+                            <div class="col text-center"><button class="btn btn-danger m-2" id="removeExistingDiocesanData" disabled data-toggle="modal" data-target="#removeDiocesanCalendarPrompt"><?php _e("Remove existing data"); ?></button></div>
                         </div>
                         <div class="form-group col col-md-3">
                             <label for="diocesanCalendarGroup" class="font-weight-bold"><?php _e("Diocesan group"); ?>:</label>
