@@ -71,9 +71,17 @@ switch(CACHEDURATION){
 
 $allowed_returntypes = array("JSON", "XML", "ICS");
 $allowed_accept_headers = array("application/json", "application/xml", "text/calendar");
+$allowed_origins = [
+    "https://johnromanodorazio.com",
+    "https://www.johnromanodorazio.com"
+];
 
 $requestHeaders = getallheaders();
 $acceptHeader = isset($requestHeaders["Accept"]) && in_array($requestHeaders["Accept"],$allowed_accept_headers) ? $allowed_returntypes[array_search($requestHeaders["Accept"],$allowed_accept_headers)] : "";
+
+if(isset($requestHeaders["Origin"]) && in_array($requestHeaders["Origin"],$allowed_origins)){
+    header('Access-Control-Allow-Origin: ' . $requestHeaders["Origin"]);
+}
 
 $supportedNationalPresets = ["ITALY","USA","VATICAN"];
 

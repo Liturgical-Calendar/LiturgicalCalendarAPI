@@ -26,5 +26,7 @@
         case 'extending':
             ?><link href="assets/css/bootstrap-multiselect.css" rel="stylesheet"><?php
         break;
+        default:
+            ?><link href="assets/css/homepage.css" rel="stylesheet"><?php
     }
 ?>

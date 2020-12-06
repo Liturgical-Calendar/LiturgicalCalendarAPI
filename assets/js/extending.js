@@ -1,5 +1,5 @@
 
-$USDiocesesByState = {
+let $USDiocesesByState = {
     "Alabama": ["Archdiocese of Mobile", "Diocese of Birmingham"],
     "Alaska": ["Archdiocese of Anchorage-Juneau", "Diocese of Fairbanks"],
     "Arizona": ["Holy Protection of Mary Byzantine Catholic Eparchy of Phoenix", "Diocese of Phoenix", "Diocese of Tucson"],
@@ -53,12 +53,12 @@ $USDiocesesByState = {
     "Wisconsin": ["Archdiocese of Milwaukee", "Diocese of Green Bay", "Diocese of La Crosse", "Diocese of Madison", "Diocese of Superior"],
     "Wyoming": ["Diocese of Cheyenne"]
 };
-$USDiocesesArr = [];
-var c = 0;
+let $USDiocesesArr = [];
+let c = 0;
 for (const [state, arr] of Object.entries($USDiocesesByState)) {
     arr.forEach(diocese => $USDiocesesArr[c++] = diocese + " (" + state + ")");
 }
-$ITALYDiocesesArr = [
+let $ITALYDiocesesArr = [
     "Arcidiocesi di Acerenza",
     "Diocesi di Acerra",
     "Diocesi di Acireale",
@@ -326,8 +326,9 @@ class litEvent {
     }
 }
 
-$CALENDAR = { LitCal: {} };
-$index = {};
+let $CALENDAR = { LitCal: {} };
+let $index = {};
+
 jQuery.ajax({
     url: "nations/index.json",
     dataType: 'json',
@@ -343,22 +344,7 @@ jQuery.ajax({
     }
 });
 
-let __ = function ($key) {
-    $lcl = LITCAL_LOCALE.toLowerCase();
-    if ($messages !== undefined && $messages !== null && typeof $messages == 'object') {
-        if ($messages.hasOwnProperty($key) && typeof $messages[$key] == 'object') {
-            if ($messages[$key].hasOwnProperty($lcl)) {
-                return $messages[$key][$lcl];
-            } else {
-                return $messages[$key]["en"];
-            }
-        } else {
-            return $key;
-        }
-    } else {
-        return $key;
-    }
-};
+const { LITCAL_LOCALE, __, COUNTRIES } = i18n;
 
 class FormControls {
     static uniqid = 0;
@@ -667,7 +653,7 @@ $(document).on('click', '#saveDiocesanCalendar_btn', function () {
             success: function (data) {
                 console.log('data returned from save action: ');
                 console.log(data);
-                $('<div class="toast" role="alert" aria-live="assertive" aria-atomic="true"><div class="toast-header"><img src="..." class="rounded mr-2" alt="..."><strong class="mr-auto">Bootstrap</strong><small class="text-muted">just now</small><button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="toast-body">See? Just like this.</div></div>').toast();
+                $('<div class="toast" role="alert" aria-live="assertive" aria-atomic="true"><div class="toast-header"><img src="..." class="rounded mr-2" alt="..."><strong class="mr-auto">Bootstrap</strong><small class="text-muted">just now</small><button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="toast-body">See? Just like this.</div></div>').toast('show');
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 console.log(textStatus + ': ' + errorThrown);
@@ -772,6 +758,12 @@ $(document).on('click', '#retrieveExistingDiocesanData', function (evt) {
     });
 });
 
+$(document).on('click', '#removeExistingDiocesanData', function (evt) {
+    evt.preventDefault();
+    let diocese = $('#diocesanCalendarDioceseName').val();
+    let dioceseKey = $('#DiocesesList').find('option[value="' + diocese + '"]').attr('data-value').toUpperCase();
+});
+
 $(document).on('click', '.onTheFlyEventRow', function () {
     let $row;
     switch (this.id) {
@@ -813,6 +805,25 @@ $(document).on('click', '.onTheFlyEventRow', function () {
     });
 });
 
+let removeDiocesanCalendarModal = function(diocese){
+    return `
+<div class="modal fade" id="removeDiocesanCalendarPrompt" tabindex="-1" role="dialog" aria-labelledby="removeDiocesanCalendarModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="removeDiocesanCalendarModalLabel">${__("Delete diocesan calendar")} ${diocese}?</h5>
+      </div>
+      <div class="modal-body">
+        ${__("If you choose to delete this diocesan calendar, the liturgical events defined for the calendar and the corresponding index entry will be removed and no longer available in the client applications.")}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" id="deleteDiocesanCalendarButton" class="btn btn-danger"><i class="far fa-trash-alt"></i>&nbsp;&nbsp;Delete calendar</button>
+      </div>
+    </div>
+  </div>
+</div>`;
+};
 
 $(document).on('change', '#diocesanCalendarDioceseName', function () {
     $CALENDAR = { LitCal: {} };
@@ -832,12 +843,16 @@ $(document).on('change', '#diocesanCalendarDioceseName', function () {
         console.log('selected diocese with key = ' + $key);
         if ($index.hasOwnProperty($key)) {
             $('#retrieveExistingDiocesanData').prop('disabled', false);
+            $('#removeExistingDiocesanData').prop('disabled', false);
+            $('body').append(removeDiocesanCalendarModal($(this).val()));
             if($index[$key].hasOwnProperty('group')){
                 $('#diocesanCalendarGroup').val($index[$key].group);
             }
             console.log('we have an existing entry for this diocese!');
         } else {
             $('#retrieveExistingDiocesanData').prop('disabled', true);
+            $('#removeExistingDiocesanData').prop('disabled', true);
+            $('body').find('#removeDiocesanCalendarPrompt').remove();
             console.log('no existing entry for this diocese');
         }
     } else {
@@ -845,10 +860,41 @@ $(document).on('change', '#diocesanCalendarDioceseName', function () {
     }
 });
 
+$(document).on('click', '#deleteDiocesanCalendarButton', function(){
+    $('#removeDiocesanCalendarPrompt').modal('toggle');
+    let $diocese = $('#diocesanCalendarDioceseName').val();
+    let $key = $('#DiocesesList').find('option[value="' + $diocese + '"]').attr('data-value').toUpperCase();
+    let $nation = $('#diocesanCalendarNationalDependency').val();
+    delete $index[$key];
+    let deleteKey = { calendar: $key, diocese: $diocese, nation: $nation};
+    $.ajax({
+        url: './deleteDiocesanCalendar.php',
+        method: 'post',
+        dataType: 'json',
+        data: deleteKey,
+        success: function (data) {
+            $('#retrieveExistingDiocesanData').prop('disabled', true);
+            $('#removeExistingDiocesanData').prop('disabled', true);
+            $('body').find('#removeDiocesanCalendarPrompt').remove();
+            $('#diocesanCalendarDioceseName').val('');
+            $('#diocesanCalendarNationalDependency').val('');
+            console.log('data returned from delete action: ');
+            console.log(data);
+            $('<div class="toast" role="alert" aria-live="assertive" aria-atomic="true"><div class="toast-header"><img src="..." class="rounded mr-2" alt="..."><strong class="mr-auto">Bootstrap</strong><small class="text-muted">just now</small><button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="toast-body">See? Just like this.</div></div>').toast('show');
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log(textStatus + ': ' + errorThrown);
+            alert('there was an error!');
+        }
+    });
+});
+
 
 $(document).on('change', '#diocesanCalendarNationalDependency', function () {
     $('#diocesanCalendarDioceseName').val('');
     $('#retrieveExistingDiocesanData').prop('disabled', true);
+    $('#removeExistingDiocesanData').prop('disabled', true);
+    $('body').find('#removeDiocesanCalendarPrompt').remove();
     switch ($(this).val()) {
         case "ITALY":
             $('#DiocesesList').empty();
