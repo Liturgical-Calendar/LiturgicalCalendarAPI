@@ -2309,6 +2309,12 @@ if($LITSETTINGS->NATIONAL !== false){
         case 'USA':
 
             if($LITSETTINGS->YEAR >= 2011){
+
+                //The Solemnity of the Immaculate Conception is the Patronal FeastDay of the United States of America
+                if(array_key_exists("ImmaculateConception",$LitCal)){
+                    $LitCal["ImmaculateConception"]->name .= ", Patronal feastday of the United States of America";
+                }
+
                 //move Saint Vincent Deacon from Jan 22 to Jan 23 in order to allow for National Day of Prayer for the Unborn on Jan 22
                 //however if Jan 22 is a Sunday, National Day of Prayer for the Unborn is moved to Jan 23 (in place of Saint Vincent Deacon)
                 if(array_key_exists("StVincentDeacon",$LitCal)){

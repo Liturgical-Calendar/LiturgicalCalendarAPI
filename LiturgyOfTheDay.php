@@ -428,10 +428,10 @@ $MESSAGES = [
         "it" => "SOLENNITÀ",
         "la" => "SOLLEMNITAS"
     ],
-    "This evening there will be a Vigil Mass for the %s %s" => [
-        "en" => "This evening there will be a Vigil Mass for the %s %s",
-        "it" => "Questa sera ci sarà la Messa nella Vigilia per la %s %s",
-        "la" => "Haec vespera erit Missa Vigiliae in %s %s"
+    "This evening there will be a Vigil Mass for the %s %s." => [
+        "en" => "This evening there will be a Vigil Mass for the %s %s.",
+        "it" => "Questa sera ci sarà la Messa nella Vigilia per la %s %s.",
+        "la" => "Haec vespera erit Missa Vigiliae in %s %s."
     ],
     "Vigil Mass" => [
         "en" => "Vigil Mass",
@@ -443,10 +443,10 @@ $MESSAGES = [
         "it" => "anche",
         "la" => "etiam"
     ],
-    "Today is %s the %s of %s" => [
-        "en" => "Today is %s the %s of %s",
-        "it" => "Oggi è %s la %s di %s",
-        "la" => "Hodie est %s %s %s"
+    "Today is %s the %s of %s." => [
+        "en" => "Today is %s the %s of %s.",
+        "it" => "Oggi è %s la %s di %s.",
+        "la" => "Hodie est %s %s %s."
     ],
     "Today is" => [
         "en" => "Today is",
@@ -600,14 +600,16 @@ if (isset($LitCalData["LitCal"])) {
             $publishDate = $dateToday->sub(new DateInterval('PT1M'))->format("Y-m-d\TH:i:s\Z");
             // retransform each entry from an associative array to a Festivity class object
             $LitCal[$key] = new Festivity($LitCal[$key]["name"], $LitCal[$key]["date"], $LitCal[$key]["color"], $LitCal[$key]["type"], $LitCal[$key]["grade"], $LitCal[$key]["common"], (isset($LitCal[$key]["liturgicalyear"]) ? $LitCal[$key]["liturgicalyear"] : null), $LitCal[$key]["displaygrade"] );
-            $mainText = $LitCal[$key]->name;
             if($LitCal[$key]->grade === 0){
-                $mainText = __("Today is") . " " . $mainText;
+                $mainText = __("Today is") . " " . $LitCal[$key]->name . ".";
             } else{ 
                 if(strpos($LitCal[$key]->name,"Vigil")){
-                    $mainText = sprintf(__("This evening there will be a Vigil Mass for the %s %s"),_G($LitCal[$key]->grade),trim(str_replace(__("Vigil Mass"),"",$LitCal[$key]->name)));
+                    $mainText = sprintf(__("This evening there will be a Vigil Mass for the %s %s."),_G($LitCal[$key]->grade),trim(str_replace(__("Vigil Mass"),"",$LitCal[$key]->name)));
                 } else if($LitCal[$key]->grade < 7) {
-                    $mainText = sprintf(__("Today is %s the %s of %s"),($idx > 0 ? __("also") : ""),_G($LitCal[$key]->grade),$LitCal[$key]->name);
+                    $mainText = sprintf(__("Today is %s the %s of %s."),($idx > 0 ? __("also") : ""),_G($LitCal[$key]->grade),$LitCal[$key]->name);
+                    if($LitCal[$key]->grade < 4 && $LitCal[$key]["common"] != "Proper"){
+                        $mainText = $mainText . " " . _C($LitCal[$key]["common"]);
+                    }
                 }
             }
             $LitCalFeed[] = new stdClass();
