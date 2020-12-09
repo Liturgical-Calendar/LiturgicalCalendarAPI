@@ -579,8 +579,10 @@ if (curl_errno($ch1)) {
         // the request did not complete as expected. common errors are 4xx
         // (not found, bad request, etc.) and 5xx (usually concerning
         // errors/exceptions in the remote script execution)
-
         die("Request failed. HTTP status code: " . $resultStatus);
+    } else {
+        //echo $result;
+        $LitCalData = json_decode($result, true); // decode as associative array rather than stdClass object
     }
 }
 
@@ -592,8 +594,7 @@ $LitCal = array();
 $LitCalFeed = array();
 $idx = 0;
 $dateToday->add(new DateInterval('PT10M'));
-$LitCalData = json_decode($result, true); // decode as associative array rather than stdClass object
-if (isset($LitCalData["LitCal"])) {
+if(isset($LitCalData["LitCal"])) {
     $LitCal = $LitCalData["LitCal"];
     foreach ($LitCal as $key => $value) {
         if($LitCal[$key]["date"] === $dateTodayTimestamp){
@@ -607,9 +608,11 @@ if (isset($LitCalData["LitCal"])) {
                     $mainText = sprintf(__("This evening there will be a Vigil Mass for the %s %s."),_G($LitCal[$key]->grade),trim(str_replace(__("Vigil Mass"),"",$LitCal[$key]->name)));
                 } else if($LitCal[$key]->grade < 7) {
                     $mainText = sprintf(__("Today is %s the %s of %s."),($idx > 0 ? __("also") : ""),_G($LitCal[$key]->grade),$LitCal[$key]->name);
-                    if($LitCal[$key]->grade < 4 && $LitCal[$key]["common"] != "Proper"){
-                        $mainText = $mainText . " " . _C($LitCal[$key]["common"]);
+                    
+                    if($LitCal[$key]->grade < 4 && $LitCal[$key]->common != "Proper"){
+                        $mainText = $mainText . " " . _C($LitCal[$key]->common);
                     }
+                    
                 }
             }
             $LitCalFeed[] = new stdClass();
@@ -621,14 +624,16 @@ if (isset($LitCalData["LitCal"])) {
             ++$idx;
         }
     }
-
+    
     header('Content-Type: application/json');
     if(count($LitCalFeed) === 1){
         echo json_encode($LitCalFeed[0]);
     } else if(count($LitCalFeed) > 1){
         echo json_encode($LitCalFeed);
     }
+    
 }
+
 
 die();
 
