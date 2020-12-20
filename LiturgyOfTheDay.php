@@ -478,7 +478,7 @@ $query = $_SERVER['PHP_SELF'];
 $dir_level = explode("/",$query);
 $URL =  $prefix . $domain . "/" . $dir_level[1] . "/LitCalMetadata.php";
 
-$logFile = fopen("./logs/AlexaSkill.log", 'a');
+$logFile = fopen(realpath("./logs/AlexaSkill.log"), 'a');
 
 $ch = curl_init($URL);
 // Disable SSL verification
