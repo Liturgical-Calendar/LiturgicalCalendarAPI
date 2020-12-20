@@ -478,7 +478,7 @@ $query = $_SERVER['PHP_SELF'];
 $dir_level = explode("/",$query);
 $URL =  $prefix . $domain . "/" . $dir_level[1] . "/LitCalMetadata.php";
 
-$logFile = fopen(__DIR__ . "/logs/AlexaSkill.log", 'a');
+//$logFile = fopen(__DIR__ . "/logs/AlexaSkill.log", 'a');
 
 $ch = curl_init($URL);
 // Disable SSL verification
@@ -558,7 +558,7 @@ $dateTimeToday = (new DateTime( 'now' ))->format("Y-m-d") . " 00:00:00";
 $dateToday = DateTime::createFromFormat('Y-m-d H:i:s', $dateTimeToday, new DateTimeZone('UTC') );
 $dateTodayTimestamp = $dateToday->format("U");
 
-fwrite($logFile, new DateTime( 'now' ))->format("Y-m-d H:i:s") . " " . print_r($queryArray, true) . " \n");
+//fwrite($logFile, new DateTime( 'now' ))->format("Y-m-d H:i:s") . " " . print_r($queryArray, true) . " \n");
 
 $prefix = $_SERVER['HTTPS'] ? 'https://' : 'http://';
 $domain = $_SERVER['HTTP_HOST'];
@@ -568,7 +568,7 @@ $dir_level = explode("/",$query);
 $URL =  $prefix . $domain . "/" . $dir_level[1] . "/LitCalEngine.php";
 //echo $URL;
 
-fwrite($logFile, $URL . "\n");
+//fwrite($logFile, $URL . "\n");
 
 $ch1 = curl_init();
 // Disable SSL verification
@@ -586,7 +586,7 @@ $result = curl_exec($ch1);
 
 if (curl_errno($ch1)) {
     // this would be your first hint that something went wrong
-    fwrite($logFile, curl_error($ch1) . "\n");
+    //fwrite($logFile, curl_error($ch1) . "\n");
     die("Could not send request. Curl error: " . curl_error($ch1));
 } else {
     // check the HTTP status code of the request
@@ -595,11 +595,11 @@ if (curl_errno($ch1)) {
         // the request did not complete as expected. common errors are 4xx
         // (not found, bad request, etc.) and 5xx (usually concerning
         // errors/exceptions in the remote script execution)
-        fwrite($logFile, "HTTP STATUS " . $resultStatus . "\n");
+        //fwrite($logFile, "HTTP STATUS " . $resultStatus . "\n");
         die("Request failed. HTTP status code: " . $resultStatus);
     } else {
         //echo $result;
-        fwrite($logFile, $result . "\n");
+        //fwrite($logFile, $result . "\n");
         $LitCalData = json_decode($result, true); // decode as associative array rather than stdClass object
     }
 }
@@ -615,32 +615,32 @@ $dateToday->add(new DateInterval('PT10M'));
 if(isset($LitCalData["LitCal"])) {
     $LitCal = $LitCalData["LitCal"];
     foreach ($LitCal as $key => $value) {
-        fwrite($logFile, "Processing litcal event $key..." . "\n");
+        //fwrite($logFile, "Processing litcal event $key..." . "\n");
         if($LitCal[$key]["date"] === $dateTodayTimestamp){
-            fwrite($logFile, "Found litcal event $key with timestamp equal to today!" . "\n");
+            //fwrite($logFile, "Found litcal event $key with timestamp equal to today!" . "\n");
             $publishDate = $dateToday->sub(new DateInterval('PT1M'))->format("Y-m-d\TH:i:s\Z");
             // retransform each entry from an associative array to a Festivity class object
             $LitCal[$key] = new Festivity($LitCal[$key]["name"], $LitCal[$key]["date"], $LitCal[$key]["color"], $LitCal[$key]["type"], $LitCal[$key]["grade"], $LitCal[$key]["common"], (isset($LitCal[$key]["liturgicalyear"]) ? $LitCal[$key]["liturgicalyear"] : null), $LitCal[$key]["displaygrade"] );
             if($LitCal[$key]->grade === 0){
-                fwrite($logFile, "we are dealing with a weekday event" . "\n");
+                //fwrite($logFile, "we are dealing with a weekday event" . "\n");
                 $mainText = __("Today is") . " " . $LitCal[$key]->name . ".";
             } else{ 
                 if(strpos($LitCal[$key]->name,"Vigil")){
-                    fwrite($logFile, "we are dealing with a Vigil Mass" . "\n");
+                    //fwrite($logFile, "we are dealing with a Vigil Mass" . "\n");
                     $mainText = sprintf(__("This evening there will be a Vigil Mass for the %s %s."),_G($LitCal[$key]->grade),trim(str_replace(__("Vigil Mass"),"",$LitCal[$key]->name)));
                 } else if($LitCal[$key]->grade < 7) {
-                    fwrite($logFile, "we are dealing with something greater than a weekday but less than a higher ranking solemnity" . "\n");
+                    //fwrite($logFile, "we are dealing with something greater than a weekday but less than a higher ranking solemnity" . "\n");
                     $mainText = sprintf(__("Today is %s the %s of %s."),($idx > 0 ? __("also") : ""),_G($LitCal[$key]->grade),$LitCal[$key]->name);
                     
                     if($LitCal[$key]->grade < 4 && $LitCal[$key]->common != "Proper"){
-                        fwrite($logFile, "we are dealing with something less than a Feast, and which has a common" . "\n");
+                        //fwrite($logFile, "we are dealing with something less than a Feast, and which has a common" . "\n");
                         $mainText = $mainText . " " . _C($LitCal[$key]->common);
                     }
                 } else {
                     $mainText = sprintf(__("Today is %s the %s."),($idx > 0 ? __("also") : ""),$LitCal[$key]->name);
                 }
             }
-            fwrite($logFile, "mainText = $mainText" . "\n");
+            //fwrite($logFile, "mainText = $mainText" . "\n");
             $LitCalFeed[] = new stdClass();
             $LitCalFeed[count($LitCalFeed)-1]->uid = "urn:uuid:" . md5("LITCAL-" . $key . '-' . $LitCal[$key]->date->format('Y'));
             $LitCalFeed[count($LitCalFeed)-1]->updateDate = $publishDate;
@@ -659,8 +659,8 @@ if(isset($LitCalData["LitCal"])) {
     }
     
 }
-fwrite($logFile,"--------\n");
-fclose($logFile);
+//fwrite($logFile,"--------\n");
+//fclose($logFile);
 die();
 
 ?>
