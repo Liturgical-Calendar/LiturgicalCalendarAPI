@@ -630,7 +630,16 @@ if(isset($LitCalData["LitCal"])) {
                     $mainText = sprintf(__("This evening there will be a Vigil Mass for the %s %s."),_G($LitCal[$key]->grade),trim(str_replace(__("Vigil Mass"),"",$LitCal[$key]->name)));
                 } else if($LitCal[$key]->grade < 7) {
                     //fwrite($logFile, "we are dealing with something greater than a weekday but less than a higher ranking solemnity" . "\n");
-                    $mainText = sprintf(__("Today is %s the %s of %s."),($idx > 0 ? __("also") : ""),_G($LitCal[$key]->grade),$LitCal[$key]->name);
+
+                    if($LitCal[$key]->displayGrade != ""){
+                        $mainText = sprintf(__("Today is %s the %s of %s."),($idx > 0 ? __("also") : ""),$LitCal[$key]->displayGrade,$LitCal[$key]->name);
+                    } else {
+                        if($LitCal[$key]->grade == 5){
+                            $mainText = sprintf(__("Today is %s the %s, %s."),($idx > 0 ? __("also") : ""),_G($LitCal[$key]->grade),$LitCal[$key]->name);
+                        } else {
+                            $mainText = sprintf(__("Today is %s the %s of %s."),($idx > 0 ? __("also") : ""),_G($LitCal[$key]->grade),$LitCal[$key]->name);
+                        }
+                    }
                     
                     if($LitCal[$key]->grade < 4 && $LitCal[$key]->common != "Proper"){
                         //fwrite($logFile, "we are dealing with something less than a Feast, and which has a common" . "\n");
