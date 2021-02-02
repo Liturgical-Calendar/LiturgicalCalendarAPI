@@ -457,6 +457,11 @@ $MESSAGES = [
         "it" => "Oggi è %s la %s di %s.",
         "la" => "Hodie est %s %s %s."
     ],
+    "Today is %s the %s, %s." => [
+        "en" => "Today is %s the %s, %s.",
+        "it" => "Oggi è %s la %s, %s.",
+        "la" => "Hodie est %s %s, %s."
+    ],
     "Today is" => [
         "en" => "Today is",
         "it" => "Oggi è",

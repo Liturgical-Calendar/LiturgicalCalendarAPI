@@ -1930,17 +1930,22 @@ if ($LITSETTINGS->YEAR >= 2002) {
         }
     }
 
-    //With the Decree of the Congregation for Divine Worship on January 25, 2021, 
+    //With the Decree of the Congregation for Divine Worship on January 25, 2021,
     //the optional memorials of Gregory of Narek, John of Avila, and Hildegard of Bingen were added to the universal roman calendar
     //http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_la.html
+
+    //and with the Decree of the Congregation for Divine Worship on January 26, 2021,
+    //the Memorial of Saint Martha on July 29th will now be of Mary, Martha and Lazarus
+    //http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_la.html
+
     if($LITSETTINGS->YEAR >= 2021){
         $StGregoryNarek_tag = ["LA" => "Sancti Gregorii Narecensis, abbatis et Ecclesiæ doctoris", "IT" => "San Gregorio di Narek, abate e dottore della Chiesa", "EN" => "Saint Gregory of Narek"];
-        $StJohnAvila_tag = ["LA" => "Santi Ioannis De Avila, presbyteri et Ecclesiæ doctoris", "IT" => "San Giovanni d'Avila, sacerdote e dottore della Chiesa", "EN" => "Saint John of Avila, priest and doctor of the Church"];
+        $StJohnAvila_tag = ["LA" => "Sancti Ioannis De Avila, presbyteri et Ecclesiæ doctoris", "IT" => "San Giovanni d'Avila, sacerdote e dottore della Chiesa", "EN" => "Saint John of Avila, priest and doctor of the Church"];
         $StHildegardBingen_tag = ["LA" => "Sanctæ Hildegardis Bingensis, virginis et Ecclesiæ doctoris", "IT" => "Santa Ildegarda de Bingen, vergine e dottore delle Chiesa", "EN" => "Saint Hildegard of Bingen, virgin and doctor of the Church"];
 
-        $StGregoryNarek_date = DateTime::createFromFormat('!j-n-Y', '27-02-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-        $StJohnAvila_date = DateTime::createFromFormat('!j-n-Y', '10-05-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-        $StHildegardBingen_date = DateTime::createFromFormat('!j-n-Y', '17-09-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+        $StGregoryNarek_date = DateTime::createFromFormat('!j-n-Y', '27-2-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+        $StJohnAvila_date = DateTime::createFromFormat('!j-n-Y', '10-5-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+        $StHildegardBingen_date = DateTime::createFromFormat('!j-n-Y', '17-9-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
 
         if(!in_array($StGregoryNarek_date,$SOLEMNITIES) && !in_array($StGregoryNarek_date,$FEASTS_MEMORIALS)){
             $LitCal["StGregoryNarek"] = new Festivity($StGregoryNarek_tag[$LITSETTINGS->LOCALE], $StGregoryNarek_date, "white", "fixed", MEMORIALOPT, "Holy Men and Women:For an Abbot,Doctors");
@@ -2078,6 +2083,11 @@ if ($LITSETTINGS->YEAR >= 2002) {
                 $coincidingFestivity->name,
                 $LITSETTINGS->YEAR
             );
+        }
+
+        if(array_key_exists("StMartha",$LitCal)){
+            $StMartha_tag = ["LA" => "Sanctorum Marthæ, Mariæ et Lazari", "IT" => "Santi Marta, Maria e Lazzaro", "EN" => "Saints Martha, Mary and Lazarus"];
+            $LitCal["StMartha"]->name = $StMartha_tag[$LITSETTINGS->LOCALE];
         }
 
 
