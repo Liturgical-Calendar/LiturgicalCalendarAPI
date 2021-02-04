@@ -14,6 +14,7 @@ class Festivity implements JsonSerializable
     public $displayGrade;
     public $common; //"Proper" or specified common(s) of saints...
     public $liturgicalyear; //not used in construction, but added externally, from the program using the current class
+    public $isVigilMass;    //not used in construction, but added externally, from the program using the current class
     public $hasVigilMass;   //not used in construction, but added externally, from the program using the current class
     public $hasVesperI;     //not used in construction, but added externally, from the program using the current class
     public $hasVesperII;    //not used in construction, but added externally, from the program using the current class
@@ -66,6 +67,9 @@ class Festivity implements JsonSerializable
         ];
         if($this->liturgicalyear !== null){
             $returnArr['liturgicalyear'] = $this->liturgicalyear;
+        }
+        if($this->isVigilMass !== null){
+            $returnArr['isVigilMass'] = $this->isVigilMass;
         }
         if($this->hasVigilMass !== null){
             $returnArr['hasVigilMass'] = $this->hasVigilMass;

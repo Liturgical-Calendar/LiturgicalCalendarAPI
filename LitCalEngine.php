@@ -2790,6 +2790,7 @@ foreach($LitCal as $key => $festivity){
                 $LitCal[$key]->hasVesperI = true;
                 $LitCal[$key]->hasVesperII = true;
                 $LitCal[$key . "_vigil"]->liturgicalyear = $LitCal[$key]->liturgicalyear;
+                $LitCal[$key . "_vigil"]->isVigilMass = true;
                 //if however the Vigil coincides with another Solemnity let's make a note of it!
                 if(in_array($VigilDate,$SOLEMNITIES)){
                     $coincidingFestivity_grade = '';
