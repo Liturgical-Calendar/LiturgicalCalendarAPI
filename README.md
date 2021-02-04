@@ -67,13 +67,18 @@ Two object keys are returned:
 ```javascript
   "LitCal":{
     "MotherGod":{
-      "name":"SOLLEMNITAS SANCTAE DEI GENITRICIS MARIAE",
+      "name":"SOLLEMNITAS SANCT\u00c6 DEI GENITRICIS MARI\u00c6",
       "color":"white",
       "type":"fixed",
       "grade":6,
       "common":"",
-      "date":"1577836800",
-      "liturgicalyear":"ANNUM A"
+      "date":"1609459200",
+      "displaygrade":"",
+      "eventidx":44,
+      "liturgicalyear":"ANNUM B",
+      "hasVigilMass":true,
+      "hasVesperI":true,
+      "hasVesperII":true
     },
     "StsBasilGreg":{
       "name":"Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiae doctorum",
@@ -81,7 +86,9 @@ Two object keys are returned:
       "type":"fixed",
       "grade":3,
       "common":"Proper",
-      "date":"1577923200"
+      "date":"1577923200",
+      "displaygrade":"",
+      "eventidx":158
     }
   }
 ```
@@ -103,9 +110,14 @@ Each of the events generated is represented as an object whose key => value pair
   * `common` : Indicates whether the liturgical texts for the celebration (in the case of memorials of saints) can be found in the Proper of Saints in the Roman Missal, or whether in the various Commons. In the former case the value will be simply `Proper`, in the latter case there will be a more complex construct:
     - if it is possible to use liturgical texts from more than one common, the multiple possible commons will be listed as a comma separated list `,`
     - each common has multiple categories of persons, with liturgical texts that are suitable for the specific category. The common and the specific category within the common will be separated by a colon `:`
-  An example value of the `common` property: `"Pastors:For a Bishop|Doctors"`. This means that it is possible to choose the liturgical texts either from the *Common of Pastors* or from the *Common of Doctors*; in the former case, the liturgical texts should be taken from the specific category *For a Bishop*. A textual representation ready for display would be something like this: *From the common of Pastors: For a Bishop; or from the Common of Doctors*. Please refer to the example scripts, whether the PHP example or the Javascript example, in order to understand better how to handle the interpretation and localization of these values, with all possible cases. 
+  An example value of the `common` property: `"Pastors:For a Bishop,Doctors"`. This means that it is possible to choose the liturgical texts either from the *Common of Pastors* or from the *Common of Doctors*; in the former case, the liturgical texts should be taken from the specific category *For a Bishop*. A textual representation ready for display would be something like this: *From the common of Pastors: For a Bishop; or from the Common of Doctors*. Please refer to the example scripts, whether the PHP example or the Javascript example, in order to understand better how to handle the interpretation and localization of these values, with all possible cases. 
   * `date`   : a PHP style unix timestamp in UTC time. The actual time (hours, minutes, seconds) should be a zero value seeing that we deal only with all day events, and time is not of importance. For use in **Javascript**, multiply this value by 1000, because Javascript uses `milliseconds` whereas **PHP** uses `seconds` as a base for a UNIX timestamp. The timestamp value should be dealt with accordingly in each programming language used: as is if the language uses seconds as a base, or multiplying by 1000 if it uses milliseconds as a base.
+  * `displaygrade` : a string which will be empty unless the grade of the festivity to be displayed does not correspond with the grades generally associated with the `grade` property
   * `liturgicalyear` : the cycle of liturgical years that this event corresponds to. This property will only be present for events where it is applicable (Sundays and Weekdays of Ordinary Time or those liturgical events whose texts are based on the liturgical cycle), as can be noted in the sample data above. When present, it will have a localized value of `YEAR A`, `YEAR B`, or `YEAR C` for festive events or a value of `YEAR I`, `YEAR II` for weekday events (if an application makes a request for the Italian language, the values will contain `ANNO` instead of `YEAR`, and likewise for any localization requested).
+  * `hasVigilMass` : boolean value to indicate whether there is a vigil Mass associated with this festivity on the preceding day. This property will only be present for liturgical events that would normally have Vigil Masses (Solemnities, Feasts of the Lord, Sundays...).
+  * `hasVesperI` : boolean value to indicate whether or not the first vespers for the festivity should be celebrated on the preceding day. This property will only be present for liturgical events that would normally have First Vespers (Solemnities, Feasts of the Lord, Sundays...).
+  * `has VesperII` : boolean value to indicate whether or not the second vespers for the festivity should be celebrated in the evening of the same day. This property will only be present for liturgical events that would normally have Second Vespers (Solemnities, Feasts of the Lord, Sundays...).
+  * `eventidx` : unique index number which indicates the order in which the liturgical event was generated by the API's engine / algorithm. Can be useful to order multiple events on the same day, in the order in which they were generated (which should usually correspond with the order of importance).
 2. **`Settings`**: has a value which is an object who's key => value pairs reflect the settings used in the request to produce this specific calendar. These are useful more or less just as feedback so that we can be sure that the calendar was effectively produced with the requesting settings. Example value of the `Settings` key:
 ```javascript
   "Settings":{
@@ -114,7 +126,7 @@ Each of the events generated is represented as an object whose key => value pair
     "ASCENSION":"SUNDAY",
     "CORPUSCHRISTI":"SUNDAY",
     "LOCALE":"LA",
-    "returntype":"JSON"
+    "RETURNTYPE":"JSON"
   }
 ```
 
