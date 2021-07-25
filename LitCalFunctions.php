@@ -125,3 +125,13 @@ function convertArray2XML(SimpleXMLElement $object, array $data)
     }
   }
 }
+
+/**
+ * psalterWeek function
+ * Calculates the current Week of the Psalter (from 1 to 4)
+ * based on the week of Ordinary Time
+ * OR the week of Advent, Christmas, Lent, or Easter
+ */
+function psalterWeek(int $weekOfOrdinaryTimeOrSeason){
+  return $weekOfOrdinaryTimeOrSeason % 4 === 0 ? 4 : $weekOfOrdinaryTimeOrSeason % 4;
+}
