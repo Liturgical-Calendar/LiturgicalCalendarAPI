@@ -18,6 +18,7 @@ class Festivity implements JsonSerializable
     public $hasVigilMass;   //not used in construction, but added externally, from the program using the current class
     public $hasVesperI;     //not used in construction, but added externally, from the program using the current class
     public $hasVesperII;    //not used in construction, but added externally, from the program using the current class
+    public $psalterWeek;    //not used in construction, but added externally, from the program using the current class
     public $idx;            //not used in construction, but set automatically inside the constructor based on the static autoincrement
 
     function __construct(string $name, DateTime $date, string $color, string $type, int $grade = 0, string $common = '', string $displayGrade='')
@@ -79,6 +80,9 @@ class Festivity implements JsonSerializable
         }
         if($this->hasVesperII !== null){
             $returnArr['hasVesperII'] = $this->hasVesperII;
+        }
+        if($this->psalterWeek !== null){
+            $returnArr['psalterWeek'] = $this->psalterWeek;
         }
         return $returnArr;
     }
