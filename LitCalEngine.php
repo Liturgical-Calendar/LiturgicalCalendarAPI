@@ -2150,6 +2150,7 @@ while ($weekdayEaster >= $LitCal["Easter"]->date && $weekdayEaster < $LitCal["Pe
         $currentEasterWeek = (($diff - $diff % 7) / 7) + 1;         //week count between current day and Easter Sunday
         $ordinal = ucfirst(getOrdinal($currentEasterWeek,$LITSETTINGS->LOCALE,$formatterFem,$LATIN_ORDINAL_FEM_GEN));
         $LitCal["EasterWeekday" . $weekdayEasterCnt] = new Festivity(($LITSETTINGS->LOCALE == 'LA' ? $LATIN_DAYOFTHEWEEK[$weekdayEaster->format('w')] : ucfirst(utf8_encode(strftime('%A',$weekdayEaster->format('U'))))) . " " . sprintf(__("of the %s Week of Easter",$LITSETTINGS->LOCALE),$ordinal), $weekdayEaster, "white", "mobile");
+	$LitCal["EasterWeekday" . $weekdayEasterCnt]->psalterWeek = psalterWeek($currentEasterWeek);
     }
 
     $weekdayEasterCnt++;
@@ -2181,6 +2182,7 @@ while ($firstOrdinary >= $FirstWeekdaysLowerLimit && $firstOrdinary < $FirstWeek
         }
         $ordinal = ucfirst(getOrdinal($currentOrdWeek,$LITSETTINGS->LOCALE,$formatterFem,$LATIN_ORDINAL_FEM_GEN));
         $LitCal["FirstOrdWeekday" . $ordWeekday] = new Festivity(($LITSETTINGS->LOCALE == 'LA' ? $LATIN_DAYOFTHEWEEK[$firstOrdinary->format('w')] : ucfirst(utf8_encode(strftime('%A',$firstOrdinary->format('U')))) ) . " " . sprintf(__("of the %s Week of Ordinary Time",$LITSETTINGS->LOCALE), $ordinal ), $firstOrdinary, "green", "mobile");
+	$LitCal["FirstOrdWeekday" . $ordWeekday]->psalterWeek = psalterWeek($currentOrdWeek);
     }
     $ordWeekday++;
 }
@@ -2206,6 +2208,7 @@ while ($lastOrdinary >= $SecondWeekdaysLowerLimit && $lastOrdinary < $SecondWeek
 
         $ordinal = ucfirst(getOrdinal($currentOrdWeek,$LITSETTINGS->LOCALE,$formatterFem,$LATIN_ORDINAL_FEM_GEN));
         $LitCal["LastOrdWeekday" . $ordWeekday] = new Festivity(($LITSETTINGS->LOCALE == 'LA' ? $LATIN_DAYOFTHEWEEK[$lastOrdinary->format('w')] : ucfirst(utf8_encode(strftime('%A',$lastOrdinary->format('U')))) ) . " " . sprintf(__("of the %s Week of Ordinary Time",$LITSETTINGS->LOCALE), $ordinal ), $lastOrdinary, "green", "mobile");
+	$LitCal["LastOrdWeekday" . $ordWeekday]->psalterWeek = psalterWeek($currentOrdWeek);
     }
     $ordWeekday++;
 }
