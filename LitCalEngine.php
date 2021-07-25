@@ -477,6 +477,21 @@ array_push( $SUNDAYS_ADVENT_LENT_EASTER,
     $LitCal["Easter6"]->date
 );
 
+$LitCal["Advent1"]->psalterWeek = 1;
+$LitCal["Advent2"]->psalterWeek = 2;
+$LitCal["Advent3"]->psalterWeek = 3;
+$LitCal["Advent4"]->psalterWeek = 4;
+$LitCal["Lent1"]->psalterWeek = 1;
+$LitCal["Lent2"]->psalterWeek = 2;
+$LitCal["Lent3"]->psalterWeek = 3;
+$LitCal["Lent4"]->psalterWeek = 4;
+$LitCal["Lent5"]->psalterWeek = 1;
+$LitCal["Easter2"]->psalterWeek = 2;
+$LitCal["Easter3"]->psalterWeek = 3;
+$LitCal["Easter4"]->psalterWeek = 4;
+$LitCal["Easter5"]->psalterWeek = 1;
+$LitCal["Easter6"]->psalterWeek = 2;
+
 if (CORPUSCHRISTI === "THURSDAY") {
     $LitCal["CorpusChristi"] = new Festivity($PROPRIUM_DE_TEMPORE["CorpusChristi"]["NAME_" . $LITSETTINGS->LOCALE], calcGregEaster($LITSETTINGS->YEAR)->add(new DateInterval('P' . (7 * 8 + 4) . 'D')),  "white",    "mobile", HIGHERSOLEMNITY);
 } else if (CORPUSCHRISTI === "SUNDAY") {
