@@ -773,6 +773,7 @@ while ($firstOrdinary >= $LitCal["BaptismLord"]->date && $firstOrdinary < $first
     $ordSun++;
     if (!in_array($firstOrdinary, $SOLEMNITIES)) {
         $LitCal["OrdSunday" . $ordSun] = new Festivity($PROPRIUM_DE_TEMPORE["OrdSunday" . $ordSun]["NAME_" . $LITSETTINGS->LOCALE], $firstOrdinary, "green", "mobile", FEASTLORD);
+	$LitCal["OrdSunday" . $ordSun]->psalterWeek = psalterWeek($ordSun);
         //add Sundays to our priority list for next checking against ordinary Feasts not of Our Lord
         $SOLEMNITIES["OrdSunday" . $ordSun]      = $firstOrdinary;
 
@@ -801,6 +802,7 @@ while ($lastOrdinary <= $LitCal["ChristKing"]->date && $lastOrdinary > $lastOrdi
     $ordSun--;
     if (!in_array($lastOrdinary, $SOLEMNITIES)) {
         $LitCal["OrdSunday" . $ordSun] = new Festivity($PROPRIUM_DE_TEMPORE["OrdSunday" . $ordSun]["NAME_" . $LITSETTINGS->LOCALE], $lastOrdinary, "green", "mobile", FEASTLORD);
+	$LitCal["OrdSunday" . $ordSun]->psalterWeek = psalterWeek($ordSun);	
         //add Sundays to our priority list for next checking against ordinary Feasts not of Our Lord
         $SOLEMNITIES["OrdSunday" . $ordSun]      = $lastOrdinary;
     } else {
