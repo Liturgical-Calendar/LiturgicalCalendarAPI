@@ -311,8 +311,10 @@
                 else if (dy !== 7 || $festivity.grade > 3) {
                   $festivityGrade = _G($festivity.grade) + ', ';
                 }
+                let $psalterWeek = $festivity.hasOwnProperty('psalterWeek') ? 'Ps W' + $festivity.psalterWeek : '';
+                let $liturgicalYear = $festivity.hasOwnProperty('liturgicalyear') ? '<br>' + $festivity.liturgicalyear + ($psalterWeek != '' ? ' | ' + $psalterWeek : '') : ($psalterWeek != '' ? $psalterWeek : '');
 
-                let $description = '<b>' + $festivity.name + '</b><br>' + $festivityGrade + '<i>' + _CC($festivity.color, true) + '</i><br><i style="font-size:.8em;">' + _C($festivity.common) + '</i>' + ($festivity.hasOwnProperty('liturgicalyear') ? '<br>' + $festivity.liturgicalyear : '');
+                let $description = '<b>' + $festivity.name + '</b><br>' + $festivityGrade + '<i>' + _CC($festivity.color, true) + '</i><br><i style="font-size:.8em;">' + _C($festivity.common) + '</i>' + $liturgicalYear;
                 $events[$keyindex] = {
                   title: $festivity.name,
                   start: $festivity.date.getUTCFullYear() + '-' + pad($festivity.date.getUTCMonth() + 1) + '-' + pad($festivity.date.getUTCDate()),
