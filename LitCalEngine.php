@@ -1888,7 +1888,7 @@ if ($LITSETTINGS->YEAR >= 2002) {
                         trim(utf8_encode(strftime('%e %B', $PaulVI_date->format('U'))))
                     ),
                 2019,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+                '<a href="https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
                 $coincidingFestivity->name,
                 $LITSETTINGS->YEAR
             );
@@ -2044,7 +2044,7 @@ if ($LITSETTINGS->YEAR >= 2002) {
             $coincidingFestivity = $LitCal[$coincidingFestivityKey];
             $Messages[] = sprintf(
                 __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
-                $StFaustina_tag[$LITSETTINGS->LOCALE],
+                $StJohnAvila_tag[$LITSETTINGS->LOCALE],
                 $LITSETTINGS->LOCALE === 'LA' ? ( $StJohnAvila_date->format('j') . ' ' . $LATIN_MONTHS[(int)$StJohnAvila_date->format('n')] ) :
                     ( $LITSETTINGS->LOCALE === 'EN' ? $StJohnAvila_date->format('F jS') :
                         trim(utf8_encode(strftime('%e %B', $StJohnAvila_date->format('U'))))
@@ -2090,7 +2090,7 @@ if ($LITSETTINGS->YEAR >= 2002) {
             $coincidingFestivity = $LitCal[$coincidingFestivityKey];
             $Messages[] = sprintf(
                 __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
-                $StFaustina_tag[$LITSETTINGS->LOCALE],
+                $StHildegardBingen_tag[$LITSETTINGS->LOCALE],
                 $LITSETTINGS->LOCALE === 'LA' ? ( $StHildegardBingen_date->format('j') . ' ' . $LATIN_MONTHS[(int)$StHildegardBingen_date->format('n')] ) :
                     ( $LITSETTINGS->LOCALE === 'EN' ? $StHildegardBingen_date->format('F jS') :
                         trim(utf8_encode(strftime('%e %B', $StHildegardBingen_date->format('U'))))
