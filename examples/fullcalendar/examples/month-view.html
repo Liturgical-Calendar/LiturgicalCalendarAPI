@@ -29,6 +29,10 @@
     #calendar {
       max-width: 1200px;
       margin: 40px auto;
+      background-color: beige;
+      padding: 24px;
+      border-radius: 16px;
+      border: 5px solid gray;
     }
 
     .backNav {
@@ -254,10 +258,11 @@
   </div>
   <div><a class="backNav" href="/LiturgicalCalendar/usage.php">↩ Go back ↩</a></div>
   <span class="material-icons" id="openSettings">settings</span>
-  <header>
-  </header>
+  <header></header>
 
   <div id='calendar'></div>
+
+  <footer></footer>
 
   <table id="LitCalMessages">
     <thead></thead>
@@ -340,6 +345,7 @@
                   events: $events,
                   firstDay: 0,
                   eventOrder: 'idx',
+                  aspectRatio: 2,
                   eventDidMount: function (info) {
                     $(info.el).attr('data-tooltip', encodeURI(info.event.extendedProps.description));
                   }//,
@@ -410,8 +416,8 @@
         templateStr = templateStr.replace('%s', '<a href="../../../LitCalEngine.php">PHP engine</a>');
         let $header = `
             <h1 style="text-align:center;">${__('Liturgical Calendar Calculation for a Given Year')} (${$Settings.year})</h1>
-            <h2 style="text-align:center;">${templateStr}</h2>
-            <div style="text-align:center;border:2px groove White;border-radius:6px;width:60%;margin:0px auto;padding-bottom:6px;">
+            <h5 style="text-align:center;">${templateStr}</h5>`,
+          $footer = `<div style="text-align:center;border:2px groove White;border-radius:6px;width:60%;margin:0px auto;padding-bottom:6px;">
             <h3>${__('Configurations being used to generate this calendar:')}</h3>
             <span>${__('YEAR')} = ${$Settings.year}, ${__('EPIPHANY')} = ${$Settings.epiphany}, ${__('ASCENSION')} = ${$Settings.ascension}, CORPUS CHRISTI = ${$Settings.corpuschristi}, LOCALE = ${$Settings.locale}</span>
             </div>`,
@@ -425,6 +431,7 @@
         <tr><td colspan="4" style="text-align:center;"><input type="submit" id="generateLitCal" value="${__("Generate Roman Calendar")}" /></td></tr>
         </table></form></div>`;
         $('header').html($header);
+        $('footer').html($footer);
         $('#LitCalTable thead').html($tbheader);
         $('#LitCalMessages thead').html(`<tr><th colspan=2 style="text-align:center;">${__("Information about the current calculation of the Liturgical Year")}</th></tr>`);
         $('#generateLitCal').button();
