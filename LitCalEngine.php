@@ -127,8 +127,8 @@ if($LITSETTINGS->DIOCESAN !== false){
         if(property_exists($index,$LITSETTINGS->DIOCESAN)){
             $diocesanDataFile = $index->{$LITSETTINGS->DIOCESAN}->path;
             $LITSETTINGS->NATIONAL = $index->{$LITSETTINGS->DIOCESAN}->nation;
-            if(file_exists($diocesanDataFile) ){
-                $DiocesanData = json_decode(file_get_contents($diocesanDataFile));
+            if( file_exists($diocesanDataFile) ){
+                $DiocesanData = json_decode( file_get_contents($diocesanDataFile) );
             }
         }
     }
@@ -1518,601 +1518,601 @@ if ($LITSETTINGS->YEAR >= 2002) {
         }
     }
 
+}
 
-    if ($LITSETTINGS->YEAR >= 2008) {
+if ($LITSETTINGS->YEAR >= 2008) {
 
-        //Saint Juan Diego was canonized in 2002, so did not make it to the Tertia Editio Typica 2002
-        //The optional memorial was added in the Tertia Editio Typica emendata in 2008,
-        //together with the optional memorial of Our Lady of Guadalupe
-        $Guadalupe_tag = ["LA" => "Beatæ Mariæ Virginis Guadalupensis", "EN" => "Our Lady of Guadalupe", "IT" => "Beata Vergine Maria di Guadalupe"];
-        $Guadalupe_date = DateTime::createFromFormat('!j-n-Y', '12-12-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+    //Saint Juan Diego was canonized in 2002, so did not make it to the Tertia Editio Typica 2002
+    //The optional memorial was added in the Tertia Editio Typica emendata in 2008,
+    //together with the optional memorial of Our Lady of Guadalupe
+    $Guadalupe_tag = ["LA" => "Beatæ Mariæ Virginis Guadalupensis", "EN" => "Our Lady of Guadalupe", "IT" => "Beata Vergine Maria di Guadalupe"];
+    $Guadalupe_date = DateTime::createFromFormat('!j-n-Y', '12-12-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
 
-        if ( (int)$Guadalupe_date->format('N') !== 7 && !in_array($Guadalupe_date, $SOLEMNITIES) && !in_array($Guadalupe_date, $FEASTS_MEMORIALS) ) {
-            $LitCal["LadyGuadalupe"] = new Festivity( $Guadalupe_tag[$LITSETTINGS->LOCALE], $Guadalupe_date, 'white', 'fixed', MEMORIALOPT, "Blessed Virgin Mary" );
-            /**
-             * TRANSLATORS:
-             * 1. Grade or rank of the festivity
-             * 2. Name of the festivity
-             * 3. Day of the festivity
-             * 4. Year from which the festivity has been added
-             * 5. Source of the information
-             * 6. Current year
-             */
-            $Messages[] = sprintf(
-                __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
-                _G($LitCal["LadyGuadalupe"]->name,$LITSETTINGS->LOCALE),
-                $LitCal["LadyGuadalupe"]->name,
-                $LITSETTINGS->LOCALE === 'LA' ? ( $Guadalupe_date->format('j') . ' ' . $LATIN_MONTHS[(int)$Guadalupe_date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $Guadalupe_date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $Guadalupe_date->format('U'))))
-                    ),
-                2002,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $LITSETTINGS->YEAR
-            );
-        } else {
-            if(in_array($Guadalupe_date,$SOLEMNITIES) ){
-                $coincidingFestivityKey = array_search($Guadalupe_date,$SOLEMNITIES);
-            }
-            else if(in_array($Guadalupe_date,$FEASTS_MEMORIALS) ){
-                $coincidingFestivityKey = array_search($Guadalupe_date,$FEASTS_MEMORIALS);
-            }
-            $coincidingFestivity = $LitCal[$coincidingFestivityKey];
-            $Messages[] = sprintf(
-                __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
-                $Guadalupe_tag[$LITSETTINGS->LOCALE],
-                $LITSETTINGS->LOCALE === 'LA' ? ( $Guadalupe_date->format('j') . ' ' . $LATIN_MONTHS[(int)$Guadalupe_date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $Guadalupe_date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $Guadalupe_date->format('U'))))
-                    ),
-                2002,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $coincidingFestivity->name,
-                $LITSETTINGS->YEAR
-            );
+    if ( (int)$Guadalupe_date->format('N') !== 7 && !in_array($Guadalupe_date, $SOLEMNITIES) && !in_array($Guadalupe_date, $FEASTS_MEMORIALS) ) {
+        $LitCal["LadyGuadalupe"] = new Festivity( $Guadalupe_tag[$LITSETTINGS->LOCALE], $Guadalupe_date, 'white', 'fixed', MEMORIALOPT, "Blessed Virgin Mary" );
+        /**
+         * TRANSLATORS:
+         * 1. Grade or rank of the festivity
+         * 2. Name of the festivity
+         * 3. Day of the festivity
+         * 4. Year from which the festivity has been added
+         * 5. Source of the information
+         * 6. Current year
+         */
+        $Messages[] = sprintf(
+            __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
+            _G($LitCal["LadyGuadalupe"]->name,$LITSETTINGS->LOCALE),
+            $LitCal["LadyGuadalupe"]->name,
+            $LITSETTINGS->LOCALE === 'LA' ? ( $Guadalupe_date->format('j') . ' ' . $LATIN_MONTHS[(int)$Guadalupe_date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $Guadalupe_date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $Guadalupe_date->format('U'))))
+                ),
+            2002,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $LITSETTINGS->YEAR
+        );
+    } else {
+        if(in_array($Guadalupe_date,$SOLEMNITIES) ){
+            $coincidingFestivityKey = array_search($Guadalupe_date,$SOLEMNITIES);
         }
-
-        $JuanDiego_tag = ["LA" => "Sancti Ioannis Didaci Cuauhtlatoatzin", "EN" => "Saint Juan Diego Cuauhtlatoatzin", "IT" => "San Juan Diego Cuauhtlatouatzin"];
-        $JuanDiego_date = DateTime::createFromFormat('!j-n-Y', '9-12-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-        if ( (int)$JuanDiego_date->format('N') !== 7 && !in_array($JuanDiego_date, $SOLEMNITIES) && !in_array($JuanDiego_date, $FEASTS_MEMORIALS) ) {
-            $LitCal["JuanDiego"] = new Festivity( $JuanDiego_tag[$LITSETTINGS->LOCALE], $JuanDiego_date, 'white', 'fixed', MEMORIALOPT, "Holy Men and Women:For One Saint" );
-            /**
-             * TRANSLATORS:
-             * 1. Grade or rank of the festivity
-             * 2. Name of the festivity
-             * 3. Day of the festivity
-             * 4. Year from which the festivity has been added
-             * 5. Source of the information
-             * 6. Current year
-             */
-            $Messages[] = sprintf(
-                __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
-                _G($LitCal["JuanDiego"]->grade,$LITSETTINGS->LOCALE),
-                $LitCal["JuanDiego"]->name,
-                $LITSETTINGS->LOCALE === 'LA' ? ( $JuanDiego_date->format('j') . ' ' . $LATIN_MONTHS[(int)$JuanDiego_date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $JuanDiego_date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $JuanDiego_date->format('U'))))
-                    ),
-                2002,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $LITSETTINGS->YEAR
-            );
-        } else {
-            if(in_array($JuanDiego_date,$SOLEMNITIES) ){
-                $coincidingFestivityKey = array_search($JuanDiego_date,$SOLEMNITIES);
-            }
-            else if(in_array($JuanDiego_date,$FEASTS_MEMORIALS) ){
-                $coincidingFestivityKey = array_search($JuanDiego_date,$FEASTS_MEMORIALS);
-            }
-            $coincidingFestivity = $LitCal[$coincidingFestivityKey];
-            $Messages[] = sprintf(
-                __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
-                $JuanDiego_tag[$LITSETTINGS->LOCALE],
-                $LITSETTINGS->LOCALE === 'LA' ? ( $JuanDiego_date->format('j') . ' ' . $LATIN_MONTHS[(int)$JuanDiego_date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $JuanDiego_date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $JuanDiego_date->format('U'))))
-                    ),
-                2002,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $coincidingFestivity->name,
-                $LITSETTINGS->YEAR
-            );
+        else if(in_array($Guadalupe_date,$FEASTS_MEMORIALS) ){
+            $coincidingFestivityKey = array_search($Guadalupe_date,$FEASTS_MEMORIALS);
         }
+        $coincidingFestivity = $LitCal[$coincidingFestivityKey];
+        $Messages[] = sprintf(
+            __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
+            $Guadalupe_tag[$LITSETTINGS->LOCALE],
+            $LITSETTINGS->LOCALE === 'LA' ? ( $Guadalupe_date->format('j') . ' ' . $LATIN_MONTHS[(int)$Guadalupe_date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $Guadalupe_date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $Guadalupe_date->format('U'))))
+                ),
+            2002,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $coincidingFestivity->name,
+            $LITSETTINGS->YEAR
+        );
+    }
 
-
-        //Saint Pio of Pietrelcina "Padre Pio" was canonized on June 16 2002, so did not make it for the Calendar of the 2002 editio typica III
-        //The memorial was added in the 2008 editio typica III emendata as an obligatory memorial
-        $StPioPietrelcina_tag = array("LA" => "S. Pii de Pietrelcina, presbyteri", "IT" => "San Pio da Pietrelcina, presbitero", "EN" => "Saint Pius of Pietrelcina, Priest");
-        $StPioPietrelcina_date = DateTime::createFromFormat('!j-n-Y', '23-9-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-        if(!in_array($StPioPietrelcina_date,$SOLEMNITIES) && !in_array($StPioPietrelcina_date,$FEASTS_MEMORIALS)){
-            $LitCal["StPioPietrelcina"] = new Festivity($StPioPietrelcina_tag[$LITSETTINGS->LOCALE], $StPioPietrelcina_date, "white", "fixed", MEMORIAL, "Pastors:For One Pastor,Holy Men and Women:For Religious");
-            /**
-             * TRANSLATORS:
-             * 1. Grade or rank of the festivity
-             * 2. Name of the festivity
-             * 3. Day of the festivity
-             * 4. Year from which the festivity has been added
-             * 5. Source of the information
-             * 6. Current year
-             */
-            $Messages[] = sprintf(
-                __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
-                _G($LitCal["StPioPietrelcina"]->grade,$LITSETTINGS->LOCALE),
-                $LitCal["StPioPietrelcina"]->name,
-                $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StPioPietrelcina"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StPioPietrelcina"]->date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StPioPietrelcina"]->date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $LitCal["StPioPietrelcina"]->date->format('U'))))
-                    ),
-                2008,
-                'Missale Romanum, ed. Typica Tertia Emendata 2008',
-                $LITSETTINGS->YEAR
-            );
+    $JuanDiego_tag = ["LA" => "Sancti Ioannis Didaci Cuauhtlatoatzin", "EN" => "Saint Juan Diego Cuauhtlatoatzin", "IT" => "San Juan Diego Cuauhtlatouatzin"];
+    $JuanDiego_date = DateTime::createFromFormat('!j-n-Y', '9-12-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+    if ( (int)$JuanDiego_date->format('N') !== 7 && !in_array($JuanDiego_date, $SOLEMNITIES) && !in_array($JuanDiego_date, $FEASTS_MEMORIALS) ) {
+        $LitCal["JuanDiego"] = new Festivity( $JuanDiego_tag[$LITSETTINGS->LOCALE], $JuanDiego_date, 'white', 'fixed', MEMORIALOPT, "Holy Men and Women:For One Saint" );
+        /**
+         * TRANSLATORS:
+         * 1. Grade or rank of the festivity
+         * 2. Name of the festivity
+         * 3. Day of the festivity
+         * 4. Year from which the festivity has been added
+         * 5. Source of the information
+         * 6. Current year
+         */
+        $Messages[] = sprintf(
+            __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
+            _G($LitCal["JuanDiego"]->grade,$LITSETTINGS->LOCALE),
+            $LitCal["JuanDiego"]->name,
+            $LITSETTINGS->LOCALE === 'LA' ? ( $JuanDiego_date->format('j') . ' ' . $LATIN_MONTHS[(int)$JuanDiego_date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $JuanDiego_date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $JuanDiego_date->format('U'))))
+                ),
+            2002,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $LITSETTINGS->YEAR
+        );
+    } else {
+        if(in_array($JuanDiego_date,$SOLEMNITIES) ){
+            $coincidingFestivityKey = array_search($JuanDiego_date,$SOLEMNITIES);
         }
-        else{
-            if(in_array($StPioPietrelcina_date,$SOLEMNITIES) ){
-                $coincidingFestivityKey = array_search($StPioPietrelcina_date,$SOLEMNITIES);
-            }
-            else if(in_array($StPioPietrelcina_date,$FEASTS_MEMORIALS) ){
-                $coincidingFestivityKey = array_search($StPioPietrelcina_date,$FEASTS_MEMORIALS);
-            }
-            $coincidingFestivity = $LitCal[$coincidingFestivityKey];
+        else if(in_array($JuanDiego_date,$FEASTS_MEMORIALS) ){
+            $coincidingFestivityKey = array_search($JuanDiego_date,$FEASTS_MEMORIALS);
+        }
+        $coincidingFestivity = $LitCal[$coincidingFestivityKey];
+        $Messages[] = sprintf(
+            __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
+            $JuanDiego_tag[$LITSETTINGS->LOCALE],
+            $LITSETTINGS->LOCALE === 'LA' ? ( $JuanDiego_date->format('j') . ' ' . $LATIN_MONTHS[(int)$JuanDiego_date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $JuanDiego_date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $JuanDiego_date->format('U'))))
+                ),
+            2002,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $coincidingFestivity->name,
+            $LITSETTINGS->YEAR
+        );
+    }
+
+
+    //Saint Pio of Pietrelcina "Padre Pio" was canonized on June 16 2002, so did not make it for the Calendar of the 2002 editio typica III
+    //The memorial was added in the 2008 editio typica III emendata as an obligatory memorial
+    $StPioPietrelcina_tag = array("LA" => "S. Pii de Pietrelcina, presbyteri", "IT" => "San Pio da Pietrelcina, presbitero", "EN" => "Saint Pius of Pietrelcina, Priest");
+    $StPioPietrelcina_date = DateTime::createFromFormat('!j-n-Y', '23-9-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+    if(!in_array($StPioPietrelcina_date,$SOLEMNITIES) && !in_array($StPioPietrelcina_date,$FEASTS_MEMORIALS)){
+        $LitCal["StPioPietrelcina"] = new Festivity($StPioPietrelcina_tag[$LITSETTINGS->LOCALE], $StPioPietrelcina_date, "white", "fixed", MEMORIAL, "Pastors:For One Pastor,Holy Men and Women:For Religious");
+        /**
+         * TRANSLATORS:
+         * 1. Grade or rank of the festivity
+         * 2. Name of the festivity
+         * 3. Day of the festivity
+         * 4. Year from which the festivity has been added
+         * 5. Source of the information
+         * 6. Current year
+         */
+        $Messages[] = sprintf(
+            __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
+            _G($LitCal["StPioPietrelcina"]->grade,$LITSETTINGS->LOCALE),
+            $LitCal["StPioPietrelcina"]->name,
+            $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StPioPietrelcina"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StPioPietrelcina"]->date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StPioPietrelcina"]->date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $LitCal["StPioPietrelcina"]->date->format('U'))))
+                ),
+            2008,
+            'Missale Romanum, ed. Typica Tertia Emendata 2008',
+            $LITSETTINGS->YEAR
+        );
+    }
+    else{
+        if(in_array($StPioPietrelcina_date,$SOLEMNITIES) ){
+            $coincidingFestivityKey = array_search($StPioPietrelcina_date,$SOLEMNITIES);
+        }
+        else if(in_array($StPioPietrelcina_date,$FEASTS_MEMORIALS) ){
+            $coincidingFestivityKey = array_search($StPioPietrelcina_date,$FEASTS_MEMORIALS);
+        }
+        $coincidingFestivity = $LitCal[$coincidingFestivityKey];
+        $Messages[] = sprintf(
+            __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
+            $StPioPietrelcina_tag[$LITSETTINGS->LOCALE],
+            $LITSETTINGS->LOCALE === 'LA' ? ( $StPioPietrelcina_date->format('j') . ' ' . $LATIN_MONTHS[(int)$StPioPietrelcina_date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $StPioPietrelcina_date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $StPioPietrelcina_date->format('U'))))
+                ),
+            2008,
+            'Missale Romanum, ed. Typica Tertia Emendata 2008',
+            $coincidingFestivity->name,
+            $LITSETTINGS->YEAR
+        );
+    }
+}
+
+
+if($LITSETTINGS->YEAR === 2009){
+    //The Conversion of St. Paul falls on a Sunday this year. However, considering that it is the Year of Saint Paul,
+    //with decree of Jan 25 2008 the Congregation for Divine Worship gave faculty to the single churches
+    //to celebrate the Conversion of St. Paul anyways. So let's re-insert it as an optional memorial?
+    //http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_la.html
+    if(!array_key_exists("ConversionStPaul",$LitCal)){
+        if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'ConversionStPaul'")) {
+            $row = mysqli_fetch_assoc($result);
+            $LitCal["ConversionStPaul"] = new Festivity($row["NAME_".$LITSETTINGS->LOCALE], DateTime::createFromFormat('!j-n-Y', '25-1-2009', new DateTimeZone('UTC')), "white", "fixed", MEMORIALOPT, "Proper" );
             $Messages[] = sprintf(
-                __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
-                $StPioPietrelcina_tag[$LITSETTINGS->LOCALE],
-                $LITSETTINGS->LOCALE === 'LA' ? ( $StPioPietrelcina_date->format('j') . ' ' . $LATIN_MONTHS[(int)$StPioPietrelcina_date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $StPioPietrelcina_date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $StPioPietrelcina_date->format('U'))))
-                    ),
-                2008,
-                'Missale Romanum, ed. Typica Tertia Emendata 2008',
-                $coincidingFestivity->name,
-                $LITSETTINGS->YEAR
+                __('The Feast \'%s\' would have been suppressed this year (2009) since it falls on a Sunday, however being the Year of the Apostle Paul, as per the %s it has been reinstated so that local churches can optionally celebrate the memorial.',$LITSETTINGS->LOCALE),
+                '<i>' . $row["NAME_" . $LITSETTINGS->LOCALE] . '</i>',
+                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>'
             );
         }
     }
+}
 
-    if($LITSETTINGS->YEAR === 2009){
-        //The Conversion of St. Paul falls on a Sunday this year. However, considering that it is the Year of Saint Paul,
-        //with decree of Jan 25 2008 the Congregation for Divine Worship gave faculty to the single churches
-        //to celebrate the Conversion of St. Paul anyways. So let's re-insert it as an optional memorial?
-        //http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_la.html
-        if(!array_key_exists("ConversionStPaul",$LitCal)){
-            if ($result = $mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'ConversionStPaul'")) {
-                $row = mysqli_fetch_assoc($result);
-                $LitCal["ConversionStPaul"] = new Festivity($row["NAME_".$LITSETTINGS->LOCALE], DateTime::createFromFormat('!j-n-Y', '25-1-2009', new DateTimeZone('UTC')), "white", "fixed", MEMORIALOPT, "Proper" );
-                $Messages[] = sprintf(
-                    __('The Feast \'%s\' would have been suppressed this year (2009) since it falls on a Sunday, however being the Year of the Apostle Paul, as per the %s it has been reinstated so that local churches can optionally celebrate the memorial.',$LITSETTINGS->LOCALE),
-                    '<i>' . $row["NAME_" . $LITSETTINGS->LOCALE] . '</i>',
-                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>'
-                );
-            }
-        }
-    }
-
+if ($LITSETTINGS->YEAR >= 2014) {
     //After the canonization of Pope Saint John XXIII and Pope Saint John Paul II
     //with decree of May 29 2014 the Congregation for Divine Worship
     //inserted the optional memorials for each in the Universal Calendar
     //on October 11 and October 22 respectively
     //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_la.html
-    if ($LITSETTINGS->YEAR >= 2014) {
-        $StJohnXXIII_tag = array("LA" => "S. Ioannis XXIII, papæ", "IT" => "San Giovanni XXIII, papa", "EN" => "Saint John XXIII, pope");
-        $StJohnXXIII_date = DateTime::createFromFormat('!j-n-Y', '11-10-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-        if(!in_array($StJohnXXIII_date,$SOLEMNITIES) && !in_array($StJohnXXIII_date,$FEASTS_MEMORIALS)){
-            $LitCal["StJohnXXIII"] = new Festivity($StJohnXXIII_tag[$LITSETTINGS->LOCALE], $StJohnXXIII_date, "white", "fixed", MEMORIALOPT, "Pastors:For a Pope");
-            /**
-             * TRANSLATORS:
-             * 1. Grade or rank of the festivity
-             * 2. Name of the festivity
-             * 3. Day of the festivity
-             * 4. Year from which the festivity has been added
-             * 5. Source of the information
-             * 6. Current year
-             */
-            $Messages[] = sprintf(
-                __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
-                _G($LitCal["StJohnXXIII"]->grade,$LITSETTINGS->LOCALE),
-                $LitCal["StJohnXXIII"]->name,
-                $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StJohnXXIII"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StJohnXXIII"]->date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StJohnXXIII"]->date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $LitCal["StJohnXXIII"]->date->format('U'))))
-                    ),
-                2014,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $LITSETTINGS->YEAR
-            );
+    $StJohnXXIII_tag = array("LA" => "S. Ioannis XXIII, papæ", "IT" => "San Giovanni XXIII, papa", "EN" => "Saint John XXIII, pope");
+    $StJohnXXIII_date = DateTime::createFromFormat('!j-n-Y', '11-10-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+    if(!in_array($StJohnXXIII_date,$SOLEMNITIES) && !in_array($StJohnXXIII_date,$FEASTS_MEMORIALS)){
+        $LitCal["StJohnXXIII"] = new Festivity($StJohnXXIII_tag[$LITSETTINGS->LOCALE], $StJohnXXIII_date, "white", "fixed", MEMORIALOPT, "Pastors:For a Pope");
+        /**
+         * TRANSLATORS:
+         * 1. Grade or rank of the festivity
+         * 2. Name of the festivity
+         * 3. Day of the festivity
+         * 4. Year from which the festivity has been added
+         * 5. Source of the information
+         * 6. Current year
+         */
+        $Messages[] = sprintf(
+            __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
+            _G($LitCal["StJohnXXIII"]->grade,$LITSETTINGS->LOCALE),
+            $LitCal["StJohnXXIII"]->name,
+            $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StJohnXXIII"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StJohnXXIII"]->date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StJohnXXIII"]->date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $LitCal["StJohnXXIII"]->date->format('U'))))
+                ),
+            2014,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $LITSETTINGS->YEAR
+        );
+    }
+    else{
+        if(in_array($StJohnXXIII_date,$SOLEMNITIES) ){
+            $coincidingFestivityKey = array_search($StJohnXXIII_date,$SOLEMNITIES);
         }
-        else{
-            if(in_array($StJohnXXIII_date,$SOLEMNITIES) ){
-                $coincidingFestivityKey = array_search($StJohnXXIII_date,$SOLEMNITIES);
-            }
-            else if(in_array($StJohnXXIII_date,$FEASTS_MEMORIALS) ){
-                $coincidingFestivityKey = array_search($StJohnXXIII_date,$FEASTS_MEMORIALS);
-            }
-            $coincidingFestivity = $LitCal[$coincidingFestivityKey];
-            $Messages[] = sprintf(
-                __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
-                $StJohnXXIII_tag[$LITSETTINGS->LOCALE],
-                $LITSETTINGS->LOCALE === 'LA' ? ( $StJohnXXIII_date->format('j') . ' ' . $LATIN_MONTHS[(int)$StJohnXXIII_date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $StJohnXXIII_date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $StJohnXXIII_date->format('U'))))
-                    ),
-                2014,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $coincidingFestivity->name,
-                $LITSETTINGS->YEAR
-            );
+        else if(in_array($StJohnXXIII_date,$FEASTS_MEMORIALS) ){
+            $coincidingFestivityKey = array_search($StJohnXXIII_date,$FEASTS_MEMORIALS);
         }
-
-        $StJohnPaulII_tag = array("LA" => "S. Ioannis Pauli II, papæ", "IT" => "San Giovanni Paolo II, papa", "EN" => "Saint John Paul II, pope");
-        $StJohnPaulII_date = DateTime::createFromFormat('!j-n-Y', '22-10-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-        if(!in_array($StJohnPaulII_date,$SOLEMNITIES) && !in_array($StJohnPaulII_date,$FEASTS_MEMORIALS)){
-            $LitCal["StJohnPaulII"] = new Festivity($StJohnPaulII_tag[$LITSETTINGS->LOCALE], $StJohnPaulII_date, "white", "fixed", MEMORIALOPT, "Pastors:For a Pope");
-            /**
-             * TRANSLATORS:
-             * 1. Grade or rank of the festivity
-             * 2. Name of the festivity
-             * 3. Day of the festivity
-             * 4. Year from which the festivity has been added
-             * 5. Source of the information
-             * 6. Current year
-             */
-            $Messages[] = sprintf(
-                __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
-                _G($LitCal["StJohnPaulII"]->grade,$LITSETTINGS->LOCALE),
-                $LitCal["StJohnPaulII"]->name,
-                $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StJohnPaulII"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StJohnPaulII"]->date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StJohnPaulII"]->date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $LitCal["StJohnPaulII"]->date->format('U'))))
-                    ),
-                2014,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $LITSETTINGS->YEAR
-            );
-        }
-        else{
-            if(in_array($StJohnPaulII_date,$SOLEMNITIES) ){
-                $coincidingFestivityKey = array_search($StJohnPaulII_date,$SOLEMNITIES);
-            }
-            else if(in_array($StJohnPaulII_date,$FEASTS_MEMORIALS) ){
-                $coincidingFestivityKey = array_search($StJohnPaulII_date,$FEASTS_MEMORIALS);
-            }
-            $coincidingFestivity = $LitCal[$coincidingFestivityKey];
-            $Messages[] = sprintf(
-                __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
-                $StJohnPaulII_tag[$LITSETTINGS->LOCALE],
-                $LITSETTINGS->LOCALE === 'LA' ? ( $StJohnPaulII_date->format('j') . ' ' . $LATIN_MONTHS[(int)$StJohnPaulII_date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $StJohnPaulII_date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $StJohnPaulII_date->format('U'))))
-                    ),
-                2014,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $coincidingFestivity->name,
-                $LITSETTINGS->YEAR
-            );
-        }
+        $coincidingFestivity = $LitCal[$coincidingFestivityKey];
+        $Messages[] = sprintf(
+            __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
+            $StJohnXXIII_tag[$LITSETTINGS->LOCALE],
+            $LITSETTINGS->LOCALE === 'LA' ? ( $StJohnXXIII_date->format('j') . ' ' . $LATIN_MONTHS[(int)$StJohnXXIII_date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $StJohnXXIII_date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $StJohnXXIII_date->format('U'))))
+                ),
+            2014,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $coincidingFestivity->name,
+            $LITSETTINGS->YEAR
+        );
     }
 
+    $StJohnPaulII_tag = array("LA" => "S. Ioannis Pauli II, papæ", "IT" => "San Giovanni Paolo II, papa", "EN" => "Saint John Paul II, pope");
+    $StJohnPaulII_date = DateTime::createFromFormat('!j-n-Y', '22-10-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+    if(!in_array($StJohnPaulII_date,$SOLEMNITIES) && !in_array($StJohnPaulII_date,$FEASTS_MEMORIALS)){
+        $LitCal["StJohnPaulII"] = new Festivity($StJohnPaulII_tag[$LITSETTINGS->LOCALE], $StJohnPaulII_date, "white", "fixed", MEMORIALOPT, "Pastors:For a Pope");
+        /**
+         * TRANSLATORS:
+         * 1. Grade or rank of the festivity
+         * 2. Name of the festivity
+         * 3. Day of the festivity
+         * 4. Year from which the festivity has been added
+         * 5. Source of the information
+         * 6. Current year
+         */
+        $Messages[] = sprintf(
+            __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
+            _G($LitCal["StJohnPaulII"]->grade,$LITSETTINGS->LOCALE),
+            $LitCal["StJohnPaulII"]->name,
+            $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StJohnPaulII"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StJohnPaulII"]->date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StJohnPaulII"]->date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $LitCal["StJohnPaulII"]->date->format('U'))))
+                ),
+            2014,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $LITSETTINGS->YEAR
+        );
+    }
+    else{
+        if(in_array($StJohnPaulII_date,$SOLEMNITIES) ){
+            $coincidingFestivityKey = array_search($StJohnPaulII_date,$SOLEMNITIES);
+        }
+        else if(in_array($StJohnPaulII_date,$FEASTS_MEMORIALS) ){
+            $coincidingFestivityKey = array_search($StJohnPaulII_date,$FEASTS_MEMORIALS);
+        }
+        $coincidingFestivity = $LitCal[$coincidingFestivityKey];
+        $Messages[] = sprintf(
+            __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
+            $StJohnPaulII_tag[$LITSETTINGS->LOCALE],
+            $LITSETTINGS->LOCALE === 'LA' ? ( $StJohnPaulII_date->format('j') . ' ' . $LATIN_MONTHS[(int)$StJohnPaulII_date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $StJohnPaulII_date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $StJohnPaulII_date->format('U'))))
+                ),
+            2014,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $coincidingFestivity->name,
+            $LITSETTINGS->YEAR
+        );
+    }
+}
+
+
+if($LITSETTINGS->YEAR >= 2019){
     //With the Decree of the Congregation of Divine Worship of Oct 7, 2019,
     //the optional memorial of the Blessed Virgin Mary of Loreto was added on Dec 10
     //http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_la.html
-    if($LITSETTINGS->YEAR >= 2019){
-        $LadyLoreto_tag = ["LA" => "Beatæ Mariæ Virginis de Loreto", "IT" => "Beata Maria Vergine di Loreto", "EN" => "Blessed Virgin Mary of Loreto"];
-        $LadyLoreto_date = DateTime::createFromFormat('!j-n-Y', '10-12-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-        if(!in_array($LadyLoreto_date,$SOLEMNITIES) && !in_array($LadyLoreto_date,$FEASTS_MEMORIALS) ){
-            $LitCal["LadyLoreto"] = new Festivity($LadyLoreto_tag[$LITSETTINGS->LOCALE], $LadyLoreto_date, "white", "fixed", MEMORIALOPT, "Blessed Virgin Mary");
-            /**
-             * TRANSLATORS:
-             * 1. Grade or rank of the festivity
-             * 2. Name of the festivity
-             * 3. Day of the festivity
-             * 4. Year from which the festivity has been added
-             * 5. Source of the information
-             * 6. Current year
-             */
-            $Messages[] = sprintf(
-                __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
-                _G($LitCal["LadyLoreto"]->grade,$LITSETTINGS->LOCALE),
-                $LitCal["LadyLoreto"]->name,
-                $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["LadyLoreto"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["LadyLoreto"]->date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["LadyLoreto"]->date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $LitCal["LadyLoreto"]->date->format('U'))))
-                    ),
-                2019,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $LITSETTINGS->YEAR
-            );
+    $LadyLoreto_tag = ["LA" => "Beatæ Mariæ Virginis de Loreto", "IT" => "Beata Maria Vergine di Loreto", "EN" => "Blessed Virgin Mary of Loreto"];
+    $LadyLoreto_date = DateTime::createFromFormat('!j-n-Y', '10-12-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+    if(!in_array($LadyLoreto_date,$SOLEMNITIES) && !in_array($LadyLoreto_date,$FEASTS_MEMORIALS) ){
+        $LitCal["LadyLoreto"] = new Festivity($LadyLoreto_tag[$LITSETTINGS->LOCALE], $LadyLoreto_date, "white", "fixed", MEMORIALOPT, "Blessed Virgin Mary");
+        /**
+         * TRANSLATORS:
+         * 1. Grade or rank of the festivity
+         * 2. Name of the festivity
+         * 3. Day of the festivity
+         * 4. Year from which the festivity has been added
+         * 5. Source of the information
+         * 6. Current year
+         */
+        $Messages[] = sprintf(
+            __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
+            _G($LitCal["LadyLoreto"]->grade,$LITSETTINGS->LOCALE),
+            $LitCal["LadyLoreto"]->name,
+            $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["LadyLoreto"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["LadyLoreto"]->date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["LadyLoreto"]->date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $LitCal["LadyLoreto"]->date->format('U'))))
+                ),
+            2019,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $LITSETTINGS->YEAR
+        );
+    }
+    else{
+        if(in_array($LadyLoreto_date,$SOLEMNITIES) ){
+            $coincidingFestivityKey = array_search($LadyLoreto_date,$SOLEMNITIES);
         }
-        else{
-            if(in_array($LadyLoreto_date,$SOLEMNITIES) ){
-                $coincidingFestivityKey = array_search($LadyLoreto_date,$SOLEMNITIES);
-            }
-            else if(in_array($LadyLoreto_date,$FEASTS_MEMORIALS) ){
-                $coincidingFestivityKey = array_search($LadyLoreto_date,$FEASTS_MEMORIALS);
-            }
-            $coincidingFestivity = $LitCal[$coincidingFestivityKey];
-            $Messages[] = sprintf(
-                __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
-                $LadyLoreto_tag[$LITSETTINGS->LOCALE],
-                $LITSETTINGS->LOCALE === 'LA' ? ( $LadyLoreto_date->format('j') . ' ' . $LATIN_MONTHS[(int)$LadyLoreto_date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $LadyLoreto_date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $LadyLoreto_date->format('U'))))
-                    ),
-                2019,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $coincidingFestivity->name,
-                $LITSETTINGS->YEAR
-            );
+        else if(in_array($LadyLoreto_date,$FEASTS_MEMORIALS) ){
+            $coincidingFestivityKey = array_search($LadyLoreto_date,$FEASTS_MEMORIALS);
         }
-
-        //With the Decree of the Congregation of Divine Worship of January 25 2019,
-        //the optional memorial of Saint Paul VI, Pope was added on May 29
-        //http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_la.html
-        $PaulVI_tag = ["LA" => "Sancti Pauli VI, Papæ", "IT" => "San Paolo VI, Papa", "EN" => "Saint Paul VI, Pope"];
-        $PaulVI_date = DateTime::createFromFormat('!j-n-Y', '29-5-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-        if(!in_array($PaulVI_date,$SOLEMNITIES) && !in_array($PaulVI_date,$FEASTS_MEMORIALS) ){
-            $LitCal["StPaulVI"] = new Festivity($PaulVI_tag[$LITSETTINGS->LOCALE], $PaulVI_date, "white", "fixed", MEMORIALOPT, "Pastors:For a Pope");
-            /**
-             * TRANSLATORS:
-             * 1. Grade or rank of the festivity
-             * 2. Name of the festivity
-             * 3. Day of the festivity
-             * 4. Year from which the festivity has been added
-             * 5. Source of the information
-             * 6. Current year
-             */
-            $Messages[] = sprintf(
-                __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
-                _G($LitCal["StPaulVI"]->grade,$LITSETTINGS->LOCALE),
-                $LitCal["StPaulVI"]->name,
-                $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StPaulVI"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StPaulVI"]->date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StPaulVI"]->date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $LitCal["StPaulVI"]->date->format('U'))))
-                    ),
-                2019,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $LITSETTINGS->YEAR
-            );
-        }
-        else{
-            if(in_array($PaulVI_date,$SOLEMNITIES) ){
-                $coincidingFestivityKey = array_search($PaulVI_date,$SOLEMNITIES);
-            }
-            else if(in_array($PaulVI_date,$FEASTS_MEMORIALS) ){
-                $coincidingFestivityKey = array_search($PaulVI_date,$FEASTS_MEMORIALS);
-            }
-            $coincidingFestivity = $LitCal[$coincidingFestivityKey];
-            $Messages[] = sprintf(
-                __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
-                $PaulVI_tag[$LITSETTINGS->LOCALE],
-                $LITSETTINGS->LOCALE === 'LA' ? ( $PaulVI_date->format('j') . ' ' . $LATIN_MONTHS[(int)$PaulVI_date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $PaulVI_date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $PaulVI_date->format('U'))))
-                    ),
-                2019,
-                '<a href="https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $coincidingFestivity->name,
-                $LITSETTINGS->YEAR
-            );
-        }
+        $coincidingFestivity = $LitCal[$coincidingFestivityKey];
+        $Messages[] = sprintf(
+            __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
+            $LadyLoreto_tag[$LITSETTINGS->LOCALE],
+            $LITSETTINGS->LOCALE === 'LA' ? ( $LadyLoreto_date->format('j') . ' ' . $LATIN_MONTHS[(int)$LadyLoreto_date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $LadyLoreto_date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $LadyLoreto_date->format('U'))))
+                ),
+            2019,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $coincidingFestivity->name,
+            $LITSETTINGS->YEAR
+        );
     }
 
+    //With the Decree of the Congregation of Divine Worship of January 25 2019,
+    //the optional memorial of Saint Paul VI, Pope was added on May 29
+    //http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_la.html
+    $PaulVI_tag = ["LA" => "Sancti Pauli VI, Papæ", "IT" => "San Paolo VI, Papa", "EN" => "Saint Paul VI, Pope"];
+    $PaulVI_date = DateTime::createFromFormat('!j-n-Y', '29-5-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+    if(!in_array($PaulVI_date,$SOLEMNITIES) && !in_array($PaulVI_date,$FEASTS_MEMORIALS) ){
+        $LitCal["StPaulVI"] = new Festivity($PaulVI_tag[$LITSETTINGS->LOCALE], $PaulVI_date, "white", "fixed", MEMORIALOPT, "Pastors:For a Pope");
+        /**
+         * TRANSLATORS:
+         * 1. Grade or rank of the festivity
+         * 2. Name of the festivity
+         * 3. Day of the festivity
+         * 4. Year from which the festivity has been added
+         * 5. Source of the information
+         * 6. Current year
+         */
+        $Messages[] = sprintf(
+            __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
+            _G($LitCal["StPaulVI"]->grade,$LITSETTINGS->LOCALE),
+            $LitCal["StPaulVI"]->name,
+            $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StPaulVI"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StPaulVI"]->date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StPaulVI"]->date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $LitCal["StPaulVI"]->date->format('U'))))
+                ),
+            2019,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $LITSETTINGS->YEAR
+        );
+    }
+    else{
+        if(in_array($PaulVI_date,$SOLEMNITIES) ){
+            $coincidingFestivityKey = array_search($PaulVI_date,$SOLEMNITIES);
+        }
+        else if(in_array($PaulVI_date,$FEASTS_MEMORIALS) ){
+            $coincidingFestivityKey = array_search($PaulVI_date,$FEASTS_MEMORIALS);
+        }
+        $coincidingFestivity = $LitCal[$coincidingFestivityKey];
+        $Messages[] = sprintf(
+            __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
+            $PaulVI_tag[$LITSETTINGS->LOCALE],
+            $LITSETTINGS->LOCALE === 'LA' ? ( $PaulVI_date->format('j') . ' ' . $LATIN_MONTHS[(int)$PaulVI_date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $PaulVI_date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $PaulVI_date->format('U'))))
+                ),
+            2019,
+            '<a href="https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $coincidingFestivity->name,
+            $LITSETTINGS->YEAR
+        );
+    }
+}
+
+
+if($LITSETTINGS->YEAR >= 2020){
     //With the Decree of the Congregation of Divine Worship of May 20, 2020, the optional memorial of St. Faustina was added on Oct 5
     //http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_la.html
-    if($LITSETTINGS->YEAR >= 2020){
-        $StFaustina_tag = ["LA" => "Sanctæ Faustinæ Kowalska", "IT" => "Santa Faustina Kowalska", "EN" => "Saint Faustina Kowalska"];
-        $StFaustina_date = DateTime::createFromFormat('!j-n-Y', '5-10-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-        if(!in_array($StFaustina_date,$SOLEMNITIES) && !in_array($StFaustina_date,$FEASTS_MEMORIALS)){
-            $LitCal["StFaustinaKowalska"] = new Festivity($StFaustina_tag[$LITSETTINGS->LOCALE], $StFaustina_date, "white", "fixed", MEMORIALOPT, "Holy Men and Women:For Religious");
-            /**
-             * TRANSLATORS:
-             * 1. Grade or rank of the festivity
-             * 2. Name of the festivity
-             * 3. Day of the festivity
-             * 4. Year from which the festivity has been added
-             * 5. Source of the information
-             * 6. Current year
-             */
-            $Messages[] = sprintf(
-                __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
-                _G($LitCal["StFaustinaKowalska"]->grade,$LITSETTINGS->LOCALE),
-                $LitCal["StFaustinaKowalska"]->name,
-                $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StFaustinaKowalska"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StFaustinaKowalska"]->date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StFaustinaKowalska"]->date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $LitCal["StFaustinaKowalska"]->date->format('U'))))
-                    ),
-                2020,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $LITSETTINGS->YEAR
-            );
-        }
-        else{
-            if(in_array($StFaustina_date,$SOLEMNITIES) ){
-                $coincidingFestivityKey = array_search($StFaustina_date,$SOLEMNITIES);
-            }
-            else if(in_array($StFaustina_date,$FEASTS_MEMORIALS) ){
-                $coincidingFestivityKey = array_search($StFaustina_date,$FEASTS_MEMORIALS);
-            }
-            $coincidingFestivity = $LitCal[$coincidingFestivityKey];
-            $Messages[] = sprintf(
-                __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
-                $StFaustina_tag[$LITSETTINGS->LOCALE],
-                $LITSETTINGS->LOCALE === 'LA' ? ( $StFaustina_date->format('j') . ' ' . $LATIN_MONTHS[(int)$StFaustina_date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $StFaustina_date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $StFaustina_date->format('U'))))
-                    ),
-                2020,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $coincidingFestivity->name,
-                $LITSETTINGS->YEAR
-            );
-        }
+    $StFaustina_tag = ["LA" => "Sanctæ Faustinæ Kowalska", "IT" => "Santa Faustina Kowalska", "EN" => "Saint Faustina Kowalska"];
+    $StFaustina_date = DateTime::createFromFormat('!j-n-Y', '5-10-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+    if(!in_array($StFaustina_date,$SOLEMNITIES) && !in_array($StFaustina_date,$FEASTS_MEMORIALS)){
+        $LitCal["StFaustinaKowalska"] = new Festivity($StFaustina_tag[$LITSETTINGS->LOCALE], $StFaustina_date, "white", "fixed", MEMORIALOPT, "Holy Men and Women:For Religious");
+        /**
+         * TRANSLATORS:
+         * 1. Grade or rank of the festivity
+         * 2. Name of the festivity
+         * 3. Day of the festivity
+         * 4. Year from which the festivity has been added
+         * 5. Source of the information
+         * 6. Current year
+         */
+        $Messages[] = sprintf(
+            __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
+            _G($LitCal["StFaustinaKowalska"]->grade,$LITSETTINGS->LOCALE),
+            $LitCal["StFaustinaKowalska"]->name,
+            $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StFaustinaKowalska"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StFaustinaKowalska"]->date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StFaustinaKowalska"]->date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $LitCal["StFaustinaKowalska"]->date->format('U'))))
+                ),
+            2020,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $LITSETTINGS->YEAR
+        );
     }
+    else{
+        if(in_array($StFaustina_date,$SOLEMNITIES) ){
+            $coincidingFestivityKey = array_search($StFaustina_date,$SOLEMNITIES);
+        }
+        else if(in_array($StFaustina_date,$FEASTS_MEMORIALS) ){
+            $coincidingFestivityKey = array_search($StFaustina_date,$FEASTS_MEMORIALS);
+        }
+        $coincidingFestivity = $LitCal[$coincidingFestivityKey];
+        $Messages[] = sprintf(
+            __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
+            $StFaustina_tag[$LITSETTINGS->LOCALE],
+            $LITSETTINGS->LOCALE === 'LA' ? ( $StFaustina_date->format('j') . ' ' . $LATIN_MONTHS[(int)$StFaustina_date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $StFaustina_date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $StFaustina_date->format('U'))))
+                ),
+            2020,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $coincidingFestivity->name,
+            $LITSETTINGS->YEAR
+        );
+    }
+}
 
+if($LITSETTINGS->YEAR >= 2021){
     //With the Decree of the Congregation for Divine Worship on January 25, 2021,
     //the optional memorials of Gregory of Narek, John of Avila, and Hildegard of Bingen were added to the universal roman calendar
     //http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_la.html
 
+    $StGregoryNarek_tag = ["LA" => "Sancti Gregorii Narecensis, abbatis et Ecclesiæ doctoris", "IT" => "San Gregorio di Narek, abate e dottore della Chiesa", "EN" => "Saint Gregory of Narek"];
+    $StJohnAvila_tag = ["LA" => "Sancti Ioannis De Avila, presbyteri et Ecclesiæ doctoris", "IT" => "San Giovanni d'Avila, sacerdote e dottore della Chiesa", "EN" => "Saint John of Avila, priest and doctor of the Church"];
+    $StHildegardBingen_tag = ["LA" => "Sanctæ Hildegardis Bingensis, virginis et Ecclesiæ doctoris", "IT" => "Santa Ildegarda de Bingen, vergine e dottore delle Chiesa", "EN" => "Saint Hildegard of Bingen, virgin and doctor of the Church"];
+
+    $StGregoryNarek_date = DateTime::createFromFormat('!j-n-Y', '27-2-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+    $StJohnAvila_date = DateTime::createFromFormat('!j-n-Y', '10-5-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+    $StHildegardBingen_date = DateTime::createFromFormat('!j-n-Y', '17-9-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
+
+    if(!in_array($StGregoryNarek_date,$SOLEMNITIES) && !in_array($StGregoryNarek_date,$FEASTS_MEMORIALS)){
+        $LitCal["StGregoryNarek"] = new Festivity($StGregoryNarek_tag[$LITSETTINGS->LOCALE], $StGregoryNarek_date, "white", "fixed", MEMORIALOPT, "Holy Men and Women:For an Abbot,Doctors");
+        /**
+         * TRANSLATORS:
+         * 1. Grade or rank of the festivity
+         * 2. Name of the festivity
+         * 3. Day of the festivity
+         * 4. Year from which the festivity has been added
+         * 5. Source of the information
+         * 6. Current year
+         */
+        $Messages[] = sprintf(
+            __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
+            _G($LitCal["StGregoryNarek"]->grade,$LITSETTINGS->LOCALE),
+            $LitCal["StGregoryNarek"]->name,
+            $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StGregoryNarek"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StGregoryNarek"]->date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StGregoryNarek"]->date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $LitCal["StGregoryNarek"]->date->format('U'))))
+                ),
+            2021,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $LITSETTINGS->YEAR
+        );
+    }
+    else{
+        if(in_array($StGregoryNarek_date,$SOLEMNITIES) ){
+            $coincidingFestivityKey = array_search($StGregoryNarek_date,$SOLEMNITIES);
+        }
+        else if(in_array($StGregoryNarek_date,$FEASTS_MEMORIALS) ){
+            $coincidingFestivityKey = array_search($StGregoryNarek_date,$FEASTS_MEMORIALS);
+        }
+        $coincidingFestivity = $LitCal[$coincidingFestivityKey];
+        $Messages[] = sprintf(
+            __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
+            $StFaustina_tag[$LITSETTINGS->LOCALE],
+            $LITSETTINGS->LOCALE === 'LA' ? ( $StGregoryNarek_date->format('j') . ' ' . $LATIN_MONTHS[(int)$StGregoryNarek_date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $StGregoryNarek_date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $StGregoryNarek_date->format('U'))))
+                ),
+            2021,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $coincidingFestivity->name,
+            $LITSETTINGS->YEAR
+        );
+    }
+
+    if(!in_array($StJohnAvila_date,$SOLEMNITIES) && !in_array($StJohnAvila_date,$FEASTS_MEMORIALS)){
+        $LitCal["StJohnAvila"] = new Festivity($StJohnAvila_tag[$LITSETTINGS->LOCALE], $StJohnAvila_date, "white", "fixed", MEMORIALOPT, "Pastors:For One Pastor,Doctors");
+        /**
+         * TRANSLATORS:
+         * 1. Grade or rank of the festivity
+         * 2. Name of the festivity
+         * 3. Day of the festivity
+         * 4. Year from which the festivity has been added
+         * 5. Source of the information
+         * 6. Current year
+         */
+        $Messages[] = sprintf(
+            __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
+            _G($LitCal["StJohnAvila"]->grade,$LITSETTINGS->LOCALE),
+            $LitCal["StJohnAvila"]->name,
+            $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StJohnAvila"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StJohnAvila"]->date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StJohnAvila"]->date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $LitCal["StJohnAvila"]->date->format('U'))))
+                ),
+            2021,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $LITSETTINGS->YEAR
+        );
+    }
+    else{
+        if(in_array($StJohnAvila_date,$SOLEMNITIES) ){
+            $coincidingFestivityKey = array_search($StJohnAvila_date,$SOLEMNITIES);
+        }
+        else if(in_array($StJohnAvila_date,$FEASTS_MEMORIALS) ){
+            $coincidingFestivityKey = array_search($StJohnAvila_date,$FEASTS_MEMORIALS);
+        }
+        $coincidingFestivity = $LitCal[$coincidingFestivityKey];
+        $Messages[] = sprintf(
+            __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
+            $StJohnAvila_tag[$LITSETTINGS->LOCALE],
+            $LITSETTINGS->LOCALE === 'LA' ? ( $StJohnAvila_date->format('j') . ' ' . $LATIN_MONTHS[(int)$StJohnAvila_date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $StJohnAvila_date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $StJohnAvila_date->format('U'))))
+                ),
+            2021,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $coincidingFestivity->name,
+            $LITSETTINGS->YEAR
+        );
+    }
+
+    if(!in_array($StHildegardBingen_date,$SOLEMNITIES) && !in_array($StHildegardBingen_date,$FEASTS_MEMORIALS)){
+        $LitCal["StHildegardBingen"] = new Festivity($StHildegardBingen_tag[$LITSETTINGS->LOCALE], $StHildegardBingen_date, "white", "fixed", MEMORIALOPT, "Virgins:For One Virgin,Doctors");
+        /**
+         * TRANSLATORS:
+         * 1. Grade or rank of the festivity
+         * 2. Name of the festivity
+         * 3. Day of the festivity
+         * 4. Year from which the festivity has been added
+         * 5. Source of the information
+         * 6. Current year
+         */
+        $Messages[] = sprintf(
+            __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
+            _G($LitCal["StHildegardBingen"]->grade,$LITSETTINGS->LOCALE),
+            $LitCal["StHildegardBingen"]->name,
+            $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StHildegardBingen"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StHildegardBingen"]->date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StHildegardBingen"]->date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $LitCal["StHildegardBingen"]->date->format('U'))))
+                ),
+            2021,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $LITSETTINGS->YEAR
+        );
+    }
+    else{
+        if(in_array($StHildegardBingen_date,$SOLEMNITIES) ){
+            $coincidingFestivityKey = array_search($StHildegardBingen_date,$SOLEMNITIES);
+        }
+        else if(in_array($StHildegardBingen_date,$FEASTS_MEMORIALS) ){
+            $coincidingFestivityKey = array_search($StHildegardBingen_date,$FEASTS_MEMORIALS);
+        }
+        $coincidingFestivity = $LitCal[$coincidingFestivityKey];
+        $Messages[] = sprintf(
+            __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
+            $StHildegardBingen_tag[$LITSETTINGS->LOCALE],
+            $LITSETTINGS->LOCALE === 'LA' ? ( $StHildegardBingen_date->format('j') . ' ' . $LATIN_MONTHS[(int)$StHildegardBingen_date->format('n')] ) :
+                ( $LITSETTINGS->LOCALE === 'EN' ? $StHildegardBingen_date->format('F jS') :
+                    trim(utf8_encode(strftime('%e %B', $StHildegardBingen_date->format('U'))))
+                ),
+            2021,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
+            $coincidingFestivity->name,
+            $LITSETTINGS->YEAR
+        );
+    }
+
     //and with the Decree of the Congregation for Divine Worship on January 26, 2021,
     //the Memorial of Saint Martha on July 29th will now be of Mary, Martha and Lazarus
     //http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_la.html
-
-    if($LITSETTINGS->YEAR >= 2021){
-        $StGregoryNarek_tag = ["LA" => "Sancti Gregorii Narecensis, abbatis et Ecclesiæ doctoris", "IT" => "San Gregorio di Narek, abate e dottore della Chiesa", "EN" => "Saint Gregory of Narek"];
-        $StJohnAvila_tag = ["LA" => "Sancti Ioannis De Avila, presbyteri et Ecclesiæ doctoris", "IT" => "San Giovanni d'Avila, sacerdote e dottore della Chiesa", "EN" => "Saint John of Avila, priest and doctor of the Church"];
-        $StHildegardBingen_tag = ["LA" => "Sanctæ Hildegardis Bingensis, virginis et Ecclesiæ doctoris", "IT" => "Santa Ildegarda de Bingen, vergine e dottore delle Chiesa", "EN" => "Saint Hildegard of Bingen, virgin and doctor of the Church"];
-
-        $StGregoryNarek_date = DateTime::createFromFormat('!j-n-Y', '27-2-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-        $StJohnAvila_date = DateTime::createFromFormat('!j-n-Y', '10-5-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-        $StHildegardBingen_date = DateTime::createFromFormat('!j-n-Y', '17-9-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-
-        if(!in_array($StGregoryNarek_date,$SOLEMNITIES) && !in_array($StGregoryNarek_date,$FEASTS_MEMORIALS)){
-            $LitCal["StGregoryNarek"] = new Festivity($StGregoryNarek_tag[$LITSETTINGS->LOCALE], $StGregoryNarek_date, "white", "fixed", MEMORIALOPT, "Holy Men and Women:For an Abbot,Doctors");
-            /**
-             * TRANSLATORS:
-             * 1. Grade or rank of the festivity
-             * 2. Name of the festivity
-             * 3. Day of the festivity
-             * 4. Year from which the festivity has been added
-             * 5. Source of the information
-             * 6. Current year
-             */
-            $Messages[] = sprintf(
-                __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
-                _G($LitCal["StGregoryNarek"]->grade,$LITSETTINGS->LOCALE),
-                $LitCal["StGregoryNarek"]->name,
-                $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StGregoryNarek"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StGregoryNarek"]->date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StGregoryNarek"]->date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $LitCal["StGregoryNarek"]->date->format('U'))))
-                    ),
-                2021,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $LITSETTINGS->YEAR
-            );
-        }
-        else{
-            if(in_array($StGregoryNarek_date,$SOLEMNITIES) ){
-                $coincidingFestivityKey = array_search($StGregoryNarek_date,$SOLEMNITIES);
-            }
-            else if(in_array($StGregoryNarek_date,$FEASTS_MEMORIALS) ){
-                $coincidingFestivityKey = array_search($StGregoryNarek_date,$FEASTS_MEMORIALS);
-            }
-            $coincidingFestivity = $LitCal[$coincidingFestivityKey];
-            $Messages[] = sprintf(
-                __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
-                $StFaustina_tag[$LITSETTINGS->LOCALE],
-                $LITSETTINGS->LOCALE === 'LA' ? ( $StGregoryNarek_date->format('j') . ' ' . $LATIN_MONTHS[(int)$StGregoryNarek_date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $StGregoryNarek_date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $StGregoryNarek_date->format('U'))))
-                    ),
-                2021,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $coincidingFestivity->name,
-                $LITSETTINGS->YEAR
-            );
-        }
-
-        if(!in_array($StJohnAvila_date,$SOLEMNITIES) && !in_array($StJohnAvila_date,$FEASTS_MEMORIALS)){
-            $LitCal["StJohnAvila"] = new Festivity($StJohnAvila_tag[$LITSETTINGS->LOCALE], $StJohnAvila_date, "white", "fixed", MEMORIALOPT, "Pastors:For One Pastor,Doctors");
-            /**
-             * TRANSLATORS:
-             * 1. Grade or rank of the festivity
-             * 2. Name of the festivity
-             * 3. Day of the festivity
-             * 4. Year from which the festivity has been added
-             * 5. Source of the information
-             * 6. Current year
-             */
-            $Messages[] = sprintf(
-                __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
-                _G($LitCal["StJohnAvila"]->grade,$LITSETTINGS->LOCALE),
-                $LitCal["StJohnAvila"]->name,
-                $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StJohnAvila"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StJohnAvila"]->date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StJohnAvila"]->date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $LitCal["StJohnAvila"]->date->format('U'))))
-                    ),
-                2021,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $LITSETTINGS->YEAR
-            );
-        }
-        else{
-            if(in_array($StJohnAvila_date,$SOLEMNITIES) ){
-                $coincidingFestivityKey = array_search($StJohnAvila_date,$SOLEMNITIES);
-            }
-            else if(in_array($StJohnAvila_date,$FEASTS_MEMORIALS) ){
-                $coincidingFestivityKey = array_search($StJohnAvila_date,$FEASTS_MEMORIALS);
-            }
-            $coincidingFestivity = $LitCal[$coincidingFestivityKey];
-            $Messages[] = sprintf(
-                __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
-                $StJohnAvila_tag[$LITSETTINGS->LOCALE],
-                $LITSETTINGS->LOCALE === 'LA' ? ( $StJohnAvila_date->format('j') . ' ' . $LATIN_MONTHS[(int)$StJohnAvila_date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $StJohnAvila_date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $StJohnAvila_date->format('U'))))
-                    ),
-                2021,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $coincidingFestivity->name,
-                $LITSETTINGS->YEAR
-            );
-        }
-
-        if(!in_array($StHildegardBingen_date,$SOLEMNITIES) && !in_array($StHildegardBingen_date,$FEASTS_MEMORIALS)){
-            $LitCal["StHildegardBingen"] = new Festivity($StHildegardBingen_tag[$LITSETTINGS->LOCALE], $StHildegardBingen_date, "white", "fixed", MEMORIALOPT, "Virgins:For One Virgin,Doctors");
-            /**
-             * TRANSLATORS:
-             * 1. Grade or rank of the festivity
-             * 2. Name of the festivity
-             * 3. Day of the festivity
-             * 4. Year from which the festivity has been added
-             * 5. Source of the information
-             * 6. Current year
-             */
-            $Messages[] = sprintf(
-                __("The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$LITSETTINGS->LOCALE),
-                _G($LitCal["StHildegardBingen"]->grade,$LITSETTINGS->LOCALE),
-                $LitCal["StHildegardBingen"]->name,
-                $LITSETTINGS->LOCALE === 'LA' ? ( $LitCal["StHildegardBingen"]->date->format('j') . ' ' . $LATIN_MONTHS[(int)$LitCal["StHildegardBingen"]->date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $LitCal["StHildegardBingen"]->date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $LitCal["StHildegardBingen"]->date->format('U'))))
-                    ),
-                2021,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $LITSETTINGS->YEAR
-            );
-        }
-        else{
-            if(in_array($StHildegardBingen_date,$SOLEMNITIES) ){
-                $coincidingFestivityKey = array_search($StHildegardBingen_date,$SOLEMNITIES);
-            }
-            else if(in_array($StHildegardBingen_date,$FEASTS_MEMORIALS) ){
-                $coincidingFestivityKey = array_search($StHildegardBingen_date,$FEASTS_MEMORIALS);
-            }
-            $coincidingFestivity = $LitCal[$coincidingFestivityKey];
-            $Messages[] = sprintf(
-                __("The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$LITSETTINGS->LOCALE),
-                $StHildegardBingen_tag[$LITSETTINGS->LOCALE],
-                $LITSETTINGS->LOCALE === 'LA' ? ( $StHildegardBingen_date->format('j') . ' ' . $LATIN_MONTHS[(int)$StHildegardBingen_date->format('n')] ) :
-                    ( $LITSETTINGS->LOCALE === 'EN' ? $StHildegardBingen_date->format('F jS') :
-                        trim(utf8_encode(strftime('%e %B', $StHildegardBingen_date->format('U'))))
-                    ),
-                2021,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower($LITSETTINGS->LOCALE) . '.html">' . __('Decree of the Congregation for Divine Worship', $LITSETTINGS->LOCALE) . '</a>',
-                $coincidingFestivity->name,
-                $LITSETTINGS->YEAR
-            );
-        }
-
-        if(array_key_exists("StMartha",$LitCal)){
-            $StMartha_tag = ["LA" => "Sanctorum Marthæ, Mariæ et Lazari", "IT" => "Santi Marta, Maria e Lazzaro", "EN" => "Saints Martha, Mary and Lazarus"];
-            $LitCal["StMartha"]->name = $StMartha_tag[$LITSETTINGS->LOCALE];
-        }
-
-
+    if(array_key_exists("StMartha",$LitCal)){
+        $StMartha_tag = ["LA" => "Sanctorum Marthæ, Mariæ et Lazari", "IT" => "Santi Marta, Maria e Lazzaro", "EN" => "Saints Martha, Mary and Lazarus"];
+        $LitCal["StMartha"]->name = $StMartha_tag[$LITSETTINGS->LOCALE];
     }
 
+}
 
-} //END LITSETTINGS->YEAR > 2002
 
 //    From the General Norms for the Liturgical Year and the Calendar (issued on Feb. 14 1969)
 //    15. On Saturdays in Ordinary Time when there is no obligatory memorial, an optional memorial of the Blessed Virgin Mary is allowed.
@@ -2723,35 +2723,37 @@ if($LITSETTINGS->DIOCESAN !== false){
         break;
         */
         default:
-            if($DiocesanData !== null){
-                
-                foreach($DiocesanData->LitCal as $key => $obj){
+            if( $DiocesanData !== null ) {
+                foreach( $DiocesanData->LitCal as $key => $obj ) {
+                    if( is_array( $obj->color ) ) {
+                        $obj->color = implode( ',', $obj->color );
+                    }
                     //if sinceYear is undefined or null or empty, let's go ahead and create the event in any case
                     //creation will be restricted only if explicitly defined by the sinceYear property
-                    if($LITSETTINGS->YEAR >= $obj->sinceYear || $obj->sinceYear === null || $obj->sinceYear == ''){
-                        $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $obj->day . '-' . $obj->month . '-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-                        if($obj->grade > FEAST){
-                            $LitCal[$LITSETTINGS->DIOCESAN . "_" . $key] = new Festivity("[" . $index->{$LITSETTINGS->DIOCESAN}->diocese . "] " . $obj->name, $currentFeastDate, strtolower($obj->color), "fixed", $obj->grade, $obj->common);
-                            if(in_array($currentFeastDate,$SOLEMNITIES) && $key != array_search($currentFeastDate,$SOLEMNITIES)){
+                    if( $LITSETTINGS->YEAR >= $obj->sinceYear || $obj->sinceYear === null || $obj->sinceYear == '' ) {
+                        $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $obj->day . '-' . $obj->month . '-' . $LITSETTINGS->YEAR, new DateTimeZone('UTC') );
+                        if( $obj->grade > FEAST ) {
+                            $LitCal[ $LITSETTINGS->DIOCESAN . "_" . $key ] = new Festivity( "[" . $index->{$LITSETTINGS->DIOCESAN}->diocese . "] " . $obj->name, $currentFeastDate, strtolower( $obj->color ), "fixed", $obj->grade, $obj->common );
+                            if( in_array ($currentFeastDate, $SOLEMNITIES ) && $key != array_search( $currentFeastDate, $SOLEMNITIES ) ) {
                                 //there seems to be a coincidence with a different Solemnity on the same day!
                                 //should we attempt to move to the next open slot?
                                 $Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                                     $LITSETTINGS->DIOCESAN . ": the Solemnity '%s', proper to the calendar of the " . $index->{$LITSETTINGS->DIOCESAN}->diocese . " and usually celebrated on %s, coincides with the Sunday or Solemnity '%s' in the year %d! Does something need to be done about this?",
                                     '<i>' . $obj->name . '</i>',
-                                    '<b>' . trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U')))) . '</b>',
-                                    '<i>' . $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name . '</i>',
+                                    '<b>' . trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format('U') ) ) ) . '</b>',
+                                    '<i>' . $LitCal[ array_search( $currentFeastDate, $SOLEMNITIES ) ]->name . '</i>',
                                     $LITSETTINGS->YEAR
                                 );
                             }
-                        } else if ($obj->grade <= FEAST && !in_array($currentFeastDate,$SOLEMNITIES)){
-                            $LitCal[$LITSETTINGS->DIOCESAN . "_" . $key] = new Festivity("[" . $index->{$LITSETTINGS->DIOCESAN}->diocese . "] " . $obj->name, $currentFeastDate, strtolower($obj->color), "fixed", $obj->grade, $obj->common);
+                        } else if ( $obj->grade <= FEAST && !in_array( $currentFeastDate, $SOLEMNITIES ) ){
+                            $LitCal[ $LITSETTINGS->DIOCESAN . "_" . $key ] = new Festivity( "[" . $index->{$LITSETTINGS->DIOCESAN}->diocese . "] " . $obj->name, $currentFeastDate, strtolower( $obj->color ), "fixed", $obj->grade, $obj->common );
                         } else {
                             $Messages[] = sprintf(
                                 $LITSETTINGS->DIOCESAN . ": the %s '%s', proper to the calendar of the " . $index->{$LITSETTINGS->DIOCESAN}->diocese . " and usually celebrated on %s, is suppressed by the Sunday or Solemnity %s in the year %d",
-                                _G($obj->grade,$LITSETTINGS->LOCALE,false),
+                                _G( $obj->grade,$LITSETTINGS->LOCALE, false ),
                                 '<i>' . $obj->name . '</i>',
-                                '<b>' . trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U')))) . '</b>',
-                                '<i>' . $LitCal[array_search($currentFeastDate,$SOLEMNITIES)]->name . '</i>',
+                                '<b>' . trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format('U') ) ) ) . '</b>',
+                                '<i>' . $LitCal[ array_search( $currentFeastDate, $SOLEMNITIES ) ]->name . '</i>',
                                 $LITSETTINGS->YEAR
                             );
                         }
