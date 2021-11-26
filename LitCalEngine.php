@@ -5,7 +5,7 @@
  * Author: John Romano D'Orazio
  * Email: priest@johnromanodorazio.com
  * Licensed under the Apache 2.0 License
- * Version 2.9
+ * Version 3.0
  * Date Created: 27 December 2017
  * Note: it is necessary to set up the MySQL liturgy tables prior to using this script
  */
@@ -35,13 +35,18 @@
  * Editio typica secunda, 1975                                                    *
  * Editio typica tertia, 2002                                                     *
  * Editio typica tertia emendata, 2008                                            *
+ * -----------------------------------                                            *
+ * Roman Missal [USA], 2011                                                       *
+ * -----------------------------------                                            *
+ * Messale Romano [ITALIA], 1983                                                  *
+ * Messale Romano [ITALIA], 2020                                                  *
  *                                                                                *
  *********************************************************************************/
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-define("VERSION","2.9");
+define("VERSION","3.0");
 
 define("CACHEDURATION","MONTH"); //possible values: DAY, WEEK, MONTH, YEAR
 $CacheDurationID;
@@ -2484,7 +2489,7 @@ if($LITSETTINGS->NATIONAL !== false){
 
             //At least in Italy, according to the ORDO (Guida Liturgico-Pastorale) della Diocesi di Roma, Saint Pio is an obligatory memorial throughout Italy
             //The September 2020 edition of the Roman Missal in Italian confirms this
-            if( array_key_exists("StPioPietrelcina",$LitCal) ){
+            if( array_key_exists( "StPioPietrelcina", $LitCal ) ){
                 $LitCal["StPioPietrelcina"]->grade = MEMORIAL;
                 $LitCal["StPioPietrelcina"]->common = "Pastors:For One Pastor";
             }
@@ -3105,4 +3110,3 @@ function GenerateResponseToRequest($LitCal,$LITSETTINGS,$Messages,$SOLEMNITIES,$
     }
     die();
 }
-

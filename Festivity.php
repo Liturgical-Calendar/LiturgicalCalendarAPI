@@ -13,12 +13,14 @@ class Festivity implements JsonSerializable
     public int $grade; //0=Weekday,1=Commemoration,2=Optional memorial,3=Obligatory memorial,4=Feast,5=Feast of the Lord,6=Solemnity,7=Higher Solemnity
     public string $displayGrade;
     public string $common;  //"Proper" or specified common(s) of saints...
-    public $liturgicalyear; //not used in construction, but added externally, from the program using the current class
-    public $isVigilMass;    //not used in construction, but added externally, from the program using the current class
-    public $hasVigilMass;   //not used in construction, but added externally, from the program using the current class
-    public $hasVesperI;     //not used in construction, but added externally, from the program using the current class
-    public $hasVesperII;    //not used in construction, but added externally, from the program using the current class
-    public $psalterWeek;    //not used in construction, but added externally, from the program using the current class
+
+    /** The following properties are not used in construction, they are only set externally */
+    public $liturgicalyear;
+    public bool $isVigilMass;
+    public bool $hasVigilMass;
+    public bool $hasVesperI;
+    public bool $hasVesperII;
+    public int $psalterWeek;
 
     function __construct(string $name, DateTime $date, string $color, string $type, int $grade = 0, string $common = '', string $displayGrade='')
     {
