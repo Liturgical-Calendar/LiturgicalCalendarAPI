@@ -38,6 +38,12 @@ let serializeRequestURL = function(obj){
         }
         //CalendarNations = nationsTmp.filter(onlyUnique);
         CalendarNations.forEach(item => $('#APICalendarSelect').append(`<option data-calendartype="nationalpreset" value="${item}">${countryNames.of(COUNTRIES[item])}</option>`));
+        if(CalendarNations.indexOf("ITALY") === -1){
+            $('#APICalendarSelect').append(`<option data-calendartype="nationalpreset" value="ITALY">${countryNames.of(COUNTRIES["ITALY"])}</option>`);
+        }
+        if(CalendarNations.indexOf("USA") === -1){
+            $('#APICalendarSelect').append(`<option data-calendartype="nationalpreset" value="USA">${countryNames.of(COUNTRIES["USA"])}</option>`);
+        }
         CalendarNations.forEach(item => {
             let $optGroup = $(`<optgroup label="${countryNames.of(COUNTRIES[item])}">`);
             $('#APICalendarSelect').append($optGroup);

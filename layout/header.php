@@ -99,7 +99,7 @@ $isStaging = (strpos(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),"-staging"
 
         <!-- Sidebar Toggler (Sidebar) -->
         <li>
-            <div class="text-center d-none d-md-inline">
+            <div class="text-center d-none d-md-block">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
         </li>

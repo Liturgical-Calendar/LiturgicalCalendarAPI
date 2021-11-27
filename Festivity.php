@@ -2,22 +2,25 @@
 ini_set('date.timezone', 'Europe/Vatican');
 class Festivity implements JsonSerializable
 {
-    private static $liturgical_colors = array("green", "purple", "white", "red", "pink");
-    private static $feast_type = array("fixed", "mobile");
+    private static array $liturgical_colors = [ "green", "purple", "white", "red", "pink" ];
+    private static array $feast_type = [ "fixed", "mobile" ];
     public static $eventIdx = 0;
+    public int $idx;
+    public string $name;
+    public DateTime $date;
+    public string $color; //"green","purple","white","red","pink"
+    public string $type;  //"mobile" or "fixed"
+    public int $grade; //0=Weekday,1=Commemoration,2=Optional memorial,3=Obligatory memorial,4=Feast,5=Feast of the Lord,6=Solemnity,7=Higher Solemnity
+    public string $displayGrade;
+    public string $common;  //"Proper" or specified common(s) of saints...
 
-    public $name;
-    public $date;
-    public $color; //"green","purple","white","red","pink"
-    public $type;  //"mobile" or "fixed"
-    public $grade; //0=Weekday,1=Commemoration,2=Optional memorial,3=Obligatory memorial,4=Feast,5=Feast of the Lord,6=Solemnity,7=Higher Solemnity
-    public $displayGrade;
-    public $common; //"Proper" or specified common(s) of saints...
-    public $liturgicalyear; //not used in construction, but added externally, from the program using the current class
-    public $hasVigilMass;   //not used in construction, but added externally, from the program using the current class
-    public $hasVesperI;     //not used in construction, but added externally, from the program using the current class
-    public $hasVesperII;    //not used in construction, but added externally, from the program using the current class
-    public $idx;            //not used in construction, but set automatically inside the constructor based on the static autoincrement
+    /** The following properties are not used in construction, they are only set externally */
+    public $liturgicalyear;
+    public bool $isVigilMass;
+    public bool $hasVigilMass;
+    public bool $hasVesperI;
+    public bool $hasVesperII;
+    public int $psalterWeek;
 
     function __construct(string $name, DateTime $date, string $color, string $type, int $grade = 0, string $common = '', string $displayGrade='')
     {
@@ -55,26 +58,32 @@ class Festivity implements JsonSerializable
     public function jsonSerialize()
     {
         $returnArr = [
-            'name'      => $this->name,
-            'color'     => $this->color,
-            'type'      => $this->type,
-            'grade'     => $this->grade,
-            'common'    => $this->common,
-            'date'      => $this->date->format('U'), //serialize the DateTime object as a PHP timestamp
-            'displaygrade' => $this->displayGrade,
-            'eventidx'  => $this->idx
+            'name'          => $this->name,
+            'color'         => $this->color,
+            'type'          => $this->type,
+            'grade'         => $this->grade,
+            'common'        => $this->common,
+            'date'          => $this->date->format('U'), //serialize the DateTime object as a PHP timestamp
+            'displaygrade'  => $this->displayGrade,
+            'eventidx'      => $this->idx
         ];
         if($this->liturgicalyear !== null){
-            $returnArr['liturgicalyear'] = $this->liturgicalyear;
+            $returnArr['liturgicalyear']    = $this->liturgicalyear;
+        }
+        if($this->isVigilMass !== null){
+            $returnArr['isVigilMass']       = $this->isVigilMass;
         }
         if($this->hasVigilMass !== null){
-            $returnArr['hasVigilMass'] = $this->hasVigilMass;
+            $returnArr['hasVigilMass']      = $this->hasVigilMass;
         }
         if($this->hasVesperI !== null){
-            $returnArr['hasVesperI'] = $this->hasVesperI;
+            $returnArr['hasVesperI']        = $this->hasVesperI;
         }
         if($this->hasVesperII !== null){
-            $returnArr['hasVesperII'] = $this->hasVesperII;
+            $returnArr['hasVesperII']       = $this->hasVesperII;
+        }
+        if($this->psalterWeek !== null){
+            $returnArr['psalterWeek']       = $this->psalterWeek;
         }
         return $returnArr;
     }

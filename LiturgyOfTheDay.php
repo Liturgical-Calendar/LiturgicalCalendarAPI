@@ -490,6 +490,7 @@ $ch = curl_init($URL);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 // Will return the response, if false it print the response
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
 // Execute
 $result = curl_exec($ch);
 
@@ -557,7 +558,7 @@ if($TIMEZONE == null){
     ini_set('date.timezone', $TIMEZONE);
 }
 //ini_set('date.timezone', 'UTC');
-setlocale(LC_TIME, strtolower($LOCALE) . '_' . $LOCALE);
+setlocale(LC_TIME, strtolower($queryArray["locale"]) . '_' . $queryArray["locale"]);
 
 $dateTimeToday = (new DateTime( 'now' ))->format("Y-m-d") . " 00:00:00";
 $dateToday = DateTime::createFromFormat('Y-m-d H:i:s', $dateTimeToday, new DateTimeZone('UTC') );
@@ -580,6 +581,7 @@ $ch1 = curl_init();
 curl_setopt($ch1, CURLOPT_SSL_VERIFYPEER, false);
 // Will return the response, if false it print the response
 curl_setopt($ch1, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch1, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
 // Set the url
 curl_setopt($ch1, CURLOPT_URL, $URL);
 // Set request method to POST
