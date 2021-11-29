@@ -4,8 +4,11 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-$LOCALE = Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-$LOCALE = !empty($_COOKIE["currentLocale"]) ? $_COOKIE["currentLocale"] : $LOCALE;
+$LOCALE = null;
+if( isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ) {
+    $LOCALE = Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+}
+$LOCALE = !empty($_COOKIE["currentLocale"]) ?? $_COOKIE["currentLocale"];
 if($LOCALE !== null){
     //we only need the two letter ISO code, not the national extension
     if(strpos($LOCALE,"_")){
