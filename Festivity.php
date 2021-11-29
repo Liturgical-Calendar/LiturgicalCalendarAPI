@@ -15,7 +15,7 @@ class Festivity implements JsonSerializable
     public string $common;  //"Proper" or specified common(s) of saints...
 
     /** The following properties are not used in construction, they are only set externally */
-    public $liturgicalyear;
+    public string $liturgicalyear;
     public ?bool $isVigilMass = null;
     public ?bool $hasVigilMass = null;
     public ?bool $hasVesperI = null;
