@@ -16,11 +16,11 @@ class Festivity implements JsonSerializable
 
     /** The following properties are not used in construction, they are only set externally */
     public $liturgicalyear;
-    public bool $isVigilMass;
-    public bool $hasVigilMass;
-    public bool $hasVesperI;
-    public bool $hasVesperII;
-    public int $psalterWeek;
+    public ?bool $isVigilMass = null;
+    public ?bool $hasVigilMass = null;
+    public ?bool $hasVesperI = null;
+    public ?bool $hasVesperII = null;
+    public ?int $psalterWeek = null;
 
     function __construct(string $name, DateTime $date, string $color, string $type, int $grade = 0, string $common = '', string $displayGrade='')
     {
