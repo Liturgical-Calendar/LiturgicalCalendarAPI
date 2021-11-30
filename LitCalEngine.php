@@ -2004,7 +2004,7 @@ class LitCalEngine {
             $coincidingFestivity = $this->LitCal[$coincidingFestivityKey];
             $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.",$this->LITSETTINGS->LOCALE),
-                $StFaustina_tag[$this->LITSETTINGS->LOCALE],
+                $StGregoryNarek_tag[$this->LITSETTINGS->LOCALE],
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $StGregoryNarek_date->format('j') . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[(int)$StGregoryNarek_date->format('n')] ) :
                     ( $this->LITSETTINGS->LOCALE === 'EN' ? $StGregoryNarek_date->format('F jS') :
                         trim(utf8_encode(strftime('%e %B', $StGregoryNarek_date->format('U'))))
@@ -2029,7 +2029,7 @@ class LitCalEngine {
              */
             $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.",$this->LITSETTINGS->LOCALE),
-                LITCAL_MESSAGES::_G( $this->LitCal["StJohnAvila"]->grade,$this->LITSETTINGS->LOCALE),
+                LITCAL_MESSAGES::_G( $this->LitCal["StJohnAvila"]->grade, $this->LITSETTINGS->LOCALE ),
                 $this->LitCal["StJohnAvila"]->name,
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $this->LitCal["StJohnAvila"]->date->format('j') . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[(int)$this->LitCal["StJohnAvila"]->date->format('n')] ) :
                     ( $this->LITSETTINGS->LOCALE === 'EN' ? $this->LitCal["StJohnAvila"]->date->format('F jS') :
