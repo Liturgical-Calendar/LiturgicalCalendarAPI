@@ -33,9 +33,9 @@ class Festivity implements JsonSerializable
         $this->date         = $date; //DateTime object
         $_color             = strtolower( $color );
         //the color string can contain multiple colors separated by a pipe character, which correspond with the multiple commons to choose from for that festivity
-        $this->color        = strpos( $_color, "," ) && LitColor::areValid( explode(",", $_color) ) ? $_color : ( LitColor::isValid( $_color ) ?? $_color );
+        $this->color        = strpos( $_color, "," ) && LitColor::areValid( explode(",", $_color) ) ? $_color : ( LitColor::isValid( $_color ) ? $_color : '???' );
         $_type              = strtolower( $type );
-        $this->type         = LitFeastType::isValid( $_type ) ?? $_type;
+        $this->type         = LitFeastType::isValid( $_type ) ? $_type : '???';
         $this->grade        = $grade >= LitGrade::WEEKDAY && $grade <= LitGrade::HIGHER_SOLEMNITY ? $grade : -1;
         $this->displayGrade = $displayGrade;
         $this->common       = $common;
