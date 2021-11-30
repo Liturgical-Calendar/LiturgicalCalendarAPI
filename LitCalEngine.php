@@ -148,9 +148,9 @@ class LitCalEngine {
     }
 
     private function validateRequestContentType() {
-        if( isset( $_SERVER['CONTENT_TYPE'] ) && $_SERVER['CONTENT_TYPE'] !== '' && !in_array( $_SERVER['CONTENT_TYPE'], $this->ALLOWED_CONTENT_TYPES ) ){
+        if( isset( $_SERVER['CONTENT_TYPE'] ) && $_SERVER['CONTENT_TYPE'] !== '' && !in_array( explode( ';', $_SERVER['CONTENT_TYPE'] )[0], $this->ALLOWED_REQUEST_CONTENT_TYPES ) ){
             header( $_SERVER["SERVER_PROTOCOL"]." 415 Unsupported Media Type", true, 415 );
-            die( '{"error":"You seem to be forming a strange kind of request? Allowed Content Types are '.implode( ' and ',$this->ALLOWED_CONTENT_TYPES ).', but your Content Type was '.$_SERVER['CONTENT_TYPE'].'"}' );
+            die( '{"error":"You seem to be forming a strange kind of request? Allowed Content Types are '.implode( ' and ', $this->ALLOWED_REQUEST_CONTENT_TYPES ).', but your Content Type was '.$_SERVER['CONTENT_TYPE'].'"}' );
         }
     }
 
