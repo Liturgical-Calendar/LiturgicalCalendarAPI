@@ -23,11 +23,20 @@ class LITSETTINGS {
         "CORPUSCHRISTI",
         "LOCALE",
         "RETURNTYPE",
-        "NATIONAL",
-        "DIOCESAN"
+        "NATIONALPRESET",
+        "DIOCESANPRESET"
     ];
 
     const SUPPORTED_NATIONAL_PRESETS = [ "ITALY", "USA", "VATICAN" ];
+
+    //If we can get more data from 1582 (year of the Gregorian reform) to 1969
+    // perhaps we can lower the limit to the year of the Gregorian reform
+    //For now we'll just deal with the Liturgical Calendar from the Editio Typica 1970
+    //const YEAR_LOWER_LIMIT          = 1583;
+    const YEAR_LOWER_LIMIT          = 1970;
+
+    //The upper limit is determined by the limit of PHP in dealing with DateTime objects
+    const YEAR_UPPER_LIMIT          = 9999;
   
     public function __construct( array $DATA ){
         $this->YEAR = (int)date("Y");
@@ -39,12 +48,12 @@ class LITSETTINGS {
                         if( gettype( $value ) === 'string' ){
                             if( is_numeric( $value ) && ctype_digit( $value ) && strlen( $value ) === 4 ){
                                 $value = (int)$value;
-                                if( $value > 1582 && $value < 9999 ){
+                                if( $value >= self::YEAR_LOWER_LIMIT && $value <= self::YEAR_UPPER_LIMIT ){
                                     $this->YEAR = $value;
                                 }
                             }
                         } elseif( gettype( $value ) === 'integer' ) {
-                            if( $value > 1582 && $value < 9999 ){
+                            if( $value >= self::YEAR_LOWER_LIMIT && $value <= self::YEAR_UPPER_LIMIT ){
                                 $this->YEAR = $value;
                             }
                         }
