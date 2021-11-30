@@ -52,6 +52,7 @@ include_once( 'includes/enums/CacheDuration.php' );
 include_once( 'includes/enums/RequestMethod.php' );
 include_once( 'includes/enums/RequestContentType.php' );
 include_once( 'includes/enums/ReturnType.php' );
+include_once( 'includes/enums/RomanMissalEdition.php' );
 
 include_once( "includes/Festivity.php" );
 include_once( "includes/LitSettings.php" );
@@ -76,8 +77,7 @@ class LitCalEngine {
     const API_VERSION                               = '3.0';
 
 
-    private string $CACHEDURATION                   = CACHEDURATION::MONTH;
-    private string $CACHEDURATIONID                 = "";
+    private string $CACHEDURATION                   = "";
     private string $CACHEFILE                       = "";
     private array $ALLOWED_ORIGINS;
     private array $ALLOWED_ACCEPT_HEADERS;
@@ -90,8 +90,6 @@ class LitCalEngine {
 
     private string $jsonEncodedRequestHeaders       = "";
     private string $responseContentType             = RETURN_TYPE::JSON;
-    private string $requestMethod                   = "";
-    private string $requestContentType              = "";
     //private bool $isAjax                          = false;
 
     private ?object $DiocesanData                   = null;
@@ -113,7 +111,7 @@ class LitCalEngine {
     private string $BaptismLordMod;
 
     public function __construct(){
-        $this->CACHEDURATIONID                      = "_" . CACHEDURATION::MONTH . date("m");
+        $this->CACHEDURATION                        = "_" . CACHEDURATION::MONTH . date("m");
         $this->ALLOWED_ORIGINS                      = [ "*" ];
         $this->ALLOWED_ACCEPT_HEADERS               = ACCEPT_HEADER::$values;
         $this->ALLOWED_RETURN_TYPES                 = RETURN_TYPE::$values;
@@ -271,7 +269,7 @@ class LitCalEngine {
 
     private function cacheFileIsAvailable() {
         $cacheFilePath = "engineCache/v" . str_replace( ".", "_", self::API_VERSION ) . "/";
-        $cacheFileName = md5( serialize($this->LITSETTINGS) ) . $this->CACHEDURATIONID . "." . strtolower( $this->LITSETTINGS->RETURNTYPE );
+        $cacheFileName = md5( serialize($this->LITSETTINGS) ) . $this->CACHEDURATION . "." . strtolower( $this->LITSETTINGS->RETURNTYPE );
         $this->CACHEFILE = $cacheFilePath . $cacheFileName;
         return file_exists( $this->CACHEFILE );
     }
@@ -1015,7 +1013,8 @@ class LitCalEngine {
                         $this->FEASTS_MEMORIALS[$row["TAG"]]      = $currentFeastDate;
 
                         //Also, while we're add it, let's remove the weekdays of Epiphany that get overriden by memorials
-                        if (false !== $key = array_search($this->LitCal[$row["TAG"]]->date, $this->WEEKDAYS_EPIPHANY)) {
+                        $key = array_search($this->LitCal[$row["TAG"]]->date, $this->WEEKDAYS_EPIPHANY);
+                        if ( false !== $key ) {
                             $this->Messages[] = sprintf(
                                 LITCAL_MESSAGES::__( "'%s' is superseded by the %s '%s' in the year %d.",$this->LITSETTINGS->LOCALE),
                                 $this->LitCal[$key]->name,
@@ -1168,7 +1167,8 @@ class LitCalEngine {
                         $this->FEASTS_MEMORIALS[$row["TAG"]]      = $currentFeastDate;
 
                         //Also, while we're add it, let's remove the weekdays of Epiphany that get overriden by memorials
-                        if (false !== $key = array_search($this->LitCal[$row["TAG"]]->date, $this->WEEKDAYS_EPIPHANY)) {
+                        $key = array_search($this->LitCal[$row["TAG"]]->date, $this->WEEKDAYS_EPIPHANY);
+                        if ( false !== $key ) {
                             $this->Messages[] = sprintf(
                                 LITCAL_MESSAGES::__( "In the year %d '%s' is superseded by the %s '%s', added on %s since the year %d (%s).",$this->LITSETTINGS->LOCALE),
                                 $this->LITSETTINGS->YEAR,
@@ -2244,15 +2244,13 @@ class LitCalEngine {
             //so when dealing with Italy, we only need to add them from 1983 until 2002, after which it's taken care of by the General Calendar
             $this->applyMessaleRomano1983();
         }
+
+        //The Sanctorale in the 2020 edition is based on the Latin 2008 Edition,
+        // there isn't really anything different from preceding editions or from the 2008 edition
     }
 
 
-    //TODO: this method is now fairly well abstracted,
-    //      however we can't necessarily take for granted
-    //      that all patron saints of countries or geographical areas
-    //      are to be found in the 'LITURGY__calendar_propriumdesanctis' table
-    //      If we add more countries to the mix, keep an eye on this
-    private function makePatron( string $tag, string $nameSuffix, int $day, int $month, LitColor $color ) {
+    private function makePatron( string $tag, string $nameSuffix, int $day, int $month, LitColor $color, string $EditionRomanMissal = ROMANMISSAL::EDITIO_TYPICA_1970 ) {
         if( array_key_exists( $tag, $this->LitCal ) ) {
             $this->LitCal[$tag]->grade = LitGrade::FEAST;
             $this->LitCal[$tag]->name .= $nameSuffix;
@@ -2263,8 +2261,9 @@ class LitCalEngine {
             $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', "{$day}-{$month}-" . $this->LITSETTINGS->YEAR, new DateTimeZone('UTC') );
 
             //let's also get the name back from the database, so we can give some feedback and maybe even recreate the festivity
-            $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = '{$tag}'");
-            $row = mysqli_fetch_assoc($result);
+            $tableName = ROMANMISSAL::getSanctoraleTableName( $EditionRomanMissal );
+            $result = $this->mysqli->query("SELECT * FROM {$tableName} WHERE TAG = '{$tag}'");
+            $row = mysqli_fetch_assoc( $result );
             $FestivityName = $row[ "NAME_" . $this->LITSETTINGS->LOCALE ] . $nameSuffix;
 
             if( in_array( $currentFeastDate, $this->SOLEMNITIES ) || in_array( $currentFeastDate, $this->FEASTS_MEMORIALS ) || (int)$currentFeastDate->format('N') === 7 ) {
@@ -2305,157 +2304,14 @@ class LitCalEngine {
 
         //Saint Benedict, Saint Bridget, and Saint Cyril and Methodius elevated to Feast, with title "patrono/i d'Europa" added
         //then from 1999, Saint Catherine of Siena and Saint Edith Stein, elevated to Feast with title "compatrona d'Europa" added
-        if(array_key_exists("StBenedict",$this->LitCal) ){
-            $this->LitCal["StBenedict"]->grade = LitGrade::FEAST;
-            $this->LitCal["StBenedict"]->name .= ", patrono d'Europa";
-            $this->LitCal["StBenedict"]->common = "Proper";
-        } else {
-            //check what's going on, for example, if it's a Sunday or Solemnity
-            $currentFeastDate = DateTime::createFromFormat('!j-n-Y', '11-7-' . $this->LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-            if(in_array($currentFeastDate,$this->SOLEMNITIES) || in_array($currentFeastDate,$this->FEASTS_MEMORIALS) || (int)$currentFeastDate->format('N') === 7 ){
-                $coincidingFestivity_grade = '';
-                if((int)$currentFeastDate->format('N') === 7 && $this->LitCal[array_search($currentFeastDate,$this->SOLEMNITIES)]->grade < LitGrade::SOLEMNITY ){
-                    //it's a Sunday
-                    $coincidingFestivity = $this->LitCal[array_search($currentFeastDate,$this->SOLEMNITIES)];
-                    $coincidingFestivity_grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
-                } else if (in_array($currentFeastDate, $this->SOLEMNITIES)){
-                    //it's a Feast of the Lord or a Solemnity
-                    $coincidingFestivity = $this->LitCal[array_search($currentFeastDate,$this->SOLEMNITIES)];
-                    $coincidingFestivity_grade = ($coincidingFestivity->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->grade,$this->LITSETTINGS->LOCALE,false) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->grade,$this->LITSETTINGS->LOCALE,false));
-                } else if(in_array($currentFeastDate, $this->FEASTS_MEMORIALS)){
-                    //we should probably be able to create it anyways in this case?
-                    $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StBenedict'");
-                    $row = mysqli_fetch_assoc($result);
-                    $this->LitCal["StBenedict"] = new Festivity($row["NAME_" . $this->LITSETTINGS->LOCALE] . ", patrono d'Europa", $currentFeastDate,"white","fixed",LitGrade::FEAST,"Proper");
-                    $coincidingFestivity = $this->LitCal[array_search($currentFeastDate,$this->FEASTS_MEMORIALS)];
-                    $coincidingFestivity_grade = LITCAL_MESSAGES::_G( $coincidingFestivity->grade,$this->LITSETTINGS->LOCALE,false);
-                }
-
-                $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                    "La Festa del patrono d'Europa <i>'San Benedetto abate'</i> è soppressa nell'anno %d dalla %s <i>'%s'</i>.",
-                    $this->LITSETTINGS->YEAR,
-                    $coincidingFestivity_grade,
-                    $coincidingFestivity->name
-                );
-
-            }
-        }
-
-        if(array_key_exists("StBridget",$this->LitCal) ){
-            $this->LitCal["StBridget"]->grade = LitGrade::FEAST;
-            $this->LitCal["StBridget"]->name .= ", patrona d'Europa";
-            $this->LitCal["StBridget"]->common = "Proper";
-        } else {
-            //check what's going on, for example, if it's a Sunday or Solemnity
-            $currentFeastDate = DateTime::createFromFormat('!j-n-Y', '23-7-' . $this->LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-            if(in_array($currentFeastDate,$this->SOLEMNITIES) || in_array($currentFeastDate,$this->FEASTS_MEMORIALS) || (int)$currentFeastDate->format('N') === 7 ){
-                $coincidingFestivity_grade = '';
-                if((int)$currentFeastDate->format('N') === 7 && $this->LitCal[array_search($currentFeastDate,$this->SOLEMNITIES)]->grade < LitGrade::SOLEMNITY ){
-                    //it's a Sunday
-                    $coincidingFestivity = $this->LitCal[array_search($currentFeastDate,$this->SOLEMNITIES)];
-                    $coincidingFestivity_grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
-                } else if (in_array($currentFeastDate, $this->SOLEMNITIES)){
-                    //it's a Feast of the Lord or a Solemnity
-                    $coincidingFestivity = $this->LitCal[array_search($currentFeastDate,$this->SOLEMNITIES)];
-                    $coincidingFestivity_grade = ($coincidingFestivity->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->grade,$this->LITSETTINGS->LOCALE,false) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->grade,$this->LITSETTINGS->LOCALE,false));
-                } else if(in_array($currentFeastDate, $this->FEASTS_MEMORIALS)){
-                    //we should probably be able to create it anyways in this case?
-                    $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StBridget'");
-                    $row = mysqli_fetch_assoc($result);
-                    $this->LitCal["StBridget"] = new Festivity($row["NAME_" . $this->LITSETTINGS->LOCALE] . ", patrona d'Europa", $currentFeastDate,"white","fixed",LitGrade::FEAST,"Proper");
-                    $coincidingFestivity = $this->LitCal[array_search($currentFeastDate,$this->FEASTS_MEMORIALS)];
-                    $coincidingFestivity_grade = LITCAL_MESSAGES::_G( $coincidingFestivity->grade,$this->LITSETTINGS->LOCALE,false);
-                }
-
-                $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                    "La Festa della patrona d'Europa <i>'Santa Brigida'</i> è soppressa nell'anno %d dalla %s <i>'%s'</i>.",
-                    $this->LITSETTINGS->YEAR,
-                    $coincidingFestivity_grade,
-                    $coincidingFestivity->name
-                );
-
-            }
-        }
-
-        if(array_key_exists("StEdithStein",$this->LitCal) ){
-            $this->LitCal["StEdithStein"]->grade = LitGrade::FEAST;
-            $this->LitCal["StEdithStein"]->name .= ", patrona d'Europa";
-            $this->LitCal["StEdithStein"]->common = "Proper";
-        } else {
-            //check what's going on, for example, if it's a Sunday or Solemnity
-            $currentFeastDate = DateTime::createFromFormat('!j-n-Y', '9-8-' . $this->LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-            if(in_array($currentFeastDate,$this->SOLEMNITIES) || in_array($currentFeastDate,$this->FEASTS_MEMORIALS) || (int)$currentFeastDate->format('N') === 7 ){
-                $coincidingFestivity_grade = '';
-                if((int)$currentFeastDate->format('N') === 7 && $this->LitCal[array_search($currentFeastDate,$this->SOLEMNITIES)]->grade < LitGrade::SOLEMNITY ){
-                    //it's a Sunday
-                    $coincidingFestivity = $this->LitCal[array_search($currentFeastDate,$this->SOLEMNITIES)];
-                    $coincidingFestivity_grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
-                } else if (in_array($currentFeastDate, $this->SOLEMNITIES)){
-                    //it's a Feast of the Lord or a Solemnity
-                    $coincidingFestivity = $this->LitCal[array_search($currentFeastDate,$this->SOLEMNITIES)];
-                    $coincidingFestivity_grade = ($coincidingFestivity->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->grade,$this->LITSETTINGS->LOCALE,false) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->grade,$this->LITSETTINGS->LOCALE,false));
-                } else if(in_array($currentFeastDate, $this->FEASTS_MEMORIALS)){
-                    //we should probably be able to create it anyways in this case?
-                    $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis_2002 WHERE TAG = 'StEdithStein'");
-                    $row = mysqli_fetch_assoc($result);
-                    $this->LitCal["StEdithStein"] = new Festivity($row["NAME_" . $this->LITSETTINGS->LOCALE] . ", patrona d'Europa", $currentFeastDate,"white","fixed",LitGrade::FEAST,"Proper");
-                    $coincidingFestivity = $this->LitCal[array_search($currentFeastDate,$this->FEASTS_MEMORIALS)];
-                    $coincidingFestivity_grade = LITCAL_MESSAGES::_G( $coincidingFestivity->grade,$this->LITSETTINGS->LOCALE,false);
-                }
-
-                $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                    "La Festa della patrona d'Europa <i>'Santa Edith Stein'</i> è soppressa nell'anno %d dalla %s <i>'%s'</i>.",
-                    $this->LITSETTINGS->YEAR,
-                    $coincidingFestivity_grade,
-                    $coincidingFestivity->name
-                );
-
-            }
-        }
-
-        if(array_key_exists("StsCyrilMethodius",$this->LitCal) ){
-            $this->LitCal["StsCyrilMethodius"]->grade = LitGrade::FEAST;
-            $this->LitCal["StsCyrilMethodius"]->name .= ", patroni d'Europa";
-            $this->LitCal["StsCyrilMethodius"]->common = "Proper";
-        } else {
-            //check what's going on, for example, if it's a Sunday or Solemnity
-            $currentFeastDate = DateTime::createFromFormat('!j-n-Y', '14-2-' . $this->LITSETTINGS->YEAR, new DateTimeZone('UTC'));
-            if(in_array($currentFeastDate,$this->SOLEMNITIES) || in_array($currentFeastDate,$this->FEASTS_MEMORIALS) || (int)$currentFeastDate->format('N') === 7 ){
-                $coincidingFestivity_grade = '';
-                if((int)$currentFeastDate->format('N') === 7 && $this->LitCal[array_search($currentFeastDate,$this->SOLEMNITIES)]->grade < LitGrade::SOLEMNITY ){
-                    //it's a Sunday
-                    $coincidingFestivity = $this->LitCal[array_search($currentFeastDate,$this->SOLEMNITIES)];
-                    $coincidingFestivity_grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst(utf8_encode(strftime('%A',$currentFeastDate->format('U'))));
-                } else if (in_array($currentFeastDate, $this->SOLEMNITIES)){
-                    //it's a Feast of the Lord or a Solemnity
-                    $coincidingFestivity = $this->LitCal[array_search($currentFeastDate,$this->SOLEMNITIES)];
-                    $coincidingFestivity_grade = ($coincidingFestivity->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->grade,$this->LITSETTINGS->LOCALE,false) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->grade,$this->LITSETTINGS->LOCALE,false));
-                } else if(in_array($currentFeastDate, $this->FEASTS_MEMORIALS)){
-                    //we should probably be able to create it anyways in this case?
-                    $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StsCyrilMethodius'");
-                    $row = mysqli_fetch_assoc($result);
-                    $this->LitCal["StsCyrilMethodius"] = new Festivity($row["NAME_" . $this->LITSETTINGS->LOCALE] . ", patroni d'Europa", $currentFeastDate,"white","fixed",LitGrade::FEAST,"Proper");
-                    $coincidingFestivity = $this->LitCal[array_search($currentFeastDate,$this->FEASTS_MEMORIALS)];
-                    $coincidingFestivity_grade = LITCAL_MESSAGES::_G( $coincidingFestivity->grade,$this->LITSETTINGS->LOCALE,false);
-                }
-
-                $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                    "La Festa dei patroni d'Europa <i>'Santi Cirillo e Metodio'</i> è soppressa nell'anno %d dalla %s <i>'%s'</i>.",
-                    $this->LITSETTINGS->YEAR,
-                    $coincidingFestivity_grade,
-                    $coincidingFestivity->name
-                );
-
-            }
-        }
+        $this->makePatron( "StBenedict", ", patrono d'Europa", 11, 7, LitColor::WHITE );
+        $this->makePatron( "StBridget", ", patrona d'Europa", 23, 7, LitColor::WHITE );
+        $this->makePatron( "StEdithStein", ", patrona d'Europa", 9, 8, LitColor::WHITE, ROMANMISSAL::USA_EDITION_2011 );
+        $this->makePatron( "StsCyrilMethodius", ", patroni d'Europa", 14, 2, LitColor::WHITE );
 
         //In 1999, Pope John Paul II elevated Catherine of Siena from patron of Italy to patron of Europe
         if( $this->LITSETTINGS->YEAR >= 1999){
-            $tag = "StCatherineSiena";
-            $nameSuffix = ", patrona d'Italia e d'Europa";
-            $day = 29;
-            $month = 4; //April
-            $this->makePatron( $tag, $nameSuffix, $day, $month, LitColor::WHITE );
+            $this->makePatron( "StCatherineSiena", ", patrona d'Italia e d'Europa", 29, 4, LitColor::WHITE );
         }
 
     }
@@ -2466,18 +2322,10 @@ class LitCalEngine {
         if ( $this->LITSETTINGS->YEAR < 1999 ) {
             //We only have to deal with years before 1999, because from 1999
             //it will be taken care of by Patron saints of Europe
-            $tag = "StCatherineSiena";
-            $nameSuffix = ", patrona d'Italia";
-            $month = 4; //April
-            $day = 29;
-            $this->makePatron( $tag, $nameSuffix, $day, $month, LitColor::WHITE );
+            $this->makePatron( "StCatherineSiena", ", patrona d'Italia", 29, 4, LitColor::WHITE );
         }
 
-        $tag2 = "StFrancisAssisi";
-        $nameSuffix2 = ", patrono d'Italia";
-        $month2 = 10; //October
-        $day2 = 4;
-        $this->makePatron( $tag2, $nameSuffix2, $day2, $month2, LitColor::WHITE );
+        $this->makePatron( "StFrancisAssisi", ", patrono d'Italia", 4, 10, LitColor::WHITE );
 
     }
 
@@ -2872,15 +2720,18 @@ class LitCalEngine {
         $SerializeableLitCal->Settings->LOCALE        = $this->LITSETTINGS->LOCALE;
         $SerializeableLitCal->Settings->RETURNTYPE    = $this->LITSETTINGS->RETURNTYPE;
         if( $this->LITSETTINGS->NATIONAL !== null ){
-            $SerializeableLitCal->Settings->NATIONALCALENDAR = $this->LITSETTINGS->NATIONAL;
+            $SerializeableLitCal->Settings->NATIONALPRESET = $this->LITSETTINGS->NATIONAL;
+        } else {
+            //die( 'value of $SerializeableLitCal->Settings->NATIONALPRESET = <' . $this->LITSETTINGS->NATIONAL . '>' );
         }
         if( $this->LITSETTINGS->DIOCESAN !== null ){
-            $SerializeableLitCal->Settings->DIOCESANCALENDAR = $this->LITSETTINGS->DIOCESAN;
+            $SerializeableLitCal->Settings->DIOCESANPRESET = $this->LITSETTINGS->DIOCESAN;
         }
 
         $SerializeableLitCal->Metadata->SOLEMNITIES       = $this->SOLEMNITIES;
         $SerializeableLitCal->Metadata->FEASTS_MEMORIALS  = $this->FEASTS_MEMORIALS;
         $SerializeableLitCal->Metadata->VERSION           = self::API_VERSION;
+        $SerializeableLitCal->Metadata->REQUEST_HEADERS   = $this->jsonEncodedRequestHeaders;
 
         //make sure we have an engineCache folder for the current Version
         if(realpath("engineCache/v" . str_replace(".","_",self::API_VERSION)) === false){
@@ -2889,6 +2740,7 @@ class LitCalEngine {
 
         switch ( $this->LITSETTINGS->RETURNTYPE) {
             case RETURN_TYPE::JSON:
+                $SerializeableLitCal->Metadata->REQUEST_HEADERS   = $this->REQUEST_HEADERS;
                 file_put_contents( $this->CACHEFILE, json_encode($SerializeableLitCal) );
                 echo json_encode( $SerializeableLitCal );
                 break;
@@ -3010,20 +2862,18 @@ class LitCalEngine {
 
 
     public function setCacheDuration( string $duration ) : void {
-        $this->CACHEDURATION = $duration;
-        $cachePrefix = "_" . $duration;
         switch( $duration ) {
             case CACHEDURATION::DAY:
-                $this->CACHEDURATIONID = $cachePrefix . date("z"); //The day of the year (starting from 0 through 365)
+                $this->CACHEDURATION = "_" . $duration . date("z"); //The day of the year (starting from 0 through 365)
                 break;
             case CACHEDURATION::WEEK:
-                $this->CACHEDURATIONID = $cachePrefix . date("W"); //ISO-8601 week number of year, weeks starting on Monday
+                $this->CACHEDURATION = "_" . $duration . date("W"); //ISO-8601 week number of year, weeks starting on Monday
                 break;
             case CACHEDURATION::MONTH:
-                $this->CACHEDURATIONID = $cachePrefix . date("m"); //Numeric representation of a month, with leading zeros
+                $this->CACHEDURATION = "_" . $duration . date("m"); //Numeric representation of a month, with leading zeros
                 break;
             case CACHEDURATION::YEAR:
-                $this->CACHEDURATIONID = $cachePrefix . date("Y"); //A full numeric representation of a year, 4 digits
+                $this->CACHEDURATION = "_" . $duration . date("Y"); //A full numeric representation of a year, 4 digits
                 break;
         }
     }
