@@ -73,7 +73,7 @@ $LitCalEngine->Init();
 
 class LitCalEngine {
 
-    const API_VERSION                               = 3.0;
+    const API_VERSION                               = '3.0';
 
 
     private string $CACHEDURATION                   = CACHEDURATION::MONTH;
@@ -199,11 +199,20 @@ class LitCalEngine {
                     $this->LITSETTINGS->RETURNTYPE = $this->ALLOWED_RETURN_TYPES[array_search( $this->REQUEST_HEADERS["Accept"], $this->ALLOWED_ACCEPT_HEADERS )];
                     $this->responseContentType = $this->REQUEST_HEADERS["Accept"];
                 } else {
-                    header( $_SERVER["SERVER_PROTOCOL"]." 406 Not Acceptable", true, 406 );
-                    $errorMessage = '{"error":"You are requesting a content type which this API cannot produce. Allowed Accept headers are ';
-                    $errorMessage .= implode( ' and ', $this->ALLOWED_ACCEPT_HEADERS );
-                    $errorMessage .= ', but you have issued an request with an Accept header of ' . $this->REQUEST_HEADERS["Accept"] . '"}';
-                    die( $errorMessage );
+                    //Requests from browser windows using the address bar will probably have an Accept header of text/html
+                    //In order to not be too drastic, let's treat text/html as though it were application/json
+                    $acceptHeaders = explode( ",", $this->REQUEST_HEADERS["Accept"] );
+                    if( in_array( 'text/html', $acceptHeaders ) ) {
+                        $this->LITSETTINGS->RETURNTYPE = RETURN_TYPE::JSON;
+                        $this->responseContentType = ACCEPT_HEADER::JSON;
+                    } else {
+                        header( $_SERVER["SERVER_PROTOCOL"]." 406 Not Acceptable", true, 406 );
+                        $errorMessage = '{"error":"You are requesting a content type which this API cannot produce. Allowed Accept headers are ';
+                        $errorMessage .= implode( ' and ', $this->ALLOWED_ACCEPT_HEADERS );
+                        $errorMessage .= ', but you have issued an request with an Accept header of ' . $this->REQUEST_HEADERS["Accept"] . '"}';
+                        die( $errorMessage );
+                    }
+
                 }
             } else {
                 $this->LITSETTINGS->RETURNTYPE = $this->ALLOWED_RETURN_TYPES[0];
@@ -315,7 +324,8 @@ class LitCalEngine {
         /**
          * Retrieve Higher Ranking Solemnities from Proprium de Tempore
          */
-        if ($result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdetempore")) {
+        $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdetempore");
+        if ( $result ) {
             while ($row = mysqli_fetch_assoc($result)) {
                 $this->PROPRIUM_DE_TEMPORE[$row["TAG"]] = array( "NAME_" . $this->LITSETTINGS->LOCALE => $row["NAME_" . $this->LITSETTINGS->LOCALE] );
             }
@@ -548,7 +558,8 @@ class LitCalEngine {
 
         //all the other fixed date solemnities are found in the Proprium de Sanctis
         //so we will look them up in the MySQL table of festivities of the Roman Calendar from the Proper of Saints
-        if ($result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = " . LitGrade::SOLEMNITY)) {
+        $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = " . LitGrade::SOLEMNITY);
+        if ( $result ) {
             while ($row = mysqli_fetch_assoc($result)) {
                 $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"] . '-' . $row["MONTH"] . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone('UTC'));
                 $this->LitCal[$row["TAG"]] = new Festivity($row["NAME_" . $this->LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"]);
@@ -724,7 +735,8 @@ class LitCalEngine {
         //the other feasts of the Lord (Presentation, Transfiguration and Triumph of the Holy Cross) are fixed date feasts
         //and are found in the Proprium de Sanctis
         //so we will look them up in the MySQL table of festivities of the Roman Calendar from the Proper of Saints
-        if ($result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = " . LitGrade::FEAST_LORD)) {
+        $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = " . LitGrade::FEAST_LORD);
+        if ( $result ) {
             while ($row = mysqli_fetch_assoc($result)) {
                 $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row["DAY"] . '-' . $row["MONTH"] . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone('UTC'));
                 $this->LitCal[$row["TAG"]] = new Festivity($row["NAME_" . $this->LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"]);
@@ -816,7 +828,8 @@ class LitCalEngine {
     private function calculateFeastsMarySaints() : void {
         //We will look up Feasts from the MySQL table of festivities of the General Roman Calendar
         //First we get the Calendarium Romanum Generale from the Missale Romanum Editio Typica 1970
-        if ($result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = " . LitGrade::FEAST)) {
+        $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = " . LitGrade::FEAST);
+        if ( $result ) {
             while ($row = mysqli_fetch_assoc($result)) {
 
                 //If a Feast (not of the Lord) occurs on a Sunday in Ordinary Time, the Sunday is celebrated.  (e.g., St. Luke, 1992)
@@ -977,7 +990,8 @@ class LitCalEngine {
             );
         }
 
-        if ($result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = " . LitGrade::MEMORIAL)) {
+        $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = " . LitGrade::MEMORIAL);
+        if ( $result ) {
             while ($row = mysqli_fetch_assoc($result)) {
 
                 //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Memorial
@@ -1111,7 +1125,8 @@ class LitCalEngine {
     source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html
     */
     private function applyMemorialsTertiaEditioTypica2002() : void {
-        if ($result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis_2002 WHERE GRADE = " . LitGrade::MEMORIAL)) {
+        $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis_2002 WHERE GRADE = " . LitGrade::MEMORIAL);
+        if ( $result ) {
             while ($row = mysqli_fetch_assoc($result)) {
 
                 //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Festivity
@@ -1359,8 +1374,8 @@ class LitCalEngine {
     }
 
     private function calculateOptionalMemorials() : void {
-
-        if ($result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = " . LitGrade::MEMORIAL_OPT)) {
+        $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = " . LitGrade::MEMORIAL_OPT);
+        if ( $result ) {
             while ($row = mysqli_fetch_assoc($result)) {
 
                 //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord or a Feast or an obligatory memorial, then go ahead and create the optional memorial
@@ -1434,7 +1449,8 @@ class LitCalEngine {
         */
     private function applyOptionalMemorialsTertiaEditioTypica2002() : void {
 
-        if ($result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis_2002 WHERE GRADE = " . LitGrade::MEMORIAL_OPT)) {
+        $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis_2002 WHERE GRADE = " . LitGrade::MEMORIAL_OPT);
+        if ( $result ) {
             while ($row = mysqli_fetch_assoc($result)) {
 
                 //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord or a Feast or an obligatory memorial, then go ahead and create the optional memorial
@@ -1524,7 +1540,8 @@ class LitCalEngine {
             } else {
                 //perhaps it wasn't created on December 12th because it was superseded by a Sunday, Solemnity or Feast
                 //but seeing that there is no problem for August 12th, let's go ahead and try creating it again
-                if ($result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StJaneFrancesDeChantal'")) {
+                $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StJaneFrancesDeChantal'");
+                if ( $result ) {
                     $row = mysqli_fetch_assoc($result);
                     $this->LitCal["StJaneFrancesDeChantal"] = new Festivity( $row["NAME_" . $this->LITSETTINGS->LOCALE], $StJaneFrancesNewDate, $row["COLOR"], 'fixed', $row["GRADE"], $row["COMMON"] );
                     $this->Messages[] = sprintf(
@@ -1556,7 +1573,8 @@ class LitCalEngine {
             } else {
                 //in order to give any kind of feedback message about what is going on, we will need to at least re-acquire the Name of this festivity,
                 //which has already been removed from our LitCal array
-                if ($result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StJaneFrancesDeChantal'")) {
+                $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StJaneFrancesDeChantal'");
+                if ( $result ) {
                     $row = mysqli_fetch_assoc($result);
                     $this->Messages[] = sprintf(
                         LITCAL_MESSAGES::__( 'The optional memorial \'%1$s\' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d. However, it is superseded by a Sunday, a Solemnity, or a Feast \'%4$s\' in the year %3$d.',$this->LITSETTINGS->LOCALE),
@@ -1681,7 +1699,8 @@ class LitCalEngine {
     private function applyOptionalMemorialDecree2009() : void {
 
         if(!array_key_exists("ConversionStPaul",$this->LitCal)){
-            if ($result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'ConversionStPaul'")) {
+            $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'ConversionStPaul'");
+            if ( $result ) {
                 $row = mysqli_fetch_assoc($result);
                 $this->LitCal["ConversionStPaul"] = new Festivity($row["NAME_". $this->LITSETTINGS->LOCALE], DateTime::createFromFormat('!j-n-Y', '25-1-2009', new DateTimeZone('UTC')), "white", "fixed", LitGrade::MEMORIAL_OPT, "Proper" );
                 $this->Messages[] = sprintf(
@@ -2464,7 +2483,8 @@ class LitCalEngine {
 
     private function applyMessaleRomano1983() : void {
 
-        if ($result = $this->mysqli->query("SELECT * FROM LITURGY__ITALY_calendar_propriumdesanctis_1983")) {
+        $result = $this->mysqli->query("SELECT * FROM LITURGY__ITALY_calendar_propriumdesanctis_1983");
+        if ( $result ) {
             while ($row = mysqli_fetch_assoc($result)) {
                 $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row['DAY'] . '-' . $row['MONTH'] . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone('UTC'));
                 if(!in_array($currentFeastDate,$this->SOLEMNITIES)){
@@ -2540,7 +2560,8 @@ class LitCalEngine {
             //if Oct 19 is a Sunday or Solemnity, Saint Paul of the Cross won't exist. But it still needs to be moved to Oct 20 so we must create it again
             $currentFeastDate = DateTime::createFromFormat('!j-n-Y', '20-10-' . $this->LITSETTINGS->YEAR, new DateTimeZone('UTC'));
             if(!in_array($currentFeastDate,$this->SOLEMNITIES) && !array_key_exists("StPaulCross",$this->LitCal) ){
-                if ($result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StPaulCross'")) {
+                $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StPaulCross'");
+                if ( $result ) {
                     $row = mysqli_fetch_assoc($result);
                     $this->LitCal["StPaulCross"] = new Festivity("[USA] " . $row["NAME_" . $this->LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"]);
                     $this->Messages[] = sprintf(
@@ -2558,8 +2579,8 @@ class LitCalEngine {
         $thanksgivingDate = new DateTime("@$thanksgivingDateTS", new DateTimeZone('UTC'));
         $this->LitCal["ThanksgivingDay"] = new Festivity("[USA] Thanksgiving", $thanksgivingDate, "white", "mobile", LitGrade::MEMORIAL, '', 'National Holiday');
 
-
-        if ($result = $this->mysqli->query("SELECT * FROM LITURGY__USA_calendar_propriumdesanctis_2011")) {
+        $result = $this->mysqli->query("SELECT * FROM LITURGY__USA_calendar_propriumdesanctis_2011");
+        if ( $result ) {
             while ($row = mysqli_fetch_assoc($result)) {
                 $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row['DAY'] . '-' . $row['MONTH'] . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone('UTC'));
                 if(!in_array($currentFeastDate,$this->SOLEMNITIES)){
@@ -2591,7 +2612,8 @@ class LitCalEngine {
             }
             else{
                 //if it was suppressed on July 14 because of higher ranking celebration, we should recreate it on July 18 if possible
-                if ($result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StCamillusDeLellis'")) {
+                $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StCamillusDeLellis'");
+                if ( $result ) {
                     $row = mysqli_fetch_assoc($result);
                     $this->LitCal["StCamillusDeLellis"] = new Festivity($row["NAME_" . $this->LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"]);
                 }
@@ -2625,7 +2647,8 @@ class LitCalEngine {
             }
             else{
                 //if it was suppressed on July 4 because of higher ranking celebration, we should recreate on July 5 if possible
-                if ($result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StElizabethPortugal'")) {
+                $result = $this->mysqli->query("SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StElizabethPortugal'");
+                if ( $result ) {
                     $row = mysqli_fetch_assoc($result);
                     $this->LitCal["StElizabethPortugal"] = new Festivity($row["NAME_" . $this->LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"]);
                 }
