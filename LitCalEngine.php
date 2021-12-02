@@ -960,6 +960,22 @@ class LitCalEngine {
         }
     }
 
+    private function reduceMemorialsInAdventLentToCommemoration( string $row, DateTime $currentFeastDate ) {
+
+        //If a fixed date optional memorial falls between 17 Dec. to 24 Dec., the Octave of Christmas or weekdays of the Lenten season,
+        //it is reduced in rank to a Commemoration (only the collect can be used
+        if ( in_array( $currentFeastDate, $this->WEEKDAYS_ADVENT_CHRISTMAS_LENT ) ) {
+            $this->LitCal[ $row["TAG"] ]->grade = LitGrade::COMMEMORATION;
+            $this->Messages[] = sprintf(
+                LITCAL_MESSAGES::__( "The %s '%s' either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration.", $this->LITSETTINGS->LOCALE ),
+                LITCAL_MESSAGES::_G( $row["GRADE"], $this->LITSETTINGS->LOCALE ),
+                $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
+                $this->LITSETTINGS->YEAR
+            );
+        }
+
+    }
+
     private function calculateMemorials() : void {
 
         $ImmaculateHeart_date = LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P' . (7 * 9 + 6) . 'D' ) );
@@ -992,10 +1008,10 @@ class LitCalEngine {
             $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                 LITCAL_MESSAGES::_G( "MEMORIAL", $this->LITSETTINGS->LOCALE ),
-                $this->PROPRIUM_DE_TEMPORE["ImmaculateHeart"]["NAME_" . $this->LITSETTINGS->LOCALE],
-                $this->LITSETTINGS->LOCALE === 'LA' ? ( $ImmaculateHeart_date->format('j') . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$ImmaculateHeart_date->format('n') ] ) :
-                    ( $this->LITSETTINGS->LOCALE === 'EN' ? $ImmaculateHeart_date->format('F jS') :
-                        trim( utf8_encode( strftime('%e %B', $ImmaculateHeart_date->format('U') ) ) )
+                $this->PROPRIUM_DE_TEMPORE[ "ImmaculateHeart" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],
+                $this->LITSETTINGS->LOCALE === 'LA' ? ( $ImmaculateHeart_date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$ImmaculateHeart_date->format('n') ] ) :
+                    ( $this->LITSETTINGS->LOCALE === 'EN' ? $ImmaculateHeart_date->format( 'F jS' ) :
+                        trim( utf8_encode( strftime('%e %B', $ImmaculateHeart_date->format( 'U' ) ) ) )
                     ),
                 $coincidingFeast_grade,
                 $coincidingFeast->name,
@@ -1012,16 +1028,7 @@ class LitCalEngine {
                 if ( (int)$currentFeastDate->format('N') !== 7 && !in_array( $currentFeastDate, $this->SOLEMNITIES ) && !in_array( $currentFeastDate, $this->FEASTS_MEMORIALS ) ) {
                     $this->LitCal[ $row["TAG"] ] = new Festivity( $row["NAME_" . $this->LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"] );
 
-                    //If a fixed date Memorial falls within the Lenten season, it is reduced in rank to a Commemoration.
-                    if ( $currentFeastDate > $this->LitCal["AshWednesday"]->date && $currentFeastDate < $this->LitCal["HolyThurs"]->date ) {
-                        $this->LitCal[ $row["TAG"] ]->grade = LitGrade::COMMEMORATION;
-                        $this->Messages[] = sprintf(
-                            LITCAL_MESSAGES::__( "The %s '%s' falls within the Lenten season in the year %d, rank reduced to Commemoration.", $this->LITSETTINGS->LOCALE ),
-                            LITCAL_MESSAGES::_G( $row["GRADE"],$this->LITSETTINGS->LOCALE ),
-                            $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
-                            $this->LITSETTINGS->YEAR
-                        );
-                    }
+                    $this->reduceMemorialsInLentToCommemoration( $row, $currentFeastDate );
 
                     //We can now add, for logical reasons, Feasts and Memorials to the $this->FEASTS_MEMORIALS array
                     if ( $this->LitCal[$row["TAG"]]->grade > LitGrade::MEMORIAL_OPT ) {
@@ -1157,22 +1164,7 @@ class LitCalEngine {
                         $this->LITSETTINGS->YEAR
                     );
 
-                    //If a fixed date Memorial falls within the Lenten season, it is reduced in rank to a Commemoration.
-                    if ($currentFeastDate > $this->LitCal["AshWednesday"]->date && $currentFeastDate < $this->LitCal["HolyThurs"]->date) {
-                        $this->LitCal[$row["TAG"]]->grade = LitGrade::COMMEMORATION;
-                        $this->Messages[] = sprintf(
-                            LITCAL_MESSAGES::__( "The %s '%s', added on %s since the year %d (%s), falls within the Lenten season in the year %d, rank reduced to Commemoration.",$this->LITSETTINGS->LOCALE),
-                            LITCAL_MESSAGES::_G( $row["GRADE"],$this->LITSETTINGS->LOCALE),
-                            $row["NAME_" . $this->LITSETTINGS->LOCALE],
-                            $this->LITSETTINGS->LOCALE === 'LA' ? ( $currentFeastDate->format('j') . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[(int)$currentFeastDate->format('n')] ) :
-                                ( $this->LITSETTINGS->LOCALE === 'EN' ? $currentFeastDate->format('F jS') :
-                                    trim(utf8_encode(strftime('%e %B', $currentFeastDate->format('U'))))
-                                ),
-                            2002,
-                            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE) . '</a>',
-                            $this->LITSETTINGS->YEAR
-                        );
-                    }
+                    $this->reduceMemorialsInLentToCommemoration( $row, $currentFeastDate );
 
                     //We can now add, for logical reasons, Feasts and Memorials to the $this->FEASTS_MEMORIALS array
                     if ($this->LitCal[$row["TAG"]]->grade > LitGrade::MEMORIAL_OPT) {
@@ -1366,16 +1358,8 @@ class LitCalEngine {
                 if ((int)$currentFeastDate->format('N') !== 7 && !in_array($currentFeastDate, $this->SOLEMNITIES) && !in_array($currentFeastDate, $this->FEASTS_MEMORIALS)) {
                     $this->LitCal[$row["TAG"]] = new Festivity($row["NAME_" . $this->LITSETTINGS->LOCALE], $currentFeastDate, $row["COLOR"], "fixed", $row["GRADE"], $row["COMMON"]);
 
-                    //If a fixed date optional memorial falls between 17 Dec. to 24 Dec., the Octave of Christmas or weekdays of the Lenten season,
-                    //it is reduced in rank to a Commemoration (only the collect can be used
-                    if (in_array($currentFeastDate, $this->WEEKDAYS_ADVENT_CHRISTMAS_LENT)) {
-                        $this->LitCal[$row["TAG"]]->grade = LitGrade::COMMEMORATION;
-                        $this->Messages[] = sprintf(
-                            LITCAL_MESSAGES::__( "The optional memorial '%s' either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration.",$this->LITSETTINGS->LOCALE),
-                            $row["NAME_" . $this->LITSETTINGS->LOCALE],
-                            $this->LITSETTINGS->YEAR
-                        );
-                    }
+                    $this->reduceMemorialsInAdventLentToCommemoration( $row, $currentFeastDate );
+
                 } else {
                     $coincidingFestivity_grade = '';
                     if((int)$currentFeastDate->format('N') === 7 && $this->LitCal[array_search($currentFeastDate,$this->SOLEMNITIES)]->grade < LitGrade::SOLEMNITY ){
@@ -1462,17 +1446,8 @@ class LitCalEngine {
                         $this->LITSETTINGS->YEAR
                     );
 
-                    //If a fixed date optional memorial falls between 17 Dec. to 24 Dec., the Octave of Christmas or weekdays of the Lenten season,
-                    //it is reduced in rank to a Commemoration (only the collect can be used
-                    if (in_array($currentFeastDate, $this->WEEKDAYS_ADVENT_CHRISTMAS_LENT)) {
-                        $this->LitCal[$row["TAG"]]->grade = LitGrade::COMMEMORATION;
-                        $this->Messages[] = sprintf(
-                            LITCAL_MESSAGES::__( "The optional memorial '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s), either falls between 17 Dec. and 24 Dec., during the Octave of Christmas, or on a weekday of the Lenten season in the year %d, rank reduced to Commemoration.",$this->LITSETTINGS->LOCALE),
-                            $this->LitCal[$row["TAG"]]->name,
-                            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_' . strtolower( $this->LITSETTINGS->LOCALE) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE) . '</a>',
-                            $this->LITSETTINGS->YEAR
-                        );
-                    }
+                    $this->reduceMemorialsInAdventLentToCommemoration( $row, $currentFeastDate );
+
                 } else {
                     $coincidingFestivity_grade = '';
                     if((int)$currentFeastDate->format('N') === 7 && $this->LitCal[array_search($currentFeastDate,$this->SOLEMNITIES)]->grade < LitGrade::SOLEMNITY ){

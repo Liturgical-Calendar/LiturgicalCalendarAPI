@@ -355,10 +355,10 @@ class LITCAL_MESSAGES {
             "it" => "La %s  <i>'%s'</i>, che di solito sarebbe celebrata il giorno <b>%s</b>, viene soppiantata dalla %s <i>'%s'</i> nell'anno %d.",
             "la" => "%s <i>'%s'</i> quo plerumque celebratur in die <b>%s</b> subplantata est ab %s <i>'%s'</i> in anno %d."
         ],
-        "The %s '%s' falls within the Lenten season in the year %d, rank reduced to Commemoration." => [
-            "en" => "The %s <i>'%s'</i> falls within the Lenten season in the year %d, rank reduced to Commemoration.",
-            "it" => "La %s <i>'%s'</i> cade nel periodo della Quaresima nell'anno %d, pertanto è stata ridotta di grado a Commemorazione.",
-            "la" => "Accidit %s <i>'%s'</i> in temporis Quadragesimæ in anno %d, ergo reductus est gradus ad Commemorationem."
+        "The %s '%s' either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration." => [
+            "en" => "The %s <i>'%s'</i> either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration.",
+            "it" => "La %s <i>'%s'</i> cade o tra il 17 Dic. e il 24 Dic., o durante l'Ottava di Natale, o tra le ferie della Quaresima nell'anno %d, pertanto il grado è stato ridotto a Commemorazione.",
+            "la" => "Accidit %s <i>'%s'</i> accidit aut infra 17 Dec. et 24 Dec. aut infra Octavam Nativitatis aut infra feriae Quadragesimae in anno %d, ergo reductus est gradus ad Commemorationem."
         ],
         "'%s' is superseded by the %s '%s' in the year %d." => [
             "en" => "<i>'%s'</i> is superseded by the %s <i>'%s'</i> in the year %d.",
@@ -375,11 +375,6 @@ class LITCAL_MESSAGES {
             "it" => "La %s <i>'%s'</i> è stata elevata al grado di %s dall'anno %d, applicabile pertanto all'anno %d (%s).",
             "la" => "%s <i>'%s'</i> elevata est in gradu %s ab anno %d, ergo applicatur ad anno %d (%s)."
         ],
-        "The %s '%s', added on %s since the year %d (%s), falls within the Lenten season in the year %d, rank reduced to Commemoration." => [
-            "en" => "The %s <i>'%s'</i>, added on <b>%s</b> since the year %d (%s), falls within the Lenten season in the year %d, rank reduced to Commemoration.",
-            "it" => "La %s <i>'%s'</i>, aggiunta il giorno <b>%s</b> a partire dall'anno %d (%s), cade nel periodo quaresimale nell'anno %d, pertanto è stata ridotta di grado a Commemorazione.",
-            "la" => "%s <i>'%s'</i> aggregata in die <b>%s</b> ab anno %d (%s) accidit in tempore Quadragesimæ in anno %d. Reducta est in gradu Commemorationis."
-        ],
         "In the year %d '%s' is superseded by the %s '%s', added on %s since the year %d (%s)." => [
             "en" => "In the year %d <i>'%s'</i> is superseded by the %s <i>'%s'</i>, added on <b>%s</b> since the year 2002 (%s).",
             "it" => "Nell'anno %d, <i>'%s'</i> è soppiantata dalla %s <i>'%s'</i>, aggiunta il giorno <b>%s</b> dall'anno %d (%s).",
@@ -389,16 +384,6 @@ class LITCAL_MESSAGES {
             "en" => "The %s <i>'%s'</i>, added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by the %s <i>'%s'</i> in the year %d.",
             "it" => "La %s <i>'%s'</i>, aggiunta nella Terza Edizione Tipica del Messale Romano dall'anno 2002 (%s) e celebrata solitamente il giorno %s, è soppressa dalla %s <i>'%s'</i> nell'anno %d.",
             "la" => "%s <i>'%s'</i> aggregata in Editione Typica Tertia Missalis Romani ab anno 2002 (%s) et plerumque celebrata in die %s subplantata est ab %s <i>'%s'</i> in anno %d."
-        ],
-        "The optional memorial '%s' either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration." => [
-            "en" => "The optional memorial <i>'%s'</i> either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration.",
-            "it" => "La memoria facoltativa <i>'%s'</i> cade o tra il 17 Dic. e il 24 Dic., o durante l'Ottava di Natale, o tra le ferie della Quaresima nell'anno %d, pertanto il grado è stato ridotto a Commemorazione.",
-            "la" => "Memoria ad libitum <i>'%s'</i> accidit aut infra 17 Dec. et 24 Dec. aut infra Octavam Nativitatis aut infra feriae Quadragesimae in anno %d, ergo reductus est gradus ad Commemorationem."
-        ],
-        "The optional memorial '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s), either falls between 17 Dec. and 24 Dec., during the Octave of Christmas, or on a weekday of the Lenten season in the year %d, rank reduced to Commemoration." => [
-            "en" => "The optional memorial <i>'%s'</i>, added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s), either falls between 17 Dec. and 24 Dec., during the Octave of Christmas, or on a weekday of the Lenten season in the year %d, rank reduced to Commemoration.",
-            "it" => "La memoria facoltativa <i>'%s'</i>, aggiunta nella Terza Edizione Tipica del Messale Romano dall'anno 2002 (%s), cade o tra il 17 Dic. e il 24 Dic., o durante l'Ottava di Natale, o tra le ferie della Quaresima nell'anno %d, il grado è stato pertanto ridotto a Commemorazione.",
-            "la" => "Memoria ad libitum <i>'%s'</i> aggregata in Editione Typica Tertia Missalis Romani ab anno 2002 (%s) accidit aut infra 17 Dec. et 24 Dec. aut infra Octavam Nativitatis aut infra feriae Quadragesimae in anno %d, ergo reductus est gradus ad Commemorationem."
         ],
         "The optional memorial '%s' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%s), applicable to the year %d." => [
             "en" => "The optional memorial <i>'%s'</i> has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%s), applicable to the year %d.",
