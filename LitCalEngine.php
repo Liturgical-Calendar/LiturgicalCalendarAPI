@@ -52,7 +52,7 @@ include_once( 'includes/enums/CacheDuration.php' );
 include_once( 'includes/enums/RequestMethod.php' );
 include_once( 'includes/enums/RequestContentType.php' );
 include_once( 'includes/enums/ReturnType.php' );
-include_once( 'includes/enums/RomanMissalEdition.php' );
+include_once( 'includes/enums/RomanMissal.php' );
 
 include_once( "includes/Festivity.php" );
 include_once( "includes/LitSettings.php" );
@@ -2249,8 +2249,10 @@ class LitCalEngine {
         // there isn't really anything different from preceding editions or from the 2008 edition
     }
 
-
-    private function makePatron( string $tag, string $nameSuffix, int $day, int $month, LitColor $color, string $EditionRomanMissal = ROMANMISSAL::EDITIO_TYPICA_1970 ) {
+    //TODO: check which edition of the Missale Romanum I have, if 1970, 1971, or 1975, seeing that the mysql table is based off of it
+    //that way I can be sure to associate the table with the correct version of the Missal...
+    //And find a way to get a hold of the other two editions...
+    private function makePatron( string $tag, string $nameSuffix, int $day, int $month, string $color, string $EditionRomanMissal = ROMANMISSAL::EDITIO_TYPICA_1970 ) {
         if( array_key_exists( $tag, $this->LitCal ) ) {
             $this->LitCal[$tag]->grade = LitGrade::FEAST;
             $this->LitCal[$tag]->name .= $nameSuffix;
@@ -2306,7 +2308,7 @@ class LitCalEngine {
         //then from 1999, Saint Catherine of Siena and Saint Edith Stein, elevated to Feast with title "compatrona d'Europa" added
         $this->makePatron( "StBenedict", ", patrono d'Europa", 11, 7, LitColor::WHITE );
         $this->makePatron( "StBridget", ", patrona d'Europa", 23, 7, LitColor::WHITE );
-        $this->makePatron( "StEdithStein", ", patrona d'Europa", 9, 8, LitColor::WHITE, ROMANMISSAL::USA_EDITION_2011 );
+        $this->makePatron( "StEdithStein", ", patrona d'Europa", 9, 8, LitColor::WHITE, ROMANMISSAL::EDITIO_TYPICA_TERTIA_2002 );
         $this->makePatron( "StsCyrilMethodius", ", patroni d'Europa", 14, 2, LitColor::WHITE );
 
         //In 1999, Pope John Paul II elevated Catherine of Siena from patron of Italy to patron of Europe
