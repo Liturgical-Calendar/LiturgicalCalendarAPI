@@ -306,21 +306,21 @@
                                 let $CSScolor = $possibleColors[0];
                                 let $textColor = ($CSScolor === 'white' || $CSScolor === 'pink' ? 'black' : 'white');
                                 let $festivityGrade = '';
-                                if ($festivity.hasOwnProperty('displaygrade') && $festivity.displaygrade !== '') {
-                                    $festivityGrade = $festivity.displaygrade + ', ';
+                                if ($festivity.hasOwnProperty('displayGrade') && $festivity.displayGrade !== '') {
+                                    $festivityGrade = $festivity.displayGrade + ', ';
                                 }
                                 else if (dy !== 7 || $festivity.grade > 3) {
                                     $festivityGrade = _G($festivity.grade) + ', ';
                                 }
 
-                                let $description = '<b>' + $festivity.name + '</b><br>' + $festivityGrade + '<i>' + _CC($festivity.color, true) + '</i><br><i style="font-size:.8em;">' + _C($festivity.common) + '</i>' + ($festivity.hasOwnProperty('liturgicalyear') ? '<br>' + $festivity.liturgicalyear : '');
+                                let $description = '<b>' + $festivity.name + '</b><br>' + $festivityGrade + '<i>' + _CC($festivity.color, true) + '</i><br><i style="font-size:.8em;">' + _C($festivity.common) + '</i>' + ($festivity.hasOwnProperty('liturgicalYear') ? '<br>' + $festivity.liturgicalYear : '');
                                 $events[$keyindex] = {
                                     title: $festivity.name,
                                     start: $festivity.date.getUTCFullYear() + '-' + pad($festivity.date.getUTCMonth() + 1) + '-' + pad($festivity.date.getUTCDate()),
                                     backgroundColor: $CSScolor,
                                     textColor: $textColor,
                                     description: $description,
-                                    idx: $festivity.eventidx
+                                    idx: $festivity.eventIdx
                                 };
 
                                 if ($keyindex === $LitCalKeys.length - 1) {

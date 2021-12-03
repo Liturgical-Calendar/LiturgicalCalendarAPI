@@ -90,9 +90,9 @@ class Festivity
     /**
      * @var string
      */
-    public $liturgicalyear;
+    public $liturgicalYear;
 
-    function __construct($name, $date, $color, $type, $grade = 0, $common = '', $liturgicalyear = null, $displayGrade)
+    function __construct($name, $date, $color, $type, $grade = 0, $common = '', $liturgicalYear = null, $displayGrade)
     {
         $this->name = (string) $name;
         $this->date = (object) DateTime::createFromFormat('U', $date, new DateTimeZone('UTC')); //
@@ -100,8 +100,8 @@ class Festivity
         $this->type = (string) $type;
         $this->grade = (int) $grade;
         $this->common = (string) $common;
-        if($liturgicalyear !== null){
-            $this->liturgicalyear = (string) $liturgicalyear;
+        if($liturgicalYear !== null){
+            $this->liturgicalYear = (string) $liturgicalYear;
         }
         $this->displayGrade = (string) $displayGrade;
     }
@@ -339,15 +339,14 @@ if ($YEAR >= 1970) {
     $dir_level = explode("/",dirname($path_info['dirname']));
     $URL =  $prefix . $domain . "/" . $dir_level[1] . "/LitCalEngine.php";
 
-    // Disable SSL verification
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     // Will return the response, if false it print the response
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     // Set the url
     curl_setopt($ch, CURLOPT_URL, $URL);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json']);
     // Set request method to POST
     curl_setopt($ch, CURLOPT_POST, 1);
-    // Define the POST field data    
+    // Define the POST field data
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(["year" => $YEAR, "epiphany" => $EPIPHANY, "ascension" => $ASCENSION, "corpuschristi" => $CORPUSCHRISTI, "locale" => $LOCALE]));
     // Execute
     $result = curl_exec($ch);
@@ -362,8 +361,8 @@ if ($YEAR >= 1970) {
             // the request did not complete as expected. common errors are 4xx
             // (not found, bad request, etc.) and 5xx (usually concerning
             // errors/exceptions in the remote script execution)
-
-            die("Request failed. HTTP status code: " . StatusCodes::getMessageForCode($resultStatus));
+            header('Content-Type: text/plain');
+            die("Request failed. HTTP status code: " . StatusCodes::getMessageForCode($resultStatus) . "\r\n\r\n$result");
         }
     }
 
@@ -386,7 +385,7 @@ if ($YEAR >= 1970) {
 
     foreach ($LitCal as $key => $value) {
         // retransform each entry from an associative array to a Festivity class object
-        $LitCal[$key] = new Festivity($LitCal[$key]["name"], $LitCal[$key]["date"], $LitCal[$key]["color"], $LitCal[$key]["type"], $LitCal[$key]["grade"], $LitCal[$key]["common"], (isset($LitCal[$key]["liturgicalyear"]) ? $LitCal[$key]["liturgicalyear"] : null), $LitCal[$key]["displaygrade"] );
+        $LitCal[$key] = new Festivity($LitCal[$key]["name"], $LitCal[$key]["date"], $LitCal[$key]["color"], $LitCal[$key]["type"], $LitCal[$key]["grade"], $LitCal[$key]["common"], (isset($LitCal[$key]["liturgicalYear"]) ? $LitCal[$key]["liturgicalYear"] : null), $LitCal[$key]["displayGrade"] );
     }
 }
 
@@ -953,7 +952,7 @@ $isStaging = (strpos(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),"-staging"
                         }
                         echo '<td rowspan="' . $rwsp . '" class="dateEntry">' . $dateString . '</td>';
                     }
-                    $currentCycle = property_exists($festivity, "liturgicalyear") && $festivity->liturgicalyear !== null && $festivity->liturgicalyear !== "" ? " (" . $festivity->liturgicalyear . ")" : "";
+                    $currentCycle = property_exists($festivity, "liturgicalYear") && $festivity->liturgicalYear !== null && $festivity->liturgicalYear !== "" ? " (" . $festivity->liturgicalYear . ")" : "";
                     echo '<td style="background-color:' . $CSScolor . ';' . (in_array($CSScolor, $highContrast) ? 'color:white;' : 'color:black;') . '">' . $festivity->name . $currentCycle . ' - <i>' . $festivityColorString . '</i><br /><i>' . $festivity->common . '</i></td>';
                     echo '<td style="background-color:' . $CSScolor . ';' . (in_array($CSScolor, $highContrast) ? 'color:white;' : 'color:black;') . '">' . ($keyname === 'AllSouls' ? __("COMMEMORATION",$LOCALE) : ($festivity->displayGrade !== "" ? $festivity->displayGrade : $GRADE[$festivity->grade] ) ) . '</td>';
                     echo '</tr>';
@@ -1033,7 +1032,7 @@ $isStaging = (strpos(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),"-staging"
                     $displayGrade = $GRADE[$festivity->grade];
                 }
                 echo '<td class="dateEntry">' . $dateString . '</td>';
-                $currentCycle = property_exists($festivity, "liturgicalyear") && $festivity->liturgicalyear !== null && $festivity->liturgicalyear !== "" ? " (" . $festivity->liturgicalyear . ")" : "";
+                $currentCycle = property_exists($festivity, "liturgicalYear") && $festivity->liturgicalYear !== null && $festivity->liturgicalYear !== "" ? " (" . $festivity->liturgicalYear . ")" : "";
                 echo '<td>' . $festivity->name . $currentCycle . ' - <i>' . $festivityColorString . '</i><br /><i>' . $festivity->common . '</i></td>';
                 echo '<td>' . $displayGrade . '</td>';
                 echo '</tr>';
