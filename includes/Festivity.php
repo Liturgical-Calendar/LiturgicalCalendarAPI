@@ -19,7 +19,7 @@ class Festivity implements JsonSerializable
     public string   $common;  //"Proper" or specified common(s) of saints...
 
     /** The following properties are not used in construction, they are only set externally */
-    public ?string  $liturgicalyear = null;
+    public ?string  $liturgicalYear = null;
     public ?bool    $isVigilMass    = null;
     public ?bool    $hasVigilMass   = null;
     public ?bool    $hasVesperI     = null;
@@ -47,8 +47,7 @@ class Festivity implements JsonSerializable
      * Tiene conto non soltanto del valore della data,
      * ma anche del grado della festa qualora ci fosse una concomitanza
      * * * * * * * * * * * * * * * * * * * * * * * * * */
-    public static function comp_date(Festivity $a, Festivity $b)
-    {
+    public static function comp_date(Festivity $a, Festivity $b) {
         if ( $a->date == $b->date ) {
             if ( $a->grade == $b->grade ) {
                 return 0;
@@ -61,17 +60,17 @@ class Festivity implements JsonSerializable
     /* Per trasformare i dati in JSON, dobbiamo indicare come trasformare soprattutto l'oggetto DateTime */
     public function jsonSerialize() {
         $returnArr = [
-            'eventidx'      => $this->idx,
+            'eventIdx'      => $this->idx,
             'name'          => $this->name,
             'date'          => $this->date->format('U'), //serialize the DateTime object as a PHP timestamp
             'color'         => $this->color,
             'type'          => $this->type,
             'grade'         => $this->grade,
-            'displaygrade'  => $this->displayGrade,
+            'displayGrade'  => $this->displayGrade,
             'common'        => $this->common
         ];
-        if ( $this->liturgicalyear !== null ) {
-            $returnArr['liturgicalyear']    = $this->liturgicalyear;
+        if ( $this->liturgicalYear !== null ) {
+            $returnArr['liturgicalYear']    = $this->liturgicalYear;
         }
         if ( $this->isVigilMass !== null ) {
             $returnArr['isVigilMass']       = $this->isVigilMass;
