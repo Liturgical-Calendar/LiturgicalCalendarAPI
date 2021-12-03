@@ -123,7 +123,7 @@ class LitCalEngine {
 
 
     private function setAllowedOriginHeader() {
-        if( count( $this->ALLOWED_ORIGINS) === 1 && $this->ALLOWED_ORIGINS[ 0 ] === "*" ) {
+        if( count( $this->ALLOWED_ORIGINS ) === 1 && $this->ALLOWED_ORIGINS[ 0 ] === "*" ) {
             header( 'Access-Control-Allow-Origin: *' );
         }
         elseif( isset( $this->REQUEST_HEADERS[ "Origin" ] ) && in_array( $this->REQUEST_HEADERS[ "Origin" ], $this->ALLOWED_ORIGINS ) ) {
