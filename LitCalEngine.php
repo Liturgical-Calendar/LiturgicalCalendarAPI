@@ -200,7 +200,7 @@ class LitCalEngine {
                     //Requests from browser windows using the address bar will probably have an Accept header of text/html
                     //In order to not be too drastic, let's treat text/html as though it were application/json
                     $acceptHeaders = explode( ",", $this->REQUEST_HEADERS["Accept"] );
-                    if( in_array( 'text/html', $acceptHeaders ) ) {
+                    if( in_array( 'text/html', $acceptHeaders ) || in_array( 'text/plain', $acceptHeaders ) || in_array( '*/*', $acceptHeaders ) ) {
                         $this->LITSETTINGS->RETURNTYPE = RETURN_TYPE::JSON;
                         $this->responseContentType = ACCEPT_HEADER::JSON;
                     } else {
