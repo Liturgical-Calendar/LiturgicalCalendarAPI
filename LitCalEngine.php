@@ -64,7 +64,9 @@ $LitCalEngine = new LitCalEngine();
 $LitCalEngine->setCacheDuration( CACHEDURATION::MONTH );
 $LitCalEngine->setAllowedOrigins( [
     "https://johnromanodorazio.com",
-    "https://www.johnromanodorazio.com"
+    "https://www.johnromanodorazio.com",
+    "https://litcal.johnromanodorazio.com",
+    "https://litcal-staging.johnromanodorazio.com"
 ] );
 $LitCalEngine->setAllowedAcceptHeaders( [ ACCEPT_HEADER::JSON, ACCEPT_HEADER::XML, ACCEPT_HEADER::ICS ] );
 $LitCalEngine->setAllowedParameterReturnTypes( [ RETURN_TYPE::JSON, RETURN_TYPE::XML, RETURN_TYPE::ICS ] );
