@@ -1,8 +1,8 @@
 <?php
 
-//ini_set('display_errors', 1);
-//ini_set('display_startup_errors', 1);
-//error_reporting(E_ALL);
+//ini_set( 'display_errors', 1 );
+//ini_set( 'display_startup_errors', 1 );
+//error_reporting( E_ALL );
 
 /** 
  *  CLASS FESTIVITY
@@ -50,28 +50,28 @@ class Festivity
     /**
      * @var string
      */
-    public $liturgicalyear;
+    public $liturgicalYear;
 
-    function __construct($name, $date, $color, $type, $grade = 0, $common = '', $liturgicalyear = null, $displayGrade)
+    function __construct( $name, $date, $color, $type, $grade = 0, $common = '', $liturgicalYear = null, $displayGrade )
     {
         $this->name = (string) $name;
-        $this->date = (object) DateTime::createFromFormat('U', $date, new DateTimeZone('UTC')); //
+        $this->date = (object) DateTime::createFromFormat( 'U', $date, new DateTimeZone( 'UTC' ) ); //
         $this->color = (string) $color;
         $this->type = (string) $type;
         $this->grade = (int) $grade;
         $this->common = (string) $common;
-        if($liturgicalyear !== null){
-            $this->liturgicalyear = (string) $liturgicalyear;
+        if( $liturgicalYear !== null ){
+            $this->liturgicalYear = (string) $liturgicalYear;
         }
         $this->displayGrade = (string) $displayGrade;
     }
 }
 
-function __($key,$locale=LITCAL_LOCALE){
+function __( $key, $locale=LITCAL_LOCALE ){
     global $MESSAGES;
-    $locale = strtolower($locale);
-    if(isset($MESSAGES[$key])){
-        if(isset($MESSAGES[$key][$locale])){
+    $locale = strtolower( $locale );
+    if( isset( $MESSAGES[$key] ) ){
+        if( isset( $MESSAGES[$key][$locale] ) ){
             return $MESSAGES[$key][$locale];
         }
         else{
@@ -83,36 +83,36 @@ function __($key,$locale=LITCAL_LOCALE){
 
 /**
  * Function _G
- * Returns a translated string with the Grade (Rank) of the Festivity
+ * Returns a translated string with the Grade ( Rank ) of the Festivity
  */
-function _G($key,$locale=LITCAL_LOCALE){
-    $locale = strtolower($locale);
+function _G( $key, $locale=LITCAL_LOCALE ){
+    $locale = strtolower( $locale );
     $key = (int)$key;
-    $grade = __("FERIA",$locale);
-    switch($key){
+    $grade = __( "FERIA", $locale );
+    switch( $key ){
         case 0: 
-            $grade = __("FERIA",$locale);
+            $grade = __( "FERIA", $locale );
         break;
         case 1: 
-            $grade = __("COMMEMORATION",$locale);
+            $grade = __( "COMMEMORATION", $locale );
         break;
         case 2: 
-            $grade = __("OPTIONAL MEMORIAL",$locale);
+            $grade = __( "OPTIONAL MEMORIAL", $locale );
         break;
         case 3: 
-            $grade = __("MEMORIAL",$locale);
+            $grade = __( "MEMORIAL", $locale );
         break;
         case 4: 
-            $grade = __("FEAST",$locale);
+            $grade = __( "FEAST", $locale );
         break;
         case 5: 
-            $grade = __("FEAST OF THE LORD",$locale);
+            $grade = __( "FEAST OF THE LORD", $locale );
         break;
         case 6: 
-            $grade = __("SOLEMNITY",$locale);
+            $grade = __( "SOLEMNITY", $locale );
         break;
         case 7: 
-            $grade = __("HIGHER RANKING SOLEMNITY",$locale);
+            $grade = __( "HIGHER RANKING SOLEMNITY", $locale );
         break;
     }
     return $grade;
@@ -122,39 +122,39 @@ function _G($key,$locale=LITCAL_LOCALE){
  * Function _C
  * Gets a translated human readable string with the Common or the Proper
  */
-function _C($common,$locale=LITCAL_LOCALE){
-    $locale = strtolower($locale);
-    if ($common !== "" && $common !== "Proper") {
-        $commons = explode(",", $common);
-        $commons = array_map(function ($txt) use ($locale) {
-            $commonArr = explode(":", $txt);
-            $commonGeneral = __($commonArr[0], $locale);
-            $commonSpecific = isset($commonArr[1]) && $commonArr[1] != "" ? __($commonArr[1], $locale) : "";
-            //$txt = str_replace(":", ": ", $txt);
-            switch ($commonGeneral) {
-                case __("Blessed Virgin Mary", $locale):
-                    $commonKey = "of (SING_FEMM)";
+function _C( $common, $locale=LITCAL_LOCALE ){
+    $locale = strtolower( $locale );
+    if ( $common !== "" && $common !== "Proper" ) {
+        $commons = explode( ",", $common );
+        $commons = array_map( function ( $txt ) use ( $locale ) {
+            $commonArr = explode( ":", $txt );
+            $commonGeneral = __( $commonArr[0], $locale );
+            $commonSpecific = isset( $commonArr[1] ) && $commonArr[1] != "" ? __( $commonArr[1], $locale ) : "";
+            //$txt = str_replace( ":", ": ", $txt );
+            switch ( $commonGeneral ) {
+                case __( "Blessed Virgin Mary", $locale ):
+                    $commonKey = "of ( SING_FEMM )";
                     break;
-                case __("Virgins", $locale):
-                    $commonKey = "of (PLUR_FEMM)";
+                case __( "Virgins", $locale ):
+                    $commonKey = "of ( PLUR_FEMM )";
                     break;
-                case __("Martyrs", $locale):
-                case __("Pastors", $locale):
-                case __("Doctors", $locale):
-                case __("Holy Men and Women", $locale):
-                    $commonKey = "of (PLUR_MASC)";
+                case __( "Martyrs", $locale ):
+                case __( "Pastors", $locale ):
+                case __( "Doctors", $locale ):
+                case __( "Holy Men and Women", $locale ):
+                    $commonKey = "of ( PLUR_MASC )";
                     break;
-                case __("Dedication of a Church", $locale):
-                    $commonKey = "of (SING_FEMM)";
+                case __( "Dedication of a Church", $locale ):
+                    $commonKey = "of ( SING_FEMM )";
                     break;
                 default:
-                    $commonKey = "of (SING_MASC)";
+                    $commonKey = "of ( SING_MASC )";
             }
-            return __("From the Common", $locale) . " " . __($commonKey, $locale) . " " . $commonGeneral . ($commonSpecific != "" ? ": " . $commonSpecific : "");
-        }, $commons);
-        $common = implode("; " . __("or", $locale) . " ", $commons);
-    } else if ($common == "Proper") {
-        $common = __("Proper", $locale);
+            return __( "From the Common", $locale ) . " " . __( $commonKey, $locale ) . " " . $commonGeneral . ( $commonSpecific != "" ? ": " . $commonSpecific : "" );
+        }, $commons );
+        $common = implode( "; " . __( "or", $locale ) . " ", $commons );
+    } else if ( $common == "Proper" ) {
+        $common = __( "Proper", $locale );
     }
     return $common;
 }
@@ -469,62 +469,62 @@ $MESSAGES = [
     ]
 ];
 
-$SUPPORTED_NATIONS = ["ITALY","USA"];
+$SUPPORTED_NATIONS = ["ITALY", "USA"];
 $SUPPORTED_DIOCESES = [];
 
-$LOCALE = isset($_GET["locale"]) ? strtoupper($_GET["locale"]) : null;
-$NATIONALPRESET = isset($_GET["nationalpreset"]) ? strtoupper($_GET["nationalpreset"]) : null;
-$DIOCESANPRESET = isset($_GET["diocesanpreset"]) ? strtoupper($_GET["diocesanpreset"]) : null;
-$TIMEZONE = isset($_GET["timezone"]) ? $_GET["timezone"] : null;
+$LOCALE = isset( $_GET["locale"] ) ? strtoupper( $_GET["locale"] ) : null;
+$NATIONALPRESET = isset( $_GET["nationalpreset"] ) ? strtoupper( $_GET["nationalpreset"] ) : null;
+$DIOCESANPRESET = isset( $_GET["diocesanpreset"] ) ? strtoupper( $_GET["diocesanpreset"] ) : null;
+$TIMEZONE = isset( $_GET["timezone"] ) ? $_GET["timezone"] : null;
 
 $prefix = $_SERVER['HTTPS'] ? 'https://' : 'http://';
 $domain = $_SERVER['HTTP_HOST'];
 $query = $_SERVER['PHP_SELF'];
-$dir_level = explode("/",$query);
+$dir_level = explode( "/", $query );
 $URL =  $prefix . $domain . "/" . $dir_level[1] . "/LitCalMetadata.php";
 
-//$logFile = fopen(__DIR__ . "/logs/AlexaSkill.log", 'a');
+//$logFile = fopen( __DIR__ . "/logs/AlexaSkill.log", 'a' );
 
-$ch = curl_init($URL);
+$ch = curl_init( $URL );
 // Disable SSL verification
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+//curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, false );
 // Will return the response, if false it print the response
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+//curl_setopt( $ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1 );
 // Execute
-$result = curl_exec($ch);
+$result = curl_exec( $ch );
 
-if (curl_errno($ch)) {
+if ( curl_errno( $ch ) ) {
     // this would be your first hint that something went wrong
-    die("Could not send request. Curl error: " . curl_error($ch));
+    die( "Could not send request. Curl error: " . curl_error( $ch ) );
 } else {
     // check the HTTP status code of the request
-    $resultStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    if ($resultStatus != 200) {
+    $resultStatus = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
+    if ( $resultStatus !== 200 ) {
         // the request did not complete as expected. common errors are 4xx
-        // (not found, bad request, etc.) and 5xx (usually concerning
-        // errors/exceptions in the remote script execution)
-        if($resultStatus == 412){
-            //the index.json file simply doesn't exist yet
+        // ( not found, bad request, etc. ) and 5xx ( usually concerning
+        // errors/exceptions in the remote script execution )
+        if( $resultStatus === 412 ){
+            die( "the index.json file simply doesn't exist yet" );
         } else {
-            die("Request failed. HTTP status code: " . $resultStatus);
+            die( "Request failed. HTTP status code: " . $resultStatus );
         }
     } else {
         //we have results from the metadata endpoint
-        $SUPPORTED_DIOCESES = json_decode($result,true);
+        $SUPPORTED_DIOCESES = json_decode( $result, true );
     }
 }
 
 // Closing
-curl_close($ch);
+curl_close( $ch );
 
 $queryArray = [];
-if($LOCALE !== null){
+if( $LOCALE !== null ){
     $queryArray["locale"] = $LOCALE;
 }
-if($NATIONALPRESET !== null && in_array($NATIONALPRESET,$SUPPORTED_NATIONS) ){
+if( $NATIONALPRESET !== null && in_array( $NATIONALPRESET, $SUPPORTED_NATIONS ) ) {
     $queryArray["nationalpreset"] = $NATIONALPRESET;
-    switch($NATIONALPRESET){
+    switch( $NATIONALPRESET ) {
         case "ITALY":
             $queryArray["locale"] = "IT";
         break;
@@ -533,10 +533,10 @@ if($NATIONALPRESET !== null && in_array($NATIONALPRESET,$SUPPORTED_NATIONS) ){
         break;
     }
 }
-if($DIOCESANPRESET !== null && array_key_exists($DIOCESANPRESET,$SUPPORTED_DIOCESES)){
+if( $DIOCESANPRESET !== null && array_key_exists( $DIOCESANPRESET, $SUPPORTED_DIOCESES ) ) {
     $queryArray["diocesanpreset"] = $DIOCESANPRESET;
     $queryArray["nationalpreset"] = $SUPPORTED_DIOCESES[$DIOCESANPRESET]["nation"];
-    switch($SUPPORTED_DIOCESES[$DIOCESANPRESET]["nation"]){
+    switch( $SUPPORTED_DIOCESES[$DIOCESANPRESET]["nation"] ) {
         case "ITALY":
             $queryArray["locale"] = "IT";
         break;
@@ -547,136 +547,145 @@ if($DIOCESANPRESET !== null && array_key_exists($DIOCESANPRESET,$SUPPORTED_DIOCE
 }
 
 //last resort is Latin for the Universal Calendar
-if(!isset($queryArray["locale"])){
+if( !isset( $queryArray["locale"] ) ) {
     $queryArray["locale"] = "LA";
 }
-define("LITCAL_LOCALE", $queryArray["locale"]);
+define( "LITCAL_LOCALE", $queryArray["locale"] );
 
-if($TIMEZONE == null){
-    ini_set('date.timezone', 'Europe/Vatican');
+if( $TIMEZONE === null ) {
+    ini_set( 'date.timezone', 'Europe/Vatican' );
 } else {
-    ini_set('date.timezone', $TIMEZONE);
+    ini_set( 'date.timezone', $TIMEZONE );
 }
-//ini_set('date.timezone', 'UTC');
-setlocale(LC_TIME, strtolower($queryArray["locale"]) . '_' . $queryArray["locale"]);
+//ini_set( 'date.timezone', 'UTC' );
+setlocale( LC_TIME, strtolower( $queryArray["locale"] ) . '_' . $queryArray["locale"] );
 
-$dateTimeToday = (new DateTime( 'now' ))->format("Y-m-d") . " 00:00:00";
-$dateToday = DateTime::createFromFormat('Y-m-d H:i:s', $dateTimeToday, new DateTimeZone('UTC') );
-$dateTodayTimestamp = $dateToday->format("U");
+$dateTimeToday = ( new DateTime( 'now' ) )->format( "Y-m-d" ) . " 00:00:00";
+$dateToday = DateTime::createFromFormat( 'Y-m-d H:i:s', $dateTimeToday, new DateTimeZone( 'UTC' ) );
+$dateTodayTimestamp = $dateToday->format( "U" );
 
-//fwrite($logFile, new DateTime( 'now' ))->format("Y-m-d H:i:s") . " " . print_r($queryArray, true) . " \n");
+//fwrite( $logFile, new DateTime( 'now' ) )->format( "Y-m-d H:i:s" ) . " " . print_r( $queryArray, true ) . " \n" );
 
 $prefix = $_SERVER['HTTPS'] ? 'https://' : 'http://';
 $domain = $_SERVER['HTTP_HOST'];
 $query = $_SERVER['PHP_SELF'];
 //echo $query . PHP_EOL;
-$dir_level = explode("/",$query);
+$dir_level = explode( "/", $query );
 $URL =  $prefix . $domain . "/" . $dir_level[1] . "/LitCalEngine.php";
 //echo $URL;
 
-//fwrite($logFile, $URL . "\n");
+//fwrite( $logFile, $URL . "\n" );
 
 $ch1 = curl_init();
 // Disable SSL verification
-curl_setopt($ch1, CURLOPT_SSL_VERIFYPEER, false);
+//curl_setopt( $ch1, CURLOPT_SSL_VERIFYPEER, false );
 // Will return the response, if false it print the response
-curl_setopt($ch1, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch1, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+curl_setopt( $ch1, CURLOPT_RETURNTRANSFER, true );
+//curl_setopt( $ch1, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1 );
 // Set the url
-curl_setopt($ch1, CURLOPT_URL, $URL);
+curl_setopt( $ch1, CURLOPT_URL, $URL );
 // Set request method to POST
-curl_setopt($ch1, CURLOPT_POST, 1);
-// Define the POST field data    
-curl_setopt($ch1, CURLOPT_POSTFIELDS, http_build_query($queryArray));
+curl_setopt( $ch1, CURLOPT_POST, 1 );
+// Define the POST field data
+curl_setopt( $ch1, CURLOPT_POSTFIELDS, http_build_query( $queryArray ) );
 // Execute
-$result = curl_exec($ch1);
+$result = curl_exec( $ch1 );
 
-if (curl_errno($ch1)) {
+if ( curl_errno( $ch1 ) ) {
     // this would be your first hint that something went wrong
-    //fwrite($logFile, curl_error($ch1) . "\n");
-    die("Could not send request. Curl error: " . curl_error($ch1));
+    //fwrite( $logFile, curl_error( $ch1 ) . "\n" );
+    die( "Could not send request. Curl error: " . curl_error( $ch1 ) );
 } else {
     // check the HTTP status code of the request
-    $resultStatus = curl_getinfo($ch1, CURLINFO_HTTP_CODE);
-    if ($resultStatus != 200) {
+    $resultStatus = curl_getinfo( $ch1, CURLINFO_HTTP_CODE );
+    if ( $resultStatus != 200 ) {
         // the request did not complete as expected. common errors are 4xx
-        // (not found, bad request, etc.) and 5xx (usually concerning
-        // errors/exceptions in the remote script execution)
-        //fwrite($logFile, "HTTP STATUS " . $resultStatus . "\n");
-        die("Request failed. HTTP status code: " . $resultStatus);
+        // ( not found, bad request, etc. ) and 5xx ( usually concerning
+        // errors/exceptions in the remote script execution )
+        //fwrite( $logFile, "HTTP STATUS " . $resultStatus . "\n" );
+        die( "Request failed. HTTP status code: " . $resultStatus );
     } else {
         //echo $result;
-        //fwrite($logFile, $result . "\n");
-        $LitCalData = json_decode($result, true); // decode as associative array rather than stdClass object
+        //fwrite( $logFile, $result . "\n" );
+        $LitCalData = json_decode( $result, true );
     }
 }
 
 // Closing
-curl_close($ch1);
+curl_close( $ch1 );
 
 // Gather the json results from the server into $LitCal array similar to the PHP Engine
-$LitCal = array();
-$LitCalFeed = array();
+$LitCal =       [];
+$LitCalFeed =   [];
 $idx = 0;
-$dateToday->add(new DateInterval('PT10M'));
-if(isset($LitCalData["LitCal"])) {
+$dateToday->add( new DateInterval( 'PT10M' ) );
+if( isset( $LitCalData["LitCal"] ) ) {
     $LitCal = $LitCalData["LitCal"];
-    foreach ($LitCal as $key => $value) {
-        //fwrite($logFile, "Processing litcal event $key..." . "\n");
-        if($LitCal[$key]["date"] === $dateTodayTimestamp){
-            //fwrite($logFile, "Found litcal event $key with timestamp equal to today!" . "\n");
-            $publishDate = $dateToday->sub(new DateInterval('PT1M'))->format("Y-m-d\TH:i:s\Z");
+    foreach ( $LitCal as $key => $value ) {
+        //fwrite( $logFile, "Processing litcal event $key..." . "\n" );
+        if( $LitCal[$key]["date"] === $dateTodayTimestamp ) {
+            //fwrite( $logFile, "Found litcal event $key with timestamp equal to today!" . "\n" );
+            $publishDate = $dateToday->sub( new DateInterval( 'PT1M' ) )->format( "Y-m-d\TH:i:s\Z" );
             // retransform each entry from an associative array to a Festivity class object
-            $LitCal[$key] = new Festivity($LitCal[$key]["name"], $LitCal[$key]["date"], $LitCal[$key]["color"], $LitCal[$key]["type"], $LitCal[$key]["grade"], $LitCal[$key]["common"], (isset($LitCal[$key]["liturgicalyear"]) ? $LitCal[$key]["liturgicalyear"] : null), $LitCal[$key]["displaygrade"] );
-            if($LitCal[$key]->grade === 0){
-                //fwrite($logFile, "we are dealing with a weekday event" . "\n");
-                $mainText = __("Today is") . " " . $LitCal[$key]->name . ".";
+            $LitCal[$key] = new Festivity(
+                $LitCal[$key]["name"],
+                $LitCal[$key]["date"],
+                $LitCal[$key]["color"],
+                $LitCal[$key]["type"],
+                $LitCal[$key]["grade"],
+                $LitCal[$key]["common"],
+                ( isset( $LitCal[$key]["liturgicalYear"] ) ? $LitCal[$key]["liturgicalYear"] : null ),
+                $LitCal[$key]["displayGrade"]
+            );
+            if( $LitCal[$key]->grade === 0 ){
+                //fwrite( $logFile, "we are dealing with a weekday event" . "\n" );
+                $mainText = __( "Today is" ) . " " . $LitCal[$key]->name . ".";
             } else{ 
-                if(strpos($LitCal[$key]->name,"Vigil")){
-                    //fwrite($logFile, "we are dealing with a Vigil Mass" . "\n");
-                    $mainText = sprintf(__("This evening there will be a Vigil Mass for the %s %s."),_G($LitCal[$key]->grade),trim(str_replace(__("Vigil Mass"),"",$LitCal[$key]->name)));
-                } else if($LitCal[$key]->grade < 7) {
-                    //fwrite($logFile, "we are dealing with something greater than a weekday but less than a higher ranking solemnity" . "\n");
+                if( strpos( $LitCal[$key]->name, "Vigil" ) ){
+                    //fwrite( $logFile, "we are dealing with a Vigil Mass" . "\n" );
+                    $mainText = sprintf( __( "This evening there will be a Vigil Mass for the %s %s." ), _G( $LitCal[$key]->grade ), trim( str_replace( __( "Vigil Mass" ), "", $LitCal[$key]->name ) ) );
+                } else if( $LitCal[$key]->grade < 7 ) {
+                    //fwrite( $logFile, "we are dealing with something greater than a weekday but less than a higher ranking solemnity" . "\n" );
 
-                    if($LitCal[$key]->displayGrade != ""){
-                        $mainText = sprintf(__("Today is %s the %s of %s."),($idx > 0 ? __("also") : ""),$LitCal[$key]->displayGrade,$LitCal[$key]->name);
+                    if( $LitCal[$key]->displayGrade != "" ){
+                        $mainText = sprintf( __( "Today is %s the %s of %s." ), ( $idx > 0 ? __( "also" ) : "" ), $LitCal[$key]->displayGrade, $LitCal[$key]->name );
                     } else {
-                        if($LitCal[$key]->grade == 5){
-                            $mainText = sprintf(__("Today is %s the %s, %s."),($idx > 0 ? __("also") : ""),_G($LitCal[$key]->grade),$LitCal[$key]->name);
+                        if( $LitCal[$key]->grade == 5 ){
+                            $mainText = sprintf( __( "Today is %s the %s, %s." ), ( $idx > 0 ? __( "also" ) : "" ), _G( $LitCal[$key]->grade ), $LitCal[$key]->name );
                         } else {
-                            $mainText = sprintf(__("Today is %s the %s of %s."),($idx > 0 ? __("also") : ""),_G($LitCal[$key]->grade),$LitCal[$key]->name);
+                            $mainText = sprintf( __( "Today is %s the %s of %s." ), ( $idx > 0 ? __( "also" ) : "" ), _G( $LitCal[$key]->grade ), $LitCal[$key]->name );
                         }
                     }
                     
-                    if($LitCal[$key]->grade < 4 && $LitCal[$key]->common != "Proper"){
-                        //fwrite($logFile, "we are dealing with something less than a Feast, and which has a common" . "\n");
-                        $mainText = $mainText . " " . _C($LitCal[$key]->common);
+                    if( $LitCal[$key]->grade < 4 && $LitCal[$key]->common != "Proper" ){
+                        //fwrite( $logFile, "we are dealing with something less than a Feast, and which has a common" . "\n" );
+                        $mainText = $mainText . " " . _C( $LitCal[$key]->common );
                     }
                 } else {
-                    $mainText = sprintf(__("Today is %s the %s."),($idx > 0 ? __("also") : ""),$LitCal[$key]->name);
+                    $mainText = sprintf( __( "Today is %s the %s." ), ( $idx > 0 ? __( "also" ) : "" ), $LitCal[$key]->name );
                 }
             }
-            //fwrite($logFile, "mainText = $mainText" . "\n");
+            //fwrite( $logFile, "mainText = $mainText" . "\n" );
             $LitCalFeed[] = new stdClass();
-            $LitCalFeed[count($LitCalFeed)-1]->uid = "urn:uuid:" . md5("LITCAL-" . $key . '-' . $LitCal[$key]->date->format('Y'));
-            $LitCalFeed[count($LitCalFeed)-1]->updateDate = $publishDate;
-            $LitCalFeed[count($LitCalFeed)-1]->titleText = "Liturgy of the Day " . $LitCal[$key]->date->format('F jS');
-            $LitCalFeed[count($LitCalFeed)-1]->mainText = $mainText;
-            $LitCalFeed[count($LitCalFeed)-1]->redirectionUrl = "https://johnromanodorazio.com/LiturgicalCalendar/";
+            $LitCalFeed[count( $LitCalFeed )-1]->uid = "urn:uuid:" . md5( "LITCAL-" . $key . '-' . $LitCal[$key]->date->format( 'Y' ) );
+            $LitCalFeed[count( $LitCalFeed )-1]->updateDate = $publishDate;
+            $LitCalFeed[count( $LitCalFeed )-1]->titleText = "Liturgy of the Day " . $LitCal[$key]->date->format( 'F jS' );
+            $LitCalFeed[count( $LitCalFeed )-1]->mainText = $mainText;
+            $LitCalFeed[count( $LitCalFeed )-1]->redirectionUrl = "https://johnromanodorazio.com/LiturgicalCalendar/";
             ++$idx;
         }
     }
 
-    header('Content-Type: application/json');
-    if(count($LitCalFeed) === 1){
-        echo json_encode($LitCalFeed[0]);
-    } else if(count($LitCalFeed) > 1){
-        echo json_encode($LitCalFeed);
+    header( 'Content-Type: application/json' );
+    if( count( $LitCalFeed ) === 1 ){
+        echo json_encode( $LitCalFeed[0] );
+    } else if( count( $LitCalFeed ) > 1 ){
+        echo json_encode( $LitCalFeed );
     }
     
 }
-//fwrite($logFile,"--------\n");
-//fclose($logFile);
+//fwrite( $logFile, "--------\n" );
+//fclose( $logFile );
 die();
 
 ?>
