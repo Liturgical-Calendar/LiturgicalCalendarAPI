@@ -60,7 +60,7 @@ include_once( "includes/LitCalFunctions.php" );
 include_once( "includes/LitCalMessages.php" );
 
 
-$LitCalEngine = new LitCalEngine( );
+$LitCalEngine = new LitCalEngine();
 $LitCalEngine->setCacheDuration( CACHEDURATION::MONTH );
 $LitCalEngine->setAllowedOrigins( [
     "https://johnromanodorazio.com",
@@ -70,7 +70,7 @@ $LitCalEngine->setAllowedAcceptHeaders( [ ACCEPT_HEADER::JSON, ACCEPT_HEADER::XM
 $LitCalEngine->setAllowedParameterReturnTypes( [ RETURN_TYPE::JSON, RETURN_TYPE::XML, RETURN_TYPE::ICS ] );
 $LitCalEngine->setAllowedRequestMethods( [ REQUEST_METHOD::GET, REQUEST_METHOD::POST ] );
 $LitCalEngine->setAllowedRequestContentTypes( [ REQUEST_CONTENT_TYPE::JSON, REQUEST_CONTENT_TYPE::FORMDATA ] );
-$LitCalEngine->Init( );
+$LitCalEngine->Init();
 
 class LitCalEngine {
 
@@ -110,19 +110,19 @@ class LitCalEngine {
     private string $BaptismLordFmt;
     private string $BaptismLordMod;
 
-    public function __construct( ){
+    public function __construct(){
         $this->CACHEDURATION                        = "_" . CACHEDURATION::MONTH . date( "m" );
         $this->ALLOWED_ORIGINS                      = [ "*" ];
         $this->ALLOWED_ACCEPT_HEADERS               = ACCEPT_HEADER::$values;
         $this->ALLOWED_RETURN_TYPES                 = RETURN_TYPE::$values;
         $this->ALLOWED_REQUEST_METHODS              = REQUEST_METHOD::$values;
         $this->ALLOWED_REQUEST_CONTENT_TYPES        = REQUEST_CONTENT_TYPE::$values;
-        $this->REQUEST_HEADERS                      = getallheaders( );
+        $this->REQUEST_HEADERS                      = getallheaders();
         $this->jsonEncodedRequestHeaders            = json_encode( $this->REQUEST_HEADERS );
     }
 
 
-    private function setAllowedOriginHeader( ) {
+    private function setAllowedOriginHeader() {
         if( count( $this->ALLOWED_ORIGINS) === 1 && $this->ALLOWED_ORIGINS[ 0 ] === "*" ) {
             header( 'Access-Control-Allow-Origin: *' );
         }
@@ -136,7 +136,7 @@ class LitCalEngine {
         header( 'Access-Control-Max-Age: 86400' );    // cache for 1 day
     }
 
-    private static function setAccessControlAllowMethods( ) {
+    private static function setAccessControlAllowMethods() {
         if ( isset( $_SERVER[ 'REQUEST_METHOD' ] ) ) {
             if ( isset( $_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_METHOD' ] ) )
                 header( "Access-Control-Allow-Methods: GET, POST" );
@@ -145,23 +145,23 @@ class LitCalEngine {
         }
     }
 
-    private function validateRequestContentType( ) {
+    private function validateRequestContentType() {
         if( isset( $_SERVER[ 'CONTENT_TYPE' ] ) && $_SERVER[ 'CONTENT_TYPE' ] !== '' && !in_array( explode( ';', $_SERVER[ 'CONTENT_TYPE' ] )[ 0 ], $this->ALLOWED_REQUEST_CONTENT_TYPES ) ){
             header( $_SERVER[ "SERVER_PROTOCOL" ]." 415 Unsupported Media Type", true, 415 );
             die( '{"error":"You seem to be forming a strange kind of request? Allowed Content Types are '.implode( ' and ', $this->ALLOWED_REQUEST_CONTENT_TYPES ).', but your Content Type was '.$_SERVER[ 'CONTENT_TYPE' ].'"}' );
         }
     }
 
-    private function initParameterData( ) {
+    private function initParameterData() {
         if ( isset( $_SERVER[ 'CONTENT_TYPE' ] ) && $_SERVER[ 'CONTENT_TYPE' ] === 'application/json' ) {
             $json = file_get_contents( 'php://input' );
             $data = json_decode( $json, true );
             if( NULL === $json || "" === $json ){
                 header( $_SERVER[ "SERVER_PROTOCOL" ]." 400 Bad Request", true, 400 );
                 die( '{"error":"No JSON data received in the request: <' . $json . '>"' );
-            } else if ( json_last_error( ) !== JSON_ERROR_NONE ) {
+            } else if ( json_last_error() !== JSON_ERROR_NONE ) {
                 header( $_SERVER[ "SERVER_PROTOCOL" ]." 400 Bad Request", true, 400 );
-                die( '{"error":"Malformed JSON data received in the request: <' . $json . '>, ' . json_last_error_msg( ) . '"}' );
+                die( '{"error":"Malformed JSON data received in the request: <' . $json . '>, ' . json_last_error_msg() . '"}' );
             } else {
                 $this->LITSETTINGS = new LITSETTINGS( $data );
             }
@@ -219,7 +219,7 @@ class LitCalEngine {
         }
     }
 
-    private function setReponseContentTypeHeader( ) {
+    private function setReponseContentTypeHeader() {
         header( "Content-Type: {$this->responseContentType}; charset=utf-8" );
         if( $this->responseContentType === ACCEPT_HEADER::ICS ){
             header( 'Content-Disposition: attachment; filename="LiturgicalCalendar.ics"' );
@@ -227,7 +227,7 @@ class LitCalEngine {
     }
 
 
-    private function loadLocalCalendarData( ) : void {
+    private function loadLocalCalendarData() : void {
         if( $this->LITSETTINGS->DIOCESAN !== null ){
             //since a Diocesan calendar is being requested, we need to retrieve the JSON data
             //first we need to discover the path, so let's retrieve our index file
@@ -267,7 +267,7 @@ class LitCalEngine {
         }
     }
 
-    private function cacheFileIsAvailable( ) {
+    private function cacheFileIsAvailable() : bool {
         $cacheFilePath = "engineCache/v" . str_replace( ".", "_", self::API_VERSION ) . "/";
         $cacheFileName = md5( serialize( $this->LITSETTINGS) ) . $this->CACHEDURATION . "." . strtolower( $this->LITSETTINGS->RETURNTYPE );
         $this->CACHEFILE = $cacheFilePath . $cacheFileName;
@@ -277,13 +277,13 @@ class LitCalEngine {
     /**
      * INITIATE CONNECTION TO THE DATABASE
      * AND CHECK FOR CONNECTION ERRORS
-     * THE DATABASECONNECT( ) FUNCTION IS DEFINED IN LITCALFUNCTIONS.PHP
+     * THE DATABASECONNECT() FUNCTION IS DEFINED IN LITCALFUNCTIONS.PHP
      * WHICH IN TURN LOADS DATABASE CONNECTION INFORMATION FROM LITCALCONFIG.PHP
      * IF THE CONNECTION SUCCEEDS, THE FUNCTION WILL RETURN THE MYSQLI CONNECTION RESOURCE
      * IN THE MYSQLI PROPERTY OF THE RETURNED OBJECT
      */
-    private function initiateDbConnection( ) : bool {
-        $dbConnect = LitCalFf::databaseConnect( );
+    private function initiateDbConnection() : bool {
+        $dbConnect = LitCalFf::databaseConnect();
         if ( $dbConnect->retString != "" && preg_match( "/^Connected to MySQL Database:/", $dbConnect->retString ) == 0 ) {
             die( '{"error": "There was an error while connecting to the database: ' . $dbConnect->retString . '"}' );
         } else {
@@ -293,7 +293,7 @@ class LitCalEngine {
         return false;
     }
 
-    private function createNumberFormatters( ) : void {
+    private function createNumberFormatters() : void {
         //ini_set( 'intl.default_locale', strtolower( $this->LITSETTINGS->LOCALE ) . '_' . $this->LITSETTINGS->LOCALE );
         setlocale( LC_TIME, strtolower( $this->LITSETTINGS->LOCALE ) . '_' . $this->LITSETTINGS->LOCALE );
         $this->formatter = new NumberFormatter( strtolower( $this->LITSETTINGS->LOCALE ), NumberFormatter::SPELLOUT );
@@ -309,16 +309,16 @@ class LitCalEngine {
         }
     }
 
-    private function dieIfBeforeMinYear( ) : void {
+    private function dieIfBeforeMinYear() : void {
         //for the time being, we cannot accept a year any earlier than 1970, since this engine is based on the liturgical reform from Vatican II
         //with the Prima Editio Typica of the Roman Missal and the General Norms promulgated with the Motu Proprio "Mysterii Paschali" in 1969
         if ( $this->LITSETTINGS->YEAR < 1970 ) {
             $this->Messages[ ] = sprintf( LITCAL_MESSAGES::__( "Only years from 1970 and after are supported. You tried requesting the year %d.", $this->LITSETTINGS->LOCALE ), $this->LITSETTINGS->YEAR );
-            $this->GenerateResponseToRequest( );
+            $this->GenerateResponseToRequest();
         }
     }
 
-    private function retrieveHigherSolemnityTranslations( ) : void {
+    private function retrieveHigherSolemnityTranslations() : void {
         /**
          * Retrieve Higher Ranking Solemnities from Proprium de Tempore
          */
@@ -330,7 +330,7 @@ class LitCalEngine {
         }
     }
 
-    private function calculateEasterTriduum( ) : void {
+    private function calculateEasterTriduum() : void {
         $this->LitCal[ "HolyThurs" ]        = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "HolyThurs" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],    LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->sub( new DateInterval( 'P3D' ) ), LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
         $this->LitCal[ "GoodFri" ]          = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "GoodFri" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],      LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->sub( new DateInterval( 'P2D' ) ), LitColor::RED,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
         $this->LitCal[ "EasterVigil" ]      = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "EasterVigil" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],  LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->sub( new DateInterval( 'P1D' ) ), LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
@@ -342,7 +342,7 @@ class LitCalEngine {
         $this->SOLEMNITIES[ "Easter" ]      = $this->LitCal[ "Easter" ]->date;
     }
 
-    private function calculateChristmasEpiphany( ) : void {
+    private function calculateChristmasEpiphany() : void {
         $this->LitCal[ "Christmas" ]        = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "Christmas" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],    DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) ), LitColor::WHITE, LitFeastType::FIXED,  LitGrade::HIGHER_SOLEMNITY );
         $this->SOLEMNITIES[ "Christmas" ]   = $this->LitCal[ "Christmas" ]->date;
 
@@ -413,7 +413,7 @@ class LitCalEngine {
 
     }
 
-    private function calculateAscensionPentecost( ) : void {
+    private function calculateAscensionPentecost() : void {
 
         if ( $this->LITSETTINGS->ASCENSION === ASCENSION::THURSDAY ) {
             $this->LitCal[ "Ascension" ]  = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "Ascension" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],    LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P39D' ) ),           LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
@@ -428,7 +428,7 @@ class LitCalEngine {
 
     }
 
-    private function calculateSundaysMajorSeasons( ) : void {
+    private function calculateSundaysMajorSeasons() : void {
         $this->LitCal[ "Advent1" ]        = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "Advent1" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],      DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 3 * 7 ) . 'D' ) ),    LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
         $this->LitCal[ "Advent2" ]        = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "Advent2" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],      DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 2 * 7 ) . 'D' ) ),    LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
         $this->LitCal[ "Advent3" ]        = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "Advent3" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],      DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P7D' ) ),            LitColor::PINK,     LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
@@ -507,12 +507,12 @@ class LitCalEngine {
 
     }
 
-    private function calculateAshWednesday( ) : void {
+    private function calculateAshWednesday() : void {
         $this->LitCal[ "AshWednesday" ]           = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "AshWednesday" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->sub( new DateInterval( 'P46D' ) ),           LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
         $this->SOLEMNITIES[ "AshWednesday" ]      = $this->LitCal[ "AshWednesday" ]->date;
     }
 
-    private function calculateWeekdaysHolyWeek( ) : void {
+    private function calculateWeekdaysHolyWeek() : void {
         //Weekdays of Holy Week from Monday to Thursday inclusive ( that is, thursday morning chrism mass... the In Coena Domini mass begins the Easter Triduum )
         $this->LitCal[ "MonHolyWeek" ]      = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "MonHolyWeek" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->sub( new DateInterval( 'P6D' ) ),            LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
         $this->LitCal[ "TueHolyWeek" ]      = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "TueHolyWeek" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->sub( new DateInterval( 'P5D' ) ),            LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
@@ -522,7 +522,7 @@ class LitCalEngine {
         $this->SOLEMNITIES[ "WedHolyWeek" ]         = $this->LitCal[ "WedHolyWeek" ]->date;
     }
 
-    private function calculateEasterOctave( ) : void {
+    private function calculateEasterOctave() : void {
         //Days within the octave of Easter
         $this->LitCal[ "MonOctaveEaster" ]  = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "MonOctaveEaster" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P1D' ) ),            LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
         $this->LitCal[ "TueOctaveEaster" ]  = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "TueOctaveEaster" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P2D' ) ),            LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
@@ -539,7 +539,7 @@ class LitCalEngine {
         $this->SOLEMNITIES[ "SatOctaveEaster" ] = $this->LitCal[ "SatOctaveEaster" ]->date;
     }
 
-    private function calculateMobileSolemnitiesOfTheLord( ) : void {
+    private function calculateMobileSolemnitiesOfTheLord() : void {
         $this->LitCal[ "SacredHeart" ]      = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "SacredHeart" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],    LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P' . ( 7 * 9 + 5 ) . 'D' ) ),  LitColor::RED,      LitFeastType::MOBILE, LitGrade::SOLEMNITY );
         $this->SOLEMNITIES[ "SacredHeart" ] = $this->LitCal[ "SacredHeart" ]->date;
 
@@ -548,7 +548,7 @@ class LitCalEngine {
         $this->SOLEMNITIES[ "ChristKing" ]  = $this->LitCal[ "ChristKing" ]->date;
     }
 
-    private function calculateFixedSolemnities( ) : void {
+    private function calculateFixedSolemnities() : void {
         //even though Mary Mother of God is a fixed date solemnity, however it is found in the Proprium de Tempore and not in the Proprium de Sanctis
         $this->LitCal[ "MotherGod" ]        = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "MotherGod" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], DateTime::createFromFormat( '!j-n-Y', '1-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) ),      LitColor::WHITE,    LitFeastType::FIXED, LitGrade::SOLEMNITY );
         $this->SOLEMNITIES[ "MotherGod" ]   = $this->LitCal[ "MotherGod" ]->date;
@@ -713,7 +713,7 @@ class LitCalEngine {
 
     }
 
-    private function calculateFeastsOfTheLord( ) : void {
+    private function calculateFeastsOfTheLord() : void {
         //Baptism of the Lord is celebrated the Sunday after Epiphany, for exceptions see immediately below...
         $this->BaptismLordFmt = '6-1-' . $this->LITSETTINGS->YEAR;
         $this->BaptismLordMod = 'next Sunday';
@@ -764,7 +764,7 @@ class LitCalEngine {
 
     }
 
-    private function calculateSundaysChristmasOrdinaryTime( ) : void {
+    private function calculateSundaysChristmasOrdinaryTime() : void {
         //If a fixed date Solemnity occurs on a Sunday of Ordinary Time or on a Sunday of Christmas, the Solemnity is celebrated in place of the Sunday. ( e.g., Birth of John the Baptist, 1990 )
         //If a fixed date Feast of the Lord occurs on a Sunday in Ordinary Time, the feast is celebrated in place of the Sunday
 
@@ -823,7 +823,7 @@ class LitCalEngine {
 
     }
 
-    private function calculateFeastsMarySaints( ) : void {
+    private function calculateFeastsMarySaints() : void {
         //We will look up Feasts from the MySQL table of festivities of the General Roman Calendar
         //First we get the Calendarium Romanum Generale from the Missale Romanum Editio Typica 1970
         $result = $this->mysqli->query( "SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = " . LitGrade::FEAST );
@@ -870,7 +870,7 @@ class LitCalEngine {
 
     }
 
-    private function calculateWeekdaysAdvent( ) : void {
+    private function calculateWeekdaysAdvent() : void {
         //  Here we are calculating all weekdays of Advent, but we are giving a certain importance to the weekdays of Advent from 17 Dec. to 24 Dec.
         //  ( the same will be true of the Octave of Christmas and weekdays of Lent )
         //  on which days obligatory memorials can only be celebrated in partial form
@@ -900,7 +900,7 @@ class LitCalEngine {
         }
     }
 
-    private function calculateWeekdaysChristmasOctave( ) : void {
+    private function calculateWeekdaysChristmasOctave() : void {
         $weekdayChristmas = DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
         $weekdayChristmasCnt = 1;
         while ( $weekdayChristmas >= $this->LitCal[ "Christmas" ]->date && $weekdayChristmas < DateTime::createFromFormat( '!j-n-Y', '31-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) ) ) {
@@ -916,7 +916,7 @@ class LitCalEngine {
         }
     }
 
-    private function calculateWeekdaysLent( ) : void {
+    private function calculateWeekdaysLent() : void {
 
         //Day of the Month of Ash Wednesday
         $DoMAshWednesday = $this->LitCal[ "AshWednesday" ]->date->format( 'j' );
@@ -976,7 +976,7 @@ class LitCalEngine {
 
     }
 
-    private function calculateMemorials( ) : void {
+    private function calculateMemorials() : void {
 
         $ImmaculateHeart_date = LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P' . ( 7 * 9 + 6 ) . 'D' ) );
         if ( !in_array( $ImmaculateHeart_date, $this->SOLEMNITIES ) && !in_array( $ImmaculateHeart_date, $this->FEASTS_MEMORIALS) ) {
@@ -1093,7 +1093,7 @@ class LitCalEngine {
 
     }
 
-    private function applyDoctorDecree1998( ) : void {
+    private function applyDoctorDecree1998() : void {
 
         if( array_key_exists( "StThereseChildJesus", $this->LitCal ) ){
             $etDoctor = '';
@@ -1113,7 +1113,7 @@ class LitCalEngine {
 
     }
 
-    private function applyFeastDecree2016( ) : void {
+    private function applyFeastDecree2016() : void {
 
         //MARYMAGDALEN: With the decree Apostolorum Apostola ( June 3rd 2016 ), the Congregation for Divine Worship
         //with the approval of Pope Francis elevated the memorial of Saint Mary Magdalen to a Feast
@@ -1142,7 +1142,7 @@ class LitCalEngine {
     24 novembris:  Ss. Andreæ Dung-Lac, presbyteri, et sociorum, martyrum.
     source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html
     */
-    private function applyMemorialsTertiaEditioTypica2002( ) : void {
+    private function applyMemorialsTertiaEditioTypica2002() : void {
         $result = $this->mysqli->query( "SELECT * FROM LITURGY__calendar_propriumdesanctis_2002 WHERE GRADE = " . LitGrade::MEMORIAL );
         if ( $result ) {
             while ( $row = mysqli_fetch_assoc( $result ) ) {
@@ -1209,7 +1209,7 @@ class LitCalEngine {
 
     }
 
-    private function applyMemorialsTertiaEditioTypicaEmendata2008( ) : void {
+    private function applyMemorialsTertiaEditioTypicaEmendata2008() : void {
 
         //Saint Pio of Pietrelcina "Padre Pio" was canonized on June 16 2002, so did not make it for the Calendar of the 2002 editio typica III
         //The memorial was added in the 2008 editio typica III emendata as an obligatory memorial
@@ -1264,7 +1264,7 @@ class LitCalEngine {
 
     }
 
-    private function applyMemorialDecree2018( ) : void {
+    private function applyMemorialDecree2018() : void {
         //With the Decree of the Congregation of Divine Worship on March 24, 2018,
         //the Obligatory Memorial of the Blessed Virgin Mary, Mother of the Church was added on the Monday after Pentecost
         //http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20180211_decreto-mater-ecclesiae_la.html
@@ -1340,7 +1340,7 @@ class LitCalEngine {
     //With the Decree of the Congregation for Divine Worship on January 26, 2021,
     //the Memorial of Saint Martha on July 29th will now be of Mary, Martha and Lazarus
     //http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_la.html
-    private function applyMemorialDecree2021( ) : void {
+    private function applyMemorialDecree2021() : void {
         if( array_key_exists( "StMartha", $this->LitCal ) ){
             $StMartha_tag = [ "LA" => "Sanctorum Marthæ, Mariæ et Lazari", "IT" => "Santi Marta, Maria e Lazzaro", "EN" => "Saints Martha, Mary and Lazarus" ];
             $this->LitCal[ "StMartha" ]->name = $StMartha_tag[ $this->LITSETTINGS->LOCALE ];
@@ -1348,7 +1348,7 @@ class LitCalEngine {
 
     }
 
-    private function calculateOptionalMemorials( ) : void {
+    private function calculateOptionalMemorials() : void {
         $result = $this->mysqli->query( "SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE GRADE = " . LitGrade::MEMORIAL_OPT );
         if ( $result ) {
             while ( $row = mysqli_fetch_assoc( $result ) ) {
@@ -1414,7 +1414,7 @@ class LitCalEngine {
         25 novembris:  S. Catharinæ Alexandrinæ, virginis et martyris
         source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html
         */
-    private function applyOptionalMemorialsTertiaEditioTypica2002( ) : void {
+    private function applyOptionalMemorialsTertiaEditioTypica2002() : void {
 
         $result = $this->mysqli->query( "SELECT * FROM LITURGY__calendar_propriumdesanctis_2002 WHERE GRADE = " . LitGrade::MEMORIAL_OPT );
         if ( $result ) {
@@ -1547,7 +1547,7 @@ class LitCalEngine {
 
     }
 
-    private function applyOptionalMemorialsTertiaEditioTypicaEmendata2008( ) : void {
+    private function applyOptionalMemorialsTertiaEditioTypicaEmendata2008() : void {
 
         //Saint Juan Diego was canonized in 2002, so did not make it to the Tertia Editio Typica 2002
         //The optional memorial was added in the Tertia Editio Typica emendata in 2008,
@@ -1654,7 +1654,7 @@ class LitCalEngine {
     //with decree of Jan 25 2008 the Congregation for Divine Worship gave faculty to the single churches
     //to celebrate the Conversion of St. Paul anyways. So let's re-insert it as an optional memorial?
     //http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_la.html
-    private function applyOptionalMemorialDecree2009( ) : void {
+    private function applyOptionalMemorialDecree2009() : void {
 
         if( !array_key_exists( "ConversionStPaul", $this->LitCal ) ){
             $result = $this->mysqli->query( "SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'ConversionStPaul'" );
@@ -1676,7 +1676,7 @@ class LitCalEngine {
     //inserted the optional memorials for each in the Universal Calendar
     //on October 11 and October 22 respectively
     //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_la.html
-    private function applyOptionalMemorialDecree2014( ) : void {
+    private function applyOptionalMemorialDecree2014() : void {
         $StJohnXXIII_tag = array( "LA" => "S. Ioannis XXIII, papæ", "IT" => "San Giovanni XXIII, papa", "EN" => "Saint John XXIII, pope" );
         $StJohnXXIII_date = DateTime::createFromFormat( '!j-n-Y', '11-10-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
         if( !in_array( $StJohnXXIII_date, $this->SOLEMNITIES) && !in_array( $StJohnXXIII_date, $this->FEASTS_MEMORIALS) ){
@@ -1775,7 +1775,7 @@ class LitCalEngine {
 
     }
 
-    private function applyOptionalMemorialDecree2019( ) : void {
+    private function applyOptionalMemorialDecree2019() : void {
         //With the Decree of the Congregation of Divine Worship of Oct 7, 2019,
         //the optional memorial of the Blessed Virgin Mary of Loreto was added on Dec 10
         //http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_la.html
@@ -1882,7 +1882,7 @@ class LitCalEngine {
 
     //With the Decree of the Congregation of Divine Worship of May 20, 2020, the optional memorial of St. Faustina was added on Oct 5
     //http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_la.html
-    private function applyOptionalMemorialDecree2020( ) : void {
+    private function applyOptionalMemorialDecree2020() : void {
         $StFaustina_tag = [ "LA" => "Sanctæ Faustinæ Kowalska", "IT" => "Santa Faustina Kowalska", "EN" => "Saint Faustina Kowalska" ];
         $StFaustina_date = DateTime::createFromFormat( '!j-n-Y', '5-10-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
         if( !in_array( $StFaustina_date, $this->SOLEMNITIES) && !in_array( $StFaustina_date, $this->FEASTS_MEMORIALS) ){
@@ -1933,7 +1933,7 @@ class LitCalEngine {
 
     }
 
-    private function applyOptionalMemorialDecree2021( ) {
+    private function applyOptionalMemorialDecree2021() {
 
         //With the Decree of the Congregation for Divine Worship on January 25, 2021,
         //the optional memorials of Gregory of Narek, John of Avila, and Hildegard of Bingen were added to the universal roman calendar
@@ -2092,7 +2092,7 @@ class LitCalEngine {
     //First we'll find the first Saturday of the year ( to do this we actually have to find the last Saturday of the previous year,
     // so that our cycle using "next Saturday" logic will actually start from the first Saturday of the year ),
     // and then continue for every next Saturday until we reach the last Saturday of the year
-    private function calculateSaturdayMemorialBVM( ) : void {
+    private function calculateSaturdayMemorialBVM() : void {
         $currentSaturday = new DateTime( "previous Saturday January {$this->LITSETTINGS->YEAR}",new DateTimeZone( 'UTC' ) );
         $lastSatDT = new DateTime( "last Saturday December {$this->LITSETTINGS->YEAR}",new DateTimeZone( 'UTC' ) );
         $SatMemBVM_cnt = 0;
@@ -2108,7 +2108,7 @@ class LitCalEngine {
     //13. Weekdays of Advent up until Dec. 16 included ( already calculated and defined together with weekdays 17 Dec. - 24 Dec. )
     //    Weekdays of Christmas season from 2 Jan. until the Saturday after Epiphany
     //    Weekdays of the Easter season, from the Monday after the Octave of Easter to the Saturday before Pentecost
-    private function calculateWeekdaysMajorSeasons( ) : void {
+    private function calculateWeekdaysMajorSeasons() : void {
 
         $DoMEaster = $this->LitCal[ "Easter" ]->date->format( 'j' );      //day of the month of Easter
         $MonthEaster = $this->LitCal[ "Easter" ]->date->format( 'n' );    //month of Easter
@@ -2135,7 +2135,7 @@ class LitCalEngine {
     }
 
     //    Weekdays of Ordinary time
-    private function calculateWeekdaysOrdinaryTime( ) : void {
+    private function calculateWeekdaysOrdinaryTime() : void {
 
         //In the first part of the year, weekdays of ordinary time begin the day after the Baptism of the Lord
         $FirstWeekdaysLowerLimit = $this->LitCal[ "BaptismLord" ]->date;
@@ -2193,14 +2193,14 @@ class LitCalEngine {
 
     }
 
-    private function applyCalendarItaly( ) : void {
-        $this->applyPatronSaintsEurope( );
-        $this->applyPatronSaintsItaly( );
+    private function applyCalendarItaly() : void {
+        $this->applyPatronSaintsEurope();
+        $this->applyPatronSaintsItaly();
         if( $this->LITSETTINGS->YEAR >= 1983 && $this->LITSETTINGS->YEAR < 2002 ){
             //The extra liturgical events found in the 1983 edition of the Roman Missal in Italian,
             //were then incorporated into the Latin edition in 2002 ( effectively being incorporated into the General Roman Calendar )
             //so when dealing with Italy, we only need to add them from 1983 until 2002, after which it's taken care of by the General Calendar
-            $this->applyMessaleRomano1983( );
+            $this->applyMessaleRomano1983();
         }
 
         //The Sanctorale in the 2020 edition is based on the Latin 2008 Edition,
@@ -2257,7 +2257,7 @@ class LitCalEngine {
 
     //Insert or elevate the Patron Saints of Europe
     //TODO: this method should work for all languages of European countries
-    private function applyPatronSaintsEurope( ) : void {
+    private function applyPatronSaintsEurope() : void {
 
         //Saint Benedict, Saint Bridget, and Saint Cyril and Methodius elevated to Feast, with title "patrono/i d'Europa" added
         //then from 1999, Saint Catherine of Siena and Saint Edith Stein, elevated to Feast with title "compatrona d'Europa" added
@@ -2274,7 +2274,7 @@ class LitCalEngine {
     }
 
     //Insert or elevate the Patron Saints of Italy
-    private function applyPatronSaintsItaly( ) : void {
+    private function applyPatronSaintsItaly() : void {
 
         if ( $this->LITSETTINGS->YEAR < 1999 ) {
             //We only have to deal with years before 1999, because from 1999
@@ -2286,7 +2286,7 @@ class LitCalEngine {
 
     }
 
-    private function applyMessaleRomano1983( ) : void {
+    private function applyMessaleRomano1983() : void {
 
         $result = $this->mysqli->query( "SELECT * FROM LITURGY__ITALY_calendar_propriumdesanctis_1983" );
         if ( $result ) {
@@ -2309,7 +2309,7 @@ class LitCalEngine {
 
     }
 
-    private function applyCalendarUSA( ) : void {
+    private function applyCalendarUSA() : void {
 
         //The Solemnity of the Immaculate Conception is the Patronal FeastDay of the United States of America
         if( array_key_exists( "ImmaculateConception", $this->LitCal ) ){
@@ -2484,7 +2484,7 @@ class LitCalEngine {
     //CYCLE THROUGH ALL EVENTS CREATED AND CALCULATE THE YEARLY LITURGICAL CYCLE, WHETHER FESTIVE ( A,B,C ) OR WEEKDAY ( I,II )
     //This property will only be set if we're dealing with a Sunday, a Solemnity, a Feast of the Lord, or a weekday
     //In all other cases it is not needed because there aren't choices of liturgical texts
-    private function setCyclesAndVigils( ) : void {
+    private function setCyclesAndVigils() : void {
         $SUNDAY_CYCLE = [ "A", "B", "C" ];
         $WEEKDAY_CYCLE = [ "I", "II" ];
         foreach( $this->LitCal as $key => $festivity ){
@@ -2659,7 +2659,7 @@ class LitCalEngine {
 
     }
 
-    private function applyDiocesanCalendar( ) {
+    private function applyDiocesanCalendar() {
 
         foreach( $this->DiocesanData->LitCal as $key => $obj ) {
             if( is_array( $obj->color ) ) {
@@ -2699,10 +2699,10 @@ class LitCalEngine {
 
     }
 
-    private function getGithubReleaseInfo( ) : stdClass {
-        $returnObj = new stdClass( );
+    private function getGithubReleaseInfo() : stdClass {
+        $returnObj = new stdClass();
         $GithubReleasesAPI = "https://api.github.com/repos/JohnRDOrazio/LiturgicalCalendar/releases/latest";
-        $ch = curl_init( );
+        $ch = curl_init();
         curl_setopt( $ch, CURLOPT_URL, $GithubReleasesAPI );
         curl_setopt( $ch, CURLOPT_USERAGENT, 'LiturgicalCalendar' );
         curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
@@ -2715,9 +2715,9 @@ class LitCalEngine {
         curl_close( $ch );
 
         $GitHubReleasesObj = json_decode( $currentVersionForDownload );
-        if( json_last_error( ) !== JSON_ERROR_NONE ){
+        if( json_last_error() !== JSON_ERROR_NONE ){
             $returnObj->status = "error";
-            $returnObj->message = json_last_error_msg( );
+            $returnObj->message = json_last_error_msg();
         } else {
             $returnObj->status = "success";
             $returnObj->obj = $GitHubReleasesObj;
@@ -2806,11 +2806,11 @@ class LitCalEngine {
 
     }
 
-    private function generateResponse( ) {
+    private function generateResponse() {
 
-        $SerializeableLitCal                          = new stdClass( );
-        $SerializeableLitCal->Settings                = new stdClass( );
-        $SerializeableLitCal->Metadata                = new stdClass( );
+        $SerializeableLitCal                          = new stdClass();
+        $SerializeableLitCal->Settings                = new stdClass();
+        $SerializeableLitCal->Metadata                = new stdClass();
 
         //$this->LitCal variable is an associative array, who's keys are a string that identifies the event created ( ex. ImmaculateConception )
         //So in order to sort by date we have to be sure to maintain the association with the proper key, uasort allows us to do this
@@ -2851,11 +2851,11 @@ class LitCalEngine {
                 $jsonObj = json_decode( $jsonStr, true );
                 $xml = new SimpleXMLElement ( "<?xml version=\"1.0\" encoding=\"UTF-8\"?" . "><LiturgicalCalendar xmlns=\"https://www.bibleget.io/catholicliturgy\"/>" );
                 LitCalFf::convertArray2XML( $jsonObj, $xml );
-                file_put_contents( $this->CACHEFILE, $xml->asXML( ) );
-                print $xml->asXML( );
+                file_put_contents( $this->CACHEFILE, $xml->asXML() );
+                print $xml->asXML();
                 break;
             case RETURN_TYPE::ICS:
-                $infoObj = $this->getGithubReleaseInfo( );
+                $infoObj = $this->getGithubReleaseInfo();
                 if( $infoObj->status === "success" ) {
                     $ical = $this->produceIcal( $SerializeableLitCal, $infoObj );
                     file_put_contents( $this->CACHEFILE, $ical );
@@ -2870,7 +2870,7 @@ class LitCalEngine {
                 echo json_encode( $SerializeableLitCal );
                 break;
         }
-        die( );
+        die();
     }
 
 
@@ -2912,28 +2912,28 @@ class LitCalEngine {
     }
 
     /**
-     * The LitCalEngine will only work once you call the public Init( ) method
+     * The LitCalEngine will only work once you call the public Init() method
      * Do not change the order of the methods that follow,
      * each one can depend on the one before it in order to function correctly!
      */
-    public function Init( ){
-        $this->setAllowedOriginHeader( );
-        $this->setAccessControlAllowMethods( );
-        $this->validateRequestContentType( );
-        $this->initParameterData( );
-        $this->setReponseContentTypeHeader( );
-        $this->loadLocalCalendarData( );
-        if( $this->cacheFileIsAvailable( ) ){
+    public function Init(){
+        $this->setAllowedOriginHeader();
+        $this->setAccessControlAllowMethods();
+        $this->validateRequestContentType();
+        $this->initParameterData();
+        $this->setReponseContentTypeHeader();
+        $this->loadLocalCalendarData();
+        if( $this->cacheFileIsAvailable() ){
             //If we already have done the calculation
             //and stored the results in a cache file
             //then we're done, just output this and die
             echo file_get_contents( $this->CACHEFILE );
-            die( );
+            die();
         } else {
-            $this->initiateDbConnection( );
-            $this->createNumberFormatters( );
-            $this->dieIfBeforeMinYear( );
-            $this->retrieveHigherSolemnityTranslations( );
+            $this->initiateDbConnection();
+            $this->createNumberFormatters();
+            $this->dieIfBeforeMinYear();
+            $this->retrieveHigherSolemnityTranslations();
             /**
              *  CALCULATE LITURGICAL EVENTS BASED ON THE ORDER OF PRECEDENCE OF LITURGICAL DAYS ( LY 59 )
              *  General Norms for the Liturgical Year and the Calendar ( issued on Feb. 14 1969 )
@@ -2941,29 +2941,29 @@ class LitCalEngine {
 
             //I.
             //1. Easter Triduum of the Lord's Passion and Resurrection
-            $this->calculateEasterTriduum( );
+            $this->calculateEasterTriduum();
             //2. Christmas, Epiphany, Ascension, and Pentecost
-            $this->calculateChristmasEpiphany( );
-            $this->calculateAscensionPentecost( );
+            $this->calculateChristmasEpiphany();
+            $this->calculateAscensionPentecost();
             //Sundays of Advent, Lent, and Easter Time
-            $this->calculateSundaysMajorSeasons( );
-            $this->calculateAshWednesday( );
-            $this->calculateWeekdaysHolyWeek( );
-            $this->calculateEasterOctave( );
+            $this->calculateSundaysMajorSeasons();
+            $this->calculateAshWednesday();
+            $this->calculateWeekdaysHolyWeek();
+            $this->calculateEasterOctave();
             //3. Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar
-            $this->calculateMobileSolemnitiesOfTheLord( );
-            $this->calculateFixedSolemnities( ); //this will also handle All Souls Day
+            $this->calculateMobileSolemnitiesOfTheLord();
+            $this->calculateFixedSolemnities(); //this will also handle All Souls Day
 
             //4. PROPER SOLEMNITIES:
             //these will be dealt with later when loading Local Calendar Data
 
             //II.
             //5. FEASTS OF THE LORD IN THE GENERAL CALENDAR
-            $this->calculateFeastsOfTheLord( );
+            $this->calculateFeastsOfTheLord();
             //6. SUNDAYS OF CHRISTMAS TIME AND SUNDAYS IN ORDINARY TIME
-            $this->calculateSundaysChristmasOrdinaryTime( );
+            $this->calculateSundaysChristmasOrdinaryTime();
             //7. FEASTS OF THE BLESSED VIRGIN MARY AND OF THE SAINTS IN THE GENERAL CALENDAR
-            $this->calculateFeastsMarySaints( );
+            $this->calculateFeastsMarySaints();
 
             //8. PROPER FEASTS:
             //a ) feast of the principal patron of the Diocese - for pastoral reasons can be celebrated as a solemnity ( PC 8, 9 )
@@ -2975,41 +2975,41 @@ class LitCalEngine {
             //these will be dealt with later when loading Local Calendar Data
 
             //9. WEEKDAYS of ADVENT FROM 17 DECEMBER TO 24 DECEMBER INCLUSIVE
-            $this->calculateWeekdaysAdvent( );
+            $this->calculateWeekdaysAdvent();
             //WEEKDAYS of the Octave of Christmas
-            $this->calculateWeekdaysChristmasOctave( );
+            $this->calculateWeekdaysChristmasOctave();
             //WEEKDAYS of LENT
-            $this->calculateWeekdaysLent( );
+            $this->calculateWeekdaysLent();
             //III.
             //10. Obligatory memorials in the General Calendar
-            $this->calculateMemorials( );
+            $this->calculateMemorials();
 
             if ( $this->LITSETTINGS->YEAR >= 1998 ) {
                 //St Therese of the Child Jesus was proclaimed a Doctor of the Church in 1998
-                $this->applyDoctorDecree1998( );
+                $this->applyDoctorDecree1998();
             }
 
             if ( $this->LITSETTINGS->YEAR >= 2002 ) {
-                $this->applyMemorialsTertiaEditioTypica2002( );
+                $this->applyMemorialsTertiaEditioTypica2002();
             }
 
             if( $this->LITSETTINGS->YEAR >= 2008 ) {
-                $this->applyMemorialsTertiaEditioTypicaEmendata2008( );
+                $this->applyMemorialsTertiaEditioTypicaEmendata2008();
             }
 
             if ( $this->LITSETTINGS->YEAR >= 2016 ) {
                 //Memorial of Saint Mary Magdalen elevated to a Feast
-                $this->applyFeastDecree2016( );
+                $this->applyFeastDecree2016();
             }
 
             if( $this->LITSETTINGS->YEAR >= 2018 ) {
                 //Memorial of the Blessed Virgin Mary, Mother of the Church added on the Monday after Pentecost
-                $this->applyMemorialDecree2018( );
+                $this->applyMemorialDecree2018();
             }
 
             if( $this->LITSETTINGS->YEAR >= 2021 ) {
                 //Memorial of St Martha becomes Martha, Mary and Lazarus
-                $this->applyMemorialDecree2021( );
+                $this->applyMemorialDecree2021();
             }
 
             //11. Proper obligatory memorials, and that is:
@@ -3021,63 +3021,63 @@ class LitCalEngine {
             //  which however can be celebrated even in those days listed at n. 9,
             //  in the special manner described by the General Instructions of the Roman Missal and of the Liturgy of the Hours ( cf pp. 26-27, n. 10 )
 
-            $this->calculateOptionalMemorials( );
+            $this->calculateOptionalMemorials();
 
             if ( $this->LITSETTINGS->YEAR >= 2002 ) {
-                $this->applyOptionalMemorialsTertiaEditioTypica2002( );
+                $this->applyOptionalMemorialsTertiaEditioTypica2002();
             }
 
             if ( $this->LITSETTINGS->YEAR >= 2008 ) {
-                $this->applyOptionalMemorialsTertiaEditioTypicaEmendata2008( );
+                $this->applyOptionalMemorialsTertiaEditioTypicaEmendata2008();
             }
 
             if( $this->LITSETTINGS->YEAR === 2009 ) {
                 //Conversion of St. Paul falls on a Sunday in the year 2009
                 //Faculty to celebrate as optional memorial
-                $this->applyOptionalMemorialDecree2009( );
+                $this->applyOptionalMemorialDecree2009();
             }
 
             if( $this->LITSETTINGS->YEAR >= 2014 ) {
                 //canonization of Pope Saint John XXIII and Pope Saint John Paul II
-                $this->applyOptionalMemorialDecree2014( );
+                $this->applyOptionalMemorialDecree2014();
             }
 
             if( $this->LITSETTINGS->YEAR >= 2019 ) {
                 //optional memorial of the Blessed Virgin Mary of Loreto
                 //and optional memorial Saint Paul VI, Pope
-                $this->applyOptionalMemorialDecree2019( );
+                $this->applyOptionalMemorialDecree2019();
             }
 
             if( $this->LITSETTINGS->YEAR >= 2020 ){
                 //optional memorial Saint Faustina
-                $this->applyOptionalMemorialDecree2020( );
+                $this->applyOptionalMemorialDecree2020();
             }
 
             if( $this->LITSETTINGS->YEAR >= 2021 ){
                 //optional memorials of Gregory of Narek, John of Avila and Hildegard of Bingen
-                $this->applyOptionalMemorialDecree2021( );
+                $this->applyOptionalMemorialDecree2021();
             }
 
             //13. Weekdays of Advent up until Dec. 16 included ( already calculated and defined together with weekdays 17 Dec. - 24 Dec. )
             //    Weekdays of Christmas season from 2 Jan. until the Saturday after Epiphany
             //    Weekdays of the Easter season, from the Monday after the Octave of Easter to the Saturday before Pentecost
             //    Weekdays of Ordinary time
-            $this->calculateWeekdaysMajorSeasons( );
-            $this->calculateWeekdaysOrdinaryTime( );
+            $this->calculateWeekdaysMajorSeasons();
+            $this->calculateWeekdaysOrdinaryTime();
 
             //15. On Saturdays in Ordinary Time when there is no obligatory memorial, an optional memorial of the Blessed Virgin Mary is allowed.
-            $this->calculateSaturdayMemorialBVM( );
+            $this->calculateSaturdayMemorialBVM();
 
             //APPLY NATIONAL CALENDARS IF REQUESTED
             if( $this->LITSETTINGS->NATIONAL !== null ) {
                 switch( $this->LITSETTINGS->NATIONAL ){
                     case 'ITALY':
-                        $this->applyCalendarItaly( );
+                        $this->applyCalendarItaly();
                         break;
                     case 'USA':
                         //I don't have any data before 2011. Are there any official printed Missals before that?
                         if( $this->LITSETTINGS->YEAR >= 2011 ) {
-                            $this->applyCalendarUSA( );
+                            $this->applyCalendarUSA();
                         }
                         break;
                 }
@@ -3085,14 +3085,14 @@ class LitCalEngine {
 
             if( $this->LITSETTINGS->DIOCESAN !== null && $this->DiocesanData !== null ) {
 
-                $this->applyDiocesanCalendar( );
+                $this->applyDiocesanCalendar();
 
             }
 
             //Set Weekly ( YEAR A, B, C ) and Daily ( YEAR I, II ) cycles for each event created
             //Set Vigil Masses if applicable
-            $this->setCyclesAndVigils( );
-            $this->generateResponse( );
+            $this->setCyclesAndVigils();
+            $this->generateResponse();
         }
     }
 
