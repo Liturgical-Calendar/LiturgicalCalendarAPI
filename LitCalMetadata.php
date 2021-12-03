@@ -13,7 +13,7 @@ header( 'Content-Type: application/json' );
 if( file_exists( 'nations/index.json' ) ) {
     echo file_get_contents( 'nations/index.json' );
 } else {
-    http_response_code(412);
+    http_response_code(404);
 }
 die();
 ?>
