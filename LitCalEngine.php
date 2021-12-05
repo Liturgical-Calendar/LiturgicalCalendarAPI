@@ -2459,20 +2459,7 @@ class LitCalEngine {
                                         $this->LITSETTINGS->YEAR
                                     );
                                 }
-                                else if( $festivity->grade > $coincidingFestivity->grade ){
-                                    $festivity->hasVigilMass = true;
-                                    $festivity->hasVesperI = true;
-                                    $coincidingFestivity->hasVesperII = false;
-                                    $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                        LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass.", $this->LITSETTINGS->LOCALE ),
-                                        $festivityGrade,
-                                        $festivity->name,
-                                        $coincidingFestivity_grade,
-                                        $coincidingFestivity->name,
-                                        $this->LITSETTINGS->YEAR
-                                    );
-                                }
-                                else if( in_array( $key, $this->SOLEMNITIES_LORD_BVM ) && !in_array( $coincidingFestivityKey, $this->SOLEMNITIES_LORD_BVM ) ){
+                                else if( $festivity->grade > $coincidingFestivity->grade || ( in_array( $key, $this->SOLEMNITIES_LORD_BVM ) && !in_array( $coincidingFestivityKey, $this->SOLEMNITIES_LORD_BVM ) ) ){
                                     $festivity->hasVigilMass = true;
                                     $festivity->hasVesperI = true;
                                     $coincidingFestivity->hasVesperII = false;
