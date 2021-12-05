@@ -52,8 +52,9 @@ include_once( 'includes/enums/CacheDuration.php' );
 include_once( 'includes/enums/RequestMethod.php' );
 include_once( 'includes/enums/RequestContentType.php' );
 include_once( 'includes/enums/ReturnType.php' );
-include_once( 'includes/enums/RomanMissal.php' );
+include_once( 'includes/APICore.php' );
 
+include_once( 'includes/enums/RomanMissal.php' );
 include_once( "includes/Festivity.php" );
 include_once( "includes/LitSettings.php" );
 include_once( "includes/LitCalFunctions.php" );
@@ -61,44 +62,34 @@ include_once( "includes/LitCalMessages.php" );
 
 
 $LitCalEngine = new LitCalEngine();
-$LitCalEngine->setCacheDuration( CACHEDURATION::MONTH );
-$LitCalEngine->setAllowedOrigins( [
+$LitCalEngine->APICore->setAllowedOrigins( [
     "https://johnromanodorazio.com",
     "https://www.johnromanodorazio.com",
     "https://litcal.johnromanodorazio.com",
     "https://litcal-staging.johnromanodorazio.com"
 ] );
-$LitCalEngine->setAllowedAcceptHeaders( [ ACCEPT_HEADER::JSON, ACCEPT_HEADER::XML, ACCEPT_HEADER::ICS ] );
-$LitCalEngine->setAllowedParameterReturnTypes( [ RETURN_TYPE::JSON, RETURN_TYPE::XML, RETURN_TYPE::ICS ] );
-$LitCalEngine->setAllowedRequestMethods( [ REQUEST_METHOD::GET, REQUEST_METHOD::POST ] );
-$LitCalEngine->setAllowedRequestContentTypes( [ REQUEST_CONTENT_TYPE::JSON, REQUEST_CONTENT_TYPE::FORMDATA ] );
+$LitCalEngine->APICore->setAllowedRequestMethods( [ REQUEST_METHOD::GET, REQUEST_METHOD::POST ] );
+$LitCalEngine->APICore->setAllowedRequestContentTypes( [ REQUEST_CONTENT_TYPE::JSON, REQUEST_CONTENT_TYPE::FORMDATA ] );
+$LitCalEngine->APICore->setAllowedAcceptHeaders( [ ACCEPT_HEADER::JSON, ACCEPT_HEADER::XML, ACCEPT_HEADER::ICS ] );
+$LitCalEngine->setAllowedReturnTypes( [ RETURN_TYPE::JSON, RETURN_TYPE::XML, RETURN_TYPE::ICS ] );
+$LitCalEngine->setCacheDuration( CACHEDURATION::MONTH );
 $LitCalEngine->Init();
 
 class LitCalEngine {
 
     const API_VERSION                               = '3.0';
-
+    public APICore $APICore;
 
     private string $CACHEDURATION                   = "";
     private string $CACHEFILE                       = "";
-    private array $ALLOWED_ORIGINS;
-    private array $ALLOWED_ACCEPT_HEADERS;
     private array $ALLOWED_RETURN_TYPES;
-    private array $ALLOWED_REQUEST_METHODS;
-    private array $ALLOWED_REQUEST_CONTENT_TYPES;
-    private array $REQUEST_HEADERS;
     private LITSETTINGS $LITSETTINGS;
     private mysqli $mysqli;
-
-    private string $jsonEncodedRequestHeaders       = "";
-    private string $responseContentType             = ACCEPT_HEADER::JSON;
-    //private bool $isAjax                          = false;
 
     private ?object $DiocesanData                   = null;
     private ?object $GeneralIndex                   = null;
     private NumberFormatter $formatter;
     private NumberFormatter $formatterFem;
-
 
     private array $PROPRIUM_DE_TEMPORE              = [];
     private array $SOLEMNITIES                      = [];
@@ -113,49 +104,12 @@ class LitCalEngine {
     private string $BaptismLordMod;
 
     public function __construct(){
+        $this->APICore                              = new APICore();
         $this->CACHEDURATION                        = "_" . CACHEDURATION::MONTH . date( "m" );
-        $this->ALLOWED_ORIGINS                      = [ "*" ];
-        $this->ALLOWED_ACCEPT_HEADERS               = ACCEPT_HEADER::$values;
-        $this->ALLOWED_RETURN_TYPES                 = RETURN_TYPE::$values;
-        $this->ALLOWED_REQUEST_METHODS              = REQUEST_METHOD::$values;
-        $this->ALLOWED_REQUEST_CONTENT_TYPES        = REQUEST_CONTENT_TYPE::$values;
-        $this->REQUEST_HEADERS                      = getallheaders();
-        $this->jsonEncodedRequestHeaders            = json_encode( $this->REQUEST_HEADERS );
-    }
-
-
-    private function setAllowedOriginHeader() {
-        if( count( $this->ALLOWED_ORIGINS ) === 1 && $this->ALLOWED_ORIGINS[ 0 ] === "*" ) {
-            header( 'Access-Control-Allow-Origin: *' );
-        }
-        elseif( isset( $this->REQUEST_HEADERS[ "Origin" ] ) && in_array( $this->REQUEST_HEADERS[ "Origin" ], $this->ALLOWED_ORIGINS ) ) {
-            header( 'Access-Control-Allow-Origin: ' . $this->REQUEST_HEADERS[ "Origin" ] );
-        }
-        else {
-            header( 'Access-Control-Allow-Origin: https://www.vatican.va' );
-        }
-        header( 'Access-Control-Allow-Credentials: true' );
-        header( 'Access-Control-Max-Age: 86400' );    // cache for 1 day
-    }
-
-    private function setAccessControlAllowMethods() {
-        if ( isset( $_SERVER[ 'REQUEST_METHOD' ] ) ) {
-            if ( isset( $_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_METHOD' ] ) )
-                header( "Access-Control-Allow-Methods: " . implode(',', $this->ALLOWED_REQUEST_METHODS) );
-            if ( isset( $_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' ] ) )
-                header( "Access-Control-Allow-Headers: {$_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' ]}" );
-        }
-    }
-
-    private function validateRequestContentType() {
-        if( isset( $_SERVER[ 'CONTENT_TYPE' ] ) && $_SERVER[ 'CONTENT_TYPE' ] !== '' && !in_array( explode( ';', $_SERVER[ 'CONTENT_TYPE' ] )[ 0 ], $this->ALLOWED_REQUEST_CONTENT_TYPES ) ){
-            header( $_SERVER[ "SERVER_PROTOCOL" ]." 415 Unsupported Media Type", true, 415 );
-            die( '{"error":"You seem to be forming a strange kind of request? Allowed Content Types are '.implode( ' and ', $this->ALLOWED_REQUEST_CONTENT_TYPES ).', but your Content Type was '.$_SERVER[ 'CONTENT_TYPE' ].'"}' );
-        }
     }
 
     private function initParameterData() {
-        if ( isset( $_SERVER[ 'CONTENT_TYPE' ] ) && $_SERVER[ 'CONTENT_TYPE' ] === 'application/json' ) {
+        if ( $this->APICore->getRequestContentType() === REQUEST_CONTENT_TYPE::JSON ) {
             $json = file_get_contents( 'php://input' );
             $data = json_decode( $json, true );
             if( NULL === $json || "" === $json ){
@@ -168,7 +122,7 @@ class LitCalEngine {
                 $this->LITSETTINGS = new LITSETTINGS( $data );
             }
         } else {
-            switch( strtoupper( $_SERVER[ "REQUEST_METHOD" ] ) ) {
+            switch( $this->APICore->getRequestMethod() ) {
                 case 'POST':
                     $this->LITSETTINGS = new LITSETTINGS( $_POST );
                     break;
@@ -178,14 +132,14 @@ class LitCalEngine {
                 default:
                     header( $_SERVER[ "SERVER_PROTOCOL" ]." 405 Method Not Allowed", true, 405 );
                     $errorMessage = '{"error":"You seem to be forming a strange kind of request? Allowed Request Methods are ';
-                    $errorMessage .= implode( ' and ', $this->ALLOWED_REQUEST_METHODS );
-                    $errorMessage .= ', but your Request Method was ' . strtoupper( $_SERVER[ 'REQUEST_METHOD' ] ) . '"}';
+                    $errorMessage .= implode( ' and ', $this->APICore->getAllowedRequestMethods() );
+                    $errorMessage .= ', but your Request Method was ' . $this->APICore->getRequestMethod() . '"}';
                     die( $errorMessage );
             }
         }
         if( $this->LITSETTINGS->RETURNTYPE !== null ) {
             if( in_array( $this->LITSETTINGS->RETURNTYPE, $this->ALLOWED_RETURN_TYPES ) ) {
-                $this->responseContentType = $this->ALLOWED_ACCEPT_HEADERS[ array_search( $this->LITSETTINGS->RETURNTYPE, $this->ALLOWED_RETURN_TYPES ) ];
+                $this->APICore->setResponseContentType( $this->APICore->getAllowedAcceptHeaders()[ array_search( $this->LITSETTINGS->RETURNTYPE, $this->ALLOWED_RETURN_TYPES ) ] );
             } else {
                 header( $_SERVER[ "SERVER_PROTOCOL" ]." 406 Not Acceptable", true, 406 );
                 $errorMessage = '{"error":"You are requesting a content type which this API cannot produce. Allowed content types are ';
@@ -194,37 +148,30 @@ class LitCalEngine {
                 die( $errorMessage );
             }
         } else {
-            if( isset( $this->REQUEST_HEADERS[ "Accept" ] ) ) {
-                if( in_array( $this->REQUEST_HEADERS[ "Accept" ], $this->ALLOWED_ACCEPT_HEADERS ) ) {
-                    $this->LITSETTINGS->RETURNTYPE = $this->ALLOWED_RETURN_TYPES[ array_search( $this->REQUEST_HEADERS[ "Accept" ], $this->ALLOWED_ACCEPT_HEADERS ) ];
-                    $this->responseContentType = $this->REQUEST_HEADERS[ "Accept" ];
+            if( $this->APICore->hasAcceptHeader() ) {
+                if( $this->APICore->isAllowedAcceptHeader() ) {
+                    $this->LITSETTINGS->RETURNTYPE = $this->ALLOWED_RETURN_TYPES[ $this->APICore->getIdxAcceptHeaderInAllowed() ];
+                    $this->APICore->setResponseContentType( $this->APICore->getAcceptHeader() );
                 } else {
                     //Requests from browser windows using the address bar will probably have an Accept header of text/html
                     //In order to not be too drastic, let's treat text/html as though it were application/json
-                    $acceptHeaders = explode( ",", $this->REQUEST_HEADERS[ "Accept" ] );
+                    $acceptHeaders = explode( ",", $this->APICore->getAcceptHeader() );
                     if( in_array( 'text/html', $acceptHeaders ) || in_array( 'text/plain', $acceptHeaders ) || in_array( '*/*', $acceptHeaders ) ) {
                         $this->LITSETTINGS->RETURNTYPE = RETURN_TYPE::JSON;
-                        $this->responseContentType = ACCEPT_HEADER::JSON;
+                        $this->APICore->setResponseContentType( ACCEPT_HEADER::JSON );
                     } else {
                         header( $_SERVER[ "SERVER_PROTOCOL" ]." 406 Not Acceptable", true, 406 );
                         $errorMessage = '{"error":"You are requesting a content type which this API cannot produce. Allowed Accept headers are ';
-                        $errorMessage .= implode( ' and ', $this->ALLOWED_ACCEPT_HEADERS );
-                        $errorMessage .= ', but you have issued an request with an Accept header of ' . $this->REQUEST_HEADERS[ "Accept" ] . '"}';
+                        $errorMessage .= implode( ' and ', $this->APICore->getAllowedAcceptHeaders() );
+                        $errorMessage .= ', but you have issued an request with an Accept header of ' . $this->APICore->getAcceptHeader() . '"}';
                         die( $errorMessage );
                     }
 
                 }
             } else {
                 $this->LITSETTINGS->RETURNTYPE = $this->ALLOWED_RETURN_TYPES[ 0 ];
-                $this->responseContentType = $this->ALLOWED_ACCEPT_HEADERS[ 0 ];
+                $this->APICore->setResponseContentType( $this->APICore->getAllowedAcceptHeaders()[ 0 ] );
             }
-        }
-    }
-
-    private function setReponseContentTypeHeader() {
-        header( "Content-Type: {$this->responseContentType}; charset=utf-8" );
-        if( $this->responseContentType === ACCEPT_HEADER::ICS ){
-            header( 'Content-Disposition: attachment; filename="LiturgicalCalendar.ics"' );
         }
     }
 
@@ -2717,7 +2664,7 @@ class LitCalEngine {
         $SerializeableLitCal->Metadata->SOLEMNITIES       = $this->SOLEMNITIES;
         $SerializeableLitCal->Metadata->FEASTS_MEMORIALS  = $this->FEASTS_MEMORIALS;
         $SerializeableLitCal->Metadata->VERSION           = self::API_VERSION;
-        $SerializeableLitCal->Metadata->REQUEST_HEADERS   = $this->jsonEncodedRequestHeaders;
+        $SerializeableLitCal->Metadata->REQUEST_HEADERS   = $this->APICore->getJsonEncodedRequestHeaders();
 
         //make sure we have an engineCache folder for the current Version
         if( realpath( "engineCache/v" . str_replace( ".","_",self::API_VERSION ) ) === false ){
@@ -2775,24 +2722,8 @@ class LitCalEngine {
         }
     }
 
-    public function setAllowedOrigins( array $origins ) : void {
-        $this->ALLOWED_ORIGINS = $origins;
-    }
-
-    public function setAllowedAcceptHeaders( array $acceptHeaders ) : void {
-        $this->ALLOWED_ACCEPT_HEADERS = array_values( array_intersect( ACCEPT_HEADER::$values, $acceptHeaders ) );
-    }
-
-    public function setAllowedParameterReturnTypes( array $returnTypes ) : void {
+    public function setAllowedReturnTypes( array $returnTypes ) : void {
         $this->ALLOWED_RETURN_TYPES = array_values( array_intersect( RETURN_TYPE::$values, $returnTypes ) );
-    }
-
-    public function setAllowedRequestMethods( array $requestMethods ) : void {
-        $this->ALLOWED_REQUEST_METHODS = array_values( array_intersect( REQUEST_METHOD::$values, $requestMethods ) );
-    }
-
-    public function setAllowedRequestContentTypes( array $requestContentTypes ) : void {
-        $this->ALLOWED_REQUEST_CONTENT_TYPES = array_values( array_intersect( REQUEST_CONTENT_TYPE::$values, $requestContentTypes ) );
     }
 
     /**
@@ -2801,11 +2732,9 @@ class LitCalEngine {
      * each one can depend on the one before it in order to function correctly!
      */
     public function Init(){
-        $this->setAllowedOriginHeader();
-        $this->setAccessControlAllowMethods();
-        $this->validateRequestContentType();
+        $this->APICore->Init();
         $this->initParameterData();
-        $this->setReponseContentTypeHeader();
+        $this->APICore->setResponseContentTypeHeader();
         $this->loadLocalCalendarData();
         if( $this->cacheFileIsAvailable() ){
             //If we already have done the calculation

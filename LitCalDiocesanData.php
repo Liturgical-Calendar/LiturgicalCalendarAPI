@@ -6,6 +6,7 @@ include_once( 'includes/enums/AcceptHeader.php' );
 include_once( 'includes/enums/RequestMethod.php' );
 include_once( 'includes/enums/RequestContentType.php' );
 include_once( 'includes/enums/ReturnType.php' );
+include_once( 'includes/APICore.php' );
 
 $allowedOrigins = [
     "https://johnromanodorazio.com",
@@ -16,211 +17,73 @@ $allowedOrigins = [
 
 $LitCalDiocesanData = new LitCalDiocesanData();
 
-$LitCalDiocesanData->setAllowedOrigins( $allowedOrigins );
-$LitCalDiocesanData->setAllowedReferers( array_map( function($el){ return $el . "/"; }, $allowedOrigins ) );
+$LitCalDiocesanData->APICore->setAllowedOrigins( $allowedOrigins );
+$LitCalDiocesanData->APICore->setAllowedReferers( array_map( function($el){ return $el . "/"; }, $allowedOrigins ) );
 
-$LitCalDiocesanData->setAllowedAcceptHeaders( [ ACCEPT_HEADER::JSON ] );
-$LitCalDiocesanData->setAllowedRequestContentTypes( [ REQUEST_CONTENT_TYPE::JSON, REQUEST_CONTENT_TYPE::FORMDATA ] );
+$LitCalDiocesanData->APICore->setAllowedAcceptHeaders( [ ACCEPT_HEADER::JSON ] );
+$LitCalDiocesanData->APICore->setAllowedRequestContentTypes( [ REQUEST_CONTENT_TYPE::JSON, REQUEST_CONTENT_TYPE::FORMDATA ] );
 $LitCalDiocesanData->Init();
 
 class LitCalDiocesanData {
 
-    private array $ALLOWED_ORIGINS;
-    private array $ALLOWED_REFERERS;
-    private array $ALLOWED_ACCEPT_HEADERS;
-    private array $ALLOWED_REQUEST_METHODS;
-    private array $ALLOWED_REQUEST_CONTENT_TYPES;
-    private array $REQUEST_HEADERS;
     private object $DATA;
     private object $RESPONSE;
     private ?stdClass $GeneralIndex                 = null;
 
-    private string $jsonEncodedRequestHeaders       = "";
-    private string $responseContentType             = ACCEPT_HEADER::JSON;
+    public APICore $APICore;
 
     public function __construct(){
-        $this->ALLOWED_ORIGINS                      = [ "*" ];
-        $this->ALLOWED_REFERERS                     = [ "*" ];
-        $this->ALLOWED_ACCEPT_HEADERS               = ACCEPT_HEADER::$values;
-        $this->ALLOWED_RETURN_TYPES                 = RETURN_TYPE::$values;
-        $this->ALLOWED_REQUEST_METHODS              = REQUEST_METHOD::$values;
-        $this->ALLOWED_REQUEST_CONTENT_TYPES        = REQUEST_CONTENT_TYPE::$values;
-        $this->REQUEST_HEADERS                      = getallheaders();
-        $this->jsonEncodedRequestHeaders            = json_encode( $this->REQUEST_HEADERS );
+        $this->APICore                              = new APICore();
         $this->RESPONSE                             = new stdClass();
-        $this->RESPONSE->requestHeadersReceived     = $this->jsonEncodedRequestHeaders;
+        $this->RESPONSE->requestHeadersReceived     = $this->APICore->getJsonEncodedRequestHeaders();
     }
 
-    private function setAllowedOriginHeader() {
-        if( count( $this->ALLOWED_ORIGINS ) === 1 && $this->ALLOWED_ORIGINS[ 0 ] === "*" ) {
-            header( 'Access-Control-Allow-Origin: *' );
+    private function handleGetPostRequests( array $REQUEST ) {
+
+        $this->APICore->validateAcceptHeader( true );
+        if( $this->APICore->getRequestContentType() === 'application/json' ) {
+            $this->DATA = $this->APICore->retrieveRequestParamsFromJsonBody();
+        } else {
+            $this->DATA = (object)$REQUEST;
         }
-        elseif( isset( $this->REQUEST_HEADERS[ "Origin" ] ) && in_array( $this->REQUEST_HEADERS[ "Origin" ], $this->ALLOWED_ORIGINS ) ) {
-            header( 'Access-Control-Allow-Origin: ' . $this->REQUEST_HEADERS[ "Origin" ] );
-        }
-        else {
-            header( 'Access-Control-Allow-Origin: https://www.vatican.va' );
-        }
-        header( 'Access-Control-Allow-Credentials: true' );
-        header( 'Access-Control-Max-Age: 86400' );    // cache for 1 day
+        $this->retrieveDiocesanCalendar();
+
     }
 
-    private function setAccessControlAllowMethods() {
-        if ( isset( $_SERVER[ 'REQUEST_METHOD' ] ) ) {
-            if ( isset( $_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_METHOD' ] ) )
-                header( "Access-Control-Allow-Methods: " . implode(',', $this->ALLOWED_REQUEST_METHODS) );
-            if ( isset( $_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' ] ) )
-                header( "Access-Control-Allow-Headers: {$_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' ]}" );
-        }
-    }
-
-    private function validateRequestContentType() {
-        if( isset( $_SERVER[ 'CONTENT_TYPE' ] ) && $_SERVER[ 'CONTENT_TYPE' ] !== '' && !in_array( explode( ';', $_SERVER[ 'CONTENT_TYPE' ] )[ 0 ], $this->ALLOWED_REQUEST_CONTENT_TYPES ) ){
-            header( $_SERVER[ "SERVER_PROTOCOL" ]." 415 Unsupported Media Type", true, 415 );
-            die( '{"error":"You seem to be forming a strange kind of request? Allowed Content Types are '.implode( ' and ', $this->ALLOWED_REQUEST_CONTENT_TYPES ).', but your Content Type was '.$_SERVER[ 'CONTENT_TYPE' ].'"}' );
-        }
-    }
-
-    private function validateAcceptHeader( bool $beLaxAboutIt ) {
-        if( isset( $this->REQUEST_HEADERS[ "Accept" ] ) ) {
-            if( in_array( explode( ',', $this->REQUEST_HEADERS[ "Accept" ] )[0], $this->ALLOWED_ACCEPT_HEADERS ) ) {
-                $this->responseContentType = $this->REQUEST_HEADERS[ "Accept" ];
-            } else {
-                if( $beLaxAboutIt ) {
-                    //Requests from browser windows using the address bar will probably have an Accept header of text/html
-                    //In order to not be too drastic, let's treat text/html as though it were application/json for GET and POST requests only
-                    $acceptHeaders = explode( ",", $this->REQUEST_HEADERS[ "Accept" ] );
-                    if( in_array( 'text/html', $acceptHeaders ) || in_array( 'text/plain', $acceptHeaders ) || in_array( '*/*', $acceptHeaders ) ) {
-                        $this->responseContentType = ACCEPT_HEADER::JSON;
-                    } else {
-                        header( $_SERVER[ "SERVER_PROTOCOL" ]." 406 Not Acceptable", true, 406 );
-                        $errorMessage = '{"error":"You are requesting a content type which this API cannot produce. Allowed Accept headers are ';
-                        $errorMessage .= implode( ' and ', $this->ALLOWED_ACCEPT_HEADERS );
-                        $errorMessage .= ', but you have issued an request with an Accept header of ' . $this->REQUEST_HEADERS[ "Accept" ] . '"}';
-                        die( $errorMessage );
-                    }
-                } else {
-                    header( $_SERVER[ "SERVER_PROTOCOL" ]." 406 Not Acceptable", true, 406 );
-                    $errorMessage = '{"error":"You are requesting a content type which this API cannot produce. Allowed Accept headers are ';
-                    $errorMessage .= implode( ' and ', $this->ALLOWED_ACCEPT_HEADERS );
-                    $errorMessage .= ', but you have issued an request with an Accept header of ' . $this->REQUEST_HEADERS[ "Accept" ] . '"}';
-                    die( $errorMessage );
-                }
+    private function handlePutPatchDeleteRequests( string $requestMethod ) {
+        $this->APICore->validateAcceptHeader( false );
+        $this->APICore->enforceAjaxRequest();
+        $this->APICore->enforceReferer();
+        if( $this->APICore->getRequestContentType() === 'application/json' ) {
+            $this->DATA = $this->APICore->retrieveRequestParamsFromJsonBody();
+            if( REQUEST_METHOD::PUT === $requestMethod ) {
+                $this->writeDiocesanCalendar();
+            } elseif( REQUEST_METHOD::DELETE === $requestMethod ) {
+                $this->deleteDiocesanCalendar();
             }
-        } else {
-            $this->responseContentType = $this->ALLOWED_ACCEPT_HEADERS[ 0 ];
-        }
-    }
-
-    private function validateReferer() {
-        return in_array( $_SERVER["HTTP_REFERER"], $this->ALLOWED_REFERERS );
-    }
-
-    private function retrieveRequestParamsFromJsonBody() : void {
-
-        $json = file_get_contents( 'php://input' );
-        $data = json_decode( $json );
-        if( "" === $json ){
-            header( $_SERVER[ "SERVER_PROTOCOL" ]." 400 Bad Request", true, 400 );
-            die( '{"error":"No JSON data received in the request"' );
-        } else if ( json_last_error() !== JSON_ERROR_NONE ) {
-            header( $_SERVER[ "SERVER_PROTOCOL" ]." 400 Bad Request", true, 400 );
-            die( '{"error":"Malformed JSON data received in the request: <' . $json . '>, ' . json_last_error_msg() . '"}' );
-        } else {
-            $this->DATA = $data;
+            
+        } else{
+            header( $_SERVER[ "SERVER_PROTOCOL" ]." 415 Unsupported Media Type", true, 415 );
+            die( '{"error":"You seem to be forming a strange kind of request? Only \'application/json\' is allowed as the Content Type for the body of the Request when using Request Methods PUT, PATCH, or DELETE: the Content Type for the body of your Request was '.$_SERVER[ 'CONTENT_TYPE' ].' and you are using Request Method ' . $_SERVER[ 'REQUEST_METHOD' ] . '"}' );
         }
 
-    }
-
-    private static function requestIsAjax() : bool {
-        return (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || empty($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest' ) === false;
-    }
-
-    private function requestContentTypeIsJson() : bool {
-        return ( isset( $_SERVER[ 'CONTENT_TYPE' ] ) && $_SERVER[ 'CONTENT_TYPE' ] === 'application/json' );
-    }
-
-    public function setAllowedOrigins( array $origins ) : void {
-        $this->ALLOWED_ORIGINS = $origins;
-    }
-
-    public function setAllowedReferers( array $referers ) : void {
-        $this->ALLOWED_REFERERS = $referers;
-    }
-
-    public function setAllowedAcceptHeaders( array $acceptHeaders ) : void {
-        $this->ALLOWED_ACCEPT_HEADERS = array_values( array_intersect( ACCEPT_HEADER::$values, $acceptHeaders ) );
-    }
-
-    public function setAllowedRequestMethods( array $requestMethods ) : void {
-        $this->ALLOWED_REQUEST_METHODS = array_values( array_intersect( REQUEST_METHOD::$values, $requestMethods ) );
-    }
-
-    public function setAllowedRequestContentTypes( array $requestContentTypes ) : void {
-        $this->ALLOWED_REQUEST_CONTENT_TYPES = array_values( array_intersect( REQUEST_CONTENT_TYPE::$values, $requestContentTypes ) );
     }
 
     private function handleRequestedMethod() {
 
         switch( strtoupper( $_SERVER[ "REQUEST_METHOD" ] ) ) {
             case 'GET':
-                $this->validateAcceptHeader( true );
-                if( $this->requestContentTypeIsJson() ) {
-                    $this->retrieveRequestParamsFromJsonBody();
-                } else {
-                    $this->DATA = (object)$_GET;
-                }
-                $this->retrieveDiocesanCalendar();
+                $this->handleGetPostRequests( $_GET );
                 break;
             case 'POST':
-                $this->validateAcceptHeader( true );
-                if( $this->requestContentTypeIsJson() ) {
-                    $this->retrieveRequestParamsFromJsonBody();
-                } else{
-                    $this->DATA = (object)$_POST;
-                }
-                $this->retrieveDiocesanCalendar();
+                $this->handleGetPostRequests( $_POST );
                 break;
             case 'PUT':
             case 'PATCH':
-                $this->validateAcceptHeader( false );
-                if( false === self::requestIsAjax() ) {
-                    header( $_SERVER[ "SERVER_PROTOCOL" ]." 418 I'm a teapot", true, 418 );
-                    $errorMessage = '{"error":"Request was not made via AJAX. When using Request Method ' . strtoupper( $_SERVER[ 'REQUEST_METHOD' ] ) . ', only AJAX requests from authorized Origins and Referers are processable."}';
-                    die( $errorMessage );
-                }
-                if( false === $this->validateReferer() ) {
-                    header( $_SERVER[ "SERVER_PROTOCOL" ]." 401 Unauthorized", true, 401 );
-                    $errorMessage = '{"error":"Request is coming from unauthorized referer ' . $_SERVER["HTTP_REFERER"] . '. Only AJAX requests from authorized Origins and Referers are processable."}';
-                    die( $errorMessage );
-                }
-                if( $this->requestContentTypeIsJson() ) {
-                    $this->retrieveRequestParamsFromJsonBody();
-                    $this->writeDiocesanCalendar();
-                } else{
-                    header( $_SERVER[ "SERVER_PROTOCOL" ]." 415 Unsupported Media Type", true, 415 );
-                    die( '{"error":"You seem to be forming a strange kind of request? Allowed Content Types are '.implode( ' and ', $this->ALLOWED_REQUEST_CONTENT_TYPES ).', but your Content Type was '.$_SERVER[ 'CONTENT_TYPE' ].'"}' );
-                }
+                $this->handlePutPatchDeleteRequests( REQUEST_METHOD::PUT );
                 break;
             case 'DELETE':
-                $this->validateAcceptHeader( false );
-                if( false === self::requestIsAjax() ) {
-                    header( $_SERVER[ "SERVER_PROTOCOL" ]." 418 I'm a teapot", true, 418 );
-                    $errorMessage = '{"error":"Request was not made via AJAX. When using Request Method ' . strtoupper( $_SERVER[ 'REQUEST_METHOD' ] ) . ', only AJAX requests from authorized Origins and Referers are processable."}';
-                    die( $errorMessage );
-                }
-                if( false === $this->validateReferer() ) {
-                    header( $_SERVER[ "SERVER_PROTOCOL" ]." 401 Unauthorized", true, 401 );
-                    $errorMessage = '{"error":"Request is coming from unauthorized referer ' . $_SERVER["HTTP_REFERER"] . '. Only AJAX requests from authorized Origins and Referers are processable."}';
-                    die( $errorMessage );
-                }
-                if( $this->requestContentTypeIsJson() ) {
-                    $this->retrieveRequestParamsFromJsonBody();
-                    $this->deleteDiocesanCalendar();
-                } else{
-                    header( $_SERVER[ "SERVER_PROTOCOL" ]." 415 Unsupported Media Type", true, 415 );
-                    die( '{"error":"You seem to be forming a strange kind of request? Allowed Content Types are '.implode( ' and ', $this->ALLOWED_REQUEST_CONTENT_TYPES ).', but your Content Type was '.$_SERVER[ 'CONTENT_TYPE' ].'"}' );
-                }
+                $this->handlePutPatchDeleteRequests( REQUEST_METHOD::DELETE );
                 break;
             case 'OPTIONS':
                 //continue;
@@ -232,10 +95,6 @@ class LitCalDiocesanData {
                 $errorMessage .= ', but your Request Method was ' . strtoupper( $_SERVER[ 'REQUEST_METHOD' ] ) . '"}';
                 die( $errorMessage );
         }
-    }
-
-    private function setReponseContentTypeHeader() {
-        header( "Content-Type: {$this->responseContentType}; charset=utf-8" );
     }
 
     private function loadIndex() {
@@ -329,21 +188,10 @@ class LitCalDiocesanData {
         }
     }
 
-    /**
-    if( property_exists( $this->GeneralIndex, $this->LITSETTINGS->DIOCESAN ) ){
-        $diocesanDataFile = $this->GeneralIndex->{$this->LITSETTINGS->DIOCESAN}->path;
-        $this->LITSETTINGS->NATIONAL = $this->GeneralIndex->{$this->LITSETTINGS->DIOCESAN}->nation;
-        if( file_exists( $diocesanDataFile ) ){
-            $this->DiocesanData = json_decode( file_get_contents( $diocesanDataFile ) );
-        }
-    }
-     */
     public function Init() {
 
-        $this->setAllowedOriginHeader();
-        $this->setAccessControlAllowMethods();
-        $this->validateRequestContentType();
-        $this->setReponseContentTypeHeader();
+        $this->APICore->Init();
+        $this->APICore->setResponseContentTypeHeader();
         $this->loadIndex();
         $this->handleRequestedMethod();
 
