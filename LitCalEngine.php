@@ -100,15 +100,15 @@ class LitCalEngine {
     private NumberFormatter $formatterFem;
 
 
-    private array $PROPRIUM_DE_TEMPORE              = [ ];
-    private array $SOLEMNITIES                      = [ ];
-    private array $FEASTS_MEMORIALS                 = [ ];
-    private array $WEEKDAYS_ADVENT_CHRISTMAS_LENT   = [ ];
-    private array $WEEKDAYS_EPIPHANY                = [ ];
-    private array $SUNDAYS_ADVENT_LENT_EASTER       = [ ];
-    private array $SOLEMNITIES_LORD_BVM             = [ ];
-    private array $LitCal                           = [ ];
-    private array $Messages                         = [ ];
+    private array $PROPRIUM_DE_TEMPORE              = [];
+    private array $SOLEMNITIES                      = [];
+    private array $FEASTS_MEMORIALS                 = [];
+    private array $WEEKDAYS_ADVENT_CHRISTMAS_LENT   = [];
+    private array $WEEKDAYS_EPIPHANY                = [];
+    private array $SUNDAYS_ADVENT_LENT_EASTER       = [];
+    private array $SOLEMNITIES_LORD_BVM             = [];
+    private array $LitCal                           = [];
+    private array $Messages                         = [];
     private string $BaptismLordFmt;
     private string $BaptismLordMod;
 
@@ -315,7 +315,7 @@ class LitCalEngine {
         //for the time being, we cannot accept a year any earlier than 1970, since this engine is based on the liturgical reform from Vatican II
         //with the Prima Editio Typica of the Roman Missal and the General Norms promulgated with the Motu Proprio "Mysterii Paschali" in 1969
         if ( $this->LITSETTINGS->YEAR < 1970 ) {
-            $this->Messages[ ] = sprintf( LITCAL_MESSAGES::__( "Only years from 1970 and after are supported. You tried requesting the year %d.", $this->LITSETTINGS->LOCALE ), $this->LITSETTINGS->YEAR );
+            $this->Messages[] = sprintf( LITCAL_MESSAGES::__( "Only years from 1970 and after are supported. You tried requesting the year %d.", $this->LITSETTINGS->LOCALE ), $this->LITSETTINGS->YEAR );
             $this->GenerateResponseToRequest();
         }
     }
@@ -596,7 +596,7 @@ class LitCalEngine {
                     //http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html
                     if( $row[ "TAG" ] === "StJoseph" && $currentFeastDate >= $this->LitCal[ "PalmSun" ]->date && $currentFeastDate <= $this->LitCal[ "Easter" ]->date ){
                         $this->LitCal[ "StJoseph" ]->date = LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->sub( new DateInterval( 'P8D' ) );
-                        $this->Messages[ ] = sprintf(
+                        $this->Messages[] = sprintf(
                             LITCAL_MESSAGES::__( "The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to %s (%s) as per the %s.", $this->LITSETTINGS->LOCALE ),
                             $this->LitCal[ "StJoseph" ]->name,
                             $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ]->name,
@@ -612,7 +612,7 @@ class LitCalEngine {
                     else if( $row[ "TAG" ] === "Annunciation" && $currentFeastDate >= $this->LitCal[ "PalmSun" ]->date && $currentFeastDate <= $this->LitCal[ "Easter2" ]->date ){
                         //if the Annunciation falls during Holy Week or within the Octave of Easter, it is transferred to the Monday after the Second Sunday of Easter.
                         $this->LitCal[ "Annunciation" ]->date = LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P8D' ) );
-                        $this->Messages[ ] = sprintf(
+                        $this->Messages[] = sprintf(
                             LITCAL_MESSAGES::__( "The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to %s (%s) as per the %s.", $this->LITSETTINGS->LOCALE ),
                             $this->LitCal[ "Annunciation" ]->name,
                             $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ]->name,
@@ -638,7 +638,7 @@ class LitCalEngine {
                     else if( in_array( $row[ "TAG" ],[ "Annunciation","StJoseph","ImmaculateConception" ] ) && in_array( $currentFeastDate, $this->SUNDAYS_ADVENT_LENT_EASTER ) ){
                         $this->LitCal[ $row[ "TAG" ]]->date = clone( $currentFeastDate );
                         $this->LitCal[ $row[ "TAG" ]]->date->add( new DateInterval( 'P1D' ) );
-                        $this->Messages[ ] = sprintf(
+                        $this->Messages[] = sprintf(
                             LITCAL_MESSAGES::__( "The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to %s (%s) as per the %s.", $this->LITSETTINGS->LOCALE ),
                             $this->LitCal[ $row[ "TAG" ]]->name,
                             $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ]->name,
@@ -653,7 +653,7 @@ class LitCalEngine {
                     }
                     else{
                         //In all other cases, let's make a note of what's happening and ask the Congegation for Divine Worship
-                        $this->Messages[ ] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                        $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                             LITCAL_MESSAGES::__( "The Solemnity '%s' coincides with the Solemnity '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!", $this->LITSETTINGS->LOCALE ),
                             $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
                             $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ]->name,
@@ -670,7 +670,7 @@ class LitCalEngine {
                         $NativityJohnBaptistNewDate = clone( $this->LitCal[ "NativityJohnBaptist" ]->date );
                         if( !in_array( $NativityJohnBaptistNewDate->sub( new DateInterval( 'P1D' ) ), $this->SOLEMNITIES ) ){
                             $this->LitCal[ "NativityJohnBaptist" ]->date->sub( new DateInterval( 'P1D' ) );
-                            $this->Messages[ ] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                            $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                                 LITCAL_MESSAGES::__( "Seeing that the Solemnity '%s' coincides with the Solemnity '%s' in the year %d, it has been anticipated by one day as per %s.", $this->LITSETTINGS->LOCALE ),
                                 $this->LitCal[ "NativityJohnBaptist" ]->name,
                                 $this->LitCal[ "SacredHeart" ]->name,
@@ -749,7 +749,7 @@ class LitCalEngine {
         //Holy Family is celebrated the Sunday after Christmas, unless Christmas falls on a Sunday, in which case it is celebrated Dec. 30
         if (  (int)DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->format( 'N' ) === 7 ) {
             $this->LitCal[ "HolyFamily" ]   = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "HolyFamily" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], DateTime::createFromFormat( '!j-n-Y', '30-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) ),           LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::FEAST_LORD );
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "'%s' falls on a Sunday in the year %d, therefore the Feast '%s' is celebrated on %s rather than on the Sunday after Christmas.", $this->LITSETTINGS->LOCALE ),
                 $this->LitCal[ "Christmas" ]->name,
                 $this->LITSETTINGS->YEAR,
@@ -786,7 +786,7 @@ class LitCalEngine {
                 $this->SOLEMNITIES[ "OrdSunday" . $ordSun ]      = $firstOrdinary;
 
             } else {
-                $this->Messages[ ] = sprintf(
+                $this->Messages[] = sprintf(
                     LITCAL_MESSAGES::__( "'%s' is superseded by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                     $this->PROPRIUM_DE_TEMPORE[ "OrdSunday" . $ordSun ][ "NAME_" . $this->LITSETTINGS->LOCALE ],
                     $this->LitCal[ array_search( $firstOrdinary, $this->SOLEMNITIES) ]->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $this->LitCal[ array_search( $firstOrdinary, $this->SOLEMNITIES) ]->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $this->LitCal[ array_search( $firstOrdinary, $this->SOLEMNITIES) ]->grade, $this->LITSETTINGS->LOCALE, false ),
@@ -813,7 +813,7 @@ class LitCalEngine {
                 //add Sundays to our priority list for next checking against ordinary Feasts not of Our Lord
                 $this->SOLEMNITIES[ "OrdSunday" . $ordSun ]      = $lastOrdinary;
             } else {
-                $this->Messages[ ] = sprintf(
+                $this->Messages[] = sprintf(
                     LITCAL_MESSAGES::__( "'%s' is superseded by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                     $this->PROPRIUM_DE_TEMPORE[ "OrdSunday" . $ordSun ][ "NAME_" . $this->LITSETTINGS->LOCALE ],
                     $this->LitCal[ array_search( $lastOrdinary, $this->SOLEMNITIES) ]->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $this->LitCal[ array_search( $lastOrdinary, $this->SOLEMNITIES) ]->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $this->LitCal[ array_search( $lastOrdinary, $this->SOLEMNITIES) ]->grade, $this->LITSETTINGS->LOCALE, false ),
@@ -849,7 +849,7 @@ class LitCalEngine {
                         $coincidingFestivity_grade = ( $coincidingFestivity->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) );
                     }
 
-                    $this->Messages[ ] = sprintf(
+                    $this->Messages[] = sprintf(
                         LITCAL_MESSAGES::__( "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                         LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE, false ),
                         $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
@@ -951,7 +951,7 @@ class LitCalEngine {
         //Also, while we're add it, let's remove the weekdays of Epiphany that get overriden by memorials
         $key = array_search( $this->LitCal[ $tag ]->date, $this->WEEKDAYS_EPIPHANY );
         if ( false !== $key ) {
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "'%s' is superseded by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                 $this->LitCal[ $key ]->name,
                 LITCAL_MESSAGES::_G( $this->LitCal[ $tag  ]->grade, $this->LITSETTINGS->LOCALE, false ),
@@ -968,7 +968,7 @@ class LitCalEngine {
         //it is reduced in rank to a Commemoration ( only the collect can be used
         if ( in_array( $currentFeastDate, $this->WEEKDAYS_ADVENT_CHRISTMAS_LENT ) ) {
             $this->LitCal[ $row[ "TAG" ] ]->grade = LitGrade::COMMEMORATION;
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The %s '%s' either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration.", $this->LITSETTINGS->LOCALE ),
                 LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE ),
                 $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
@@ -1007,7 +1007,7 @@ class LitCalEngine {
                 $coincidingFeast = $this->LitCal[ array_search( $ImmaculateHeart_date, $this->FEASTS_MEMORIALS ) ];
                 $coincidingFeast_grade = LITCAL_MESSAGES::_G( $coincidingFeast->grade, $this->LITSETTINGS->LOCALE );
             }
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                 LITCAL_MESSAGES::_G( "MEMORIAL", $this->LITSETTINGS->LOCALE ),
                 $this->PROPRIUM_DE_TEMPORE[ "ImmaculateHeart" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],
@@ -1043,35 +1043,42 @@ class LitCalEngine {
                     }
 
                 } else {
-                    $coincidingFestivity_grade = '';
-                    if(  (int)$currentFeastDate->format( 'N' ) === 7 && $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ]->grade < LitGrade::SOLEMNITY ){
-                        //it's a Sunday
-                        $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ];
-                        $coincidingFestivity_grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
-                    } else if ( in_array( $currentFeastDate, $this->SOLEMNITIES ) ) {
-                        //it's a Feast of the Lord or a Solemnity
-                        $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ];
-                        $coincidingFestivity_grade = ( $coincidingFestivity->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) );
-                    } else if( in_array( $currentFeastDate, $this->FEASTS_MEMORIALS ) ) {
-                        $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->FEASTS_MEMORIALS ) ];
-                        $coincidingFestivity_grade = LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false );
-                    }
-
-                    $this->Messages[ ] = sprintf(
-                        LITCAL_MESSAGES::__( "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
-                        LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE, false ),
-                        $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
-                        $this->LITSETTINGS->LOCALE === 'LA' ? ( $currentFeastDate->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[  (int)$currentFeastDate->format( 'n' ) ] ) :
-                            ( $this->LITSETTINGS->LOCALE === 'EN' ? $currentFeastDate->format( 'F jS' ) :
-                                trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) )
-                            ),
-                        $coincidingFestivity_grade,
-                        $coincidingFestivity->name,
-                        $this->LITSETTINGS->YEAR
-                    );
+                    $this->handleCoincidence( $currentFeastDate, $row );
                 }
             }
         }
+
+    }
+
+    private function handleCoincidence( DateTime $currentFeastDate, array $row ) {
+
+        $coincidingFestivity = new stdClass();
+        $coincidingFestivity->grade = '';
+        if(  (int)$currentFeastDate->format( 'N' ) === 7 && $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ]->grade < LitGrade::SOLEMNITY ){
+            //it's a Sunday
+            $coincidingFestivity->event = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ];
+            $coincidingFestivity->grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
+        } else if ( in_array( $currentFeastDate, $this->SOLEMNITIES ) ) {
+            //it's a Feast of the Lord or a Solemnity
+            $coincidingFestivity->event = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ];
+            $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) );
+        } else if( in_array( $currentFeastDate, $this->FEASTS_MEMORIALS ) ) {
+            $coincidingFestivity->event = $this->LitCal[ array_search( $currentFeastDate, $this->FEASTS_MEMORIALS ) ];
+            $coincidingFestivity->grade = LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false );
+        }
+
+        $this->Messages[] = sprintf(
+            LITCAL_MESSAGES::__( "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
+            LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE, false ),
+            $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
+            $this->LITSETTINGS->LOCALE === 'LA' ? ( $currentFeastDate->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[  (int)$currentFeastDate->format( 'n' ) ] ) :
+                ( $this->LITSETTINGS->LOCALE === 'EN' ? $currentFeastDate->format( 'F jS' ) :
+                    trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) )
+                ),
+            $coincidingFestivity->grade,
+            $coincidingFestivity->event->name,
+            $this->LITSETTINGS->YEAR
+        );
 
     }
 
@@ -1084,7 +1091,7 @@ class LitCalEngine {
             $this->LitCal[ "ImmaculateHeart" ]->grade = LitGrade::MEMORIAL_OPT;
             $this->LitCal[ $row[ "TAG" ] ]->grade = LitGrade::MEMORIAL_OPT;
             //unset( $this->LitCal[ $key ] ); $this->FEASTS_MEMORIALS ImmaculateHeart
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The Memorial '%s' coincides with another Memorial '%s' in the year %d. They are both reduced in rank to optional memorials (%s).", $this->LITSETTINGS->LOCALE ),
                 $this->LitCal[ "ImmaculateHeart" ]->name,
                 $this->LitCal[ $row[ "TAG" ] ]->name,
@@ -1123,7 +1130,7 @@ class LitCalEngine {
 
         if ( array_key_exists( "StMaryMagdalene", $this->LitCal ) ) {
             if ( $this->LitCal[ "StMaryMagdalene" ]->grade == LitGrade::MEMORIAL ) {
-                $this->Messages[ ] = sprintf(
+                $this->Messages[] = sprintf(
                     LITCAL_MESSAGES::__( "The %s '%s' has been raised to the rank of %s since the year %d, applicable to the year %d (%s).", $this->LITSETTINGS->LOCALE ),
                     LITCAL_MESSAGES::_G( $this->LitCal[ "StMaryMagdalene" ]->grade, $this->LITSETTINGS->LOCALE ),
                     $this->LitCal[ "StMaryMagdalene" ]->name,
@@ -1153,7 +1160,7 @@ class LitCalEngine {
                 $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row[ "DAY" ] . '-' . $row[ "MONTH" ] . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
                 if (  (int)$currentFeastDate->format( 'N' ) !== 7 && !in_array( $currentFeastDate, $this->SOLEMNITIES) && !in_array( $currentFeastDate, $this->FEASTS_MEMORIALS) ) {
                     $this->LitCal[ $row[ "TAG" ]] = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ] );
-                    $this->Messages[ ] = sprintf(
+                    $this->Messages[] = sprintf(
                         LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                         LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE ),
                         $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
@@ -1192,7 +1199,7 @@ class LitCalEngine {
                         $coincidingFestivity_grade = LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false );
                     }
 
-                    $this->Messages[ ] = sprintf(
+                    $this->Messages[] = sprintf(
                         LITCAL_MESSAGES::__( "The %s '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                         LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE, false ),
                         $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
@@ -1229,7 +1236,7 @@ class LitCalEngine {
              * 5. Source of the information
              * 6. Current year
              */
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                 LITCAL_MESSAGES::_G( $this->LitCal[ "StPioPietrelcina" ]->grade, $this->LITSETTINGS->LOCALE ),
                 $this->LitCal[ "StPioPietrelcina" ]->name,
@@ -1250,7 +1257,7 @@ class LitCalEngine {
                 $coincidingFestivityKey = array_search( $StPioPietrelcina_date, $this->FEASTS_MEMORIALS);
             }
             $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                 $StPioPietrelcina_tag[ $this->LITSETTINGS->LOCALE ],
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $StPioPietrelcina_date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$StPioPietrelcina_date->format( 'n' ) ] ) :
@@ -1275,7 +1282,7 @@ class LitCalEngine {
         //The Memorial is superseded by Solemnities and Feasts, but not by Memorials of Saints
         if( !in_array( $MaryMotherChurch_date, $this->SOLEMNITIES) && !in_array( $MaryMotherChurch_date, $this->FEASTS_MEMORIALS) ){
             $this->LitCal[ "MaryMotherChurch" ] = new Festivity( $MaryMotherChurch_tag[ $this->LITSETTINGS->LOCALE ], $MaryMotherChurch_date, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL, "Proper" );
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                 LITCAL_MESSAGES::_G( $this->LitCal[ "MaryMotherChurch" ]->grade, $this->LITSETTINGS->LOCALE ),
                 $this->LitCal[ "MaryMotherChurch" ]->name,
@@ -1292,7 +1299,7 @@ class LitCalEngine {
     
             if( $coincidingFestivity->grade <= LitGrade::MEMORIAL ){
                 $this->LitCal[ "MaryMotherChurch" ] = new Festivity( $MaryMotherChurch_tag[ $this->LITSETTINGS->LOCALE ], $MaryMotherChurch_date, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL, "Proper" );
-                $this->Messages[ ] = sprintf(
+                $this->Messages[] = sprintf(
                     LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                     LITCAL_MESSAGES::_G( $this->LitCal[ "MaryMotherChurch" ]->grade, $this->LITSETTINGS->LOCALE ),
                     $this->LitCal[ "MaryMotherChurch" ]->name,
@@ -1301,7 +1308,7 @@ class LitCalEngine {
                     '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20180211_decreto-mater-ecclesiae_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
                     $this->LITSETTINGS->YEAR
                 );
-                $this->Messages[ ] = sprintf(
+                $this->Messages[] = sprintf(
                     LITCAL_MESSAGES::__( "The %s '%s' has been suppressed by the Memorial '%s', added on %s since the year %d (%s).", $this->LITSETTINGS->LOCALE ),
                     LITCAL_MESSAGES::_G( $this->LitCal[ $coincidingFestivityKey ]->grade, $this->LITSETTINGS->LOCALE, false ),
                     '<i>' . $this->LitCal[ $coincidingFestivityKey ]->name . '</i>',
@@ -1312,7 +1319,7 @@ class LitCalEngine {
                 );
                 unset( $this->LitCal[ $coincidingFestivityKey ] );
             }else{
-                $this->Messages[ ] = sprintf(
+                $this->Messages[] = sprintf(
                     LITCAL_MESSAGES::__( "The Memorial '%s', added on %s since the year %d (%s), is however superseded by a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                     $MaryMotherChurch_tag[ $this->LITSETTINGS->LOCALE ],
                     LITCAL_MESSAGES::__( 'the Monday after Pentecost', $this->LITSETTINGS->LOCALE ),
@@ -1326,7 +1333,7 @@ class LitCalEngine {
         else if( in_array( $MaryMotherChurch_date, $this->SOLEMNITIES) ){
             $coincidingFestivityKey = array_search( $MaryMotherChurch_date, $this->SOLEMNITIES);
             $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The Memorial '%s', added on %s since the year %d (%s), is however superseded by a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                 $this->LitCal[ "MaryMotherChurch" ]->name,
                 LITCAL_MESSAGES::__( 'the Monday after Pentecost', $this->LITSETTINGS->LOCALE ),
@@ -1363,32 +1370,7 @@ class LitCalEngine {
                     $this->reduceMemorialsInAdventLentToCommemoration( $row, $currentFeastDate );
 
                 } else {
-                    $coincidingFestivity_grade = '';
-                    if(  (int)$currentFeastDate->format( 'N' ) === 7 && $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ]->grade < LitGrade::SOLEMNITY ){
-                        //it's a Sunday
-                        $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ];
-                        $coincidingFestivity_grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
-                    } else if ( in_array( $currentFeastDate, $this->SOLEMNITIES) ){
-                        //it's a Feast of the Lord or a Solemnity
-                        $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ];
-                        $coincidingFestivity_grade = ( $coincidingFestivity->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) );
-                    } else if( in_array( $currentFeastDate, $this->FEASTS_MEMORIALS) ){
-                        $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->FEASTS_MEMORIALS) ];
-                        $coincidingFestivity_grade = LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false );
-                    }
-
-                    $this->Messages[ ] = sprintf(
-                        LITCAL_MESSAGES::__( "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
-                        LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE, false ),
-                        $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
-                        $this->LITSETTINGS->LOCALE === 'LA' ? ( $currentFeastDate->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$currentFeastDate->format( 'n' ) ] ) :
-                            ( $this->LITSETTINGS->LOCALE === 'EN' ? $currentFeastDate->format( 'F jS' ) :
-                                trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) )
-                            ),
-                        $coincidingFestivity_grade,
-                        $coincidingFestivity->name,
-                        $this->LITSETTINGS->YEAR
-                    );
+                    $this->handleCoincidence( $currentFeastDate, $row );
                 }
             }
         }
@@ -1435,7 +1417,7 @@ class LitCalEngine {
                      * 5. Source of the information
                      * 6. Current year
                      */
-                    $this->Messages[ ] = sprintf(
+                    $this->Messages[] = sprintf(
                         LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                         LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE ),
                         $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
@@ -1464,7 +1446,7 @@ class LitCalEngine {
                         $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->FEASTS_MEMORIALS ) ];
                         $coincidingFestivity_grade = LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false );
                     }
-                    $this->Messages[ ] = sprintf(
+                    $this->Messages[] = sprintf(
                         LITCAL_MESSAGES::__( "The %s '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                         LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE, false ),
                         $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
@@ -1491,7 +1473,7 @@ class LitCalEngine {
         if (  (int)$StJaneFrancesNewDate->format( 'N' ) !== 7 && !in_array( $StJaneFrancesNewDate, $this->SOLEMNITIES) && !in_array( $StJaneFrancesNewDate, $this->FEASTS_MEMORIALS) ) {
             if( array_key_exists( "StJaneFrancesDeChantal", $this->LitCal ) ){
                 $this->LitCal[ "StJaneFrancesDeChantal" ]->date = $StJaneFrancesNewDate;
-                $this->Messages[ ] = sprintf(
+                $this->Messages[] = sprintf(
                     LITCAL_MESSAGES::__( "The optional memorial '%s' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                     $this->LitCal[ "StJaneFrancesDeChantal" ]->name,
                     '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
@@ -1504,7 +1486,7 @@ class LitCalEngine {
                 if ( $result ) {
                     $row = mysqli_fetch_assoc( $result );
                     $this->LitCal[ "StJaneFrancesDeChantal" ] = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $StJaneFrancesNewDate, $row[ "COLOR" ], 'fixed', $row[ "GRADE" ], $row[ "COMMON" ] );
-                    $this->Messages[ ] = sprintf(
+                    $this->Messages[] = sprintf(
                         LITCAL_MESSAGES::__( "The optional memorial '%s', which would have been superseded this year by a Sunday or Solemnity were it on Dec. 12, has however been transferred to Aug. 12 since the year 2002 (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                         $this->LitCal[ "StJaneFrancesDeChantal" ]->name,
                         '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
@@ -1522,7 +1504,7 @@ class LitCalEngine {
             $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
             //we can't move it, but we still need to remove it from Dec 12th if it's there!!!
             if( array_key_exists( "StJaneFrancesDeChantal", $this->LitCal ) ){
-                $this->Messages[ ] = sprintf(
+                $this->Messages[] = sprintf(
                     LITCAL_MESSAGES::__( 'The optional memorial \'%1$s\' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d. However, it is superseded by a Sunday, a Solemnity, or a Feast \'%4$s\' in the year %3$d.', $this->LITSETTINGS->LOCALE ),
                     $this->LitCal[ "StJaneFrancesDeChantal" ]->name,
                     '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
@@ -1536,7 +1518,7 @@ class LitCalEngine {
                 $result = $this->mysqli->query( "SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StJaneFrancesDeChantal'" );
                 if ( $result ) {
                     $row = mysqli_fetch_assoc( $result );
-                    $this->Messages[ ] = sprintf(
+                    $this->Messages[] = sprintf(
                         LITCAL_MESSAGES::__( 'The optional memorial \'%1$s\' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d. However, it is superseded by a Sunday, a Solemnity, or a Feast \'%4$s\' in the year %3$d.', $this->LITSETTINGS->LOCALE ),
                         $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
                         '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
@@ -1568,7 +1550,7 @@ class LitCalEngine {
              * 5. Source of the information
              * 6. Current year
              */
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                 LITCAL_MESSAGES::_G( $this->LitCal[ "LadyGuadalupe" ]->grade, $this->LITSETTINGS->LOCALE ),
                 $this->LitCal[ "LadyGuadalupe" ]->name,
@@ -1588,7 +1570,7 @@ class LitCalEngine {
                 $coincidingFestivityKey = array_search( $Guadalupe_date, $this->FEASTS_MEMORIALS);
             }
             $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                 $Guadalupe_tag[ $this->LITSETTINGS->LOCALE ],
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $Guadalupe_date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$Guadalupe_date->format( 'n' ) ] ) :
@@ -1615,7 +1597,7 @@ class LitCalEngine {
              * 5. Source of the information
              * 6. Current year
              */
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                 LITCAL_MESSAGES::_G( $this->LitCal[ "JuanDiego" ]->grade, $this->LITSETTINGS->LOCALE ),
                 $this->LitCal[ "JuanDiego" ]->name,
@@ -1635,7 +1617,7 @@ class LitCalEngine {
                 $coincidingFestivityKey = array_search( $JuanDiego_date, $this->FEASTS_MEMORIALS);
             }
             $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                 $JuanDiego_tag[ $this->LITSETTINGS->LOCALE ],
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $JuanDiego_date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$JuanDiego_date->format( 'n' ) ] ) :
@@ -1663,7 +1645,7 @@ class LitCalEngine {
             if ( $result ) {
                 $row = mysqli_fetch_assoc( $result );
                 $this->LitCal[ "ConversionStPaul" ] = new Festivity( $row[ "NAME_". $this->LITSETTINGS->LOCALE ], DateTime::createFromFormat( '!j-n-Y', '25-1-2009', new DateTimeZone( 'UTC' ) ), LitColor::WHITE, LitFeastType::FIXED, LitGrade::MEMORIAL_OPT, "Proper" );
-                $this->Messages[ ] = sprintf(
+                $this->Messages[] = sprintf(
                     LITCAL_MESSAGES::__( 'The Feast \'%s\' would have been suppressed this year ( 2009 ) since it falls on a Sunday, however being the Year of the Apostle Paul, as per the %s it has been reinstated so that local churches can optionally celebrate the memorial.', $this->LITSETTINGS->LOCALE ),
                     '<i>' . $row[ "NAME_" . $this->LITSETTINGS->LOCALE ] . '</i>',
                     '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>'
@@ -1692,7 +1674,7 @@ class LitCalEngine {
              * 5. Source of the information
              * 6. Current year
              */
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                 LITCAL_MESSAGES::_G( $this->LitCal[ "StJohnXXIII" ]->grade, $this->LITSETTINGS->LOCALE ),
                 $this->LitCal[ "StJohnXXIII" ]->name,
@@ -1713,7 +1695,7 @@ class LitCalEngine {
                 $coincidingFestivityKey = array_search( $StJohnXXIII_date, $this->FEASTS_MEMORIALS);
             }
             $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                 $StJohnXXIII_tag[ $this->LITSETTINGS->LOCALE ],
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $StJohnXXIII_date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$StJohnXXIII_date->format( 'n' ) ] ) :
@@ -1740,7 +1722,7 @@ class LitCalEngine {
              * 5. Source of the information
              * 6. Current year
              */
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                 LITCAL_MESSAGES::_G( $this->LitCal[ "StJohnPaulII" ]->grade, $this->LITSETTINGS->LOCALE ),
                 $this->LitCal[ "StJohnPaulII" ]->name,
@@ -1761,7 +1743,7 @@ class LitCalEngine {
                 $coincidingFestivityKey = array_search( $StJohnPaulII_date, $this->FEASTS_MEMORIALS);
             }
             $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                 $StJohnPaulII_tag[ $this->LITSETTINGS->LOCALE ],
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $StJohnPaulII_date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$StJohnPaulII_date->format( 'n' ) ] ) :
@@ -1794,7 +1776,7 @@ class LitCalEngine {
              * 5. Source of the information
              * 6. Current year
              */
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                 LITCAL_MESSAGES::_G( $this->LitCal[ "LadyLoreto" ]->grade, $this->LITSETTINGS->LOCALE ),
                 $this->LitCal[ "LadyLoreto" ]->name,
@@ -1815,7 +1797,7 @@ class LitCalEngine {
                 $coincidingFestivityKey = array_search( $LadyLoreto_date, $this->FEASTS_MEMORIALS);
             }
             $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                 $LadyLoreto_tag[ $this->LITSETTINGS->LOCALE ],
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $LadyLoreto_date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$LadyLoreto_date->format( 'n' ) ] ) :
@@ -1845,7 +1827,7 @@ class LitCalEngine {
              * 5. Source of the information
              * 6. Current year
              */
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                 LITCAL_MESSAGES::_G( $this->LitCal[ "StPaulVI" ]->grade, $this->LITSETTINGS->LOCALE ),
                 $this->LitCal[ "StPaulVI" ]->name,
@@ -1866,7 +1848,7 @@ class LitCalEngine {
                 $coincidingFestivityKey = array_search( $PaulVI_date, $this->FEASTS_MEMORIALS);
             }
             $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                 $PaulVI_tag[ $this->LITSETTINGS->LOCALE ],
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $PaulVI_date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$PaulVI_date->format( 'n' ) ] ) :
@@ -1898,7 +1880,7 @@ class LitCalEngine {
              * 5. Source of the information
              * 6. Current year
              */
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                 LITCAL_MESSAGES::_G( $this->LitCal[ "StFaustinaKowalska" ]->grade, $this->LITSETTINGS->LOCALE ),
                 $this->LitCal[ "StFaustinaKowalska" ]->name,
@@ -1919,7 +1901,7 @@ class LitCalEngine {
                 $coincidingFestivityKey = array_search( $StFaustina_date, $this->FEASTS_MEMORIALS);
             }
             $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                 $StFaustina_tag[ $this->LITSETTINGS->LOCALE ],
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $StFaustina_date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$StFaustina_date->format( 'n' ) ] ) :
@@ -1960,7 +1942,7 @@ class LitCalEngine {
              * 5. Source of the information
              * 6. Current year
              */
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                 LITCAL_MESSAGES::_G( $this->LitCal[ "StGregoryNarek" ]->grade, $this->LITSETTINGS->LOCALE ),
                 $this->LitCal[ "StGregoryNarek" ]->name,
@@ -1981,7 +1963,7 @@ class LitCalEngine {
                 $coincidingFestivityKey = array_search( $StGregoryNarek_date, $this->FEASTS_MEMORIALS);
             }
             $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                 $StGregoryNarek_tag[ $this->LITSETTINGS->LOCALE ],
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $StGregoryNarek_date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$StGregoryNarek_date->format( 'n' ) ] ) :
@@ -2006,7 +1988,7 @@ class LitCalEngine {
              * 5. Source of the information
              * 6. Current year
              */
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                 LITCAL_MESSAGES::_G( $this->LitCal[ "StJohnAvila" ]->grade, $this->LITSETTINGS->LOCALE ),
                 $this->LitCal[ "StJohnAvila" ]->name,
@@ -2027,7 +2009,7 @@ class LitCalEngine {
                 $coincidingFestivityKey = array_search( $StJohnAvila_date, $this->FEASTS_MEMORIALS);
             }
             $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                 $StJohnAvila_tag[ $this->LITSETTINGS->LOCALE ],
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $StJohnAvila_date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$StJohnAvila_date->format( 'n' ) ] ) :
@@ -2052,7 +2034,7 @@ class LitCalEngine {
              * 5. Source of the information
              * 6. Current year
              */
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                 LITCAL_MESSAGES::_G( $this->LitCal[ "StHildegardBingen" ]->grade, $this->LITSETTINGS->LOCALE ),
                 $this->LitCal[ "StHildegardBingen" ]->name,
@@ -2073,7 +2055,7 @@ class LitCalEngine {
                 $coincidingFestivityKey = array_search( $StHildegardBingen_date, $this->FEASTS_MEMORIALS);
             }
             $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                 $StHildegardBingen_tag[ $this->LITSETTINGS->LOCALE ],
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $StHildegardBingen_date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$StHildegardBingen_date->format( 'n' ) ] ) :
@@ -2242,7 +2224,7 @@ class LitCalEngine {
                     $coincidingFestivity_grade = LITCAL_MESSAGES::_G(  $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false );
                 }
 
-                $this->Messages[ ] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                     LITCAL_MESSAGES::__( "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                     LITCAL_MESSAGES::_G(  LitGrade::FEAST, $this->LITSETTINGS->LOCALE, false ),
                     $FestivityName,
@@ -2298,7 +2280,7 @@ class LitCalEngine {
                     $this->LitCal[ $row[ "TAG" ]] = new Festivity( "[ ITALIA ] " . $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ], $row[ "DISPLAYGRADE" ] );
                 }
                 else{
-                    $this->Messages[ ] = sprintf(
+                    $this->Messages[] = sprintf(
                         "ITALIA: la %s '%s' (%s), aggiunta al calendario nell'edizione del Messale Romano del 1983 pubblicata dalla CEI, è soppressa da una Domenica o una Solennità nell'anno %d",
                         $row[ "DISPLAYGRADE" ] !== "" ? $row[ "DISPLAYGRADE" ] : LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE, false ),
                         '<i>' . $row[ "NAME_" . $this->LITSETTINGS->LOCALE ] . '</i>',
@@ -2325,7 +2307,7 @@ class LitCalEngine {
             //so if the National Day of Prayer happens on a Sunday and must be moved to Monday, Saint Vincent will be already gone anyways
             $this->LitCal[ "StVincentDeacon" ]->date->add( new DateInterval( 'P1D' ) );
             //let's not worry about translating these messages, just leave them in English
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 "USA: The Memorial '%s' was moved from Jan 22 to Jan 23 to make room for the National Day of Prayer for the Unborn, as per the 2011 Roman Missal issued by the USCCB",
                 '<i>' . $this->LitCal[ "StVincentDeacon" ]->name . '</i>'
             );
@@ -2335,7 +2317,7 @@ class LitCalEngine {
         if( array_key_exists( "StsJeanBrebeuf", $this->LitCal ) ){
             //if it exists, it means it's not on a Sunday, so we can go ahead and elevate it to Memorial
             $this->LitCal[ "StsJeanBrebeuf" ]->grade = LitGrade::MEMORIAL;
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 "USA: The optional memorial '%s' is elevated to Memorial on Oct 19 as per the 2011 Roman Missal issued by the USCCB, applicable to the year %d",
                 '<i>' . $this->LitCal[ "StsJeanBrebeuf" ]->name . '</i>',
                 $this->LITSETTINGS->YEAR
@@ -2345,7 +2327,7 @@ class LitCalEngine {
             if( array_key_exists( "StPaulCross", $this->LitCal ) ){ //of course it will exist if StsJeanBrebeuf exists, they are originally on the same day
                 $this->LitCal[ "StPaulCross" ]->date->add( new DateInterval( 'P1D' ) );
                 if( in_array( $this->LitCal[ "StPaulCross" ]->date, $this->SOLEMNITIES) || in_array( $this->LitCal[ "StPaulCross" ]->date, $this->FEASTS_MEMORIALS) ){
-                    $this->Messages[ ] = sprintf(
+                    $this->Messages[] = sprintf(
                         "USA: The optional memorial '%s' is transferred from Oct 19 to Oct 20 as per the 2011 Roman Missal issued by the USCCB, to make room for '%s' elevated to the rank of Memorial, however in the year %d it is superseded by a higher ranking liturgical event",
                         '<i>' . $this->LitCal[ "StPaulCross" ]->name . '</i>',
                         '<i>' . $this->LitCal[ "StsJeanBrebeuf" ]->name . '</i>',
@@ -2353,7 +2335,7 @@ class LitCalEngine {
                     );
                     unset( $this->LitCal[ "StPaulCross" ] );
                 }else{
-                    $this->Messages[ ] = sprintf(
+                    $this->Messages[] = sprintf(
                         'USA: The optional memorial \'%1$s\' is transferred from Oct 19 to Oct 20 as per the 2011 Roman Missal issued by the USCCB, to make room for \'%2$s\' elevated to the rank of Memorial: applicable to the year %3$d.',
                         '<i>' . $this->LitCal[ "StPaulCross" ]->name . '</i>',
                         '<i>' . $this->LitCal[ "StsJeanBrebeuf" ]->name . '</i>',
@@ -2371,7 +2353,7 @@ class LitCalEngine {
                 if ( $result ) {
                     $row = mysqli_fetch_assoc( $result );
                     $this->LitCal[ "StPaulCross" ] = new Festivity( "[ USA ] " . $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ] );
-                    $this->Messages[ ] = sprintf(
+                    $this->Messages[] = sprintf(
                         'USA: The optional memorial \'%1$s\' is transferred from Oct 19 to Oct 20 as per the 2011 Roman Missal issued by the USCCB, to make room for \'%2$s\' elevated to the rank of Memorial: applicable to the year %3$d.',
                         $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
                         '<i>' . $this->LitCal[ "StsJeanBrebeuf" ]->name . '</i>',
@@ -2395,13 +2377,13 @@ class LitCalEngine {
                 }
                 else if(  (int)$currentFeastDate->format( 'N' ) === 7 && $row[ "TAG" ] === "PrayerUnborn" ){
                     $this->LitCal[ $row[ "TAG" ]] = new Festivity( "[ USA ] " . $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate->add( new DateInterval( 'P1D' ) ), $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ], $row[ "DISPLAYGRADE" ] );
-                    $this->Messages[ ] = sprintf(
+                    $this->Messages[] = sprintf(
                         "USA: The National Day of Prayer for the Unborn is set to Jan 22 as per the 2011 Roman Missal issued by the USCCB, however since it coincides with a Sunday or a Solemnity in the year %d, it has been moved to Jan 23",
                         $this->LITSETTINGS->YEAR
                     );
                 }
                 else{
-                    $this->Messages[ ] = sprintf(
+                    $this->Messages[] = sprintf(
                         "USA: the %s '%s', added to the calendar as per the 2011 Roman Missal issued by the USCCB, is superseded by a Sunday or a Solemnity in the year %d",
                         $row[ "DISPLAYGRADE" ] !== "" ? $row[ "DISPLAYGRADE" ] : LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE, false ),
                         '<i>' . $row[ "NAME_" . $this->LITSETTINGS->LOCALE ] . '</i>',
@@ -2425,7 +2407,7 @@ class LitCalEngine {
                     $this->LitCal[ "StCamillusDeLellis" ] = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ] );
                 }
             }
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 'USA: The optional memorial \'%1$s\' is transferred from July 14 to July 18 as per the 2011 Roman Missal issued by the USCCB, to make room for the Memorial \'%2$s\': applicable to the year %3$d.',
                 '<i>' . $this->LitCal[ "StCamillusDeLellis" ]->name . '</i>',
                 '<i>' . "Blessed Kateri Tekakwitha" . '</i>', //can't use $this->LitCal[ "KateriTekakwitha" ], might not exist!
@@ -2436,7 +2418,7 @@ class LitCalEngine {
         else{
             if( array_key_exists( "StCamillusDeLellis", $this->LitCal ) ){
                 //Can't move Camillus De Lellis from July 14 to July 18, so simply suppress to make room for Kateri Tekakwitha
-                $this->Messages[ ] = sprintf(
+                $this->Messages[] = sprintf(
                     'USA: The optional memorial \'%1$s\' is transferred from July 14 to July 18 as per the 2011 Roman Missal issued by the USCCB, to make room for the Memorial \'%2$s\', however it is superseded by a higher ranking festivity in the year %3$d.',
                     '<i>' . $this->LitCal[ "StCamillusDeLellis" ]->name . '</i>',
                     '<i>' . "Blessed Kateri Tekakwitha" . '</i>', //can't use $this->LitCal[ "KateriTekakwitha" ], might not exist!
@@ -2460,7 +2442,7 @@ class LitCalEngine {
                     $this->LitCal[ "StElizabethPortugal" ] = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ] );
                 }
             }
-            $this->Messages[ ] = sprintf(
+            $this->Messages[] = sprintf(
                 'USA: The optional memorial \'%1$s\' is transferred from July 4 to July 5 as per the 2011 Roman Missal issued by the USCCB, to make room for the Holiday \'%2$s\': applicable to the year %3$d.',
                 '<i>' . $this->LitCal[ "StElizabethPortugal" ]->name . '</i>',
                 '<i>' . "Independence Day" . '</i>', //can't use $this->LitCal[ "IndependenceDay" ], might not exist!
@@ -2471,7 +2453,7 @@ class LitCalEngine {
         else{
             if( array_key_exists( "StElizabethPortugal", $this->LitCal ) ){
                 //Can't move Elizabeth of Portugal to July 5, so simply suppress to make room for Independence Day
-                $this->Messages[ ] = sprintf(
+                $this->Messages[] = sprintf(
                     'USA: The optional memorial \'%1$s\' is transferred from July 4 to July 5 as per the 2011 Roman Missal issued by the USCCB, to make room for the holiday \'%2$s\', however it is superseded by a higher ranking festivity in the year %3$d.',
                     '<i>' . $this->LitCal[ "StElizabethPortugal" ]->name . '</i>',
                     '<i>' . "Independence Day" . '</i>', //can't use $this->LitCal[ "IndependenceDay" ], might not exist!
@@ -2553,7 +2535,7 @@ class LitCalEngine {
                                     $festivity->hasVigilMass = false;
                                     $festivity->hasVesperI = false;
                                     $coincidingFestivity->hasVesperII = true;
-                                    $this->Messages[ ] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                    $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                                         LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while  the first Solemnity will not have a Vigil Mass or Vespers I.", $this->LITSETTINGS->LOCALE ),
                                         $festivityGrade,
                                         $festivity->name,
@@ -2566,7 +2548,7 @@ class LitCalEngine {
                                     $festivity->hasVigilMass = true;
                                     $festivity->hasVesperI = true;
                                     $coincidingFestivity->hasVesperII = false;
-                                    $this->Messages[ ] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                    $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                                         LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass.", $this->LITSETTINGS->LOCALE ),
                                         $festivityGrade,
                                         $festivity->name,
@@ -2579,7 +2561,7 @@ class LitCalEngine {
                                     $festivity->hasVigilMass = true;
                                     $festivity->hasVesperI = true;
                                     $coincidingFestivity->hasVesperII = false;
-                                    $this->Messages[ ] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                    $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                                         LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass.", $this->LITSETTINGS->LOCALE ),
                                         $festivityGrade,
                                         $festivity->name,
@@ -2593,7 +2575,7 @@ class LitCalEngine {
                                     $festivity->hasVesperI = false;
                                     $festivity->hasVigilMass = false;
                                     unset( $this->LitCal[ $key . "_vigil" ] );
-                                    $this->Messages[ ] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                    $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                                         LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while  the first Solemnity will not have a Vigil Mass or Vespers I.", $this->LITSETTINGS->LOCALE ),
                                         $festivityGrade,
                                         $festivity->name,
@@ -2607,7 +2589,7 @@ class LitCalEngine {
                                             $coincidingFestivity->hasVesperII = false;
                                             $festivity->hasVesperI = true;
                                             $festivity->hasVigilMass = true;
-                                            $this->Messages[ ] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                            $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                                                 LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As per %s, the first has precedence, therefore the Vigil Mass is confirmed as are I Vespers.", $this->LITSETTINGS->LOCALE ),
                                                 $festivityGrade,
                                                 $festivity->name,
@@ -2619,7 +2601,7 @@ class LitCalEngine {
                                         }
                                     }
                                     else {
-                                        $this->Messages[ ] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                        $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                                             LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!", $this->LITSETTINGS->LOCALE ),
                                             $festivityGrade,
                                             $festivity->name,
@@ -2638,7 +2620,7 @@ class LitCalEngine {
                                     && false === ( $coincidingFestivity->date > $this->LitCal[ "Easter" ]->date && $coincidingFestivity->date < $this->LitCal[ "Easter2" ]->date )
                                 ){
 
-                                    $this->Messages[ ] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                    $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                                         LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass.", $this->LITSETTINGS->LOCALE ),
                                         $festivityGrade,
                                         $festivity->name,
@@ -2676,7 +2658,7 @@ class LitCalEngine {
                     if( in_array ( $currentFeastDate, $this->SOLEMNITIES ) && $key != array_search( $currentFeastDate, $this->SOLEMNITIES ) ) {
                         //there seems to be a coincidence with a different Solemnity on the same day!
                         //should we attempt to move to the next open slot?
-                        $this->Messages[ ] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                        $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                             $this->LITSETTINGS->DIOCESAN . ": the Solemnity '%s', proper to the calendar of the " . $this->GeneralIndex->{$this->LITSETTINGS->DIOCESAN}->diocese . " and usually celebrated on %s, coincides with the Sunday or Solemnity '%s' in the year %d! Does something need to be done about this?",
                             '<i>' . $obj->name . '</i>',
                             '<b>' . trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) ) . '</b>',
@@ -2687,7 +2669,7 @@ class LitCalEngine {
                 } else if ( $obj->grade <= LitGrade::FEAST && !in_array( $currentFeastDate, $this->SOLEMNITIES ) ){
                     $this->LitCal[ $this->LITSETTINGS->DIOCESAN . "_" . $key ] = new Festivity( "[ " . $this->GeneralIndex->{$this->LITSETTINGS->DIOCESAN}->diocese . " ] " . $obj->name, $currentFeastDate, strtolower( $obj->color ), LitFeastType::FIXED, $obj->grade, $obj->common );
                 } else {
-                    $this->Messages[ ] = sprintf(
+                    $this->Messages[] = sprintf(
                         $this->LITSETTINGS->DIOCESAN . ": the %s '%s', proper to the calendar of the " . $this->GeneralIndex->{$this->LITSETTINGS->DIOCESAN}->diocese . " and usually celebrated on %s, is suppressed by the Sunday or Solemnity %s in the year %d",
                         LITCAL_MESSAGES::_G(  $obj->grade, $this->LITSETTINGS->LOCALE, false ),
                         '<i>' . $obj->name . '</i>',
