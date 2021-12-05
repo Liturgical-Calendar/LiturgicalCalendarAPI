@@ -91,7 +91,7 @@ class LitCalEngine {
     private mysqli $mysqli;
 
     private string $jsonEncodedRequestHeaders       = "";
-    private string $responseContentType             = RETURN_TYPE::JSON;
+    private string $responseContentType             = ACCEPT_HEADER::JSON;
     //private bool $isAjax                          = false;
 
     private ?object $DiocesanData                   = null;
@@ -138,10 +138,10 @@ class LitCalEngine {
         header( 'Access-Control-Max-Age: 86400' );    // cache for 1 day
     }
 
-    private static function setAccessControlAllowMethods() {
+    private function setAccessControlAllowMethods() {
         if ( isset( $_SERVER[ 'REQUEST_METHOD' ] ) ) {
             if ( isset( $_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_METHOD' ] ) )
-                header( "Access-Control-Allow-Methods: GET, POST" );
+                header( "Access-Control-Allow-Methods: " . implode(',', $this->ALLOWED_REQUEST_METHODS) );
             if ( isset( $_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' ] ) )
                 header( "Access-Control-Allow-Headers: {$_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' ]}" );
         }
