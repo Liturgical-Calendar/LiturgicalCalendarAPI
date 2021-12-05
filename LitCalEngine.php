@@ -1148,41 +1148,39 @@ class LitCalEngine {
 
     }
 
+    private function createMaryMotherChurch( stdClass $MaryMotherChurch ) {
+        $this->LitCal[ "MaryMotherChurch" ] = new Festivity( $MaryMotherChurch->tag[ $this->LITSETTINGS->LOCALE ], $MaryMotherChurch->date, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL, "Proper" );
+        $this->Messages[] = sprintf(
+            LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
+            LITCAL_MESSAGES::_G( $this->LitCal[ "MaryMotherChurch" ]->grade, $this->LITSETTINGS->LOCALE ),
+            $this->LitCal[ "MaryMotherChurch" ]->name,
+            LITCAL_MESSAGES::__( 'the Monday after Pentecost', $this->LITSETTINGS->LOCALE ),
+            2018,
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20180211_decreto-mater-ecclesiae_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
+            $this->LITSETTINGS->YEAR
+        );
+    }
+
     private function applyMemorialDecree2018() : void {
         //With the Decree of the Congregation of Divine Worship on March 24, 2018,
         //the Obligatory Memorial of the Blessed Virgin Mary, Mother of the Church was added on the Monday after Pentecost
         //http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20180211_decreto-mater-ecclesiae_la.html
-        $MaryMotherChurch_tag = [ "LA" => "Beatæ Mariæ Virginis, Ecclesiæ Matris", "IT" => "Beata Vergine Maria, Madre della Chiesa", "EN" => "Blessed Virgin Mary, Mother of the Church" ];
-        $MaryMotherChurch_date = LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P' . ( 7 * 7 + 1 ) . 'D' ) );
+        $MaryMotherChurch = new stdClass();
+        $MaryMotherChurch->tag = [ "LA" => "Beatæ Mariæ Virginis, Ecclesiæ Matris", "IT" => "Beata Vergine Maria, Madre della Chiesa", "EN" => "Blessed Virgin Mary, Mother of the Church" ];
+        $MaryMotherChurch->date = LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P' . ( 7 * 7 + 1 ) . 'D' ) );
         //The Memorial is superseded by Solemnities and Feasts, but not by Memorials of Saints
-        if( !in_array( $MaryMotherChurch_date, $this->SOLEMNITIES) && !in_array( $MaryMotherChurch_date, $this->FEASTS_MEMORIALS) ){
-            $this->LitCal[ "MaryMotherChurch" ] = new Festivity( $MaryMotherChurch_tag[ $this->LITSETTINGS->LOCALE ], $MaryMotherChurch_date, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL, "Proper" );
-            $this->Messages[] = sprintf(
-                LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
-                LITCAL_MESSAGES::_G( $this->LitCal[ "MaryMotherChurch" ]->grade, $this->LITSETTINGS->LOCALE ),
-                $this->LitCal[ "MaryMotherChurch" ]->name,
-                LITCAL_MESSAGES::__( 'the Monday after Pentecost', $this->LITSETTINGS->LOCALE ),
-                2018,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20180211_decreto-mater-ecclesiae_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
-                $this->LITSETTINGS->YEAR
-            );
+        if( !in_array( $MaryMotherChurch->date, $this->SOLEMNITIES) && !in_array( $MaryMotherChurch->date, $this->FEASTS_MEMORIALS) ){
+            $this->createMaryMotherChurch( $MaryMotherChurch );
         }
-        else if ( in_array( $MaryMotherChurch_date, $this->FEASTS_MEMORIALS) ){
+        else if ( in_array( $MaryMotherChurch->date, $this->FEASTS_MEMORIALS) ){
             //we have to find out what it coincides with. If it's a feast, it is superseded by the feast. If a memorial, it will suppress the memorial
-            $coincidingFestivityKey = array_search( $MaryMotherChurch_date, $this->FEASTS_MEMORIALS);
+            $coincidingFestivityKey = array_search( $MaryMotherChurch->date, $this->FEASTS_MEMORIALS);
             $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
-    
+
             if( $coincidingFestivity->grade <= LitGrade::MEMORIAL ){
-                $this->LitCal[ "MaryMotherChurch" ] = new Festivity( $MaryMotherChurch_tag[ $this->LITSETTINGS->LOCALE ], $MaryMotherChurch_date, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL, "Proper" );
-                $this->Messages[] = sprintf(
-                    LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
-                    LITCAL_MESSAGES::_G( $this->LitCal[ "MaryMotherChurch" ]->grade, $this->LITSETTINGS->LOCALE ),
-                    $this->LitCal[ "MaryMotherChurch" ]->name,
-                    LITCAL_MESSAGES::__( 'the Monday after Pentecost', $this->LITSETTINGS->LOCALE ),
-                    2018,
-                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20180211_decreto-mater-ecclesiae_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
-                    $this->LITSETTINGS->YEAR
-                );
+
+                $this->createMaryMotherChurch( $MaryMotherChurch );
+
                 $this->Messages[] = sprintf(
                     LITCAL_MESSAGES::__( "The %s '%s' has been suppressed by the Memorial '%s', added on %s since the year %d (%s).", $this->LITSETTINGS->LOCALE ),
                     LITCAL_MESSAGES::_G( $this->LitCal[ $coincidingFestivityKey ]->grade, $this->LITSETTINGS->LOCALE, false ),
@@ -1196,7 +1194,7 @@ class LitCalEngine {
             }else{
                 $this->Messages[] = sprintf(
                     LITCAL_MESSAGES::__( "The Memorial '%s', added on %s since the year %d (%s), is however superseded by a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
-                    $MaryMotherChurch_tag[ $this->LITSETTINGS->LOCALE ],
+                    $MaryMotherChurch->tag[ $this->LITSETTINGS->LOCALE ],
                     LITCAL_MESSAGES::__( 'the Monday after Pentecost', $this->LITSETTINGS->LOCALE ),
                     2018,
                     '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20180211_decreto-mater-ecclesiae_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
@@ -1205,8 +1203,8 @@ class LitCalEngine {
                 );
             }
         }
-        else if( in_array( $MaryMotherChurch_date, $this->SOLEMNITIES) ){
-            $coincidingFestivityKey = array_search( $MaryMotherChurch_date, $this->SOLEMNITIES);
+        else if( in_array( $MaryMotherChurch->date, $this->SOLEMNITIES) ){
+            $coincidingFestivityKey = array_search( $MaryMotherChurch->date, $this->SOLEMNITIES);
             $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
             $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The Memorial '%s', added on %s since the year %d (%s), is however superseded by a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
