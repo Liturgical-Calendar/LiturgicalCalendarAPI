@@ -1082,6 +1082,38 @@ class LitCalEngine {
 
     }
 
+    private function handleTertiaEditioCoincidence( DateTime $currentFeastDate, array $row ) {
+
+        $coincidingFestivity = new stdClass();
+        $coincidingFestivity->grade = '';
+        if(  (int)$currentFeastDate->format( 'N' ) === 7 && $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ]->grade < LitGrade::SOLEMNITY ){
+            //it's a Sunday
+            $coincidingFestivity->event = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ];
+            $coincidingFestivity->grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
+        } else if ( in_array( $currentFeastDate, $this->SOLEMNITIES) ){
+            //it's a Feast of the Lord or a Solemnity
+            $coincidingFestivity->event = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ];
+            $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) );
+        } else if( in_array( $currentFeastDate, $this->FEASTS_MEMORIALS) ){
+            $coincidingFestivity->event = $this->LitCal[ array_search( $currentFeastDate, $this->FEASTS_MEMORIALS ) ];
+            $coincidingFestivity->grade = LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false );
+        }
+        $this->Messages[] = sprintf(
+            LITCAL_MESSAGES::__( "The %s '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
+            LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE, false ),
+            $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
+            $this->LITSETTINGS->LOCALE === 'LA' ? ( $currentFeastDate->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$currentFeastDate->format( 'n' ) ] ) :
+                ( $this->LITSETTINGS->LOCALE === 'EN' ? $currentFeastDate->format( 'F jS' ) :
+                    trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) )
+                ),
+            $coincidingFestivity->grade,
+            $coincidingFestivity->name,
+            $this->LITSETTINGS->YEAR
+        );
+
+    }
+
     private function checkImmaculateHeartCoincidence( DateTime $currentFeastDate ) {
 
         //IMMACULATEHEART: in years when the memorial of the Immaculate Heart of Mary coincides with another obligatory memorial,
@@ -1145,78 +1177,6 @@ class LitCalEngine {
 
     }
 
-    /*if we are dealing with a calendar from the year 2002 onwards we need to add the new obligatory memorials from the Tertia Editio Typica:
-    14 augusti:  S. Maximiliani Mariæ Kolbe, presbyteri et martyris;
-    20 septembris:  Ss. Andreæ Kim Taegon, presbyteri, et Pauli Chong Hasang et sociorum, martyrum;
-    24 novembris:  Ss. Andreæ Dung-Lac, presbyteri, et sociorum, martyrum.
-    source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html
-    */
-    private function applyMemorialsTertiaEditioTypica2002() : void {
-        $result = $this->mysqli->query( "SELECT * FROM LITURGY__calendar_propriumdesanctis_2002 WHERE GRADE = " . LitGrade::MEMORIAL );
-        if ( $result ) {
-            while ( $row = mysqli_fetch_assoc( $result ) ) {
-
-                //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord, then go ahead and create the Festivity
-                $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row[ "DAY" ] . '-' . $row[ "MONTH" ] . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-                if (  (int)$currentFeastDate->format( 'N' ) !== 7 && !in_array( $currentFeastDate, $this->SOLEMNITIES) && !in_array( $currentFeastDate, $this->FEASTS_MEMORIALS) ) {
-                    $this->LitCal[ $row[ "TAG" ]] = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ] );
-                    $this->Messages[] = sprintf(
-                        LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
-                        LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE ),
-                        $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
-                        $this->LITSETTINGS->LOCALE === 'LA' ? ( $currentFeastDate->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$currentFeastDate->format( 'n' ) ] ) :
-                            ( $this->LITSETTINGS->LOCALE === 'EN' ? $currentFeastDate->format( 'F jS' ) :
-                                trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) )
-                            ),
-                        2002,
-                        '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
-                        $this->LITSETTINGS->YEAR
-                    );
-
-                    $this->reduceMemorialsInAdventLentToCommemoration( $row, $currentFeastDate );
-
-                    //We can now add, for logical reasons, Feasts and Memorials to the $this->FEASTS_MEMORIALS array
-                    if ( $this->LitCal[ $row[ "TAG" ]]->grade > LitGrade::MEMORIAL_OPT ) {
-                        $this->FEASTS_MEMORIALS[ $row[ "TAG" ]]      = $currentFeastDate;
-
-                        $this->removeWeekdaysEpiphanyOverridenByMemorials( $row[ "TAG" ] );
-
-                        $this->checkImmaculateHeartCoincidence( $currentFeastDate );
-
-                    }
-                } else {
-                    $coincidingFestivity_grade = '';
-                    if(  (int)$currentFeastDate->format( 'N' ) === 7 && $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ]->grade < LitGrade::SOLEMNITY ){
-                        //it's a Sunday
-                        $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ];
-                        $coincidingFestivity_grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
-                    } else if ( in_array( $currentFeastDate, $this->SOLEMNITIES) ){
-                        //it's a Feast of the Lord or a Solemnity
-                        $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ];
-                        $coincidingFestivity_grade = ( $coincidingFestivity->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) );
-                    } else if( in_array( $currentFeastDate, $this->FEASTS_MEMORIALS) ){
-                        $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ];
-                        $coincidingFestivity_grade = LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false );
-                    }
-
-                    $this->Messages[] = sprintf(
-                        LITCAL_MESSAGES::__( "The %s '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
-                        LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE, false ),
-                        $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
-                        '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
-                        $this->LITSETTINGS->LOCALE === 'LA' ? ( $currentFeastDate->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$currentFeastDate->format( 'n' ) ] ) :
-                            ( $this->LITSETTINGS->LOCALE === 'EN' ? $currentFeastDate->format( 'F jS' ) :
-                                trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) )
-                            ),
-                        $coincidingFestivity_grade,
-                        $coincidingFestivity->name,
-                        $this->LITSETTINGS->YEAR
-                    );
-                }
-            }
-        }
-
-    }
 
     private function applyMemorialsTertiaEditioTypicaEmendata2008() : void {
 
@@ -1377,7 +1337,13 @@ class LitCalEngine {
 
     }
 
-    /*if we are dealing with a calendar from the year 2002 onwards we need to add the optional memorials from the Tertia Editio Typica:
+    /*
+    * if we are dealing with a calendar from the year 2002 onwards we need to add the new obligatory memorials from the Tertia Editio Typica:
+        14 augusti:  S. Maximiliani Mariæ Kolbe, presbyteri et martyris;
+        20 septembris:  Ss. Andreæ Kim Taegon, presbyteri, et Pauli Chong Hasang et sociorum, martyrum;
+        24 novembris:  Ss. Andreæ Dung-Lac, presbyteri, et sociorum, martyrum.
+
+    * if we are dealing with a calendar from the year 2002 onwards we need to add the optional memorials from the Tertia Editio Typica:
         23 aprilis:  S. Adalberti, episcopi et martyris
         28 aprilis:  S. Ludovici Mariæ Grignion de Montfort, presbyteri
         2 augusti:  S. Petri Iuliani Eymard, presbyteri
@@ -1396,11 +1362,12 @@ class LitCalEngine {
         9 augusti:  S. Teresiæ Benedictæ a Cruce, virginis et martyris
         12 septembris:  SS.mi Nominis Mariæ
         25 novembris:  S. Catharinæ Alexandrinæ, virginis et martyris
-        source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html
-        */
-    private function applyOptionalMemorialsTertiaEditioTypica2002() : void {
 
-        $result = $this->mysqli->query( "SELECT * FROM LITURGY__calendar_propriumdesanctis_2002 WHERE GRADE = " . LitGrade::MEMORIAL_OPT );
+        source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_it.html
+    */
+    private function applyMemorialsTertiaEditioTypica2002( int $grade = LitGrade::MEMORIAL ) : void {
+
+        $result = $this->mysqli->query( "SELECT * FROM LITURGY__calendar_propriumdesanctis_2002 WHERE GRADE = " . $grade );
         if ( $result ) {
             while ( $row = mysqli_fetch_assoc( $result ) ) {
 
@@ -1432,33 +1399,19 @@ class LitCalEngine {
 
                     $this->reduceMemorialsInAdventLentToCommemoration( $row, $currentFeastDate );
 
-                } else {
-                    $coincidingFestivity_grade = '';
-                    if(  (int)$currentFeastDate->format( 'N' ) === 7 && $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ]->grade < LitGrade::SOLEMNITY ){
-                        //it's a Sunday
-                        $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ];
-                        $coincidingFestivity_grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
-                    } else if ( in_array( $currentFeastDate, $this->SOLEMNITIES) ){
-                        //it's a Feast of the Lord or a Solemnity
-                        $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ];
-                        $coincidingFestivity_grade = ( $coincidingFestivity->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) );
-                    } else if( in_array( $currentFeastDate, $this->FEASTS_MEMORIALS) ){
-                        $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->FEASTS_MEMORIALS ) ];
-                        $coincidingFestivity_grade = LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false );
+                    //We can now add, for logical reasons, Feasts and Memorials to the $this->FEASTS_MEMORIALS array
+                    if ( $grade === LitGrade::MEMORIAL && $this->LitCal[ $row[ "TAG" ]]->grade > LitGrade::MEMORIAL_OPT ) {
+
+                        $this->FEASTS_MEMORIALS[ $row[ "TAG" ]]      = $currentFeastDate;
+
+                        $this->removeWeekdaysEpiphanyOverridenByMemorials( $row[ "TAG" ] );
+
+                        $this->checkImmaculateHeartCoincidence( $currentFeastDate );
+
                     }
-                    $this->Messages[] = sprintf(
-                        LITCAL_MESSAGES::__( "The %s '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
-                        LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE, false ),
-                        $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
-                        '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
-                        $this->LITSETTINGS->LOCALE === 'LA' ? ( $currentFeastDate->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$currentFeastDate->format( 'n' ) ] ) :
-                            ( $this->LITSETTINGS->LOCALE === 'EN' ? $currentFeastDate->format( 'F jS' ) :
-                                trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) )
-                            ),
-                        $coincidingFestivity_grade,
-                        $coincidingFestivity->name,
-                        $this->LITSETTINGS->YEAR
-                    );
+
+                } else {
+                    $this->handleTertiaEditioCoincidence( $currentFeastDate, $row );
                 }
             }
         }
@@ -2974,7 +2927,7 @@ class LitCalEngine {
             }
 
             if ( $this->LITSETTINGS->YEAR >= 2002 ) {
-                $this->applyMemorialsTertiaEditioTypica2002();
+                $this->applyMemorialsTertiaEditioTypica2002( LitGrade::MEMORIAL );
             }
 
             if( $this->LITSETTINGS->YEAR >= 2008 ) {
@@ -3008,7 +2961,7 @@ class LitCalEngine {
             $this->calculateOptionalMemorials();
 
             if ( $this->LITSETTINGS->YEAR >= 2002 ) {
-                $this->applyOptionalMemorialsTertiaEditioTypica2002();
+                $this->applyMemorialsTertiaEditioTypica2002( LitGrade::MEMORIAL_OPT );
             }
 
             if ( $this->LITSETTINGS->YEAR >= 2008 ) {
