@@ -267,7 +267,7 @@ class LitCalEngine {
         }
     }
 
-    private function retrieveHigherSolemnityTranslations() : void {
+    private function populatePropriumDeTempore() : void {
         /**
          * Retrieve Higher Ranking Solemnities from Proprium de Tempore
          */
@@ -2457,7 +2457,6 @@ class LitCalEngine {
                                             $this->LITSETTINGS->YEAR
                                         );
                                     }
-
                                 }
                             } else {
                                 if(
@@ -2477,16 +2476,153 @@ class LitCalEngine {
                                     );
                                 }
                             }
-
                         }
                     } else {
                         $this->LitCal[ $key ]->hasVigilMass = false;
                         $this->LitCal[ $key ]->hasVesperI = false;
                     }
                 }
-
             }
         }
+
+    }
+
+    private function calculateUniversalCalendar() : void {
+
+        $this->populatePropriumDeTempore();
+        /**
+         *  CALCULATE LITURGICAL EVENTS BASED ON THE ORDER OF PRECEDENCE OF LITURGICAL DAYS ( LY 59 )
+         *  General Norms for the Liturgical Year and the Calendar ( issued on Feb. 14 1969 )
+         */
+
+        //I.
+        //1. Easter Triduum of the Lord's Passion and Resurrection
+        $this->calculateEasterTriduum();
+        //2. Christmas, Epiphany, Ascension, and Pentecost
+        $this->calculateChristmasEpiphany();
+        $this->calculateAscensionPentecost();
+        //Sundays of Advent, Lent, and Easter Time
+        $this->calculateSundaysMajorSeasons();
+        $this->calculateAshWednesday();
+        $this->calculateWeekdaysHolyWeek();
+        $this->calculateEasterOctave();
+        //3. Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar
+        $this->calculateMobileSolemnitiesOfTheLord();
+        $this->calculateFixedSolemnities(); //this will also handle All Souls Day
+
+        //4. PROPER SOLEMNITIES:
+        //these will be dealt with later when loading Local Calendar Data
+
+        //II.
+        //5. FEASTS OF THE LORD IN THE GENERAL CALENDAR
+        $this->calculateFeastsOfTheLord();
+        //6. SUNDAYS OF CHRISTMAS TIME AND SUNDAYS IN ORDINARY TIME
+        $this->calculateSundaysChristmasOrdinaryTime();
+        //7. FEASTS OF THE BLESSED VIRGIN MARY AND OF THE SAINTS IN THE GENERAL CALENDAR
+        $this->calculateFeastsMarySaints();
+
+        //8. PROPER FEASTS:
+        //a ) feast of the principal patron of the Diocese - for pastoral reasons can be celebrated as a solemnity ( PC 8, 9 )
+        //b ) feast of the anniversary of the Dedication of the cathedral church
+        //c ) feast of the principal Patron of the region or province, of a nation or a wider territory - for pastoral reasons can be celebrated as a solemnity ( PC 8, 9 )
+        //d ) feast of the titular, of the founder, of the principal patron of an Order or Congregation and of the religious province, without prejudice to the prescriptions of n. 4 d
+        //e ) other feasts proper to an individual church
+        //f ) other feasts inscribed in the calendar of a diocese or of a religious order or congregation
+        //these will be dealt with later when loading Local Calendar Data
+
+        //9. WEEKDAYS of ADVENT FROM 17 DECEMBER TO 24 DECEMBER INCLUSIVE
+        $this->calculateWeekdaysAdvent();
+        //WEEKDAYS of the Octave of Christmas
+        $this->calculateWeekdaysChristmasOctave();
+        //WEEKDAYS of LENT
+        $this->calculateWeekdaysLent();
+        //III.
+        //10. Obligatory memorials in the General Calendar
+        $this->calculateMemorials( LitGrade::MEMORIAL, RomanMissal::EDITIO_TYPICA_1970 );
+
+        if ( $this->LITSETTINGS->YEAR >= 1998 ) {
+            //St Therese of the Child Jesus was proclaimed a Doctor of the Church in 1998
+            $this->applyDoctorDecree1998();
+        }
+
+        if ( $this->LITSETTINGS->YEAR >= 2002 ) {
+            $this->calculateMemorials( LitGrade::MEMORIAL, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
+        }
+
+        if( $this->LITSETTINGS->YEAR >= 2008 ) {
+            $this->applyMemorialsTertiaEditioTypicaEmendata2008();
+        }
+
+        if ( $this->LITSETTINGS->YEAR >= 2016 ) {
+            //Memorial of Saint Mary Magdalen elevated to a Feast
+            $this->applyFeastDecree2016();
+        }
+
+        if( $this->LITSETTINGS->YEAR >= 2018 ) {
+            //Memorial of the Blessed Virgin Mary, Mother of the Church added on the Monday after Pentecost
+            $this->applyMemorialDecree2018();
+        }
+
+        if( $this->LITSETTINGS->YEAR >= 2021 ) {
+            //Memorial of St Martha becomes Martha, Mary and Lazarus
+            $this->applyMemorialDecree2021();
+        }
+
+        //11. Proper obligatory memorials, and that is:
+        //a ) obligatory memorial of the seconday Patron of a place, of a diocese, of a region or religious province
+        //b ) other obligatory memorials in the calendar of a single diocese, order or congregation
+        //these will be dealt with later when loading Local Calendar Data
+
+        //12. Optional memorials ( a proper memorial is to be preferred to a general optional memorial ( PC, 23 c ) )
+        //  which however can be celebrated even in those days listed at n. 9,
+        //  in the special manner described by the General Instructions of the Roman Missal and of the Liturgy of the Hours ( cf pp. 26-27, n. 10 )
+
+        $this->calculateMemorials( LitGrade::MEMORIAL_OPT, RomanMissal::EDITIO_TYPICA_1970 );
+
+        if ( $this->LITSETTINGS->YEAR >= 2002 ) {
+            $this->calculateMemorials( LitGrade::MEMORIAL_OPT, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
+        }
+
+        if ( $this->LITSETTINGS->YEAR >= 2008 ) {
+            $this->applyOptionalMemorialsTertiaEditioTypicaEmendata2008();
+        }
+
+        if( $this->LITSETTINGS->YEAR === 2009 ) {
+            //Conversion of St. Paul falls on a Sunday in the year 2009
+            //Faculty to celebrate as optional memorial
+            $this->applyOptionalMemorialDecree2009();
+        }
+
+        if( $this->LITSETTINGS->YEAR >= 2014 ) {
+            //canonization of Pope Saint John XXIII and Pope Saint John Paul II
+            $this->applyOptionalMemorialDecree2014();
+        }
+
+        if( $this->LITSETTINGS->YEAR >= 2019 ) {
+            //optional memorial of the Blessed Virgin Mary of Loreto
+            //and optional memorial Saint Paul VI, Pope
+            $this->applyOptionalMemorialDecree2019();
+        }
+
+        if( $this->LITSETTINGS->YEAR >= 2020 ){
+            //optional memorial Saint Faustina
+            $this->applyOptionalMemorialDecree2020();
+        }
+
+        if( $this->LITSETTINGS->YEAR >= 2021 ){
+            //optional memorials of Gregory of Narek, John of Avila and Hildegard of Bingen
+            $this->applyOptionalMemorialDecree2021();
+        }
+
+        //13. Weekdays of Advent up until Dec. 16 included ( already calculated and defined together with weekdays 17 Dec. - 24 Dec. )
+        //    Weekdays of Christmas season from 2 Jan. until the Saturday after Epiphany
+        //    Weekdays of the Easter season, from the Monday after the Octave of Easter to the Saturday before Pentecost
+        //    Weekdays of Ordinary time
+        $this->calculateWeekdaysMajorSeasons();
+        $this->calculateWeekdaysOrdinaryTime();
+
+        //15. On Saturdays in Ordinary Time when there is no obligatory memorial, an optional memorial of the Blessed Virgin Mary is allowed.
+        $this->calculateSaturdayMemorialBVM();
 
     }
 
@@ -2746,149 +2882,17 @@ class LitCalEngine {
             $this->initiateDbConnection();
             $this->createNumberFormatters();
             $this->dieIfBeforeMinYear();
-            $this->retrieveHigherSolemnityTranslations();
-            /**
-             *  CALCULATE LITURGICAL EVENTS BASED ON THE ORDER OF PRECEDENCE OF LITURGICAL DAYS ( LY 59 )
-             *  General Norms for the Liturgical Year and the Calendar ( issued on Feb. 14 1969 )
-             */
 
-            //I.
-            //1. Easter Triduum of the Lord's Passion and Resurrection
-            $this->calculateEasterTriduum();
-            //2. Christmas, Epiphany, Ascension, and Pentecost
-            $this->calculateChristmasEpiphany();
-            $this->calculateAscensionPentecost();
-            //Sundays of Advent, Lent, and Easter Time
-            $this->calculateSundaysMajorSeasons();
-            $this->calculateAshWednesday();
-            $this->calculateWeekdaysHolyWeek();
-            $this->calculateEasterOctave();
-            //3. Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar
-            $this->calculateMobileSolemnitiesOfTheLord();
-            $this->calculateFixedSolemnities(); //this will also handle All Souls Day
+            $this->calculateUniversalCalendar();
 
-            //4. PROPER SOLEMNITIES:
-            //these will be dealt with later when loading Local Calendar Data
-
-            //II.
-            //5. FEASTS OF THE LORD IN THE GENERAL CALENDAR
-            $this->calculateFeastsOfTheLord();
-            //6. SUNDAYS OF CHRISTMAS TIME AND SUNDAYS IN ORDINARY TIME
-            $this->calculateSundaysChristmasOrdinaryTime();
-            //7. FEASTS OF THE BLESSED VIRGIN MARY AND OF THE SAINTS IN THE GENERAL CALENDAR
-            $this->calculateFeastsMarySaints();
-
-            //8. PROPER FEASTS:
-            //a ) feast of the principal patron of the Diocese - for pastoral reasons can be celebrated as a solemnity ( PC 8, 9 )
-            //b ) feast of the anniversary of the Dedication of the cathedral church
-            //c ) feast of the principal Patron of the region or province, of a nation or a wider territory - for pastoral reasons can be celebrated as a solemnity ( PC 8, 9 )
-            //d ) feast of the titular, of the founder, of the principal patron of an Order or Congregation and of the religious province, without prejudice to the prescriptions of n. 4 d
-            //e ) other feasts proper to an individual church
-            //f ) other feasts inscribed in the calendar of a diocese or of a religious order or congregation
-            //these will be dealt with later when loading Local Calendar Data
-
-            //9. WEEKDAYS of ADVENT FROM 17 DECEMBER TO 24 DECEMBER INCLUSIVE
-            $this->calculateWeekdaysAdvent();
-            //WEEKDAYS of the Octave of Christmas
-            $this->calculateWeekdaysChristmasOctave();
-            //WEEKDAYS of LENT
-            $this->calculateWeekdaysLent();
-            //III.
-            //10. Obligatory memorials in the General Calendar
-            $this->calculateMemorials( LitGrade::MEMORIAL, RomanMissal::EDITIO_TYPICA_1970 );
-
-            if ( $this->LITSETTINGS->YEAR >= 1998 ) {
-                //St Therese of the Child Jesus was proclaimed a Doctor of the Church in 1998
-                $this->applyDoctorDecree1998();
-            }
-
-            if ( $this->LITSETTINGS->YEAR >= 2002 ) {
-                $this->calculateMemorials( LitGrade::MEMORIAL, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
-            }
-
-            if( $this->LITSETTINGS->YEAR >= 2008 ) {
-                $this->applyMemorialsTertiaEditioTypicaEmendata2008();
-            }
-
-            if ( $this->LITSETTINGS->YEAR >= 2016 ) {
-                //Memorial of Saint Mary Magdalen elevated to a Feast
-                $this->applyFeastDecree2016();
-            }
-
-            if( $this->LITSETTINGS->YEAR >= 2018 ) {
-                //Memorial of the Blessed Virgin Mary, Mother of the Church added on the Monday after Pentecost
-                $this->applyMemorialDecree2018();
-            }
-
-            if( $this->LITSETTINGS->YEAR >= 2021 ) {
-                //Memorial of St Martha becomes Martha, Mary and Lazarus
-                $this->applyMemorialDecree2021();
-            }
-
-            //11. Proper obligatory memorials, and that is:
-            //a ) obligatory memorial of the seconday Patron of a place, of a diocese, of a region or religious province
-            //b ) other obligatory memorials in the calendar of a single diocese, order or congregation
-            //these will be dealt with later when loading Local Calendar Data
-
-            //12. Optional memorials ( a proper memorial is to be preferred to a general optional memorial ( PC, 23 c ) )
-            //  which however can be celebrated even in those days listed at n. 9,
-            //  in the special manner described by the General Instructions of the Roman Missal and of the Liturgy of the Hours ( cf pp. 26-27, n. 10 )
-
-            $this->calculateMemorials( LitGrade::MEMORIAL_OPT, RomanMissal::EDITIO_TYPICA_1970 );
-
-            if ( $this->LITSETTINGS->YEAR >= 2002 ) {
-                $this->calculateMemorials( LitGrade::MEMORIAL_OPT, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
-            }
-
-            if ( $this->LITSETTINGS->YEAR >= 2008 ) {
-                $this->applyOptionalMemorialsTertiaEditioTypicaEmendata2008();
-            }
-
-            if( $this->LITSETTINGS->YEAR === 2009 ) {
-                //Conversion of St. Paul falls on a Sunday in the year 2009
-                //Faculty to celebrate as optional memorial
-                $this->applyOptionalMemorialDecree2009();
-            }
-
-            if( $this->LITSETTINGS->YEAR >= 2014 ) {
-                //canonization of Pope Saint John XXIII and Pope Saint John Paul II
-                $this->applyOptionalMemorialDecree2014();
-            }
-
-            if( $this->LITSETTINGS->YEAR >= 2019 ) {
-                //optional memorial of the Blessed Virgin Mary of Loreto
-                //and optional memorial Saint Paul VI, Pope
-                $this->applyOptionalMemorialDecree2019();
-            }
-
-            if( $this->LITSETTINGS->YEAR >= 2020 ){
-                //optional memorial Saint Faustina
-                $this->applyOptionalMemorialDecree2020();
-            }
-
-            if( $this->LITSETTINGS->YEAR >= 2021 ){
-                //optional memorials of Gregory of Narek, John of Avila and Hildegard of Bingen
-                $this->applyOptionalMemorialDecree2021();
-            }
-
-            //13. Weekdays of Advent up until Dec. 16 included ( already calculated and defined together with weekdays 17 Dec. - 24 Dec. )
-            //    Weekdays of Christmas season from 2 Jan. until the Saturday after Epiphany
-            //    Weekdays of the Easter season, from the Monday after the Octave of Easter to the Saturday before Pentecost
-            //    Weekdays of Ordinary time
-            $this->calculateWeekdaysMajorSeasons();
-            $this->calculateWeekdaysOrdinaryTime();
-
-            //15. On Saturdays in Ordinary Time when there is no obligatory memorial, an optional memorial of the Blessed Virgin Mary is allowed.
-            $this->calculateSaturdayMemorialBVM();
-
-            //APPLY NATIONAL CALENDARS IF REQUESTED
             if( $this->LITSETTINGS->NATIONAL !== null ) {
                 switch( $this->LITSETTINGS->NATIONAL ){
                     case 'ITALY':
                         $this->applyCalendarItaly();
                         break;
                     case 'USA':
-                        //I don't have any data before 2011. Are there any official printed Missals before that?
+                        //I don't have any data before 2011
+                        //I need copies of the calendar from the Missals printed before 2011...
                         if( $this->LITSETTINGS->YEAR >= 2011 ) {
                             $this->applyCalendarUSA();
                         }
@@ -2897,13 +2901,9 @@ class LitCalEngine {
             }
 
             if( $this->LITSETTINGS->DIOCESAN !== null && $this->DiocesanData !== null ) {
-
                 $this->applyDiocesanCalendar();
-
             }
 
-            //Set Weekly ( YEAR A, B, C ) and Daily ( YEAR I, II ) cycles for each event created
-            //Set Vigil Masses if applicable
             $this->setCyclesAndVigils();
             $this->generateResponse();
         }
