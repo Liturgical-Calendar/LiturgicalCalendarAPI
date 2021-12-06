@@ -1353,7 +1353,7 @@ class LitCalEngine {
                 $result = $this->mysqli->query( "SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StJaneFrancesDeChantal'" );
                 if ( $result ) {
                     $row = mysqli_fetch_assoc( $result );
-                    $this->LitCal[ "StJaneFrancesDeChantal" ] = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $StJaneFrancesNewDate, $row[ "COLOR" ], 'fixed', $row[ "GRADE" ], $row[ "COMMON" ] );
+                    $this->LitCal[ "StJaneFrancesDeChantal" ] = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $StJaneFrancesNewDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ] );
                     $this->Messages[] = sprintf(
                         LITCAL_MESSAGES::__( "The optional memorial '%s', which would have been superseded this year by a Sunday or Solemnity were it on Dec. 12, has however been transferred to Aug. 12 since the year 2002 (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
                         $this->LitCal[ "StJaneFrancesDeChantal" ]->name,
@@ -1413,7 +1413,7 @@ class LitCalEngine {
         ];
         $Guadalupe_date = DateTime::createFromFormat( '!j-n-Y', '12-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
         if ( self::DateIsNotSunday( $Guadalupe_date ) && !in_array( $Guadalupe_date, $this->SOLEMNITIES) && !in_array( $Guadalupe_date, $this->FEASTS_MEMORIALS) ) {
-            $this->LitCal[ "LadyGuadalupe" ] = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $Guadalupe_date, 'white', 'fixed', LitGrade::MEMORIAL_OPT, "Blessed Virgin Mary" );
+            $this->LitCal[ "LadyGuadalupe" ] = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $Guadalupe_date, LitColor::WHITE, LitFeastType::FIXED, LitGrade::MEMORIAL_OPT, "Blessed Virgin Mary" );
             /**
              * TRANSLATORS:
              * 1. Grade or rank of the festivity
@@ -1448,7 +1448,7 @@ class LitCalEngine {
         ];
         $JuanDiego_date = DateTime::createFromFormat( '!j-n-Y', '9-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
         if ( self::DateIsNotSunday( $JuanDiego_date ) && !in_array( $JuanDiego_date, $this->SOLEMNITIES) && !in_array( $JuanDiego_date, $this->FEASTS_MEMORIALS) ) {
-            $this->LitCal[ "JuanDiego" ] = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $JuanDiego_date, 'white', 'fixed', LitGrade::MEMORIAL_OPT, "Holy Men and Women:For One Saint" );
+            $this->LitCal[ "JuanDiego" ] = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $JuanDiego_date, LitColor::WHITE, LitFeastType::FIXED, LitGrade::MEMORIAL_OPT, "Holy Men and Women:For One Saint" );
             /**
              * TRANSLATORS:
              * 1. Grade or rank of the festivity
