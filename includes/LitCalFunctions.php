@@ -190,9 +190,6 @@ class LitCalFf {
           $new_object = $xml->addChild( "LitCalEvent" );
           $new_object->addAttribute( "eventkey", $key );
         }
-        //TODO: verify that this actually works?
-        //do we need to catch anything being returnd?
-        //do we need to pass $new_object as a reference?
         self::convertArray2XML( $value, $new_object );
       } else {
         // if the key is a number, it needs text with it to actually work
