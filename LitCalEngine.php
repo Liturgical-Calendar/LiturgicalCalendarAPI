@@ -792,28 +792,7 @@ class LitCalEngine {
                     $this->LitCal[ $row[ "TAG" ]] = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ] );
                     $this->FEASTS_MEMORIALS[ $row[ "TAG" ]]      = $currentFeastDate;
                 } else {
-                    $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ];
-                    $coincidingFestivity_grade = '';
-                    if( self::DateIsSunday( $currentFeastDate ) && $coincidingFestivity->grade < LitGrade::SOLEMNITY ){
-                        //it's a Sunday
-                        $coincidingFestivity_grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
-                    } else{
-                        //it's a Feast of the Lord or a Solemnity
-                        $coincidingFestivity_grade = ( $coincidingFestivity->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) );
-                    }
-
-                    $this->Messages[] = sprintf(
-                        LITCAL_MESSAGES::__( "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
-                        LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE, false ),
-                        $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
-                        $this->LITSETTINGS->LOCALE === 'LA' ? ( $currentFeastDate->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$currentFeastDate->format( 'n' ) ] ) :
-                            ( $this->LITSETTINGS->LOCALE === 'EN' ? $currentFeastDate->format( 'F jS' ) :
-                                trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) )
-                            ),
-                        $coincidingFestivity_grade,
-                        $coincidingFestivity->name,
-                        $this->LITSETTINGS->YEAR
-                    );
+                    $this->handleCoincidence( $currentFeastDate, $row, RomanMissal::EDITIO_TYPICA_1970 );
                 }
             }
         }
@@ -951,9 +930,12 @@ class LitCalEngine {
         switch( $missal ){
             case RomanMissal::EDITIO_TYPICA_1970:
                 $this->Messages[] = sprintf(
-                    LITCAL_MESSAGES::__( "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
+                    LITCAL_MESSAGES::__( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                     LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE, false ),
                     $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
+                    RomanMissal::getName( $missal ),
+                    1970,
+                    '',
                     $this->LITSETTINGS->LOCALE === 'LA' ? ( $currentFeastDate->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[  (int)$currentFeastDate->format( 'n' ) ] ) :
                         ( $this->LITSETTINGS->LOCALE === 'EN' ? $currentFeastDate->format( 'F jS' ) :
                             trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) )
@@ -965,16 +947,35 @@ class LitCalEngine {
                 break;
             case RomanMissal::EDITIO_TYPICA_TERTIA_2002:
                 $this->Messages[] = sprintf(
-                    LITCAL_MESSAGES::__( "The %s '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
+                    LITCAL_MESSAGES::__( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
                     LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE, false ),
                     $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
+                    RomanMissal::getName( $missal ),
+                    2002,
                     '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
                     $this->LITSETTINGS->LOCALE === 'LA' ? ( $currentFeastDate->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$currentFeastDate->format( 'n' ) ] ) :
                         ( $this->LITSETTINGS->LOCALE === 'EN' ? $currentFeastDate->format( 'F jS' ) :
                             trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) )
                         ),
                     $coincidingFestivity->grade,
-                    $coincidingFestivity->name,
+                    $coincidingFestivity->event->name,
+                    $this->LITSETTINGS->YEAR
+                );
+                break;
+            case RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008:
+                $this->Messages[] = sprintf(
+                    LITCAL_MESSAGES::__( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
+                    LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE, false ),
+                    $row[ "NAME_" . $this->LITSETTINGS->LOCALE ],
+                    RomanMissal::getName( $missal ),
+                    2008,
+                    'Missale Romanum, ed. Typica Tertia Emendata 2008',
+                    $this->LITSETTINGS->LOCALE === 'LA' ? ( $currentFeastDate->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$currentFeastDate->format( 'n' ) ] ) :
+                        ( $this->LITSETTINGS->LOCALE === 'EN' ? $currentFeastDate->format( 'F jS' ) :
+                            trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) )
+                        ),
+                    $coincidingFestivity->grade,
+                    $coincidingFestivity->event->name,
                     $this->LITSETTINGS->YEAR
                 );
                 break;
@@ -1050,10 +1051,15 @@ class LitCalEngine {
 
         //Saint Pio of Pietrelcina "Padre Pio" was canonized on June 16 2002, so did not make it for the Calendar of the 2002 editio typica III
         //The memorial was added in the 2008 editio typica III emendata as an obligatory memorial
-        $StPioPietrelcina_tag = array( "LA" => "S. Pii de Pietrelcina, presbyteri", "IT" => "San Pio da Pietrelcina, presbitero", "EN" => "Saint Pius of Pietrelcina, Priest" );
+        $row = [
+            "NAME_EN" => "Saint Pius of Pietrelcina, Priest",
+            "NAME_IT" => "San Pio da Pietrelcina, presbitero",
+            "NAME_LA" => "S. Pii de Pietrelcina, presbyteri",
+            "GRADE"   => LitGrade::MEMORIAL
+        ];
         $StPioPietrelcina_date = DateTime::createFromFormat( '!j-n-Y', '23-9-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
         if( !in_array( $StPioPietrelcina_date, $this->SOLEMNITIES) && !in_array( $StPioPietrelcina_date, $this->FEASTS_MEMORIALS) ){
-            $this->LitCal[ "StPioPietrelcina" ] = new Festivity( $StPioPietrelcina_tag[ $this->LITSETTINGS->LOCALE ], $StPioPietrelcina_date, LitColor::WHITE, LitFeastType::FIXED, LitGrade::MEMORIAL, "Pastors:For One Pastor,Holy Men and Women:For Religious" );
+            $this->LitCal[ "StPioPietrelcina" ] = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $StPioPietrelcina_date, LitColor::WHITE, LitFeastType::FIXED, LitGrade::MEMORIAL, "Pastors:For One Pastor,Holy Men and Women:For Religious" );
             $this->FEASTS_MEMORIALS[ "StPioPietrelcina" ]      = $StPioPietrelcina_date;
             /**
              * TRANSLATORS:
@@ -1078,25 +1084,7 @@ class LitCalEngine {
             );
         }
         else{
-            if( in_array( $StPioPietrelcina_date, $this->SOLEMNITIES) ){
-                $coincidingFestivityKey = array_search( $StPioPietrelcina_date, $this->SOLEMNITIES);
-            }
-            else if( in_array( $StPioPietrelcina_date, $this->FEASTS_MEMORIALS) ){
-                $coincidingFestivityKey = array_search( $StPioPietrelcina_date, $this->FEASTS_MEMORIALS);
-            }
-            $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
-            $this->Messages[] = sprintf(
-                LITCAL_MESSAGES::__( "The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
-                $StPioPietrelcina_tag[ $this->LITSETTINGS->LOCALE ],
-                $this->LITSETTINGS->LOCALE === 'LA' ? ( $StPioPietrelcina_date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$StPioPietrelcina_date->format( 'n' ) ] ) :
-                    ( $this->LITSETTINGS->LOCALE === 'EN' ? $StPioPietrelcina_date->format( 'F jS' ) :
-                        trim( utf8_encode( strftime( '%e %B', $StPioPietrelcina_date->format( 'U' ) ) ) )
-                    ),
-                2008,
-                'Missale Romanum, ed. Typica Tertia Emendata 2008',
-                $coincidingFestivity->name,
-                $this->LITSETTINGS->YEAR
-            );
+            $this->handleCoincidence( $StPioPietrelcina_date, $row, RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 );
         }
 
     }
@@ -1298,7 +1286,7 @@ class LitCalEngine {
             if( in_array( $ImmaculateHeart_date, $this->SOLEMNITIES ) ) {
                 $coincidingFeast = $this->LitCal[ array_search( $ImmaculateHeart_date, $this->SOLEMNITIES ) ];
                 if( self::DateIsSunday( $ImmaculateHeart_date ) && $coincidingFeast->grade < LitGrade::SOLEMNITY ){
-                    $coincidingFestivity_grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
+                    $coincidingFeast_grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
                 } else {
                     $coincidingFeast_grade = LITCAL_MESSAGES::_G( $coincidingFeast->grade, $this->LITSETTINGS->LOCALE );
                 }

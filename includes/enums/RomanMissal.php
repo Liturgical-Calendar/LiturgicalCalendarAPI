@@ -23,15 +23,30 @@ class ROMANMISSAL {
         "LITURGY__ITALY_calendar_propriumdesanctis_2020"    => "ITALY_2020"
     ];
 
-    public static function isValid( $value ) {
+    public static array $names = [
+        "VATICAN_1970"  => "Editio Typica 1970",
+        "VATICAN_1971"  => "Reimpressio Emendata 1971",
+        "VATICAN_1975"  => "Editio Typica Secunda 1975",
+        "VATICAN_2002"  => "Editio Typica Tertia 2002",
+        "VATICAN_2008"  => "Editio Typica Tertia Emendata 2008",
+        "USA_2011"      => "Roman Missal 2011 Edition",
+        "ITALY_1983"    => "Messale Romano ed. 1983",
+        "ITALY_2020"    => "Messale Romano ed. 2020"
+    ];
+
+    public static function isValid( $value ) : bool {
         return in_array( $value, self::$values );
+    }
+
+    public static function isLatinMissal( $value ) : bool {
+        return in_array( $value, self::$values ) && strpos( $value, "VATICAN_" );
     }
 
     public static function getSanctoraleTableName( $value ) : string|int|false {
         return array_search( $value, self::$values );
     }
 
-    public static function isLatinMissal( $value ) : bool {
-        return in_array( $value, self::$values ) && strpos( $value, "VATICAN_" );
+    public static function getName( $value ) : string {
+        return self::$names[ $value ];
     }
 }
