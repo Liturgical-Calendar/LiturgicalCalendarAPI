@@ -910,7 +910,7 @@ class LitCalEngine {
 
     }
 
-    private function handleCoincidence( DateTime $currentFeastDate, array $row, string $missal = RomanMissal::EDITIO_TYPICA_1970 ) {
+    private function determineSundaySolemnityOrFeast( DateTime $currentFeastDate ) : stdClass {
 
         $coincidingFestivity = new stdClass();
         $coincidingFestivity->grade = '';
@@ -926,7 +926,13 @@ class LitCalEngine {
             $coincidingFestivity->event = $this->LitCal[ array_search( $currentFeastDate, $this->FEASTS_MEMORIALS ) ];
             $coincidingFestivity->grade = LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false );
         }
+        return $coincidingFestivity;
 
+    }
+
+    private function handleCoincidence( DateTime $currentFeastDate, array $row, string $missal = RomanMissal::EDITIO_TYPICA_1970 ) {
+
+        $coincidingFestivity = $this->determineSundaySolemnityOrFeast( $currentFeastDate );
         switch( $missal ){
             case RomanMissal::EDITIO_TYPICA_1970:
                 $this->Messages[] = sprintf(
@@ -985,21 +991,7 @@ class LitCalEngine {
 
     private function handleCoincidenceDecree( DateTime $currentFeastDate, array $row, int $yearSince, string $decree ) : void {
 
-        $coincidingFestivity = new stdClass();
-        $coincidingFestivity->grade = '';
-        if( self::DateIsSunday( $currentFeastDate ) && $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ]->grade < LitGrade::SOLEMNITY ){
-            //it's a Sunday
-            $coincidingFestivity->event = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ];
-            $coincidingFestivity->grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
-        } else if ( in_array( $currentFeastDate, $this->SOLEMNITIES ) ) {
-            //it's a Feast of the Lord or a Solemnity
-            $coincidingFestivity->event = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ];
-            $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) );
-        } else if( in_array( $currentFeastDate, $this->FEASTS_MEMORIALS ) ) {
-            $coincidingFestivity->event = $this->LitCal[ array_search( $currentFeastDate, $this->FEASTS_MEMORIALS ) ];
-            $coincidingFestivity->grade = LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false );
-        }
-
+        $coincidingFestivity = $this->determineSundaySolemnityOrFeast( $currentFeastDate );
         $this->Messages[] = sprintf(
             LITCAL_MESSAGES::__( "The %s '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
             $coincidingFestivity->grade,
