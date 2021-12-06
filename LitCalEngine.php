@@ -367,6 +367,7 @@ class LitCalEngine {
         if ( $this->LITSETTINGS->ASCENSION === ASCENSION::THURSDAY ) {
             $this->LitCal[ "Ascension" ]  = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "Ascension" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],    LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P39D' ) ),           LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
             $this->LitCal[ "Easter7" ]    = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "Easter7" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],      LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P' . ( 7 * 6 ) . 'D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+            $this->SOLEMNITIES[ "Easter7" ] = $this->LitCal[ "Easter7" ]->date;
         } else if ( $this->LITSETTINGS->ASCENSION === "SUNDAY" ) {
             $this->LitCal[ "Ascension" ]  = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "Ascension" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],    LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P' . ( 7 * 6 ) . 'D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
         }
@@ -396,6 +397,7 @@ class LitCalEngine {
         $this->LitCal[ "Trinity" ]        = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "Trinity" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],      LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P' . ( 7 * 8 ) . 'D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
         if ( $this->LITSETTINGS->CORPUSCHRISTI === CORPUSCHRISTI::THURSDAY ) {
             $this->LitCal[ "CorpusChristi" ]  = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "CorpusChristi" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P' . ( 7 * 8 + 4 ) . 'D' ) ),  LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+            //Seeing the Sunday is not taken by Corpus Christi, it should be later taken by a Sunday of Ordinary Time (they are calculate back to Pentecost)
         } else if ( $this->LITSETTINGS->CORPUSCHRISTI === CORPUSCHRISTI::SUNDAY ) {
             $this->LitCal[ "CorpusChristi" ]  = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "CorpusChristi" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P' . ( 7 * 9 ) . 'D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
         }
@@ -728,9 +730,9 @@ class LitCalEngine {
             $ordSun++;
             if ( !in_array( $firstOrdinary, $this->SOLEMNITIES) ) {
                 $this->LitCal[ "OrdSunday" . $ordSun ] = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "OrdSunday" . $ordSun ][ "NAME_" . $this->LITSETTINGS->LOCALE ], $firstOrdinary, LitColor::GREEN, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
-            $this->LitCal[ "OrdSunday" . $ordSun ]->psalterWeek = LitCalFf::psalterWeek( $ordSun );
+                $this->LitCal[ "OrdSunday" . $ordSun ]->psalterWeek = LitCalFf::psalterWeek( $ordSun );
                 //add Sundays to our priority list for next checking against ordinary Feasts not of Our Lord
-                $this->SOLEMNITIES[ "OrdSunday" . $ordSun ]      = $firstOrdinary;
+                $this->SOLEMNITIES[ "OrdSunday" . $ordSun ] = $firstOrdinary;
 
             } else {
                 $this->Messages[] = sprintf(
@@ -756,9 +758,9 @@ class LitCalEngine {
             $ordSun--;
             if ( !in_array( $lastOrdinary, $this->SOLEMNITIES) ) {
                 $this->LitCal[ "OrdSunday" . $ordSun ] = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "OrdSunday" . $ordSun ][ "NAME_" . $this->LITSETTINGS->LOCALE ], $lastOrdinary, LitColor::GREEN, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
-            $this->LitCal[ "OrdSunday" . $ordSun ]->psalterWeek = LitCalFf::psalterWeek( $ordSun );	
+                $this->LitCal[ "OrdSunday" . $ordSun ]->psalterWeek = LitCalFf::psalterWeek( $ordSun );	
                 //add Sundays to our priority list for next checking against ordinary Feasts not of Our Lord
-                $this->SOLEMNITIES[ "OrdSunday" . $ordSun ]      = $lastOrdinary;
+                $this->SOLEMNITIES[ "OrdSunday" . $ordSun ] = $lastOrdinary;
             } else {
                 $this->Messages[] = sprintf(
                     LITCAL_MESSAGES::__( "'%s' is superseded by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
@@ -929,7 +931,7 @@ class LitCalEngine {
 
         $coincidingFestivity = new stdClass();
         $coincidingFestivity->grade = '';
-        if(  (int)$currentFeastDate->format( 'N' ) === 7 && $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ]->grade < LitGrade::SOLEMNITY ){
+        if( (int)$currentFeastDate->format( 'N' ) === 7 && $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ]->grade < LitGrade::SOLEMNITY ){
             //it's a Sunday
             $coincidingFestivity->event = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ];
             $coincidingFestivity->grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
@@ -1255,13 +1257,9 @@ class LitCalEngine {
 
                     //We can now add, for logical reasons, Feasts and Memorials to the $this->FEASTS_MEMORIALS array
                     if ( $grade === LitGrade::MEMORIAL && $this->LitCal[ $row[ "TAG" ]]->grade > LitGrade::MEMORIAL_OPT ) {
-
-                        $this->FEASTS_MEMORIALS[ $row[ "TAG" ]]      = $currentFeastDate;
-
+                        $this->FEASTS_MEMORIALS[ $row[ "TAG" ]] = $currentFeastDate;
                         $this->removeWeekdaysEpiphanyOverridenByMemorials( $row[ "TAG" ] );
-
                         $this->checkImmaculateHeartCoincidence( $currentFeastDate );
-
                     }
 
                 } else {
@@ -2809,7 +2807,6 @@ class LitCalEngine {
 
         switch ( $this->LITSETTINGS->RETURNTYPE ) {
             case RETURN_TYPE::JSON:
-                $SerializeableLitCal->Metadata->REQUEST_HEADERS   = $this->REQUEST_HEADERS;
                 file_put_contents( $this->CACHEFILE, json_encode( $SerializeableLitCal ) );
                 echo json_encode( $SerializeableLitCal );
                 break;
