@@ -983,23 +983,33 @@ class LitCalEngine {
 
     }
 
-    private function checkImmaculateHeartCoincidence( DateTime $currentFeastDate ) {
+    private function checkImmaculateHeartCoincidence( DateTime $currentFeastDate, array $row ) : bool {
 
+        $coincidence = false;
         //IMMACULATEHEART: in years when the memorial of the Immaculate Heart of Mary coincides with another obligatory memorial,
         //as happened in 2014 [ 28 June, Saint Irenaeus ] and 2015 [ 13 June, Saint Anthony of Padua ], both must be considered optional for that year
         //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
-        if ( isset( $this->LitCal[ "ImmaculateHeart" ] ) && $currentFeastDate == $this->LitCal[ "ImmaculateHeart" ]->date ) {
-            $this->LitCal[ "ImmaculateHeart" ]->grade = LitGrade::MEMORIAL_OPT;
-            $this->LitCal[ $row[ "TAG" ] ]->grade = LitGrade::MEMORIAL_OPT;
-            //unset( $this->LitCal[ $key ] ); $this->FEASTS_MEMORIALS ImmaculateHeart
-            $this->Messages[] = sprintf(
-                LITCAL_MESSAGES::__( "The Memorial '%s' coincides with another Memorial '%s' in the year %d. They are both reduced in rank to optional memorials (%s).", $this->LITSETTINGS->LOCALE ),
-                $this->LitCal[ "ImmaculateHeart" ]->name,
-                $this->LitCal[ $row[ "TAG" ] ]->name,
-                $this->LITSETTINGS->YEAR,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>'
-            );
+        if ( isset( $this->LitCal[ "ImmaculateHeart" ] ) ) {
+            if( (int)$row[ "GRADE" ] === LitGrade::MEMORIAL ) {
+                if( $currentFeastDate->format( 'U' ) === $this->LitCal[ "ImmaculateHeart" ]->date->format( 'U' ) ) {
+                    $this->LitCal[ "ImmaculateHeart" ]->grade = LitGrade::MEMORIAL_OPT;
+                    if( !isset( $this->LitCal[ $row[ "TAG" ] ] ) ) {
+                        $this->LitCal[ $row[ "TAG" ] ] = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ] );
+                    }
+                    $this->LitCal[ $row[ "TAG" ] ]->grade = LitGrade::MEMORIAL_OPT;
+                    //unset( $this->LitCal[ $key ] ); $this->FEASTS_MEMORIALS ImmaculateHeart
+                    $this->Messages[] = sprintf(
+                        LITCAL_MESSAGES::__( "The Memorial '%s' coincides with another Memorial '%s' in the year %d. They are both reduced in rank to optional memorials (%s).", $this->LITSETTINGS->LOCALE ),
+                        $this->LitCal[ "ImmaculateHeart" ]->name,
+                        $this->LitCal[ $row[ "TAG" ] ]->name,
+                        $this->LITSETTINGS->YEAR,
+                        '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>'
+                    );
+                    $coincidence = true;
+                }
+            }
         }
+        return $coincidence;
 
     }
 
@@ -1171,7 +1181,7 @@ class LitCalEngine {
 
     }
 
-    private function calculateMemorials( int $grade = LitGrade::MEMORIAL_OPT, string $missal = RomanMissal::EDITIO_TYPICA_1970 ) : void {
+    private function calculateMemorials( int $grade = LitGrade::MEMORIAL, string $missal = RomanMissal::EDITIO_TYPICA_1970 ) : void {
 
         switch( $missal ){
             case RomanMissal::EDITIO_TYPICA_1970:
@@ -1251,11 +1261,16 @@ class LitCalEngine {
                     if ( $grade === LitGrade::MEMORIAL && $this->LitCal[ $row[ "TAG" ]]->grade > LitGrade::MEMORIAL_OPT ) {
                         $this->FEASTS_MEMORIALS[ $row[ "TAG" ]] = $currentFeastDate;
                         $this->removeWeekdaysEpiphanyOverridenByMemorials( $row[ "TAG" ] );
-                        $this->checkImmaculateHeartCoincidence( $currentFeastDate );
+                        //we shouldn't have to check for ImmaculateHeartCoincidence here.
+                        //Since ImmaculateHeart is already in the FEASTS_MEMORIALS array,
+                        //we will never get here if the current date coincides with ImmaculateHeart
+                        //$this->checkImmaculateHeartCoincidence( $currentFeastDate, $row );
                     }
 
                 } else {
-                    $this->handleCoincidence( $currentFeastDate, $row, RomanMissal::EDITIO_TYPICA_1970 );
+                    if( false === $this->checkImmaculateHeartCoincidence( $currentFeastDate, $row ) ) {
+                        $this->handleCoincidence( $currentFeastDate, $row, RomanMissal::EDITIO_TYPICA_1970 );
+                    }
                 }
             }
         }
@@ -1282,31 +1297,9 @@ class LitCalEngine {
             //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
             //This is taken care of in the next code cycle, see tag IMMACULATEHEART: in the code comments ahead
         } else {
-            $coincidingFeast_grade = '';
-            if( in_array( $ImmaculateHeart_date, $this->SOLEMNITIES ) ) {
-                $coincidingFeast = $this->LitCal[ array_search( $ImmaculateHeart_date, $this->SOLEMNITIES ) ];
-                if( self::DateIsSunday( $ImmaculateHeart_date ) && $coincidingFeast->grade < LitGrade::SOLEMNITY ){
-                    $coincidingFeast_grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
-                } else {
-                    $coincidingFeast_grade = LITCAL_MESSAGES::_G( $coincidingFeast->grade, $this->LITSETTINGS->LOCALE );
-                }
-            }
-            else if( in_array( $ImmaculateHeart_date, $this->FEASTS_MEMORIALS ) ) {
-                $coincidingFeast = $this->LitCal[ array_search( $ImmaculateHeart_date, $this->FEASTS_MEMORIALS ) ];
-                $coincidingFeast_grade = LITCAL_MESSAGES::_G( $coincidingFeast->grade, $this->LITSETTINGS->LOCALE );
-            }
-            $this->Messages[] = sprintf(
-                LITCAL_MESSAGES::__( "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
-                LITCAL_MESSAGES::_G( LitGrade::MEMORIAL, $this->LITSETTINGS->LOCALE ),
-                $this->PROPRIUM_DE_TEMPORE[ "ImmaculateHeart" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],
-                $this->LITSETTINGS->LOCALE === 'LA' ? ( $ImmaculateHeart_date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[  (int)$ImmaculateHeart_date->format( 'n' ) ] ) :
-                    ( $this->LITSETTINGS->LOCALE === 'EN' ? $ImmaculateHeart_date->format( 'F jS' ) :
-                        trim( utf8_encode( strftime( '%e %B', $ImmaculateHeart_date->format( 'U' ) ) ) )
-                    ),
-                $coincidingFeast_grade,
-                $coincidingFeast->name,
-                $this->LITSETTINGS->YEAR
-            );
+            $row = $this->PROPRIUM_DE_TEMPORE[ "ImmaculateHeart" ];
+            $row[ "GRADE" ] = LitGrade::MEMORIAL;
+            $this->handleCoincidence( $ImmaculateHeart_date, $row, RomanMissal::EDITIO_TYPICA_1970 );
         }
 
     }
