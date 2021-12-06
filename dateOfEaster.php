@@ -8,17 +8,13 @@ $LOCALE = isset($_GET["locale"]) ? strtoupper($_GET["locale"]) : "LA"; //default
 setlocale(LC_TIME, strtolower($LOCALE) . '_' . $LOCALE);
 
 include_once( 'includes/LitCalFunctions.php' );
-
+include_once( 'includes/LitCalMessages.php' );
 
 if(file_exists('engineCache/easter/' . $LOCALE . '.json') ){
     header('Content-Type: application/json');
     echo file_get_contents('engineCache/easter/' . $LOCALE . '.json');
     die();
 }
-
-$EasterDates = new stdClass();
-$EasterDates->DatesArray = [];
-
 
 function __($key) {
     global $messages;
@@ -40,22 +36,7 @@ function __($key) {
 }
 
 function _e($key) {
-    global $messages;
-    global $LOCALE;
-    $lcl = strtolower($LOCALE);
-    if (isset($messages)) {
-        if (isset($messages[$key])) {
-            if (isset($messages[$key][$lcl])) {
-                echo $messages[$key][$lcl];
-            } else {
-                echo $messages[$key]["en"];
-            }
-        } else {
-            echo $key;
-        }
-    } else {
-        echo $key;
-    }
+    echo __($key);
 }
 
 $messages = [
@@ -106,118 +87,63 @@ $messages = [
     ]
 ];
 
-$monthsLatin = [
-    "",
-    "Ianuarius",
-    "Februarius",
-    "Martius",
-    "Aprilis",
-    "Maius",
-    "Iunius",
-    "Iulius",
-    "Augustus",
-    "September",
-    "October",
-    "November",
-    "December"
-];
 
-function integerToRoman($integer) {
-    // Convert the integer into an integer (just to make sure)
-    $integer = intval($integer);
-    $result = '';
-    
-    // Create a lookup array that contains all of the Roman numerals.
-    $lookup = array(
-        'X&#773;'           => 10000,
-        'I&#773;X&#773;'    => 9000,
-        'V&#773;'           => 5000,
-        'I&#773;V&#773;'    => 4000,
-        'M'                 => 1000,
-        'CM'                => 900,
-        'D'                 => 500,
-        'CD'                => 400,
-        'C'                 => 100,
-        'XC'                => 90,
-        'L'                 => 50,
-        'XL'                => 40,
-        'X'                 => 10,
-        'IX'                => 9,
-        'V'                 => 5,
-        'IV'                => 4,
-        'I'                 => 1
-    );
-
-    foreach($lookup as $roman => $value){
-        // Determine the number of matches
-        $matches = intval($integer/$value);
-        
-        // Add the same number of characters to the string
-        $result .= str_repeat($roman,$matches);
-        
-        // Set the integer to be the remainder of the integer and the value
-        $integer = $integer % $value;
-    }
-    
-    // The Roman numeral should be built, return it
-    return $result;
-}
-
-
-$last_coincidence = "";
-$dateLastCoincidence = null;
+$EasterDates                = new stdClass();
+$EasterDates->DatesArray    = [];
+$last_coincidence           = "";
+$dateLastCoincidence        = null;
 
 for($i=1583;$i<=9999;$i++){
-    $EasterDates->DatesArray[$i-1583] = new stdClass();
-    $gregorian_easter = LitCalFf::calcGregEaster( $i ); 
-    $julian_easter = LitCalFf::calcJulianEaster( $i );
-    $western_julian_easter = LitCalFf::calcJulianEaster( $i, true );
-    $same_easter = false;
+    $EasterDates->DatesArray[$i-1583]   = new stdClass();
+    $gregorian_easter                   = LitCalFf::calcGregEaster( $i ); 
+    $julian_easter                      = LitCalFf::calcJulianEaster( $i );
+    $western_julian_easter              = LitCalFf::calcJulianEaster( $i, true );
+    $same_easter                        = false;
 
     if($gregorian_easter->format( 'l, F jS, Y' ) === $western_julian_easter->format( 'l, F jS, Y' ) ) {
-        $same_easter = true;
-        $last_coincidence = $gregorian_easter->format( 'l, F jS, Y' );
-        $dateLastCoincidence = $gregorian_easter;
+        $same_easter                    = true;
+        $last_coincidence               = $gregorian_easter->format( 'l, F jS, Y' );
+        $dateLastCoincidence            = $gregorian_easter;
     }
 
-    $gregDateString = "";
-    $julianDateString = "";
-    $westernJulianDateString = "";
+    $gregDateString                     = "";
+    $julianDateString                   = "";
+    $westernJulianDateString            = "";
     switch ($LOCALE) {
         case "LA":
-            $month = (int)$gregorian_easter->format('n'); //n = 1-January to 12-December
-            $monthLatin = $monthsLatin[$month];
-            $gregDateString = 'Dies Domini, ' . $gregorian_easter->format('j') . ' ' . $monthLatin . ' ' . $gregorian_easter->format('Y');
-            $month = (int)$julian_easter->format('n'); //n = 1-January to 12-December
-            $monthLatin = $monthsLatin[$month];
-            $julianDateString = 'Dies Domini, ' . $julian_easter->format('j') . ' ' . $monthLatin . ' ' . $julian_easter->format('Y');
-            $month = (int)$western_julian_easter->format('n'); //n = 1-January to 12-December
-            $monthLatin = $monthsLatin[$month];
-            $westernJulianDateString = 'Dies Domini, ' . $western_julian_easter->format('j') . ' ' . $monthLatin . ' ' . $western_julian_easter->format('Y');
+            $month                      = (int)$gregorian_easter->format('n'); //n      = 1-January to 12-December
+            $monthLatin                 = LITCAL_MESSAGES::LATIN_MONTHS[$month];
+            $gregDateString             = 'Dies Domini, ' . $gregorian_easter->format('j') . ' ' . $monthLatin . ' ' . $gregorian_easter->format('Y');
+            $month                      = (int)$julian_easter->format('n'); //n         = 1-January to 12-December
+            $monthLatin                 = LITCAL_MESSAGES::LATIN_MONTHS[$month];
+            $julianDateString           = 'Dies Domini, ' . $julian_easter->format('j') . ' ' . $monthLatin . ' ' . $julian_easter->format('Y');
+            $month                      = (int)$western_julian_easter->format('n'); //n = 1-January to 12-December
+            $monthLatin                 = LITCAL_MESSAGES::LATIN_MONTHS[$month];
+            $westernJulianDateString    = 'Dies Domini, ' . $western_julian_easter->format('j') . ' ' . $monthLatin . ' ' . $western_julian_easter->format('Y');
             break;
         case "EN":
-            $gregDateString = $gregorian_easter->format('l, F jS, Y');
-            $julianDateString = __('Sunday') . $julian_easter->format(', F jS, Y');
-            $westernJulianDateString = $western_julian_easter->format('l, F jS, Y');
+            $gregDateString             = $gregorian_easter->format('l, F jS, Y');
+            $julianDateString           = __('Sunday') . $julian_easter->format(', F jS, Y');
+            $westernJulianDateString    = $western_julian_easter->format('l, F jS, Y');
             break;
         default:
-            $gregDateString = utf8_encode(strftime('%A %e %B %Y', $gregorian_easter->format('U')));
-            $julianDateString = strtolower(__('Sunday')) . utf8_encode(strftime(' %e %B %Y', $julian_easter->format('U')));
-            $westernJulianDateString = utf8_encode(strftime('%A %e %B %Y', $western_julian_easter->format('U')));
+            $gregDateString             = utf8_encode(strftime('%A %e %B %Y', $gregorian_easter->format('U')));
+            $julianDateString           = strtolower(__('Sunday')) . utf8_encode(strftime(' %e %B %Y', $julian_easter->format('U')));
+            $westernJulianDateString    = utf8_encode(strftime('%A %e %B %Y', $western_julian_easter->format('U')));
     }
 
-    $EasterDates->DatesArray[$i-1583]->gregorianEaster = $gregorian_easter->format('U');
-    $EasterDates->DatesArray[$i-1583]->julianEaster = $julian_easter->format('U');
-    $EasterDates->DatesArray[$i-1583]->westernJulianEaster = $western_julian_easter->format('U');
-    $EasterDates->DatesArray[$i-1583]->coinciding = $same_easter;
-    $EasterDates->DatesArray[$i-1583]->gregorianDateString = $gregDateString;
-    $EasterDates->DatesArray[$i-1583]->julianDateString = $julianDateString;
-    $EasterDates->DatesArray[$i-1583]->westernJulianDateString = $westernJulianDateString;
+    $EasterDates->DatesArray[$i-1583]->gregorianEaster          = $gregorian_easter->format('U');
+    $EasterDates->DatesArray[$i-1583]->julianEaster             = $julian_easter->format('U');
+    $EasterDates->DatesArray[$i-1583]->westernJulianEaster      = $western_julian_easter->format('U');
+    $EasterDates->DatesArray[$i-1583]->coinciding               = $same_easter;
+    $EasterDates->DatesArray[$i-1583]->gregorianDateString      = $gregDateString;
+    $EasterDates->DatesArray[$i-1583]->julianDateString         = $julianDateString;
+    $EasterDates->DatesArray[$i-1583]->westernJulianDateString  = $westernJulianDateString;
 
 }
 
-$EasterDates->lastCoincidenceString = $dateLastCoincidence->format( 'l, F jS, Y' );
-$EasterDates->lastCoincidence = $dateLastCoincidence->format( 'U' );
+$EasterDates->lastCoincidenceString     = $dateLastCoincidence->format( 'l, F jS, Y' );
+$EasterDates->lastCoincidence           = $dateLastCoincidence->format( 'U' );
 
 if ( !is_dir( 'engineCache/easter/' ) ) {
     mkdir( 'engineCache/easter/', 0774, true );
@@ -226,5 +152,5 @@ file_put_contents( 'engineCache/easter/' . $LOCALE . '.json', json_encode( $East
 
 header('Content-Type: application/json');
 echo json_encode($EasterDates);
-
+die();
 ?>

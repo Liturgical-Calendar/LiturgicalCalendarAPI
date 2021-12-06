@@ -1305,7 +1305,7 @@ class LitCalEngine {
             }
             $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
-                LITCAL_MESSAGES::_G( "MEMORIAL", $this->LITSETTINGS->LOCALE ),
+                LITCAL_MESSAGES::_G( LitGrade::MEMORIAL, $this->LITSETTINGS->LOCALE ),
                 $this->PROPRIUM_DE_TEMPORE[ "ImmaculateHeart" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $ImmaculateHeart_date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[  (int)$ImmaculateHeart_date->format( 'n' ) ] ) :
                     ( $this->LITSETTINGS->LOCALE === 'EN' ? $ImmaculateHeart_date->format( 'F jS' ) :
@@ -2732,11 +2732,11 @@ class LitCalEngine {
 
             $description = LITCAL_MESSAGES::_C( $CalEvent->common, $this->LITSETTINGS->LOCALE );
             $description .=  '\n' . $displayGrade;
-            $description .= $CalEvent->color != "" ? '\n' . ParseColorString( $CalEvent->color, $this->LITSETTINGS->LOCALE, false ) : "";
+            $description .= $CalEvent->color != "" ? '\n' . LITCAL_MESSAGES::ParseColorString( $CalEvent->color, $this->LITSETTINGS->LOCALE, false ) : "";
             $description .= property_exists( $CalEvent,'liturgicalyear' ) && $CalEvent->liturgicalYear !== null && $CalEvent->liturgicalYear != "" ? '\n' . $CalEvent->liturgicalYear : "";
             $htmlDescription = "<P DIR=LTR>" . LITCAL_MESSAGES::_C( $CalEvent->common, $this->LITSETTINGS->LOCALE );
             $htmlDescription .=  '<BR>' . $displayGradeHTML;
-            $htmlDescription .= $CalEvent->color != "" ? "<BR>" . ParseColorString( $CalEvent->color, $this->LITSETTINGS->LOCALE, true ) : "";
+            $htmlDescription .= $CalEvent->color != "" ? "<BR>" . LITCAL_MESSAGES::ParseColorString( $CalEvent->color, $this->LITSETTINGS->LOCALE, true ) : "";
             $htmlDescription .= property_exists( $CalEvent,'liturgicalyear' ) && $CalEvent->liturgicalYear !== null && $CalEvent->liturgicalYear != "" ? '<BR>' . $CalEvent->liturgicalYear . "</P>" : "</P>";
             $ical .= "BEGIN:VEVENT\r\n";
             $ical .= "CLASS:PUBLIC\r\n";
