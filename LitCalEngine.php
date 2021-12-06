@@ -303,42 +303,42 @@ class LitCalEngine {
             //Weekdays from Jan. 2 through Jan. 5 are called "*day before Epiphany"
             $nth = 0;
             for ( $i = 2; $i <= 5; $i++ ) {
-                if (  (int)DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->format( 'N' ) === 7 ) {
-                    $this->LitCal[ "Christmas2" ]       = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "Christmas2" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) ), LitColor::WHITE,     LitFeastType::MOBILE, LitGrade::FEAST_LORD );
+                $dateTime = DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
+                if ( self::DateIsSunday( $dateTime ) ) {
+                    $this->LitCal[ "Christmas2" ]       = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "Christmas2" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], $dateTime, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
                     $this->SOLEMNITIES[ "Christmas2" ]  = $this->LitCal[ "Christmas2" ]->date;
                 } else {
                     $nth++;
-                    $this->LitCal[ "DayBeforeEpiphany" . $nth ] = new Festivity( sprintf( LITCAL_MESSAGES::__( "%s day before Epiphany", $this->LITSETTINGS->LOCALE ), ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : ucfirst( $this->formatter->format( $nth ) ) ) ), DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) ), LitColor::WHITE,     LitFeastType::MOBILE );
-                    $this->WEEKDAYS_EPIPHANY[ "DayBeforeEpiphany" . $nth ] = $this->LitCal[ "DayBeforeEpiphany" . $nth ]->date;
+                    $this->LitCal[ "DayBeforeEpiphany" . $nth ]             = new Festivity( sprintf( LITCAL_MESSAGES::__( "%s day before Epiphany", $this->LITSETTINGS->LOCALE ), ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : ucfirst( $this->formatter->format( $nth ) ) ) ), $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
+                    $this->WEEKDAYS_EPIPHANY[ "DayBeforeEpiphany" . $nth ]  = $this->LitCal[ "DayBeforeEpiphany" . $nth ]->date;
                 }
             }
 
             //Weekdays from Jan. 7 until the following Sunday are called "*day after Epiphany"
-            $SundayAfterEpiphany =  (int) DateTime::createFromFormat( '!j-n-Y', '6-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->modify( 'next Sunday' )->format( 'j' );
-            if ( $SundayAfterEpiphany !== 7 ) {
+            $SundayAfterEpiphany =  (int)DateTime::createFromFormat( '!j-n-Y', '6-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->modify( 'next Sunday' )->format( 'j' );
+            if ( $SundayAfterEpiphany !== 7 ) { //this means January 7th, it does not refer to the day of the week which is obviously Sunday in this case
                 $nth = 0;
                 for ( $i = 7; $i < $SundayAfterEpiphany; $i++ ) {
                     $nth++;
-                    $this->LitCal[ "DayAfterEpiphany" . $nth ] = new Festivity( sprintf( LITCAL_MESSAGES::__( "%s day after Epiphany", $this->LITSETTINGS->LOCALE ), ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : ucfirst( $this->formatter->format( $nth ) ) ) ), DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) ), LitColor::WHITE,     LitFeastType::MOBILE );
+                    $dateTime = DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
+                    $this->LitCal[ "DayAfterEpiphany" . $nth ] = new Festivity( sprintf( LITCAL_MESSAGES::__( "%s day after Epiphany", $this->LITSETTINGS->LOCALE ), ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : ucfirst( $this->formatter->format( $nth ) ) ) ), $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
                     $this->WEEKDAYS_EPIPHANY[ "DayAfterEpiphany" . $nth ] = $this->LitCal[ "DayAfterEpiphany" . $nth ]->date;
                 }
             }
         } else if ( $this->LITSETTINGS->EPIPHANY === EPIPHANY::SUNDAY_JAN2_JAN8 ) {
             //If January 2nd is a Sunday, then go with Jan 2nd
-            if (  (int)DateTime::createFromFormat( '!j-n-Y', '2-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->format( 'N' ) === 7 ) {
-                $this->LitCal[ "Epiphany" ] = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "Epiphany" ][ "NAME_" . $this->LITSETTINGS->LOCALE ],      DateTime::createFromFormat( '!j-n-Y', '2-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) ), LitColor::WHITE,    LitFeastType::MOBILE,    LitGrade::HIGHER_SOLEMNITY );
+            $dateTime = DateTime::createFromFormat( '!j-n-Y', '2-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
+            if ( self::DateIsSunday( $dateTime ) ) {
+                $this->LitCal[ "Epiphany" ] = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "Epiphany" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], $dateTime, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
             }
             //otherwise find the Sunday following Jan 2nd
             else {
-                $SundayOfEpiphany = DateTime::createFromFormat( '!j-n-Y', '2-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->modify( 'next Sunday' );
+                $SundayOfEpiphany = $dateTime->modify( 'next Sunday' );
                 $this->LitCal[ "Epiphany" ] = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "Epiphany" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], $SundayOfEpiphany, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
 
                 //Weekdays from Jan. 2 until the following Sunday are called "*day before Epiphany"
-                //echo $SundayOfEpiphany->format( 'j' );
-                $DayOfEpiphany =  (int) $SundayOfEpiphany->format( 'j' );
-
+                $DayOfEpiphany = (int)$SundayOfEpiphany->format( 'j' );
                 $nth = 0;
-
                 for ( $i = 2; $i < $DayOfEpiphany; $i++ ) {
                     $nth++;
                     $this->LitCal[ "DayBeforeEpiphany" . $nth ] = new Festivity( sprintf( LITCAL_MESSAGES::__( "%s day before Epiphany", $this->LITSETTINGS->LOCALE ), ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : ucfirst( $this->formatter->format( $nth ) ) ) ), DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) ), LitColor::WHITE,     LitFeastType::MOBILE );
@@ -670,10 +670,12 @@ class LitCalEngine {
         $this->BaptismLordMod = 'next Sunday';
         //If Epiphany is celebrated on Sunday between Jan. 2 - Jan 8, and Jan. 7 or Jan. 8 is Sunday, then Baptism of the Lord is celebrated on the Monday immediately following that Sunday
         if ( $this->LITSETTINGS->EPIPHANY === EPIPHANY::SUNDAY_JAN2_JAN8 ) {
-            if (  (int)DateTime::createFromFormat( '!j-n-Y', '7-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->format( 'N' ) === 7 ) {
+            $dateJan7 = DateTime::createFromFormat( '!j-n-Y', '7-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
+            $dateJan8 = DateTime::createFromFormat( '!j-n-Y', '8-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
+            if ( self::DateIsSunday( $dateJan7 ) ) {
                 $this->BaptismLordFmt = '7-1-' . $this->LITSETTINGS->YEAR;
                 $this->BaptismLordMod = 'next Monday';
-            } else if (  (int)DateTime::createFromFormat( '!j-n-Y', '8-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->format( 'N' ) === 7 ) {
+            } else if ( self::DateIsSunday( $dateJan8 ) ) {
                 $this->BaptismLordFmt = '8-1-' . $this->LITSETTINGS->YEAR;
                 $this->BaptismLordMod = 'next Monday';
             }
@@ -696,8 +698,9 @@ class LitCalEngine {
         $this->SOLEMNITIES[ "ExaltationCross" ] = $this->LitCal[ "ExaltationCross" ]->date;
 
         //Holy Family is celebrated the Sunday after Christmas, unless Christmas falls on a Sunday, in which case it is celebrated Dec. 30
-        if (  (int)DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->format( 'N' ) === 7 ) {
-            $this->LitCal[ "HolyFamily" ]   = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "HolyFamily" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], DateTime::createFromFormat( '!j-n-Y', '30-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) ),           LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::FEAST_LORD );
+        if ( self::DateIsSunday( $this->LitCal[ "Christmas" ]->date ) ) {
+            $holyFamilyDate = DateTime::createFromFormat( '!j-n-Y', '30-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
+            $this->LitCal[ "HolyFamily" ] = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "HolyFamily" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], $holyFamilyDate, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
             $this->Messages[] = sprintf(
                 LITCAL_MESSAGES::__( "'%s' falls on a Sunday in the year %d, therefore the Feast '%s' is celebrated on %s rather than on the Sunday after Christmas.", $this->LITSETTINGS->LOCALE ),
                 $this->LitCal[ "Christmas" ]->name,
@@ -709,9 +712,10 @@ class LitCalEngine {
                     )
             );
         } else {
-            $this->LitCal[ "HolyFamily" ]   = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "HolyFamily" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->modify( 'next Sunday' ),                                          LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
+            $holyFamilyDate = DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->modify( 'next Sunday' );
+            $this->LitCal[ "HolyFamily" ] = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "HolyFamily" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], $holyFamilyDate, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
         }
-        $this->SOLEMNITIES[ "HolyFamily" ]      = $this->LitCal[ "HolyFamily" ]->date;
+        $this->SOLEMNITIES[ "HolyFamily" ] = $this->LitCal[ "HolyFamily" ]->date;
 
     }
 
@@ -784,13 +788,13 @@ class LitCalEngine {
                 //If a Feast ( not of the Lord ) occurs on a Sunday in Ordinary Time, the Sunday is celebrated.  ( e.g., St. Luke, 1992 )
                 //obviously solemnities also have precedence
                 $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row[ "DAY" ] . '-' . $row[ "MONTH" ] . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-                if (  (int)$currentFeastDate->format( 'N' ) !== 7 && !in_array( $currentFeastDate, $this->SOLEMNITIES) ) {
+                if ( self::DateIsNotSunday( $currentFeastDate ) && !in_array( $currentFeastDate, $this->SOLEMNITIES) ) {
                     $this->LitCal[ $row[ "TAG" ]] = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ] );
                     $this->FEASTS_MEMORIALS[ $row[ "TAG" ]]      = $currentFeastDate;
                 } else {
                     $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES) ];
                     $coincidingFestivity_grade = '';
-                    if(  (int)$currentFeastDate->format( 'N' ) === 7 && $coincidingFestivity->grade < LitGrade::SOLEMNITY ){
+                    if( self::DateIsSunday( $currentFeastDate ) && $coincidingFestivity->grade < LitGrade::SOLEMNITY ){
                         //it's a Sunday
                         $coincidingFestivity_grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
                     } else{
@@ -834,9 +838,9 @@ class LitCalEngine {
             $weekdayAdvent = DateTime::createFromFormat( '!j-n-Y', $DoMAdvent1 . '-' . $MonthAdvent1 . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayAdventCnt . 'D' ) );
 
             //if we're not dealing with a sunday or a solemnity, then create the weekday
-            if ( !in_array( $weekdayAdvent, $this->SOLEMNITIES) && !in_array( $weekdayAdvent, $this->FEASTS_MEMORIALS) &&  (int)$weekdayAdvent->format( 'N' ) !== 7 ) {
-                $upper =  (int)$weekdayAdvent->format( 'z' );
-                $diff = $upper -  (int)$this->LitCal[ "Advent1" ]->date->format( 'z' ); //day count between current day and First Sunday of Advent
+            if ( !in_array( $weekdayAdvent, $this->SOLEMNITIES) && !in_array( $weekdayAdvent, $this->FEASTS_MEMORIALS) && self::DateIsNotSunday( $weekdayAdvent ) ) {
+                $upper = (int)$weekdayAdvent->format( 'z' );
+                $diff = $upper - (int)$this->LitCal[ "Advent1" ]->date->format( 'z' ); //day count between current day and First Sunday of Advent
                 $currentAdvWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1; //week count between current day and First Sunday of Advent
 
                 $ordinal = ucfirst( LitCalFf::getOrdinal( $currentAdvWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem,LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
@@ -857,7 +861,7 @@ class LitCalEngine {
         while ( $weekdayChristmas >= $this->LitCal[ "Christmas" ]->date && $weekdayChristmas < DateTime::createFromFormat( '!j-n-Y', '31-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) ) ) {
             $weekdayChristmas = DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayChristmasCnt . 'D' ) );
 
-            if ( !in_array( $weekdayChristmas, $this->SOLEMNITIES) && !in_array( $weekdayChristmas, $this->FEASTS_MEMORIALS) &&  (int)$weekdayChristmas->format( 'N' ) !== 7 ) {
+            if ( !in_array( $weekdayChristmas, $this->SOLEMNITIES) && !in_array( $weekdayChristmas, $this->FEASTS_MEMORIALS) && self::DateIsNotSunday( $weekdayChristmas ) ) {
                 $ordinal = ucfirst( LitCalFf::getOrdinal( ( $weekdayChristmasCnt + 1 ), $this->LITSETTINGS->LOCALE, $this->formatter, LITCAL_MESSAGES::LATIN_ORDINAL ) );
                 $this->LitCal[ "ChristmasWeekday" . $weekdayChristmasCnt ] = new Festivity( sprintf( LITCAL_MESSAGES::__( "%s Day of the Octave of Christmas", $this->LITSETTINGS->LOCALE ), $ordinal ), $weekdayChristmas, LitColor::WHITE, LitFeastType::MOBILE );
                 array_push( $this->WEEKDAYS_ADVENT_CHRISTMAS_LENT, $this->LitCal[ "ChristmasWeekday" . $weekdayChristmasCnt ]->date );
@@ -877,7 +881,7 @@ class LitCalEngine {
         while ( $weekdayLent >= $this->LitCal[ "AshWednesday" ]->date && $weekdayLent < $this->LitCal[ "PalmSun" ]->date ) {
             $weekdayLent = DateTime::createFromFormat( '!j-n-Y', $DoMAshWednesday . '-' . $MonthAshWednesday . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayLentCnt . 'D' ) );
 
-            if ( !in_array( $weekdayLent, $this->SOLEMNITIES ) &&  (int)$weekdayLent->format( 'N' ) !== 7 ) {
+            if ( !in_array( $weekdayLent, $this->SOLEMNITIES ) && self::DateIsNotSunday( $weekdayLent ) ) {
 
                 if ( $weekdayLent > $this->LitCal[ "Lent1" ]->date ) {
                     $upper =  (int)$weekdayLent->format( 'z' );
@@ -931,7 +935,7 @@ class LitCalEngine {
 
         $coincidingFestivity = new stdClass();
         $coincidingFestivity->grade = '';
-        if( (int)$currentFeastDate->format( 'N' ) === 7 && $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ]->grade < LitGrade::SOLEMNITY ){
+        if( self::DateIsSunday( $currentFeastDate ) && $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ]->grade < LitGrade::SOLEMNITY ){
             //it's a Sunday
             $coincidingFestivity->event = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ];
             $coincidingFestivity->grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
@@ -1226,7 +1230,7 @@ class LitCalEngine {
 
                 //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord or a Feast or an obligatory memorial, then go ahead and create the optional memorial
                 $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row[ "DAY" ] . '-' . $row[ "MONTH" ] . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-                if ( (int)$currentFeastDate->format( 'N' ) !== 7 && !in_array( $currentFeastDate, $this->SOLEMNITIES) && !in_array( $currentFeastDate, $this->FEASTS_MEMORIALS) ) {
+                if ( self::DateIsNotSunday( $currentFeastDate ) && !in_array( $currentFeastDate, $this->SOLEMNITIES) && !in_array( $currentFeastDate, $this->FEASTS_MEMORIALS) ) {
                     $this->LitCal[ $row[ "TAG" ]] = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ] );
 
                     $this->reduceMemorialsInAdventLentToCommemoration( $row, $currentFeastDate );
@@ -1293,7 +1297,7 @@ class LitCalEngine {
             $coincidingFeast_grade = '';
             if( in_array( $ImmaculateHeart_date, $this->SOLEMNITIES ) ) {
                 $coincidingFeast = $this->LitCal[ array_search( $ImmaculateHeart_date, $this->SOLEMNITIES ) ];
-                if(  (int)$ImmaculateHeart_date->format( 'N' ) === 7 && $coincidingFeast->grade < LitGrade::SOLEMNITY ){
+                if( self::DateIsSunday( $ImmaculateHeart_date ) && $coincidingFeast->grade < LitGrade::SOLEMNITY ){
                     $coincidingFestivity_grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
                 } else {
                     $coincidingFeast_grade = LITCAL_MESSAGES::_G( $coincidingFeast->grade, $this->LITSETTINGS->LOCALE );
@@ -1328,7 +1332,7 @@ class LitCalEngine {
     private function handleSaintJaneFrancesDeChantal() {
 
         $StJaneFrancesNewDate = DateTime::createFromFormat( '!j-n-Y', '12-8-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-        if ( (int)$StJaneFrancesNewDate->format( 'N' ) !== 7 && !in_array( $StJaneFrancesNewDate, $this->SOLEMNITIES) && !in_array( $StJaneFrancesNewDate, $this->FEASTS_MEMORIALS) ) {
+        if ( self::DateIsNotSunday( $StJaneFrancesNewDate ) && !in_array( $StJaneFrancesNewDate, $this->SOLEMNITIES) && !in_array( $StJaneFrancesNewDate, $this->FEASTS_MEMORIALS) ) {
             if( array_key_exists( "StJaneFrancesDeChantal", $this->LitCal ) ){
                 $this->LitCal[ "StJaneFrancesDeChantal" ]->date = $StJaneFrancesNewDate;
                 $this->Messages[] = sprintf(
@@ -1397,7 +1401,7 @@ class LitCalEngine {
         $Guadalupe_tag = [ "LA" => "Beatæ Mariæ Virginis Guadalupensis", "EN" => "Our Lady of Guadalupe", "IT" => "Beata Vergine Maria di Guadalupe" ];
         $Guadalupe_date = DateTime::createFromFormat( '!j-n-Y', '12-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
 
-        if (  (int)$Guadalupe_date->format( 'N' ) !== 7 && !in_array( $Guadalupe_date, $this->SOLEMNITIES) && !in_array( $Guadalupe_date, $this->FEASTS_MEMORIALS) ) {
+        if ( self::DateIsNotSunday( $Guadalupe_date ) && !in_array( $Guadalupe_date, $this->SOLEMNITIES) && !in_array( $Guadalupe_date, $this->FEASTS_MEMORIALS) ) {
             $this->LitCal[ "LadyGuadalupe" ] = new Festivity( $Guadalupe_tag[ $this->LITSETTINGS->LOCALE ], $Guadalupe_date, 'white', 'fixed', LitGrade::MEMORIAL_OPT, "Blessed Virgin Mary" );
             /**
              * TRANSLATORS:
@@ -1444,7 +1448,7 @@ class LitCalEngine {
 
         $JuanDiego_tag = [ "LA" => "Sancti Ioannis Didaci Cuauhtlatoatzin", "EN" => "Saint Juan Diego Cuauhtlatoatzin", "IT" => "San Juan Diego Cuauhtlatouatzin" ];
         $JuanDiego_date = DateTime::createFromFormat( '!j-n-Y', '9-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-        if (  (int)$JuanDiego_date->format( 'N' ) !== 7 && !in_array( $JuanDiego_date, $this->SOLEMNITIES) && !in_array( $JuanDiego_date, $this->FEASTS_MEMORIALS) ) {
+        if ( self::DateIsNotSunday( $JuanDiego_date ) && !in_array( $JuanDiego_date, $this->SOLEMNITIES) && !in_array( $JuanDiego_date, $this->FEASTS_MEMORIALS) ) {
             $this->LitCal[ "JuanDiego" ] = new Festivity( $JuanDiego_tag[ $this->LITSETTINGS->LOCALE ], $JuanDiego_date, 'white', 'fixed', LitGrade::MEMORIAL_OPT, "Holy Men and Women:For One Saint" );
             /**
              * TRANSLATORS:
@@ -1961,7 +1965,7 @@ class LitCalEngine {
         while ( $weekdayEaster >= $this->LitCal[ "Easter" ]->date && $weekdayEaster < $this->LitCal[ "Pentecost" ]->date ) {
             $weekdayEaster = DateTime::createFromFormat( '!j-n-Y', $DoMEaster . '-' . $MonthEaster . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayEasterCnt . 'D' ) );
 
-            if ( !in_array( $weekdayEaster, $this->SOLEMNITIES) && !in_array( $weekdayEaster, $this->FEASTS_MEMORIALS) &&  (int)$weekdayEaster->format( 'N' ) !== 7 ) {
+            if ( !in_array( $weekdayEaster, $this->SOLEMNITIES) && !in_array( $weekdayEaster, $this->FEASTS_MEMORIALS) && self::DateIsNotSunday( $weekdayEaster ) ) {
 
                 $upper =  (int)$weekdayEaster->format( 'z' );
                 $diff = $upper -  (int)$this->LitCal[ "Easter" ]->date->format( 'z' ); //day count between current day and Easter Sunday
@@ -2045,7 +2049,7 @@ class LitCalEngine {
             $this->applyMessaleRomano1983();
         }
 
-        //The Sanctorale in the 2020 edition is based on the Latin 2008 Edition,
+        //The Sanctorale in the 2020 edition Messale Romano is based on the Latin 2008 Edition,
         // there isn't really anything different from preceding editions or from the 2008 edition
     }
 
@@ -2065,26 +2069,26 @@ class LitCalEngine {
             $row = mysqli_fetch_assoc( $result );
             $FestivityName = $row[ "NAME_" . $this->LITSETTINGS->LOCALE ] . $nameSuffix;
 
-            if( in_array( $currentFeastDate, $this->SOLEMNITIES ) || in_array( $currentFeastDate, $this->FEASTS_MEMORIALS ) ||  (int)$currentFeastDate->format( 'N' ) === 7 ) {
+            if( in_array( $currentFeastDate, $this->SOLEMNITIES ) || in_array( $currentFeastDate, $this->FEASTS_MEMORIALS ) ||  self::DateIsSunday( $currentFeastDate ) ) {
                 $coincidingFestivity_grade = '';
-                if (  (int)$currentFeastDate->format( 'N' ) === 7 && $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ]->grade < LitGrade::SOLEMNITY ){
+                if ( self::DateIsSunday( $currentFeastDate ) && $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ]->grade < LitGrade::SOLEMNITY ){
                     //it's a Sunday
                     $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ];
                     $coincidingFestivity_grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
                 } else if ( in_array( $currentFeastDate, $this->SOLEMNITIES ) ) {
                     //it's a Feast of the Lord or a Solemnity
                     $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ];
-                    $coincidingFestivity_grade = ( $coincidingFestivity->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G(  $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G(  $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) );
+                    $coincidingFestivity_grade = ( $coincidingFestivity->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) );
                 } else if ( in_array( $currentFeastDate, $this->FEASTS_MEMORIALS ) ) {
                     //we should probably be able to create it anyways in this case?
                     $this->LitCal[ $tag ] = new Festivity( $FestivityName, $currentFeastDate, $color, LitFeastType::FIXED, LitGrade::FEAST, "Proper" );
                     $coincidingFestivity = $this->LitCal[ array_search( $currentFeastDate, $this->FEASTS_MEMORIALS ) ];
-                    $coincidingFestivity_grade = LITCAL_MESSAGES::_G(  $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false );
+                    $coincidingFestivity_grade = LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false );
                 }
 
                 $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                     LITCAL_MESSAGES::__( "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
-                    LITCAL_MESSAGES::_G(  LitGrade::FEAST, $this->LITSETTINGS->LOCALE, false ),
+                    LITCAL_MESSAGES::_G( LitGrade::FEAST, $this->LITSETTINGS->LOCALE, false ),
                     $FestivityName,
                     trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) ),
                     $coincidingFestivity_grade,
@@ -2233,7 +2237,7 @@ class LitCalEngine {
                 if( !in_array( $currentFeastDate, $this->SOLEMNITIES) ){
                     $this->LitCal[ $row[ "TAG" ]] = new Festivity( "[ USA ] " . $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ], $row[ "DISPLAYGRADE" ] );
                 }
-                else if(  (int)$currentFeastDate->format( 'N' ) === 7 && $row[ "TAG" ] === "PrayerUnborn" ){
+                else if( self::DateIsSunday( $currentFeastDate ) && $row[ "TAG" ] === "PrayerUnborn" ){
                     $this->LitCal[ $row[ "TAG" ]] = new Festivity( "[ USA ] " . $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate->add( new DateInterval( 'P1D' ) ), $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ], $row[ "DISPLAYGRADE" ] );
                     $this->Messages[] = sprintf(
                         "USA: The National Day of Prayer for the Unborn is set to Jan 22 as per the 2011 Roman Missal issued by the USCCB, however since it coincides with a Sunday or a Solemnity in the year %d, it has been moved to Jan 23",
@@ -2331,7 +2335,7 @@ class LitCalEngine {
         $WEEKDAY_CYCLE = [ "I", "II" ];
         foreach( $this->LitCal as $key => $festivity ){
             //first let's deal with weekdays we calculate the weekday cycle
-            if (  (int)$festivity->grade === LitGrade::WEEKDAY &&  (int)$festivity->date->format( 'N' ) !== 7 ) {
+            if ( self::DateIsNotSunday( $festivity->date ) && (int)$festivity->grade === LitGrade::WEEKDAY ) {
                 if ( $festivity->date < $this->LitCal[ "Advent1" ]->date ) {
                     $this->LitCal[ $key ]->liturgicalYear = LITCAL_MESSAGES::__( "YEAR", $this->LITSETTINGS->LOCALE ) . " " . ( $WEEKDAY_CYCLE[ ( $this->LITSETTINGS->YEAR - 1 ) % 2 ] );
                 } else if ( $festivity->date >= $this->LitCal[ "Advent1" ]->date ) {
@@ -2339,147 +2343,170 @@ class LitCalEngine {
                 }
             }
             //if we're dealing with a Sunday or a Solemnity or a Feast of the Lord, then we calculate the Sunday/Festive Cycle
-            else if(  (int)$festivity->date->format( 'N' ) === 7 ||  (int)$festivity->grade > LitGrade::FEAST ) {
+            else if( self::DateIsSunday( $festivity->date ) || (int)$festivity->grade > LitGrade::FEAST ) {
                 if ( $festivity->date < $this->LitCal[ "Advent1" ]->date ) {
                     $this->LitCal[ $key ]->liturgicalYear = LITCAL_MESSAGES::__( "YEAR", $this->LITSETTINGS->LOCALE ) . " " . ( $SUNDAY_CYCLE[ ( $this->LITSETTINGS->YEAR - 1 ) % 3 ] );
                 } else if ( $festivity->date >= $this->LitCal[ "Advent1" ]->date ) {
                     $this->LitCal[ $key ]->liturgicalYear = LITCAL_MESSAGES::__( "YEAR", $this->LITSETTINGS->LOCALE ) . " " . ( $SUNDAY_CYCLE[ $this->LITSETTINGS->YEAR % 3 ] );
                 }
+                $this->calculateVigilMass( $festivity, $key );
+            }
+        }
 
-                //Let's calculate Vigil Masses while we're at it
-                //Should we create new events, or is it enough to add metadata?
-                //We'll do both for the time being, then we'll see with usage...
-                $VigilDate = clone( $festivity->date );
-                $VigilDate->sub( new DateInterval( 'P1D' ) );
+    }
 
-                $festivityGrade = '';
-                if(  (int)$festivity->date->format( 'N' ) === 7 && $festivity->grade < LitGrade::SOLEMNITY ){
-                    $festivityGrade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $festivity->date->format( 'U' ) ) ) );
-                } else {
-                    $festivityGrade = ( $festivity->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $festivity->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $festivity->grade, $this->LITSETTINGS->LOCALE, false ) );
-                }
+    private static function DateIsSunday( DateTime $dt ) : bool {
+        return (int)$dt->format( 'N' ) === 7;
+    }
 
-                //conditions for which the festivity SHOULD have a vigil
-                if( true === ( $festivity->grade >= LitGrade::SOLEMNITY ) || true ===  (  (int)$festivity->date->format( 'N' ) === 7 ) ){
-                    //filter out cases in which the festivity should NOT have a vigil
-                    if(
-                        false === ( $key === 'AllSouls' )
-                        && false === ( $key === 'AshWednesday' )
-                        && false === ( $festivity->date > $this->LitCal[ "PalmSun" ]->date && $festivity->date < $this->LitCal[ "Easter" ]->date )
-                        && false === ( $festivity->date > $this->LitCal[ "Easter" ]->date && $festivity->date < $this->LitCal[ "Easter2" ]->date )
-                    ){
-                        $this->LitCal[ $key . "_vigil" ] = new Festivity( $festivity->name . " " . LITCAL_MESSAGES::__( "Vigil Mass", $this->LITSETTINGS->LOCALE ), $VigilDate, $festivity->color, $festivity->type, $festivity->grade, $festivity->common );
-                        $this->LitCal[ $key ]->hasVigilMass = true;
-                        $this->LitCal[ $key ]->hasVesperI = true;
-                        $this->LitCal[ $key ]->hasVesperII = true;
-                        $this->LitCal[ $key . "_vigil" ]->liturgicalYear = $this->LitCal[ $key ]->liturgicalYear;
-                        $this->LitCal[ $key . "_vigil" ]->isVigilMass = true;
-                        //if however the Vigil coincides with another Solemnity let's make a note of it!
-                        if( in_array( $VigilDate, $this->SOLEMNITIES) ){
-                            $coincidingFestivity_grade = '';
-                            $coincidingFestivityKey = array_search( $VigilDate, $this->SOLEMNITIES);
-                            $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
-                            if(  (int)$VigilDate->format( 'N' ) === 7 && $coincidingFestivity->grade < LitGrade::SOLEMNITY ){
-                                //it's a Sunday
-                                $coincidingFestivity_grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $VigilDate->format( 'U' ) ) ) );
-                            } else{
-                                //it's a Feast of the Lord or a Solemnity
-                                $coincidingFestivity_grade = ( $coincidingFestivity->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) );
-                            }
+    private static function DateIsNotSunday( DateTime $dt ) : bool {
+        return (int)$dt->format( 'N' ) !== 7;
+    }
 
-                            //suppress warning messages for known situations, like the Octave of Easter
-                            if( $festivity->grade !== LitGrade::HIGHER_SOLEMNITY ){
-                                if( $festivity->grade < $coincidingFestivity->grade ){
-                                    $festivity->hasVigilMass = false;
-                                    $festivity->hasVesperI = false;
-                                    $coincidingFestivity->hasVesperII = true;
-                                    $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                        LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while  the first Solemnity will not have a Vigil Mass or Vespers I.", $this->LITSETTINGS->LOCALE ),
-                                        $festivityGrade,
-                                        $festivity->name,
-                                        $coincidingFestivity_grade,
-                                        $coincidingFestivity->name,
-                                        $this->LITSETTINGS->YEAR
-                                    );
-                                }
-                                else if( $festivity->grade > $coincidingFestivity->grade || ( in_array( $key, $this->SOLEMNITIES_LORD_BVM ) && !in_array( $coincidingFestivityKey, $this->SOLEMNITIES_LORD_BVM ) ) ){
-                                    $festivity->hasVigilMass = true;
-                                    $festivity->hasVesperI = true;
+    private function calculateVigilMass( Festivity $festivity, string $key ) {
+
+        //Let's calculate Vigil Masses while we're at it
+        //Should we create new events, or is it enough to add metadata?
+        //We'll do both for the time being, then we'll see with usage...
+        $VigilDate = clone( $festivity->date );
+        $VigilDate->sub( new DateInterval( 'P1D' ) );
+        $festivityGrade = '';
+        if( self::DateIsSunday( $festivity->date ) && $festivity->grade < LitGrade::SOLEMNITY ) {
+            $festivityGrade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $festivity->date->format( 'U' ) ) ) );
+        } else {
+            if( $festivity->grade > LitGrade::SOLEMNITY ) {
+                $festivityGrade = '<i>' . LITCAL_MESSAGES::_G( $festivity->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>';
+            } else {
+                $festivityGrade = LITCAL_MESSAGES::_G( $festivity->grade, $this->LITSETTINGS->LOCALE, false );
+            }
+        }
+
+        //conditions for which the festivity SHOULD have a vigil
+        if( self::DateIsSunday( $festivity->date ) || true === ( $festivity->grade >= LitGrade::SOLEMNITY ) ){
+            //filter out cases in which the festivity should NOT have a vigil
+            if(
+                false === ( $key === 'AllSouls' )
+                && false === ( $key === 'AshWednesday' )
+                && false === ( $festivity->date > $this->LitCal[ "PalmSun" ]->date && $festivity->date < $this->LitCal[ "Easter" ]->date )
+                && false === ( $festivity->date > $this->LitCal[ "Easter" ]->date && $festivity->date < $this->LitCal[ "Easter2" ]->date )
+            ){
+                $this->LitCal[ $key . "_vigil" ] = new Festivity( 
+                    $festivity->name . " " . LITCAL_MESSAGES::__( "Vigil Mass", $this->LITSETTINGS->LOCALE ),
+                    $VigilDate,
+                    $festivity->color,
+                    $festivity->type,
+                    $festivity->grade,
+                    $festivity->common
+                );
+                $this->LitCal[ $key ]->hasVigilMass                 = true;
+                $this->LitCal[ $key ]->hasVesperI                   = true;
+                $this->LitCal[ $key ]->hasVesperII                  = true;
+                $this->LitCal[ $key . "_vigil" ]->isVigilMass       = true;
+                $this->LitCal[ $key . "_vigil" ]->liturgicalYear    = $this->LitCal[ $key ]->liturgicalYear;
+                //if however the Vigil coincides with another Solemnity let's make a note of it!
+                if( in_array( $VigilDate, $this->SOLEMNITIES) ){
+                    $coincidingFestivity_grade = '';
+                    $coincidingFestivityKey = array_search( $VigilDate, $this->SOLEMNITIES);
+                    $coincidingFestivity = $this->LitCal[ $coincidingFestivityKey ];
+                    if( self::DateIsSunday( $VigilDate ) && $coincidingFestivity->grade < LitGrade::SOLEMNITY ){
+                        //it's a Sunday
+                        $coincidingFestivity_grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $VigilDate->format( 'U' ) ) ) );
+                    } else{
+                        //it's a Feast of the Lord or a Solemnity
+                        $coincidingFestivity_grade = ( $coincidingFestivity->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) );
+                    }
+
+                    //suppress warning messages for known situations, like the Octave of Easter
+                    if( $festivity->grade !== LitGrade::HIGHER_SOLEMNITY ){
+                        if( $festivity->grade < $coincidingFestivity->grade ){
+                            $festivity->hasVigilMass = false;
+                            $festivity->hasVesperI = false;
+                            $coincidingFestivity->hasVesperII = true;
+                            $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while  the first Solemnity will not have a Vigil Mass or Vespers I.", $this->LITSETTINGS->LOCALE ),
+                                $festivityGrade,
+                                $festivity->name,
+                                $coincidingFestivity_grade,
+                                $coincidingFestivity->name,
+                                $this->LITSETTINGS->YEAR
+                            );
+                        }
+                        else if( $festivity->grade > $coincidingFestivity->grade || ( in_array( $key, $this->SOLEMNITIES_LORD_BVM ) && !in_array( $coincidingFestivityKey, $this->SOLEMNITIES_LORD_BVM ) ) ){
+                            $festivity->hasVigilMass = true;
+                            $festivity->hasVesperI = true;
+                            $coincidingFestivity->hasVesperII = false;
+                            $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass.", $this->LITSETTINGS->LOCALE ),
+                                $festivityGrade,
+                                $festivity->name,
+                                $coincidingFestivity_grade,
+                                $coincidingFestivity->name,
+                                $this->LITSETTINGS->YEAR
+                            );
+                        }
+                        else if( in_array( $coincidingFestivityKey, $this->SOLEMNITIES_LORD_BVM ) && !in_array( $key, $this->SOLEMNITIES_LORD_BVM ) ){
+                            $coincidingFestivity->hasVesperII = true;
+                            $festivity->hasVesperI = false;
+                            $festivity->hasVigilMass = false;
+                            unset( $this->LitCal[ $key . "_vigil" ] );
+                            $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while  the first Solemnity will not have a Vigil Mass or Vespers I.", $this->LITSETTINGS->LOCALE ),
+                                $festivityGrade,
+                                $festivity->name,
+                                $coincidingFestivity_grade,
+                                $coincidingFestivity->name,
+                                $this->LITSETTINGS->YEAR
+                            );
+                        } else {
+                            if( $this->LITSETTINGS->YEAR === 2022 ){
+                                if( $key === 'SacredHeart' || $key === 'Lent3' || $key === 'Assumption' ){
                                     $coincidingFestivity->hasVesperII = false;
+                                    $festivity->hasVesperI = true;
+                                    $festivity->hasVigilMass = true;
                                     $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                        LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass.", $this->LITSETTINGS->LOCALE ),
+                                        LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As per %s, the first has precedence, therefore the Vigil Mass is confirmed as are I Vespers.", $this->LITSETTINGS->LOCALE ),
                                         $festivityGrade,
                                         $festivity->name,
                                         $coincidingFestivity_grade,
                                         $coincidingFestivity->name,
-                                        $this->LITSETTINGS->YEAR
+                                        $this->LITSETTINGS->YEAR,
+                                        '<a href="http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html">' . LITCAL_MESSAGES::__( "Decree of the Congregation for Divine Worship", $this->LITSETTINGS->LOCALE ) . '</a>'
                                     );
                                 }
-                                else if( in_array( $coincidingFestivityKey, $this->SOLEMNITIES_LORD_BVM ) && !in_array( $key, $this->SOLEMNITIES_LORD_BVM ) ){
-                                    $coincidingFestivity->hasVesperII = true;
-                                    $festivity->hasVesperI = false;
-                                    $festivity->hasVigilMass = false;
-                                    unset( $this->LitCal[ $key . "_vigil" ] );
-                                    $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                        LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while  the first Solemnity will not have a Vigil Mass or Vespers I.", $this->LITSETTINGS->LOCALE ),
-                                        $festivityGrade,
-                                        $festivity->name,
-                                        $coincidingFestivity_grade,
-                                        $coincidingFestivity->name,
-                                        $this->LITSETTINGS->YEAR
-                                    );
-                                } else {
-                                    if( $this->LITSETTINGS->YEAR === 2022 ){
-                                        if( $key === 'SacredHeart' || $key === 'Lent3' || $key === 'Assumption' ){
-                                            $coincidingFestivity->hasVesperII = false;
-                                            $festivity->hasVesperI = true;
-                                            $festivity->hasVigilMass = true;
-                                            $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                                LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As per %s, the first has precedence, therefore the Vigil Mass is confirmed as are I Vespers.", $this->LITSETTINGS->LOCALE ),
-                                                $festivityGrade,
-                                                $festivity->name,
-                                                $coincidingFestivity_grade,
-                                                $coincidingFestivity->name,
-                                                $this->LITSETTINGS->YEAR,
-                                                '<a href="http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html">' . LITCAL_MESSAGES::__( "Decree of the Congregation for Divine Worship", $this->LITSETTINGS->LOCALE ) . '</a>'
-                                            );
-                                        }
-                                    }
-                                    else {
-                                        $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                            LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!", $this->LITSETTINGS->LOCALE ),
-                                            $festivityGrade,
-                                            $festivity->name,
-                                            $coincidingFestivity_grade,
-                                            $coincidingFestivity->name,
-                                            $this->LITSETTINGS->YEAR
-                                        );
-                                    }
-                                }
-                            } else {
-                                if(
-                                    //false === ( $key === 'AllSouls' )
-                                    //&& false === ( $key === 'AshWednesday' )
-                                    false === ( $coincidingFestivity->date > $this->LitCal[ "PalmSun" ]->date && $coincidingFestivity->date < $this->LitCal[ "Easter" ]->date )
-                                    && false === ( $coincidingFestivity->date > $this->LitCal[ "Easter" ]->date && $coincidingFestivity->date < $this->LitCal[ "Easter2" ]->date )
-                                ){
-
-                                    $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                        LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass.", $this->LITSETTINGS->LOCALE ),
-                                        $festivityGrade,
-                                        $festivity->name,
-                                        $coincidingFestivity_grade,
-                                        $coincidingFestivity->name,
-                                        $this->LITSETTINGS->YEAR
-                                    );
-                                }
+                            }
+                            else {
+                                $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                    LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!", $this->LITSETTINGS->LOCALE ),
+                                    $festivityGrade,
+                                    $festivity->name,
+                                    $coincidingFestivity_grade,
+                                    $coincidingFestivity->name,
+                                    $this->LITSETTINGS->YEAR
+                                );
                             }
                         }
                     } else {
-                        $this->LitCal[ $key ]->hasVigilMass = false;
-                        $this->LitCal[ $key ]->hasVesperI = false;
+                        if(
+                            //false === ( $key === 'AllSouls' )
+                            //&& false === ( $key === 'AshWednesday' )
+                            false === ( $coincidingFestivity->date > $this->LitCal[ "PalmSun" ]->date && $coincidingFestivity->date < $this->LitCal[ "Easter" ]->date )
+                            && false === ( $coincidingFestivity->date > $this->LitCal[ "Easter" ]->date && $coincidingFestivity->date < $this->LitCal[ "Easter2" ]->date )
+                        ){
+
+                            $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                                LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass.", $this->LITSETTINGS->LOCALE ),
+                                $festivityGrade,
+                                $festivity->name,
+                                $coincidingFestivity_grade,
+                                $coincidingFestivity->name,
+                                $this->LITSETTINGS->YEAR
+                            );
+                        }
                     }
                 }
+            } else {
+                $this->LitCal[ $key ]->hasVigilMass = false;
+                $this->LitCal[ $key ]->hasVesperI = false;
             }
         }
 
@@ -2652,7 +2679,7 @@ class LitCalEngine {
                 } else {
                     $this->Messages[] = sprintf(
                         $this->LITSETTINGS->DIOCESAN . ": the %s '%s', proper to the calendar of the " . $this->GeneralIndex->{$this->LITSETTINGS->DIOCESAN}->diocese . " and usually celebrated on %s, is suppressed by the Sunday or Solemnity %s in the year %d",
-                        LITCAL_MESSAGES::_G(  $obj->grade, $this->LITSETTINGS->LOCALE, false ),
+                        LITCAL_MESSAGES::_G( $obj->grade, $this->LITSETTINGS->LOCALE, false ),
                         '<i>' . $obj->name . '</i>',
                         '<b>' . trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) ) . '</b>',
                         '<i>' . $this->LitCal[ array_search( $currentFeastDate, $this->SOLEMNITIES ) ]->name . '</i>',
@@ -2711,7 +2738,7 @@ class LitCalEngine {
                 $displayGrade = strip_tags( LITCAL_MESSAGES::__( "COMMEMORATION", $this->LITSETTINGS->LOCALE ) );
                 $displayGradeHTML = LITCAL_MESSAGES::__( "COMMEMORATION", $this->LITSETTINGS->LOCALE );
             }
-            else if(  (int)$CalEvent->date->format( 'N' ) !==7 ){
+            else if( (int)$CalEvent->date->format( 'N' ) !==7 ){
                 if( property_exists( $CalEvent,'displayGrade' ) && $CalEvent->displayGrade !== "" ){
                     $displayGrade = $CalEvent->displayGrade;
                     $displayGradeHTML = '<B>' . $CalEvent->displayGrade . '</B>';
@@ -2720,7 +2747,7 @@ class LitCalEngine {
                     $displayGradeHTML = LITCAL_MESSAGES::_G( $CalEvent->grade, $this->LITSETTINGS->LOCALE, true );
                 }
             }
-            else if(  (int)$CalEvent->grade > LitGrade::MEMORIAL ){
+            else if( (int)$CalEvent->grade > LitGrade::MEMORIAL ){
                 if( property_exists( $CalEvent,'displayGrade' ) && $CalEvent->displayGrade !== "" ){
                     $displayGrade = $CalEvent->displayGrade;
                     $displayGradeHTML = '<B>' . $CalEvent->displayGrade . '</B>';
