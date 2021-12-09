@@ -1,0 +1,1872 @@
+[
+    {
+        "RECURRENCE_ID": 0,
+        "MONTH": 1,
+        "DAY": 2,
+        "TAG": "StsBasilGreg",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 1,
+        "MONTH": 1,
+        "DAY": 7,
+        "TAG": "StRayPenyafort",
+        "GRADE": 2,
+        "COMMON": "Pastors:For One Pastor",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 2,
+        "MONTH": 1,
+        "DAY": 13,
+        "TAG": "StHilaryPoitiers",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop,Doctors",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 3,
+        "MONTH": 1,
+        "DAY": 17,
+        "TAG": "StAnthonyEgypt",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 4,
+        "MONTH": 1,
+        "DAY": 20,
+        "TAG": "StFabianPope",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For One Martyr,Pastors:For a Pope",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 5,
+        "MONTH": 1,
+        "DAY": 20,
+        "TAG": "StSebastian",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For One Martyr",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 6,
+        "MONTH": 1,
+        "DAY": 21,
+        "TAG": "StAgnes",
+        "GRADE": 3,
+        "COMMON": "Martyrs:For a Virgin Martyr,Virgins:For One Virgin",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 7,
+        "MONTH": 1,
+        "DAY": 22,
+        "TAG": "StVincentDeacon",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For One Martyr",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 8,
+        "MONTH": 1,
+        "DAY": 24,
+        "TAG": "StFrancisDeSales",
+        "GRADE": 3,
+        "COMMON": "Pastors:For a Bishop,Doctors",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 9,
+        "MONTH": 1,
+        "DAY": 25,
+        "TAG": "ConversionStPaul",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 10,
+        "MONTH": 1,
+        "DAY": 26,
+        "TAG": "StsTimothyTitus",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 11,
+        "MONTH": 1,
+        "DAY": 27,
+        "TAG": "StAngelaMerici",
+        "GRADE": 2,
+        "COMMON": "Virgins:For One Virgin,Holy Men and Women:For Educators",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 12,
+        "MONTH": 1,
+        "DAY": 28,
+        "TAG": "StThomasAquinas",
+        "GRADE": 3,
+        "COMMON": "Pastors:For One Pastor,Doctors",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 13,
+        "MONTH": 1,
+        "DAY": 31,
+        "TAG": "StJohnBosco",
+        "GRADE": 3,
+        "COMMON": "Pastors:For One Pastor,Holy Men and Women:For Educators",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 14,
+        "MONTH": 2,
+        "DAY": 2,
+        "TAG": "Presentation",
+        "GRADE": 5,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 15,
+        "MONTH": 2,
+        "DAY": 3,
+        "TAG": "StBlase",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For One Martyr,Pastors:For a Bishop",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 16,
+        "MONTH": 2,
+        "DAY": 3,
+        "TAG": "StAnsgar",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop,Pastors:For Missionaries",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 17,
+        "MONTH": 2,
+        "DAY": 5,
+        "TAG": "StAgatha",
+        "GRADE": 3,
+        "COMMON": "Martyrs:For a Virgin Martyr,Virgins:For One Virgin",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 18,
+        "MONTH": 2,
+        "DAY": 6,
+        "TAG": "StsPaulMiki",
+        "GRADE": 3,
+        "COMMON": "Martyrs:For Several Martyrs",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 19,
+        "MONTH": 2,
+        "DAY": 8,
+        "TAG": "StJeromeEmiliani",
+        "GRADE": 2,
+        "COMMON": "Holy Men and Women:For Educators",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 20,
+        "MONTH": 2,
+        "DAY": 10,
+        "TAG": "StScholastica",
+        "GRADE": 3,
+        "COMMON": "Virgins:For One Virgin,Holy Men and Women:For a Nun",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 21,
+        "MONTH": 2,
+        "DAY": 11,
+        "TAG": "LadyLourdes",
+        "GRADE": 2,
+        "COMMON": "Blessed Virgin Mary",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 22,
+        "MONTH": 2,
+        "DAY": 14,
+        "TAG": "StsCyrilMethodius",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 23,
+        "MONTH": 2,
+        "DAY": 17,
+        "TAG": "SevenHolyFounders",
+        "GRADE": 2,
+        "COMMON": "Holy Men and Women:For Religious",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 24,
+        "MONTH": 2,
+        "DAY": 21,
+        "TAG": "StPeterDamian",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop,Doctors",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 25,
+        "MONTH": 2,
+        "DAY": 22,
+        "TAG": "ChairStPeter",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 26,
+        "MONTH": 2,
+        "DAY": 23,
+        "TAG": "StPolycarp",
+        "GRADE": 3,
+        "COMMON": "Martyrs:For One Martyr,Pastors:For a Bishop",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 27,
+        "MONTH": 3,
+        "DAY": 4,
+        "TAG": "StCasimir",
+        "GRADE": 2,
+        "COMMON": "Holy Men and Women:For One Saint",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 28,
+        "MONTH": 3,
+        "DAY": 7,
+        "TAG": "StsPerpetuaFelicity",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 29,
+        "MONTH": 3,
+        "DAY": 8,
+        "TAG": "StJohnGod",
+        "GRADE": 2,
+        "COMMON": "Holy Men and Women:For Religious,Holy Men and Women:For Those Who Practiced Works of Mercy",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 30,
+        "MONTH": 3,
+        "DAY": 9,
+        "TAG": "StFrancesRome",
+        "GRADE": 2,
+        "COMMON": "Holy Men and Women:For Religious,Holy Men and Women:For Holy Women",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 31,
+        "MONTH": 3,
+        "DAY": 17,
+        "TAG": "StPatrick",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop,Pastors:For Missionaries",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 32,
+        "MONTH": 3,
+        "DAY": 18,
+        "TAG": "StCyrilJerusalem",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop,Doctors",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 33,
+        "MONTH": 3,
+        "DAY": 19,
+        "TAG": "StJoseph",
+        "GRADE": 6,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 34,
+        "MONTH": 3,
+        "DAY": 23,
+        "TAG": "StTuribius",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 35,
+        "MONTH": 3,
+        "DAY": 25,
+        "TAG": "Annunciation",
+        "GRADE": 6,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 36,
+        "MONTH": 4,
+        "DAY": 2,
+        "TAG": "StFrancisPaola",
+        "GRADE": 2,
+        "COMMON": "Holy Men and Women:For Religious",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 37,
+        "MONTH": 4,
+        "DAY": 4,
+        "TAG": "StIsidore",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop,Doctors",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 38,
+        "MONTH": 4,
+        "DAY": 5,
+        "TAG": "StVincentFerrer",
+        "GRADE": 2,
+        "COMMON": "Pastors:For Missionaries",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 39,
+        "MONTH": 4,
+        "DAY": 7,
+        "TAG": "StJohnBaptistDeLaSalle",
+        "GRADE": 3,
+        "COMMON": "Pastors:For One Pastor,Holy Men and Women:For Educators",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 40,
+        "MONTH": 4,
+        "DAY": 11,
+        "TAG": "StStanislaus",
+        "GRADE": 3,
+        "COMMON": "Martyrs:For One Martyr,Pastors:For a Bishop",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 41,
+        "MONTH": 4,
+        "DAY": 13,
+        "TAG": "StMartinPope",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For One Martyr,Pastors:For a Pope",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 42,
+        "MONTH": 4,
+        "DAY": 21,
+        "TAG": "StAnselm",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop,Doctors",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 43,
+        "MONTH": 4,
+        "DAY": 23,
+        "TAG": "StGeorge",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For One Martyr",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 44,
+        "MONTH": 4,
+        "DAY": 24,
+        "TAG": "StFidelisSigmaringen",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For One Martyr,Pastors:For One Pastor",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 45,
+        "MONTH": 4,
+        "DAY": 25,
+        "TAG": "StMarkEvangelist",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 46,
+        "MONTH": 4,
+        "DAY": 28,
+        "TAG": "StPeterChanel",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For One Martyr,Pastors:For Missionaries",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 47,
+        "MONTH": 4,
+        "DAY": 29,
+        "TAG": "StCatherineSiena",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 48,
+        "MONTH": 4,
+        "DAY": 30,
+        "TAG": "StPiusV",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Pope",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 49,
+        "MONTH": 5,
+        "DAY": 1,
+        "TAG": "StJosephWorker",
+        "GRADE": 2,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 50,
+        "MONTH": 5,
+        "DAY": 2,
+        "TAG": "StAthanasius",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 51,
+        "MONTH": 5,
+        "DAY": 3,
+        "TAG": "StsPhilipJames",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 52,
+        "MONTH": 5,
+        "DAY": 12,
+        "TAG": "StsNereusAchilleus",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For Several Martyrs",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 53,
+        "MONTH": 5,
+        "DAY": 12,
+        "TAG": "StPancras",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For One Martyr",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 54,
+        "MONTH": 5,
+        "DAY": 14,
+        "TAG": "StMatthiasAp",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 55,
+        "MONTH": 5,
+        "DAY": 18,
+        "TAG": "StJohnIPope",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For One Martyr,Pastors:For a Pope",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 56,
+        "MONTH": 5,
+        "DAY": 20,
+        "TAG": "StBernardineSiena",
+        "GRADE": 2,
+        "COMMON": "Pastors:For Missionaries,Holy Men and Women:For Religious",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 57,
+        "MONTH": 5,
+        "DAY": 25,
+        "TAG": "StBedeVenerable",
+        "GRADE": 2,
+        "COMMON": "Doctors,Holy Men and Women:For a Monk",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 58,
+        "MONTH": 5,
+        "DAY": 25,
+        "TAG": "StGregoryVII",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Pope",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 59,
+        "MONTH": 5,
+        "DAY": 25,
+        "TAG": "StMaryMagdalenePazzi",
+        "GRADE": 2,
+        "COMMON": "Virgins:For One Virgin,Holy Men and Women:For Religious",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 60,
+        "MONTH": 5,
+        "DAY": 26,
+        "TAG": "StPhilipNeri",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 61,
+        "MONTH": 5,
+        "DAY": 27,
+        "TAG": "StAugustineCanterbury",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop,Pastors:For Missionaries",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 62,
+        "MONTH": 5,
+        "DAY": 31,
+        "TAG": "Visitation",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 63,
+        "MONTH": 6,
+        "DAY": 1,
+        "TAG": "StJustinMartyr",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 64,
+        "MONTH": 6,
+        "DAY": 2,
+        "TAG": "StsMarcellinusPeter",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For Several Martyrs",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 65,
+        "MONTH": 6,
+        "DAY": 3,
+        "TAG": "StsCharlesLwanga",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 66,
+        "MONTH": 6,
+        "DAY": 5,
+        "TAG": "StBoniface",
+        "GRADE": 3,
+        "COMMON": "Martyrs:For One Martyr,Pastors:For Missionaries",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 67,
+        "MONTH": 6,
+        "DAY": 6,
+        "TAG": "StNorbert",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop,Holy Men and Women:For Religious",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 68,
+        "MONTH": 6,
+        "DAY": 9,
+        "TAG": "StEphrem",
+        "GRADE": 2,
+        "COMMON": "Doctors",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 69,
+        "MONTH": 6,
+        "DAY": 11,
+        "TAG": "StBarnabasAp",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 70,
+        "MONTH": 6,
+        "DAY": 13,
+        "TAG": "StAnthonyPadua",
+        "GRADE": 3,
+        "COMMON": "Pastors:For One Pastor,Doctors,Holy Men and Women:For Religious",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 71,
+        "MONTH": 6,
+        "DAY": 19,
+        "TAG": "StRomuald",
+        "GRADE": 2,
+        "COMMON": "Holy Men and Women:For an Abbot",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 72,
+        "MONTH": 6,
+        "DAY": 21,
+        "TAG": "StAloysiusGonzaga",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 73,
+        "MONTH": 6,
+        "DAY": 22,
+        "TAG": "StPaulinusNola",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 74,
+        "MONTH": 6,
+        "DAY": 22,
+        "TAG": "StsJohnFisherThomasMore",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For Several Martyrs",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 75,
+        "MONTH": 6,
+        "DAY": 24,
+        "TAG": "NativityJohnBaptist",
+        "GRADE": 6,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 76,
+        "MONTH": 6,
+        "DAY": 27,
+        "TAG": "StCyrilAlexandria",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop,Doctors",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 77,
+        "MONTH": 6,
+        "DAY": 28,
+        "TAG": "StIrenaeus",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 78,
+        "MONTH": 6,
+        "DAY": 29,
+        "TAG": "StsPeterPaulAp",
+        "GRADE": 6,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 79,
+        "MONTH": 6,
+        "DAY": 30,
+        "TAG": "FirstMartyrsRome",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For Several Martyrs",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 80,
+        "MONTH": 7,
+        "DAY": 3,
+        "TAG": "StThomasAp",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 81,
+        "MONTH": 7,
+        "DAY": 4,
+        "TAG": "StElizabethPortugal",
+        "GRADE": 2,
+        "COMMON": "Holy Men and Women:For Those Who Practiced Works of Mercy",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 82,
+        "MONTH": 7,
+        "DAY": 5,
+        "TAG": "StAnthonyZaccaria",
+        "GRADE": 2,
+        "COMMON": "Pastors:For One Pastor,Holy Men and Women:For Religious,Holy Men and Women:For Educators",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 83,
+        "MONTH": 7,
+        "DAY": 6,
+        "TAG": "StMariaGoretti",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For a Virgin Martyr,Virgins:For One Virgin",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 84,
+        "MONTH": 7,
+        "DAY": 11,
+        "TAG": "StBenedict",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 85,
+        "MONTH": 7,
+        "DAY": 13,
+        "TAG": "StHenry",
+        "GRADE": 2,
+        "COMMON": "Holy Men and Women:For One Saint",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 86,
+        "MONTH": 7,
+        "DAY": 14,
+        "TAG": "StCamillusDeLellis",
+        "GRADE": 2,
+        "COMMON": "Holy Men and Women:For Those Who Practiced Works of Mercy",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 87,
+        "MONTH": 7,
+        "DAY": 15,
+        "TAG": "StBonaventure",
+        "GRADE": 3,
+        "COMMON": "Pastors:For a Bishop,Doctors",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 88,
+        "MONTH": 7,
+        "DAY": 16,
+        "TAG": "LadyMountCarmel",
+        "GRADE": 2,
+        "COMMON": "Blessed Virgin Mary",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 89,
+        "MONTH": 7,
+        "DAY": 21,
+        "TAG": "StLawrenceBrindisi",
+        "GRADE": 2,
+        "COMMON": "Pastors:For One Pastor,Doctors,Holy Men and Women:For Religious",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 90,
+        "MONTH": 7,
+        "DAY": 22,
+        "TAG": "StMaryMagdalene",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 91,
+        "MONTH": 7,
+        "DAY": 23,
+        "TAG": "StBridget",
+        "GRADE": 2,
+        "COMMON": "Holy Men and Women:For Religious,Holy Men and Women:For Holy Women",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 92,
+        "MONTH": 7,
+        "DAY": 25,
+        "TAG": "StJamesAp",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 93,
+        "MONTH": 7,
+        "DAY": 26,
+        "TAG": "StsJoachimAnne",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 94,
+        "MONTH": 7,
+        "DAY": 29,
+        "TAG": "StMartha",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 95,
+        "MONTH": 7,
+        "DAY": 30,
+        "TAG": "StPeterChrysologus",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop,Doctors",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 96,
+        "MONTH": 7,
+        "DAY": 31,
+        "TAG": "StIgnatiusLoyola",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 97,
+        "MONTH": 8,
+        "DAY": 1,
+        "TAG": "StAlphonsusMariaDeLiguori",
+        "GRADE": 3,
+        "COMMON": "Pastors:For a Bishop,Doctors",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 98,
+        "MONTH": 8,
+        "DAY": 2,
+        "TAG": "StEusebius",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 99,
+        "MONTH": 8,
+        "DAY": 4,
+        "TAG": "StJeanVianney",
+        "GRADE": 3,
+        "COMMON": "Pastors:For One Pastor",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 100,
+        "MONTH": 8,
+        "DAY": 5,
+        "TAG": "DedicationStMaryMajor",
+        "GRADE": 2,
+        "COMMON": "Blessed Virgin Mary",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 101,
+        "MONTH": 8,
+        "DAY": 6,
+        "TAG": "Transfiguration",
+        "GRADE": 5,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 102,
+        "MONTH": 8,
+        "DAY": 7,
+        "TAG": "StSixtusIIPope",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For Several Martyrs",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 103,
+        "MONTH": 8,
+        "DAY": 7,
+        "TAG": "StCajetan",
+        "GRADE": 2,
+        "COMMON": "Pastors:For One Pastor,Holy Men and Women:For Religious",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 104,
+        "MONTH": 8,
+        "DAY": 8,
+        "TAG": "StDominic",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 105,
+        "MONTH": 8,
+        "DAY": 10,
+        "TAG": "StLawrenceDeacon",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 106,
+        "MONTH": 8,
+        "DAY": 11,
+        "TAG": "StClare",
+        "GRADE": 3,
+        "COMMON": "Virgins:For One Virgin,Holy Men and Women:For a Nun",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 107,
+        "MONTH": 12,
+        "DAY": 12,
+        "TAG": "StJaneFrancesDeChantal",
+        "GRADE": 2,
+        "COMMON": "Holy Men and Women:For Religious",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 108,
+        "MONTH": 8,
+        "DAY": 13,
+        "TAG": "StsPontianHippolytus",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For Several Martyrs,Pastors:For Several Pastors",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 109,
+        "MONTH": 8,
+        "DAY": 15,
+        "TAG": "Assumption",
+        "GRADE": 6,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 110,
+        "MONTH": 8,
+        "DAY": 16,
+        "TAG": "StStephenHungary",
+        "GRADE": 2,
+        "COMMON": "Holy Men and Women:For One Saint",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 111,
+        "MONTH": 8,
+        "DAY": 19,
+        "TAG": "StJohnEudes",
+        "GRADE": 2,
+        "COMMON": "Pastors:For One Pastor,Holy Men and Women:For Religious",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 112,
+        "MONTH": 8,
+        "DAY": 20,
+        "TAG": "StBernardClairvaux",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 113,
+        "MONTH": 8,
+        "DAY": 21,
+        "TAG": "StPiusX",
+        "GRADE": 3,
+        "COMMON": "Pastors:For a Pope",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 114,
+        "MONTH": 8,
+        "DAY": 22,
+        "TAG": "QueenshipMary",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 115,
+        "MONTH": 8,
+        "DAY": 23,
+        "TAG": "StRoseLima",
+        "GRADE": 2,
+        "COMMON": "Virgins:For One Virgin",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 116,
+        "MONTH": 8,
+        "DAY": 24,
+        "TAG": "StBartholomewAp",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 117,
+        "MONTH": 8,
+        "DAY": 25,
+        "TAG": "StLouis",
+        "GRADE": 2,
+        "COMMON": "Holy Men and Women:For One Saint",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 118,
+        "MONTH": 8,
+        "DAY": 25,
+        "TAG": "StJosephCalasanz",
+        "GRADE": 2,
+        "COMMON": "Pastors:For One Pastor,Holy Men and Women:For Educators",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 119,
+        "MONTH": 8,
+        "DAY": 27,
+        "TAG": "StMonica",
+        "GRADE": 3,
+        "COMMON": "Holy Men and Women:For Holy Women",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 120,
+        "MONTH": 8,
+        "DAY": 28,
+        "TAG": "StAugustineHippo",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 121,
+        "MONTH": 8,
+        "DAY": 29,
+        "TAG": "BeheadingJohnBaptist",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 122,
+        "MONTH": 9,
+        "DAY": 3,
+        "TAG": "StGregoryGreat",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 123,
+        "MONTH": 9,
+        "DAY": 8,
+        "TAG": "NativityVirginMary",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 124,
+        "MONTH": 9,
+        "DAY": 13,
+        "TAG": "StJohnChrysostom",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 125,
+        "MONTH": 9,
+        "DAY": 14,
+        "TAG": "ExaltationCross",
+        "GRADE": 5,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 126,
+        "MONTH": 9,
+        "DAY": 15,
+        "TAG": "LadySorrows",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 127,
+        "MONTH": 9,
+        "DAY": 16,
+        "TAG": "StsCorneliusCyprian",
+        "GRADE": 3,
+        "COMMON": "Martyrs:For Several Martyrs,Pastors:For a Bishop",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 128,
+        "MONTH": 9,
+        "DAY": 17,
+        "TAG": "StRobertBellarmine",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop,Doctors",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 129,
+        "MONTH": 9,
+        "DAY": 19,
+        "TAG": "StJanuarius",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For One Martyr,Pastors:For a Bishop",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 130,
+        "MONTH": 9,
+        "DAY": 21,
+        "TAG": "StMatthewEvangelist",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 131,
+        "MONTH": 9,
+        "DAY": 26,
+        "TAG": "StsCosmasDamian",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For Several Martyrs",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 132,
+        "MONTH": 9,
+        "DAY": 27,
+        "TAG": "StVincentDePaul",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 133,
+        "MONTH": 9,
+        "DAY": 28,
+        "TAG": "StWenceslaus",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For One Martyr",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 134,
+        "MONTH": 9,
+        "DAY": 29,
+        "TAG": "StsArchangels",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 135,
+        "MONTH": 9,
+        "DAY": 30,
+        "TAG": "StJerome",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 136,
+        "MONTH": 10,
+        "DAY": 1,
+        "TAG": "StThereseChildJesus",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 137,
+        "MONTH": 10,
+        "DAY": 2,
+        "TAG": "GuardianAngels",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 138,
+        "MONTH": 10,
+        "DAY": 4,
+        "TAG": "StFrancisAssisi",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 139,
+        "MONTH": 10,
+        "DAY": 6,
+        "TAG": "StBruno",
+        "GRADE": 2,
+        "COMMON": "Pastors:For One Pastor,Holy Men and Women:For a Monk",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 140,
+        "MONTH": 10,
+        "DAY": 7,
+        "TAG": "LadyRosary",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 141,
+        "MONTH": 10,
+        "DAY": 9,
+        "TAG": "StDenis",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For Several Martyrs",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 142,
+        "MONTH": 10,
+        "DAY": 9,
+        "TAG": "StJohnLeonardi",
+        "GRADE": 2,
+        "COMMON": "Pastors:For Missionaries,Holy Men and Women:For Those Who Practiced Works of Mercy",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 143,
+        "MONTH": 10,
+        "DAY": 14,
+        "TAG": "StCallistusIPope",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For One Martyr,Pastors:For a Pope",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 144,
+        "MONTH": 10,
+        "DAY": 15,
+        "TAG": "StTeresaJesus",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 145,
+        "MONTH": 10,
+        "DAY": 16,
+        "TAG": "StHedwig",
+        "GRADE": 2,
+        "COMMON": "Holy Men and Women:For Religious,Holy Men and Women:For Holy Women",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 146,
+        "MONTH": 10,
+        "DAY": 16,
+        "TAG": "StMargaretAlacoque",
+        "GRADE": 2,
+        "COMMON": "Virgins:For One Virgin",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 147,
+        "MONTH": 10,
+        "DAY": 17,
+        "TAG": "StIgnatiusAntioch",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 148,
+        "MONTH": 10,
+        "DAY": 18,
+        "TAG": "StLukeEvangelist",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 149,
+        "MONTH": 10,
+        "DAY": 19,
+        "TAG": "StsJeanBrebeuf",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For Missionary Martyrs",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 150,
+        "MONTH": 10,
+        "DAY": 19,
+        "TAG": "StPaulCross",
+        "GRADE": 2,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 151,
+        "MONTH": 10,
+        "DAY": 23,
+        "TAG": "StJohnCapistrano",
+        "GRADE": 2,
+        "COMMON": "Pastors:For Missionaries,Holy Men and Women:For Religious",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 152,
+        "MONTH": 10,
+        "DAY": 24,
+        "TAG": "StAnthonyMaryClaret",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop,Pastors:For Missionaries",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 153,
+        "MONTH": 10,
+        "DAY": 28,
+        "TAG": "StSimonStJudeAp",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 154,
+        "MONTH": 11,
+        "DAY": 1,
+        "TAG": "AllSaints",
+        "GRADE": 6,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 155,
+        "MONTH": 11,
+        "DAY": 2,
+        "TAG": "AllSouls",
+        "GRADE": 6,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "purple"
+    },
+    {
+        "RECURRENCE_ID": 156,
+        "MONTH": 11,
+        "DAY": 3,
+        "TAG": "StMartinPorres",
+        "GRADE": 2,
+        "COMMON": "Holy Men and Women:For Religious",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 157,
+        "MONTH": 11,
+        "DAY": 4,
+        "TAG": "StCharlesBorromeo",
+        "GRADE": 3,
+        "COMMON": "Pastors:For a Bishop",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 158,
+        "MONTH": 11,
+        "DAY": 9,
+        "TAG": "DedicationLateran",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 159,
+        "MONTH": 11,
+        "DAY": 10,
+        "TAG": "StLeoGreat",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 160,
+        "MONTH": 11,
+        "DAY": 11,
+        "TAG": "StMartinTours",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 161,
+        "MONTH": 11,
+        "DAY": 12,
+        "TAG": "StJosaphat",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 162,
+        "MONTH": 11,
+        "DAY": 15,
+        "TAG": "StAlbertGreat",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop,Doctors",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 163,
+        "MONTH": 11,
+        "DAY": 16,
+        "TAG": "StMargaretScotland",
+        "GRADE": 2,
+        "COMMON": "Holy Men and Women:For Those Who Practiced Works of Mercy",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 164,
+        "MONTH": 11,
+        "DAY": 16,
+        "TAG": "StGertrudeGreat",
+        "GRADE": 2,
+        "COMMON": "Virgins:For One Virgin,Holy Men and Women:For a Nun",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 165,
+        "MONTH": 11,
+        "DAY": 17,
+        "TAG": "StElizabethHungary",
+        "GRADE": 3,
+        "COMMON": "Holy Men and Women:For Those Who Practiced Works of Mercy",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 166,
+        "MONTH": 11,
+        "DAY": 18,
+        "TAG": "DedicationStsPeterPaul",
+        "GRADE": 2,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 167,
+        "MONTH": 11,
+        "DAY": 21,
+        "TAG": "PresentationMary",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 168,
+        "MONTH": 11,
+        "DAY": 22,
+        "TAG": "StCecilia",
+        "GRADE": 3,
+        "COMMON": "Martyrs:For a Virgin Martyr,Virgins:For One Virgin",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 169,
+        "MONTH": 11,
+        "DAY": 23,
+        "TAG": "StClementIPope",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For One Martyr,Pastors:For a Pope",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 170,
+        "MONTH": 11,
+        "DAY": 23,
+        "TAG": "StColumban",
+        "GRADE": 2,
+        "COMMON": "Pastors:For Missionaries,Holy Men and Women:For an Abbot",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 171,
+        "MONTH": 11,
+        "DAY": 30,
+        "TAG": "StAndrewAp",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 172,
+        "MONTH": 12,
+        "DAY": 3,
+        "TAG": "StFrancisXavier",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 173,
+        "MONTH": 12,
+        "DAY": 4,
+        "TAG": "StJohnDamascene",
+        "GRADE": 2,
+        "COMMON": "Pastors:For One Pastor,Doctors",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 174,
+        "MONTH": 12,
+        "DAY": 6,
+        "TAG": "StNicholas",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Bishop",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 175,
+        "MONTH": 12,
+        "DAY": 7,
+        "TAG": "StAmbrose",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 176,
+        "MONTH": 12,
+        "DAY": 8,
+        "TAG": "ImmaculateConception",
+        "GRADE": 6,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 177,
+        "MONTH": 12,
+        "DAY": 11,
+        "TAG": "StDamasusIPope",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Pope",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 178,
+        "MONTH": 12,
+        "DAY": 13,
+        "TAG": "StLucySyracuse",
+        "GRADE": 3,
+        "COMMON": "Martyrs:For a Virgin Martyr,Virgins:For One Virgin",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 179,
+        "MONTH": 12,
+        "DAY": 14,
+        "TAG": "StJohnCross",
+        "GRADE": 3,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 180,
+        "MONTH": 12,
+        "DAY": 21,
+        "TAG": "StPeterCanisius",
+        "GRADE": 2,
+        "COMMON": "Pastors:For One Pastor,Doctors",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 181,
+        "MONTH": 12,
+        "DAY": 23,
+        "TAG": "StJohnKanty",
+        "GRADE": 2,
+        "COMMON": "Pastors:For One Pastor,Holy Men and Women:For Those Who Practiced Works of Mercy",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 182,
+        "MONTH": 12,
+        "DAY": 26,
+        "TAG": "StStephenProtomartyr",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 183,
+        "MONTH": 12,
+        "DAY": 27,
+        "TAG": "StJohnEvangelist",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    },
+    {
+        "RECURRENCE_ID": 184,
+        "MONTH": 12,
+        "DAY": 28,
+        "TAG": "HolyInnocents",
+        "GRADE": 4,
+        "COMMON": "Proper",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "red"
+    },
+    {
+        "RECURRENCE_ID": 185,
+        "MONTH": 12,
+        "DAY": 29,
+        "TAG": "StThomasBecket",
+        "GRADE": 2,
+        "COMMON": "Martyrs:For One Martyr,Pastors:For a Bishop",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white,red"
+    },
+    {
+        "RECURRENCE_ID": 186,
+        "MONTH": 12,
+        "DAY": 31,
+        "TAG": "StSylvesterIPope",
+        "GRADE": 2,
+        "COMMON": "Pastors:For a Pope",
+        "CALENDAR": "GENERAL ROMAN",
+        "COLOR": "white"
+    }
+]
