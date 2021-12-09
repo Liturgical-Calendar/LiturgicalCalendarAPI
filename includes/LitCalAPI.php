@@ -209,10 +209,13 @@ class LitCalAPI {
         /**
          * Retrieve Higher Ranking Solemnities from Proprium de Tempore
          */
-        $result = $this->mysqli->query( "SELECT * FROM LITURGY__calendar_propriumdetempore" );
-        if ( $result ) {
-            while ( $row = mysqli_fetch_assoc( $result ) ) {
-                $this->PROPRIUM_DE_TEMPORE[ $row[ "TAG" ]] = array( "NAME_" . $this->LITSETTINGS->LOCALE => $row[ "NAME_" . $this->LITSETTINGS->LOCALE ] );
+        $propriumdetemporeFile = strtolower( "data/propriumdetempore/{$this->LITSETTINGS->LOCALE}.json" );
+        if( file_exists( $propriumdetemporeFile ) ) {
+            $PropriumDeTempore = json_decode( file_get_contents( $propriumdetemporeFile ), true );
+            if( json_last_error() === JSON_ERROR_NONE ){
+                foreach( $PropriumDeTempore as $key => $event ) {
+                    $this->PROPRIUM_DE_TEMPORE[ $key ] = [ "NAME_" . $this->LITSETTINGS->LOCALE => $event ];
+                }
             }
         }
     }
