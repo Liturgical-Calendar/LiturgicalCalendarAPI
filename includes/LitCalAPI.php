@@ -31,7 +31,6 @@ class LitCalAPI {
     private NumberFormatter $formatterFem;
 
     private array $PROPRIUM_DE_TEMPORE              = [];
-    private array $SUNDAYS_ADVENT_LENT_EASTER       = [];
     private array $Messages                         = [];
     private FestivityCollection $Cal;
     private array $tempCal                          = [];
@@ -491,7 +490,7 @@ class LitCalAPI {
                         */
 
                     }
-                    else if( in_array( $row->TAG, [ "Annunciation", "StJoseph", "ImmaculateConception" ] ) && in_array( $currentFeastDate, $this->SUNDAYS_ADVENT_LENT_EASTER ) ){
+                    else if( in_array( $row->TAG, [ "Annunciation", "StJoseph", "ImmaculateConception" ] ) && $this->Cal->isSundayAdventLentEaster( $currentFeastDate ) ){
                         $tempFestivity->date = clone( $currentFeastDate );
                         $tempFestivity->date->add( new DateInterval( 'P1D' ) );
                         $this->Messages[] = sprintf(
