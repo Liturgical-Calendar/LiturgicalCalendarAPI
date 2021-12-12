@@ -1646,7 +1646,6 @@ class LitCalAPI {
 
 
     //Insert or elevate the Patron Saints of Europe
-    //TODO: this method should work for all languages of European countries
     private function applyPatronSaintsEurope() : void {
 
         //Saint Benedict, Saint Bridget, and Saint Cyril and Methodius elevated to Feast, with title "patrono/i d'Europa" added
