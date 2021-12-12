@@ -104,6 +104,14 @@ class FestivityCollection {
         return $this->inFeasts( $date ) || $this->inMemorials( $date );
     }
 
+    public function inSolemnitiesFeastsOrMemorials( DateTime $date ) : bool {
+        return $this->inSolemnities( $date ) || $this->inFeastsOrMemorials( $date );
+    }
+
+    public function notInSolemnitiesFeastsOrMemorials( DateTime $date ) : bool {
+        return !$this->inSolemnitiesFeastsOrMemorials( $date );
+    }
+
     public function inWeekdaysAdventChristmasLent( DateTime $date ) : bool {
         return in_array( $date, $this->WEEKDAYS_ADVENT_CHRISTMAS_LENT );
     }

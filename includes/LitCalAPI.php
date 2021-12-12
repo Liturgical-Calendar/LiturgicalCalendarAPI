@@ -698,7 +698,7 @@ class LitCalAPI {
             $weekdayAdvent = DateTime::createFromFormat( '!j-n-Y', $DoMAdvent1 . '-' . $MonthAdvent1 . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayAdventCnt . 'D' ) );
 
             //if we're not dealing with a sunday or a solemnity, then create the weekday
-            if ( !$this->Cal->inSolemnities( $weekdayAdvent ) && !$this->Cal->inFeastsOrMemorials( $weekdayAdvent ) && self::DateIsNotSunday( $weekdayAdvent ) ) {
+            if ( $this->Cal->notInSolemnitiesFeastsOrMemorials( $weekdayAdvent ) && self::DateIsNotSunday( $weekdayAdvent ) ) {
                 $upper = (int)$weekdayAdvent->format( 'z' );
                 $diff = $upper - (int)$this->Cal->getFestivity("Advent1")->date->format( 'z' ); //day count between current day and First Sunday of Advent
                 $currentAdvWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1; //week count between current day and First Sunday of Advent
@@ -717,7 +717,7 @@ class LitCalAPI {
         $weekdayChristmasCnt = 1;
         while ( $weekdayChristmas >= $this->Cal->getFestivity( "Christmas" )->date && $weekdayChristmas < DateTime::createFromFormat( '!j-n-Y', '31-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) ) ) {
             $weekdayChristmas = DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayChristmasCnt . 'D' ) );
-            if ( !$this->Cal->inSolemnities( $weekdayChristmas ) && !$this->Cal->inFeastsOrMemorials( $weekdayChristmas ) && self::DateIsNotSunday( $weekdayChristmas ) ) {
+            if ( $this->Cal->notInSolemnitiesFeastsOrMemorials( $weekdayChristmas ) && self::DateIsNotSunday( $weekdayChristmas ) ) {
                 $ordinal = ucfirst( LitCalFf::getOrdinal( ( $weekdayChristmasCnt + 1 ), $this->LITSETTINGS->LOCALE, $this->formatter, LITCAL_MESSAGES::LATIN_ORDINAL ) );
                 $festivity = new Festivity( sprintf( LITCAL_MESSAGES::__( "%s Day of the Octave of Christmas", $this->LITSETTINGS->LOCALE ), $ordinal ), $weekdayChristmas, LitColor::WHITE, LitFeastType::MOBILE );
                 $this->Cal->addFestivity( "ChristmasWeekday" . $weekdayChristmasCnt, $festivity );
@@ -763,7 +763,7 @@ class LitCalAPI {
 
             //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord or a Feast or an obligatory memorial, then go ahead and create the optional memorial
             $row->DATE = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-            if ( self::DateIsNotSunday( $row->DATE ) && !$this->Cal->inSolemnities( $row->DATE ) && !$this->Cal->inFeastsOrMemorials( $row->DATE ) ) {
+            if ( self::DateIsNotSunday( $row->DATE ) && $this->Cal->notInSolemnitiesFeastsOrMemorials( $row->DATE ) ) {
                 $newFestivity = new Festivity( $row->NAME, $row->DATE, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
                 $this->Cal->addFestivity( $row->TAG, $newFestivity );
 
@@ -1033,7 +1033,7 @@ class LitCalAPI {
         $row->NAME = $names[ $this->LITSETTINGS->LOCALE ];
         $row->GRADE = LitGrade::MEMORIAL;
         $row->DATE = DateTime::createFromFormat( '!j-n-Y', '23-9-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-        if( !$this->Cal->inSolemnities( $row->DATE ) && !$this->Cal->inFeastsOrMemorials( $row->DATE ) ) {
+        if( $this->Cal->notInSolemnitiesFeastsOrMemorials( $row->DATE ) ) {
             $newFestivity = new Festivity( $row->NAME, $row->DATE, LitColor::WHITE, LitFeastType::FIXED, LitGrade::MEMORIAL, "Pastors:For One Pastor,Holy Men and Women:For Religious" );
             $this->Cal->addFestivity( "StPioPietrelcina", $newFestivity );
 
@@ -1144,7 +1144,7 @@ class LitCalAPI {
     private function createImmaculateHeart() {
         $row = new stdClass();
         $row->DATE = LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P' . ( 7 * 9 + 6 ) . 'D' ) );
-        if ( !$this->Cal->inSolemnities( $row->DATE ) && !$this->Cal->inFeastsOrMemorials( $row->DATE ) ) {
+        if ( $this->Cal->notInSolemnitiesFeastsOrMemorials( $row->DATE ) ) {
             //Immaculate Heart of Mary fixed on the Saturday following the second Sunday after Pentecost
             //( see Calendarium Romanum Generale in Missale Romanum Editio Typica 1970 )
             //Pentecost = LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P'.( 7*7 ).'D' ) )
@@ -1172,7 +1172,7 @@ class LitCalAPI {
     private function handleSaintJaneFrancesDeChantal() {
 
         $StJaneFrancesNewDate = DateTime::createFromFormat( '!j-n-Y', '12-8-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-        if ( self::DateIsNotSunday( $StJaneFrancesNewDate ) && !$this->Cal->inSolemnities( $StJaneFrancesNewDate ) && !$this->Cal->inFeastsOrMemorials( $StJaneFrancesNewDate ) ) {
+        if ( self::DateIsNotSunday( $StJaneFrancesNewDate ) && $this->Cal->notInSolemnitiesFeastsOrMemorials( $StJaneFrancesNewDate ) ) {
             $festivity = $this->Cal->getFestivity( "StJaneFrancesDeChantal" );
             if( $festivity !== null ) {
                 $this->Cal->moveFestivityDate( "StJaneFrancesDeChantal", $StJaneFrancesNewDate );
@@ -1250,7 +1250,7 @@ class LitCalAPI {
         $rows[1]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>';
 
         foreach( $rows as $row ) {
-            if ( self::DateIsNotSunday( $row->DATE ) && !$this->Cal->inSolemnities( $row->DATE ) && !$this->Cal->inFeastsOrMemorials( $row->DATE ) ) {
+            if ( self::DateIsNotSunday( $row->DATE ) && $this->Cal->notInSolemnitiesFeastsOrMemorials( $row->DATE ) ) {
                 $festivity = new Festivity( $row->NAME, $row->DATE, LitColor::WHITE, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
                 $this->Cal->addFestivity( $row->TAG, $festivity );
                 /**
@@ -1302,7 +1302,7 @@ class LitCalAPI {
 
     private function addPreparedRows( array $rows ) : void {
         foreach( $rows as $row ) {
-            if( !$this->Cal->inSolemnities( $row->DATE ) && !$this->Cal->inFeastsOrMemorials( $row->DATE ) ) {
+            if( $this->Cal->notInSolemnitiesFeastsOrMemorials( $row->DATE ) ) {
                 $festivity = new Festivity( $row->NAME, $row->DATE, LitColor::WHITE, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
                 $this->Cal->addFestivity( $row->TAG, $festivity );
                 /**
@@ -1493,7 +1493,7 @@ class LitCalAPI {
         $weekdayEasterCnt = 1;
         while ( $weekdayEaster >= $this->Cal->getFestivity( "Easter" )->date && $weekdayEaster < $this->Cal->getFestivity( "Pentecost" )->date ) {
             $weekdayEaster = DateTime::createFromFormat( '!j-n-Y', $DoMEaster . '-' . $MonthEaster . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayEasterCnt . 'D' ) );
-            if ( !$this->Cal->inSolemnities( $weekdayEaster ) && !$this->Cal->inFeastsOrMemorials( $weekdayEaster ) && self::DateIsNotSunday( $weekdayEaster ) ) {
+            if ( $this->Cal->notInSolemnitiesFeastsOrMemorials( $weekdayEaster ) && self::DateIsNotSunday( $weekdayEaster ) ) {
                 $upper =  (int)$weekdayEaster->format( 'z' );
                 $diff = $upper - (int)$this->Cal->getFestivity( "Easter" )->date->format( 'z' ); //day count between current day and Easter Sunday
                 $currentEasterWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1;         //week count between current day and Easter Sunday
@@ -1522,7 +1522,7 @@ class LitCalAPI {
 
         while ( $firstOrdinary >= $FirstWeekdaysLowerLimit && $firstOrdinary < $FirstWeekdaysUpperLimit ) {
             $firstOrdinary = DateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod )->add( new DateInterval( 'P' . $ordWeekday . 'D' ) );
-            if ( !$this->Cal->inSolemnities( $firstOrdinary ) && !$this->Cal->inFeastsOrMemorials( $firstOrdinary ) ) {
+            if ( $this->Cal->notInSolemnitiesFeastsOrMemorials( $firstOrdinary ) ) {
                 //The Baptism of the Lord is the First Sunday, so the weekdays following are of the First Week of Ordinary Time
                 //After the Second Sunday, let's calculate which week of Ordinary Time we're in
                 if ( $firstOrdinary > $firstSunday ) {
@@ -1551,7 +1551,7 @@ class LitCalAPI {
 
         while ( $lastOrdinary >= $SecondWeekdaysLowerLimit && $lastOrdinary < $SecondWeekdaysUpperLimit ) {
             $lastOrdinary = LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P' . ( 7 * 7 + $ordWeekday ) . 'D' ) );
-            if ( !$this->Cal->inSolemnities( $lastOrdinary ) && !$this->Cal->inFeastsOrMemorials( $lastOrdinary ) ) {
+            if ( $this->Cal->notInSolemnitiesFeastsOrMemorials( $lastOrdinary ) ) {
                 $lower          = (int)$lastOrdinary->format( 'z' );
                 $diff           = $dayLastSunday - $lower; //day count between current day and Christ the King Sunday
                 $weekDiff       = ( ( $diff - $diff % 7 ) / 7 ); //week count between current day and Christ the King Sunday;
@@ -1578,7 +1578,7 @@ class LitCalAPI {
         $SatMemBVM_cnt = 0;
         while( $currentSaturday <= $lastSatDT ){
             $currentSaturday = DateTime::createFromFormat( '!j-n-Y', $currentSaturday->format( 'j-n-Y' ),new DateTimeZone( 'UTC' ) )->modify( 'next Saturday' );
-            if( !$this->Cal->inSolemnities( $currentSaturday ) && !$this->Cal->inFeastsOrMemorials( $currentSaturday ) ) {
+            if( $this->Cal->notInSolemnitiesFeastsOrMemorials( $currentSaturday ) ) {
                 $memID = "SatMemBVM" . ++$SatMemBVM_cnt;
                 $festivity = new Festivity( LITCAL_MESSAGES::__( "Saturday Memorial of the Blessed Virgin Mary", $this->LITSETTINGS->LOCALE ), $currentSaturday, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL_OPT, "Blessed Virgin Mary" );
                 $this->Cal->addFestivity( $memID, $festivity );
@@ -1738,7 +1738,7 @@ class LitCalAPI {
             $festivity1 = $this->Cal->getFestivity( "StPaulCross" );
             if( $festivity1 !== null ){ //of course it will exist if StsJeanBrebeuf exists, they are originally on the same day
                 $this->Cal->moveFestivityDate( "StPaulCross", $festivity1->date->add( new DateInterval( 'P1D' ) ) );
-                if( $this->Cal->inSolemnities( $festivity1->date ) || $this->Cal->inFeastsOrMemorials( $festivity1->date ) ) {
+                if( $this->Cal->inSolemnitiesFeastsOrMemorials( $festivity1->date ) ) {
                     $this->Messages[] = sprintf(
                         "USA: The optional memorial '%s' is transferred from Oct 19 to Oct 20 as per the 2011 Roman Missal issued by the USCCB, to make room for '%s' elevated to the rank of Memorial, however in the year %d it is superseded by a higher ranking liturgical event",
                         '<i>' . $festivity1->name . '</i>',
@@ -1808,79 +1808,55 @@ class LitCalAPI {
         }
 
         $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', '18-7-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-        $festivity = $this->Cal->getFestivity( "StCamillusDeLellis" );
-        if( !$this->Cal->inSolemnities( $currentFeastDate ) ) {
+        $this->moveFestivityDate( "StCamillusDeLellis", $currentFeastDate, "Blessed Kateri Tekakwitha" );
+
+        $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', '5-7-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
+        $this->moveFestivityDate( "StElizabethPortugal", $currentFeastDate, "Independence Day" );
+
+    }
+
+    private function moveFestivityDate( string $tag, DateTime $newDate, string $inFavorOf ) {
+        $festivity = $this->Cal->getFestivity( $tag );
+        $oldDateStr = $festivity->date->format('F jS');
+        $newDateStr = $newDate->format('F jS');
+        if( !$this->Cal->inSolemnities( $newDate ) ) {
             if( $festivity !== null ){
                 //Move Camillus De Lellis from July 14 to July 18, to make room for Kateri Tekakwitha
-                $this->Cal->moveFestivityDate( "StCamillusDeLellis", $currentFeastDate );
+                $this->Cal->moveFestivityDate( $tag, $newDate );
             }
             else{
                 //if it was suppressed on July 14 because of higher ranking celebration, we should recreate it on July 18 if possible
-                $result = $this->mysqli->query( "SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StCamillusDeLellis'" );
+                $result = $this->mysqli->query( "SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = '$tag'" );
                 if ( $result ) {
                     $row = mysqli_fetch_assoc( $result );
-                    $festivity = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ] );
-                    $this->Cal->addFestivity( "StCamillusDeLellis", $festivity );
+                    $festivity = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $newDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ] );
+                    $this->Cal->addFestivity( $tag, $festivity );
                 }
             }
             $this->Messages[] = sprintf(
-                'USA: The optional memorial \'%1$s\' is transferred from July 14 to July 18 as per the 2011 Roman Missal issued by the USCCB, to make room for the Memorial \'%2$s\': applicable to the year %3$d.',
+                'USA: The optional memorial \'%1$s\' is transferred from %4$s to %5$s as per the 2011 Roman Missal issued by the USCCB, to make room for the Memorial \'%2$s\': applicable to the year %3$d.',
                 '<i>' . $festivity->name . '</i>',
-                '<i>' . "Blessed Kateri Tekakwitha" . '</i>', //can't use $this->Cal->getFestivity( "KateriTekakwitha" ), might not exist!
-                $this->LITSETTINGS->YEAR
+                '<i>' . $inFavorOf . '</i>',
+                $this->LITSETTINGS->YEAR,
+                $oldDateStr,
+                $newDateStr
             );
-            $this->Cal->setProperty( "StCamillusDeLellis", "name", "[ USA ] " . $festivity->name );
+            $this->Cal->setProperty( $tag, "name", "[ USA ] " . $festivity->name );
         }
         else{
             if( $festivity !== null ){
                 //Can't move Camillus De Lellis from July 14 to July 18, so simply suppress to make room for Kateri Tekakwitha
                 $this->Messages[] = sprintf(
-                    'USA: The optional memorial \'%1$s\' is transferred from July 14 to July 18 as per the 2011 Roman Missal issued by the USCCB, to make room for the Memorial \'%2$s\', however it is superseded by a higher ranking festivity in the year %3$d.',
+                    'USA: The optional memorial \'%1$s\' is transferred from %4$s to %5$s as per the 2011 Roman Missal issued by the USCCB, to make room for the Memorial \'%2$s\', however it is superseded by a higher ranking festivity in the year %3$d.',
                     '<i>' . $festivity->name . '</i>',
-                    '<i>' . "Blessed Kateri Tekakwitha" . '</i>', //can't use $this->Cal->getFestivity( "KateriTekakwitha" ), might not exist!
-                    $this->LITSETTINGS->YEAR
+                    '<i>' . $inFavorOf . '</i>',
+                    $this->LITSETTINGS->YEAR,
+                    $oldDateStr,
+                    $newDateStr
                 );
-                $this->Cal->removeFestivity( "StCamillusDeLellis" );
+                $this->Cal->removeFestivity( $tag );
             }
         }
-
-        $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', '5-7-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-        $festivity = $this->Cal->getFestivity( "StElizabethPortugal" );
-        if( !$this->Cal->inSolemnities( $currentFeastDate ) ) {
-            if( $festivity !== null ) {
-                //Move Elizabeth of Portugal from July 4 to July 5 to make room for Independence Day
-                $this->Cal->moveFestivityDate( "StElizabethPortugal", $currentFeastDate );
-            }
-            else{
-                //if it was suppressed on July 4 because of higher ranking celebration, we should recreate on July 5 if possible
-                $result = $this->mysqli->query( "SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StElizabethPortugal'" );
-                if ( $result ) {
-                    $row = mysqli_fetch_assoc( $result );
-                    $festivity = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ] );
-                    $this->Cal->addFestivity( "StElizabethPortugal", $festivity );
-                }
-            }
-            $this->Messages[] = sprintf(
-                'USA: The optional memorial \'%1$s\' is transferred from July 4 to July 5 as per the 2011 Roman Missal issued by the USCCB, to make room for the Holiday \'%2$s\': applicable to the year %3$d.',
-                '<i>' . $festivity->name . '</i>',
-                '<i>' . "Independence Day" . '</i>', //can't use $this->Cal->getFestivity( "IndependenceDay" ), might not exist!
-                $this->LITSETTINGS->YEAR
-            );
-            $this->Cal->setProperty( "StElizabethPortugal", "name", "[ USA ] " . $festivity->name );
-        }
-        else{
-            if( $festivity !== null ){
-                //Can't move Elizabeth of Portugal to July 5, so simply suppress to make room for Independence Day
-                $this->Messages[] = sprintf(
-                    'USA: The optional memorial \'%1$s\' is transferred from July 4 to July 5 as per the 2011 Roman Missal issued by the USCCB, to make room for the holiday \'%2$s\', however it is superseded by a higher ranking festivity in the year %3$d.',
-                    '<i>' . $festivity->name . '</i>',
-                    '<i>' . "Independence Day" . '</i>', //can't use $this->Cal->getFestivity( "IndependenceDay" ), might not exist!
-                    $this->LITSETTINGS->YEAR
-                );
-                $this->Cal->removeFestivity( "StElizabethPortugal" );
-            }
-        }
-
     }
 
     private static function DateIsSunday( DateTime $dt ) : bool {
