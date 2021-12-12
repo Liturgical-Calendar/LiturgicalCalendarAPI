@@ -158,6 +158,38 @@ class FestivityCollection {
         }
     }
 
+    private function handleGradeProperty( string $key, int $value, int $oldValue ) : void {
+        if( $value >= LitGrade::FEAST_LORD ) {
+            $this->solemnities[ $key ] = $this->festivities[ $key ]->date;
+            if( $oldValue < LitGrade::FEAST_LORD && $this->feastOrMemorialKeyFromDate( $this->festivities[ $key ]->date ) === $key ) {
+                if( $this->inFeasts( $this->festivities[ $key ]->date ) ) {
+                    unset( $this->feasts[ $key ] );
+                }
+                elseif( $this->inMemorials( $this->festivities[ $key ]->date ) ) {
+                    unset( $this->memorials[ $key ] );
+                }
+            }
+        }
+        else if( $value === LitGrade::FEAST ) {
+            $this->feasts[ $key ] = $this->festivities[ $key ]->date;
+            if( $oldValue > LitGrade::FEAST ) {
+                unset( $this->solemnities[ $key ] );
+            }
+            else if( $oldValue === LitGrade::MEMORIAL ) {
+                unset( $this->memorials[ $key ] );
+            }
+        }
+        else if( $value === LitGrade::MEMORIAL ) {
+            $this->memorials[ $key ] = $this->festivities[ $key ]->date;
+            if( $oldValue > LitGrade::FEAST ) {
+                unset( $this->solemnities[ $key ] );
+            }
+            elseif( $oldValue > LitGrade::MEMORIAL ) {
+                unset ( $this->feasts[ $key ] );
+            }
+        }
+    }
+
     public function setProperty( string $key, string $property, string|int|bool $value ) : bool {
         $reflect = new ReflectionClass( new Festivity("test", new DateTime('NOW')) );
         if( array_key_exists( $key, $this->festivities ) ) {
@@ -169,36 +201,8 @@ class FestivityCollection {
                 elseif( $reflect->getProperty( $property )->getType() instanceof ReflectionUnionType && in_array( gettype( $value ), $reflect->getProperty( $property )->getType()->getTypes() ) ) {
                     $this->festivities[ $key ]->{$property} = $value;
                 }
-                if($key === "grade" ) {
-                    if( $value >= LitGrade::FEAST_LORD ) {
-                        $this->solemnities[ $key ] = $this->festivities[ $key ]->date;
-                        if( $oldValue < LitGrade::FEAST_LORD && $this->feastOrMemorialKeyFromDate( $this->festivities[ $key ]->date ) === $key ) {
-                            if( $this->inFeasts( $this->festivities[ $key ]->date ) ) {
-                                unset( $this->feasts[ $key ] );
-                            }
-                            elseif( $this->inMemorials( $this->festivities[ $key ]->date ) ) {
-                                unset( $this->memorials[ $key ] );
-                            }
-                        }
-                    }
-                    else if( $value === LitGrade::FEAST ) {
-                        $this->feasts[ $key ] = $this->festivities[ $key ]->date;
-                        if( $oldValue > LitGrade::FEAST ) {
-                            unset( $this->solemnities[ $key ] );
-                        }
-                        else if( $oldValue === LitGrade::MEMORIAL ) {
-                            unset( $this->memorials[ $key ] );
-                        }
-                    }
-                    else if( $value === LitGrade::MEMORIAL ) {
-                        $this->memorials[ $key ] = $this->festivities[ $key ]->date;
-                        if( $oldValue > LitGrade::FEAST ) {
-                            unset( $this->solemnities[ $key ] );
-                        }
-                        elseif( $oldValue > LitGrade::MEMORIAL ) {
-                            unset ( $this->feasts[ $key ] );
-                        }
-                    }
+                if( $key === "grade" ) {
+                    $this->handleGradeProperty( $key, $value, $oldValue );
                 }
                 return true;
             }
