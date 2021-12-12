@@ -34,6 +34,29 @@ class ROMANMISSAL {
         "ITALY_2020"    => "Messale Romano ed. 2020"
     ];
 
+    public static array $jsonFiles = [
+        "VATICAN_1970"  => "data/propriumdesanctis_1970/propriumdesanctis_1970.json",
+        "VATICAN_1971"  => false,
+        "VATICAN_1975"  => false,
+        "VATICAN_2002"  => "data/propriumdesanctis_2002/propriumdesanctis_2002.json",
+        "VATICAN_2008"  => false,
+        "USA_2011"      => "data/propriumdesanctis_USA_2011/propriumdesanctis_USA_2011.json",
+        "ITALY_1983"    => "data/propriumdesanctis_ITALY_1983/propriumdesanctis_ITALY_1983.json",
+        "ITALY_2020"    => false
+    ];
+
+    public static array $i18nPath = [
+        "VATICAN_1970"  => "data/propriumdesanctis_1970/i18n/",
+        "VATICAN_1971"  => false,
+        "VATICAN_1975"  => false,
+        "VATICAN_2002"  => "data/propriumdesanctis_2002/i18n/",
+        "VATICAN_2008"  => false,
+        "USA_2011"      => false,
+        "ITALY_1983"    => false,
+        "ITALY_2020"    => false
+    ];
+
+
     public static function isValid( $value ) : bool {
         return in_array( $value, self::$values );
     }
@@ -44,6 +67,14 @@ class ROMANMISSAL {
 
     public static function getSanctoraleTableName( $value ) : string|int|false {
         return array_search( $value, self::$values );
+    }
+
+    public static function getSanctoraleFileName( $value ) : string|false {
+        return self::$jsonFiles[ $value ];
+    }
+
+    public static function getSanctoraleI18nFilePath( $value ) : string|false {
+        return self::$i18nPath[ $value ];
     }
 
     public static function getName( $value ) : string {
