@@ -1787,38 +1787,37 @@ class LitCalAPI {
         $festivity = new Festivity( "[ USA ] Thanksgiving", $thanksgivingDate, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL, '', 'National Holiday' );
         $this->Cal->addFestivity( "ThanksgivingDay", $festivity );
 
-        $result = $this->mysqli->query( "SELECT * FROM LITURGY__USA_calendar_propriumdesanctis_2011" );
-        if ( $result ) {
-            while ( $row = mysqli_fetch_assoc( $result ) ) {
-                $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row[ 'DAY' ] . '-' . $row[ 'MONTH' ] . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-                if( !$this->Cal->inSolemnities( $currentFeastDate ) ) {
-                    $festivity = new Festivity( "[ USA ] " . $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ], $row[ "DISPLAYGRADE" ] );
-                    $this->Cal->addFestivity( $row[ 'TAG' ], $festivity );
-                }
-                else if( self::DateIsSunday( $currentFeastDate ) && $row[ "TAG" ] === "PrayerUnborn" ){
-                    $festivity = new Festivity( "[ USA ] " . $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate->add( new DateInterval( 'P1D' ) ), $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ], $row[ "DISPLAYGRADE" ] );
-                    $this->Cal->addFestivity( $row[ 'TAG' ], $festivity );
-                    $this->Messages[] = sprintf(
-                        "USA: The National Day of Prayer for the Unborn is set to Jan 22 as per the 2011 Roman Missal issued by the USCCB, however since it coincides with a Sunday or a Solemnity in the year %d, it has been moved to Jan 23",
-                        $this->LITSETTINGS->YEAR
-                    );
-                }
-                else{
-                    $this->Messages[] = sprintf(
-                        "USA: the %s '%s', added to the calendar as per the 2011 Roman Missal issued by the USCCB, is superseded by a Sunday or a Solemnity in the year %d",
-                        $row[ "DISPLAYGRADE" ] !== "" ? $row[ "DISPLAYGRADE" ] : LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE, false ),
-                        '<i>' . $row[ "NAME_" . $this->LITSETTINGS->LOCALE ] . '</i>',
-                        $this->LITSETTINGS->YEAR
-                    );
-                }
-            }
-        }
-
         $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', '18-7-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
         $this->moveFestivityDate( "StCamillusDeLellis", $currentFeastDate, "Blessed Kateri Tekakwitha" );
 
         $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', '5-7-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
         $this->moveFestivityDate( "StElizabethPortugal", $currentFeastDate, "Independence Day" );
+
+        $this->readPropriumDeSanctisJSONData( RomanMissal::USA_EDITION_2011 );
+
+        foreach ( $this->tempCal[ RomanMissal::USA_EDITION_2011 ] as $row ) {
+            $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
+            if( !$this->Cal->inSolemnities( $currentFeastDate ) ) {
+                $festivity = new Festivity( "[ USA ] " . $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON, $row->DISPLAYGRADE );
+                $this->Cal->addFestivity( $row->TAG, $festivity );
+            }
+            else if( self::DateIsSunday( $currentFeastDate ) && $row->TAG === "PrayerUnborn" ){
+                $festivity = new Festivity( "[ USA ] " . $row->NAME, $currentFeastDate->add( new DateInterval( 'P1D' ) ), $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON, $row->DISPLAYGRADE );
+                $this->Cal->addFestivity( $row->TAG, $festivity );
+                $this->Messages[] = sprintf(
+                    "USA: The National Day of Prayer for the Unborn is set to Jan 22 as per the 2011 Roman Missal issued by the USCCB, however since it coincides with a Sunday or a Solemnity in the year %d, it has been moved to Jan 23",
+                    $this->LITSETTINGS->YEAR
+                );
+            }
+            else{
+                $this->Messages[] = sprintf(
+                    "USA: the %s '%s', added to the calendar as per the 2011 Roman Missal issued by the USCCB, is superseded by a Sunday or a Solemnity in the year %d",
+                    $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE, false ),
+                    '<i>' . $row->NAME . '</i>',
+                    $this->LITSETTINGS->YEAR
+                );
+            }
+        }
 
     }
 
