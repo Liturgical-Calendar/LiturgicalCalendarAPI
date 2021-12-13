@@ -8,14 +8,16 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-14 00:11+0100\n"
-"PO-Revision-Date: 2021-12-14 00:18+0100\n"
-"Last-Translator: Ubuntu <priest@johnromanodorazio.com>\n"
-"Language-Team: Italian\n"
+"PO-Revision-Date: 2021-12-13 23:50+0000\n"
+"Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
+"Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
+"liturgical-calendar/api-strings/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ASCII\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.9.1\n"
 
 #: includes/LitCalAPI.php:179
 #, php-format
@@ -23,16 +25,18 @@ msgid ""
 "Only years from 1970 and after are supported. You tried requesting the year "
 "%d."
 msgstr ""
+"Sono supportati anni dal 1970 in poi soltanto. Tu invece hai provato a "
+"richiedere l'anno %d."
 
 #: includes/LitCalAPI.php:261 includes/LitCalAPI.php:294
 #, php-format
 msgid "%s day before Epiphany"
-msgstr ""
+msgstr "%s giorno prima dell'Epifania"
 
 #: includes/LitCalAPI.php:273 includes/LitCalAPI.php:304
 #, php-format
 msgid "%s day after Epiphany"
-msgstr ""
+msgstr "%s giorno dopo l'Epifania"
 
 #: includes/LitCalAPI.php:439 includes/LitCalAPI.php:455
 #: includes/LitCalAPI.php:481
@@ -41,10 +45,12 @@ msgid ""
 "The Solemnity '%s' falls on %s in the year %d, the celebration has been "
 "transferred to %s (%s) as per the %s."
 msgstr ""
+"La Solennità <i>'%s'</i> coincide con <b>%s</b> nell'anno %d, pertanto la "
+"celebrazione è stata trasferita al %s (%s) in accordo con il %s."
 
 #: includes/LitCalAPI.php:443
 msgid "the Saturday preceding Palm Sunday"
-msgstr ""
+msgstr "sabato che precede la Domenica delle Palme"
 
 #: includes/LitCalAPI.php:448 includes/LitCalAPI.php:464
 #: includes/LitCalAPI.php:490 includes/LitCalAPI.php:518
@@ -60,15 +66,15 @@ msgstr ""
 #: includes/LitCalAPI.php:1414 includes/LitCalAPI.php:1428
 #: includes/LitCalAPI.php:1442
 msgid "Decree of the Congregation for Divine Worship"
-msgstr ""
+msgstr "Decreto della Congregazione per il Culto Divino"
 
 #: includes/LitCalAPI.php:459
 msgid "the Monday following the Second Sunday of Easter"
-msgstr ""
+msgstr "lunedì che segue la Seconda Domenica di Pasqua"
 
 #: includes/LitCalAPI.php:485
 msgid "the following Monday"
-msgstr ""
+msgstr "lunedì seguente"
 
 #: includes/LitCalAPI.php:496
 #, php-format
@@ -76,6 +82,8 @@ msgid ""
 "The Solemnity '%s' coincides with the Solemnity '%s' in the year %d. We "
 "should ask the Congregation for Divine Worship what to do about this!"
 msgstr ""
+"La Solennità <i>'%s'</i> coincide con la Solennità <i>'%s'</i> nell'anno %d. "
+"Dovremmo chiedere alla Congregazione del Culto Divino cosa fare a riguardo!"
 
 #: includes/LitCalAPI.php:514
 #, php-format
@@ -83,11 +91,13 @@ msgid ""
 "Seeing that the Solemnity '%s' coincides with the Solemnity '%s' in the year "
 "%d, it has been anticipated by one day as per %s."
 msgstr ""
+"Visto che la Solennità <i>'%s'</i> coincide con la Solennità <i>'%s'</i> "
+"nell'anno %d, la prima è stata anticipata di un giorno per %s."
 
 #: includes/LitCalAPI.php:527 includes/LitCalAPI.php:2084
 #: includes/LitCalAPI.php:2085
 msgid "COMMEMORATION"
-msgstr ""
+msgstr "<I>Commemorazione</I>"
 
 #: includes/LitCalAPI.php:582
 #, php-format
@@ -95,31 +105,33 @@ msgid ""
 "'%s' falls on a Sunday in the year %d, therefore the Feast '%s' is "
 "celebrated on %s rather than on the Sunday after Christmas."
 msgstr ""
+"'%s' coincide con una Domenica nell'anno %d, pertanto la Festa <i>'%s'</i> "
+"viene celebrata il %s anziché la Domenica dopo Natale."
 
 #: includes/LitCalAPI.php:616 includes/LitCalAPI.php:640
 #: includes/LitCalAPI.php:822
 #, php-format
 msgid "'%s' is superseded by the %s '%s' in the year %d."
-msgstr ""
+msgstr "<i>'%s'</i> è soppiantata dalla %s <i>'%s'</i> nell'anno %d."
 
 #: includes/LitCalAPI.php:692
 #, php-format
 msgid "of the %s Week of Advent"
-msgstr ""
+msgstr "della %s Settimana dell'Avvento"
 
 #: includes/LitCalAPI.php:707
 #, php-format
 msgid "%s Day of the Octave of Christmas"
-msgstr ""
+msgstr "\"%s Giorno dell'Ottava di Natale"
 
 #: includes/LitCalAPI.php:729
 #, php-format
 msgid "of the %s Week of Lent"
-msgstr ""
+msgstr "della %s Settimana di Quaresima"
 
 #: includes/LitCalAPI.php:731
 msgid "after Ash Wednesday"
-msgstr ""
+msgstr "dopo il Mercoledì delle Ceneri"
 
 #: includes/LitCalAPI.php:770 includes/LitCalAPI.php:1015
 #: includes/LitCalAPI.php:1037 includes/LitCalAPI.php:1230
@@ -129,6 +141,8 @@ msgid ""
 "The %s '%s' has been added on %s since the year %d (%s), applicable to the "
 "year %d."
 msgstr ""
+"La %s <i>'%s'</i> è stata inserita il giorno <b>%s</b> a partire dall'anno "
+"%d (%s), applicabile pertanto all'anno %d."
 
 #: includes/LitCalAPI.php:807
 #, php-format
@@ -137,6 +151,9 @@ msgid ""
 "of Christmas, or on the weekdays of the Lenten season in the year %d, rank "
 "reduced to Commemoration."
 msgstr ""
+"La %s <i>'%s'</i> cade o tra il 17 Dic. e il 24 Dic., o durante l'Ottava di "
+"Natale, o tra le ferie della Quaresima nell'anno %d, pertanto il grado è "
+"stato ridotto a Commemorazione."
 
 #: includes/LitCalAPI.php:839
 #, php-format
@@ -144,6 +161,9 @@ msgid ""
 "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) "
 "usually celebrated on %s, is suppressed by the %s '%s' in the year %d."
 msgstr ""
+"La %s <i>'%s'</i>, aggiunta nella %s del Messale Romano dall'anno %d (%s) e "
+"celebrata solitamente il giorno %s, è soppressa dalla %s <i>'%s'</i> "
+"nell'anno %d."
 
 #: includes/LitCalAPI.php:856 includes/LitCalAPI.php:873
 #, php-format
@@ -151,6 +171,9 @@ msgid ""
 "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and "
 "usually celebrated on %s, is suppressed by the %s '%s' in the year %d."
 msgstr ""
+"La %s <i>'%s'</i>, aggiunta nella %s del Messale Romano dall'anno %d (%s) e "
+"celebrata solitamente il giorno %s, è soppressa dalla %s <i>'%s'</i> "
+"nell'anno %d."
 
 #: includes/LitCalAPI.php:896
 #, php-format
@@ -158,6 +181,8 @@ msgid ""
 "The %s '%s', added on %s since the year %d (%s), is however superseded by a "
 "Sunday, a Solemnity or a Feast '%s' in the year %d."
 msgstr ""
+"La %s '%s', aggiunta nel giorno %s sin dal %d (%s), è tuttavia superata da "
+"una Domenica, una Solennità o una Festa '%s' nell'anno %d."
 
 #: includes/LitCalAPI.php:931
 #, php-format
@@ -165,6 +190,8 @@ msgid ""
 "The Memorial '%s' coincides with another Memorial '%s' in the year %d. They "
 "are both reduced in rank to optional memorials (%s)."
 msgstr ""
+"La Memoria '%s' coincide con un'altra Memoria '%s' nell'anno %d. Tutte e due "
+"sono ridotte al grado di memorie opzionali (%s)."
 
 #: includes/LitCalAPI.php:973
 #, php-format
@@ -172,6 +199,8 @@ msgid ""
 "The %s '%s' has been raised to the rank of %s since the year %d, applicable "
 "to the year %d (%s)."
 msgstr ""
+"La %s '%s' è stata promossa al grado di %s sin dal %d, applicabile pertanto "
+"all'anno %d (%s)."
 
 #: includes/LitCalAPI.php:1040 includes/LitCalAPI.php:1065
 #: includes/LitCalAPI.php:1082
