@@ -38,34 +38,25 @@ class LITSETTINGS {
     //The upper limit is determined by the limit of PHP in dealing with DateTime objects
     const YEAR_UPPER_LIMIT          = 9999;
   
-    public function __construct( array $DATA ){
+    public function __construct( array $DATA ) {
+        //we need at least a default value for the current year
         $this->YEAR = (int)date("Y");
-        foreach( $DATA as $key => $value ){
+
+        foreach( $DATA as $key => $value ) {
             $key = strtoupper( $key );
             if( in_array( $key, self::ALLOWED_PARAMS ) ){
                 switch( $key ){
                     case "YEAR":
-                        if( gettype( $value ) === 'string' ){
-                            if( is_numeric( $value ) && ctype_digit( $value ) && strlen( $value ) === 4 ){
-                                $value = (int)$value;
-                                if( $value >= self::YEAR_LOWER_LIMIT && $value <= self::YEAR_UPPER_LIMIT ){
-                                    $this->YEAR = $value;
-                                }
-                            }
-                        } elseif( gettype( $value ) === 'integer' ) {
-                            if( $value >= self::YEAR_LOWER_LIMIT && $value <= self::YEAR_UPPER_LIMIT ){
-                                $this->YEAR = $value;
-                            }
-                        }
+                        $this->enforceYearValidity( $value );
                         break;
                     case "EPIPHANY":
                         $this->EPIPHANY         = EPIPHANY::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : EPIPHANY::JAN6;
                         break;
                     case "ASCENSION":
-                        $this->ASCENSION        = ASCENSION::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : ASCENSION::SUNDAY;
+                        $this->ASCENSION        = ASCENSION::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : ASCENSION::THURSDAY;
                         break;
                     case "CORPUSCHRISTI":
-                        $this->CORPUSCHRISTI    = CORPUSCHRISTI::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : CORPUSCHRISTI::SUNDAY;
+                        $this->CORPUSCHRISTI    = CORPUSCHRISTI::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : CORPUSCHRISTI::THURSDAY;
                         break;
                     case "LOCALE":
                         $this->LOCALE           = LIT_LOCALE::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : LIT_LOCALE::LA;
@@ -78,7 +69,23 @@ class LITSETTINGS {
                         break;
                     case "DIOCESANPRESET":
                         $this->DIOCESAN         = strtoupper( $value );
+                        break;
                 }
+            }
+        }
+    }
+
+    private function enforceYearValidity( int|string $value ) {
+        if( gettype( $value ) === 'string' ){
+            if( is_numeric( $value ) && ctype_digit( $value ) && strlen( $value ) === 4 ){
+                $value = (int)$value;
+                if( $value >= self::YEAR_LOWER_LIMIT && $value <= self::YEAR_UPPER_LIMIT ){
+                    $this->YEAR = $value;
+                }
+            }
+        } elseif( gettype( $value ) === 'integer' ) {
+            if( $value >= self::YEAR_LOWER_LIMIT && $value <= self::YEAR_UPPER_LIMIT ){
+                $this->YEAR = $value;
             }
         }
     }

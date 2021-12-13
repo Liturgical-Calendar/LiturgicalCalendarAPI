@@ -1,4 +1,22 @@
-[![CodeFactor](https://www.codefactor.io/repository/github/johnrdorazio/liturgicalcalendar/badge/development)](https://www.codefactor.io/repository/github/johnrdorazio/liturgicalcalendar/overview/development)
+<table>
+    <thead>
+        <tr><th colspan="2">Code quality</th><th>Translation status</th></tr>
+        <tr><th style="text-align:center;"><a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/master">main branch</a></th><th style="text-align:center;"><a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/development">development branch</a></th><th></th></tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="text-align:center;">
+                <a href="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/overview/master"><img src="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/badge/master" title="CodeFactor" /></a>
+            </td>
+            <td style="text-align:center;">
+                <a href="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/overview/development"><img src="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/badge/development" title="CodeFactor" /></a>
+            </td>
+            <td><a href="https://translate.johnromanodorazio.com/engage/liturgical-calendar/">
+<img src="https://translate.johnromanodorazio.com/widgets/liturgical-calendar/-/287x66-white.png" alt="Translation status" />
+</a></td>
+        </tr>
+    </tbody>
+</table>
 
 # Liturgical Calendar
 A PHP script that will generate the liturgical calendar for any given year, based on the General Roman Calendar, calculating the mobile festivities and the precedence of solemnities, feasts, memorials... This script serves as a data endpoint, which will generate the data for the General Roman Calendar in a data exchange format, such as JSON, XML, or ICS. An example of the endpoint can be found at https://johnromanodorazio.com/LiturgicalCalendar/, at the first link on the page [*data generation endpoint here*](https://johnromanodorazio.com/LiturgicalCalendar/LitCalEngine.php).
@@ -18,9 +36,7 @@ Some characteristics of this endpoint:
 # How to setup the endpoint yourself
 
 ### 1. Setup the database tables
-  Included is an SQL dump **`liturgy.sql`** which contains database tables with fixed date festivities, memorials and optional memorials of the General Roman Calendar. The PHP script aids itself with these tables to generate the liturgical calendar along with the localized translations of the festivities. The tables themselves do not necessarily define the dates of all festivities, for example movable feasts are necessarily calculated in the script itself, in this case the tables serve only for localization purposes.
-### 2. Edit the configuration file for access to the database
-  Once the tables are set up in a database, the `LitCalConfig-sample.php` file must be renamed to `LitCalConfig.php` and populated with the credentials to access the database. Seeing that this file will be renamed for production, it will not be overwritten when the scripts get updated from a new release or a `git pull`.
+  Data for both movable date festivities and for fixed date festivities, memorials and optional memorials of the General Roman Calendar can be found in JSON format under the `/data/` folder, which is in turned subdivided into subfolders according to the type of data that is contained (`propriumdetempore`, `propriumdesanctis_1970`, etc.). Such data may be specific to the Roman Missal of a given nation / Episcopal Conference from a given year (e.g. `propriumdesanctis_USA_2011`). The PHP script will read the correct JSON files based on the current locale in order to produce localized translations of the festivities. The tables themselves do not necessarily define the dates of all festivities, for example the dates for movable feasts are necessarily calculated in the script itself; in this case the JSON files serve only for localization purposes.
 
 # How to use the endpoint
 There are a few proof of concept example applications for usage of the endpoint at https://johnromanodorazio.com/LiturgicalCalendar/, which demonstrate generating an HTML representation of the Liturgical Calendar.
@@ -149,6 +165,12 @@ Each of the events generated is represented as an object whose key => value pair
     "The Memorial <i>'Saint John Baptist de la Salle, priest'<\/i> falls within the Lenten season in the year 2020, rank reduced to Commemoration."
 ]
 ```
+
+# Languages
+
+<a href="https://translate.johnromanodorazio.com/engage/liturgical-calendar/">
+<img src="https://translate.johnromanodorazio.com/widgets/liturgical-calendar/-/open-graph.png" alt="Translation status" />
+</a>
 
 # CHANGELOG
 
