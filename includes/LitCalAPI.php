@@ -23,7 +23,6 @@ class LitCalAPI {
     private string $CACHEFILE                       = "";
     private array $ALLOWED_RETURN_TYPES;
     private LITSETTINGS $LITSETTINGS;
-    private mysqli $mysqli;
 
     private ?object $DiocesanData                   = null;
     private ?object $GeneralIndex                   = null;
@@ -156,25 +155,6 @@ class LitCalAPI {
         $cacheFileName = md5( serialize( $this->LITSETTINGS) ) . $this->CACHEDURATION . "." . strtolower( $this->LITSETTINGS->RETURNTYPE );
         $this->CACHEFILE = $cacheFilePath . $cacheFileName;
         return file_exists( $this->CACHEFILE );
-    }
-
-    /**
-     * INITIATE CONNECTION TO THE DATABASE
-     * AND CHECK FOR CONNECTION ERRORS
-     * THE DATABASECONNECT() FUNCTION IS DEFINED IN LITCALFUNCTIONS.PHP
-     * WHICH IN TURN LOADS DATABASE CONNECTION INFORMATION FROM LITCALCONFIG.PHP
-     * IF THE CONNECTION SUCCEEDS, THE FUNCTION WILL RETURN THE MYSQLI CONNECTION RESOURCE
-     * IN THE MYSQLI PROPERTY OF THE RETURNED OBJECT
-     */
-    private function initiateDbConnection() : bool {
-        $dbConnect = LitCalFf::databaseConnect();
-        if ( $dbConnect->retString != "" && preg_match( "/^Connected to MySQL Database:/", $dbConnect->retString ) == 0 ) {
-            die( '{"error": "There was an error while connecting to the database: ' . $dbConnect->retString . '"}' );
-        } else {
-            $this->mysqli = $dbConnect->mysqli;
-            return $this->mysqli !== null;
-        }
-        return false;
     }
 
     private function createNumberFormatters() : void {
@@ -1171,7 +1151,6 @@ class LitCalAPI {
             } else {
                 //perhaps it wasn't created on December 12th because it was superseded by a Sunday, Solemnity or Feast
                 //but seeing that there is no problem for August 12th, let's go ahead and try creating it again
-                //$result = $this->mysqli->query( "SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = 'StJaneFrancesDeChantal'" );
                 $row = $this->tempCal[ ROMANMISSAL::EDITIO_TYPICA_1970 ][ 'StJaneFrancesDeChantal' ];
                 $festivity = new Festivity( $row->NAME, $StJaneFrancesNewDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
                 $this->Cal->addFestivity( "StJaneFrancesDeChantal", $festivity );
@@ -1821,23 +1800,28 @@ class LitCalAPI {
 
     }
 
+    /**currently only using this for the USA calendar
+     * The celebrations being transferred are all from the 1970 Editio Typica
+     * 
+     * If it were to become useful for other national calendars,
+     * we might have to abstract out the Calendar that is the source
+     * of the festivity that is being transferred
+     */
     private function moveFestivityDate( string $tag, DateTime $newDate, string $inFavorOf ) {
         $festivity = $this->Cal->getFestivity( $tag );
         $oldDateStr = $festivity->date->format('F jS');
         $newDateStr = $newDate->format('F jS');
         if( !$this->Cal->inSolemnities( $newDate ) ) {
             if( $festivity !== null ){
-                //Move Camillus De Lellis from July 14 to July 18, to make room for Kateri Tekakwitha
+                //Move from old date to new date, to make room for another celebration
                 $this->Cal->moveFestivityDate( $tag, $newDate );
             }
             else{
-                //if it was suppressed on July 14 because of higher ranking celebration, we should recreate it on July 18 if possible
-                $result = $this->mysqli->query( "SELECT * FROM LITURGY__calendar_propriumdesanctis WHERE TAG = '$tag'" );
-                if ( $result ) {
-                    $row = mysqli_fetch_assoc( $result );
-                    $festivity = new Festivity( $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $newDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ] );
-                    $this->Cal->addFestivity( $tag, $festivity );
-                }
+                //if it was suppressed on the original date because of a higher ranking celebration,
+                //we should recreate it on the new date
+                $row = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ $tag ];
+                $festivity = new Festivity( $row->NAME, $newDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
+                $this->Cal->addFestivity( $tag, $festivity );
             }
             $this->Messages[] = sprintf(
                 'USA: The optional memorial \'%1$s\' is transferred from %4$s to %5$s as per the 2011 Roman Missal issued by the USCCB, to make room for the Memorial \'%2$s\': applicable to the year %3$d.',
@@ -1851,7 +1835,7 @@ class LitCalAPI {
         }
         else{
             if( $festivity !== null ){
-                //Can't move Camillus De Lellis from July 14 to July 18, so simply suppress to make room for Kateri Tekakwitha
+                //If the new date is already covered by a Solmenity, then we can't move the celebration, so we simply suppress it
                 $this->Messages[] = sprintf(
                     'USA: The optional memorial \'%1$s\' is transferred from %4$s to %5$s as per the 2011 Roman Missal issued by the USCCB, to make room for the Memorial \'%2$s\', however it is superseded by a higher ranking festivity in the year %3$d.',
                     '<i>' . $festivity->name . '</i>',
@@ -2264,7 +2248,6 @@ class LitCalAPI {
             echo file_get_contents( $this->CACHEFILE );
             die();
         } else {
-            $this->initiateDbConnection();
             $this->createNumberFormatters();
             $this->dieIfBeforeMinYear();
 
