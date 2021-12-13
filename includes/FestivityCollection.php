@@ -57,11 +57,11 @@ class FestivityCollection {
         //Sundays of Advent, Lent, Easter
         if( preg_match( '/(?:Advent|Lent|Easter)([1-7])/', $key, $matches ) === 1 ) {
             $this->SUNDAYS_ADVENT_LENT_EASTER[] = $festivity->date;
-            $this->festivities[ $key ]->psalterWeek = intval( $matches[1] ) % 4 === 0 ? 4 : intval( $matches[1] ) % 4;
+            $this->festivities[ $key ]->psalterWeek = self::psalterWeek( intval( $matches[1] ) );
         }
         //Ordinary Sunday Psalter Week
         if( preg_match( '/OrdSunday([1-9][0-9]*)/', $key, $matches ) === 1 ) {
-            $this->festivities[ $key ]->psalterWeek = intval( $matches[1] ) % 4 === 0 ? 4 : intval( $matches[1] ) % 4;
+            $this->festivities[ $key ]->psalterWeek = self::psalterWeek( intval( $matches[1] ) );
         }
     }
 
@@ -442,5 +442,14 @@ class FestivityCollection {
         return $coincidingFestivity;
     }
 
+    /**
+     * psalterWeek function
+     * Calculates the current Week of the Psalter (from 1 to 4)
+     * based on the week of Ordinary Time
+     * OR the week of Advent, Christmas, Lent, or Easter
+     */
+    public static function psalterWeek( int $weekOfOrdinaryTimeOrSeason ) : int {
+        return $weekOfOrdinaryTimeOrSeason % 4 === 0 ? 4 : $weekOfOrdinaryTimeOrSeason % 4;
+    }
 
 }

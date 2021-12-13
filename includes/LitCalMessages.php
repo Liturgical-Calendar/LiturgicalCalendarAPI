@@ -720,4 +720,54 @@ class LITCAL_MESSAGES {
         return $string; //should never get here
     }
 
+    /**
+     * Ordinal Suffix function
+     * Useful for choosing the correct suffix for ordinal numbers
+     * in the English language
+     * @Author: John Romano D'Orazio
+     */
+    public static function ordSuffix(int $ord) : string {
+        $ord_suffix = ''; //st, nd, rd, th
+        if ($ord === 1 || ($ord % 10 === 1  && $ord <> 11)) {
+        $ord_suffix = 'st';
+        } else if ($ord === 2 || ($ord % 10 === 2  && $ord <> 12)) {
+        $ord_suffix = 'nd';
+        } else if ($ord === 3 || ($ord % 10 === 3  && $ord <> 13)) {
+        $ord_suffix = 'rd';
+        } else {
+        $ord_suffix = 'th';
+        }
+        return $ord_suffix;
+    }
+
+    /*public static function ordinal( int $number ) : string {
+        $ends = array('th','st','nd','rd','th','th','th','th','th','th');
+        if ((($number % 100) >= 11) && (($number%100) <= 13))
+            return $number. 'th';
+        else
+            return $number. $ends[$number % 10];
+    }*/
+
+
+    /**
+     * @param int $num
+     * @param string $LOCALE
+     * @param NumberFormatter $formatter
+     * @param string[] $latinOrdinals
+     */
+    public static function getOrdinal(int $num, string $LOCALE, NumberFormatter $formatter, array $latinOrdinals) : string {
+        $ordinal = "";
+        switch($LOCALE){
+            case 'LA':
+                $ordinal = $latinOrdinals[$num];
+            break;
+            case 'EN':
+                $ordinal = $num . self::ordSuffix($num);
+            break;
+            default:
+                $ordinal = $formatter->format($num);
+        }
+        return $ordinal;
+    }
+
 }
