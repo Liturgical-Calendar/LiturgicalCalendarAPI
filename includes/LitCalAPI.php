@@ -219,14 +219,17 @@ class LitCalAPI {
         }
     }
 
-    private function populateFestivityCollection( string $missal ) {
+    private function readPropriumDeSanctisJSONData( string $missal ) {
         $propriumdesanctisFile = ROMANMISSAL::getSanctoraleFileName( $missal );
         $propriumdesanctisI18nPath = ROMANMISSAL::getSanctoraleI18nFilePath( $missal );
-        $propriumdesanctisI18nFile = $propriumdesanctisI18nPath . strtolower( $this->LITSETTINGS->LOCALE ) . ".json";
-        if( file_exists( $propriumdesanctisI18nFile ) ) {
-            $NAME = json_decode( file_get_contents( $propriumdesanctisI18nFile ), true );
-            if( json_last_error() !== JSON_ERROR_NONE ) {
-                die( '{"ERROR": "There was an error trying to retrieve and decode JSON i18n data for the Proprium de Sanctis for the Missal ' . ROMANMISSAL::getName( $missal ) . ': ' . json_last_error_msg() . '"}' );
+
+        if( $propriumdesanctisI18nPath !== false ) {
+            $propriumdesanctisI18nFile = $propriumdesanctisI18nPath . strtolower( $this->LITSETTINGS->LOCALE ) . ".json";
+            if( file_exists( $propriumdesanctisI18nFile ) ) {
+                $NAME = json_decode( file_get_contents( $propriumdesanctisI18nFile ), true );
+                if( json_last_error() !== JSON_ERROR_NONE ) {
+                    die( '{"ERROR": "There was an error trying to retrieve and decode JSON i18n data for the Proprium de Sanctis for the Missal ' . ROMANMISSAL::getName( $missal ) . ': ' . json_last_error_msg() . '"}' );
+                }
             }
         }
 
@@ -235,7 +238,9 @@ class LitCalAPI {
             if( json_last_error() === JSON_ERROR_NONE ){
                 $this->tempCal[ $missal ] = [];
                 foreach( $PropriumDeSanctis as $row ) {
-                    $row->NAME = $NAME[ $row->TAG ];
+                    if( $propriumdesanctisI18nPath !== false && $NAME !== null ) {
+                        $row->NAME = $NAME[ $row->TAG ];
+                    }
                     $this->tempCal[ $missal ][ $row->TAG ] = $row;
                 }
             } else {
@@ -812,26 +817,6 @@ class LitCalAPI {
 
     }
 
-    private function determineSundaySolemnityOrFeast( DateTime $currentFeastDate ) : stdClass {
-
-        $coincidingFestivity = new stdClass();
-        $coincidingFestivity->grade = '';
-        if( self::DateIsSunday( $currentFeastDate ) && $this->Cal->solemnityFromDate( $currentFeastDate )->grade < LitGrade::SOLEMNITY ){
-            //it's a Sunday
-            $coincidingFestivity->event = $this->Cal->solemnityFromDate( $currentFeastDate );
-            $coincidingFestivity->grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
-        } else if ( $this->Cal->inSolemnities( $currentFeastDate ) ) {
-            //it's a Feast of the Lord or a Solemnity
-            $coincidingFestivity->event = $this->Cal->solemnityFromDate( $currentFeastDate );
-            $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) );
-        } else if( $this->Cal->inFeastsOrMemorials( $currentFeastDate ) ) {
-            $coincidingFestivity->event = $this->Cal->feastOrMemorialFromDate( $currentFeastDate );
-            $coincidingFestivity->grade = LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false );
-        }
-        return $coincidingFestivity;
-
-    }
-
     private function reduceMemorialsInAdventLentToCommemoration( DateTime $currentFeastDate, stdClass $row ) {
 
         //If a fixed date optional memorial falls between 17 Dec. to 24 Dec., the Octave of Christmas or weekdays of the Lenten season,
@@ -867,7 +852,7 @@ class LitCalAPI {
 
     private function handleCoincidence( stdClass $row, string $missal = RomanMissal::EDITIO_TYPICA_1970 ) {
 
-        $coincidingFestivity = $this->determineSundaySolemnityOrFeast( $row->DATE );
+        $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $row->DATE );
         switch( $missal ){
             case RomanMissal::EDITIO_TYPICA_1970:
                 $this->Messages[] = sprintf(
@@ -926,7 +911,7 @@ class LitCalAPI {
 
     private function handleCoincidenceDecree( stdClass $row ) : void {
 
-        $coincidingFestivity = $this->determineSundaySolemnityOrFeast( $row->DATE );
+        $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $row->DATE );
         $this->Messages[] = sprintf(
             LITCAL_MESSAGES::__( "The %s '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
             $coincidingFestivity->grade,
@@ -1589,7 +1574,8 @@ class LitCalAPI {
     private function applyCalendarItaly() : void {
         $this->applyPatronSaintsEurope();
         $this->applyPatronSaintsItaly();
-        if( $this->LITSETTINGS->YEAR >= 1983 && $this->LITSETTINGS->YEAR < 2002 ){
+        if( $this->LITSETTINGS->YEAR >= 1983 && $this->LITSETTINGS->YEAR < 2002 ) {
+            $this->readPropriumDeSanctisJSONData( RomanMissal::ITALY_EDITION_1983 );
             //The extra liturgical events found in the 1983 edition of the Roman Missal in Italian,
             //were then incorporated into the Latin edition in 2002 ( effectively being incorporated into the General Roman Calendar )
             //so when dealing with Italy, we only need to add them from 1983 until 2002, after which it's taken care of by the General Calendar
@@ -1676,27 +1662,26 @@ class LitCalAPI {
     }
 
     private function applyMessaleRomano1983() : void {
-
-        $result = $this->mysqli->query( "SELECT * FROM LITURGY__ITALY_calendar_propriumdesanctis_1983" );
-        if ( $result ) {
-            while ( $row = mysqli_fetch_assoc( $result ) ) {
-                $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row[ 'DAY' ] . '-' . $row[ 'MONTH' ] . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-                if( !$this->Cal->inSolemnities( $currentFeastDate ) ) {
-                    $festivity = new Festivity( "[ ITALIA ] " . $row[ "NAME_" . $this->LITSETTINGS->LOCALE ], $currentFeastDate, $row[ "COLOR" ], LitFeastType::FIXED, $row[ "GRADE" ], $row[ "COMMON" ], $row[ "DISPLAYGRADE" ] );
-                    $this->Cal->addFestivity( $row[ "TAG" ], $festivity );
-                }
-                else{
-                    $this->Messages[] = sprintf(
-                        "ITALIA: la %s '%s' (%s), aggiunta al calendario nell'edizione del Messale Romano del 1983 pubblicata dalla CEI, è soppressa da una Domenica o una Solennità nell'anno %d",
-                        $row[ "DISPLAYGRADE" ] !== "" ? $row[ "DISPLAYGRADE" ] : LITCAL_MESSAGES::_G( $row[ "GRADE" ], $this->LITSETTINGS->LOCALE, false ),
-                        '<i>' . $row[ "NAME_" . $this->LITSETTINGS->LOCALE ] . '</i>',
-                        trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) ),
-                        $this->LITSETTINGS->YEAR
-                    );
-                }
+        //we have no solemnities or feasts in this data, at the most memorials
+        foreach ( $this->tempCal[ RomanMissal::ITALY_EDITION_1983 ] as $row ) {
+            $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
+            if( !$this->Cal->inSolemnitiesOrFeasts( $currentFeastDate ) ) {
+                $festivity = new Festivity( "[ ITALIA ] " . $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON, $row->DISPLAYGRADE );
+                $this->Cal->addFestivity( $row->TAG, $festivity );
+            }
+            else{
+                $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $currentFeastDate );
+                $this->Messages[] = sprintf(
+                    "ITALIA: la %s '%s' (%s), aggiunta al calendario nell'edizione del Messale Romano del 1983 pubblicata dalla CEI, è soppressa dalla %s '%s' nell'anno %d",
+                    $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE, false ),
+                    '<i>' . $row->NAME . '</i>',
+                    trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) ),
+                    LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ),
+                    $coincidingFestivity->name,
+                    $this->LITSETTINGS->YEAR
+                );
             }
         }
-
     }
 
     private function applyCalendarUSA() : void {
@@ -1887,7 +1872,7 @@ class LitCalAPI {
         $this->calculateEasterOctave();
         //3. Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar
         $this->calculateMobileSolemnitiesOfTheLord();
-        $this->populateFestivityCollection( ROMANMISSAL::EDITIO_TYPICA_1970 );
+        $this->readPropriumDeSanctisJSONData( ROMANMISSAL::EDITIO_TYPICA_1970 );
         $this->calculateFixedSolemnities(); //this will also handle All Souls Day
 
         //4. PROPER SOLEMNITIES:
@@ -1926,7 +1911,7 @@ class LitCalAPI {
         }
 
         if ( $this->LITSETTINGS->YEAR >= 2002 ) {
-            $this->populateFestivityCollection( ROMANMISSAL::EDITIO_TYPICA_TERTIA_2002 );
+            $this->readPropriumDeSanctisJSONData( ROMANMISSAL::EDITIO_TYPICA_TERTIA_2002 );
             $this->calculateMemorials( LitGrade::MEMORIAL, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
         }
 

@@ -96,6 +96,10 @@ class FestivityCollection {
         return in_array( $date, $this->feasts );
     }
 
+    public function inSolemnitiesOrFeasts( DateTime $date ) : bool {
+        return $this->inSolemnities( $date ) || $this->inFeasts( $date );
+    }
+
     public function inMemorials( DateTime $date ) : bool {
         return in_array( $date, $this->memorials );
     }
@@ -419,5 +423,24 @@ class FestivityCollection {
     public function getFeastsAndMemorials() : array {
         return array_merge( $this->feasts, $this->memorials );
     }
+
+    public function determineSundaySolemnityOrFeast( DateTime $currentFeastDate ) : stdClass {
+        $coincidingFestivity = new stdClass();
+        $coincidingFestivity->grade = '';
+        if( self::DateIsSunday( $currentFeastDate ) && $this->solemnityFromDate( $currentFeastDate )->grade < LitGrade::SOLEMNITY ){
+            //it's a Sunday
+            $coincidingFestivity->event = $this->Cal->solemnityFromDate( $currentFeastDate );
+            $coincidingFestivity->grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
+        } else if ( $this->inSolemnities( $currentFeastDate ) ) {
+            //it's a Feast of the Lord or a Solemnity
+            $coincidingFestivity->event = $this->solemnityFromDate( $currentFeastDate );
+            $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) );
+        } else if( $this->inFeastsOrMemorials( $currentFeastDate ) ) {
+            $coincidingFestivity->event = $this->feastOrMemorialFromDate( $currentFeastDate );
+            $coincidingFestivity->grade = LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false );
+        }
+        return $coincidingFestivity;
+    }
+
 
 }
