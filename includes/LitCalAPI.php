@@ -528,12 +528,13 @@ class LitCalAPI {
                     //This will happen again in 2033 and 2044
                     if( $row->TAG === "NativityJohnBaptist" && $this->Cal->solemnityKeyFromDate( $currentFeastDate ) === "SacredHeart" ){
                         $NativityJohnBaptistNewDate = clone( $this->Cal->getFestivity( "SacredHeart" )->date );
+                        $SacredHeart = $this->Cal->solemnityFromDate( $currentFeastDate );
                         if( !$this->Cal->inSolemnities( $NativityJohnBaptistNewDate->sub( new DateInterval( 'P1D' ) ) ) ) {
                             $tempFestivity->date->sub( new DateInterval( 'P1D' ) );
                             $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                                 LITCAL_MESSAGES::__( "Seeing that the Solemnity '%s' coincides with the Solemnity '%s' in the year %d, it has been anticipated by one day as per %s.", $this->LITSETTINGS->LOCALE ),
                                 $tempFestivity->name,
-                                $this->Cal->solemnityFromDate( $currentFeastDate )->name,
+                                $SacredHeart->name,
                                 $this->LITSETTINGS->YEAR,
                                 '<a href="http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>'
                             );
@@ -852,7 +853,7 @@ class LitCalAPI {
 
     private function handleCoincidence( stdClass $row, string $missal = RomanMissal::EDITIO_TYPICA_1970 ) {
 
-        $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $row->DATE );
+        $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $row->DATE, $this->LITSETTINGS );
         switch( $missal ){
             case RomanMissal::EDITIO_TYPICA_1970:
                 $this->Messages[] = sprintf(
@@ -911,7 +912,7 @@ class LitCalAPI {
 
     private function handleCoincidenceDecree( stdClass $row ) : void {
 
-        $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $row->DATE );
+        $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $row->DATE, $this->LITSETTINGS );
         $this->Messages[] = sprintf(
             LITCAL_MESSAGES::__( "The %s '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
             $coincidingFestivity->grade,
@@ -1601,7 +1602,7 @@ class LitCalAPI {
             //let's also get the name back from the database, so we can give some feedback and maybe even recreate the festivity
             $FestivityName = $row->NAME . $nameSuffix;
 
-            if( $this->Cal->inSolemnities( $currentFeastDate ) || $this->Cal->inFeastsOrMemorials( $currentFeastDate ) ||  self::DateIsSunday( $currentFeastDate ) ) {
+            if( $this->Cal->inSolemnitiesFeastsOrMemorials( $currentFeastDate ) || self::DateIsSunday( $currentFeastDate ) ) {
                 $coincidingFestivity = new stdClass();
                 $coincidingFestivity->event = $this->Cal->solemnityFromDate( $currentFeastDate );
                 if ( self::DateIsSunday( $currentFeastDate ) && $coincidingFestivity->event->grade < LitGrade::SOLEMNITY ){
@@ -1638,12 +1639,34 @@ class LitCalAPI {
         //then from 1999, Saint Catherine of Siena and Saint Edith Stein, elevated to Feast with title "compatrona d'Europa" added
         $this->makePatron( "StBenedict", ", patrono d'Europa", 11, 7, LitColor::WHITE );
         $this->makePatron( "StBridget", ", patrona d'Europa", 23, 7, LitColor::WHITE );
-        $this->makePatron( "StEdithStein", ", patrona d'Europa", 9, 8, LitColor::WHITE, ROMANMISSAL::EDITIO_TYPICA_TERTIA_2002 );
         $this->makePatron( "StsCyrilMethodius", ", patroni d'Europa", 14, 2, LitColor::WHITE );
 
         //In 1999, Pope John Paul II elevated Catherine of Siena from patron of Italy to patron of Europe
         if( $this->LITSETTINGS->YEAR >= 1999 ){
             $this->makePatron( "StCatherineSiena", ", patrona d'Italia e d'Europa", 29, 4, LitColor::WHITE );
+            if( $this->LITSETTINGS->YEAR >= 2002 ){
+                $this->makePatron( "StEdithStein", ", patrona d'Europa", 9, 8, LitColor::WHITE, ROMANMISSAL::EDITIO_TYPICA_TERTIA_2002 );
+            } else {
+                //between 1999 and 2002 we have to manually create StEdithStein
+                //since the makePatron method expects to find data from the Missals,
+                //we are going to have to fake this one as belonging to a Missal...
+                //let's add it to the future Missal that doesn't exist yet
+                $EdithStein = new stdClass();
+                $EdithStein->NAME = "Santa Teresa Benedetta della Croce (Edith Stein), vergine e martire";
+                $EdithStein->MONTH = 8;
+                $EdithStein->DAY    = 9;
+                $EdithStein->TAG    = "StEdithStein";
+                $EdithStein->GRADE  = 2;
+                $EdithStein->COMMON = "Martyrs:For a Virgin Martyr,Virgins:For One Virgin";
+                $EdithStein->CALENDAR   = "GENERAL ROMAN";
+                $EdithStein->COLOR  = "white,red";
+                $this->tempCal[ RomanMissal::EDITIO_TYPICA_TERTIA_2002 ][ "StEdithStein" ] = $EdithStein;
+                $EdithStein->DATE = DateTime::createFromFormat( '!j-n-Y', $EdithStein->DAY . '-' . $EdithStein->MONTH . '-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
+                if( !$this->Cal->inSolemnitiesFeastsOrMemorials( $EdithStein->DATE ) ) {
+                    $this->Cal->addFestivity( $EdithStein->TAG, new Festivity( $EdithStein->NAME, $EdithStein->DATE, $EdithStein->COLOR, LitFeastType::FIXED, $EdithStein->GRADE, $EdithStein->COMMON ) );
+                    $this->makePatron( "StEdithStein", ", patrona d'Europa", $EdithStein->DAY, $EdithStein->MONTH, $EdithStein->COLOR, ROMANMISSAL::EDITIO_TYPICA_TERTIA_2002 );
+                }
+            }
         }
 
     }
@@ -1670,14 +1693,14 @@ class LitCalAPI {
                 $this->Cal->addFestivity( $row->TAG, $festivity );
             }
             else{
-                $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $currentFeastDate );
+                $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $currentFeastDate, $this->LITSETTINGS );
                 $this->Messages[] = sprintf(
                     "ITALIA: la %s '%s' (%s), aggiunta al calendario nell'edizione del Messale Romano del 1983 pubblicata dalla CEI, è soppressa dalla %s '%s' nell'anno %d",
                     $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE, false ),
                     '<i>' . $row->NAME . '</i>',
                     trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) ),
-                    LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ),
-                    $coincidingFestivity->name,
+                    $coincidingFestivity->grade,
+                    $coincidingFestivity->event->name,
                     $this->LITSETTINGS->YEAR
                 );
             }

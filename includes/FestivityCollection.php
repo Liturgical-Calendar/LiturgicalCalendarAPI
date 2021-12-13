@@ -207,10 +207,10 @@ class FestivityCollection {
         if( array_key_exists( $key, $this->festivities ) ) {
             $oldValue = $this->festivities[ $key ]->{$property};
             if( $reflect->hasProperty( $property ) ) {
-                if( $reflect->getProperty( $property )->getType() instanceof ReflectionNamedType && $reflect->getProperty( $property )->getType()->getName() === gettype( $value ) ) {
+                if( $reflect->getProperty( $property )->getType() instanceof ReflectionNamedType && $reflect->getProperty( $property )->getType()->getName() === get_debug_type( $value ) ) {
                     $this->festivities[ $key ]->{$property} = $value;
                 }
-                elseif( $reflect->getProperty( $property )->getType() instanceof ReflectionUnionType && in_array( gettype( $value ), $reflect->getProperty( $property )->getType()->getTypes() ) ) {
+                elseif( $reflect->getProperty( $property )->getType() instanceof ReflectionUnionType && in_array( get_debug_type( $value ), $reflect->getProperty( $property )->getType()->getTypes() ) ) {
                     $this->festivities[ $key ]->{$property} = $value;
                 }
                 if( $key === "grade" ) {
@@ -424,20 +424,20 @@ class FestivityCollection {
         return array_merge( $this->feasts, $this->memorials );
     }
 
-    public function determineSundaySolemnityOrFeast( DateTime $currentFeastDate ) : stdClass {
+    public function determineSundaySolemnityOrFeast( DateTime $currentFeastDate, LitSettings $LITSETTINGS ) : stdClass {
         $coincidingFestivity = new stdClass();
         $coincidingFestivity->grade = '';
         if( self::DateIsSunday( $currentFeastDate ) && $this->solemnityFromDate( $currentFeastDate )->grade < LitGrade::SOLEMNITY ){
             //it's a Sunday
-            $coincidingFestivity->event = $this->Cal->solemnityFromDate( $currentFeastDate );
-            $coincidingFestivity->grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
+            $coincidingFestivity->event = $this->solemnityFromDate( $currentFeastDate );
+            $coincidingFestivity->grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
         } else if ( $this->inSolemnities( $currentFeastDate ) ) {
             //it's a Feast of the Lord or a Solemnity
             $coincidingFestivity->event = $this->solemnityFromDate( $currentFeastDate );
-            $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) );
+            $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $LITSETTINGS->LOCALE, false ) );
         } else if( $this->inFeastsOrMemorials( $currentFeastDate ) ) {
             $coincidingFestivity->event = $this->feastOrMemorialFromDate( $currentFeastDate );
-            $coincidingFestivity->grade = LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false );
+            $coincidingFestivity->grade = LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $LITSETTINGS->LOCALE, false );
         }
         return $coincidingFestivity;
     }
