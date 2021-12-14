@@ -443,7 +443,7 @@ class LitCalAPI {
                             _( "the Saturday preceding Palm Sunday" ),
                             $this->LITSETTINGS->LOCALE === 'LA' ? ( $tempFestivity->date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$tempFestivity->date->format( 'n' ) ] ) :
                                 ( $this->LITSETTINGS->LOCALE === 'EN' ? $tempFestivity->date->format( 'F jS' ) :
-                                    trim( utf8_encode( strftime( '%e %B', $tempFestivity->date->format( 'U' ) ) ) )
+                                    trim( strftime( '%e %B', $tempFestivity->date->format( 'U' ) ) )
                                 ),
                             '<a href="http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>'
                         );
@@ -459,7 +459,7 @@ class LitCalAPI {
                             _( 'the Monday following the Second Sunday of Easter' ),
                             $this->LITSETTINGS->LOCALE === 'LA' ? ( $tempFestivity->date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$tempFestivity->date->format( 'n' ) ] ) :
                                 ( $this->LITSETTINGS->LOCALE === 'EN' ? $tempFestivity->date->format( 'F jS' ) :
-                                    trim( utf8_encode( strftime( '%e %B', $tempFestivity->date->format( 'U' ) ) ) )
+                                    trim( strftime( '%e %B', $tempFestivity->date->format( 'U' ) ) )
                                 ),
                             '<a href="http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>'
                         );
@@ -485,7 +485,7 @@ class LitCalAPI {
                             _( "the following Monday" ),
                             $this->LITSETTINGS->LOCALE === 'LA' ? ( $tempFestivity->date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$tempFestivity->date->format( 'n' ) ] ) :
                                 ( $this->LITSETTINGS->LOCALE === 'EN' ? $tempFestivity->date->format( 'F jS' ) :
-                                    trim( utf8_encode( strftime( '%e %B', $tempFestivity->date->format( 'U' ) ) ) )
+                                    trim( strftime( '%e %B', $tempFestivity->date->format( 'U' ) ) )
                                 ),
                             '<a href="http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/1990/284-285.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>'
                         );
@@ -585,7 +585,7 @@ class LitCalAPI {
                 $HolyFamily->name,
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $HolyFamily->date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$HolyFamily->date->format( 'n' ) ] ) :
                     ( $this->LITSETTINGS->LOCALE === 'EN' ? $HolyFamily->date->format( 'F jS' ) :
-                        trim( utf8_encode( strftime( '%e %B', $HolyFamily->date->format( 'U' ) ) ) )
+                        trim( strftime( '%e %B', $HolyFamily->date->format( 'U' ) ) )
                     )
             );
         } else {
@@ -689,7 +689,7 @@ class LitCalAPI {
                 $currentAdvWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1; //week count between current day and First Sunday of Advent
 
                 $ordinal = ucfirst( LITCAL_MESSAGES::getOrdinal( $currentAdvWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem, LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
-                $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayAdvent->format( 'w' ) ] : ucfirst( utf8_encode( strftime( '%A', $weekdayAdvent->format( 'U' ) ) ) ) ) . " " . sprintf( _( "of the %s Week of Advent" ), $ordinal ), $weekdayAdvent, LitColor::PURPLE, LitFeastType::MOBILE );
+                $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayAdvent->format( 'w' ) ] : ucfirst( strftime( '%A', $weekdayAdvent->format( 'U' ) ) ) ) . " " . sprintf( _( "of the %s Week of Advent" ), $ordinal ), $weekdayAdvent, LitColor::PURPLE, LitFeastType::MOBILE );
                 $this->Cal->addFestivity( "AdventWeekday" . $weekdayAdventCnt, $festivity );
             }
 
@@ -726,9 +726,9 @@ class LitCalAPI {
                     $diff = $upper -  (int)$this->Cal->getFestivity( "Lent1" )->date->format( 'z' ); //day count between current day and First Sunday of Lent
                     $currentLentWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1; //week count between current day and First Sunday of Lent
                     $ordinal = ucfirst( LITCAL_MESSAGES::getOrdinal( $currentLentWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem, LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
-                    $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayLent->format( 'w' ) ] : ucfirst( utf8_encode( strftime( '%A', $weekdayLent->format( 'U' ) ) ) ) ) . " ".  sprintf( _( "of the %s Week of Lent" ), $ordinal ), $weekdayLent, LitColor::PURPLE, LitFeastType::MOBILE );
+                    $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayLent->format( 'w' ) ] : ucfirst( strftime( '%A', $weekdayLent->format( 'U' ) ) ) ) . " ".  sprintf( _( "of the %s Week of Lent" ), $ordinal ), $weekdayLent, LitColor::PURPLE, LitFeastType::MOBILE );
                 } else {
-                    $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayLent->format( 'w' ) ] : ucfirst( utf8_encode( strftime( '%A', $weekdayLent->format( 'U' ) ) ) ) ) . " ". _( "after Ash Wednesday" ), $weekdayLent, LitColor::PURPLE, LitFeastType::MOBILE );
+                    $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayLent->format( 'w' ) ] : ucfirst( strftime( '%A', $weekdayLent->format( 'U' ) ) ) ) . " ". _( "after Ash Wednesday" ), $weekdayLent, LitColor::PURPLE, LitFeastType::MOBILE );
                 }
                 $this->Cal->addFestivity( "LentWeekday" . $weekdayLentCnt, $festivity );
             }
@@ -772,7 +772,7 @@ class LitCalAPI {
                         $row->NAME,
                         $this->LITSETTINGS->LOCALE === 'LA' ? ( $row->DATE->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
                             ( $this->LITSETTINGS->LOCALE === 'EN' ? $row->DATE->format( 'F jS' ) :
-                                trim( utf8_encode( strftime( '%e %B', $row->DATE->format( 'U' ) ) ) )
+                                trim( strftime( '%e %B', $row->DATE->format( 'U' ) ) )
                             ),
                         $row->yearSince,
                         $row->DECREE,
@@ -844,7 +844,7 @@ class LitCalAPI {
                     '',
                     $this->LITSETTINGS->LOCALE === 'LA' ? ( $row->DATE->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[  (int)$row->DATE->format( 'n' ) ] ) :
                         ( $this->LITSETTINGS->LOCALE === 'EN' ? $row->DATE->format( 'F jS' ) :
-                            trim( utf8_encode( strftime( '%e %B', $row->DATE->format( 'U' ) ) ) )
+                            trim( strftime( '%e %B', $row->DATE->format( 'U' ) ) )
                         ),
                     $coincidingFestivity->grade,
                     $coincidingFestivity->event->name,
@@ -861,7 +861,7 @@ class LitCalAPI {
                     '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>',
                     $this->LITSETTINGS->LOCALE === 'LA' ? ( $row->DATE->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
                         ( $this->LITSETTINGS->LOCALE === 'EN' ? $row->DATE->format( 'F jS' ) :
-                            trim( utf8_encode( strftime( '%e %B', $row->DATE->format( 'U' ) ) ) )
+                            trim( strftime( '%e %B', $row->DATE->format( 'U' ) ) )
                         ),
                     $coincidingFestivity->grade,
                     $coincidingFestivity->event->name,
@@ -878,7 +878,7 @@ class LitCalAPI {
                     'Missale Romanum, ed. Typica Tertia Emendata 2008',
                     $this->LITSETTINGS->LOCALE === 'LA' ? ( $row->DATE->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
                         ( $this->LITSETTINGS->LOCALE === 'EN' ? $row->DATE->format( 'F jS' ) :
-                            trim( utf8_encode( strftime( '%e %B', $row->DATE->format( 'U' ) ) ) )
+                            trim( strftime( '%e %B', $row->DATE->format( 'U' ) ) )
                         ),
                     $coincidingFestivity->grade,
                     $coincidingFestivity->event->name,
@@ -898,7 +898,7 @@ class LitCalAPI {
             $row->NAME,
             $this->LITSETTINGS->LOCALE === 'LA' ? ( $row->DATE->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
                 ( $this->LITSETTINGS->LOCALE === 'EN' ? $row->DATE->format( 'F jS' ) :
-                    trim( utf8_encode( strftime( '%e %B', $row->DATE->format( 'U' ) ) ) )
+                    trim( strftime( '%e %B', $row->DATE->format( 'U' ) ) )
                 ),
             $row->yearSince,
             $row->DECREE,
@@ -1017,7 +1017,7 @@ class LitCalAPI {
                 $newFestivity->name,
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $newFestivity->date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$newFestivity->date->format( 'n' ) ] ) :
                     ( $this->LITSETTINGS->LOCALE === 'EN' ? $newFestivity->date->format( 'F jS' ) :
-                        trim( utf8_encode( strftime( '%e %B', $newFestivity->date->format( 'U' ) ) ) )
+                        trim( strftime( '%e %B', $newFestivity->date->format( 'U' ) ) )
                     ),
                 2008,
                 'Missale Romanum, ed. Typica Tertia Emendata 2008',
@@ -1233,7 +1233,7 @@ class LitCalAPI {
                     $festivity->name,
                     $this->LITSETTINGS->LOCALE === 'LA' ? ( $row->DATE->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
                         ( $this->LITSETTINGS->LOCALE === 'EN' ? $row->DATE->format( 'F jS' ) :
-                            trim( utf8_encode( strftime( '%e %B', $row->DATE->format( 'U' ) ) ) )
+                            trim( strftime( '%e %B', $row->DATE->format( 'U' ) ) )
                         ),
                     $row->yearSince,
                     $row->DECREE,
@@ -1285,7 +1285,7 @@ class LitCalAPI {
                     $festivity->name,
                     $this->LITSETTINGS->LOCALE === 'LA' ? ( $festivity->date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$festivity->date->format( 'n' ) ] ) :
                         ( $this->LITSETTINGS->LOCALE === 'EN' ? $festivity->date->format( 'F jS' ) :
-                            trim( utf8_encode( strftime( '%e %B', $festivity->date->format( 'U' ) ) ) )
+                            trim( strftime( '%e %B', $festivity->date->format( 'U' ) ) )
                         ),
                     $row->yearSince,
                     $row->DECREE,
@@ -1463,7 +1463,7 @@ class LitCalAPI {
                 $diff = $upper - (int)$this->Cal->getFestivity( "Easter" )->date->format( 'z' ); //day count between current day and Easter Sunday
                 $currentEasterWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1;         //week count between current day and Easter Sunday
                 $ordinal = ucfirst( LITCAL_MESSAGES::getOrdinal( $currentEasterWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem, LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
-                $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayEaster->format( 'w' ) ] : ucfirst( utf8_encode( strftime( '%A', $weekdayEaster->format( 'U' ) ) ) ) ) . " " . sprintf( _( "of the %s Week of Easter" ), $ordinal ), $weekdayEaster, LitColor::WHITE, LitFeastType::MOBILE );
+                $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayEaster->format( 'w' ) ] : ucfirst( strftime( '%A', $weekdayEaster->format( 'U' ) ) ) ) . " " . sprintf( _( "of the %s Week of Easter" ), $ordinal ), $weekdayEaster, LitColor::WHITE, LitFeastType::MOBILE );
                 $festivity->psalterWeek = $this->Cal::psalterWeek( $currentEasterWeek );
                 $this->Cal->addFestivity( "EasterWeekday" . $weekdayEasterCnt, $festivity );
             }
@@ -1496,7 +1496,7 @@ class LitCalAPI {
                     $currentOrdWeek = ( ( $diff - $diff % 7 ) / 7 ) + 2;
                 }
                 $ordinal = ucfirst( LITCAL_MESSAGES::getOrdinal( $currentOrdWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem,LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
-                $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $firstOrdinary->format( 'w' ) ] : ucfirst( utf8_encode( strftime( '%A', $firstOrdinary->format( 'U' ) ) ) ) ) . " " . sprintf( _( "of the %s Week of Ordinary Time" ), $ordinal ), $firstOrdinary, LitColor::GREEN, LitFeastType::MOBILE );
+                $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $firstOrdinary->format( 'w' ) ] : ucfirst( strftime( '%A', $firstOrdinary->format( 'U' ) ) ) ) . " " . sprintf( _( "of the %s Week of Ordinary Time" ), $ordinal ), $firstOrdinary, LitColor::GREEN, LitFeastType::MOBILE );
                 $festivity->psalterWeek = $this->Cal::psalterWeek( $currentOrdWeek );
                 $this->Cal->addFestivity( "FirstOrdWeekday" . $ordWeekday, $festivity );
             }
@@ -1523,7 +1523,7 @@ class LitCalAPI {
                 $currentOrdWeek = 34 - $weekDiff;
 
                 $ordinal = ucfirst( LITCAL_MESSAGES::getOrdinal( $currentOrdWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem,LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
-                $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $lastOrdinary->format( 'w' ) ] : ucfirst( utf8_encode( strftime( '%A', $lastOrdinary->format( 'U' ) ) ) ) ) . " " . sprintf( _( "of the %s Week of Ordinary Time" ), $ordinal ), $lastOrdinary, LitColor::GREEN, LitFeastType::MOBILE );
+                $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $lastOrdinary->format( 'w' ) ] : ucfirst( strftime( '%A', $lastOrdinary->format( 'U' ) ) ) ) . " " . sprintf( _( "of the %s Week of Ordinary Time" ), $ordinal ), $lastOrdinary, LitColor::GREEN, LitFeastType::MOBILE );
                 $festivity->psalterWeek = $this->Cal::psalterWeek( $currentOrdWeek );
                 $this->Cal->addFestivity( "LastOrdWeekday" . $ordWeekday, $festivity );
             }
@@ -1586,7 +1586,7 @@ class LitCalAPI {
                 $coincidingFestivity->event = $this->Cal->solemnityFromDate( $currentFeastDate );
                 if ( self::DateIsSunday( $currentFeastDate ) && $coincidingFestivity->event->grade < LitGrade::SOLEMNITY ){
                     //it's a Sunday
-                    $coincidingFestivity->grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
+                    $coincidingFestivity->grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( strftime( '%A', $currentFeastDate->format( 'U' ) ) );
                 } else if ( $this->Cal->inSolemnities( $currentFeastDate ) ) {
                     //it's a Feast of the Lord or a Solemnity
                     $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) );
@@ -1600,7 +1600,7 @@ class LitCalAPI {
                     _( "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d." ),
                     LITCAL_MESSAGES::_G( LitGrade::FEAST, $this->LITSETTINGS->LOCALE, false ),
                     $FestivityName,
-                    trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) ),
+                    trim( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ),
                     $coincidingFestivity->grade,
                     $coincidingFestivity->event->name,
                     $this->LITSETTINGS->YEAR
@@ -1677,7 +1677,7 @@ class LitCalAPI {
                     "ITALIA: la %s '%s' (%s), aggiunta al calendario nell'edizione del Messale Romano del 1983 pubblicata dalla CEI, è soppressa dalla %s '%s' nell'anno %d",
                     $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE, false ),
                     '<i>' . $row->NAME . '</i>',
-                    trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) ),
+                    trim( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ),
                     $coincidingFestivity->grade,
                     $coincidingFestivity->event->name,
                     $this->LITSETTINGS->YEAR
@@ -2015,7 +2015,7 @@ class LitCalAPI {
                         $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                             $this->LITSETTINGS->DIOCESAN . ": the Solemnity '%s', proper to the calendar of the " . $this->GeneralIndex->{$this->LITSETTINGS->DIOCESAN}->diocese . " and usually celebrated on %s, coincides with the Sunday or Solemnity '%s' in the year %d! Does something need to be done about this?",
                             '<i>' . $obj->name . '</i>',
-                            '<b>' . trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) ) . '</b>',
+                            '<b>' . trim( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) . '</b>',
                             '<i>' . $this->Cal->solemnityFromDate( $currentFeastDate )->name . '</i>',
                             $this->LITSETTINGS->YEAR
                         );
@@ -2028,7 +2028,7 @@ class LitCalAPI {
                         $this->LITSETTINGS->DIOCESAN . ": the %s '%s', proper to the calendar of the " . $this->GeneralIndex->{$this->LITSETTINGS->DIOCESAN}->diocese . " and usually celebrated on %s, is suppressed by the Sunday or Solemnity %s in the year %d",
                         LITCAL_MESSAGES::_G( $obj->grade, $this->LITSETTINGS->LOCALE, false ),
                         '<i>' . $obj->name . '</i>',
-                        '<b>' . trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) ) . '</b>',
+                        '<b>' . trim( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) . '</b>',
                         '<i>' . $this->Cal->solemnityFromDate( $currentFeastDate )->name . '</i>',
                         $this->LITSETTINGS->YEAR
                     );
@@ -2125,18 +2125,18 @@ class LitCalAPI {
             $ical .= "UID:" . md5( "LITCAL-" . $FestivityKey . '-' . $CalEvent->date->format( 'Y' ) ) . "\r\n";
             $ical .= "CREATED:" . str_replace( ':' , '', str_replace( '-', '', $publishDate ) ) . "\r\n";
             $desc = "DESCRIPTION:" . str_replace( ',','\,', $description );
-            $ical .= strlen( $desc ) > 75 ? rtrim( utf8_encode( chunk_split( utf8_decode( $desc ),71,"\r\n\t" ) ) ) . "\r\n" : "$desc\r\n";
+            $ical .= strlen( $desc ) > 75 ? rtrim( chunk_split( utf8_decode( $desc ),71,"\r\n\t" ) ) . "\r\n" : "$desc\r\n";
             $ical .= "LAST-MODIFIED:" . str_replace( ':' , '', str_replace( '-', '', $publishDate ) ) . "\r\n";
             $summaryLang = ";LANGUAGE=" . strtolower( $this->LITSETTINGS->LOCALE ); //strtolower( $this->LITSETTINGS->LOCALE ) === "la" ? "" :
             $summary = "SUMMARY".$summaryLang.":" . str_replace( ',','\,',str_replace( "\r\n"," ", $CalEvent->name ) );
-            $ical .= strlen( $summary ) > 75 ? rtrim( utf8_encode( chunk_split( utf8_decode( $summary ),75,"\r\n\t" ) ) ) . "\r\n" : $summary . "\r\n";
+            $ical .= strlen( $summary ) > 75 ? rtrim( chunk_split( utf8_decode( $summary ),75,"\r\n\t" ) ) . "\r\n" : $summary . "\r\n";
             $ical .= "TRANSP:TRANSPARENT\r\n";
             $ical .= "X-MICROSOFT-CDO-ALLDAYEVENT:TRUE\r\n";
             $ical .= "X-MICROSOFT-DISALLOW-COUNTER:TRUE\r\n";
             $xAltDesc = 'X-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">\n<HTML>\n<BODY>\n\n';
             $xAltDesc .= str_replace( ',','\,', $htmlDescription );
             $xAltDesc .= '\n\n</BODY>\n</HTML>';
-            $ical .= strlen( $xAltDesc ) > 75 ? rtrim( utf8_encode( chunk_split( utf8_decode( $xAltDesc ),71,"\r\n\t" ) ) ) . "\r\n" : "$xAltDesc\r\n";
+            $ical .= strlen( $xAltDesc ) > 75 ? rtrim( chunk_split( utf8_decode( $xAltDesc ),71,"\r\n\t" ) ) . "\r\n" : "$xAltDesc\r\n";
             $ical .= "END:VEVENT\r\n";
         }
         $ical .= "END:VCALENDAR";
