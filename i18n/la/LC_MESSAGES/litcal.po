@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-14 00:11+0100\n"
-"PO-Revision-Date: 2021-12-14 01:09+0000\n"
+"PO-Revision-Date: 2021-12-14 19:54+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/la/>\n"
@@ -164,7 +164,7 @@ msgstr ""
 "celebrata in die %s subplantata est ab %s <i>'%s'</i> in anno %d."
 
 #: includes/LitCalAPI.php:856 includes/LitCalAPI.php:873
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and "
 "usually celebrated on %s, is suppressed by the %s '%s' in the year %d."
@@ -178,6 +178,8 @@ msgid ""
 "The %s '%s', added on %s since the year %d (%s), is however superseded by a "
 "Sunday, a Solemnity or a Feast '%s' in the year %d."
 msgstr ""
+"%s <i>'%s'</i>, aggregata in die %s ab anno %d (%s), subplantata est ab "
+"Dominica, aut Sollemnitate, aut Festu <i>'%s'</i> in anno %d."
 
 #: includes/LitCalAPI.php:931
 #, php-format
@@ -185,6 +187,8 @@ msgid ""
 "The Memorial '%s' coincides with another Memorial '%s' in the year %d. They "
 "are both reduced in rank to optional memorials (%s)."
 msgstr ""
+"Memoria <i>'%s'</i> coincidet cum alia Memoria <i>'%s'</i> in anno %d. Ergo "
+"ambo simul redunctur in gradu Memoriæ ad libitum (%s)."
 
 #: includes/LitCalAPI.php:973
 #, php-format
@@ -192,11 +196,13 @@ msgid ""
 "The %s '%s' has been raised to the rank of %s since the year %d, applicable "
 "to the year %d (%s)."
 msgstr ""
+"%s <i>'%s'</i> elevata est in gradu %s ab anno %d, ergo applicatur ad anno "
+"%d (%s)."
 
 #: includes/LitCalAPI.php:1040 includes/LitCalAPI.php:1065
 #: includes/LitCalAPI.php:1082
 msgid "the Monday after Pentecost"
-msgstr ""
+msgstr "dies Lunae post Pentecostem"
 
 #: includes/LitCalAPI.php:1063
 #, php-format
@@ -204,6 +210,8 @@ msgid ""
 "The Memorial '%s', added on %s since the year %d (%s), is however superseded "
 "by a Solemnity or a Feast '%s' in the year %d."
 msgstr ""
+"Memoria <i>'%s'</i> aggregata in die %s ab anno %d (%s), subplantata est ab "
+"Sollemnitate aut Festu <i>'%s'</i> in anno %d."
 
 #: includes/LitCalAPI.php:1078
 #, php-format
@@ -211,6 +219,7 @@ msgid ""
 "The %s '%s' has been suppressed by the Memorial '%s', added on %s since the "
 "year %d (%s)."
 msgstr ""
+"%s '%s' subplantata est ad Memoria '%s', aggregata in die %s ab anno %d (%s)."
 
 #: includes/LitCalAPI.php:1145
 #, php-format
@@ -218,6 +227,8 @@ msgid ""
 "The optional memorial '%s' has been transferred from Dec. 12 to Aug. 12 "
 "since the year 2002 (%s), applicable to the year %d."
 msgstr ""
+"Memoria ad libitum <i>'%s'</i> traslata est de 12 Dec. ad 12 Aug. ab anno "
+"2002 (%s), ergo viget in anno %d."
 
 #: includes/LitCalAPI.php:1157
 #, php-format
@@ -226,6 +237,9 @@ msgid ""
 "Sunday or Solemnity were it on Dec. 12, has however been transferred to Aug. "
 "12 since the year 2002 (%s), applicable to the year %d."
 msgstr ""
+"Memoria ad libitum <i>'%s'</i> qua subplantata fuisset ab Dominica aut "
+"Sollemnitate si celebrata fuisset in die 12 Dec., nihilominus traslata est "
+"ad 12 Aug. ab anno 2002 (%s), ergo viget in anno %d."
 
 #: includes/LitCalAPI.php:1172
 #, php-format
@@ -234,6 +248,9 @@ msgid ""
 "since the year 2002 (%2$s), applicable to the year %3$d. However, it is "
 "superseded by a Sunday, a Solemnity, or a Feast '%4$s' in the year %3$d."
 msgstr ""
+"Memoria ad libitum <i>\\'%1$s\\'</i> traslata est de 12 Dec. ad 12 Aug. ab "
+"anno 2002 (%2$s), ergo viget in anno %3$d. Nihilominus subplantata est ab "
+"Dominica, aut Sollemnitate, aut Festu <i>\\'%4$s\\'</i> in anno %3$d."
 
 #: includes/LitCalAPI.php:1260
 #, php-format
@@ -243,20 +260,23 @@ msgid ""
 "has been reinstated so that local churches can optionally celebrate the "
 "memorial."
 msgstr ""
+"Festum '%s' hoc anno ( 2009 ) supprimeretur quia congruit cum Dominica, "
+"tamen quamvis sit Annus Pauli Apostoli, restituta est secundum %s ut "
+"permittant ecclesias locales ad memoriam celebrandam."
 
 #: includes/LitCalAPI.php:1465
 #, php-format
 msgid "of the %s Week of Easter"
-msgstr ""
+msgstr "ebdomadæ %s Temporis Paschali"
 
 #: includes/LitCalAPI.php:1498 includes/LitCalAPI.php:1525
 #, php-format
 msgid "of the %s Week of Ordinary Time"
-msgstr ""
+msgstr "Hebdomadæ %s Temporis Ordinarii"
 
 #: includes/LitCalAPI.php:1547
 msgid "Saturday Memorial of the Blessed Virgin Mary"
-msgstr ""
+msgstr "Memoria Sanctæ Mariæ in Sabbato"
 
 #: includes/LitCalAPI.php:1599
 #, php-format
@@ -264,3 +284,5 @@ msgid ""
 "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the "
 "year %d."
 msgstr ""
+"%s '%s', celebrata plerumque in die %s, subplantata est ab %s '%s' in anno "
+"%d."
