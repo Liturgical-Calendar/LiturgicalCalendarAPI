@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-14 00:11+0100\n"
-"PO-Revision-Date: 2021-12-13 23:50+0000\n"
+"PO-Revision-Date: 2021-12-14 00:04+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
@@ -205,7 +205,7 @@ msgstr ""
 #: includes/LitCalAPI.php:1040 includes/LitCalAPI.php:1065
 #: includes/LitCalAPI.php:1082
 msgid "the Monday after Pentecost"
-msgstr ""
+msgstr "il lunedì dopo la Pentecoste"
 
 #: includes/LitCalAPI.php:1063
 #, php-format
@@ -213,6 +213,8 @@ msgid ""
 "The Memorial '%s', added on %s since the year %d (%s), is however superseded "
 "by a Solemnity or a Feast '%s' in the year %d."
 msgstr ""
+"La Memoria '%s', aggiunta il %s sin dal %d (%s), è tuttavia superata da una "
+"Solennità o da una Festa '%s' nell'anno %d."
 
 #: includes/LitCalAPI.php:1078
 #, php-format
@@ -220,6 +222,8 @@ msgid ""
 "The %s '%s' has been suppressed by the Memorial '%s', added on %s since the "
 "year %d (%s)."
 msgstr ""
+"La %s '%s' è stata soppressa dalla Memoria '%s', aggiunta il %s sin dal %d "
+"(%s)."
 
 #: includes/LitCalAPI.php:1145
 #, php-format
@@ -227,6 +231,8 @@ msgid ""
 "The optional memorial '%s' has been transferred from Dec. 12 to Aug. 12 "
 "since the year 2002 (%s), applicable to the year %d."
 msgstr ""
+"La memoria facoltativa '%s' è stata trasferita dal 12 Dic. al 12 Agosto sin "
+"dal 2002 (%s), applicabile pertanto all'anno %d."
 
 #: includes/LitCalAPI.php:1157
 #, php-format
@@ -235,6 +241,9 @@ msgid ""
 "Sunday or Solemnity were it on Dec. 12, has however been transferred to Aug. "
 "12 since the year 2002 (%s), applicable to the year %d."
 msgstr ""
+"La memoria facoltativa '%s', che sarebbe stata soppressa quest'anno da una "
+"Domenica o da una Solennità se veniva celebrata il 12 Dic., è stata tuttavia "
+"trasferita al 12 Agosto sin dal 2002 (%s), applicabile pertanto all'anno %d."
 
 #: includes/LitCalAPI.php:1172
 #, php-format
@@ -243,6 +252,9 @@ msgid ""
 "since the year 2002 (%2$s), applicable to the year %3$d. However, it is "
 "superseded by a Sunday, a Solemnity, or a Feast '%4$s' in the year %3$d."
 msgstr ""
+"La memoria facoltativa '%1$s' è stata trasferita dal 12 Dic. al 12 Agosto "
+"sin dal 2002 (%2$s), applicabile pertanto all'anno %3$d. Tuttavia, è "
+"soppressa da una Domenica, una Solennità o una Festa '%4$s' nell'anno %3$d."
 
 #: includes/LitCalAPI.php:1260
 #, php-format
@@ -252,20 +264,24 @@ msgid ""
 "has been reinstated so that local churches can optionally celebrate the "
 "memorial."
 msgstr ""
+"La Festa '%s' sarebbe stata soppressa quest'anno ( 2009 ) visto che cade di "
+"Domenica, tuttavia trattandosi dell'Anno dell'Apostolo Paolo, è stata "
+"restituita secondo il %s in modo che le chiese locali abbiano facoltà di "
+"mantenere la memoria."
 
 #: includes/LitCalAPI.php:1465
 #, php-format
 msgid "of the %s Week of Easter"
-msgstr ""
+msgstr "della %s Settimana di Pasqua"
 
 #: includes/LitCalAPI.php:1498 includes/LitCalAPI.php:1525
 #, php-format
 msgid "of the %s Week of Ordinary Time"
-msgstr ""
+msgstr "della %s Settimana del Tempo Ordinario"
 
 #: includes/LitCalAPI.php:1547
 msgid "Saturday Memorial of the Blessed Virgin Mary"
-msgstr ""
+msgstr "Memoria di Santa Maria in sabato"
 
 #: includes/LitCalAPI.php:1599
 #, php-format
@@ -273,3 +289,5 @@ msgid ""
 "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the "
 "year %d."
 msgstr ""
+"La %s '%s', celebrata solitamente il %s, è soppressa dalla %s '%s' nell'anno "
+"%d."
