@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-14 00:11+0100\n"
-"PO-Revision-Date: 2021-12-14 00:48+0000\n"
+"PO-Revision-Date: 2021-12-14 19:54+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
@@ -122,7 +122,7 @@ msgstr "della %s Settimana dell'Avvento"
 #: includes/LitCalAPI.php:707
 #, php-format
 msgid "%s Day of the Octave of Christmas"
-msgstr "\"%s Giorno dell'Ottava di Natale"
+msgstr "%s Giorno dell'Ottava di Natale"
 
 #: includes/LitCalAPI.php:729
 #, php-format
