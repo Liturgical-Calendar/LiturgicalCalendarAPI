@@ -836,7 +836,7 @@ class LitCalAPI {
         switch( $missal ){
             case RomanMissal::EDITIO_TYPICA_1970:
                 $this->Messages[] = sprintf(
-                    _( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) usually celebrated on %s, is suppressed by the %s '%s' in the year %d." ),
+                    _( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d." ),
                     LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE, false ),
                     $row->NAME,
                     RomanMissal::getName( $missal ),
@@ -1123,6 +1123,7 @@ class LitCalAPI {
         } else {
             $row = (object)$this->PROPRIUM_DE_TEMPORE[ "ImmaculateHeart" ];
             $row->GRADE = LitGrade::MEMORIAL;
+            $row->DATE = LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P' . ( 7 * 9 + 6 ) . 'D' ) );
             $this->handleCoincidence( $row, RomanMissal::EDITIO_TYPICA_1970 );
         }
 
@@ -2209,7 +2210,13 @@ class LitCalAPI {
     }
 
     private function prepareL10N() : void {
-        setlocale( LC_ALL, strtolower( $this->LITSETTINGS->LOCALE ) . '_' . $this->LITSETTINGS->LOCALE . '.UTF-8', strtolower( $this->LITSETTINGS->LOCALE ) );
+        $localeArray = [
+            strtolower( $this->LITSETTINGS->LOCALE ) . '_' . $this->LITSETTINGS->LOCALE . '.utf8',
+            strtolower( $this->LITSETTINGS->LOCALE ) . '_' . $this->LITSETTINGS->LOCALE . '.UTF-8',
+            strtolower( $this->LITSETTINGS->LOCALE ) . '_' . $this->LITSETTINGS->LOCALE,
+            strtolower( $this->LITSETTINGS->LOCALE )
+        ];
+        setlocale( LC_ALL, $localeArray );
         $this->createNumberFormatters();
         bindtextdomain("litcal", "i18n");
         textdomain("litcal");
