@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-14 00:11+0100\n"
-"PO-Revision-Date: 2021-12-14 00:04+0000\n"
+"PO-Revision-Date: 2021-12-14 00:48+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
@@ -92,7 +92,7 @@ msgid ""
 "%d, it has been anticipated by one day as per %s."
 msgstr ""
 "Visto che la Solennità <i>'%s'</i> coincide con la Solennità <i>'%s'</i> "
-"nell'anno %d, la prima è stata anticipata di un giorno per %s."
+"nell'anno %d, la prima è stata anticipata di un giorno come da %s."
 
 #: includes/LitCalAPI.php:527 includes/LitCalAPI.php:2084
 #: includes/LitCalAPI.php:2085
