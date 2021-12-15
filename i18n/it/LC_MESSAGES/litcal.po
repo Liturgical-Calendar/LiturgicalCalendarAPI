@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-15 12:02+0000\n"
-"PO-Revision-Date: 2021-12-14 19:54+0000\n"
+"PO-Revision-Date: 2021-12-15 12:51+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
@@ -281,42 +281,42 @@ msgstr ""
 #. translators: liturgical rank. Keep lowercase
 #: includes/LitCalMessages.php:380 includes/LitCalMessages.php:416
 msgid "weekday"
-msgstr ""
+msgstr "feria"
 
 #. translators: liturgical rank. Keep Capitalized
 #: includes/LitCalMessages.php:385
 msgid "Commemoration"
-msgstr ""
+msgstr "Commemorazione"
 
 #. translators: liturgical rank. Keep Capitalized
 #: includes/LitCalMessages.php:390
 msgid "Optional memorial"
-msgstr ""
+msgstr "Memoria facoltativa"
 
 #. translators: liturgical rank. Keep Capitalized
 #: includes/LitCalMessages.php:394
 msgid "Memorial"
-msgstr ""
+msgstr "Memoria"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: includes/LitCalMessages.php:398
 msgid "FEAST"
-msgstr ""
+msgstr "FESTA"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: includes/LitCalMessages.php:402
 msgid "FEAST OF THE LORD"
-msgstr ""
+msgstr "FESTA DEL SIGNORE"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: includes/LitCalMessages.php:407
 msgid "SOLEMNITY"
-msgstr ""
+msgstr "SOLENNITÀ"
 
 #. translators: liturgical rank. Keep lowercase
 #: includes/LitCalMessages.php:412
 msgid "celebration with precedence over solemnities"
-msgstr ""
+msgstr "celebrazione con precedenza sulle solennità"
 
 #~ msgid "COMMEMORATION"
 #~ msgstr "<I>Commemorazione</I>"
