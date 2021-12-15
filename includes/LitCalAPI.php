@@ -528,7 +528,7 @@ class LitCalAPI {
         }
 
         //let's add a displayGrade property for AllSouls so applications don't have to worry about fixing it
-        $this->Cal->setProperty( "AllSouls", "displayGrade", LitCal_Messages::_G( "COMMEMORATION", $this->LITSETTINGS->LOCALE, false ) );
+        $this->Cal->setProperty( "AllSouls", "displayGrade", LitGrade::i18n( "COMMEMORATION", false ) );
 
         $this->Cal->addSolemnitiesLordBVM( [
             "Easter",
@@ -619,7 +619,7 @@ class LitCalAPI {
                 $this->Messages[] = sprintf(
                     _( "'%s' is superseded by the %s '%s' in the year %d." ),
                     $this->PROPRIUM_DE_TEMPORE[ "OrdSunday" . $ordSun ][ "NAME_" . $this->LITSETTINGS->LOCALE ],
-                    $this->Cal->solemnityFromDate( $firstOrdinary )->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $this->Cal->solemnityFromDate( $firstOrdinary )->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $this->Cal->solemnityFromDate( $firstOrdinary )->grade, $this->LITSETTINGS->LOCALE, false ),
+                    $this->Cal->solemnityFromDate( $firstOrdinary )->grade > LitGrade::SOLEMNITY ? '<i>' . LitGrade::i18n( $this->Cal->solemnityFromDate( $firstOrdinary )->grade, false ) . '</i>' : LitGrade::i18n( $this->Cal->solemnityFromDate( $firstOrdinary )->grade, false ),
                     $this->Cal->solemnityFromDate( $firstOrdinary )->name,
                     $this->LITSETTINGS->YEAR
                 );
@@ -643,7 +643,7 @@ class LitCalAPI {
                 $this->Messages[] = sprintf(
                     _( "'%s' is superseded by the %s '%s' in the year %d." ),
                     $this->PROPRIUM_DE_TEMPORE[ "OrdSunday" . $ordSun ][ "NAME_" . $this->LITSETTINGS->LOCALE ],
-                    $this->Cal->solemnityFromDate( $lastOrdinary )->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $this->Cal->solemnityFromDate( $lastOrdinary )->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $this->Cal->solemnityFromDate( $lastOrdinary )->grade, $this->LITSETTINGS->LOCALE, false ),
+                    $this->Cal->solemnityFromDate( $lastOrdinary )->grade > LitGrade::SOLEMNITY ? '<i>' . LitGrade::i18n( $this->Cal->solemnityFromDate( $lastOrdinary )->grade, false ) . '</i>' : LitGrade::i18n( $this->Cal->solemnityFromDate( $lastOrdinary )->grade, false ),
                     $this->Cal->solemnityFromDate( $lastOrdinary )->name,
                     $this->LITSETTINGS->YEAR
                 );
@@ -772,7 +772,7 @@ class LitCalAPI {
                      */
                     $this->Messages[] = sprintf(
                         _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." ),
-                        LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE ),
+                        LitGrade::i18n( $row->GRADE, $this->LITSETTINGS->LOCALE ),
                         $row->NAME,
                         $this->LITSETTINGS->LOCALE === 'LA' ? ( $row->DATE->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
                             ( $this->LITSETTINGS->LOCALE === 'EN' ? $row->DATE->format( 'F jS' ) :
@@ -809,7 +809,7 @@ class LitCalAPI {
             $this->Cal->setProperty( $row->TAG, "grade", LitGrade::COMMEMORATION );
             $this->Messages[] = sprintf(
                 _( "The %s '%s' either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration." ),
-                LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE ),
+                LitGrade::i18n( $row->GRADE, $this->LITSETTINGS->LOCALE ),
                 $row->NAME,
                 $this->LITSETTINGS->YEAR
             );
@@ -825,7 +825,7 @@ class LitCalAPI {
                 $this->Messages[] = sprintf(
                     _( "'%s' is superseded by the %s '%s' in the year %d." ),
                     $this->Cal->getFestivity( $key )->name,
-                    LITCAL_MESSAGES::_G( $festivity->grade, $this->LITSETTINGS->LOCALE, false ),
+                    LitGrade::i18n( $festivity->grade, false ),
                     $festivity->name,
                     $this->LITSETTINGS->YEAR
                 );
@@ -841,7 +841,7 @@ class LitCalAPI {
             case RomanMissal::EDITIO_TYPICA_1970:
                 $this->Messages[] = sprintf(
                     _( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d." ),
-                    LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE, false ),
+                    LitGrade::i18n( $row->GRADE, false ),
                     $row->NAME,
                     RomanMissal::getName( $missal ),
                     1970,
@@ -858,7 +858,7 @@ class LitCalAPI {
             case RomanMissal::EDITIO_TYPICA_TERTIA_2002:
                 $this->Messages[] = sprintf(
                     _( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d." ),
-                    LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE, false ),
+                    LitGrade::i18n( $row->GRADE, false ),
                     $row->NAME,
                     RomanMissal::getName( $missal ),
                     2002,
@@ -875,7 +875,7 @@ class LitCalAPI {
             case RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008:
                 $this->Messages[] = sprintf(
                     _( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d." ),
-                    LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE, false ),
+                    LitGrade::i18n( $row->GRADE, false ),
                     $row->NAME,
                     RomanMissal::getName( $missal ),
                     2008,
@@ -975,9 +975,9 @@ class LitCalAPI {
             if ( $festivity->grade === LitGrade::MEMORIAL ) {
                 $this->Messages[] = sprintf(
                     _( "The %s '%s' has been raised to the rank of %s since the year %d, applicable to the year %d (%s)." ),
-                    LITCAL_MESSAGES::_G( $festivity->grade, $this->LITSETTINGS->LOCALE ),
+                    LitGrade::i18n( $festivity->grade, $this->LITSETTINGS->LOCALE ),
                     $festivity->name,
-                    LITCAL_MESSAGES::_G( LitGrade::FEAST, $this->LITSETTINGS->LOCALE ),
+                    LitGrade::i18n( LitGrade::FEAST, $this->LITSETTINGS->LOCALE ),
                     2016,
                     $this->LITSETTINGS->YEAR,
                     '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf">' . _( "Decree of the Congregation for Divine Worship" ) . '</a>'
@@ -1017,7 +1017,7 @@ class LitCalAPI {
              */
             $this->Messages[] = sprintf(
                 _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." ),
-                LITCAL_MESSAGES::_G( $newFestivity->grade, $this->LITSETTINGS->LOCALE ),
+                LitGrade::i18n( $newFestivity->grade, $this->LITSETTINGS->LOCALE ),
                 $newFestivity->name,
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $newFestivity->date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$newFestivity->date->format( 'n' ) ] ) :
                     ( $this->LITSETTINGS->LOCALE === 'EN' ? $newFestivity->date->format( 'F jS' ) :
@@ -1039,7 +1039,7 @@ class LitCalAPI {
         $this->Cal->addFestivity( "MaryMotherChurch", $festivity );
         $this->Messages[] = sprintf(
             _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." ),
-            LITCAL_MESSAGES::_G( $festivity->grade, $this->LITSETTINGS->LOCALE ),
+            LitGrade::i18n( $festivity->grade, $this->LITSETTINGS->LOCALE ),
             $festivity->name,
             _( 'the Monday after Pentecost' ),
             2018,
@@ -1080,7 +1080,7 @@ class LitCalAPI {
                     foreach( $coincidingFestivities as $coincidingFestivityKey => $coincidingFestivity ) {
                         $this->Messages[] = sprintf(
                             _( "The %s '%s' has been suppressed by the Memorial '%s', added on %s since the year %d (%s)." ),
-                            LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ),
+                            LitGrade::i18n( $coincidingFestivity->grade, false ),
                             '<i>' . $coincidingFestivity->name . '</i>',
                             $MaryMotherChurch->tag[ $this->LITSETTINGS->LOCALE ],
                             _( 'the Monday after Pentecost' ),
@@ -1233,7 +1233,7 @@ class LitCalAPI {
                  */
                 $this->Messages[] = sprintf(
                     _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." ),
-                    LITCAL_MESSAGES::_G( $festivity->grade, $this->LITSETTINGS->LOCALE ),
+                    LitGrade::i18n( $festivity->grade, $this->LITSETTINGS->LOCALE ),
                     $festivity->name,
                     $this->LITSETTINGS->LOCALE === 'LA' ? ( $row->DATE->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
                         ( $this->LITSETTINGS->LOCALE === 'EN' ? $row->DATE->format( 'F jS' ) :
@@ -1285,7 +1285,7 @@ class LitCalAPI {
                  */
                 $this->Messages[] = sprintf(
                     _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." ),
-                    LITCAL_MESSAGES::_G( $festivity->grade, $this->LITSETTINGS->LOCALE ),
+                    LitGrade::i18n( $festivity->grade, $this->LITSETTINGS->LOCALE ),
                     $festivity->name,
                     $this->LITSETTINGS->LOCALE === 'LA' ? ( $festivity->date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$festivity->date->format( 'n' ) ] ) :
                         ( $this->LITSETTINGS->LOCALE === 'EN' ? $festivity->date->format( 'F jS' ) :
@@ -1593,16 +1593,16 @@ class LitCalAPI {
                     $coincidingFestivity->grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( $this->dayOfTheWeek->format( $currentFeastDate->format( 'U' ) ) );
                 } else if ( $this->Cal->inSolemnities( $currentFeastDate ) ) {
                     //it's a Feast of the Lord or a Solemnity
-                    $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) );
+                    $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LitGrade::i18n( $coincidingFestivity->event->grade, false ) . '</i>' : LitGrade::i18n( $coincidingFestivity->grade, false ) );
                 } else if ( $this->Cal->inFeastsOrMemorials( $currentFeastDate ) ) {
                     //we should probably be able to create it anyways in this case?
                     $this->Cal->addFestivity( $tag, new Festivity( $FestivityName, $currentFeastDate, $color, LitFeastType::FIXED, LitGrade::FEAST, "Proper" ) );
-                    $coincidingFestivity->grade = LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false );
+                    $coincidingFestivity->grade = LitGrade::i18n( $coincidingFestivity->event->grade, false );
                 }
 
                 $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                     _( "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d." ),
-                    LITCAL_MESSAGES::_G( LitGrade::FEAST, $this->LITSETTINGS->LOCALE, false ),
+                    LitGrade::i18n( LitGrade::FEAST, false ),
                     $FestivityName,
                     $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ),
                     $coincidingFestivity->grade,
@@ -1679,7 +1679,7 @@ class LitCalAPI {
                 $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $currentFeastDate, $this->LITSETTINGS );
                 $this->Messages[] = sprintf(
                     "ITALIA: la %s '%s' (%s), aggiunta al calendario nell'edizione del Messale Romano del 1983 pubblicata dalla CEI, è soppressa dalla %s '%s' nell'anno %d",
-                    $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE, false ),
+                    $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : LitGrade::i18n( $row->GRADE, false ),
                     '<i>' . $row->NAME . '</i>',
                     $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ),
                     $coincidingFestivity->grade,
@@ -1795,7 +1795,7 @@ class LitCalAPI {
             else{
                 $this->Messages[] = sprintf(
                     "USA: the %s '%s', added to the calendar as per the 2011 Roman Missal issued by the USCCB, is superseded by a Sunday or a Solemnity in the year %d",
-                    $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE, false ),
+                    $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : LitGrade::i18n( $row->GRADE, false ),
                     '<i>' . $row->NAME . '</i>',
                     $this->LITSETTINGS->YEAR
                 );
@@ -2030,7 +2030,7 @@ class LitCalAPI {
                 } else {
                     $this->Messages[] = sprintf(
                         $this->LITSETTINGS->DIOCESAN . ": the %s '%s', proper to the calendar of the " . $this->GeneralIndex->{$this->LITSETTINGS->DIOCESAN}->diocese . " and usually celebrated on %s, is suppressed by the Sunday or Solemnity %s in the year %d",
-                        LITCAL_MESSAGES::_G( $obj->grade, $this->LITSETTINGS->LOCALE, false ),
+                        LitGrade::i18n( $obj->grade, false ),
                         '<i>' . $obj->name . '</i>',
                         '<b>' . $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ) . '</b>',
                         '<i>' . $this->Cal->solemnityFromDate( $currentFeastDate )->name . '</i>',
@@ -2086,16 +2086,16 @@ class LitCalAPI {
             $displayGrade = "";
             $displayGradeHTML = "";
             if( $FestivityKey === 'AllSouls' ){
-                $displayGrade = LitCal_Messages::_G( "COMMEMORATION", $this->LITSETTINGS->LOCALE, false );
-                $displayGradeHTML = LitCal_Messages::_G( "COMMEMORATION", $this->LITSETTINGS->LOCALE, true );
+                $displayGrade = LitGrade::i18n( "COMMEMORATION", false );
+                $displayGradeHTML = LitGrade::i18n( "COMMEMORATION", true );
             }
             else if( (int)$CalEvent->date->format( 'N' ) !==7 ){
                 if( property_exists( $CalEvent,'displayGrade' ) && $CalEvent->displayGrade !== "" ){
                     $displayGrade = $CalEvent->displayGrade;
                     $displayGradeHTML = '<B>' . $CalEvent->displayGrade . '</B>';
                 } else {
-                    $displayGrade = LITCAL_MESSAGES::_G( $CalEvent->grade, $this->LITSETTINGS->LOCALE, false );
-                    $displayGradeHTML = LITCAL_MESSAGES::_G( $CalEvent->grade, $this->LITSETTINGS->LOCALE, true );
+                    $displayGrade = LitGrade::i18n( $CalEvent->grade, false );
+                    $displayGradeHTML = LitGrade::i18n( $CalEvent->grade, true );
                 }
             }
             else if( (int)$CalEvent->grade > LitGrade::MEMORIAL ){
@@ -2103,8 +2103,8 @@ class LitCalAPI {
                     $displayGrade = $CalEvent->displayGrade;
                     $displayGradeHTML = '<B>' . $CalEvent->displayGrade . '</B>';
                 } else {
-                    $displayGrade = LITCAL_MESSAGES::_G( $CalEvent->grade, $this->LITSETTINGS->LOCALE, false );
-                    $displayGradeHTML = LITCAL_MESSAGES::_G( $CalEvent->grade, $this->LITSETTINGS->LOCALE, true );
+                    $displayGrade = LitGrade::i18n( $CalEvent->grade, false );
+                    $displayGradeHTML = LitGrade::i18n( $CalEvent->grade, true );
                 }
             }
 

@@ -15,208 +15,6 @@ class LITCAL_MESSAGES {
             "it" => "ANNO",
             "la" => "ANNUM"
         ],
-        "From the Common" => [
-            "en" => "From the Common",
-            "it" => "Dal Comune",
-            "la" => "De Communi"
-        ],
-        "of (SING_MASC)" => [
-            "en" => "of",
-            "it" => "del",
-            "la" => ""
-        ],
-        "of (SING_FEMM)" => [
-            "en" => "of the",
-            "it" => "della",
-            "la" => "" //latin expresses the genitive in the declination of the noun, no need for a preposition, leave empty
-        ],
-        "of (PLUR_MASC)" => [
-            "en" => "of",
-            "it" => "dei",
-            "la" => "" //latin expresses the genitive in the declination of the noun, no need for a preposition, leave empty
-        ],
-        "of (PLUR_MASC_ALT)" => [
-            "en" => "of",
-            "it" => "degli",
-            "la" => "" //latin expresses the genitive in the declination of the noun, no need for a preposition, leave empty
-        ],
-        "of (PLUR_FEMM)" => [
-            "en" => "of",
-            "it" => "delle",
-            "la" => "" //latin expresses the genitive in the declination of the noun, no need for a preposition, leave empty
-        ],
-        /*translators: in reference to the Common of the Blessed Virgin Mary */
-        "Blessed Virgin Mary" => [
-            "en" => "Blessed Virgin Mary",
-            "it" => "Beata Vergine Maria",
-            "la" => "Beatæ Virginis Mariæ"
-        ],
-        /*translators: all of the following are in the genitive case, in reference to "from the Common of %s" */
-        "Martyrs" => [
-            "en" => "Martyrs",
-            "it" => "Martiri",
-            "la" => "Martyrum"
-        ],
-        "Pastors" => [
-            "en" => "Pastors",
-            "it" => "Pastori",
-            "la" => "Pastorum"
-        ],
-        "Doctors" => [
-            "en" => "Doctors",
-            "it" => "Dottori della Chiesa",
-            "la" => "Doctorum Ecclesiæ"
-        ],
-        "Virgins" => [
-            "en" => "Virgins",
-            "it" => "Vergini",
-            "la" => "Virginum"
-        ],
-        "Holy Men and Women" => [
-            "en" => "Holy Men and Women",
-            "it" => "Santi e delle Sante",
-            "la" => "Sanctorum et Sanctarum"
-        ],
-        "For One Martyr" => [
-            "en" => "For One Martyr",
-            "it" => "Per un martire",
-            "la" => "Pro uno martyre"
-        ],
-        "For Several Martyrs" => [
-            "en" => "For Several Martyrs",
-            "it" => "Per più martiri",
-            "la" => "Pro pluribus martyribus"
-        ],
-        "For Missionary Martyrs" => [
-            "en" => "For Missionary Martyrs",
-            "it" => "Per i martiri missionari",
-            "la" => "Pro missionariis martyribus"
-        ],
-        "For One Missionary Martyr" => [
-            "en" => "For One Missionary Martyr",
-            "it" => "Per un martire missionario",
-            "la" => "Pro uno missionario martyre"
-        ],
-        "For Several Missionary Martyrs" => [
-            "en" => "For Several Missionary Martyrs",
-            "it" => "Per più martiri missionari",
-            "la" => "Pro pluribus missionariis martyribus"
-        ],
-        "For a Virgin Martyr" => [
-            "en" => "For a Virgin Martyr",
-            "it" => "Per una vergine martire",
-            "la" => "Pro virgine martyre"
-        ],
-        "For a Holy Woman Martyr" => [
-            "en" => "For a Holy Woman Martyr",
-            "it" => "Per una santa martire",
-            "la" => "Pro una martyre muliere",
-        ],
-        "For a Pope" => [
-            "en" => "For a Pope",
-            "it" => "Per i papi",
-            "la" => "Pro Papa"
-        ],
-        "For a Bishop" => [
-            "en" => "For a Bishop",
-            "it" => "Per i vescovi",
-            "la" => "Pro Episcopis"
-        ],
-        "For One Pastor" => [
-            "en" => "For One Pastor",
-            "it" => "Per un pastore",
-            "la" => "Pro Pastoribus"
-        ],
-        "For Several Pastors" => [
-            "en" => "For Several Pastors",
-            "it" => "Per i pastori",
-            "la" => "Pro Pastoribus"
-        ],
-        "For Founders of a Church" => [
-            "en" => "For Founders of a Church",
-            "it" => "Per i fondatori delle chiese",
-            "la" => "Pro Fundatoribus ecclesiarum"
-        ],
-        "For One Founder" => [
-            "en" => "For One Founder",
-            "it" => "Per un fondatore",
-            "la" => "Pro Uno Fundatore"
-        ],
-        "For Several Founders" => [
-            "en" => "For Several Founders",
-            "it" => "Per più fondatori",
-            "la" => "Pro Pluribus Fundatoribus"
-        ],
-        "For Missionaries" => [
-            "en" => "For Missionaries",
-            "it" => "Per i missionari",
-            "la" => "Pro missionariis"
-        ],
-        "For One Virgin" => [
-            "en" => "For One Virgin",
-            "it" => "Per una vergine",
-            "la" => "Pro una virgine"
-        ],
-        "For Several Virgins" => [
-            "en" => "For Several Virgins",
-            "it" => "Per più vergini",
-            "la" => "Pro pluribus virginibus"
-        ],
-        "For Religious" => [
-            "en" => "For Religious",
-            "it" => "Per i religiosi",
-            "la" => "Pro Religiosis"
-        ],
-        "For Those Who Practiced Works of Mercy" => [
-            "en" => "For Those Who Practiced Works of Mercy",
-            "it" => "Per gli operatori di misericordia",
-            "la" => "Pro iis qui opera Misericordiæ Exercuerunt"
-        ],
-        "For an Abbot" => [
-            "en" => "For an Abbot",
-            "it" => "Per un abate",
-            "la" => "Pro abbate"
-        ],
-        "For a Monk" => [
-            "en" => "For a Monk",
-            "it" => "Per un monaco",
-            "la" => "Pro monacho"
-        ],
-        "For a Nun" => [
-            "en" => "For a Nun",
-            "it" => "Per i religiosi",
-            "la" => "Pro moniali"
-        ],
-        "For Educators" => [
-            "en" => "For Educators",
-            "it" => "Per gli educatori",
-            "la" => "Pro Educatoribus"
-        ],
-        "For Holy Women" => [
-            "en" => "For Holy Women",
-            "it" => "Per le sante",
-            "la" => "Pro Sanctis Mulieribus"
-        ],
-        "For One Saint" => [
-            "en" => "For One Saint",
-            "it" => "Per un Santo",
-            "la" => "Pro uno Sancto"
-        ],
-        "For Several Saints" => [
-            "en" => "For Several Saints",
-            "it" => "Per più Santi",
-            "la" => "Pro pluribus Sanctos"
-        ],
-        "or" => [
-            "en" => "or",
-            "it" => "oppure",
-            "la" => "vel"
-        ],
-        "Proper" => [
-            "en" => "Proper",
-            "it" => "Proprio",
-            "la" => "Proprium"
-        ],
         "green" => [
             "en" => "green",
             "it" => "verde",
@@ -369,54 +167,80 @@ class LITCAL_MESSAGES {
         return $key;
     }
 
-    /**
-     * Function _G
-     * Returns a translated string with the Grade (Rank) of the Festivity
-     */
-    public static function _G( int $key, bool $html=true ) : string {
-        switch($key){
-            case LitGrade::WEEKDAY:
-                /**translators: liturgical rank. Keep lowercase  */
-                $grade = _( "weekday" );
-                $tags = ['<I>','</I>'];
-            break;
-            case LitGrade::COMMEMORATION:
-                /**translators: liturgical rank. Keep Capitalized  */
-                $grade = _( "Commemoration" );
-                $tags = ['<I>','</I>'];
-            break;
-            case LitGrade::MEMORIAL_OPT:
-                /**translators: liturgical rank. Keep Capitalized  */
-                $grade = _( "Optional memorial" );
-            break;
-            case LitGrade::MEMORIAL:
-                /**translators: liturgical rank. Keep Capitalized  */
-                $grade = _( "Memorial" );
-            break;
-            case LitGrade::FEAST:
-                /**translators: liturgical rank. Keep UPPERCASE  */
-                $grade = _( "FEAST" );
-            break;
-            case LitGrade::FEAST_LORD:
-                /**translators: liturgical rank. Keep UPPERCASE  */
-                $grade = _( "FEAST OF THE LORD" );
-                $tags = ['<B>','</B>'];
-            break;
-            case LitGrade::SOLEMNITY:
-                /**translators: liturgical rank. Keep UPPERCASE  */
-                $grade = _( "SOLEMNITY" );
-                $tags = ['<B>','</B>'];
-            break;
-            case LitGrade::HIGHER_SOLEMNITY:
-                /**translators: liturgical rank. Keep lowercase  */
-                $grade = _( "celebration with precedence over solemnities" );
-                $tags = ['<B><I>','</I></B>'];
-            break;
-            default:
-                $grade = _( "weekday" );
-                $tags = ['',''];
+    public static function _CG( string $commonGeneral ) : string {
+        switch( $commonGeneral ){
+            case 'Martyrs':
+                return _( 'Martyrs' );
+            case 'Pastors':
+                return _( 'Pastors' );
+            case 'Doctors':
+                return _( 'Doctors' );
+            case 'Virgins':
+                return _( 'Virgins' );
+            case 'Holy Men and Women':
+                return _( 'Holy Men and Women' );
+            case 'Blessed Virgin Mary':
+                return _( 'Blessed Virgin Mary' );
+            case 'Dedication of a Church':
+                return _( 'Dedication of a Church' );
         }
-        return $html ? $tags[0] . $grade . $tags[1] : $grade;
+    }
+
+    public static function _CS( string $commonSpecific ) : string {
+        switch( $commonSpecific ) {
+            case "For One Martyr":
+                return _( "For One Martyr" );
+            case "For Several Martyrs":
+                return _( "For Several Martyrs" );
+            case "For Missionary Martyrs":
+                return _( "For Missionary Martyrs" );
+            case "For One Missionary Martyr":
+                return _( "For One Missionary Martyr" );
+            case "For Several Missionary Martyrs":
+                return _( "For Several Missionary Martyrs" );
+            case "For a Virgin Martyr":
+                return _( "For a Virgin Martyr" );
+            case "For a Holy Woman Martyr":
+                return _( "For a Holy Woman Martyr" );
+            case "For a Pope":
+                return _( "For a Pope" );
+            case "For a Bishop":
+                return _( "For a Bishop" );
+            case "For One Pastor":
+                return _( "For One Pastor" );
+            case "For Several Pastors":
+                return _( "For Several Pastors" );
+            case "For Founders of a Church":
+                return _( "For Founders of a Church" );
+            case "For One Founder":
+                return _( "For One Founder" );
+            case "For Several Founders":
+                return _( "For Several Founders" );
+            case "For Missionaries":
+                return _( "For Missionaries" );
+            case "For One Virgin":
+                return _( "For One Virgin" );
+            case "For Several Virgins":
+                return _( "For Several Virgins" );
+            case "For Religious":
+                return _( "For Religious" );
+            case "For Those Who Practiced Works of Mercy":
+                return _( "For Those Who Practiced Works of Mercy" );
+            case "For an Abbot":
+                return _( "For an Abbot" );
+            case "For a Monk":
+                return _( "For a Monk" );
+            case "For a Nun":
+                return _( "For a Nun" );
+            case "For Educators":
+                return _( "For Educators" );
+            case "For Holy Women":
+                return _( "For Holy Women" );
+            case "For One Saint":
+                return _( "For One Saint" );
+            case "For Several Saints":
+                return _( "For Several Saints" );
+        }
     }
 
     /**
@@ -427,35 +251,44 @@ class LITCAL_MESSAGES {
         $locale = strtolower($locale);
         if ($common !== "" && $common !== "Proper") {
             $commons = explode(",", $common);
-            $commons = array_map(function ($txt) use ($locale) {
-                $commonArr = explode(":", $txt);
-                $commonGeneral = self::__( $commonArr[0], $locale );
-                $commonSpecific = isset($commonArr[1]) && $commonArr[1] != "" ? self::__( $commonArr[1], $locale ) : "";
-                //$txt = str_replace(":", ": ", $txt);
+            $commons = array_map(function ($txt) {
+                if( strpos($txt, ":") !== false ){
+                    [$commonGeneral, $commonSpecific] = explode(":", $txt);
+                } else {
+                    $commonGeneral = $txt;
+                    $commonSpecific = "";
+                }
                 switch ($commonGeneral) {
-                    case self::__( "Blessed Virgin Mary", $locale ):
-                        $commonKey = "of (SING_FEMM)";
+                    case "Blessed Virgin Mary":
+                        /**translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
+                        $commonKey = _( "(SING_FEMM)" . "\004" . "of" );
                         break;
-                    case self::__( "Virgins", $locale ):
-                        $commonKey = "of (PLUR_FEMM)";
+                    case "Virgins":
+                        /**translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
+                        $commonKey = _( "(PLUR_FEMM)" . "\004" . "of" );
                         break;
-                    case self::__( "Martyrs", $locale ):
-                    case self::__( "Pastors", $locale ):
-                    case self::__( "Doctors", $locale ):
-                    case self::__( "Holy Men and Women", $locale ):
-                        $commonKey = "of (PLUR_MASC)";
+                    case "Martyrs":
+                    case "Pastors":
+                    case "Doctors":
+                    case "Holy Men and Women":
+                        /**translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty! */
+                        $commonKey = _( "(PLUR_MASC)" . "\004" . "of" );
                         break;
-                    case self::__( "Dedication of a Church", $locale ):
-                        $commonKey = "of (SING_FEMM)";
+                    case "Dedication of a Church":
+                        /**translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
+                        $commonKey = _( "(SING_FEMM)" . "\004" . "of" );
                         break;
                     default:
-                        $commonKey = "of (SING_MASC)";
+                        /**translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty! */
+                        $commonKey = _( "(SING_MASC)" . "\004" . "of" );
                 }
-                return self::__( "From the Common", $locale ) . " " . self::__( $commonKey, $locale ) . " " . $commonGeneral . ($commonSpecific != "" ? ": " . $commonSpecific : "");
+                return _( "From the Common" ) . " " . $commonKey . " " . self::_CG( $commonGeneral ) . ($commonSpecific != "" ? ": " . self::_CS( $commonSpecific ) : "");
             }, $commons);
-            $common = implode( "; " . self::__( "or", $locale) . " ", $commons );
+            /**translators: when there are multiple possible commons, this will be the glue "or from the common of..." */
+            $common = implode( "; " . _( "or" ) . " ", $commons );
         } else if ($common == "Proper") {
-            $common = self::__( "Proper", $locale );
+            /**translators: context = the Proper as opposed to the Common */
+            $common = _( "Proper" );
         }
         return $common;
     }
@@ -485,27 +318,27 @@ class LITCAL_MESSAGES {
     }
 
     public static function ParseColorString( string $string, string $LOCALE, bool $html=false) : string {
-        if($html === true) {
+        if( $html === true ) {
             if( strpos( $string, "," ) ) {
                 $colors = explode( ",", $string );
                 $colors = array_map( function($txt) use ($LOCALE) {
-                    return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $txt ) . '">' . self::__( $txt, $LOCALE ) . '</FONT></SPAN></I></B>';
+                    return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $txt ) . '">' . LitColor::i18n( $txt ) . '</FONT></SPAN></I></B>';
                 }, $colors );
                 return implode( ' <I><FONT FACE="Calibri">' . self::__( "or", $LOCALE ) . "</FONT></I> ", $colors );
             }
             else{
-                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $string ) . '">' . self::__( $string, $LOCALE ) . '</FONT></SPAN></I></B>';
+                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $string ) . '">' . LitColor::i18n( $string ) . '</FONT></SPAN></I></B>';
             }
         } else{
-            if(strpos($string,",")){
-                $colors = explode(",",$string);
-                $colors = array_map(function($txt) use ($LOCALE){
-                    return self::__( $txt, $LOCALE );
-                },$colors);
-                return implode(" " . self::__( "or", $LOCALE ) . " ",$colors);
+            if( strpos( $string, "," ) ) {
+                $colors = explode( ",", $string );
+                $colors = array_map( function($txt) {
+                    return LitColor::i18n( $txt );
+                }, $colors );
+                return implode( " " . _( "or" ) . " ", $colors );
             }
             else{
-                return self::__( $string, $LOCALE );
+                return LitColor::i18n( $string );
             }
         }
         return $string; //should never get here

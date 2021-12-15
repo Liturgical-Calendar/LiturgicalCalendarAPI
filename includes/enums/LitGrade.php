@@ -74,4 +74,50 @@ class LitGrade {
     public static function isValid( int $value ) {
         return in_array( $value, self::$values );
     }
+
+    public static function i18n( int $value, bool $html = true ) {
+        switch( $value ) {
+            case self::WEEKDAY:
+                /**translators: liturgical rank. Keep lowercase  */
+                $grade = _( "weekday" );
+                $tags = ['<I>','</I>'];
+            break;
+            case self::COMMEMORATION:
+                /**translators: liturgical rank. Keep Capitalized  */
+                $grade = _( "Commemoration" );
+                $tags = ['<I>','</I>'];
+            break;
+            case self::MEMORIAL_OPT:
+                /**translators: liturgical rank. Keep Capitalized  */
+                $grade = _( "Optional memorial" );
+            break;
+            case self::MEMORIAL:
+                /**translators: liturgical rank. Keep Capitalized  */
+                $grade = _( "Memorial" );
+            break;
+            case self::FEAST:
+                /**translators: liturgical rank. Keep UPPERCASE  */
+                $grade = _( "FEAST" );
+            break;
+            case self::FEAST_LORD:
+                /**translators: liturgical rank. Keep UPPERCASE  */
+                $grade = _( "FEAST OF THE LORD" );
+                $tags = ['<B>','</B>'];
+            break;
+            case self::SOLEMNITY:
+                /**translators: liturgical rank. Keep UPPERCASE  */
+                $grade = _( "SOLEMNITY" );
+                $tags = ['<B>','</B>'];
+            break;
+            case self::HIGHER_SOLEMNITY:
+                /**translators: liturgical rank. Keep lowercase  */
+                $grade = _( "celebration with precedence over solemnities" );
+                $tags = ['<B><I>','</I></B>'];
+            break;
+            default:
+                $grade = _( "weekday" );
+                $tags = ['',''];
+        }
+        return $html ? $tags[0] . $grade . $tags[1] : $grade;
+    }
 }
