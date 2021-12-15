@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-15 15:50+0000\n"
-"PO-Revision-Date: 2021-12-15 12:51+0000\n"
+"PO-Revision-Date: 2021-12-15 15:57+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
@@ -280,19 +280,19 @@ msgstr ""
 
 #: includes/LitCalMessages.php:185
 msgid "Martyrs"
-msgstr ""
+msgstr "Martiri"
 
 #: includes/LitCalMessages.php:187
 msgid "Pastors"
-msgstr ""
+msgstr "Pastori"
 
 #: includes/LitCalMessages.php:189
 msgid "Doctors"
-msgstr ""
+msgstr "Dottori della Chiesa"
 
 #: includes/LitCalMessages.php:191
 msgid "Virgins"
-msgstr ""
+msgstr "Vergini"
 
 #: includes/LitCalMessages.php:193
 msgid "Holy Men and Women"
