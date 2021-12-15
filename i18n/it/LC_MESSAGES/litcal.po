@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-15 12:53+0000\n"
+"POT-Creation-Date: 2021-12-15 15:50+0000\n"
 "PO-Revision-Date: 2021-12-15 12:51+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -278,43 +278,240 @@ msgstr ""
 "La %s '%s', celebrata solitamente il %s, è soppressa dalla %s '%s' nell'anno "
 "%d."
 
+#: includes/LitCalMessages.php:185
+msgid "Martyrs"
+msgstr ""
+
+#: includes/LitCalMessages.php:187
+msgid "Pastors"
+msgstr ""
+
+#: includes/LitCalMessages.php:189
+msgid "Doctors"
+msgstr ""
+
+#: includes/LitCalMessages.php:191
+msgid "Virgins"
+msgstr ""
+
+#: includes/LitCalMessages.php:193
+msgid "Holy Men and Women"
+msgstr ""
+
+#: includes/LitCalMessages.php:195
+#, fuzzy
+#| msgid "Saturday Memorial of the Blessed Virgin Mary"
+msgid "Blessed Virgin Mary"
+msgstr "Memoria di Santa Maria in sabato"
+
+#: includes/LitCalMessages.php:197
+msgid "Dedication of a Church"
+msgstr ""
+
+#: includes/LitCalMessages.php:204
+msgid "For One Martyr"
+msgstr ""
+
+#: includes/LitCalMessages.php:206
+msgid "For Several Martyrs"
+msgstr ""
+
+#: includes/LitCalMessages.php:208
+msgid "For Missionary Martyrs"
+msgstr ""
+
+#: includes/LitCalMessages.php:210
+msgid "For One Missionary Martyr"
+msgstr ""
+
+#: includes/LitCalMessages.php:212
+msgid "For Several Missionary Martyrs"
+msgstr ""
+
+#: includes/LitCalMessages.php:214
+msgid "For a Virgin Martyr"
+msgstr ""
+
+#: includes/LitCalMessages.php:216
+msgid "For a Holy Woman Martyr"
+msgstr ""
+
+#: includes/LitCalMessages.php:218
+msgid "For a Pope"
+msgstr ""
+
+#: includes/LitCalMessages.php:220
+msgid "For a Bishop"
+msgstr ""
+
+#: includes/LitCalMessages.php:222
+msgid "For One Pastor"
+msgstr ""
+
+#: includes/LitCalMessages.php:224
+msgid "For Several Pastors"
+msgstr ""
+
+#: includes/LitCalMessages.php:226
+msgid "For Founders of a Church"
+msgstr ""
+
+#: includes/LitCalMessages.php:228
+msgid "For One Founder"
+msgstr ""
+
+#: includes/LitCalMessages.php:230
+msgid "For Several Founders"
+msgstr ""
+
+#: includes/LitCalMessages.php:232
+msgid "For Missionaries"
+msgstr ""
+
+#: includes/LitCalMessages.php:234
+msgid "For One Virgin"
+msgstr ""
+
+#: includes/LitCalMessages.php:236
+msgid "For Several Virgins"
+msgstr ""
+
+#: includes/LitCalMessages.php:238
+msgid "For Religious"
+msgstr ""
+
+#: includes/LitCalMessages.php:240
+msgid "For Those Who Practiced Works of Mercy"
+msgstr ""
+
+#: includes/LitCalMessages.php:242
+msgid "For an Abbot"
+msgstr ""
+
+#: includes/LitCalMessages.php:244
+msgid "For a Monk"
+msgstr ""
+
+#: includes/LitCalMessages.php:246
+msgid "For a Nun"
+msgstr ""
+
+#: includes/LitCalMessages.php:248
+msgid "For Educators"
+msgstr ""
+
+#: includes/LitCalMessages.php:250
+msgid "For Holy Women"
+msgstr ""
+
+#: includes/LitCalMessages.php:252
+msgid "For One Saint"
+msgstr ""
+
+#: includes/LitCalMessages.php:254
+msgid "For Several Saints"
+msgstr ""
+
+#. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: includes/LitCalMessages.php:276 includes/LitCalMessages.php:291
+msgctxt "(SING_FEMM)"
+msgid "of"
+msgstr ""
+
+#. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: includes/LitCalMessages.php:280
+msgctxt "(PLUR_FEMM)"
+msgid "of"
+msgstr ""
+
+#. translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: includes/LitCalMessages.php:287
+msgctxt "(PLUR_MASC)"
+msgid "of"
+msgstr ""
+
+#. translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: includes/LitCalMessages.php:295
+msgctxt "(SING_MASC)"
+msgid "of"
+msgstr ""
+
+#: includes/LitCalMessages.php:297
+msgid "From the Common"
+msgstr ""
+
+#. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
+#: includes/LitCalMessages.php:300 includes/LitCalMessages.php:350
+msgid "or"
+msgstr ""
+
+#. translators: context = the Proper as opposed to the Common
+#: includes/LitCalMessages.php:303
+msgid "Proper"
+msgstr ""
+
+#. translators: context = liturgical color
+#: includes/enums/LitColor.php:23
+msgid "green"
+msgstr ""
+
+#. translators: context = liturgical color
+#: includes/enums/LitColor.php:26
+msgid "purple"
+msgstr ""
+
+#. translators: context = liturgical color
+#: includes/enums/LitColor.php:29
+msgid "white"
+msgstr ""
+
+#. translators: context = liturgical color
+#: includes/enums/LitColor.php:32
+msgid "red"
+msgstr ""
+
+#. translators: context = liturgical color
+#: includes/enums/LitColor.php:35
+msgid "pink"
+msgstr ""
+
 #. translators: liturgical rank. Keep lowercase
-#: includes/LitCalMessages.php:380 includes/LitCalMessages.php:416
+#: includes/enums/LitGrade.php:82 includes/enums/LitGrade.php:118
 msgid "weekday"
 msgstr "feria"
 
 #. translators: liturgical rank. Keep Capitalized
-#: includes/LitCalMessages.php:385
+#: includes/enums/LitGrade.php:87
 msgid "Commemoration"
 msgstr "Commemorazione"
 
 #. translators: liturgical rank. Keep Capitalized
-#: includes/LitCalMessages.php:390
+#: includes/enums/LitGrade.php:92
 msgid "Optional memorial"
 msgstr "Memoria facoltativa"
 
 #. translators: liturgical rank. Keep Capitalized
-#: includes/LitCalMessages.php:394
+#: includes/enums/LitGrade.php:96
 msgid "Memorial"
 msgstr "Memoria"
 
 #. translators: liturgical rank. Keep UPPERCASE
-#: includes/LitCalMessages.php:398
+#: includes/enums/LitGrade.php:100
 msgid "FEAST"
 msgstr "FESTA"
 
 #. translators: liturgical rank. Keep UPPERCASE
-#: includes/LitCalMessages.php:402
+#: includes/enums/LitGrade.php:104
 msgid "FEAST OF THE LORD"
 msgstr "FESTA DEL SIGNORE"
 
 #. translators: liturgical rank. Keep UPPERCASE
-#: includes/LitCalMessages.php:407
+#: includes/enums/LitGrade.php:109
 msgid "SOLEMNITY"
 msgstr "SOLENNITÀ"
 
 #. translators: liturgical rank. Keep lowercase
-#: includes/LitCalMessages.php:412
+#: includes/enums/LitGrade.php:114
 msgid "celebration with precedence over solemnities"
 msgstr "celebrazione con precedenza sulle solennità"
 
