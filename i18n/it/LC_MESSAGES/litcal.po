@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-15 15:58+0000\n"
-"PO-Revision-Date: 2021-12-15 15:57+0000\n"
+"PO-Revision-Date: 2021-12-16 11:23+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
@@ -301,212 +301,210 @@ msgstr "Vergini"
 #. translators: context = from the Common of nn
 #: includes/LitCalMessages.php:198
 msgid "Holy Men and Women"
-msgstr ""
+msgstr "Santi e delle Sante"
 
 #. translators: context = from the Common of nn
 #: includes/LitCalMessages.php:201
-#, fuzzy
-#| msgid "Saturday Memorial of the Blessed Virgin Mary"
 msgid "Blessed Virgin Mary"
-msgstr "Memoria di Santa Maria in sabato"
+msgstr "Beata Vergine Maria"
 
 #. translators: context = from the Common of nn
 #: includes/LitCalMessages.php:204
 msgid "Dedication of a Church"
-msgstr ""
+msgstr "Dedicazione di una Chiesa"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:212
 msgid "For One Martyr"
-msgstr ""
+msgstr "Per un martire"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:215
 msgid "For Several Martyrs"
-msgstr ""
+msgstr "Per più martiri"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:218
 msgid "For Missionary Martyrs"
-msgstr ""
+msgstr "Per i martiri missionari"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:221
 msgid "For One Missionary Martyr"
-msgstr ""
+msgstr "Per un martire missionario"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:224
 msgid "For Several Missionary Martyrs"
-msgstr ""
+msgstr "Per più martiri missionari"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:227
 msgid "For a Virgin Martyr"
-msgstr ""
+msgstr "Per una vergine martire"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:230
 msgid "For a Holy Woman Martyr"
-msgstr ""
+msgstr "Per una santa martire"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:233
 msgid "For a Pope"
-msgstr ""
+msgstr "Per i papi"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:236
 msgid "For a Bishop"
-msgstr ""
+msgstr "Per i vescovi"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:239
 msgid "For One Pastor"
-msgstr ""
+msgstr "Per un pastore"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:242
 msgid "For Several Pastors"
-msgstr ""
+msgstr "Per i pastori"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:245
 msgid "For Founders of a Church"
-msgstr ""
+msgstr "Per i fondatori delle chiese"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:248
 msgid "For One Founder"
-msgstr ""
+msgstr "Per un fondatore"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:251
 msgid "For Several Founders"
-msgstr ""
+msgstr "Per più fondatori"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:254
 msgid "For Missionaries"
-msgstr ""
+msgstr "Per i missionari"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:257
 msgid "For One Virgin"
-msgstr ""
+msgstr "Per una vergine"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:260
 msgid "For Several Virgins"
-msgstr ""
+msgstr "Per più vergini"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:263
 msgid "For Religious"
-msgstr ""
+msgstr "Per i religiosi"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:266
 msgid "For Those Who Practiced Works of Mercy"
-msgstr ""
+msgstr "Per gli operatori di misericordia"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:269
 msgid "For an Abbot"
-msgstr ""
+msgstr "Per un abate"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:272
 msgid "For a Monk"
-msgstr ""
+msgstr "Per un monaco"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:275
 msgid "For a Nun"
-msgstr ""
+msgstr "Per i religiosi"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:278
 msgid "For Educators"
-msgstr ""
+msgstr "Per gli educatori"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:281
 msgid "For Holy Women"
-msgstr ""
+msgstr "Per le sante"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:284
 msgid "For One Saint"
-msgstr ""
+msgstr "Per un Santo"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:287
 msgid "For Several Saints"
-msgstr ""
+msgstr "Per più santi"
 
 #. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: includes/LitCalMessages.php:309 includes/LitCalMessages.php:324
 msgctxt "(SING_FEMM)"
 msgid "of"
-msgstr ""
+msgstr "della"
 
 #. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: includes/LitCalMessages.php:313
 msgctxt "(PLUR_FEMM)"
 msgid "of"
-msgstr ""
+msgstr "delle"
 
 #. translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: includes/LitCalMessages.php:320
 msgctxt "(PLUR_MASC)"
 msgid "of"
-msgstr ""
+msgstr "dei"
 
 #. translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: includes/LitCalMessages.php:328
 msgctxt "(SING_MASC)"
 msgid "of"
-msgstr ""
+msgstr "del"
 
 #: includes/LitCalMessages.php:330
 msgid "From the Common"
-msgstr ""
+msgstr "Dal Comune"
 
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
 #: includes/LitCalMessages.php:333 includes/LitCalMessages.php:383
 msgid "or"
-msgstr ""
+msgstr "oppure"
 
 #. translators: context = the Proper as opposed to the Common
 #: includes/LitCalMessages.php:336
 msgid "Proper"
-msgstr ""
+msgstr "Proprio"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:23
 msgid "green"
-msgstr ""
+msgstr "verde"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:26
 msgid "purple"
-msgstr ""
+msgstr "viola"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:29
 msgid "white"
-msgstr ""
+msgstr "bianco"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:32
 msgid "red"
-msgstr ""
+msgstr "rosso"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:35
 msgid "pink"
-msgstr ""
+msgstr "rosa"
 
 #. translators: liturgical rank. Keep lowercase
 #: includes/enums/LitGrade.php:82 includes/enums/LitGrade.php:118
