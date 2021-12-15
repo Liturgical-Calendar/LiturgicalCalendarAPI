@@ -182,18 +182,25 @@ class LITCAL_MESSAGES {
     public static function _CG( string $commonGeneral ) : string {
         switch( $commonGeneral ){
             case 'Martyrs':
+                /**translators: context = from the Common of nn */
                 return _( 'Martyrs' );
             case 'Pastors':
+                /**translators: context = from the Common of nn */
                 return _( 'Pastors' );
             case 'Doctors':
+                /**translators: context = from the Common of nn */
                 return _( 'Doctors' );
             case 'Virgins':
+                /**translators: context = from the Common of nn */
                 return _( 'Virgins' );
             case 'Holy Men and Women':
+                /**translators: context = from the Common of nn */
                 return _( 'Holy Men and Women' );
             case 'Blessed Virgin Mary':
+                /**translators: context = from the Common of nn */
                 return _( 'Blessed Virgin Mary' );
             case 'Dedication of a Church':
+                /**translators: context = from the Common of nn */
                 return _( 'Dedication of a Church' );
         }
     }
@@ -201,56 +208,82 @@ class LITCAL_MESSAGES {
     public static function _CS( string $commonSpecific ) : string {
         switch( $commonSpecific ) {
             case "For One Martyr":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For One Martyr" );
             case "For Several Martyrs":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For Several Martyrs" );
             case "For Missionary Martyrs":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For Missionary Martyrs" );
             case "For One Missionary Martyr":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For One Missionary Martyr" );
             case "For Several Missionary Martyrs":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For Several Missionary Martyrs" );
             case "For a Virgin Martyr":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For a Virgin Martyr" );
             case "For a Holy Woman Martyr":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For a Holy Woman Martyr" );
             case "For a Pope":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For a Pope" );
             case "For a Bishop":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For a Bishop" );
             case "For One Pastor":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For One Pastor" );
             case "For Several Pastors":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For Several Pastors" );
             case "For Founders of a Church":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For Founders of a Church" );
             case "For One Founder":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For One Founder" );
             case "For Several Founders":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For Several Founders" );
             case "For Missionaries":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For Missionaries" );
             case "For One Virgin":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For One Virgin" );
             case "For Several Virgins":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For Several Virgins" );
             case "For Religious":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For Religious" );
             case "For Those Who Practiced Works of Mercy":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For Those Who Practiced Works of Mercy" );
             case "For an Abbot":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For an Abbot" );
             case "For a Monk":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For a Monk" );
             case "For a Nun":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For a Nun" );
             case "For Educators":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For Educators" );
             case "For Holy Women":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For Holy Women" );
             case "For One Saint":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For One Saint" );
             case "For Several Saints":
+                /**translators: context = from the Common of nn: nn */
                 return _( "For Several Saints" );
         }
     }
