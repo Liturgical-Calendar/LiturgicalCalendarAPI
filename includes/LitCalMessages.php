@@ -2,6 +2,18 @@
 
 include_once( 'includes/enums/LitGrade.php' );
 
+if (!function_exists('pgettext')) {
+
+    function pgettext($context, $msgid) {
+       $contextString = "{$context}\004{$msgid}";
+       $translation = dcgettext('litcal', $contextString, LC_MESSAGES);
+       //$translation = _( $contextString );
+       if ($translation == $contextString)  return $msgid;
+       else  return $translation;
+    }
+
+}
+
 class LITCAL_MESSAGES {
 
     const MESSAGES = [
@@ -261,26 +273,26 @@ class LITCAL_MESSAGES {
                 switch ($commonGeneral) {
                     case "Blessed Virgin Mary":
                         /**translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                        $commonKey = _( "(SING_FEMM)" . "\004" . "of" );
+                        $commonKey = pgettext( "(SING_FEMM)", "of" );
                         break;
                     case "Virgins":
                         /**translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                        $commonKey = _( "(PLUR_FEMM)" . "\004" . "of" );
+                        $commonKey = pgettext( "(PLUR_FEMM)", "of" );
                         break;
                     case "Martyrs":
                     case "Pastors":
                     case "Doctors":
                     case "Holy Men and Women":
                         /**translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                        $commonKey = _( "(PLUR_MASC)" . "\004" . "of" );
+                        $commonKey = pgettext( "(PLUR_MASC)", "of" );
                         break;
                     case "Dedication of a Church":
                         /**translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                        $commonKey = _( "(SING_FEMM)" . "\004" . "of" );
+                        $commonKey = pgettext( "(SING_FEMM)", "of" );
                         break;
                     default:
                         /**translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                        $commonKey = _( "(SING_MASC)" . "\004" . "of" );
+                        $commonKey = pgettext( "(SING_MASC)", "of" );
                 }
                 return _( "From the Common" ) . " " . $commonKey . " " . self::_CG( $commonGeneral ) . ($commonSpecific != "" ? ": " . self::_CS( $commonSpecific ) : "");
             }, $commons);
