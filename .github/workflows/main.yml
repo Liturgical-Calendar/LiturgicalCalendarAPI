@@ -1,0 +1,52 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ development ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Update source file translation strings
+        run: |
+          git checkout development
+          xgettext --from-code=UTF-8 -o i18n/litcal.pot includes/LitCalAPI.php
+
+      - name: Push changes  # push the output folder to your repo
+        uses: actions-x/commit@v4
+        with:
+          # The committer's email address
+          email: ${{ github.actor }}@localhost
+          # The committer's name
+          name: ${{ github.actor }}
+          # The commit message
+          message: regenerated i18n/litcal.pot from source files
+          # The branch to push the changes back to, defaults to the current branch
+          branch: ${{ github.ref }}
+          # The files to add separated by space, defaults to every file
+          files: i18n/litcal.pot
+          # The repository to push the code to, defaults to origin (e.g. this repository)
+          repository: origin
+          # The token used to push the code, not needed if you push to the same repository
+          #token: # default is ${{ github.token }}
+          # Whether to perform force push
+          force: 0
+          # The working directory that will be used for git commands
+          #directory: # default is .
