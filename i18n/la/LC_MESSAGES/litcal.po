@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-15 11:50+0000\n"
+"POT-Creation-Date: 2021-12-15 11:59+0000\n"
 "PO-Revision-Date: 2021-12-14 19:54+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
@@ -92,11 +92,6 @@ msgid ""
 msgstr ""
 "Ex causa Sollemnitas <i>'%s'</i> coincidet cum Sollemnitate <i>'%s'</i> in "
 "anno %d, anticipata est ab uno die secundum %s."
-
-#: includes/LitCalAPI.php:531 includes/LitCalAPI.php:2089
-#: includes/LitCalAPI.php:2090
-msgid "COMMEMORATION"
-msgstr "<I>Commemoratio</I>"
 
 #: includes/LitCalAPI.php:586
 #, php-format
@@ -278,6 +273,9 @@ msgid ""
 msgstr ""
 "%s '%s', celebrata plerumque in die %s, subplantata est ab %s '%s' in anno "
 "%d."
+
+#~ msgid "COMMEMORATION"
+#~ msgstr "<I>Commemoratio</I>"
 
 #~ msgid ""
 #~ "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) "

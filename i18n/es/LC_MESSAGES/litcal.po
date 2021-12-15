@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-15 11:50+0000\n"
+"POT-Creation-Date: 2021-12-15 11:59+0000\n"
 "PO-Revision-Date: 2021-12-14 00:20+0100\n"
 "Last-Translator: Ubuntu <priest@johnromanodorazio.com>\n"
 "Language-Team: Spanish\n"
@@ -82,11 +82,6 @@ msgstr ""
 msgid ""
 "Seeing that the Solemnity '%s' coincides with the Solemnity '%s' in the year "
 "%d, it has been anticipated by one day as per %s."
-msgstr ""
-
-#: includes/LitCalAPI.php:531 includes/LitCalAPI.php:2089
-#: includes/LitCalAPI.php:2090
-msgid "COMMEMORATION"
 msgstr ""
 
 #: includes/LitCalAPI.php:586
