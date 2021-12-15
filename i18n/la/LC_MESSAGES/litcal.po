@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-15 07:02+0000\n"
-"PO-Revision-Date: 2021-12-14 19:54+0000\n"
+"POT-Creation-Date: 2021-12-15 12:02+0000\n"
+"PO-Revision-Date: 2021-12-15 12:51+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/la/>\n"
@@ -92,11 +92,6 @@ msgid ""
 msgstr ""
 "Ex causa Sollemnitas <i>'%s'</i> coincidet cum Sollemnitate <i>'%s'</i> in "
 "anno %d, anticipata est ab uno die secundum %s."
-
-#: includes/LitCalAPI.php:531 includes/LitCalAPI.php:2089
-#: includes/LitCalAPI.php:2090
-msgid "COMMEMORATION"
-msgstr "<I>Commemoratio</I>"
 
 #: includes/LitCalAPI.php:586
 #, php-format
@@ -278,6 +273,49 @@ msgid ""
 msgstr ""
 "%s '%s', celebrata plerumque in die %s, subplantata est ab %s '%s' in anno "
 "%d."
+
+#. translators: liturgical rank. Keep lowercase
+#: includes/LitCalMessages.php:380 includes/LitCalMessages.php:416
+msgid "weekday"
+msgstr "feria"
+
+#. translators: liturgical rank. Keep Capitalized
+#: includes/LitCalMessages.php:385
+msgid "Commemoration"
+msgstr "Commemoratio"
+
+#. translators: liturgical rank. Keep Capitalized
+#: includes/LitCalMessages.php:390
+msgid "Optional memorial"
+msgstr "Memoria ad libitum"
+
+#. translators: liturgical rank. Keep Capitalized
+#: includes/LitCalMessages.php:394
+msgid "Memorial"
+msgstr "Memoria"
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: includes/LitCalMessages.php:398
+msgid "FEAST"
+msgstr "FESTUM"
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: includes/LitCalMessages.php:402
+msgid "FEAST OF THE LORD"
+msgstr "FESTUM DOMINI"
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: includes/LitCalMessages.php:407
+msgid "SOLEMNITY"
+msgstr "SOLLEMNITAS"
+
+#. translators: liturgical rank. Keep lowercase
+#: includes/LitCalMessages.php:412
+msgid "celebration with precedence over solemnities"
+msgstr "celebratio altioris ordinis quam sollemnitatis"
+
+#~ msgid "COMMEMORATION"
+#~ msgstr "<I>Commemoratio</I>"
 
 #~ msgid ""
 #~ "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) "

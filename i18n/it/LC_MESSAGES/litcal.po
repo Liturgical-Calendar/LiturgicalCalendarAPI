@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-15 07:02+0000\n"
-"PO-Revision-Date: 2021-12-14 19:54+0000\n"
+"POT-Creation-Date: 2021-12-15 12:02+0000\n"
+"PO-Revision-Date: 2021-12-15 12:51+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
@@ -93,11 +93,6 @@ msgid ""
 msgstr ""
 "Visto che la Solennità <i>'%s'</i> coincide con la Solennità <i>'%s'</i> "
 "nell'anno %d, la prima è stata anticipata di un giorno come da %s."
-
-#: includes/LitCalAPI.php:531 includes/LitCalAPI.php:2089
-#: includes/LitCalAPI.php:2090
-msgid "COMMEMORATION"
-msgstr "<I>Commemorazione</I>"
 
 #: includes/LitCalAPI.php:586
 #, php-format
@@ -282,6 +277,49 @@ msgid ""
 msgstr ""
 "La %s '%s', celebrata solitamente il %s, è soppressa dalla %s '%s' nell'anno "
 "%d."
+
+#. translators: liturgical rank. Keep lowercase
+#: includes/LitCalMessages.php:380 includes/LitCalMessages.php:416
+msgid "weekday"
+msgstr "feria"
+
+#. translators: liturgical rank. Keep Capitalized
+#: includes/LitCalMessages.php:385
+msgid "Commemoration"
+msgstr "Commemorazione"
+
+#. translators: liturgical rank. Keep Capitalized
+#: includes/LitCalMessages.php:390
+msgid "Optional memorial"
+msgstr "Memoria facoltativa"
+
+#. translators: liturgical rank. Keep Capitalized
+#: includes/LitCalMessages.php:394
+msgid "Memorial"
+msgstr "Memoria"
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: includes/LitCalMessages.php:398
+msgid "FEAST"
+msgstr "FESTA"
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: includes/LitCalMessages.php:402
+msgid "FEAST OF THE LORD"
+msgstr "FESTA DEL SIGNORE"
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: includes/LitCalMessages.php:407
+msgid "SOLEMNITY"
+msgstr "SOLENNITÀ"
+
+#. translators: liturgical rank. Keep lowercase
+#: includes/LitCalMessages.php:412
+msgid "celebration with precedence over solemnities"
+msgstr "celebrazione con precedenza sulle solennità"
+
+#~ msgid "COMMEMORATION"
+#~ msgstr "<I>Commemorazione</I>"
 
 #~ msgid ""
 #~ "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) "
