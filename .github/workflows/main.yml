@@ -27,7 +27,7 @@ jobs:
       - name: Update source file translation strings
         run: |
           sudo apt-get install -y gettext
-          xgettext --from-code=UTF-8 --add-comments='translators:' -o i18n/litcal.pot includes/LitCalAPI.php
+          xgettext --from-code=UTF-8 --add-comments='translators:' -o i18n/litcal.pot includes/LitCalAPI.php includes/LitCalMessages.php
 
       - name: Push changes  # push the output folder to your repo
         uses: actions-x/commit@v4
