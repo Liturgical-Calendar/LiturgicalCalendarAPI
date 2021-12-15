@@ -1,5 +1,7 @@
 <?php
 
+include_once( 'includes/enums/LitGrade.php' );
+
 class LITCAL_MESSAGES {
 
     const MESSAGES = [
@@ -245,46 +247,6 @@ class LITCAL_MESSAGES {
             "it" => "Mese",
             "la" => "Mensis"
         ],
-        "FERIA" => [
-            "en" => "<I>weekday</I>",
-            "it" => "<I>feria</I>",
-            "la" => "<I>feria</I>"
-        ],
-        "COMMEMORATION" => [
-            "en" => "<I>Commemoration</I>",
-            "it" => "<I>Commemorazione</I>",
-            "la" => "<I>Commemoratio</I>"
-        ],
-        "OPTIONAL MEMORIAL" => [
-            "en" => "Optional memorial",
-            "it" => "Memoria facoltativa",
-            "la" => "Memoria ad libitum"
-        ],
-        "MEMORIAL" => [
-            "en" => "Memorial",
-            "it" => "Memoria",
-            "la" => "Memoria"
-        ],
-        "FEAST" => [
-            "en" => "FEAST",
-            "it" => "FESTA",
-            "la" => "FESTUM"
-        ],
-        "FEAST OF THE LORD" => [
-            "en" => "<B>FEAST OF THE LORD</B>",
-            "it" => "<B>FESTA DEL SIGNORE</B>",
-            "la" => "<B>FESTUM DOMINI</B>"
-        ],
-        "SOLEMNITY" => [
-            "en" => "<B>SOLEMNITY</B>",
-            "it" => "<B>SOLENNITÀ</B>",
-            "la" => "<B>SOLLEMNITAS</B>"
-        ],
-        "HIGHER RANKING SOLEMNITY" => [
-            "en" => "<B><I>celebration with precedence over solemnities</I></B>",
-            "it" => "<B><I>celebrazione con precedenza sulle solennità</I></B>",
-            "la" => "<B><I>celebratione cum præcellentiam super sollemnitates</I></B>"
-        ],
         "Vigil Mass" => [
             "en" => "Vigil Mass",
             "it" => "Messa nella Vigilia",
@@ -394,7 +356,7 @@ class LITCAL_MESSAGES {
         "December"
     ];
     
-    public static function __( string $key, string $locale="LA" ) : string {
+    public static function __( string $key, string $locale="la" ) : string {
         $locale = strtolower($locale);
         if( isset( self::MESSAGES[$key] ) ) {
             if( isset( self::MESSAGES[$key][$locale] ) ) {
@@ -411,36 +373,50 @@ class LITCAL_MESSAGES {
      * Function _G
      * Returns a translated string with the Grade (Rank) of the Festivity
      */
-    public static function _G( int $key, string $locale="LA", bool $html=true ) : string {
-        $locale = strtolower( $locale );
-        $grade = self::__( "FERIA", $locale );
+    public static function _G( int $key, bool $html=true ) : string {
         switch($key){
-            case 0: 
-                $grade = self::__( "FERIA", $locale );
+            case LitGrade::WEEKDAY:
+                /**translators: liturgical rank. Keep lowercase  */
+                $grade = _( "weekday" );
+                $tags = ['<I>','</I>'];
             break;
-            case 1: 
-                $grade = self::__( "COMMEMORATION", $locale );
+            case LitGrade::COMMEMORATION:
+                /**translators: liturgical rank. Keep Capitalized  */
+                $grade = _( "Commemoration" );
+                $tags = ['<I>','</I>'];
             break;
-            case 2: 
-                $grade = self::__( "OPTIONAL MEMORIAL", $locale );
+            case LitGrade::MEMORIAL_OPT:
+                /**translators: liturgical rank. Keep Capitalized  */
+                $grade = _( "Optional memorial" );
             break;
-            case 3: 
-                $grade = self::__( "MEMORIAL", $locale );
+            case LitGrade::MEMORIAL:
+                /**translators: liturgical rank. Keep Capitalized  */
+                $grade = _( "Memorial" );
             break;
-            case 4: 
-                $grade = self::__( "FEAST", $locale );
+            case LitGrade::FEAST:
+                /**translators: liturgical rank. Keep UPPERCASE  */
+                $grade = _( "FEAST" );
             break;
-            case 5: 
-                $grade = self::__( "FEAST OF THE LORD", $locale );
+            case LitGrade::FEAST_LORD:
+                /**translators: liturgical rank. Keep UPPERCASE  */
+                $grade = _( "FEAST OF THE LORD" );
+                $tags = ['<B>','</B>'];
             break;
-            case 6: 
-                $grade = self::__( "SOLEMNITY", $locale );
+            case LitGrade::SOLEMNITY:
+                /**translators: liturgical rank. Keep UPPERCASE  */
+                $grade = _( "SOLEMNITY" );
+                $tags = ['<B>','</B>'];
             break;
-            case 7: 
-                $grade = self::__( "HIGHER RANKING SOLEMNITY", $locale );
+            case LitGrade::HIGHER_SOLEMNITY:
+                /**translators: liturgical rank. Keep lowercase  */
+                $grade = _( "celebration with precedence over solemnities" );
+                $tags = ['<B><I>','</I></B>'];
             break;
+            default:
+                $grade = _( "weekday" );
+                $tags = ['',''];
         }
-        return $html === true ? $grade : strip_tags($grade);
+        return $html ? $tags[0] . $grade . $tags[1] : $grade;
     }
 
     /**
@@ -484,7 +460,7 @@ class LITCAL_MESSAGES {
         return $common;
     }
 
-    public function ColorToHex( string $color ) : string {
+    public static function ColorToHex( string $color ) : string {
         $hex = "#";
         switch($color){
             case "red":
@@ -508,7 +484,7 @@ class LITCAL_MESSAGES {
         return $hex;
     }
 
-    public function ParseColorString( string $string, string $LOCALE, bool $html=false) : string {
+    public static function ParseColorString( string $string, string $LOCALE, bool $html=false) : string {
         if($html === true) {
             if( strpos( $string, "," ) ) {
                 $colors = explode( ",", $string );

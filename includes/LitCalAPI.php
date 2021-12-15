@@ -528,7 +528,7 @@ class LitCalAPI {
         }
 
         //let's add a displayGrade property for AllSouls so applications don't have to worry about fixing it
-        $this->Cal->setProperty( "AllSouls", "displayGrade", strip_tags( _( "COMMEMORATION" ) ) );
+        $this->Cal->setProperty( "AllSouls", "displayGrade", LitCal_Messages::_G( "COMMEMORATION", $this->LITSETTINGS->LOCALE, false ) );
 
         $this->Cal->addSolemnitiesLordBVM( [
             "Easter",
@@ -2086,8 +2086,8 @@ class LitCalAPI {
             $displayGrade = "";
             $displayGradeHTML = "";
             if( $FestivityKey === 'AllSouls' ){
-                $displayGrade = strip_tags( _( "COMMEMORATION" ) );
-                $displayGradeHTML = _( "COMMEMORATION" );
+                $displayGrade = LitCal_Messages::_G( "COMMEMORATION", $this->LITSETTINGS->LOCALE, false );
+                $displayGradeHTML = LitCal_Messages::_G( "COMMEMORATION", $this->LITSETTINGS->LOCALE, true );
             }
             else if( (int)$CalEvent->date->format( 'N' ) !==7 ){
                 if( property_exists( $CalEvent,'displayGrade' ) && $CalEvent->displayGrade !== "" ){
