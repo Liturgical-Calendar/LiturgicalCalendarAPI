@@ -202,6 +202,10 @@ class LITCAL_MESSAGES {
             case 'Dedication of a Church':
                 /**translators: context = from the Common of nn */
                 return _( 'Dedication of a Church' );
+            default:
+                //there are cases where a Common is specific to a single language edition Missal
+                //in that case, we don't need a translation, so just return the original value
+                return $commonGeneral;
         }
     }
 
@@ -285,6 +289,8 @@ class LITCAL_MESSAGES {
             case "For Several Saints":
                 /**translators: context = from the Common of nn: nn */
                 return _( "For Several Saints" );
+            default:
+                return $commonSpecific;
         }
     }
 
@@ -306,28 +312,28 @@ class LITCAL_MESSAGES {
                 switch ($commonGeneral) {
                     case "Blessed Virgin Mary":
                         /**translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                        $commonKey = pgettext( "(SING_FEMM)", "of" );
+                        $possessive = pgettext( "(SING_FEMM)", "of" );
                         break;
                     case "Virgins":
                         /**translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                        $commonKey = pgettext( "(PLUR_FEMM)", "of" );
+                        $possessive = pgettext( "(PLUR_FEMM)", "of" );
                         break;
                     case "Martyrs":
                     case "Pastors":
                     case "Doctors":
                     case "Holy Men and Women":
                         /**translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                        $commonKey = pgettext( "(PLUR_MASC)", "of" );
+                        $possessive = pgettext( "(PLUR_MASC)", "of" );
                         break;
                     case "Dedication of a Church":
                         /**translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                        $commonKey = pgettext( "(SING_FEMM)", "of" );
+                        $possessive = pgettext( "(SING_FEMM)", "of" );
                         break;
                     default:
                         /**translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                        $commonKey = pgettext( "(SING_MASC)", "of" );
+                        $possessive = pgettext( "(SING_MASC)", "of" );
                 }
-                return _( "From the Common" ) . " " . $commonKey . " " . self::_CG( $commonGeneral ) . ($commonSpecific != "" ? ": " . self::_CS( $commonSpecific ) : "");
+                return _( "From the Common" ) . " " . $possessive . " " . self::_CG( $commonGeneral ) . ($commonSpecific != "" ? ": " . self::_CS( $commonSpecific ) : "");
             }, $commons);
             /**translators: when there are multiple possible commons, this will be the glue "or from the common of..." */
             $common = implode( "; " . _( "or" ) . " ", $commons );

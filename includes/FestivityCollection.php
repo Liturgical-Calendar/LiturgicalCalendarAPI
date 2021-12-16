@@ -268,9 +268,9 @@ class FestivityCollection {
             $festivityGrade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $festivity->date->format( 'U' ) ) ) );
         } else {
             if( $festivity->grade > LitGrade::SOLEMNITY ) {
-                $festivityGrade = '<i>' . LITCAL_MESSAGES::_G( $festivity->grade, $LITSETTINGS->LOCALE, false ) . '</i>';
+                $festivityGrade = '<i>' . LitGrade::i18n( $festivity->grade, false ) . '</i>';
             } else {
-                $festivityGrade = LITCAL_MESSAGES::_G( $festivity->grade, $LITSETTINGS->LOCALE, false );
+                $festivityGrade = LitGrade::i18n( $festivity->grade, false );
             }
         }
 
@@ -307,7 +307,7 @@ class FestivityCollection {
                         $coincidingFestivity->grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $VigilDate->format( 'U' ) ) ) );
                     } else{
                         //it's a Feast of the Lord or a Solemnity
-                        $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $LITSETTINGS->LOCALE, false ) );
+                        $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LitGrade::i18n( $coincidingFestivity->event->grade, false ) . '</i>' : LitGrade::i18n( $coincidingFestivity->event->grade, false ) );
                     }
 
                     //suppress warning messages for known situations, like the Octave of Easter
@@ -434,10 +434,10 @@ class FestivityCollection {
         } else if ( $this->inSolemnities( $currentFeastDate ) ) {
             //it's a Feast of the Lord or a Solemnity
             $coincidingFestivity->event = $this->solemnityFromDate( $currentFeastDate );
-            $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $LITSETTINGS->LOCALE, false ) );
+            $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LitGrade::i18n( $coincidingFestivity->event->grade, false ) . '</i>' : LitGrade::i18n( $coincidingFestivity->event->grade, false ) );
         } else if( $this->inFeastsOrMemorials( $currentFeastDate ) ) {
             $coincidingFestivity->event = $this->feastOrMemorialFromDate( $currentFeastDate );
-            $coincidingFestivity->grade = LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $LITSETTINGS->LOCALE, false );
+            $coincidingFestivity->grade = LitGrade::i18n( $coincidingFestivity->event->grade, false );
         }
         return $coincidingFestivity;
     }

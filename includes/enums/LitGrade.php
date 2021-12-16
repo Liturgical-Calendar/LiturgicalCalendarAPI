@@ -90,14 +90,17 @@ class LitGrade {
             case self::MEMORIAL_OPT:
                 /**translators: liturgical rank. Keep Capitalized  */
                 $grade = _( "Optional memorial" );
+                $tags = ['',''];
             break;
             case self::MEMORIAL:
                 /**translators: liturgical rank. Keep Capitalized  */
                 $grade = _( "Memorial" );
+                $tags = ['',''];
             break;
             case self::FEAST:
                 /**translators: liturgical rank. Keep UPPERCASE  */
                 $grade = _( "FEAST" );
+                $tags = ['',''];
             break;
             case self::FEAST_LORD:
                 /**translators: liturgical rank. Keep UPPERCASE  */

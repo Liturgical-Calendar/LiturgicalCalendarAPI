@@ -528,7 +528,7 @@ class LitCalAPI {
         }
 
         //let's add a displayGrade property for AllSouls so applications don't have to worry about fixing it
-        $this->Cal->setProperty( "AllSouls", "displayGrade", LitGrade::i18n( "COMMEMORATION", false ) );
+        $this->Cal->setProperty( "AllSouls", "displayGrade", LitGrade::i18n( LitGrade::COMMEMORATION, false ) );
 
         $this->Cal->addSolemnitiesLordBVM( [
             "Easter",
@@ -2044,7 +2044,7 @@ class LitCalAPI {
 
     private function getGithubReleaseInfo() : stdClass {
         $returnObj = new stdClass();
-        $GithubReleasesAPI = "https://api.github.com/repos/JohnRDOrazio/LiturgicalCalendar/releases/latest";
+        $GithubReleasesAPI = "https://api.github.com/repos/Liturgical-Calendar/LiturgicalCalendarAPI/releases/latest";
         $ch = curl_init();
         curl_setopt( $ch, CURLOPT_URL, $GithubReleasesAPI );
         curl_setopt( $ch, CURLOPT_USERAGENT, 'LiturgicalCalendar' );
@@ -2065,9 +2065,7 @@ class LitCalAPI {
             $returnObj->status = "success";
             $returnObj->obj = $GitHubReleasesObj;
         }
-
         return $returnObj;
-
     }
 
     private function produceIcal( stdClass $SerializeableLitCal, stdClass $GitHubReleasesObj ) : string {
@@ -2086,8 +2084,8 @@ class LitCalAPI {
             $displayGrade = "";
             $displayGradeHTML = "";
             if( $FestivityKey === 'AllSouls' ){
-                $displayGrade = LitGrade::i18n( "COMMEMORATION", false );
-                $displayGradeHTML = LitGrade::i18n( "COMMEMORATION", true );
+                $displayGrade = LitGrade::i18n( LitGrade::COMMEMORATION, false );
+                $displayGradeHTML = LitGrade::i18n( LitGrade::COMMEMORATION, true );
             }
             else if( (int)$CalEvent->date->format( 'N' ) !==7 ){
                 if( property_exists( $CalEvent,'displayGrade' ) && $CalEvent->displayGrade !== "" ){
@@ -2197,7 +2195,7 @@ class LitCalAPI {
             case RETURN_TYPE::ICS:
                 $infoObj = $this->getGithubReleaseInfo();
                 if( $infoObj->status === "success" ) {
-                    $ical = $this->produceIcal( $SerializeableLitCal, $infoObj );
+                    $ical = $this->produceIcal( $SerializeableLitCal, $infoObj->obj );
                     file_put_contents( $this->CACHEFILE, $ical );
                     echo $ical;
                 }
