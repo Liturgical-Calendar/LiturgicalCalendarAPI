@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-15 15:58+0000\n"
-"PO-Revision-Date: 2021-12-15 12:51+0000\n"
+"PO-Revision-Date: 2021-12-16 11:23+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/la/>\n"
@@ -277,34 +277,32 @@ msgstr ""
 #. translators: context = from the Common of nn
 #: includes/LitCalMessages.php:186
 msgid "Martyrs"
-msgstr ""
+msgstr "Martyrum"
 
 #. translators: context = from the Common of nn
 #: includes/LitCalMessages.php:189
 msgid "Pastors"
-msgstr ""
+msgstr "Pastorum"
 
 #. translators: context = from the Common of nn
 #: includes/LitCalMessages.php:192
 msgid "Doctors"
-msgstr ""
+msgstr "Doctorum Ecclesiæ"
 
 #. translators: context = from the Common of nn
 #: includes/LitCalMessages.php:195
 msgid "Virgins"
-msgstr ""
+msgstr "Virginum"
 
 #. translators: context = from the Common of nn
 #: includes/LitCalMessages.php:198
 msgid "Holy Men and Women"
-msgstr ""
+msgstr "Sanctorum et Sanctarum"
 
 #. translators: context = from the Common of nn
 #: includes/LitCalMessages.php:201
-#, fuzzy
-#| msgid "Saturday Memorial of the Blessed Virgin Mary"
 msgid "Blessed Virgin Mary"
-msgstr "Memoria Sanctæ Mariæ in Sabbato"
+msgstr "Beatæ Virginis Mariæ"
 
 #. translators: context = from the Common of nn
 #: includes/LitCalMessages.php:204
