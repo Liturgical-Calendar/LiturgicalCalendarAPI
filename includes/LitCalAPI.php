@@ -41,7 +41,6 @@ class LitCalAPI {
     public function __construct(){
         $this->APICore                              = new APICore();
         $this->CACHEDURATION                        = "_" . CACHEDURATION::MONTH . date( "m" );
-        $this->Cal                                  = new FestivityCollection();
     }
 
     private function initParameterData() {
@@ -2255,6 +2254,7 @@ class LitCalAPI {
     public function Init(){
         $this->APICore->Init();
         $this->initParameterData();
+        $this->Cal = new FestivityCollection( $this->LITSETTINGS );
         $this->APICore->setResponseContentTypeHeader();
         $this->loadLocalCalendarData();
         if( $this->cacheFileIsAvailable() ){
@@ -2288,7 +2288,7 @@ class LitCalAPI {
             }
 
             //$this->setCyclesAndVigils();
-            $this->Cal->setCyclesAndVigils( $this->LITSETTINGS );
+            $this->Cal->setCyclesAndVigils();
             $this->generateResponse();
         }
     }

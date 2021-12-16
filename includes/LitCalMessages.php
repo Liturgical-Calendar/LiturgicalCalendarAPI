@@ -27,31 +27,6 @@ class LITCAL_MESSAGES {
             "it" => "ANNO",
             "la" => "ANNUM"
         ],
-        "green" => [
-            "en" => "green",
-            "it" => "verde",
-            "la" => "viridis"
-        ],
-        "purple" => [
-            "en" => "purple",
-            "it" => "viola",
-            "la" => "purpura"
-        ],
-        "white" => [
-            "en" => "white",
-            "it" => "bianco",
-            "la" => "albus"
-        ],
-        "red" => [
-            "en" => "red",
-            "it" => "rosso",
-            "la" => "ruber"
-        ],
-        "pink" => [
-            "en" => "pink",
-            "it" => "rosa",
-            "la" => "rosea"
-        ],
         "Month" => [
             "en" => "Month",
             "it" => "Mese",
