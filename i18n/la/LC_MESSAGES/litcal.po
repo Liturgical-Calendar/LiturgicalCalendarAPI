@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-16 16:35+0000\n"
-"PO-Revision-Date: 2021-12-16 16:34+0000\n"
+"PO-Revision-Date: 2021-12-17 01:18+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/la/>\n"
@@ -480,11 +480,11 @@ msgstr "Proprium"
 #: includes/FestivityCollection.php:246 includes/FestivityCollection.php:248
 #: includes/FestivityCollection.php:254 includes/FestivityCollection.php:256
 msgid "YEAR"
-msgstr ""
+msgstr "ANNUM"
 
 #: includes/FestivityCollection.php:290
 msgid "Vigil Mass"
-msgstr ""
+msgstr "Missa in Vigilia"
 
 #: includes/FestivityCollection.php:323 includes/FestivityCollection.php:350
 #, php-format
@@ -513,16 +513,13 @@ msgid ""
 msgstr ""
 
 #: includes/FestivityCollection.php:376
-#, fuzzy, php-format
-#| msgid ""
-#| "The Solemnity '%s' coincides with the Solemnity '%s' in the year %d. We "
-#| "should ask the Congregation for Divine Worship what to do about this!"
+#, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We "
 "should ask the Congregation for Divine Worship what to do about this!"
 msgstr ""
-"Sollemnitas <i>'%s'</i> coincidet cum Sollemnitate <i>'%s'</i> in anno %d. "
-"Oportet quaerere a Congregatione Cultu Divino quid facere!"
+"Missa in Vigilia %s '%s' coincidet cum %s'%s' in anno %d. Oportet quaerere a "
+"Congregatione Cultu Divino quid facere!"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:23
