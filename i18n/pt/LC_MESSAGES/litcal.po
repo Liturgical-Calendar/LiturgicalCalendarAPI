@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-15 15:58+0000\n"
+"POT-Creation-Date: 2021-12-16 11:24+0000\n"
 "PO-Revision-Date: 2021-12-14 00:21+0100\n"
 "Last-Translator: Ubuntu <priest@johnromanodorazio.com>\n"
 "Language-Team: Portuguese\n"
@@ -270,170 +270,170 @@ msgid "Dedication of a Church"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:212
+#: includes/LitCalMessages.php:216
 msgid "For One Martyr"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:215
+#: includes/LitCalMessages.php:219
 msgid "For Several Martyrs"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:218
+#: includes/LitCalMessages.php:222
 msgid "For Missionary Martyrs"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:221
+#: includes/LitCalMessages.php:225
 msgid "For One Missionary Martyr"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:224
+#: includes/LitCalMessages.php:228
 msgid "For Several Missionary Martyrs"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:227
+#: includes/LitCalMessages.php:231
 msgid "For a Virgin Martyr"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:230
+#: includes/LitCalMessages.php:234
 msgid "For a Holy Woman Martyr"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:233
+#: includes/LitCalMessages.php:237
 msgid "For a Pope"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:236
+#: includes/LitCalMessages.php:240
 msgid "For a Bishop"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:239
+#: includes/LitCalMessages.php:243
 msgid "For One Pastor"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:242
+#: includes/LitCalMessages.php:246
 msgid "For Several Pastors"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:245
+#: includes/LitCalMessages.php:249
 msgid "For Founders of a Church"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:248
+#: includes/LitCalMessages.php:252
 msgid "For One Founder"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:251
+#: includes/LitCalMessages.php:255
 msgid "For Several Founders"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:254
+#: includes/LitCalMessages.php:258
 msgid "For Missionaries"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:257
+#: includes/LitCalMessages.php:261
 msgid "For One Virgin"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:260
+#: includes/LitCalMessages.php:264
 msgid "For Several Virgins"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:263
+#: includes/LitCalMessages.php:267
 msgid "For Religious"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:266
+#: includes/LitCalMessages.php:270
 msgid "For Those Who Practiced Works of Mercy"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:269
+#: includes/LitCalMessages.php:273
 msgid "For an Abbot"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:272
+#: includes/LitCalMessages.php:276
 msgid "For a Monk"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:275
+#: includes/LitCalMessages.php:279
 msgid "For a Nun"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:278
+#: includes/LitCalMessages.php:282
 msgid "For Educators"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:281
+#: includes/LitCalMessages.php:285
 msgid "For Holy Women"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:284
+#: includes/LitCalMessages.php:288
 msgid "For One Saint"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:287
+#: includes/LitCalMessages.php:291
 msgid "For Several Saints"
 msgstr ""
 
 #. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/LitCalMessages.php:309 includes/LitCalMessages.php:324
+#: includes/LitCalMessages.php:315 includes/LitCalMessages.php:330
 msgctxt "(SING_FEMM)"
 msgid "of"
 msgstr ""
 
 #. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/LitCalMessages.php:313
+#: includes/LitCalMessages.php:319
 msgctxt "(PLUR_FEMM)"
 msgid "of"
 msgstr ""
 
 #. translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/LitCalMessages.php:320
+#: includes/LitCalMessages.php:326
 msgctxt "(PLUR_MASC)"
 msgid "of"
 msgstr ""
 
 #. translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/LitCalMessages.php:328
+#: includes/LitCalMessages.php:334
 msgctxt "(SING_MASC)"
 msgid "of"
 msgstr ""
 
-#: includes/LitCalMessages.php:330
+#: includes/LitCalMessages.php:336
 msgid "From the Common"
 msgstr ""
 
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
-#: includes/LitCalMessages.php:333 includes/LitCalMessages.php:383
+#: includes/LitCalMessages.php:339 includes/LitCalMessages.php:389
 msgid "or"
 msgstr ""
 
 #. translators: context = the Proper as opposed to the Common
-#: includes/LitCalMessages.php:336
+#: includes/LitCalMessages.php:342
 msgid "Proper"
 msgstr ""
 
@@ -463,7 +463,7 @@ msgid "pink"
 msgstr ""
 
 #. translators: liturgical rank. Keep lowercase
-#: includes/enums/LitGrade.php:82 includes/enums/LitGrade.php:118
+#: includes/enums/LitGrade.php:82 includes/enums/LitGrade.php:121
 msgid "weekday"
 msgstr ""
 
@@ -478,26 +478,26 @@ msgid "Optional memorial"
 msgstr ""
 
 #. translators: liturgical rank. Keep Capitalized
-#: includes/enums/LitGrade.php:96
+#: includes/enums/LitGrade.php:97
 msgid "Memorial"
 msgstr ""
 
 #. translators: liturgical rank. Keep UPPERCASE
-#: includes/enums/LitGrade.php:100
+#: includes/enums/LitGrade.php:102
 msgid "FEAST"
 msgstr ""
 
 #. translators: liturgical rank. Keep UPPERCASE
-#: includes/enums/LitGrade.php:104
+#: includes/enums/LitGrade.php:107
 msgid "FEAST OF THE LORD"
 msgstr ""
 
 #. translators: liturgical rank. Keep UPPERCASE
-#: includes/enums/LitGrade.php:109
+#: includes/enums/LitGrade.php:112
 msgid "SOLEMNITY"
 msgstr ""
 
 #. translators: liturgical rank. Keep lowercase
-#: includes/enums/LitGrade.php:114
+#: includes/enums/LitGrade.php:117
 msgid "celebration with precedence over solemnities"
 msgstr ""
