@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-16 12:43+0000\n"
-"PO-Revision-Date: 2021-12-16 11:23+0000\n"
+"PO-Revision-Date: 2021-12-16 16:34+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/la/>\n"
@@ -307,137 +307,137 @@ msgstr "Beatæ Virginis Mariæ"
 #. translators: context = from the Common of nn
 #: includes/LitCalMessages.php:204
 msgid "Dedication of a Church"
-msgstr ""
+msgstr "Dedicationis ecclesiæ"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:216
 msgid "For One Martyr"
-msgstr ""
+msgstr "Pro uno martyre"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:219
 msgid "For Several Martyrs"
-msgstr ""
+msgstr "Pro pluribus martyribus"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:222
 msgid "For Missionary Martyrs"
-msgstr ""
+msgstr "Pro missionariis martyribus"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:225
 msgid "For One Missionary Martyr"
-msgstr ""
+msgstr "Pro uno missionario martyre"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:228
 msgid "For Several Missionary Martyrs"
-msgstr ""
+msgstr "Pro pluribus missionariis martyribus"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:231
 msgid "For a Virgin Martyr"
-msgstr ""
+msgstr "Pro virgine martyre"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:234
 msgid "For a Holy Woman Martyr"
-msgstr ""
+msgstr "Pro una martyre muliere"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:237
 msgid "For a Pope"
-msgstr ""
+msgstr "Pro Papa"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:240
 msgid "For a Bishop"
-msgstr ""
+msgstr "Pro Episcopis"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:243
 msgid "For One Pastor"
-msgstr ""
+msgstr "Pro Pastoribus"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:246
 msgid "For Several Pastors"
-msgstr ""
+msgstr "Pro pluribus pastoribus"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:249
 msgid "For Founders of a Church"
-msgstr ""
+msgstr "Pro Fundatoribus ecclesiarum"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:252
 msgid "For One Founder"
-msgstr ""
+msgstr "Pro Uno Fundatore"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:255
 msgid "For Several Founders"
-msgstr ""
+msgstr "Pro Pluribus Fundatoribus"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:258
 msgid "For Missionaries"
-msgstr ""
+msgstr "Pro missionariis"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:261
 msgid "For One Virgin"
-msgstr ""
+msgstr "Pro una virgine"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:264
 msgid "For Several Virgins"
-msgstr ""
+msgstr "Pro pluribus virginibus"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:267
 msgid "For Religious"
-msgstr ""
+msgstr "Pro Religiosis"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:270
 msgid "For Those Who Practiced Works of Mercy"
-msgstr ""
+msgstr "Pro iis qui opera Misericordiæ Exercuerunt"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:273
 msgid "For an Abbot"
-msgstr ""
+msgstr "Pro abbate"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:276
 msgid "For a Monk"
-msgstr ""
+msgstr "Pro monacho"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:279
 msgid "For a Nun"
-msgstr ""
+msgstr "Pro moniali"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:282
 msgid "For Educators"
-msgstr ""
+msgstr "Pro Educatoribus"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:285
 msgid "For Holy Women"
-msgstr ""
+msgstr "Pro Sanctis Mulieribus"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:288
 msgid "For One Saint"
-msgstr ""
+msgstr "Pro uno Sancto"
 
 #. translators: context = from the Common of nn: nn
 #: includes/LitCalMessages.php:291
 msgid "For Several Saints"
-msgstr ""
+msgstr "Pro pluribus Sanctos"
 
 #. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: includes/LitCalMessages.php:315 includes/LitCalMessages.php:330
@@ -465,42 +465,42 @@ msgstr ""
 
 #: includes/LitCalMessages.php:336
 msgid "From the Common"
-msgstr ""
+msgstr "De Communi"
 
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
 #: includes/LitCalMessages.php:339 includes/LitCalMessages.php:389
 msgid "or"
-msgstr ""
+msgstr "vel"
 
 #. translators: context = the Proper as opposed to the Common
 #: includes/LitCalMessages.php:342
 msgid "Proper"
-msgstr ""
+msgstr "Proprium"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:23
 msgid "green"
-msgstr ""
+msgstr "viridis"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:26
 msgid "purple"
-msgstr ""
+msgstr "purpura"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:29
 msgid "white"
-msgstr ""
+msgstr "albus"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:32
 msgid "red"
-msgstr ""
+msgstr "ruber"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:35
 msgid "pink"
-msgstr ""
+msgstr "rosea"
 
 #. translators: liturgical rank. Keep lowercase
 #: includes/enums/LitGrade.php:82 includes/enums/LitGrade.php:121
