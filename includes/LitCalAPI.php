@@ -1749,16 +1749,18 @@ class LitCalAPI {
         }
         else{
             //if Oct 19 is a Sunday or Solemnity, Saint Paul of the Cross won't exist. But it still needs to be moved to Oct 20 so we must create it again
+            //just keep in mind the StsJeanBrebeuf also won't exist, so we need to retrieve the name from the tempCal
             $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', '20-10-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
             $festivity = $this->Cal->getFestivity( "StPaulCross" );
             if( !$this->Cal->inSolemnities( $currentFeastDate ) && $festivity === null ) {
                 $row = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ "StPaulCross" ];
+                $row2 = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ "StsJeanBrebeuf" ];
                 $festivity = new Festivity( "[ USA ] " . $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
                 $this->Cal->addFestivity( "StPaulCross", $festivity );
                 $this->Messages[] = sprintf(
                     'USA: The optional memorial \'%1$s\' is transferred from Oct 19 to Oct 20 as per the 2011 Roman Missal issued by the USCCB, to make room for \'%2$s\' elevated to the rank of Memorial: applicable to the year %3$d.',
                     $row->NAME,
-                    '<i>' . $this->Cal->getFestivity( "StsJeanBrebeuf" )->name . '</i>',
+                    '<i>' . $row2->NAME . '</i>',
                     $this->LITSETTINGS->YEAR
                 );
             }
