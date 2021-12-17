@@ -7,6 +7,7 @@ on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ development ]
+    paths: [ '**.php' ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -26,16 +27,16 @@ jobs:
       # Runs a single command using the runners shell
       - name: Update source file translation strings
         run: |
-          git checkout development
-          xgettext --from-code=UTF-8 -o i18n/litcal.pot includes/LitCalAPI.php
+          sudo apt-get install -y gettext
+          xgettext --from-code=UTF-8 --add-comments='translators:' --keyword="pgettext:1c,2" -o i18n/litcal.pot includes/LitCalAPI.php includes/LitCalMessages.php includes/FestivityCollection.php includes/enums/LitColor.php includes/enums/LitCommon.php includes/enums/LitGrade.php
 
       - name: Push changes  # push the output folder to your repo
         uses: actions-x/commit@v4
         with:
           # The committer's email address
-          email: ${{ github.actor }}@localhost
+          email: 41898282+github-actions[bot]@users.noreply.github.com
           # The committer's name
-          name: ${{ github.actor }}
+          name: github-actions
           # The commit message
           message: regenerated i18n/litcal.pot from source files
           # The branch to push the changes back to, defaults to the current branch

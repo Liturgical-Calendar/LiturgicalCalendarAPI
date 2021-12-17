@@ -1,0 +1,601 @@
+# Latin translations for PACKAGE package.
+# Copyright (C) 2021 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Ubuntu <priest@johnromanodorazio.com>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-12-17 12:17+0000\n"
+"PO-Revision-Date: 2021-12-17 11:43+0000\n"
+"Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
+"Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
+"liturgical-calendar/api-strings/la/>\n"
+"Language: la\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.9.1\n"
+
+#: includes/LitCalAPI.php:188
+#, php-format
+msgid ""
+"Only years from 1970 and after are supported. You tried requesting the year "
+"%d."
+msgstr ""
+"Petere potes nisi ab annis MCMLXX et ultra. Tu anno %d conatus est petere."
+
+#: includes/LitCalAPI.php:271 includes/LitCalAPI.php:308
+#, php-format
+msgid "%s day before Epiphany"
+msgstr "Dies %s ante Epiphaniam"
+
+#: includes/LitCalAPI.php:285 includes/LitCalAPI.php:321
+#, php-format
+msgid "%s day after Epiphany"
+msgstr "Dies %s post Epiphaniam"
+
+#: includes/LitCalAPI.php:458 includes/LitCalAPI.php:474
+#: includes/LitCalAPI.php:500
+#, php-format
+msgid ""
+"The Solemnity '%s' falls on %s in the year %d, the celebration has been "
+"transferred to %s (%s) as per the %s."
+msgstr ""
+"Coincidet enim Sollemnitas <i>'%s'</i> cum <b>%s</b> in anno %d, ergo "
+"traslata est celebratio ad %s (%s) secundum %s."
+
+#: includes/LitCalAPI.php:462
+msgid "the Saturday preceding Palm Sunday"
+msgstr "sabbatum ante Dominicam in Palmis"
+
+#: includes/LitCalAPI.php:467 includes/LitCalAPI.php:483
+#: includes/LitCalAPI.php:509 includes/LitCalAPI.php:537
+#: includes/LitCalAPI.php:788 includes/LitCalAPI.php:890
+#: includes/LitCalAPI.php:964 includes/LitCalAPI.php:1008
+#: includes/LitCalAPI.php:1071 includes/LitCalAPI.php:1096
+#: includes/LitCalAPI.php:1113 includes/LitCalAPI.php:1177
+#: includes/LitCalAPI.php:1189 includes/LitCalAPI.php:1204
+#: includes/LitCalAPI.php:1230 includes/LitCalAPI.php:1244
+#: includes/LitCalAPI.php:1292 includes/LitCalAPI.php:1347
+#: includes/LitCalAPI.php:1361 includes/LitCalAPI.php:1385
+#: includes/LitCalAPI.php:1402 includes/LitCalAPI.php:1422
+#: includes/LitCalAPI.php:1444 includes/LitCalAPI.php:1458
+#: includes/LitCalAPI.php:1472 includes/FestivityCollection.php:385
+msgid "Decree of the Congregation for Divine Worship"
+msgstr "Decretum Congregationis pro Cultu Divino"
+
+#: includes/LitCalAPI.php:478
+msgid "the Monday following the Second Sunday of Easter"
+msgstr "diem Lunæ post Dominicam Secundam Paschæ"
+
+#: includes/LitCalAPI.php:504
+msgid "the following Monday"
+msgstr "diem Lunæ proximum"
+
+#: includes/LitCalAPI.php:515
+#, php-format
+msgid ""
+"The Solemnity '%s' coincides with the Solemnity '%s' in the year %d. We "
+"should ask the Congregation for Divine Worship what to do about this!"
+msgstr ""
+"Sollemnitas <i>'%s'</i> coincidet cum Sollemnitate <i>'%s'</i> in anno %d. "
+"Oportet quaerere a Congregatione Cultu Divino quid facere!"
+
+#: includes/LitCalAPI.php:533
+#, php-format
+msgid ""
+"Seeing that the Solemnity '%s' coincides with the Solemnity '%s' in the year "
+"%d, it has been anticipated by one day as per %s."
+msgstr ""
+"Ex causa Sollemnitas <i>'%s'</i> coincidet cum Sollemnitate <i>'%s'</i> in "
+"anno %d, anticipata est ab uno die secundum %s."
+
+#: includes/LitCalAPI.php:601
+#, php-format
+msgid ""
+"'%s' falls on a Sunday in the year %d, therefore the Feast '%s' is "
+"celebrated on %s rather than on the Sunday after Christmas."
+msgstr ""
+"'%s' coincidet cum Dominica in anno %d, ergo Festum <i>'%s'</i> celebrentur "
+"die %s quam Dominica post Nativitate."
+
+#: includes/LitCalAPI.php:635 includes/LitCalAPI.php:659
+#: includes/LitCalAPI.php:851
+#, php-format
+msgid "'%s' is superseded by the %s '%s' in the year %d."
+msgstr "<i>'%s'</i> subplantata est ab %s <i>'%s'</i> in anno %d."
+
+#: includes/LitCalAPI.php:712
+#, php-format
+msgid "of the %s Week of Advent"
+msgstr "Hebdomadæ %s Adventus"
+
+#: includes/LitCalAPI.php:729
+#, php-format
+msgid "%s Day of the Octave of Christmas"
+msgstr "Dies %s Octavæ Nativitatis"
+
+#: includes/LitCalAPI.php:753
+#, php-format
+msgid "of the %s Week of Lent"
+msgstr "Hebdomadæ %s Quadragesimæ"
+
+#: includes/LitCalAPI.php:758
+msgid "after Ash Wednesday"
+msgstr "post Feria IV Cinerum"
+
+#: includes/LitCalAPI.php:799 includes/LitCalAPI.php:1044
+#: includes/LitCalAPI.php:1066 includes/LitCalAPI.php:1260
+#: includes/LitCalAPI.php:1312
+#, php-format
+msgid ""
+"The %s '%s' has been added on %s since the year %d (%s), applicable to the "
+"year %d."
+msgstr ""
+"%s <i>'%s'</i> aggregata est igitur in die <b>%s</b> ab anno %d (%s), ergo "
+"viget in anno %d."
+
+#: includes/LitCalAPI.php:836
+#, php-format
+msgid ""
+"The %s '%s' either falls between 17 Dec. and 24 Dec., or during the Octave "
+"of Christmas, or on the weekdays of the Lenten season in the year %d, rank "
+"reduced to Commemoration."
+msgstr ""
+"Accidit %s <i>'%s'</i> aut infra 17 Dec. et 24 Dec. aut infra Octavam "
+"Nativitatis aut infra ferias Quadragesimae in anno %d, ergo reductus est "
+"gradus ad Commemorationem."
+
+#: includes/LitCalAPI.php:868 includes/LitCalAPI.php:885
+#: includes/LitCalAPI.php:902
+#, php-format
+msgid ""
+"The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and "
+"usually celebrated on %s, is suppressed by the %s '%s' in the year %d."
+msgstr ""
+"%s <i>'%s'</i> aggregata in %s Missalis Romani ab anno %d (%s) et plerumque "
+"celebrata in die %s subplantata est ab %s <i>'%s'</i> in anno %d."
+
+#: includes/LitCalAPI.php:925
+#, php-format
+msgid ""
+"The %s '%s', added on %s since the year %d (%s), is however superseded by a "
+"Sunday, a Solemnity or a Feast '%s' in the year %d."
+msgstr ""
+"%s <i>'%s'</i>, aggregata in die %s ab anno %d (%s), subplantata est ab "
+"Dominica, aut Sollemnitate, aut Festu <i>'%s'</i> in anno %d."
+
+#: includes/LitCalAPI.php:960
+#, php-format
+msgid ""
+"The Memorial '%s' coincides with another Memorial '%s' in the year %d. They "
+"are both reduced in rank to optional memorials (%s)."
+msgstr ""
+"Memoria <i>'%s'</i> coincidet cum alia Memoria <i>'%s'</i> in anno %d. Ergo "
+"ambo simul redunctur in gradu Memoriæ ad libitum (%s)."
+
+#: includes/LitCalAPI.php:1002
+#, php-format
+msgid ""
+"The %s '%s' has been raised to the rank of %s since the year %d, applicable "
+"to the year %d (%s)."
+msgstr ""
+"%s <i>'%s'</i> elevata est in gradu %s ab anno %d, ergo applicatur ad anno "
+"%d (%s)."
+
+#: includes/LitCalAPI.php:1069 includes/LitCalAPI.php:1094
+#: includes/LitCalAPI.php:1111
+msgid "the Monday after Pentecost"
+msgstr "dies Lunae post Pentecostem"
+
+#: includes/LitCalAPI.php:1092
+#, php-format
+msgid ""
+"The Memorial '%s', added on %s since the year %d (%s), is however superseded "
+"by a Solemnity or a Feast '%s' in the year %d."
+msgstr ""
+"Memoria <i>'%s'</i> aggregata in die %s ab anno %d (%s), subplantata est ab "
+"Sollemnitate aut Festu <i>'%s'</i> in anno %d."
+
+#: includes/LitCalAPI.php:1107
+#, php-format
+msgid ""
+"The %s '%s' has been suppressed by the Memorial '%s', added on %s since the "
+"year %d (%s)."
+msgstr ""
+"%s '%s' subplantata est ad Memoria '%s', aggregata in die %s ab anno %d (%s)."
+
+#: includes/LitCalAPI.php:1175
+#, php-format
+msgid ""
+"The optional memorial '%s' has been transferred from Dec. 12 to Aug. 12 "
+"since the year 2002 (%s), applicable to the year %d."
+msgstr ""
+"Memoria ad libitum <i>'%s'</i> traslata est de 12 Dec. ad 12 Aug. ab anno "
+"2002 (%s), ergo viget in anno %d."
+
+#: includes/LitCalAPI.php:1187
+#, php-format
+msgid ""
+"The optional memorial '%s', which would have been superseded this year by a "
+"Sunday or Solemnity were it on Dec. 12, has however been transferred to Aug. "
+"12 since the year 2002 (%s), applicable to the year %d."
+msgstr ""
+"Memoria ad libitum <i>'%s'</i> qua subplantata fuisset ab Dominica aut "
+"Sollemnitate si celebrata fuisset in die 12 Dec., nihilominus traslata est "
+"ad 12 Aug. ab anno 2002 (%s), ergo viget in anno %d."
+
+#: includes/LitCalAPI.php:1202
+#, php-format
+msgid ""
+"The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
+"since the year 2002 (%2$s), applicable to the year %3$d. However, it is "
+"superseded by a Sunday, a Solemnity, or a Feast '%4$s' in the year %3$d."
+msgstr ""
+"Memoria ad libitum <i>\\'%1$s\\'</i> traslata est de 12 Dec. ad 12 Aug. ab "
+"anno 2002 (%2$s), ergo viget in anno %3$d. Nihilominus subplantata est ab "
+"Dominica, aut Sollemnitate, aut Festu <i>\\'%4$s\\'</i> in anno %3$d."
+
+#: includes/LitCalAPI.php:1290
+#, php-format
+msgid ""
+"The Feast '%s' would have been suppressed this year ( 2009 ) since it falls "
+"on a Sunday, however being the Year of the Apostle Paul, as per the %s it "
+"has been reinstated so that local churches can optionally celebrate the "
+"memorial."
+msgstr ""
+"Festum '%s' hoc anno ( 2009 ) supprimeretur quia congruit cum Dominica, "
+"tamen quamvis sit Annus Pauli Apostoli, restituta est secundum %s ut "
+"permittant ecclesias locales ad memoriam celebrandam."
+
+#: includes/LitCalAPI.php:1496
+#, php-format
+msgid "of the %s Week of Easter"
+msgstr "Hebdomadæ %s Temporis Paschali"
+
+#: includes/LitCalAPI.php:1532 includes/LitCalAPI.php:1562
+#, php-format
+msgid "of the %s Week of Ordinary Time"
+msgstr "Hebdomadæ %s Temporis Ordinarii"
+
+#: includes/LitCalAPI.php:1586
+msgid "Saturday Memorial of the Blessed Virgin Mary"
+msgstr "Memoria Sanctæ Mariæ in Sabbato"
+
+#: includes/LitCalAPI.php:1639
+#, php-format
+msgid ""
+"The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the "
+"year %d."
+msgstr ""
+"%s '%s', celebrata plerumque in die %s, subplantata est ab %s '%s' in anno "
+"%d."
+
+#. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
+#: includes/LitCalMessages.php:141 includes/LitCalMessages.php:152
+#: includes/enums/LitCommon.php:280
+msgid "or"
+msgstr "vel"
+
+#. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
+#: includes/FestivityCollection.php:36
+msgid "YEAR"
+msgstr "ANNUM"
+
+#: includes/FestivityCollection.php:37
+msgid "Vigil Mass"
+msgstr "Missa in Vigilia"
+
+#: includes/FestivityCollection.php:338 includes/FestivityCollection.php:365
+#, php-format
+msgid ""
+"The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
+"This last Solemnity takes precedence, therefore it will maintain Vespers II "
+"and an evening Mass, while the first Solemnity will not have a Vigil Mass or "
+"Vespers I."
+msgstr ""
+"Missa in Vigilia %s '%s' coincidet cum %s'%s' in anno %d. Sollemnitas ultima "
+"praecedentia habet, ergo servabit Secundis Vesperis atque Missa vesperum, "
+"cum Sollemnitas prima neque Missa in Vigilia neque Primis Vesperis servabit."
+
+#: includes/FestivityCollection.php:351 includes/FestivityCollection.php:409
+#, php-format
+msgid ""
+"The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
+"Since the first Solemnity has precedence, it will have Vespers I and a vigil "
+"Mass, whereas the last Solemnity will not have either Vespers II or an "
+"evening Mass."
+msgstr ""
+
+#: includes/FestivityCollection.php:379
+#, php-format
+msgid ""
+"The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As "
+"per %s, the first has precedence, therefore the Vigil Mass is confirmed as "
+"are I Vespers."
+msgstr ""
+
+#: includes/FestivityCollection.php:391
+#, php-format
+msgid ""
+"The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We "
+"should ask the Congregation for Divine Worship what to do about this!"
+msgstr ""
+"Missa in Vigilia %s '%s' coincidet cum %s'%s' in anno %d. Oportet quaerere a "
+"Congregatione Cultu Divino quid facere!"
+
+#. translators: context = liturgical color
+#: includes/enums/LitColor.php:23
+msgid "green"
+msgstr "viridis"
+
+#. translators: context = liturgical color
+#: includes/enums/LitColor.php:26
+msgid "purple"
+msgstr "purpura"
+
+#. translators: context = liturgical color
+#: includes/enums/LitColor.php:29
+msgid "white"
+msgstr "albus"
+
+#. translators: context = liturgical color
+#: includes/enums/LitColor.php:32
+msgid "red"
+msgstr "ruber"
+
+#. translators: context = liturgical color
+#: includes/enums/LitColor.php:35
+msgid "pink"
+msgstr "rosea"
+
+#: includes/enums/LitCommon.php:66
+msgid "Proper"
+msgstr "Proprium"
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:68
+msgid "Dedication of a Church"
+msgstr "Dedicationis ecclesiæ"
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:70
+msgid "Blessed Virgin Mary"
+msgstr "Beatæ Virginis Mariæ"
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:72
+msgid "Martyrs"
+msgstr "Martyrum"
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:74
+msgid "Pastors"
+msgstr "Pastorum"
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:76
+msgid "Doctors"
+msgstr "Doctorum Ecclesiæ"
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:78
+msgid "Virgins"
+msgstr "Virginum"
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:80
+msgid "Holy Men and Women"
+msgstr "Sanctorum et Sanctarum"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:83
+msgid "For One Martyr"
+msgstr "Pro uno martyre"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:85
+msgid "For Several Martyrs"
+msgstr "Pro pluribus martyribus"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:87
+msgid "For Missionary Martyrs"
+msgstr "Pro missionariis martyribus"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:89
+msgid "For One Missionary Martyr"
+msgstr "Pro uno missionario martyre"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:91
+msgid "For Several Missionary Martyrs"
+msgstr "Pro pluribus missionariis martyribus"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:93
+msgid "For a Virgin Martyr"
+msgstr "Pro virgine martyre"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:95
+msgid "For a Holy Woman Martyr"
+msgstr "Pro una martyre muliere"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:97
+msgid "For a Pope"
+msgstr "Pro Papa"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:99
+msgid "For a Bishop"
+msgstr "Pro Episcopis"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:101
+msgid "For One Pastor"
+msgstr "Pro Pastoribus"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:103
+msgid "For Several Pastors"
+msgstr "Pro pluribus pastoribus"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:105
+msgid "For Founders of a Church"
+msgstr "Pro Fundatoribus ecclesiarum"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:107
+msgid "For One Founder"
+msgstr "Pro Uno Fundatore"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:109
+msgid "For Several Founders"
+msgstr "Pro Pluribus Fundatoribus"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:111
+msgid "For Missionaries"
+msgstr "Pro missionariis"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:113
+msgid "For One Virgin"
+msgstr "Pro una virgine"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:115
+msgid "For Several Virgins"
+msgstr "Pro pluribus virginibus"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:117
+msgid "For Several Saints"
+msgstr "Pro pluribus Sanctos"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:119
+msgid "For One Saint"
+msgstr "Pro uno Sancto"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:121
+msgid "For an Abbot"
+msgstr "Pro abbate"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:123
+msgid "For a Monk"
+msgstr "Pro monacho"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:125
+msgid "For a Nun"
+msgstr "Pro moniali"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:127
+msgid "For Religious"
+msgstr "Pro Religiosis"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:129
+msgid "For Those Who Practiced Works of Mercy"
+msgstr "Pro iis qui opera Misericordiæ Exercuerunt"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:131
+msgid "For Educators"
+msgstr "Pro Educatoribus"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:133
+msgid "For Holy Women"
+msgstr "Pro Sanctis Mulieribus"
+
+#. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: includes/enums/LitCommon.php:180 includes/enums/LitCommon.php:192
+msgctxt "(SING_FEMM)"
+msgid "of"
+msgstr ""
+
+#. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: includes/enums/LitCommon.php:183
+msgctxt "(PLUR_FEMM)"
+msgid "of"
+msgstr ""
+
+#. translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: includes/enums/LitCommon.php:189
+msgctxt "(PLUR_MASC)"
+msgid "of"
+msgstr ""
+
+#. translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: includes/enums/LitCommon.php:195
+msgctxt "(SING_MASC)"
+msgid "of"
+msgstr ""
+
+#: includes/enums/LitCommon.php:276
+msgid "From the Common"
+msgstr "De Communi"
+
+#. translators: liturgical rank. Keep lowercase
+#: includes/enums/LitGrade.php:88 includes/enums/LitGrade.php:127
+msgid "weekday"
+msgstr "feria"
+
+#. translators: liturgical rank. Keep Capitalized
+#: includes/enums/LitGrade.php:93
+msgid "Commemoration"
+msgstr "Commemoratio"
+
+#. translators: liturgical rank. Keep Capitalized
+#: includes/enums/LitGrade.php:98
+msgid "Optional memorial"
+msgstr "Memoria ad libitum"
+
+#. translators: liturgical rank. Keep Capitalized
+#: includes/enums/LitGrade.php:103
+msgid "Memorial"
+msgstr "Memoria"
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: includes/enums/LitGrade.php:108
+msgid "FEAST"
+msgstr "FESTUM"
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: includes/enums/LitGrade.php:113
+msgid "FEAST OF THE LORD"
+msgstr "FESTUM DOMINI"
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: includes/enums/LitGrade.php:118
+msgid "SOLEMNITY"
+msgstr "SOLLEMNITAS"
+
+#. translators: liturgical rank. Keep lowercase
+#: includes/enums/LitGrade.php:123
+msgid "celebration with precedence over solemnities"
+msgstr "celebratio altioris ordinis quam sollemnitatis"
+
+#~ msgid "COMMEMORATION"
+#~ msgstr "<I>Commemoratio</I>"
+
+#~ msgid ""
+#~ "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) "
+#~ "usually celebrated on %s, is suppressed by the %s '%s' in the year %d."
+#~ msgstr ""
+#~ "%s <i>'%s'</i> aggregata in %s Missalis Romani ab anno %d (%s) et "
+#~ "plerumque celebrata in die %s subplantata est ab %s <i>'%s'</i> in anno "
+#~ "%d."

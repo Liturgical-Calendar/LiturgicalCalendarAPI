@@ -8,9 +8,6 @@
 
 ini_set('date.timezone', 'Europe/Vatican');
 
-define("LITURGYAPP", "AMDG");
-include_once( "LitCalConfig.php" );
-
 /**
  *  THE ENTIRE LITURGICAL CALENDAR DEPENDS MAINLY ON THE DATE OF EASTER
  *  THE FOLLOWING LITCALFUNCTIONS.PHP DEFINES AMONG OTHER THINGS THE FUNCTION
@@ -21,6 +18,30 @@ include_once( "LitCalConfig.php" );
 class LitCalFf {
 
   const NON_EVENT_KEYS = [ 'LitCal', 'Settings', 'Messages', 'Metadata', 'SOLEMNITIES', 'FEASTS_MEMORIALS' ];
+
+  public static function isNotLitCalEventKey( string $key ) : bool {
+    return in_array( $key, self::NON_EVENT_KEYS );
+  }
+
+  public static function convertArray2XML(array $data, ?SimpleXMLElement &$xml) : void {
+    foreach( $data as $key => $value ) {
+      if( is_array( $value ) ) {
+        if( self::isNotLitCalEventKey( $key ) ) {
+          $new_object = $xml->addChild( $key );
+        } else {
+          $new_object = $xml->addChild( "LitCalEvent" );
+          $new_object->addAttribute( "eventkey", $key );
+        }
+        self::convertArray2XML( $value, $new_object );
+      } else {
+        // if the key is a number, it needs text with it to actually work
+        if( is_numeric( $key ) ) {
+          $key = "numeric_$key";
+        }
+        $xml->addChild( $key, $value );
+      }
+    }
+  }
 
   // https://en.wikipedia.org/wiki/Computus#Anonymous_Gregorian_algorithm
   // aka Meeus/Jones/Butcher algorithm
@@ -99,116 +120,6 @@ class LitCalFf {
         */
     }
     return $dateObj;
-  }
-
-
-  /** 
-   * Ordinal Suffix function
-   * Useful for choosing the correct suffix for ordinal numbers
-   * in the English language
-   * @Author: John Romano D'Orazio
-   */
-  public static function ordSuffix(int $ord) : string {
-    $ord_suffix = ''; //st, nd, rd, th
-    if ($ord === 1 || ($ord % 10 === 1  && $ord <> 11)) {
-      $ord_suffix = 'st';
-    } else if ($ord === 2 || ($ord % 10 === 2  && $ord <> 12)) {
-      $ord_suffix = 'nd';
-    } else if ($ord === 3 || ($ord % 10 === 3  && $ord <> 13)) {
-      $ord_suffix = 'rd';
-    } else {
-      $ord_suffix = 'th';
-    }
-    return $ord_suffix;
-  }
-
-  public static function ordinal( int $number ) : string {
-    $ends = array('th','st','nd','rd','th','th','th','th','th','th');
-    if ((($number % 100) >= 11) && (($number%100) <= 13))
-        return $number. 'th';
-    else
-        return $number. $ends[$number % 10];
-  }
-
-
-  /**
-   * @param int $num
-   * @param string $LOCALE
-   * @param NumberFormatter $formatter
-   * @param string[] $latinOrdinals
-   */
-  public static function getOrdinal(int $num, string $LOCALE, NumberFormatter $formatter, array $latinOrdinals) : string {
-    $ordinal = "";
-    switch($LOCALE){
-        case 'LA':
-            $ordinal = $latinOrdinals[$num];
-        break;
-        case 'EN':
-            $ordinal = $num . self::ordSuffix($num);
-        break;
-        default:
-            $ordinal = $formatter->format($num);
-    }
-    return $ordinal;
-  }
-  
-  /**
-   * Database Connection function
-   */
-  
-  public static function databaseConnect() : stdClass {
-  
-    $retObject = new stdClass();
-    $retObject->retString = "";
-    $retObject->mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_NAME);
-  
-    if ($retObject->mysqli->connect_errno) {
-      $retObject->retString .= "Failed to connect to MySQL: (" . $retObject->mysqli->connect_errno . ") " . $retObject->mysqli->connect_error . PHP_EOL;
-      return $retObject;
-    } else {
-      $retObject->retString .= sprintf("Connected to MySQL Database: %s\n", DB_NAME);
-    }
-    if (!$retObject->mysqli->set_charset(DB_CHARSET)) {
-      $retObject->retString .= sprintf("Error loading character set utf8: %s\n", $retObject->mysqli->error);
-    } else {
-      $retObject->retString .= sprintf("Current character set: %s\n", $retObject->mysqli->character_set_name());
-    }
-
-    return $retObject;
-  }
-
-  public static function isNotLitCalEventKey( string $key ) : bool {
-    return in_array( $key, self::NON_EVENT_KEYS );
-  }
-
-  public static function convertArray2XML(array $data, ?SimpleXMLElement &$xml) : void {
-    foreach( $data as $key => $value ) {
-      if( is_array( $value ) ) {
-        if( self::isNotLitCalEventKey( $key ) ) {
-          $new_object = $xml->addChild( $key );
-        } else {
-          $new_object = $xml->addChild( "LitCalEvent" );
-          $new_object->addAttribute( "eventkey", $key );
-        }
-        self::convertArray2XML( $value, $new_object );
-      } else {
-        // if the key is a number, it needs text with it to actually work
-        if( is_numeric( $key ) ) {
-          $key = "numeric_$key";
-        }
-        $xml->addChild( $key, $value );
-      }
-    }
-  }
-
-  /**
-   * psalterWeek function
-   * Calculates the current Week of the Psalter (from 1 to 4)
-   * based on the week of Ordinary Time
-   * OR the week of Advent, Christmas, Lent, or Easter
-   */
-  public static function psalterWeek( int $weekOfOrdinaryTimeOrSeason ) : int {
-    return $weekOfOrdinaryTimeOrSeason % 4 === 0 ? 4 : $weekOfOrdinaryTimeOrSeason % 4;
   }
 
 }

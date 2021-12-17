@@ -1,482 +1,9 @@
 <?php
 
+include_once( 'includes/enums/LitColor.php' );
+
 class LITCAL_MESSAGES {
 
-    const MESSAGES = [
-        "%s day before Epiphany" => [
-            "en" => "%s day before Epiphany",
-            "it" => "%s giorno prima dell'Epifania",
-            "la" => "Dies %s ante Epiphaniam"
-        ],
-        "%s day after Epiphany" => [
-            "en" => "%s day after Epiphany",
-            "it" => "%s giorno dopo l'Epifania",
-            "la" => "Dies %s post Epiphaniam"
-        ],
-        "of the %s Week of Ordinary Time" => [
-            "en" => "of the %s Week of Ordinary Time",
-            "it" => "della %s Settimana del Tempo Ordinario",
-            "la" => "Hebdomadæ %s Temporis Ordinarii"
-        ],
-        "of the %s Week of Easter" => [
-            "en" => "of the %s Week of Easter",
-            "it" => "della %s Settimana di Pasqua",
-            "la" => "Hebdomadæ %s Temporis Paschali"
-        ],
-        "of the %s Week of Advent" => [
-            "en" => "of the %s Week of Advent",
-            "it" => "della %s Settimana dell'Avvento",
-            "la" => "Hebdomadæ %s Adventus"
-        ],
-        "%s Day of the Octave of Christmas" => [
-            "en" => "%s Day of the Octave of Christmas",
-            "it" => "%s Giorno dell'Ottava di Natale",
-            "la" => "Dies %s Octavæ Nativitatis"
-        ],
-        "of the %s Week of Lent" => [
-            "en" => "of the %s Week of Lent",
-            "it" => "della %s Settimana di Quaresima",
-            "la" => "Hebdomadæ %s Quadragesimæ"
-        ],
-        "after Ash Wednesday" => [
-            "en" => "after Ash Wednesday",
-            "it" => "dopo il Mercoledì delle Ceneri",
-            "la" => "post Feria IV Cinerum"
-        ],
-        "Saturday Memorial of the Blessed Virgin Mary" => [
-            "en" => "Saturday Memorial of the Blessed Virgin Mary",
-            "it" => "Memoria di Santa Maria in sabato",
-            "la" => "Memoria Sanctæ Mariæ in Sabbato"
-        ],
-        /* The following strings would usually be used by a user-facing application, 
-         *  however I decided to add them here seeing they are just as useful for generating
-         *  the ICS calendar output, which is pretty final as it is, 
-         *  there are no client applications that take care of localization...
-         */
-        "YEAR" => [
-            "en" => "YEAR",
-            "it" => "ANNO",
-            "la" => "ANNUM"
-        ],
-        "From the Common" => [
-            "en" => "From the Common",
-            "it" => "Dal Comune",
-            "la" => "De Communi"
-        ],
-        "of (SING_MASC)" => [
-            "en" => "of",
-            "it" => "del",
-            "la" => ""
-        ],
-        "of (SING_FEMM)" => [
-            "en" => "of the",
-            "it" => "della",
-            "la" => "" //latin expresses the genitive in the declination of the noun, no need for a preposition, leave empty
-        ],
-        "of (PLUR_MASC)" => [
-            "en" => "of",
-            "it" => "dei",
-            "la" => "" //latin expresses the genitive in the declination of the noun, no need for a preposition, leave empty
-        ],
-        "of (PLUR_MASC_ALT)" => [
-            "en" => "of",
-            "it" => "degli",
-            "la" => "" //latin expresses the genitive in the declination of the noun, no need for a preposition, leave empty
-        ],
-        "of (PLUR_FEMM)" => [
-            "en" => "of",
-            "it" => "delle",
-            "la" => "" //latin expresses the genitive in the declination of the noun, no need for a preposition, leave empty
-        ],
-        /*translators: in reference to the Common of the Blessed Virgin Mary */
-        "Blessed Virgin Mary" => [
-            "en" => "Blessed Virgin Mary",
-            "it" => "Beata Vergine Maria",
-            "la" => "Beatæ Virginis Mariæ"
-        ],
-        /*translators: all of the following are in the genitive case, in reference to "from the Common of %s" */
-        "Martyrs" => [
-            "en" => "Martyrs",
-            "it" => "Martiri",
-            "la" => "Martyrum"
-        ],
-        "Pastors" => [
-            "en" => "Pastors",
-            "it" => "Pastori",
-            "la" => "Pastorum"
-        ],
-        "Doctors" => [
-            "en" => "Doctors",
-            "it" => "Dottori della Chiesa",
-            "la" => "Doctorum Ecclesiæ"
-        ],
-        "Virgins" => [
-            "en" => "Virgins",
-            "it" => "Vergini",
-            "la" => "Virginum"
-        ],
-        "Holy Men and Women" => [
-            "en" => "Holy Men and Women",
-            "it" => "Santi e delle Sante",
-            "la" => "Sanctorum et Sanctarum"
-        ],
-        "For One Martyr" => [
-            "en" => "For One Martyr",
-            "it" => "Per un martire",
-            "la" => "Pro uno martyre"
-        ],
-        "For Several Martyrs" => [
-            "en" => "For Several Martyrs",
-            "it" => "Per più martiri",
-            "la" => "Pro pluribus martyribus"
-        ],
-        "For Missionary Martyrs" => [
-            "en" => "For Missionary Martyrs",
-            "it" => "Per i martiri missionari",
-            "la" => "Pro missionariis martyribus"
-        ],
-        "For One Missionary Martyr" => [
-            "en" => "For One Missionary Martyr",
-            "it" => "Per un martire missionario",
-            "la" => "Pro uno missionario martyre"
-        ],
-        "For Several Missionary Martyrs" => [
-            "en" => "For Several Missionary Martyrs",
-            "it" => "Per più martiri missionari",
-            "la" => "Pro pluribus missionariis martyribus"
-        ],
-        "For a Virgin Martyr" => [
-            "en" => "For a Virgin Martyr",
-            "it" => "Per una vergine martire",
-            "la" => "Pro virgine martyre"
-        ],
-        "For a Holy Woman Martyr" => [
-            "en" => "For a Holy Woman Martyr",
-            "it" => "Per una santa martire",
-            "la" => "Pro una martyre muliere",
-        ],
-        "For a Pope" => [
-            "en" => "For a Pope",
-            "it" => "Per i papi",
-            "la" => "Pro Papa"
-        ],
-        "For a Bishop" => [
-            "en" => "For a Bishop",
-            "it" => "Per i vescovi",
-            "la" => "Pro Episcopis"
-        ],
-        "For One Pastor" => [
-            "en" => "For One Pastor",
-            "it" => "Per un pastore",
-            "la" => "Pro Pastoribus"
-        ],
-        "For Several Pastors" => [
-            "en" => "For Several Pastors",
-            "it" => "Per i pastori",
-            "la" => "Pro Pastoribus"
-        ],
-        "For Founders of a Church" => [
-            "en" => "For Founders of a Church",
-            "it" => "Per i fondatori delle chiese",
-            "la" => "Pro Fundatoribus ecclesiarum"
-        ],
-        "For One Founder" => [
-            "en" => "For One Founder",
-            "it" => "Per un fondatore",
-            "la" => "Pro Uno Fundatore"
-        ],
-        "For Several Founders" => [
-            "en" => "For Several Founders",
-            "it" => "Per più fondatori",
-            "la" => "Pro Pluribus Fundatoribus"
-        ],
-        "For Missionaries" => [
-            "en" => "For Missionaries",
-            "it" => "Per i missionari",
-            "la" => "Pro missionariis"
-        ],
-        "For One Virgin" => [
-            "en" => "For One Virgin",
-            "it" => "Per una vergine",
-            "la" => "Pro una virgine"
-        ],
-        "For Several Virgins" => [
-            "en" => "For Several Virgins",
-            "it" => "Per più vergini",
-            "la" => "Pro pluribus virginibus"
-        ],
-        "For Religious" => [
-            "en" => "For Religious",
-            "it" => "Per i religiosi",
-            "la" => "Pro Religiosis"
-        ],
-        "For Those Who Practiced Works of Mercy" => [
-            "en" => "For Those Who Practiced Works of Mercy",
-            "it" => "Per gli operatori di misericordia",
-            "la" => "Pro iis qui opera Misericordiæ Exercuerunt"
-        ],
-        "For an Abbot" => [
-            "en" => "For an Abbot",
-            "it" => "Per un abate",
-            "la" => "Pro abbate"
-        ],
-        "For a Monk" => [
-            "en" => "For a Monk",
-            "it" => "Per un monaco",
-            "la" => "Pro monacho"
-        ],
-        "For a Nun" => [
-            "en" => "For a Nun",
-            "it" => "Per i religiosi",
-            "la" => "Pro moniali"
-        ],
-        "For Educators" => [
-            "en" => "For Educators",
-            "it" => "Per gli educatori",
-            "la" => "Pro Educatoribus"
-        ],
-        "For Holy Women" => [
-            "en" => "For Holy Women",
-            "it" => "Per le sante",
-            "la" => "Pro Sanctis Mulieribus"
-        ],
-        "For One Saint" => [
-            "en" => "For One Saint",
-            "it" => "Per un Santo",
-            "la" => "Pro uno Sancto"
-        ],
-        "For Several Saints" => [
-            "en" => "For Several Saints",
-            "it" => "Per più Santi",
-            "la" => "Pro pluribus Sanctos"
-        ],
-        "or" => [
-            "en" => "or",
-            "it" => "oppure",
-            "la" => "vel"
-        ],
-        "Proper" => [
-            "en" => "Proper",
-            "it" => "Proprio",
-            "la" => "Proprium"
-        ],
-        "green" => [
-            "en" => "green",
-            "it" => "verde",
-            "la" => "viridis"
-        ],
-        "purple" => [
-            "en" => "purple",
-            "it" => "viola",
-            "la" => "purpura"
-        ],
-        "white" => [
-            "en" => "white",
-            "it" => "bianco",
-            "la" => "albus"
-        ],
-        "red" => [
-            "en" => "red",
-            "it" => "rosso",
-            "la" => "ruber"
-        ],
-        "pink" => [
-            "en" => "pink",
-            "it" => "rosa",
-            "la" => "rosea"
-        ],
-        "Month" => [
-            "en" => "Month",
-            "it" => "Mese",
-            "la" => "Mensis"
-        ],
-        "FERIA" => [
-            "en" => "<I>weekday</I>",
-            "it" => "<I>feria</I>",
-            "la" => "<I>feria</I>"
-        ],
-        "COMMEMORATION" => [
-            "en" => "<I>Commemoration</I>",
-            "it" => "<I>Commemorazione</I>",
-            "la" => "<I>Commemoratio</I>"
-        ],
-        "OPTIONAL MEMORIAL" => [
-            "en" => "Optional memorial",
-            "it" => "Memoria facoltativa",
-            "la" => "Memoria ad libitum"
-        ],
-        "MEMORIAL" => [
-            "en" => "Memorial",
-            "it" => "Memoria",
-            "la" => "Memoria"
-        ],
-        "FEAST" => [
-            "en" => "FEAST",
-            "it" => "FESTA",
-            "la" => "FESTUM"
-        ],
-        "FEAST OF THE LORD" => [
-            "en" => "<B>FEAST OF THE LORD</B>",
-            "it" => "<B>FESTA DEL SIGNORE</B>",
-            "la" => "<B>FESTUM DOMINI</B>"
-        ],
-        "SOLEMNITY" => [
-            "en" => "<B>SOLEMNITY</B>",
-            "it" => "<B>SOLENNITÀ</B>",
-            "la" => "<B>SOLLEMNITAS</B>"
-        ],
-        "HIGHER RANKING SOLEMNITY" => [
-            "en" => "<B><I>celebration with precedence over solemnities</I></B>",
-            "it" => "<B><I>celebrazione con precedenza sulle solennità</I></B>",
-            "la" => "<B><I>celebratione cum præcellentiam super sollemnitates</I></B>"
-        ],
-        "Decree of the Congregation for Divine Worship" => [
-            "en" => "Decree of the Congregation for Divine Worship",
-            "it" => "Decreto della Congregazione per il Culto Divino",
-            "la" => "Decretum Congregationis pro Cultu Divino"
-        ],
-        "Only years from 1970 and after are supported. You tried requesting the year %d." => [
-            "en" => "Only years from 1970 and after are supported. You tried requesting the year %d.",
-            "it" => "Soltanto anni dal 1970 in poi sono supportati. Hai provato a richiedere l'anno %d.",
-            "la" => "Tantum ab anno MCMLXX et ultra præsto sunt. Tu anno %d conatus est petere."
-        ],
-        "The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to %s (%s) as per the %s." => [
-            "en" => "The Solemnity <i>'%s'</i> falls on <b>%s</b> in the year %d, the celebration has been transferred to %s (%s) as per the %s.",
-            "it" => "La Solennità <i>'%s'</i> coincide con <b>%s</b> nell'anno %d, pertanto la celebrazione è stata trasferita al %s (%s) in accordo con il %s.",
-            "la" => "Coincidet enim Sollemnitas <i>'%s'</i> cum <b>%s</b> in anno %d, ergo traslata est celebratio ad %s (%s) secundum %s."
-        ],
-        "'%s' falls on a Sunday in the year %d, therefore the Feast '%s' is celebrated on %s rather than on the Sunday after Christmas." => [
-            "en" => "'%s' falls on a Sunday in the year %d, therefore the Feast <i>'%s'</i> is celebrated on %s rather than on the Sunday after Christmas.",
-            "it" => "'%s' coincide con una Domenica nell'anno %d, pertanto la Festa <i>'%s'</i> viene celebrata il %s anziché la Domenica dopo Natale.",
-            "la" => "'%s' coincidet cum Dominica in anno %d, ergo Festum <i>'%s'</i> celebrentur die %s quam Dominica post Nativitate."
-        ],
-        "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d." => [
-            "en" => "The %s <i>'%s'</i>, usually celebrated on <b>%s</b>, is suppressed by the %s <i>'%s'</i> in the year %d.",
-            "it" => "La %s  <i>'%s'</i>, che di solito sarebbe celebrata il giorno <b>%s</b>, viene soppiantata dalla %s <i>'%s'</i> nell'anno %d.",
-            "la" => "%s <i>'%s'</i> quo plerumque celebratur in die <b>%s</b> subplantata est ab %s <i>'%s'</i> in anno %d."
-        ],
-        "The %s '%s' either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration." => [
-            "en" => "The %s <i>'%s'</i> either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration.",
-            "it" => "La %s <i>'%s'</i> cade o tra il 17 Dic. e il 24 Dic., o durante l'Ottava di Natale, o tra le ferie della Quaresima nell'anno %d, pertanto il grado è stato ridotto a Commemorazione.",
-            "la" => "Accidit %s <i>'%s'</i> accidit aut infra 17 Dec. et 24 Dec. aut infra Octavam Nativitatis aut infra feriae Quadragesimae in anno %d, ergo reductus est gradus ad Commemorationem."
-        ],
-        "'%s' is superseded by the %s '%s' in the year %d." => [
-            "en" => "<i>'%s'</i> is superseded by the %s <i>'%s'</i> in the year %d.",
-            "it" => "<i>'%s'</i> è soppiantata dalla %s <i>'%s'</i> nell'anno %d.",
-            "la" => "<i>'%s'</i> subplantata est ab %s <i>'%s'</i> in anno %d."
-        ],
-        "The Memorial '%s' coincides with another Memorial '%s' in the year %d. They are both reduced in rank to optional memorials (%s)." => [
-            "en" => "The Memorial <i>'%s'</i> coincides with another Memorial <i>'%s'</i> in the year %d. They are both reduced in rank to optional memorials (%s).",
-            "it" => "La Memoria obbligatoria <i>'%s'</i> coincide con l'altra Memoria obbligatoria <i>'%s'</i> nell'anno %d. Pertanto tutte e due sono ridotte di grado a Memoria facoltativa (%s).",
-            "la" => "Memoria <i>'%s'</i> coincidet cum alia Memoria <i>'%s'</i> in anno %d. Ergo ambo simul redunctur in gradu Memoriæ ad libitum (%s)."
-        ],
-        "The %s '%s' has been raised to the rank of %s since the year %d, applicable to the year %d (%s)." => [
-            "en" => "The %s <i>'%s'</i> has been raised to the rank of %s since the year %d, applicable to the year %d (%s).",
-            "it" => "La %s <i>'%s'</i> è stata elevata al grado di %s dall'anno %d, applicabile pertanto all'anno %d (%s).",
-            "la" => "%s <i>'%s'</i> elevata est in gradu %s ab anno %d, ergo applicatur ad anno %d (%s)."
-        ],
-        "In the year %d '%s' is superseded by the %s '%s', added on %s since the year %d (%s)." => [
-            "en" => "In the year %d <i>'%s'</i> is superseded by the %s <i>'%s'</i>, added on <b>%s</b> since the year 2002 (%s).",
-            "it" => "Nell'anno %d, <i>'%s'</i> è soppiantata dalla %s <i>'%s'</i>, aggiunta il giorno <b>%s</b> dall'anno %d (%s).",
-            "la" => "In anno %d <i>'%s'</i> subplantata est ab %s <i>'%s'</i> aggregata in die <b>%s</b> ab anno %d (%s)."
-        ],
-        "The %s '%s', added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d." => [
-            "en" => "The %s <i>'%s'</i>, added in the Tertia Editio Typica of the Roman Missal since the year 2002 (%s) and usually celebrated on %s, is suppressed by the %s <i>'%s'</i> in the year %d.",
-            "it" => "La %s <i>'%s'</i>, aggiunta nella Terza Edizione Tipica del Messale Romano dall'anno 2002 (%s) e celebrata solitamente il giorno %s, è soppressa dalla %s <i>'%s'</i> nell'anno %d.",
-            "la" => "%s <i>'%s'</i> aggregata in Editione Typica Tertia Missalis Romani ab anno 2002 (%s) et plerumque celebrata in die %s subplantata est ab %s <i>'%s'</i> in anno %d."
-        ],
-        "The optional memorial '%s' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%s), applicable to the year %d." => [
-            "en" => "The optional memorial <i>'%s'</i> has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%s), applicable to the year %d.",
-            "it" => "La memoria facoltativa <i>'%s'</i> è stata trasferita dal 12 Dic. al 12 Agosto a partire dall'anno 2002 (%s), applicabile pertanto all'anno %d.",
-            "la" => "Memoria ad libitum <i>'%s'</i> traslata est de 12 Dec. ad 12 Aug. ab anno 2002 (%s), ergo viget in anno %d."
-        ],
-        "The optional memorial '%s', which would have been superseded this year by a Sunday or Solemnity were it on Dec. 12, has however been transferred to Aug. 12 since the year 2002 (%s), applicable to the year %d." => [
-            "en" => "The optional memorial <i>'%s'</i>, which would have been superseded this year by a Sunday or Solemnity were it on Dec. 12, has however been transferred to Aug. 12 since the year 2002 (%s), applicable to the year %d.",
-            "it" => "La memoria facoltativa <i>'%s'</i>, che sarebbe stata soppressa quest'anno da una Domenica o da una Solennità se fosse celebrata il 12 dic., è stata tuttavia trasferita al 12 Agosto a partire dall'anno 2002 (%s), applicabile pertanto all'anno %d.",
-            "la" => "Memoria ad libitum <i>'%s'</i> qua subplantata fuisset ab Dominica aut Sollemnitate si celebrata fuisset in die 12 Dec., nihilominus traslata est ad 12 Aug. ab anno 2002 (%s), ergo viget in anno %d."
-        ],
-        'The optional memorial \'%1$s\' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d. However, it is superseded by a Sunday, a Solemnity, or a Feast \'%4$s\' in the year %3$d.' => [
-            "en" => 'The optional memorial <i>\'%1$s\'</i> has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d. However, it is superseded by a Sunday, a Solemnity, or a Feast  <i>\'%4$s\'</i> in the year %3$d.',
-            "it" => 'La memoria facoltativa <i>\'%1$s\'</i> è stata trasferita dal 12 Dic. al 12 Agosto a partire dall\'anno 2002 (%2$s), applicabile pertanto all\'anno %3$d. Tuttavia è soppressa da una Domenica, una Solennità o una Festa  <i>\'%4$s\'</i> nell\'anno %3$d.',
-            "la" => 'Memoria ad libitum <i>\'%1$s\'</i> traslata est de 12 Dec. ad 12 Aug. ab anno 2002 (%2$s), ergo viget in anno %3$d. Nihilominus subplantata est ab Dominica, aut Sollemnitate, aut Festu  <i>\'%4$s\'</i> in anno %3$d.'
-        ],
-        "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." => [
-            "en" => "The %s <i>'%s'</i> has been added on <b>%s</b> since the year %d (%s), applicable to the year %d.",
-            "it" => "La %s <i>'%s'</i> è stata inserita il giorno <b>%s</b> a partire dall'anno %d (%s), applicabile pertanto all'anno %d.",
-            "la" => "%s <i>'%s'</i> aggregata est igitur in die <b>%s</b> ab anno %d (%s), ergo viget in anno %d. "
-        ],
-        "The optional memorial '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d." => [
-            "en" => "The optional memorial <i>'%s'</i>, added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast <i>'%s'</i> in the year %d.",
-            "it" => "La memoria facoltativa <i>'%s'</i>, è stata inserita il giorno %s a partire dall'anno %d (%s), tuttavia è soppressa da una Domenica, una Solennità o una Festa <i>'%s'</i> nell'anno %d.",
-            "la" => "Memoria ad libitum <i>'%s'</i>, aggregata est igitur in die %s ab anno %d (%s). Nihilominus subplantata est ab Dominica, aut Sollemnitate, aut Festu <i>'%s'</i> in anno %d. "
-        ],
-        "The Memorial '%s', added on %s since the year %d (%s), is however superseded by a Solemnity or a Feast '%s' in the year %d." => [
-            "en" => "The Memorial <i>'%s'</i> has been added on %s since the year %d (%s), is however superseded by a Solemnity or a Feast <i>'%s'</i> in the year %d.",
-            "it" => "La Memoria <i>'%s'</i> è stata inserita il giorno %s a partire dall'anno %d (%s), tuttavia è soppressa da una Solennità o una Festa <i>'%s'</i> nell'anno %d.",
-            "la" => "Memoria <i>'%s'</i> aggregata est igitur in die %s ab anno %d (%s). Nihilominus subplantata est ab Sollemnitate aut Festu <i>'%s'</i> in anno %d. "
-        ],
-        "the Monday after Pentecost" => [
-            "en" => "the Monday after Pentecost",
-            "it" => "il lunedì dopo la Pentecoste",
-            "la" => "dies Lunae post Pentecostem"
-        ],
-        "The %s '%s' has been suppressed by the Memorial '%s', added on %s since the year %d (%s)." => [
-            "en" => "The %s <i>'%s'</i> has been suppressed by the Memorial <i>'%s'</i>, added on %s since the year %d (%s).",
-            "it" => "La %s <i>'%s'</i> è stata soppressa dalla Memoria <i>'%s'</i>, aggiunta %s a partire dall'anno %d (%s).",
-            "la" => "%s <i>'%s'</i> subplantata est ab Memoria <i>'%s'</i>, aggregata in %s ab anno %d (%s)."
-        ],
-        "The Solemnity '%s' coincides with the Solemnity '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!" => [
-            "en" => "The Solemnity <i>'%s'</i> coincides with the Solemnity <i>'%s'</i> in the year %d. We should ask the Congregation for Divine Worship what to do about this!",
-            "it" => "La Solennità <i>'%s'</i> coincide con la Solennità <i>'%s'</i> nell'anno %d. Dovremmo chiedere alla Congregazione del Culto Divino cosa fare a riguardo!",
-            "la" => "Sollemnitas <i>'%s'</i> coincidet cum Sollemnitate <i>'%s'</i> in anno %d. Oportet quaerere a Congregatione Cultu Divino quid facere!"
-        ],
-        "Seeing that the Solemnity '%s' coincides with the Solemnity '%s' in the year %d, it has been anticipated by one day as per %s." => [
-            "en" => "Seeing that the Solemnity <i>'%s'</i> coincides with the Solemnity <i>'%s'</i> in the year %d, the prior has been moved forward by one day as per %s.",
-            "it" => "Visto che la Solennità <i>'%s'</i> coincide con la Solennità <i>'%s'</i> nell'anno %d, la prima è stata anticipata di un giorno per %s.",
-            "la" => "Quod ratione Sollemnitas <i>'%s'</i> coincidet cum Sollemnitate <i>'%s'</i> in anno %d, sollemnitas prima ??? anticipata est ab uno die ??? (%s)"
-        ],
-        "the following Monday" => [
-            "en" => "the following Monday",
-            "it" => "lunedì seguente",
-            "la" => "diem Lunæ proximum"
-        ],
-        "the Saturday preceding Palm Sunday" => [
-            "en" => "the Saturday preceding Palm Sunday",
-            "it" => "sabato che precede la Domenica delle Palme",
-            "la" => "sabbatum ante Dominicam in Palmis"
-        ],
-        "the Monday following the Second Sunday of Easter" => [
-            "en" => "the Monday following the Second Sunday of Easter",
-            "it" => "lunedì che segue la Seconda Domenica di Pasqua",
-            "la" => "diem Lunæ post Dominicam Secundam Paschæ"
-        ],
-        "Vigil Mass" => [
-            "en" => "Vigil Mass",
-            "it" => "Messa nella Vigilia",
-            "la" => "Missa Vigiliæ"
-        ],
-        "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!" => [
-            "en" => "The Vigil Mass for the %s <i>'%s'</i> coincides with the %s <i>'%s'</i> in the year %d. We should ask the Congregation for Divine Worship what to do about this!",
-            "it" => "La Messa nella Vigilia per la %s <i>'%s'</i> coincide con la %s <i>'%s'</i> nell'anno %d. Dovremmo chiedere alla Congregazione del Culto come comportarsi!",
-            "la" => "Missa Vigiliæ (de %s <i>'%s'</i>) coincidet cum (%s <i>'%s'</i>) in anno %d. Oportet quaerere a Congregatione Cultu Divino quid facere!"
-        ],
-        "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass." => [
-            "en" => "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass.",
-            "it" => "La Messa nella Vigilia per la %s <i>'%s'</i> coincide con la %s <i>'%s'</i> nell'anno %d. Dato che la prima ha la precedenza, avrà i Vespri I e una Messa di vigilia, mentre l'ultima non avrà né i Vespri II né una Messa serale.",
-            "la" => "Missa Vigiliæ (de %s <i>'%s'</i>) coincidet cum (%s <i>'%s'</i>) in anno %d. Quia Sollemnitas prima præcellentiam habet super secundam, I Vesperas haberet et Missam vigiliæ, cum Sollemnitas ultima necque II Vesperas nec Missam ad vesperam haberet."
-        ],
-        "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while  the first Solemnity will not have a Vigil Mass or Vespers I." => [
-            "en" => "The Vigil Mass for the %s <i>'%s'</i> coincides with the %s <i>'%s'</i> in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while  the first Solemnity will not have a Vigil Mass or Vespers I.",
-            "it" => "La Messa nella Vigilia per la %s <i>'%s'</i> coincide con la %s <i>'%s'</i> nell'anno %d. Dato che quest'ultima ha la precedenza, manterrà i Vespri II e una Messa serale, mentre la prima non avrà né una Messa di vigilia né i Vespri I.",
-            "la" => "Missa Vigiliæ (de %s <i>'%s'</i>) coincidet cum (%s <i>'%s'</i>) in anno %d. Sollemnitas ultima præcellentiam habet super primam, ergo II Vesperas et Missam ad vesperam haberet, cum Sollemnitas prima necque I Vesperas nec Missam vigiliæ haberet."
-        ],
-        "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As per %s, the first has precedence, therefore the Vigil Mass is confirmed as are I Vespers." => [
-            "en" => "The Vigil Mass for the %s <i>'%s'</i> coincides with the %s '%s' in the year %d. As per %s, the first has precedence, therefore the Vigil Mass is confirmed as are I Vespers.",
-            "it" => "La Messa nella Vigilia per la %s <i>'%s'</i> coincide con la %s <i>'%s'</i> nell'anno %d. Secondo il %s, la prima ha la precedenza, pertanto avrà i Vespri I e una Messa di vigilia, mentre l'ultima non avrà né i Vespri II né una Messa serale.",
-            "la" => "Missa Vigiliæ (de %s <i>'%s'</i>) coincidet cum (%s <i>'%s'</i>) in anno %d. Secundum %s, prima præcellentiam habet, ergo I Vesperas haberet et Missam vigiliæ, cum Sollemnitas ultima necque II Vesperas nec Missam ad vesperam haberet."
-        ]
-    ];
-    
     const LATIN_ORDINAL = [
         "",
         "primus",
@@ -578,98 +105,9 @@ class LITCAL_MESSAGES {
         "November",
         "December"
     ];
-    
-    public static function __( string $key, string $locale="LA" ) : string {
-        $locale = strtolower($locale);
-        if( isset( self::MESSAGES[$key] ) ) {
-            if( isset( self::MESSAGES[$key][$locale] ) ) {
-                return self::MESSAGES[$key][$locale];
-            }
-            else{
-                return $key;
-            }
-        }
-        return $key;
-    }
 
-    /**
-     * Function _G
-     * Returns a translated string with the Grade (Rank) of the Festivity
-     */
-    public static function _G( int $key, string $locale="LA", bool $html=true ) : string {
-        $locale = strtolower( $locale );
-        $grade = self::__( "FERIA", $locale );
-        switch($key){
-            case 0: 
-                $grade = self::__( "FERIA", $locale );
-            break;
-            case 1: 
-                $grade = self::__( "COMMEMORATION", $locale );
-            break;
-            case 2: 
-                $grade = self::__( "OPTIONAL MEMORIAL", $locale );
-            break;
-            case 3: 
-                $grade = self::__( "MEMORIAL", $locale );
-            break;
-            case 4: 
-                $grade = self::__( "FEAST", $locale );
-            break;
-            case 5: 
-                $grade = self::__( "FEAST OF THE LORD", $locale );
-            break;
-            case 6: 
-                $grade = self::__( "SOLEMNITY", $locale );
-            break;
-            case 7: 
-                $grade = self::__( "HIGHER RANKING SOLEMNITY", $locale );
-            break;
-        }
-        return $html === true ? $grade : strip_tags($grade);
-    }
 
-    /**
-     * Function _C
-     * Gets a translated human readable string with the Common or the Proper
-     */
-    public static function _C( string $common, string $locale="la" ) : string {
-        $locale = strtolower($locale);
-        if ($common !== "" && $common !== "Proper") {
-            $commons = explode(",", $common);
-            $commons = array_map(function ($txt) use ($locale) {
-                $commonArr = explode(":", $txt);
-                $commonGeneral = self::__( $commonArr[0], $locale );
-                $commonSpecific = isset($commonArr[1]) && $commonArr[1] != "" ? self::__( $commonArr[1], $locale ) : "";
-                //$txt = str_replace(":", ": ", $txt);
-                switch ($commonGeneral) {
-                    case self::__( "Blessed Virgin Mary", $locale ):
-                        $commonKey = "of (SING_FEMM)";
-                        break;
-                    case self::__( "Virgins", $locale ):
-                        $commonKey = "of (PLUR_FEMM)";
-                        break;
-                    case self::__( "Martyrs", $locale ):
-                    case self::__( "Pastors", $locale ):
-                    case self::__( "Doctors", $locale ):
-                    case self::__( "Holy Men and Women", $locale ):
-                        $commonKey = "of (PLUR_MASC)";
-                        break;
-                    case self::__( "Dedication of a Church", $locale ):
-                        $commonKey = "of (SING_FEMM)";
-                        break;
-                    default:
-                        $commonKey = "of (SING_MASC)";
-                }
-                return self::__( "From the Common", $locale ) . " " . self::__( $commonKey, $locale ) . " " . $commonGeneral . ($commonSpecific != "" ? ": " . $commonSpecific : "");
-            }, $commons);
-            $common = implode( "; " . self::__( "or", $locale) . " ", $commons );
-        } else if ($common == "Proper") {
-            $common = self::__( "Proper", $locale );
-        }
-        return $common;
-    }
-
-    public function ColorToHex( string $color ) : string {
+    public static function ColorToHex( string $color ) : string {
         $hex = "#";
         switch($color){
             case "red":
@@ -693,31 +131,81 @@ class LITCAL_MESSAGES {
         return $hex;
     }
 
-    public function ParseColorString( string $string, string $LOCALE, bool $html=false) : string {
-        if($html === true) {
+    public static function ParseColorString( string $string, string $LOCALE, bool $html=false) : string {
+        if( $html === true ) {
             if( strpos( $string, "," ) ) {
                 $colors = explode( ",", $string );
                 $colors = array_map( function($txt) use ($LOCALE) {
-                    return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $txt ) . '">' . self::__( $txt, $LOCALE ) . '</FONT></SPAN></I></B>';
+                    return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $txt ) . '">' . LitColor::i18n( $txt, $LOCALE ) . '</FONT></SPAN></I></B>';
                 }, $colors );
-                return implode( ' <I><FONT FACE="Calibri">' . self::__( "or", $LOCALE ) . "</FONT></I> ", $colors );
+                return implode( ' <I><FONT FACE="Calibri">' . _( "or" ) . "</FONT></I> ", $colors );
             }
             else{
-                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $string ) . '">' . self::__( $string, $LOCALE ) . '</FONT></SPAN></I></B>';
+                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $string ) . '">' . LitColor::i18n( $string, $LOCALE ) . '</FONT></SPAN></I></B>';
             }
         } else{
-            if(strpos($string,",")){
-                $colors = explode(",",$string);
-                $colors = array_map(function($txt) use ($LOCALE){
-                    return self::__( $txt, $LOCALE );
-                },$colors);
-                return implode(" " . self::__( "or", $LOCALE ) . " ",$colors);
+            if( strpos( $string, "," ) ) {
+                $colors = explode( ",", $string );
+                $colors = array_map( function($txt) use($LOCALE) {
+                    return LitColor::i18n( $txt, $LOCALE );
+                }, $colors );
+                return implode( " " . _( "or" ) . " ", $colors );
             }
             else{
-                return self::__( $string, $LOCALE );
+                return LitColor::i18n( $string, $LOCALE );
             }
         }
         return $string; //should never get here
+    }
+
+    /**
+     * Ordinal Suffix function
+     * Useful for choosing the correct suffix for ordinal numbers
+     * in the English language
+     * @Author: John Romano D'Orazio
+     */
+    public static function ordSuffix(int $ord) : string {
+        $ord_suffix = ''; //st, nd, rd, th
+        if ($ord === 1 || ($ord % 10 === 1  && $ord <> 11)) {
+        $ord_suffix = 'st';
+        } else if ($ord === 2 || ($ord % 10 === 2  && $ord <> 12)) {
+        $ord_suffix = 'nd';
+        } else if ($ord === 3 || ($ord % 10 === 3  && $ord <> 13)) {
+        $ord_suffix = 'rd';
+        } else {
+        $ord_suffix = 'th';
+        }
+        return $ord_suffix;
+    }
+
+    /*public static function ordinal( int $number ) : string {
+        $ends = array('th','st','nd','rd','th','th','th','th','th','th');
+        if ((($number % 100) >= 11) && (($number%100) <= 13))
+            return $number. 'th';
+        else
+            return $number. $ends[$number % 10];
+    }*/
+
+
+    /**
+     * @param int $num
+     * @param string $LOCALE
+     * @param NumberFormatter $formatter
+     * @param string[] $latinOrdinals
+     */
+    public static function getOrdinal(int $num, string $LOCALE, NumberFormatter $formatter, array $latinOrdinals) : string {
+        $ordinal = "";
+        switch($LOCALE){
+            case 'LA':
+                $ordinal = $latinOrdinals[$num];
+            break;
+            case 'EN':
+                $ordinal = $num . self::ordSuffix($num);
+            break;
+            default:
+                $ordinal = $formatter->format($num);
+        }
+        return $ordinal;
     }
 
 }

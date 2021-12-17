@@ -15,11 +15,29 @@ class FestivityCollection {
     private array $WEEKDAYS_EPIPHANY                = [];
     private array $SOLEMNITIES_LORD_BVM             = [];
     private array $SUNDAYS_ADVENT_LENT_EASTER       = [];
+    private array $T                                = [];
+    private IntlDateFormatter $dayOfTheWeek;
+    private LITSETTINGS $LITSETTINGS;
+    private LitGrade $LitGrade;
     const SUNDAY_CYCLE              = [ "A", "B", "C" ];
     const WEEKDAY_CYCLE             = [ "I", "II" ];
 
-    public function __construct() {
-        //nothing particular about this
+    public function __construct( LITSETTINGS $LITSETTINGS ) {
+        $this->LITSETTINGS = $LITSETTINGS;
+        $this->dayOfTheWeek = IntlDateFormatter::create( strtolower( $this->LITSETTINGS->LOCALE ), IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEEE" );
+        if( $this->LITSETTINGS->LOCALE === 'LA' ) {
+            $this->T = [
+                "YEAR"          => "ANNUM",
+                "Vigil Mass"    => "Missa in Vigilia"
+            ];
+        } else {
+            $this->T = [
+                /**translators: in reference to the cycle of liturgical years (A, B, C; I, II) */
+                "YEAR"          => _( "YEAR" ),
+                "Vigil Mass"    => _( "Vigil Mass" )
+            ];
+        }
+        $this->LitGrade = new LitGrade( $this->LITSETTINGS->LOCALE );
     }
 
     private static function DateIsSunday( DateTime $dt ) : bool {
@@ -57,11 +75,11 @@ class FestivityCollection {
         //Sundays of Advent, Lent, Easter
         if( preg_match( '/(?:Advent|Lent|Easter)([1-7])/', $key, $matches ) === 1 ) {
             $this->SUNDAYS_ADVENT_LENT_EASTER[] = $festivity->date;
-            $this->festivities[ $key ]->psalterWeek = intval( $matches[1] ) % 4 === 0 ? 4 : intval( $matches[1] ) % 4;
+            $this->festivities[ $key ]->psalterWeek = self::psalterWeek( intval( $matches[1] ) );
         }
         //Ordinary Sunday Psalter Week
         if( preg_match( '/OrdSunday([1-9][0-9]*)/', $key, $matches ) === 1 ) {
-            $this->festivities[ $key ]->psalterWeek = intval( $matches[1] ) % 4 === 0 ? 4 : intval( $matches[1] ) % 4;
+            $this->festivities[ $key ]->psalterWeek = self::psalterWeek( intval( $matches[1] ) );
         }
     }
 
@@ -236,28 +254,28 @@ class FestivityCollection {
         unset( $this->festivities[ $key ] );
     }
 
-    public function setCyclesAndVigils( LitSettings $LITSETTINGS ) {
+    public function setCyclesAndVigils() {
         foreach( $this->festivities as $key => $festivity ) {
             if ( self::DateIsNotSunday( $festivity->date ) && (int)$festivity->grade === LitGrade::WEEKDAY ) {
                 if ( $festivity->date < $this->festivities[ "Advent1" ]->date ) {
-                    $this->festivities[ $key ]->liturgicalYear = LITCAL_MESSAGES::__( "YEAR", $LITSETTINGS->LOCALE ) . " " . ( self::WEEKDAY_CYCLE[ ( $LITSETTINGS->YEAR - 1 ) % 2 ] );
+                    $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::WEEKDAY_CYCLE[ ( $this->LITSETTINGS->YEAR - 1 ) % 2 ] );
                 } else if ( $festivity->date >= $this->festivities[ "Advent1" ]->date ) {
-                    $this->festivities[ $key ]->liturgicalYear = LITCAL_MESSAGES::__( "YEAR", $LITSETTINGS->LOCALE ) . " " . ( self::WEEKDAY_CYCLE[ $LITSETTINGS->YEAR % 2 ] );
+                    $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::WEEKDAY_CYCLE[ $this->LITSETTINGS->YEAR % 2 ] );
                 }
             }
             //if we're dealing with a Sunday or a Solemnity or a Feast of the Lord, then we calculate the Sunday/Festive Cycle
             else if( self::DateIsSunday( $festivity->date ) || (int)$festivity->grade > LitGrade::FEAST ) {
                 if ( $festivity->date < $this->festivities[ "Advent1" ]->date ) {
-                    $this->festivities[ $key ]->liturgicalYear = LITCAL_MESSAGES::__( "YEAR", $LITSETTINGS->LOCALE ) . " " . ( self::SUNDAY_CYCLE[ ( $LITSETTINGS->YEAR - 1 ) % 3 ] );
+                    $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::SUNDAY_CYCLE[ ( $this->LITSETTINGS->YEAR - 1 ) % 3 ] );
                 } else if ( $festivity->date >= $this->festivities[ "Advent1" ]->date ) {
-                    $this->festivities[ $key ]->liturgicalYear = LITCAL_MESSAGES::__( "YEAR", $LITSETTINGS->LOCALE ) . " " . ( self::SUNDAY_CYCLE[ $LITSETTINGS->YEAR % 3 ] );
+                    $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::SUNDAY_CYCLE[ $this->LITSETTINGS->YEAR % 3 ] );
                 }
-                $this->calculateVigilMass( $key, $festivity, $LITSETTINGS );
+                $this->calculateVigilMass( $key, $festivity );
             }
         }
     }
 
-    private function calculateVigilMass( string $key, Festivity $festivity, LITSETTINGS $LITSETTINGS ) {
+    private function calculateVigilMass( string $key, Festivity $festivity ) {
 
         //Let's calculate Vigil Masses while we're at it
         //We'll create new events and add metadata
@@ -265,12 +283,12 @@ class FestivityCollection {
         $VigilDate->sub( new DateInterval( 'P1D' ) );
         $festivityGrade = '';
         if( self::DateIsSunday( $festivity->date ) && $festivity->grade < LitGrade::SOLEMNITY ) {
-            $festivityGrade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $festivity->date->format( 'U' ) ) ) );
+            $festivityGrade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( $this->dayOfTheWeek->format( $festivity->date->format( 'U' ) ) );
         } else {
             if( $festivity->grade > LitGrade::SOLEMNITY ) {
-                $festivityGrade = '<i>' . LITCAL_MESSAGES::_G( $festivity->grade, $LITSETTINGS->LOCALE, false ) . '</i>';
+                $festivityGrade = '<i>' . $this->LitGrade->i18n( $festivity->grade, false ) . '</i>';
             } else {
-                $festivityGrade = LITCAL_MESSAGES::_G( $festivity->grade, $LITSETTINGS->LOCALE, false );
+                $festivityGrade = $this->LitGrade->i18n( $festivity->grade, false );
             }
         }
 
@@ -284,7 +302,7 @@ class FestivityCollection {
                 && false === ( $festivity->date > $this->festivities[ "Easter" ]->date && $festivity->date < $this->festivities[ "Easter2" ]->date )
             ){
                 $this->festivities[ $key . "_vigil" ] = new Festivity( 
-                    $festivity->name . " " . LITCAL_MESSAGES::__( "Vigil Mass", $LITSETTINGS->LOCALE ),
+                    $festivity->name . " " . $this->T[ "Vigil Mass" ],
                     $VigilDate,
                     $festivity->color,
                     $festivity->type,
@@ -304,10 +322,10 @@ class FestivityCollection {
                     $coincidingFestivity->event = $this->festivities[ $coincidingFestivity->key ];
                     if( self::DateIsSunday( $VigilDate ) && $coincidingFestivity->event->grade < LitGrade::SOLEMNITY ){
                         //it's a Sunday
-                        $coincidingFestivity->grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $VigilDate->format( 'U' ) ) ) );
+                        $coincidingFestivity->grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( $this->dayOfTheWeek->format( $VigilDate->format( 'U' ) ) );
                     } else{
                         //it's a Feast of the Lord or a Solemnity
-                        $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $LITSETTINGS->LOCALE, false ) );
+                        $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $coincidingFestivity->event->grade, false ) . '</i>' : $this->LitGrade->i18n( $coincidingFestivity->event->grade, false ) );
                     }
 
                     //suppress warning messages for known situations, like the Octave of Easter
@@ -317,12 +335,12 @@ class FestivityCollection {
                             $festivity->hasVesperI = false;
                             $coincidingFestivity->event->hasVesperII = true;
                             $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while  the first Solemnity will not have a Vigil Mass or Vespers I.", $LITSETTINGS->LOCALE ),
+                                _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while the first Solemnity will not have a Vigil Mass or Vespers I." ),
                                 $festivityGrade,
                                 $festivity->name,
                                 $coincidingFestivity->grade,
                                 $coincidingFestivity->event->name,
-                                $LITSETTINGS->YEAR
+                                $this->LITSETTINGS->YEAR
                             );
                         }
                         else if( $festivity->grade > $coincidingFestivity->event->grade || ( $this->isSolemnityLordBVM( $key ) && !$this->isSolemnityLordBVM( $coincidingFestivity->key ) ) ) {
@@ -330,12 +348,12 @@ class FestivityCollection {
                             $festivity->hasVesperI = true;
                             $coincidingFestivity->event->hasVesperII = false;
                             $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass.", $LITSETTINGS->LOCALE ),
+                                _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass." ),
                                 $festivityGrade,
                                 $festivity->name,
                                 $coincidingFestivity->grade,
                                 $coincidingFestivity->event->name,
-                                $LITSETTINGS->YEAR
+                                $this->LITSETTINGS->YEAR
                             );
                         }
                         else if( in_array( $coincidingFestivity->key, $this->SOLEMNITIES_LORD_BVM ) && !in_array( $key, $this->SOLEMNITIES_LORD_BVM ) ){
@@ -344,38 +362,38 @@ class FestivityCollection {
                             $festivity->hasVigilMass = false;
                             unset( $this->festivities[ $key . "_vigil" ] );
                             $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while  the first Solemnity will not have a Vigil Mass or Vespers I.", $LITSETTINGS->LOCALE ),
+                                _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while the first Solemnity will not have a Vigil Mass or Vespers I." ),
                                 $festivityGrade,
                                 $festivity->name,
                                 $coincidingFestivity->grade,
                                 $coincidingFestivity->event->name,
-                                $LITSETTINGS->YEAR
+                                $this->LITSETTINGS->YEAR
                             );
                         } else {
-                            if( $LITSETTINGS->YEAR === 2022 ){
+                            if( $this->LITSETTINGS->YEAR === 2022 ){
                                 if( $key === 'SacredHeart' || $key === 'Lent3' || $key === 'Assumption' ){
                                     $coincidingFestivity->event->hasVesperII = false;
                                     $festivity->hasVesperI = true;
                                     $festivity->hasVigilMass = true;
                                     $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                        LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As per %s, the first has precedence, therefore the Vigil Mass is confirmed as are I Vespers.", $LITSETTINGS->LOCALE ),
+                                        _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As per %s, the first has precedence, therefore the Vigil Mass is confirmed as are I Vespers." ),
                                         $festivityGrade,
                                         $festivity->name,
                                         $coincidingFestivity->grade,
                                         $coincidingFestivity->event->name,
-                                        $LITSETTINGS->YEAR,
-                                        '<a href="http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html">' . LITCAL_MESSAGES::__( "Decree of the Congregation for Divine Worship", $LITSETTINGS->LOCALE ) . '</a>'
+                                        $this->LITSETTINGS->YEAR,
+                                        '<a href="http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html">' . _( "Decree of the Congregation for Divine Worship" ) . '</a>'
                                     );
                                 }
                             }
                             else {
                                 $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                    LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!", $LITSETTINGS->LOCALE ),
+                                    _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!" ),
                                     $festivityGrade,
                                     $festivity->name,
                                     $coincidingFestivity->grade,
                                     $coincidingFestivity->event->name,
-                                    $LITSETTINGS->YEAR
+                                    $this->LITSETTINGS->YEAR
                                 );
                             }
                         }
@@ -388,12 +406,12 @@ class FestivityCollection {
                         ){
 
                             $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                LITCAL_MESSAGES::__( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass.", $LITSETTINGS->LOCALE ),
+                                _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass." ),
                                 $festivityGrade,
                                 $festivity->name,
                                 $coincidingFestivity->grade,
                                 $coincidingFestivity->event->name,
-                                $LITSETTINGS->YEAR
+                                $this->LITSETTINGS->YEAR
                             );
                         }
                     }
@@ -424,23 +442,32 @@ class FestivityCollection {
         return array_merge( $this->feasts, $this->memorials );
     }
 
-    public function determineSundaySolemnityOrFeast( DateTime $currentFeastDate, LitSettings $LITSETTINGS ) : stdClass {
+    public function determineSundaySolemnityOrFeast( DateTime $currentFeastDate ) : stdClass {
         $coincidingFestivity = new stdClass();
         $coincidingFestivity->grade = '';
         if( self::DateIsSunday( $currentFeastDate ) && $this->solemnityFromDate( $currentFeastDate )->grade < LitGrade::SOLEMNITY ){
             //it's a Sunday
             $coincidingFestivity->event = $this->solemnityFromDate( $currentFeastDate );
-            $coincidingFestivity->grade = $LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
+            $coincidingFestivity->grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( $this->dayOfTheWeek->format( $currentFeastDate->format( 'U' ) ) );
         } else if ( $this->inSolemnities( $currentFeastDate ) ) {
             //it's a Feast of the Lord or a Solemnity
             $coincidingFestivity->event = $this->solemnityFromDate( $currentFeastDate );
-            $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $LITSETTINGS->LOCALE, false ) );
+            $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $coincidingFestivity->event->grade, false ) . '</i>' : $this->LitGrade->i18n( $coincidingFestivity->event->grade, false ) );
         } else if( $this->inFeastsOrMemorials( $currentFeastDate ) ) {
             $coincidingFestivity->event = $this->feastOrMemorialFromDate( $currentFeastDate );
-            $coincidingFestivity->grade = LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $LITSETTINGS->LOCALE, false );
+            $coincidingFestivity->grade = $this->LitGrade->i18n( $coincidingFestivity->event->grade, false );
         }
         return $coincidingFestivity;
     }
 
+    /**
+     * psalterWeek function
+     * Calculates the current Week of the Psalter (from 1 to 4)
+     * based on the week of Ordinary Time
+     * OR the week of Advent, Christmas, Lent, or Easter
+     */
+    public static function psalterWeek( int $weekOfOrdinaryTimeOrSeason ) : int {
+        return $weekOfOrdinaryTimeOrSeason % 4 === 0 ? 4 : $weekOfOrdinaryTimeOrSeason % 4;
+    }
 
 }

@@ -71,7 +71,62 @@ class LitGrade {
 
     public static array $values = [ 0, 1, 2, 3, 4, 5, 6, 7 ];
 
+    private string $locale;
+
+    public function __construct( string $locale ) {
+        $this->locale = $locale;
+    }
+
     public static function isValid( int $value ) {
         return in_array( $value, self::$values );
+    }
+
+    public function i18n( int $value, bool $html = true ) {
+        switch( $value ) {
+            case self::WEEKDAY:
+                /**translators: liturgical rank. Keep lowercase  */
+                $grade = $this->locale === 'LA' ? 'feria'                 : _( "weekday" );
+                $tags = ['<I>','</I>'];
+            break;
+            case self::COMMEMORATION:
+                /**translators: liturgical rank. Keep Capitalized  */
+                $grade = $this->locale === 'LA' ? 'Commemoratio'          : _( "Commemoration" );
+                $tags = ['<I>','</I>'];
+            break;
+            case self::MEMORIAL_OPT:
+                /**translators: liturgical rank. Keep Capitalized  */
+                $grade = $this->locale === 'LA' ? 'Memoria ad libitum'    : _( "Optional memorial" );
+                $tags = ['',''];
+            break;
+            case self::MEMORIAL:
+                /**translators: liturgical rank. Keep Capitalized  */
+                $grade = $this->locale === 'LA' ? 'Memoria obligatoria'   : _( "Memorial" );
+                $tags = ['',''];
+            break;
+            case self::FEAST:
+                /**translators: liturgical rank. Keep UPPERCASE  */
+                $grade = $this->locale === 'LA' ? 'FESTUM'                : _( "FEAST" );
+                $tags = ['',''];
+            break;
+            case self::FEAST_LORD:
+                /**translators: liturgical rank. Keep UPPERCASE  */
+                $grade = $this->locale === 'LA' ? 'FESTUM DOMINI'         : _( "FEAST OF THE LORD" );
+                $tags = ['<B>','</B>'];
+            break;
+            case self::SOLEMNITY:
+                /**translators: liturgical rank. Keep UPPERCASE  */
+                $grade = $this->locale === 'LA' ? 'SOLLEMNITAS'           : _( "SOLEMNITY" );
+                $tags = ['<B>','</B>'];
+            break;
+            case self::HIGHER_SOLEMNITY:
+                /**translators: liturgical rank. Keep lowercase  */
+                $grade = $this->locale === 'LA' ? 'celebratio altioris ordinis quam sollemnitatis' : _( "celebration with precedence over solemnities" );
+                $tags = ['<B><I>','</I></B>'];
+            break;
+            default:
+                $grade = $this->locale === 'LA' ? 'feria'                 : _( "weekday" );
+                $tags = ['',''];
+        }
+        return $html ? $tags[0] . $grade . $tags[1] : $grade;
     }
 }

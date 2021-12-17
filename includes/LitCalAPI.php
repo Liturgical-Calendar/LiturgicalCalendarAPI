@@ -2,6 +2,10 @@
 
 include_once( 'includes/enums/AcceptHeader.php' );
 include_once( 'includes/enums/CacheDuration.php' );
+include_once( 'includes/enums/LitColor.php' );
+include_once( 'includes/enums/LitCommon.php' );
+include_once( 'includes/enums/LitFeastType.php' );
+include_once( 'includes/enums/LitGrade.php' );
 include_once( 'includes/enums/RequestMethod.php' );
 include_once( 'includes/enums/RequestContentType.php' );
 include_once( 'includes/enums/ReturnType.php' );
@@ -23,11 +27,15 @@ class LitCalAPI {
     private string $CACHEFILE                       = "";
     private array $ALLOWED_RETURN_TYPES;
     private LITSETTINGS $LITSETTINGS;
+    private LitCommon $LitCommon;
+    private LitGrade $LitGrade;
 
     private ?object $DiocesanData                   = null;
     private ?object $GeneralIndex                   = null;
     private NumberFormatter $formatter;
     private NumberFormatter $formatterFem;
+    private IntlDateFormatter $dayAndMonth;
+    private IntlDateFormatter $dayOfTheWeek;
 
     private array $PROPRIUM_DE_TEMPORE              = [];
     private array $Messages                         = [];
@@ -39,7 +47,6 @@ class LitCalAPI {
     public function __construct(){
         $this->APICore                              = new APICore();
         $this->CACHEDURATION                        = "_" . CACHEDURATION::MONTH . date( "m" );
-        $this->Cal                                  = new FestivityCollection();
     }
 
     private function initParameterData() {
@@ -157,9 +164,10 @@ class LitCalAPI {
         return file_exists( $this->CACHEFILE );
     }
 
-    private function createNumberFormatters() : void {
+    private function createFormatters() : void {
         //ini_set( 'intl.default_locale', strtolower( $this->LITSETTINGS->LOCALE ) . '_' . $this->LITSETTINGS->LOCALE );
-        setlocale( LC_TIME, strtolower( $this->LITSETTINGS->LOCALE ) . '_' . $this->LITSETTINGS->LOCALE );
+        $this->dayAndMonth = IntlDateFormatter::create( strtolower( $this->LITSETTINGS->LOCALE ), IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "d MMMM" );
+        $this->dayOfTheWeek  = IntlDateFormatter::create( strtolower( $this->LITSETTINGS->LOCALE ), IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEEE" );
         $this->formatter = new NumberFormatter( strtolower( $this->LITSETTINGS->LOCALE ), NumberFormatter::SPELLOUT );
         switch( $this->LITSETTINGS->LOCALE ){
             case 'EN':
@@ -177,7 +185,7 @@ class LitCalAPI {
         //for the time being, we cannot accept a year any earlier than 1970, since this engine is based on the liturgical reform from Vatican II
         //with the Prima Editio Typica of the Roman Missal and the General Norms promulgated with the Motu Proprio "Mysterii Paschali" in 1969
         if ( $this->LITSETTINGS->YEAR < 1970 ) {
-            $this->Messages[] = sprintf( LITCAL_MESSAGES::__( "Only years from 1970 and after are supported. You tried requesting the year %d.", $this->LITSETTINGS->LOCALE ), $this->LITSETTINGS->YEAR );
+            $this->Messages[] = sprintf( _( "Only years from 1970 and after are supported. You tried requesting the year %d." ), $this->LITSETTINGS->YEAR );
             $this->GenerateResponseToRequest();
         }
     }
@@ -259,7 +267,9 @@ class LitCalAPI {
                     $this->Cal->addFestivity( "Christmas2", $Christmas2 );
                 } else {
                     $nth++;
-                    $festivity = new Festivity( sprintf( LITCAL_MESSAGES::__( "%s day before Epiphany", $this->LITSETTINGS->LOCALE ), ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : ucfirst( $this->formatter->format( $nth ) ) ) ), $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
+                    $nthStr = $this->LITSETTINGS->LOCALE === 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
+                    $name = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Dies %s ante Epiphaniam", $nthStr ) : sprintf( _( "%s day before Epiphany" ), ucfirst( $nthStr ) );
+                    $festivity = new Festivity( $name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
                     $this->Cal->addFestivity( "DayBeforeEpiphany" . $nth, $festivity );
                 }
             }
@@ -270,8 +280,10 @@ class LitCalAPI {
                 $nth = 0;
                 for ( $i = 7; $i < $SundayAfterEpiphany; $i++ ) {
                     $nth++;
+                    $nthStr = $this->LITSETTINGS->LOCALE === 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
                     $dateTime = DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-                    $festivity = new Festivity( sprintf( LITCAL_MESSAGES::__( "%s day after Epiphany", $this->LITSETTINGS->LOCALE ), ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : ucfirst( $this->formatter->format( $nth ) ) ) ), $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
+                    $name = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Dies %s post Epiphaniam", $nthStr ) : sprintf( _( "%s day after Epiphany" ), ucfirst( $nthStr ) );
+                    $festivity = new Festivity( $name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
                     $this->Cal->addFestivity( "DayAfterEpiphany" . $nth, $festivity );
                 }
             }
@@ -292,7 +304,10 @@ class LitCalAPI {
                 $nth = 0;
                 for ( $i = 2; $i < $DayOfEpiphany; $i++ ) {
                     $nth++;
-                    $festivity = new Festivity( sprintf( LITCAL_MESSAGES::__( "%s day before Epiphany", $this->LITSETTINGS->LOCALE ), ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : ucfirst( $this->formatter->format( $nth ) ) ) ), DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) ), LitColor::WHITE,     LitFeastType::MOBILE );
+                    $nthStr = $this->LITSETTINGS->LOCALE === 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
+                    $name = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Dies %s ante Epiphaniam", $nthStr ) : sprintf( _( "%s day before Epiphany" ), ucfirst( $nthStr ) );
+                    $dateTime = DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
+                    $festivity = new Festivity( $name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
                     $this->Cal->addFestivity( "DayBeforeEpiphany" . $nth, $festivity );
                 }
 
@@ -302,7 +317,10 @@ class LitCalAPI {
                     $nth = 0;
                     for ( $i = $DayOfEpiphany + 1; $i < $SundayAfterEpiphany; $i++ ) {
                         $nth++;
-                        $festivity = new Festivity( sprintf( LITCAL_MESSAGES::__( "%s day after Epiphany", $this->LITSETTINGS->LOCALE ), ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : ucfirst( $this->formatter->format( $nth ) ) ) ), DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) ), LitColor::WHITE,     LitFeastType::MOBILE );
+                        $nthStr = $this->LITSETTINGS->LOCALE === 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
+                        $name = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Dies %s post Epiphaniam", $nthStr ) : sprintf( _( "%s day after Epiphany" ), ucfirst( $nthStr ) );
+                        $dateTime = DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
+                        $festivity = new Festivity( $name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
                         $this->Cal->addFestivity( "DayAfterEpiphany" . $nth, $festivity );
                     }
                 }
@@ -437,32 +455,32 @@ class LitCalAPI {
                     if( $row->TAG === "StJoseph" && $currentFeastDate >= $this->Cal->getFestivity("PalmSun")->date && $currentFeastDate <= $this->Cal->getFestivity("Easter")->date ){
                         $tempFestivity->date = LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->sub( new DateInterval( 'P8D' ) );
                         $this->Messages[] = sprintf(
-                            LITCAL_MESSAGES::__( "The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to %s (%s) as per the %s.", $this->LITSETTINGS->LOCALE ),
+                            _( "The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to %s (%s) as per the %s." ),
                             $tempFestivity->name,
                             $this->Cal->solemnityFromDate( $currentFeastDate )->name,
                             $this->LITSETTINGS->YEAR,
-                            LITCAL_MESSAGES::__( "the Saturday preceding Palm Sunday", $this->LITSETTINGS->LOCALE ),
+                            _( "the Saturday preceding Palm Sunday" ),
                             $this->LITSETTINGS->LOCALE === 'LA' ? ( $tempFestivity->date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$tempFestivity->date->format( 'n' ) ] ) :
                                 ( $this->LITSETTINGS->LOCALE === 'EN' ? $tempFestivity->date->format( 'F jS' ) :
-                                    trim( utf8_encode( strftime( '%e %B', $tempFestivity->date->format( 'U' ) ) ) )
+                                    $this->dayAndMonth->format( $tempFestivity->date->format( 'U' ) )
                                 ),
-                            '<a href="http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>'
+                            '<a href="http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>'
                         );
                     }
                     else if( $row->TAG === "Annunciation" && $currentFeastDate >= $this->Cal->getFestivity( "PalmSun" )->date && $currentFeastDate <= $this->Cal->getFestivity( "Easter2" )->date ){
                         //if the Annunciation falls during Holy Week or within the Octave of Easter, it is transferred to the Monday after the Second Sunday of Easter.
                         $tempFestivity->date = LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P8D' ) );
                         $this->Messages[] = sprintf(
-                            LITCAL_MESSAGES::__( "The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to %s (%s) as per the %s.", $this->LITSETTINGS->LOCALE ),
+                            _( "The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to %s (%s) as per the %s." ),
                             $tempFestivity->name,
                             $this->Cal->solemnityFromDate( $currentFeastDate )->name,
                             $this->LITSETTINGS->YEAR,
-                            LITCAL_MESSAGES::__( 'the Monday following the Second Sunday of Easter', $this->LITSETTINGS->LOCALE ),
+                            _( 'the Monday following the Second Sunday of Easter' ),
                             $this->LITSETTINGS->LOCALE === 'LA' ? ( $tempFestivity->date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$tempFestivity->date->format( 'n' ) ] ) :
                                 ( $this->LITSETTINGS->LOCALE === 'EN' ? $tempFestivity->date->format( 'F jS' ) :
-                                    trim( utf8_encode( strftime( '%e %B', $tempFestivity->date->format( 'U' ) ) ) )
+                                    $this->dayAndMonth->format( $tempFestivity->date->format( 'U' ) )
                                 ),
-                            '<a href="http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>'
+                            '<a href="http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>'
                         );
 
                         //In some German churches it was the custom to keep the office of the Annunciation on the Saturday before Palm Sunday if the 25th of March fell in Holy Week.
@@ -479,22 +497,22 @@ class LitCalAPI {
                         $tempFestivity->date = clone( $currentFeastDate );
                         $tempFestivity->date->add( new DateInterval( 'P1D' ) );
                         $this->Messages[] = sprintf(
-                            LITCAL_MESSAGES::__( "The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to %s (%s) as per the %s.", $this->LITSETTINGS->LOCALE ),
+                            _( "The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to %s (%s) as per the %s." ),
                             $tempFestivity->name,
                             $this->Cal->solemnityFromDate( $currentFeastDate )->name,
                             $this->LITSETTINGS->YEAR,
-                            LITCAL_MESSAGES::__( "the following Monday", $this->LITSETTINGS->LOCALE ),
+                            _( "the following Monday" ),
                             $this->LITSETTINGS->LOCALE === 'LA' ? ( $tempFestivity->date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$tempFestivity->date->format( 'n' ) ] ) :
                                 ( $this->LITSETTINGS->LOCALE === 'EN' ? $tempFestivity->date->format( 'F jS' ) :
-                                    trim( utf8_encode( strftime( '%e %B', $tempFestivity->date->format( 'U' ) ) ) )
+                                    $this->dayAndMonth->format( $tempFestivity->date->format( 'U' ) )
                                 ),
-                            '<a href="http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/1990/284-285.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>'
+                            '<a href="http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/1990/284-285.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>'
                         );
                     }
                     else{
                         //In all other cases, let's make a note of what's happening and ask the Congegation for Divine Worship
                         $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                            LITCAL_MESSAGES::__( "The Solemnity '%s' coincides with the Solemnity '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!", $this->LITSETTINGS->LOCALE ),
+                            _( "The Solemnity '%s' coincides with the Solemnity '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!" ),
                             $row->NAME,
                             $this->Cal->solemnityFromDate( $currentFeastDate )->name,
                             $this->LITSETTINGS->YEAR
@@ -512,11 +530,11 @@ class LitCalAPI {
                         if( !$this->Cal->inSolemnities( $NativityJohnBaptistNewDate->sub( new DateInterval( 'P1D' ) ) ) ) {
                             $tempFestivity->date->sub( new DateInterval( 'P1D' ) );
                             $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                LITCAL_MESSAGES::__( "Seeing that the Solemnity '%s' coincides with the Solemnity '%s' in the year %d, it has been anticipated by one day as per %s.", $this->LITSETTINGS->LOCALE ),
+                                _( "Seeing that the Solemnity '%s' coincides with the Solemnity '%s' in the year %d, it has been anticipated by one day as per %s." ),
                                 $tempFestivity->name,
                                 $SacredHeart->name,
                                 $this->LITSETTINGS->YEAR,
-                                '<a href="http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>'
+                                '<a href="http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>'
                             );
                         }
                     }
@@ -525,7 +543,7 @@ class LitCalAPI {
         }
 
         //let's add a displayGrade property for AllSouls so applications don't have to worry about fixing it
-        $this->Cal->setProperty( "AllSouls", "displayGrade", strip_tags( LITCAL_MESSAGES::__( "COMMEMORATION", $this->LITSETTINGS->LOCALE ) ) );
+        $this->Cal->setProperty( "AllSouls", "displayGrade", $this->LitGrade->i18n( LitGrade::COMMEMORATION, false ) );
 
         $this->Cal->addSolemnitiesLordBVM( [
             "Easter",
@@ -580,13 +598,13 @@ class LitCalAPI {
             $holyFamilyDate = DateTime::createFromFormat( '!j-n-Y', '30-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
             $HolyFamily = new Festivity( $this->PROPRIUM_DE_TEMPORE[ "HolyFamily" ][ "NAME_" . $this->LITSETTINGS->LOCALE ], $holyFamilyDate, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
             $this->Messages[] = sprintf(
-                LITCAL_MESSAGES::__( "'%s' falls on a Sunday in the year %d, therefore the Feast '%s' is celebrated on %s rather than on the Sunday after Christmas.", $this->LITSETTINGS->LOCALE ),
+                _( "'%s' falls on a Sunday in the year %d, therefore the Feast '%s' is celebrated on %s rather than on the Sunday after Christmas." ),
                 $this->Cal->getFestivity( "Christmas" )->name,
                 $this->LITSETTINGS->YEAR,
                 $HolyFamily->name,
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $HolyFamily->date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$HolyFamily->date->format( 'n' ) ] ) :
                     ( $this->LITSETTINGS->LOCALE === 'EN' ? $HolyFamily->date->format( 'F jS' ) :
-                        trim( utf8_encode( strftime( '%e %B', $HolyFamily->date->format( 'U' ) ) ) )
+                        $this->dayAndMonth->format( $HolyFamily->date->format( 'U' ) )
                     )
             );
         } else {
@@ -614,9 +632,9 @@ class LitCalAPI {
                 $this->Cal->addFestivity( "OrdSunday" . $ordSun, new Festivity( $this->PROPRIUM_DE_TEMPORE[ "OrdSunday" . $ordSun ][ "NAME_" . $this->LITSETTINGS->LOCALE ], $firstOrdinary, LitColor::GREEN, LitFeastType::MOBILE, LitGrade::FEAST_LORD ) );
             } else {
                 $this->Messages[] = sprintf(
-                    LITCAL_MESSAGES::__( "'%s' is superseded by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
+                    _( "'%s' is superseded by the %s '%s' in the year %d." ),
                     $this->PROPRIUM_DE_TEMPORE[ "OrdSunday" . $ordSun ][ "NAME_" . $this->LITSETTINGS->LOCALE ],
-                    $this->Cal->solemnityFromDate( $firstOrdinary )->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $this->Cal->solemnityFromDate( $firstOrdinary )->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $this->Cal->solemnityFromDate( $firstOrdinary )->grade, $this->LITSETTINGS->LOCALE, false ),
+                    $this->Cal->solemnityFromDate( $firstOrdinary )->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $this->Cal->solemnityFromDate( $firstOrdinary )->grade, false ) . '</i>' : $this->LitGrade->i18n( $this->Cal->solemnityFromDate( $firstOrdinary )->grade, false ),
                     $this->Cal->solemnityFromDate( $firstOrdinary )->name,
                     $this->LITSETTINGS->YEAR
                 );
@@ -638,9 +656,9 @@ class LitCalAPI {
                 $this->Cal->addFestivity( "OrdSunday" . $ordSun, new Festivity( $this->PROPRIUM_DE_TEMPORE[ "OrdSunday" . $ordSun ][ "NAME_" . $this->LITSETTINGS->LOCALE ], $lastOrdinary, LitColor::GREEN, LitFeastType::MOBILE, LitGrade::FEAST_LORD ) );
             } else {
                 $this->Messages[] = sprintf(
-                    LITCAL_MESSAGES::__( "'%s' is superseded by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
+                    _( "'%s' is superseded by the %s '%s' in the year %d." ),
                     $this->PROPRIUM_DE_TEMPORE[ "OrdSunday" . $ordSun ][ "NAME_" . $this->LITSETTINGS->LOCALE ],
-                    $this->Cal->solemnityFromDate( $lastOrdinary )->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $this->Cal->solemnityFromDate( $lastOrdinary )->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $this->Cal->solemnityFromDate( $lastOrdinary )->grade, $this->LITSETTINGS->LOCALE, false ),
+                    $this->Cal->solemnityFromDate( $lastOrdinary )->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $this->Cal->solemnityFromDate( $lastOrdinary )->grade, false ) . '</i>' : $this->LitGrade->i18n( $this->Cal->solemnityFromDate( $lastOrdinary )->grade, false ),
                     $this->Cal->solemnityFromDate( $lastOrdinary )->name,
                     $this->LITSETTINGS->YEAR
                 );
@@ -689,8 +707,11 @@ class LitCalAPI {
                 $diff = $upper - (int)$this->Cal->getFestivity("Advent1")->date->format( 'z' ); //day count between current day and First Sunday of Advent
                 $currentAdvWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1; //week count between current day and First Sunday of Advent
 
-                $ordinal = ucfirst( LitCalFf::getOrdinal( $currentAdvWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem, LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
-                $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayAdvent->format( 'w' ) ] : ucfirst( utf8_encode( strftime( '%A', $weekdayAdvent->format( 'U' ) ) ) ) ) . " " . sprintf( LITCAL_MESSAGES::__( "of the %s Week of Advent", $this->LITSETTINGS->LOCALE ), $ordinal ), $weekdayAdvent, LitColor::PURPLE, LitFeastType::MOBILE );
+                $dayOfTheWeek = $this->LITSETTINGS->LOCALE === 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayAdvent->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $weekdayAdvent->format( 'U' ) ) );
+                $ordinal = ucfirst( LITCAL_MESSAGES::getOrdinal( $currentAdvWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem, LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
+                $nthStr = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Hebdomadæ %s Adventus", $ordinal ) : sprintf( _( "of the %s Week of Advent" ), $ordinal );
+                $name = $dayOfTheWeek . " " . $nthStr;
+                $festivity = new Festivity( $name, $weekdayAdvent, LitColor::PURPLE, LitFeastType::MOBILE );
                 $this->Cal->addFestivity( "AdventWeekday" . $weekdayAdventCnt, $festivity );
             }
 
@@ -704,8 +725,9 @@ class LitCalAPI {
         while ( $weekdayChristmas >= $this->Cal->getFestivity( "Christmas" )->date && $weekdayChristmas < DateTime::createFromFormat( '!j-n-Y', '31-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) ) ) {
             $weekdayChristmas = DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayChristmasCnt . 'D' ) );
             if ( $this->Cal->notInSolemnitiesFeastsOrMemorials( $weekdayChristmas ) && self::DateIsNotSunday( $weekdayChristmas ) ) {
-                $ordinal = ucfirst( LitCalFf::getOrdinal( ( $weekdayChristmasCnt + 1 ), $this->LITSETTINGS->LOCALE, $this->formatter, LITCAL_MESSAGES::LATIN_ORDINAL ) );
-                $festivity = new Festivity( sprintf( LITCAL_MESSAGES::__( "%s Day of the Octave of Christmas", $this->LITSETTINGS->LOCALE ), $ordinal ), $weekdayChristmas, LitColor::WHITE, LitFeastType::MOBILE );
+                $ordinal = ucfirst( LITCAL_MESSAGES::getOrdinal( ( $weekdayChristmasCnt + 1 ), $this->LITSETTINGS->LOCALE, $this->formatter, LITCAL_MESSAGES::LATIN_ORDINAL ) );
+                $name = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Dies %s Octavæ Nativitatis", $ordinal ) : sprintf( _( "%s Day of the Octave of Christmas" ), $ordinal );
+                $festivity = new Festivity( $name, $weekdayChristmas, LitColor::WHITE, LitFeastType::MOBILE );
                 $this->Cal->addFestivity( "ChristmasWeekday" . $weekdayChristmasCnt, $festivity );
             }
             $weekdayChristmasCnt++;
@@ -726,10 +748,16 @@ class LitCalAPI {
                     $upper =  (int)$weekdayLent->format( 'z' );
                     $diff = $upper -  (int)$this->Cal->getFestivity( "Lent1" )->date->format( 'z' ); //day count between current day and First Sunday of Lent
                     $currentLentWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1; //week count between current day and First Sunday of Lent
-                    $ordinal = ucfirst( LitCalFf::getOrdinal( $currentLentWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem, LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
-                    $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayLent->format( 'w' ) ] : ucfirst( utf8_encode( strftime( '%A', $weekdayLent->format( 'U' ) ) ) ) ) . " ".  sprintf( LITCAL_MESSAGES::__( "of the %s Week of Lent", $this->LITSETTINGS->LOCALE ), $ordinal ), $weekdayLent, LitColor::PURPLE, LitFeastType::MOBILE );
+                    $ordinal = ucfirst( LITCAL_MESSAGES::getOrdinal( $currentLentWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem, LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
+                    $dayOfTheWeek = $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayLent->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $weekdayLent->format( 'U' ) ) );
+                    $nthStr = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Hebdomadæ %s Quadragesimæ", $ordinal ) : sprintf( _( "of the %s Week of Lent" ), $ordinal );
+                    $name = $dayOfTheWeek . " ".  $nthStr;
+                    $festivity = new Festivity( $name, $weekdayLent, LitColor::PURPLE, LitFeastType::MOBILE );
                 } else {
-                    $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayLent->format( 'w' ) ] : ucfirst( utf8_encode( strftime( '%A', $weekdayLent->format( 'U' ) ) ) ) ) . " ". LITCAL_MESSAGES::__( "after Ash Wednesday", $this->LITSETTINGS->LOCALE ), $weekdayLent, LitColor::PURPLE, LitFeastType::MOBILE );
+                    $dayOfTheWeek = $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayLent->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $weekdayLent->format( 'U' ) ) );
+                    $postStr = $this->LITSETTINGS->LOCALE === 'LA' ? "post Feria IV Cinerum" : _( "after Ash Wednesday" );
+                    $name = $dayOfTheWeek . " ". $postStr;
+                    $festivity = new Festivity( $name, $weekdayLent, LitColor::PURPLE, LitFeastType::MOBILE );
                 }
                 $this->Cal->addFestivity( "LentWeekday" . $weekdayLentCnt, $festivity );
             }
@@ -757,7 +785,7 @@ class LitCalAPI {
 
                 if( $missal === RomanMissal::EDITIO_TYPICA_TERTIA_2002 ) {
                     $row->yearSince = 2002;
-                    $row->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>';
+                    $row->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
                     /**
                      * TRANSLATORS:
                      * 1. Grade or rank of the festivity
@@ -768,12 +796,12 @@ class LitCalAPI {
                      * 6. Current year
                      */
                     $this->Messages[] = sprintf(
-                        LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
-                        LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE ),
+                        _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." ),
+                        $this->LitGrade->i18n( $row->GRADE, false ),
                         $row->NAME,
                         $this->LITSETTINGS->LOCALE === 'LA' ? ( $row->DATE->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
                             ( $this->LITSETTINGS->LOCALE === 'EN' ? $row->DATE->format( 'F jS' ) :
-                                trim( utf8_encode( strftime( '%e %B', $row->DATE->format( 'U' ) ) ) )
+                                $this->dayAndMonth->format( $row->DATE->format( 'U' ) )
                             ),
                         $row->yearSince,
                         $row->DECREE,
@@ -805,8 +833,8 @@ class LitCalAPI {
         if ( $this->Cal->inWeekdaysAdventChristmasLent( $currentFeastDate ) ) {
             $this->Cal->setProperty( $row->TAG, "grade", LitGrade::COMMEMORATION );
             $this->Messages[] = sprintf(
-                LITCAL_MESSAGES::__( "The %s '%s' either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration.", $this->LITSETTINGS->LOCALE ),
-                LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE ),
+                _( "The %s '%s' either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration." ),
+                $this->LitGrade->i18n( $row->GRADE, false ),
                 $row->NAME,
                 $this->LITSETTINGS->YEAR
             );
@@ -820,9 +848,9 @@ class LitCalAPI {
             $key = $this->Cal->weekdayEpiphanyKeyFromDate( $festivity->date );
             if ( false !== $key ) {
                 $this->Messages[] = sprintf(
-                    LITCAL_MESSAGES::__( "'%s' is superseded by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
+                    _( "'%s' is superseded by the %s '%s' in the year %d." ),
                     $this->Cal->getFestivity( $key )->name,
-                    LITCAL_MESSAGES::_G( $festivity->grade, $this->LITSETTINGS->LOCALE, false ),
+                    $this->LitGrade->i18n( $festivity->grade, false ),
                     $festivity->name,
                     $this->LITSETTINGS->YEAR
                 );
@@ -837,15 +865,15 @@ class LitCalAPI {
         switch( $missal ){
             case RomanMissal::EDITIO_TYPICA_1970:
                 $this->Messages[] = sprintf(
-                    LITCAL_MESSAGES::__( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
-                    LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE, false ),
+                    _( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d." ),
+                    $this->LitGrade->i18n( $row->GRADE, false ),
                     $row->NAME,
                     RomanMissal::getName( $missal ),
                     1970,
                     '',
                     $this->LITSETTINGS->LOCALE === 'LA' ? ( $row->DATE->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[  (int)$row->DATE->format( 'n' ) ] ) :
                         ( $this->LITSETTINGS->LOCALE === 'EN' ? $row->DATE->format( 'F jS' ) :
-                            trim( utf8_encode( strftime( '%e %B', $row->DATE->format( 'U' ) ) ) )
+                            $this->dayAndMonth->format( $row->DATE->format( 'U' ) )
                         ),
                     $coincidingFestivity->grade,
                     $coincidingFestivity->event->name,
@@ -854,15 +882,15 @@ class LitCalAPI {
                 break;
             case RomanMissal::EDITIO_TYPICA_TERTIA_2002:
                 $this->Messages[] = sprintf(
-                    LITCAL_MESSAGES::__( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
-                    LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE, false ),
+                    _( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d." ),
+                    $this->LitGrade->i18n( $row->GRADE, false ),
                     $row->NAME,
                     RomanMissal::getName( $missal ),
                     2002,
-                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
+                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>',
                     $this->LITSETTINGS->LOCALE === 'LA' ? ( $row->DATE->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
                         ( $this->LITSETTINGS->LOCALE === 'EN' ? $row->DATE->format( 'F jS' ) :
-                            trim( utf8_encode( strftime( '%e %B', $row->DATE->format( 'U' ) ) ) )
+                            $this->dayAndMonth->format( $row->DATE->format( 'U' ) )
                         ),
                     $coincidingFestivity->grade,
                     $coincidingFestivity->event->name,
@@ -871,15 +899,15 @@ class LitCalAPI {
                 break;
             case RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008:
                 $this->Messages[] = sprintf(
-                    LITCAL_MESSAGES::__( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
-                    LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE, false ),
+                    _( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d." ),
+                    $this->LitGrade->i18n( $row->GRADE, false ),
                     $row->NAME,
                     RomanMissal::getName( $missal ),
                     2008,
                     'Missale Romanum, ed. Typica Tertia Emendata 2008',
                     $this->LITSETTINGS->LOCALE === 'LA' ? ( $row->DATE->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
                         ( $this->LITSETTINGS->LOCALE === 'EN' ? $row->DATE->format( 'F jS' ) :
-                            trim( utf8_encode( strftime( '%e %B', $row->DATE->format( 'U' ) ) ) )
+                            $this->dayAndMonth->format( $row->DATE->format( 'U' ) )
                         ),
                     $coincidingFestivity->grade,
                     $coincidingFestivity->event->name,
@@ -894,12 +922,12 @@ class LitCalAPI {
 
         $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $row->DATE, $this->LITSETTINGS );
         $this->Messages[] = sprintf(
-            LITCAL_MESSAGES::__( "The %s '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
+            _( "The %s '%s', added on %s since the year %d (%s), is however superseded by a Sunday, a Solemnity or a Feast '%s' in the year %d." ),
             $coincidingFestivity->grade,
             $row->NAME,
             $this->LITSETTINGS->LOCALE === 'LA' ? ( $row->DATE->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
                 ( $this->LITSETTINGS->LOCALE === 'EN' ? $row->DATE->format( 'F jS' ) :
-                    trim( utf8_encode( strftime( '%e %B', $row->DATE->format( 'U' ) ) ) )
+                    $this->dayAndMonth->format( $row->DATE->format( 'U' ) )
                 ),
             $row->yearSince,
             $row->DECREE,
@@ -929,11 +957,11 @@ class LitCalAPI {
                     }
 
                     $this->Messages[] = sprintf(
-                        LITCAL_MESSAGES::__( "The Memorial '%s' coincides with another Memorial '%s' in the year %d. They are both reduced in rank to optional memorials (%s).", $this->LITSETTINGS->LOCALE ),
+                        _( "The Memorial '%s' coincides with another Memorial '%s' in the year %d. They are both reduced in rank to optional memorials (%s)." ),
                         $ImmaculateHeart->name,
                         $festivity->name,
                         $this->LITSETTINGS->YEAR,
-                        '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>'
+                        '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>'
                     );
                     $coincidence = true;
                 }
@@ -971,13 +999,13 @@ class LitCalAPI {
         if ( $festivity !== null ) {
             if ( $festivity->grade === LitGrade::MEMORIAL ) {
                 $this->Messages[] = sprintf(
-                    LITCAL_MESSAGES::__( "The %s '%s' has been raised to the rank of %s since the year %d, applicable to the year %d (%s).", $this->LITSETTINGS->LOCALE ),
-                    LITCAL_MESSAGES::_G( $festivity->grade, $this->LITSETTINGS->LOCALE ),
+                    _( "The %s '%s' has been raised to the rank of %s since the year %d, applicable to the year %d (%s)." ),
+                    $this->LitGrade->i18n( $festivity->grade, false ),
                     $festivity->name,
-                    LITCAL_MESSAGES::_G( LitGrade::FEAST, $this->LITSETTINGS->LOCALE ),
+                    $this->LitGrade->i18n( LitGrade::FEAST, false ),
                     2016,
                     $this->LITSETTINGS->YEAR,
-                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf">' . LITCAL_MESSAGES::__( "Decree of the Congregation for Divine Worship", $this->LITSETTINGS->LOCALE ) . '</a>'
+                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf">' . _( "Decree of the Congregation for Divine Worship" ) . '</a>'
                 );
                 $this->Cal->setProperty( "StMaryMagdalene", "grade", LitGrade::FEAST );
             }
@@ -1013,12 +1041,12 @@ class LitCalAPI {
              * 6. Current year
              */
             $this->Messages[] = sprintf(
-                LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
-                LITCAL_MESSAGES::_G( $newFestivity->grade, $this->LITSETTINGS->LOCALE ),
+                _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." ),
+                $this->LitGrade->i18n( $newFestivity->grade, false ),
                 $newFestivity->name,
                 $this->LITSETTINGS->LOCALE === 'LA' ? ( $newFestivity->date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$newFestivity->date->format( 'n' ) ] ) :
                     ( $this->LITSETTINGS->LOCALE === 'EN' ? $newFestivity->date->format( 'F jS' ) :
-                        trim( utf8_encode( strftime( '%e %B', $newFestivity->date->format( 'U' ) ) ) )
+                        $this->dayAndMonth->format( $newFestivity->date->format( 'U' ) )
                     ),
                 2008,
                 'Missale Romanum, ed. Typica Tertia Emendata 2008',
@@ -1035,12 +1063,12 @@ class LitCalAPI {
         $festivity = new Festivity( $MaryMotherChurch->tag[ $this->LITSETTINGS->LOCALE ], $MaryMotherChurch->date, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL, "Proper" );
         $this->Cal->addFestivity( "MaryMotherChurch", $festivity );
         $this->Messages[] = sprintf(
-            LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
-            LITCAL_MESSAGES::_G( $festivity->grade, $this->LITSETTINGS->LOCALE ),
+            _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." ),
+            $this->LitGrade->i18n( $festivity->grade, false ),
             $festivity->name,
-            LITCAL_MESSAGES::__( 'the Monday after Pentecost', $this->LITSETTINGS->LOCALE ),
+            _( 'the Monday after Pentecost' ),
             2018,
-            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20180211_decreto-mater-ecclesiae_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
+            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20180211_decreto-mater-ecclesiae_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>',
             $this->LITSETTINGS->YEAR
         );
     }
@@ -1061,11 +1089,11 @@ class LitCalAPI {
             }
 
             $this->Messages[] = sprintf(
-                LITCAL_MESSAGES::__( "The Memorial '%s', added on %s since the year %d (%s), is however superseded by a Solemnity or a Feast '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
+                _( "The Memorial '%s', added on %s since the year %d (%s), is however superseded by a Solemnity or a Feast '%s' in the year %d." ),
                 $MaryMotherChurch->tag[ $this->LITSETTINGS->LOCALE ],
-                LITCAL_MESSAGES::__( 'the Monday after Pentecost', $this->LITSETTINGS->LOCALE ),
+                _( 'the Monday after Pentecost' ),
                 2018,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20180211_decreto-mater-ecclesiae_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
+                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20180211_decreto-mater-ecclesiae_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>',
                 $coincidingFestivity->name,
                 $this->LITSETTINGS->YEAR
             );
@@ -1076,13 +1104,13 @@ class LitCalAPI {
                 if( count( $coincidingFestivities ) > 0 ){
                     foreach( $coincidingFestivities as $coincidingFestivityKey => $coincidingFestivity ) {
                         $this->Messages[] = sprintf(
-                            LITCAL_MESSAGES::__( "The %s '%s' has been suppressed by the Memorial '%s', added on %s since the year %d (%s).", $this->LITSETTINGS->LOCALE ),
-                            LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ),
+                            _( "The %s '%s' has been suppressed by the Memorial '%s', added on %s since the year %d (%s)." ),
+                            $this->LitGrade->i18n( $coincidingFestivity->grade, false ),
                             '<i>' . $coincidingFestivity->name . '</i>',
                             $MaryMotherChurch->tag[ $this->LITSETTINGS->LOCALE ],
-                            LITCAL_MESSAGES::__( 'the Monday after Pentecost', $this->LITSETTINGS->LOCALE ),
+                            _( 'the Monday after Pentecost' ),
                             2018,
-                            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20180211_decreto-mater-ecclesiae_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>'
+                            '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20180211_decreto-mater-ecclesiae_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>'
                         );
                         $this->Cal->removeFestivity( $coincidingFestivityKey );
                     }
@@ -1124,6 +1152,7 @@ class LitCalAPI {
         } else {
             $row = (object)$this->PROPRIUM_DE_TEMPORE[ "ImmaculateHeart" ];
             $row->GRADE = LitGrade::MEMORIAL;
+            $row->DATE = LitCalFf::calcGregEaster( $this->LITSETTINGS->YEAR )->add( new DateInterval( 'P' . ( 7 * 9 + 6 ) . 'D' ) );
             $this->handleCoincidence( $row, RomanMissal::EDITIO_TYPICA_1970 );
         }
 
@@ -1143,9 +1172,9 @@ class LitCalAPI {
             if( $festivity !== null ) {
                 $this->Cal->moveFestivityDate( "StJaneFrancesDeChantal", $StJaneFrancesNewDate );
                 $this->Messages[] = sprintf(
-                    LITCAL_MESSAGES::__( "The optional memorial '%s' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
+                    _( "The optional memorial '%s' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%s), applicable to the year %d." ),
                     $festivity->name,
-                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
+                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>',
                     $this->LITSETTINGS->YEAR
                 );
             } else {
@@ -1155,14 +1184,14 @@ class LitCalAPI {
                 $festivity = new Festivity( $row->NAME, $StJaneFrancesNewDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
                 $this->Cal->addFestivity( "StJaneFrancesDeChantal", $festivity );
                 $this->Messages[] = sprintf(
-                    LITCAL_MESSAGES::__( "The optional memorial '%s', which would have been superseded this year by a Sunday or Solemnity were it on Dec. 12, has however been transferred to Aug. 12 since the year 2002 (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
+                    _( "The optional memorial '%s', which would have been superseded this year by a Sunday or Solemnity were it on Dec. 12, has however been transferred to Aug. 12 since the year 2002 (%s), applicable to the year %d." ),
                     $festivity->name,
-                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
+                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>',
                     $this->LITSETTINGS->YEAR
                 );
             }
         } else {
-            $coincidingFestivity = $this->Cal->feastOrMemorialFromDate( $StJaneFrancesNewDate );
+            $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $StJaneFrancesNewDate );
             $festivity = $this->Cal->getFestivity( "StJaneFrancesDeChantal" );
             //we can't move it, but we still need to remove it from Dec 12th if it's there!!!
             if( $festivity !== null ) {
@@ -1170,11 +1199,11 @@ class LitCalAPI {
             }
             $row = $this->tempCal[ ROMANMISSAL::EDITIO_TYPICA_1970 ][ 'StJaneFrancesDeChantal' ];
             $this->Messages[] = sprintf(
-                LITCAL_MESSAGES::__( 'The optional memorial \'%1$s\' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d. However, it is superseded by a Sunday, a Solemnity, or a Feast \'%4$s\' in the year %3$d.', $this->LITSETTINGS->LOCALE ),
+                _( 'The optional memorial \'%1$s\' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d. However, it is superseded by a Sunday, a Solemnity, or a Feast \'%4$s\' in the year %3$d.' ),
                 $row->NAME,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>',
+                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>',
                 $this->LITSETTINGS->YEAR,
-                $coincidingFestivity->name
+                $coincidingFestivity->event->name
             );
         }
 
@@ -1198,7 +1227,7 @@ class LitCalAPI {
         $rows[0]->DATE = DateTime::createFromFormat( '!j-n-Y', '12-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
         $rows[0]->COMMON = "Blessed Virgin Mary";
         $rows[0]->yearSince = 2002;
-        $rows[0]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>';
+        $rows[0]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
 
         $rows[1] = new stdClass();
         $rows[1]->TAG = "JuanDiego";
@@ -1212,7 +1241,7 @@ class LitCalAPI {
         $rows[1]->DATE = DateTime::createFromFormat( '!j-n-Y', '9-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
         $rows[1]->COMMON = "Holy Men and Women:For One Saint";
         $rows[1]->yearSince = 2002;
-        $rows[1]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>';
+        $rows[1]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
 
         foreach( $rows as $row ) {
             if ( self::DateIsNotSunday( $row->DATE ) && $this->Cal->notInSolemnitiesFeastsOrMemorials( $row->DATE ) ) {
@@ -1228,12 +1257,12 @@ class LitCalAPI {
                  * 6. Current year
                  */
                 $this->Messages[] = sprintf(
-                    LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
-                    LITCAL_MESSAGES::_G( $festivity->grade, $this->LITSETTINGS->LOCALE ),
+                    _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." ),
+                    $this->LitGrade->i18n( $festivity->grade, false ),
                     $festivity->name,
                     $this->LITSETTINGS->LOCALE === 'LA' ? ( $row->DATE->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
                         ( $this->LITSETTINGS->LOCALE === 'EN' ? $row->DATE->format( 'F jS' ) :
-                            trim( utf8_encode( strftime( '%e %B', $row->DATE->format( 'U' ) ) ) )
+                            $this->dayAndMonth->format( $row->DATE->format( 'U' ) )
                         ),
                     $row->yearSince,
                     $row->DECREE,
@@ -1258,9 +1287,9 @@ class LitCalAPI {
             $festivity = new Festivity( $row->NAME, DateTime::createFromFormat( '!j-n-Y', '25-1-2009', new DateTimeZone( 'UTC' ) ), LitColor::WHITE, LitFeastType::FIXED, LitGrade::MEMORIAL_OPT, "Proper" );
             $this->Cal->addFestivity( "ConversionStPaul", $festivity );
             $this->Messages[] = sprintf(
-                LITCAL_MESSAGES::__( 'The Feast \'%s\' would have been suppressed this year ( 2009 ) since it falls on a Sunday, however being the Year of the Apostle Paul, as per the %s it has been reinstated so that local churches can optionally celebrate the memorial.', $this->LITSETTINGS->LOCALE ),
+                _( 'The Feast \'%s\' would have been suppressed this year ( 2009 ) since it falls on a Sunday, however being the Year of the Apostle Paul, as per the %s it has been reinstated so that local churches can optionally celebrate the memorial.' ),
                 '<i>' . $row->NAME . '</i>',
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>'
+                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>'
             );
         }
     }
@@ -1280,12 +1309,12 @@ class LitCalAPI {
                  * 6. Current year
                  */
                 $this->Messages[] = sprintf(
-                    LITCAL_MESSAGES::__( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d.", $this->LITSETTINGS->LOCALE ),
-                    LITCAL_MESSAGES::_G( $festivity->grade, $this->LITSETTINGS->LOCALE ),
+                    _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." ),
+                    $this->LitGrade->i18n( $festivity->grade, false ),
                     $festivity->name,
                     $this->LITSETTINGS->LOCALE === 'LA' ? ( $festivity->date->format( 'j' ) . ' ' . LITCAL_MESSAGES::LATIN_MONTHS[ (int)$festivity->date->format( 'n' ) ] ) :
                         ( $this->LITSETTINGS->LOCALE === 'EN' ? $festivity->date->format( 'F jS' ) :
-                            trim( utf8_encode( strftime( '%e %B', $festivity->date->format( 'U' ) ) ) )
+                            $this->dayAndMonth->format( $festivity->date->format( 'U' ) )
                         ),
                     $row->yearSince,
                     $row->DECREE,
@@ -1315,7 +1344,7 @@ class LitCalAPI {
         $rows[0]->NAME = $names[ $this->LITSETTINGS->LOCALE ];
         $rows[0]->GRADE = LitGrade::MEMORIAL_OPT;
         $rows[0]->DATE = DateTime::createFromFormat( '!j-n-Y', '11-10-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-        $rows[0]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>';
+        $rows[0]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
         $rows[0]->COMMON = "Pastors:For a Pope";
         $rows[0]->yearSince = 2014;
 
@@ -1329,7 +1358,7 @@ class LitCalAPI {
         $rows[1]->NAME = $names[ $this->LITSETTINGS->LOCALE ];
         $rows[1]->GRADE = LitGrade::MEMORIAL_OPT;
         $rows[1]->DATE = DateTime::createFromFormat( '!j-n-Y', '22-10-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-        $rows[1]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>';
+        $rows[1]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
         $rows[1]->COMMON = "Pastors:For a Pope";
         $rows[1]->yearSince = 2014;
 
@@ -1353,7 +1382,7 @@ class LitCalAPI {
         $rows[0]->GRADE = LitGrade::MEMORIAL_OPT;
         $rows[0]->COMMON = "Blessed Virgin Mary";
         $rows[0]->DATE = DateTime::createFromFormat( '!j-n-Y', '10-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-        $rows[0]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>';
+        $rows[0]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
         $rows[0]->yearSince = 2019;
 
         //With the Decree of the Congregation of Divine Worship of January 25 2019,
@@ -1370,7 +1399,7 @@ class LitCalAPI {
         $rows[1]->GRADE = LitGrade::MEMORIAL_OPT;
         $rows[1]->COMMON = "Pastors:For a Pope";
         $rows[1]->DATE = DateTime::createFromFormat( '!j-n-Y', '29-5-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-        $rows[1]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>';
+        $rows[1]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
         $rows[1]->yearSince = 2019;
 
         $this->addPreparedRows( $rows );
@@ -1390,7 +1419,7 @@ class LitCalAPI {
         $row->GRADE = LitGrade::MEMORIAL_OPT;
         $row->COMMON = "Holy Men and Women:For Religious";
         $row->DATE = DateTime::createFromFormat( '!j-n-Y', '5-10-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-        $row->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>';
+        $row->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
         $row->yearSince = 2020;
 
         $this->addPreparedRows( [ $row ] );
@@ -1412,7 +1441,7 @@ class LitCalAPI {
         $rows[0]->NAME = $names[ $this->LITSETTINGS->LOCALE ];
         $rows[0]->GRADE = LitGrade::MEMORIAL_OPT;
         $rows[0]->DATE = DateTime::createFromFormat( '!j-n-Y', '27-2-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-        $rows[0]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>';
+        $rows[0]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
         $rows[0]->COMMON = "Holy Men and Women:For an Abbot,Doctors";
         $rows[0]->yearSince = 2021;
 
@@ -1426,7 +1455,7 @@ class LitCalAPI {
         $rows[1]->NAME = $names[ $this->LITSETTINGS->LOCALE ];
         $rows[1]->GRADE = LitGrade::MEMORIAL_OPT;
         $rows[1]->DATE = DateTime::createFromFormat( '!j-n-Y', '10-5-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-        $rows[1]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>';
+        $rows[1]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
         $rows[1]->COMMON = "Pastors:For One Pastor,Doctors";
         $rows[1]->yearSince = 2021;
 
@@ -1440,7 +1469,7 @@ class LitCalAPI {
         $rows[2]->NAME = $names[ $this->LITSETTINGS->LOCALE ];
         $rows[2]->GRADE = LitGrade::MEMORIAL_OPT;
         $rows[2]->DATE = DateTime::createFromFormat( '!j-n-Y', '17-9-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-        $rows[2]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . LITCAL_MESSAGES::__( 'Decree of the Congregation for Divine Worship', $this->LITSETTINGS->LOCALE ) . '</a>';
+        $rows[2]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
         $rows[2]->COMMON = "Virgins:For One Virgin,Doctors";
         $rows[2]->yearSince = 2021;
 
@@ -1462,9 +1491,12 @@ class LitCalAPI {
                 $upper =  (int)$weekdayEaster->format( 'z' );
                 $diff = $upper - (int)$this->Cal->getFestivity( "Easter" )->date->format( 'z' ); //day count between current day and Easter Sunday
                 $currentEasterWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1;         //week count between current day and Easter Sunday
-                $ordinal = ucfirst( LitCalFf::getOrdinal( $currentEasterWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem, LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
-                $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayEaster->format( 'w' ) ] : ucfirst( utf8_encode( strftime( '%A', $weekdayEaster->format( 'U' ) ) ) ) ) . " " . sprintf( LITCAL_MESSAGES::__( "of the %s Week of Easter", $this->LITSETTINGS->LOCALE ), $ordinal ), $weekdayEaster, LitColor::WHITE, LitFeastType::MOBILE );
-                $festivity->psalterWeek = LitCalFf::psalterWeek( $currentEasterWeek );
+                $ordinal = ucfirst( LITCAL_MESSAGES::getOrdinal( $currentEasterWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem, LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
+                $dayOfTheWeek = $this->LITSETTINGS->LOCALE === 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayEaster->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $weekdayEaster->format( 'U' ) ) );
+                $t = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Hebdomadæ %s Temporis Paschali", $ordinal ) : sprintf( _( "of the %s Week of Easter" ), $ordinal );
+                $name = $dayOfTheWeek . " " . $t;
+                $festivity = new Festivity( $name, $weekdayEaster, LitColor::WHITE, LitFeastType::MOBILE );
+                $festivity->psalterWeek = $this->Cal::psalterWeek( $currentEasterWeek );
                 $this->Cal->addFestivity( "EasterWeekday" . $weekdayEasterCnt, $festivity );
             }
             $weekdayEasterCnt++;
@@ -1495,9 +1527,12 @@ class LitCalAPI {
                     $diff           = $upper - $dayFirstSunday;
                     $currentOrdWeek = ( ( $diff - $diff % 7 ) / 7 ) + 2;
                 }
-                $ordinal = ucfirst( LitCalFf::getOrdinal( $currentOrdWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem,LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
-                $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $firstOrdinary->format( 'w' ) ] : ucfirst( utf8_encode( strftime( '%A', $firstOrdinary->format( 'U' ) ) ) ) ) . " " . sprintf( LITCAL_MESSAGES::__( "of the %s Week of Ordinary Time", $this->LITSETTINGS->LOCALE ), $ordinal ), $firstOrdinary, LitColor::GREEN, LitFeastType::MOBILE );
-                $festivity->psalterWeek = LitCalFf::psalterWeek( $currentOrdWeek );
+                $ordinal = ucfirst( LITCAL_MESSAGES::getOrdinal( $currentOrdWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem,LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
+                $dayOfTheWeek = $this->LITSETTINGS->LOCALE === 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $firstOrdinary->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $firstOrdinary->format( 'U' ) ) );
+                $nthStr = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Hebdomadæ %s Temporis Ordinarii", $ordinal ) : sprintf( _( "of the %s Week of Ordinary Time" ), $ordinal );
+                $name = $dayOfTheWeek . " " . $nthStr;
+                $festivity = new Festivity( $name, $firstOrdinary, LitColor::GREEN, LitFeastType::MOBILE );
+                $festivity->psalterWeek = $this->Cal::psalterWeek( $currentOrdWeek );
                 $this->Cal->addFestivity( "FirstOrdWeekday" . $ordWeekday, $festivity );
             }
             $ordWeekday++;
@@ -1522,9 +1557,12 @@ class LitCalAPI {
                 $weekDiff       = ( ( $diff - $diff % 7 ) / 7 ); //week count between current day and Christ the King Sunday;
                 $currentOrdWeek = 34 - $weekDiff;
 
-                $ordinal = ucfirst( LitCalFf::getOrdinal( $currentOrdWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem,LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
-                $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $lastOrdinary->format( 'w' ) ] : ucfirst( utf8_encode( strftime( '%A', $lastOrdinary->format( 'U' ) ) ) ) ) . " " . sprintf( LITCAL_MESSAGES::__( "of the %s Week of Ordinary Time", $this->LITSETTINGS->LOCALE ), $ordinal ), $lastOrdinary, LitColor::GREEN, LitFeastType::MOBILE );
-                $festivity->psalterWeek = LitCalFf::psalterWeek( $currentOrdWeek );
+                $ordinal = ucfirst( LITCAL_MESSAGES::getOrdinal( $currentOrdWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem,LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
+                $dayOfTheWeek = $this->LITSETTINGS->LOCALE === 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $lastOrdinary->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $lastOrdinary->format( 'U' ) ) );
+                $nthStr = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Hebdomadæ %s Temporis Ordinarii", $ordinal ) : sprintf( _( "of the %s Week of Ordinary Time" ), $ordinal );
+                $name = $dayOfTheWeek . " " . $nthStr;
+                $festivity = new Festivity( $name, $lastOrdinary, LitColor::GREEN, LitFeastType::MOBILE );
+                $festivity->psalterWeek = $this->Cal::psalterWeek( $currentOrdWeek );
                 $this->Cal->addFestivity( "LastOrdWeekday" . $ordWeekday, $festivity );
             }
             $ordWeekday++;
@@ -1545,7 +1583,8 @@ class LitCalAPI {
             $currentSaturday = DateTime::createFromFormat( '!j-n-Y', $currentSaturday->format( 'j-n-Y' ),new DateTimeZone( 'UTC' ) )->modify( 'next Saturday' );
             if( $this->Cal->notInSolemnitiesFeastsOrMemorials( $currentSaturday ) ) {
                 $memID = "SatMemBVM" . ++$SatMemBVM_cnt;
-                $festivity = new Festivity( LITCAL_MESSAGES::__( "Saturday Memorial of the Blessed Virgin Mary", $this->LITSETTINGS->LOCALE ), $currentSaturday, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL_OPT, "Blessed Virgin Mary" );
+                $name = $this->LITSETTINGS->LOCALE === 'LA' ? "Memoria Sanctæ Mariæ in Sabbato" : _( "Saturday Memorial of the Blessed Virgin Mary" );
+                $festivity = new Festivity( $name, $currentSaturday, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL_OPT, "Blessed Virgin Mary" );
                 $this->Cal->addFestivity( $memID, $festivity );
             }
         }
@@ -1586,21 +1625,21 @@ class LitCalAPI {
                 $coincidingFestivity->event = $this->Cal->solemnityFromDate( $currentFeastDate );
                 if ( self::DateIsSunday( $currentFeastDate ) && $coincidingFestivity->event->grade < LitGrade::SOLEMNITY ){
                     //it's a Sunday
-                    $coincidingFestivity->grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( utf8_encode( strftime( '%A', $currentFeastDate->format( 'U' ) ) ) );
+                    $coincidingFestivity->grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( $this->dayOfTheWeek->format( $currentFeastDate->format( 'U' ) ) );
                 } else if ( $this->Cal->inSolemnities( $currentFeastDate ) ) {
                     //it's a Feast of the Lord or a Solemnity
-                    $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LITCAL_MESSAGES::_G( $coincidingFestivity->grade, $this->LITSETTINGS->LOCALE, false ) );
+                    $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $coincidingFestivity->event->grade, false ) . '</i>' : $this->LitGrade->i18n( $coincidingFestivity->grade, false ) );
                 } else if ( $this->Cal->inFeastsOrMemorials( $currentFeastDate ) ) {
                     //we should probably be able to create it anyways in this case?
                     $this->Cal->addFestivity( $tag, new Festivity( $FestivityName, $currentFeastDate, $color, LitFeastType::FIXED, LitGrade::FEAST, "Proper" ) );
-                    $coincidingFestivity->grade = LITCAL_MESSAGES::_G( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false );
+                    $coincidingFestivity->grade = $this->LitGrade->i18n( $coincidingFestivity->event->grade, false );
                 }
 
                 $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                    LITCAL_MESSAGES::__( "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d.", $this->LITSETTINGS->LOCALE ),
-                    LITCAL_MESSAGES::_G( LitGrade::FEAST, $this->LITSETTINGS->LOCALE, false ),
+                    _( "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d." ),
+                    $this->LitGrade->i18n( LitGrade::FEAST, false ),
                     $FestivityName,
-                    trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) ),
+                    $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ),
                     $coincidingFestivity->grade,
                     $coincidingFestivity->event->name,
                     $this->LITSETTINGS->YEAR
@@ -1675,9 +1714,9 @@ class LitCalAPI {
                 $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $currentFeastDate, $this->LITSETTINGS );
                 $this->Messages[] = sprintf(
                     "ITALIA: la %s '%s' (%s), aggiunta al calendario nell'edizione del Messale Romano del 1983 pubblicata dalla CEI, è soppressa dalla %s '%s' nell'anno %d",
-                    $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE, false ),
+                    $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : $this->LitGrade->i18n( $row->GRADE, false ),
                     '<i>' . $row->NAME . '</i>',
-                    trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) ),
+                    $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ),
                     $coincidingFestivity->grade,
                     $coincidingFestivity->event->name,
                     $this->LITSETTINGS->YEAR
@@ -1745,16 +1784,18 @@ class LitCalAPI {
         }
         else{
             //if Oct 19 is a Sunday or Solemnity, Saint Paul of the Cross won't exist. But it still needs to be moved to Oct 20 so we must create it again
+            //just keep in mind the StsJeanBrebeuf also won't exist, so we need to retrieve the name from the tempCal
             $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', '20-10-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
             $festivity = $this->Cal->getFestivity( "StPaulCross" );
             if( !$this->Cal->inSolemnities( $currentFeastDate ) && $festivity === null ) {
                 $row = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ "StPaulCross" ];
+                $row2 = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ "StsJeanBrebeuf" ];
                 $festivity = new Festivity( "[ USA ] " . $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
                 $this->Cal->addFestivity( "StPaulCross", $festivity );
                 $this->Messages[] = sprintf(
                     'USA: The optional memorial \'%1$s\' is transferred from Oct 19 to Oct 20 as per the 2011 Roman Missal issued by the USCCB, to make room for \'%2$s\' elevated to the rank of Memorial: applicable to the year %3$d.',
                     $row->NAME,
-                    '<i>' . $this->Cal->getFestivity( "StsJeanBrebeuf" )->name . '</i>',
+                    '<i>' . $row2->NAME . '</i>',
                     $this->LITSETTINGS->YEAR
                 );
             }
@@ -1791,7 +1832,7 @@ class LitCalAPI {
             else{
                 $this->Messages[] = sprintf(
                     "USA: the %s '%s', added to the calendar as per the 2011 Roman Missal issued by the USCCB, is superseded by a Sunday or a Solemnity in the year %d",
-                    $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : LITCAL_MESSAGES::_G( $row->GRADE, $this->LITSETTINGS->LOCALE, false ),
+                    $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : $this->LitGrade->i18n( $row->GRADE, false ),
                     '<i>' . $row->NAME . '</i>',
                     $this->LITSETTINGS->YEAR
                 );
@@ -2015,7 +2056,7 @@ class LitCalAPI {
                         $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                             $this->LITSETTINGS->DIOCESAN . ": the Solemnity '%s', proper to the calendar of the " . $this->GeneralIndex->{$this->LITSETTINGS->DIOCESAN}->diocese . " and usually celebrated on %s, coincides with the Sunday or Solemnity '%s' in the year %d! Does something need to be done about this?",
                             '<i>' . $obj->name . '</i>',
-                            '<b>' . trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) ) . '</b>',
+                            '<b>' . $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ) . '</b>',
                             '<i>' . $this->Cal->solemnityFromDate( $currentFeastDate )->name . '</i>',
                             $this->LITSETTINGS->YEAR
                         );
@@ -2026,9 +2067,9 @@ class LitCalAPI {
                 } else {
                     $this->Messages[] = sprintf(
                         $this->LITSETTINGS->DIOCESAN . ": the %s '%s', proper to the calendar of the " . $this->GeneralIndex->{$this->LITSETTINGS->DIOCESAN}->diocese . " and usually celebrated on %s, is suppressed by the Sunday or Solemnity %s in the year %d",
-                        LITCAL_MESSAGES::_G( $obj->grade, $this->LITSETTINGS->LOCALE, false ),
+                        $this->LitGrade->i18n( $obj->grade, false ),
                         '<i>' . $obj->name . '</i>',
-                        '<b>' . trim( utf8_encode( strftime( '%e %B', $currentFeastDate->format( 'U' ) ) ) ) . '</b>',
+                        '<b>' . $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ) . '</b>',
                         '<i>' . $this->Cal->solemnityFromDate( $currentFeastDate )->name . '</i>',
                         $this->LITSETTINGS->YEAR
                     );
@@ -2040,7 +2081,7 @@ class LitCalAPI {
 
     private function getGithubReleaseInfo() : stdClass {
         $returnObj = new stdClass();
-        $GithubReleasesAPI = "https://api.github.com/repos/JohnRDOrazio/LiturgicalCalendar/releases/latest";
+        $GithubReleasesAPI = "https://api.github.com/repos/Liturgical-Calendar/LiturgicalCalendarAPI/releases/latest";
         $ch = curl_init();
         curl_setopt( $ch, CURLOPT_URL, $GithubReleasesAPI );
         curl_setopt( $ch, CURLOPT_USERAGENT, 'LiturgicalCalendar' );
@@ -2061,9 +2102,7 @@ class LitCalAPI {
             $returnObj->status = "success";
             $returnObj->obj = $GitHubReleasesObj;
         }
-
         return $returnObj;
-
     }
 
     private function produceIcal( stdClass $SerializeableLitCal, stdClass $GitHubReleasesObj ) : string {
@@ -2082,16 +2121,16 @@ class LitCalAPI {
             $displayGrade = "";
             $displayGradeHTML = "";
             if( $FestivityKey === 'AllSouls' ){
-                $displayGrade = strip_tags( LITCAL_MESSAGES::__( "COMMEMORATION", $this->LITSETTINGS->LOCALE ) );
-                $displayGradeHTML = LITCAL_MESSAGES::__( "COMMEMORATION", $this->LITSETTINGS->LOCALE );
+                $displayGrade = $this->LitGrade->i18n( LitGrade::COMMEMORATION, false );
+                $displayGradeHTML = $this->LitGrade->i18n( LitGrade::COMMEMORATION, true );
             }
             else if( (int)$CalEvent->date->format( 'N' ) !==7 ){
                 if( property_exists( $CalEvent,'displayGrade' ) && $CalEvent->displayGrade !== "" ){
                     $displayGrade = $CalEvent->displayGrade;
                     $displayGradeHTML = '<B>' . $CalEvent->displayGrade . '</B>';
                 } else {
-                    $displayGrade = LITCAL_MESSAGES::_G( $CalEvent->grade, $this->LITSETTINGS->LOCALE, false );
-                    $displayGradeHTML = LITCAL_MESSAGES::_G( $CalEvent->grade, $this->LITSETTINGS->LOCALE, true );
+                    $displayGrade = $this->LitGrade->i18n( $CalEvent->grade, false );
+                    $displayGradeHTML = $this->LitGrade->i18n( $CalEvent->grade, true );
                 }
             }
             else if( (int)$CalEvent->grade > LitGrade::MEMORIAL ){
@@ -2099,16 +2138,16 @@ class LitCalAPI {
                     $displayGrade = $CalEvent->displayGrade;
                     $displayGradeHTML = '<B>' . $CalEvent->displayGrade . '</B>';
                 } else {
-                    $displayGrade = LITCAL_MESSAGES::_G( $CalEvent->grade, $this->LITSETTINGS->LOCALE, false );
-                    $displayGradeHTML = LITCAL_MESSAGES::_G( $CalEvent->grade, $this->LITSETTINGS->LOCALE, true );
+                    $displayGrade = $this->LitGrade->i18n( $CalEvent->grade, false );
+                    $displayGradeHTML = $this->LitGrade->i18n( $CalEvent->grade, true );
                 }
             }
 
-            $description = LITCAL_MESSAGES::_C( $CalEvent->common, $this->LITSETTINGS->LOCALE );
+            $description = $this->LitCommon->C( $CalEvent->common );
             $description .=  '\n' . $displayGrade;
             $description .= $CalEvent->color != "" ? '\n' . LITCAL_MESSAGES::ParseColorString( $CalEvent->color, $this->LITSETTINGS->LOCALE, false ) : "";
             $description .= property_exists( $CalEvent,'liturgicalyear' ) && $CalEvent->liturgicalYear !== null && $CalEvent->liturgicalYear != "" ? '\n' . $CalEvent->liturgicalYear : "";
-            $htmlDescription = "<P DIR=LTR>" . LITCAL_MESSAGES::_C( $CalEvent->common, $this->LITSETTINGS->LOCALE );
+            $htmlDescription = "<P DIR=LTR>" . $this->LitCommon->C( $CalEvent->common );
             $htmlDescription .=  '<BR>' . $displayGradeHTML;
             $htmlDescription .= $CalEvent->color != "" ? "<BR>" . LITCAL_MESSAGES::ParseColorString( $CalEvent->color, $this->LITSETTINGS->LOCALE, true ) : "";
             $htmlDescription .= property_exists( $CalEvent,'liturgicalyear' ) && $CalEvent->liturgicalYear !== null && $CalEvent->liturgicalYear != "" ? '<BR>' . $CalEvent->liturgicalYear . "</P>" : "</P>";
@@ -2125,18 +2164,18 @@ class LitCalAPI {
             $ical .= "UID:" . md5( "LITCAL-" . $FestivityKey . '-' . $CalEvent->date->format( 'Y' ) ) . "\r\n";
             $ical .= "CREATED:" . str_replace( ':' , '', str_replace( '-', '', $publishDate ) ) . "\r\n";
             $desc = "DESCRIPTION:" . str_replace( ',','\,', $description );
-            $ical .= strlen( $desc ) > 75 ? rtrim( utf8_encode( chunk_split( utf8_decode( $desc ),71,"\r\n\t" ) ) ) . "\r\n" : "$desc\r\n";
+            $ical .= strlen( $desc ) > 75 ? rtrim( chunk_split( $desc,71,"\r\n\t" ) ) . "\r\n" : "$desc\r\n";
             $ical .= "LAST-MODIFIED:" . str_replace( ':' , '', str_replace( '-', '', $publishDate ) ) . "\r\n";
             $summaryLang = ";LANGUAGE=" . strtolower( $this->LITSETTINGS->LOCALE ); //strtolower( $this->LITSETTINGS->LOCALE ) === "la" ? "" :
             $summary = "SUMMARY".$summaryLang.":" . str_replace( ',','\,',str_replace( "\r\n"," ", $CalEvent->name ) );
-            $ical .= strlen( $summary ) > 75 ? rtrim( utf8_encode( chunk_split( utf8_decode( $summary ),75,"\r\n\t" ) ) ) . "\r\n" : $summary . "\r\n";
+            $ical .= strlen( $summary ) > 75 ? rtrim( chunk_split( $summary,75,"\r\n\t" ) ) . "\r\n" : $summary . "\r\n";
             $ical .= "TRANSP:TRANSPARENT\r\n";
             $ical .= "X-MICROSOFT-CDO-ALLDAYEVENT:TRUE\r\n";
             $ical .= "X-MICROSOFT-DISALLOW-COUNTER:TRUE\r\n";
             $xAltDesc = 'X-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">\n<HTML>\n<BODY>\n\n';
             $xAltDesc .= str_replace( ',','\,', $htmlDescription );
             $xAltDesc .= '\n\n</BODY>\n</HTML>';
-            $ical .= strlen( $xAltDesc ) > 75 ? rtrim( utf8_encode( chunk_split( utf8_decode( $xAltDesc ),71,"\r\n\t" ) ) ) . "\r\n" : "$xAltDesc\r\n";
+            $ical .= strlen( $xAltDesc ) > 75 ? rtrim( chunk_split( $xAltDesc,71,"\r\n\t" ) ) . "\r\n" : "$xAltDesc\r\n";
             $ical .= "END:VEVENT\r\n";
         }
         $ical .= "END:VCALENDAR";
@@ -2193,7 +2232,7 @@ class LitCalAPI {
             case RETURN_TYPE::ICS:
                 $infoObj = $this->getGithubReleaseInfo();
                 if( $infoObj->status === "success" ) {
-                    $ical = $this->produceIcal( $SerializeableLitCal, $infoObj );
+                    $ical = $this->produceIcal( $SerializeableLitCal, $infoObj->obj );
                     file_put_contents( $this->CACHEFILE, $ical );
                     echo $ical;
                 }
@@ -2209,6 +2248,21 @@ class LitCalAPI {
         die();
     }
 
+    private function prepareL10N() : void {
+        $localeArray = [
+            strtolower( $this->LITSETTINGS->LOCALE ) . '_' . $this->LITSETTINGS->LOCALE . '.utf8',
+            strtolower( $this->LITSETTINGS->LOCALE ) . '_' . $this->LITSETTINGS->LOCALE . '.UTF-8',
+            strtolower( $this->LITSETTINGS->LOCALE ) . '_' . $this->LITSETTINGS->LOCALE,
+            strtolower( $this->LITSETTINGS->LOCALE )
+        ];
+        setlocale( LC_ALL, $localeArray );
+        $this->createFormatters();
+        bindtextdomain("litcal", "i18n");
+        textdomain("litcal");
+        $this->Cal          = new FestivityCollection( $this->LITSETTINGS );
+        $this->LitCommon    = new LitCommon( $this->LITSETTINGS->LOCALE );
+        $this->LitGrade     = new LitGrade( $this->LITSETTINGS->LOCALE );
+    }
 
     public function setCacheDuration( string $duration ) : void {
         switch( $duration ) {
@@ -2248,9 +2302,8 @@ class LitCalAPI {
             echo file_get_contents( $this->CACHEFILE );
             die();
         } else {
-            $this->createNumberFormatters();
             $this->dieIfBeforeMinYear();
-
+            $this->prepareL10N();
             $this->calculateUniversalCalendar();
 
             if( $this->LITSETTINGS->NATIONAL !== null ) {
@@ -2273,7 +2326,7 @@ class LitCalAPI {
             }
 
             //$this->setCyclesAndVigils();
-            $this->Cal->setCyclesAndVigils( $this->LITSETTINGS );
+            $this->Cal->setCyclesAndVigils();
             $this->generateResponse();
         }
     }
