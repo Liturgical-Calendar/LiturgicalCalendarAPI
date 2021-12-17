@@ -15,6 +15,7 @@ class FestivityCollection {
     private array $WEEKDAYS_EPIPHANY                = [];
     private array $SOLEMNITIES_LORD_BVM             = [];
     private array $SUNDAYS_ADVENT_LENT_EASTER       = [];
+    private array $T                                = [];
     private IntlDateFormatter $dayOfTheWeek;
     private LITSETTINGS $LITSETTINGS;
     const SUNDAY_CYCLE              = [ "A", "B", "C" ];
@@ -23,6 +24,18 @@ class FestivityCollection {
     public function __construct( LITSETTINGS $LITSETTINGS ) {
         $this->LITSETTINGS = $LITSETTINGS;
         $this->dayOfTheWeek = IntlDateFormatter::create( strtolower( $this->LITSETTINGS->LOCALE ), IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEEE" );
+        if( $this->LITSETTINGS->LOCALE === 'LA' ) {
+            $this->T = [
+                "YEAR"          => "ANNUM",
+                "Vigil Mass"    => "Missa in Vigilia"
+            ];
+        } else {
+            $this->T = [
+                /**translators: in reference to the cycle of liturgical years (A, B, C; I, II) */
+                "YEAR"          => _( "YEAR" ),
+                "Vigil Mass"    => _( "Vigil Mass" )
+            ];
+        }
     }
 
     private static function DateIsSunday( DateTime $dt ) : bool {
@@ -243,17 +256,17 @@ class FestivityCollection {
         foreach( $this->festivities as $key => $festivity ) {
             if ( self::DateIsNotSunday( $festivity->date ) && (int)$festivity->grade === LitGrade::WEEKDAY ) {
                 if ( $festivity->date < $this->festivities[ "Advent1" ]->date ) {
-                    $this->festivities[ $key ]->liturgicalYear = _( "YEAR" ) . " " . ( self::WEEKDAY_CYCLE[ ( $this->LITSETTINGS->YEAR - 1 ) % 2 ] );
+                    $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::WEEKDAY_CYCLE[ ( $this->LITSETTINGS->YEAR - 1 ) % 2 ] );
                 } else if ( $festivity->date >= $this->festivities[ "Advent1" ]->date ) {
-                    $this->festivities[ $key ]->liturgicalYear = _( "YEAR" ) . " " . ( self::WEEKDAY_CYCLE[ $this->LITSETTINGS->YEAR % 2 ] );
+                    $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::WEEKDAY_CYCLE[ $this->LITSETTINGS->YEAR % 2 ] );
                 }
             }
             //if we're dealing with a Sunday or a Solemnity or a Feast of the Lord, then we calculate the Sunday/Festive Cycle
             else if( self::DateIsSunday( $festivity->date ) || (int)$festivity->grade > LitGrade::FEAST ) {
                 if ( $festivity->date < $this->festivities[ "Advent1" ]->date ) {
-                    $this->festivities[ $key ]->liturgicalYear = _( "YEAR" ) . " " . ( self::SUNDAY_CYCLE[ ( $this->LITSETTINGS->YEAR - 1 ) % 3 ] );
+                    $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::SUNDAY_CYCLE[ ( $this->LITSETTINGS->YEAR - 1 ) % 3 ] );
                 } else if ( $festivity->date >= $this->festivities[ "Advent1" ]->date ) {
-                    $this->festivities[ $key ]->liturgicalYear = _( "YEAR" ) . " " . ( self::SUNDAY_CYCLE[ $this->LITSETTINGS->YEAR % 3 ] );
+                    $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::SUNDAY_CYCLE[ $this->LITSETTINGS->YEAR % 3 ] );
                 }
                 $this->calculateVigilMass( $key, $festivity );
             }
@@ -287,7 +300,7 @@ class FestivityCollection {
                 && false === ( $festivity->date > $this->festivities[ "Easter" ]->date && $festivity->date < $this->festivities[ "Easter2" ]->date )
             ){
                 $this->festivities[ $key . "_vigil" ] = new Festivity( 
-                    $festivity->name . " " . _( "Vigil Mass" ),
+                    $festivity->name . " " . $this->T[ "Vigil Mass" ],
                     $VigilDate,
                     $festivity->color,
                     $festivity->type,

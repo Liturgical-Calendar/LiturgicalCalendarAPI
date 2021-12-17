@@ -266,7 +266,9 @@ class LitCalAPI {
                     $this->Cal->addFestivity( "Christmas2", $Christmas2 );
                 } else {
                     $nth++;
-                    $festivity = new Festivity( sprintf( _( "%s day before Epiphany" ), ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : ucfirst( $this->formatter->format( $nth ) ) ) ), $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
+                    $nthStr = $this->LITSETTINGS->LOCALE === 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
+                    $name = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Dies %s ante Epiphaniam", $nthStr ) : sprintf( _( "%s day before Epiphany" ), ucfirst( $nthStr ) );
+                    $festivity = new Festivity( $name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
                     $this->Cal->addFestivity( "DayBeforeEpiphany" . $nth, $festivity );
                 }
             }
@@ -277,8 +279,10 @@ class LitCalAPI {
                 $nth = 0;
                 for ( $i = 7; $i < $SundayAfterEpiphany; $i++ ) {
                     $nth++;
+                    $nthStr = $this->LITSETTINGS->LOCALE === 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
                     $dateTime = DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
-                    $festivity = new Festivity( sprintf( _( "%s day after Epiphany" ), ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : ucfirst( $this->formatter->format( $nth ) ) ) ), $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
+                    $name = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Dies %s post Epiphaniam", $nthStr ) : sprintf( _( "%s day after Epiphany" ), ucfirst( $nthStr ) );
+                    $festivity = new Festivity( $name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
                     $this->Cal->addFestivity( "DayAfterEpiphany" . $nth, $festivity );
                 }
             }
@@ -299,7 +303,10 @@ class LitCalAPI {
                 $nth = 0;
                 for ( $i = 2; $i < $DayOfEpiphany; $i++ ) {
                     $nth++;
-                    $festivity = new Festivity( sprintf( _( "%s day before Epiphany" ), ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : ucfirst( $this->formatter->format( $nth ) ) ) ), DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) ), LitColor::WHITE,     LitFeastType::MOBILE );
+                    $nthStr = $this->LITSETTINGS->LOCALE === 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
+                    $name = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Dies %s ante Epiphaniam", $nthStr ) : sprintf( _( "%s day before Epiphany" ), ucfirst( $nthStr ) );
+                    $dateTime = DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
+                    $festivity = new Festivity( $name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
                     $this->Cal->addFestivity( "DayBeforeEpiphany" . $nth, $festivity );
                 }
 
@@ -309,7 +316,10 @@ class LitCalAPI {
                     $nth = 0;
                     for ( $i = $DayOfEpiphany + 1; $i < $SundayAfterEpiphany; $i++ ) {
                         $nth++;
-                        $festivity = new Festivity( sprintf( _( "%s day after Epiphany" ), ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : ucfirst( $this->formatter->format( $nth ) ) ) ), DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) ), LitColor::WHITE,     LitFeastType::MOBILE );
+                        $nthStr = $this->LITSETTINGS->LOCALE === 'LA' ? LITCAL_MESSAGES::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
+                        $name = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Dies %s post Epiphaniam", $nthStr ) : sprintf( _( "%s day after Epiphany" ), ucfirst( $nthStr ) );
+                        $dateTime = DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) );
+                        $festivity = new Festivity( $name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
                         $this->Cal->addFestivity( "DayAfterEpiphany" . $nth, $festivity );
                     }
                 }
@@ -696,8 +706,11 @@ class LitCalAPI {
                 $diff = $upper - (int)$this->Cal->getFestivity("Advent1")->date->format( 'z' ); //day count between current day and First Sunday of Advent
                 $currentAdvWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1; //week count between current day and First Sunday of Advent
 
+                $dayOfTheWeek = $this->LITSETTINGS->LOCALE === 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayAdvent->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $weekdayAdvent->format( 'U' ) ) );
                 $ordinal = ucfirst( LITCAL_MESSAGES::getOrdinal( $currentAdvWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem, LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
-                $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayAdvent->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $weekdayAdvent->format( 'U' ) ) ) ) . " " . sprintf( _( "of the %s Week of Advent" ), $ordinal ), $weekdayAdvent, LitColor::PURPLE, LitFeastType::MOBILE );
+                $nthStr = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Hebdomadæ %s Adventus", $ordinal ) : sprintf( _( "of the %s Week of Advent" ), $ordinal );
+                $name = $dayOfTheWeek . " " . $nthStr;
+                $festivity = new Festivity( $name, $weekdayAdvent, LitColor::PURPLE, LitFeastType::MOBILE );
                 $this->Cal->addFestivity( "AdventWeekday" . $weekdayAdventCnt, $festivity );
             }
 
@@ -712,7 +725,8 @@ class LitCalAPI {
             $weekdayChristmas = DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LITSETTINGS->YEAR, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayChristmasCnt . 'D' ) );
             if ( $this->Cal->notInSolemnitiesFeastsOrMemorials( $weekdayChristmas ) && self::DateIsNotSunday( $weekdayChristmas ) ) {
                 $ordinal = ucfirst( LITCAL_MESSAGES::getOrdinal( ( $weekdayChristmasCnt + 1 ), $this->LITSETTINGS->LOCALE, $this->formatter, LITCAL_MESSAGES::LATIN_ORDINAL ) );
-                $festivity = new Festivity( sprintf( _( "%s Day of the Octave of Christmas" ), $ordinal ), $weekdayChristmas, LitColor::WHITE, LitFeastType::MOBILE );
+                $name = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Dies %s Octavæ Nativitatis", $ordinal ) : sprintf( _( "%s Day of the Octave of Christmas" ), $ordinal );
+                $festivity = new Festivity( $name, $weekdayChristmas, LitColor::WHITE, LitFeastType::MOBILE );
                 $this->Cal->addFestivity( "ChristmasWeekday" . $weekdayChristmasCnt, $festivity );
             }
             $weekdayChristmasCnt++;
@@ -734,9 +748,15 @@ class LitCalAPI {
                     $diff = $upper -  (int)$this->Cal->getFestivity( "Lent1" )->date->format( 'z' ); //day count between current day and First Sunday of Lent
                     $currentLentWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1; //week count between current day and First Sunday of Lent
                     $ordinal = ucfirst( LITCAL_MESSAGES::getOrdinal( $currentLentWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem, LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
-                    $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayLent->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $weekdayLent->format( 'U' ) ) ) ) . " ".  sprintf( _( "of the %s Week of Lent" ), $ordinal ), $weekdayLent, LitColor::PURPLE, LitFeastType::MOBILE );
+                    $dayOfTheWeek = $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayLent->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $weekdayLent->format( 'U' ) ) );
+                    $nthStr = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Hebdomadæ %s Quadragesimæ", $ordinal ) : sprintf( _( "of the %s Week of Lent" ), $ordinal );
+                    $name = $dayOfTheWeek . " ".  $nthStr;
+                    $festivity = new Festivity( $name, $weekdayLent, LitColor::PURPLE, LitFeastType::MOBILE );
                 } else {
-                    $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayLent->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $weekdayLent->format( 'U' ) ) ) ) . " ". _( "after Ash Wednesday" ), $weekdayLent, LitColor::PURPLE, LitFeastType::MOBILE );
+                    $dayOfTheWeek = $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayLent->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $weekdayLent->format( 'U' ) ) );
+                    $postStr = $this->LITSETTINGS->LOCALE === 'LA' ? "post Feria IV Cinerum" : _( "after Ash Wednesday" );
+                    $name = $dayOfTheWeek . " ". $postStr;
+                    $festivity = new Festivity( $name, $weekdayLent, LitColor::PURPLE, LitFeastType::MOBILE );
                 }
                 $this->Cal->addFestivity( "LentWeekday" . $weekdayLentCnt, $festivity );
             }
@@ -1471,7 +1491,10 @@ class LitCalAPI {
                 $diff = $upper - (int)$this->Cal->getFestivity( "Easter" )->date->format( 'z' ); //day count between current day and Easter Sunday
                 $currentEasterWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1;         //week count between current day and Easter Sunday
                 $ordinal = ucfirst( LITCAL_MESSAGES::getOrdinal( $currentEasterWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem, LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
-                $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayEaster->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $weekdayEaster->format( 'U' ) ) ) ) . " " . sprintf( _( "of the %s Week of Easter" ), $ordinal ), $weekdayEaster, LitColor::WHITE, LitFeastType::MOBILE );
+                $dayOfTheWeek = $this->LITSETTINGS->LOCALE === 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $weekdayEaster->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $weekdayEaster->format( 'U' ) ) );
+                $t = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Hebdomadæ %s Temporis Paschali", $ordinal ) : sprintf( _( "of the %s Week of Easter" ), $ordinal );
+                $name = $dayOfTheWeek . " " . $t;
+                $festivity = new Festivity( $name, $weekdayEaster, LitColor::WHITE, LitFeastType::MOBILE );
                 $festivity->psalterWeek = $this->Cal::psalterWeek( $currentEasterWeek );
                 $this->Cal->addFestivity( "EasterWeekday" . $weekdayEasterCnt, $festivity );
             }
@@ -1504,7 +1527,10 @@ class LitCalAPI {
                     $currentOrdWeek = ( ( $diff - $diff % 7 ) / 7 ) + 2;
                 }
                 $ordinal = ucfirst( LITCAL_MESSAGES::getOrdinal( $currentOrdWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem,LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
-                $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $firstOrdinary->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $firstOrdinary->format( 'U' ) ) ) ) . " " . sprintf( _( "of the %s Week of Ordinary Time" ), $ordinal ), $firstOrdinary, LitColor::GREEN, LitFeastType::MOBILE );
+                $dayOfTheWeek = $this->LITSETTINGS->LOCALE === 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $firstOrdinary->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $firstOrdinary->format( 'U' ) ) );
+                $nthStr = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Hebdomadæ %s Temporis Ordinarii", $ordinal ) : sprintf( _( "of the %s Week of Ordinary Time" ), $ordinal );
+                $name = $dayOfTheWeek . " " . $nthStr;
+                $festivity = new Festivity( $name, $firstOrdinary, LitColor::GREEN, LitFeastType::MOBILE );
                 $festivity->psalterWeek = $this->Cal::psalterWeek( $currentOrdWeek );
                 $this->Cal->addFestivity( "FirstOrdWeekday" . $ordWeekday, $festivity );
             }
@@ -1531,7 +1557,10 @@ class LitCalAPI {
                 $currentOrdWeek = 34 - $weekDiff;
 
                 $ordinal = ucfirst( LITCAL_MESSAGES::getOrdinal( $currentOrdWeek, $this->LITSETTINGS->LOCALE, $this->formatterFem,LITCAL_MESSAGES::LATIN_ORDINAL_FEM_GEN ) );
-                $festivity = new Festivity( ( $this->LITSETTINGS->LOCALE == 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $lastOrdinary->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $lastOrdinary->format( 'U' ) ) ) ) . " " . sprintf( _( "of the %s Week of Ordinary Time" ), $ordinal ), $lastOrdinary, LitColor::GREEN, LitFeastType::MOBILE );
+                $dayOfTheWeek = $this->LITSETTINGS->LOCALE === 'LA' ? LITCAL_MESSAGES::LATIN_DAYOFTHEWEEK[ $lastOrdinary->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $lastOrdinary->format( 'U' ) ) );
+                $nthStr = $this->LITSETTINGS->LOCALE === 'LA' ? sprintf( "Hebdomadæ %s Temporis Ordinarii", $ordinal ) : sprintf( _( "of the %s Week of Ordinary Time" ), $ordinal );
+                $name = $dayOfTheWeek . " " . $nthStr;
+                $festivity = new Festivity( $name, $lastOrdinary, LitColor::GREEN, LitFeastType::MOBILE );
                 $festivity->psalterWeek = $this->Cal::psalterWeek( $currentOrdWeek );
                 $this->Cal->addFestivity( "LastOrdWeekday" . $ordWeekday, $festivity );
             }
@@ -1553,7 +1582,8 @@ class LitCalAPI {
             $currentSaturday = DateTime::createFromFormat( '!j-n-Y', $currentSaturday->format( 'j-n-Y' ),new DateTimeZone( 'UTC' ) )->modify( 'next Saturday' );
             if( $this->Cal->notInSolemnitiesFeastsOrMemorials( $currentSaturday ) ) {
                 $memID = "SatMemBVM" . ++$SatMemBVM_cnt;
-                $festivity = new Festivity( _( "Saturday Memorial of the Blessed Virgin Mary" ), $currentSaturday, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL_OPT, "Blessed Virgin Mary" );
+                $name = $this->LITSETTINGS->LOCALE === 'LA' ? "Memoria Sanctæ Mariæ in Sabbato" : _( "Saturday Memorial of the Blessed Virgin Mary" );
+                $festivity = new Festivity( $name, $currentSaturday, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL_OPT, "Blessed Virgin Mary" );
                 $this->Cal->addFestivity( $memID, $festivity );
             }
         }
