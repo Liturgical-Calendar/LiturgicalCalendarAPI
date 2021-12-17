@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-17 12:12+0000\n"
+"POT-Creation-Date: 2021-12-17 12:17+0000\n"
 "PO-Revision-Date: 2021-12-17 01:38+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -280,7 +280,7 @@ msgstr ""
 
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
 #: includes/LitCalMessages.php:141 includes/LitCalMessages.php:152
-#: includes/enums/LitCommon.php:279
+#: includes/enums/LitCommon.php:280
 msgid "or"
 msgstr "oppure"
 
