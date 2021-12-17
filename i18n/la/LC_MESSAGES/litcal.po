@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2021-12-17 01:19+0000\n"
-"PO-Revision-Date: 2021-12-17 01:18+0000\n"
+"PO-Revision-Date: 2021-12-17 01:38+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/la/>\n"
@@ -293,18 +293,16 @@ msgid "Vigil Mass"
 msgstr "Missa in Vigilia"
 
 #: includes/FestivityCollection.php:323
-#, fuzzy, php-format
-#| msgid ""
-#| "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
-#| "We should ask the Congregation for Divine Worship what to do about this!"
+#, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
 "This last Solemnity takes precedence, therefore it will maintain Vespers II "
 "and an evening Mass, while the first Solemnity will not have a Vigil Mass or "
 "Vespers I."
 msgstr ""
-"Missa in Vigilia %s '%s' coincidet cum %s'%s' in anno %d. Oportet quaerere a "
-"Congregatione Cultu Divino quid facere!"
+"Missa in Vigilia %s '%s' coincidet cum %s'%s' in anno %d. Sollemnitas ultima "
+"praecedentia habet, ergo servabit Secundis Vesperis atque Missa vesperum, "
+"cum Sollemnitas prima neque Missa in Vigilia neque Primis Vesperis servabit."
 
 #: includes/FestivityCollection.php:336 includes/FestivityCollection.php:394
 #, php-format
