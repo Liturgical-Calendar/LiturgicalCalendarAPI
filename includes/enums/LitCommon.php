@@ -57,77 +57,84 @@ class LitCommon {
     const PRO_EDUCATORIBUS                      = "For Educators";
     const PRO_SANCTIS_MULIERIBUS                = "For Holy Women";
 
+    private string $locale;
+    private array $GTXT;
 
-    const GTXT = [
-        self::PROPRIO                           => _( "Proper" ),
-        /**translators: context = from the Common of nn */
-        self::DEDICATIONIS_ECCLESIAE            => _( "Dedication of a Church" ),
-        /**translators: context = from the Common of nn */
-        self::BEATAE_MARIAE_VIRGINIS            => _( "Blessed Virgin Mary" ),
-        /**translators: context = from the Common of nn */
-        self::MARTYRUM                          => _( "Martyrs" ),
-        /**translators: context = from the Common of nn */
-        self::PASTORUM                          => _( "Pastors" ),
-        /**translators: context = from the Common of nn */
-        self::DOCTORUM                          => _( "Doctors" ),
-        /**translators: context = from the Common of nn */
-        self::VIRGINUM                          => _( "Virgins" ),
-        /**translators: context = from the Common of nn */
-        self::SANCTORUM_ET_SANCTARUM            => _( "Holy Men and Women" ),
+    public function __construct( string $locale ) {
+        $this->locale = strtolower( $locale );
+        $this->GTXT = [
+            self::PROPRIO                           => _( "Proper" ),
+            /**translators: context = from the Common of nn */
+            self::DEDICATIONIS_ECCLESIAE            => _( "Dedication of a Church" ),
+            /**translators: context = from the Common of nn */
+            self::BEATAE_MARIAE_VIRGINIS            => _( "Blessed Virgin Mary" ),
+            /**translators: context = from the Common of nn */
+            self::MARTYRUM                          => _( "Martyrs" ),
+            /**translators: context = from the Common of nn */
+            self::PASTORUM                          => _( "Pastors" ),
+            /**translators: context = from the Common of nn */
+            self::DOCTORUM                          => _( "Doctors" ),
+            /**translators: context = from the Common of nn */
+            self::VIRGINUM                          => _( "Virgins" ),
+            /**translators: context = from the Common of nn */
+            self::SANCTORUM_ET_SANCTARUM            => _( "Holy Men and Women" ),
+    
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_UNO_MARTYRE                       => _( "For One Martyr" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_PLURIBUS_MARTYRIBUS               => _( "For Several Martyrs" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_MISSIONARIIS_MARTYRIBUS           => _( "For Missionary Martyrs" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_UNO_MISSIONARIO_MARTYRE           => _( "For One Missionary Martyr" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_PLURIBUS_MISSIONARIIS_MARTYRIBUS  => _( "For Several Missionary Martyrs" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_VIRGINE_MARTYRE                   => _( "For a Virgin Martyr" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_SANCTA_MULIERE_MARTYRE            => _( "For a Holy Woman Martyr" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_PAPA                              => _( "For a Pope" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_EPISCOPO                          => _( "For a Bishop" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_UNO_PASTORE                       => _( "For One Pastor" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_PLURIBUS_PASTORIBUS               => _( "For Several Pastors" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_FUNDATORIBUS_ECCLESIARUM          => _( "For Founders of a Church" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_UNO_FUNDATORE                     => _( "For One Founder" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_PLURIBUS_FUNDATORIBUS             => _( "For Several Founders" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_MISSIONARIIS                      => _( "For Missionaries" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_UNA_VIRGINE                       => _( "For One Virgin" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_PLURIBUS_VIRGINIBUS               => _( "For Several Virgins" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_PLURIBUS_SANCTIS                  => _( "For Several Saints" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_UNO_SANCTO                        => _( "For One Saint" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_ABBATE                            => _( "For an Abbot" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_MONACHO                           => _( "For a Monk" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_MONIALI                           => _( "For a Nun" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_RELIGIOSIS                        => _( "For Religious" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_IIS_QUI_OPERA_MISERICORDIAE_EXERCUERUNT => _( "For Those Who Practiced Works of Mercy" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_EDUCATORIBUS                      => _( "For Educators" ),
+            /**translators: context = from the Common of nn: nn */
+            self::PRO_SANCTIS_MULIERIBUS                => _( "For Holy Women" )
+        ];
+    }
 
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_UNO_MARTYRE                       => _( "For One Martyr" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_PLURIBUS_MARTYRIBUS               => _( "For Several Martyrs" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_MISSIONARIIS_MARTYRIBUS           => _( "For Missionary Martyrs" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_UNO_MISSIONARIO_MARTYRE           => _( "For One Missionary Martyr" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_PLURIBUS_MISSIONARIIS_MARTYRIBUS  => _( "For Several Missionary Martyrs" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_VIRGINE_MARTYRE                   => _( "For a Virgin Martyr" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_SANCTA_MULIERE_MARTYRE            => _( "For a Holy Woman Martyr" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_PAPA                              => _( "For a Pope" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_EPISCOPO                          => _( "For a Bishop" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_UNO_PASTORE                       => _( "For One Pastor" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_PLURIBUS_PASTORIBUS               => _( "For Several Pastors" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_FUNDATORIBUS_ECCLESIARUM          => _( "For Founders of a Church" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_UNO_FUNDATORE                     => _( "For One Founder" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_PLURIBUS_FUNDATORIBUS             => _( "For Several Founders" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_MISSIONARIIS                      => _( "For Missionaries" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_UNA_VIRGINE                       => _( "For One Virgin" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_PLURIBUS_VIRGINIBUS               => _( "For Several Virgins" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_PLURIBUS_SANCTIS                  => _( "For Several Saints" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_UNO_SANCTO                        => _( "For One Saint" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_ABBATE                            => _( "For an Abbot" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_MONACHO                           => _( "For a Monk" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_MONIALI                           => _( "For a Nun" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_RELIGIOSIS                        => _( "For Religious" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_IIS_QUI_OPERA_MISERICORDIAE_EXERCUERUNT => _( "For Those Who Practiced Works of Mercy" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_EDUCATORIBUS                      => _( "For Educators" ),
-        /**translators: context = from the Common of nn: nn */
-        self::PRO_SANCTIS_MULIERIBUS                => _( "For Holy Women" )
-    ];
+
 
     const LATIN = [
         self::PROPRIO                               => "Proprio",
@@ -234,11 +241,45 @@ class LitCommon {
         return empty( array_diff( $values, self::$values ) );
     }
 
-    public static function i18n( string $value, string $locale ) : string {
-        return $locale === 'LA' ? self::LATIN[ $value ] : self::GTXT[ $value ];
+    public function i18n( string $value ) : string {
+        if( self::isValid( $value ) ) {
+            if( $this->locale === "la" ) {
+                return self::LATIN[ $value ];
+            } else{
+                return $this->GTXT[ $value ];
+            }
+        }
+        return $value;
     }
 
-    public static function getPossessive( string $value, string $locale ) : string {
-        return $locale === "LA" ? "" : self::POSSESSIVE( $value );
+    public function getPossessive( string $value ) : string {
+        return $this->locale === "la" ? "" : self::POSSESSIVE( $value );
     }
+
+    /**
+     * Function C
+     * Returns a translated human readable string of the Common or the Proper
+     */
+    public function C( string $common="" ) : string {
+        if ($common !== "") {
+            if( $common === LitCommon::PROPRIO ) {
+                $common = $this->i18n( $common );
+            } else{
+                $commons = explode(",", $common);
+                $commons = array_map(function ($txt) {
+                    if( strpos($txt, ":") !== false ){
+                        [$commonGeneral, $commonSpecific] = explode(":", $txt);
+                    } else {
+                        $commonGeneral = $txt;
+                        $commonSpecific = "";
+                    }
+                    return _( "From the Common" ) . " " . $this->getPossessive( $commonGeneral ) . " " . $this->i18n( $commonGeneral ) . ($commonSpecific != "" ? ": " . $this->i18n( $commonSpecific ) : "");
+                }, $commons);
+                /**translators: when there are multiple possible commons, this will be the glue "or from the common of..." */
+                $common = implode( "; " . _( "or" ) . " ", $commons );
+            }
+        }
+        return $common;
+    }
+
 }

@@ -107,33 +107,6 @@ class LITCAL_MESSAGES {
         "December"
     ];
 
-    /**
-     * Function _C
-     * Gets a translated human readable string with the Common or the Proper
-     */
-    public static function _C( string $common="", string $locale="LA" ) : string {
-        $locale = strtolower($locale);
-        if ($common !== "") {
-            if( $common === LitCommon::PROPRIO ) {
-                $common = LitCommon::i18n( $common, $locale );
-            } else{
-                $commons = explode(",", $common);
-                $commons = array_map(function ($txt) use($locale) {
-                    if( strpos($txt, ":") !== false ){
-                        [$commonGeneral, $commonSpecific] = explode(":", $txt);
-                    } else {
-                        $commonGeneral = $txt;
-                        $commonSpecific = "";
-                    }
-                    $possessive = LitCommon::getPossessive( $commonGeneral, $locale );
-                    return _( "From the Common" ) . " " . $possessive . " " . LitCommon::i18n( $commonGeneral, $locale ) . ($commonSpecific != "" ? ": " . LitCommon::i18n( $commonSpecific, $locale ) : "");
-                }, $commons);
-                /**translators: when there are multiple possible commons, this will be the glue "or from the common of..." */
-                $common = implode( "; " . _( "or" ) . " ", $commons );
-            }
-        }
-        return $common;
-    }
 
     public static function ColorToHex( string $color ) : string {
         $hex = "#";
@@ -166,7 +139,7 @@ class LITCAL_MESSAGES {
                 $colors = array_map( function($txt) use ($LOCALE) {
                     return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $txt ) . '">' . LitColor::i18n( $txt, $LOCALE ) . '</FONT></SPAN></I></B>';
                 }, $colors );
-                return implode( ' <I><FONT FACE="Calibri">' . self::__( "or", $LOCALE ) . "</FONT></I> ", $colors );
+                return implode( ' <I><FONT FACE="Calibri">' . _( "or" ) . "</FONT></I> ", $colors );
             }
             else{
                 return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $string ) . '">' . LitColor::i18n( $string, $LOCALE ) . '</FONT></SPAN></I></B>';

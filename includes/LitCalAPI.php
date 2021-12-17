@@ -23,6 +23,7 @@ class LitCalAPI {
     private string $CACHEFILE                       = "";
     private array $ALLOWED_RETURN_TYPES;
     private LITSETTINGS $LITSETTINGS;
+    private LitCommon $LitCommon;
 
     private ?object $DiocesanData                   = null;
     private ?object $GeneralIndex                   = null;
@@ -2107,11 +2108,11 @@ class LitCalAPI {
                 }
             }
 
-            $description = LITCAL_MESSAGES::_C( $CalEvent->common, $this->LITSETTINGS->LOCALE );
+            $description = $this->LitCommon->C( $CalEvent->common );
             $description .=  '\n' . $displayGrade;
             $description .= $CalEvent->color != "" ? '\n' . LITCAL_MESSAGES::ParseColorString( $CalEvent->color, $this->LITSETTINGS->LOCALE, false ) : "";
             $description .= property_exists( $CalEvent,'liturgicalyear' ) && $CalEvent->liturgicalYear !== null && $CalEvent->liturgicalYear != "" ? '\n' . $CalEvent->liturgicalYear : "";
-            $htmlDescription = "<P DIR=LTR>" . LITCAL_MESSAGES::_C( $CalEvent->common, $this->LITSETTINGS->LOCALE );
+            $htmlDescription = "<P DIR=LTR>" . $this->LitCommon->C( $CalEvent->common );
             $htmlDescription .=  '<BR>' . $displayGradeHTML;
             $htmlDescription .= $CalEvent->color != "" ? "<BR>" . LITCAL_MESSAGES::ParseColorString( $CalEvent->color, $this->LITSETTINGS->LOCALE, true ) : "";
             $htmlDescription .= property_exists( $CalEvent,'liturgicalyear' ) && $CalEvent->liturgicalYear !== null && $CalEvent->liturgicalYear != "" ? '<BR>' . $CalEvent->liturgicalYear . "</P>" : "</P>";
@@ -2128,18 +2129,18 @@ class LitCalAPI {
             $ical .= "UID:" . md5( "LITCAL-" . $FestivityKey . '-' . $CalEvent->date->format( 'Y' ) ) . "\r\n";
             $ical .= "CREATED:" . str_replace( ':' , '', str_replace( '-', '', $publishDate ) ) . "\r\n";
             $desc = "DESCRIPTION:" . str_replace( ',','\,', $description );
-            $ical .= strlen( $desc ) > 75 ? rtrim( chunk_split( utf8_decode( $desc ),71,"\r\n\t" ) ) . "\r\n" : "$desc\r\n";
+            $ical .= strlen( $desc ) > 75 ? rtrim( chunk_split( $desc,71,"\r\n\t" ) ) . "\r\n" : "$desc\r\n";
             $ical .= "LAST-MODIFIED:" . str_replace( ':' , '', str_replace( '-', '', $publishDate ) ) . "\r\n";
             $summaryLang = ";LANGUAGE=" . strtolower( $this->LITSETTINGS->LOCALE ); //strtolower( $this->LITSETTINGS->LOCALE ) === "la" ? "" :
             $summary = "SUMMARY".$summaryLang.":" . str_replace( ',','\,',str_replace( "\r\n"," ", $CalEvent->name ) );
-            $ical .= strlen( $summary ) > 75 ? rtrim( chunk_split( utf8_decode( $summary ),75,"\r\n\t" ) ) . "\r\n" : $summary . "\r\n";
+            $ical .= strlen( $summary ) > 75 ? rtrim( chunk_split( $summary,75,"\r\n\t" ) ) . "\r\n" : $summary . "\r\n";
             $ical .= "TRANSP:TRANSPARENT\r\n";
             $ical .= "X-MICROSOFT-CDO-ALLDAYEVENT:TRUE\r\n";
             $ical .= "X-MICROSOFT-DISALLOW-COUNTER:TRUE\r\n";
             $xAltDesc = 'X-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">\n<HTML>\n<BODY>\n\n';
             $xAltDesc .= str_replace( ',','\,', $htmlDescription );
             $xAltDesc .= '\n\n</BODY>\n</HTML>';
-            $ical .= strlen( $xAltDesc ) > 75 ? rtrim( chunk_split( utf8_decode( $xAltDesc ),71,"\r\n\t" ) ) . "\r\n" : "$xAltDesc\r\n";
+            $ical .= strlen( $xAltDesc ) > 75 ? rtrim( chunk_split( $xAltDesc,71,"\r\n\t" ) ) . "\r\n" : "$xAltDesc\r\n";
             $ical .= "END:VEVENT\r\n";
         }
         $ical .= "END:VCALENDAR";
@@ -2223,6 +2224,8 @@ class LitCalAPI {
         $this->createFormatters();
         bindtextdomain("litcal", "i18n");
         textdomain("litcal");
+        $this->Cal          = new FestivityCollection( $this->LITSETTINGS );
+        $this->LitCommon    = new LitCommon( $this->LITSETTINGS->LOCALE );
     }
 
     public function setCacheDuration( string $duration ) : void {
@@ -2254,7 +2257,6 @@ class LitCalAPI {
     public function Init(){
         $this->APICore->Init();
         $this->initParameterData();
-        $this->Cal = new FestivityCollection( $this->LITSETTINGS );
         $this->APICore->setResponseContentTypeHeader();
         $this->loadLocalCalendarData();
         if( $this->cacheFileIsAvailable() ){
