@@ -1,7 +1,6 @@
 <?php
 
-include_once( 'includes/enums/LitGrade.php' );
-include_once( 'includes/enums/LitCommon.php' );
+include_once( 'includes/enums/LitColor.php' );
 
 class LITCAL_MESSAGES {
 
