@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-16 16:35+0000\n"
+"POT-Creation-Date: 2021-12-17 01:19+0000\n"
 "PO-Revision-Date: 2021-12-17 01:18+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -278,208 +278,14 @@ msgstr ""
 "La %s '%s', celebrata solitamente il %s, è soppressa dalla %s '%s' nell'anno "
 "%d."
 
-#. translators: context = from the Common of nn
-#: includes/LitCalMessages.php:161
-msgid "Martyrs"
-msgstr "Martiri"
-
-#. translators: context = from the Common of nn
-#: includes/LitCalMessages.php:164
-msgid "Pastors"
-msgstr "Pastori"
-
-#. translators: context = from the Common of nn
-#: includes/LitCalMessages.php:167
-msgid "Doctors"
-msgstr "Dottori della Chiesa"
-
-#. translators: context = from the Common of nn
-#: includes/LitCalMessages.php:170
-msgid "Virgins"
-msgstr "Vergini"
-
-#. translators: context = from the Common of nn
-#: includes/LitCalMessages.php:173
-msgid "Holy Men and Women"
-msgstr "Santi e delle Sante"
-
-#. translators: context = from the Common of nn
-#: includes/LitCalMessages.php:176
-msgid "Blessed Virgin Mary"
-msgstr "Beata Vergine Maria"
-
-#. translators: context = from the Common of nn
-#: includes/LitCalMessages.php:179
-msgid "Dedication of a Church"
-msgstr "Dedicazione di una Chiesa"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:191
-msgid "For One Martyr"
-msgstr "Per un martire"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:194
-msgid "For Several Martyrs"
-msgstr "Per più martiri"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:197
-msgid "For Missionary Martyrs"
-msgstr "Per i martiri missionari"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:200
-msgid "For One Missionary Martyr"
-msgstr "Per un martire missionario"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:203
-msgid "For Several Missionary Martyrs"
-msgstr "Per più martiri missionari"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:206
-msgid "For a Virgin Martyr"
-msgstr "Per una vergine martire"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:209
-msgid "For a Holy Woman Martyr"
-msgstr "Per una santa martire"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:212
-msgid "For a Pope"
-msgstr "Per i papi"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:215
-msgid "For a Bishop"
-msgstr "Per i vescovi"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:218
-msgid "For One Pastor"
-msgstr "Per un pastore"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:221
-msgid "For Several Pastors"
-msgstr "Per i pastori"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:224
-msgid "For Founders of a Church"
-msgstr "Per i fondatori delle chiese"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:227
-msgid "For One Founder"
-msgstr "Per un fondatore"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:230
-msgid "For Several Founders"
-msgstr "Per più fondatori"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:233
-msgid "For Missionaries"
-msgstr "Per i missionari"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:236
-msgid "For One Virgin"
-msgstr "Per una vergine"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:239
-msgid "For Several Virgins"
-msgstr "Per più vergini"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:242
-msgid "For Religious"
-msgstr "Per i religiosi"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:245
-msgid "For Those Who Practiced Works of Mercy"
-msgstr "Per gli operatori di misericordia"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:248
-msgid "For an Abbot"
-msgstr "Per un abate"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:251
-msgid "For a Monk"
-msgstr "Per un monaco"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:254
-msgid "For a Nun"
-msgstr "Per i religiosi"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:257
-msgid "For Educators"
-msgstr "Per gli educatori"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:260
-msgid "For Holy Women"
-msgstr "Per le sante"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:263
-msgid "For One Saint"
-msgstr "Per un Santo"
-
-#. translators: context = from the Common of nn: nn
-#: includes/LitCalMessages.php:266
-msgid "For Several Saints"
-msgstr "Per più santi"
-
-#. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/LitCalMessages.php:290 includes/LitCalMessages.php:305
-msgctxt "(SING_FEMM)"
-msgid "of"
-msgstr "della"
-
-#. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/LitCalMessages.php:294
-msgctxt "(PLUR_FEMM)"
-msgid "of"
-msgstr "delle"
-
-#. translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/LitCalMessages.php:301
-msgctxt "(PLUR_MASC)"
-msgid "of"
-msgstr "dei"
-
-#. translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/LitCalMessages.php:309
-msgctxt "(SING_MASC)"
-msgid "of"
-msgstr "del"
-
-#: includes/LitCalMessages.php:311
+#: includes/LitCalMessages.php:129
 msgid "From the Common"
 msgstr "Dal Comune"
 
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
-#: includes/LitCalMessages.php:314 includes/LitCalMessages.php:364
+#: includes/LitCalMessages.php:132 includes/LitCalMessages.php:180
 msgid "or"
 msgstr "oppure"
-
-#. translators: context = the Proper as opposed to the Common
-#: includes/LitCalMessages.php:317
-msgid "Proper"
-msgstr "Proprio"
 
 #: includes/FestivityCollection.php:246 includes/FestivityCollection.php:248
 #: includes/FestivityCollection.php:254 includes/FestivityCollection.php:256
@@ -490,13 +296,18 @@ msgstr "ANNO"
 msgid "Vigil Mass"
 msgstr "Messa della vigilia"
 
-#: includes/FestivityCollection.php:323 includes/FestivityCollection.php:350
-#, php-format
+#: includes/FestivityCollection.php:323
+#, fuzzy, php-format
+#| msgid ""
+#| "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
+#| "This last Solemnity takes precedence, therefore it will maintain Vespers "
+#| "II and an evening Mass, while  the first Solemnity will not have a Vigil "
+#| "Mass or Vespers I."
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
 "This last Solemnity takes precedence, therefore it will maintain Vespers II "
-"and an evening Mass, while  the first Solemnity will not have a Vigil Mass "
-"or Vespers I."
+"and an evening Mass, while the first Solemnity will not have a Vigil Mass or "
+"Vespers I."
 msgstr ""
 "La Messa nella Vigilia per la %s '%s' coincide con la %s '%s' nell'anno %d. "
 "Quest'ultima Solennità ha la precedenza, pertanto manterrà i Secondi Vespri "
@@ -515,6 +326,19 @@ msgstr ""
 "Visto che la prima Solennità ha la precedenza, avrà i Primi Vespri e una "
 "Messa di Vigilia, mentre l'ultima Solennità non avrà né i Secondi Vespri né "
 "una Messa serale."
+
+#: includes/FestivityCollection.php:350
+#, php-format
+msgid ""
+"The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
+"This last Solemnity takes precedence, therefore it will maintain Vespers II "
+"and an evening Mass, while  the first Solemnity will not have a Vigil Mass "
+"or Vespers I."
+msgstr ""
+"La Messa nella Vigilia per la %s '%s' coincide con la %s '%s' nell'anno %d. "
+"Quest'ultima Solennità ha la precedenza, pertanto manterrà i Secondi Vespri "
+"e una Messa serale, mentre la prima Solennità non avrà né una Messa di "
+"Vigilia né i Primi Vespri."
 
 #: includes/FestivityCollection.php:364
 #, php-format
@@ -560,6 +384,199 @@ msgstr "rosso"
 #: includes/enums/LitColor.php:35
 msgid "pink"
 msgstr "rosa"
+
+#: includes/enums/LitCommon.php:62
+msgid "Proper"
+msgstr "Proprio"
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:64
+msgid "Dedication of a Church"
+msgstr "Dedicazione di una Chiesa"
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:66
+msgid "Blessed Virgin Mary"
+msgstr "Beata Vergine Maria"
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:68
+msgid "Martyrs"
+msgstr "Martiri"
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:70
+msgid "Pastors"
+msgstr "Pastori"
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:72
+msgid "Doctors"
+msgstr "Dottori della Chiesa"
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:74
+msgid "Virgins"
+msgstr "Vergini"
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:76
+msgid "Holy Men and Women"
+msgstr "Santi e delle Sante"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:79
+msgid "For One Martyr"
+msgstr "Per un martire"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:81
+msgid "For Several Martyrs"
+msgstr "Per più martiri"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:83
+msgid "For Missionary Martyrs"
+msgstr "Per i martiri missionari"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:85
+msgid "For One Missionary Martyr"
+msgstr "Per un martire missionario"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:87
+msgid "For Several Missionary Martyrs"
+msgstr "Per più martiri missionari"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:89
+msgid "For a Virgin Martyr"
+msgstr "Per una vergine martire"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:91
+msgid "For a Holy Woman Martyr"
+msgstr "Per una santa martire"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:93
+msgid "For a Pope"
+msgstr "Per i papi"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:95
+msgid "For a Bishop"
+msgstr "Per i vescovi"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:97
+msgid "For One Pastor"
+msgstr "Per un pastore"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:99
+msgid "For Several Pastors"
+msgstr "Per i pastori"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:101
+msgid "For Founders of a Church"
+msgstr "Per i fondatori delle chiese"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:103
+msgid "For One Founder"
+msgstr "Per un fondatore"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:105
+msgid "For Several Founders"
+msgstr "Per più fondatori"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:107
+msgid "For Missionaries"
+msgstr "Per i missionari"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:109
+msgid "For One Virgin"
+msgstr "Per una vergine"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:111
+msgid "For Several Virgins"
+msgstr "Per più vergini"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:113
+msgid "For Several Saints"
+msgstr "Per più santi"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:115
+msgid "For One Saint"
+msgstr "Per un Santo"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:117
+msgid "For an Abbot"
+msgstr "Per un abate"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:119
+msgid "For a Monk"
+msgstr "Per un monaco"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:121
+msgid "For a Nun"
+msgstr "Per i religiosi"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:123
+msgid "For Religious"
+msgstr "Per i religiosi"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:125
+msgid "For Those Who Practiced Works of Mercy"
+msgstr "Per gli operatori di misericordia"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:127
+msgid "For Educators"
+msgstr "Per gli educatori"
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:129
+msgid "For Holy Women"
+msgstr "Per le sante"
+
+#. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: includes/enums/LitCommon.php:173 includes/enums/LitCommon.php:185
+msgctxt "(SING_FEMM)"
+msgid "of"
+msgstr "della"
+
+#. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: includes/enums/LitCommon.php:176
+msgctxt "(PLUR_FEMM)"
+msgid "of"
+msgstr "delle"
+
+#. translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: includes/enums/LitCommon.php:182
+msgctxt "(PLUR_MASC)"
+msgid "of"
+msgstr "dei"
+
+#. translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: includes/enums/LitCommon.php:188
+msgctxt "(SING_MASC)"
+msgid "of"
+msgstr "del"
 
 #. translators: liturgical rank. Keep lowercase
 #: includes/enums/LitGrade.php:82 includes/enums/LitGrade.php:121
