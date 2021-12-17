@@ -18,6 +18,7 @@ class FestivityCollection {
     private array $T                                = [];
     private IntlDateFormatter $dayOfTheWeek;
     private LITSETTINGS $LITSETTINGS;
+    private LitGrade $LitGrade;
     const SUNDAY_CYCLE              = [ "A", "B", "C" ];
     const WEEKDAY_CYCLE             = [ "I", "II" ];
 
@@ -36,6 +37,7 @@ class FestivityCollection {
                 "Vigil Mass"    => _( "Vigil Mass" )
             ];
         }
+        $this->LitGrade = new LitGrade( $this->LITSETTINGS->LOCALE );
     }
 
     private static function DateIsSunday( DateTime $dt ) : bool {
@@ -284,9 +286,9 @@ class FestivityCollection {
             $festivityGrade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( $this->dayOfTheWeek->format( $festivity->date->format( 'U' ) ) );
         } else {
             if( $festivity->grade > LitGrade::SOLEMNITY ) {
-                $festivityGrade = '<i>' . LitGrade::i18n( $festivity->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>';
+                $festivityGrade = '<i>' . $this->LitGrade->i18n( $festivity->grade, false ) . '</i>';
             } else {
-                $festivityGrade = LitGrade::i18n( $festivity->grade, $this->LITSETTINGS->LOCALE, false );
+                $festivityGrade = $this->LitGrade->i18n( $festivity->grade, false );
             }
         }
 
@@ -323,7 +325,7 @@ class FestivityCollection {
                         $coincidingFestivity->grade = $this->LITSETTINGS->LOCALE === 'LA' ? 'Die Domini' : ucfirst( $this->dayOfTheWeek->format( $VigilDate->format( 'U' ) ) );
                     } else{
                         //it's a Feast of the Lord or a Solemnity
-                        $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LitGrade::i18n( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LitGrade::i18n( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) );
+                        $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $coincidingFestivity->event->grade, false ) . '</i>' : $this->LitGrade->i18n( $coincidingFestivity->event->grade, false ) );
                     }
 
                     //suppress warning messages for known situations, like the Octave of Easter
@@ -450,10 +452,10 @@ class FestivityCollection {
         } else if ( $this->inSolemnities( $currentFeastDate ) ) {
             //it's a Feast of the Lord or a Solemnity
             $coincidingFestivity->event = $this->solemnityFromDate( $currentFeastDate );
-            $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . LitGrade::i18n( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) . '</i>' : LitGrade::i18n( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false ) );
+            $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $coincidingFestivity->event->grade, false ) . '</i>' : $this->LitGrade->i18n( $coincidingFestivity->event->grade, false ) );
         } else if( $this->inFeastsOrMemorials( $currentFeastDate ) ) {
             $coincidingFestivity->event = $this->feastOrMemorialFromDate( $currentFeastDate );
-            $coincidingFestivity->grade = LitGrade::i18n( $coincidingFestivity->event->grade, $this->LITSETTINGS->LOCALE, false );
+            $coincidingFestivity->grade = $this->LitGrade->i18n( $coincidingFestivity->event->grade, false );
         }
         return $coincidingFestivity;
     }
