@@ -320,7 +320,7 @@ class FestivityCollection {
                             $festivity->hasVesperI = false;
                             $coincidingFestivity->event->hasVesperII = true;
                             $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while  the first Solemnity will not have a Vigil Mass or Vespers I." ),
+                                _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while the first Solemnity will not have a Vigil Mass or Vespers I." ),
                                 $festivityGrade,
                                 $festivity->name,
                                 $coincidingFestivity->grade,

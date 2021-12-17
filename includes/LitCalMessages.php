@@ -1,44 +1,10 @@
 <?php
 
 include_once( 'includes/enums/LitGrade.php' );
-
-if (!function_exists('pgettext')) {
-
-    function pgettext($context, $msgid) {
-       $contextString = "{$context}\004{$msgid}";
-       $translation = dcgettext('litcal', $contextString, LC_MESSAGES);
-       //$translation = _( $contextString );
-       if ($translation == $contextString)  return $msgid;
-       else  return $translation;
-    }
-
-}
+include_once( 'includes/enums/LitCommon.php' );
 
 class LITCAL_MESSAGES {
 
-    const MESSAGES = [
-       /* The following strings would usually be used by a user-facing application, 
-         *  however I decided to add them here seeing they are just as useful for generating
-         *  the ICS calendar output, which is pretty final as it is, 
-         *  there are no client applications that take care of localization...
-         */
-        "YEAR" => [
-            "en" => "YEAR",
-            "it" => "ANNO",
-            "la" => "ANNUM"
-        ],
-        "Month" => [
-            "en" => "Month",
-            "it" => "Mese",
-            "la" => "Mensis"
-        ],
-        "Vigil Mass" => [
-            "en" => "Vigil Mass",
-            "it" => "Messa nella Vigilia",
-            "la" => "Missa Vigiliæ"
-        ]
-    ];
-    
     const LATIN_ORDINAL = [
         "",
         "primus",
@@ -140,181 +106,31 @@ class LITCAL_MESSAGES {
         "November",
         "December"
     ];
-    
-    public static function __( string $key, string $locale="la" ) : string {
-        $locale = strtolower($locale);
-        if( isset( self::MESSAGES[$key] ) ) {
-            if( isset( self::MESSAGES[$key][$locale] ) ) {
-                return self::MESSAGES[$key][$locale];
-            }
-            else{
-                return $key;
-            }
-        }
-        return $key;
-    }
-
-    public static function _CG( string $commonGeneral ) : string {
-        switch( $commonGeneral ){
-            case 'Martyrs':
-                /**translators: context = from the Common of nn */
-                return _( 'Martyrs' );
-            case 'Pastors':
-                /**translators: context = from the Common of nn */
-                return _( 'Pastors' );
-            case 'Doctors':
-                /**translators: context = from the Common of nn */
-                return _( 'Doctors' );
-            case 'Virgins':
-                /**translators: context = from the Common of nn */
-                return _( 'Virgins' );
-            case 'Holy Men and Women':
-                /**translators: context = from the Common of nn */
-                return _( 'Holy Men and Women' );
-            case 'Blessed Virgin Mary':
-                /**translators: context = from the Common of nn */
-                return _( 'Blessed Virgin Mary' );
-            case 'Dedication of a Church':
-                /**translators: context = from the Common of nn */
-                return _( 'Dedication of a Church' );
-            default:
-                //there are cases where a Common is specific to a single language edition Missal
-                //in that case, we don't need a translation, so just return the original value
-                return $commonGeneral;
-        }
-    }
-
-    public static function _CS( string $commonSpecific ) : string {
-        switch( $commonSpecific ) {
-            case "For One Martyr":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For One Martyr" );
-            case "For Several Martyrs":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For Several Martyrs" );
-            case "For Missionary Martyrs":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For Missionary Martyrs" );
-            case "For One Missionary Martyr":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For One Missionary Martyr" );
-            case "For Several Missionary Martyrs":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For Several Missionary Martyrs" );
-            case "For a Virgin Martyr":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For a Virgin Martyr" );
-            case "For a Holy Woman Martyr":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For a Holy Woman Martyr" );
-            case "For a Pope":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For a Pope" );
-            case "For a Bishop":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For a Bishop" );
-            case "For One Pastor":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For One Pastor" );
-            case "For Several Pastors":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For Several Pastors" );
-            case "For Founders of a Church":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For Founders of a Church" );
-            case "For One Founder":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For One Founder" );
-            case "For Several Founders":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For Several Founders" );
-            case "For Missionaries":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For Missionaries" );
-            case "For One Virgin":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For One Virgin" );
-            case "For Several Virgins":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For Several Virgins" );
-            case "For Religious":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For Religious" );
-            case "For Those Who Practiced Works of Mercy":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For Those Who Practiced Works of Mercy" );
-            case "For an Abbot":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For an Abbot" );
-            case "For a Monk":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For a Monk" );
-            case "For a Nun":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For a Nun" );
-            case "For Educators":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For Educators" );
-            case "For Holy Women":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For Holy Women" );
-            case "For One Saint":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For One Saint" );
-            case "For Several Saints":
-                /**translators: context = from the Common of nn: nn */
-                return _( "For Several Saints" );
-            default:
-                return $commonSpecific;
-        }
-    }
 
     /**
      * Function _C
      * Gets a translated human readable string with the Common or the Proper
      */
-    public static function _C( string $common, string $locale="la" ) : string {
+    public static function _C( string $common="", string $locale="LA" ) : string {
         $locale = strtolower($locale);
-        if ($common !== "" && $common !== "Proper") {
-            $commons = explode(",", $common);
-            $commons = array_map(function ($txt) {
-                if( strpos($txt, ":") !== false ){
-                    [$commonGeneral, $commonSpecific] = explode(":", $txt);
-                } else {
-                    $commonGeneral = $txt;
-                    $commonSpecific = "";
-                }
-                switch ($commonGeneral) {
-                    case "Blessed Virgin Mary":
-                        /**translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                        $possessive = pgettext( "(SING_FEMM)", "of" );
-                        break;
-                    case "Virgins":
-                        /**translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                        $possessive = pgettext( "(PLUR_FEMM)", "of" );
-                        break;
-                    case "Martyrs":
-                    case "Pastors":
-                    case "Doctors":
-                    case "Holy Men and Women":
-                        /**translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                        $possessive = pgettext( "(PLUR_MASC)", "of" );
-                        break;
-                    case "Dedication of a Church":
-                        /**translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                        $possessive = pgettext( "(SING_FEMM)", "of" );
-                        break;
-                    default:
-                        /**translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                        $possessive = pgettext( "(SING_MASC)", "of" );
-                }
-                return _( "From the Common" ) . " " . $possessive . " " . self::_CG( $commonGeneral ) . ($commonSpecific != "" ? ": " . self::_CS( $commonSpecific ) : "");
-            }, $commons);
-            /**translators: when there are multiple possible commons, this will be the glue "or from the common of..." */
-            $common = implode( "; " . _( "or" ) . " ", $commons );
-        } else if ($common == "Proper") {
-            /**translators: context = the Proper as opposed to the Common */
-            $common = _( "Proper" );
+        if ($common !== "") {
+            if( $common === LitCommon::PROPRIO ) {
+                $common = LitCommon::i18n( $common, $locale );
+            } else{
+                $commons = explode(",", $common);
+                $commons = array_map(function ($txt) use($locale) {
+                    if( strpos($txt, ":") !== false ){
+                        [$commonGeneral, $commonSpecific] = explode(":", $txt);
+                    } else {
+                        $commonGeneral = $txt;
+                        $commonSpecific = "";
+                    }
+                    $possessive = LitCommon::getPossessive( $commonGeneral, $locale );
+                    return _( "From the Common" ) . " " . $possessive . " " . LitCommon::i18n( $commonGeneral, $locale ) . ($commonSpecific != "" ? ": " . LitCommon::i18n( $commonSpecific, $locale ) : "");
+                }, $commons);
+                /**translators: when there are multiple possible commons, this will be the glue "or from the common of..." */
+                $common = implode( "; " . _( "or" ) . " ", $commons );
+            }
         }
         return $common;
     }
@@ -348,23 +164,23 @@ class LITCAL_MESSAGES {
             if( strpos( $string, "," ) ) {
                 $colors = explode( ",", $string );
                 $colors = array_map( function($txt) use ($LOCALE) {
-                    return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $txt ) . '">' . LitColor::i18n( $txt ) . '</FONT></SPAN></I></B>';
+                    return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $txt ) . '">' . LitColor::i18n( $txt, $LOCALE ) . '</FONT></SPAN></I></B>';
                 }, $colors );
                 return implode( ' <I><FONT FACE="Calibri">' . self::__( "or", $LOCALE ) . "</FONT></I> ", $colors );
             }
             else{
-                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $string ) . '">' . LitColor::i18n( $string ) . '</FONT></SPAN></I></B>';
+                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $string ) . '">' . LitColor::i18n( $string, $LOCALE ) . '</FONT></SPAN></I></B>';
             }
         } else{
             if( strpos( $string, "," ) ) {
                 $colors = explode( ",", $string );
-                $colors = array_map( function($txt) {
-                    return LitColor::i18n( $txt );
+                $colors = array_map( function($txt) use($LOCALE) {
+                    return LitColor::i18n( $txt, $LOCALE );
                 }, $colors );
                 return implode( " " . _( "or" ) . " ", $colors );
             }
             else{
-                return LitColor::i18n( $string );
+                return LitColor::i18n( $string, $LOCALE );
             }
         }
         return $string; //should never get here
