@@ -1170,7 +1170,7 @@ class LitCalAPI {
                 );
             }
         } else {
-            $coincidingFestivity = $this->Cal->feastOrMemorialFromDate( $StJaneFrancesNewDate );
+            $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $StJaneFrancesNewDate );
             $festivity = $this->Cal->getFestivity( "StJaneFrancesDeChantal" );
             //we can't move it, but we still need to remove it from Dec 12th if it's there!!!
             if( $festivity !== null ) {
@@ -1182,7 +1182,7 @@ class LitCalAPI {
                 $row->NAME,
                 '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LITSETTINGS->LOCALE ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>',
                 $this->LITSETTINGS->YEAR,
-                $coincidingFestivity->name
+                $coincidingFestivity->event->name
             );
         }
 
