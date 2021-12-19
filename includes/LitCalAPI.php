@@ -37,7 +37,7 @@ class LitCalAPI {
     private IntlDateFormatter $dayAndMonth;
     private IntlDateFormatter $dayOfTheWeek;
 
-    private array $PropriumDeTempore              = [];
+    private array $PropriumDeTempore                = [];
     private array $Messages                         = [];
     private FestivityCollection $Cal;
     private array $tempCal                          = [];
@@ -198,7 +198,7 @@ class LitCalAPI {
             $PropriumDeTempore = json_decode( file_get_contents( $propriumdetemporeFile ), true );
             if( json_last_error() === JSON_ERROR_NONE ){
                 foreach( $PropriumDeTempore as $key => $event ) {
-                    $this->PropriumDeTempore[ $key ] = [ "NAME_" . $this->LitSettings->Locale => $event ];
+                    $this->PropriumDeTempore[ $key ] = [ "NAME" => $event ];
                 }
             } else {
                 die( '{"ERROR": "There was an error trying to retrieve and decode JSON data for the Proprium de Tempore. ' . json_last_error_msg() . '"}' );
@@ -237,10 +237,10 @@ class LitCalAPI {
     }
 
     private function calculateEasterTriduum() : void {
-        $HolyThurs        = new Festivity( $this->PropriumDeTempore[ "HolyThurs" ][ "NAME_" . $this->LitSettings->Locale ],    LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P3D' ) ), LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
-        $GoodFri          = new Festivity( $this->PropriumDeTempore[ "GoodFri" ][ "NAME_" . $this->LitSettings->Locale ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P2D' ) ), LitColor::RED,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
-        $EasterVigil      = new Festivity( $this->PropriumDeTempore[ "EasterVigil" ][ "NAME_" . $this->LitSettings->Locale ],  LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P1D' ) ), LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
-        $Easter           = new Festivity( $this->PropriumDeTempore[ "Easter" ][ "NAME_" . $this->LitSettings->Locale ],       LitFunc::calcGregEaster( $this->LitSettings->Year ),                               LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+        $HolyThurs        = new Festivity( $this->PropriumDeTempore[ "HolyThurs" ][ "NAME" ],    LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P3D' ) ), LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+        $GoodFri          = new Festivity( $this->PropriumDeTempore[ "GoodFri" ][ "NAME" ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P2D' ) ), LitColor::RED,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+        $EasterVigil      = new Festivity( $this->PropriumDeTempore[ "EasterVigil" ][ "NAME" ],  LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P1D' ) ), LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+        $Easter           = new Festivity( $this->PropriumDeTempore[ "Easter" ][ "NAME" ],       LitFunc::calcGregEaster( $this->LitSettings->Year ),                               LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
 
         $this->Cal->addFestivity( "HolyThurs",      $HolyThurs );
         $this->Cal->addFestivity( "GoodFri",        $GoodFri );
@@ -249,12 +249,12 @@ class LitCalAPI {
     }
 
     private function calculateChristmasEpiphany() : void {
-        $Christmas = new Festivity( $this->PropriumDeTempore[ "Christmas" ][ "NAME_" . $this->LitSettings->Locale ],    DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) ), LitColor::WHITE, LitFeastType::FIXED,  LitGrade::HIGHER_SOLEMNITY );
+        $Christmas = new Festivity( $this->PropriumDeTempore[ "Christmas" ][ "NAME" ],    DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) ), LitColor::WHITE, LitFeastType::FIXED,  LitGrade::HIGHER_SOLEMNITY );
         $this->Cal->addFestivity( "Christmas", $Christmas );
 
         if ( $this->LitSettings->Epiphany === Epiphany::JAN6 ) {
 
-            $Epiphany     = new Festivity( $this->PropriumDeTempore[ "Epiphany" ][ "NAME_" . $this->LitSettings->Locale ],     DateTime::createFromFormat( '!j-n-Y', '6-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) ),  LitColor::WHITE, LitFeastType::FIXED,  LitGrade::HIGHER_SOLEMNITY );
+            $Epiphany     = new Festivity( $this->PropriumDeTempore[ "Epiphany" ][ "NAME" ],     DateTime::createFromFormat( '!j-n-Y', '6-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) ),  LitColor::WHITE, LitFeastType::FIXED,  LitGrade::HIGHER_SOLEMNITY );
             $this->Cal->addFestivity( "Epiphany",   $Epiphany );
             //If a Sunday occurs on a day from Jan. 2 through Jan. 5, it is called the "Second Sunday of Christmas"
             //Weekdays from Jan. 2 through Jan. 5 are called "*day before Epiphany"
@@ -262,7 +262,7 @@ class LitCalAPI {
             for ( $i = 2; $i <= 5; $i++ ) {
                 $dateTime = DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
                 if ( self::DateIsSunday( $dateTime ) ) {
-                    $Christmas2 = new Festivity( $this->PropriumDeTempore[ "Christmas2" ][ "NAME_" . $this->LitSettings->Locale ], $dateTime, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
+                    $Christmas2 = new Festivity( $this->PropriumDeTempore[ "Christmas2" ][ "NAME" ], $dateTime, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
                     $this->Cal->addFestivity( "Christmas2", $Christmas2 );
                 } else {
                     $nth++;
@@ -290,13 +290,13 @@ class LitCalAPI {
             //If January 2nd is a Sunday, then go with Jan 2nd
             $dateTime = DateTime::createFromFormat( '!j-n-Y', '2-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
             if ( self::DateIsSunday( $dateTime ) ) {
-                $Epiphany = new Festivity( $this->PropriumDeTempore[ "Epiphany" ][ "NAME_" . $this->LitSettings->Locale ], $dateTime, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+                $Epiphany = new Festivity( $this->PropriumDeTempore[ "Epiphany" ][ "NAME" ], $dateTime, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
                 $this->Cal->addFestivity( "Epiphany",   $Epiphany );
             }
             //otherwise find the Sunday following Jan 2nd
             else {
                 $SundayOfEpiphany = $dateTime->modify( 'next Sunday' );
-                $Epiphany = new Festivity( $this->PropriumDeTempore[ "Epiphany" ][ "NAME_" . $this->LitSettings->Locale ], $SundayOfEpiphany, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+                $Epiphany = new Festivity( $this->PropriumDeTempore[ "Epiphany" ][ "NAME" ], $SundayOfEpiphany, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
                 $this->Cal->addFestivity( "Epiphany",   $Epiphany );
                 //Weekdays from Jan. 2 until the following Sunday are called "*day before Epiphany"
                 $DayOfEpiphany = (int)$SundayOfEpiphany->format( 'j' );
@@ -331,56 +331,56 @@ class LitCalAPI {
     private function calculateAscensionPentecost() : void {
 
         if ( $this->LitSettings->Ascension === Ascension::THURSDAY ) {
-            $Ascension = new Festivity( $this->PropriumDeTempore[ "Ascension" ][ "NAME_" . $this->LitSettings->Locale ],  LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P39D' ) ),                LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
-            $Easter7 = new Festivity( $this->PropriumDeTempore[ "Easter7" ][ "NAME_" . $this->LitSettings->Locale ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 6 ) . 'D' ) ), LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+            $Ascension = new Festivity( $this->PropriumDeTempore[ "Ascension" ][ "NAME" ],  LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P39D' ) ),                LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+            $Easter7 = new Festivity( $this->PropriumDeTempore[ "Easter7" ][ "NAME" ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 6 ) . 'D' ) ), LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
             $this->Cal->addFestivity( "Easter7", $Easter7 );
         } else if ( $this->LitSettings->Ascension === "SUNDAY" ) {
-            $Ascension = new Festivity( $this->PropriumDeTempore[ "Ascension" ][ "NAME_" . $this->LitSettings->Locale ],  LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 6 ) . 'D' ) ), LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+            $Ascension = new Festivity( $this->PropriumDeTempore[ "Ascension" ][ "NAME" ],  LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 6 ) . 'D' ) ), LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
         }
         $this->Cal->addFestivity( "Ascension", $Ascension );
 
-        $Pentecost = new Festivity( $this->PropriumDeTempore[ "Pentecost" ][ "NAME_" . $this->LitSettings->Locale ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 7 ) . 'D' ) ), LitColor::RED,      LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+        $Pentecost = new Festivity( $this->PropriumDeTempore[ "Pentecost" ][ "NAME" ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 7 ) . 'D' ) ), LitColor::RED,      LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
         $this->Cal->addFestivity( "Pentecost", $Pentecost );
 
     }
 
     private function calculateSundaysMajorSeasons() : void {
-        $this->Cal->addFestivity( "Advent1",    new Festivity( $this->PropriumDeTempore[ "Advent1" ][ "NAME_" . $this->LitSettings->Locale ],      DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 3 * 7 ) . 'D' ) ), LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "Advent2",    new Festivity( $this->PropriumDeTempore[ "Advent2" ][ "NAME_" . $this->LitSettings->Locale ],      DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 2 * 7 ) . 'D' ) ), LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "Advent3",    new Festivity( $this->PropriumDeTempore[ "Advent3" ][ "NAME_" . $this->LitSettings->Locale ],      DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P7D' ) ),                 LitColor::PINK,     LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "Advent4",    new Festivity( $this->PropriumDeTempore[ "Advent4" ][ "NAME_" . $this->LitSettings->Locale ],      DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' ),                                                   LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "Lent1",      new Festivity( $this->PropriumDeTempore[ "Lent1" ][ "NAME_" . $this->LitSettings->Locale ],        LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P' . ( 6 * 7 ) . 'D' ) ),    LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "Lent2",      new Festivity( $this->PropriumDeTempore[ "Lent2" ][ "NAME_" . $this->LitSettings->Locale ],        LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P' . ( 5 * 7 ) . 'D' ) ),    LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "Lent3",      new Festivity( $this->PropriumDeTempore[ "Lent3" ][ "NAME_" . $this->LitSettings->Locale ],        LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P' . ( 4 * 7 ) . 'D' ) ),    LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "Lent4",      new Festivity( $this->PropriumDeTempore[ "Lent4" ][ "NAME_" . $this->LitSettings->Locale ],        LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P' . ( 3 * 7 ) . 'D' ) ),    LitColor::PINK,     LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "Lent5",      new Festivity( $this->PropriumDeTempore[ "Lent5" ][ "NAME_" . $this->LitSettings->Locale ],        LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P' . ( 2 * 7 ) . 'D' ) ),    LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "PalmSun",    new Festivity( $this->PropriumDeTempore[ "PalmSun" ][ "NAME_" . $this->LitSettings->Locale ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P7D' ) ),                    LitColor::RED,      LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "Easter2",    new Festivity( $this->PropriumDeTempore[ "Easter2" ][ "NAME_" . $this->LitSettings->Locale ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P7D' ) ),                    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "Easter3",    new Festivity( $this->PropriumDeTempore[ "Easter3" ][ "NAME_" . $this->LitSettings->Locale ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 2 ) . 'D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "Easter4",    new Festivity( $this->PropriumDeTempore[ "Easter4" ][ "NAME_" . $this->LitSettings->Locale ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 3 ) . 'D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "Easter5",    new Festivity( $this->PropriumDeTempore[ "Easter5" ][ "NAME_" . $this->LitSettings->Locale ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 4 ) . 'D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "Easter6",    new Festivity( $this->PropriumDeTempore[ "Easter6" ][ "NAME_" . $this->LitSettings->Locale ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 5 ) . 'D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "Trinity",    new Festivity( $this->PropriumDeTempore[ "Trinity" ][ "NAME_" . $this->LitSettings->Locale ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 8 ) . 'D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Advent1",    new Festivity( $this->PropriumDeTempore[ "Advent1" ][ "NAME" ],      DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 3 * 7 ) . 'D' ) ), LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Advent2",    new Festivity( $this->PropriumDeTempore[ "Advent2" ][ "NAME" ],      DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 2 * 7 ) . 'D' ) ), LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Advent3",    new Festivity( $this->PropriumDeTempore[ "Advent3" ][ "NAME" ],      DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P7D' ) ),                 LitColor::PINK,     LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Advent4",    new Festivity( $this->PropriumDeTempore[ "Advent4" ][ "NAME" ],      DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' ),                                                   LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Lent1",      new Festivity( $this->PropriumDeTempore[ "Lent1" ][ "NAME" ],        LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P' . ( 6 * 7 ) . 'D' ) ),    LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Lent2",      new Festivity( $this->PropriumDeTempore[ "Lent2" ][ "NAME" ],        LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P' . ( 5 * 7 ) . 'D' ) ),    LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Lent3",      new Festivity( $this->PropriumDeTempore[ "Lent3" ][ "NAME" ],        LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P' . ( 4 * 7 ) . 'D' ) ),    LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Lent4",      new Festivity( $this->PropriumDeTempore[ "Lent4" ][ "NAME" ],        LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P' . ( 3 * 7 ) . 'D' ) ),    LitColor::PINK,     LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Lent5",      new Festivity( $this->PropriumDeTempore[ "Lent5" ][ "NAME" ],        LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P' . ( 2 * 7 ) . 'D' ) ),    LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "PalmSun",    new Festivity( $this->PropriumDeTempore[ "PalmSun" ][ "NAME" ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P7D' ) ),                    LitColor::RED,      LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Easter2",    new Festivity( $this->PropriumDeTempore[ "Easter2" ][ "NAME" ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P7D' ) ),                    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Easter3",    new Festivity( $this->PropriumDeTempore[ "Easter3" ][ "NAME" ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 2 ) . 'D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Easter4",    new Festivity( $this->PropriumDeTempore[ "Easter4" ][ "NAME" ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 3 ) . 'D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Easter5",    new Festivity( $this->PropriumDeTempore[ "Easter5" ][ "NAME" ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 4 ) . 'D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Easter6",    new Festivity( $this->PropriumDeTempore[ "Easter6" ][ "NAME" ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 5 ) . 'D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Trinity",    new Festivity( $this->PropriumDeTempore[ "Trinity" ][ "NAME" ],      LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 8 ) . 'D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
         if ( $this->LitSettings->CorpusChristi === CorpusChristi::THURSDAY ) {
-            $CorpusChristi = new Festivity( $this->PropriumDeTempore[ "CorpusChristi" ][ "NAME_" . $this->LitSettings->Locale ], LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 8 + 4 ) . 'D' ) ),  LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+            $CorpusChristi = new Festivity( $this->PropriumDeTempore[ "CorpusChristi" ][ "NAME" ], LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 8 + 4 ) . 'D' ) ),  LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
             //Seeing the Sunday is not taken by Corpus Christi, it should be later taken by a Sunday of Ordinary Time (they are calculate back to Pentecost)
         } else if ( $this->LitSettings->CorpusChristi === CorpusChristi::SUNDAY ) {
-            $CorpusChristi = new Festivity( $this->PropriumDeTempore[ "CorpusChristi" ][ "NAME_" . $this->LitSettings->Locale ], LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 9 ) . 'D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+            $CorpusChristi = new Festivity( $this->PropriumDeTempore[ "CorpusChristi" ][ "NAME" ], LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 9 ) . 'D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
         }
         $this->Cal->addFestivity( "CorpusChristi", $CorpusChristi );
 
     }
 
     private function calculateAshWednesday() : void {
-        $AshWednesday = new Festivity( $this->PropriumDeTempore[ "AshWednesday" ][ "NAME_" . $this->LitSettings->Locale ], LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P46D' ) ),           LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+        $AshWednesday = new Festivity( $this->PropriumDeTempore[ "AshWednesday" ][ "NAME" ], LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P46D' ) ),           LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
         $this->Cal->addFestivity( "AshWednesday", $AshWednesday );
     }
 
     private function calculateWeekdaysHolyWeek() : void {
         //Weekdays of Holy Week from Monday to Thursday inclusive ( that is, thursday morning chrism mass... the In Coena Domini mass begins the Easter Triduum )
-        $MonHolyWeek = new Festivity( $this->PropriumDeTempore[ "MonHolyWeek" ][ "NAME_" . $this->LitSettings->Locale ], LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P6D' ) ),            LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
-        $TueHolyWeek = new Festivity( $this->PropriumDeTempore[ "TueHolyWeek" ][ "NAME_" . $this->LitSettings->Locale ], LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P5D' ) ),            LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
-        $WedHolyWeek = new Festivity( $this->PropriumDeTempore[ "WedHolyWeek" ][ "NAME_" . $this->LitSettings->Locale ], LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P4D' ) ),            LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+        $MonHolyWeek = new Festivity( $this->PropriumDeTempore[ "MonHolyWeek" ][ "NAME" ], LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P6D' ) ),            LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+        $TueHolyWeek = new Festivity( $this->PropriumDeTempore[ "TueHolyWeek" ][ "NAME" ], LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P5D' ) ),            LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+        $WedHolyWeek = new Festivity( $this->PropriumDeTempore[ "WedHolyWeek" ][ "NAME" ], LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P4D' ) ),            LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
         $this->Cal->addFestivity( "MonHolyWeek", $MonHolyWeek );
         $this->Cal->addFestivity( "TueHolyWeek", $TueHolyWeek );
         $this->Cal->addFestivity( "WedHolyWeek", $WedHolyWeek );
@@ -388,12 +388,12 @@ class LitCalAPI {
 
     private function calculateEasterOctave() : void {
         //Days within the octave of Easter
-        $MonOctaveEaster = new Festivity( $this->PropriumDeTempore[ "MonOctaveEaster" ][ "NAME_" . $this->LitSettings->Locale ], LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P1D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
-        $TueOctaveEaster = new Festivity( $this->PropriumDeTempore[ "TueOctaveEaster" ][ "NAME_" . $this->LitSettings->Locale ], LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P2D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
-        $WedOctaveEaster = new Festivity( $this->PropriumDeTempore[ "WedOctaveEaster" ][ "NAME_" . $this->LitSettings->Locale ], LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P3D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
-        $ThuOctaveEaster = new Festivity( $this->PropriumDeTempore[ "ThuOctaveEaster" ][ "NAME_" . $this->LitSettings->Locale ], LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P4D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
-        $FriOctaveEaster = new Festivity( $this->PropriumDeTempore[ "FriOctaveEaster" ][ "NAME_" . $this->LitSettings->Locale ], LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P5D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
-        $SatOctaveEaster = new Festivity( $this->PropriumDeTempore[ "SatOctaveEaster" ][ "NAME_" . $this->LitSettings->Locale ], LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P6D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+        $MonOctaveEaster = new Festivity( $this->PropriumDeTempore[ "MonOctaveEaster" ][ "NAME" ], LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P1D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+        $TueOctaveEaster = new Festivity( $this->PropriumDeTempore[ "TueOctaveEaster" ][ "NAME" ], LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P2D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+        $WedOctaveEaster = new Festivity( $this->PropriumDeTempore[ "WedOctaveEaster" ][ "NAME" ], LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P3D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+        $ThuOctaveEaster = new Festivity( $this->PropriumDeTempore[ "ThuOctaveEaster" ][ "NAME" ], LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P4D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+        $FriOctaveEaster = new Festivity( $this->PropriumDeTempore[ "FriOctaveEaster" ][ "NAME" ], LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P5D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
+        $SatOctaveEaster = new Festivity( $this->PropriumDeTempore[ "SatOctaveEaster" ][ "NAME" ], LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P6D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
 
         $this->Cal->addFestivity( "MonOctaveEaster", $MonOctaveEaster );
         $this->Cal->addFestivity( "TueOctaveEaster", $TueOctaveEaster );
@@ -404,17 +404,17 @@ class LitCalAPI {
     }
 
     private function calculateMobileSolemnitiesOfTheLord() : void {
-        $SacredHeart = new Festivity( $this->PropriumDeTempore[ "SacredHeart" ][ "NAME_" . $this->LitSettings->Locale ],    LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 9 + 5 ) . 'D' ) ),  LitColor::RED,      LitFeastType::MOBILE, LitGrade::SOLEMNITY );
+        $SacredHeart = new Festivity( $this->PropriumDeTempore[ "SacredHeart" ][ "NAME" ],    LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 9 + 5 ) . 'D' ) ),  LitColor::RED,      LitFeastType::MOBILE, LitGrade::SOLEMNITY );
         $this->Cal->addFestivity( "SacredHeart", $SacredHeart );
 
         //Christ the King is calculated backwards from the first sunday of advent
-        $ChristKing = new Festivity( $this->PropriumDeTempore[ "ChristKing" ][ "NAME_" . $this->LitSettings->Locale ],     DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 4 * 7 ) . 'D' ) ),    LitColor::RED,  LitFeastType::MOBILE, LitGrade::SOLEMNITY );
+        $ChristKing = new Festivity( $this->PropriumDeTempore[ "ChristKing" ][ "NAME" ],     DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 4 * 7 ) . 'D' ) ),    LitColor::RED,  LitFeastType::MOBILE, LitGrade::SOLEMNITY );
         $this->Cal->addFestivity( "ChristKing", $ChristKing );
     }
 
     private function calculateFixedSolemnities() : void {
         //even though Mary Mother of God is a fixed date solemnity, however it is found in the Proprium de Tempore and not in the Proprium de Sanctis
-        $MotherGod = new Festivity( $this->PropriumDeTempore[ "MotherGod" ][ "NAME_" . $this->LitSettings->Locale ], DateTime::createFromFormat( '!j-n-Y', '1-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) ),      LitColor::WHITE,    LitFeastType::FIXED, LitGrade::SOLEMNITY );
+        $MotherGod = new Festivity( $this->PropriumDeTempore[ "MotherGod" ][ "NAME" ], DateTime::createFromFormat( '!j-n-Y', '1-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) ),      LitColor::WHITE,    LitFeastType::FIXED, LitGrade::SOLEMNITY );
         $this->Cal->addFestivity( "MotherGod", $MotherGod );
 
         $tempCalSolemnities = array_filter( $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ], function( $el ){ return $el->GRADE === LitGrade::SOLEMNITY; } );
@@ -579,7 +579,7 @@ class LitCalAPI {
                 $this->BaptismLordMod = 'next Monday';
             }
         }
-        $BaptismLord      = new Festivity( $this->PropriumDeTempore[ "BaptismLord" ][ "NAME_" . $this->LitSettings->Locale ], DateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod ), LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
+        $BaptismLord      = new Festivity( $this->PropriumDeTempore[ "BaptismLord" ][ "NAME" ], DateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod ), LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
         $this->Cal->addFestivity( "BaptismLord", $BaptismLord );
 
         //the other feasts of the Lord ( Presentation, Transfiguration and Triumph of the Holy Cross) are fixed date feasts
@@ -595,7 +595,7 @@ class LitCalAPI {
         //Holy Family is celebrated the Sunday after Christmas, unless Christmas falls on a Sunday, in which case it is celebrated Dec. 30
         if ( self::DateIsSunday( $this->Cal->getFestivity( "Christmas" )->date ) ) {
             $holyFamilyDate = DateTime::createFromFormat( '!j-n-Y', '30-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-            $HolyFamily = new Festivity( $this->PropriumDeTempore[ "HolyFamily" ][ "NAME_" . $this->LitSettings->Locale ], $holyFamilyDate, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
+            $HolyFamily = new Festivity( $this->PropriumDeTempore[ "HolyFamily" ][ "NAME" ], $holyFamilyDate, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
             $this->Messages[] = sprintf(
                 _( "'%s' falls on a Sunday in the year %d, therefore the Feast '%s' is celebrated on %s rather than on the Sunday after Christmas." ),
                 $this->Cal->getFestivity( "Christmas" )->name,
@@ -608,7 +608,7 @@ class LitCalAPI {
             );
         } else {
             $holyFamilyDate = DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'next Sunday' );
-            $HolyFamily = new Festivity( $this->PropriumDeTempore[ "HolyFamily" ][ "NAME_" . $this->LitSettings->Locale ], $holyFamilyDate, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
+            $HolyFamily = new Festivity( $this->PropriumDeTempore[ "HolyFamily" ][ "NAME" ], $holyFamilyDate, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
         }
         $this->Cal->addFestivity( "HolyFamily", $HolyFamily );
 
@@ -628,11 +628,11 @@ class LitCalAPI {
             $firstOrdinary = DateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod )->modify( 'next Sunday' )->add( new DateInterval( 'P' . ( ( $ordSun - 1 ) * 7 ) . 'D' ) );
             $ordSun++;
             if ( !$this->Cal->inSolemnities( $firstOrdinary ) ) {
-                $this->Cal->addFestivity( "OrdSunday" . $ordSun, new Festivity( $this->PropriumDeTempore[ "OrdSunday" . $ordSun ][ "NAME_" . $this->LitSettings->Locale ], $firstOrdinary, LitColor::GREEN, LitFeastType::MOBILE, LitGrade::FEAST_LORD ) );
+                $this->Cal->addFestivity( "OrdSunday" . $ordSun, new Festivity( $this->PropriumDeTempore[ "OrdSunday" . $ordSun ][ "NAME" ], $firstOrdinary, LitColor::GREEN, LitFeastType::MOBILE, LitGrade::FEAST_LORD ) );
             } else {
                 $this->Messages[] = sprintf(
                     _( "'%s' is superseded by the %s '%s' in the year %d." ),
-                    $this->PropriumDeTempore[ "OrdSunday" . $ordSun ][ "NAME_" . $this->LitSettings->Locale ],
+                    $this->PropriumDeTempore[ "OrdSunday" . $ordSun ][ "NAME" ],
                     $this->Cal->solemnityFromDate( $firstOrdinary )->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $this->Cal->solemnityFromDate( $firstOrdinary )->grade, false ) . '</i>' : $this->LitGrade->i18n( $this->Cal->solemnityFromDate( $firstOrdinary )->grade, false ),
                     $this->Cal->solemnityFromDate( $firstOrdinary )->name,
                     $this->LitSettings->Year
@@ -652,11 +652,11 @@ class LitCalAPI {
             $lastOrdinary = DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( ++$ordSunCycle * 7 ) . 'D' ) );
             $ordSun--;
             if ( !$this->Cal->inSolemnities( $lastOrdinary ) ) {
-                $this->Cal->addFestivity( "OrdSunday" . $ordSun, new Festivity( $this->PropriumDeTempore[ "OrdSunday" . $ordSun ][ "NAME_" . $this->LitSettings->Locale ], $lastOrdinary, LitColor::GREEN, LitFeastType::MOBILE, LitGrade::FEAST_LORD ) );
+                $this->Cal->addFestivity( "OrdSunday" . $ordSun, new Festivity( $this->PropriumDeTempore[ "OrdSunday" . $ordSun ][ "NAME" ], $lastOrdinary, LitColor::GREEN, LitFeastType::MOBILE, LitGrade::FEAST_LORD ) );
             } else {
                 $this->Messages[] = sprintf(
                     _( "'%s' is superseded by the %s '%s' in the year %d." ),
-                    $this->PropriumDeTempore[ "OrdSunday" . $ordSun ][ "NAME_" . $this->LitSettings->Locale ],
+                    $this->PropriumDeTempore[ "OrdSunday" . $ordSun ][ "NAME" ],
                     $this->Cal->solemnityFromDate( $lastOrdinary )->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $this->Cal->solemnityFromDate( $lastOrdinary )->grade, false ) . '</i>' : $this->LitGrade->i18n( $this->Cal->solemnityFromDate( $lastOrdinary )->grade, false ),
                     $this->Cal->solemnityFromDate( $lastOrdinary )->name,
                     $this->LitSettings->Year
@@ -1143,7 +1143,7 @@ class LitCalAPI {
             //Pentecost = LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P'.( 7*7 ).'D' ) )
             //Second Sunday after Pentecost = LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P'.( 7*9 ).'D' ) )
             //Following Saturday = LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P'.( 7*9+6 ).'D' ) )
-            $this->Cal->addFestivity( "ImmaculateHeart", new Festivity( $this->PropriumDeTempore[ "ImmaculateHeart" ][ "NAME_" . $this->LitSettings->Locale ], $row->DATE, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL ) );
+            $this->Cal->addFestivity( "ImmaculateHeart", new Festivity( $this->PropriumDeTempore[ "ImmaculateHeart" ][ "NAME" ], $row->DATE, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL ) );
 
             //In years when this memorial coincides with another obligatory memorial, as happened in 2014 [ 28 June, Saint Irenaeus ] and 2015 [ 13 June, Saint Anthony of Padua ], both must be considered optional for that year
             //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
