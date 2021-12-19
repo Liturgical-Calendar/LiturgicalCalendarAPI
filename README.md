@@ -19,7 +19,7 @@
 </table>
 
 # Liturgical Calendar
-A PHP script that will generate the liturgical calendar for any given year, based on the General Roman Calendar, calculating the mobile festivities and the precedence of solemnities, feasts, memorials... This script serves as a data endpoint, which will generate the data for the General Roman Calendar in a data exchange format, such as JSON, XML, or ICS. An example of the endpoint can be found at https://johnromanodorazio.com/LiturgicalCalendar/, at the first link on the page [*data generation endpoint here*](https://johnromanodorazio.com/LiturgicalCalendar/LitCalEngine.php).
+A PHP script that will generate the liturgical calendar for any given year, based on the General Roman Calendar, calculating the mobile festivities and the precedence of solemnities, feasts, memorials... This script serves as a data endpoint, which will generate the data for the General Roman Calendar in a data exchange format, such as JSON, XML, or ICS. An example of the endpoint can be found at https://litcal.johnromanodorazio.com/, at the first link on the page [*data generation endpoint here*](https://litcal.johnromanodorazio.com/api/dev/LitCalEngine.php).
 
 Some characteristics of this endpoint:
 * **The data is based on official sources**, not copied from random internet sources. Sources used are the various editions of the **Roman Missal** in Latin, English, and Italian, **Magisterial documents**, and the **Decrees of the Congregation for Divine Worship**
@@ -33,32 +33,27 @@ Some characteristics of this endpoint:
 * **The data is historically accurate**, *i.e.* the liturgical calendar produced for the year 1979 will reflect the calendar as it was in that year, and not as it would be today (obviously future years will reflect the calendar as it is generated in the current year; as new decrees are issued by the Congregation for Divine Worship or new editions of the Roman Missal are published, the script will need to be updated to account for any new criteria)
 
 
-# How to setup the endpoint yourself
-
-### 1. Setup the database tables
-  Data for both movable date festivities and for fixed date festivities, memorials and optional memorials of the General Roman Calendar can be found in JSON format under the `/data/` folder, which is in turned subdivided into subfolders according to the type of data that is contained (`propriumdetempore`, `propriumdesanctis_1970`, etc.). Such data may be specific to the Roman Missal of a given nation / Episcopal Conference from a given year (e.g. `propriumdesanctis_USA_2011`). The PHP script will read the correct JSON files based on the current locale in order to produce localized translations of the festivities. The tables themselves do not necessarily define the dates of all festivities, for example the dates for movable feasts are necessarily calculated in the script itself; in this case the JSON files serve only for localization purposes.
-
 # How to use the endpoint
-There are a few proof of concept example applications for usage of the endpoint at https://johnromanodorazio.com/LiturgicalCalendar/, which demonstrate generating an HTML representation of the Liturgical Calendar.
+There are a few proof of concept example applications for usage of the endpoint at https://litcal.johnromanodorazio.com/usage.php, which demonstrate generating an HTML representation of the Liturgical Calendar.
 
-* The [first example](https://www.johnromanodorazio.com/LiturgicalCalendar/examples/php/) uses cURL in PHP to make a request to the endpoint and handle the results. 
-* The [second example](https://www.johnromanodorazio.com/LiturgicalCalendar/examples/javascript/) uses AJAX in Javascript to make the request to the endpoint and handle the results.
-* The [third example](https://www.johnromanodorazio.com/LiturgicalCalendar/examples/fullcalendar/examples/month-view.html) makes use of the [FullCalendar javascript framework](https://github.com/fullcalendar/fullcalendar) to display the results from the AJAX request in a nicely formatted calendar view.
-* The [fourth example](https://www.johnromanodorazio.com/LiturgicalCalendar/examples/fullcalendar/examples/messages.html) is the same as the third except that it outputs the Messages first and the [FullCalendar](https://github.com/fullcalendar/fullcalendar) calendar view after.
+* The [first example](https://litcal.johnromanodorazio.com/examples/php/) uses cURL in PHP to make a request to the endpoint and handle the results. 
+* The [second example](https://litcal.johnromanodorazio.com/examples/javascript/) uses AJAX in Javascript to make the request to the endpoint and handle the results.
+* The [third example](https://litcal.johnromanodorazio.com/examples/fullcalendar/examples/month-view.html) makes use of the [FullCalendar javascript framework](https://github.com/fullcalendar/fullcalendar) to display the results from the AJAX request in a nicely formatted calendar view.
+* The [fourth example](https://litcal.johnromanodorazio.com/examples/fullcalendar/examples/messages.html) is the same as the third except that it outputs the Messages first and the [FullCalendar](https://github.com/fullcalendar/fullcalendar) calendar view after.
 
 All of these examples request `JSON` as the data exchange format generated by the endpoint. Any application could use the endpoint in a similar manner: an Android App, a plugin for a Desktop Publishing App...
 
-Together with the information that follows, Swaggerhub documentation of the API [can be found here](https://johnromanodorazio.com/LiturgicalCalendar/dist/) (kudos to @MichaelRShelton for generating the docs from the Swagger docker image).
+Together with the information that follows, Swaggerhub documentation of the API [can be found here](https://litcal.johnromanodorazio.com/dist/) (kudos to @MichaelRShelton for generating the docs from the Swagger docker image).
 
 ## Parameters that can be used in the request to the endpoint
-* ***`locale`***: can have a value of *`EN`*, *`IT`*, or *`LA`* (*default*: ***`LA`***). Sets the desired localization for the Calendar to *English*, *Italian*, or *Latin* respectively.
+* ***`locale`***: can have a value of *`EN`*, *`ES`*, *`FR`*, *`DE`*, *`IT`*, *`LA`*, or *`PT`* (*default*: ***`LA`***). This will set the desired localization for the Calendar to *English*, *Spanish*, *French*, *German*, *Italian*, *Latin*, or *Portuguese* respectively. You can also request one of these locales using the `Accept-Language` header rather than the `locale` parameter. Example using `cURL` in `PHP`: `curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept-Language: it']);`.
 * ***`epiphany`***: can have a value of *`SUNDAY_JAN2_JAN8`* or *`JAN6`* (*default*: ***`JAN6`***). Indicates whether Epiphany should fall exactly on January 6th or instead on the Sunday between January 2nd and January 8th. Traditionally it falls on January 6th in the Vatican, but each regional Conference of Bishops can opt to celebrate on the Sunday.
 * ***`ascension`***: can have a value of *`THURSDAY`* or *`SUNDAY`* (*default*: ***`SUNDAY`***). Indicates whether the feast of the Ascension should fall on a Thursday or on a Sunday. Traditionally in the Vatican it falls on a Thursday, but for pastoral reasons each regional Conference of Bishops can opt to celebrate on Sunday.
 * ***`corpuschristi`***: can have a value of *`THURSDAY`* or *`SUNDAY`* (*default*: ***`SUNDAY`***). Indicates whether the feast of Corpus Christi should fall on a Thursday or on a Sunday. Traditionally in the Vatican it falls on a Thursday, but for pastoral reasons each regional Conference of Bishops can opt to celebrate on Sunday.
-* ***`nationalpreset`***: supported values as of v2.8 are *`VATICAN`*, *`ITALY`*, and *`USA`*. This will take precedence over the previous parameters. For example, a value of `ITALY` will automatically set `locale` to `IT`, `epiphany` to `JAN6`, `ascension` to `SUNDAY` and `corpuschristi` to `SUNDAY`, and it will add to / modify the calendar with those celebrations that are proper to the Italian Missal. Similarly a value of `USA` will automatically set `locale` to `EN`, `epiphany` to `SUNDAY_JAN2_JAN8`, `ascension` to `SUNDAY` and `corpuschristi` to `SUNDAY`, and will add to / modify the calendar with the celebrations that are proper to the English USA Missal. A value of `VATICAN` will set `locale` to `LA`, `epiphany` to `JAN6`, `ascension` to `THURSDAY` and `corpuschristi` to `THURSDAY` (even though these last two might change from to year within the Vatican).
-* ***`diocesanpreset`***: only supported value as of v2.8 is *`DIOCESIDIROMA`*, (a value of `DIOCESILAZIO` is equivalent to `DIOCESIDIROMA` as of v2.8). This will take precedence over the previous parameters. For example, a value of `DIOCESIDIROMA` will automatically set `nationalpreset` to `ITALY`, and will add to / modify the calendar with those celebrations that are proper to the Diocese of Rome, based on the calendar for Italy.
+* ***`nationalcalendar`***: supported values as of v2.8 are *`VATICAN`*, *`ITALY`*, and *`USA`*. This will take precedence over the previous parameters. For example, a value of `ITALY` will automatically set `locale` to `IT`, `epiphany` to `JAN6`, `ascension` to `SUNDAY` and `corpuschristi` to `SUNDAY`, and it will add to / modify the calendar with those celebrations that are proper to the Italian Missal. Similarly a value of `USA` will automatically set `locale` to `EN`, `epiphany` to `SUNDAY_JAN2_JAN8`, `ascension` to `SUNDAY` and `corpuschristi` to `SUNDAY`, and will add to / modify the calendar with the celebrations that are proper to the English USA Missal. A value of `VATICAN` will set `locale` to `LA`, `epiphany` to `JAN6`, `ascension` to `THURSDAY` and `corpuschristi` to `THURSDAY` (even though these last two might change from to year within the Vatican).
+* ***`diocesancalendar`***: only supported value as of v2.8 is *`DIOCESIDIROMA`*, (a value of `DIOCESILAZIO` is equivalent to `DIOCESIDIROMA` as of v2.8). This will take precedence over the previous parameters. For example, a value of `DIOCESIDIROMA` will automatically set `nationalcalendar` to `ITALY`, and will add to / modify the calendar with those celebrations that are proper to the Diocese of Rome, based on the calendar for Italy.
 * ***`year`***: can have a value starting from *`1970`* and a maximum value of *`9999`* (*default*: ***current year***). For the time being, this endpoint only calculates the Liturgical Calendar that follows the reform of the Second Vatican Council, starting from the publishing of the *Editio Typica* of the Roman Missal in 1970. Perhaps in future updates information from the calendar preceding the Second Vatican Council will be added, in order to have a greater historical range from the endpoint.
-* ***`returntype`***: can have a value of *`JSON`*, *`XML`*, or *`ICS`* (*default*: ***`JSON`***). Indicates the format of the data that will be returned by the endpoint. **N.B.** the desired data type should also be detected from the `Accept header` set by the requesting client, if not indicated by means of the `returntype` parameter; in this case, possible values are `application/json`, `application/xml`, and `text/calendar`
+* ***`returntype`***: can have a value of *`JSON`*, *`XML`*, or *`ICS`* (*default*: ***`JSON`***). Indicates the format of the data that will be returned by the endpoint. **N.B.** the desired data type should also be detected from the `Accept header` set by the requesting client, if not indicated by means of the `returntype` parameter; in this case, possible values are `application/json`, `application/xml`, and `text/calendar`. Using the `Accept` header is the preferable method.
 
 **N.B.** The parameter names are expected to be in lowercase characters. The parameter values are generally expected to be in uppercase characters, but they will work in lowercase characters just as well (starting from v2.5).
 
@@ -173,6 +168,18 @@ Each of the events generated is represented as an object whose key => value pair
 </a>
 
 # CHANGELOG
+
+## [v3.0](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.0) (December 20th 2021)
+ * all calendar data moved from a MySQL database to JSON files, that can be tracked in the repository
+ * the Calendar data for the Universal Calendar, as contained in the JSON files, is now translatable to other languages through a Weblate project
+ * the frontend and any implementations of the API have been moved to their own separate repositories,
+   only the API code remains in this repository
+ * the PHP source code for the API has been pretty much completely rewritten, using classes and enum type classes
+ * all translatable strings in the PHP source code have been ported to `gettext`, and are now managed in a Weblate project
+ * parameters `diocesanpreset` and `nationalpreset` have been renamed to `diocesancalendar` and `nationalcalendar`
+ * API now supports POST requests that send JSON in the body instead of Form Data
+ * Data type can be set through the `Accept` header rather than the `returntype` parameter
+ * Language can be set through the `Accept-Language` header rather than the `locale` parameter
 
 ## [v2.9](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v2.9) (November 12th 2020)
  * adds Vigil Masses for Sundays and Solemnities, including occasional notes by the Congregation for Divine Worship
