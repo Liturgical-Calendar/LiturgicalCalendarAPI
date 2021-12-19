@@ -17,6 +17,7 @@ include_once( "includes/FestivityCollection.php" );
 include_once( "includes/LitSettings.php" );
 include_once( "includes/LitFunc.php" );
 include_once( "includes/LitMessages.php" );
+include_once( "includes/pgettext.php" );
 
 class LitCalAPI {
 
@@ -1654,22 +1655,27 @@ class LitCalAPI {
 
         //Saint Benedict, Saint Bridget, and Saint Cyril and Methodius elevated to Feast, with title "patrono/i d'Europa" added
         //then from 1999, Saint Catherine of Siena and Saint Edith Stein, elevated to Feast with title "compatrona d'Europa" added
-        $this->makePatron( "StBenedict", ", patrono d'Europa", 11, 7, LitColor::WHITE );
-        $this->makePatron( "StBridget", ", patrona d'Europa", 23, 7, LitColor::WHITE );
-        $this->makePatron( "StsCyrilMethodius", ", patroni d'Europa", 14, 2, LitColor::WHITE );
+        $this->makePatron( "StBenedict",        ", " . pgettext("Male singular", "patron of Europe"),   11, 7, LitColor::WHITE );
+        $this->makePatron( "StBridget",         ", " . pgettext("Female singular", "patron of Europe"), 23, 7, LitColor::WHITE );
+        $this->makePatron( "StsCyrilMethodius", ", " . pgettext("Male plural", "patrons of Europe"),    14, 2, LitColor::WHITE );
 
         //In 1999, Pope John Paul II elevated Catherine of Siena from patron of Italy to patron of Europe
-        if( $this->LitSettings->Year >= 1999 ){
-            $this->makePatron( "StCatherineSiena", ", patrona d'Italia e d'Europa", 29, 4, LitColor::WHITE );
-            if( $this->LitSettings->Year >= 2002 ){
-                $this->makePatron( "StEdithStein", ", patrona d'Europa", 9, 8, LitColor::WHITE, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
+        if( $this->LitSettings->Year >= 1999 ) {
+            if( $this->LitSettings->NationalCalendar === "ITALY" ) {
+                $name = "patrona d'Italia e d'Europa";
+            } else {
+                $name = pgettext("Female singular", "patron of Europe");
+            }
+            $this->makePatron( "StCatherineSiena", ", " . $name, 29, 4, LitColor::WHITE );
+            if( $this->LitSettings->Year >= 2002 ) {
+                $this->makePatron( "StEdithStein", ", " . pgettext("Female singular", "patron of Europe"), 9, 8, LitColor::WHITE, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
             } else {
                 //between 1999 and 2002 we have to manually create StEdithStein
                 //since the makePatron method expects to find data from the Missals,
                 //we are going to have to fake this one as belonging to a Missal...
                 //let's add it to the future Missal that doesn't exist yet
                 $EdithStein = new stdClass();
-                $EdithStein->NAME = "Santa Teresa Benedetta della Croce (Edith Stein), vergine e martire";
+                $EdithStein->NAME = _("Saint Teresa Benedicta of the Cross, Virgin and Martyr");
                 $EdithStein->MONTH = 8;
                 $EdithStein->DAY    = 9;
                 $EdithStein->TAG    = "StEdithStein";
