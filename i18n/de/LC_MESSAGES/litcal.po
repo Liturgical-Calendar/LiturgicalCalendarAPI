@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-17 12:17+0000\n"
+"POT-Creation-Date: 2021-12-19 01:58+0000\n"
 "PO-Revision-Date: 2021-12-14 00:21+0100\n"
 "Last-Translator: Ubuntu <priest@johnromanodorazio.com>\n"
 "Language-Team: German\n"
@@ -234,9 +234,29 @@ msgid ""
 "year %d."
 msgstr ""
 
+#: includes/LitCalAPI.php:1658
+msgctxt "Male singular"
+msgid "patron of Europe"
+msgstr ""
+
+#: includes/LitCalAPI.php:1659 includes/LitCalAPI.php:1667
+#: includes/LitCalAPI.php:1671
+msgctxt "Female singular"
+msgid "patron of Europe"
+msgstr ""
+
+#: includes/LitCalAPI.php:1660
+msgctxt "Male plural"
+msgid "patrons of Europe"
+msgstr ""
+
+#: includes/LitCalAPI.php:1678
+msgid "Saint Teresa Benedicta of the Cross, Virgin and Martyr"
+msgstr ""
+
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
-#: includes/LitCalMessages.php:141 includes/LitCalMessages.php:152
-#: includes/enums/LitCommon.php:280
+#: includes/LitMessages.php:142 includes/LitMessages.php:153
+#: includes/enums/LitCommon.php:270
 msgid "or"
 msgstr ""
 
@@ -307,200 +327,200 @@ msgstr ""
 msgid "pink"
 msgstr ""
 
-#: includes/enums/LitCommon.php:66
+#: includes/enums/LitCommon.php:56
 msgid "Proper"
 msgstr ""
 
 #. translators: context = from the Common of nn
-#: includes/enums/LitCommon.php:68
+#: includes/enums/LitCommon.php:58
 msgid "Dedication of a Church"
 msgstr ""
 
 #. translators: context = from the Common of nn
-#: includes/enums/LitCommon.php:70
+#: includes/enums/LitCommon.php:60
 msgid "Blessed Virgin Mary"
 msgstr ""
 
 #. translators: context = from the Common of nn
-#: includes/enums/LitCommon.php:72
+#: includes/enums/LitCommon.php:62
 msgid "Martyrs"
 msgstr ""
 
 #. translators: context = from the Common of nn
-#: includes/enums/LitCommon.php:74
+#: includes/enums/LitCommon.php:64
 msgid "Pastors"
 msgstr ""
 
 #. translators: context = from the Common of nn
-#: includes/enums/LitCommon.php:76
+#: includes/enums/LitCommon.php:66
 msgid "Doctors"
 msgstr ""
 
 #. translators: context = from the Common of nn
-#: includes/enums/LitCommon.php:78
+#: includes/enums/LitCommon.php:68
 msgid "Virgins"
 msgstr ""
 
 #. translators: context = from the Common of nn
-#: includes/enums/LitCommon.php:80
+#: includes/enums/LitCommon.php:70
 msgid "Holy Men and Women"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:83
+#: includes/enums/LitCommon.php:73
 msgid "For One Martyr"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:85
+#: includes/enums/LitCommon.php:75
 msgid "For Several Martyrs"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:87
+#: includes/enums/LitCommon.php:77
 msgid "For Missionary Martyrs"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:89
+#: includes/enums/LitCommon.php:79
 msgid "For One Missionary Martyr"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:91
+#: includes/enums/LitCommon.php:81
 msgid "For Several Missionary Martyrs"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:93
+#: includes/enums/LitCommon.php:83
 msgid "For a Virgin Martyr"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:95
+#: includes/enums/LitCommon.php:85
 msgid "For a Holy Woman Martyr"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:97
+#: includes/enums/LitCommon.php:87
 msgid "For a Pope"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:99
+#: includes/enums/LitCommon.php:89
 msgid "For a Bishop"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:101
+#: includes/enums/LitCommon.php:91
 msgid "For One Pastor"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:103
+#: includes/enums/LitCommon.php:93
 msgid "For Several Pastors"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:105
+#: includes/enums/LitCommon.php:95
 msgid "For Founders of a Church"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:107
+#: includes/enums/LitCommon.php:97
 msgid "For One Founder"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:109
+#: includes/enums/LitCommon.php:99
 msgid "For Several Founders"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:111
+#: includes/enums/LitCommon.php:101
 msgid "For Missionaries"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:113
+#: includes/enums/LitCommon.php:103
 msgid "For One Virgin"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:115
+#: includes/enums/LitCommon.php:105
 msgid "For Several Virgins"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:117
+#: includes/enums/LitCommon.php:107
 msgid "For Several Saints"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:119
+#: includes/enums/LitCommon.php:109
 msgid "For One Saint"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:121
+#: includes/enums/LitCommon.php:111
 msgid "For an Abbot"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:123
+#: includes/enums/LitCommon.php:113
 msgid "For a Monk"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:125
+#: includes/enums/LitCommon.php:115
 msgid "For a Nun"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:127
+#: includes/enums/LitCommon.php:117
 msgid "For Religious"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:129
+#: includes/enums/LitCommon.php:119
 msgid "For Those Who Practiced Works of Mercy"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:131
+#: includes/enums/LitCommon.php:121
 msgid "For Educators"
 msgstr ""
 
 #. translators: context = from the Common of nn: nn
-#: includes/enums/LitCommon.php:133
+#: includes/enums/LitCommon.php:123
 msgid "For Holy Women"
 msgstr ""
 
 #. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/enums/LitCommon.php:180 includes/enums/LitCommon.php:192
+#: includes/enums/LitCommon.php:170 includes/enums/LitCommon.php:182
 msgctxt "(SING_FEMM)"
 msgid "of"
 msgstr ""
 
 #. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/enums/LitCommon.php:183
+#: includes/enums/LitCommon.php:173
 msgctxt "(PLUR_FEMM)"
 msgid "of"
 msgstr ""
 
 #. translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/enums/LitCommon.php:189
+#: includes/enums/LitCommon.php:179
 msgctxt "(PLUR_MASC)"
 msgid "of"
 msgstr ""
 
 #. translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/enums/LitCommon.php:195
+#: includes/enums/LitCommon.php:185
 msgctxt "(SING_MASC)"
 msgid "of"
 msgstr ""
 
-#: includes/enums/LitCommon.php:276
+#: includes/enums/LitCommon.php:266
 msgid "From the Common"
 msgstr ""
 
