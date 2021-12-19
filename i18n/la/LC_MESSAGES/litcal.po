@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2021-12-19 01:58+0000\n"
-"PO-Revision-Date: 2021-12-17 11:43+0000\n"
+"PO-Revision-Date: 2021-12-19 02:04+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/la/>\n"
@@ -277,24 +277,22 @@ msgstr ""
 #: includes/LitCalAPI.php:1658
 msgctxt "Male singular"
 msgid "patron of Europe"
-msgstr ""
+msgstr "patronus Europae"
 
 #: includes/LitCalAPI.php:1659 includes/LitCalAPI.php:1667
 #: includes/LitCalAPI.php:1671
 msgctxt "Female singular"
 msgid "patron of Europe"
-msgstr ""
+msgstr "patrona Europae"
 
 #: includes/LitCalAPI.php:1660
 msgctxt "Male plural"
 msgid "patrons of Europe"
-msgstr ""
+msgstr "patroni Europae"
 
 #: includes/LitCalAPI.php:1678
-#, fuzzy
-#| msgid "Saturday Memorial of the Blessed Virgin Mary"
 msgid "Saint Teresa Benedicta of the Cross, Virgin and Martyr"
-msgstr "Memoria Sanctæ Mariæ in Sabbato"
+msgstr "Sanctæ Teresiæ Benedictæ a Cruce, virginis et martyris"
 
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
 #: includes/LitMessages.php:142 includes/LitMessages.php:153
