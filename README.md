@@ -59,7 +59,7 @@ Together with the information that follows, Swaggerhub documentation of the API 
 
 A sample request to the endpoint could look like this:
 
-https://johnromanodorazio.com/LiturgicalCalendar/LitCalEngine.php?year=2020&epiphany=SUNDAY_JAN2_JAN8&ascension=SUNDAY&corpuschristi=SUNDAY&returntype=JSON&locale=EN
+https://litcal.johnromanodorazio.com/api/dev/LitCalEngine.php?year=2020&epiphany=SUNDAY_JAN2_JAN8&ascension=SUNDAY&corpuschristi=SUNDAY&returntype=JSON&locale=EN
 
 If no parameters are given, the default values indicated above will be used.
 
@@ -75,91 +75,98 @@ Both **POST** and **GET** requests can be made.
 For simplicity we will only take into consideration the structure of a response with JSON data.
 Two object keys are returned:
 1. **`LitCal`**: has a value which is an object who's key => value pairs reflect the liturgical events generated for the calendar requested. Example value of the `LitCal` key (limited to two of the generated events):
-```javascript
-  "LitCal":{
-    "MotherGod":{
-      "name":"SOLLEMNITAS SANCT\u00c6 DEI GENITRICIS MARI\u00c6",
-      "color":"white",
-      "type":"fixed",
-      "grade":6,
-      "common":"",
-      "date":"1609459200",
-      "displaygrade":"",
-      "eventidx":44,
-      "liturgicalyear":"ANNUM B",
-      "hasVigilMass":true,
-      "hasVesperI":true,
-      "hasVesperII":true
-    },
-    "StsBasilGreg":{
-      "name":"Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiae doctorum",
-      "color":"white",
-      "type":"fixed",
-      "grade":3,
-      "common":"Proper",
-      "date":"1577923200",
-      "displaygrade":"",
-      "eventidx":158
+    ```javascript
+    "LitCal":{
+      "MotherGod":{
+        "name":"SOLLEMNITAS SANCT\u00c6 DEI GENITRICIS MARI\u00c6",
+        "color":"white",
+        "type":"fixed",
+        "grade":6,
+        "common":"",
+        "date":"1609459200",
+        "displayGrade":"",
+        "eventIdx":44,
+        "liturgicalYear":"ANNUM B",
+        "hasVigilMass":true,
+        "hasVesperI":true,
+        "hasVesperII":true
+      },
+      "StsBasilGreg":{
+        "name":"Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiae doctorum",
+        "color":"white",
+        "type":"fixed",
+        "grade":3,
+        "common":"Proper",
+        "date":"1577923200",
+        "displayGrade":"",
+        "eventIdx":158
+      }
     }
-  }
-```
-Each of the events generated is represented as an object whose key => value pairs give the necessary information about the liturgical event:
-  * `name`   : A localized string with the full name of the liturgical event ready for display
-  * `color`  : The liturgical color associated with this liturgical event. Some events might have multiple possible liturgical colors, for examples memorials of saints where there is a choice between Commons. In these cases, the multiple possible colors are separated by a pipe character `|` in the same order as the relative possible Commons indicated in the `common` property. The color value is always in English, so that it can be used as is for generation of CSS styling rules especially if used as inline styles. Localization of these values is up to the requesting application which is in charge of creating the display, for example a value of `red|white` can be split on the pipe character and these values used for CSS styling, and a string could be created in Latin for display purposes: `'ruber vel album'`
-  * `type`   : The type of celebration, whether *fixed* or *mobile* (*fixed* celebrations have the same date every year, *mobile* celebrations are calculated either based on the date of Easter or because they always fall on the same day of the week within a specific time frame)
-  * `grade`  : The logical importance of the celebration, represented as a number from 0 to 7, used to calculate precedence compared to other possible events. The importance or precedence value will determine whether one event may suppress another event or have it moved to the next possible open slot according to certain criteria. A general association with liturgical terminology could be something like this:
-    - `0` = WEEKDAY
-    - `1` = COMMEMORATION
-    - `2` = OPTIONAL MEMORIAL
-    - `3` = MEMORIAL
-    - `4` = FEAST
-    - `5` = FEAST OF THE LORD
-    - `6` = SOLEMNITY
-    - `7` = event that has precedence over a solemnity
+    ```
+    Each of the events generated is represented as an object whose key => value pairs give the necessary information about the liturgical event:
+    * `name`   : A localized string with the full name of the liturgical event ready for display
+    * `color`  : The liturgical color associated with this liturgical event. Some events might have multiple possible liturgical colors, for examples memorials of saints where there is a choice between Commons. In these cases, the multiple possible colors are separated by a pipe character `|` in the same order as the relative possible Commons indicated in the `common` property. The color value is always in English, so that it can be used as is for generation of CSS styling rules especially if used as inline styles. Localization of these values is up to the requesting application which is in charge of creating the display, for example a value of `red|white` can be split on the pipe character and these values used for CSS styling, and a string could be created in Latin for display purposes: `'ruber vel album'`
+    * `type`   : The type of celebration, whether *fixed* or *mobile* (*fixed* celebrations have the same date every year, *mobile* celebrations are calculated either based on the date of Easter or because they always fall on the same day of the week within a specific time frame)
+    * `grade`  : The logical importance of the celebration, represented as a number from 0 to 7, used to calculate precedence compared to other possible events. The importance or precedence value will determine whether one event may suppress another event or have it moved to the next possible open slot according to certain criteria. A general association with liturgical terminology could be something like this:
+      - `0` = WEEKDAY
+      - `1` = COMMEMORATION
+      - `2` = OPTIONAL MEMORIAL
+      - `3` = MEMORIAL
+      - `4` = FEAST
+      - `5` = FEAST OF THE LORD
+      - `6` = SOLEMNITY
+      - `7` = event that has precedence over a solemnity
     
-  However this association is not suitable for displaying the actual *grade* (or *'rank'*) of the festivity in liturgical terms, because some events have a logical importance that does not correspond with their portrayed grade, for example "All Souls Day" is called a "Commemoration" and yet it is given the same importance as a solemnity. Thus "All Souls Day" will have a grade of 6, but should be displayed as "Commemoration" rather than as "Solemnity". See the `displaygrade` property which would contain the actual liturgical grade associated with the event, suitable for display.
-  * `common` : Indicates whether the liturgical texts for the celebration (in the case of memorials of saints) can be found in the Proper of Saints in the Roman Missal, or whether in the various Commons. In the former case the value will be simply `Proper`, in the latter case there will be a more complex construct:
-    - if it is possible to use liturgical texts from more than one common, the multiple possible commons will be listed as a comma separated list `,`
-    - each common has multiple categories of persons, with liturgical texts that are suitable for the specific category. The common and the specific category within the common will be separated by a colon `:`
-  An example value of the `common` property: `"Pastors:For a Bishop,Doctors"`. This means that it is possible to choose the liturgical texts either from the *Common of Pastors* or from the *Common of Doctors*; in the former case, the liturgical texts should be taken from the specific category *For a Bishop*. A textual representation ready for display would be something like this: *From the common of Pastors: For a Bishop; or from the Common of Doctors*. Please refer to the example scripts, whether the PHP example or the Javascript example, in order to understand better how to handle the interpretation and localization of these values, with all possible cases. 
-  * `date`   : a PHP style unix timestamp in UTC time. The actual time (hours, minutes, seconds) should be a zero value seeing that we deal only with all day events, and time is not of importance. For use in **Javascript**, multiply this value by 1000, because Javascript uses `milliseconds` whereas **PHP** uses `seconds` as a base for a UNIX timestamp. The timestamp value should be dealt with accordingly in each programming language used: as is if the language uses seconds as a base, or multiplying by 1000 if it uses milliseconds as a base.
-  * `displaygrade` : a string which will be empty unless the grade of the festivity to be displayed does not correspond with the grades generally associated with the `grade` property (such as "All Souls Day" or )
-  * `liturgicalyear` : the cycle of liturgical years that this event corresponds to. This property will only be present for events where it is applicable (Sundays and Weekdays of Ordinary Time or those liturgical events whose texts are based on the liturgical cycle), as can be noted in the sample data above. When present, it will have a localized value of `YEAR A`, `YEAR B`, or `YEAR C` for festive events or a value of `YEAR I`, `YEAR II` for weekday events (if an application makes a request for the Italian language, the values will contain `ANNO` instead of `YEAR`, and likewise for any localization requested).
-  * `hasVigilMass` : boolean value to indicate whether there is a vigil Mass associated with this festivity on the preceding day. This property will only be present for liturgical events that would normally have Vigil Masses (Solemnities, Feasts of the Lord, Sundays...).
-  * `hasVesperI` : boolean value to indicate whether or not the first vespers for the festivity should be celebrated on the preceding day. This property will only be present for liturgical events that would normally have First Vespers (Solemnities, Feasts of the Lord, Sundays...).
-  * `has VesperII` : boolean value to indicate whether or not the second vespers for the festivity should be celebrated in the evening of the same day. This property will only be present for liturgical events that would normally have Second Vespers (Solemnities, Feasts of the Lord, Sundays...).
-  * `isVigilMass` : boolean value to indicate whether the current celebration is a Vigil Mass for a festivity which will be celebrated on the following day. This property will only be present for liturgical events that are actually Vigil Mass events, therefore it will always have a value of true when it is present.
-  * `eventidx` : unique index number which indicates the order in which the liturgical event was generated by the API's engine / algorithm. Can be useful to order multiple events on the same day, in the order in which they were generated (which should usually correspond with the order of importance).
+    However this association is not suitable for displaying the actual *grade* (or *'rank'*) of the festivity in liturgical terms, because some events have a logical importance that does not correspond with their portrayed grade, for example "All Souls Day" is called a "Commemoration" and yet it is given the same importance as a solemnity. Thus "All Souls Day" will have a grade of 6, but should be displayed as "Commemoration" rather than as "Solemnity". See the `displaygrade` property which would contain the actual liturgical grade associated with the event, suitable for display.
+    * `common` : Indicates whether the liturgical texts for the celebration (in the case of memorials of saints) can be found in the Proper of Saints in the Roman Missal, or whether in the various Commons. In the former case the value will be simply `Proper`, in the latter case there will be a more complex construct:
+      - if it is possible to use liturgical texts from more than one common, the multiple possible commons will be listed as a comma separated list `,`
+      - each common has multiple categories of persons, with liturgical texts that are suitable for the specific category. The common and the specific category within the common will be separated by a colon `:`
+      An example value of the `common` property: `"Pastors:For a Bishop,Doctors"`. This means that it is possible to choose the liturgical texts either from the *Common of Pastors* or from the *Common of Doctors*; in the former case, the liturgical texts should be taken from the specific category *For a Bishop*. A textual representation ready for display would be something like this: *From the common of Pastors: For a Bishop; or from the Common of Doctors*. Please refer to the example scripts, whether the PHP example or the Javascript example, in order to understand better how to handle the interpretation and localization of these values, with all possible cases. 
+    * `date`   : a PHP style unix timestamp in UTC time. The actual time (hours, minutes, seconds) should be a zero value seeing that we deal only with all day events, and time is not of importance. For use in **Javascript**, multiply this value by 1000, because Javascript uses `milliseconds` whereas **PHP** uses `seconds` as a base for a UNIX timestamp. The timestamp value should be dealt with accordingly in each programming language used: as is if the language uses seconds as a base, or multiplying by 1000 if it uses milliseconds as a base.
+    * `displayGrade` : a string which will be empty unless the grade of the festivity to be displayed does not correspond with the grades generally associated with the `grade` property (such as "All Souls Day" or )
+    * `liturgicalYear` : the cycle of liturgical years that this event corresponds to. This property will only be present for events where it is applicable (Sundays and Weekdays of Ordinary Time or those liturgical events whose texts are based on the liturgical cycle), as can be noted in the sample data above. When present, it will have a localized value of `YEAR A`, `YEAR B`, or `YEAR C` for festive events or a value of `YEAR I`, `YEAR II` for weekday events (if an application makes a request for the Italian language, the values will contain `ANNO` instead of `YEAR`, and likewise for any localization requested).
+    * `hasVigilMass` : boolean value to indicate whether there is a vigil Mass associated with this festivity on the preceding day. This property will only be present for liturgical events that would normally have Vigil Masses (Solemnities, Feasts of the Lord, Sundays...).
+    * `hasVesperI` : boolean value to indicate whether or not the first vespers for the festivity should be celebrated on the preceding day. This property will only be present for liturgical events that would normally have First Vespers (Solemnities, Feasts of the Lord, Sundays...).
+    * `hasVesperII` : boolean value to indicate whether or not the second vespers for the festivity should be celebrated in the evening of the same day. This property will only be present for liturgical events that would normally have Second Vespers (Solemnities, Feasts of the Lord, Sundays...).
+    * `isVigilMass` : boolean value to indicate whether the current celebration is a Vigil Mass for a festivity which will be celebrated on the following day. This property will only be present for liturgical events that are actually Vigil Mass events, therefore it will always have a value of true when it is present.
+    * `eventIdx` : unique index number which indicates the order in which the liturgical event was generated by the API's engine / algorithm. Can be useful to order multiple events on the same day, in the order in which they were generated (which should usually correspond with the order of importance).
+
 2. **`Settings`**: has a value which is an object who's key => value pairs reflect the settings used in the request to produce this specific calendar. These are useful more or less just as feedback so that we can be sure that the calendar was effectively produced with the requesting settings. Example value of the `Settings` key:
-```javascript
-  "Settings":{
-    "YEAR":2020,
-    "EPIPHANY":"JAN6",
-    "ASCENSION":"SUNDAY",
-    "CORPUSCHRISTI":"SUNDAY",
-    "LOCALE":"LA",
-    "RETURNTYPE":"JSON"
-  }
-```
+   ```javascript
+   "Settings":{
+     "Year":2020,
+     "Epiphany":"JAN6",
+     "Ascension":"SUNDAY",
+     "CorpusChristi":"SUNDAY",
+     "Locale":"LA",
+     "ReturnType":"JSON"
+   }
+   ```
 
-3. **`Messages`**: has a value which is an array containing all of the significant operations done in the calculation of the requested Liturgical Calendar, with links to the Decrees of the Congregation for Divine Worship where applicable. Useful for understanding how or why the calculations were done, and what changes have been applied in the generation of the Calendar. A small sample portion of data that can be returned:
+3. **`Metadata`**: gives a little more context about how the Calendar was generated. There are four properties:
+    * `VERSION`: current version of the endpoint to which the request was sent
+    * `RequestHeaders`: a JSON encoded string of the request headers that the API received from the requesting party, and which may have influenced the generation of the Calendar (for example, the `Accept` and the `Accept-Language` headers)
+    * `Solemnities`: an object containing all of the Liturgical events that were added to the Solemnities collection
+    * `FeastsMemorials`: an object containing all of the Liturgical events that were added to the Feasts and Memorials collections
 
-```Javascript
-"Messages": [
-    "<i>'4th Sunday of Ordinary Time'<\/i> is superseded by a Solemnity in the year 2020.",
-    "<i>'31st Sunday of Ordinary Time'<\/i> is superseded by a Solemnity in the year 2020.",
-    "<i>'11th Sunday of Ordinary Time'<\/i> is superseded by a Solemnity in the year 2020.",
-    "The Feast <i>'Saints Philip and James, Apostles'<\/i>, usually celebrated on May 3rd, is suppressed by a Sunday or a Solemnity in the year 2020.",
-    "The Feast <i>'Visitation of the Blessed Virgin Mary'<\/i>, usually celebrated on May 31st, is suppressed by a Sunday or a Solemnity in the year 2020.",
-    "The Feast <i>'Saint Luke the Evangelist'<\/i>, usually celebrated on October 18th, is suppressed by a Sunday or a Solemnity in the year 2020.",
-    "The Feast <i>'Saint John, Apostle and Evangelist'<\/i>, usually celebrated on December 27th, is suppressed by a Sunday or a Solemnity in the year 2020.",
-    "<i>'First day before Epiphany'<\/i> is superseded the Memorial <i>'Saints Basil the Great and Gregory Nazianzen, bishops and doctors'<\/i> in the year 2020.",
-    "The Memorial <i>'Saints Timothy and Titus, bishops'<\/i>, usually celebrated on January 26th, is suppressed by a Sunday, a Solemnity or a Feast in the year 2020.",
-    "The Memorial <i>'Saint Polycarp, bishop and martyr'<\/i>, usually celebrated on February 23rd, is suppressed by a Sunday, a Solemnity or a Feast in the year 2020.",
-    "The Memorial <i>'Saints Perpetua and Felicity, martyrs'<\/i> falls within the Lenten season in the year 2020, rank reduced to Commemoration.",
-    "The Memorial <i>'Saint John Baptist de la Salle, priest'<\/i> falls within the Lenten season in the year 2020, rank reduced to Commemoration."
-]
-```
+4. **`Messages`**: has a value which is an array containing all of the significant operations done in the calculation of the requested Liturgical Calendar, with links to the Decrees of the Congregation for Divine Worship where applicable. Useful for understanding how or why the calculations were done, and what changes have been applied in the generation of the Calendar. A small sample portion of data that can be returned:
+    
+    ```Javascript
+    "Messages": [
+        "<i>'4th Sunday of Ordinary Time'<\/i> is superseded by a Solemnity in the year 2020.",
+        "<i>'31st Sunday of Ordinary Time'<\/i> is superseded by a Solemnity in the year 2020.",
+        "<i>'11th Sunday of Ordinary Time'<\/i> is superseded by a Solemnity in the year 2020.",
+        "The Feast <i>'Saints Philip and James, Apostles'<\/i>, usually celebrated on May 3rd, is suppressed by a Sunday or a Solemnity in the year 2020.",
+        "The Feast <i>'Visitation of the Blessed Virgin Mary'<\/i>, usually celebrated on May 31st, is suppressed by a Sunday or a Solemnity in the year 2020.",
+        "The Feast <i>'Saint Luke the Evangelist'<\/i>, usually celebrated on October 18th, is suppressed by a Sunday or a Solemnity in the year 2020.",
+        "The Feast <i>'Saint John, Apostle and Evangelist'<\/i>, usually celebrated on December 27th, is suppressed by a Sunday or a Solemnity in the year 2020.",
+        "<i>'First day before Epiphany'<\/i> is superseded the Memorial <i>'Saints Basil the Great and Gregory Nazianzen, bishops and doctors'<\/i> in the year 2020.",
+        "The Memorial <i>'Saints Timothy and Titus, bishops'<\/i>, usually celebrated on January 26th, is suppressed by a Sunday, a Solemnity or a Feast in the year 2020.",
+        "The Memorial <i>'Saint Polycarp, bishop and martyr'<\/i>, usually celebrated on February 23rd, is suppressed by a Sunday, a Solemnity or a Feast in the year 2020.",
+        "The Memorial <i>'Saints Perpetua and Felicity, martyrs'<\/i> falls within the Lenten season in the year 2020, rank reduced to Commemoration.",
+        "The Memorial <i>'Saint John Baptist de la Salle, priest'<\/i> falls within the Lenten season in the year 2020, rank reduced to Commemoration."
+    ]
+    ```
 
 # Languages
 
