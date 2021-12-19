@@ -1,6 +1,6 @@
 <?php
 
-class REQUEST_METHOD {
+class RequestMethod {
     const POST      = "POST";   //Create / read
     const GET       = "GET";    //Read
     const PATCH     = "PATCH";  //Update / modify

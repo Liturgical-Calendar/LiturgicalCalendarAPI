@@ -15,7 +15,7 @@ ini_set('date.timezone', 'Europe/Vatican');
  */
 
 
-class LitCalFf {
+class LitFunc {
 
   const NON_EVENT_KEYS = [ 'LitCal', 'Settings', 'Messages', 'Metadata', 'SOLEMNITIES', 'FEASTS_MEMORIALS' ];
 
@@ -80,7 +80,7 @@ class LitCalFf {
     $month = floor( ($d + $e + 114) / 31 );
     $day = ( ($d + $e + 114) % 31 ) + 1;
 
-    $dateObj   = DateTime::createFromFormat('!j-n-Y', $day.'-'.$month.'-'.$Y);
+    $dateObj   = DateTime::createFromFormat('!j-n-Y', $day.'-'.$month.'-'.$Y, new DateTimeZone( 'UTC' ));
     if($gregCal){
         //from February 29th 2100 Julian (March 14th 2100 Gregorian), 
         //the difference between the Julian and Gregorian calendars will increase to 14 days

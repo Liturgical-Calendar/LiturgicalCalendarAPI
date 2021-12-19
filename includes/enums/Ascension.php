@@ -1,6 +1,6 @@
 <?php
 
-class ASCENSION {
+class Ascension {
     const THURSDAY          = "THURSDAY";
     const SUNDAY            = "SUNDAY";
     public static array $values = [ "THURSDAY", "SUNDAY" ];

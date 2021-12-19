@@ -1,8 +1,9 @@
 <?php
 
 include_once( 'includes/enums/LitColor.php' );
+include_once( 'includes/enums/LitLocale.php' );
 
-class LITCAL_MESSAGES {
+class LitMessages {
 
     const LATIN_ORDINAL = [
         "",
@@ -196,10 +197,10 @@ class LITCAL_MESSAGES {
     public static function getOrdinal(int $num, string $LOCALE, NumberFormatter $formatter, array $latinOrdinals) : string {
         $ordinal = "";
         switch($LOCALE){
-            case 'LA':
+            case LitLocale::LATIN:
                 $ordinal = $latinOrdinals[$num];
             break;
-            case 'EN':
+            case LitLocale::ENGLISH:
                 $ordinal = $num . self::ordSuffix($num);
             break;
             default:

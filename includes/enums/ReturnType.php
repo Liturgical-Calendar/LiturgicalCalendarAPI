@@ -1,7 +1,7 @@
 <?php
 
 /**
- * class RETURN_TYPE
+ * class ReturnType
  * Represents possible Content Types for the Response
  *  as indicated in a parameter in the request
  *  rather than in the Accept header
@@ -9,7 +9,7 @@
  *  in the ACCEPT_HEADER class, so that conversions can be made
  */
 
-class RETURN_TYPE {
+class ReturnType {
     const ATTACHMENT    = "ATTACHMENT";
     const JSON          = "JSON";
     const XML           = "XML";

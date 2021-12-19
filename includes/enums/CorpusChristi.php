@@ -1,6 +1,6 @@
 <?php
 
-class CORPUSCHRISTI {
+class CorpusChristi {
     const THURSDAY          = "THURSDAY";
     const SUNDAY            = "SUNDAY";
     public static array $values = [ "THURSDAY", "SUNDAY" ];

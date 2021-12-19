@@ -6,15 +6,15 @@ include_once( 'enums/CorpusChristi.php' );
 include_once( 'enums/LitLocale.php' );
 include_once( 'enums/ReturnType.php' );
 
-class LITSETTINGS {
-    public int $YEAR;
-    public string $EPIPHANY      = EPIPHANY::JAN6;
-    public string $ASCENSION     = ASCENSION::THURSDAY;
-    public string $CORPUSCHRISTI = CORPUSCHRISTI::THURSDAY;
-    public string $LOCALE        = LIT_LOCALE::LA;
-    public ?string $RETURNTYPE   = null;
-    public ?string $NATIONAL     = null;
-    public ?string $DIOCESAN     = null;
+class LitSettings {
+    public int $Year;
+    public string $Epiphany             = Epiphany::JAN6;
+    public string $Ascension            = Ascension::THURSDAY;
+    public string $CorpusChristi        = CorpusChristi::THURSDAY;
+    public ?string $Locale              = null;
+    public ?string $ReturnType          = null;
+    public ?string $NationalCalendar    = null;
+    public ?string $DiocesanCalendar    = null;
 
     const ALLOWED_PARAMS  = [
         "YEAR",
@@ -23,11 +23,11 @@ class LITSETTINGS {
         "CORPUSCHRISTI",
         "LOCALE",
         "RETURNTYPE",
-        "NATIONALPRESET",
-        "DIOCESANPRESET"
+        "NATIONALCALENDAR",
+        "DIOCESANCALENDAR"
     ];
 
-    const SUPPORTED_NATIONAL_PRESETS = [ "ITALY", "USA", "VATICAN" ];
+    const SUPPORTED_NATIONAL_CALENDARS = [ "ITALY", "USA", "VATICAN" ];
 
     //If we can get more data from 1582 (year of the Gregorian reform) to 1969
     // perhaps we can lower the limit to the year of the Gregorian reform
@@ -40,7 +40,7 @@ class LITSETTINGS {
   
     public function __construct( array $DATA ) {
         //we need at least a default value for the current year
-        $this->YEAR = (int)date("Y");
+        $this->Year = (int)date("Y");
 
         foreach( $DATA as $key => $value ) {
             $key = strtoupper( $key );
@@ -50,27 +50,35 @@ class LITSETTINGS {
                         $this->enforceYearValidity( $value );
                         break;
                     case "EPIPHANY":
-                        $this->EPIPHANY         = EPIPHANY::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : EPIPHANY::JAN6;
+                        $this->Epiphany         = Epiphany::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : Epiphany::JAN6;
                         break;
                     case "ASCENSION":
-                        $this->ASCENSION        = ASCENSION::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : ASCENSION::THURSDAY;
+                        $this->Ascension        = Ascension::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : Ascension::THURSDAY;
                         break;
                     case "CORPUSCHRISTI":
-                        $this->CORPUSCHRISTI    = CORPUSCHRISTI::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : CORPUSCHRISTI::THURSDAY;
+                        $this->CorpusChristi    = CorpusChristi::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : CorpusChristi::THURSDAY;
                         break;
                     case "LOCALE":
-                        $this->LOCALE           = LIT_LOCALE::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : LIT_LOCALE::LA;
+                        $this->Locale           = LitLocale::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : LitLocale::LATIN;
                         break;
                     case "RETURNTYPE":
-                        $this->RETURNTYPE       = RETURN_TYPE::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : RETURN_TYPE::JSON;
+                        $this->ReturnType       = ReturnType::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : ReturnType::JSON;
                         break;
-                    case "NATIONALPRESET":
-                        $this->NATIONAL         = in_array( strtoupper( $value ), self::SUPPORTED_NATIONAL_PRESETS ) ? strtoupper( $value ) : null;
+                    case "NATIONALCALENDAR":
+                        $this->NationalCalendar = in_array( strtoupper( $value ), self::SUPPORTED_NATIONAL_CALENDARS ) ? strtoupper( $value ) : null;
                         break;
-                    case "DIOCESANPRESET":
-                        $this->DIOCESAN         = strtoupper( $value );
+                    case "DIOCESANCALENDAR":
+                        $this->DiocesanCalendar = strtoupper( $value );
                         break;
                 }
+            }
+        }
+        if( $this->Locale === null ) {
+            if( isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ) {
+                $value = explode("_", Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']) )[0];
+                $this->Locale = LitLocale::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : LitLocale::LATIN;
+            } else {
+                $this->Locale = LitLocale::Latin;
             }
         }
     }
@@ -80,12 +88,12 @@ class LITSETTINGS {
             if( is_numeric( $value ) && ctype_digit( $value ) && strlen( $value ) === 4 ){
                 $value = (int)$value;
                 if( $value >= self::YEAR_LOWER_LIMIT && $value <= self::YEAR_UPPER_LIMIT ){
-                    $this->YEAR = $value;
+                    $this->Year = $value;
                 }
             }
         } elseif( gettype( $value ) === 'integer' ) {
             if( $value >= self::YEAR_LOWER_LIMIT && $value <= self::YEAR_UPPER_LIMIT ){
-                $this->YEAR = $value;
+                $this->Year = $value;
             }
         }
     }
