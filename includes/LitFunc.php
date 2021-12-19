@@ -15,7 +15,7 @@ ini_set('date.timezone', 'Europe/Vatican');
  */
 
 
-class LitCalFf {
+class LitFunc {
 
   const NON_EVENT_KEYS = [ 'LitCal', 'Settings', 'Messages', 'Metadata', 'SOLEMNITIES', 'FEASTS_MEMORIALS' ];
 

@@ -62,9 +62,9 @@ $LitCalEngine->APICore->setAllowedOrigins( [
     "https://litcal.johnromanodorazio.com",
     "https://litcal-staging.johnromanodorazio.com"
 ] );
-$LitCalEngine->APICore->setAllowedRequestMethods( [ REQUEST_METHOD::GET, REQUEST_METHOD::POST ] );
-$LitCalEngine->APICore->setAllowedRequestContentTypes( [ REQUEST_CONTENT_TYPE::JSON, REQUEST_CONTENT_TYPE::FORMDATA ] );
-$LitCalEngine->APICore->setAllowedAcceptHeaders( [ ACCEPT_HEADER::JSON, ACCEPT_HEADER::XML, ACCEPT_HEADER::ICS ] );
-$LitCalEngine->setAllowedReturnTypes( [ RETURN_TYPE::JSON, RETURN_TYPE::XML, RETURN_TYPE::ICS ] );
-$LitCalEngine->setCacheDuration( CACHEDURATION::MONTH );
+$LitCalEngine->APICore->setAllowedRequestMethods( [ RequestMethod::GET, RequestMethod::POST ] );
+$LitCalEngine->APICore->setAllowedRequestContentTypes( [ RequestContentType::JSON, RequestContentType::FORMDATA ] );
+$LitCalEngine->APICore->setAllowedAcceptHeaders( [ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS ] );
+$LitCalEngine->setAllowedReturnTypes( [ ReturnType::JSON, ReturnType::XML, ReturnType::ICS ] );
+$LitCalEngine->setCacheDuration( CacheDuration::MONTH );
 $LitCalEngine->Init();

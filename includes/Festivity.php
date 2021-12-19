@@ -58,7 +58,7 @@ class Festivity implements JsonSerializable
     }
 
     /* Per trasformare i dati in JSON, dobbiamo indicare come trasformare soprattutto l'oggetto DateTime */
-    public function jsonSerialize() {
+    public function jsonSerialize() : mixed {
         $returnArr = [
             'eventIdx'      => $this->idx,
             'name'          => $this->name,

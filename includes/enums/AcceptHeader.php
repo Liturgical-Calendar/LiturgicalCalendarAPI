@@ -1,6 +1,6 @@
 <?php
 
-class ACCEPT_HEADER {
+class AcceptHeader {
     const ATTACHMENT= "application/octet-stream";
     const JSON      = "application/json";
     const XML       = "application/xml";

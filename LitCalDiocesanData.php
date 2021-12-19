@@ -20,8 +20,8 @@ $LitCalDiocesanData = new LitCalDiocesanData();
 $LitCalDiocesanData->APICore->setAllowedOrigins( $allowedOrigins );
 $LitCalDiocesanData->APICore->setAllowedReferers( array_map( function($el){ return $el . "/"; }, $allowedOrigins ) );
 
-$LitCalDiocesanData->APICore->setAllowedAcceptHeaders( [ ACCEPT_HEADER::JSON ] );
-$LitCalDiocesanData->APICore->setAllowedRequestContentTypes( [ REQUEST_CONTENT_TYPE::JSON, REQUEST_CONTENT_TYPE::FORMDATA ] );
+$LitCalDiocesanData->APICore->setAllowedAcceptHeaders( [ AcceptHeader::JSON ] );
+$LitCalDiocesanData->APICore->setAllowedRequestContentTypes( [ RequestContentType::JSON, RequestContentType::FORMDATA ] );
 $LitCalDiocesanData->Init();
 
 class LitCalDiocesanData {
@@ -56,9 +56,9 @@ class LitCalDiocesanData {
         $this->APICore->enforceReferer();
         if( $this->APICore->getRequestContentType() === 'application/json' ) {
             $this->DATA = $this->APICore->retrieveRequestParamsFromJsonBody();
-            if( REQUEST_METHOD::PUT === $requestMethod ) {
+            if( RequestMethod::PUT === $requestMethod ) {
                 $this->writeDiocesanCalendar();
-            } elseif( REQUEST_METHOD::DELETE === $requestMethod ) {
+            } elseif( RequestMethod::DELETE === $requestMethod ) {
                 $this->deleteDiocesanCalendar();
             }
             
@@ -72,26 +72,26 @@ class LitCalDiocesanData {
     private function handleRequestedMethod() {
 
         switch( strtoupper( $_SERVER[ "REQUEST_METHOD" ] ) ) {
-            case 'GET':
+            case RequestMethod::GET:
                 $this->handleGetPostRequests( $_GET );
                 break;
-            case 'POST':
+            case RequestMethod::POST:
                 $this->handleGetPostRequests( $_POST );
                 break;
-            case 'PUT':
-            case 'PATCH':
-                $this->handlePutPatchDeleteRequests( REQUEST_METHOD::PUT );
+            case RequestMethod::PUT:
+            case RequestMethod::PATCH:
+                $this->handlePutPatchDeleteRequests( RequestMethod::PUT );
                 break;
-            case 'DELETE':
-                $this->handlePutPatchDeleteRequests( REQUEST_METHOD::DELETE );
+            case RequestMethod::DELETE:
+                $this->handlePutPatchDeleteRequests( RequestMethod::DELETE );
                 break;
-            case 'OPTIONS':
+            case RequestMethod::OPTIONS:
                 //continue;
                 break;
             default:
                 header( $_SERVER[ "SERVER_PROTOCOL" ]." 405 Method Not Allowed", true, 405 );
                 $errorMessage = '{"error":"You seem to be forming a strange kind of request? Allowed Request Methods are ';
-                $errorMessage .= implode( ' and ', $this->ALLOWED_REQUEST_METHODS );
+                $errorMessage .= implode( ' and ', $this->AllowedRequestMethods );
                 $errorMessage .= ', but your Request Method was ' . strtoupper( $_SERVER[ 'REQUEST_METHOD' ] ) . '"}';
                 die( $errorMessage );
         }

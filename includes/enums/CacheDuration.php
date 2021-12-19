@@ -1,6 +1,6 @@
 <?php
 
-class CACHEDURATION {
+class CacheDuration {
     const DAY       = "DAY";
     const WEEK      = "WEEK";
     const MONTH     = "MONTH";

@@ -1,6 +1,6 @@
 <?php
 
-class ROMANMISSAL {
+class RomanMissal {
 
     const EDITIO_TYPICA_1970                    = "VATICAN_1970";
     const REIMPRESSIO_EMENDATA_1971             = "VATICAN_1971";
