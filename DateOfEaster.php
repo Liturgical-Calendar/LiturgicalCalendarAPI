@@ -5,7 +5,11 @@ ini_set("display_errors", 1);
 ini_set('date.timezone', 'Europe/Vatican');
 
 include_once( 'includes/enums/LitLocale.php' );
-$LOCALE = isset($_GET["locale"]) && LitLocale::isValid(strtoupper($_GET["locale"])) ? strtoupper($_GET["locale"]) : LitLocale::LATIN;
+$AvailableLocales = array_filter(ResourceBundle::getLocales(''), function ($value) {
+    return strpos($value, '_') === false;
+});
+
+$LOCALE = isset($_GET["locale"]) && in_array( strtolower($_GET["locale"]), $AvailableLocales) ? strtoupper($_GET["locale"]) : LitLocale::LATIN;
 
 if(file_exists('engineCache/easter/' . $LOCALE . '.json') ){
     header('Content-Type: application/json');
