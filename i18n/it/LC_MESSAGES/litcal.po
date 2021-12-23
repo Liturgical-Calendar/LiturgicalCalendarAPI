@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
-"POT-Creation-Date: 2021-12-19 03:17+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-12-23 14:00+0000\n"
 "PO-Revision-Date: 2021-12-20 13:12+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -582,42 +582,42 @@ msgid "From the Common"
 msgstr "Dal Comune"
 
 #. translators: liturgical rank. Keep lowercase
-#: includes/enums/LitGrade.php:88 includes/enums/LitGrade.php:127
+#: includes/enums/LitGrade.php:90 includes/enums/LitGrade.php:129
 msgid "weekday"
 msgstr "feria"
 
 #. translators: liturgical rank. Keep Capitalized
-#: includes/enums/LitGrade.php:93
+#: includes/enums/LitGrade.php:95
 msgid "Commemoration"
 msgstr "Commemorazione"
 
 #. translators: liturgical rank. Keep Capitalized
-#: includes/enums/LitGrade.php:98
+#: includes/enums/LitGrade.php:100
 msgid "Optional memorial"
 msgstr "Memoria facoltativa"
 
 #. translators: liturgical rank. Keep Capitalized
-#: includes/enums/LitGrade.php:103
+#: includes/enums/LitGrade.php:105
 msgid "Memorial"
 msgstr "Memoria"
 
 #. translators: liturgical rank. Keep UPPERCASE
-#: includes/enums/LitGrade.php:108
+#: includes/enums/LitGrade.php:110
 msgid "FEAST"
 msgstr "FESTA"
 
 #. translators: liturgical rank. Keep UPPERCASE
-#: includes/enums/LitGrade.php:113
+#: includes/enums/LitGrade.php:115
 msgid "FEAST OF THE LORD"
 msgstr "FESTA DEL SIGNORE"
 
 #. translators: liturgical rank. Keep UPPERCASE
-#: includes/enums/LitGrade.php:118
+#: includes/enums/LitGrade.php:120
 msgid "SOLEMNITY"
 msgstr "SOLENNITÀ"
 
 #. translators: liturgical rank. Keep lowercase
-#: includes/enums/LitGrade.php:123
+#: includes/enums/LitGrade.php:125
 msgid "celebration with precedence over solemnities"
 msgstr "celebrazione con precedenza sulle solennità"
 

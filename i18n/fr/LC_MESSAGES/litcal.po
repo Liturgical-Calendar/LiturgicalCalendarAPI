@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-19 03:17+0000\n"
+"POT-Creation-Date: 2021-12-23 14:00+0000\n"
 "PO-Revision-Date: 2021-12-14 00:20+0100\n"
 "Last-Translator: Ubuntu <priest@johnromanodorazio.com>\n"
 "Language-Team: French\n"
@@ -525,41 +525,41 @@ msgid "From the Common"
 msgstr ""
 
 #. translators: liturgical rank. Keep lowercase
-#: includes/enums/LitGrade.php:88 includes/enums/LitGrade.php:127
+#: includes/enums/LitGrade.php:90 includes/enums/LitGrade.php:129
 msgid "weekday"
 msgstr ""
 
 #. translators: liturgical rank. Keep Capitalized
-#: includes/enums/LitGrade.php:93
+#: includes/enums/LitGrade.php:95
 msgid "Commemoration"
 msgstr ""
 
 #. translators: liturgical rank. Keep Capitalized
-#: includes/enums/LitGrade.php:98
+#: includes/enums/LitGrade.php:100
 msgid "Optional memorial"
 msgstr ""
 
 #. translators: liturgical rank. Keep Capitalized
-#: includes/enums/LitGrade.php:103
+#: includes/enums/LitGrade.php:105
 msgid "Memorial"
 msgstr ""
 
 #. translators: liturgical rank. Keep UPPERCASE
-#: includes/enums/LitGrade.php:108
+#: includes/enums/LitGrade.php:110
 msgid "FEAST"
 msgstr ""
 
 #. translators: liturgical rank. Keep UPPERCASE
-#: includes/enums/LitGrade.php:113
+#: includes/enums/LitGrade.php:115
 msgid "FEAST OF THE LORD"
 msgstr ""
 
 #. translators: liturgical rank. Keep UPPERCASE
-#: includes/enums/LitGrade.php:118
+#: includes/enums/LitGrade.php:120
 msgid "SOLEMNITY"
 msgstr ""
 
 #. translators: liturgical rank. Keep lowercase
-#: includes/enums/LitGrade.php:123
+#: includes/enums/LitGrade.php:125
 msgid "celebration with precedence over solemnities"
 msgstr ""
