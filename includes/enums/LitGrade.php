@@ -7,6 +7,8 @@
  *  A COPY OF THE DOCUMENT IS INCLUDED ALONGSIDE THIS ENGINE, SEEING THAT THERE IS NO DIRECT ONLINE LINK TO THE ACTUAL NORMS
  */
 
+include_once( 'includes/enums/LitLocale.php' );
+
 /*****************************************************
  * DEFINE THE ORDER OF IMPORTANCE OF THE FESTIVITIES *
  ****************************************************/
@@ -85,46 +87,46 @@ class LitGrade {
         switch( $value ) {
             case self::WEEKDAY:
                 /**translators: liturgical rank. Keep lowercase  */
-                $grade = $this->locale === 'LA' ? 'feria'                 : _( "weekday" );
+                $grade = $this->locale === LitLocale::LATIN ? 'feria'                 : _( "weekday" );
                 $tags = ['<I>','</I>'];
             break;
             case self::COMMEMORATION:
                 /**translators: liturgical rank. Keep Capitalized  */
-                $grade = $this->locale === 'LA' ? 'Commemoratio'          : _( "Commemoration" );
+                $grade = $this->locale === LitLocale::LATIN ? 'Commemoratio'          : _( "Commemoration" );
                 $tags = ['<I>','</I>'];
             break;
             case self::MEMORIAL_OPT:
                 /**translators: liturgical rank. Keep Capitalized  */
-                $grade = $this->locale === 'LA' ? 'Memoria ad libitum'    : _( "Optional memorial" );
+                $grade = $this->locale === LitLocale::LATIN ? 'Memoria ad libitum'    : _( "Optional memorial" );
                 $tags = ['',''];
             break;
             case self::MEMORIAL:
                 /**translators: liturgical rank. Keep Capitalized  */
-                $grade = $this->locale === 'LA' ? 'Memoria obligatoria'   : _( "Memorial" );
+                $grade = $this->locale === LitLocale::LATIN ? 'Memoria obligatoria'   : _( "Memorial" );
                 $tags = ['',''];
             break;
             case self::FEAST:
                 /**translators: liturgical rank. Keep UPPERCASE  */
-                $grade = $this->locale === 'LA' ? 'FESTUM'                : _( "FEAST" );
+                $grade = $this->locale === LitLocale::LATIN ? 'FESTUM'                : _( "FEAST" );
                 $tags = ['',''];
             break;
             case self::FEAST_LORD:
                 /**translators: liturgical rank. Keep UPPERCASE  */
-                $grade = $this->locale === 'LA' ? 'FESTUM DOMINI'         : _( "FEAST OF THE LORD" );
+                $grade = $this->locale === LitLocale::LATIN ? 'FESTUM DOMINI'         : _( "FEAST OF THE LORD" );
                 $tags = ['<B>','</B>'];
             break;
             case self::SOLEMNITY:
                 /**translators: liturgical rank. Keep UPPERCASE  */
-                $grade = $this->locale === 'LA' ? 'SOLLEMNITAS'           : _( "SOLEMNITY" );
+                $grade = $this->locale === LitLocale::LATIN ? 'SOLLEMNITAS'           : _( "SOLEMNITY" );
                 $tags = ['<B>','</B>'];
             break;
             case self::HIGHER_SOLEMNITY:
                 /**translators: liturgical rank. Keep lowercase  */
-                $grade = $this->locale === 'LA' ? 'celebratio altioris ordinis quam sollemnitatis' : _( "celebration with precedence over solemnities" );
+                $grade = $this->locale === LitLocale::LATIN ? 'celebratio altioris ordinis quam sollemnitatis' : _( "celebration with precedence over solemnities" );
                 $tags = ['<B><I>','</I></B>'];
             break;
             default:
-                $grade = $this->locale === 'LA' ? 'feria'                 : _( "weekday" );
+                $grade = $this->locale === LitLocale::LATIN ? 'feria'                 : _( "weekday" );
                 $tags = ['',''];
         }
         return $html ? $tags[0] . $grade . $tags[1] : $grade;

@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
-"POT-Creation-Date: 2021-12-19 01:58+0000\n"
-"PO-Revision-Date: 2021-12-19 02:04+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-12-26 00:07+0000\n"
+"PO-Revision-Date: 2021-12-25 23:32+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/la/>\n"
@@ -63,7 +63,7 @@ msgstr "sabbatum ante Dominicam in Palmis"
 #: includes/LitCalAPI.php:1361 includes/LitCalAPI.php:1385
 #: includes/LitCalAPI.php:1402 includes/LitCalAPI.php:1422
 #: includes/LitCalAPI.php:1444 includes/LitCalAPI.php:1458
-#: includes/LitCalAPI.php:1472 includes/FestivityCollection.php:385
+#: includes/LitCalAPI.php:1472 includes/FestivityCollection.php:386
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decretum Congregationis pro Cultu Divino"
 
@@ -309,7 +309,7 @@ msgstr "ANNUM"
 msgid "Vigil Mass"
 msgstr "Missa in Vigilia"
 
-#: includes/FestivityCollection.php:338 includes/FestivityCollection.php:365
+#: includes/FestivityCollection.php:339 includes/FestivityCollection.php:366
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
@@ -321,7 +321,7 @@ msgstr ""
 "praecedentia habet, ergo servabit Secundis Vesperis atque Missa vesperum, "
 "cum Sollemnitas prima neque Missa in Vigilia neque Primis Vesperis servabit."
 
-#: includes/FestivityCollection.php:351 includes/FestivityCollection.php:409
+#: includes/FestivityCollection.php:352 includes/FestivityCollection.php:410
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
@@ -330,7 +330,7 @@ msgid ""
 "evening Mass."
 msgstr ""
 
-#: includes/FestivityCollection.php:379
+#: includes/FestivityCollection.php:380
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As "
@@ -338,7 +338,7 @@ msgid ""
 "are I Vespers."
 msgstr ""
 
-#: includes/FestivityCollection.php:391
+#: includes/FestivityCollection.php:392
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We "
@@ -384,7 +384,7 @@ msgstr "Dedicationis ecclesiæ"
 #. translators: context = from the Common of nn
 #: includes/enums/LitCommon.php:60
 msgid "Blessed Virgin Mary"
-msgstr "Beatæ Virginis Mariæ"
+msgstr "Beatæ Mariæ Virginis"
 
 #. translators: context = from the Common of nn
 #: includes/enums/LitCommon.php:62
@@ -399,7 +399,7 @@ msgstr "Pastorum"
 #. translators: context = from the Common of nn
 #: includes/enums/LitCommon.php:66
 msgid "Doctors"
-msgstr "Doctorum Ecclesiæ"
+msgstr "Doctorum"
 
 #. translators: context = from the Common of nn
 #: includes/enums/LitCommon.php:68
@@ -444,22 +444,22 @@ msgstr "Pro virgine martyre"
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:85
 msgid "For a Holy Woman Martyr"
-msgstr "Pro una martyre muliere"
+msgstr "Pro sancta muliere martyre"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:87
 msgid "For a Pope"
-msgstr "Pro Papa"
+msgstr "Pro papa"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:89
 msgid "For a Bishop"
-msgstr "Pro Episcopis"
+msgstr "Pro episcopo"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:91
 msgid "For One Pastor"
-msgstr "Pro Pastoribus"
+msgstr "Pro uno pastore"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:93
@@ -469,17 +469,17 @@ msgstr "Pro pluribus pastoribus"
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:95
 msgid "For Founders of a Church"
-msgstr "Pro Fundatoribus ecclesiarum"
+msgstr "Pro fundatoribus ecclesiarum"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:97
 msgid "For One Founder"
-msgstr "Pro Uno Fundatore"
+msgstr "Pro uno fundatore"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:99
 msgid "For Several Founders"
-msgstr "Pro Pluribus Fundatoribus"
+msgstr "Pro pluribus fundatoribus"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:101
@@ -499,12 +499,12 @@ msgstr "Pro pluribus virginibus"
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:107
 msgid "For Several Saints"
-msgstr "Pro pluribus Sanctos"
+msgstr "Pro pluribus sanctis"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:109
 msgid "For One Saint"
-msgstr "Pro uno Sancto"
+msgstr "Pro uno sancto"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:111
@@ -524,22 +524,22 @@ msgstr "Pro moniali"
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:117
 msgid "For Religious"
-msgstr "Pro Religiosis"
+msgstr "Pro religiosis"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:119
 msgid "For Those Who Practiced Works of Mercy"
-msgstr "Pro iis qui opera Misericordiæ Exercuerunt"
+msgstr "Pro iis qui opera misericordiae exercuerunt"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:121
 msgid "For Educators"
-msgstr "Pro Educatoribus"
+msgstr "Pro educatoribus"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:123
 msgid "For Holy Women"
-msgstr "Pro Sanctis Mulieribus"
+msgstr "Pro sanctis mulieribus"
 
 #. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: includes/enums/LitCommon.php:170 includes/enums/LitCommon.php:182
@@ -567,45 +567,45 @@ msgstr ""
 
 #: includes/enums/LitCommon.php:266
 msgid "From the Common"
-msgstr "De Communi"
+msgstr "De Commune"
 
 #. translators: liturgical rank. Keep lowercase
-#: includes/enums/LitGrade.php:88 includes/enums/LitGrade.php:127
+#: includes/enums/LitGrade.php:90 includes/enums/LitGrade.php:129
 msgid "weekday"
 msgstr "feria"
 
 #. translators: liturgical rank. Keep Capitalized
-#: includes/enums/LitGrade.php:93
+#: includes/enums/LitGrade.php:95
 msgid "Commemoration"
 msgstr "Commemoratio"
 
 #. translators: liturgical rank. Keep Capitalized
-#: includes/enums/LitGrade.php:98
+#: includes/enums/LitGrade.php:100
 msgid "Optional memorial"
 msgstr "Memoria ad libitum"
 
 #. translators: liturgical rank. Keep Capitalized
-#: includes/enums/LitGrade.php:103
+#: includes/enums/LitGrade.php:105
 msgid "Memorial"
-msgstr "Memoria"
+msgstr "Memoria obligatoria"
 
 #. translators: liturgical rank. Keep UPPERCASE
-#: includes/enums/LitGrade.php:108
+#: includes/enums/LitGrade.php:110
 msgid "FEAST"
 msgstr "FESTUM"
 
 #. translators: liturgical rank. Keep UPPERCASE
-#: includes/enums/LitGrade.php:113
+#: includes/enums/LitGrade.php:115
 msgid "FEAST OF THE LORD"
 msgstr "FESTUM DOMINI"
 
 #. translators: liturgical rank. Keep UPPERCASE
-#: includes/enums/LitGrade.php:118
+#: includes/enums/LitGrade.php:120
 msgid "SOLEMNITY"
 msgstr "SOLLEMNITAS"
 
 #. translators: liturgical rank. Keep lowercase
-#: includes/enums/LitGrade.php:123
+#: includes/enums/LitGrade.php:125
 msgid "celebration with precedence over solemnities"
 msgstr "celebratio altioris ordinis quam sollemnitatis"
 

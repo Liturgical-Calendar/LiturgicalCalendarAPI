@@ -59,11 +59,11 @@ Together with the information that follows, Swaggerhub documentation of the API 
 
 A sample request to the endpoint could look like this:
 
-https://litcal.johnromanodorazio.com/api/dev/LitCalEngine.php?year=2020&epiphany=SUNDAY_JAN2_JAN8&ascension=SUNDAY&corpuschristi=SUNDAY&returntype=JSON&locale=EN
+https://litcal.johnromanodorazio.com/api/v3/LitCalEngine.php?year=2020&epiphany=SUNDAY_JAN2_JAN8&ascension=SUNDAY&corpuschristi=SUNDAY&returntype=JSON&locale=EN
 
 If no parameters are given, the default values indicated above will be used.
 
-Both **POST** and **GET** requests can be made.
+Both **POST** and **GET** requests can be made. In the case of **POST** requests, the request body can have a content type that is either JSON encoded (`application/json` or FORM encoded (`application/x-www-form-urlencoded`). FORM encoding is the default for jQuery AJAX requests and for cURL requests, in any case a JSON encoded request body will also work. 
 
 ## Using the endpoint as a calendar URL for Calendar Apps
 * **GOOGLE CALENDAR ON A DESKTOP COMPUTER**: you can only *add a calendar by URL* using Google Calendar on a computer, I don't believe it is possible from smartphone / Android devices. At the bottom left corner of the screen, next to **`Other calendars`**, click on the **`+`** to add a new calendar and choose **`From URL`**. Paste in the URL of the endpoint with the desired parameters, (make sure you use **`ICS`** as value of the *`returntype`* parameter). And remember, if you omit the *`year`* parameter, it will use the current year. This should mean that as Google Calendar continues to poll the calendar URL (supposedly every 8 hours), on the turn of a new year new events should be created automatically for the new year. Once the calendar has been added from a computer, it should become available for the same gmail account on the Google Calendar app on a smartphone.
@@ -176,7 +176,7 @@ Two object keys are returned:
 
 # CHANGELOG
 
-## [v3.0](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.0) (December 20th 2021)
+## [v3.0](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.0) (December 26th 2021)
  * all calendar data moved from a MySQL database to JSON files, that can be tracked in the repository
  * the Calendar data for the Universal Calendar, as contained in the JSON files, is now translatable to other languages through a Weblate project
  * the frontend and any implementations of the API have been moved to their own separate repositories,

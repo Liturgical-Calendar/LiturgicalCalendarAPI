@@ -1855,12 +1855,12 @@ class LitCalAPI {
      */
     private function moveFestivityDate( string $tag, DateTime $newDate, string $inFavorOf ) {
         $festivity = $this->Cal->getFestivity( $tag );
-        $oldDateStr = $festivity->date->format('F jS');
         $newDateStr = $newDate->format('F jS');
         if( !$this->Cal->inSolemnities( $newDate ) ) {
             if( $festivity !== null ){
                 //Move from old date to new date, to make room for another celebration
                 $this->Cal->moveFestivityDate( $tag, $newDate );
+                $oldDateStr = $festivity->date->format('F jS');
             }
             else{
                 //if it was suppressed on the original date because of a higher ranking celebration,
@@ -1868,6 +1868,8 @@ class LitCalAPI {
                 $row = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ $tag ];
                 $festivity = new Festivity( $row->NAME, $newDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
                 $this->Cal->addFestivity( $tag, $festivity );
+                $oldDate = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+                $oldDateStr = $oldDate->format('F jS');
             }
             $this->Messages[] = sprintf(
                 'USA: The optional memorial \'%1$s\' is transferred from %4$s to %5$s as per the 2011 Roman Missal issued by the USCCB, to make room for the Memorial \'%2$s\': applicable to the year %3$d.',
@@ -1880,7 +1882,8 @@ class LitCalAPI {
             $this->Cal->setProperty( $tag, "name", "[ USA ] " . $festivity->name );
         }
         else{
-            if( $festivity !== null ){
+            if( $festivity !== null ) {
+                $oldDateStr = $festivity->date->format('F jS');
                 //If the new date is already covered by a Solmenity, then we can't move the celebration, so we simply suppress it
                 $this->Messages[] = sprintf(
                     'USA: The optional memorial \'%1$s\' is transferred from %4$s to %5$s as per the 2011 Roman Missal issued by the USCCB, to make room for the Memorial \'%2$s\', however it is superseded by a higher ranking festivity in the year %3$d.',
