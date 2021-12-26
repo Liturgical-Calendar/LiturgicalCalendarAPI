@@ -78,7 +78,7 @@ class LitSettings {
                 $value = explode("_", Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']) )[0];
                 $this->Locale = LitLocale::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : LitLocale::LATIN;
             } else {
-                $this->Locale = LitLocale::Latin;
+                $this->Locale = LitLocale::LATIN;
             }
         }
     }
