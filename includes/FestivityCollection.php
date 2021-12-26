@@ -278,7 +278,7 @@ class FestivityCollection {
     private function calculateVigilMass( string $key, Festivity $festivity ) {
 
         //Let's calculate Vigil Masses while we're at it
-        //We'll create new events and add metadata
+        //We'll both create new events and add metadata to existing events
         $VigilDate = clone( $festivity->date );
         $VigilDate->sub( new DateInterval( 'P1D' ) );
         $festivityGrade = '';
@@ -334,6 +334,7 @@ class FestivityCollection {
                             $festivity->hasVigilMass = false;
                             $festivity->hasVesperI = false;
                             $coincidingFestivity->event->hasVesperII = true;
+                            unset( $this->festivities[ $key . "_vigil" ] );
                             $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                                 _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while the first Solemnity will not have a Vigil Mass or Vespers I." ),
                                 $festivityGrade,
@@ -356,7 +357,7 @@ class FestivityCollection {
                                 $this->LitSettings->Year
                             );
                         }
-                        else if( in_array( $coincidingFestivity->key, $this->SolemnitiesLordBVM ) && !in_array( $key, $this->SolemnitiesLordBVM ) ){
+                        else if( $this->isSolemnityLordBVM( $coincidingFestivity->key ) && !$this->isSolemnityLordBVM( $key ) ){
                             $coincidingFestivity->event->hasVesperII = true;
                             $festivity->hasVesperI = false;
                             $festivity->hasVigilMass = false;
