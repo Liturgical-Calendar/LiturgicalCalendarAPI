@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-25 23:32+0000\n"
+"POT-Creation-Date: 2021-12-26 00:07+0000\n"
 "PO-Revision-Date: 2021-12-25 23:32+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -64,7 +64,7 @@ msgstr "sabato che precede la Domenica delle Palme"
 #: includes/LitCalAPI.php:1361 includes/LitCalAPI.php:1385
 #: includes/LitCalAPI.php:1402 includes/LitCalAPI.php:1422
 #: includes/LitCalAPI.php:1444 includes/LitCalAPI.php:1458
-#: includes/LitCalAPI.php:1472 includes/FestivityCollection.php:385
+#: includes/LitCalAPI.php:1472 includes/FestivityCollection.php:386
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decreto della Congregazione per il Culto Divino"
 
@@ -313,7 +313,7 @@ msgstr "ANNO"
 msgid "Vigil Mass"
 msgstr "Messa della vigilia"
 
-#: includes/FestivityCollection.php:338 includes/FestivityCollection.php:365
+#: includes/FestivityCollection.php:339 includes/FestivityCollection.php:366
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
@@ -326,7 +326,7 @@ msgstr ""
 "e una Messa serale, mentre la prima Solennità non avrà né una Messa di "
 "Vigilia né i Primi Vespri."
 
-#: includes/FestivityCollection.php:351 includes/FestivityCollection.php:409
+#: includes/FestivityCollection.php:352 includes/FestivityCollection.php:410
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
@@ -339,7 +339,7 @@ msgstr ""
 "Messa di Vigilia, mentre l'ultima Solennità non avrà né i Secondi Vespri né "
 "una Messa serale."
 
-#: includes/FestivityCollection.php:379
+#: includes/FestivityCollection.php:380
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As "
@@ -350,7 +350,7 @@ msgstr ""
 "Secondo il %s, la prima ha la precedenza, pertanto la Messa nella Vigilia è "
 "confermata come anche i Primi Vespri."
 
-#: includes/FestivityCollection.php:391
+#: includes/FestivityCollection.php:392
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We "

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-25 23:32+0000\n"
+"POT-Creation-Date: 2021-12-26 00:07+0000\n"
 "PO-Revision-Date: 2021-12-14 00:21+0100\n"
 "Last-Translator: Ubuntu <priest@johnromanodorazio.com>\n"
 "Language-Team: Portuguese\n"
@@ -58,7 +58,7 @@ msgstr ""
 #: includes/LitCalAPI.php:1361 includes/LitCalAPI.php:1385
 #: includes/LitCalAPI.php:1402 includes/LitCalAPI.php:1422
 #: includes/LitCalAPI.php:1444 includes/LitCalAPI.php:1458
-#: includes/LitCalAPI.php:1472 includes/FestivityCollection.php:385
+#: includes/LitCalAPI.php:1472 includes/FestivityCollection.php:386
 msgid "Decree of the Congregation for Divine Worship"
 msgstr ""
 
@@ -269,7 +269,7 @@ msgstr ""
 msgid "Vigil Mass"
 msgstr ""
 
-#: includes/FestivityCollection.php:338 includes/FestivityCollection.php:365
+#: includes/FestivityCollection.php:339 includes/FestivityCollection.php:366
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
@@ -278,7 +278,7 @@ msgid ""
 "Vespers I."
 msgstr ""
 
-#: includes/FestivityCollection.php:351 includes/FestivityCollection.php:409
+#: includes/FestivityCollection.php:352 includes/FestivityCollection.php:410
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
@@ -287,7 +287,7 @@ msgid ""
 "evening Mass."
 msgstr ""
 
-#: includes/FestivityCollection.php:379
+#: includes/FestivityCollection.php:380
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As "
@@ -295,7 +295,7 @@ msgid ""
 "are I Vespers."
 msgstr ""
 
-#: includes/FestivityCollection.php:391
+#: includes/FestivityCollection.php:392
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We "
