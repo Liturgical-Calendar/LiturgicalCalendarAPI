@@ -63,9 +63,14 @@ https://litcal.johnromanodorazio.com/api/v3/LitCalEngine.php?year=2020&epiphany=
 
 If no parameters are given, the default values indicated above will be used.
 
-Both **POST** and **GET** requests can be made. In the case of **POST** requests, the request body can have a content type that is either JSON encoded (`application/json` or FORM encoded (`application/x-www-form-urlencoded`). FORM encoding is the default for jQuery AJAX requests and for cURL requests, in any case a JSON encoded request body will also work. 
+Both **POST** and **GET** requests can be made. In the case of **POST** requests, the request body can have a content type that is either JSON encoded (`application/json` or FORM encoded (`application/x-www-form-urlencoded`). FORM encoding is the default for jQuery AJAX requests and for cURL requests, in any case a JSON encoded request body will also work.
+
+_(See the Open API documentation [here](https://litcal.johnromanodorazio.com/dist/ "https://litcal.johnromanodorazio.com/dist/").)_
 
 ## Using the endpoint as a calendar URL for Calendar Apps
+
+_(See [usage.php#calSubscription](https://litcal.johnromanodorazio.com/usage.php#calSubscription "https://litcal.johnromanodorazio.com/usage.php#calSubscription").)_
+
 * **GOOGLE CALENDAR ON A DESKTOP COMPUTER**: you can only *add a calendar by URL* using Google Calendar on a computer, I don't believe it is possible from smartphone / Android devices. At the bottom left corner of the screen, next to **`Other calendars`**, click on the **`+`** to add a new calendar and choose **`From URL`**. Paste in the URL of the endpoint with the desired parameters, (make sure you use **`ICS`** as value of the *`returntype`* parameter). And remember, if you omit the *`year`* parameter, it will use the current year. This should mean that as Google Calendar continues to poll the calendar URL (supposedly every 8 hours), on the turn of a new year new events should be created automatically for the new year. Once the calendar has been added from a computer, it should become available for the same gmail account on the Google Calendar app on a smartphone.
 * **CALENDAR APPS ON AN ANDROID DEVICE**: after you have *added a calendar by URL* in your Google Calendar on a Desktop Computer, you should then find that calendar synchronized with your Google account, so the calendar should become available to any Android Calendar apps that have access to your Google account to synchronize calendars.
 * **IPHONE**: go to **`Phone Settings`** -> **`Accounts`** -> **`Add account`** -> **`Other`** -> **`Add Calendar`**, and paste in the endpoint URL with the desired parameters, (make sure you use **`ICS`** as value of the *`returntype`* parameter). And remember, if you omit the *`year`* parameter, it will use the current year. This should mean that as the iPhone Calendar continues to poll the calendar URL, on the turn of a new year new events should be created automatically for the new year.
