@@ -71,6 +71,9 @@ class LitCalAPI {
                 case RequestMethod::GET:
                     $this->LitSettings = new LitSettings( $_GET );
                     break;
+                case RequestMethod::OPTIONS:
+                    //continue
+                    break;
                 default:
                     header( $_SERVER[ "SERVER_PROTOCOL" ]." 405 Method Not Allowed", true, 405 );
                     $errorMessage = '{"error":"You seem to be forming a strange kind of request? Allowed Request Methods are ';

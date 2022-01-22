@@ -55,14 +55,24 @@ include_once( 'includes/enums/ReturnType.php' );
 
 include_once( "includes/LitCalAPI.php" );
 
-$LitCalEngine = new LitCalAPI();
-$LitCalEngine->APICore->setAllowedOrigins( [
+if( file_exists("allowedOrigins.php") ) {
+    include_once( 'allowedOrigins.php' );
+}
+
+$allowedOrigins = [
     "https://johnromanodorazio.com",
     "https://www.johnromanodorazio.com",
     "https://litcal.johnromanodorazio.com",
     "https://litcal-staging.johnromanodorazio.com"
-] );
-$LitCalEngine->APICore->setAllowedRequestMethods( [ RequestMethod::GET, RequestMethod::POST ] );
+];
+
+if( defined('ALLOWED_ORIGINS') && is_array( ALLOWED_ORIGINS ) ) {
+    $allowedOrigins = array_merge( $allowedOrigins, ALLOWED_ORIGINS );
+}
+
+$LitCalEngine = new LitCalAPI();
+$LitCalEngine->APICore->setAllowedOrigins( $allowedOrigins );
+$LitCalEngine->APICore->setAllowedRequestMethods( [ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ] );
 $LitCalEngine->APICore->setAllowedRequestContentTypes( [ RequestContentType::JSON, RequestContentType::FORMDATA ] );
 $LitCalEngine->APICore->setAllowedAcceptHeaders( [ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS ] );
 $LitCalEngine->setAllowedReturnTypes( [ ReturnType::JSON, ReturnType::XML, ReturnType::ICS ] );
