@@ -1925,8 +1925,8 @@ class LitCalAPI {
         }
 
         if( $this->LitSettings->Year >= 2008 ) {
-            $this->readPropriumDeSanctisJSONData( RomanMissal::EDITIO_TYPICA_TERTIA_2008 );
-            $this->calculateMemorials( LitGrade::MEMORIAL, RomanMissal::EDITIO_TYPICA_TERTIA_2008 );
+            $this->readPropriumDeSanctisJSONData( RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 );
+            $this->calculateMemorials( LitGrade::MEMORIAL, RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 );
         }
 
         if ( $this->LitSettings->Year >= 2016 ) {
@@ -1960,7 +1960,7 @@ class LitCalAPI {
         }
 
         if ( $this->LitSettings->Year >= 2008 ) {
-            $this->calculateMemorials( LitGrade::MEMORIAL_OPT, RomanMissal::EDITIO_TYPICA_TERTIA_2008 );
+            $this->calculateMemorials( LitGrade::MEMORIAL_OPT, RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 );
         }
 
         if( $this->LitSettings->Year === 2009 ) {
