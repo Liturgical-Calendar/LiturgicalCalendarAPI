@@ -151,6 +151,9 @@ class LitCalDiocesanData {
                 header( $_SERVER[ "SERVER_PROTOCOL" ]." 400 Bad request", true, 400 );
                 die( '{"error":"Malformed data received in <calendar> parameters"}' );
             }
+            if( property_exists( $this->DATA, 'overrides' ) ) {
+                $CalData->Overrides = $this->DATA->overrides;
+            }
             $this->RESPONSE->Calendar = json_encode( $CalData );
             if( property_exists( $this->DATA, 'group' ) ) {
                 $this->RESPONSE->Group = strip_tags( $this->DATA->group );
