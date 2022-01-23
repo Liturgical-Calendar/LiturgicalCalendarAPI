@@ -812,7 +812,7 @@ class LitCalAPI {
 
     }
 
-    private function addMemorialMissalMessage( object $row ) {
+    private function addMissalMemorialMessage( object $row ) {
         /**translators:
          * 1. Grade or rank of the festivity
          * 2. Name of the festivity
