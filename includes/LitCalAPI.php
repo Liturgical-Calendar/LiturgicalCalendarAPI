@@ -812,6 +812,29 @@ class LitCalAPI {
 
     }
 
+    private function addMemorialMissalMessage( object $row ) {
+        /**translators:
+         * 1. Grade or rank of the festivity
+         * 2. Name of the festivity
+         * 3. Day of the festivity
+         * 4. Year from which the festivity has been added
+         * 5. Source of the information
+         * 6. Current year
+         */
+        $this->Messages[] = sprintf(
+            _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." ),
+            $this->LitGrade->i18n( $row->GRADE, false ),
+            $row->NAME,
+            $this->LitSettings->Locale === LitLocale::LATIN ? ( $row->DATE->format( 'j' ) . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
+                ( $this->LitSettings->Locale === LitLocale::ENGLISH ? $row->DATE->format( 'F jS' ) :
+                    $this->dayAndMonth->format( $row->DATE->format( 'U' ) )
+                ),
+            $row->yearSince,
+            $row->DECREE,
+            $this->LitSettings->Year
+        );
+    }
+
     private function calculateMemorials( int $grade = LitGrade::MEMORIAL, string $missal = RomanMissal::EDITIO_TYPICA_1970 ) : void {
 
         if( $missal === RomanMissal::EDITIO_TYPICA_1970 && $grade === LitGrade::MEMORIAL ) {
@@ -832,27 +855,21 @@ class LitCalAPI {
                 if( $missal === RomanMissal::EDITIO_TYPICA_TERTIA_2002 ) {
                     $row->yearSince = 2002;
                     $row->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_' . strtolower( $this->LitSettings->Locale ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
-                    /**
-                     * TRANSLATORS:
-                     * 1. Grade or rank of the festivity
-                     * 2. Name of the festivity
-                     * 3. Day of the festivity
-                     * 4. Year from which the festivity has been added
-                     * 5. Source of the information
-                     * 6. Current year
-                     */
-                    $this->Messages[] = sprintf(
-                        _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." ),
-                        $this->LitGrade->i18n( $row->GRADE, false ),
-                        $row->NAME,
-                        $this->LitSettings->Locale === LitLocale::LATIN ? ( $row->DATE->format( 'j' ) . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
-                            ( $this->LitSettings->Locale === LitLocale::ENGLISH ? $row->DATE->format( 'F jS' ) :
-                                $this->dayAndMonth->format( $row->DATE->format( 'U' ) )
-                            ),
-                        $row->yearSince,
-                        $row->DECREE,
-                        $this->LitSettings->Year
-                    );
+                    $this->addMissalMemorialMessage( $row );
+                }
+                else if( $missal === RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 ) {
+                    $row->yearSince = 2008;
+                    switch( $row->TAG ) {
+                        case "StPioPietrelcina":
+                            $row->DECREE = 'Missale Romanum, ed. Typica Tertia Emendata 2008';
+                        break;
+                        /**both of the following tags refer to the same decree, no need for a break between them */
+                        case "LadyGuadalupe":
+                        case "JuanDiego":
+                            $row->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LitSettings->Locale ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
+                        break;
+                    }
+                    $this->addMissalMemorialMessage( $row );
                 }
 
                 if ( $grade === LitGrade::MEMORIAL && $this->Cal->getFestivity( $row->TAG )->grade > LitGrade::MEMORIAL_OPT ) {
@@ -862,6 +879,9 @@ class LitCalAPI {
             } else {
                 if( false === $this->checkImmaculateHeartCoincidence( $row->DATE, $row ) ) {
                     $this->handleCoincidence( $row, RomanMissal::EDITIO_TYPICA_1970 );
+                }
+                else if( $missal === RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 ) {
+                    $this->handleCoincidence( $row, RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 );
                 }
             }
         }
@@ -1059,52 +1079,6 @@ class LitCalAPI {
 
     }
 
-
-    private function applyMemorialsTertiaEditioTypicaEmendata2008() : void {
-
-        //Saint Pio of Pietrelcina "Padre Pio" was canonized on June 16 2002, so did not make it for the Calendar of the 2002 editio typica III
-        //The memorial was added in the 2008 editio typica III emendata as an obligatory memorial
-        $row = new stdClass();
-        $names = [
-            "EN" => "Saint Pius of Pietrelcina, Priest",
-            "IT" => "San Pio da Pietrelcina, presbitero",
-            "LA" => "S. Pii de Pietrelcina, presbyteri"
-        ];
-        $row->NAME = $names[ $this->LitSettings->Locale ];
-        $row->GRADE = LitGrade::MEMORIAL;
-        $row->DATE = DateTime::createFromFormat( '!j-n-Y', '23-9-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-        if( $this->Cal->notInSolemnitiesFeastsOrMemorials( $row->DATE ) ) {
-            $newFestivity = new Festivity( $row->NAME, $row->DATE, LitColor::WHITE, LitFeastType::FIXED, LitGrade::MEMORIAL, "Pastors:For One Pastor,Holy Men and Women:For Religious" );
-            $this->Cal->addFestivity( "StPioPietrelcina", $newFestivity );
-
-            /**
-             * TRANSLATORS:
-             * 1. Grade or rank of the festivity
-             * 2. Name of the festivity
-             * 3. Day of the festivity
-             * 4. Year from which the festivity has been added
-             * 5. Source of the information
-             * 6. Current year
-             */
-            $this->Messages[] = sprintf(
-                _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." ),
-                $this->LitGrade->i18n( $newFestivity->grade, false ),
-                $newFestivity->name,
-                $this->LitSettings->Locale === LitLocale::LATIN ? ( $newFestivity->date->format( 'j' ) . ' ' . LitMessages::LATIN_MONTHS[ (int)$newFestivity->date->format( 'n' ) ] ) :
-                    ( $this->LitSettings->Locale === LitLocale::ENGLISH ? $newFestivity->date->format( 'F jS' ) :
-                        $this->dayAndMonth->format( $newFestivity->date->format( 'U' ) )
-                    ),
-                2008,
-                'Missale Romanum, ed. Typica Tertia Emendata 2008',
-                $this->LitSettings->Year
-            );
-        }
-        else{
-            $this->handleCoincidence( $row, RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 );
-        }
-
-    }
-
     private function createMaryMotherChurch( stdClass $MaryMotherChurch ) {
         $festivity = new Festivity( $MaryMotherChurch->tag[ $this->LitSettings->Locale ], $MaryMotherChurch->date, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL, "Proper" );
         $this->Cal->addFestivity( "MaryMotherChurch", $festivity );
@@ -1255,71 +1229,6 @@ class LitCalAPI {
 
     }
 
-    private function applyOptionalMemorialsTertiaEditioTypicaEmendata2008() : void {
-
-        //Saint Juan Diego was canonized in 2002, so did not make it to the Tertia Editio Typica 2002
-        //The optional memorial was added in the Tertia Editio Typica emendata in 2008,
-        //together with the optional memorial of Our Lady of Guadalupe
-        $rows = [];
-        $rows[0] = new stdClass();
-        $rows[0]->TAG = "LadyGuadalupe";
-        $rows[0]->GRADE = LitGrade::MEMORIAL_OPT;
-        $names = [
-            "EN" => "Our Lady of Guadalupe",
-            "IT" => "Beata Vergine Maria di Guadalupe",
-            "LA" => "Beatæ Mariæ Virginis Guadalupensis"
-        ];
-        $rows[0]->NAME = $names[ $this->LitSettings->Locale ];
-        $rows[0]->DATE = DateTime::createFromFormat( '!j-n-Y', '12-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-        $rows[0]->COMMON = "Blessed Virgin Mary";
-        $rows[0]->yearSince = 2002;
-        $rows[0]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LitSettings->Locale ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
-
-        $rows[1] = new stdClass();
-        $rows[1]->TAG = "JuanDiego";
-        $rows[1]->GRADE = LitGrade::MEMORIAL_OPT;
-        $names = [
-            "EN" => "Saint Juan Diego Cuauhtlatoatzin",
-            "IT" => "San Juan Diego Cuauhtlatouatzin",
-            "LA" => "Sancti Ioannis Didaci Cuauhtlatoatzin"
-        ];
-        $rows[1]->NAME = $names[ $this->LitSettings->Locale ];
-        $rows[1]->DATE = DateTime::createFromFormat( '!j-n-Y', '9-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-        $rows[1]->COMMON = "Holy Men and Women:For One Saint";
-        $rows[1]->yearSince = 2002;
-        $rows[1]->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LitSettings->Locale ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
-
-        foreach( $rows as $row ) {
-            if ( self::DateIsNotSunday( $row->DATE ) && $this->Cal->notInSolemnitiesFeastsOrMemorials( $row->DATE ) ) {
-                $festivity = new Festivity( $row->NAME, $row->DATE, LitColor::WHITE, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
-                $this->Cal->addFestivity( $row->TAG, $festivity );
-                /**
-                 * TRANSLATORS:
-                 * 1. Grade or rank of the festivity
-                 * 2. Name of the festivity
-                 * 3. Day of the festivity
-                 * 4. Year from which the festivity has been added
-                 * 5. Source of the information
-                 * 6. Current year
-                 */
-                $this->Messages[] = sprintf(
-                    _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." ),
-                    $this->LitGrade->i18n( $festivity->grade, false ),
-                    $festivity->name,
-                    $this->LitSettings->Locale === LitLocale::LATIN ? ( $row->DATE->format( 'j' ) . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
-                        ( $this->LitSettings->Locale === LitLocale::ENGLISH ? $row->DATE->format( 'F jS' ) :
-                            $this->dayAndMonth->format( $row->DATE->format( 'U' ) )
-                        ),
-                    $row->yearSince,
-                    $row->DECREE,
-                    $this->LitSettings->Year
-                );
-            } else {
-                $this->handleCoincidence( $row, RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 );
-            }
-        }
-
-    }
 
     //The Conversion of St. Paul falls on a Sunday in the year 2009.
     //However, considering that it is the Year of Saint Paul,
@@ -1345,8 +1254,7 @@ class LitCalAPI {
             if( $this->Cal->notInSolemnitiesFeastsOrMemorials( $row->DATE ) ) {
                 $festivity = new Festivity( $row->NAME, $row->DATE, LitColor::WHITE, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
                 $this->Cal->addFestivity( $row->TAG, $festivity );
-                /**
-                 * TRANSLATORS:
+                /**translators:
                  * 1. Grade or rank of the festivity
                  * 2. Name of the festivity
                  * 3. Day of the festivity
@@ -2017,7 +1925,8 @@ class LitCalAPI {
         }
 
         if( $this->LitSettings->Year >= 2008 ) {
-            $this->applyMemorialsTertiaEditioTypicaEmendata2008();
+            $this->readPropriumDeSanctisJSONData( RomanMissal::EDITIO_TYPICA_TERTIA_2008 );
+            $this->calculateMemorials( LitGrade::MEMORIAL, RomanMissal::EDITIO_TYPICA_TERTIA_2008 );
         }
 
         if ( $this->LitSettings->Year >= 2016 ) {
@@ -2051,7 +1960,7 @@ class LitCalAPI {
         }
 
         if ( $this->LitSettings->Year >= 2008 ) {
-            $this->applyOptionalMemorialsTertiaEditioTypicaEmendata2008();
+            $this->calculateMemorials( LitGrade::MEMORIAL_OPT, RomanMissal::EDITIO_TYPICA_TERTIA_2008 );
         }
 
         if( $this->LitSettings->Year === 2009 ) {
