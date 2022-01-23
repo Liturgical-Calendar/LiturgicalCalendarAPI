@@ -1,6 +1,5 @@
 [
     {
-        "RECURRENCE_ID": 0,
         "MONTH": 4,
         "DAY": 23,
         "TAG": "StAdalbert",
@@ -9,10 +8,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Martyrs:For One Martyr,Pastors:For a Bishop",
         "CALENDAR": "",
-        "COLOR": "white,red"
+        "COLOR": "white,red",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 1,
         "MONTH": 4,
         "DAY": 28,
         "TAG": "StLouisGrignonMontfort",
@@ -21,10 +26,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Pastors:For One Pastor",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 2,
         "MONTH": 8,
         "DAY": 2,
         "TAG": "StPeterJulianEymard",
@@ -33,10 +44,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Pastors:For One Pastor,Holy Men and Women:For Religious",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 3,
         "MONTH": 8,
         "DAY": 14,
         "TAG": "StMaximilianKolbe",
@@ -45,10 +62,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Proper",
         "CALENDAR": "",
-        "COLOR": "white,red"
+        "COLOR": "white,red",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 4,
         "MONTH": 9,
         "DAY": 9,
         "TAG": "StPeterClaver",
@@ -57,10 +80,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Pastors:For One Pastor,Holy Men and Women:For Those Who Practiced Works of Mercy",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 5,
         "MONTH": 9,
         "DAY": 20,
         "TAG": "StAndrewKimTaegon",
@@ -69,10 +98,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Proper",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 6,
         "MONTH": 9,
         "DAY": 28,
         "TAG": "StsLawrenceRuiz",
@@ -81,10 +116,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Martyrs:For Several Martyrs",
         "CALENDAR": "",
-        "COLOR": "red"
+        "COLOR": "red",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 7,
         "MONTH": 11,
         "DAY": 24,
         "TAG": "StAndrewDungLac",
@@ -93,6 +134,13 @@
         "DISPLAYGRADE": "",
         "COMMON": "Proper",
         "CALENDAR": "",
-        "COLOR": "red"
+        "COLOR": "red",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     }
 ]
