@@ -137,8 +137,8 @@ class LitCalAPI {
             }
         }
 
-        if( $this->LitSettings->NationalCalendar !== null ){
-            switch( $this->LitSettings->NationalCalendar ){
+        if( $this->LitSettings->NationalCalendar !== null ) {
+            switch( $this->LitSettings->NationalCalendar ) {
                 case 'VATICAN':
                     $this->LitSettings->Epiphany        = Epiphany::JAN6;
                     $this->LitSettings->Ascension       = Ascension::THURSDAY;
@@ -157,6 +157,30 @@ class LitCalAPI {
                     $this->LitSettings->CorpusChristi   = CorpusChristi::SUNDAY;
                     $this->LitSettings->Locale          = LitLocale::ENGLISH;
                 break;
+            }
+        }
+
+        if( $this->LitSettings->DiocesanCalendar !== null && $this->DiocesanData !== null ) {
+            if( property_exists( $this->DiocesanData, "Overrides" ) ) {
+                foreach( $this->DiocesanData->Overrides as $key => $value ) {
+                    switch( $key ) {
+                        case "Epiphany":
+                            if( Epiphany::isValid( $value ) ) {
+                                $this->LitSettings->Epiphany        = $value;
+                            }
+                        break;
+                        case "Ascension":
+                            if( Ascension::isValid( $value ) ) {
+                                $this->LitSettings->Ascension       = $value;
+                            }
+                        break;
+                        case "CorpusChristi":
+                            if( CorpusChristi::isValid( $value ) ) {
+                                $this->LitSettings->CorpusChristi   = $value;
+                            }
+                        break;
+                    }
+                }
             }
         }
     }
