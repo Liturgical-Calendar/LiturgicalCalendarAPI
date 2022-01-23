@@ -29,7 +29,7 @@ jobs:
         run: |
           sudo apt-get install -y gettext
           xgettext --from-code=UTF-8 --add-comments='translators:' --keyword="pgettext:1c,2" -o i18n/litcal.pot includes/LitCalAPI.php includes/LitMessages.php includes/FestivityCollection.php includes/enums/LitColor.php includes/enums/LitCommon.php includes/enums/LitGrade.php
-          echo "::set-output name=POT_LINES_CHANGED::$(git diff -U0 | grep '^[+|-][^+|-]' | grep -Ev '^[+-]"POT-Creation-Date' | tee >(wc -l))"
+          echo "::set-output name=POT_LINES_CHANGED::$(git diff -U0 | grep '^[+|-][^+|-]' | grep -Ev '^[+-]"POT-Creation-Date' | wc -l)"
 
       # push the output folder to your repo
       - name: Push changes
