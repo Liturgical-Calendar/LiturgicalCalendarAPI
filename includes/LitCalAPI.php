@@ -120,23 +120,7 @@ class LitCalAPI {
         }
     }
 
-
-    private function loadLocalCalendarData() : void {
-        if( $this->LitSettings->DiocesanCalendar !== null ){
-            //since a Diocesan calendar is being requested, we need to retrieve the JSON data
-            //first we need to discover the path, so let's retrieve our index file
-            if( file_exists( "nations/index.json" ) ){
-                $this->GeneralIndex = json_decode( file_get_contents( "nations/index.json" ) );
-                if( property_exists( $this->GeneralIndex, $this->LitSettings->DiocesanCalendar ) ){
-                    $diocesanDataFile = $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->path;
-                    $this->LitSettings->NationalCalendar = $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->nation;
-                    if( file_exists( $diocesanDataFile ) ){
-                        $this->DiocesanData = json_decode( file_get_contents( $diocesanDataFile ) );
-                    }
-                }
-            }
-        }
-
+    private function updateSettingsBasedOnNationalCalendar() : void {
         if( $this->LitSettings->NationalCalendar !== null ) {
             switch( $this->LitSettings->NationalCalendar ) {
                 case 'VATICAN':
@@ -159,7 +143,9 @@ class LitCalAPI {
                 break;
             }
         }
+    }
 
+    private function updateSettingsBasedOnDiocesanCalendar() : void {
         if( $this->LitSettings->DiocesanCalendar !== null && $this->DiocesanData !== null ) {
             if( property_exists( $this->DiocesanData, "Overrides" ) ) {
                 foreach( $this->DiocesanData->Overrides as $key => $value ) {
@@ -183,6 +169,27 @@ class LitCalAPI {
                 }
             }
         }
+    }
+
+
+    private function loadLocalCalendarData() : void {
+        if( $this->LitSettings->DiocesanCalendar !== null ){
+            //since a Diocesan calendar is being requested, we need to retrieve the JSON data
+            //first we need to discover the path, so let's retrieve our index file
+            if( file_exists( "nations/index.json" ) ){
+                $this->GeneralIndex = json_decode( file_get_contents( "nations/index.json" ) );
+                if( property_exists( $this->GeneralIndex, $this->LitSettings->DiocesanCalendar ) ){
+                    $diocesanDataFile = $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->path;
+                    $this->LitSettings->NationalCalendar = $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->nation;
+                    if( file_exists( $diocesanDataFile ) ){
+                        $this->DiocesanData = json_decode( file_get_contents( $diocesanDataFile ) );
+                    }
+                }
+            }
+        }
+
+        $this->updateSettingsBasedOnNationalCalendar();
+        $this->updateSettingsBasedOnDiocesanCalendar();
     }
 
     private function cacheFileIsAvailable() : bool {
