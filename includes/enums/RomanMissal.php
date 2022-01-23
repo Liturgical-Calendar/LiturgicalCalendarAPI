@@ -39,7 +39,7 @@ class RomanMissal {
         "VATICAN_1971"  => false,
         "VATICAN_1975"  => false,
         "VATICAN_2002"  => "data/propriumdesanctis_2002/propriumdesanctis_2002.json",
-        "VATICAN_2008"  => "data/propriumdesanctis_2002/propriumdesanctis_2008.json",
+        "VATICAN_2008"  => "data/propriumdesanctis_2008/propriumdesanctis_2008.json",
         "USA_2011"      => "data/propriumdesanctis_USA_2011/propriumdesanctis_USA_2011.json",
         "ITALY_1983"    => "data/propriumdesanctis_ITALY_1983/propriumdesanctis_ITALY_1983.json",
         "ITALY_2020"    => false
