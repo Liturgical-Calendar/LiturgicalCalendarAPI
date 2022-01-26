@@ -1229,33 +1229,38 @@ class LitCalAPI {
                 function( $row ) {
                     return $row->Metadata->action === "makeDoctor";
                 });
-            if ( $this->LitSettings->Year >= 1998 ) {
-                //St Therese of the Child Jesus was proclaimed a Doctor of the Church in 1998
-                $this->applyDoctorDecree1998();
+            foreach( $DoctorsDecrees as $row ) {
+                if( $this->LitSettings->Year >= $row->Metadata->sinceYear ) {
+                    $festivity = $this->Cal->getFestivity( $row->Festivity->TAG );
+                    if( $festivity !== null ) {
+                        $lang = ( property_exists( $row->Metadata, 'decreeLangs' ) && property_exists( $row->Metadata->decreeLangs, $this->LitSettings->Locale ) ) ? 
+                            $row->Metadata->decreeLangs->{$this->LitSettings->Locale} :
+                            "en";
+                        $url = str_contains( $row->Metadata->decreeURL, '%s' ) ? sprintf($row->Metadata->decreeURL, $lang) : $row->Metadata->decreeURL;
+                        $decree = '<a href="' . $url . '">' . _( "Decree of the Congregation for Divine Worship" ) . '</a>';
+                        /**translators:
+                         * 1. Grade or rank of the festivity
+                         * 2. Name of the festivity
+                         * 3. New name of the festivity
+                         * 4. Year from which the grade has been changed
+                         * 5. Current year
+                         * 6. Source of the information
+                         */
+                        $message = _( "'%s' has been declared a Doctor of the Church since the year %d, applicable to the year %d (%s)." );
+                        $this->Messages[] = sprintf(
+                            $message,
+                            '<i>' . $festivity->name . '</i>',
+                            $row->Metadata->sinceYear,
+                            $this->LitSettings->Year,
+                            $decree
+                        );
+                        $etDoctor = $this->LitSettings->Locale === LitLocale::LATIN ? " et Ecclesiæ doctoris" : " " . _( "and Doctor of the Church" );
+                        $this->Cal->setProperty( $row->Festivity->TAG, "name", $festivity->name . $etDoctor );
+                    }
+                }
             }
         }
-
     }
-
-    private function applyDoctorDecree1998() : void {
-        $festivity = $this->Cal->getFestivity( "StThereseChildJesus" );
-        if( $festivity !== null ) {
-            $etDoctor = '';
-            switch( $this->LitSettings->Locale ){
-                case LitLocale::LATIN:
-                    $etDoctor = " et doctoris";
-                break;
-                case LitLocale::ENGLISH:
-                    $etDoctor = " and doctor of the Church";
-                break;
-                case LitLocale::ITALIAN:
-                    $etDoctor = " e dottore della Chiesa";
-                break;
-            }
-            $this->Cal->setProperty( 'StThereseChildJesus', 'name', $festivity->name . $etDoctor );
-        }
-    }
-
 
     private function createMobileFestivity( object $row ) : void {
         $festivity = new Festivity( $row->Festivity->NAME, $row->Festivity->DATE, $row->Festivity->COLOR, LitFeastType::MOBILE, $row->Festivity->GRADE, $row->Festivity->COMMON );
