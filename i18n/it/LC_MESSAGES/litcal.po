@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 15:41+0000\n"
+"POT-Creation-Date: 2022-01-26 16:03+0000\n"
 "PO-Revision-Date: 2021-12-25 23:32+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -457,27 +457,27 @@ msgstr ""
 "Dovremmo chiedere alla Congregazione del Culto Divino cosa fare a riguardo!"
 
 #. translators: context = liturgical color
-#: includes/enums/LitColor.php:23
+#: includes/enums/LitColor.php:24
 msgid "green"
 msgstr "verde"
 
 #. translators: context = liturgical color
-#: includes/enums/LitColor.php:26
+#: includes/enums/LitColor.php:27
 msgid "purple"
 msgstr "viola"
 
 #. translators: context = liturgical color
-#: includes/enums/LitColor.php:29
+#: includes/enums/LitColor.php:30
 msgid "white"
 msgstr "bianco"
 
 #. translators: context = liturgical color
-#: includes/enums/LitColor.php:32
+#: includes/enums/LitColor.php:33
 msgid "red"
 msgstr "rosso"
 
 #. translators: context = liturgical color
-#: includes/enums/LitColor.php:35
+#: includes/enums/LitColor.php:36
 msgid "pink"
 msgstr "rosa"
 

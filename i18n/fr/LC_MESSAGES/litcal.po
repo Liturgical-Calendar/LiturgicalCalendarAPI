@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 15:41+0000\n"
+"POT-Creation-Date: 2022-01-26 16:03+0000\n"
 "PO-Revision-Date: 2021-12-14 00:20+0100\n"
 "Last-Translator: Ubuntu <priest@johnromanodorazio.com>\n"
 "Language-Team: French\n"
@@ -381,27 +381,27 @@ msgid ""
 msgstr ""
 
 #. translators: context = liturgical color
-#: includes/enums/LitColor.php:23
+#: includes/enums/LitColor.php:24
 msgid "green"
 msgstr ""
 
 #. translators: context = liturgical color
-#: includes/enums/LitColor.php:26
+#: includes/enums/LitColor.php:27
 msgid "purple"
 msgstr ""
 
 #. translators: context = liturgical color
-#: includes/enums/LitColor.php:29
+#: includes/enums/LitColor.php:30
 msgid "white"
 msgstr ""
 
 #. translators: context = liturgical color
-#: includes/enums/LitColor.php:32
+#: includes/enums/LitColor.php:33
 msgid "red"
 msgstr ""
 
 #. translators: context = liturgical color
-#: includes/enums/LitColor.php:35
+#: includes/enums/LitColor.php:36
 msgid "pink"
 msgstr ""
 
