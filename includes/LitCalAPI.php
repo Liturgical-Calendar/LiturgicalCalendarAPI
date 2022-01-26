@@ -968,7 +968,7 @@ class LitCalAPI {
         switch( $missal ){
             case RomanMissal::EDITIO_TYPICA_1970:
                 $YEAR = 1970;
-                $lang = in_array($this->LitSettings->Locale, ["DE","EN","IT","LA","PT"]) ? strtolower($this->LitSettings->Locale) ? "en";
+                $lang = in_array($this->LitSettings->Locale, ["DE","EN","IT","LA","PT"]) ? strtolower($this->LitSettings->Locale) : "en";
                 $DECREE = "<a href=\"https://www.vatican.va/content/paul-vi/$lang/apost_constitutions/documents/hf_p-vi_apc_19690403_missale-romanum.html\">" . _( 'Apostolic Constitution Missale Romanum' ) . "</a>";
                 break;
             case RomanMissal::EDITIO_TYPICA_TERTIA_2002:
