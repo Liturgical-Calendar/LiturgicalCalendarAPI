@@ -21,7 +21,7 @@ include_once( "includes/pgettext.php" );
 
 class LitCalAPI {
 
-    const API_VERSION                               = '3.2';
+    const API_VERSION                               = '3.3';
     public APICore $APICore;
 
     private string $CacheDuration                   = "";
@@ -850,8 +850,9 @@ class LitCalAPI {
          * 5. Source of the information
          * 6. Current year
          */
+        $message = _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." );
         $this->Messages[] = sprintf(
-            _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." ),
+            $message,
             $this->LitGrade->i18n( $row->GRADE, false ),
             $row->NAME,
             $this->LitSettings->Locale === LitLocale::LATIN ? ( $row->DATE->format( 'j' ) . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
@@ -927,8 +928,14 @@ class LitCalAPI {
         //it is reduced in rank to a Commemoration ( only the collect can be used
         if ( $this->Cal->inWeekdaysAdventChristmasLent( $currentFeastDate ) ) {
             $this->Cal->setProperty( $row->TAG, "grade", LitGrade::COMMEMORATION );
+            /**translators:
+             * 1. Grade or rank of the festivity
+             * 2. Name of the festivity
+             * 3. Current year
+             */
+            $message = _( "The %s '%s' either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration." );
             $this->Messages[] = sprintf(
-                _( "The %s '%s' either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration." ),
+                $message,
                 $this->LitGrade->i18n( $row->GRADE, false ),
                 $row->NAME,
                 $this->LitSettings->Year
@@ -942,8 +949,17 @@ class LitCalAPI {
         if( $this->Cal->inWeekdaysEpiphany( $festivity->date ) ){
             $key = $this->Cal->weekdayEpiphanyKeyFromDate( $festivity->date );
             if ( false !== $key ) {
+                /**translators:
+                 * 1. Grade or rank of the festivity that has been superseded
+                 * 2. Name of the festivity that has been superseded
+                 * 3. Grade or rank of the festivity that is superseding
+                 * 4. Name of the festivity that is superseding
+                 * 5. Current year
+                 */
+                $message = _( "The %s '%s' is superseded by the %s '%s' in the year %d." );
                 $this->Messages[] = sprintf(
-                    _( "'%s' is superseded by the %s '%s' in the year %d." ),
+                    $message,
+                    $this->LitGrade->i18n( $this->Cal->getFestivity( $key )->grade ),
                     $this->Cal->getFestivity( $key )->name,
                     $this->LitGrade->i18n( $festivity->grade, false ),
                     $festivity->name,
@@ -959,57 +975,46 @@ class LitCalAPI {
         $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $row->DATE, $this->LitSettings );
         switch( $missal ){
             case RomanMissal::EDITIO_TYPICA_1970:
-                $this->Messages[] = sprintf(
-                    _( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d." ),
-                    $this->LitGrade->i18n( $row->GRADE, false ),
-                    $row->NAME,
-                    RomanMissal::getName( $missal ),
-                    1970,
-                    '',
-                    $this->LitSettings->Locale === LitLocale::LATIN ? ( $row->DATE->format( 'j' ) . ' ' . LitMessages::LATIN_MONTHS[  (int)$row->DATE->format( 'n' ) ] ) :
-                        ( $this->LitSettings->Locale === LitLocale::ENGLISH ? $row->DATE->format( 'F jS' ) :
-                            $this->dayAndMonth->format( $row->DATE->format( 'U' ) )
-                        ),
-                    $coincidingFestivity->grade,
-                    $coincidingFestivity->event->name,
-                    $this->LitSettings->Year
-                );
+                $YEAR = 1970;
+                $lang = in_array($this->LitSettings->Locale, ["DE","EN","IT","LA","PT"]) ? strtolower($this->LitSettings->Locale) ? "en";
+                $DECREE = "<a href=\"https://www.vatican.va/content/paul-vi/$lang/apost_constitutions/documents/hf_p-vi_apc_19690403_missale-romanum.html\">" . _( 'Apostolic Constitution Missale Romanum' ) . "</a>";
                 break;
             case RomanMissal::EDITIO_TYPICA_TERTIA_2002:
-                $this->Messages[] = sprintf(
-                    _( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d." ),
-                    $this->LitGrade->i18n( $row->GRADE, false ),
-                    $row->NAME,
-                    RomanMissal::getName( $missal ),
-                    2002,
-                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_' . strtolower( $this->LitSettings->Locale ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>',
-                    $this->LitSettings->Locale === LitLocale::LATIN ? ( $row->DATE->format( 'j' ) . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
-                        ( $this->LitSettings->Locale === LitLocale::ENGLISH ? $row->DATE->format( 'F jS' ) :
-                            $this->dayAndMonth->format( $row->DATE->format( 'U' ) )
-                        ),
-                    $coincidingFestivity->grade,
-                    $coincidingFestivity->event->name,
-                    $this->LitSettings->Year
-                );
+                $YEAR = 2002;
+                $DECREE = '<a href="https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2002/03/22/0150/00449.html">' . _( 'Vatican Press conference: Presentation of the Editio Typica Tertia of the Roman Missal' ) . '</a>';
                 break;
             case RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008:
-                $this->Messages[] = sprintf(
-                    _( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d." ),
-                    $this->LitGrade->i18n( $row->GRADE, false ),
-                    $row->NAME,
-                    RomanMissal::getName( $missal ),
-                    2008,
-                    'Missale Romanum, ed. Typica Tertia Emendata 2008',
-                    $this->LitSettings->Locale === LitLocale::LATIN ? ( $row->DATE->format( 'j' ) . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->DATE->format( 'n' ) ] ) :
-                        ( $this->LitSettings->Locale === LitLocale::ENGLISH ? $row->DATE->format( 'F jS' ) :
-                            $this->dayAndMonth->format( $row->DATE->format( 'U' ) )
-                        ),
-                    $coincidingFestivity->grade,
-                    $coincidingFestivity->event->name,
-                    $this->LitSettings->Year
-                );
+                $YEAR = 2008;
+                $DECREE = '';
                 break;
         }
+        /**translators:
+         * 1. Grade or rank of the festivity that has been superseded
+         * 2. Name of the festivity that has been superseded
+         * 3. Edition of the Roman Missal
+         * 4. Year in which the Edition of the Roman Missal was published
+         * 5. Any possible decrees or sources about the edition of the Roman Missal
+         * 6. Date in which the superseded festivity is usually celebrated
+         * 3. Grade or rank of the festivity that is superseding
+         * 4. Name of the festivity that is superseding
+         * 5. Current year
+         */
+        $message = _( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d." );
+        $this->Messages[] = sprintf(
+            $message,
+            $this->LitGrade->i18n( $row->GRADE, false ),
+            $row->NAME,
+            RomanMissal::getName( $missal ),
+            $YEAR,
+            $DECREE,
+            $this->LitSettings->Locale === LitLocale::LATIN ? ( $row->DATE->format( 'j' ) . ' ' . LitMessages::LATIN_MONTHS[  (int)$row->DATE->format( 'n' ) ] ) :
+                ( $this->LitSettings->Locale === LitLocale::ENGLISH ? $row->DATE->format( 'F jS' ) :
+                    $this->dayAndMonth->format( $row->DATE->format( 'U' ) )
+                ),
+            $coincidingFestivity->grade,
+            $coincidingFestivity->event->name,
+            $this->LitSettings->Year
+        );
 
     }
 
@@ -1066,8 +1071,13 @@ class LitCalAPI {
                     } else {
                         $this->Cal->setProperty( $row->TAG, "grade", LitGrade::MEMORIAL_OPT );
                     }
-
                     $this->Messages[] = sprintf(
+                        /**translators:
+                         * 1. Name of the first coinciding Memorial
+                         * 2. Name of the second coinciding Memorial
+                         * 3. Current year
+                         * 4. Source of the information
+                         */
                         _( "The Memorial '%s' coincides with another Memorial '%s' in the year %d. They are both reduced in rank to optional memorials (%s)." ),
                         $ImmaculateHeart->name,
                         $festivity->name,
@@ -1399,12 +1409,14 @@ class LitCalAPI {
         $StJaneFrancesNewDate = DateTime::createFromFormat( '!j-n-Y', '12-8-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
         if ( self::DateIsNotSunday( $StJaneFrancesNewDate ) && $this->Cal->notInSolemnitiesFeastsOrMemorials( $StJaneFrancesNewDate ) ) {
             $festivity = $this->Cal->getFestivity( "StJaneFrancesDeChantal" );
+            $langs = ["LA" => "lt", "ES" => "es"];
+            $lang = in_array( $this->LitSettings->Locale, array_keys($langs) ) ? $langs[$this->LitSettings->Locale] : "lt";
             if( $festivity !== null ) {
                 $this->Cal->moveFestivityDate( "StJaneFrancesDeChantal", $StJaneFrancesNewDate );
                 $this->Messages[] = sprintf(
                     _( "The optional memorial '%s' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%s), applicable to the year %d." ),
                     $festivity->name,
-                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LitSettings->Locale ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>',
+                    "<a href=\"http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\">" . _( 'Decree of the Congregation for Divine Worship' ) . '</a>',
                     $this->LitSettings->Year
                 );
             } else {
@@ -1416,7 +1428,7 @@ class LitCalAPI {
                 $this->Messages[] = sprintf(
                     _( "The optional memorial '%s', which would have been superseded this year by a Sunday or Solemnity were it on Dec. 12, has however been transferred to Aug. 12 since the year 2002 (%s), applicable to the year %d." ),
                     $festivity->name,
-                    '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LitSettings->Locale ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>',
+                    "<a href=\"http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\">" . _( 'Decree of the Congregation for Divine Worship' ) . '</a>',
                     $this->LitSettings->Year
                 );
             }
@@ -1431,7 +1443,7 @@ class LitCalAPI {
             $this->Messages[] = sprintf(
                 _( 'The optional memorial \'%1$s\' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d. However, it is superseded by a Sunday, a Solemnity, or a Feast \'%4$s\' in the year %3$d.' ),
                 $row->NAME,
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LitSettings->Locale ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>',
+                "<a href=\"http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\">" . _( 'Decree of the Congregation for Divine Worship' ) . '</a>',
                 $this->LitSettings->Year,
                 $coincidingFestivity->event->name
             );
@@ -1451,10 +1463,12 @@ class LitCalAPI {
             $row = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ "ConversionStPaul" ];
             $festivity = new Festivity( $row->NAME, DateTime::createFromFormat( '!j-n-Y', '25-1-2009', new DateTimeZone( 'UTC' ) ), LitColor::WHITE, LitFeastType::FIXED, LitGrade::MEMORIAL_OPT, "Proper" );
             $this->Cal->addFestivity( "ConversionStPaul", $festivity );
+            $langs = ["FR" => "fr", "EN" => "en", "IT" => "it", "LA" => "lt", "PT" => "pt", "ES" => "sp", "DE" => "ge"];
+            $lang = in_array( $this->LitSettings->Locale, array_keys($langs) ) ? $langs[$this->LitSettings->Locale] : "en";
             $this->Messages[] = sprintf(
                 _( 'The Feast \'%s\' would have been suppressed this year ( 2009 ) since it falls on a Sunday, however being the Year of the Apostle Paul, as per the %s it has been reinstated so that local churches can optionally celebrate the memorial.' ),
                 '<i>' . $row->NAME . '</i>',
-                '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_' . strtolower( $this->LitSettings->Locale ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>'
+                "<a href=\"http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_$lang.html\">" . _( 'Decree of the Congregation for Divine Worship' ) . '</a>'
             );
         }
     }
