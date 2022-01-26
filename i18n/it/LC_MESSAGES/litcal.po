@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 16:03+0000\n"
+"POT-Creation-Date: 2022-01-26 16:34+0000\n"
 "PO-Revision-Date: 2021-12-25 23:32+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -57,10 +57,11 @@ msgstr "sabato che precede la Domenica delle Palme"
 #: includes/LitCalAPI.php:886 includes/LitCalAPI.php:898
 #: includes/LitCalAPI.php:985 includes/LitCalAPI.php:1022
 #: includes/LitCalAPI.php:1075 includes/LitCalAPI.php:1116
-#: includes/LitCalAPI.php:1155 includes/LitCalAPI.php:1267
-#: includes/LitCalAPI.php:1294 includes/LitCalAPI.php:1402
-#: includes/LitCalAPI.php:1414 includes/LitCalAPI.php:1429
-#: includes/LitCalAPI.php:1452 includes/FestivityCollection.php:386
+#: includes/LitCalAPI.php:1155 includes/LitCalAPI.php:1240
+#: includes/LitCalAPI.php:1272 includes/LitCalAPI.php:1299
+#: includes/LitCalAPI.php:1407 includes/LitCalAPI.php:1419
+#: includes/LitCalAPI.php:1434 includes/LitCalAPI.php:1457
+#: includes/FestivityCollection.php:386
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decreto della Congregazione per il Culto Divino"
 
@@ -141,7 +142,7 @@ msgstr "dopo il Mercoledì delle Ceneri"
 #.  6. Current year
 #.
 #: includes/LitCalAPI.php:854 includes/LitCalAPI.php:1130
-#: includes/LitCalAPI.php:1278
+#: includes/LitCalAPI.php:1283
 #, php-format
 msgid ""
 "The %s '%s' has been added on %s since the year %d (%s), applicable to the "
@@ -265,6 +266,32 @@ msgstr ""
 "all'anno %d (%s)."
 
 #. translators:
+#.  1. Grade or rank of the festivity
+#.  2. Name of the festivity
+#.  3. New name of the festivity
+#.  4. Year from which the grade has been changed
+#.  5. Current year
+#.  6. Source of the information
+#.
+#: includes/LitCalAPI.php:1249
+#, fuzzy, php-format
+#| msgid ""
+#| "The %s '%s' has been raised to the rank of %s since the year %d, "
+#| "applicable to the year %d (%s)."
+msgid ""
+"'%s' has been declared a Doctor of the Church since the year %d, applicable "
+"to the year %d (%s)."
+msgstr ""
+"La %s '%s' è stata promossa al grado di %s sin dal %d, applicabile pertanto "
+"all'anno %d (%s)."
+
+#: includes/LitCalAPI.php:1257
+#, fuzzy
+#| msgid "Dedication of a Church"
+msgid "and Doctor of the Church"
+msgstr "Dedicazione di una Chiesa"
+
+#. translators:
 #.  1. Grade or rank of the festivity being created
 #.  2. Name of the festivity being created
 #.  3. Indication of the mobile date for the festivity being created
@@ -274,7 +301,7 @@ msgstr ""
 #.  7. Name of superseding festivity
 #.  8. Current year
 #.
-#: includes/LitCalAPI.php:1315
+#: includes/LitCalAPI.php:1320
 #, fuzzy, php-format
 #| msgid ""
 #| "The %s '%s', added on %s since the year %d (%s), is however superseded by "
@@ -296,7 +323,7 @@ msgstr ""
 #.  7. Year from which the festivity has been added
 #.  8. Source of the information
 #.
-#: includes/LitCalAPI.php:1343
+#: includes/LitCalAPI.php:1348
 #, fuzzy, php-format
 #| msgid ""
 #| "The %s '%s' has been suppressed by the Memorial '%s', added on %s since "
@@ -308,7 +335,7 @@ msgstr ""
 "La %s '%s' è stata soppressa dalla Memoria '%s', aggiunta il %s sin dal %d "
 "(%s)."
 
-#: includes/LitCalAPI.php:1400
+#: includes/LitCalAPI.php:1405
 #, php-format
 msgid ""
 "The optional memorial '%s' has been transferred from Dec. 12 to Aug. 12 "
@@ -317,7 +344,7 @@ msgstr ""
 "La memoria facoltativa '%s' è stata trasferita dal 12 Dic. al 12 Agosto sin "
 "dal 2002 (%s), applicabile pertanto all'anno %d."
 
-#: includes/LitCalAPI.php:1412
+#: includes/LitCalAPI.php:1417
 #, php-format
 msgid ""
 "The optional memorial '%s', which would have been superseded this year by a "
@@ -328,7 +355,7 @@ msgstr ""
 "Domenica o da una Solennità se veniva celebrata il 12 Dic., è stata tuttavia "
 "trasferita al 12 Agosto sin dal 2002 (%s), applicabile pertanto all'anno %d."
 
-#: includes/LitCalAPI.php:1427
+#: includes/LitCalAPI.php:1432
 #, php-format
 msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
@@ -339,7 +366,7 @@ msgstr ""
 "sin dal 2002 (%2$s), applicabile pertanto all'anno %3$d. Tuttavia, è "
 "soppressa da una Domenica, una Solennità o una Festa '%4$s' nell'anno %3$d."
 
-#: includes/LitCalAPI.php:1450
+#: includes/LitCalAPI.php:1455
 #, php-format
 msgid ""
 "The Feast '%s' would have been suppressed this year ( 2009 ) since it falls "
@@ -352,21 +379,21 @@ msgstr ""
 "restituita secondo il %s in modo che le chiese locali abbiano facoltà di "
 "mantenere la memoria."
 
-#: includes/LitCalAPI.php:1474
+#: includes/LitCalAPI.php:1479
 #, php-format
 msgid "of the %s Week of Easter"
 msgstr "della %s Settimana di Pasqua"
 
-#: includes/LitCalAPI.php:1510 includes/LitCalAPI.php:1540
+#: includes/LitCalAPI.php:1515 includes/LitCalAPI.php:1545
 #, php-format
 msgid "of the %s Week of Ordinary Time"
 msgstr "della %s Settimana del Tempo Ordinario"
 
-#: includes/LitCalAPI.php:1564
+#: includes/LitCalAPI.php:1569
 msgid "Saturday Memorial of the Blessed Virgin Mary"
 msgstr "Memoria di Santa Maria in sabato"
 
-#: includes/LitCalAPI.php:1617
+#: includes/LitCalAPI.php:1622
 #, php-format
 msgid ""
 "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the "
@@ -375,23 +402,23 @@ msgstr ""
 "La %s '%s', celebrata solitamente il %s, è soppressa dalla %s '%s' nell'anno "
 "%d."
 
-#: includes/LitCalAPI.php:1636
+#: includes/LitCalAPI.php:1641
 msgctxt "Male singular"
 msgid "patron of Europe"
 msgstr "patrono d'Europa"
 
-#: includes/LitCalAPI.php:1637 includes/LitCalAPI.php:1645
-#: includes/LitCalAPI.php:1649
+#: includes/LitCalAPI.php:1642 includes/LitCalAPI.php:1650
+#: includes/LitCalAPI.php:1654
 msgctxt "Female singular"
 msgid "patron of Europe"
 msgstr "patrona d'Europa"
 
-#: includes/LitCalAPI.php:1638
+#: includes/LitCalAPI.php:1643
 msgctxt "Male plural"
 msgid "patrons of Europe"
 msgstr "patroni d'Europa"
 
-#: includes/LitCalAPI.php:1656
+#: includes/LitCalAPI.php:1661
 msgid "Saint Teresa Benedicta of the Cross, Virgin and Martyr"
 msgstr "Santa Teresa Benedetta della Croce (Edith Stein), vergine e martire"
 
