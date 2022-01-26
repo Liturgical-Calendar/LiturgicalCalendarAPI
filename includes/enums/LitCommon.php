@@ -1,6 +1,7 @@
 <?php
 
 include_once( "includes/pgettext.php" );
+include_once( "includes/enums/LitLocale.php" );
 
 class LitCommon {
 
@@ -51,7 +52,7 @@ class LitCommon {
     private array $GTXT;
 
     public function __construct( string $locale ) {
-        $this->locale = strtolower( $locale );
+        $this->locale = strtoupper( $locale );
         $this->GTXT = [
             self::PROPRIO                           => _( "Proper" ),
             /**translators: context = from the Common of nn */
@@ -233,7 +234,7 @@ class LitCommon {
 
     public function i18n( string $value ) : string {
         if( self::isValid( $value ) ) {
-            if( $this->locale === "la" ) {
+            if( $this->locale === LitLocale::LATIN ) {
                 return self::LATIN[ $value ];
             } else{
                 return $this->GTXT[ $value ];
@@ -243,7 +244,7 @@ class LitCommon {
     }
 
     public function getPossessive( string $value ) : string {
-        return $this->locale === "la" ? "" : self::POSSESSIVE( $value );
+        return $this->locale === LitLocale::LATIN ? "" : self::POSSESSIVE( $value );
     }
 
     /**
@@ -263,7 +264,7 @@ class LitCommon {
                         $commonGeneral = $txt;
                         $commonSpecific = "";
                     }
-                    $fromTheCommon = $this->locale === 'la' ? "De Commune" : _( "From the Common" );
+                    $fromTheCommon = $this->locale === LitLocale::LATIN ? "De Commune" : _( "From the Common" );
                     return $fromTheCommon . " " . $this->getPossessive( $commonGeneral ) . " " . $this->i18n( $commonGeneral ) . ($commonSpecific != "" ? ": " . $this->i18n( $commonSpecific ) : "");
                 }, $commons);
                 /**translators: when there are multiple possible commons, this will be the glue "or from the common of..." */
