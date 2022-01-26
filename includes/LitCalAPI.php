@@ -866,14 +866,11 @@ class LitCalAPI {
     }
 
     private function calculateMemorials( int $grade = LitGrade::MEMORIAL, string $missal = RomanMissal::EDITIO_TYPICA_1970 ) : void {
-
         if( $missal === RomanMissal::EDITIO_TYPICA_1970 && $grade === LitGrade::MEMORIAL ) {
             $this->createImmaculateHeart();
         }
         $tempCal = array_filter( $this->tempCal[ $missal ], function( $el ) use ( $grade ){ return $el->GRADE === $grade; } );
-
         foreach ( $tempCal as $row ) {
-
             //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord or a Feast or an obligatory memorial, then go ahead and create the optional memorial
             $row->DATE = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
             if ( self::DateIsNotSunday( $row->DATE ) && $this->Cal->notInSolemnitiesFeastsOrMemorials( $row->DATE ) ) {
@@ -884,28 +881,28 @@ class LitCalAPI {
 
                 if( $missal === RomanMissal::EDITIO_TYPICA_TERTIA_2002 ) {
                     $row->yearSince = 2002;
-                    $row->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020327_card-medina-estevez_' . strtolower( $this->LitSettings->Locale ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
+                    $row->DECREE = '<a href="https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2002/03/22/0150/00449.html">' . _( 'Vatican Press conference: Presentation of the Editio Typica Tertia of the Roman Missal' ) . '</a>';
                     $this->addMissalMemorialMessage( $row );
                 }
                 else if( $missal === RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 ) {
                     $row->yearSince = 2008;
                     switch( $row->TAG ) {
                         case "StPioPietrelcina":
-                            $row->DECREE = 'Missale Romanum, ed. Typica Tertia Emendata 2008';
+                            $row->DECREE = RomanMissal::getName( $missal );
                         break;
                         /**both of the following tags refer to the same decree, no need for a break between them */
                         case "LadyGuadalupe":
                         case "JuanDiego":
-                            $row->DECREE = '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_' . strtolower( $this->LitSettings->Locale ) . '.html">' . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
+                            $langs = ["LA" => "lt", "ES" => "es"];
+                            $lang = in_array( $this->LitSettings->Locale, array_keys($langs) ) ? $langs[$this->LitSettings->Locale] : "lt";
+                            $row->DECREE = "<a href=\"http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\">" . _( 'Decree of the Congregation for Divine Worship' ) . '</a>';
                         break;
                     }
                     $this->addMissalMemorialMessage( $row );
                 }
-
                 if ( $grade === LitGrade::MEMORIAL && $this->Cal->getFestivity( $row->TAG )->grade > LitGrade::MEMORIAL_OPT ) {
                     $this->removeWeekdaysEpiphanyOverridenByMemorials( $row->TAG );
                 }
-
             } else {
                 if( false === $this->checkImmaculateHeartCoincidence( $row->DATE, $row ) ) {
                     $this->handleCoincidence( $row, RomanMissal::EDITIO_TYPICA_1970 );
@@ -915,15 +912,12 @@ class LitCalAPI {
                 }
             }
         }
-
         if( $missal === RomanMissal::EDITIO_TYPICA_TERTIA_2002 && $grade === LitGrade::MEMORIAL_OPT ) {
             $this->handleSaintJaneFrancesDeChantal();
         }
-
     }
 
     private function reduceMemorialsInAdventLentToCommemoration( DateTime $currentFeastDate, stdClass $row ) {
-
         //If a fixed date optional memorial falls between 17 Dec. to 24 Dec., the Octave of Christmas or weekdays of the Lenten season,
         //it is reduced in rank to a Commemoration ( only the collect can be used
         if ( $this->Cal->inWeekdaysAdventChristmasLent( $currentFeastDate ) ) {
@@ -941,7 +935,6 @@ class LitCalAPI {
                 $this->LitSettings->Year
             );
         }
-
     }
 
     private function removeWeekdaysEpiphanyOverridenByMemorials( string $tag ) {
@@ -971,7 +964,6 @@ class LitCalAPI {
     }
 
     private function handleCoincidence( stdClass $row, string $missal = RomanMissal::EDITIO_TYPICA_1970 ) {
-
         $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $row->DATE, $this->LitSettings );
         switch( $missal ){
             case RomanMissal::EDITIO_TYPICA_1970:
@@ -1015,11 +1007,9 @@ class LitCalAPI {
             $coincidingFestivity->event->name,
             $this->LitSettings->Year
         );
-
     }
 
     private function handleCoincidenceDecree( object $row ) : void {
-
         $lang = ( property_exists( $row->Metadata, 'decreeLangs' ) && property_exists( $row->Metadata->decreeLangs, $this->LitSettings->Locale ) ) ? 
             $row->Metadata->decreeLangs->{$this->LitSettings->Locale} :
             "en";
@@ -1050,11 +1040,9 @@ class LitCalAPI {
             $coincidingFestivity->event->name,
             $this->LitSettings->Year
         );
-
     }
 
     private function checkImmaculateHeartCoincidence( DateTime $currentFeastDate, stdClass $row ) : bool {
-
         $coincidence = false;
         //IMMACULATEHEART: in years when the memorial of the Immaculate Heart of Mary coincides with another obligatory memorial,
         //as happened in 2014 [ 28 June, Saint Irenaeus ] and 2015 [ 13 June, Saint Anthony of Padua ], both must be considered optional for that year
@@ -1089,7 +1077,6 @@ class LitCalAPI {
             }
         }
         return $coincidence;
-
     }
 
     private function applyDecrees( int|string $grade = LitGrade::MEMORIAL ) : void {
@@ -1374,7 +1361,6 @@ class LitCalAPI {
         return false;
     }
 
-
     private function createImmaculateHeart() {
         $row = new stdClass();
         $row->DATE = LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 9 + 6 ) . 'D' ) );
@@ -1395,17 +1381,17 @@ class LitCalAPI {
             $row->DATE = LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 9 + 6 ) . 'D' ) );
             $this->handleCoincidence( $row, RomanMissal::EDITIO_TYPICA_1970 );
         }
-
     }
 
-    //In the Tertia Editio Typica (2002),
-    //Saint Jane Frances de Chantal was moved from December 12 to August 12,
-    //probably to allow local bishop's conferences to insert Our Lady of Guadalupe as an optional memorial on December 12
-    //seeing that with the decree of March 25th 1999 of the Congregation of Divine Worship
-    //Our Lady of Guadalupe was granted as a Feast day for all dioceses and territories of the Americas
-    //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_lt.html
+    /**
+     * In the Tertia Editio Typica (2002),
+     * Saint Jane Frances de Chantal was moved from December 12 to August 12,
+     * probably to allow local bishop's conferences to insert Our Lady of Guadalupe as an optional memorial on December 12
+     * seeing that with the decree of March 25th 1999 of the Congregation of Divine Worship
+     * Our Lady of Guadalupe was granted as a Feast day for all dioceses and territories of the Americas
+     * source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_lt.html
+     */
     private function handleSaintJaneFrancesDeChantal() {
-
         $StJaneFrancesNewDate = DateTime::createFromFormat( '!j-n-Y', '12-8-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
         if ( self::DateIsNotSunday( $StJaneFrancesNewDate ) && $this->Cal->notInSolemnitiesFeastsOrMemorials( $StJaneFrancesNewDate ) ) {
             $festivity = $this->Cal->getFestivity( "StJaneFrancesDeChantal" );
@@ -1448,15 +1434,16 @@ class LitCalAPI {
                 $coincidingFestivity->event->name
             );
         }
-
     }
 
 
-    //The Conversion of St. Paul falls on a Sunday in the year 2009.
-    //However, considering that it is the Year of Saint Paul,
-    //with decree of Jan 25 2008 the Congregation for Divine Worship gave faculty to the single churches
-    //to celebrate the Conversion of St. Paul anyways. So let's re-insert it as an optional memorial?
-    //http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_la.html
+    /**
+     * The Conversion of St. Paul falls on a Sunday in the year 2009.
+     * However, considering that it is the Year of Saint Paul,
+     * with decree of Jan 25 2008 the Congregation for Divine Worship gave faculty to the single churches
+     * to celebrate the Conversion of St. Paul anyways. So let's re-insert it as an optional memorial?
+     * http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_la.html
+     */
     private function applyOptionalMemorialDecree2009() : void {
         $festivity = $this->Cal->getFestivity( "ConversionStPaul" );
         if( $festivity === null ) {
@@ -1535,7 +1522,6 @@ class LitCalAPI {
             $ordWeekday++;
         }
 
-
         //In the second part of the year, weekdays of ordinary time begin the day after Pentecost
         $SecondWeekdaysLowerLimit = $this->Cal->getFestivity( "Pentecost" )->date;
         //and end with the Feast of Christ the King
@@ -1564,7 +1550,6 @@ class LitCalAPI {
             }
             $ordWeekday++;
         }
-
     }
 
     //On Saturdays in Ordinary Time when there is no obligatory memorial, an optional memorial of the Blessed Virgin Mary is allowed.
@@ -1672,36 +1657,32 @@ class LitCalAPI {
                 //we are going to have to fake this one as belonging to a Missal...
                 //let's add it to the future Missal that doesn't exist yet
                 $EdithStein = new stdClass();
-                $EdithStein->NAME = _("Saint Teresa Benedicta of the Cross, Virgin and Martyr");
-                $EdithStein->MONTH = 8;
-                $EdithStein->DAY    = 9;
-                $EdithStein->TAG    = "StEdithStein";
-                $EdithStein->GRADE  = 2;
-                $EdithStein->COMMON = "Martyrs:For a Virgin Martyr,Virgins:For One Virgin";
+                $EdithStein->NAME       = _("Saint Teresa Benedicta of the Cross, Virgin and Martyr");
+                $EdithStein->MONTH      = 8;
+                $EdithStein->DAY        = 9;
+                $EdithStein->TAG        = "StEdithStein";
+                $EdithStein->GRADE      = LitGrade::MEMORIAL_OPT;
+                $EdithStein->COMMON     = "Martyrs:For a Virgin Martyr,Virgins:For One Virgin";
                 $EdithStein->CALENDAR   = "GENERAL ROMAN";
                 $EdithStein->COLOR  = "white,red";
                 $this->tempCal[ RomanMissal::EDITIO_TYPICA_TERTIA_2002 ][ "StEdithStein" ] = $EdithStein;
                 $EdithStein->DATE = DateTime::createFromFormat( '!j-n-Y', $EdithStein->DAY . '-' . $EdithStein->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
                 if( !$this->Cal->inSolemnitiesFeastsOrMemorials( $EdithStein->DATE ) ) {
                     $this->Cal->addFestivity( $EdithStein->TAG, new Festivity( $EdithStein->NAME, $EdithStein->DATE, $EdithStein->COLOR, LitFeastType::FIXED, $EdithStein->GRADE, $EdithStein->COMMON ) );
-                    $this->makePatron( "StEdithStein", ", patrona d'Europa", $EdithStein->DAY, $EdithStein->MONTH, $EdithStein->COLOR, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
+                    $this->makePatron( "StEdithStein", ", " . pgettext("Female singular", "patron of Europe"), $EdithStein->DAY, $EdithStein->MONTH, $EdithStein->COLOR, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
                 }
             }
         }
-
     }
 
     //Insert or elevate the Patron Saints of Italy
     private function applyPatronSaintsItaly() : void {
-
         if ( $this->LitSettings->Year < 1999 ) {
             //We only have to deal with years before 1999, because from 1999
             //it will be taken care of by Patron saints of Europe
             $this->makePatron( "StCatherineSiena", ", patrona d'Italia", 29, 4, LitColor::WHITE );
         }
-
         $this->makePatron( "StFrancisAssisi", ", patrono d'Italia", 4, 10, LitColor::WHITE );
-
     }
 
     private function applyMessaleRomano1983() : void {
@@ -2009,7 +1990,6 @@ class LitCalAPI {
     }
 
     private function applyDiocesanCalendar() {
-
         foreach( $this->DiocesanData->LitCal as $key => $obj ) {
             if( is_array( $obj->color ) ) {
                 $obj->color = implode( ',', $obj->color );
@@ -2045,7 +2025,6 @@ class LitCalAPI {
                 }
             }
         }
-
     }
 
     private function getGithubReleaseInfo() : stdClass {
@@ -2075,7 +2054,6 @@ class LitCalAPI {
     }
 
     private function produceIcal( stdClass $SerializeableLitCal, stdClass $GitHubReleasesObj ) : string {
-
         $publishDate = $GitHubReleasesObj->published_at;
         $ical = "BEGIN:VCALENDAR\r\n";
         $ical .= "PRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\r\n";
@@ -2148,13 +2126,10 @@ class LitCalAPI {
             $ical .= "END:VEVENT\r\n";
         }
         $ical .= "END:VCALENDAR";
-
         return $ical;
-
     }
 
     private function generateResponse() {
-
         $SerializeableLitCal                          = new stdClass();
         $SerializeableLitCal->Settings                = new stdClass();
         $SerializeableLitCal->Metadata                = new stdClass();
