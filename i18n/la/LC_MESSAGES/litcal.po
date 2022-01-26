@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 16:03+0000\n"
+"POT-Creation-Date: 2022-01-26 18:34+0000\n"
 "PO-Revision-Date: 2021-12-25 23:32+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
@@ -53,13 +53,13 @@ msgstr "sabbatum ante Dominicam in Palmis"
 
 #: includes/LitCalAPI.php:542 includes/LitCalAPI.php:558
 #: includes/LitCalAPI.php:584 includes/LitCalAPI.php:612
-#: includes/LitCalAPI.php:886 includes/LitCalAPI.php:898
-#: includes/LitCalAPI.php:985 includes/LitCalAPI.php:1022
-#: includes/LitCalAPI.php:1075 includes/LitCalAPI.php:1116
-#: includes/LitCalAPI.php:1155 includes/LitCalAPI.php:1267
-#: includes/LitCalAPI.php:1294 includes/LitCalAPI.php:1402
-#: includes/LitCalAPI.php:1414 includes/LitCalAPI.php:1429
-#: includes/LitCalAPI.php:1452 includes/FestivityCollection.php:386
+#: includes/LitCalAPI.php:898 includes/LitCalAPI.php:1017
+#: includes/LitCalAPI.php:1073 includes/LitCalAPI.php:1113
+#: includes/LitCalAPI.php:1152 includes/LitCalAPI.php:1237
+#: includes/LitCalAPI.php:1269 includes/LitCalAPI.php:1296
+#: includes/LitCalAPI.php:1405 includes/LitCalAPI.php:1417
+#: includes/LitCalAPI.php:1432 includes/LitCalAPI.php:1458
+#: includes/FestivityCollection.php:386
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decretum Congregationis pro Cultu Divino"
 
@@ -99,7 +99,6 @@ msgstr ""
 "die %s quam Dominica post Nativitate."
 
 #: includes/LitCalAPI.php:710 includes/LitCalAPI.php:734
-#: includes/LitCalAPI.php:946
 #, php-format
 msgid "'%s' is superseded by the %s '%s' in the year %d."
 msgstr "<i>'%s'</i> subplantata est ab %s <i>'%s'</i> in anno %d."
@@ -139,8 +138,8 @@ msgstr "post Feria IV Cinerum"
 #.  5. Source of the information
 #.  6. Current year
 #.
-#: includes/LitCalAPI.php:854 includes/LitCalAPI.php:1130
-#: includes/LitCalAPI.php:1278
+#: includes/LitCalAPI.php:853 includes/LitCalAPI.php:1127
+#: includes/LitCalAPI.php:1280
 #, php-format
 msgid ""
 "The %s '%s' has been added on %s since the year %d (%s), applicable to the "
@@ -149,7 +148,18 @@ msgstr ""
 "%s <i>'%s'</i> aggregata est igitur in die <b>%s</b> ab anno %d (%s), ergo "
 "viget in anno %d."
 
-#: includes/LitCalAPI.php:931
+#: includes/LitCalAPI.php:884 includes/LitCalAPI.php:976
+msgid ""
+"Vatican Press conference: Presentation of the Editio Typica Tertia of the "
+"Roman Missal"
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity
+#.  2. Name of the festivity
+#.  3. Current year
+#.
+#: includes/LitCalAPI.php:930
 #, php-format
 msgid ""
 "The %s '%s' either falls between 17 Dec. and 24 Dec., or during the Octave "
@@ -160,8 +170,35 @@ msgstr ""
 "Nativitatis aut infra ferias Quadragesimae in anno %d, ergo reductus est "
 "gradus ad Commemorationem."
 
-#: includes/LitCalAPI.php:963 includes/LitCalAPI.php:980
-#: includes/LitCalAPI.php:997
+#. translators:
+#.  1. Grade or rank of the festivity that has been superseded
+#.  2. Name of the festivity that has been superseded
+#.  3. Grade or rank of the festivity that is superseding
+#.  4. Name of the festivity that is superseding
+#.  5. Current year
+#.
+#: includes/LitCalAPI.php:952
+#, fuzzy, php-format
+#| msgid "'%s' is superseded by the %s '%s' in the year %d."
+msgid "The %s '%s' is superseded by the %s '%s' in the year %d."
+msgstr "<i>'%s'</i> subplantata est ab %s <i>'%s'</i> in anno %d."
+
+#: includes/LitCalAPI.php:972
+msgid "Apostolic Constitution Missale Romanum"
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity that has been superseded
+#.  2. Name of the festivity that has been superseded
+#.  3. Edition of the Roman Missal
+#.  4. Year in which the Edition of the Roman Missal was published
+#.  5. Any possible decrees or sources about the edition of the Roman Missal
+#.  6. Date in which the superseded festivity is usually celebrated
+#.  3. Grade or rank of the festivity that is superseding
+#.  4. Name of the festivity that is superseding
+#.  5. Current year
+#.
+#: includes/LitCalAPI.php:994
 #, php-format
 msgid ""
 "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and "
@@ -180,7 +217,7 @@ msgstr ""
 #.  7. Name of the superseding festivity
 #.  8. Current year
 #.
-#: includes/LitCalAPI.php:1035
+#: includes/LitCalAPI.php:1030
 #, fuzzy, php-format
 #| msgid ""
 #| "The %s '%s', added on %s since the year %d (%s), is however superseded by "
@@ -192,7 +229,13 @@ msgstr ""
 "%s <i>'%s'</i>, aggregata in die %s ab anno %d (%s), subplantata est ab "
 "Dominica, aut Sollemnitate, aut Festu <i>'%s'</i> in anno %d."
 
-#: includes/LitCalAPI.php:1071
+#. translators:
+#.  1. Name of the first coinciding Memorial
+#.  2. Name of the second coinciding Memorial
+#.  3. Current year
+#.  4. Source of the information
+#.
+#: includes/LitCalAPI.php:1069
 #, php-format
 msgid ""
 "The Memorial '%s' coincides with another Memorial '%s' in the year %d. They "
@@ -201,7 +244,7 @@ msgstr ""
 "Memoria <i>'%s'</i> coincidet cum alia Memoria <i>'%s'</i> in anno %d. Ergo "
 "ambo simul redunctur in gradu Memoriæ ad libitum (%s)."
 
-#: includes/LitCalAPI.php:1105
+#: includes/LitCalAPI.php:1102
 msgid "the Monday after Pentecost"
 msgstr "dies Lunae post Pentecostem"
 
@@ -213,7 +256,7 @@ msgstr "dies Lunae post Pentecostem"
 #.  5. Current year
 #.  6. Source of the information
 #.
-#: includes/LitCalAPI.php:1168
+#: includes/LitCalAPI.php:1165
 #, fuzzy, php-format
 #| msgid ""
 #| "The %s '%s' has been raised to the rank of %s since the year %d, "
@@ -233,7 +276,7 @@ msgstr ""
 #.  5. Current year
 #.  6. Source of the information
 #.
-#: includes/LitCalAPI.php:1190
+#: includes/LitCalAPI.php:1187
 #, php-format
 msgid ""
 "The %s '%s' has been raised to the rank of %s since the year %d, applicable "
@@ -250,7 +293,7 @@ msgstr ""
 #.  5. Current year
 #.  6. Source of the information
 #.
-#: includes/LitCalAPI.php:1200
+#: includes/LitCalAPI.php:1197
 #, fuzzy, php-format
 #| msgid ""
 #| "The %s '%s' has been raised to the rank of %s since the year %d, "
@@ -263,6 +306,32 @@ msgstr ""
 "%d (%s)."
 
 #. translators:
+#.  1. Grade or rank of the festivity
+#.  2. Name of the festivity
+#.  3. New name of the festivity
+#.  4. Year from which the grade has been changed
+#.  5. Current year
+#.  6. Source of the information
+#.
+#: includes/LitCalAPI.php:1246
+#, fuzzy, php-format
+#| msgid ""
+#| "The %s '%s' has been raised to the rank of %s since the year %d, "
+#| "applicable to the year %d (%s)."
+msgid ""
+"'%s' has been declared a Doctor of the Church since the year %d, applicable "
+"to the year %d (%s)."
+msgstr ""
+"%s <i>'%s'</i> elevata est in gradu %s ab anno %d, ergo applicatur ad anno "
+"%d (%s)."
+
+#: includes/LitCalAPI.php:1254
+#, fuzzy
+#| msgid "Dedication of a Church"
+msgid "and Doctor of the Church"
+msgstr "Dedicationis ecclesiæ"
+
+#. translators:
 #.  1. Grade or rank of the festivity being created
 #.  2. Name of the festivity being created
 #.  3. Indication of the mobile date for the festivity being created
@@ -272,7 +341,7 @@ msgstr ""
 #.  7. Name of superseding festivity
 #.  8. Current year
 #.
-#: includes/LitCalAPI.php:1315
+#: includes/LitCalAPI.php:1317
 #, fuzzy, php-format
 #| msgid ""
 #| "The %s '%s', added on %s since the year %d (%s), is however superseded by "
@@ -294,7 +363,7 @@ msgstr ""
 #.  7. Year from which the festivity has been added
 #.  8. Source of the information
 #.
-#: includes/LitCalAPI.php:1343
+#: includes/LitCalAPI.php:1345
 #, fuzzy, php-format
 #| msgid ""
 #| "The %s '%s' has been suppressed by the Memorial '%s', added on %s since "
@@ -305,7 +374,7 @@ msgid ""
 msgstr ""
 "%s '%s' subplantata est ad Memoria '%s', aggregata in die %s ab anno %d (%s)."
 
-#: includes/LitCalAPI.php:1400
+#: includes/LitCalAPI.php:1403
 #, php-format
 msgid ""
 "The optional memorial '%s' has been transferred from Dec. 12 to Aug. 12 "
@@ -314,7 +383,7 @@ msgstr ""
 "Memoria ad libitum <i>'%s'</i> traslata est de 12 Dec. ad 12 Aug. ab anno "
 "2002 (%s), ergo viget in anno %d."
 
-#: includes/LitCalAPI.php:1412
+#: includes/LitCalAPI.php:1415
 #, php-format
 msgid ""
 "The optional memorial '%s', which would have been superseded this year by a "
@@ -325,7 +394,7 @@ msgstr ""
 "Sollemnitate si celebrata fuisset in die 12 Dec., nihilominus traslata est "
 "ad 12 Aug. ab anno 2002 (%s), ergo viget in anno %d."
 
-#: includes/LitCalAPI.php:1427
+#: includes/LitCalAPI.php:1430
 #, php-format
 msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
@@ -336,7 +405,7 @@ msgstr ""
 "anno 2002 (%2$s), ergo viget in anno %3$d. Nihilominus subplantata est ab "
 "Dominica, aut Sollemnitate, aut Festu <i>\\'%4$s\\'</i> in anno %3$d."
 
-#: includes/LitCalAPI.php:1450
+#: includes/LitCalAPI.php:1456
 #, php-format
 msgid ""
 "The Feast '%s' would have been suppressed this year ( 2009 ) since it falls "
@@ -348,21 +417,21 @@ msgstr ""
 "tamen quamvis sit Annus Pauli Apostoli, restituta est secundum %s ut "
 "permittant ecclesias locales ad memoriam celebrandam."
 
-#: includes/LitCalAPI.php:1474
+#: includes/LitCalAPI.php:1480
 #, php-format
 msgid "of the %s Week of Easter"
 msgstr "Hebdomadæ %s Temporis Paschali"
 
-#: includes/LitCalAPI.php:1510 includes/LitCalAPI.php:1540
+#: includes/LitCalAPI.php:1516 includes/LitCalAPI.php:1545
 #, php-format
 msgid "of the %s Week of Ordinary Time"
 msgstr "Hebdomadæ %s Temporis Ordinarii"
 
-#: includes/LitCalAPI.php:1564
+#: includes/LitCalAPI.php:1568
 msgid "Saturday Memorial of the Blessed Virgin Mary"
 msgstr "Memoria Sanctæ Mariæ in Sabbato"
 
-#: includes/LitCalAPI.php:1617
+#: includes/LitCalAPI.php:1621
 #, php-format
 msgid ""
 "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the "
@@ -371,23 +440,23 @@ msgstr ""
 "%s '%s', celebrata plerumque in die %s, subplantata est ab %s '%s' in anno "
 "%d."
 
-#: includes/LitCalAPI.php:1636
+#: includes/LitCalAPI.php:1640
 msgctxt "Male singular"
 msgid "patron of Europe"
 msgstr "patronus Europae"
 
-#: includes/LitCalAPI.php:1637 includes/LitCalAPI.php:1645
-#: includes/LitCalAPI.php:1649
+#: includes/LitCalAPI.php:1641 includes/LitCalAPI.php:1649
+#: includes/LitCalAPI.php:1653 includes/LitCalAPI.php:1672
 msgctxt "Female singular"
 msgid "patron of Europe"
 msgstr "patrona Europae"
 
-#: includes/LitCalAPI.php:1638
+#: includes/LitCalAPI.php:1642
 msgctxt "Male plural"
 msgid "patrons of Europe"
 msgstr "patroni Europae"
 
-#: includes/LitCalAPI.php:1656
+#: includes/LitCalAPI.php:1660
 msgid "Saint Teresa Benedicta of the Cross, Virgin and Martyr"
 msgstr "Sanctæ Teresiæ Benedictæ a Cruce, virginis et martyris"
 
