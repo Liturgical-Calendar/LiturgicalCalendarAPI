@@ -1190,7 +1190,7 @@ class LitCalAPI {
         }
     }
 
-    private function createDoctorFromDecree( object $row ) : void {
+    private function createDoctorsFromDecrees() : void {
         $DoctorsDecrees = array_filter(
             $this->tempCal[ "MEMORIALS_FROM_DECREES" ],
             function( $row ) {
@@ -1261,7 +1261,7 @@ class LitCalAPI {
             }
         }
         else if( gettype($grade) === "string" && $grade === "DOCTORS" ) {
-            $this->createDoctorFromDecree( $row );
+            $this->createDoctorsFromDecrees();
         }
     }
 
