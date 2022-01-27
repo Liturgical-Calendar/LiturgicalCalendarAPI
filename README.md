@@ -232,7 +232,7 @@ add translations for the Messages array in Italian, English and Latin (please fo
  * move as many festivities as possible to the MySQL tables to allow for localization (mobile feasts will be calculated in the script, but still need to be localized)
  * add ICS data generation (requires more localization strings, because it is already a form of final display of the data)
 
-## [v2.0](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/1.0) (January 8th 2018)
+## [v2.0](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/2.0) (January 8th 2018)
  * separate the display logic from the engine, so that the engine can act as an endpoint
  * make the engine return JSON or XML data that the display logic can use to generate a user-friendly representation of the data
 
