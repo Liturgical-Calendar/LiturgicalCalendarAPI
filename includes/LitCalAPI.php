@@ -1079,6 +1079,157 @@ class LitCalAPI {
         return $coincidence;
     }
 
+    private function createFestivityFromDecree( object $row ) : void {
+        if( $row->Festivity->TYPE === "mobile" ) {
+            //we won't have a date defined for mobile festivites, we'll have to calculate them here case by case
+            switch( $row->Festivity->TAG ) {
+                case "MaryMotherChurch":
+                    $row->Festivity->DATE = LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 7 + 1 ) . 'D' ) );
+                    $row->Metadata->addedWhen = _( 'the Monday after Pentecost' );
+            }
+            if( true === $this->checkCoincidencesNewMobileFestivity( $row ) ) {
+                $this->createMobileFestivity( $row );
+            }
+        } else {
+            $row->Festivity->DATE = DateTime::createFromFormat( '!j-n-Y', "{$row->Festivity->DAY}-{$row->Festivity->MONTH}-{$this->LitSettings->Year}", new DateTimeZone( 'UTC' ) );
+            $decree = $this->elaborateDecreeSource( $row );
+            if( $row->Festivity->GRADE === LitGrade::MEMORIAL_OPT ) {
+                if( $this->Cal->notInSolemnitiesFeastsOrMemorials( $row->Festivity->DATE ) ) {
+                    $festivity = new Festivity( $row->Festivity->NAME, $row->Festivity->DATE, $row->Festivity->COLOR, LitFeastType::FIXED, $row->Festivity->GRADE, $row->Festivity->COMMON );
+                    $this->Cal->addFestivity( $row->Festivity->TAG, $festivity );
+                    $this->Messages[] = sprintf(
+                        /**translators:
+                         * 1. Grade or rank of the festivity
+                         * 2. Name of the festivity
+                         * 3. Day of the festivity
+                         * 4. Year from which the festivity has been added
+                         * 5. Source of the information
+                         * 6. Current year
+                         */
+                        _( 'The %1$s \'%2$s\' has been added on %3$s since the year %4$d (%5$s), applicable to the year %6$d.' ),
+                        $this->LitGrade->i18n( $row->Festivity->GRADE, false ),
+                        $row->Festivity->NAME,
+                        $this->LitSettings->Locale === LitLocale::LATIN ? ( $row->Festivity->DATE->format( 'j' ) . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->Festivity->DATE->format( 'n' ) ] ) :
+                            ( $this->LitSettings->Locale === LitLocale::ENGLISH ? $row->Festivity->DATE->format( 'F jS' ) :
+                                $this->dayAndMonth->format( $row->Festivity->DATE->format( 'U' ) )
+                            ),
+                        $row->Metadata->sinceYear,
+                        $decree,
+                        $this->LitSettings->Year
+                    );
+                }
+                else{
+                    $this->handleCoincidenceDecree( $row );
+                }
+            }
+        }
+    }
+
+    private function setPropertyBasedOnDecree( object $row ) : void {
+        $festivity = $this->Cal->getFestivity( $row->Festivity->TAG );
+        if ( $festivity !== null ) {
+            $decree = $this->elaborateDecreeSource( $row );
+            switch( $row->Metadata->property ) {
+                case "name":
+                    //example: StMartha becomes Martha, Mary and Lazarus in 2021
+                    $this->Cal->setProperty( $row->Festivity->TAG, "name", $row->Festivity->NAME );
+                    /**translators:
+                     * 1. Grade or rank of the festivity
+                     * 2. Name of the festivity
+                     * 3. New name of the festivity
+                     * 4. Year from which the grade has been changed
+                     * 5. Current year
+                     * 6. Source of the information
+                     */
+                    $message = _( 'The name of the %1$s \'%2$s\' has been changed to %3$s since the year %4$d, applicable to the year %5$d (%6$s).' );
+                    $this->Messages[] = sprintf(
+                        $message,
+                        $this->LitGrade->i18n( $festivity->grade, false ),
+                        '<i>' . $festivity->name . '</i>',
+                        '<i>' . $row->Festivity->NAME . '</i>',
+                        $row->Metadata->sinceYear,
+                        $this->LitSettings->Year,
+                        $decree
+                    );
+                break;
+                case "grade":
+                    if( $row->Festivity->GRADE > $festivity->grade ) {
+                        //example: StMaryMagdalene raised to Feast in 2016
+                        /**translators:
+                         * 1. Grade or rank of the festivity
+                         * 2. Name of the festivity
+                         * 3. New grade of the festivity
+                         * 4. Year from which the grade has been changed
+                         * 5. Current year
+                         * 6. Source of the information
+                         */
+                        $message = _( 'The %1$s \'%2$s\' has been raised to the rank of %3$s since the year %4$d, applicable to the year %5$d (%6$s).' );
+                    } else {
+                        /**translators:
+                         * 1. Grade or rank of the festivity
+                         * 2. Name of the festivity
+                         * 3. New grade of the festivity
+                         * 4. Year from which the grade has been changed
+                         * 5. Current year
+                         * 6. Source of the information
+                         */
+                        $message = _( 'The %1$s \'%2$s\' has been lowered to the rank of %3$s since the year %4$d, applicable to the year %5$d (%6$s).' );
+                    }
+                    $this->Messages[] = sprintf(
+                        $message,
+                        $this->LitGrade->i18n( $festivity->grade, false ),
+                        $festivity->name,
+                        $this->LitGrade->i18n( $row->Festivity->GRADE, false ),
+                        $row->Metadata->sinceYear,
+                        $this->LitSettings->Year,
+                        $decree
+                    );
+                    $this->Cal->setProperty( $row->Festivity->TAG, "grade", $row->Festivity->GRADE );
+                break;
+            }
+        }
+    }
+
+    private function createDoctorFromDecree( object $row ) : void {
+        $DoctorsDecrees = array_filter(
+            $this->tempCal[ "MEMORIALS_FROM_DECREES" ],
+            function( $row ) {
+                return $row->Metadata->action === "makeDoctor";
+            });
+        foreach( $DoctorsDecrees as $row ) {
+            if( $this->LitSettings->Year >= $row->Metadata->sinceYear ) {
+                $festivity = $this->Cal->getFestivity( $row->Festivity->TAG );
+                if( $festivity !== null ) {
+                    $decree = $this->elaborateDecreeSource( $row );
+                    /**translators:
+                     * 1. Name of the festivity
+                     * 2. Year in which was declared Doctor
+                     * 3. Current year
+                     * 4. Source of the information
+                     */
+                    $message = _( '\'%1$s\' has been declared a Doctor of the Church since the year %2$d, applicable to the year %3$d (%4$s).' );
+                    $this->Messages[] = sprintf(
+                        $message,
+                        '<i>' . $festivity->name . '</i>',
+                        $row->Metadata->sinceYear,
+                        $this->LitSettings->Year,
+                        $decree
+                    );
+                    $etDoctor = $this->LitSettings->Locale === LitLocale::LATIN ? " et Ecclesiæ doctoris" : " " . _( "and Doctor of the Church" );
+                    $this->Cal->setProperty( $row->Festivity->TAG, "name", $festivity->name . $etDoctor );
+                }
+            }
+        }
+    }
+
+    private function elaborateDecreeSource( object $row ) : string {
+        $lang = ( property_exists( $row->Metadata, 'decreeLangs' ) && property_exists( $row->Metadata->decreeLangs, $this->LitSettings->Locale ) ) ? 
+            $row->Metadata->decreeLangs->{$this->LitSettings->Locale} :
+            "en";
+        $url = str_contains( $row->Metadata->decreeURL, '%s' ) ? sprintf($row->Metadata->decreeURL, $lang) : $row->Metadata->decreeURL;
+        return '<a href="' . $url . '">' . _( "Decree of the Congregation for Divine Worship" ) . '</a>';
+    }
+
     private function applyDecrees( int|string $grade = LitGrade::MEMORIAL ) : void {
         if( !isset($this->tempCal[ "MEMORIALS_FROM_DECREES" ]) || !is_array( $this->tempCal[ "MEMORIALS_FROM_DECREES" ] ) ) {
             die( '{"ERROR": "We seem to be missing data for Memorials based on Decrees: array data was not found!"}' );
@@ -1094,121 +1245,10 @@ class LitCalAPI {
                     switch( $row->Metadata->action ) {
                         case "createNew":
                             //example: MaryMotherChurch in 2018
-                            if( $row->Festivity->TYPE === "mobile" ) {
-                                //we won't have a date defined for mobile festivites, we'll have to calculate them here case by case
-                                switch( $row->Festivity->TAG ) {
-                                    case "MaryMotherChurch":
-                                        $row->Festivity->DATE = LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 7 + 1 ) . 'D' ) );
-                                        $row->Metadata->addedWhen = _( 'the Monday after Pentecost' );
-                                }
-                                if( true === $this->checkCoincidencesNewMobileFestivity( $row ) ) {
-                                    $this->createMobileFestivity( $row );
-                                }
-                            } else {
-                                $row->Festivity->DATE = DateTime::createFromFormat( '!j-n-Y', "{$row->Festivity->DAY}-{$row->Festivity->MONTH}-{$this->LitSettings->Year}", new DateTimeZone( 'UTC' ) );
-                                $lang = ( property_exists( $row->Metadata, 'decreeLangs' ) && property_exists( $row->Metadata->decreeLangs, $this->LitSettings->Locale ) ) ? 
-                                    $row->Metadata->decreeLangs->{$this->LitSettings->Locale} :
-                                    "en";
-                                $url = str_contains( $row->Metadata->decreeURL, '%s' ) ? sprintf($row->Metadata->decreeURL, $lang) : $row->Metadata->decreeURL;
-                                $decree = '<a href="' . $url . '">' . _( "Decree of the Congregation for Divine Worship" ) . '</a>';
-                                if( $row->Festivity->GRADE === LitGrade::MEMORIAL_OPT ) {
-                                    if( $this->Cal->notInSolemnitiesFeastsOrMemorials( $row->Festivity->DATE ) ) {
-                                        $festivity = new Festivity( $row->Festivity->NAME, $row->Festivity->DATE, $row->Festivity->COLOR, LitFeastType::FIXED, $row->Festivity->GRADE, $row->Festivity->COMMON );
-                                        $this->Cal->addFestivity( $row->Festivity->TAG, $festivity );
-                                        $this->Messages[] = sprintf(
-                                            /**translators:
-                                             * 1. Grade or rank of the festivity
-                                             * 2. Name of the festivity
-                                             * 3. Day of the festivity
-                                             * 4. Year from which the festivity has been added
-                                             * 5. Source of the information
-                                             * 6. Current year
-                                             */
-                                            _( 'The %1$s \'%2$s\' has been added on %3$s since the year %4$d (%5$s), applicable to the year %6$d.' ),
-                                            $this->LitGrade->i18n( $row->Festivity->GRADE, false ),
-                                            $row->Festivity->NAME,
-                                            $this->LitSettings->Locale === LitLocale::LATIN ? ( $row->Festivity->DATE->format( 'j' ) . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->Festivity->DATE->format( 'n' ) ] ) :
-                                                ( $this->LitSettings->Locale === LitLocale::ENGLISH ? $row->Festivity->DATE->format( 'F jS' ) :
-                                                    $this->dayAndMonth->format( $row->Festivity->DATE->format( 'U' ) )
-                                                ),
-                                            $row->Metadata->sinceYear,
-                                            $decree,
-                                            $this->LitSettings->Year
-                                        );
-                                    }
-                                    else{
-                                        $this->handleCoincidenceDecree( $row );
-                                    }
-                                }
-                            }
+                            $this->createFestivityFromDecree( $row );
                         break;
                         case "setProperty":
-                            $festivity = $this->Cal->getFestivity( $row->Festivity->TAG );
-                            if ( $festivity !== null ) {
-                                $lang = ( property_exists( $row->Metadata, 'decreeLangs' ) && property_exists( $row->Metadata->decreeLangs, $this->LitSettings->Locale ) ) ? 
-                                    $row->Metadata->decreeLangs->{$this->LitSettings->Locale} :
-                                    "en";
-                                $url = str_contains( $row->Metadata->decreeURL, '%s' ) ? sprintf($row->Metadata->decreeURL, $lang) : $row->Metadata->decreeURL;
-                                $decree = '<a href="' . $url . '">' . _( "Decree of the Congregation for Divine Worship" ) . '</a>';
-                                switch( $row->Metadata->property ) {
-                                    case "name":
-                                        //example: StMartha becomes Martha, Mary and Lazarus in 2021
-                                        $this->Cal->setProperty( $row->Festivity->TAG, "name", $row->Festivity->NAME );
-                                        /**translators:
-                                         * 1. Grade or rank of the festivity
-                                         * 2. Name of the festivity
-                                         * 3. New name of the festivity
-                                         * 4. Year from which the grade has been changed
-                                         * 5. Current year
-                                         * 6. Source of the information
-                                         */
-                                        $message = _( 'The name of the %1$s \'%2$s\' has been changed to %3$s since the year %4$d, applicable to the year %5$d (%6$s).' );
-                                        $this->Messages[] = sprintf(
-                                            $message,
-                                            $this->LitGrade->i18n( $festivity->grade, false ),
-                                            '<i>' . $festivity->name . '</i>',
-                                            '<i>' . $row->Festivity->NAME . '</i>',
-                                            $row->Metadata->sinceYear,
-                                            $this->LitSettings->Year,
-                                            $decree
-                                        );
-                                    break;
-                                    case "grade":
-                                        if( $row->Festivity->GRADE > $festivity->grade ) {
-                                            //example: StMaryMagdalene raised to Feast in 2016
-                                            /**translators:
-                                             * 1. Grade or rank of the festivity
-                                             * 2. Name of the festivity
-                                             * 3. New grade of the festivity
-                                             * 4. Year from which the grade has been changed
-                                             * 5. Current year
-                                             * 6. Source of the information
-                                             */
-                                            $message = _( 'The %1$s \'%2$s\' has been raised to the rank of %3$s since the year %4$d, applicable to the year %5$d (%6$s).' );
-                                        } else {
-                                            /**translators:
-                                             * 1. Grade or rank of the festivity
-                                             * 2. Name of the festivity
-                                             * 3. New grade of the festivity
-                                             * 4. Year from which the grade has been changed
-                                             * 5. Current year
-                                             * 6. Source of the information
-                                             */
-                                            $message = _( 'The %1$s \'%2$s\' has been lowered to the rank of %3$s since the year %4$d, applicable to the year %5$d (%6$s).' );
-                                        }
-                                        $this->Messages[] = sprintf(
-                                            $message,
-                                            $this->LitGrade->i18n( $festivity->grade, false ),
-                                            $festivity->name,
-                                            $this->LitGrade->i18n( $row->Festivity->GRADE, false ),
-                                            $row->Metadata->sinceYear,
-                                            $this->LitSettings->Year,
-                                            $decree
-                                        );
-                                        $this->Cal->setProperty( $row->Festivity->TAG, "grade", $row->Festivity->GRADE );
-                                    break;
-                                }
-                            }
+                            $this->setPropertyBasedOnDecree( $row );
                         break;
                     }
                 }
@@ -1221,39 +1261,7 @@ class LitCalAPI {
             }
         }
         else if( gettype($grade) === "string" && $grade === "DOCTORS" ) {
-            $DoctorsDecrees = array_filter(
-                $this->tempCal[ "MEMORIALS_FROM_DECREES" ],
-                function( $row ) {
-                    return $row->Metadata->action === "makeDoctor";
-                });
-            foreach( $DoctorsDecrees as $row ) {
-                if( $this->LitSettings->Year >= $row->Metadata->sinceYear ) {
-                    $festivity = $this->Cal->getFestivity( $row->Festivity->TAG );
-                    if( $festivity !== null ) {
-                        $lang = ( property_exists( $row->Metadata, 'decreeLangs' ) && property_exists( $row->Metadata->decreeLangs, $this->LitSettings->Locale ) ) ? 
-                            $row->Metadata->decreeLangs->{$this->LitSettings->Locale} :
-                            "en";
-                        $url = str_contains( $row->Metadata->decreeURL, '%s' ) ? sprintf($row->Metadata->decreeURL, $lang) : $row->Metadata->decreeURL;
-                        $decree = '<a href="' . $url . '">' . _( "Decree of the Congregation for Divine Worship" ) . '</a>';
-                        /**translators:
-                         * 1. Name of the festivity
-                         * 2. Year in which was declared Doctor
-                         * 3. Current year
-                         * 4. Source of the information
-                         */
-                        $message = _( '\'%1$s\' has been declared a Doctor of the Church since the year %2$d, applicable to the year %3$d (%4$s).' );
-                        $this->Messages[] = sprintf(
-                            $message,
-                            '<i>' . $festivity->name . '</i>',
-                            $row->Metadata->sinceYear,
-                            $this->LitSettings->Year,
-                            $decree
-                        );
-                        $etDoctor = $this->LitSettings->Locale === LitLocale::LATIN ? " et Ecclesiæ doctoris" : " " . _( "and Doctor of the Church" );
-                        $this->Cal->setProperty( $row->Festivity->TAG, "name", $festivity->name . $etDoctor );
-                    }
-                }
-            }
+            $this->createDoctorFromDecree( $row );
         }
     }
 
