@@ -180,6 +180,14 @@ Two object keys are returned:
 </a>
 
 # CHANGELOG
+## [v3.3](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.3) (January 27th 2022)
+ * move festivity data from the 2008 Editio Typica Tertia emendata out from the `LitCalAPI.php`, to a JSON file
+ * move data for festivities from Decrees of the Congregation of Divine Worship out from the `LitCalAPI.php`, to a JSON file
+## [v3.2](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.2) (January 23rd 2022)
+ * allow full CORS requests from enabled domains
+ * allow Diocesan overrides for Epiphany, Ascension and Corpus Christi
+## [v3.1](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.1) (December 26th 2021)
+ * bugfix which was missed in the v3.0 release: 86ee62ad68d58736880da2b5b39117dec7386dfc
 
 ## [v3.0](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.0) (December 26th 2021)
  * all calendar data moved from a MySQL database to JSON files, that can be tracked in the repository
