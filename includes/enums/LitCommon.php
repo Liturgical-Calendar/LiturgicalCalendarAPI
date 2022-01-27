@@ -1,6 +1,7 @@
 <?php
 
 include_once( "includes/pgettext.php" );
+include_once( "includes/enums/LitLocale.php" );
 
 class LitCommon {
 
@@ -51,7 +52,7 @@ class LitCommon {
     private array $GTXT;
 
     public function __construct( string $locale ) {
-        $this->locale = strtolower( $locale );
+        $this->locale = strtoupper( $locale );
         $this->GTXT = [
             self::PROPRIO                           => _( "Proper" ),
             /**translators: context = from the Common of nn */
@@ -123,8 +124,6 @@ class LitCommon {
             self::PRO_SANCTIS_MULIERIBUS                => _( "For Holy Women" )
         ];
     }
-
-
 
     const LATIN = [
         self::PROPRIO                               => "Proprio",
@@ -223,17 +222,75 @@ class LitCommon {
         "For Holy Women"
     ];
 
+    public static array $MARTYRUM = [
+        self::PRO_UNO_MARTYRE,
+        self::PRO_PLURIBUS_MARTYRIBUS,
+        self::PRO_MISSIONARIIS_MARTYRIBUS,
+        self::PRO_UNO_MISSIONARIO_MARTYRE,
+        self::PRO_PLURIBUS_MISSIONARIIS_MARTYRIBUS,
+        self::PRO_VIRGINE_MARTYRE,
+        self::PRO_SANCTA_MULIERE_MARTYRE
+    ];
+
+    public static array $PASTORUM = [
+        self::PRO_PAPA,
+        self::PRO_EPISCOPO,
+        self::PRO_UNO_PASTORE,
+        self::PRO_PLURIBUS_PASTORIBUS,
+        self::PRO_FUNDATORIBUS_ECCLESIARUM,
+        self::PRO_UNO_FUNDATORE,
+        self::PRO_PLURIBUS_FUNDATORIBUS,
+        self::PRO_MISSIONARIIS
+    ];
+
+    public static array $VIRGINUM = [
+        self::PRO_UNA_VIRGINE,
+        self::PRO_PLURIBUS_VIRGINIBUS
+    ];
+
+    public static array $SANCTORUM = [
+        self::PRO_PLURIBUS_SANCTIS,
+        self::PRO_UNO_SANCTO,
+        self::PRO_ABBATE,
+        self::PRO_MONACHO,
+        self::PRO_MONIALI,
+        self::PRO_RELIGIOSIS,
+        self::PRO_IIS_QUI_OPERA_MISERICORDIAE_EXERCUERUNT,
+        self::PRO_EDUCATORIBUS,
+        self::PRO_SANCTIS_MULIERIBUS
+    ];
+
     public static function isValid( string $value ) {
         return in_array( $value, self::$values );
     }
 
-    public static function areValid( array $values ){
+    public static function areValid( array $values ) {
         return empty( array_diff( $values, self::$values ) );
+    }
+
+    public static function AB( string|array $value ) : string {
+        if( is_array( $value ) ) {
+            $mapped = array_map('self::AB', $value);
+            return implode( ',', $mapped );
+        } else {
+            if( in_array($value, self::$MARTYRUM) ) {
+                return self::MARTYRUM . ':' . $value;
+            }
+            if( in_array($value, self::$PASTORUM) ) {
+                return self::PASTORUM . ':' . $value;
+            }
+            if( in_array($value, self::$VIRGINUM) ) {
+                return self::VIRGINUM . ':' . $value;
+            }
+            if( in_array($value, self::$SANCTORUM) ) {
+                return self::SANCTORUM_ET_SANCTARUM . ':' . $value;
+            }
+        }
     }
 
     public function i18n( string $value ) : string {
         if( self::isValid( $value ) ) {
-            if( $this->locale === "la" ) {
+            if( $this->locale === LitLocale::LATIN ) {
                 return self::LATIN[ $value ];
             } else{
                 return $this->GTXT[ $value ];
@@ -243,7 +300,7 @@ class LitCommon {
     }
 
     public function getPossessive( string $value ) : string {
-        return $this->locale === "la" ? "" : self::POSSESSIVE( $value );
+        return $this->locale === LitLocale::LATIN ? "" : self::POSSESSIVE( $value );
     }
 
     /**
@@ -263,7 +320,7 @@ class LitCommon {
                         $commonGeneral = $txt;
                         $commonSpecific = "";
                     }
-                    $fromTheCommon = $this->locale === 'la' ? "De Commune" : _( "From the Common" );
+                    $fromTheCommon = $this->locale === LitLocale::LATIN ? "De Commune" : _( "From the Common" );
                     return $fromTheCommon . " " . $this->getPossessive( $commonGeneral ) . " " . $this->i18n( $commonGeneral ) . ($commonSpecific != "" ? ": " . $this->i18n( $commonSpecific ) : "");
                 }, $commons);
                 /**translators: when there are multiple possible commons, this will be the glue "or from the common of..." */

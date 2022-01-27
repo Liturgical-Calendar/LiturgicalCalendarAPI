@@ -1,6 +1,5 @@
 [
     {
-        "RECURRENCE_ID": 0,
         "MONTH": 1,
         "DAY": 4,
         "TAG": "StElizabethSeton",
@@ -9,10 +8,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Proper",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 1,
         "MONTH": 1,
         "DAY": 5,
         "TAG": "StJohnNeumann",
@@ -21,10 +26,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Proper",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 2,
         "MONTH": 1,
         "DAY": 6,
         "TAG": "StAndreBessette",
@@ -33,10 +44,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Holy Men and Women:For Religious",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 3,
         "MONTH": 1,
         "DAY": 22,
         "TAG": "PrayerUnborn",
@@ -45,10 +62,16 @@
         "DISPLAYGRADE": "National Day of Prayer",
         "COMMON": "Masses and Prayers for Various Needs and Occasions:For Giving Thanks to God for the Gift of Human Life,Preservation of Peace and Justice",
         "CALENDAR": "",
-        "COLOR": "purple,white"
+        "COLOR": "purple,white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 4,
         "MONTH": 3,
         "DAY": 3,
         "TAG": "StKatharineDrexel",
@@ -57,10 +80,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Virgins:For One Virgin",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 5,
         "MONTH": 5,
         "DAY": 10,
         "TAG": "StDamienVeuster",
@@ -69,10 +98,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Pastors:For Missionaries",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 6,
         "MONTH": 5,
         "DAY": 15,
         "TAG": "StIsidore",
@@ -81,10 +116,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Holy Men and Women:For One Saint",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 7,
         "MONTH": 7,
         "DAY": 1,
         "TAG": "JuniperoSerra",
@@ -93,10 +134,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Pastors:For One Pastor,Pastors:For Missionaries",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 8,
         "MONTH": 7,
         "DAY": 4,
         "TAG": "IndependenceDay",
@@ -105,10 +152,16 @@
         "DISPLAYGRADE": "National Holiday",
         "COMMON": "",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 9,
         "MONTH": 7,
         "DAY": 14,
         "TAG": "KateriTekakwitha",
@@ -117,10 +170,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Virgins:For One Virgin",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 10,
         "MONTH": 9,
         "DAY": 9,
         "TAG": "StPeterClaver",
@@ -129,10 +188,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Pastors:For One Pastor,Holy Men and Women:For Those Who Practiced Works of Mercy",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 11,
         "MONTH": 10,
         "DAY": 6,
         "TAG": "MarieDurocher",
@@ -141,10 +206,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Virgins:For One Virgin",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 12,
         "MONTH": 11,
         "DAY": 13,
         "TAG": "StFrancesXCabrini",
@@ -153,10 +224,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Virgins:For One Virgin,Holy Men and Women:For Those Who Practiced Works of Mercy",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 13,
         "MONTH": 11,
         "DAY": 18,
         "TAG": "StRoseDuchesne",
@@ -165,10 +242,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Virgins:For One Virgin",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 14,
         "MONTH": 11,
         "DAY": 23,
         "TAG": "MiguelPro",
@@ -177,10 +260,16 @@
         "DISPLAYGRADE": "",
         "COMMON": "Martyrs:For One Martyr,Pastors:For One Pastor",
         "CALENDAR": "",
-        "COLOR": "white,red"
+        "COLOR": "white,red",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     },
     {
-        "RECURRENCE_ID": 15,
         "MONTH": 12,
         "DAY": 12,
         "TAG": "LadyGuadalupe",
@@ -189,6 +278,13 @@
         "DISPLAYGRADE": "",
         "COMMON": "Proper",
         "CALENDAR": "",
-        "COLOR": "white"
+        "COLOR": "white",
+        "READINGS": {
+            "FIRST_READING": "",
+            "RESPONSORIAL_PSALM": "",
+            "SECOND_READING": "",
+            "ALLELUIA_VERSE": "",
+            "GOSPEL": ""
+        }
     }
 ]
