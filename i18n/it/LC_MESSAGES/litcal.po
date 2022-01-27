@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 18:34+0000\n"
+"POT-Creation-Date: 2022-01-27 14:10+0000\n"
 "PO-Revision-Date: 2021-12-25 23:32+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -57,9 +57,9 @@ msgstr "sabato che precede la Domenica delle Palme"
 #: includes/LitCalAPI.php:898 includes/LitCalAPI.php:1017
 #: includes/LitCalAPI.php:1073 includes/LitCalAPI.php:1113
 #: includes/LitCalAPI.php:1152 includes/LitCalAPI.php:1237
-#: includes/LitCalAPI.php:1269 includes/LitCalAPI.php:1296
-#: includes/LitCalAPI.php:1405 includes/LitCalAPI.php:1417
-#: includes/LitCalAPI.php:1432 includes/LitCalAPI.php:1458
+#: includes/LitCalAPI.php:1267 includes/LitCalAPI.php:1294
+#: includes/LitCalAPI.php:1403 includes/LitCalAPI.php:1415
+#: includes/LitCalAPI.php:1430 includes/LitCalAPI.php:1456
 #: includes/FestivityCollection.php:386
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decreto della Congregazione per il Culto Divino"
@@ -140,11 +140,14 @@ msgstr "dopo il Mercoledì delle Ceneri"
 #.  6. Current year
 #.
 #: includes/LitCalAPI.php:853 includes/LitCalAPI.php:1127
-#: includes/LitCalAPI.php:1280
-#, php-format
+#: includes/LitCalAPI.php:1278
+#, fuzzy, php-format
+#| msgid ""
+#| "The %s '%s' has been added on %s since the year %d (%s), applicable to "
+#| "the year %d."
 msgid ""
-"The %s '%s' has been added on %s since the year %d (%s), applicable to the "
-"year %d."
+"The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
+"applicable to the year %6$d."
 msgstr ""
 "La %s <i>'%s'</i> è stata inserita il giorno <b>%s</b> a partire dall'anno "
 "%d (%s), applicabile pertanto all'anno %d."
@@ -161,11 +164,15 @@ msgstr ""
 #.  3. Current year
 #.
 #: includes/LitCalAPI.php:930
-#, php-format
+#, fuzzy, php-format
+#| msgid ""
+#| "The %s '%s' either falls between 17 Dec. and 24 Dec., or during the "
+#| "Octave of Christmas, or on the weekdays of the Lenten season in the year "
+#| "%d, rank reduced to Commemoration."
 msgid ""
-"The %s '%s' either falls between 17 Dec. and 24 Dec., or during the Octave "
-"of Christmas, or on the weekdays of the Lenten season in the year %d, rank "
-"reduced to Commemoration."
+"The %1$s '%2$s' either falls between 17 Dec. and 24 Dec., or during the "
+"Octave of Christmas, or on the weekdays of the Lenten season in the year "
+"%3$d, rank reduced to Commemoration."
 msgstr ""
 "La %s <i>'%s'</i> cade o tra il 17 Dic. e il 24 Dic., o durante l'Ottava di "
 "Natale, o tra le ferie della Quaresima nell'anno %d, pertanto il grado è "
@@ -181,7 +188,7 @@ msgstr ""
 #: includes/LitCalAPI.php:952
 #, fuzzy, php-format
 #| msgid "'%s' is superseded by the %s '%s' in the year %d."
-msgid "The %s '%s' is superseded by the %s '%s' in the year %d."
+msgid "The %1$s '%2$s' is superseded by the %3$s '%4$s' in the year %5$d."
 msgstr "<i>'%s'</i> è soppiantata dalla %s <i>'%s'</i> nell'anno %d."
 
 #: includes/LitCalAPI.php:972
@@ -195,15 +202,19 @@ msgstr ""
 #.  4. Year in which the Edition of the Roman Missal was published
 #.  5. Any possible decrees or sources about the edition of the Roman Missal
 #.  6. Date in which the superseded festivity is usually celebrated
-#.  3. Grade or rank of the festivity that is superseding
-#.  4. Name of the festivity that is superseding
-#.  5. Current year
+#.  7. Grade or rank of the festivity that is superseding
+#.  8. Name of the festivity that is superseding
+#.  9. Current year
 #.
 #: includes/LitCalAPI.php:994
-#, php-format
+#, fuzzy, php-format
+#| msgid ""
+#| "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) "
+#| "and usually celebrated on %s, is suppressed by the %s '%s' in the year %d."
 msgid ""
-"The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and "
-"usually celebrated on %s, is suppressed by the %s '%s' in the year %d."
+"The %1$s '%2$s', added in the %3$s of the Roman Missal since the year %4$d "
+"(%5$s) and usually celebrated on %6$s, is suppressed by the %7$s '%8$s' in "
+"the year %9$d."
 msgstr ""
 "La %s <i>'%s'</i>, aggiunta nella %s del Messale Romano dall'anno %d (%s) e "
 "celebrata solitamente il giorno %s, è soppressa dalla %s <i>'%s'</i> "
@@ -225,8 +236,8 @@ msgstr ""
 #| "The %s '%s', added on %s since the year %d (%s), is however superseded by "
 #| "a Sunday, a Solemnity or a Feast '%s' in the year %d."
 msgid ""
-"The %s '%s', added on %s since the year %d (%s), is however superseded by a "
-"%s '%s' in the year %d."
+"The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
+"superseded by a %6$s '%7$s' in the year %8$d."
 msgstr ""
 "La %s '%s', aggiunta nel giorno %s sin dal %d (%s), è tuttavia superata da "
 "una Domenica, una Solennità o una Festa '%s' nell'anno %d."
@@ -238,10 +249,13 @@ msgstr ""
 #.  4. Source of the information
 #.
 #: includes/LitCalAPI.php:1069
-#, php-format
+#, fuzzy, php-format
+#| msgid ""
+#| "The Memorial '%s' coincides with another Memorial '%s' in the year %d. "
+#| "They are both reduced in rank to optional memorials (%s)."
 msgid ""
-"The Memorial '%s' coincides with another Memorial '%s' in the year %d. They "
-"are both reduced in rank to optional memorials (%s)."
+"The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
+"They are both reduced in rank to optional memorials (%4$s)."
 msgstr ""
 "La Memoria '%s' coincide con un'altra Memoria '%s' nell'anno %d. Tutte e due "
 "sono ridotte al grado di memorie opzionali (%s)."
@@ -264,8 +278,8 @@ msgstr "il lunedì dopo la Pentecoste"
 #| "The %s '%s' has been raised to the rank of %s since the year %d, "
 #| "applicable to the year %d (%s)."
 msgid ""
-"The name of the %s '%s' has been changed to %s since the year %d, applicable "
-"to the year %d (%s)."
+"The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
+"applicable to the year %5$d (%6$s)."
 msgstr ""
 "La %s '%s' è stata promossa al grado di %s sin dal %d, applicabile pertanto "
 "all'anno %d (%s)."
@@ -279,10 +293,13 @@ msgstr ""
 #.  6. Source of the information
 #.
 #: includes/LitCalAPI.php:1187
-#, php-format
+#, fuzzy, php-format
+#| msgid ""
+#| "The %s '%s' has been raised to the rank of %s since the year %d, "
+#| "applicable to the year %d (%s)."
 msgid ""
-"The %s '%s' has been raised to the rank of %s since the year %d, applicable "
-"to the year %d (%s)."
+"The %1$s '%2$s' has been raised to the rank of %3$s since the year %4$d, "
+"applicable to the year %5$d (%6$s)."
 msgstr ""
 "La %s '%s' è stata promossa al grado di %s sin dal %d, applicabile pertanto "
 "all'anno %d (%s)."
@@ -301,33 +318,31 @@ msgstr ""
 #| "The %s '%s' has been raised to the rank of %s since the year %d, "
 #| "applicable to the year %d (%s)."
 msgid ""
-"The %s '%s' has been lowered to the rank of %s since the year %d, applicable "
-"to the year %d (%s)."
+"The %1$s '%2$s' has been lowered to the rank of %3$s since the year %4$d, "
+"applicable to the year %5$d (%6$s)."
 msgstr ""
 "La %s '%s' è stata promossa al grado di %s sin dal %d, applicabile pertanto "
 "all'anno %d (%s)."
 
 #. translators:
-#.  1. Grade or rank of the festivity
-#.  2. Name of the festivity
-#.  3. New name of the festivity
-#.  4. Year from which the grade has been changed
-#.  5. Current year
-#.  6. Source of the information
+#.  1. Name of the festivity
+#.  2. Year in which was declared Doctor
+#.  3. Current year
+#.  4. Source of the information
 #.
-#: includes/LitCalAPI.php:1246
+#: includes/LitCalAPI.php:1244
 #, fuzzy, php-format
 #| msgid ""
 #| "The %s '%s' has been raised to the rank of %s since the year %d, "
 #| "applicable to the year %d (%s)."
 msgid ""
-"'%s' has been declared a Doctor of the Church since the year %d, applicable "
-"to the year %d (%s)."
+"'%1$s' has been declared a Doctor of the Church since the year %2$d, "
+"applicable to the year %3$d (%4$s)."
 msgstr ""
 "La %s '%s' è stata promossa al grado di %s sin dal %d, applicabile pertanto "
 "all'anno %d (%s)."
 
-#: includes/LitCalAPI.php:1254
+#: includes/LitCalAPI.php:1252
 #, fuzzy
 #| msgid "Dedication of a Church"
 msgid "and Doctor of the Church"
@@ -343,14 +358,14 @@ msgstr "Dedicazione di una Chiesa"
 #.  7. Name of superseding festivity
 #.  8. Current year
 #.
-#: includes/LitCalAPI.php:1317
+#: includes/LitCalAPI.php:1315
 #, fuzzy, php-format
 #| msgid ""
 #| "The %s '%s', added on %s since the year %d (%s), is however superseded by "
 #| "a Sunday, a Solemnity or a Feast '%s' in the year %d."
 msgid ""
-"The %s '%s', added on %s since the year %d (%s), is however superseded by "
-"the %s '%s' in the year %d."
+"The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
+"superseded by the %6$s '%7$s' in the year %8$d."
 msgstr ""
 "La %s '%s', aggiunta nel giorno %s sin dal %d (%s), è tuttavia superata da "
 "una Domenica, una Solennità o una Festa '%s' nell'anno %d."
@@ -365,19 +380,19 @@ msgstr ""
 #.  7. Year from which the festivity has been added
 #.  8. Source of the information
 #.
-#: includes/LitCalAPI.php:1345
+#: includes/LitCalAPI.php:1343
 #, fuzzy, php-format
 #| msgid ""
 #| "The %s '%s' has been suppressed by the Memorial '%s', added on %s since "
 #| "the year %d (%s)."
 msgid ""
-"In the year %d, the %s '%s' has been suppressed by the %s '%s', added on %s "
-"since the year %d (%s)."
+"In the year %1$d, the %2$s '%3$s' has been suppressed by the %4$s '%5$s', "
+"added on %6$s since the year %7$d (%8$s)."
 msgstr ""
 "La %s '%s' è stata soppressa dalla Memoria '%s', aggiunta il %s sin dal %d "
 "(%s)."
 
-#: includes/LitCalAPI.php:1403
+#: includes/LitCalAPI.php:1401
 #, php-format
 msgid ""
 "The optional memorial '%s' has been transferred from Dec. 12 to Aug. 12 "
@@ -386,7 +401,7 @@ msgstr ""
 "La memoria facoltativa '%s' è stata trasferita dal 12 Dic. al 12 Agosto sin "
 "dal 2002 (%s), applicabile pertanto all'anno %d."
 
-#: includes/LitCalAPI.php:1415
+#: includes/LitCalAPI.php:1413
 #, php-format
 msgid ""
 "The optional memorial '%s', which would have been superseded this year by a "
@@ -397,7 +412,7 @@ msgstr ""
 "Domenica o da una Solennità se veniva celebrata il 12 Dic., è stata tuttavia "
 "trasferita al 12 Agosto sin dal 2002 (%s), applicabile pertanto all'anno %d."
 
-#: includes/LitCalAPI.php:1430
+#: includes/LitCalAPI.php:1428
 #, php-format
 msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
@@ -408,7 +423,7 @@ msgstr ""
 "sin dal 2002 (%2$s), applicabile pertanto all'anno %3$d. Tuttavia, è "
 "soppressa da una Domenica, una Solennità o una Festa '%4$s' nell'anno %3$d."
 
-#: includes/LitCalAPI.php:1456
+#: includes/LitCalAPI.php:1454
 #, php-format
 msgid ""
 "The Feast '%s' would have been suppressed this year ( 2009 ) since it falls "
@@ -421,52 +436,63 @@ msgstr ""
 "restituita secondo il %s in modo che le chiese locali abbiano facoltà di "
 "mantenere la memoria."
 
-#: includes/LitCalAPI.php:1480
+#: includes/LitCalAPI.php:1478
 #, php-format
 msgid "of the %s Week of Easter"
 msgstr "della %s Settimana di Pasqua"
 
-#: includes/LitCalAPI.php:1516 includes/LitCalAPI.php:1545
+#: includes/LitCalAPI.php:1514 includes/LitCalAPI.php:1543
 #, php-format
 msgid "of the %s Week of Ordinary Time"
 msgstr "della %s Settimana del Tempo Ordinario"
 
-#: includes/LitCalAPI.php:1568
+#: includes/LitCalAPI.php:1566
 msgid "Saturday Memorial of the Blessed Virgin Mary"
 msgstr "Memoria di Santa Maria in sabato"
 
-#: includes/LitCalAPI.php:1621
-#, php-format
+#. translators:
+#.  1. Grade of the festivity
+#.  2. Name of the festivity
+#.  3. Date on which the festivity is usually celebrated
+#.  4. Grade of the superseding festivity
+#.  5. Name of the superseding festivity
+#.  6. Current year
+#.
+#: includes/LitCalAPI.php:1625
+#, fuzzy, php-format
+#| msgid ""
+#| "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in "
+#| "the year %d."
 msgid ""
-"The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the "
-"year %d."
+"The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
+"'%5$s' in the year %6$d."
 msgstr ""
 "La %s '%s', celebrata solitamente il %s, è soppressa dalla %s '%s' nell'anno "
 "%d."
 
-#: includes/LitCalAPI.php:1640
+#: includes/LitCalAPI.php:1643
 msgctxt "Male singular"
 msgid "patron of Europe"
 msgstr "patrono d'Europa"
 
-#: includes/LitCalAPI.php:1641 includes/LitCalAPI.php:1649
-#: includes/LitCalAPI.php:1653 includes/LitCalAPI.php:1672
+#: includes/LitCalAPI.php:1644 includes/LitCalAPI.php:1652
+#: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:1675
 msgctxt "Female singular"
 msgid "patron of Europe"
 msgstr "patrona d'Europa"
 
-#: includes/LitCalAPI.php:1642
+#: includes/LitCalAPI.php:1645
 msgctxt "Male plural"
 msgid "patrons of Europe"
 msgstr "patroni d'Europa"
 
-#: includes/LitCalAPI.php:1660
+#: includes/LitCalAPI.php:1663
 msgid "Saint Teresa Benedicta of the Cross, Virgin and Martyr"
 msgstr "Santa Teresa Benedetta della Croce (Edith Stein), vergine e martire"
 
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
 #: includes/LitMessages.php:142 includes/LitMessages.php:153
-#: includes/enums/LitCommon.php:271
+#: includes/enums/LitCommon.php:327
 msgid "or"
 msgstr "oppure"
 
@@ -720,30 +746,30 @@ msgid "For Holy Women"
 msgstr "Per le sante"
 
 #. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/enums/LitCommon.php:171 includes/enums/LitCommon.php:183
+#: includes/enums/LitCommon.php:169 includes/enums/LitCommon.php:181
 msgctxt "(SING_FEMM)"
 msgid "of"
 msgstr "della"
 
 #. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/enums/LitCommon.php:174
+#: includes/enums/LitCommon.php:172
 msgctxt "(PLUR_FEMM)"
 msgid "of"
 msgstr "delle"
 
 #. translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/enums/LitCommon.php:180
+#: includes/enums/LitCommon.php:178
 msgctxt "(PLUR_MASC)"
 msgid "of"
 msgstr "dei"
 
 #. translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/enums/LitCommon.php:186
+#: includes/enums/LitCommon.php:184
 msgctxt "(SING_MASC)"
 msgid "of"
 msgstr "del"
 
-#: includes/enums/LitCommon.php:267
+#: includes/enums/LitCommon.php:323
 msgid "From the Common"
 msgstr "Dal Comune"
 
