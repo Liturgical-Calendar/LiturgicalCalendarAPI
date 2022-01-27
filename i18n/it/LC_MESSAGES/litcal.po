@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2022-01-27 14:10+0000\n"
-"PO-Revision-Date: 2021-12-25 23:32+0000\n"
+"PO-Revision-Date: 2022-01-27 14:23+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.9.1\n"
+"X-Generator: Weblate 4.10.1\n"
 
 #: includes/LitCalAPI.php:222
 #, php-format
@@ -141,22 +141,21 @@ msgstr "dopo il Mercoledì delle Ceneri"
 #.
 #: includes/LitCalAPI.php:853 includes/LitCalAPI.php:1127
 #: includes/LitCalAPI.php:1278
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s' has been added on %s since the year %d (%s), applicable to "
-#| "the year %d."
+#, php-format
 msgid ""
 "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
 "applicable to the year %6$d."
 msgstr ""
-"La %s <i>'%s'</i> è stata inserita il giorno <b>%s</b> a partire dall'anno "
-"%d (%s), applicabile pertanto all'anno %d."
+"La %1$s '%2$s' è stata inserita il giorno %3$s a partire dall'anno %4$d "
+"(%5$s), applicabile pertanto all'anno %6$d."
 
 #: includes/LitCalAPI.php:884 includes/LitCalAPI.php:976
 msgid ""
 "Vatican Press conference: Presentation of the Editio Typica Tertia of the "
 "Roman Missal"
 msgstr ""
+"Conferenza Stampa Vaticana: Presentazione della Editio Typica Tertia del "
+"Messale Romano"
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -164,18 +163,14 @@ msgstr ""
 #.  3. Current year
 #.
 #: includes/LitCalAPI.php:930
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s' either falls between 17 Dec. and 24 Dec., or during the "
-#| "Octave of Christmas, or on the weekdays of the Lenten season in the year "
-#| "%d, rank reduced to Commemoration."
+#, php-format
 msgid ""
 "The %1$s '%2$s' either falls between 17 Dec. and 24 Dec., or during the "
 "Octave of Christmas, or on the weekdays of the Lenten season in the year "
 "%3$d, rank reduced to Commemoration."
 msgstr ""
-"La %s <i>'%s'</i> cade o tra il 17 Dic. e il 24 Dic., o durante l'Ottava di "
-"Natale, o tra le ferie della Quaresima nell'anno %d, pertanto il grado è "
+"La %1$s '%2$s' cade o tra il 17 Dic. e il 24 Dic., o durante l'Ottava di "
+"Natale, o tra le ferie della Quaresima nell'anno %3$d, pertanto il grado è "
 "stato ridotto a Commemorazione."
 
 #. translators:
@@ -186,14 +181,13 @@ msgstr ""
 #.  5. Current year
 #.
 #: includes/LitCalAPI.php:952
-#, fuzzy, php-format
-#| msgid "'%s' is superseded by the %s '%s' in the year %d."
+#, php-format
 msgid "The %1$s '%2$s' is superseded by the %3$s '%4$s' in the year %5$d."
-msgstr "<i>'%s'</i> è soppiantata dalla %s <i>'%s'</i> nell'anno %d."
+msgstr "La %1$s '%2$s' è soppiantata dalla %3$s '%4$s' nell'anno %5$d."
 
 #: includes/LitCalAPI.php:972
 msgid "Apostolic Constitution Missale Romanum"
-msgstr ""
+msgstr "Costituzione Apostolica Missale Romanum"
 
 #. translators:
 #.  1. Grade or rank of the festivity that has been superseded
@@ -207,18 +201,15 @@ msgstr ""
 #.  9. Current year
 #.
 #: includes/LitCalAPI.php:994
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) "
-#| "and usually celebrated on %s, is suppressed by the %s '%s' in the year %d."
+#, php-format
 msgid ""
 "The %1$s '%2$s', added in the %3$s of the Roman Missal since the year %4$d "
 "(%5$s) and usually celebrated on %6$s, is suppressed by the %7$s '%8$s' in "
 "the year %9$d."
 msgstr ""
-"La %s <i>'%s'</i>, aggiunta nella %s del Messale Romano dall'anno %d (%s) e "
-"celebrata solitamente il giorno %s, è soppressa dalla %s <i>'%s'</i> "
-"nell'anno %d."
+"La %1$s '%2$s', aggiunta nella %3$s del Messale Romano dall'anno %4$d (%5$s) "
+"e celebrata solitamente il giorno %6$s, è soppressa dalla %7$s '%8$s' "
+"nell'anno %9$d."
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -231,16 +222,13 @@ msgstr ""
 #.  8. Current year
 #.
 #: includes/LitCalAPI.php:1030
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s', added on %s since the year %d (%s), is however superseded by "
-#| "a Sunday, a Solemnity or a Feast '%s' in the year %d."
+#, php-format
 msgid ""
 "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
 "superseded by a %6$s '%7$s' in the year %8$d."
 msgstr ""
-"La %s '%s', aggiunta nel giorno %s sin dal %d (%s), è tuttavia superata da "
-"una Domenica, una Solennità o una Festa '%s' nell'anno %d."
+"La %1$s '%2$s', aggiunta nel giorno %3$s sin dal %4$d (%5$s), è tuttavia "
+"superata da una %6$s '%7$s' nell'anno %8$d."
 
 #. translators:
 #.  1. Name of the first coinciding Memorial
@@ -249,16 +237,13 @@ msgstr ""
 #.  4. Source of the information
 #.
 #: includes/LitCalAPI.php:1069
-#, fuzzy, php-format
-#| msgid ""
-#| "The Memorial '%s' coincides with another Memorial '%s' in the year %d. "
-#| "They are both reduced in rank to optional memorials (%s)."
+#, php-format
 msgid ""
 "The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
 "They are both reduced in rank to optional memorials (%4$s)."
 msgstr ""
-"La Memoria '%s' coincide con un'altra Memoria '%s' nell'anno %d. Tutte e due "
-"sono ridotte al grado di memorie opzionali (%s)."
+"La Memoria '%1$s' coincide con un'altra Memoria '%2$s' nell'anno %3$d. Tutte "
+"e due sono ridotte al grado di memorie facoltative (%4$s)."
 
 #: includes/LitCalAPI.php:1102
 msgid "the Monday after Pentecost"
@@ -273,16 +258,13 @@ msgstr "il lunedì dopo la Pentecoste"
 #.  6. Source of the information
 #.
 #: includes/LitCalAPI.php:1165
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s' has been raised to the rank of %s since the year %d, "
-#| "applicable to the year %d (%s)."
+#, php-format
 msgid ""
 "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
 "applicable to the year %5$d (%6$s)."
 msgstr ""
-"La %s '%s' è stata promossa al grado di %s sin dal %d, applicabile pertanto "
-"all'anno %d (%s)."
+"Il nome della %1$s '%2$s' è stata cambiata in %3$s sin dal %4$d, applicabile "
+"pertanto all'anno %5$d (%6$s)."
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -293,16 +275,13 @@ msgstr ""
 #.  6. Source of the information
 #.
 #: includes/LitCalAPI.php:1187
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s' has been raised to the rank of %s since the year %d, "
-#| "applicable to the year %d (%s)."
+#, php-format
 msgid ""
 "The %1$s '%2$s' has been raised to the rank of %3$s since the year %4$d, "
 "applicable to the year %5$d (%6$s)."
 msgstr ""
-"La %s '%s' è stata promossa al grado di %s sin dal %d, applicabile pertanto "
-"all'anno %d (%s)."
+"La %1$s '%2$s' è stata promossa al grado di %3$s sin dal %4$d, applicabile "
+"pertanto all'anno %5$d (%6$s)."
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -313,16 +292,13 @@ msgstr ""
 #.  6. Source of the information
 #.
 #: includes/LitCalAPI.php:1197
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s' has been raised to the rank of %s since the year %d, "
-#| "applicable to the year %d (%s)."
+#, php-format
 msgid ""
 "The %1$s '%2$s' has been lowered to the rank of %3$s since the year %4$d, "
 "applicable to the year %5$d (%6$s)."
 msgstr ""
-"La %s '%s' è stata promossa al grado di %s sin dal %d, applicabile pertanto "
-"all'anno %d (%s)."
+"La %1$s '%2$s' è stata ridotta al grado di %3$s sin dal %4$d, applicabile "
+"pertanto all'anno %5$d (%6$s)."
 
 #. translators:
 #.  1. Name of the festivity
@@ -331,22 +307,17 @@ msgstr ""
 #.  4. Source of the information
 #.
 #: includes/LitCalAPI.php:1244
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s' has been raised to the rank of %s since the year %d, "
-#| "applicable to the year %d (%s)."
+#, php-format
 msgid ""
 "'%1$s' has been declared a Doctor of the Church since the year %2$d, "
 "applicable to the year %3$d (%4$s)."
 msgstr ""
-"La %s '%s' è stata promossa al grado di %s sin dal %d, applicabile pertanto "
-"all'anno %d (%s)."
+"'%1$s' è stato dichiarato Dottore della Chiesa sin dal %2$d, applicabile "
+"pertanto all'anno %3$d (%4$s)."
 
 #: includes/LitCalAPI.php:1252
-#, fuzzy
-#| msgid "Dedication of a Church"
 msgid "and Doctor of the Church"
-msgstr "Dedicazione di una Chiesa"
+msgstr "e Dottore della Chiesa"
 
 #. translators:
 #.  1. Grade or rank of the festivity being created
@@ -359,16 +330,13 @@ msgstr "Dedicazione di una Chiesa"
 #.  8. Current year
 #.
 #: includes/LitCalAPI.php:1315
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s', added on %s since the year %d (%s), is however superseded by "
-#| "a Sunday, a Solemnity or a Feast '%s' in the year %d."
+#, php-format
 msgid ""
 "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
 "superseded by the %6$s '%7$s' in the year %8$d."
 msgstr ""
-"La %s '%s', aggiunta nel giorno %s sin dal %d (%s), è tuttavia superata da "
-"una Domenica, una Solennità o una Festa '%s' nell'anno %d."
+"La %1$s '%2$s', aggiunta nel giorno %3$s sin dal %4$d (%5$s), è tuttavia "
+"superata dalla %6$s '%7$s' nell'anno %8$d."
 
 #. translators:
 #.  1. Current year
@@ -381,16 +349,13 @@ msgstr ""
 #.  8. Source of the information
 #.
 #: includes/LitCalAPI.php:1343
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s' has been suppressed by the Memorial '%s', added on %s since "
-#| "the year %d (%s)."
+#, php-format
 msgid ""
 "In the year %1$d, the %2$s '%3$s' has been suppressed by the %4$s '%5$s', "
 "added on %6$s since the year %7$d (%8$s)."
 msgstr ""
-"La %s '%s' è stata soppressa dalla Memoria '%s', aggiunta il %s sin dal %d "
-"(%s)."
+"Nell'anno %1$d, la %2$s '%3$s' è stata soppressa dalla %4$s '%5$s', aggiunta "
+"il giorno %6$s sin dal %7$d (%8$s)."
 
 #: includes/LitCalAPI.php:1401
 #, php-format
@@ -459,16 +424,13 @@ msgstr "Memoria di Santa Maria in sabato"
 #.  6. Current year
 #.
 #: includes/LitCalAPI.php:1625
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in "
-#| "the year %d."
+#, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
 "'%5$s' in the year %6$d."
 msgstr ""
-"La %s '%s', celebrata solitamente il %s, è soppressa dalla %s '%s' nell'anno "
-"%d."
+"La %1$s '%2$s', celebrata solitamente il giorno %3$s, è soppressa dalla %4$s "
+"'%5$s' nell'anno %6$d."
 
 #: includes/LitCalAPI.php:1643
 msgctxt "Male singular"
