@@ -850,7 +850,7 @@ class LitCalAPI {
          * 5. Source of the information
          * 6. Current year
          */
-        $message = _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." );
+        $message = _( 'The %1$s \'%2$s\' has been added on %3$s since the year %4$d (%5$s), applicable to the year %6$d.' );
         $this->Messages[] = sprintf(
             $message,
             $this->LitGrade->i18n( $row->GRADE, false ),
@@ -927,7 +927,7 @@ class LitCalAPI {
              * 2. Name of the festivity
              * 3. Current year
              */
-            $message = _( "The %s '%s' either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %d, rank reduced to Commemoration." );
+            $message = _( 'The %1$s \'%2$s\' either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %3$d, rank reduced to Commemoration.' );
             $this->Messages[] = sprintf(
                 $message,
                 $this->LitGrade->i18n( $row->GRADE, false ),
@@ -949,7 +949,7 @@ class LitCalAPI {
                  * 4. Name of the festivity that is superseding
                  * 5. Current year
                  */
-                $message = _( "The %s '%s' is superseded by the %s '%s' in the year %d." );
+                $message = _( 'The %1$s \'%2$s\' is superseded by the %3$s \'%4$s\' in the year %5$d.' );
                 $this->Messages[] = sprintf(
                     $message,
                     $this->LitGrade->i18n( $this->Cal->getFestivity( $key )->grade ),
@@ -987,11 +987,11 @@ class LitCalAPI {
          * 4. Year in which the Edition of the Roman Missal was published
          * 5. Any possible decrees or sources about the edition of the Roman Missal
          * 6. Date in which the superseded festivity is usually celebrated
-         * 3. Grade or rank of the festivity that is superseding
-         * 4. Name of the festivity that is superseding
-         * 5. Current year
+         * 7. Grade or rank of the festivity that is superseding
+         * 8. Name of the festivity that is superseding
+         * 9. Current year
          */
-        $message = _( "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) and usually celebrated on %s, is suppressed by the %s '%s' in the year %d." );
+        $message = _( 'The %1$s \'%2$s\', added in the %3$s of the Roman Missal since the year %4$d (%5$s) and usually celebrated on %6$s, is suppressed by the %7$s \'%8$s\' in the year %9$d.' );
         $this->Messages[] = sprintf(
             $message,
             $this->LitGrade->i18n( $row->GRADE, false ),
@@ -1027,7 +1027,7 @@ class LitCalAPI {
              * 7. Name of the superseding festivity
              * 8. Current year
              */
-            _( "The %s '%s', added on %s since the year %d (%s), is however superseded by a %s '%s' in the year %d." ),
+            _( 'The %1$s \'%2$s\', added on %3$s since the year %4$d (%5$s), is however superseded by a %6$s \'%7$s\' in the year %8$d.' ),
             $this->LitGrade->i18n( $row->Festivity->GRADE ),
             $row->Festivity->NAME,
             $this->LitSettings->Locale === LitLocale::LATIN ? ( $row->Festivity->DATE->format( 'j' ) . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->Festivity->DATE->format( 'n' ) ] ) :
@@ -1066,7 +1066,7 @@ class LitCalAPI {
                          * 3. Current year
                          * 4. Source of the information
                          */
-                        _( "The Memorial '%s' coincides with another Memorial '%s' in the year %d. They are both reduced in rank to optional memorials (%s)." ),
+                        _( 'The Memorial \'%1$s\' coincides with another Memorial \'%2$s\' in the year %3$d. They are both reduced in rank to optional memorials (%4$s).' ),
                         $ImmaculateHeart->name,
                         $festivity->name,
                         $this->LitSettings->Year,
@@ -1124,7 +1124,7 @@ class LitCalAPI {
                                              * 5. Source of the information
                                              * 6. Current year
                                              */
-                                            _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." ),
+                                            _( 'The %1$s \'%2$s\' has been added on %3$s since the year %4$d (%5$s), applicable to the year %6$d.' ),
                                             $this->LitGrade->i18n( $row->Festivity->GRADE, false ),
                                             $row->Festivity->NAME,
                                             $this->LitSettings->Locale === LitLocale::LATIN ? ( $row->Festivity->DATE->format( 'j' ) . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->Festivity->DATE->format( 'n' ) ] ) :
@@ -1162,7 +1162,7 @@ class LitCalAPI {
                                          * 5. Current year
                                          * 6. Source of the information
                                          */
-                                        $message = _( "The name of the %s '%s' has been changed to %s since the year %d, applicable to the year %d (%s)." );
+                                        $message = _( 'The name of the %1$s \'%2$s\' has been changed to %3$s since the year %4$d, applicable to the year %5$d (%6$s).' );
                                         $this->Messages[] = sprintf(
                                             $message,
                                             $this->LitGrade->i18n( $festivity->grade, false ),
@@ -1184,7 +1184,7 @@ class LitCalAPI {
                                              * 5. Current year
                                              * 6. Source of the information
                                              */
-                                            $message = _( "The %s '%s' has been raised to the rank of %s since the year %d, applicable to the year %d (%s)." );
+                                            $message = _( 'The %1$s \'%2$s\' has been raised to the rank of %3$s since the year %4$d, applicable to the year %5$d (%6$s).' );
                                         } else {
                                             /**translators:
                                              * 1. Grade or rank of the festivity
@@ -1194,7 +1194,7 @@ class LitCalAPI {
                                              * 5. Current year
                                              * 6. Source of the information
                                              */
-                                            $message = _( "The %s '%s' has been lowered to the rank of %s since the year %d, applicable to the year %d (%s)." );
+                                            $message = _( 'The %1$s \'%2$s\' has been lowered to the rank of %3$s since the year %4$d, applicable to the year %5$d (%6$s).' );
                                         }
                                         $this->Messages[] = sprintf(
                                             $message,
@@ -1236,14 +1236,12 @@ class LitCalAPI {
                         $url = str_contains( $row->Metadata->decreeURL, '%s' ) ? sprintf($row->Metadata->decreeURL, $lang) : $row->Metadata->decreeURL;
                         $decree = '<a href="' . $url . '">' . _( "Decree of the Congregation for Divine Worship" ) . '</a>';
                         /**translators:
-                         * 1. Grade or rank of the festivity
-                         * 2. Name of the festivity
-                         * 3. New name of the festivity
-                         * 4. Year from which the grade has been changed
-                         * 5. Current year
-                         * 6. Source of the information
+                         * 1. Name of the festivity
+                         * 2. Year in which was declared Doctor
+                         * 3. Current year
+                         * 4. Source of the information
                          */
-                        $message = _( "'%s' has been declared a Doctor of the Church since the year %d, applicable to the year %d (%s)." );
+                        $message = _( '\'%1$s\' has been declared a Doctor of the Church since the year %2$d, applicable to the year %3$d (%4$s).' );
                         $this->Messages[] = sprintf(
                             $message,
                             '<i>' . $festivity->name . '</i>',
@@ -1277,7 +1275,7 @@ class LitCalAPI {
              * 5. Source of the information
              * 6. Current year
              */
-            _( "The %s '%s' has been added on %s since the year %d (%s), applicable to the year %d." ),
+            _( 'The %1$s \'%2$s\' has been added on %3$s since the year %4$d (%5$s), applicable to the year %6$d.' ),
             $this->LitGrade->i18n( $row->Festivity->GRADE, false ),
             $row->Festivity->NAME,
             $row->Metadata->addedWhen,
@@ -1314,7 +1312,7 @@ class LitCalAPI {
                      * 7. Name of superseding festivity
                      * 8. Current year
                      */
-                    _( "The %s '%s', added on %s since the year %d (%s), is however superseded by the %s '%s' in the year %d." ),
+                    _( 'The %1$s \'%2$s\', added on %3$s since the year %4$d (%5$s), is however superseded by the %6$s \'%7$s\' in the year %8$d.' ),
                     $this->LitGrade->i18n( $row->Festivity->GRADE, false ),
                     '<i>' . $row->Festivity->NAME . '</i>',
                     $row->Metadata->addedWhen,
@@ -1342,7 +1340,7 @@ class LitCalAPI {
                                  * 7. Year from which the festivity has been added
                                  * 8. Source of the information
                                  */
-                                _( "In the year %d, the %s '%s' has been suppressed by the %s '%s', added on %s since the year %d (%s)." ),
+                                _( 'In the year %1$d, the %2$s \'%3$s\' has been suppressed by the %4$s \'%5$s\', added on %6$s since the year %7$d (%8$s).' ),
                                 $this->LitGrade->i18n( $coincidingFestivity->grade, false ),
                                 '<i>' . $coincidingFestivity->name . '</i>',
                                 $this->LitGrade->i18n( $row->Festivity->GRADE, false ),
@@ -1448,7 +1446,7 @@ class LitCalAPI {
         $festivity = $this->Cal->getFestivity( "ConversionStPaul" );
         if( $festivity === null ) {
             $row = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ "ConversionStPaul" ];
-            $festivity = new Festivity( $row->NAME, DateTime::createFromFormat( '!j-n-Y', '25-1-2009', new DateTimeZone( 'UTC' ) ), LitColor::WHITE, LitFeastType::FIXED, LitGrade::MEMORIAL_OPT, "Proper" );
+            $festivity = new Festivity( $row->NAME, DateTime::createFromFormat( '!j-n-Y', '25-1-2009', new DateTimeZone( 'UTC' ) ), LitColor::WHITE, LitFeastType::FIXED, LitGrade::MEMORIAL_OPT, LitCommon::PROPRIO );
             $this->Cal->addFestivity( "ConversionStPaul", $festivity );
             $langs = ["FR" => "fr", "EN" => "en", "IT" => "it", "LA" => "lt", "PT" => "pt", "ES" => "sp", "DE" => "ge"];
             $lang = in_array( $this->LitSettings->Locale, array_keys($langs) ) ? $langs[$this->LitSettings->Locale] : "en";
@@ -1566,7 +1564,7 @@ class LitCalAPI {
             if( $this->Cal->notInSolemnitiesFeastsOrMemorials( $currentSaturday ) ) {
                 $memID = "SatMemBVM" . ++$SatMemBVM_cnt;
                 $name = $this->LitSettings->Locale === LitLocale::LATIN ? "Memoria Sanctæ Mariæ in Sabbato" : _( "Saturday Memorial of the Blessed Virgin Mary" );
-                $festivity = new Festivity( $name, $currentSaturday, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL_OPT, "Blessed Virgin Mary" );
+                $festivity = new Festivity( $name, $currentSaturday, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL_OPT, LitCommon::BEATAE_MARIAE_VIRGINIS );
                 $this->Cal->addFestivity( $memID, $festivity );
             }
         }
@@ -1590,18 +1588,17 @@ class LitCalAPI {
     private function makePatron( string $tag, string $nameSuffix, int $day, int $month, string $color, string $EditionRomanMissal = RomanMissal::EDITIO_TYPICA_1970 ) {
         $festivity = $this->Cal->getFestivity( $tag );
         if( $festivity !== null ) {
-            $this->Cal->setProperty( $tag, "grade", LitGrade::FEAST );
-            $this->Cal->setProperty( $tag, "name", $festivity->name . $nameSuffix );
-            $this->Cal->setProperty( $tag, "common", "Proper" );
+            if( $festivity->grade < LitGrade::FEAST ) {
+                $this->Cal->setProperty( $tag, "grade", LitGrade::FEAST );
+            }
+            $this->Cal->setProperty( $tag, "name", $festivity->name . ", " . $nameSuffix );
+            $this->Cal->setProperty( $tag, "common", LitCommon::PROPRIO );
         } else{
-
             //check what's going on, for example, if it's a Sunday or Solemnity
             $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', "{$day}-{$month}-" . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-
             $row = $this->tempCal[ $EditionRomanMissal ][ $tag ];
             //let's also get the name back from the database, so we can give some feedback and maybe even recreate the festivity
-            $FestivityName = $row->NAME . $nameSuffix;
-
+            $FestivityName = $row->NAME . ", " .  $nameSuffix;
             if( $this->Cal->inSolemnitiesFeastsOrMemorials( $currentFeastDate ) || self::DateIsSunday( $currentFeastDate ) ) {
                 $coincidingFestivity = new stdClass();
                 $coincidingFestivity->event = $this->Cal->solemnityFromDate( $currentFeastDate );
@@ -1613,12 +1610,19 @@ class LitCalAPI {
                     $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $coincidingFestivity->event->grade, false ) . '</i>' : $this->LitGrade->i18n( $coincidingFestivity->grade, false ) );
                 } else if ( $this->Cal->inFeastsOrMemorials( $currentFeastDate ) ) {
                     //we should probably be able to create it anyways in this case?
-                    $this->Cal->addFestivity( $tag, new Festivity( $FestivityName, $currentFeastDate, $color, LitFeastType::FIXED, LitGrade::FEAST, "Proper" ) );
+                    $this->Cal->addFestivity( $tag, new Festivity( $FestivityName, $currentFeastDate, $color, LitFeastType::FIXED, LitGrade::FEAST, LitCommon::PROPRIO ) );
                     $coincidingFestivity->grade = $this->LitGrade->i18n( $coincidingFestivity->event->grade, false );
                 }
-
                 $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                    _( "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in the year %d." ),
+                    /**translators:
+                     * 1. Grade of the festivity
+                     * 2. Name of the festivity
+                     * 3. Date on which the festivity is usually celebrated
+                     * 4. Grade of the superseding festivity
+                     * 5. Name of the superseding festivity
+                     * 6. Current year
+                     */
+                    _( 'The %1$s \'%2$s\', usually celebrated on %3$s, is suppressed by the %4$s \'%5$s\' in the year %6$d.' ),
                     $this->LitGrade->i18n( LitGrade::FEAST, false ),
                     $FestivityName,
                     $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ),
@@ -1626,7 +1630,6 @@ class LitCalAPI {
                     $coincidingFestivity->event->name,
                     $this->LitSettings->Year
                 );
-
             }
         }
     }
@@ -1637,9 +1640,9 @@ class LitCalAPI {
 
         //Saint Benedict, Saint Bridget, and Saint Cyril and Methodius elevated to Feast, with title "patrono/i d'Europa" added
         //then from 1999, Saint Catherine of Siena and Saint Edith Stein, elevated to Feast with title "compatrona d'Europa" added
-        $this->makePatron( "StBenedict",        ", " . pgettext("Male singular", "patron of Europe"),   11, 7, LitColor::WHITE );
-        $this->makePatron( "StBridget",         ", " . pgettext("Female singular", "patron of Europe"), 23, 7, LitColor::WHITE );
-        $this->makePatron( "StsCyrilMethodius", ", " . pgettext("Male plural", "patrons of Europe"),    14, 2, LitColor::WHITE );
+        $this->makePatron( "StBenedict",        pgettext("Male singular", "patron of Europe"),   11, 7, LitColor::WHITE );
+        $this->makePatron( "StBridget",         pgettext("Female singular", "patron of Europe"), 23, 7, LitColor::WHITE );
+        $this->makePatron( "StsCyrilMethodius", pgettext("Male plural", "patrons of Europe"),    14, 2, LitColor::WHITE );
 
         //In 1999, Pope John Paul II elevated Catherine of Siena from patron of Italy to patron of Europe
         if( $this->LitSettings->Year >= 1999 ) {
@@ -1648,9 +1651,9 @@ class LitCalAPI {
             } else {
                 $name = pgettext("Female singular", "patron of Europe");
             }
-            $this->makePatron( "StCatherineSiena", ", " . $name, 29, 4, LitColor::WHITE );
+            $this->makePatron( "StCatherineSiena", $name, 29, 4, LitColor::WHITE );
             if( $this->LitSettings->Year >= 2002 ) {
-                $this->makePatron( "StEdithStein", ", " . pgettext("Female singular", "patron of Europe"), 9, 8, LitColor::WHITE, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
+                $this->makePatron( "StEdithStein", pgettext("Female singular", "patron of Europe"), 9, 8, LitColor::WHITE, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
             } else {
                 //between 1999 and 2002 we have to manually create StEdithStein
                 //since the makePatron method expects to find data from the Missals,
@@ -1662,14 +1665,14 @@ class LitCalAPI {
                 $EdithStein->DAY        = 9;
                 $EdithStein->TAG        = "StEdithStein";
                 $EdithStein->GRADE      = LitGrade::MEMORIAL_OPT;
-                $EdithStein->COMMON     = "Martyrs:For a Virgin Martyr,Virgins:For One Virgin";
+                $EdithStein->COMMON     = LitCommon::AB( [LitCommon::PRO_VIRGINE_MARTYRE,LitCommon::PRO_UNA_VIRGINE] );
                 $EdithStein->CALENDAR   = "GENERAL ROMAN";
                 $EdithStein->COLOR  = "white,red";
                 $this->tempCal[ RomanMissal::EDITIO_TYPICA_TERTIA_2002 ][ "StEdithStein" ] = $EdithStein;
                 $EdithStein->DATE = DateTime::createFromFormat( '!j-n-Y', $EdithStein->DAY . '-' . $EdithStein->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
                 if( !$this->Cal->inSolemnitiesFeastsOrMemorials( $EdithStein->DATE ) ) {
                     $this->Cal->addFestivity( $EdithStein->TAG, new Festivity( $EdithStein->NAME, $EdithStein->DATE, $EdithStein->COLOR, LitFeastType::FIXED, $EdithStein->GRADE, $EdithStein->COMMON ) );
-                    $this->makePatron( "StEdithStein", ", " . pgettext("Female singular", "patron of Europe"), $EdithStein->DAY, $EdithStein->MONTH, $EdithStein->COLOR, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
+                    $this->makePatron( "StEdithStein", pgettext("Female singular", "patron of Europe"), $EdithStein->DAY, $EdithStein->MONTH, $EdithStein->COLOR, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
                 }
             }
         }
@@ -1680,9 +1683,9 @@ class LitCalAPI {
         if ( $this->LitSettings->Year < 1999 ) {
             //We only have to deal with years before 1999, because from 1999
             //it will be taken care of by Patron saints of Europe
-            $this->makePatron( "StCatherineSiena", ", patrona d'Italia", 29, 4, LitColor::WHITE );
+            $this->makePatron( "StCatherineSiena", "patrona d'Italia", 29, 4, LitColor::WHITE );
         }
-        $this->makePatron( "StFrancisAssisi", ", patrono d'Italia", 4, 10, LitColor::WHITE );
+        $this->makePatron( "StFrancisAssisi", "patrono d'Italia", 4, 10, LitColor::WHITE );
     }
 
     private function applyMessaleRomano1983() : void {
@@ -1713,7 +1716,7 @@ class LitCalAPI {
         //The Solemnity of the Immaculate Conception is the Patronal FeastDay of the United States of America
         $festivity = $this->Cal->getFestivity( "ImmaculateConception" );
         if( $festivity !== null ) {
-            $this->Cal->setProperty( "ImmaculateConception", "name", $festivity->name . ", Patronal feastday of the United States of America" );
+            $this->makePatron( "ImmaculateConception", "Patronal feastday of the United States of America", 8, 12, LitColor::WHITE );
         }
 
         //move Saint Vincent Deacon from Jan 22 to Jan 23 in order to allow for National Day of Prayer for the Unborn on Jan 22
@@ -1821,7 +1824,6 @@ class LitCalAPI {
                 );
             }
         }
-
     }
 
     /**currently only using this for the USA calendar

@@ -125,8 +125,6 @@ class LitCommon {
         ];
     }
 
-
-
     const LATIN = [
         self::PROPRIO                               => "Proprio",
         self::DEDICATIONIS_ECCLESIAE                => "Dedicationis ecclesiæ",
@@ -224,12 +222,70 @@ class LitCommon {
         "For Holy Women"
     ];
 
+    public static array $MARTYRUM = [
+        self::PRO_UNO_MARTYRE,
+        self::PRO_PLURIBUS_MARTYRIBUS,
+        self::PRO_MISSIONARIIS_MARTYRIBUS,
+        self::PRO_UNO_MISSIONARIO_MARTYRE,
+        self::PRO_PLURIBUS_MISSIONARIIS_MARTYRIBUS,
+        self::PRO_VIRGINE_MARTYRE,
+        self::PRO_SANCTA_MULIERE_MARTYRE
+    ];
+
+    public static array $PASTORUM = [
+        self::PRO_PAPA,
+        self::PRO_EPISCOPO,
+        self::PRO_UNO_PASTORE,
+        self::PRO_PLURIBUS_PASTORIBUS,
+        self::PRO_FUNDATORIBUS_ECCLESIARUM,
+        self::PRO_UNO_FUNDATORE,
+        self::PRO_PLURIBUS_FUNDATORIBUS,
+        self::PRO_MISSIONARIIS
+    ];
+
+    public static array $VIRGINUM = [
+        self::PRO_UNA_VIRGINE,
+        self::PRO_PLURIBUS_VIRGINIBUS
+    ];
+
+    public static array $SANCTORUM = [
+        self::PRO_PLURIBUS_SANCTIS,
+        self::PRO_UNO_SANCTO,
+        self::PRO_ABBATE,
+        self::PRO_MONACHO,
+        self::PRO_MONIALI,
+        self::PRO_RELIGIOSIS,
+        self::PRO_IIS_QUI_OPERA_MISERICORDIAE_EXERCUERUNT,
+        self::PRO_EDUCATORIBUS,
+        self::PRO_SANCTIS_MULIERIBUS
+    ];
+
     public static function isValid( string $value ) {
         return in_array( $value, self::$values );
     }
 
-    public static function areValid( array $values ){
+    public static function areValid( array $values ) {
         return empty( array_diff( $values, self::$values ) );
+    }
+
+    public static function AB( string|array $value ) : string {
+        if( is_array( $value ) ) {
+            $mapped = array_map('self::AB', $value);
+            return implode( ',', $mapped );
+        } else {
+            if( in_array($value, self::$MARTYRUM) ) {
+                return self::MARTYRUM . ':' . $value;
+            }
+            if( in_array($value, self::$PASTORUM) ) {
+                return self::PASTORUM . ':' . $value;
+            }
+            if( in_array($value, self::$VIRGINUM) ) {
+                return self::VIRGINUM . ':' . $value;
+            }
+            if( in_array($value, self::$SANCTORUM) ) {
+                return self::SANCTORUM_ET_SANCTARUM . ':' . $value;
+            }
+        }
     }
 
     public function i18n( string $value ) : string {
