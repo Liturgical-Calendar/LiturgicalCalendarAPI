@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-27 14:10+0000\n"
+"POT-Creation-Date: 2022-01-27 14:41+0000\n"
 "PO-Revision-Date: 2021-12-14 00:21+0100\n"
 "Last-Translator: Ubuntu <priest@johnromanodorazio.com>\n"
 "Language-Team: Portuguese\n"
@@ -49,11 +49,10 @@ msgstr ""
 #: includes/LitCalAPI.php:542 includes/LitCalAPI.php:558
 #: includes/LitCalAPI.php:584 includes/LitCalAPI.php:612
 #: includes/LitCalAPI.php:898 includes/LitCalAPI.php:1017
-#: includes/LitCalAPI.php:1073 includes/LitCalAPI.php:1113
-#: includes/LitCalAPI.php:1152 includes/LitCalAPI.php:1237
-#: includes/LitCalAPI.php:1267 includes/LitCalAPI.php:1294
-#: includes/LitCalAPI.php:1403 includes/LitCalAPI.php:1415
-#: includes/LitCalAPI.php:1430 includes/LitCalAPI.php:1456
+#: includes/LitCalAPI.php:1073 includes/LitCalAPI.php:1230
+#: includes/LitCalAPI.php:1275 includes/LitCalAPI.php:1302
+#: includes/LitCalAPI.php:1411 includes/LitCalAPI.php:1423
+#: includes/LitCalAPI.php:1438 includes/LitCalAPI.php:1464
 #: includes/FestivityCollection.php:386
 msgid "Decree of the Congregation for Divine Worship"
 msgstr ""
@@ -127,8 +126,8 @@ msgstr ""
 #.  5. Source of the information
 #.  6. Current year
 #.
-#: includes/LitCalAPI.php:853 includes/LitCalAPI.php:1127
-#: includes/LitCalAPI.php:1278
+#: includes/LitCalAPI.php:853 includes/LitCalAPI.php:1109
+#: includes/LitCalAPI.php:1286
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
@@ -219,7 +218,7 @@ msgid ""
 "They are both reduced in rank to optional memorials (%4$s)."
 msgstr ""
 
-#: includes/LitCalAPI.php:1102
+#: includes/LitCalAPI.php:1088
 msgid "the Monday after Pentecost"
 msgstr ""
 
@@ -231,7 +230,7 @@ msgstr ""
 #.  5. Current year
 #.  6. Source of the information
 #.
-#: includes/LitCalAPI.php:1165
+#: includes/LitCalAPI.php:1144
 #, php-format
 msgid ""
 "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
@@ -246,7 +245,7 @@ msgstr ""
 #.  5. Current year
 #.  6. Source of the information
 #.
-#: includes/LitCalAPI.php:1187
+#: includes/LitCalAPI.php:1166
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been raised to the rank of %3$s since the year %4$d, "
@@ -261,7 +260,7 @@ msgstr ""
 #.  5. Current year
 #.  6. Source of the information
 #.
-#: includes/LitCalAPI.php:1197
+#: includes/LitCalAPI.php:1176
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been lowered to the rank of %3$s since the year %4$d, "
@@ -274,14 +273,14 @@ msgstr ""
 #.  3. Current year
 #.  4. Source of the information
 #.
-#: includes/LitCalAPI.php:1244
+#: includes/LitCalAPI.php:1210
 #, php-format
 msgid ""
 "'%1$s' has been declared a Doctor of the Church since the year %2$d, "
 "applicable to the year %3$d (%4$s)."
 msgstr ""
 
-#: includes/LitCalAPI.php:1252
+#: includes/LitCalAPI.php:1218
 msgid "and Doctor of the Church"
 msgstr ""
 
@@ -295,7 +294,7 @@ msgstr ""
 #.  7. Name of superseding festivity
 #.  8. Current year
 #.
-#: includes/LitCalAPI.php:1315
+#: includes/LitCalAPI.php:1323
 #, php-format
 msgid ""
 "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
@@ -312,21 +311,21 @@ msgstr ""
 #.  7. Year from which the festivity has been added
 #.  8. Source of the information
 #.
-#: includes/LitCalAPI.php:1343
+#: includes/LitCalAPI.php:1351
 #, php-format
 msgid ""
 "In the year %1$d, the %2$s '%3$s' has been suppressed by the %4$s '%5$s', "
 "added on %6$s since the year %7$d (%8$s)."
 msgstr ""
 
-#: includes/LitCalAPI.php:1401
+#: includes/LitCalAPI.php:1409
 #, php-format
 msgid ""
 "The optional memorial '%s' has been transferred from Dec. 12 to Aug. 12 "
 "since the year 2002 (%s), applicable to the year %d."
 msgstr ""
 
-#: includes/LitCalAPI.php:1413
+#: includes/LitCalAPI.php:1421
 #, php-format
 msgid ""
 "The optional memorial '%s', which would have been superseded this year by a "
@@ -334,7 +333,7 @@ msgid ""
 "12 since the year 2002 (%s), applicable to the year %d."
 msgstr ""
 
-#: includes/LitCalAPI.php:1428
+#: includes/LitCalAPI.php:1436
 #, php-format
 msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
@@ -342,7 +341,7 @@ msgid ""
 "superseded by a Sunday, a Solemnity, or a Feast '%4$s' in the year %3$d."
 msgstr ""
 
-#: includes/LitCalAPI.php:1454
+#: includes/LitCalAPI.php:1462
 #, php-format
 msgid ""
 "The Feast '%s' would have been suppressed this year ( 2009 ) since it falls "
@@ -351,17 +350,17 @@ msgid ""
 "memorial."
 msgstr ""
 
-#: includes/LitCalAPI.php:1478
+#: includes/LitCalAPI.php:1486
 #, php-format
 msgid "of the %s Week of Easter"
 msgstr ""
 
-#: includes/LitCalAPI.php:1514 includes/LitCalAPI.php:1543
+#: includes/LitCalAPI.php:1522 includes/LitCalAPI.php:1551
 #, php-format
 msgid "of the %s Week of Ordinary Time"
 msgstr ""
 
-#: includes/LitCalAPI.php:1566
+#: includes/LitCalAPI.php:1574
 msgid "Saturday Memorial of the Blessed Virgin Mary"
 msgstr ""
 
@@ -373,30 +372,30 @@ msgstr ""
 #.  5. Name of the superseding festivity
 #.  6. Current year
 #.
-#: includes/LitCalAPI.php:1625
+#: includes/LitCalAPI.php:1633
 #, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
 "'%5$s' in the year %6$d."
 msgstr ""
 
-#: includes/LitCalAPI.php:1643
+#: includes/LitCalAPI.php:1651
 msgctxt "Male singular"
 msgid "patron of Europe"
 msgstr ""
 
-#: includes/LitCalAPI.php:1644 includes/LitCalAPI.php:1652
-#: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:1675
+#: includes/LitCalAPI.php:1652 includes/LitCalAPI.php:1660
+#: includes/LitCalAPI.php:1664 includes/LitCalAPI.php:1683
 msgctxt "Female singular"
 msgid "patron of Europe"
 msgstr ""
 
-#: includes/LitCalAPI.php:1645
+#: includes/LitCalAPI.php:1653
 msgctxt "Male plural"
 msgid "patrons of Europe"
 msgstr ""
 
-#: includes/LitCalAPI.php:1663
+#: includes/LitCalAPI.php:1671
 msgid "Saint Teresa Benedicta of the Cross, Virgin and Martyr"
 msgstr ""
 
