@@ -40,11 +40,11 @@ class FestivityCollection {
         $this->LitGrade = new LitGrade( $this->LitSettings->Locale );
     }
 
-    private static function DateIsSunday( DateTime $dt ) : bool {
+    public static function DateIsSunday( DateTime $dt ) : bool {
         return (int)$dt->format( 'N' ) === 7;
     }
 
-    private static function DateIsNotSunday( DateTime $dt ) : bool {
+    public static function DateIsNotSunday( DateTime $dt ) : bool {
         return (int)$dt->format( 'N' ) !== 7;
     }
 

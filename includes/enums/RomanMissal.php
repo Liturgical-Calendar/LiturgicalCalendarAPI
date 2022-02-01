@@ -29,7 +29,7 @@ class RomanMissal {
         "VATICAN_1975"  => "Editio Typica Secunda 1975",
         "VATICAN_2002"  => "Editio Typica Tertia 2002",
         "VATICAN_2008"  => "Editio Typica Tertia Emendata 2008",
-        "USA_2011"      => "Roman Missal 2011 Edition",
+        "USA_2011"      => "2011 Roman Missal issued by the USCCB",
         "ITALY_1983"    => "Messale Romano ed. 1983",
         "ITALY_2020"    => "Messale Romano ed. 2020"
     ];

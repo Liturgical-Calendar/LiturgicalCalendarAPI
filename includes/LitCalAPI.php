@@ -1082,6 +1082,8 @@ class LitCalAPI {
     private function createFestivityFromDecree( object $row ) : void {
         if( $row->Festivity->TYPE === "mobile" ) {
             //we won't have a date defined for mobile festivites, we'll have to calculate them here case by case
+            //otherwise we'll have to create a language that we can interpret in an automated fashion...
+            //for example we can use strtotime
             switch( $row->Festivity->TAG ) {
                 case "MaryMotherChurch":
                     $row->Festivity->DATE = LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 7 + 1 ) . 'D' ) );
@@ -1730,19 +1732,17 @@ class LitCalAPI {
         //move Saint Vincent Deacon from Jan 22 to Jan 23 in order to allow for National Day of Prayer for the Unborn on Jan 22
         //however if Jan 22 is a Sunday, National Day of Prayer for the Unborn is moved to Jan 23 ( in place of Saint Vincent Deacon )
         $festivity = $this->Cal->getFestivity( "StVincentDeacon" );
-        if( $festivity !== null ){
-            //I believe we don't have to worry about suppressing, because if it's on a Sunday it won't exist already
-            //so if the National Day of Prayer happens on a Sunday and must be moved to Monday, Saint Vincent will be already gone anyways
-            $StVincentDeaconNewDate = $festivity->date->add( new DateInterval( 'P1D' ) );
-            $this->Cal->moveFestivityDate( "StVincentDeacon", $StVincentDeaconNewDate );
-            //let's not worry about translating these messages, just leave them in English
-            $this->Messages[] = sprintf(
-                "USA: The Memorial '%s' was moved from Jan 22 to Jan 23 to make room for the National Day of Prayer for the Unborn, as per the 2011 Roman Missal issued by the USCCB",
-                '<i>' . $festivity->name . '</i>'
-            );
-            $this->Cal->setProperty( "StVincentDeacon", "name", "[ USA ] " . $festivity->name );
+        if( $festivity !== null ) {
+            $StVincentDeaconNewDate = clone ( $festivity->date );
+            $StVincentDeaconNewDate->add( new DateInterval( 'P1D' ) );
+            $this->moveFestivityDate( "StVincentDeacon", $StVincentDeaconNewDate, "National Day of Prayer for the Unborn", RomanMissal::USA_EDITION_2011 );
         }
 
+        //move Saint Paul of the Cross to the next day (Oct 20), to make room for Saint John Brebeuf, elevated to memorial
+        $StPaulCrossNewDate = DateTime::createFromFormat( '!j-n-Y', '20-10-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+        $this->moveFestivityDate( "StPaulCross", $StPaulCrossNewDate, "Saint John Brebeuf (elevated to memorial)", RomanMissal::USA_EDITION_2011 );
+
+        //elevate Saint John Brebeuf to memorial
         $festivity = $this->Cal->getFestivity( "StsJeanBrebeuf" );
         if( $festivity !== null ) {
             //if it exists, it means it's not on a Sunday, so we can go ahead and elevate it to Memorial
@@ -1753,46 +1753,6 @@ class LitCalAPI {
                 $this->LitSettings->Year
             );
             $this->Cal->setProperty( "StsJeanBrebeuf", "name", "[ USA ] " . $festivity->name );
-
-            $festivity1 = $this->Cal->getFestivity( "StPaulCross" );
-            if( $festivity1 !== null ){ //of course it will exist if StsJeanBrebeuf exists, they are originally on the same day
-                $this->Cal->moveFestivityDate( "StPaulCross", $festivity1->date->add( new DateInterval( 'P1D' ) ) );
-                if( $this->Cal->inSolemnitiesFeastsOrMemorials( $festivity1->date ) ) {
-                    $this->Messages[] = sprintf(
-                        "USA: The optional memorial '%s' is transferred from Oct 19 to Oct 20 as per the 2011 Roman Missal issued by the USCCB, to make room for '%s' elevated to the rank of Memorial, however in the year %d it is superseded by a higher ranking liturgical event",
-                        '<i>' . $festivity1->name . '</i>',
-                        '<i>' . $festivity->name . '</i>',
-                        $this->LitSettings->Year
-                    );
-                    $this->Cal->removeFestivity( "StPaulCross" );
-                }else{
-                    $this->Messages[] = sprintf(
-                        'USA: The optional memorial \'%1$s\' is transferred from Oct 19 to Oct 20 as per the 2011 Roman Missal issued by the USCCB, to make room for \'%2$s\' elevated to the rank of Memorial: applicable to the year %3$d.',
-                        '<i>' . $festivity1->name . '</i>',
-                        '<i>' . $festivity->name . '</i>',
-                        $this->LitSettings->Year
-                    );
-                    $this->Cal->setProperty( "StPaulCross", "name", "[ USA ] " . $festivity1->name );
-                }
-            }
-        }
-        else{
-            //if Oct 19 is a Sunday or Solemnity, Saint Paul of the Cross won't exist. But it still needs to be moved to Oct 20 so we must create it again
-            //just keep in mind the StsJeanBrebeuf also won't exist, so we need to retrieve the name from the tempCal
-            $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', '20-10-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-            $festivity = $this->Cal->getFestivity( "StPaulCross" );
-            if( !$this->Cal->inSolemnities( $currentFeastDate ) && $festivity === null ) {
-                $row = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ "StPaulCross" ];
-                $row2 = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ "StsJeanBrebeuf" ];
-                $festivity = new Festivity( "[ USA ] " . $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
-                $this->Cal->addFestivity( "StPaulCross", $festivity );
-                $this->Messages[] = sprintf(
-                    'USA: The optional memorial \'%1$s\' is transferred from Oct 19 to Oct 20 as per the 2011 Roman Missal issued by the USCCB, to make room for \'%2$s\' elevated to the rank of Memorial: applicable to the year %3$d.',
-                    $row->NAME,
-                    '<i>' . $row2->NAME . '</i>',
-                    $this->LitSettings->Year
-                );
-            }
         }
 
         //The fourth Thursday of November is Thanksgiving
@@ -1802,10 +1762,10 @@ class LitCalAPI {
         $this->Cal->addFestivity( "ThanksgivingDay", $festivity );
 
         $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', '18-7-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-        $this->moveFestivityDate( "StCamillusDeLellis", $currentFeastDate, "Blessed Kateri Tekakwitha" );
+        $this->moveFestivityDate( "StCamillusDeLellis", $currentFeastDate, "Blessed Kateri Tekakwitha", RomanMissal::USA_EDITION_2011 );
 
         $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', '5-7-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-        $this->moveFestivityDate( "StElizabethPortugal", $currentFeastDate, "Independence Day" );
+        $this->moveFestivityDate( "StElizabethPortugal", $currentFeastDate, "Independence Day", RomanMissal::USA_EDITION_2011 );
 
         $this->readPropriumDeSanctisJSONData( RomanMissal::USA_EDITION_2011 );
 
@@ -1841,45 +1801,56 @@ class LitCalAPI {
      * we might have to abstract out the Calendar that is the source
      * of the festivity that is being transferred
      */
-    private function moveFestivityDate( string $tag, DateTime $newDate, string $inFavorOf ) {
+    private function moveFestivityDate( string $tag, DateTime $newDate, string $inFavorOf, $missal ) {
         $festivity = $this->Cal->getFestivity( $tag );
         $newDateStr = $newDate->format('F jS');
-        if( !$this->Cal->inSolemnities( $newDate ) ) {
-            if( $festivity !== null ){
-                //Move from old date to new date, to make room for another celebration
-                $this->Cal->moveFestivityDate( $tag, $newDate );
+        if( !$this->Cal->inSolemnitiesFeastsOrMemorials( $newDate ) ) {
+            if( $festivity !== null ) {
                 $oldDateStr = $festivity->date->format('F jS');
+                $this->Cal->moveFestivityDate( $tag, $newDate );
             }
             else{
                 //if it was suppressed on the original date because of a higher ranking celebration,
                 //we should recreate it on the new date
-                $row = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ $tag ];
-                $festivity = new Festivity( $row->NAME, $newDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
-                $this->Cal->addFestivity( $tag, $festivity );
-                $oldDate = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-                $oldDateStr = $oldDate->format('F jS');
+                //except in the case of Saint Vincent Deacon, where the National Day of Prayer will take over the new date
+                if( $tag !== "StVincentDeacon" ) {
+                    $row = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ $tag ];
+                    $festivity = new Festivity( $row->NAME, $newDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
+                    $this->Cal->addFestivity( $tag, $festivity );
+                    $oldDate = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+                    $oldDateStr = $oldDate->format('F jS');
+                }
             }
-            $this->Messages[] = sprintf(
-                'USA: The optional memorial \'%1$s\' is transferred from %4$s to %5$s as per the 2011 Roman Missal issued by the USCCB, to make room for the Memorial \'%2$s\': applicable to the year %3$d.',
-                '<i>' . $festivity->name . '</i>',
-                '<i>' . $inFavorOf . '</i>',
-                $this->LitSettings->Year,
-                $oldDateStr,
-                $newDateStr
-            );
-            $this->Cal->setProperty( $tag, "name", "[ USA ] " . $festivity->name );
-        }
-        else{
             if( $festivity !== null ) {
-                $oldDateStr = $festivity->date->format('F jS');
-                //If the new date is already covered by a Solmenity, then we can't move the celebration, so we simply suppress it
                 $this->Messages[] = sprintf(
-                    'USA: The optional memorial \'%1$s\' is transferred from %4$s to %5$s as per the 2011 Roman Missal issued by the USCCB, to make room for the Memorial \'%2$s\', however it is superseded by a higher ranking festivity in the year %3$d.',
+                    'USA: The %1$s \'%2$s\' is transferred from %5$s to %6$s as per the %7$s, to make room for \'%3$s\': applicable to the year %4$d.',
+                    $this->LitGrade->i18n( $festivity->grade ),
                     '<i>' . $festivity->name . '</i>',
                     '<i>' . $inFavorOf . '</i>',
                     $this->LitSettings->Year,
                     $oldDateStr,
-                    $newDateStr
+                    $newDateStr,
+                    RomanMissal::getName( $missal )
+                );
+                $this->Cal->setProperty( $tag, "name", "[ USA ] " . $festivity->name );
+            }
+        }
+        else{
+            if( $festivity !== null ) {
+                $oldDateStr = $festivity->date->format('F jS');
+                $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $newDate );
+                //If the new date is already covered by a Solemnity, Feast or Memorial, then we can't move the celebration, so we simply suppress it
+                $this->Messages[] = sprintf(
+                    'USA: The %1$s \'%2$s\' would have been transferred from %3$s to %4$s as per the %5$s, to make room for \'%6$s\', however it is suppressed by the %7$s \'%8$s\' in the year %9$d.',
+                    $this->LitGrade->i18n( $festivity->grade ),
+                    '<i>' . $festivity->name . '</i>',
+                    $oldDateStr,
+                    $newDateStr,
+                    RomanMissal::getName( $missal ),
+                    '<i>' . $inFavorOf . '</i>',
+                    $coincidingFestivity->grade,
+                    $coincidingFestivity->event->name,
+                    $this->LitSettings->Year
                 );
                 $this->Cal->removeFestivity( $tag );
             }
