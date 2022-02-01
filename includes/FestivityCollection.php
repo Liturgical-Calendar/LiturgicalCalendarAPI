@@ -98,11 +98,11 @@ class FestivityCollection {
         return array_filter( $this->festivities, function( $el ) use ( $date ) { return $el->date == $date; } );
     }
 
-    public function isSolemnityLordBVM( string $key ) {
+    public function isSolemnityLordBVM( string $key ) : bool {
         return in_array( $key, $this->SolemnitiesLordBVM );
     }
 
-    public function isSundayAdventLentEaster( DateTime $date ) {
+    public function isSundayAdventLentEaster( DateTime $date ) : bool {
         return in_array( $date, $this->SundaysAdventLentEaster );
     }
 
@@ -275,6 +275,94 @@ class FestivityCollection {
         }
     }
 
+    private function festivityCanHaveVigil( Festivity|stdClass $festivity, ?string $key = null ) : bool {
+        if( $festivity instanceof Festivity ) {
+            return (
+                false === ( $key === 'AllSouls' )
+                && false === ( $key === 'AshWednesday' )
+                && false === ( $festivity->date > $this->festivities[ "PalmSun" ]->date && $festivity->date < $this->festivities[ "Easter" ]->date )
+                && false === ( $festivity->date > $this->festivities[ "Easter" ]->date && $festivity->date < $this->festivities[ "Easter2" ]->date )
+            );
+        }
+        else if( $festivity instanceof stdClass ) {
+            return (
+                false === ( $festivity->event->date > $this->festivities[ "PalmSun" ]->date && $festivity->event->date < $this->festivities[ "Easter" ]->date )
+                && false === ( $festivity->event->date > $this->festivities[ "Easter" ]->date && $festivity->event->date < $this->festivities[ "Easter2" ]->date )
+            );
+        }
+    }
+
+    private function createVigilMass( string $key, Festivity $festivity, DateTime $VigilDate ) : void {
+        $this->festivities[ $key . "_vigil" ] = new Festivity( 
+            $festivity->name . " " . $this->T[ "Vigil Mass" ],
+            $VigilDate,
+            $festivity->color,
+            $festivity->type,
+            $festivity->grade,
+            $festivity->common
+        );
+        $this->festivities[ $key ]->hasVigilMass                 = true;
+        $this->festivities[ $key ]->hasVesperI                   = true;
+        $this->festivities[ $key ]->hasVesperII                  = true;
+        $this->festivities[ $key . "_vigil" ]->isVigilMass       = true;
+        $this->festivities[ $key . "_vigil" ]->liturgicalYear    = $this->festivities[ $key ]->liturgicalYear;
+    }
+
+    private function coincidingFestivityTakesPrecedenceOverVigil( string $key, Festivity $festivity, stdClass $coincidingFestivity ) : bool {
+        return (
+            $festivity->grade < $coincidingFestivity->event->grade ||
+            ( $this->isSolemnityLordBVM( $coincidingFestivity->key ) && !$this->isSolemnityLordBVM( $key ) )
+        );
+    }
+
+    private function vigilTakesPrecedenceOverCoincidingFestivity( string $key, Festivity $festivity, stdClass $coincidingFestivity ) : bool {
+        return (
+            $festivity->grade > $coincidingFestivity->event->grade ||
+            ( $this->isSolemnityLordBVM( $key ) && !$this->isSolemnityLordBVM( $coincidingFestivity->key ) )
+        );
+    }
+
+    private function handleVigilFestivityCoincidence( string $key, Festivity $festivity, string $festivityGrade, stdClass $coincidingFestivity, bool|string $vigilTakesPrecedence ) : void {
+        if( gettype($vigilTakesPrecedence) === "string" && $vigilTakesPrecedence === "YEAR2022" ) {
+            $festivity->hasVigilMass = true;
+            $festivity->hasVesperI = true;
+            $coincidingFestivity->event->hasVesperII = false;
+            $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As per %s, the first has precedence, therefore the Vigil Mass is confirmed as are I Vespers." ),
+                $festivityGrade,
+                $festivity->name,
+                $coincidingFestivity->grade,
+                $coincidingFestivity->event->name,
+                $this->LitSettings->Year,
+                '<a href="http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html">' . _( "Decree of the Congregation for Divine Worship" ) . '</a>'
+            );
+        } else {
+            $festivity->hasVigilMass = $vigilTakesPrecedence;
+            $festivity->hasVesperI = $vigilTakesPrecedence;
+            $coincidingFestivity->event->hasVesperII = !$vigilTakesPrecedence;
+            if( $vigilTakesPrecedence ) {
+                $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                    _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass." ),
+                    $festivityGrade,
+                    $festivity->name,
+                    $coincidingFestivity->grade,
+                    $coincidingFestivity->event->name,
+                    $this->LitSettings->Year
+                );
+            } else {
+                unset( $this->festivities[ $key . "_vigil" ] );
+                $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                    _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while the first Solemnity will not have a Vigil Mass or Vespers I." ),
+                    $festivityGrade,
+                    $festivity->name,
+                    $coincidingFestivity->grade,
+                    $coincidingFestivity->event->name,
+                    $this->LitSettings->Year
+                );
+            }
+        }
+    }
+
     private function calculateVigilMass( string $key, Festivity $festivity ) {
 
         //Let's calculate Vigil Masses while we're at it
@@ -295,25 +383,8 @@ class FestivityCollection {
         //conditions for which the festivity SHOULD have a vigil
         if( self::DateIsSunday( $festivity->date ) || true === ( $festivity->grade >= LitGrade::SOLEMNITY ) ){
             //filter out cases in which the festivity should NOT have a vigil
-            if(
-                false === ( $key === 'AllSouls' )
-                && false === ( $key === 'AshWednesday' )
-                && false === ( $festivity->date > $this->festivities[ "PalmSun" ]->date && $festivity->date < $this->festivities[ "Easter" ]->date )
-                && false === ( $festivity->date > $this->festivities[ "Easter" ]->date && $festivity->date < $this->festivities[ "Easter2" ]->date )
-            ){
-                $this->festivities[ $key . "_vigil" ] = new Festivity( 
-                    $festivity->name . " " . $this->T[ "Vigil Mass" ],
-                    $VigilDate,
-                    $festivity->color,
-                    $festivity->type,
-                    $festivity->grade,
-                    $festivity->common
-                );
-                $this->festivities[ $key ]->hasVigilMass                 = true;
-                $this->festivities[ $key ]->hasVesperI                   = true;
-                $this->festivities[ $key ]->hasVesperII                  = true;
-                $this->festivities[ $key . "_vigil" ]->isVigilMass       = true;
-                $this->festivities[ $key . "_vigil" ]->liturgicalYear    = $this->festivities[ $key ]->liturgicalYear;
+            if( $this->festivityCanHaveVigil( $festivity, $key ) ) {
+                $this->createVigilMass( $key, $festivity, $VigilDate );
                 //if however the Vigil coincides with another Solemnity let's make a note of it!
                 if( $this->inSolemnities( $VigilDate ) ) {
                     $coincidingFestivity = new stdClass();
@@ -329,14 +400,19 @@ class FestivityCollection {
                     }
 
                     //suppress warning messages for known situations, like the Octave of Easter
-                    if( $festivity->grade !== LitGrade::HIGHER_SOLEMNITY ){
-                        if( $festivity->grade < $coincidingFestivity->event->grade ){
-                            $festivity->hasVigilMass = false;
-                            $festivity->hasVesperI = false;
-                            $coincidingFestivity->event->hasVesperII = true;
-                            unset( $this->festivities[ $key . "_vigil" ] );
+                    if( $festivity->grade !== LitGrade::HIGHER_SOLEMNITY ) {
+                        if( $this->coincidingFestivityTakesPrecedenceOverVigil( $key, $festivity, $coincidingFestivity ) ) {
+                            $this->handleVigilFestivityCoincidence( $key, $festivity, $festivityGrade, $coincidingFestivity, false );
+                        }
+                        else if( $this->vigilTakesPrecedenceOverCoincidingFestivity( $key, $festivity, $coincidingFestivity ) ) {
+                            $this->handleVigilFestivityCoincidence( $key, $festivity, $festivityGrade, $coincidingFestivity, true );
+                        }
+                        else if ( $this->LitSettings->Year === 2022 && ( $key === 'SacredHeart' || $key === 'Lent3' || $key === 'Assumption' ) ) {
+                            $this->handleVigilFestivityCoincidence( $key, $festivity, $festivityGrade, $coincidingFestivity, "YEAR2022" );
+                        }
+                        else {
                             $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while the first Solemnity will not have a Vigil Mass or Vespers I." ),
+                                _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!" ),
                                 $festivityGrade,
                                 $festivity->name,
                                 $coincidingFestivity->grade,
@@ -344,77 +420,9 @@ class FestivityCollection {
                                 $this->LitSettings->Year
                             );
                         }
-                        else if( $festivity->grade > $coincidingFestivity->event->grade || ( $this->isSolemnityLordBVM( $key ) && !$this->isSolemnityLordBVM( $coincidingFestivity->key ) ) ) {
-                            $festivity->hasVigilMass = true;
-                            $festivity->hasVesperI = true;
-                            $coincidingFestivity->event->hasVesperII = false;
-                            $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass." ),
-                                $festivityGrade,
-                                $festivity->name,
-                                $coincidingFestivity->grade,
-                                $coincidingFestivity->event->name,
-                                $this->LitSettings->Year
-                            );
-                        }
-                        else if( $this->isSolemnityLordBVM( $coincidingFestivity->key ) && !$this->isSolemnityLordBVM( $key ) ){
-                            $coincidingFestivity->event->hasVesperII = true;
-                            $festivity->hasVesperI = false;
-                            $festivity->hasVigilMass = false;
-                            unset( $this->festivities[ $key . "_vigil" ] );
-                            $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while the first Solemnity will not have a Vigil Mass or Vespers I." ),
-                                $festivityGrade,
-                                $festivity->name,
-                                $coincidingFestivity->grade,
-                                $coincidingFestivity->event->name,
-                                $this->LitSettings->Year
-                            );
-                        } else {
-                            if( $this->LitSettings->Year === 2022 ){
-                                if( $key === 'SacredHeart' || $key === 'Lent3' || $key === 'Assumption' ){
-                                    $coincidingFestivity->event->hasVesperII = false;
-                                    $festivity->hasVesperI = true;
-                                    $festivity->hasVigilMass = true;
-                                    $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                        _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As per %s, the first has precedence, therefore the Vigil Mass is confirmed as are I Vespers." ),
-                                        $festivityGrade,
-                                        $festivity->name,
-                                        $coincidingFestivity->grade,
-                                        $coincidingFestivity->event->name,
-                                        $this->LitSettings->Year,
-                                        '<a href="http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html">' . _( "Decree of the Congregation for Divine Worship" ) . '</a>'
-                                    );
-                                }
-                            }
-                            else {
-                                $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                    _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!" ),
-                                    $festivityGrade,
-                                    $festivity->name,
-                                    $coincidingFestivity->grade,
-                                    $coincidingFestivity->event->name,
-                                    $this->LitSettings->Year
-                                );
-                            }
-                        }
-                    } else {
-                        if(
-                            //false === ( $key === 'AllSouls' )
-                            //&& false === ( $key === 'AshWednesday' )
-                            false === ( $coincidingFestivity->event->date > $this->festivities[ "PalmSun" ]->date && $coincidingFestivity->event->date < $this->festivities[ "Easter" ]->date )
-                            && false === ( $coincidingFestivity->event->date > $this->festivities[ "Easter" ]->date && $coincidingFestivity->event->date < $this->festivities[ "Easter2" ]->date )
-                        ){
-
-                            $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass." ),
-                                $festivityGrade,
-                                $festivity->name,
-                                $coincidingFestivity->grade,
-                                $coincidingFestivity->event->name,
-                                $this->LitSettings->Year
-                            );
-                        }
+                    }
+                    else if ( $this->festivityCanHaveVigil( $coincidingFestivity, null ) ) {
+                        $this->handleVigilFestivityCoincidence( $key, $festivity, $festivityGrade, $coincidingFestivity, true );
                     }
                 }
             } else {
