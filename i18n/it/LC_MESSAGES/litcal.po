@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-01 15:43+0000\n"
+"POT-Creation-Date: 2022-02-01 16:53+0000\n"
 "PO-Revision-Date: 2022-01-30 15:15+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -59,7 +59,7 @@ msgstr "sabato che precede la Domenica delle Palme"
 #: includes/LitCalAPI.php:1277 includes/LitCalAPI.php:1304
 #: includes/LitCalAPI.php:1413 includes/LitCalAPI.php:1425
 #: includes/LitCalAPI.php:1440 includes/LitCalAPI.php:1466
-#: includes/FestivityCollection.php:386
+#: includes/FestivityCollection.php:337
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decreto della Congregazione per il Culto Divino"
 
@@ -466,20 +466,18 @@ msgstr "ANNO"
 msgid "Vigil Mass"
 msgstr "Messa della vigilia"
 
-#: includes/FestivityCollection.php:339 includes/FestivityCollection.php:366
+#: includes/FestivityCollection.php:331
 #, php-format
 msgid ""
-"The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
-"This last Solemnity takes precedence, therefore it will maintain Vespers II "
-"and an evening Mass, while the first Solemnity will not have a Vigil Mass or "
-"Vespers I."
+"The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As "
+"per %s, the first has precedence, therefore the Vigil Mass is confirmed as "
+"are I Vespers."
 msgstr ""
 "La Messa nella Vigilia per la %s '%s' coincide con la %s '%s' nell'anno %d. "
-"Quest'ultima Solennità ha la precedenza, pertanto manterrà i Secondi Vespri "
-"e una Messa serale, mentre la prima Solennità non avrà né una Messa di "
-"Vigilia né i Primi Vespri."
+"Secondo il %s, la prima ha la precedenza, pertanto la Messa nella Vigilia è "
+"confermata come anche i Primi Vespri."
 
-#: includes/FestivityCollection.php:352 includes/FestivityCollection.php:410
+#: includes/FestivityCollection.php:345
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
@@ -492,18 +490,20 @@ msgstr ""
 "Messa di Vigilia, mentre l'ultima Solennità non avrà né i Secondi Vespri né "
 "una Messa serale."
 
-#: includes/FestivityCollection.php:380
+#: includes/FestivityCollection.php:355
 #, php-format
 msgid ""
-"The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As "
-"per %s, the first has precedence, therefore the Vigil Mass is confirmed as "
-"are I Vespers."
+"The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
+"This last Solemnity takes precedence, therefore it will maintain Vespers II "
+"and an evening Mass, while the first Solemnity will not have a Vigil Mass or "
+"Vespers I."
 msgstr ""
 "La Messa nella Vigilia per la %s '%s' coincide con la %s '%s' nell'anno %d. "
-"Secondo il %s, la prima ha la precedenza, pertanto la Messa nella Vigilia è "
-"confermata come anche i Primi Vespri."
+"Quest'ultima Solennità ha la precedenza, pertanto manterrà i Secondi Vespri "
+"e una Messa serale, mentre la prima Solennità non avrà né una Messa di "
+"Vigilia né i Primi Vespri."
 
-#: includes/FestivityCollection.php:392
+#: includes/FestivityCollection.php:415
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We "
