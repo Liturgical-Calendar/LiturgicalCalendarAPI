@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-01 15:43+0000\n"
+"POT-Creation-Date: 2022-02-01 16:53+0000\n"
 "PO-Revision-Date: 2021-12-14 00:21+0100\n"
 "Last-Translator: Ubuntu <priest@johnromanodorazio.com>\n"
 "Language-Team: German\n"
@@ -53,7 +53,7 @@ msgstr ""
 #: includes/LitCalAPI.php:1277 includes/LitCalAPI.php:1304
 #: includes/LitCalAPI.php:1413 includes/LitCalAPI.php:1425
 #: includes/LitCalAPI.php:1440 includes/LitCalAPI.php:1466
-#: includes/FestivityCollection.php:386
+#: includes/FestivityCollection.php:337
 msgid "Decree of the Congregation for Divine Worship"
 msgstr ""
 
@@ -414,16 +414,15 @@ msgstr ""
 msgid "Vigil Mass"
 msgstr ""
 
-#: includes/FestivityCollection.php:339 includes/FestivityCollection.php:366
+#: includes/FestivityCollection.php:331
 #, php-format
 msgid ""
-"The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
-"This last Solemnity takes precedence, therefore it will maintain Vespers II "
-"and an evening Mass, while the first Solemnity will not have a Vigil Mass or "
-"Vespers I."
+"The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As "
+"per %s, the first has precedence, therefore the Vigil Mass is confirmed as "
+"are I Vespers."
 msgstr ""
 
-#: includes/FestivityCollection.php:352 includes/FestivityCollection.php:410
+#: includes/FestivityCollection.php:345
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
@@ -432,15 +431,16 @@ msgid ""
 "evening Mass."
 msgstr ""
 
-#: includes/FestivityCollection.php:380
+#: includes/FestivityCollection.php:355
 #, php-format
 msgid ""
-"The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As "
-"per %s, the first has precedence, therefore the Vigil Mass is confirmed as "
-"are I Vespers."
+"The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
+"This last Solemnity takes precedence, therefore it will maintain Vespers II "
+"and an evening Mass, while the first Solemnity will not have a Vigil Mass or "
+"Vespers I."
 msgstr ""
 
-#: includes/FestivityCollection.php:392
+#: includes/FestivityCollection.php:415
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We "
