@@ -2139,38 +2139,42 @@ class LitCalAPI {
         $SerializeableLitCal->Metadata->FeastsMemorials  = $this->Cal->getFeastsAndMemorials();
 
         //make sure we have an engineCache folder for the current Version
-        if( realpath( "engineCache/v" . str_replace( ".","_",self::API_VERSION ) ) === false ){
-            mkdir( "engineCache/v" . str_replace( ".","_",self::API_VERSION ), 0755, true );
+        if( realpath( "engineCache/v" . str_replace( ".", "_", self::API_VERSION ) ) === false ) {
+            mkdir( "engineCache/v" . str_replace( ".", "_", self::API_VERSION ), 0755, true );
         }
 
         switch ( $this->LitSettings->ReturnType ) {
             case ReturnType::JSON:
-                file_put_contents( $this->CACHEFILE, json_encode( $SerializeableLitCal ) );
-                echo json_encode( $SerializeableLitCal );
+                $response = json_encode( $SerializeableLitCal );
                 break;
             case ReturnType::XML:
                 $jsonStr = json_encode( $SerializeableLitCal );
                 $jsonObj = json_decode( $jsonStr, true );
                 $xml = new SimpleXMLElement ( "<?xml version=\"1.0\" encoding=\"UTF-8\"?" . "><LiturgicalCalendar xmlns=\"https://www.bibleget.io/catholicliturgy\"/>" );
                 LitFunc::convertArray2XML( $jsonObj, $xml );
-                file_put_contents( $this->CACHEFILE, $xml->asXML() );
-                print $xml->asXML();
+                $response = $xml->asXML();
                 break;
             case ReturnType::ICS:
                 $infoObj = $this->getGithubReleaseInfo();
                 if( $infoObj->status === "success" ) {
-                    $ical = $this->produceIcal( $SerializeableLitCal, $infoObj->obj );
-                    file_put_contents( $this->CACHEFILE, $ical );
-                    echo $ical;
+                    $response = $this->produceIcal( $SerializeableLitCal, $infoObj->obj );
                 }
                 else{
                     die( 'Error receiving or parsing info from github about latest release: '.$infoObj->message );
                 }
                 break;
             default:
-                file_put_contents( $this->CACHEFILE, json_encode( $SerializeableLitCal ) );
-                echo json_encode( $SerializeableLitCal );
+                $response = json_encode( $SerializeableLitCal );
                 break;
+        }
+        file_put_contents( $this->CACHEFILE, $response );
+        $responseHash = md5( $response );
+        header("Etag: \"{$responseHash}\"");
+        if (!empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
+            header( $_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified" );
+            header('Content-Length: 0');
+        } else {
+            echo $response;
         }
         die();
     }
