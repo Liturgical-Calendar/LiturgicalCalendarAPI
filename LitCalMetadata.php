@@ -22,10 +22,17 @@ $baseNationalCalendars = [ "ITALY", "USA", "VATICAN" ];
 if( file_exists( 'nations/index.json' ) ) {
     $index = file_get_contents( 'nations/index.json' );
     if( $index !== false ) {
-        $diocesanCalendars = json_decode( $index, true );
-        $nationalCalendars = [];
+        $diocesanCalendars  = json_decode( $index, true );
+        $nationalCalendars  = [];
+        $diocesanGroups     = [];
         foreach( $diocesanCalendars as $key => $value ) {
             unset( $diocesanCalendars[$key]["path"] );
+            if( array_key_exists( "group", $value ) && $value !== "" ) {
+                if( !array_key_exists($value["group"], $diocesanGroups) ) {
+                    $diocesanGroups[$value["group"]] = [];
+                }
+                $diocesanGroups[$value["group"]][] = $key;
+            }
             if( !array_key_exists($diocesanCalendars[$key]["nation"], $nationalCalendars) ) {
                 $nationalCalendars[$diocesanCalendars[$key]["nation"]] = [];
             }
@@ -41,7 +48,8 @@ if( file_exists( 'nations/index.json' ) ) {
         $response = json_encode( [
             "LitCalMetadata" => [
                 "NationalCalendars" => $nationalCalendars,
-                "DiocesanCalendars" => $diocesanCalendars
+                "DiocesanCalendars" => $diocesanCalendars,
+                "DiocesanGroups"    => $diocesanGroups
             ],
         ], JSON_PRETTY_PRINT );
         $responseHash = md5( $response );
