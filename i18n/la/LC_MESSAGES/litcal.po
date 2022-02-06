@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-06 22:33+0000\n"
+"POT-Creation-Date: 2022-02-06 22:59+0000\n"
 "PO-Revision-Date: 2021-12-25 23:32+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
@@ -445,6 +445,11 @@ msgstr "Hebdomadæ %s Temporis Ordinarii"
 msgid "Saturday Memorial of the Blessed Virgin Mary"
 msgstr "Memoria Sanctæ Mariæ in Sabbato"
 
+#: includes/LitCalAPI.php:1602 includes/LitCalAPI.php:1605
+#, php-format
+msgid "Error retrieving and decoding Wider Region data from file %s."
+msgstr ""
+
 #. translators:
 #.  1. Grade of the festivity
 #.  2. Name of the festivity
@@ -453,7 +458,7 @@ msgstr "Memoria Sanctæ Mariæ in Sabbato"
 #.  5. Name of the superseding festivity
 #.  6. Current year
 #.
-#: includes/LitCalAPI.php:1637
+#: includes/LitCalAPI.php:1671
 #, fuzzy, php-format
 #| msgid ""
 #| "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in "
@@ -465,30 +470,25 @@ msgstr ""
 "%s '%s', celebrata plerumque in die %s, subplantata est ab %s '%s' in anno "
 "%d."
 
-#: includes/LitCalAPI.php:1655
+#: includes/LitCalAPI.php:1689
 msgctxt "Male singular"
 msgid "patron of Europe"
 msgstr "patronus Europae"
 
-#: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:1664
-#: includes/LitCalAPI.php:1668 includes/LitCalAPI.php:1687
+#: includes/LitCalAPI.php:1690 includes/LitCalAPI.php:1698
+#: includes/LitCalAPI.php:1702 includes/LitCalAPI.php:1721
 msgctxt "Female singular"
 msgid "patron of Europe"
 msgstr "patrona Europae"
 
-#: includes/LitCalAPI.php:1657
+#: includes/LitCalAPI.php:1691
 msgctxt "Male plural"
 msgid "patrons of Europe"
 msgstr "patroni Europae"
 
-#: includes/LitCalAPI.php:1675
+#: includes/LitCalAPI.php:1709
 msgid "Saint Teresa Benedicta of the Cross, Virgin and Martyr"
 msgstr "Sanctæ Teresiæ Benedictæ a Cruce, virginis et martyris"
-
-#: includes/LitCalAPI.php:2236 includes/LitCalAPI.php:2239
-#, php-format
-msgid "Error retrieving and decoding Wider Region data from file %s."
-msgstr ""
 
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
 #: includes/LitMessages.php:142 includes/LitMessages.php:153

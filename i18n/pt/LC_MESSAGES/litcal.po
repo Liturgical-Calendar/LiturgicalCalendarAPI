@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-06 22:33+0000\n"
+"POT-Creation-Date: 2022-02-06 22:59+0000\n"
 "PO-Revision-Date: 2021-12-14 00:21+0100\n"
 "Last-Translator: Ubuntu <priest@johnromanodorazio.com>\n"
 "Language-Team: Portuguese\n"
@@ -364,6 +364,11 @@ msgstr ""
 msgid "Saturday Memorial of the Blessed Virgin Mary"
 msgstr ""
 
+#: includes/LitCalAPI.php:1602 includes/LitCalAPI.php:1605
+#, php-format
+msgid "Error retrieving and decoding Wider Region data from file %s."
+msgstr ""
+
 #. translators:
 #.  1. Grade of the festivity
 #.  2. Name of the festivity
@@ -372,36 +377,31 @@ msgstr ""
 #.  5. Name of the superseding festivity
 #.  6. Current year
 #.
-#: includes/LitCalAPI.php:1637
+#: includes/LitCalAPI.php:1671
 #, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
 "'%5$s' in the year %6$d."
 msgstr ""
 
-#: includes/LitCalAPI.php:1655
+#: includes/LitCalAPI.php:1689
 msgctxt "Male singular"
 msgid "patron of Europe"
 msgstr ""
 
-#: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:1664
-#: includes/LitCalAPI.php:1668 includes/LitCalAPI.php:1687
+#: includes/LitCalAPI.php:1690 includes/LitCalAPI.php:1698
+#: includes/LitCalAPI.php:1702 includes/LitCalAPI.php:1721
 msgctxt "Female singular"
 msgid "patron of Europe"
 msgstr ""
 
-#: includes/LitCalAPI.php:1657
+#: includes/LitCalAPI.php:1691
 msgctxt "Male plural"
 msgid "patrons of Europe"
 msgstr ""
 
-#: includes/LitCalAPI.php:1675
+#: includes/LitCalAPI.php:1709
 msgid "Saint Teresa Benedicta of the Cross, Virgin and Martyr"
-msgstr ""
-
-#: includes/LitCalAPI.php:2236 includes/LitCalAPI.php:2239
-#, php-format
-msgid "Error retrieving and decoding Wider Region data from file %s."
 msgstr ""
 
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
