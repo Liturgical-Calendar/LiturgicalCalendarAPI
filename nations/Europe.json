@@ -1,0 +1,172 @@
+{
+    "LitCal": [
+        {
+            "Festivity": {
+                "tag": "StBenedict",
+                "color": "white",
+                "grade": 4,
+                "day": 11,
+                "month": 7,
+                "sinceYear": 1964
+            },
+            "Metadata": {
+                "action": "makePatron",
+                "decreeURL": "https://www.vatican.va/content/paul-vi/%s/apost_letters/documents/hf_p-vi_apl_19641024_pacis-nuntius.html",
+                "decreeLangs": {
+                    "IT": "it",
+                    "ES": "es",
+                    "LA": "la"
+                }
+            }
+        },
+        {
+            "Festivity": {
+                "tag": "StsCyrilMethodius",
+                "color": "white",
+                "grade": 4,
+                "day": 14,
+                "month": 2,
+                "sinceYear": 1980
+            },
+            "Metadata": {
+                "action": "makePatron",
+                "decreeURL": "https://www.vatican.va/content/john-paul-ii/%s/apost_letters/1980/documents/hf_jp-ii_apl_31121980_egregiae-virtutis.html",
+                "decreeLangs": {
+                    "ES": "es",
+                    "IT": "it",
+                    "LA": "la",
+                    "PT": "pt"
+                }
+            }
+        },
+        {
+            "Festivity": {
+                "tag": "StBridget",
+                "color": "white",
+                "grade": 4,
+                "day": 23,
+                "month": 7,
+                "sinceYear": 1999
+            },
+            "Metadata": {
+                "action": "makePatron",
+                "decreeURL": "https://www.vatican.va/content/john-paul-ii/%s/motu_proprio/documents/hf_jp-ii_motu-proprio_01101999_co-patronesses-europe.html",
+                "decreeLangs": {
+                    "DE": "de",
+                    "EN": "en",
+                    "ES": "es",
+                    "FR": "fr",
+                    "IT": "it",
+                    "LA": "la",
+                    "PT": "pt"
+                }
+            }
+        },
+        {
+            "Festivity": {
+                "tag": "StCatherineSiena",
+                "color": "white",
+                "grade": 4,
+                "day": 29,
+                "month": 4,
+                "sinceYear": 1999
+            },
+            "Metadata": {
+                "action": "makePatron",
+                "decreeURL": "https://www.vatican.va/content/john-paul-ii/%s/motu_proprio/documents/hf_jp-ii_motu-proprio_01101999_co-patronesses-europe.html",
+                "decreeLangs": {
+                    "DE": "de",
+                    "EN": "en",
+                    "ES": "es",
+                    "FR": "fr",
+                    "IT": "it",
+                    "LA": "la",
+                    "PT": "pt"
+                }
+            }
+        },
+        {
+            "Festivity": {
+                "tag": "StEdithStein",
+                "color": "white",
+                "grade": 4,
+                "day": 9,
+                "month": 8,
+                "sinceYear": 1999,
+                "common": "Martyrs:For a Virgin Martyr,Virgins:For One Virgin",
+                "readings": {
+                    "FIRST_READING": "",
+                    "RESPONSORIAL_PSALM": "",
+                    "SECOND_READING": "",
+                    "ALLELUIA_VERSE": "",
+                    "GOSPEL": ""
+                }
+            },
+            "Metadata": {
+                "action": "create",
+                "decreeURL": "https://www.vatican.va/content/john-paul-ii/%s/motu_proprio/documents/hf_jp-ii_motu-proprio_01101999_co-patronesses-europe.html",
+                "decreeLangs": {
+                    "DE": "de",
+                    "EN": "en",
+                    "ES": "es",
+                    "FR": "fr",
+                    "IT": "it",
+                    "LA": "la",
+                    "PT": "pt"
+                }
+            }
+        },
+        {
+            "Festivity": {
+                "tag": "StEdithStein",
+                "color": "white",
+                "grade": 4,
+                "day": 9,
+                "month": 8,
+                "sinceYear": 2002
+            },
+            "Metadata": {
+                "action": "makePatron",
+                "decreeURL": "https://www.vatican.va/content/john-paul-ii/%s/motu_proprio/documents/hf_jp-ii_motu-proprio_01101999_co-patronesses-europe.html",
+                "decreeLangs": {
+                    "DE": "de",
+                    "EN": "en",
+                    "ES": "es",
+                    "FR": "fr",
+                    "IT": "it",
+                    "LA": "la",
+                    "PT": "pt"
+                }
+            }
+        }
+    ],
+    "NationalCalendars": {
+        "AUSTRIA": "AT",
+        "BELGIUM": "BE",
+        "BULGARIA": "BG",
+        "CZECH REPUBLIC": "CZ",
+        "CYPRUS": "CY",
+        "CROATIA": "HR",
+        "DENMARK": "DK",
+        "ESTONIA": "EE",
+        "FINLAND": "FI",
+        "FRANCE": "FR",
+        "GERMANY": "DE",
+        "GREECE": "GR",
+        "IRELAND": "IE",
+        "ITALY": "IT",
+        "LATVIA": "LV",
+        "LITHUANIA": "LT",
+        "LUXEMBOURG": "LU",
+        "MALTA": "MT",
+        "NETHERLANDS": "NL",
+        "POLONIA": "PL",
+        "PORTUGAL": "PT",
+        "ROMANIA": "RO",
+        "SLOVACCHIA": "SK",
+        "SLOVENIA": "SI",
+        "SPAIN": "ES",
+        "SWEDEN": "SE",
+        "HUNGARY": "HU"
+    }
+}

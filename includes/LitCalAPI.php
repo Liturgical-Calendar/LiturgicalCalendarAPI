@@ -32,6 +32,8 @@ class LitCalAPI {
     private LitGrade $LitGrade;
 
     private ?object $DiocesanData                   = null;
+    private ?object $NationalData                   = null;
+    private ?object $widerRegionData                = null;
     private ?object $GeneralIndex                   = null;
     private NumberFormatter $formatter;
     private NumberFormatter $formatterFem;
@@ -172,7 +174,7 @@ class LitCalAPI {
     }
 
 
-    private function loadLocalCalendarData() : void {
+    private function loadDiocesanCalendarData() : void {
         if( $this->LitSettings->DiocesanCalendar !== null ){
             //since a Diocesan calendar is being requested, we need to retrieve the JSON data
             //first we need to discover the path, so let's retrieve our index file
@@ -220,14 +222,14 @@ class LitCalAPI {
         //with the Prima Editio Typica of the Roman Missal and the General Norms promulgated with the Motu Proprio "Mysterii Paschali" in 1969
         if ( $this->LitSettings->Year < 1970 ) {
             $this->Messages[] = sprintf( _( "Only years from 1970 and after are supported. You tried requesting the year %d." ), $this->LitSettings->Year );
-            $this->GenerateResponseToRequest();
+            $this->GenerateResponse();
         }
     }
 
     /**
      * Retrieve Higher Ranking Solemnities from Proprium de Tempore
      */
-    private function populatePropriumDeTempore() : void {
+    private function loadPropriumDeTemporeData() : void {
         $propriumdetemporeFile = strtolower( "data/propriumdetempore/{$this->LitSettings->Locale}.json" );
         if( file_exists( $propriumdetemporeFile ) ) {
             $PropriumDeTempore = json_decode( file_get_contents( $propriumdetemporeFile ), true );
@@ -241,7 +243,7 @@ class LitCalAPI {
         }
     }
 
-    private function readPropriumDeSanctisJSONData( string $missal ) : void {
+    private function loadPropriumDeSanctisData( string $missal ) : void {
         $propriumdesanctisFile = RomanMissal::getSanctoraleFileName( $missal );
         $propriumdesanctisI18nPath = RomanMissal::getSanctoraleI18nFilePath( $missal );
 
@@ -271,7 +273,7 @@ class LitCalAPI {
         }
     }
 
-    private function readMemorialsFromDecreesJSONData() : void {
+    private function loadMemorialsFromDecreesData() : void {
         $memorialsFromDecreesFile       = "data/memorialsFromDecrees/memorialsFromDecrees.json";
         $memorialsFromDecreesI18nPath   = "data/memorialsFromDecrees/i18n/";
         $memorialsFromDecreesI18nFile = $memorialsFromDecreesI18nPath . strtolower( $this->LitSettings->Locale ) . ".json";
@@ -1584,7 +1586,7 @@ class LitCalAPI {
         $this->applyPatronSaintsEurope();
         $this->applyPatronSaintsItaly();
         if( $this->LitSettings->Year >= 1983 && $this->LitSettings->Year < 2002 ) {
-            $this->readPropriumDeSanctisJSONData( RomanMissal::ITALY_EDITION_1983 );
+            $this->loadPropriumDeSanctisData( RomanMissal::ITALY_EDITION_1983 );
             //The extra liturgical events found in the 1983 edition of the Roman Missal in Italian,
             //were then incorporated into the Latin edition in 2002 ( effectively being incorporated into the General Roman Calendar )
             //so when dealing with Italy, we only need to add them from 1983 until 2002, after which it's taken care of by the General Calendar
@@ -1767,7 +1769,7 @@ class LitCalAPI {
         $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', '5-7-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
         $this->moveFestivityDate( "StElizabethPortugal", $currentFeastDate, "Independence Day", RomanMissal::USA_EDITION_2011 );
 
-        $this->readPropriumDeSanctisJSONData( RomanMissal::USA_EDITION_2011 );
+        $this->loadPropriumDeSanctisData( RomanMissal::USA_EDITION_2011 );
 
         foreach ( $this->tempCal[ RomanMissal::USA_EDITION_2011 ] as $row ) {
             $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
@@ -1867,7 +1869,7 @@ class LitCalAPI {
 
     private function calculateUniversalCalendar() : void {
 
-        $this->populatePropriumDeTempore();
+        $this->loadPropriumDeTemporeData();
         /**
          *  CALCULATE LITURGICAL EVENTS BASED ON THE ORDER OF PRECEDENCE OF LITURGICAL DAYS ( LY 59 )
          *  General Norms for the Liturgical Year and the Calendar ( issued on Feb. 14 1969 )
@@ -1886,7 +1888,7 @@ class LitCalAPI {
         $this->calculateEasterOctave();
         //3. Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar
         $this->calculateMobileSolemnitiesOfTheLord();
-        $this->readPropriumDeSanctisJSONData( RomanMissal::EDITIO_TYPICA_1970 );
+        $this->loadPropriumDeSanctisData( RomanMissal::EDITIO_TYPICA_1970 );
         $this->calculateFixedSolemnities(); //this will also handle All Souls Day
 
         //4. PROPER SOLEMNITIES:
@@ -1920,16 +1922,16 @@ class LitCalAPI {
         $this->calculateMemorials( LitGrade::MEMORIAL, RomanMissal::EDITIO_TYPICA_1970 );
 
         if ( $this->LitSettings->Year >= 2002 ) {
-            $this->readPropriumDeSanctisJSONData( RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
+            $this->loadPropriumDeSanctisData( RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
             $this->calculateMemorials( LitGrade::MEMORIAL, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
         }
 
         if( $this->LitSettings->Year >= 2008 ) {
-            $this->readPropriumDeSanctisJSONData( RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 );
+            $this->loadPropriumDeSanctisData( RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 );
             $this->calculateMemorials( LitGrade::MEMORIAL, RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 );
         }
 
-        $this->readMemorialsFromDecreesJSONData();
+        $this->loadMemorialsFromDecreesData();
         $this->applyDecrees( LitGrade::MEMORIAL );
 
         //11. Proper obligatory memorials, and that is:
@@ -2210,6 +2212,33 @@ class LitCalAPI {
         $this->AllowedReturnTypes = array_values( array_intersect( ReturnType::$values, $returnTypes ) );
     }
 
+    private function loadNationalCalendarData() : void {
+        $nationalDataFile = "nations/{$this->LitSettings->NationalCalendar}/{$this->LitSettings->NationalCalendar}.json";
+        if( file_exists( $nationalDataFile ) ) {
+            $this->NationalData = json_decode( file_get_contents($nationalDataFile ) );
+            if( property_exists( $this->NationalData, "Metadata" ) && property_exists( $this->NationalData, "WiderRegion" ) ){
+                $widerRegionDataFile = $this->NationalData->Metadata->WiderRegion->jsonFile;
+                $widerRegionI18nFile = $this->NationalData->Metadata->WiderRegion->i18nFile;
+                if( file_exists( $widerRegionI18nFile ) ) {
+                    $widerRegionI18nData = json_decode( file_get_contents( $widerRegionI18nFile ) );
+                    if( json_last_error() === JSON_ERROR_NONE && file_exists( $widerRegionDataFile ) ) {
+                        $this->WiderRegionData = json_decode( file_get_contents( $widerRegionDataFile ), true );
+                        if( json_last_error() === JSON_ERROR_NONE ) {
+                            foreach( $this->WiderRegionData as $idx => $value ) {
+                                $tag = $value["Festivity"]["tag"];
+                                $this->WiderRegionData[$idx]["Festivity"]["name"] = $widerRegionI18nData[ $tag ];
+                            }
+                        } else {
+                            $this->Messages[] = sprintf( _( "Error retrieving and decoding Wider Region data from file %s." ), $widerRegionDataFile ) . ": " . json_last_error_msg();
+                        }
+                    } else {
+                        $this->Messages[] = sprintf( _( "Error retrieving and decoding Wider Region data from file %s." ), $widerRegionI18nFile ) . ": " . json_last_error_msg();
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * The LitCalEngine will only work once you call the public Init() method
      * Do not change the order of the methods that follow,
@@ -2218,7 +2247,7 @@ class LitCalAPI {
     public function Init(){
         $this->APICore->Init();
         $this->initParameterData();
-        $this->loadLocalCalendarData();
+        $this->loadDiocesanCalendarData();
         $this->APICore->setResponseContentTypeHeader();
         if( $this->cacheFileIsAvailable() ){
             //If we already have done the calculation
@@ -2232,6 +2261,8 @@ class LitCalAPI {
             $this->calculateUniversalCalendar();
 
             if( $this->LitSettings->NationalCalendar !== null ) {
+                //$this->loadNationalCalendarData();
+                //$this->applyNationalCalendar();
                 switch( $this->LitSettings->NationalCalendar ){
                     case 'ITALY':
                         $this->applyCalendarItaly();
