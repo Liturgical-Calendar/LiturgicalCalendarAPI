@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-06 22:25+0000\n"
+"POT-Creation-Date: 2022-02-06 22:33+0000\n"
 "PO-Revision-Date: 2022-02-05 02:15+0000\n"
 "Last-Translator: padrecedano <padre.cedano@gmail.com>\n"
 "Language-Team: Spanish <https://translate.johnromanodorazio.com/projects/"
@@ -404,7 +404,7 @@ msgstr ""
 msgid "Saint Teresa Benedicta of the Cross, Virgin and Martyr"
 msgstr ""
 
-#: includes/LitCalAPI.php:2232 includes/LitCalAPI.php:2235
+#: includes/LitCalAPI.php:2236 includes/LitCalAPI.php:2239
 #, php-format
 msgid "Error retrieving and decoding Wider Region data from file %s."
 msgstr ""
