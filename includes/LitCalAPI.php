@@ -33,7 +33,7 @@ class LitCalAPI {
 
     private ?object $DiocesanData                   = null;
     private ?object $NationalData                   = null;
-    private ?object $widerRegionData                = null;
+    private ?object $WiderRegionData                = null;
     private ?object $GeneralIndex                   = null;
     private NumberFormatter $formatter;
     private NumberFormatter $formatterFem;
@@ -1582,6 +1582,40 @@ class LitCalAPI {
         }
     }
 
+    private function loadNationalCalendarData() : void {
+        $nationalDataFile = "nations/{$this->LitSettings->NationalCalendar}/{$this->LitSettings->NationalCalendar}.json";
+        if( file_exists( $nationalDataFile ) ) {
+            $this->NationalData = json_decode( file_get_contents($nationalDataFile ) );
+            if( property_exists( $this->NationalData, "Metadata" ) && property_exists( $this->NationalData, "WiderRegion" ) ){
+                $widerRegionDataFile = $this->NationalData->Metadata->WiderRegion->jsonFile;
+                $widerRegionI18nFile = $this->NationalData->Metadata->WiderRegion->i18nFile;
+                if( file_exists( $widerRegionI18nFile ) ) {
+                    $widerRegionI18nData = json_decode( file_get_contents( $widerRegionI18nFile ) );
+                    if( json_last_error() === JSON_ERROR_NONE && file_exists( $widerRegionDataFile ) ) {
+                        $this->WiderRegionData = json_decode( file_get_contents( $widerRegionDataFile ), true );
+                        if( json_last_error() === JSON_ERROR_NONE ) {
+                            foreach( $this->WiderRegionData as $idx => $value ) {
+                                $tag = $value["Festivity"]["tag"];
+                                $this->WiderRegionData[$idx]["Festivity"]["name"] = $widerRegionI18nData[ $tag ];
+                            }
+                        } else {
+                            $this->Messages[] = sprintf( _( "Error retrieving and decoding Wider Region data from file %s." ), $widerRegionDataFile ) . ": " . json_last_error_msg();
+                        }
+                    } else {
+                        $this->Messages[] = sprintf( _( "Error retrieving and decoding Wider Region data from file %s." ), $widerRegionI18nFile ) . ": " . json_last_error_msg();
+                    }
+                }
+            }
+        }
+    }
+
+    private function applyNationalCalendar() : void {
+        //first thing is apply any wider region festivities, such as Patron Saints of the Wider Region (example: Europe)
+        if( $this->WiderRegionData !== null ) {
+
+        }
+    }
+
     private function applyCalendarItaly() : void {
         $this->applyPatronSaintsEurope();
         $this->applyPatronSaintsItaly();
@@ -2216,33 +2250,6 @@ class LitCalAPI {
         $this->AllowedReturnTypes = array_values( array_intersect( ReturnType::$values, $returnTypes ) );
     }
 
-    private function loadNationalCalendarData() : void {
-        $nationalDataFile = "nations/{$this->LitSettings->NationalCalendar}/{$this->LitSettings->NationalCalendar}.json";
-        if( file_exists( $nationalDataFile ) ) {
-            $this->NationalData = json_decode( file_get_contents($nationalDataFile ) );
-            if( property_exists( $this->NationalData, "Metadata" ) && property_exists( $this->NationalData, "WiderRegion" ) ){
-                $widerRegionDataFile = $this->NationalData->Metadata->WiderRegion->jsonFile;
-                $widerRegionI18nFile = $this->NationalData->Metadata->WiderRegion->i18nFile;
-                if( file_exists( $widerRegionI18nFile ) ) {
-                    $widerRegionI18nData = json_decode( file_get_contents( $widerRegionI18nFile ) );
-                    if( json_last_error() === JSON_ERROR_NONE && file_exists( $widerRegionDataFile ) ) {
-                        $this->WiderRegionData = json_decode( file_get_contents( $widerRegionDataFile ), true );
-                        if( json_last_error() === JSON_ERROR_NONE ) {
-                            foreach( $this->WiderRegionData as $idx => $value ) {
-                                $tag = $value["Festivity"]["tag"];
-                                $this->WiderRegionData[$idx]["Festivity"]["name"] = $widerRegionI18nData[ $tag ];
-                            }
-                        } else {
-                            $this->Messages[] = sprintf( _( "Error retrieving and decoding Wider Region data from file %s." ), $widerRegionDataFile ) . ": " . json_last_error_msg();
-                        }
-                    } else {
-                        $this->Messages[] = sprintf( _( "Error retrieving and decoding Wider Region data from file %s." ), $widerRegionI18nFile ) . ": " . json_last_error_msg();
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * The LitCalEngine will only work once you call the public Init() method
      * Do not change the order of the methods that follow,
@@ -2253,11 +2260,21 @@ class LitCalAPI {
         $this->initParameterData();
         $this->loadDiocesanCalendarData();
         $this->APICore->setResponseContentTypeHeader();
+
         if( $this->cacheFileIsAvailable() ){
             //If we already have done the calculation
             //and stored the results in a cache file
             //then we're done, just output this and die
-            echo file_get_contents( $this->CACHEFILE );
+            //or better, make the client use it's own cache copy!
+            $response = file_get_contents( $this->CACHEFILE );
+            $responseHash = md5( $response );
+            header("Etag: \"{$responseHash}\"");
+            if (!empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
+                header( $_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified" );
+                header('Content-Length: 0');
+            } else {
+                echo $response;
+            }
             die();
         } else {
             $this->dieIfBeforeMinYear();
@@ -2269,7 +2286,9 @@ class LitCalAPI {
                 //$this->applyNationalCalendar();
                 switch( $this->LitSettings->NationalCalendar ){
                     case 'ITALY':
-                        $this->applyCalendarItaly();
+                        $this->loadNationalCalendarData();
+                        $this->applyNationalCalendar();
+                        //$this->applyCalendarItaly();
                         break;
                     case 'USA':
                         //I don't have any data before 2011
