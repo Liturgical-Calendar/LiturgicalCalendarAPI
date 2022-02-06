@@ -13,14 +13,14 @@ class RomanMissal {
     const ITALY_EDITION_2020                    = "ITALY_2020";
 
     public static array $values = [ 
-        "LITURGY__calendar_propriumdesanctis"               => "VATICAN_1970",
-        "LITURGY__calendar_propriumdesanctis_1971"          => "VATICAN_1971",
-        "LITURGY__calendar_propriumdesanctis_1975"          => "VATICAN_1975",
-        "LITURGY__calendar_propriumdesanctis_2002"          => "VATICAN_2002",
-        "LITURGY__calendar_propriumdesanctis_2008"          => "VATICAN_2008",
-        "LITURGY__USA_calendar_propriumdesanctis_2011"      => "USA_2011",
-        "LITURGY__ITALY_calendar_propriumdesanctis_1983"    => "ITALY_1983",
-        "LITURGY__ITALY_calendar_propriumdesanctis_2020"    => "ITALY_2020"
+        "VATICAN_1970",
+        "VATICAN_1971",
+        "VATICAN_1975",
+        "VATICAN_2002",
+        "VATICAN_2008",
+        "USA_2011",
+        "ITALY_1983",
+        "ITALY_2020"
     ];
 
     public static array $names = [
@@ -65,8 +65,8 @@ class RomanMissal {
         return in_array( $value, self::$values ) && strpos( $value, "VATICAN_" );
     }
 
-    public static function getSanctoraleTableName( $value ) : string|int|false {
-        return array_search( $value, self::$values );
+    public static function getName( $value ) : string {
+        return self::$names[ $value ];
     }
 
     public static function getSanctoraleFileName( $value ) : string|false {
@@ -75,9 +75,5 @@ class RomanMissal {
 
     public static function getSanctoraleI18nFilePath( $value ) : string|false {
         return self::$i18nPath[ $value ];
-    }
-
-    public static function getName( $value ) : string {
-        return self::$names[ $value ];
     }
 }
