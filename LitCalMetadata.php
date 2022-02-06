@@ -9,6 +9,7 @@ else {
     header( 'Access-Control-Allow-Origin: *' );
 }
 header( 'Access-Control-Max-Age: 86400' );    // cache for 1 day
+header( 'Cache-Control: must-revalidate, max-age=259200' );
 header( 'Content-Type: application/json' );
 
 //National Calendars are defined in the LitCalAPI engine itself,
@@ -37,12 +38,20 @@ if( file_exists( 'nations/index.json' ) ) {
             }
         }
 
-        echo json_encode( [
+        $response = json_encode( [
             "LitCalMetadata" => [
                 "NationalCalendars" => $nationalCalendars,
                 "DiocesanCalendars" => $diocesanCalendars
             ],
         ], JSON_PRETTY_PRINT );
+        $responseHash = md5( $response );
+        header("Etag: \"{$responseHash}\"");
+        if (!empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
+            header( $_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified" );
+            header('Content-Length: 0');
+        } else {
+            echo $response;
+        }
     } else {
         http_response_code(503);
     }
