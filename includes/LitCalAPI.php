@@ -254,7 +254,17 @@ class LitCalAPI {
                 if( json_last_error() !== JSON_ERROR_NONE ) {
                     die( '{"ERROR": "There was an error trying to retrieve and decode JSON i18n data for the Proprium de Sanctis for the Missal ' . RomanMissal::getName( $missal ) . ': ' . json_last_error_msg() . '"}' );
                 }
+            } else {
+                $this->Messages[] = sprintf(
+                    _( 'Data for the sanctorale from %s could not be found.' ),
+                    RomanMissal::getName( $missal )
+                );
             }
+        } else {
+            $this->Messages[] = sprintf(
+                _( 'Translation data for the sanctorale from %s could not be found.' ),
+                RomanMissal::getName( $missal )
+            );
         }
 
         if( file_exists( $propriumdesanctisFile ) ) {
@@ -1585,50 +1595,314 @@ class LitCalAPI {
     private function loadNationalCalendarData() : void {
         $nationalDataFile = "nations/{$this->LitSettings->NationalCalendar}/{$this->LitSettings->NationalCalendar}.json";
         if( file_exists( $nationalDataFile ) ) {
-            $this->NationalData = json_decode( file_get_contents($nationalDataFile ) );
-            if( property_exists( $this->NationalData, "Metadata" ) && property_exists( $this->NationalData, "WiderRegion" ) ){
-                $widerRegionDataFile = $this->NationalData->Metadata->WiderRegion->jsonFile;
-                $widerRegionI18nFile = $this->NationalData->Metadata->WiderRegion->i18nFile;
-                if( file_exists( $widerRegionI18nFile ) ) {
-                    $widerRegionI18nData = json_decode( file_get_contents( $widerRegionI18nFile ) );
-                    if( json_last_error() === JSON_ERROR_NONE && file_exists( $widerRegionDataFile ) ) {
-                        $this->WiderRegionData = json_decode( file_get_contents( $widerRegionDataFile ), true );
-                        if( json_last_error() === JSON_ERROR_NONE ) {
-                            foreach( $this->WiderRegionData as $idx => $value ) {
-                                $tag = $value["Festivity"]["tag"];
-                                $this->WiderRegionData[$idx]["Festivity"]["name"] = $widerRegionI18nData[ $tag ];
+            $this->NationalData = json_decode( file_get_contents( $nationalDataFile ) );
+            if( json_last_error() === JSON_ERROR_NONE ) {
+                if( property_exists( $this->NationalData, "Metadata" ) && property_exists( $this->NationalData->Metadata, "WiderRegion" ) ){
+                    $widerRegionDataFile = $this->NationalData->Metadata->WiderRegion->jsonFile;
+                    $widerRegionI18nFile = $this->NationalData->Metadata->WiderRegion->i18nFile;
+                    if( file_exists( $widerRegionI18nFile ) ) {
+                        $widerRegionI18nData = json_decode( file_get_contents( $widerRegionI18nFile ) );
+                        if( json_last_error() === JSON_ERROR_NONE && file_exists( $widerRegionDataFile ) ) {
+                            $this->WiderRegionData = json_decode( file_get_contents( $widerRegionDataFile ) );
+                            if( json_last_error() === JSON_ERROR_NONE && property_exists( $this->WiderRegionData, "LitCal" ) ) {
+                                foreach( $this->WiderRegionData->LitCal as $idx => $value ) {
+                                    $tag = $value->Festivity->tag;
+                                    $this->WiderRegionData->LitCal[$idx]->Festivity->name = $widerRegionI18nData->{ $tag };
+                                }
+                            } else {
+                                $this->Messages[] = sprintf( _( "Error retrieving and decoding Wider Region data from file %s." ), $widerRegionDataFile ) . ": " . json_last_error_msg();
                             }
                         } else {
-                            $this->Messages[] = sprintf( _( "Error retrieving and decoding Wider Region data from file %s." ), $widerRegionDataFile ) . ": " . json_last_error_msg();
+                            $this->Messages[] = sprintf( _( "Error retrieving and decoding Wider Region data from file %s." ), $widerRegionI18nFile ) . ": " . json_last_error_msg();
                         }
-                    } else {
-                        $this->Messages[] = sprintf( _( "Error retrieving and decoding Wider Region data from file %s." ), $widerRegionI18nFile ) . ": " . json_last_error_msg();
                     }
+                } else {
+                    $this->Messages[] = "Could not find a WiderRegion property in the Metadata for the National Calendar {$this->LitSettings->NationalCalendar}";
                 }
+            } else {
+                $this->Messages[] = sprintf( _( "Error retrieving and decoding National data from file %s." ), $nationalDataFile ) . ": " . json_last_error_msg();
             }
+        }
+    }
+
+    private function handleMissingFestivity( object $row ) : void {
+        $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', "{$row->Festivity->day}-{$row->Festivity->month}-" . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+        //let's also get the name back from the database, so we can give some feedback and maybe even recreate the festivity
+        if( $this->Cal->inSolemnitiesFeastsOrMemorials( $currentFeastDate ) || self::DateIsSunday( $currentFeastDate ) ) {
+            $coincidingFestivity = new stdClass();
+            if ( self::DateIsSunday( $currentFeastDate ) && $coincidingFestivity->event->grade < LitGrade::SOLEMNITY ){
+                //it's a Sunday
+                $coincidingFestivity->event = $this->Cal->solemnityFromDate( $currentFeastDate );
+                $coincidingFestivity->grade = $this->LitSettings->Locale === LitLocale::LATIN ? 'Die Domini' : ucfirst( $this->dayOfTheWeek->format( $currentFeastDate->format( 'U' ) ) );
+            } else if ( $this->Cal->inSolemnities( $currentFeastDate ) ) {
+                $coincidingFestivity->event = $this->Cal->solemnityFromDate( $currentFeastDate );
+                //it's a Feast of the Lord or a Solemnity
+                $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $coincidingFestivity->event->grade, false ) . '</i>' : $this->LitGrade->i18n( $coincidingFestivity->grade, false ) );
+            } else if ( $this->Cal->inFeastsOrMemorials( $currentFeastDate ) ) {
+                $coincidingFestivity->event = $this->Cal->feastOrMemorialFromDate( $currentFeastDate );
+                //we should probably be able to create it anyways in this case?
+                $this->Cal->addFestivity( $row->Festivity->tag, new Festivity( $row->Festivity->name, $currentFeastDate, $row->Festivity->color, LitFeastType::FIXED, $row->Festivity->grade, LitCommon::PROPRIO ) );
+                $coincidingFestivity->grade = $this->LitGrade->i18n( $coincidingFestivity->event->grade, false );
+            }
+            $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                /**translators:
+                 * 1. Grade of the festivity
+                 * 2. Name of the festivity
+                 * 3. Date on which the festivity is usually celebrated
+                 * 4. Grade of the superseding festivity
+                 * 5. Name of the superseding festivity
+                 * 6. Current year
+                 */
+                _( 'The %1$s \'%2$s\', usually celebrated on %3$s, is suppressed by the %4$s \'%5$s\' in the year %6$d.' ),
+                $this->LitGrade->i18n( $row->Festivity->grade, false ),
+                $row->Festivity->name,
+                $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ),
+                $coincidingFestivity->grade,
+                $coincidingFestivity->event->name,
+                $this->LitSettings->Year
+            );
+        }
+    }
+
+    private function festivityCanBeCreated( object $row ) : bool {
+        switch( $row->Festivity->grade ) {
+            case LitGrade::MEMORIAL_OPT:
+                return $this->Cal->notInSolemnitiesFeastsOrMemorials( $row->Festivity->DATE );
+            case LitGrade::MEMORIAL:
+                return $this->Cal->notInSolemnitiesOrFeasts( $row->Festivity->DATE );
+                //however we still have to handle possible coincidences with another memorial
+            case LitGrade::FEAST:
+                return $this->Cal->notInSolemnities( $row->Festivity->DATE );
+                //however we still have to handle possible coincidences with another feast
+            case LitGrade::SOLEMNITY:
+                return true;
+                //however we still have to handle possible coincidences with another solemnity
+        }
+        return false;
+    }
+
+    private function festivityDoesNotCoincide( object $row ) : bool {
+        switch( $row->Festivity->grade ) {
+            case LitGrade::MEMORIAL_OPT:
+                return true;
+                //optional memorials never have problems as regards coincidence with another optional memorial
+            case LitGrade::MEMORIAL:
+                return $this->Cal->notInMemorials( $row->Festivity->DATE );
+            case LitGrade::FEAST:
+                return $this->Cal->notInFeasts( $row->Festivity->DATE );
+            case LitGrade::SOLEMNITY:
+                return $this->Cal->notInSolemnities( $row->Festivity->DATE );
+        }
+        //functions should generally have a default return value
+        //however, it would make no sense to give a default return value here
+        //we really need to cover all cases and give a sure return value
+    }
+
+    private function handleFestivityCreationWithCoincidence( object $row ) : void {
+        switch( $row->Festivity->grade ) {
+            case LitGrade::MEMORIAL:
+                //both memorials become optional memorials
+                $coincidingFestivities = $this->Cal->getCalEventsFromDate( $row->Festivity->DATE );
+                $coincidingMemorials = array_filter( $coincidingFestivities, function( $el ) { return $el->grade === LitGrade::MEMORIAL; } );
+                $coincidingMemorialName = '';
+                foreach( $coincidingMemorials as $key => $value ) {
+                    $this->Cal->setProperty( $key, "grade", LitGrade::MEMORIAL_OPT );
+                    $coincidingMemorialName = $value->name;
+                }
+                $festivity = new Festivity( $row->Festivity->name, $row->Festivity->DATE, $row->Festivity->color, LitFeastType::FIXED, LitGrade::MEMORIAL_OPT, $row->Festivity->common );
+                $this->Cal->addFestivity( $row->Festivity->tag, $festivity );
+                $this->Messages[] = sprintf(
+                    /**translators:
+                     * 1. Name of the first coinciding Memorial
+                     * 2. Name of the second coinciding Memorial
+                     * 3. Current year
+                     * 4. Source of the information
+                     */
+                    _( 'The Memorial \'%1$s\' coincides with another Memorial \'%2$s\' in the year %3$d. They are both reduced in rank to optional memorials.' ),
+                    $row->Festivity->name,
+                    $coincidingMemorialName,
+                    $this->LitSettings->Year
+                );
+                break;
+            case LitGrade::FEAST:
+                //there seems to be a coincidence with a different Feast on the same day!
+                //what should we do about this? perhaps move one of them?
+                $coincidingFestivities = $this->Cal->getCalEventsFromDate( $row->Festivity->DATE );
+                $coincidingFeasts = array_filter( $coincidingFestivities, function( $el ) { return $el->grade === LitGrade::FEAST; } );
+                $coincidingFeastName = '';
+                foreach( $coincidingFeasts as $key => $value ) {
+                    //$this->Cal->setProperty( $key, "grade", LitGrade::MEMORIAL_OPT );
+                    $coincidingFeastName = $value->name;
+                }
+                $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                    $this->LitSettings->NationalCalendar . ": the Feast '%s', usually celebrated on %s, coincides with another Feast '%s' in the year %d! Does something need to be done about this?",
+                    '<b>' . $row->Festivity->name . '</b>',
+                    '<b>' . $this->dayAndMonth->format(  $row->Festivity->DATE->format( 'U' ) ) . '</b>',
+                    '<b>' . $coincidingFeastName . '</b>',
+                    $this->LitSettings->Year
+                );
+                break;
+            case LitGrade::SOLEMNITY:
+                //there seems to be a coincidence with a different Solemnity on the same day!
+                //should we attempt to move to the next open slot?
+                $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                    $this->LitSettings->NationalCalendar . ": the Solemnity '%s', usually celebrated on %s, coincides with the Sunday or Solemnity '%s' in the year %d! Does something need to be done about this?",
+                    '<i>' . $row->Festivity->name . '</i>',
+                    '<b>' . $this->dayAndMonth->format(  $row->Festivity->DATE->format( 'U' ) ) . '</b>',
+                    '<i>' . $this->Cal->solemnityFromDate(  $row->Festivity->DATE )->name . '</i>',
+                    $this->LitSettings->Year
+                );
+                break;
+        }
+    }
+
+    private function createNewRegionalFestivity( object $row ) : void {
+        $row->Festivity->DATE = DateTime::createFromFormat( '!j-n-Y', "{$row->Festivity->day}-{$row->Festivity->month}-{$this->LitSettings->Year}", new DateTimeZone( 'UTC' ) );
+        if( $this->festivityCanBeCreated( $row ) ) {
+            if( $this->festivityDoesNotCoincide( $row ) ) {
+                $festivity = new Festivity( $row->Festivity->name, $row->Festivity->DATE, $row->Festivity->color, LitFeastType::FIXED, $row->Festivity->grade, $row->Festivity->common );
+                $this->Cal->addFestivity( $row->Festivity->tag, $festivity );
+            } else {
+                $this->handleFestivityCreationWithCoincidence( $row );
+            }
+            $this->Messages[] = sprintf(
+                /**translators:
+                 * 1. Grade or rank of the festivity
+                 * 2. Name of the festivity
+                 * 3. Day of the festivity
+                 * 4. Year from which the festivity has been added
+                 * 5. Source of the information
+                 * 6. Current year
+                 */
+                _( 'The %1$s \'%2$s\' has been added on %3$s since the year %4$d (%5$s), applicable to the year %6$d.' ),
+                $this->LitGrade->i18n( $row->Festivity->grade, false ),
+                $row->Festivity->name,
+                $this->LitSettings->Locale === LitLocale::LATIN ? ( $row->Festivity->DATE->format( 'j' ) . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->Festivity->DATE->format( 'n' ) ] ) :
+                    ( $this->LitSettings->Locale === LitLocale::ENGLISH ? $row->Festivity->DATE->format( 'F jS' ) :
+                        $this->dayAndMonth->format( $row->Festivity->DATE->format( 'U' ) )
+                    ),
+                $row->Metadata->sinceYear,
+                $this->elaborateDecreeSource( $row ),
+                $this->LitSettings->Year
+            );
+        } else {
+            //$this->handleCoincidenceDecree( $row );
         }
     }
 
     private function applyNationalCalendar() : void {
         //first thing is apply any wider region festivities, such as Patron Saints of the Wider Region (example: Europe)
-        if( $this->WiderRegionData !== null ) {
-
+        if( $this->WiderRegionData !== null && property_exists( $this->WiderRegionData, "LitCal" ) ) {
+            foreach( $this->WiderRegionData->LitCal as $row ) {
+                if( $this->LitSettings->Year >= $row->Metadata->sinceYear ) {
+                    if( property_exists( $row->Metadata, "untilYear" ) && $this->LitSettings->Year >= $row->Metadata->untilYear ) {
+                        continue;
+                    } else {
+                        //if either the property doesn't exist (so no limit is set)
+                        //or there is a limit but we are within those limits
+                        switch( $row->Metadata->action ) {
+                            case "makePatron":
+                                $festivity = $this->Cal->getFestivity( $row->Festivity->tag );
+                                if( $festivity !== null ) {
+                                    if( $festivity->grade !== $row->Festivity->grade ) {
+                                        $this->Cal->setProperty( $row->Festivity->tag, "grade", $row->Festivity->grade );
+                                    }
+                                    $this->Cal->setProperty( $row->Festivity->tag, "name", $row->Festivity->name );
+                                } else {
+                                    $this->handleMissingFestivity( $row );
+                                }
+                                break;
+                            case "createNew":
+                                $this->createNewRegionalFestivity( $row );
+                                break;
+                        }
+                    }
+                }
+            }
         }
-    }
 
-    private function applyCalendarItaly() : void {
-        $this->applyPatronSaintsEurope();
-        $this->applyPatronSaintsItaly();
-        if( $this->LitSettings->Year >= 1983 && $this->LitSettings->Year < 2002 ) {
-            $this->loadPropriumDeSanctisData( RomanMissal::ITALY_EDITION_1983 );
-            //The extra liturgical events found in the 1983 edition of the Roman Missal in Italian,
-            //were then incorporated into the Latin edition in 2002 ( effectively being incorporated into the General Roman Calendar )
-            //so when dealing with Italy, we only need to add them from 1983 until 2002, after which it's taken care of by the General Calendar
-            $this->applyMessaleRomano1983();
+        if( $this->NationalData !== null && property_exists( $this->NationalData, "LitCal" ) ) {
+            foreach( $this->NationalData->LitCal as $row ) {
+                if( $this->LitSettings->Year >= $row->Metadata->sinceYear ) {
+                    if( property_exists( $row->Metadata, "untilYear" ) && $this->LitSettings->Year >= $row->Metadata->untilYear ) {
+                        continue;
+                    } else {
+                        switch( $row->Metadata->action ) {
+                            case "makePatron":
+                                $festivity = $this->Cal->getFestivity( $row->Festivity->tag );
+                                if( $festivity !== null ) {
+                                    if( $festivity->grade !== $row->Festivity->grade ) {
+                                        $this->Cal->setProperty( $row->Festivity->tag, "grade", $row->Festivity->grade );
+                                    }
+                                    $this->Cal->setProperty( $row->Festivity->tag, "name", $row->Festivity->name );
+                                } else {
+                                    $this->handleMissingFestivity( $row );
+                                }
+                                break;
+                            case "createNew":
+                                $this->createNewRegionalFestivity( $row );
+                                break;
+                        }
+                    }
+                }
+            }
         }
 
-        //The Sanctorale in the 2020 edition Messale Romano is based on the Latin 2008 Edition,
-        // there isn't really anything different from preceding editions or from the 2008 edition
+        if( $this->NationalData !== null && property_exists( $this->NationalData, "Metadata" ) && property_exists( $this->NationalData->Metadata, "Missals" ) ) {
+            $this->Messages[] = "Found Missals for region " . $this->NationalData->Metadata->Region. ": " . implode(', ', $this->NationalData->Metadata->Missals);
+            foreach( $this->NationalData->Metadata->Missals as $missal ) {
+                $yearLimits = RomanMissal::getYearLimits( $missal );
+                if( $this->LitSettings->Year >= $yearLimits->sinceYear ) {
+                    if( property_exists( $yearLimits, "untilYear" ) && $this->LitSettings->Year >= $yearLimits->untilYear ) {
+                        continue;
+                    } else {
+                        if( RomanMissal::getSanctoraleFileName( $missal ) !== false ) {
+                            $this->Messages[] = sprintf(
+                                _( 'Found a sanctorale data file for %s' ),
+                                RomanMissal::getName( $missal )
+                            );
+                            $this->loadPropriumDeSanctisData( $missal );
+                            foreach ( $this->tempCal[ $missal ] as $row ) {
+                                $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+                                if( !$this->Cal->inSolemnitiesOrFeasts( $currentFeastDate ) ) {
+                                    $festivity = new Festivity( "[ {$this->NationalData->Metadata->Region} ] " . $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON, $row->DISPLAYGRADE );
+                                    $this->Cal->addFestivity( $row->TAG, $festivity );
+                                }
+                                else{
+                                    $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $currentFeastDate, $this->LitSettings );
+                                    $this->Messages[] = sprintf(
+                                        /**translators:
+                                         * 1. Festivity grade
+                                         * 2. Festivity name
+                                         * 3. Festivity date
+                                         * 4. Edition of the Roman Missal
+                                         * 5. Superseding festivity grade
+                                         * 6. Superseding festivity name
+                                         * 7. Current year
+                                         */
+                                        $this->NationalData->Metadata->Region . ": " . _( 'The %1$s \'%2$s\' (%3$s), added to the national calendar in the %4$s, is superseded by the %5$s \'%6$s\' in the year %7$d' ),
+                                        $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : $this->LitGrade->i18n( $row->GRADE, false ),
+                                        '<i>' . $row->NAME . '</i>',
+                                        $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ),
+                                        RomanMissal::getName( $missal ),
+                                        $coincidingFestivity->grade,
+                                        $coincidingFestivity->event->name,
+                                        $this->LitSettings->Year
+                                    );
+                                }
+                            }
+                        } else {
+                            $this->Messages[] = sprintf(
+                                _( 'Could not find a sanctorale data file for %s' ),
+                                RomanMissal::getName( $missal )
+                            );
+                        }
+                    }
+                }
+            }
+        } else {
+            $this->Messages[] = "Did not find any Missals for region " . $this->NationalData->Metadata->Region;
+        }
     }
 
     private function makePatron( string $tag, string $nameSuffix, int $day, int $month, string $color, string $EditionRomanMissal = RomanMissal::EDITIO_TYPICA_1970 ) {
@@ -1671,83 +1945,6 @@ class LitCalAPI {
                     _( 'The %1$s \'%2$s\', usually celebrated on %3$s, is suppressed by the %4$s \'%5$s\' in the year %6$d.' ),
                     $this->LitGrade->i18n( LitGrade::FEAST, false ),
                     $FestivityName,
-                    $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ),
-                    $coincidingFestivity->grade,
-                    $coincidingFestivity->event->name,
-                    $this->LitSettings->Year
-                );
-            }
-        }
-    }
-
-
-    //Insert or elevate the Patron Saints of Europe
-    private function applyPatronSaintsEurope() : void {
-
-        //Saint Benedict, Saint Bridget, and Saint Cyril and Methodius elevated to Feast, with title "patrono/i d'Europa" added
-        //then from 1999, Saint Catherine of Siena and Saint Edith Stein, elevated to Feast with title "compatrona d'Europa" added
-        $this->makePatron( "StBenedict",        pgettext("Male singular", "patron of Europe"),   11, 7, LitColor::WHITE );
-        $this->makePatron( "StBridget",         pgettext("Female singular", "patron of Europe"), 23, 7, LitColor::WHITE );
-        $this->makePatron( "StsCyrilMethodius", pgettext("Male plural", "patrons of Europe"),    14, 2, LitColor::WHITE );
-
-        //In 1999, Pope John Paul II elevated Catherine of Siena from patron of Italy to patron of Europe
-        if( $this->LitSettings->Year >= 1999 ) {
-            if( $this->LitSettings->NationalCalendar === "ITALY" ) {
-                $name = "patrona d'Italia e d'Europa";
-            } else {
-                $name = pgettext("Female singular", "patron of Europe");
-            }
-            $this->makePatron( "StCatherineSiena", $name, 29, 4, LitColor::WHITE );
-            if( $this->LitSettings->Year >= 2002 ) {
-                $this->makePatron( "StEdithStein", pgettext("Female singular", "patron of Europe"), 9, 8, LitColor::WHITE, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
-            } else {
-                //between 1999 and 2002 we have to manually create StEdithStein
-                //since the makePatron method expects to find data from the Missals,
-                //we are going to have to fake this one as belonging to a Missal...
-                //let's add it to the future Missal that doesn't exist yet
-                $EdithStein = new stdClass();
-                $EdithStein->NAME       = _("Saint Teresa Benedicta of the Cross, Virgin and Martyr");
-                $EdithStein->MONTH      = 8;
-                $EdithStein->DAY        = 9;
-                $EdithStein->TAG        = "StEdithStein";
-                $EdithStein->GRADE      = LitGrade::MEMORIAL_OPT;
-                $EdithStein->COMMON     = LitCommon::AB( [LitCommon::PRO_VIRGINE_MARTYRE,LitCommon::PRO_UNA_VIRGINE] );
-                $EdithStein->CALENDAR   = "GENERAL ROMAN";
-                $EdithStein->COLOR  = "white,red";
-                $this->tempCal[ RomanMissal::EDITIO_TYPICA_TERTIA_2002 ][ "StEdithStein" ] = $EdithStein;
-                $EdithStein->DATE = DateTime::createFromFormat( '!j-n-Y', $EdithStein->DAY . '-' . $EdithStein->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-                if( !$this->Cal->inSolemnitiesFeastsOrMemorials( $EdithStein->DATE ) ) {
-                    $this->Cal->addFestivity( $EdithStein->TAG, new Festivity( $EdithStein->NAME, $EdithStein->DATE, $EdithStein->COLOR, LitFeastType::FIXED, $EdithStein->GRADE, $EdithStein->COMMON ) );
-                    $this->makePatron( "StEdithStein", pgettext("Female singular", "patron of Europe"), $EdithStein->DAY, $EdithStein->MONTH, $EdithStein->COLOR, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
-                }
-            }
-        }
-    }
-
-    //Insert or elevate the Patron Saints of Italy
-    private function applyPatronSaintsItaly() : void {
-        if ( $this->LitSettings->Year < 1999 ) {
-            //We only have to deal with years before 1999, because from 1999
-            //it will be taken care of by Patron saints of Europe
-            $this->makePatron( "StCatherineSiena", "patrona d'Italia", 29, 4, LitColor::WHITE );
-        }
-        $this->makePatron( "StFrancisAssisi", "patrono d'Italia", 4, 10, LitColor::WHITE );
-    }
-
-    private function applyMessaleRomano1983() : void {
-        //we have no solemnities or feasts in this data, at the most memorials
-        foreach ( $this->tempCal[ RomanMissal::ITALY_EDITION_1983 ] as $row ) {
-            $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-            if( !$this->Cal->inSolemnitiesOrFeasts( $currentFeastDate ) ) {
-                $festivity = new Festivity( "[ ITALIA ] " . $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON, $row->DISPLAYGRADE );
-                $this->Cal->addFestivity( $row->TAG, $festivity );
-            }
-            else{
-                $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $currentFeastDate, $this->LitSettings );
-                $this->Messages[] = sprintf(
-                    "ITALIA: la %s '%s' (%s), aggiunta al calendario nell'edizione del Messale Romano del 1983 pubblicata dalla CEI, è soppressa dalla %s '%s' nell'anno %d",
-                    $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : $this->LitGrade->i18n( $row->GRADE, false ),
-                    '<i>' . $row->NAME . '</i>',
                     $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ),
                     $coincidingFestivity->grade,
                     $coincidingFestivity->event->name,
@@ -2288,7 +2485,6 @@ class LitCalAPI {
                     case 'ITALY':
                         $this->loadNationalCalendarData();
                         $this->applyNationalCalendar();
-                        //$this->applyCalendarItaly();
                         break;
                     case 'USA':
                         //I don't have any data before 2011

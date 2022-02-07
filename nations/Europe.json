@@ -6,11 +6,11 @@
                 "color": "white",
                 "grade": 4,
                 "day": 11,
-                "month": 7,
-                "sinceYear": 1964
+                "month": 7
             },
             "Metadata": {
                 "action": "makePatron",
+                "sinceYear": 1964,
                 "decreeURL": "https://www.vatican.va/content/paul-vi/%s/apost_letters/documents/hf_p-vi_apl_19641024_pacis-nuntius.html",
                 "decreeLangs": {
                     "IT": "it",
@@ -25,11 +25,11 @@
                 "color": "white",
                 "grade": 4,
                 "day": 14,
-                "month": 2,
-                "sinceYear": 1980
+                "month": 2
             },
             "Metadata": {
                 "action": "makePatron",
+                "sinceYear": 1980,
                 "decreeURL": "https://www.vatican.va/content/john-paul-ii/%s/apost_letters/1980/documents/hf_jp-ii_apl_31121980_egregiae-virtutis.html",
                 "decreeLangs": {
                     "ES": "es",
@@ -45,11 +45,11 @@
                 "color": "white",
                 "grade": 4,
                 "day": 23,
-                "month": 7,
-                "sinceYear": 1999
+                "month": 7
             },
             "Metadata": {
                 "action": "makePatron",
+                "sinceYear": 1999,
                 "decreeURL": "https://www.vatican.va/content/john-paul-ii/%s/motu_proprio/documents/hf_jp-ii_motu-proprio_01101999_co-patronesses-europe.html",
                 "decreeLangs": {
                     "DE": "de",
@@ -68,11 +68,11 @@
                 "color": "white",
                 "grade": 4,
                 "day": 29,
-                "month": 4,
-                "sinceYear": 1999
+                "month": 4
             },
             "Metadata": {
                 "action": "makePatron",
+                "sinceYear": 1999,
                 "decreeURL": "https://www.vatican.va/content/john-paul-ii/%s/motu_proprio/documents/hf_jp-ii_motu-proprio_01101999_co-patronesses-europe.html",
                 "decreeLangs": {
                     "DE": "de",
@@ -92,7 +92,6 @@
                 "grade": 4,
                 "day": 9,
                 "month": 8,
-                "sinceYear": 1999,
                 "common": "Martyrs:For a Virgin Martyr,Virgins:For One Virgin",
                 "readings": {
                     "FIRST_READING": "",
@@ -103,7 +102,8 @@
                 }
             },
             "Metadata": {
-                "action": "create",
+                "action": "createNew",
+                "sinceYear": 1999,
                 "decreeURL": "https://www.vatican.va/content/john-paul-ii/%s/motu_proprio/documents/hf_jp-ii_motu-proprio_01101999_co-patronesses-europe.html",
                 "decreeLangs": {
                     "DE": "de",
@@ -122,11 +122,11 @@
                 "color": "white",
                 "grade": 4,
                 "day": 9,
-                "month": 8,
-                "sinceYear": 2002
+                "month": 8
             },
             "Metadata": {
                 "action": "makePatron",
+                "sinceYear": 2002,
                 "decreeURL": "https://www.vatican.va/content/john-paul-ii/%s/motu_proprio/documents/hf_jp-ii_motu-proprio_01101999_co-patronesses-europe.html",
                 "decreeLangs": {
                     "DE": "de",
