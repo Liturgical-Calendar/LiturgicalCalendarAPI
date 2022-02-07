@@ -110,20 +110,40 @@ class FestivityCollection {
         return in_array( $date, $this->solemnities );
     }
 
+    public function notInSolemnities( DateTime $date ) : bool {
+        return !$this->inSolemnities( $date );
+    }
+
     public function inFeasts( DateTime $date ) : bool {
         return in_array( $date, $this->feasts );
+    }
+
+    public function notInFeasts( DateTime $date ) : bool {
+        return !$this->inFeasts( $date );
     }
 
     public function inSolemnitiesOrFeasts( DateTime $date ) : bool {
         return $this->inSolemnities( $date ) || $this->inFeasts( $date );
     }
 
+    public function notInSolemnitiesOrFeasts( DateTime $date ) : bool {
+        return !$this->inSolemnitiesOrFeasts( $date );
+    }
+
     public function inMemorials( DateTime $date ) : bool {
         return in_array( $date, $this->memorials );
     }
 
+    public function notInMemorials( DateTime $date ) : bool {
+        return !$this->inMemorials( $date );
+    }
+
     public function inFeastsOrMemorials( DateTime $date ) : bool {
         return $this->inFeasts( $date ) || $this->inMemorials( $date );
+    }
+
+    public function notInFeastsOrMemorials( DateTime $date ) : bool {
+        return !$this->inFeastsOrMemorials( $date );
     }
 
     public function inSolemnitiesFeastsOrMemorials( DateTime $date ) : bool {
