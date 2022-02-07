@@ -44,12 +44,21 @@ if( file_exists( 'nations/index.json' ) ) {
                 $nationalCalendars[$nation] = [];
             }
         }
+        $filterDirResults = ['..', '.', 'index.json'];
+        $dirResults = array_diff( scandir('nations'), $filterDirResults );
+        $widerRegionsFiles = array_values( array_filter( $dirResults, function($el) {
+            return !is_dir('nations/' . $el) && pathinfo('nations/' . $el, PATHINFO_EXTENSION) === 'json';
+        }) );
+        $widerRegionsNames = array_map( function($el){
+            return pathinfo('nations/' . $el, PATHINFO_FILENAME);
+        }, $widerRegionsFiles );
 
         $response = json_encode( [
             "LitCalMetadata" => [
                 "NationalCalendars" => $nationalCalendars,
                 "DiocesanCalendars" => $diocesanCalendars,
-                "DiocesanGroups"    => $diocesanGroups
+                "DiocesanGroups"    => $diocesanGroups,
+                "WiderRegions"      => $widerRegionsNames
             ],
         ], JSON_PRETTY_PRINT );
         $responseHash = md5( $response );
