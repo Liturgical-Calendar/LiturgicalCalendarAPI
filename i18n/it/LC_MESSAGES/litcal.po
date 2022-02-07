@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-06 22:59+0000\n"
+"POT-Creation-Date: 2022-02-07 13:15+0000\n"
 "PO-Revision-Date: 2022-01-30 15:15+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -59,7 +59,7 @@ msgstr "sabato che precede la Domenica delle Palme"
 #: includes/LitCalAPI.php:1279 includes/LitCalAPI.php:1306
 #: includes/LitCalAPI.php:1415 includes/LitCalAPI.php:1427
 #: includes/LitCalAPI.php:1442 includes/LitCalAPI.php:1468
-#: includes/FestivityCollection.php:337
+#: includes/FestivityCollection.php:357
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decreto della Congregazione per il Culto Divino"
 
@@ -471,7 +471,7 @@ msgstr "ANNO"
 msgid "Vigil Mass"
 msgstr "Messa della vigilia"
 
-#: includes/FestivityCollection.php:331
+#: includes/FestivityCollection.php:351
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As "
@@ -482,7 +482,7 @@ msgstr ""
 "Secondo il %s, la prima ha la precedenza, pertanto la Messa nella Vigilia è "
 "confermata come anche i Primi Vespri."
 
-#: includes/FestivityCollection.php:345
+#: includes/FestivityCollection.php:365
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
@@ -495,7 +495,7 @@ msgstr ""
 "Messa di Vigilia, mentre l'ultima Solennità non avrà né i Secondi Vespri né "
 "una Messa serale."
 
-#: includes/FestivityCollection.php:355
+#: includes/FestivityCollection.php:375
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
@@ -508,7 +508,7 @@ msgstr ""
 "e una Messa serale, mentre la prima Solennità non avrà né una Messa di "
 "Vigilia né i Primi Vespri."
 
-#: includes/FestivityCollection.php:415
+#: includes/FestivityCollection.php:435
 #, php-format
 msgid ""
 "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We "
