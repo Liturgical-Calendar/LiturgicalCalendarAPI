@@ -1785,67 +1785,48 @@ class LitCalAPI {
                 $this->elaborateDecreeSource( $row ),
                 $this->LitSettings->Year
             );
-        } else {
+        }// else {
             //$this->handleCoincidenceDecree( $row );
+        //}
+    }
+    
+    private function handleNationalCalendarRows( array $rows ) : void {
+        foreach( $this->WiderRegionData->LitCal as $row ) {
+            if( $this->LitSettings->Year >= $row->Metadata->sinceYear ) {
+                if( property_exists( $row->Metadata, "untilYear" ) && $this->LitSettings->Year >= $row->Metadata->untilYear ) {
+                    continue;
+                } else {
+                    //if either the property doesn't exist (so no limit is set)
+                    //or there is a limit but we are within those limits
+                    switch( $row->Metadata->action ) {
+                        case "makePatron":
+                            $festivity = $this->Cal->getFestivity( $row->Festivity->tag );
+                            if( $festivity !== null ) {
+                                if( $festivity->grade !== $row->Festivity->grade ) {
+                                    $this->Cal->setProperty( $row->Festivity->tag, "grade", $row->Festivity->grade );
+                                }
+                                $this->Cal->setProperty( $row->Festivity->tag, "name", $row->Festivity->name );
+                            } else {
+                                $this->handleMissingFestivity( $row );
+                            }
+                            break;
+                        case "createNew":
+                            $this->createNewRegionalFestivity( $row );
+                            break;
+                    }
+                }
+            }
         }
     }
 
     private function applyNationalCalendar() : void {
         //first thing is apply any wider region festivities, such as Patron Saints of the Wider Region (example: Europe)
         if( $this->WiderRegionData !== null && property_exists( $this->WiderRegionData, "LitCal" ) ) {
-            foreach( $this->WiderRegionData->LitCal as $row ) {
-                if( $this->LitSettings->Year >= $row->Metadata->sinceYear ) {
-                    if( property_exists( $row->Metadata, "untilYear" ) && $this->LitSettings->Year >= $row->Metadata->untilYear ) {
-                        continue;
-                    } else {
-                        //if either the property doesn't exist (so no limit is set)
-                        //or there is a limit but we are within those limits
-                        switch( $row->Metadata->action ) {
-                            case "makePatron":
-                                $festivity = $this->Cal->getFestivity( $row->Festivity->tag );
-                                if( $festivity !== null ) {
-                                    if( $festivity->grade !== $row->Festivity->grade ) {
-                                        $this->Cal->setProperty( $row->Festivity->tag, "grade", $row->Festivity->grade );
-                                    }
-                                    $this->Cal->setProperty( $row->Festivity->tag, "name", $row->Festivity->name );
-                                } else {
-                                    $this->handleMissingFestivity( $row );
-                                }
-                                break;
-                            case "createNew":
-                                $this->createNewRegionalFestivity( $row );
-                                break;
-                        }
-                    }
-                }
-            }
+            $this->handleNationalCalendarRow( $this->WiderRegionData->LitCal );
         }
 
         if( $this->NationalData !== null && property_exists( $this->NationalData, "LitCal" ) ) {
-            foreach( $this->NationalData->LitCal as $row ) {
-                if( $this->LitSettings->Year >= $row->Metadata->sinceYear ) {
-                    if( property_exists( $row->Metadata, "untilYear" ) && $this->LitSettings->Year >= $row->Metadata->untilYear ) {
-                        continue;
-                    } else {
-                        switch( $row->Metadata->action ) {
-                            case "makePatron":
-                                $festivity = $this->Cal->getFestivity( $row->Festivity->tag );
-                                if( $festivity !== null ) {
-                                    if( $festivity->grade !== $row->Festivity->grade ) {
-                                        $this->Cal->setProperty( $row->Festivity->tag, "grade", $row->Festivity->grade );
-                                    }
-                                    $this->Cal->setProperty( $row->Festivity->tag, "name", $row->Festivity->name );
-                                } else {
-                                    $this->handleMissingFestivity( $row );
-                                }
-                                break;
-                            case "createNew":
-                                $this->createNewRegionalFestivity( $row );
-                                break;
-                        }
-                    }
-                }
-            }
+            $this->handleNationalCalendarRow( $this->NationalData->LitCal );
         }
 
         if( $this->NationalData !== null && property_exists( $this->NationalData, "Metadata" ) && property_exists( $this->NationalData->Metadata, "Missals" ) ) {
