@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-07 13:17+0000\n"
+"POT-Creation-Date: 2022-02-09 20:04+0000\n"
 "PO-Revision-Date: 2022-01-30 15:15+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -450,7 +450,7 @@ msgstr ""
 #.  5. Name of the superseding festivity
 #.  6. Current year
 #.
-#: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:1945
+#: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:1926
 #, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
@@ -477,7 +477,7 @@ msgstr ""
 "La Memoria '%1$s' coincide con un'altra Memoria '%2$s' nell'anno %3$d. Tutte "
 "e due sono ridotte al grado di memorie facoltative (%4$s)."
 
-#: includes/LitCalAPI.php:1861
+#: includes/LitCalAPI.php:1842
 #, php-format
 msgid "Found a sanctorale data file for %s"
 msgstr ""
@@ -491,7 +491,7 @@ msgstr ""
 #.  6. Superseding festivity name
 #.  7. Current year
 #.
-#: includes/LitCalAPI.php:1883
+#: includes/LitCalAPI.php:1864
 #, fuzzy, php-format
 #| msgid ""
 #| "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
@@ -503,7 +503,7 @@ msgstr ""
 "La %1$s '%2$s', aggiunta nel giorno %3$s sin dal %4$d (%5$s), è tuttavia "
 "superata dalla %6$s '%7$s' nell'anno %8$d."
 
-#: includes/LitCalAPI.php:1896
+#: includes/LitCalAPI.php:1877
 #, php-format
 msgid "Could not find a sanctorale data file for %s"
 msgstr ""
