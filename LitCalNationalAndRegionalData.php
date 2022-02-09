@@ -15,14 +15,14 @@ $allowedOrigins = [
     "https://litcal-staging.johnromanodorazio.com"
 ];
 
-$LitCalDiocesanData = new LitCalNationalData();
+$LitCalNationalData = new LitCalNationalData();
 
-$LitCalDiocesanData->APICore->setAllowedOrigins( $allowedOrigins );
-$LitCalDiocesanData->APICore->setAllowedReferers( array_map( function($el){ return $el . "/"; }, $allowedOrigins ) );
+$LitCalNationalData->APICore->setAllowedOrigins( $allowedOrigins );
+$LitCalNationalData->APICore->setAllowedReferers( array_map( function($el){ return $el . "/"; }, $allowedOrigins ) );
 
-$LitCalDiocesanData->APICore->setAllowedAcceptHeaders( [ AcceptHeader::JSON ] );
-$LitCalDiocesanData->APICore->setAllowedRequestContentTypes( [ RequestContentType::JSON, RequestContentType::FORMDATA ] );
-$LitCalDiocesanData->Init();
+$LitCalNationalData->APICore->setAllowedAcceptHeaders( [ AcceptHeader::JSON ] );
+$LitCalNationalData->APICore->setAllowedRequestContentTypes( [ RequestContentType::JSON, RequestContentType::FORMDATA ] );
+$LitCalNationalData->Init();
 
 class LitCalNationalData {
 
@@ -151,7 +151,7 @@ class LitCalNationalData {
 
             //$this->createOrUpdateIndex( $path );
             header( $_SERVER[ "SERVER_PROTOCOL" ]." 201 Created", true, 201 );
-            die( '{"success":"Diocesan calendar created or updated for diocese \"'. $this->RESPONSE->Diocese .'\""}' );
+            die( '{"success":"National calendar created or updated for nation \"'. $this->RESPONSE->Diocese .'\""}' );
 
         }
     }
@@ -170,7 +170,7 @@ class LitCalNationalData {
 
             //$this->createOrUpdateIndex( $path, true );
             header( $_SERVER[ "SERVER_PROTOCOL" ]." 200 OK", true, 200 );
-            die( '{"success":"Diocesan calendar deleted for diocese \"'. $this->RESPONSE->Diocese .'\""}' );
+            die( '{"success":"National calendar deleted for nation \"'. $this->RESPONSE->Diocese .'\""}' );
 
         }
     }
