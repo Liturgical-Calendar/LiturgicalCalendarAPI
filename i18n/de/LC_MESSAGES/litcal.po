@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-09 20:04+0000\n"
+"POT-Creation-Date: 2022-02-13 11:53+0000\n"
 "PO-Revision-Date: 2021-12-14 00:21+0100\n"
 "Last-Translator: Ubuntu <priest@johnromanodorazio.com>\n"
 "Language-Team: German\n"
@@ -448,7 +448,7 @@ msgstr ""
 
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
 #: includes/LitMessages.php:142 includes/LitMessages.php:153
-#: includes/enums/LitCommon.php:327
+#: includes/enums/LitCommon.php:331
 msgid "or"
 msgstr ""
 
@@ -712,7 +712,7 @@ msgctxt "(SING_MASC)"
 msgid "of"
 msgstr ""
 
-#: includes/enums/LitCommon.php:323
+#: includes/enums/LitCommon.php:327
 msgid "From the Common"
 msgstr ""
 
