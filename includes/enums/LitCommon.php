@@ -261,6 +261,10 @@ class LitCommon {
     ];
 
     public static function isValid( string $value ) {
+        if( strpos($value, ',') || strpos($value, ':') ) {
+            $values = preg_split('/[,:]/', $value);
+            return self::areValid( $values );
+        }
         return in_array( $value, self::$values );
     }
 
