@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2022-02-13 12:37+0000\n"
-"PO-Revision-Date: 2022-01-30 15:15+0000\n"
+"PO-Revision-Date: 2022-02-16 09:56+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
@@ -31,12 +31,12 @@ msgstr ""
 #: includes/LitCalAPI.php:259
 #, php-format
 msgid "Data for the sanctorale from %s could not be found."
-msgstr ""
+msgstr "Non sono stati trovati dati per il santorale di: %s."
 
 #: includes/LitCalAPI.php:265
 #, php-format
 msgid "Translation data for the sanctorale from %s could not be found."
-msgstr ""
+msgstr "Non sono stati trovati dati per la traduzione del santorale di: %s."
 
 #: includes/LitCalAPI.php:341 includes/LitCalAPI.php:380
 #, php-format
@@ -436,11 +436,13 @@ msgstr "Memoria di Santa Maria in sabato"
 #, php-format
 msgid "Error retrieving and decoding Wider Region data from file %s."
 msgstr ""
+"Errore nella lettura o nella decodifica dei dati per la Regione più ampia "
+"dal file %s."
 
 #: includes/LitCalAPI.php:1623
 #, php-format
 msgid "Error retrieving and decoding National data from file %s."
-msgstr ""
+msgstr "Errore nella lettura o nella decodifica dei dati Nazionali dal file %s."
 
 #. translators:
 #.  1. Grade of the festivity
@@ -466,21 +468,18 @@ msgstr ""
 #.  4. Source of the information
 #.
 #: includes/LitCalAPI.php:1721
-#, fuzzy, php-format
-#| msgid ""
-#| "The Memorial '%1$s' coincides with another Memorial '%2$s' in the year "
-#| "%3$d. They are both reduced in rank to optional memorials (%4$s)."
+#, php-format
 msgid ""
 "The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
 "They are both reduced in rank to optional memorials."
 msgstr ""
 "La Memoria '%1$s' coincide con un'altra Memoria '%2$s' nell'anno %3$d. Tutte "
-"e due sono ridotte al grado di memorie facoltative (%4$s)."
+"e due sono ridotte al grado di memorie facoltative."
 
 #: includes/LitCalAPI.php:1842
 #, php-format
 msgid "Found a sanctorale data file for %s"
-msgstr ""
+msgstr "Trovato un file con dati per il santorale di: %s"
 
 #. translators:
 #.  1. Festivity grade
@@ -492,21 +491,18 @@ msgstr ""
 #.  7. Current year
 #.
 #: includes/LitCalAPI.php:1864
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
-#| "superseded by the %6$s '%7$s' in the year %8$d."
+#, php-format
 msgid ""
 "The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
 "superseded by the %5$s '%6$s' in the year %7$d"
 msgstr ""
-"La %1$s '%2$s', aggiunta nel giorno %3$s sin dal %4$d (%5$s), è tuttavia "
-"superata dalla %6$s '%7$s' nell'anno %8$d."
+"La %1$s '%2$s' (%3$s), aggiunta al calendario nazionale nel %4$s, è tuttavia "
+"superata dalla %5$s '%6$s' nell'anno %7$d"
 
 #: includes/LitCalAPI.php:1877
 #, php-format
 msgid "Could not find a sanctorale data file for %s"
-msgstr ""
+msgstr "Non è stato trovato un file con i dati del santorale di: %s"
 
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
 #: includes/LitMessages.php:142 includes/LitMessages.php:153
