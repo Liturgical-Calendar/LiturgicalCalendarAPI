@@ -6,10 +6,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2022-02-13 12:37+0000\n"
-"PO-Revision-Date: 2022-02-05 02:15+0000\n"
-"Last-Translator: padrecedano <padre.cedano@gmail.com>\n"
+"PO-Revision-Date: 2022-02-16 09:56+0000\n"
+"Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Spanish <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/es/>\n"
 "Language: es\n"
@@ -744,17 +744,17 @@ msgstr ""
 #. translators: liturgical rank. Keep UPPERCASE
 #: includes/enums/LitGrade.php:110
 msgid "FEAST"
-msgstr ""
+msgstr "FIESTA"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: includes/enums/LitGrade.php:115
 msgid "FEAST OF THE LORD"
-msgstr ""
+msgstr "FIESTA DEL SEÑOR"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: includes/enums/LitGrade.php:120
 msgid "SOLEMNITY"
-msgstr ""
+msgstr "SOLEMNIDAD"
 
 #. translators: liturgical rank. Keep lowercase
 #: includes/enums/LitGrade.php:125
