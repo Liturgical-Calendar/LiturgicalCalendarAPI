@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2022-02-13 12:37+0000\n"
-"PO-Revision-Date: 2022-02-16 09:56+0000\n"
+"PO-Revision-Date: 2022-03-03 16:15+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/la/>\n"
@@ -157,16 +157,13 @@ msgstr "post Feria IV Cinerum"
 #.
 #: includes/LitCalAPI.php:865 includes/LitCalAPI.php:1123
 #: includes/LitCalAPI.php:1300 includes/LitCalAPI.php:1777
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s' has been added on %s since the year %d (%s), applicable to "
-#| "the year %d."
+#, php-format
 msgid ""
 "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
 "applicable to the year %6$d."
 msgstr ""
-"%s <i>'%s'</i> aggregata est igitur in die <b>%s</b> ab anno %d (%s), ergo "
-"viget in anno %d."
+"%1$s <i>'%2$s'</i> aggregata est igitur in die %3$s ab anno %4$d (%5$s), "
+"ergo viget in anno %6$d."
 
 #: includes/LitCalAPI.php:896 includes/LitCalAPI.php:988
 msgid ""
@@ -180,18 +177,14 @@ msgstr ""
 #.  3. Current year
 #.
 #: includes/LitCalAPI.php:942
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s' either falls between 17 Dec. and 24 Dec., or during the "
-#| "Octave of Christmas, or on the weekdays of the Lenten season in the year "
-#| "%d, rank reduced to Commemoration."
+#, php-format
 msgid ""
 "The %1$s '%2$s' either falls between 17 Dec. and 24 Dec., or during the "
 "Octave of Christmas, or on the weekdays of the Lenten season in the year "
 "%3$d, rank reduced to Commemoration."
 msgstr ""
-"Accidit %s <i>'%s'</i> aut infra 17 Dec. et 24 Dec. aut infra Octavam "
-"Nativitatis aut infra ferias Quadragesimae in anno %d, ergo reductus est "
+"Accidit %1$s <i>'%2$s'</i> aut infra 17 Dec. et 24 Dec. aut infra Octavam "
+"Nativitatis aut infra ferias Quadragesimae in anno %3$d, ergo reductus est "
 "gradus ad Commemorationem."
 
 #. translators:
@@ -202,10 +195,9 @@ msgstr ""
 #.  5. Current year
 #.
 #: includes/LitCalAPI.php:964
-#, fuzzy, php-format
-#| msgid "'%s' is superseded by the %s '%s' in the year %d."
+#, php-format
 msgid "The %1$s '%2$s' is superseded by the %3$s '%4$s' in the year %5$d."
-msgstr "<i>'%s'</i> subplantata est ab %s <i>'%s'</i> in anno %d."
+msgstr "%1$s '%2$s' subplantata est ab %3$s '%4$s' in anno %5$d."
 
 #: includes/LitCalAPI.php:984
 msgid "Apostolic Constitution Missale Romanum"
@@ -223,17 +215,14 @@ msgstr ""
 #.  9. Current year
 #.
 #: includes/LitCalAPI.php:1006
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s', added in the %s of the Roman Missal since the year %d (%s) "
-#| "and usually celebrated on %s, is suppressed by the %s '%s' in the year %d."
+#, php-format
 msgid ""
 "The %1$s '%2$s', added in the %3$s of the Roman Missal since the year %4$d "
 "(%5$s) and usually celebrated on %6$s, is suppressed by the %7$s '%8$s' in "
 "the year %9$d."
 msgstr ""
-"%s <i>'%s'</i> aggregata in %s Missalis Romani ab anno %d (%s) et plerumque "
-"celebrata in die %s subplantata est ab %s <i>'%s'</i> in anno %d."
+"%1$s '%2$s' aggregata in %3$s Missalis Romani ab anno %4$d (%5$s) et "
+"plerumque celebrata in die %6$s subplantata est ab %7$s '%8$s' in anno %9$d."
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -246,16 +235,13 @@ msgstr ""
 #.  8. Current year
 #.
 #: includes/LitCalAPI.php:1042
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s', added on %s since the year %d (%s), is however superseded by "
-#| "a Sunday, a Solemnity or a Feast '%s' in the year %d."
+#, php-format
 msgid ""
 "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
 "superseded by a %6$s '%7$s' in the year %8$d."
 msgstr ""
-"%s <i>'%s'</i>, aggregata in die %s ab anno %d (%s), subplantata est ab "
-"Dominica, aut Sollemnitate, aut Festu <i>'%s'</i> in anno %d."
+"%1$s '%2$s', aggregata in die %3$s ab anno %4$d (%5$s), subplantata est ab "
+"%6$s '%7$s' in anno %8$d."
 
 #. translators:
 #.  1. Name of the first coinciding Memorial
@@ -264,16 +250,13 @@ msgstr ""
 #.  4. Source of the information
 #.
 #: includes/LitCalAPI.php:1081
-#, fuzzy, php-format
-#| msgid ""
-#| "The Memorial '%s' coincides with another Memorial '%s' in the year %d. "
-#| "They are both reduced in rank to optional memorials (%s)."
+#, php-format
 msgid ""
 "The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
 "They are both reduced in rank to optional memorials (%4$s)."
 msgstr ""
-"Memoria <i>'%s'</i> coincidet cum alia Memoria <i>'%s'</i> in anno %d. Ergo "
-"ambo simul redunctur in gradu Memoriæ ad libitum (%s)."
+"Memoria '%1$s' coincidet cum alia Memoria '%2$s' in anno %3$d. Ergo ambo "
+"simul redunctur in gradu Memoriæ ad libitum (%4$s)."
 
 #: includes/LitCalAPI.php:1102
 msgid "the Monday after Pentecost"
@@ -288,16 +271,13 @@ msgstr "dies Lunae post Pentecostem"
 #.  6. Source of the information
 #.
 #: includes/LitCalAPI.php:1158
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s' has been raised to the rank of %s since the year %d, "
-#| "applicable to the year %d (%s)."
+#, php-format
 msgid ""
 "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
 "applicable to the year %5$d (%6$s)."
 msgstr ""
-"%s <i>'%s'</i> elevata est in gradu %s ab anno %d, ergo applicatur ad anno "
-"%d (%s)."
+"%1$s '%2$s' elevata est in gradu %3$s ab anno %4$d, ergo applicatur ad anno "
+"%5$d (%6$s)."
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -308,16 +288,13 @@ msgstr ""
 #.  6. Source of the information
 #.
 #: includes/LitCalAPI.php:1180
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s' has been raised to the rank of %s since the year %d, "
-#| "applicable to the year %d (%s)."
+#, php-format
 msgid ""
 "The %1$s '%2$s' has been raised to the rank of %3$s since the year %4$d, "
 "applicable to the year %5$d (%6$s)."
 msgstr ""
-"%s <i>'%s'</i> elevata est in gradu %s ab anno %d, ergo applicatur ad anno "
-"%d (%s)."
+"%1$s '%2$s' elevata est in gradu %3$s ab anno %4$d, ergo applicatur ad anno "
+"%5$d (%6$s)."
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -328,16 +305,13 @@ msgstr ""
 #.  6. Source of the information
 #.
 #: includes/LitCalAPI.php:1190
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s' has been raised to the rank of %s since the year %d, "
-#| "applicable to the year %d (%s)."
+#, php-format
 msgid ""
 "The %1$s '%2$s' has been lowered to the rank of %3$s since the year %4$d, "
 "applicable to the year %5$d (%6$s)."
 msgstr ""
-"%s <i>'%s'</i> elevata est in gradu %s ab anno %d, ergo applicatur ad anno "
-"%d (%s)."
+"%1$s '%2$s' elevata est in gradu %3$s ab anno %4$d, ergo applicatur ad anno "
+"%5$d (%6$s)."
 
 #. translators:
 #.  1. Name of the festivity
@@ -346,16 +320,13 @@ msgstr ""
 #.  4. Source of the information
 #.
 #: includes/LitCalAPI.php:1224
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s' has been raised to the rank of %s since the year %d, "
-#| "applicable to the year %d (%s)."
+#, php-format
 msgid ""
 "'%1$s' has been declared a Doctor of the Church since the year %2$d, "
 "applicable to the year %3$d (%4$s)."
 msgstr ""
-"%s <i>'%s'</i> elevata est in gradu %s ab anno %d, ergo applicatur ad anno "
-"%d (%s)."
+"'%1$s' declarato/a est Doctor Ecclesiæ ab anno %2$d, ergo applicatur ad anno "
+"%3$d (%4$s)."
 
 #: includes/LitCalAPI.php:1232
 #, fuzzy
@@ -374,16 +345,13 @@ msgstr "Dedicationis ecclesiæ"
 #.  8. Current year
 #.
 #: includes/LitCalAPI.php:1337
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s', added on %s since the year %d (%s), is however superseded by "
-#| "a Sunday, a Solemnity or a Feast '%s' in the year %d."
+#, php-format
 msgid ""
 "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
 "superseded by the %6$s '%7$s' in the year %8$d."
 msgstr ""
-"%s <i>'%s'</i>, aggregata in die %s ab anno %d (%s), subplantata est ab "
-"Dominica, aut Sollemnitate, aut Festu <i>'%s'</i> in anno %d."
+"%1$s '%2$s', aggregata in die %3$s ab anno %4$d (%5$s), subplantata est ab "
+"%6$s '%7$s' in anno %8$d."
 
 #. translators:
 #.  1. Current year
@@ -396,15 +364,13 @@ msgstr ""
 #.  8. Source of the information
 #.
 #: includes/LitCalAPI.php:1365
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s' has been suppressed by the Memorial '%s', added on %s since "
-#| "the year %d (%s)."
+#, php-format
 msgid ""
 "In the year %1$d, the %2$s '%3$s' has been suppressed by the %4$s '%5$s', "
 "added on %6$s since the year %7$d (%8$s)."
 msgstr ""
-"%s '%s' subplantata est ad Memoria '%s', aggregata in die %s ab anno %d (%s)."
+"In anno %1$d, %2$s '%3$s' subplantata est ad %4$s '%5$s', aggregata in die "
+"%6$s ab anno %7$d (%8$s)."
 
 #: includes/LitCalAPI.php:1423
 #, php-format
@@ -482,16 +448,13 @@ msgstr ""
 #.  6. Current year
 #.
 #: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:1926
-#, fuzzy, php-format
-#| msgid ""
-#| "The %s '%s', usually celebrated on %s, is suppressed by the %s '%s' in "
-#| "the year %d."
+#, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
 "'%5$s' in the year %6$d."
 msgstr ""
-"%s '%s', celebrata plerumque in die %s, subplantata est ab %s '%s' in anno "
-"%d."
+"%1$s '%2$s', celebrata plerumque in die %3$s, subplantata est ab %4$s '%5$s' "
+"in anno %6$d."
 
 #. translators:
 #.  1. Name of the first coinciding Memorial
@@ -500,16 +463,13 @@ msgstr ""
 #.  4. Source of the information
 #.
 #: includes/LitCalAPI.php:1721
-#, fuzzy, php-format
-#| msgid ""
-#| "The Memorial '%s' coincides with another Memorial '%s' in the year %d. "
-#| "They are both reduced in rank to optional memorials (%s)."
+#, php-format
 msgid ""
 "The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
 "They are both reduced in rank to optional memorials."
 msgstr ""
-"Memoria <i>'%s'</i> coincidet cum alia Memoria <i>'%s'</i> in anno %d. Ergo "
-"ambo simul redunctur in gradu Memoriæ ad libitum (%s)."
+"Memoria '%1$s' coincidet cum alia Memoria '%2$s' in anno %3$d. Ergo ambo "
+"simul redunctur in gradu Memoriæ ad libitum."
 
 #: includes/LitCalAPI.php:1842
 #, php-format
