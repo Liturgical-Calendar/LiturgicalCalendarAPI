@@ -1822,11 +1822,11 @@ class LitCalAPI {
     private function applyNationalCalendar() : void {
         //first thing is apply any wider region festivities, such as Patron Saints of the Wider Region (example: Europe)
         if( $this->WiderRegionData !== null && property_exists( $this->WiderRegionData, "LitCal" ) ) {
-            $this->handleNationalCalendarRow( $this->WiderRegionData->LitCal );
+            $this->handleNationalCalendarRows( $this->WiderRegionData->LitCal );
         }
 
         if( $this->NationalData !== null && property_exists( $this->NationalData, "LitCal" ) ) {
-            $this->handleNationalCalendarRow( $this->NationalData->LitCal );
+            $this->handleNationalCalendarRows( $this->NationalData->LitCal );
         }
 
         if( $this->NationalData !== null && property_exists( $this->NationalData, "Metadata" ) && property_exists( $this->NationalData->Metadata, "Missals" ) ) {
