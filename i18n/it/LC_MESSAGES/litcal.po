@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
-"POT-Creation-Date: 2022-02-13 12:37+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-03-14 06:31+0000\n"
 "PO-Revision-Date: 2022-02-16 09:56+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -442,7 +442,8 @@ msgstr ""
 #: includes/LitCalAPI.php:1623
 #, php-format
 msgid "Error retrieving and decoding National data from file %s."
-msgstr "Errore nella lettura o nella decodifica dei dati Nazionali dal file %s."
+msgstr ""
+"Errore nella lettura o nella decodifica dei dati Nazionali dal file %s."
 
 #. translators:
 #.  1. Grade of the festivity
@@ -452,7 +453,7 @@ msgstr "Errore nella lettura o nella decodifica dei dati Nazionali dal file %s."
 #.  5. Name of the superseding festivity
 #.  6. Current year
 #.
-#: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:1926
+#: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:1932
 #, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
@@ -476,7 +477,7 @@ msgstr ""
 "La Memoria '%1$s' coincide con un'altra Memoria '%2$s' nell'anno %3$d. Tutte "
 "e due sono ridotte al grado di memorie facoltative."
 
-#: includes/LitCalAPI.php:1842
+#: includes/LitCalAPI.php:1848
 #, php-format
 msgid "Found a sanctorale data file for %s"
 msgstr "Trovato un file con dati per il santorale di: %s"
@@ -490,7 +491,7 @@ msgstr "Trovato un file con dati per il santorale di: %s"
 #.  6. Superseding festivity name
 #.  7. Current year
 #.
-#: includes/LitCalAPI.php:1864
+#: includes/LitCalAPI.php:1870
 #, php-format
 msgid ""
 "The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
@@ -499,7 +500,7 @@ msgstr ""
 "La %1$s '%2$s' (%3$s), aggiunta al calendario nazionale nel %4$s, è tuttavia "
 "superata dalla %5$s '%6$s' nell'anno %7$d"
 
-#: includes/LitCalAPI.php:1877
+#: includes/LitCalAPI.php:1883
 #, php-format
 msgid "Could not find a sanctorale data file for %s"
 msgstr "Non è stato trovato un file con i dati del santorale di: %s"
