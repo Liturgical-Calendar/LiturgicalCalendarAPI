@@ -1791,7 +1791,7 @@ class LitCalAPI {
     }
     
     private function handleNationalCalendarRows( array $rows ) : void {
-        foreach( $this->WiderRegionData->LitCal as $row ) {
+        foreach( $rows as $row ) {
             if( $this->LitSettings->Year >= $row->Metadata->sinceYear ) {
                 if( property_exists( $row->Metadata, "untilYear" ) && $this->LitSettings->Year >= $row->Metadata->untilYear ) {
                     continue;
@@ -1812,6 +1812,12 @@ class LitCalAPI {
                             break;
                         case "createNew":
                             $this->createNewRegionalFestivity( $row );
+                            break;
+                        case "setProperty":
+                            break;
+                        case "moveFestivity":
+                            $festivityNewDate = DateTime::createFromFormat( '!j-n-Y', $row->Festivity->day.'-'.$row->Festivity->month.'-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+                            $this->moveFestivityDate( $row->Festivity->tag, $festivityNewDate, $row->Metadata->reason, $row->Metadata->missal );
                             break;
                     }
                 }
