@@ -1413,10 +1413,10 @@ class LitCalAPI {
      */
     private function handleSaintJaneFrancesDeChantal() {
         $StJaneFrancesNewDate = DateTime::createFromFormat( '!j-n-Y', '12-8-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+        $langs = ["LA" => "lt", "ES" => "es"];
+        $lang = in_array( $this->LitSettings->Locale, array_keys($langs) ) ? $langs[$this->LitSettings->Locale] : "lt";
         if ( self::DateIsNotSunday( $StJaneFrancesNewDate ) && $this->Cal->notInSolemnitiesFeastsOrMemorials( $StJaneFrancesNewDate ) ) {
             $festivity = $this->Cal->getFestivity( "StJaneFrancesDeChantal" );
-            $langs = ["LA" => "lt", "ES" => "es"];
-            $lang = in_array( $this->LitSettings->Locale, array_keys($langs) ) ? $langs[$this->LitSettings->Locale] : "lt";
             if( $festivity !== null ) {
                 $this->Cal->moveFestivityDate( "StJaneFrancesDeChantal", $StJaneFrancesNewDate );
                 $this->Messages[] = sprintf(
