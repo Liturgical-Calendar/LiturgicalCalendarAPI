@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-14 06:31+0000\n"
+"POT-Creation-Date: 2022-05-01 12:51+0000\n"
 "PO-Revision-Date: 2022-02-16 09:56+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Spanish <https://translate.johnromanodorazio.com/projects/"
@@ -150,7 +150,7 @@ msgstr ""
 #.  6. Current year
 #.
 #: includes/LitCalAPI.php:865 includes/LitCalAPI.php:1123
-#: includes/LitCalAPI.php:1300 includes/LitCalAPI.php:1777
+#: includes/LitCalAPI.php:1300 includes/LitCalAPI.php:1783
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
@@ -405,7 +405,7 @@ msgstr ""
 #.  5. Name of the superseding festivity
 #.  6. Current year
 #.
-#: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:1932
+#: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:1941
 #, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
@@ -425,7 +425,7 @@ msgid ""
 "They are both reduced in rank to optional memorials."
 msgstr ""
 
-#: includes/LitCalAPI.php:1848
+#: includes/LitCalAPI.php:1854
 #, php-format
 msgid "Found a sanctorale data file for %s"
 msgstr ""
@@ -439,14 +439,14 @@ msgstr ""
 #.  6. Superseding festivity name
 #.  7. Current year
 #.
-#: includes/LitCalAPI.php:1870
+#: includes/LitCalAPI.php:1876
 #, php-format
 msgid ""
 "The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
 "superseded by the %5$s '%6$s' in the year %7$d"
 msgstr ""
 
-#: includes/LitCalAPI.php:1883
+#: includes/LitCalAPI.php:1889
 #, php-format
 msgid "Could not find a sanctorale data file for %s"
 msgstr ""
