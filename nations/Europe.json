@@ -3,7 +3,7 @@
         {
             "Festivity": {
                 "tag": "StBenedict",
-                "color": "white",
+                "color": ["white"],
                 "grade": 4,
                 "day": 11,
                 "month": 7
@@ -22,7 +22,7 @@
         {
             "Festivity": {
                 "tag": "StsCyrilMethodius",
-                "color": "white",
+                "color": ["white"],
                 "grade": 4,
                 "day": 14,
                 "month": 2
@@ -42,7 +42,7 @@
         {
             "Festivity": {
                 "tag": "StBridget",
-                "color": "white",
+                "color": ["white"],
                 "grade": 4,
                 "day": 23,
                 "month": 7
@@ -65,7 +65,7 @@
         {
             "Festivity": {
                 "tag": "StCatherineSiena",
-                "color": "white",
+                "color": ["white"],
                 "grade": 4,
                 "day": 29,
                 "month": 4
@@ -88,7 +88,7 @@
         {
             "Festivity": {
                 "tag": "StEdithStein",
-                "color": "white",
+                "color": ["red","white"],
                 "grade": 4,
                 "day": 9,
                 "month": 8,
@@ -120,7 +120,7 @@
         {
             "Festivity": {
                 "tag": "StEdithStein",
-                "color": "white",
+                "color": ["red","white"],
                 "grade": 4,
                 "day": 9,
                 "month": 8

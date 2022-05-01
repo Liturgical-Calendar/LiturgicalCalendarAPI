@@ -1,5 +1,7 @@
 <?php
 
+include_once( 'includes/enums/RomanMissal.php' );
+
 $requestHeaders = getallheaders();
 if( isset( $requestHeaders[ "Origin" ] ) ) {
     header( "Access-Control-Allow-Origin: {$requestHeaders[ "Origin" ]}" );
@@ -58,7 +60,8 @@ if( file_exists( 'nations/index.json' ) ) {
                 "NationalCalendars" => $nationalCalendars,
                 "DiocesanCalendars" => $diocesanCalendars,
                 "DiocesanGroups"    => $diocesanGroups,
-                "WiderRegions"      => $widerRegionsNames
+                "WiderRegions"      => $widerRegionsNames,
+                "RomanMissals"      => RomanMissal::produceMetadata()
             ],
         ], JSON_PRETTY_PRINT );
         $responseHash = md5( $response );
