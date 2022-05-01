@@ -1629,20 +1629,20 @@ class LitCalAPI {
         $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', "{$row->Festivity->day}-{$row->Festivity->month}-" . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
         //let's also get the name back from the database, so we can give some feedback and maybe even recreate the festivity
         if( $this->Cal->inSolemnitiesFeastsOrMemorials( $currentFeastDate ) || self::DateIsSunday( $currentFeastDate ) ) {
-            $coincidingFestivity = new stdClass();
-            if ( self::DateIsSunday( $currentFeastDate ) && $coincidingFestivity->event->grade < LitGrade::SOLEMNITY ){
-                //it's a Sunday
-                $coincidingFestivity->event = $this->Cal->solemnityFromDate( $currentFeastDate );
-                $coincidingFestivity->grade = $this->LitSettings->Locale === LitLocale::LATIN ? 'Die Domini' : ucfirst( $this->dayOfTheWeek->format( $currentFeastDate->format( 'U' ) ) );
-            } else if ( $this->Cal->inSolemnities( $currentFeastDate ) ) {
-                $coincidingFestivity->event = $this->Cal->solemnityFromDate( $currentFeastDate );
-                //it's a Feast of the Lord or a Solemnity
-                $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $coincidingFestivity->event->grade, false ) . '</i>' : $this->LitGrade->i18n( $coincidingFestivity->grade, false ) );
-            } else if ( $this->Cal->inFeastsOrMemorials( $currentFeastDate ) ) {
-                $coincidingFestivity->event = $this->Cal->feastOrMemorialFromDate( $currentFeastDate );
+            $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $currentFeastDate, $this->LitSettings );
+            if ( $this->Cal->inFeastsOrMemorials( $currentFeastDate ) ) {
                 //we should probably be able to create it anyways in this case?
-                $this->Cal->addFestivity( $row->Festivity->tag, new Festivity( $row->Festivity->name, $currentFeastDate, $row->Festivity->color, LitFeastType::FIXED, $row->Festivity->grade, LitCommon::PROPRIO ) );
-                $coincidingFestivity->grade = $this->LitGrade->i18n( $coincidingFestivity->event->grade, false );
+                $this->Cal->addFestivity(
+                    $row->Festivity->tag,
+                    new Festivity(
+                        $row->Festivity->name,
+                        $currentFeastDate,
+                        $row->Festivity->color,
+                        LitFeastType::FIXED,
+                        $row->Festivity->grade,
+                        LitCommon::PROPRIO
+                    )
+                );
             }
             $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                 /**translators:
@@ -1756,8 +1756,14 @@ class LitCalAPI {
         }
     }
 
-    private function createNewRegionalFestivity( object $row ) : void {
+    private function createNewRegionalOrNationalFestivity( object $row ) : void {
         $row->Festivity->DATE = DateTime::createFromFormat( '!j-n-Y', "{$row->Festivity->day}-{$row->Festivity->month}-{$this->LitSettings->Year}", new DateTimeZone( 'UTC' ) );
+        if( is_array( $row->Festivity->color ) ) {
+            $row->Festivity->color = implode(",", $row->Festivity->color);
+        }
+        if( is_array( $row->Festivity->common ) ) {
+            $row->Festivity->common = implode(",", $row->Festivity->common);
+        }
         if( $this->festivityCanBeCreated( $row ) ) {
             if( $this->festivityDoesNotCoincide( $row ) ) {
                 $festivity = new Festivity( $row->Festivity->name, $row->Festivity->DATE, $row->Festivity->color, LitFeastType::FIXED, $row->Festivity->grade, $row->Festivity->common );
@@ -1811,7 +1817,7 @@ class LitCalAPI {
                             }
                             break;
                         case "createNew":
-                            $this->createNewRegionalFestivity( $row );
+                            $this->createNewRegionalOrNationalFestivity( $row );
                             break;
                         case "setProperty":
                             break;
@@ -1892,7 +1898,7 @@ class LitCalAPI {
         }
     }
 
-    private function makePatron( string $tag, string $nameSuffix, int $day, int $month, string $color, string $EditionRomanMissal = RomanMissal::EDITIO_TYPICA_1970 ) {
+    private function makePatron( string $tag, string $nameSuffix, int $day, int $month, array|string $color, string $EditionRomanMissal = RomanMissal::EDITIO_TYPICA_1970 ) {
         $festivity = $this->Cal->getFestivity( $tag );
         if( $festivity !== null ) {
             if( $festivity->grade < LitGrade::FEAST ) {
@@ -1917,6 +1923,9 @@ class LitCalAPI {
                     $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $coincidingFestivity->event->grade, false ) . '</i>' : $this->LitGrade->i18n( $coincidingFestivity->grade, false ) );
                 } else if ( $this->Cal->inFeastsOrMemorials( $currentFeastDate ) ) {
                     //we should probably be able to create it anyways in this case?
+                    if( is_array( $color ) ) {
+                        $color = implode(",", $color);
+                    }
                     $this->Cal->addFestivity( $tag, new Festivity( $FestivityName, $currentFeastDate, $color, LitFeastType::FIXED, LitGrade::FEAST, LitCommon::PROPRIO ) );
                     $coincidingFestivity->grade = $this->LitGrade->i18n( $coincidingFestivity->event->grade, false );
                 }
@@ -1946,7 +1955,7 @@ class LitCalAPI {
         //The Solemnity of the Immaculate Conception is the Patronal FeastDay of the United States of America
         $festivity = $this->Cal->getFestivity( "ImmaculateConception" );
         if( $festivity !== null ) {
-            $this->makePatron( "ImmaculateConception", "Patronal feastday of the United States of America", 8, 12, LitColor::WHITE );
+            $this->makePatron( "ImmaculateConception", "Patronal feastday of the United States of America", 8, 12, [ LitColor::WHITE ] );
         }
 
         //move Saint Vincent Deacon from Jan 22 to Jan 23 in order to allow for National Day of Prayer for the Unborn on Jan 22
@@ -1990,6 +1999,9 @@ class LitCalAPI {
         $this->loadPropriumDeSanctisData( RomanMissal::USA_EDITION_2011 );
 
         foreach ( $this->tempCal[ RomanMissal::USA_EDITION_2011 ] as $row ) {
+            if( is_array( $row->COLOR ) ) {
+                $row->COLOR = implode(",", $row->COLOR );
+            }
             $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
             if( !$this->Cal->inSolemnities( $currentFeastDate ) ) {
                 $festivity = new Festivity( "[ USA ] " . $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON, $row->DISPLAYGRADE );
