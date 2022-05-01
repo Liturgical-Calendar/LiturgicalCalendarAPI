@@ -92,4 +92,11 @@ class RomanMissal {
         return (object) self::$yearLimits[ $value ];
     }
 
+    public static function produceMetadata() : array {
+        $reflectionClass = new ReflectionClass(static::class);
+        $metadata = $reflectionClass->getConstants();
+        array_walk($metadata, function(string &$v){ $v = [ "value" => $v, "name" => self::getName( $v ), "sanctoraleFileName" => self::getSanctoraleFileName( $v ), "yearLimits" => self::$yearLimits[ $v ] ]; });
+        return $metadata;
+    }
+
 }

@@ -34,6 +34,7 @@ foreach( $LatinMissals as $LatinMissal ) {
                 $key = $festivity[ "TAG" ];
                 $FestivityCollection[ $key ] = $festivity;
                 $FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
+                $FestivityCollection[ $key ][ "MISSAL" ] = $LatinMissal;
             }
         }
     }
