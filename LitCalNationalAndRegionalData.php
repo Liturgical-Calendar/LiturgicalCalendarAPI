@@ -118,6 +118,10 @@ class LitCalNationalData {
                     $responseStr = json_encode( $response );
                     echo $responseStr;
                     die();
+                } else {
+                    header( $_SERVER[ "SERVER_PROTOCOL" ]." 404 Not Found", true, 404 );
+                    echo "{\"message\":\"file $calendarDataFile does not exist\"}";
+                    die();
                 }
             }
         }
