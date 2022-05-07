@@ -128,35 +128,22 @@ class LitCalNationalData {
     }
 
     private function writeNationalCalendar() {
-        if( !property_exists( $this->DATA, 'calendar' ) || !property_exists( $this->DATA, 'diocese' ) || !property_exists( $this->DATA, 'nation' ) ) {
+        if( !property_exists( $this->DATA, 'LitCal' ) || !property_exists( $this->DATA, 'Metadata' ) || !property_exists( $this->DATA, 'Settings' ) ) {
             header( $_SERVER[ "SERVER_PROTOCOL" ]." 400 Bad request", true, 400 );
-            die( '{"error":"Required parameters were not received"}' );
+            die( '{"error":"Not all required parameters were received (LitCal, Metadata, Settings)"}' );
         } else {
-            $this->RESPONSE->Nation = strip_tags( $this->DATA->nation );
-            $this->RESPONSE->Diocese = strip_tags( $this->DATA->diocese );
-            $CalData = json_decode( $this->DATA->calendar );
-            if( json_last_error() !== JSON_ERROR_NONE ) {
-                header( $_SERVER[ "SERVER_PROTOCOL" ]." 400 Bad request", true, 400 );
-                die( '{"error":"Malformed data received in <calendar> parameters"}' );
+            $region = $this->DATA->Metadata->Region;
+            if( $region === 'UNITED STATES' ) {
+                $region = 'USA';
             }
-            if( property_exists( $this->DATA, 'overrides' ) ) {
-                $CalData->Overrides = $this->DATA->overrides;
-            }
-            $this->RESPONSE->Calendar = json_encode( $CalData );
-            if( property_exists( $this->DATA, 'group' ) ) {
-                $this->RESPONSE->Group = strip_tags( $this->DATA->group );
-            }
-            $path = "nations/{$this->RESPONSE->Nation}";
+            $path = "nations/{$region}";
             if( !file_exists( $path ) ){
                 mkdir( $path, 0755, true );
             }
-
-            file_put_contents( $path . "/{$this->RESPONSE->Diocese}.json", $this->RESPONSE->Calendar . PHP_EOL );
-
-            //$this->createOrUpdateIndex( $path );
+            $data = json_encode( $this->DATA, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE );
+            file_put_contents( $path . "/{$region}.json",  $data . PHP_EOL );
             header( $_SERVER[ "SERVER_PROTOCOL" ]." 201 Created", true, 201 );
-            die( '{"success":"National calendar created or updated for nation \"'. $this->RESPONSE->Diocese .'\""}' );
-
+            die( '{"success":"National calendar created or updated for nation \"'. $this->DATA->Metadata->Region .'\""}' );
         }
     }
 
