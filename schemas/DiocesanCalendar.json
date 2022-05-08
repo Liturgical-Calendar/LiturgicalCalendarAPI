@@ -1,0 +1,230 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$ref": "#/definitions/DiocesanCalendar",
+    "definitions": {
+        "DiocesanCalendar": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "LitCal": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/LitCal"
+                    }
+                },
+                "Overrides": {
+                    "$ref": "#/definitions/Overrides"
+                }
+            },
+            "required": [
+                "LitCal"
+            ],
+            "title": "DiocesanCalendar"
+        },
+        "LitCal": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "color": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/ColorString"
+                        },
+                        {
+                            "$ref": "#/definitions/ColorArray"
+                        }
+                    ]
+                },
+                "grade": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 7,
+                    "description": "0 = WEEKDAY, 1 = COMMEMORATION, 2 = MEMORIAL_OPT, 3 = MEMORIAL, 4 = FEAST, 5 = FEAST_LORD, 6 = SOLEMNITY, 7 = HIGHER_SOLEMNITY"
+                },
+                "common": {
+                    "$ref": "#/definitions/Common"
+                },
+                "day": {
+                    "type": "integer"
+                },
+                "month": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 12
+                },
+                "readings": {
+                    "$ref": "#/definitions/Readings"
+                },
+                "formRowNum": {
+                    "type": "integer"
+                },
+                "sinceYear": {
+                    "type": "string",
+                    "format": "integer"
+                },
+                "decreeURL": {
+                    "type": "string",
+                    "format": "uri",
+                    "qt-uri-protocols": [
+                        "https"
+                    ],
+                    "qt-uri-extensions": [
+                        ".html"
+                    ]
+                },
+                "decreeLangs": {
+                    "$ref": "#/definitions/DecreeLangs"
+                }
+            },
+            "required": [
+                "color",
+                "common",
+                "day",
+                "formRowNum",
+                "grade",
+                "month",
+                "name",
+                "sinceYear"
+            ],
+            "title": "LitCal"
+        },
+        "ColorString": {
+            "type": "string",
+            "enum": [
+                "white",
+                "red",
+                "green",
+                "purple",
+                "pink"
+            ],
+            "title": "ColorString"
+        },
+        "ColorArray": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "white",
+                    "red",
+                    "green",
+                    "purple",
+                    "pink"
+                ]
+            },
+            "title": "ColorArray"
+        },
+        "Common": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [ 
+                    "Proper",
+                    "Dedication of a Church",
+                    "Blessed Virgin Mary",
+                    "Martyrs",
+                    "Pastors",
+                    "Doctors",
+                    "Virgins",
+                    "Holy Men and Women",
+                    "For One Martyr",
+                    "For Several Martyrs",
+                    "For Missionary Martyrs",
+                    "For One Missionary Martyr",
+                    "For Several Missionary Martyrs",
+                    "For a Virgin Martyr",
+                    "For a Holy Woman Martyr",
+                    "For a Pope",
+                    "For a Bishop",
+                    "For One Pastor",
+                    "For Several Pastors",
+                    "For Founders of a Church",
+                    "For One Founder",
+                    "For Several Founders",
+                    "For Missionaries",
+                    "For One Virgin",
+                    "For Several Virgins",
+                    "For Several Saints",
+                    "For One Saint",
+                    "For an Abbot",
+                    "For a Monk",
+                    "For a Nun",
+                    "For Religious",
+                    "For Those Who Practiced Works of Mercy",
+                    "For Educators",
+                    "For Holy Women"
+                ]
+            },
+            "title": "Common"
+        },
+        "Readings": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "FIRST_READING": {
+                    "type": "string"
+                },
+                "RESPONSORIAL_PSALM": {
+                    "type": "string"
+                },
+                "SECOND_READING": {
+                    "type": "string"
+                },
+                "ALLELUIA_VERSE": {
+                    "type": "string"
+                },
+                "GOSPEL": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "ALLELUIA_VERSE",
+                "FIRST_READING",
+                "GOSPEL",
+                "RESPONSORIAL_PSALM",
+                "SECOND_READING"
+            ],
+            "title": "Readings"
+        },
+        "Overrides": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "Epiphany": {
+                    "type": "string",
+                    "enum": [
+                        "JAN6",
+                        "SUNDAY_JAN2_JAN8"
+                    ]
+                },
+                "Ascension": {
+                    "type": "string",
+                    "enum": [
+                        "SUNDAY",
+                        "THURSDAY"
+                    ]
+                },
+                "CorpusChristi": {
+                    "type": "string",
+                    "enum": [
+                        "SUNDAY",
+                        "THURSDAY"
+                    ]
+                }
+            },
+            "minItems": 1,
+            "title": "Overrides"
+        },
+        "DecreeLangs": {
+            "type": "object",
+            "additionalProperties": {
+                "$ref": "#/definitions/LangMapping"
+            },
+            "minItems": 1,
+            "description": "mapping between two-letter ISO code for a language, and the actual two-letter representation used in the Decree URL",
+            "title": "DecreeLangs"
+        }
+    }
+}
