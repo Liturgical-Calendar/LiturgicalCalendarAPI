@@ -268,23 +268,5 @@
             "ALLELUIA_VERSE": "",
             "GOSPEL": ""
         }
-    },
-    {
-        "MONTH": 12,
-        "DAY": 12,
-        "TAG": "LadyGuadalupe",
-        "NAME": "Our Lady of Guadalupe",
-        "GRADE": 4,
-        "DISPLAYGRADE": "",
-        "COMMON": "Proper",
-        "CALENDAR": "",
-        "COLOR": "white",
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
-        }
     }
 ]
