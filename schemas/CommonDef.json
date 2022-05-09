@@ -1,0 +1,323 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "LitColor": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "white",
+                    "red",
+                    "green",
+                    "purple",
+                    "pink"
+                ]
+            },
+            "title": "LitColor"
+        },
+        "LitCommon": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [ 
+                    "Proper",
+                    "Dedication of a Church",
+                    "Blessed Virgin Mary",
+                    "Martyrs",
+                    "Pastors",
+                    "Doctors",
+                    "Virgins",
+                    "Holy Men and Women",
+                    "For One Martyr",
+                    "For Several Martyrs",
+                    "For Missionary Martyrs",
+                    "For One Missionary Martyr",
+                    "For Several Missionary Martyrs",
+                    "For a Virgin Martyr",
+                    "For a Holy Woman Martyr",
+                    "For a Pope",
+                    "For a Bishop",
+                    "For One Pastor",
+                    "For Several Pastors",
+                    "For Founders of a Church",
+                    "For One Founder",
+                    "For Several Founders",
+                    "For Missionaries",
+                    "For One Virgin",
+                    "For Several Virgins",
+                    "For Several Saints",
+                    "For One Saint",
+                    "For an Abbot",
+                    "For a Monk",
+                    "For a Nun",
+                    "For Religious",
+                    "For Those Who Practiced Works of Mercy",
+                    "For Educators",
+                    "For Holy Women"
+                ]
+            },
+            "title": "Common"
+        },
+        "LitGrade": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 7,
+            "description": "0 = WEEKDAY, 1 = COMMEMORATION, 2 = MEMORIAL_OPT, 3 = MEMORIAL, 4 = FEAST, 5 = FEAST_LORD, 6 = SOLEMNITY, 7 = HIGHER_SOLEMNITY",
+            "title": "LitGrade"
+        },
+        "Readings": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "PALM_GOSPEL": {
+                    "type": "string"
+                },
+                "FIRST_READING": {
+                    "type": "string"
+                },
+                "RESPONSORIAL_PSALM": {
+                    "type": "string"
+                },
+                "SECOND_READING": {
+                    "type": "string"
+                },
+                "RESPONSORIAL_PSALM_2": {
+                    "type": "string"
+                },
+                "THIRD_READING": {
+                    "type": "string"
+                },
+                "RESPONSORIAL_PSALM_3": {
+                    "type": "string"
+                },
+                "FOURTH_READING": {
+                    "type": "string"
+                },
+                "RESPONSORIAL_PSALM_4": {
+                    "type": "string"
+                },
+                "FIFTH_READING": {
+                    "type": "string"
+                },
+                "RESPONSORIAL_PSALM_5": {
+                    "type": "string"
+                },
+                "SIXTH_READING": {
+                    "type": "string"
+                },
+                "RESPONSORIAL_PSALM_6": {
+                    "type": "string"
+                },
+                "SEVENTH_READING": {
+                    "type": "string"
+                },
+                "RESPONSORIAL_PSALM_7": {
+                    "type": "string"
+                },
+                "EPISTLE": {
+                    "type": "string"
+                },
+                "RESPONSORIAL_PSALM_EPISTLE": {
+                    "type": "string"
+                },
+                "ALLELUIA_VERSE": {
+                    "type": "string"
+                },
+                "GOSPEL": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "FIRST_READING",
+                "RESPONSORIAL_PSALM",
+                "ALLELUIA_VERSE",
+                "GOSPEL"
+            ],
+            "title": "Readings"
+        },
+        "Day": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "maximum value will be 28, 29, 30, or 31 depending on whether we are dealing with a leap year, and whether we are dealing with a month that usually has 28, 30, or 31 days",
+            "title": "Day"
+        },
+        "Month": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12,
+            "title": "Month"
+        },
+        "LitFeastType": {
+            "type": "string",
+            "enum": [
+                "fixed",
+                "mobile"
+            ],
+            "title": "LitFeastType"
+        },
+        "Epiphany": {
+            "type": "string",
+            "enum": [
+                "JAN6",
+                "SUNDAY_JAN2_JAN8"
+            ],
+            "title": "Epiphany"
+        },
+        "Ascension": {
+            "type": "string",
+            "enum": [
+                "SUNDAY",
+                "THURSDAY"
+            ],
+            "title": "Ascension"
+        },
+        "CorpusChristi": {
+            "type": "string",
+            "enum": [
+                "SUNDAY",
+                "THURSDAY"
+            ],
+            "title": "CorpusChristi"
+        },
+        "DecreeLangs": {
+            "type": "object",
+            "properties": {
+                "DE": {
+                    "type": "string",
+                    "description": "German",
+                    "enum": [
+                        "de",
+                        "ge"
+                    ]
+                },
+                "EN": {
+                    "type": "string",
+                    "description": "English",
+                    "enum": [
+                        "en"
+                    ]
+                },
+                "ES": {
+                    "type": "string",
+                    "description": "Spanish",
+                    "enum": [
+                        "es",
+                        "sp"
+                    ]
+                },
+                "FR": {
+                    "type": "string",
+                    "description": "French",
+                    "enum": [
+                        "fr"
+                    ]
+                },
+                "IT": {
+                    "type": "string",
+                    "description": "Italian",
+                    "enum": [
+                        "it"
+                    ]
+                },
+                "LA": {
+                    "type": "string",
+                    "description": "Latin",
+                    "enum": [
+                        "la"
+                    ]
+                },
+                "PL": {
+                    "type": "string",
+                    "description": "Polish",
+                    "enum": [
+                        "pl"
+                    ]
+                },
+                "PT": {
+                    "type": "string",
+                    "description": "Portuguese",
+                    "enum": [
+                        "po",
+                        "pt"
+                    ]
+                }
+            },
+            "description": "mapping between two-letter ISO code for a language, and the actual two-letter representation used in the Decree URL",
+            "title": "DecreeLangs"
+        },
+        "Calendar": {
+            "type": "string",
+            "enum": [
+                "GENERAL ROMAN"
+            ],
+            "title": "Calendar"
+        },
+        "DecreeURL": {
+            "type": "string",
+            "format": "uri",
+            "qt-uri-protocols": [
+                "http",
+                "https"
+            ],
+            "qt-uri-extensions": [
+                ".html",
+                ".pdf"
+            ],
+            "title": "DecreeURL"
+        },
+        "ColorString": {
+            "type": "string",
+            "description": "This is defined simply for backwards compatibility. In the latest work on the API, arrays are supported, and should be expected. Once this definition is clear everywhere, we can remove this definition...",
+            "enum": [
+                "white",
+                "red",
+                "green",
+                "purple",
+                "pink",
+                "white,red"
+            ],
+            "title": "ColorString"
+        },
+        "Missals": {
+            "type": "array",
+            "description": "Missals as defined in the PHP RomanMissal enum, from which data for the current calendar is drawn",
+            "items": {
+                "$ref": "#/definitions/Missal"
+            }
+        },
+        "Missal": {
+            "type": "string",
+            "enum": [
+                "USA_2011",
+                "ITALY_1983",
+                "ITALY_2020"
+            ]
+        },
+        "MemorialFromDecreesAction": {
+            "type": "string",
+            "enum": [
+                "createNew",
+                "setProperty",
+                "makeDoctor"
+            ],
+            "title": "MemorialFromDecreesAction"
+        },
+        "WiderRegionCalendarAction": {
+            "type": "string",
+            "enum": [
+                "createNew",
+                "makePatron"
+            ]
+        },
+        "NationalCalendarAction": {
+            "type": "string",
+            "enum": [
+                "createNew",
+                "setProperty",
+                "makePatron",
+                "moveFestivity"
+            ],
+            "title": "NationalCalendarAction"
+        }
+    }
+}

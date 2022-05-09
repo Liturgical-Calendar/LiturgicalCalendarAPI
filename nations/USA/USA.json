@@ -21,12 +21,12 @@
                 "tag": "StVincentDeacon",
                 "name": "Saint Vincent, Deacon and Martyr",
                 "day": 23,
-                "month": 1,
-                "missal": "USA_2011",
-                "reason": "National Day of Prayer for the Unborn"
+                "month": 1
             },
             "Metadata": {
                 "action": "moveFestivity",
+                "missal": "USA_2011",
+                "reason": "National Day of Prayer for the Unborn",
                 "sinceYear": 1970
             }
         },
@@ -48,12 +48,12 @@
                 "tag": "StPaulCross",
                 "name": "Saint Paul of the Cross, Priest",
                 "day": 20,
-                "month": 10,
-                "missal": "USA_2011",
-                "reason": "Saint John Brebeuf (elevated to memorial)"
+                "month": 10
             },
             "Metadata": {
                 "action": "moveFestivity",
+                "missal": "USA_2011",
+                "reason": "Saint John Brebeuf (elevated to memorial)",
                 "sinceYear": 1970
             }
         },
@@ -74,9 +74,9 @@
             "Festivity": {
                 "tag": "StsJeanBrebeuf",
                 "name": "Saints John de Brébeuf and Isaac Jogues, Priests, and Companions, Martyrs",
-                "grade": 3,
                 "day": 19,
-                "month": 10
+                "month": 10,
+                "grade": 3
             },
             "Metadata": {
                 "action": "setProperty",
@@ -105,12 +105,15 @@
                     "white"
                 ],
                 "grade": 3,
-                "strtotime": "fourth thursday of november",
+                "day": null,
+                "month": null,
                 "common": [],
-                "readings": ""
+                "readings": "",
+                "strtotime": "fourth thursday of november"
             },
             "Metadata": {
-                "action": "createNew"
+                "action": "createNew",
+                "sinceYear": 1970
             }
         },
         {
@@ -118,12 +121,12 @@
                 "tag": "StCamillusDeLellis",
                 "name": "Saint Camillus de Lellis, Priest",
                 "day": 18,
-                "month": 7,
-                "missal": "USA_2011",
-                "reason": "Blessed Kateri Tekakwitha"
+                "month": 7
             },
             "Metadata": {
                 "action": "moveFestivity",
+                "missal": "USA_2011",
+                "reason": "Blessed Kateri Tekakwitha",
                 "sinceYear": 1970
             }
         },
@@ -145,12 +148,12 @@
                 "tag": "StElizabethPortugal",
                 "name": "Saint Elizabeth of Portugal",
                 "day": 5,
-                "month": 7,
-                "missal": "USA_2011",
-                "reason": "Independence Day"
+                "month": 7
             },
             "Metadata": {
                 "action": "moveFestivity",
+                "missal": "USA_2011",
+                "reason": "Independence Day",
                 "sinceYear": 1970
             }
         },
