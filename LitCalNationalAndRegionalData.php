@@ -160,6 +160,17 @@ class LitCalNationalData {
                 if( !file_exists( $path ) ) {
                     mkdir( $path, 0755, true );
                 }
+                $translationJSON = new stdClass();
+                foreach( $this->DATA->LitCal as $CalEvent ) {
+                    $translationJSON->{ $CalEvent->Festivity->tag } = '';
+                }
+                if( count( $this->DATA->Metadata->Languages ) > 0 ) {
+                    foreach( $this->DATA->Metadata->Languages as $iso ) {
+                        if( !file_exists( "nations/{$widerRegion}/{$iso}.json" ) ) {
+                            file_put_contents( "nations/{$widerRegion}/{$iso}.json", json_encode( $translationJSON, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE ) );
+                        }
+                    }
+                }
             }
             $data = json_encode( $this->DATA, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE );
             file_put_contents( "nations/{$this->DATA->Metadata->WiderRegion}.json",  $data . PHP_EOL );

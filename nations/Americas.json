@@ -31,8 +31,9 @@
         "IsMultilingual": true,
         "Languages": [
             "en",
-            "es",
-            "pt"
+            "fr",
+            "pt",
+            "es"
         ],
         "WiderRegion": "Americas"
     }
