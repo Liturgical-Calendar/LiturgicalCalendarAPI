@@ -154,6 +154,7 @@
         "FRANCE": "FR",
         "GERMANY": "DE",
         "GREECE": "GR",
+        "HUNGARY": "HU",
         "IRELAND": "IE",
         "ITALY": "IT",
         "LATVIA": "LV",
@@ -167,7 +168,37 @@
         "SLOVACCHIA": "SK",
         "SLOVENIA": "SI",
         "SPAIN": "ES",
-        "SWEDEN": "SE",
-        "HUNGARY": "HU"
+        "SWEDEN": "SE"
+    },
+    "Metadata": {
+        "IsMultilingual": true,
+        "Languages": [
+            "bg",
+            "cs",
+            "da",
+            "de",
+            "el",
+            "es",
+            "et",
+            "fi",
+            "fr",
+            "ga",
+            "hr",
+            "hu",
+            "it",
+            "lb",
+            "lt",
+            "lv",
+            "mt",
+            "nl",
+            "pl",
+            "pt",
+            "ro",
+            "sk",
+            "sl",
+            "sv",
+            "tr"
+        ],
+        "WiderRegion": "Europe"
     }
 }
