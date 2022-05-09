@@ -2209,7 +2209,7 @@ class LitCalAPI {
             }
             //if sinceYear is undefined or null or empty, let's go ahead and create the event in any case
             //creation will be restricted only if explicitly defined by the sinceYear property
-            if( $this->LitSettings->Year >= $obj->sinceYear || $obj->sinceYear === null || $obj->sinceYear == '' ) {
+            if( $this->LitSettings->Year >= $obj->sinceYear || $obj->sinceYear === null || $obj->sinceYear === 0 ) {
                 $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $obj->day . '-' . $obj->month . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
                 if( $obj->grade > LitGrade::FEAST ) {
                     if( $this->Cal->inSolemnities( $currentFeastDate ) && $key != $this->Cal->solemnityKeyFromDate( $currentFeastDate ) ) {
