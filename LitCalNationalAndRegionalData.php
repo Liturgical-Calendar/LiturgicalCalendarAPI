@@ -8,12 +8,22 @@ include_once( 'includes/enums/RequestContentType.php' );
 include_once( 'includes/enums/ReturnType.php' );
 include_once( 'includes/APICore.php' );
 
+if( file_exists("allowedOrigins.php") ) {
+    include_once( 'allowedOrigins.php' );
+}
+
 $allowedOrigins = [
     "https://johnromanodorazio.com",
     "https://www.johnromanodorazio.com",
     "https://litcal.johnromanodorazio.com",
-    "https://litcal-staging.johnromanodorazio.com"
+    "https://litcal-staging.johnromanodorazio.com",
+    "https://litcal.org",
+    "https://www.litcal.org"
 ];
+
+if( defined('ALLOWED_ORIGINS') && is_array( ALLOWED_ORIGINS ) ) {
+    $allowedOrigins = array_merge( $allowedOrigins, ALLOWED_ORIGINS );
+}
 
 $LitCalNationalData = new LitCalNationalData();
 
