@@ -10,24 +10,19 @@
             "additionalProperties": false,
             "properties": {
                 "MONTH": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 12
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Month"
                 },
                 "DAY": {
-                    "type": "integer"
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Day"
                 },
                 "TAG": {
                     "type": "string"
                 },
                 "GRADE": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 7,
-                    "description": "0 = WEEKDAY, 1 = COMMEMORATION, 2 = MEMORIAL_OPT, 3 = MEMORIAL, 4 = FEAST, 5 = FEAST_LORD, 6 = SOLEMNITY, 7 = HIGHER_SOLEMNITY"
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                 },
                 "COMMON": {
-                    "$ref": "#/definitions/Common"
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
                 },
                 "CALENDAR": {
                     "$ref": "#/definitions/Calendar"
@@ -35,10 +30,10 @@
                 "COLOR": {
                     "anyOf": [
                         {
-                            "$ref": "#/definitions/ColorString"
+                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/ColorString"
                         },
                         {
-                            "$ref": "#/definitions/ColorArray"
+                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                         }
                     ]
                 },
@@ -66,7 +61,7 @@
                     "$ref": "#/definitions/LiturgicalEventWithVigilMass"
                 },
                 {
-                    "$ref": "#/definitions/LiturgicalEventReadings"
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Readings"
                 }
             ],
             "title": "Readings"
@@ -76,116 +71,15 @@
             "additionalProperties": false,
             "properties": {
                 "VIGIL": {
-                    "$ref": "#/definitions/LiturgicalEventReadings"
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Readings"
                 },
                 "DAY": {
-                    "$ref": "#/definitions/LiturgicalEventReadings"
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Readings"
                 }
             }
         },
-        "LiturgicalEventReadings": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "FIRST_READING": {
-                    "type": "string"
-                },
-                "RESPONSORIAL_PSALM": {
-                    "type": "string"
-                },
-                "SECOND_READING": {
-                    "type": "string"
-                },
-                "ALLELUIA_VERSE": {
-                    "type": "string"
-                },
-                "GOSPEL": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "FIRST_READING",
-                "RESPONSORIAL_PSALM",
-                "SECOND_READING",
-                "ALLELUIA_VERSE",
-                "GOSPEL"
-            ],
-            "title": "LiturgicalEventReadings"
-        },
         "Calendar": {
-            "type": "string",
-            "enum": [
-                "GENERAL ROMAN"
-            ],
-            "title": "Calendar"
-        },
-        "ColorString": {
-            "type": "string",
-            "enum": [
-                "white",
-                "red",
-                "green",
-                "purple",
-                "pink"
-            ],
-            "title": "ColorString"
-        },
-        "ColorArray": {
-            "type": "array",
-            "items": {
-                "type": "string",
-                "enum": [
-                    "white",
-                    "red",
-                    "green",
-                    "purple",
-                    "pink"
-                ]
-            },
-            "title": "ColorArray"
-        },
-        "Common": {
-            "type": "array",
-            "items": {
-                "type": "string",
-                "enum": [ 
-                    "Proper",
-                    "Dedication of a Church",
-                    "Blessed Virgin Mary",
-                    "Martyrs",
-                    "Pastors",
-                    "Doctors",
-                    "Virgins",
-                    "Holy Men and Women",
-                    "For One Martyr",
-                    "For Several Martyrs",
-                    "For Missionary Martyrs",
-                    "For One Missionary Martyr",
-                    "For Several Missionary Martyrs",
-                    "For a Virgin Martyr",
-                    "For a Holy Woman Martyr",
-                    "For a Pope",
-                    "For a Bishop",
-                    "For One Pastor",
-                    "For Several Pastors",
-                    "For Founders of a Church",
-                    "For One Founder",
-                    "For Several Founders",
-                    "For Missionaries",
-                    "For One Virgin",
-                    "For Several Virgins",
-                    "For Several Saints",
-                    "For One Saint",
-                    "For an Abbot",
-                    "For a Monk",
-                    "For a Nun",
-                    "For Religious",
-                    "For Those Who Practiced Works of Mercy",
-                    "For Educators",
-                    "For Holy Women"
-                ]
-            },
-            "title": "Common"
+            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Calendar"
         }
     }
 }

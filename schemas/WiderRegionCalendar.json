@@ -49,32 +49,27 @@
                 "color": {
                     "anyOf": [
                         {
-                            "$ref": "#/definitions/ColorString"
+                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/ColorString"
                         },
                         {
-                            "$ref": "#/definitions/ColorArray"
+                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                         }
                     ]
                 },
                 "grade": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 7,
-                    "description": "0 = WEEKDAY, 1 = COMMEMORATION, 2 = MEMORIAL_OPT, 3 = MEMORIAL, 4 = FEAST, 5 = FEAST_LORD, 6 = SOLEMNITY, 7 = HIGHER_SOLEMNITY"
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                 },
                 "day": {
-                    "type": "integer"
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Day"
                 },
                 "month": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 12
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Month"
                 },
                 "common": {
-                    "$ref": "#/definitions/Common"
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
                 },
                 "readings": {
-                    "$ref": "#/definitions/Readings"
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Readings"
                 }
             },
             "required": [
@@ -86,125 +81,21 @@
             ],
             "title": "Festivity"
         },
-        "ColorString": {
-            "type": "string",
-            "enum": [
-                "white",
-                "red",
-                "green",
-                "purple",
-                "pink"
-            ],
-            "title": "ColorString"
-        },
-        "ColorArray": {
-            "type": "array",
-            "items": {
-                "type": "string",
-                "enum": [
-                    "white",
-                    "red",
-                    "green",
-                    "purple",
-                    "pink"
-                ]
-            },
-            "title": "ColorArray"
-        },
-        "Common": {
-            "type": "array",
-            "items": {
-                "type": "string",
-                "enum": [ 
-                    "Proper",
-                    "Dedication of a Church",
-                    "Blessed Virgin Mary",
-                    "Martyrs",
-                    "Pastors",
-                    "Doctors",
-                    "Virgins",
-                    "Holy Men and Women",
-                    "For One Martyr",
-                    "For Several Martyrs",
-                    "For Missionary Martyrs",
-                    "For One Missionary Martyr",
-                    "For Several Missionary Martyrs",
-                    "For a Virgin Martyr",
-                    "For a Holy Woman Martyr",
-                    "For a Pope",
-                    "For a Bishop",
-                    "For One Pastor",
-                    "For Several Pastors",
-                    "For Founders of a Church",
-                    "For One Founder",
-                    "For Several Founders",
-                    "For Missionaries",
-                    "For One Virgin",
-                    "For Several Virgins",
-                    "For Several Saints",
-                    "For One Saint",
-                    "For an Abbot",
-                    "For a Monk",
-                    "For a Nun",
-                    "For Religious",
-                    "For Those Who Practiced Works of Mercy",
-                    "For Educators",
-                    "For Holy Women"
-                ]
-            },
-            "title": "Common"
-        },
-        "Readings": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "FIRST_READING": {
-                    "type": "string"
-                },
-                "RESPONSORIAL_PSALM": {
-                    "type": "string"
-                },
-                "SECOND_READING": {
-                    "type": "string"
-                },
-                "ALLELUIA_VERSE": {
-                    "type": "string"
-                },
-                "GOSPEL": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "ALLELUIA_VERSE",
-                "FIRST_READING",
-                "GOSPEL",
-                "RESPONSORIAL_PSALM",
-                "SECOND_READING"
-            ],
-            "title": "Readings"
-        },
         "Metadata": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
                 "action": {
-                    "type": "string"
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/WiderRegionCalendarAction"
                 },
                 "sinceYear": {
                     "type": "integer"
                 },
                 "decreeURL": {
-                    "type": "string",
-                    "format": "uri",
-                    "qt-uri-protocols": [
-                        "https"
-                    ],
-                    "qt-uri-extensions": [
-                        ".html"
-                    ]
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/DecreeURL"
                 },
                 "decreeLangs": {
-                    "$ref": "#/definitions/DecreeLangs"
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/DecreeLangs"
                 },
                 "untilYear": {
                     "type": "integer"
@@ -218,15 +109,6 @@
             ],
             "title": "Metadata"
         },
-        "DecreeLangs": {
-            "type": "object",
-            "additionalProperties": {
-                "$ref": "#/definitions/LangMapping"
-            },
-            "minItems": 1,
-            "description": "mapping between two-letter ISO code for a language, and the actual two-letter representation used in the Decree URL",
-            "title": "DecreeLangs"
-        },
         "NationalCalendars": {
             "type": "object",
             "additionalProperties": {
@@ -237,11 +119,6 @@
         "NationalCalendarVals": {
             "type": "string",
             "description": "a key value pair where the key is the uppercased country name in English, and the value is the corresponding two letter ISO code for the same country; this is useful for discovery of National Calendars that use this same WiderRegion Calendar"
-        },
-        "LangMapping": {
-            "type": "string",
-            "description": "a key value pair where the key is the uppercased two letter ISO code for a language, and the value is the two-letter representation of the same language as used in the Decree URL (generally lowercase, but not necessarily)",
-            "title": "LangMapping"
         }
     }
 }
