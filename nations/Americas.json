@@ -1,0 +1,39 @@
+{
+    "LitCal": [
+        {
+            "Festivity": {
+                "tag": "LadyGuadalupe",
+                "name": "Our Lady of Guadalupe",
+                "color": [
+                    "white"
+                ],
+                "grade": 4,
+                "day": 12,
+                "month": 12
+            },
+            "Metadata": {
+                "action": "makePatron",
+                "sinceYear": 1999,
+                "decreeURL": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/homilies\/1999\/documents\/hf_jp-ii_hom_19990123_mexico-guadalupe.html",
+                "decreeLangs": {
+                    "DE": "de",
+                    "ES": "es",
+                    "EN": "en",
+                    "FR": "fr",
+                    "IT": "it",
+                    "PT": "pt"
+                }
+            }
+        }
+    ],
+    "NationalCalendars": {},
+    "Metadata": {
+        "IsMultilingual": true,
+        "Languages": [
+            "en",
+            "es",
+            "pt"
+        ],
+        "WiderRegion": "Americas"
+    }
+}

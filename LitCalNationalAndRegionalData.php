@@ -138,22 +138,37 @@ class LitCalNationalData {
     }
 
     private function writeNationalCalendar() {
-        if( !property_exists( $this->DATA, 'LitCal' ) || !property_exists( $this->DATA, 'Metadata' ) || !property_exists( $this->DATA, 'Settings' ) ) {
-            header( $_SERVER[ "SERVER_PROTOCOL" ]." 400 Bad request", true, 400 );
-            die( '{"error":"Not all required parameters were received (LitCal, Metadata, Settings)"}' );
-        } else {
+        if( property_exists( $this->DATA, 'LitCal' ) && property_exists( $this->DATA, 'Metadata' ) && property_exists( $this->DATA, 'Settings' ) ) {
             $region = $this->DATA->Metadata->Region;
             if( $region === 'UNITED STATES' ) {
                 $region = 'USA';
             }
             $path = "nations/{$region}";
-            if( !file_exists( $path ) ){
+            if( !file_exists( $path ) ) {
                 mkdir( $path, 0755, true );
             }
             $data = json_encode( $this->DATA, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE );
             file_put_contents( $path . "/{$region}.json",  $data . PHP_EOL );
             header( $_SERVER[ "SERVER_PROTOCOL" ]." 201 Created", true, 201 );
             die( '{"success":"National calendar created or updated for nation \"'. $this->DATA->Metadata->Region .'\""}' );
+        }
+        else if ( property_exists( $this->DATA, 'LitCal' ) && property_exists( $this->DATA, 'Metadata' ) && property_exists( $this->DATA, 'NationalCalendars' ) ) {
+            $this->DATA->Metadata->WiderRegion = ucfirst( strtolower( $this->DATA->Metadata->WiderRegion ) );
+            $widerRegion = strtoupper( $this->DATA->Metadata->WiderRegion );
+            if( $this->DATA->Metadata->IsMultilingual === true ) {
+                $path = "nations/{$widerRegion}";
+                if( !file_exists( $path ) ) {
+                    mkdir( $path, 0755, true );
+                }
+            }
+            $data = json_encode( $this->DATA, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE );
+            file_put_contents( "nations/{$this->DATA->Metadata->WiderRegion}.json",  $data . PHP_EOL );
+            header( $_SERVER[ "SERVER_PROTOCOL" ]." 201 Created", true, 201 );
+            die( '{"success":"Wider region calendar created or updated for region \"'. $this->DATA->Metadata->WiderRegion .'\""}' );
+        }
+        else {
+            header( $_SERVER[ "SERVER_PROTOCOL" ]." 400 Bad request", true, 400 );
+            die( '{"error":"Not all required parameters were received (LitCal, Metadata, Settings)"}' );
         }
     }
 

@@ -14,11 +14,15 @@
                 },
                 "NationalCalendars": {
                     "$ref": "#/definitions/NationalCalendars"
+                },
+                "Metadata": {
+                    "$ref": "#/definitions/CalendarMetadata"
                 }
             },
             "required": [
                 "LitCal",
-                "NationalCalendars"
+                "NationalCalendars",
+                "Metadata"
             ],
             "title": "WiderRegionCalendar"
         },
@@ -119,6 +123,29 @@
         "NationalCalendarVals": {
             "type": "string",
             "description": "a key value pair where the key is the uppercased country name in English, and the value is the corresponding two letter ISO code for the same country; this is useful for discovery of National Calendars that use this same WiderRegion Calendar"
+        },
+        "CalendarMetadata": {
+            "type": "object",
+            "properties": {
+                "IsMultilingual": {
+                    "type": "boolean"
+                },
+                "Languages": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "pattern": "[A-Z]{2}"
+                    }
+                },
+                "WiderRegion": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "IsMultilingual",
+                "WiderRegion"
+            ],
+            "title": "CalendarMetadata"
         }
     }
 }
