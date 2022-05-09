@@ -57,8 +57,7 @@
                     "type": "integer"
                 },
                 "sinceYear": {
-                    "type": "string",
-                    "format": "integer"
+                    "type": "integer"
                 },
                 "decreeURL": {
                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/DecreeURL"
