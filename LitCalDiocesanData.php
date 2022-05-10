@@ -8,12 +8,20 @@ include_once( 'includes/enums/RequestContentType.php' );
 include_once( 'includes/enums/ReturnType.php' );
 include_once( 'includes/APICore.php' );
 
+if( file_exists("allowedOrigins.php") ) {
+    include_once( 'allowedOrigins.php' );
+}
+
 $allowedOrigins = [
     "https://johnromanodorazio.com",
     "https://www.johnromanodorazio.com",
     "https://litcal.johnromanodorazio.com",
     "https://litcal-staging.johnromanodorazio.com"
 ];
+
+if( defined('ALLOWED_ORIGINS') && is_array( ALLOWED_ORIGINS ) ) {
+    $allowedOrigins = array_merge( $allowedOrigins, ALLOWED_ORIGINS );
+}
 
 $LitCalDiocesanData = new LitCalDiocesanData();
 
@@ -47,7 +55,6 @@ class LitCalDiocesanData {
             $this->DATA = (object)$REQUEST;
         }
         $this->retrieveDiocesanCalendar();
-
     }
 
     private function handlePutPatchDeleteRequests( string $requestMethod ) {
@@ -70,7 +77,6 @@ class LitCalDiocesanData {
     }
 
     private function handleRequestedMethod() {
-
         switch( strtoupper( $_SERVER[ "REQUEST_METHOD" ] ) ) {
             case RequestMethod::GET:
                 $this->handleGetPostRequests( $_GET );
@@ -192,12 +198,10 @@ class LitCalDiocesanData {
     }
 
     public function Init() {
-
         $this->APICore->Init();
         $this->APICore->setResponseContentTypeHeader();
         $this->loadIndex();
         $this->handleRequestedMethod();
-
     }
 
 }

@@ -16,9 +16,7 @@ $allowedOrigins = [
     "https://johnromanodorazio.com",
     "https://www.johnromanodorazio.com",
     "https://litcal.johnromanodorazio.com",
-    "https://litcal-staging.johnromanodorazio.com",
-    "https://litcal.org",
-    "https://www.litcal.org"
+    "https://litcal-staging.johnromanodorazio.com"
 ];
 
 if( defined('ALLOWED_ORIGINS') && is_array( ALLOWED_ORIGINS ) ) {
@@ -48,6 +46,7 @@ class LitCalNationalData {
     }
 
     private function handleGetPostRequests( array $REQUEST ) {
+
         $this->APICore->validateAcceptHeader( true );
         if( $this->APICore->getRequestContentType() === 'application/json' ) {
             $this->DATA = $this->APICore->retrieveRequestParamsFromJsonBody();
