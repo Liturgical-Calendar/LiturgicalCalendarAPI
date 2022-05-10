@@ -197,7 +197,7 @@ class LitCalRegionalData {
             if( property_exists( $this->DATA, 'Overrides' ) ) {
                 $CalData->Overrides = $this->DATA->Overrides;
             }
-            $this->RESPONSE->Calendar = json_encode( $CalData );
+            $this->RESPONSE->Calendar = json_encode( $CalData, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE );
             if( property_exists( $this->DATA, 'group' ) ) {
                 $this->RESPONSE->Group = strip_tags( $this->DATA->group );
             }
@@ -266,7 +266,7 @@ class LitCalRegionalData {
             }
         }
 
-        file_put_contents( "nations/index.json", json_encode( $this->GeneralIndex ) . PHP_EOL );
+        file_put_contents( "nations/index.json", json_encode( $this->GeneralIndex, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE ) . PHP_EOL );
     }
 
     public function Init() {

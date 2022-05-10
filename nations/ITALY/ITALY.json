@@ -4,7 +4,7 @@
             "Festivity": {
                 "tag": "StCatherineSiena",
                 "name": "Santa Caterina da Siena, vergine e dottore della Chiesa, patrona d'Italia",
-                "color": "white",
+                "color": ["white"],
                 "grade": 4,
                 "day": 29,
                 "month": 4
@@ -20,7 +20,7 @@
             "Festivity": {
                 "tag": "StFrancisAssisi",
                 "name": "San Francesco d'Assisi, patrono d'Italia",
-                "color": "white",
+                "color": ["white"],
                 "grade": 4,
                 "day": 29,
                 "month": 4

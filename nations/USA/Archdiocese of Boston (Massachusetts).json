@@ -2,9 +2,9 @@
     "LitCal": {
         "DedicationoftheCathedraloftheHolyCross": {
             "name": "Dedication of the Cathedral of the Holy Cross",
-            "color": "white",
+            "color": ["white"],
             "grade": 4,
-            "common": "Dedication of a Church",
+            "common": ["Dedication of a Church"],
             "day": 8,
             "month": 12,
             "formRowNum": 1,
