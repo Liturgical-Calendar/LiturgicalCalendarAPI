@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-01 12:51+0000\n"
+"POT-Creation-Date: 2022-05-10 05:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -145,7 +145,7 @@ msgstr ""
 #.  6. Current year
 #.
 #: includes/LitCalAPI.php:865 includes/LitCalAPI.php:1123
-#: includes/LitCalAPI.php:1300 includes/LitCalAPI.php:1783
+#: includes/LitCalAPI.php:1300 includes/LitCalAPI.php:1822
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
@@ -400,7 +400,7 @@ msgstr ""
 #.  5. Name of the superseding festivity
 #.  6. Current year
 #.
-#: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:1941
+#: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:2003
 #, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
@@ -420,7 +420,13 @@ msgid ""
 "They are both reduced in rank to optional memorials."
 msgstr ""
 
-#: includes/LitCalAPI.php:1854
+#: includes/LitCalAPI.php:1781
+msgid ""
+"We should be creating a new festivity, however we do not seem to have the "
+"correct date information in order to proceed"
+msgstr ""
+
+#: includes/LitCalAPI.php:1901
 #, php-format
 msgid "Found a sanctorale data file for %s"
 msgstr ""
@@ -434,16 +440,31 @@ msgstr ""
 #.  6. Superseding festivity name
 #.  7. Current year
 #.
-#: includes/LitCalAPI.php:1876
+#: includes/LitCalAPI.php:1937
 #, php-format
 msgid ""
 "The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
 "superseded by the %5$s '%6$s' in the year %7$d"
 msgstr ""
 
-#: includes/LitCalAPI.php:1889
+#: includes/LitCalAPI.php:1951
 #, php-format
 msgid "Could not find a sanctorale data file for %s"
+msgstr ""
+
+#: includes/LitCalAPI.php:2045
+#, php-format
+msgid ""
+"The %1$s '%2$s' is transferred from %5$s to %6$s as per the %7$s, to make "
+"room for '%3$s': applicable to the year %4$d."
+msgstr ""
+
+#: includes/LitCalAPI.php:2063
+#, php-format
+msgid ""
+"The %1$s '%2$s' would have been transferred from %3$s to %4$s as per the "
+"%5$s, to make room for '%6$s', however it is suppressed by the %7$s '%8$s' "
+"in the year %9$d."
 msgstr ""
 
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
