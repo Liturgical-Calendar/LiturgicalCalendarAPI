@@ -131,7 +131,7 @@ class LitCalRegionalData {
                         if( file_exists( "nations/{$uKey}/{$locale}.json" ) ) {
                             $localeData = json_decode( file_get_contents( "nations/{$uKey}/{$locale}.json" ) );
                             foreach( $this->RESPONSE->LitCal as $idx => $el ) {
-                                $this->RESPONSE->LitCal[$idx]->Festivity->name = $localeData->{$response->LitCal[$idx]->Festivity->tag};
+                                $this->RESPONSE->LitCal[$idx]->Festivity->name = $localeData->{$this->RESPONSE->LitCal[$idx]->Festivity->tag};
                             }
                         }
                     }
