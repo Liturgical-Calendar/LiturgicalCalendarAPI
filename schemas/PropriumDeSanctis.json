@@ -28,14 +28,7 @@
                     "$ref": "#/definitions/Calendar"
                 },
                 "COLOR": {
-                    "anyOf": [
-                        {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/ColorString"
-                        },
-                        {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
-                        }
-                    ]
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                 },
                 "READINGS": {
                     "$ref": "#/definitions/Readings"

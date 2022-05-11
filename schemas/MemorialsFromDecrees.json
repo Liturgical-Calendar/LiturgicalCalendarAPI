@@ -39,14 +39,7 @@
                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Calendar"
                 },
                 "COLOR": {
-                    "anyOf": [
-                        {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/ColorString"
-                        },
-                        {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
-                        }
-                    ]
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                 },
                 "TYPE": {
                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitFeastType"

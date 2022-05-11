@@ -54,14 +54,7 @@
                     "type": "string"
                 },
                 "color": {
-                    "anyOf": [
-                        {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/ColorString"
-                        },
-                        {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
-                        }
-                    ]
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                 },
                 "grade": {
                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitGrade"

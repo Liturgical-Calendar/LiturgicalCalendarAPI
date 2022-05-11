@@ -6,9 +6,15 @@
         "NAME": "Sant'Adalberto, vescovo e martire",
         "GRADE": 2,
         "DISPLAYGRADE": "",
-        "COMMON": "Martyrs:For One Martyr,Pastors:For a Bishop",
+        "COMMON": [
+            "Martyrs:For One Martyr",
+            "Pastors:For a Bishop"
+        ],
         "CALENDAR": "",
-        "COLOR": "white,red",
+        "COLOR": [
+            "white",
+            "red"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -24,9 +30,13 @@
         "NAME": "San Luigi Grignon de Montfort",
         "GRADE": 2,
         "DISPLAYGRADE": "",
-        "COMMON": "Pastors:For One Pastor",
+        "COMMON": [
+            "Pastors:For One Pastor"
+        ],
         "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -42,9 +52,14 @@
         "NAME": "San Pietro Giuliani, sacerdote",
         "GRADE": 2,
         "DISPLAYGRADE": "",
-        "COMMON": "Pastors:For One Pastor,Holy Men and Women:For Religious",
+        "COMMON": [
+            "Pastors:For One Pastor",
+            "Holy Men and Women:For Religious"
+        ],
         "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -60,9 +75,14 @@
         "NAME": "San Massimiliano Kolbe, sacerdote e martire",
         "GRADE": 3,
         "DISPLAYGRADE": "",
-        "COMMON": "Proper",
+        "COMMON": [
+            "Proper"
+        ],
         "CALENDAR": "",
-        "COLOR": "white,red",
+        "COLOR": [
+            "white",
+            "red"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -78,9 +98,14 @@
         "NAME": "San Pietro Claver, sacerdote",
         "GRADE": 2,
         "DISPLAYGRADE": "",
-        "COMMON": "Pastors:For One Pastor,Holy Men and Women:For Those Who Practiced Works of Mercy",
+        "COMMON": [
+            "Pastors:For One Pastor",
+            "Holy Men and Women:For Those Who Practiced Works of Mercy"
+        ],
         "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -96,9 +121,13 @@
         "NAME": "Santi Andrea Kim Taegon, sacerdote, Paolo Chong Hasang e compagni martiri",
         "GRADE": 3,
         "DISPLAYGRADE": "",
-        "COMMON": "Proper",
+        "COMMON": [
+            "Proper"
+        ],
         "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -114,9 +143,13 @@
         "NAME": "Santi Lorenzo Ruiz e compagni martiri",
         "GRADE": 2,
         "DISPLAYGRADE": "",
-        "COMMON": "Martyrs:For Several Martyrs",
+        "COMMON": [
+            "Martyrs:For Several Martyrs"
+        ],
         "CALENDAR": "",
-        "COLOR": "red",
+        "COLOR": [
+            "red"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -132,9 +165,13 @@
         "NAME": "Sant'Andrea Dung-Lac e compagni martiri",
         "GRADE": 3,
         "DISPLAYGRADE": "",
-        "COMMON": "Proper",
+        "COMMON": [
+            "Proper"
+        ],
         "CALENDAR": "",
-        "COLOR": "red",
+        "COLOR": [
+            "red"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
