@@ -50,6 +50,9 @@
                 "tag": {
                     "type": "string"
                 },
+                "name": {
+                    "type": "string"
+                },
                 "color": {
                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                 },

@@ -257,15 +257,7 @@
         },
         "DecreeURL": {
             "type": "string",
-            "format": "uri",
-            "qt-uri-protocols": [
-                "http",
-                "https"
-            ],
-            "qt-uri-extensions": [
-                ".html",
-                ".pdf"
-            ],
+            "pattern": "^https?:\\\/\\\/(www\\.)?[a-zA-Z]{1,50}\\.[a-zA-Z]{1,6}([-a-zA-Z0-9()@:%._+~\\\/]*)\\.(html|pdf)$",
             "title": "DecreeURL"
         },
         "Missals": {

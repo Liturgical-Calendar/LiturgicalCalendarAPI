@@ -112,7 +112,13 @@
                     "Martyrs:For a Virgin Martyr",
                     "Virgins:For One Virgin"
                 ],
-                "readings": ""
+                "readings": {
+                    "FIRST_READING": "",
+                    "RESPONSORIAL_PSALM": "",
+                    "SECOND_READING": "",
+                    "ALLELUIA_VERSE": "",
+                    "GOSPEL": ""
+                }
             },
             "Metadata": {
                 "action": "createNew",
