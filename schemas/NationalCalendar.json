@@ -108,6 +108,9 @@
                 "sinceYear": {
                     "type": "integer"
                 },
+                "untilYear": {
+                    "type": "integer"
+                },
                 "missal": {
                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Missal"
                 },

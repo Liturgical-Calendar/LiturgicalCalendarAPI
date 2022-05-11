@@ -294,7 +294,8 @@
             "enum": [
                 "createNew",
                 "makePatron"
-            ]
+            ],
+            "title": "WiderRegionCalendarAction"
         },
         "NationalCalendarAction": {
             "type": "string",

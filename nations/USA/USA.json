@@ -108,7 +108,13 @@
                 "day": null,
                 "month": null,
                 "common": [],
-                "readings": "",
+                "readings": {
+                    "FIRST_READING": "",
+                    "RESPONSORIAL_PSALM": "",
+                    "SECOND_READING": "",
+                    "ALLELUIA_VERSE": "",
+                    "GOSPEL": ""
+                },
                 "strtotime": "fourth thursday of november"
             },
             "Metadata": {
