@@ -248,6 +248,7 @@
         "Calendar": {
             "type": "string",
             "enum": [
+                "",
                 "GENERAL ROMAN"
             ],
             "title": "Calendar"

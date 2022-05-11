@@ -60,7 +60,7 @@
                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                 },
                 "day": {
-                    "anyOf": [
+                    "oneOf": [
                         {
                             "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Day"
                         },
@@ -70,7 +70,7 @@
                     ]
                 },
                 "month": {
-                    "anyOf": [
+                    "oneOf": [
                         {
                             "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Month"
                         },
