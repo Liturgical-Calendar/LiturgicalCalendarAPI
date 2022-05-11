@@ -130,7 +130,7 @@
                     "type": "array",
                     "items": {
                         "type": "string",
-                        "pattern": "[A-Z]{2}"
+                        "pattern": "[a-z]{2}_[A-Z1-9]{2,3}"
                     }
                 },
                 "WiderRegion": {
