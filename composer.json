@@ -1,0 +1,5 @@
+{
+    "require": {
+        "swaggest/json-schema": "^0.12"
+    }
+}
