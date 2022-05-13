@@ -3,10 +3,14 @@ error_reporting( E_ALL );
 ini_set( 'display_errors', 1 );
 
 include_once( 'includes/enums/AcceptHeader.php' );
+include_once( 'includes/enums/LitSchema.php' );
 include_once( 'includes/enums/RequestMethod.php' );
 include_once( 'includes/enums/RequestContentType.php' );
 include_once( 'includes/enums/ReturnType.php' );
 include_once( 'includes/APICore.php' );
+include_once( 'vendor/autoload.php' );
+
+use Swaggest\JsonSchema\Schema;
 
 if( file_exists("allowedOrigins.php") ) {
     include_once( 'allowedOrigins.php' );
@@ -156,10 +160,18 @@ class LitCalRegionalData {
             if( !file_exists( $path ) ) {
                 mkdir( $path, 0755, true );
             }
-            $data = json_encode( $this->DATA, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE );
-            file_put_contents( $path . "/{$region}.json",  $data . PHP_EOL );
-            header( $_SERVER[ "SERVER_PROTOCOL" ]." 201 Created", true, 201 );
-            die( '{"success":"National calendar created or updated for nation \"'. $this->DATA->Metadata->Region .'\""}' );
+
+            $test = $this->validateDataAgainstSchema( $this->DATA, LitSchema::NATIONAL );
+            if( $test === true ) {
+                $data = json_encode( $this->DATA, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE );
+                file_put_contents( $path . "/{$region}.json",  $data . PHP_EOL );
+                header( $_SERVER[ "SERVER_PROTOCOL" ]." 201 Created", true, 201 );
+                die( '{"success":"National calendar created or updated for nation \"'. $this->DATA->Metadata->Region .'\""}' );
+            } else {
+                header( $_SERVER[ "SERVER_PROTOCOL" ]." 422 Unprocessable Entity", true, 422 );
+                die( json_encode( $test ) );
+            }
+
         }
         else if ( property_exists( $this->DATA, 'LitCal' ) && property_exists( $this->DATA, 'Metadata' ) && property_exists( $this->DATA, 'NationalCalendars' ) ) {
             $this->DATA->Metadata->WiderRegion = ucfirst( strtolower( $this->DATA->Metadata->WiderRegion ) );
@@ -181,10 +193,18 @@ class LitCalRegionalData {
                     }
                 }
             }
-            $data = json_encode( $this->DATA, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE );
-            file_put_contents( "nations/{$this->DATA->Metadata->WiderRegion}.json",  $data . PHP_EOL );
-            header( $_SERVER[ "SERVER_PROTOCOL" ]." 201 Created", true, 201 );
-            die( '{"success":"Wider region calendar created or updated for region \"'. $this->DATA->Metadata->WiderRegion .'\""}' );
+
+            $test = $this->validateDataAgainstSchema( $this->DATA, LitSchema::WIDERREGION );
+            if( $test === true ) {
+                $data = json_encode( $this->DATA, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE );
+                file_put_contents( "nations/{$this->DATA->Metadata->WiderRegion}.json",  $data . PHP_EOL );
+                header( $_SERVER[ "SERVER_PROTOCOL" ]." 201 Created", true, 201 );
+                die( '{"success":"Wider region calendar created or updated for region \"'. $this->DATA->Metadata->WiderRegion .'\""}' );
+            } else {
+                header( $_SERVER[ "SERVER_PROTOCOL" ]." 422 Unprocessable Entity", true, 422 );
+                die( json_encode( $test ) );
+            }
+
         }
         else if ( property_exists( $this->DATA, 'LitCal' ) && property_exists( $this->DATA, 'Diocese' ) && property_exists( $this->DATA, 'Nation' ) ) {
             $this->RESPONSE->Nation = strip_tags( $this->DATA->Nation );
@@ -206,7 +226,13 @@ class LitCalRegionalData {
                 mkdir( $path, 0755, true );
             }
 
-            file_put_contents( $path . "/{$this->RESPONSE->Diocese}.json", $this->RESPONSE->Calendar . PHP_EOL );
+            $test = $this->validateDataAgainstSchema( $CalData, LitSchema::DIOCESAN );
+            if( $test === true ) {
+                file_put_contents( $path . "/{$this->RESPONSE->Diocese}.json", $this->RESPONSE->Calendar . PHP_EOL );
+            } else {
+                header( $_SERVER[ "SERVER_PROTOCOL" ]." 422 Unprocessable Entity", true, 422 );
+                die( json_encode( $test ) );
+            }
 
             $this->createOrUpdateIndex( $path );
             header( $_SERVER[ "SERVER_PROTOCOL" ]." 201 Created", true, 201 );
@@ -266,7 +292,27 @@ class LitCalRegionalData {
             }
         }
 
-        file_put_contents( "nations/index.json", json_encode( $this->GeneralIndex, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE ) . PHP_EOL );
+        $test = $this->validateDataAgainstSchema( $this->GeneralIndex, LitSchema::INDEX );
+        if( $test === true ) {
+            file_put_contents( "nations/index.json", json_encode( $this->GeneralIndex, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE ) . PHP_EOL );
+        } else {
+            header( $_SERVER[ "SERVER_PROTOCOL" ]." 422 Unprocessable Entity", true, 422 );
+            die( json_encode( $test ) );
+        }
+
+    }
+
+    private function validateDataAgainstSchema( object $data, string $schemaUrl ) : bool {
+        $result = new stdClass();
+        $schema = Schema::import( $schemaUrl );
+        try {
+            $validation = $schema->in($data);
+            return true;
+        } catch (Exception $e) {
+            $result->error = LitSchema::ERROR_MESSAGES[ $schemaUrl ] . PHP_EOL . $e->getMessage();
+            header( $_SERVER[ "SERVER_PROTOCOL" ]." 422 Unprocessable Entity", true, 422 );
+            die( json_encode( $result ) );
+        }
     }
 
     public function Init() {
