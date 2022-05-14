@@ -60,24 +60,10 @@
                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                 },
                 "day": {
-                    "oneOf": [
-                        {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Day"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ]
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Day"
                 },
                 "month": {
-                    "oneOf": [
-                        {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Month"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ]
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Month"
                 },
                 "common": {
                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
