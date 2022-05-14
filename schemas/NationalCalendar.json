@@ -90,11 +90,25 @@
                     "description": "supports PHP strtotime string format"
                 }
             },
-            "required": [
-                "day",
-                "month",
-                "name",
-                "tag"
+            "anyOf": [
+                {
+                    "required": [
+                        "day",
+                        "month",
+                        "name",
+                        "tag"
+                    ]
+                },
+                {
+                    "required": [
+                        "strtotime",
+                        "name",
+                        "tag",
+                        "common",
+                        "color",
+                        "grade"
+                    ]
+                }
             ],
             "title": "Festivity"
         },
