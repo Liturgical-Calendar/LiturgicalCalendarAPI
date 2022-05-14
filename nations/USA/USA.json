@@ -74,9 +74,9 @@
             "Festivity": {
                 "tag": "StsJeanBrebeuf",
                 "name": "Saints John de Brébeuf and Isaac Jogues, Priests, and Companions, Martyrs",
+                "grade": 3,
                 "day": 19,
-                "month": 10,
-                "grade": 3
+                "month": 10
             },
             "Metadata": {
                 "action": "setProperty",
@@ -105,17 +105,8 @@
                     "white"
                 ],
                 "grade": 3,
-                "day": null,
-                "month": null,
-                "common": [],
-                "readings": {
-                    "FIRST_READING": "",
-                    "RESPONSORIAL_PSALM": "",
-                    "SECOND_READING": "",
-                    "ALLELUIA_VERSE": "",
-                    "GOSPEL": ""
-                },
-                "strtotime": "fourth thursday of november"
+                "strtotime": "fourth thursday of november",
+                "common": []
             },
             "Metadata": {
                 "action": "createNew",
