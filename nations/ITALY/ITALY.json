@@ -4,7 +4,9 @@
             "Festivity": {
                 "tag": "StCatherineSiena",
                 "name": "Santa Caterina da Siena, vergine e dottore della Chiesa, patrona d'Italia",
-                "color": ["white"],
+                "color": [
+                    "white"
+                ],
                 "grade": 4,
                 "day": 29,
                 "month": 4
@@ -13,14 +15,16 @@
                 "action": "makePatron",
                 "sinceYear": 1939,
                 "untilYear": 1999,
-                "decreeURL": "https://www.vatican.va/content/pius-xii/it/briefs/documents/hf_p-xii_brief_19390618_patroni-italia.html"
+                "decreeURL": "https:\/\/www.vatican.va\/content\/pius-xii\/it\/briefs\/documents\/hf_p-xii_brief_19390618_patroni-italia.html"
             }
         },
         {
             "Festivity": {
                 "tag": "StFrancisAssisi",
                 "name": "San Francesco d'Assisi, patrono d'Italia",
-                "color": ["white"],
+                "color": [
+                    "white"
+                ],
                 "grade": 4,
                 "day": 29,
                 "month": 4
@@ -28,7 +32,7 @@
             "Metadata": {
                 "action": "makePatron",
                 "sinceYear": 1939,
-                "decreeURL": "https://www.vatican.va/content/pius-xii/it/briefs/documents/hf_p-xii_brief_19390618_patroni-italia.html"
+                "decreeURL": "https:\/\/www.vatican.va\/content\/pius-xii\/it\/briefs\/documents\/hf_p-xii_brief_19390618_patroni-italia.html"
             }
         }
     ],
@@ -39,7 +43,7 @@
         "Locale": "IT"
     },
     "Metadata": {
-        "Region": "ITALIA",
+        "Region": "ITALY",
         "WiderRegion": {
             "name": "Europe",
             "jsonFile": "nations\/Europe.json",
