@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-15 08:53+0000\n"
+"POT-Creation-Date: 2022-05-18 06:19+0000\n"
 "PO-Revision-Date: 2022-02-16 09:56+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -157,7 +157,7 @@ msgstr "dopo il Mercoledì delle Ceneri"
 #.  6. Current year
 #.
 #: includes/LitCalAPI.php:865 includes/LitCalAPI.php:1123
-#: includes/LitCalAPI.php:1300 includes/LitCalAPI.php:1823
+#: includes/LitCalAPI.php:1300 includes/LitCalAPI.php:1822
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
@@ -428,18 +428,18 @@ msgstr "della %s Settimana di Pasqua"
 msgid "of the %s Week of Ordinary Time"
 msgstr "della %s Settimana del Tempo Ordinario"
 
-#: includes/LitCalAPI.php:1589
+#: includes/LitCalAPI.php:1588
 msgid "Saturday Memorial of the Blessed Virgin Mary"
 msgstr "Memoria di Santa Maria in sabato"
 
-#: includes/LitCalAPI.php:1614 includes/LitCalAPI.php:1617
+#: includes/LitCalAPI.php:1613 includes/LitCalAPI.php:1616
 #, php-format
 msgid "Error retrieving and decoding Wider Region data from file %s."
 msgstr ""
 "Errore nella lettura o nella decodifica dei dati per la Regione più ampia "
 "dal file %s."
 
-#: includes/LitCalAPI.php:1624
+#: includes/LitCalAPI.php:1623
 #, php-format
 msgid "Error retrieving and decoding National data from file %s."
 msgstr ""
@@ -453,7 +453,7 @@ msgstr ""
 #.  5. Name of the superseding festivity
 #.  6. Current year
 #.
-#: includes/LitCalAPI.php:1657 includes/LitCalAPI.php:2004
+#: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:2003
 #, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
@@ -468,7 +468,7 @@ msgstr ""
 #.  3. Current year
 #.  4. Source of the information
 #.
-#: includes/LitCalAPI.php:1722
+#: includes/LitCalAPI.php:1721
 #, php-format
 msgid ""
 "The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
@@ -477,13 +477,13 @@ msgstr ""
 "La Memoria '%1$s' coincide con un'altra Memoria '%2$s' nell'anno %3$d. Tutte "
 "e due sono ridotte al grado di memorie facoltative."
 
-#: includes/LitCalAPI.php:1782
+#: includes/LitCalAPI.php:1781
 msgid ""
 "We should be creating a new festivity, however we do not seem to have the "
 "correct date information in order to proceed"
 msgstr ""
 
-#: includes/LitCalAPI.php:1902
+#: includes/LitCalAPI.php:1901
 #, php-format
 msgid "Found a sanctorale data file for %s"
 msgstr "Trovato un file con dati per il santorale di: %s"
@@ -497,7 +497,7 @@ msgstr "Trovato un file con dati per il santorale di: %s"
 #.  6. Superseding festivity name
 #.  7. Current year
 #.
-#: includes/LitCalAPI.php:1938
+#: includes/LitCalAPI.php:1937
 #, php-format
 msgid ""
 "The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
@@ -506,12 +506,12 @@ msgstr ""
 "La %1$s '%2$s' (%3$s), aggiunta al calendario nazionale nel %4$s, è tuttavia "
 "superata dalla %5$s '%6$s' nell'anno %7$d"
 
-#: includes/LitCalAPI.php:1952
+#: includes/LitCalAPI.php:1951
 #, php-format
 msgid "Could not find a sanctorale data file for %s"
 msgstr "Non è stato trovato un file con i dati del santorale di: %s"
 
-#: includes/LitCalAPI.php:2046
+#: includes/LitCalAPI.php:2045
 #, fuzzy, php-format
 #| msgid ""
 #| "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
@@ -523,7 +523,7 @@ msgstr ""
 "La %1$s '%2$s' è stata inserita il giorno %3$s a partire dall'anno %4$d "
 "(%5$s), applicabile pertanto all'anno %6$d."
 
-#: includes/LitCalAPI.php:2064
+#: includes/LitCalAPI.php:2063
 #, fuzzy, php-format
 #| msgid ""
 #| "The %1$s '%2$s', added in the %3$s of the Roman Missal since the year "

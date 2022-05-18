@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-15 08:53+0000\n"
+"POT-Creation-Date: 2022-05-18 06:19+0000\n"
 "PO-Revision-Date: 2022-02-16 09:56+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Spanish <https://translate.johnromanodorazio.com/projects/"
@@ -150,7 +150,7 @@ msgstr ""
 #.  6. Current year
 #.
 #: includes/LitCalAPI.php:865 includes/LitCalAPI.php:1123
-#: includes/LitCalAPI.php:1300 includes/LitCalAPI.php:1823
+#: includes/LitCalAPI.php:1300 includes/LitCalAPI.php:1822
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
@@ -383,16 +383,16 @@ msgstr ""
 msgid "of the %s Week of Ordinary Time"
 msgstr ""
 
-#: includes/LitCalAPI.php:1589
+#: includes/LitCalAPI.php:1588
 msgid "Saturday Memorial of the Blessed Virgin Mary"
 msgstr ""
 
-#: includes/LitCalAPI.php:1614 includes/LitCalAPI.php:1617
+#: includes/LitCalAPI.php:1613 includes/LitCalAPI.php:1616
 #, php-format
 msgid "Error retrieving and decoding Wider Region data from file %s."
 msgstr ""
 
-#: includes/LitCalAPI.php:1624
+#: includes/LitCalAPI.php:1623
 #, php-format
 msgid "Error retrieving and decoding National data from file %s."
 msgstr ""
@@ -405,7 +405,7 @@ msgstr ""
 #.  5. Name of the superseding festivity
 #.  6. Current year
 #.
-#: includes/LitCalAPI.php:1657 includes/LitCalAPI.php:2004
+#: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:2003
 #, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
@@ -418,20 +418,20 @@ msgstr ""
 #.  3. Current year
 #.  4. Source of the information
 #.
-#: includes/LitCalAPI.php:1722
+#: includes/LitCalAPI.php:1721
 #, php-format
 msgid ""
 "The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
 "They are both reduced in rank to optional memorials."
 msgstr ""
 
-#: includes/LitCalAPI.php:1782
+#: includes/LitCalAPI.php:1781
 msgid ""
 "We should be creating a new festivity, however we do not seem to have the "
 "correct date information in order to proceed"
 msgstr ""
 
-#: includes/LitCalAPI.php:1902
+#: includes/LitCalAPI.php:1901
 #, php-format
 msgid "Found a sanctorale data file for %s"
 msgstr ""
@@ -445,26 +445,26 @@ msgstr ""
 #.  6. Superseding festivity name
 #.  7. Current year
 #.
-#: includes/LitCalAPI.php:1938
+#: includes/LitCalAPI.php:1937
 #, php-format
 msgid ""
 "The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
 "superseded by the %5$s '%6$s' in the year %7$d"
 msgstr ""
 
-#: includes/LitCalAPI.php:1952
+#: includes/LitCalAPI.php:1951
 #, php-format
 msgid "Could not find a sanctorale data file for %s"
 msgstr ""
 
-#: includes/LitCalAPI.php:2046
+#: includes/LitCalAPI.php:2045
 #, php-format
 msgid ""
 "The %1$s '%2$s' is transferred from %5$s to %6$s as per the %7$s, to make "
 "room for '%3$s': applicable to the year %4$d."
 msgstr ""
 
-#: includes/LitCalAPI.php:2064
+#: includes/LitCalAPI.php:2063
 #, php-format
 msgid ""
 "The %1$s '%2$s' would have been transferred from %3$s to %4$s as per the "
