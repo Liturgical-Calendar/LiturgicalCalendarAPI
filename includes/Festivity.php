@@ -13,11 +13,11 @@ class Festivity implements JsonSerializable
     public int      $idx;
     public string   $name;
     public DateTime $date;
-    public array $color;
+    public string|array $color;
     public string   $type;
     public int      $grade;
     public string   $displayGrade;
-    public array   $common;  //"Proper" or specified common(s) of saints...
+    public string|array   $common;  //"Proper" or specified common(s) of saints...
 
     /** The following properties are not used in construction, they are only set externally */
     public ?string  $liturgicalYear = null;
@@ -27,19 +27,26 @@ class Festivity implements JsonSerializable
     public ?bool    $hasVesperII    = null;
     public ?int     $psalterWeek    = null;
 
-    function __construct(string $name, DateTime $date, array $color = [ '???' ], string $type = '???', int $grade = LitGrade::WEEKDAY, array $common = [], string $displayGrade='')
+    function __construct(string $name, DateTime $date, string|array $color = '???', string $type = '???', int $grade = LitGrade::WEEKDAY, string|array $common = [], string $displayGrade='')
     {
         $this->idx          = self::$eventIdx++;
         $this->name         = $name;
         $this->date         = $date; //DateTime object
         if( is_array( $color ) && LitColor::areValid( $color ) ) {
             $this->color = $color;
+        } else {
+            $_color             = strtolower( $color );
+            //the color string can contain multiple colors separated by a comma, when there are multiple commons to choose from for that festivity
+            $this->color        = strpos( $_color, "," ) && LitColor::areValid( explode(",", $_color) ) ? explode(",", $_color) : ( LitColor::isValid( $_color ) ? [ $_color ] : [ '???' ] );
         }
         $_type              = strtolower( $type );
         $this->type         = LitFeastType::isValid( $_type ) ? $_type : '???';
         $this->grade        = $grade >= LitGrade::WEEKDAY && $grade <= LitGrade::HIGHER_SOLEMNITY ? $grade : -1;
         $this->displayGrade = $displayGrade;
-        if( is_array( $common ) && LitCommon::areValid( $common ) ) {
+        if( is_string( $common ) ) {
+            $this->common       = strpos( $common, "," ) && LitCommon::areValid( explode(",", $common) ) ? explode(",", $common) : ( LitCommon::isValid( $common ) ? [ $common ] : [ '???' ] );
+        }
+        else if( is_array( $common ) && LitCommon::areValid( $common ) ) {
             $this->common = $common;
         }
         else {
