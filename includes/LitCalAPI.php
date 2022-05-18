@@ -1582,8 +1582,7 @@ class LitCalAPI {
         $lastSatDT = new DateTime( "last Saturday December {$this->LitSettings->Year}", new DateTimeZone( 'UTC' ) );
         $SatMemBVM_cnt = 0;
         while( $currentSaturday <= $lastSatDT ){
-            //$currentSaturday = DateTime::createFromFormat( '!j-n-Y', $currentSaturday->format( 'j-n-Y' ),new DateTimeZone( 'UTC' ) )->modify( 'next Saturday' );
-            $currentSaturday->modify( 'next Saturday' );
+            $currentSaturday = DateTime::createFromFormat( '!j-n-Y', $currentSaturday->format( 'j-n-Y' ),new DateTimeZone( 'UTC' ) )->modify( 'next Saturday' );
             if( $this->Cal->notInSolemnitiesFeastsOrMemorials( $currentSaturday ) ) {
                 $memID = "SatMemBVM" . ++$SatMemBVM_cnt;
                 $name = $this->LitSettings->Locale === LitLocale::LATIN ? "Memoria Sanctæ Mariæ in Sabbato" : _( "Saturday Memorial of the Blessed Virgin Mary" );
