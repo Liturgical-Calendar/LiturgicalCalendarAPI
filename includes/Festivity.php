@@ -2,6 +2,7 @@
 ini_set('date.timezone', 'Europe/Vatican');
 
 include_once( 'enums/LitColor.php' );
+include_once( 'enums/LitCommon.php' );
 include_once( 'enums/LitFeastType.php' );
 include_once( 'enums/LitGrade.php' );
 
@@ -12,11 +13,11 @@ class Festivity implements JsonSerializable
     public int      $idx;
     public string   $name;
     public DateTime $date;
-    public string   $color;
+    public array $color;
     public string   $type;
     public int      $grade;
     public string   $displayGrade;
-    public string   $common;  //"Proper" or specified common(s) of saints...
+    public array   $common;  //"Proper" or specified common(s) of saints...
 
     /** The following properties are not used in construction, they are only set externally */
     public ?string  $liturgicalYear = null;
@@ -26,19 +27,24 @@ class Festivity implements JsonSerializable
     public ?bool    $hasVesperII    = null;
     public ?int     $psalterWeek    = null;
 
-    function __construct(string $name, DateTime $date, string $color = '???', string $type = '???', int $grade = LitGrade::WEEKDAY, string $common = '', string $displayGrade='')
+    function __construct(string $name, DateTime $date, array $color = [ '???' ], string $type = '???', int $grade = LitGrade::WEEKDAY, array $common = [], string $displayGrade='')
     {
         $this->idx          = self::$eventIdx++;
         $this->name         = $name;
         $this->date         = $date; //DateTime object
-        $_color             = strtolower( $color );
-        //the color string can contain multiple colors separated by a pipe character, which correspond with the multiple commons to choose from for that festivity
-        $this->color        = strpos( $_color, "," ) && LitColor::areValid( explode(",", $_color) ) ? $_color : ( LitColor::isValid( $_color ) ? $_color : '???' );
+        if( is_array( $color ) && LitColor::areValid( $color ) ) {
+            $this->color = $color;
+        }
         $_type              = strtolower( $type );
         $this->type         = LitFeastType::isValid( $_type ) ? $_type : '???';
         $this->grade        = $grade >= LitGrade::WEEKDAY && $grade <= LitGrade::HIGHER_SOLEMNITY ? $grade : -1;
         $this->displayGrade = $displayGrade;
-        $this->common       = $common;
+        if( is_array( $common ) && LitCommon::areValid( $common ) ) {
+            $this->common = $common;
+        }
+        else {
+            $this->common = [];
+        }
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * *
