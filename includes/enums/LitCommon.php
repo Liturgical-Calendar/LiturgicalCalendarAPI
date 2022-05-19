@@ -270,7 +270,7 @@ class LitCommon {
 
     public static function areValid( array $values ) {
         $values = array_reduce($values, function( $carry, $key ){
-            return strpos($key, ':') ? array_merge( explode(':', $key), $carry ) : array_merge( [ $key ], $carry );
+            return strpos($key, ':') ? ( $carry + explode(':', $key) ) : ( [ ...$carry, $key ] );
         }, [] );
         return empty( array_diff( $values, self::$values ) );
     }
