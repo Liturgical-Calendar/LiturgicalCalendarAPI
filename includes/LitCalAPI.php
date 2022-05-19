@@ -52,6 +52,10 @@ class LitCalAPI {
         $this->CacheDuration                        = "_" . CacheDuration::MONTH . date( "m" );
     }
 
+    private static function debugWrite( string $string ) {
+        file_put_contents( "debug.log", $string . PHP_EOL, FILE_APPEND );
+    }
+
     private function initParameterData() {
         if ( $this->APICore->getRequestContentType() === RequestContentType::JSON ) {
             $json = file_get_contents( 'php://input' );
@@ -509,7 +513,7 @@ class LitCalAPI {
         foreach( $tempCalSolemnities as $row ) {
             $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
             $tempFestivity = new Festivity( $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
-
+            //LitCalAPI::debugWrite( "adding new fixed solemnity '$row->NAME', common vartype = " . gettype( $row->COMMON ) . ", common = " . implode(', ', $row->COMMON) );
             //A Solemnity impeded in any given year is transferred to the nearest day following designated in nn. 1-8 of the Tables given above ( LY 60 )
             //However if a solemnity is impeded by a Sunday of Advent, Lent or Easter Time, the solemnity is transferred to the Monday following,
             //or to the nearest free day, as laid down by the General Norms.
@@ -887,6 +891,9 @@ class LitCalAPI {
             $row->DATE = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
             if ( self::DateIsNotSunday( $row->DATE ) && $this->Cal->notInSolemnitiesFeastsOrMemorials( $row->DATE ) ) {
                 $newFestivity = new Festivity( $row->NAME, $row->DATE, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
+                //LitCalAPI::debugWrite( "adding new memorial '$row->NAME', common vartype = " . gettype( $row->COMMON ) . ", common = " . implode(', ', $row->COMMON) );
+                //LitCalAPI::debugWrite( ">>> added new memorial '$newFestivity->name', common vartype = " . gettype( $newFestivity->common ) . ", common = " . implode(', ', $newFestivity->common) );
+
                 $this->Cal->addFestivity( $row->TAG, $newFestivity );
 
                 $this->reduceMemorialsInAdventLentToCommemoration( $row->DATE, $row );

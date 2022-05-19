@@ -162,7 +162,7 @@ class LitCommon {
         self::PRO_SANCTIS_MULIERIBUS                => "Pro sanctis mulieribus"
     ];
 
-    public static function POSSESSIVE( string $value ) : string {
+    private static function POSSESSIVE( string $value ) : string {
         switch( $value ) {
             case "Blessed Virgin Mary":
                 /**translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
@@ -269,6 +269,9 @@ class LitCommon {
     }
 
     public static function areValid( array $values ) {
+        $values = array_reduce($values, function( $carry, $key ){
+            return strpos($key, ':') ? array_merge( explode(':', $key), $carry ) : array_merge( [ $key ], $carry );
+        }, [] );
         return empty( array_diff( $values, self::$values ) );
     }
 
@@ -294,7 +297,7 @@ class LitCommon {
     }
     */
 
-    public function i18n( string|array $value ) : string|array {
+    private function i18n( string|array $value ) : string|array {
         if( is_array( $value ) && self::areValid( $value ) ) {
             return array_map( [$this, 'i18n'], $value );
         }
@@ -308,7 +311,7 @@ class LitCommon {
         return $value;
     }
 
-    public function getPossessive( string|array $value ) : string|array {
+    private function getPossessive( string|array $value ) : string|array {
         if( is_array( $value ) ) {
             return array_map( [$this, 'getPossessive'], $value );
         }
