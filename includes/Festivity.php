@@ -44,7 +44,7 @@ class Festivity implements JsonSerializable
         $this->grade        = $grade >= LitGrade::WEEKDAY && $grade <= LitGrade::HIGHER_SOLEMNITY ? $grade : -1;
         $this->displayGrade = $displayGrade;
         if( is_string( $common ) ) {
-            $this->common       = strpos( $common, "," ) && LitCommon::areValid( explode(",", $common) ) ? explode(",", $common) : ( LitCommon::isValid( $common ) ? [ $common ] : [ '???' ] );
+            $this->common       = LitCommon::areValid( explode(",", $common) ) ? explode(",", $common) : [ '???' ];
         }
         else if( is_array( $common ) && LitCommon::areValid( $common ) ) {
             $this->common = $common;
