@@ -1716,7 +1716,7 @@ class LitCalAPI {
                     $this->Cal->setProperty( $key, "grade", LitGrade::MEMORIAL_OPT );
                     $coincidingMemorialName = $value->name;
                 }
-                $festivity = new Festivity( $row->Festivity->name, $row->Festivity->DATE, implode(',', $row->Festivity->color), LitFeastType::FIXED, LitGrade::MEMORIAL_OPT, implode(',', $row->Festivity->common) );
+                $festivity = new Festivity( $row->Festivity->name, $row->Festivity->DATE, $row->Festivity->color, LitFeastType::FIXED, LitGrade::MEMORIAL_OPT, $row->Festivity->common );
                 $this->Cal->addFestivity( $row->Festivity->tag, $festivity );
                 $this->Messages[] = sprintf(
                     /**translators:
@@ -1787,12 +1787,6 @@ class LitCalAPI {
             ob_end_clean();
             $this->Messages[] = _( 'We should be creating a new festivity, however we do not seem to have the correct date information in order to proceed' ) . ' :: ' . $a;
             return;
-        }
-        if( is_array( $row->Festivity->color ) ) {
-            $row->Festivity->color = implode(",", $row->Festivity->color);
-        }
-        if( is_array( $row->Festivity->common ) ) {
-            $row->Festivity->common = implode(",", $row->Festivity->common);
         }
         if( $this->festivityCanBeCreated( $row ) ) {
             if( $this->festivityDoesNotCoincide( $row ) ) {
@@ -1910,12 +1904,6 @@ class LitCalAPI {
                             );
                             $this->loadPropriumDeSanctisData( $missal );
                             foreach ( $this->tempCal[ $missal ] as $row ) {
-                                if( is_array( $row->COLOR ) ) {
-                                    $row->COLOR = implode(',', $row->COLOR);
-                                }
-                                if( is_array( $row->COMMON ) ) {
-                                    $row->COMMON = implode(',', $row->COMMON);
-                                }
                                 $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
                                 if( !$this->Cal->inSolemnitiesOrFeasts( $currentFeastDate ) ) {
                                     $festivity = new Festivity( "[ {$this->NationalData->Metadata->Region} ] " . $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON, $row->DISPLAYGRADE );
@@ -1992,9 +1980,6 @@ class LitCalAPI {
                     $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $coincidingFestivity->event->grade, false ) . '</i>' : $this->LitGrade->i18n( $coincidingFestivity->grade, false ) );
                 } else if ( $this->Cal->inFeastsOrMemorials( $currentFeastDate ) ) {
                     //we should probably be able to create it anyways in this case?
-                    if( is_array( $color ) ) {
-                        $color = implode(",", $color);
-                    }
                     $this->Cal->addFestivity( $tag, new Festivity( $FestivityName, $currentFeastDate, $color, LitFeastType::FIXED, LitGrade::FEAST, LitCommon::PROPRIO ) );
                     $coincidingFestivity->grade = $this->LitGrade->i18n( $coincidingFestivity->event->grade, false );
                 }
@@ -2198,12 +2183,6 @@ class LitCalAPI {
 
     private function applyDiocesanCalendar() {
         foreach( $this->DiocesanData->LitCal as $key => $obj ) {
-            if( is_array( $obj->color ) ) {
-                $obj->color = implode( ',', $obj->color );
-            }
-            if( is_array( $obj->common ) ) {
-                $obj->common = implode( ',', $obj->common );
-            }
             //if sinceYear is undefined or null or empty, let's go ahead and create the event in any case
             //creation will be restricted only if explicitly defined by the sinceYear property
             if( $this->LitSettings->Year >= $obj->sinceYear || $obj->sinceYear === null || $obj->sinceYear === 0 ) {
