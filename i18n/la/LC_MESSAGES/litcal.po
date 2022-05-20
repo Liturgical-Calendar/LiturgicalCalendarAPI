@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-19 23:32+0000\n"
+"POT-Creation-Date: 2022-05-20 00:12+0000\n"
 "PO-Revision-Date: 2022-03-03 16:15+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
@@ -156,7 +156,7 @@ msgstr "post Feria IV Cinerum"
 #.  6. Current year
 #.
 #: includes/LitCalAPI.php:869 includes/LitCalAPI.php:1130
-#: includes/LitCalAPI.php:1307 includes/LitCalAPI.php:1829
+#: includes/LitCalAPI.php:1307 includes/LitCalAPI.php:1823
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
@@ -447,7 +447,7 @@ msgstr ""
 #.  5. Name of the superseding festivity
 #.  6. Current year
 #.
-#: includes/LitCalAPI.php:1663 includes/LitCalAPI.php:2010
+#: includes/LitCalAPI.php:1663 includes/LitCalAPI.php:1995
 #, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
@@ -477,7 +477,7 @@ msgid ""
 "correct date information in order to proceed"
 msgstr ""
 
-#: includes/LitCalAPI.php:1908
+#: includes/LitCalAPI.php:1902
 #, php-format
 msgid "Found a sanctorale data file for %s"
 msgstr ""
@@ -491,7 +491,7 @@ msgstr ""
 #.  6. Superseding festivity name
 #.  7. Current year
 #.
-#: includes/LitCalAPI.php:1944
+#: includes/LitCalAPI.php:1932
 #, php-format
 msgid ""
 "The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
@@ -500,12 +500,12 @@ msgstr ""
 "%1$s '%2$s' (%3$s), aggregata calendario nationali in %4$s, subplantata est "
 "ab %5$s '%6$s' in anno %7$d"
 
-#: includes/LitCalAPI.php:1958
+#: includes/LitCalAPI.php:1946
 #, php-format
 msgid "Could not find a sanctorale data file for %s"
 msgstr ""
 
-#: includes/LitCalAPI.php:2052
+#: includes/LitCalAPI.php:2037
 #, fuzzy, php-format
 #| msgid ""
 #| "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
@@ -517,7 +517,7 @@ msgstr ""
 "%1$s <i>'%2$s'</i> aggregata est igitur in die %3$s ab anno %4$d (%5$s), "
 "ergo viget in anno %6$d."
 
-#: includes/LitCalAPI.php:2070
+#: includes/LitCalAPI.php:2055
 #, fuzzy, php-format
 #| msgid ""
 #| "The %1$s '%2$s', added in the %3$s of the Roman Missal since the year "
