@@ -1,135 +1,132 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "array",
-    "items": {
-        "$ref": "#/definitions/LitCalMetadata"
+    "type": "object",
+    "properties": {
+        "LitCalMetadata": {
+            "$ref": "#/definitions/LitCalMetadata"
+        }
     },
+    "required": [
+        "LitCalMetadata"
+    ],
+    "title": "LitCalMetadata",
     "definitions": {
         "LitCalMetadata": {
             "type": "object",
             "properties": {
-                "LitCalMetadata": {
+                "NationalCalendars": {
                     "type": "object",
-                    "properties": {
-                        "NationalCalendars": {
-                            "type": "object",
-                            "propertyNames": {
-                                "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Region"
-                            },
-                            "patternProperties": {
-                                "": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
-                                    }
-                                }
-                              }
-                        },
-                        "DiocesanCalendars": {
-                            "type": "object",
-                            "patternProperties": {
-                                "": {
-                                    "type": "object",
-                                    "properties": {
-                                        "nation": {
-                                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Region"
-                                        },
-                                        "diocese": {
-                                            "type": "string"
-                                        },
-                                        "group": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "required": [
-                                        "nation",
-                                        "diocese"
-                                    ]
-                                }
-                              }
-                        },
-                        "DiocesanGroups": {
-                            "type": "object",
-                            "patternProperties": {
-                                "": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
-                                    }
-                                }
-                            }
-                        },
-                        "WiderRegions": {
+                    "propertyNames": {
+                        "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Region"
+                    },
+                    "patternProperties": {
+                        "": {
                             "type": "array",
                             "items": {
-                                "type": "string",
-                                "enum": [
-                                    "Africa",
-                                    "Alsace",
-                                    "Americas",
-                                    "Anatolia",
-                                    "Antarctica",
-                                    "Asia",
-                                    "Australasia",
-                                    "Central Africa",
-                                    "Central America",
-                                    "Europe",
-                                    "Indies",
-                                    "North Africa",
-                                    "Oceania",
-                                    "Scandinavia",
-                                    "South America",
-                                    "West Indies"
-                                ]
+                                "type": "string"
                             }
-                        },
-                        "RomanMissals": {
+                        }
+                        }
+                },
+                "DiocesanCalendars": {
+                    "type": "object",
+                    "patternProperties": {
+                        "": {
                             "type": "object",
-                            "propertyNames": {
-                                "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/MissalDef"
-                            },
-                            "patternProperties": {
-                                "": {
-                                    "type": "object",
-                                    "properties": {
-                                        "value": {
-                                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Missal"
-                                        },
-                                        "name": {
-                                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/MissalName"
-                                        },
-                                        "sanctoraleFileName": {
-                                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/MissalFileName"
-                                        },
-                                        "yearLimits": {
-                                            "type": "object",
-                                            "properties": {
-                                                "sinceYear": {
-                                                    "type": "integer"
-                                                },
-                                                "untilYear": {
-                                                    "type": "integer"
-                                                }
-                                            },
-                                            "required": [ "sinceYear" ]
-                                        }
-                                    },
-                                    "required": [
-                                        "value",
-                                        "name",
-                                        "sanctoraleFileName",
-                                        "yearLimits"
-                                    ]
+                            "properties": {
+                                "nation": {
+                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Region"
+                                },
+                                "diocese": {
+                                    "type": "string"
+                                },
+                                "group": {
+                                    "type": "string"
                                 }
+                            },
+                            "required": [
+                                "nation",
+                                "diocese"
+                            ]
+                        }
+                        }
+                },
+                "DiocesanGroups": {
+                    "type": "object",
+                    "patternProperties": {
+                        "": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
                             }
                         }
                     }
+                },
+                "WiderRegions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "Africa",
+                            "Alsace",
+                            "Americas",
+                            "Anatolia",
+                            "Antarctica",
+                            "Asia",
+                            "Australasia",
+                            "Central Africa",
+                            "Central America",
+                            "Europe",
+                            "Indies",
+                            "North Africa",
+                            "Oceania",
+                            "Scandinavia",
+                            "South America",
+                            "West Indies"
+                        ]
+                    }
+                },
+                "RomanMissals": {
+                    "type": "object",
+                    "propertyNames": {
+                        "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/MissalDef"
+                    },
+                    "patternProperties": {
+                        "": {
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Missal"
+                                },
+                                "name": {
+                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/MissalName"
+                                },
+                                "sanctoraleFileName": {
+                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/MissalFileName"
+                                },
+                                "yearLimits": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sinceYear": {
+                                            "type": "integer"
+                                        },
+                                        "untilYear": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [ "sinceYear" ]
+                                }
+                            },
+                            "required": [
+                                "value",
+                                "name",
+                                "sanctoraleFileName",
+                                "yearLimits"
+                            ]
+                        }
+                    }
                 }
-            },
-            "required": [
-                "LitCalMetadata"
-            ],
-            "title": "LitCalMetadata"
+            }
         }
     }
 }
