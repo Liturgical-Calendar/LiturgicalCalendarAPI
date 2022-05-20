@@ -5,10 +5,9 @@
     "definitions": {
         "PropriumDeTempore": {
             "type": "object",
-            "additionalProperties": true,
-            "required": [
-                "READINGS"
-            ],
+            "additionalProperties": {
+                "$ref": "#/definitions/LitEvent"
+            },
             "title": "PropriumDeTempore"
         },
         "LitEvent": {
@@ -17,7 +16,10 @@
                 "READINGS": {
                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Readings"
                 }
-            }
+            },
+            "required": [
+                "READINGS"
+            ]
         }
     }
 }
