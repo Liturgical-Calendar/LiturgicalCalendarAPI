@@ -2,11 +2,11 @@
     {
         "Festivity": {
             "TAG": "StMaryMagdalene",
-            "GRADE": 4,
-            "sinceYear": 2016
+            "GRADE": 4
         },
         "Metadata": {
             "action": "setProperty",
+            "sinceYear": 2016,
             "property": "grade",
             "decreeURL": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_%s.pdf",
             "decreeLangs": {
