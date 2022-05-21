@@ -12,6 +12,7 @@
         },
         "LitEvent": {
             "type": "object",
+            "additionalProperties": false,
             "properties": {
                 "READINGS": {
                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Readings"

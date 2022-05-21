@@ -4,6 +4,7 @@ include_once( 'includes/enums/LitGrade.php' );
 include_once( 'includes/Festivity.php' );
 include_once( 'includes/LitMessages.php' );
 include_once( 'includes/LitSettings.php' );
+include_once( 'includes/LitDateTime.php' );
 
 class FestivityCollection {
 
@@ -12,10 +13,10 @@ class FestivityCollection {
     private array $feasts           = [];
     private array $memorials        = [];
     private array $WeekdayAdventChristmasLent   = [];
-    private array $WeekdaysEpiphany                = [];
-    private array $SolemnitiesLordBVM             = [];
-    private array $SundaysAdventLentEaster       = [];
-    private array $T                                = [];
+    private array $WeekdaysEpiphany             = [];
+    private array $SolemnitiesLordBVM           = [];
+    private array $SundaysAdventLentEaster      = [];
+    private array $T                            = [];
     private IntlDateFormatter $dayOfTheWeek;
     private LitSettings $LitSettings;
     private LitGrade $LitGrade;
@@ -24,7 +25,14 @@ class FestivityCollection {
 
     public function __construct( LitSettings $LitSettings ) {
         $this->LitSettings = $LitSettings;
-        $this->dayOfTheWeek = IntlDateFormatter::create( strtolower( $this->LitSettings->Locale ), IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEEE" );
+        $this->dayOfTheWeek = IntlDateFormatter::create(
+            strtolower( $this->LitSettings->Locale ),
+            IntlDateFormatter::FULL,
+            IntlDateFormatter::NONE,
+            'UTC',
+            IntlDateFormatter::GREGORIAN,
+            "EEEE"
+        );
         if( $this->LitSettings->Locale === LitLocale::LATIN ) {
             $this->T = [
                 "YEAR"          => "ANNUM",
@@ -241,7 +249,7 @@ class FestivityCollection {
     }
 
     public function setProperty( string $key, string $property, string|int|bool $value ) : bool {
-        $reflect = new ReflectionClass( new Festivity("test", new DateTime('NOW')) );
+        $reflect = new ReflectionClass( new Festivity("test", new LitDateTime('NOW')) );
         if( array_key_exists( $key, $this->festivities ) ) {
             $oldValue = $this->festivities[ $key ]->{$property};
             if( $reflect->hasProperty( $property ) ) {

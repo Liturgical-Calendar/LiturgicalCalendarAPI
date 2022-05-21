@@ -1,0 +1,193 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$ref": "#/definitions/LitCal",
+    "definitions": {
+        "LitCal": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "Settings": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "Year": {
+                            "type": "integer",
+                            "minimum": 1969,
+                            "maximum": 9999
+                        },
+                        "Epiphany": {
+                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
+                        },
+                        "Ascension": {
+                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Ascension"
+                        },
+                        "CorpusChristi": {
+                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
+                        },
+                        "Locale": {
+                            "type": "string",
+                            "enum": [
+                                "DE",
+                                "EN",
+                                "ES",
+                                "FR",
+                                "IT",
+                                "LA",
+                                "PT"
+                            ]
+                        },
+                        "ReturnType": {
+                            "type": "string",
+                            "enum": [
+                                "ICS",
+                                "JSON",
+                                "XML"
+                            ]
+                        },
+                        "NationalCalendar": {
+                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Region"
+                        }
+                    },
+                    "required": [
+                        "Year",
+                        "Epiphany",
+                        "Ascension",
+                        "CorpusChristi",
+                        "Locale",
+                        "ReturnType",
+                        "NationalCalendar"
+                    ]
+                },
+                "Metadata": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "VERSION": {
+                            "type": "string",
+                            "minLength": 3,
+                            "maxLength": 5,
+                            "pattern": "^(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)$"
+                        },
+                        "RequestHeaders": {
+                            "type": "string",
+                            "contentMediaType": "application/json"
+                        },
+                        "Solemnities": {
+                            "$ref": "#/definitions/DateTimeObjectCollection"
+                        },
+                        "FeastsMemorials": {
+                            "$ref": "#/definitions/DateTimeObjectCollection"
+                        }
+                    },
+                    "required": [
+                        "VERSION",
+                        "RequestHeaders",
+                        "Solemnities",
+                        "FeastsMemorials"
+                    ]
+                },
+                "LitCal": {
+                    "type": "object",
+                    "patternProperties": {
+                        "": {
+                            "$ref": "#/definitions/Festivity"
+                        }
+                    }
+                },
+                "Messages": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "Settings",
+                "Metadata",
+                "LitCal",
+                "Messages"
+            ]
+        },
+        "DateTimeObjectCollection": {
+            "type": "object",
+            "patternProperties": {
+                "": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "date": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "timezone_type": {
+                            "type": "integer",
+                            "const": 3
+                        },
+                        "timezone": {
+                            "type": "string",
+                            "const": "UTC"
+                        }
+                    }
+                }
+            }
+        },
+        "Festivity": {
+            "type": "object",
+            "properties": {
+                "eventIdx": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 999
+                },
+                "name": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "integer",
+                    "minimum": -86400,
+                    "maximum": 253402214400
+                },
+                "color": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
+                },
+                "type": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitFeastType"
+                },
+                "grade": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
+                },
+                "displayGrade": {
+                    "type": "string"
+                },
+                "common": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
+                },
+                "liturgicalYear": {
+                    "type": "string"
+                },
+                "isVigilMass": {
+                    "type": "boolean"
+                },
+                "hasVigilMass":  {
+                    "type": "boolean"
+                },
+                "hasVesperI":  {
+                    "type": "boolean"
+                },
+                "hasVesperII":  {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "eventIdx",
+                "name",
+                "date",
+                "color",
+                "type",
+                "grade",
+                "displayGrade",
+                "common"
+            ]
+        }
+    }
+}

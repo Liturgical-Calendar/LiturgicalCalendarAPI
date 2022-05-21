@@ -10,6 +10,7 @@ include_once( 'includes/enums/ReturnType.php' );
 include_once( 'includes/APICore.php' );
 include_once( 'vendor/autoload.php' );
 
+use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
 
 if( file_exists("allowedOrigins.php") ) {
@@ -48,9 +49,11 @@ class LitCalHealth {
         "data/propriumdesanctis_ITALY_1983/propriumdesanctis_ITALY_1983.json"   => LitSchema::PROPRIUMDESANCTIS,
         "data/propriumdesanctis_USA_2011/propriumdesanctis_USA_2011.json"       => LitSchema::PROPRIUMDESANCTIS,
         "data/propriumdetempore.json"                                           => LitSchema::PROPRIUMDETEMPORE,
-        "nations/index.json"                                        => LitSchema::INDEX,
-        "https://litcal.johnromanodorazio.com/api/dev/LitCalMetadata.php" => LitSchema::METADATA
+        "nations/index.json"                                                    => LitSchema::INDEX,
+        "https://litcal.johnromanodorazio.com/api/dev/LitCalMetadata.php"       => LitSchema::METADATA
     ];
+
+    const LitCalBaseUrl = "https://litcal.johnromanodorazio.com/api/dev/LitCalEngine.php";
 
     public APICore $APICore;
     //private array $MESSAGES                         = [];
@@ -62,53 +65,128 @@ class LitCalHealth {
     }
 
     private function executeValidations() {
+        $MetadataIsValid = false;
+        $Metadata = new stdClass();
         $result = new stdClass();
         $result->messages = [];
         foreach( LitCalHealth::DataSchema as $dataPath => $schema ) {
-            $message = new stdClass();
             $data = file_get_contents( $dataPath );
             if( $data !== false ) {
+                $message = new stdClass();
                 $message->type = "success";
-                $message->text = "Data file $dataPath exists";
-                $result->messages = $message;
+                $message->text = "The Data file $dataPath exists";
+                $result->messages[] = $message;
 
                 $jsonData = json_decode( $data );
                 if( json_last_error() === JSON_ERROR_NONE ) {
+                    $message = new stdClass();
                     $message->type = "success";
                     $message->text = "The Data file $dataPath was successfully decoded as JSON";
-                    $result->messages = $message;
+                    $result->messages[] = $message;
 
-                    if( $this->validateDataAgainstSchema( $jsonData, $schema ) ) {
+                    $validationResult = $this->validateDataAgainstSchema( $jsonData, $schema );
+                    if( gettype( $validationResult ) === 'boolean' && $validationResult === true ) {
+                        if( $schema === LitSchema::METADATA ) {
+                            $MetadataIsValid = true;
+                            $Metadata = $jsonData->LitCalMetadata;
+                        }
+                        $message = new stdClass();
                         $message->type = "success";
                         $message->text = "The Data file $dataPath was successfully validated against the Schema $schema";
-                        $result->messages = $message;
+                        $result->messages[] = $message;
+                    }
+                    else if( gettype( $validationResult === 'object' ) ) {
+                        $result->messages[] = $validationResult;
                     }
                 } else {
+                    $message = new stdClass();
                     $message->type = "error";
                     $message->text = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg();
-                    $result->messages = $message;
+                    $result->messages[] = $message;
                 }
 
             } else {
+                $message = new stdClass();
                 $message->type = "error";
                 $message->text = "Data file $dataPath does not exist";
-                $result->messages = $message;
+                $result->messages[] = $message;
             }
         }
+        if( $MetadataIsValid ) {
+            $NationalCalendars  = [];
+            $DiocesanCalendars  = [];
+            $Years              = [];
+            foreach( $Metadata->NationalCalendars as $key => $value ){
+                array_push( $NationalCalendars, $key );
+                array_push( $DiocesanCalendars, ...$value );
+            }
+            for( $i=10; $i>0; $i-- ) {
+                array_push( $Years, rand(1970,9999) );
+            }
+        }
+        $result = $this->validateCalendars( $NationalCalendars, $Years, 'nationalcalendar', $result );
+        $result = $this->validateCalendars( $DiocesanCalendars, $Years, 'diocesancalendar', $result );
         die( json_encode( $result ) );
     }
 
-    private function validateDataAgainstSchema( object|array $data, string $schemaUrl ) : bool {
-        $result = new stdClass();
-        $schema = Schema::import( $schemaUrl );
-        try {
-            $validation = $schema->in($data);
-            return true;
-        } catch (Exception $e) {
-            $result->error = LitSchema::ERROR_MESSAGES[ $schemaUrl ] . PHP_EOL . $e->getMessage();
-            header( $_SERVER[ "SERVER_PROTOCOL" ]." 422 Unprocessable Entity", true, 422 );
-            die( json_encode( $result ) );
+    private function validateCalendars( array $Calendars, array $Years, string $type, object $result ) : object {
+        foreach( $Calendars as $Calendar ) {
+            foreach( $Years as $Year ) {
+                $req = "?$type=$Calendar&year=$Year";
+                $data = file_get_contents( self::LitCalBaseUrl . $req );
+                if( $data !== false ) {
+                    $message = new stdClass();
+                    $message->type = "success";
+                    $message->text = "The $type of $Calendar exists";
+                    $result->messages[] = $message;
+    
+                    $jsonData = json_decode( $data );
+                    if( json_last_error() === JSON_ERROR_NONE ) {
+                        $message = new stdClass();
+                        $message->type = "success";
+                        $message->text = "The $type of $Calendar was successfully decoded as JSON";
+                        $result->messages[] = $message;
+    
+                        $validationResult = $this->validateDataAgainstSchema( $jsonData, LitSchema::LITCAL );
+                        if( gettype( $validationResult ) === 'boolean' && $validationResult === true ) {
+                            $message = new stdClass();
+                            $message->type = "success";
+                            $message->text = "The $type of $Calendar was successfully validated against the Schema " . LitSchema::LITCAL;
+                            $result->messages[] = $message;
+                        }
+                        else if( gettype( $validationResult === 'object' ) ) {
+                            $result->messages[] = $validationResult;
+                        }
+                    } else {
+                        $message = new stdClass();
+                        $message->type = "error";
+                        $message->text = "There was an error decoding the $type of $Calendar from the URL " . self::LitCalBaseUrl . $req . " as JSON: " . json_last_error_msg();
+                        $result->messages[] = $message;
+                    }
+                } else {
+                    $message = new stdClass();
+                    $message->type = "error";
+                    $message->text = "The $type of $Calendar does not exist at the URL " . self::LitCalBaseUrl . $req;
+                    $result->messages[] = $message;
+                }
+            }
         }
+        return $result;
+    }
+
+    private function validateDataAgainstSchema( object|array $data, string $schemaUrl ) : bool|object {
+        $res = false;
+        try {
+            $schema = Schema::import( $schemaUrl );
+            $schema->in($data);
+            $res = true;
+        } catch (InvalidValue|Exception $e) {
+            $message = new stdClass();
+            $message->type = "error";
+            $message->text = LitSchema::ERROR_MESSAGES[ $schemaUrl ] . PHP_EOL . $e->getMessage();
+            return $message;
+        }
+        return $res;
     }
 
     private function handleRequestedMethod() {

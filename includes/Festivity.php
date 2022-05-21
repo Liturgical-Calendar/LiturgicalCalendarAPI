@@ -5,6 +5,7 @@ include_once( 'enums/LitColor.php' );
 include_once( 'enums/LitCommon.php' );
 include_once( 'enums/LitFeastType.php' );
 include_once( 'enums/LitGrade.php' );
+include_once( 'LitDateTime.php' );
 
 class Festivity implements JsonSerializable
 {
@@ -12,7 +13,7 @@ class Festivity implements JsonSerializable
 
     public int      $idx;
     public string   $name;
-    public DateTime $date;
+    public LitDateTime $date;
     public array    $color;
     public string   $type;
     public int      $grade;
@@ -27,7 +28,7 @@ class Festivity implements JsonSerializable
     public ?bool    $hasVesperII    = null;
     public ?int     $psalterWeek    = null;
 
-    function __construct(string $name, DateTime $date, string|array $color = [ '???' ], string $type = '???', int $grade = LitGrade::WEEKDAY, string|array $common = [ '???' ], string $displayGrade='')
+    function __construct(string $name, LitDateTime $date, string|array $color = [ '???' ], string $type = '???', int $grade = LitGrade::WEEKDAY, string|array $common = [ '???' ], string $displayGrade='')
     {
         $this->idx          = self::$eventIdx++;
         $this->name         = $name;
@@ -61,10 +62,11 @@ class Festivity implements JsonSerializable
             }
         }
     }
-
+    /*
     private static function debugWrite( string $string ) {
         file_put_contents( "debug.log", $string . PHP_EOL, FILE_APPEND );
     }
+    */
 
     /* * * * * * * * * * * * * * * * * * * * * * * * *
      * Funzione statica di comparazione
@@ -87,7 +89,8 @@ class Festivity implements JsonSerializable
         $returnArr = [
             'eventIdx'      => $this->idx,
             'name'          => $this->name,
-            'date'          => $this->date->format('U'), //serialize the DateTime object as a PHP timestamp
+            //serialize the DateTime object as a PHP timestamp (seconds since the Unix Epoch)
+            'date'          => (int) $this->date->format('U'),
             'color'         => $this->color,
             'type'          => $this->type,
             'grade'         => $this->grade,

@@ -62,7 +62,7 @@ if( file_exists( 'nations/index.json' ) ) {
                 "DiocesanGroups"    => $diocesanGroups,
                 "WiderRegions"      => $widerRegionsNames,
                 "RomanMissals"      => RomanMissal::produceMetadata()
-            ],
+            ]
         ], JSON_PRETTY_PRINT );
         $responseHash = md5( $response );
         header("Etag: \"{$responseHash}\"");

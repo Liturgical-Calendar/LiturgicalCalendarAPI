@@ -375,6 +375,7 @@
         },
         "CalendarMetadata": {
             "type": "object",
+            "additionalProperties": false,
             "properties": {
                 "IsMultilingual": {
                     "type": "boolean"

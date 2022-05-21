@@ -1,5 +1,7 @@
 <?php
 
+include_once( 'includes/LitDateTime.php' );
+
 /**
  * Useful functions for LitCalEngine.php
  * @Author: John Romano D'Orazio
@@ -61,7 +63,7 @@ class LitFunc {
     $month = floor(($h + $l - 7 * $m + 114) / 31);
     $day = (($h + $l - 7 * $m + 114) % 31) + 1;
 
-    $dateObj   = DateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new DateTimeZone('UTC'));
+    $dateObj   = LitDateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new DateTimeZone('UTC'));
 
     return $dateObj;
   }
@@ -80,7 +82,7 @@ class LitFunc {
     $month = floor( ($d + $e + 114) / 31 );
     $day = ( ($d + $e + 114) % 31 ) + 1;
 
-    $dateObj   = DateTime::createFromFormat('!j-n-Y', $day.'-'.$month.'-'.$Y, new DateTimeZone( 'UTC' ));
+    $dateObj   = LitDateTime::createFromFormat('!j-n-Y', $day.'-'.$month.'-'.$Y, new DateTimeZone( 'UTC' ));
     if($gregCal){
         //from February 29th 2100 Julian (March 14th 2100 Gregorian), 
         //the difference between the Julian and Gregorian calendars will increase to 14 days
@@ -89,12 +91,12 @@ class LitFunc {
         $dateObj->add(new DateInterval($dateDiff));
         */
         $GregDateDiff = array();
-        $GregDateDiff[0] = [DateTime::createFromFormat('!j-n-Y', '4-10-1582'),"P10D"]; //add 10 == GREGORIAN CUTOVER DATE
+        $GregDateDiff[0] = [LitDateTime::createFromFormat('!j-n-Y', '4-10-1582'),"P10D"]; //add 10 == GREGORIAN CUTOVER DATE
         $idx = 0;
         $cc = 10;
         for($cent = 17;$cent <= 99; $cent++){
             if($cent % 4 > 0){
-                $GregDateDiff[++$idx] = [DateTime::createFromFormat('!j-n-Y', '28-2-'.$cent.'00'),"P" . ++$cc . "D"];
+                $GregDateDiff[++$idx] = [LitDateTime::createFromFormat('!j-n-Y', '28-2-'.$cent.'00'),"P" . ++$cc . "D"];
             }
         }
 
@@ -105,18 +107,18 @@ class LitFunc {
             }
         }
         /*
-        $GregDateDiff[1] = DateTime::createFromFormat('!j-n-Y', '28-2-1700'); //add 11 (1600 was a leap year)
-        $GregDateDiff[2] = DateTime::createFromFormat('!j-n-Y', '28-2-1800'); //add 12
-        $GregDateDiff[3] = DateTime::createFromFormat('!j-n-Y', '28-2-1900'); //add 13
-        $GregDateDiff[4] = DateTime::createFromFormat('!j-n-Y', '28-2-2100'); //add 14 (2000 was a leap year)
-        $GregDateDiff[5] = DateTime::createFromFormat('!j-n-Y', '28-2-2200'); //add 15
-        $GregDateDiff[6] = DateTime::createFromFormat('!j-n-Y', '28-2-2300'); //add 16
-        $GregDateDiff[7] = DateTime::createFromFormat('!j-n-Y', '28-2-2500'); //add 17 (2400 will be a leap year)
-        $GregDateDiff[8] = DateTime::createFromFormat('!j-n-Y', '28-2-2600'); //add 18 
-        $GregDateDiff[9] = DateTime::createFromFormat('!j-n-Y', '28-2-2700'); //add 19 
-        $GregDateDiff[10] = DateTime::createFromFormat('!j-n-Y', '28-2-2900'); //add 20 (2800 will be a leap year)
-        $GregDateDiff[11] = DateTime::createFromFormat('!j-n-Y', '28-2-3000'); //add 21 
-        $GregDateDiff[12] = DateTime::createFromFormat('!j-n-Y', '28-2-3100'); //add 22 
+        $GregDateDiff[1] = LitDateTime::createFromFormat('!j-n-Y', '28-2-1700'); //add 11 (1600 was a leap year)
+        $GregDateDiff[2] = LitDateTime::createFromFormat('!j-n-Y', '28-2-1800'); //add 12
+        $GregDateDiff[3] = LitDateTime::createFromFormat('!j-n-Y', '28-2-1900'); //add 13
+        $GregDateDiff[4] = LitDateTime::createFromFormat('!j-n-Y', '28-2-2100'); //add 14 (2000 was a leap year)
+        $GregDateDiff[5] = LitDateTime::createFromFormat('!j-n-Y', '28-2-2200'); //add 15
+        $GregDateDiff[6] = LitDateTime::createFromFormat('!j-n-Y', '28-2-2300'); //add 16
+        $GregDateDiff[7] = LitDateTime::createFromFormat('!j-n-Y', '28-2-2500'); //add 17 (2400 will be a leap year)
+        $GregDateDiff[8] = LitDateTime::createFromFormat('!j-n-Y', '28-2-2600'); //add 18 
+        $GregDateDiff[9] = LitDateTime::createFromFormat('!j-n-Y', '28-2-2700'); //add 19 
+        $GregDateDiff[10] = LitDateTime::createFromFormat('!j-n-Y', '28-2-2900'); //add 20 (2800 will be a leap year)
+        $GregDateDiff[11] = LitDateTime::createFromFormat('!j-n-Y', '28-2-3000'); //add 21 
+        $GregDateDiff[12] = LitDateTime::createFromFormat('!j-n-Y', '28-2-3100'); //add 22 
         */
     }
     return $dateObj;

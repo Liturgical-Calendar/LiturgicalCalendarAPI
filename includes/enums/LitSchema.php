@@ -11,6 +11,7 @@ class LitSchema {
     const DECREEMEMORIALS   = "https://litcal.org/api/dev/schemas/MemorialsFromDecrees.json";
     const I18N              = "https://litcal.org/api/dev/schemas/LitCalTranslation.json";
     const METADATA          = "https://litcal.org/api/dev/schemas/LitCalMetadata.json";
+    const LITCAL            = "https://litcal.org/api/dev/schemas/LitCal.json";
 
     const ERROR_MESSAGES = [
         LitSchema::INDEX             => "Schema validation error: Index not updated",
@@ -21,7 +22,8 @@ class LitSchema {
         LitSchema::WIDERREGION       => "Schema validation error: Wider Region data not created / updated",
         LitSchema::DECREEMEMORIALS   => "Schema validation error: Memorials from Decrees data not created / updated",
         LitSchema::I18N              => "Schema validation error: Translation data not created / updated",
-        LitSchema::METADATA          => "Schema validation error: LitCalMetadata not valid"
+        LitSchema::METADATA          => "Schema validation error: LitCalMetadata not valid",
+        LitSchema::LITCAL            => "Schema validation error: LitCal not valid"
     ];
 
 }
