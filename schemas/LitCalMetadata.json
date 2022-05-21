@@ -1,5 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "LitCalMetadata",
     "type": "object",
     "properties": {
         "LitCalMetadata": {
@@ -9,7 +10,7 @@
     "required": [
         "LitCalMetadata"
     ],
-    "title": "LitCalMetadata",
+    "additionalProperties": false,
     "definitions": {
         "LitCalMetadata": {
             "type": "object",
@@ -114,7 +115,8 @@
                                             "type": "integer"
                                         }
                                     },
-                                    "required": [ "sinceYear" ]
+                                    "required": [ "sinceYear" ],
+                                    "additionalProperties": false
                                 }
                             },
                             "required": [
@@ -122,11 +124,20 @@
                                 "name",
                                 "sanctoraleFileName",
                                 "yearLimits"
-                            ]
+                            ],
+                            "additionalProperties": false
                         }
                     }
                 }
-            }
+            },
+            "required": [
+                "NationalCalendars",
+                "DiocesanCalendars",
+                "DiocesanGroups",
+                "WiderRegions",
+                "RomanMissals"
+            ],
+            "additionalProperties": false
         }
     }
 }
