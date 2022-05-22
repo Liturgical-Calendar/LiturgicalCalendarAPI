@@ -132,7 +132,11 @@ class LitCalHealth {
     private function validateCalendars( array $Calendars, array $Years, string $type, object $result ) : object {
         foreach( $Calendars as $Calendar ) {
             foreach( $Years as $Year ) {
-                $req = "?$type=$Calendar&year=$Year";
+                if( $Calendar === 'VATICAN' ) {
+                    $req = "?year=$Year";
+                } else {
+                    $req = "?$type=$Calendar&year=$Year";
+                }
                 $data = file_get_contents( self::LitCalBaseUrl . $req );
                 if( $data !== false ) {
                     $message = new stdClass();
