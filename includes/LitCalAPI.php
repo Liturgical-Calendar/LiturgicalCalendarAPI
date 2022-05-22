@@ -1586,8 +1586,8 @@ class LitCalAPI {
     // so that our cycle using "next Saturday" logic will actually start from the first Saturday of the year ),
     // and then continue for every next Saturday until we reach the last Saturday of the year
     private function calculateSaturdayMemorialBVM() : void {
-        $currentSaturday = new DateTime( "previous Saturday January {$this->LitSettings->Year}", new DateTimeZone( 'UTC' ) );
-        $lastSatDT = new DateTime( "last Saturday December {$this->LitSettings->Year}", new DateTimeZone( 'UTC' ) );
+        $currentSaturday = new LitDateTime( "previous Saturday January {$this->LitSettings->Year}", new DateTimeZone( 'UTC' ) );
+        $lastSatDT = new LitDateTime( "last Saturday December {$this->LitSettings->Year}", new DateTimeZone( 'UTC' ) );
         $SatMemBVM_cnt = 0;
         while( $currentSaturday <= $lastSatDT ){
             $currentSaturday = LitDateTime::createFromFormat( '!j-n-Y', $currentSaturday->format( 'j-n-Y' ),new DateTimeZone( 'UTC' ) )->modify( 'next Saturday' );
@@ -1770,7 +1770,8 @@ class LitCalAPI {
             && $row->Festivity->strtotime !== ''
         ) {
             $festivityDateTS = strtotime( $row->Festivity->strtotime . ' ' . $this->LitSettings->Year . ' UTC' );
-            $row->Festivity->DATE = new DateTime( "@$festivityDateTS", new DateTimeZone( 'UTC' ) );
+            $row->Festivity->DATE = new LitDateTime( "@$festivityDateTS" );
+            $row->Festivity->DATE->setTimeZone(new DateTimeZone('UTC'));
         }
         else if(
             property_exists( $row->Festivity, 'month' )
