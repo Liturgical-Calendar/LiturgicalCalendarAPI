@@ -137,21 +137,21 @@ class LitCalHealth {
                 if( $data !== false ) {
                     $message = new stdClass();
                     $message->type = "success";
-                    $message->text = "The $type of $Calendar exists";
+                    $message->text = "The $type of $Calendar for the year $Year exists";
                     $result->messages[] = $message;
     
                     $jsonData = json_decode( $data );
                     if( json_last_error() === JSON_ERROR_NONE ) {
                         $message = new stdClass();
                         $message->type = "success";
-                        $message->text = "The $type of $Calendar was successfully decoded as JSON";
+                        $message->text = "The $type of $Calendar for the year $Year was successfully decoded as JSON";
                         $result->messages[] = $message;
     
                         $validationResult = $this->validateDataAgainstSchema( $jsonData, LitSchema::LITCAL );
                         if( gettype( $validationResult ) === 'boolean' && $validationResult === true ) {
                             $message = new stdClass();
                             $message->type = "success";
-                            $message->text = "The $type of $Calendar was successfully validated against the Schema " . LitSchema::LITCAL;
+                            $message->text = "The $type of $Calendar for the year $Year was successfully validated against the Schema " . LitSchema::LITCAL;
                             $result->messages[] = $message;
                         }
                         else if( gettype( $validationResult === 'object' ) ) {
@@ -160,13 +160,13 @@ class LitCalHealth {
                     } else {
                         $message = new stdClass();
                         $message->type = "error";
-                        $message->text = "There was an error decoding the $type of $Calendar from the URL " . self::LitCalBaseUrl . $req . " as JSON: " . json_last_error_msg();
+                        $message->text = "There was an error decoding the $type of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as JSON: " . json_last_error_msg();
                         $result->messages[] = $message;
                     }
                 } else {
                     $message = new stdClass();
                     $message->type = "error";
-                    $message->text = "The $type of $Calendar does not exist at the URL " . self::LitCalBaseUrl . $req;
+                    $message->text = "The $type of $Calendar for the year $Year does not exist at the URL " . self::LitCalBaseUrl . $req;
                     $result->messages[] = $message;
                 }
             }
