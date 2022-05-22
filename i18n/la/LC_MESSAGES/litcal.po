@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-21 23:09+0000\n"
+"POT-Creation-Date: 2022-05-22 09:41+0000\n"
 "PO-Revision-Date: 2022-03-03 16:15+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
@@ -156,7 +156,7 @@ msgstr "post Feria IV Cinerum"
 #.  6. Current year
 #.
 #: includes/LitCalAPI.php:870 includes/LitCalAPI.php:1131
-#: includes/LitCalAPI.php:1308 includes/LitCalAPI.php:1824
+#: includes/LitCalAPI.php:1308 includes/LitCalAPI.php:1825
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
@@ -447,7 +447,7 @@ msgstr ""
 #.  5. Name of the superseding festivity
 #.  6. Current year
 #.
-#: includes/LitCalAPI.php:1664 includes/LitCalAPI.php:1996
+#: includes/LitCalAPI.php:1664 includes/LitCalAPI.php:1997
 #, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
@@ -471,13 +471,13 @@ msgstr ""
 "Memoria '%1$s' coincidet cum alia Memoria '%2$s' in anno %3$d. Ergo ambo "
 "simul redunctur in gradu Memoriæ ad libitum."
 
-#: includes/LitCalAPI.php:1789
+#: includes/LitCalAPI.php:1790
 msgid ""
 "We should be creating a new festivity, however we do not seem to have the "
 "correct date information in order to proceed"
 msgstr ""
 
-#: includes/LitCalAPI.php:1903
+#: includes/LitCalAPI.php:1904
 #, php-format
 msgid "Found a sanctorale data file for %s"
 msgstr ""
@@ -491,7 +491,7 @@ msgstr ""
 #.  6. Superseding festivity name
 #.  7. Current year
 #.
-#: includes/LitCalAPI.php:1933
+#: includes/LitCalAPI.php:1934
 #, php-format
 msgid ""
 "The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
@@ -500,12 +500,12 @@ msgstr ""
 "%1$s '%2$s' (%3$s), aggregata calendario nationali in %4$s, subplantata est "
 "ab %5$s '%6$s' in anno %7$d"
 
-#: includes/LitCalAPI.php:1947
+#: includes/LitCalAPI.php:1948
 #, php-format
 msgid "Could not find a sanctorale data file for %s"
 msgstr ""
 
-#: includes/LitCalAPI.php:2038
+#: includes/LitCalAPI.php:2039
 #, fuzzy, php-format
 #| msgid ""
 #| "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
@@ -517,7 +517,7 @@ msgstr ""
 "%1$s <i>'%2$s'</i> aggregata est igitur in die %3$s ab anno %4$d (%5$s), "
 "ergo viget in anno %6$d."
 
-#: includes/LitCalAPI.php:2056
+#: includes/LitCalAPI.php:2057
 #, fuzzy, php-format
 #| msgid ""
 #| "The %1$s '%2$s', added in the %3$s of the Roman Missal since the year "

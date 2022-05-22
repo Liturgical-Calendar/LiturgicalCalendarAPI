@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-21 23:09+0000\n"
+"POT-Creation-Date: 2022-05-22 09:41+0000\n"
 "PO-Revision-Date: 2022-05-21 10:16+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Spanish <https://translate.johnromanodorazio.com/projects/"
@@ -150,7 +150,7 @@ msgstr ""
 #.  6. Current year
 #.
 #: includes/LitCalAPI.php:870 includes/LitCalAPI.php:1131
-#: includes/LitCalAPI.php:1308 includes/LitCalAPI.php:1824
+#: includes/LitCalAPI.php:1308 includes/LitCalAPI.php:1825
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
@@ -405,7 +405,7 @@ msgstr ""
 #.  5. Name of the superseding festivity
 #.  6. Current year
 #.
-#: includes/LitCalAPI.php:1664 includes/LitCalAPI.php:1996
+#: includes/LitCalAPI.php:1664 includes/LitCalAPI.php:1997
 #, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
@@ -425,13 +425,13 @@ msgid ""
 "They are both reduced in rank to optional memorials."
 msgstr ""
 
-#: includes/LitCalAPI.php:1789
+#: includes/LitCalAPI.php:1790
 msgid ""
 "We should be creating a new festivity, however we do not seem to have the "
 "correct date information in order to proceed"
 msgstr ""
 
-#: includes/LitCalAPI.php:1903
+#: includes/LitCalAPI.php:1904
 #, php-format
 msgid "Found a sanctorale data file for %s"
 msgstr ""
@@ -445,26 +445,26 @@ msgstr ""
 #.  6. Superseding festivity name
 #.  7. Current year
 #.
-#: includes/LitCalAPI.php:1933
+#: includes/LitCalAPI.php:1934
 #, php-format
 msgid ""
 "The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
 "superseded by the %5$s '%6$s' in the year %7$d"
 msgstr ""
 
-#: includes/LitCalAPI.php:1947
+#: includes/LitCalAPI.php:1948
 #, php-format
 msgid "Could not find a sanctorale data file for %s"
 msgstr ""
 
-#: includes/LitCalAPI.php:2038
+#: includes/LitCalAPI.php:2039
 #, php-format
 msgid ""
 "The %1$s '%2$s' is transferred from %5$s to %6$s as per the %7$s, to make "
 "room for '%3$s': applicable to the year %4$d."
 msgstr ""
 
-#: includes/LitCalAPI.php:2056
+#: includes/LitCalAPI.php:2057
 #, php-format
 msgid ""
 "The %1$s '%2$s' would have been transferred from %3$s to %4$s as per the "
