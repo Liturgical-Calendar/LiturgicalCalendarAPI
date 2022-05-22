@@ -1,5 +1,6 @@
 {
     "require": {
-        "swaggest/json-schema": "^0.12"
+        "swaggest/json-schema": "^0.12",
+        "phpunit/phpunit": "^9"
     }
 }
