@@ -46,6 +46,9 @@
                         },
                         "NationalCalendar": {
                             "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Region"
+                        },
+                        "DiocesanCalendar": {
+                            "type": "string"
                         }
                     },
                     "required": [
