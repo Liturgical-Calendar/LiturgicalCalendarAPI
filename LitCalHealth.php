@@ -8,6 +8,8 @@ include_once( 'includes/enums/RequestMethod.php' );
 include_once( 'includes/enums/RequestContentType.php' );
 include_once( 'includes/enums/ReturnType.php' );
 include_once( 'includes/APICore.php' );
+include_once( 'tests/NativityJohnBaptistTest.php' );
+include_once( 'tests/StJaneFrancesDeChantalTest.php' );
 include_once( 'vendor/autoload.php' );
 
 use Swaggest\JsonSchema\InvalidValue;
@@ -56,7 +58,7 @@ class LitCalHealth {
     const LitCalBaseUrl = "https://litcal.johnromanodorazio.com/api/dev/LitCalEngine.php";
 
     public APICore $APICore;
-    //private array $MESSAGES                         = [];
+    private object $CalendarData;
 
     public function __construct(){
         $this->APICore                              = new APICore();
@@ -120,12 +122,32 @@ class LitCalHealth {
                 array_push( $NationalCalendars, $key );
                 array_push( $DiocesanCalendars, ...$value );
             }
+            $twentyYearsFromNow = (int)date("Y") + 20;
             for( $i=10; $i>0; $i-- ) {
-                array_push( $Years, rand(1970,9999) );
+                array_push( $Years, rand(1970,$twentyYearsFromNow) );
             }
         }
         $result = $this->validateCalendars( $NationalCalendars, $Years, 'nationalcalendar', $result );
         $result = $this->validateCalendars( $DiocesanCalendars, $Years, 'diocesancalendar', $result );
+        $result = $this->testJohnBaptist( $NationalCalendars, [2022, 2033, 2044], 'nationalcalendar', $result );
+        $result = $this->testJohnBaptist( $DiocesanCalendars, [2022, 2033, 2044], 'diocesancalendar', $result );
+        $result = $this->testStJaneFrancesDeChantalMoved( $NationalCalendars, [2001, 2002, 2010], 'nationalcalendar', $result, 'movedornot' );
+        $result = $this->testStJaneFrancesDeChantalMoved( $DiocesanCalendars, [2001, 2002, 2010], 'diocesancalendar', $result, 'movedornot' );
+        $yearsOverridden = [
+            1971,
+            1976,
+            1982,
+            1993,
+            1999,
+            2012,
+            2018,
+            2029,
+            2035,
+            2040,
+            2046
+        ];
+        $result = $this->testStJaneFrancesDeChantalMoved( $NationalCalendars, $yearsOverridden, 'nationalcalendar', $result, 'overridden' );
+        $result = $this->testStJaneFrancesDeChantalMoved( $DiocesanCalendars, $yearsOverridden, 'diocesancalendar', $result, 'overridden' );
         die( json_encode( $result ) );
     }
 
@@ -157,6 +179,133 @@ class LitCalHealth {
                             $message->type = "success";
                             $message->text = "The $type of $Calendar for the year $Year was successfully validated against the Schema " . LitSchema::LITCAL;
                             $result->messages[] = $message;
+                        }
+                        else if( gettype( $validationResult === 'object' ) ) {
+                            $result->messages[] = $validationResult;
+                        }
+                    } else {
+                        $message = new stdClass();
+                        $message->type = "error";
+                        $message->text = "There was an error decoding the $type of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as JSON: " . json_last_error_msg();
+                        $result->messages[] = $message;
+                    }
+                } else {
+                    $message = new stdClass();
+                    $message->type = "error";
+                    $message->text = "The $type of $Calendar for the year $Year does not exist at the URL " . self::LitCalBaseUrl . $req;
+                    $result->messages[] = $message;
+                }
+            }
+        }
+        return $result;
+    }
+
+    private function testJohnBaptist( array $Calendars, array $Years, string $type, object $result ) : object {
+        foreach( $Calendars as $Calendar ) {
+            foreach( $Years as $Year ) {
+                if( $Calendar === 'VATICAN' ) {
+                    $req = "?year=$Year";
+                } else {
+                    $req = "?$type=$Calendar&year=$Year";
+                }
+                $data = file_get_contents( self::LitCalBaseUrl . $req );
+                if( $data !== false ) {
+                    $message = new stdClass();
+                    $message->type = "success";
+                    $message->text = "The $type of $Calendar for the year $Year exists";
+                    $result->messages[] = $message;
+    
+                    $jsonData = json_decode( $data );
+                    if( json_last_error() === JSON_ERROR_NONE ) {
+                        $message = new stdClass();
+                        $message->type = "success";
+                        $message->text = "The $type of $Calendar for the year $Year was successfully decoded as JSON";
+                        $result->messages[] = $message;
+    
+                        $validationResult = $this->validateDataAgainstSchema( $jsonData, LitSchema::LITCAL );
+                        if( gettype( $validationResult ) === 'boolean' && $validationResult === true ) {
+                            $message = new stdClass();
+                            $message->type = "success";
+                            $message->text = "The $type of $Calendar for the year $Year was successfully validated against the Schema " . LitSchema::LITCAL;
+                            $result->messages[] = $message;
+                            NativityJohnBaptistTest::$testObject = $jsonData;
+                            $NativityJohnBaptistTest = new NativityJohnBaptistTest;
+                            $testResult = $NativityJohnBaptistTest->testJune23();
+                            if( gettype( $testResult ) === 'boolean' && $testResult === true ) {
+                                $message = new stdClass();
+                                $message->type = "success";
+                                $message->text = "Nativity of John the Baptist test passed for the $type of $Calendar for the year $Year";
+                                $result->messages[] = $message;
+                            }
+                            else if( gettype( $testResult ) === 'object' ) {
+                                $result->messages[] = $testResult;
+                            }
+                        }
+                        else if( gettype( $validationResult === 'object' ) ) {
+                            $result->messages[] = $validationResult;
+                        }
+                    } else {
+                        $message = new stdClass();
+                        $message->type = "error";
+                        $message->text = "There was an error decoding the $type of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as JSON: " . json_last_error_msg();
+                        $result->messages[] = $message;
+                    }
+                } else {
+                    $message = new stdClass();
+                    $message->type = "error";
+                    $message->text = "The $type of $Calendar for the year $Year does not exist at the URL " . self::LitCalBaseUrl . $req;
+                    $result->messages[] = $message;
+                }
+            }
+        }
+        return $result;
+    }
+
+    private function testStJaneFrancesDeChantalMoved( array $Calendars, array $Years, string $type, object $result, string $test ) : object {
+        foreach( $Calendars as $Calendar ) {
+            foreach( $Years as $Year ) {
+                if( $Calendar === 'VATICAN' ) {
+                    $req = "?year=$Year";
+                } else {
+                    $req = "?$type=$Calendar&year=$Year";
+                }
+                $data = file_get_contents( self::LitCalBaseUrl . $req );
+                if( $data !== false ) {
+                    $message = new stdClass();
+                    $message->type = "success";
+                    $message->text = "The $type of $Calendar for the year $Year exists";
+                    $result->messages[] = $message;
+    
+                    $jsonData = json_decode( $data );
+                    if( json_last_error() === JSON_ERROR_NONE ) {
+                        $message = new stdClass();
+                        $message->type = "success";
+                        $message->text = "The $type of $Calendar for the year $Year was successfully decoded as JSON";
+                        $result->messages[] = $message;
+    
+                        $validationResult = $this->validateDataAgainstSchema( $jsonData, LitSchema::LITCAL );
+                        if( gettype( $validationResult ) === 'boolean' && $validationResult === true ) {
+                            $message = new stdClass();
+                            $message->type = "success";
+                            $message->text = "The $type of $Calendar for the year $Year was successfully validated against the Schema " . LitSchema::LITCAL;
+                            $result->messages[] = $message;
+                            StJaneFrancesDeChantalTest::$testObject = $jsonData;
+                            $StJaneFrancesDeChantalTest = new StJaneFrancesDeChantalTest;
+                            if( $test === 'movedornot' ) {
+                                $testResult = $StJaneFrancesDeChantalTest->testMovedOrNot();
+                            }
+                            else if( $test === 'overridden' ) {
+                                $testResult = $StJaneFrancesDeChantalTest->testOverridden();
+                            }
+                            if( gettype( $testResult ) === 'boolean' && $testResult === true ) {
+                                $message = new stdClass();
+                                $message->type = "success";
+                                $message->text = "Saint Jane Frances de Chantal test ($test) passed for the $type of $Calendar for the year $Year";
+                                $result->messages[] = $message;
+                            }
+                            else if( gettype( $testResult ) === 'object' ) {
+                                $result->messages[] = $testResult;
+                            }
                         }
                         else if( gettype( $validationResult === 'object' ) ) {
                             $result->messages[] = $validationResult;
