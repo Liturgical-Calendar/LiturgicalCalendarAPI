@@ -2201,9 +2201,9 @@ class LitCalAPI {
                             $this->LitSettings->Year
                         );
                     }
-                    $this->Cal->addFestivity( $this->LitSettings->DiocesanCalendar . "_" . $key, new Festivity( "[ " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " ] " . $obj->name, $currentFeastDate, strtolower( $obj->color ), LitFeastType::FIXED, $obj->grade, $obj->common ) );
+                    $this->Cal->addFestivity( $this->LitSettings->DiocesanCalendar . "_" . $key, new Festivity( "[ " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " ] " . $obj->name, $currentFeastDate, $obj->color, LitFeastType::FIXED, $obj->grade, $obj->common ) );
                 } else if ( $obj->grade <= LitGrade::FEAST && !$this->Cal->inSolemnities( $currentFeastDate ) ) {
-                    $this->Cal->addFestivity( $this->LitSettings->DiocesanCalendar . "_" . $key, new Festivity( "[ " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " ] " . $obj->name, $currentFeastDate, strtolower( $obj->color ), LitFeastType::FIXED, $obj->grade, $obj->common ) );
+                    $this->Cal->addFestivity( $this->LitSettings->DiocesanCalendar . "_" . $key, new Festivity( "[ " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " ] " . $obj->name, $currentFeastDate, $obj->color, LitFeastType::FIXED, $obj->grade, $obj->common ) );
                 } else {
                     $this->Messages[] = sprintf(
                         $this->LitSettings->DiocesanCalendar . ": the %s '%s', proper to the calendar of the " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " and usually celebrated on %s, is suppressed by the Sunday or Solemnity %s in the year %d",
