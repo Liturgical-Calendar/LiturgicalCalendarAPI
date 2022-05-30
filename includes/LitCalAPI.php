@@ -777,7 +777,7 @@ class LitCalAPI {
         //With the decree Apostolorum Apostola ( June 3rd 2016 ), the Congregation for Divine Worship
         //with the approval of Pope Francis elevated the memorial of Saint Mary Magdalen to a Feast
         //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf
-        //This is taken care of ahead when the memorials are created, see comment tag MARYMAGDALEN:
+        //This is taken care of ahead when the "memorials from decrees" are applied
 
     }
 
@@ -939,7 +939,7 @@ class LitCalAPI {
 
     private function reduceMemorialsInAdventLentToCommemoration( DateTime $currentFeastDate, stdClass $row ) {
         //If a fixed date optional memorial falls between 17 Dec. to 24 Dec., the Octave of Christmas or weekdays of the Lenten season,
-        //it is reduced in rank to a Commemoration ( only the collect can be used
+        //it is reduced in rank to a Commemoration ( only the collect can be used )
         if ( $this->Cal->inWeekdaysAdventChristmasLent( $currentFeastDate ) ) {
             $this->Cal->setProperty( $row->TAG, "grade", LitGrade::COMMEMORATION );
             /**translators:
