@@ -27,6 +27,7 @@ if( file_exists( 'nations/index.json' ) ) {
         $diocesanCalendars  = json_decode( $index, true );
         $nationalCalendars  = [];
         $diocesanGroups     = [];
+        $nationalCalendarsMetadata = [];
         foreach( $diocesanCalendars as $key => $value ) {
             unset( $diocesanCalendars[$key]["path"] );
             if( array_key_exists( "group", $value ) && $value !== "" ) {
@@ -37,13 +38,24 @@ if( file_exists( 'nations/index.json' ) ) {
             }
             if( !array_key_exists($diocesanCalendars[$key]["nation"], $nationalCalendars) ) {
                 $nationalCalendars[$diocesanCalendars[$key]["nation"]] = [];
+                $nationalCalendarsMetadata[$diocesanCalendars[$key]["nation"]] = [
+                    "missals" => [],
+                    "widerRegions" => [],
+                    "dioceses" => []
+                ];
             }
             $nationalCalendars[$diocesanCalendars[$key]["nation"]][] = $key;
+            $nationalCalendarsMetadata[$diocesanCalendars[$key]["nation"]]["dioceses"][] = $key;
         }
 
         foreach( $baseNationalCalendars as $nation ) {
             if( !array_key_exists( $nation, $nationalCalendars ) ) {
                 $nationalCalendars[$nation] = [];
+            }
+            if( file_exists( "nations/$nation/$nation.json" ) ) {
+                $nationData = json_decode( file_get_contents( "nations/$nation/$nation.json" ) );
+                $nationalCalendarsMetadata[$nation]["missals"] = $nationData->Metadata->Missals;
+                $nationalCalendarsMetadata[$nation]["widerRegions"][] = $nationData->Metadata->WiderRegion->name;
             }
         }
         $filterDirResults = ['..', '.', 'index.json'];
@@ -58,6 +70,7 @@ if( file_exists( 'nations/index.json' ) ) {
         $response = json_encode( [
             "LitCalMetadata" => [
                 "NationalCalendars" => $nationalCalendars,
+                "NationalCalendarsMetadata" => $nationalCalendarsMetadata,
                 "DiocesanCalendars" => $diocesanCalendars,
                 "DiocesanGroups"    => $diocesanGroups,
                 "WiderRegions"      => $widerRegionsNames,
