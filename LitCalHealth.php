@@ -35,20 +35,23 @@ class LitCalHealth implements MessageComponentInterface {
                         break;
                     case 'validateCalendar':
                         if(
-                            property_exists( $messageReceived, 'category' ) &&
+                            property_exists( $messageReceived, 'calendar' ) &&
                             property_exists( $messageReceived, 'year' ) &&
-                            property_exists( $messageReceived, 'calendar' )
+                            property_exists( $messageReceived, 'category' )
                         ) {
                             $this->validateCalendar( $messageReceived->calendar, $messageReceived->year, $messageReceived->category, $from );
                         }
                         break;
                     case 'executeUnitTest':
                         if(
+                            property_exists( $messageReceived, 'calendar' ) &&
+                            property_exists( $messageReceived, 'year' ) &&
                             property_exists( $messageReceived, 'category' ) &&
-                            property_exists( $messageReceived, 'year' )
+                            property_exists( $messageReceived, 'test' )
                         ) {
-                            $this->executeUnitTest( $messageReceived->category, $messageReceived->year, $from );
+                            $this->executeUnitTest( $messageReceived->calendar, $messageReceived->year, $messageReceived->category, $messageReceived->test, $from );
                         }
+                        break;
                     default:
                         $message = new stdClass();
                         $message->type = "echobot";
@@ -172,17 +175,17 @@ class LitCalHealth implements MessageComponentInterface {
         }
     }
 
-    private function validateCalendar( string $Calendar, int $Year, string $type, ConnectionInterface $to ) : void {
+    private function validateCalendar( string $Calendar, int $Year, string $category, ConnectionInterface $to ) : void {
         if( $Calendar === 'VATICAN' ) {
             $req = "?year=$Year";
         } else {
-            $req = "?$type=$Calendar&year=$Year";
+            $req = "?$category=$Calendar&year=$Year";
         }
         $data = file_get_contents( self::LitCalBaseUrl . $req );
         if( $data !== false ) {
             $message = new stdClass();
             $message->type = "success";
-            $message->text = "The $type of $Calendar for the year $Year exists";
+            $message->text = "The $category of $Calendar for the year $Year exists";
             $message->classes = ".calendar-$Calendar.file-exists.year-$Year";
             $this->sendMessage( $to, $message );
 
@@ -190,7 +193,7 @@ class LitCalHealth implements MessageComponentInterface {
             if( json_last_error() === JSON_ERROR_NONE ) {
                 $message = new stdClass();
                 $message->type = "success";
-                $message->text = "The $type of $Calendar for the year $Year was successfully decoded as JSON";
+                $message->text = "The $category of $Calendar for the year $Year was successfully decoded as JSON";
                 $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                 $this->sendMessage( $to, $message );
 
@@ -198,7 +201,7 @@ class LitCalHealth implements MessageComponentInterface {
                 if( gettype( $validationResult ) === 'boolean' && $validationResult === true ) {
                     $message = new stdClass();
                     $message->type = "success";
-                    $message->text = "The $type of $Calendar for the year $Year was successfully validated against the Schema " . LitSchema::LITCAL;
+                    $message->text = "The $category of $Calendar for the year $Year was successfully validated against the Schema " . LitSchema::LITCAL;
                     $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
                     $this->sendMessage( $to, $message );
                 }
@@ -209,35 +212,39 @@ class LitCalHealth implements MessageComponentInterface {
             } else {
                 $message = new stdClass();
                 $message->type = "error";
-                $message->text = "There was an error decoding the $type of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as JSON: " . json_last_error_msg();
+                $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as JSON: " . json_last_error_msg();
                 $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                 $this->sendMessage( $to, $message );
             }
         } else {
             $message = new stdClass();
             $message->type = "error";
-            $message->text = "The $type of $Calendar for the year $Year does not exist at the URL " . self::LitCalBaseUrl . $req;
+            $message->text = "The $category of $Calendar for the year $Year does not exist at the URL " . self::LitCalBaseUrl . $req;
             $message->classes = ".calendar-$Calendar.file-exists.year-$Year";
             $this->sendMessage( $to, $message );
         }
     }
 
-    private function executeUnitTest( string $test, int $year, ConnectionInterface $to ) {
+    private function executeUnitTest( string $Calendar, int $Year, string $category, string $test, ConnectionInterface $to ) {
         switch( $test ) {
             case 'testJohnBaptist':
-                $this->testJohnBaptist( $year, $to );
+                $this->testJohnBaptist( $Calendar, $Year, $category, $to );
                 break;
             case 'testStJaneFrancesDeChantalMoved':
-                $this->testStJaneFrancesDeChantalMoved( $year, $to, 'StJaneFrancesDeChantalMoved' );
+                $this->testStJaneFrancesDeChantalMoved( $Calendar, $Year, $category, $to, 'StJaneFrancesDeChantalMoved' );
                 break;
             case 'testStJaneFrancesDeChantalOverridden':
-                $this->testStJaneFrancesDeChantalMoved( $year, $to, 'StJaneFrancesDeChantalOverridden' );
+                $this->testStJaneFrancesDeChantalMoved( $Calendar, $Year, $category, $to, 'StJaneFrancesDeChantalOverridden' );
                 break;
         }
     }
 
-    private function testJohnBaptist( int $Year, ConnectionInterface $to ) : void {
-        $req = "?year=$Year";
+    private function testJohnBaptist( string $Calendar, int $Year, string $category, ConnectionInterface $to ) : void {
+        if( $Calendar === 'VATICAN' ) {
+            $req = "?year=$Year";
+        } else {
+            $req = "?$category=$Calendar&year=$Year";
+        }
         $data = file_get_contents( self::LitCalBaseUrl . $req );
         if( $data !== false ) {
             $message = new stdClass();
@@ -296,8 +303,12 @@ class LitCalHealth implements MessageComponentInterface {
         }
     }
 
-    private function testStJaneFrancesDeChantalMoved( int $Year, ConnectionInterface $to, string $test ) : void {
-        $req = "?year=$Year";
+    private function testStJaneFrancesDeChantalMoved( string $Calendar, int $Year, string $category, ConnectionInterface $to, string $test ) : void {
+        if( $Calendar === 'VATICAN' ) {
+            $req = "?year=$Year";
+        } else {
+            $req = "?$category=$Calendar&year=$Year";
+        }
         $data = file_get_contents( self::LitCalBaseUrl . $req );
         if( $data !== false ) {
             $message = new stdClass();
