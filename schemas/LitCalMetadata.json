@@ -27,7 +27,39 @@
                                 "type": "string"
                             }
                         }
+                    }
+                },
+                "NationalCalendarsMetadata": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "propertyNames": {
+                        "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Region"
+                    },
+                    "patternProperties": {
+                        "": {
+                            "type": "object",
+                            "properties": {
+                                "missals": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Missal"
+                                    }
+                                },
+                                "widerRegions": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/WiderRegionDef"
+                                    }
+                                },
+                                "dioceses": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
                         }
+                    }
                 },
                 "DiocesanCalendars": {
                     "type": "object",
@@ -50,7 +82,7 @@
                                 "diocese"
                             ]
                         }
-                        }
+                    }
                 },
                 "DiocesanGroups": {
                     "type": "object",
@@ -66,25 +98,7 @@
                 "WiderRegions": {
                     "type": "array",
                     "items": {
-                        "type": "string",
-                        "enum": [
-                            "Africa",
-                            "Alsace",
-                            "Americas",
-                            "Anatolia",
-                            "Antarctica",
-                            "Asia",
-                            "Australasia",
-                            "Central Africa",
-                            "Central America",
-                            "Europe",
-                            "Indies",
-                            "North Africa",
-                            "Oceania",
-                            "Scandinavia",
-                            "South America",
-                            "West Indies"
-                        ]
+                        "$ref": "#/definitions/WiderRegionDef"
                     }
                 },
                 "RomanMissals": {
@@ -132,12 +146,34 @@
             },
             "required": [
                 "NationalCalendars",
+                "NationalCalendarsMetadata",
                 "DiocesanCalendars",
                 "DiocesanGroups",
                 "WiderRegions",
                 "RomanMissals"
             ],
             "additionalProperties": false
+        },
+        "WiderRegionDef": {
+            "type": "string",
+            "enum": [
+                "Africa",
+                "Alsace",
+                "Americas",
+                "Anatolia",
+                "Antarctica",
+                "Asia",
+                "Australasia",
+                "Central Africa",
+                "Central America",
+                "Europe",
+                "Indies",
+                "North Africa",
+                "Oceania",
+                "Scandinavia",
+                "South America",
+                "West Indies"
+            ]
         }
     }
 }
