@@ -29,8 +29,12 @@ class LitCalHealth implements MessageComponentInterface {
             if( property_exists( $messageReceived, 'action' ) ) {
                 switch( $messageReceived->action ) {
                     case 'executeValidation':
-                        if( property_exists( $messageReceived, 'validate' ) ) {
-                            $this->executeValidation( $messageReceived->validate, $from );
+                        if(
+                            property_exists( $messageReceived, 'validate' ) &&
+                            property_exists( $messageReceived, 'sourceFile' ) &&
+                            property_exists( $messageReceived, 'category' )
+                        ) {
+                            $this->executeValidation( $messageReceived, $from );
                         }
                         break;
                     case 'validateCalendar':
@@ -87,49 +91,42 @@ class LitCalHealth implements MessageComponentInterface {
         }
     }
 
-
-    const SchemaValidation = [
-        "LitCalMetadata"                => "https://litcal.johnromanodorazio.com/api/dev/LitCalMetadata.php",
-        "PropriumDeTempore"             => "data/propriumdetempore.json",
-        "PropriumDeSanctis1970"         => "data/propriumdesanctis_1970/propriumdesanctis_1970.json",
-        "PropriumDeSanctis2002"         => "data/propriumdesanctis_2002/propriumdesanctis_2002.json",
-        "PropriumDeSanctis2008"         => "data/propriumdesanctis_2008/propriumdesanctis_2008.json",
-        "PropriumDeSanctisITALY1983"    => "data/propriumdesanctis_ITALY_1983/propriumdesanctis_ITALY_1983.json",
-        "PropriumDeSanctisUSA2011"      => "data/propriumdesanctis_USA_2011/propriumdesanctis_USA_2011.json",
-        "MemorialsFromDecrees"          => "data/memorialsFromDecrees/memorialsFromDecrees.json",
-        "RegionalCalendarsIndex"        => "nations/index.json"
-    ];
-
     const DataPathToSchema = [
         "https://litcal.johnromanodorazio.com/api/dev/LitCalMetadata.php"       => LitSchema::METADATA,
         "data/propriumdetempore.json"                                           => LitSchema::PROPRIUMDETEMPORE,
         "data/propriumdesanctis_1970/propriumdesanctis_1970.json"               => LitSchema::PROPRIUMDESANCTIS,
         "data/propriumdesanctis_2002/propriumdesanctis_2002.json"               => LitSchema::PROPRIUMDESANCTIS,
         "data/propriumdesanctis_2008/propriumdesanctis_2008.json"               => LitSchema::PROPRIUMDESANCTIS,
-        "data/propriumdesanctis_ITALY_1983/propriumdesanctis_ITALY_1983.json"   => LitSchema::PROPRIUMDESANCTIS,
-        "data/propriumdesanctis_USA_2011/propriumdesanctis_USA_2011.json"       => LitSchema::PROPRIUMDESANCTIS,
         "data/memorialsFromDecrees/memorialsFromDecrees.json"                   => LitSchema::DECREEMEMORIALS,
         "nations/index.json"                                                    => LitSchema::INDEX
     ];
 
     const LitCalBaseUrl = "https://litcal.johnromanodorazio.com/api/dev/LitCalEngine.php";
 
-    private object $CalendarData;
-
     public function __construct() {
         $this->clients = new \SplObjectStorage;
     }
 
-    private function executeValidation( string $validate, ConnectionInterface $to ) {
-        if( array_key_exists( $validate, LitCalHealth::SchemaValidation ) ) {
-            $dataPath = LitCalHealth::SchemaValidation[ $validate ];
-            $schema = LitCalHealth::DataPathToSchema[ $dataPath ];
+    private function executeValidation( object $validation, ConnectionInterface $to ) {
+        //if( file_exists( $validation->sourceFile ) ) {
+            $dataPath = $validation->sourceFile;
+            switch( $validation->category ) {
+                case 'universalcalendar':
+                    $schema = LitCalHealth::DataPathToSchema[ $dataPath ];
+                    break;
+                case 'nationalcalendar':
+                    $schema = LitSchema::NATIONAL;
+                    break;
+                case 'diocesancalendar':
+                    $schema = LitSchema::DIOCESAN;
+                    break;
+            }
             $data = file_get_contents( $dataPath );
             if( $data !== false ) {
                 $message = new stdClass();
                 $message->type = "success";
                 $message->text = "The Data file $dataPath exists";
-                $message->classes = ".$validate.file-exists";
+                $message->classes = ".$validation->validate.file-exists";
                 $this->sendMessage( $to, $message );
 
                 $jsonData = json_decode( $data );
@@ -137,7 +134,7 @@ class LitCalHealth implements MessageComponentInterface {
                     $message = new stdClass();
                     $message->type = "success";
                     $message->text = "The Data file $dataPath was successfully decoded as JSON";
-                    $message->classes = ".$validate.json-valid";
+                    $message->classes = ".$validation->validate.json-valid";
                     $this->sendMessage( $to, $message );
 
                     $validationResult = $this->validateDataAgainstSchema( $jsonData, $schema );
@@ -145,18 +142,18 @@ class LitCalHealth implements MessageComponentInterface {
                         $message = new stdClass();
                         $message->type = "success";
                         $message->text = "The Data file $dataPath was successfully validated against the Schema $schema";
-                        $message->classes = ".$validate.schema-valid";
+                        $message->classes = ".$validation->validate.schema-valid";
                         $this->sendMessage( $to, $message );
                     }
                     else if( gettype( $validationResult === 'object' ) ) {
-                        $validationResult->classes = ".$validate.schema-valid";
+                        $validationResult->classes = ".$validation->validate.schema-valid";
                         $this->sendMessage( $to, $validationResult );
                     }
                 } else {
                     $message = new stdClass();
                     $message->type = "error";
                     $message->text = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg();
-                    $message->classes = ".$validate.json-valid";
+                    $message->classes = ".$validation->validate.json-valid";
                     $this->sendMessage( $to, $message );
                 }
 
@@ -164,15 +161,17 @@ class LitCalHealth implements MessageComponentInterface {
                 $message = new stdClass();
                 $message->type = "error";
                 $message->text = "Data file $dataPath does not exist";
-                $message->classes = ".$validate.file-exists";
+                $message->classes = ".$validation->validate.file-exists";
                 $this->sendMessage( $to, $message );
             }
+        /*
         } else {
             $message = new stdClass();
             $message->type = "error";
-            $message->text = "The validation requested \"{$validate}\" does not seem to be a supported validation";
+            $message->text = "The validation requested \"{$validation->validate}\" does not seem to be a supported validation, or the corresponding file to validate \"{$validation->sourceFile} does not exist\"";
             $this->sendMessage( $to, $message );
         }
+        */
     }
 
     private function validateCalendar( string $Calendar, int $Year, string $category, ConnectionInterface $to ) : void {
