@@ -120,6 +120,12 @@ class LitCalHealth implements MessageComponentInterface {
                 case 'diocesancalendar':
                     $schema = LitSchema::DIOCESAN;
                     break;
+                case 'widerregioncalendar':
+                    $schema = LitSchema::WIDERREGION;
+                    break;
+                case 'propriumdesanctis':
+                    $schema = LitSchema::PROPRIUMDESANCTIS;
+                    break;
             }
             $data = file_get_contents( $dataPath );
             if( $data !== false ) {
