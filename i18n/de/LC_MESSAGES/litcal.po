@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2022-05-22 09:41+0000\n"
-"PO-Revision-Date: 2022-06-02 20:16+0000\n"
+"PO-Revision-Date: 2022-06-06 06:40+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: German <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/de/>\n"
@@ -752,7 +752,7 @@ msgstr ""
 #. translators: liturgical rank. Keep Capitalized
 #: includes/enums/LitGrade.php:100
 msgid "Optional memorial"
-msgstr "Optionale Gedenkstätten"
+msgstr "Optionale Gedenkstät"
 
 #. translators: liturgical rank. Keep Capitalized
 #: includes/enums/LitGrade.php:105
