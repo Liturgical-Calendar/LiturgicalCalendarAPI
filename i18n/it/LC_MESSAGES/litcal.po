@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2022-06-06 08:21+0000\n"
-"PO-Revision-Date: 2022-06-06 08:21+0000\n"
+"PO-Revision-Date: 2022-06-06 08:59+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
@@ -54,16 +54,13 @@ msgstr "%s giorno dopo l'Epifania"
 #. translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Explicatory string for the transferral, 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
 #: includes/LitCalAPI.php:553 includes/LitCalAPI.php:570
 #: includes/LitCalAPI.php:597
-#, fuzzy, php-format
-#| msgid ""
-#| "The Solemnity '%s' falls on %s in the year %d, the celebration has been "
-#| "transferred to %s (%s) as per the %s."
+#, php-format
 msgid ""
 "The Solemnity '%1$s' falls on %2$s in the year %3$d, the celebration has "
 "been transferred to %4$s (%5$s) as per the %6$s."
 msgstr ""
-"La Solennità <i>'%s'</i> coincide con <b>%s</b> nell'anno %d, pertanto la "
-"celebrazione è stata trasferita al %s (%s) in accordo con il %s."
+"La Solennità <i>'%1$s'</i> cade di %2$s nell'anno %3$d, pertanto la "
+"celebrazione è stata trasferita al %4$s (%5$s) in accordo con il %6$s."
 
 #: includes/LitCalAPI.php:557
 msgid "the Saturday preceding Palm Sunday"
@@ -90,49 +87,40 @@ msgstr "lunedì seguente"
 
 #. translators: 1: Festivity name, 2: Coinciding Festivity name, 3: Requested calendar year
 #: includes/LitCalAPI.php:613
-#, fuzzy, php-format
-#| msgid ""
-#| "The Solemnity '%s' coincides with the Solemnity '%s' in the year %d. We "
-#| "should ask the Congregation for Divine Worship what to do about this!"
+#, php-format
 msgid ""
 "The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year %3$d. "
 "We should ask the Congregation for Divine Worship what to do about this!"
 msgstr ""
-"La Solennità <i>'%s'</i> coincide con la Solennità <i>'%s'</i> nell'anno %d. "
-"Dovremmo chiedere alla Congregazione del Culto Divino cosa fare a riguardo!"
+"La Solennità <i>'%1$s'</i> coincide con la Solennità <i>'%2$s'</i> nell'anno "
+"%3$d. Dovremmo chiedere alla Congregazione del Culto Divino cosa fare a "
+"riguardo!"
 
 #. translators: 1: Festivity name, 2: Coinciding Festivity name, 3: Requested calendar year, 4: Decree of the Congregation for Divine Worship
 #: includes/LitCalAPI.php:632
-#, fuzzy, php-format
-#| msgid ""
-#| "Seeing that the Solemnity '%s' coincides with the Solemnity '%s' in the "
-#| "year %d, it has been anticipated by one day as per %s."
+#, php-format
 msgid ""
 "Seeing that the Solemnity '%1$s' coincides with the Solemnity '%2$s' in the "
 "year %3$d, it has been anticipated by one day as per %4$s."
 msgstr ""
-"Visto che la Solennità <i>'%s'</i> coincide con la Solennità <i>'%s'</i> "
-"nell'anno %d, la prima è stata anticipata di un giorno come da %s."
+"Visto che la Solennità <i>'%1$s'</i> coincide con la Solennità <i>'%2$s'</i> "
+"nell'anno %3$d, la prima è stata anticipata di un giorno come da %4$s."
 
 #. translators: 1: Festivity name (Christmas), 2: Requested calendar year, 3: Festivity name (Holy Family), 4: New date for Holy Family
 #: includes/LitCalAPI.php:701
-#, fuzzy, php-format
-#| msgid ""
-#| "'%s' falls on a Sunday in the year %d, therefore the Feast '%s' is "
-#| "celebrated on %s rather than on the Sunday after Christmas."
+#, php-format
 msgid ""
 "'%1$s' falls on a Sunday in the year %2$d, therefore the Feast '%3$s' is "
 "celebrated on %4$s rather than on the Sunday after Christmas."
 msgstr ""
-"'%s' coincide con una Domenica nell'anno %d, pertanto la Festa <i>'%s'</i> "
-"viene celebrata il %s anziché la Domenica dopo Natale."
+"'%1$s' coincide con una Domenica nell'anno %2$d, pertanto la Festa "
+"<i>'%3$s'</i> viene celebrata il %4$s anziché la Domenica dopo Natale."
 
 #. translators: 1: Festivity name, 2: Superseding Festivity grade, 3: Superseding Festivity name, 4: Requested calendar year
 #: includes/LitCalAPI.php:736 includes/LitCalAPI.php:761
-#, fuzzy, php-format
-#| msgid "'%s' is superseded by the %s '%s' in the year %d."
+#, php-format
 msgid "'%1$s' is superseded by the %2$s '%3$s' in the year %4$d."
-msgstr "<i>'%s'</i> è soppiantata dalla %s <i>'%s'</i> nell'anno %d."
+msgstr "<i>'%1$s'</i> è soppiantata dalla %2$s <i>'%3$s'</i> nell'anno %4$d."
 
 #: includes/LitCalAPI.php:814
 #, php-format
@@ -397,32 +385,26 @@ msgstr ""
 
 #. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
 #: includes/LitCalAPI.php:1442
-#, fuzzy, php-format
-#| msgid ""
-#| "The optional memorial '%s' has been transferred from Dec. 12 to Aug. 12 "
-#| "since the year 2002 (%s), applicable to the year %d."
+#, php-format
 msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
 "since the year 2002 (%2$s), applicable to the year %3$d."
 msgstr ""
-"La memoria facoltativa '%s' è stata trasferita dal 12 Dic. al 12 Agosto sin "
-"dal 2002 (%s), applicabile pertanto all'anno %d."
+"La memoria facoltativa '%1$s' è stata trasferita dal 12 Dic. al 12 Agosto "
+"sin dal 2002 (%2$s), applicabile pertanto all'anno %3$d."
 
 #. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
 #: includes/LitCalAPI.php:1455
-#, fuzzy, php-format
-#| msgid ""
-#| "The optional memorial '%s', which would have been superseded this year by "
-#| "a Sunday or Solemnity were it on Dec. 12, has however been transferred to "
-#| "Aug. 12 since the year 2002 (%s), applicable to the year %d."
+#, php-format
 msgid ""
 "The optional memorial '%1$s', which would have been superseded this year by "
 "a Sunday or Solemnity were it on Dec. 12, has however been transferred to "
 "Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d."
 msgstr ""
-"La memoria facoltativa '%s', che sarebbe stata soppressa quest'anno da una "
+"La memoria facoltativa '%1$s', che sarebbe stata soppressa quest'anno da una "
 "Domenica o da una Solennità se veniva celebrata il 12 Dic., è stata tuttavia "
-"trasferita al 12 Agosto sin dal 2002 (%s), applicabile pertanto all'anno %d."
+"trasferita al 12 Agosto sin dal 2002 (%2$s), applicabile pertanto all'anno "
+"%3$d."
 
 #: includes/LitCalAPI.php:1470
 #, php-format
@@ -437,21 +419,16 @@ msgstr ""
 
 #. translators: 1: Festivity name, 2: Source of the information
 #: includes/LitCalAPI.php:1497
-#, fuzzy, php-format
-#| msgid ""
-#| "The Feast '%s' would have been suppressed this year ( 2009 ) since it "
-#| "falls on a Sunday, however being the Year of the Apostle Paul, as per the "
-#| "%s it has been reinstated so that local churches can optionally celebrate "
-#| "the memorial."
+#, php-format
 msgid ""
 "The Feast '%1$s' would have been suppressed this year ( 2009 ) since it "
 "falls on a Sunday, however being the Year of the Apostle Paul, as per the "
 "%2$s it has been reinstated so that local churches can optionally celebrate "
 "the memorial."
 msgstr ""
-"La Festa '%s' sarebbe stata soppressa quest'anno ( 2009 ) visto che cade di "
-"Domenica, tuttavia trattandosi dell'Anno dell'Apostolo Paolo, è stata "
-"restituita secondo il %s in modo che le chiese locali abbiano facoltà di "
+"La Festa '%1$s' sarebbe stata soppressa quest'anno ( 2009 ) visto che cade "
+"di Domenica, tuttavia trattandosi dell'Anno dell'Apostolo Paolo, è stata "
+"restituita secondo il %2$s in modo che le chiese locali abbiano facoltà di "
 "mantenere la memoria."
 
 #: includes/LitCalAPI.php:1521
