@@ -1,1 +1,19 @@
-{"LitCal":{"DedicationoftheCathedraloftheHolyCross":{"name":"Dedication of the Cathedral of the Holy Cross","color":"white","grade":4,"common":"Dedication of a Church","day":8,"month":12,"formRowNum":1,"sinceYear":"1970"}},"Overrides":{"Epiphany":"JAN6","Ascension":"THURSDAY","CorpusChristi":"THURSDAY"}}
+{
+    "LitCal": {
+        "DedicationoftheCathedraloftheHolyCross": {
+            "name": "Dedication of the Cathedral of the Holy Cross",
+            "color": ["white"],
+            "grade": 4,
+            "common": ["Dedication of a Church"],
+            "day": 8,
+            "month": 12,
+            "formRowNum": 1,
+            "sinceYear": 1970
+        }
+    },
+    "Overrides": {
+        "Epiphany": "JAN6",
+        "Ascension": "THURSDAY",
+        "CorpusChristi": "THURSDAY"
+    }
+}

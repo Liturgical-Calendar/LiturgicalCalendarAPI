@@ -2,3 +2,5 @@ LiturgicalCalendar.iml
 .idea
 engineCache/*
 allowedOrigins.php
+vendor/*
+

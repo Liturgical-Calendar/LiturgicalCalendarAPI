@@ -4,9 +4,13 @@
         "DAY": 3,
         "TAG": "NameJesus",
         "GRADE": 2,
-        "COMMON": "Proper",
+        "COMMON": [
+            "Proper"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -20,9 +24,13 @@
         "DAY": 8,
         "TAG": "StJosephineBakhita",
         "GRADE": 2,
-        "COMMON": "Virgins:For One Virgin",
+        "COMMON": [
+            "Virgins:For One Virgin"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -36,9 +44,15 @@
         "DAY": 23,
         "TAG": "StAdalbert",
         "GRADE": 2,
-        "COMMON": "Martyrs:For One Martyr,Pastors:For a Bishop",
+        "COMMON": [
+            "Martyrs:For One Martyr",
+            "Pastors:For a Bishop"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white,red",
+        "COLOR": [
+            "white",
+            "red"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -52,9 +66,13 @@
         "DAY": 28,
         "TAG": "StLouisGrignionMontfort",
         "GRADE": 2,
-        "COMMON": "Pastors:For One Pastor",
+        "COMMON": [
+            "Pastors:For One Pastor"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -68,9 +86,13 @@
         "DAY": 13,
         "TAG": "LadyFatima",
         "GRADE": 2,
-        "COMMON": "Blessed Virgin Mary",
+        "COMMON": [
+            "Blessed Virgin Mary"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -84,9 +106,13 @@
         "DAY": 21,
         "TAG": "StChristopherMagallanes",
         "GRADE": 2,
-        "COMMON": "Martyrs:For Several Martyrs",
+        "COMMON": [
+            "Martyrs:For Several Martyrs"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "red",
+        "COLOR": [
+            "red"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -100,9 +126,13 @@
         "DAY": 22,
         "TAG": "StRitaCascia",
         "GRADE": 2,
-        "COMMON": "Holy Men and Women:For Religious",
+        "COMMON": [
+            "Holy Men and Women:For Religious"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -116,9 +146,13 @@
         "DAY": 9,
         "TAG": "StAugustineZhaoRong",
         "GRADE": 2,
-        "COMMON": "Martyrs:For Several Martyrs",
+        "COMMON": [
+            "Martyrs:For Several Martyrs"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "red",
+        "COLOR": [
+            "red"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -132,9 +166,15 @@
         "DAY": 20,
         "TAG": "StApollinaris",
         "GRADE": 2,
-        "COMMON": "Martyrs:For One Martyr,Pastors:For a Bishop",
+        "COMMON": [
+            "Martyrs:For One Martyr",
+            "Pastors:For a Bishop"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white,red",
+        "COLOR": [
+            "white",
+            "red"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -148,9 +188,14 @@
         "DAY": 24,
         "TAG": "StSharbelMakhluf",
         "GRADE": 2,
-        "COMMON": "Pastors:For One Pastor,Holy Men and Women:For a Monk",
+        "COMMON": [
+            "Pastors:For One Pastor",
+            "Holy Men and Women:For a Monk"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -164,9 +209,14 @@
         "DAY": 2,
         "TAG": "StPeterJulianEymard",
         "GRADE": 2,
-        "COMMON": "Pastors:For One Pastor,Holy Men and Women:For Religious",
+        "COMMON": [
+            "Pastors:For One Pastor",
+            "Holy Men and Women:For Religious"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -180,9 +230,15 @@
         "DAY": 9,
         "TAG": "StEdithStein",
         "GRADE": 2,
-        "COMMON": "Martyrs:For a Virgin Martyr,Virgins:For One Virgin",
+        "COMMON": [
+            "Martyrs:For a Virgin Martyr",
+            "Virgins:For One Virgin"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white,red",
+        "COLOR": [
+            "white",
+            "red"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -196,9 +252,14 @@
         "DAY": 14,
         "TAG": "StMaximilianKolbe",
         "GRADE": 3,
-        "COMMON": "Proper",
+        "COMMON": [
+            "Proper"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white,red",
+        "COLOR": [
+            "white",
+            "red"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -212,9 +273,14 @@
         "DAY": 9,
         "TAG": "StPeterClaver",
         "GRADE": 2,
-        "COMMON": "Pastors:For One Pastor,Holy Men and Women:For Those Who Practiced Works of Mercy",
+        "COMMON": [
+            "Pastors:For One Pastor",
+            "Holy Men and Women:For Those Who Practiced Works of Mercy"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -228,9 +294,13 @@
         "DAY": 12,
         "TAG": "HolyNameMary",
         "GRADE": 2,
-        "COMMON": "Proper",
+        "COMMON": [
+            "Proper"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -244,9 +314,13 @@
         "DAY": 20,
         "TAG": "StAndrewKimTaegon",
         "GRADE": 3,
-        "COMMON": "Proper",
+        "COMMON": [
+            "Proper"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -260,9 +334,13 @@
         "DAY": 28,
         "TAG": "StsLawrenceRuiz",
         "GRADE": 2,
-        "COMMON": "Martyrs:For Several Martyrs",
+        "COMMON": [
+            "Martyrs:For Several Martyrs"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "red",
+        "COLOR": [
+            "red"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -276,9 +354,13 @@
         "DAY": 24,
         "TAG": "StAndrewDungLac",
         "GRADE": 3,
-        "COMMON": "Proper",
+        "COMMON": [
+            "Proper"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "red",
+        "COLOR": [
+            "red"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -292,9 +374,15 @@
         "DAY": 25,
         "TAG": "StCatherineAlexandria",
         "GRADE": 2,
-        "COMMON": "Martyrs:For a Virgin Martyr,Virgins:For One Virgin",
+        "COMMON": [
+            "Martyrs:For a Virgin Martyr",
+            "Virgins:For One Virgin"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white,red",
+        "COLOR": [
+            "white",
+            "red"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",

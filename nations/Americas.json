@@ -1,0 +1,83 @@
+{
+    "LitCal": [
+        {
+            "Festivity": {
+                "tag": "LadyGuadalupe",
+                "name": "[ USA ] Our Lady of Guadalupe",
+                "color": [
+                    "white"
+                ],
+                "grade": 4,
+                "day": 12,
+                "month": 12
+            },
+            "Metadata": {
+                "action": "makePatron",
+                "sinceYear": 1999,
+                "decreeURL": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/homilies\/1999\/documents\/hf_jp-ii_hom_19990123_mexico-guadalupe.html",
+                "decreeLangs": {
+                    "DE": "de",
+                    "ES": "es",
+                    "EN": "en",
+                    "FR": "fr",
+                    "IT": "it",
+                    "PT": "pt"
+                }
+            }
+        }
+    ],
+    "NationalCalendars": {
+        "Canada": "CA",
+        "United States": "US",
+        "Brazil": "BR",
+        "Argentina": "AR",
+        "Belize": "BZ",
+        "Bolivia": "BO",
+        "Chile": "CL",
+        "Colombia": "CO",
+        "Costa Rica": "CR",
+        "Cuba": "CU",
+        "Dominican Republic": "DO",
+        "Ecuador": "EC",
+        "El Salvador": "SV",
+        "Guatemala": "GT",
+        "Honduras": "HN",
+        "Latin America": "419",
+        "Mexico": "MX",
+        "Nicaragua": "NI",
+        "Panama": "PA",
+        "Paraguay": "PY",
+        "Peru": "PE",
+        "Puerto Rico": "PR"
+    },
+    "Metadata": {
+        "IsMultilingual": true,
+        "Languages": [
+            "en_CA",
+            "en_US",
+            "fr_CA",
+            "pt_BR",
+            "es_AR",
+            "es_BZ",
+            "es_BO",
+            "es_BR",
+            "es_CL",
+            "es_CO",
+            "es_CR",
+            "es_CU",
+            "es_DO",
+            "es_EC",
+            "es_SV",
+            "es_GT",
+            "es_HN",
+            "es_419",
+            "es_MX",
+            "es_NI",
+            "es_PA",
+            "es_PY",
+            "es_PE",
+            "es_PR"
+        ],
+        "WiderRegion": "Americas"
+    }
+}

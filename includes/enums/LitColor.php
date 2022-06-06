@@ -10,6 +10,9 @@ class LitColor {
     public static array $values = [ "green", "purple", "white", "red", "pink" ];
 
     public static function isValid( string $value ) {
+        if( strpos($value, ',') ) {
+            return areValid( explode(',', $value) );
+        }
         return in_array( $value, self::$values );
     }
 

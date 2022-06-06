@@ -4,9 +4,14 @@
         "DAY": 23,
         "TAG": "StPioPietrelcina",
         "GRADE": 3,
-        "COMMON": "Pastors:For One Pastor,Holy Men and Women:For Religious",
+        "COMMON": [
+            "Pastors:For One Pastor",
+            "Holy Men and Women:For Religious"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -20,9 +25,13 @@
         "DAY": 12,
         "TAG": "LadyGuadalupe",
         "GRADE": 2,
-        "COMMON": "Blessed Virgin Mary",
+        "COMMON": [
+            "Blessed Virgin Mary"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -36,9 +45,13 @@
         "DAY": 9,
         "TAG": "JuanDiego",
         "GRADE": 2,
-        "COMMON": "Holy Men and Women:For One Saint",
+        "COMMON": [
+            "Holy Men and Women:For One Saint"
+        ],
         "CALENDAR": "GENERAL ROMAN",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",

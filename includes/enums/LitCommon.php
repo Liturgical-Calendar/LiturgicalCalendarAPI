@@ -162,7 +162,7 @@ class LitCommon {
         self::PRO_SANCTIS_MULIERIBUS                => "Pro sanctis mulieribus"
     ];
 
-    public static function POSSESSIVE( string $value ) : string {
+    private static function POSSESSIVE( string $value ) : string {
         switch( $value ) {
             case "Blessed Virgin Mary":
                 /**translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
@@ -261,13 +261,21 @@ class LitCommon {
     ];
 
     public static function isValid( string $value ) {
+        if( strpos($value, ',') || strpos($value, ':') ) {
+            $values = preg_split('/[,:]/', $value);
+            return self::areValid( $values );
+        }
         return in_array( $value, self::$values );
     }
 
     public static function areValid( array $values ) {
+        $values = array_reduce($values, function( $carry, $key ){
+            return strpos($key, ':') ? ( $carry + explode(':', $key) ) : ( [ ...$carry, $key ] );
+        }, [] );
         return empty( array_diff( $values, self::$values ) );
     }
 
+    /*
     public static function AB( string|array $value ) : string {
         if( is_array( $value ) ) {
             $mapped = array_map('self::AB', $value);
@@ -287,9 +295,13 @@ class LitCommon {
             }
         }
     }
+    */
 
-    public function i18n( string $value ) : string {
-        if( self::isValid( $value ) ) {
+    private function i18n( string|array $value ) : string|array {
+        if( is_array( $value ) && self::areValid( $value ) ) {
+            return array_map( [$this, 'i18n'], $value );
+        }
+        else if( self::isValid( $value ) ) {
             if( $this->locale === LitLocale::LATIN ) {
                 return self::LATIN[ $value ];
             } else{
@@ -299,7 +311,10 @@ class LitCommon {
         return $value;
     }
 
-    public function getPossessive( string $value ) : string {
+    private function getPossessive( string|array $value ) : string|array {
+        if( is_array( $value ) ) {
+            return array_map( [$this, 'getPossessive'], $value );
+        }
         return $this->locale === LitLocale::LATIN ? "" : self::POSSESSIVE( $value );
     }
 
@@ -307,12 +322,16 @@ class LitCommon {
      * Function C
      * Returns a translated human readable string of the Common or the Proper
      */
-    public function C( string $common="" ) : string {
-        if ($common !== "") {
-            if( $common === LitCommon::PROPRIO ) {
+    public function C( string|array $common="" ) : string|array {
+        if ( ( is_string( $common ) && $common !== "" ) || is_array( $common ) ) {
+            if( (is_string( $common ) && $common === LitCommon::PROPRIO) || ( is_array( $common ) && in_array( LitCommon::PROPRIO, $common ) ) ) {
                 $common = $this->i18n( $common );
-            } else{
-                $commons = explode(",", $common);
+            } else {
+                if( is_string( $common ) ) {
+                    $commons = explode(",", $common);
+                } else {
+                    $commons = $common;
+                }
                 $commons = array_map(function ($txt) {
                     if( strpos($txt, ":") !== false ){
                         [$commonGeneral, $commonSpecific] = explode(":", $txt);

@@ -1,0 +1,35 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$ref": "#/definitions/Index",
+    "definitions": {
+        "Index": {
+            "type": "object",
+            "patternProperties": {
+                "[A-Z]{1,255}": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "pattern": "^nations\\\/[A-Z &()\\-]+\\\/[a-zA-Z0-9 ()-]+\\.json$"
+                        },
+                        "nation": {
+                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Region"
+                        },
+                        "diocese": {
+                            "type": "string"
+                        },
+                        "group": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "path",
+                        "nation",
+                        "diocese"
+                    ]
+                }
+            }
+        }
+    }
+}

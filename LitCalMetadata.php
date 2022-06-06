@@ -1,5 +1,7 @@
 <?php
 
+include_once( 'includes/enums/RomanMissal.php' );
+
 $requestHeaders = getallheaders();
 if( isset( $requestHeaders[ "Origin" ] ) ) {
     header( "Access-Control-Allow-Origin: {$requestHeaders[ "Origin" ]}" );
@@ -9,6 +11,7 @@ else {
     header( 'Access-Control-Allow-Origin: *' );
 }
 header( 'Access-Control-Max-Age: 86400' );    // cache for 1 day
+header( 'Cache-Control: must-revalidate, max-age=259200' );
 header( 'Content-Type: application/json' );
 
 //National Calendars are defined in the LitCalAPI engine itself,
@@ -21,28 +24,67 @@ $baseNationalCalendars = [ "ITALY", "USA", "VATICAN" ];
 if( file_exists( 'nations/index.json' ) ) {
     $index = file_get_contents( 'nations/index.json' );
     if( $index !== false ) {
-        $diocesanCalendars = json_decode( $index, true );
-        $nationalCalendars = [];
+        $diocesanCalendars  = json_decode( $index, true );
+        $nationalCalendars  = [];
+        $diocesanGroups     = [];
+        $nationalCalendarsMetadata = [];
         foreach( $diocesanCalendars as $key => $value ) {
             unset( $diocesanCalendars[$key]["path"] );
+            if( array_key_exists( "group", $value ) && $value !== "" ) {
+                if( !array_key_exists($value["group"], $diocesanGroups) ) {
+                    $diocesanGroups[$value["group"]] = [];
+                }
+                $diocesanGroups[$value["group"]][] = $key;
+            }
             if( !array_key_exists($diocesanCalendars[$key]["nation"], $nationalCalendars) ) {
                 $nationalCalendars[$diocesanCalendars[$key]["nation"]] = [];
+                $nationalCalendarsMetadata[$diocesanCalendars[$key]["nation"]] = [
+                    "missals" => [],
+                    "widerRegions" => [],
+                    "dioceses" => []
+                ];
             }
             $nationalCalendars[$diocesanCalendars[$key]["nation"]][] = $key;
+            $nationalCalendarsMetadata[$diocesanCalendars[$key]["nation"]]["dioceses"][] = $key;
         }
 
         foreach( $baseNationalCalendars as $nation ) {
             if( !array_key_exists( $nation, $nationalCalendars ) ) {
                 $nationalCalendars[$nation] = [];
             }
+            if( file_exists( "nations/$nation/$nation.json" ) ) {
+                $nationData = json_decode( file_get_contents( "nations/$nation/$nation.json" ) );
+                $nationalCalendarsMetadata[$nation]["missals"] = $nationData->Metadata->Missals;
+                $nationalCalendarsMetadata[$nation]["widerRegions"][] = $nationData->Metadata->WiderRegion->name;
+            }
         }
+        $filterDirResults = ['..', '.', 'index.json'];
+        $dirResults = array_diff( scandir('nations'), $filterDirResults );
+        $widerRegionsFiles = array_values( array_filter( $dirResults, function($el) {
+            return !is_dir('nations/' . $el) && pathinfo('nations/' . $el, PATHINFO_EXTENSION) === 'json';
+        }) );
+        $widerRegionsNames = array_map( function($el){
+            return pathinfo('nations/' . $el, PATHINFO_FILENAME);
+        }, $widerRegionsFiles );
 
-        echo json_encode( [
+        $response = json_encode( [
             "LitCalMetadata" => [
                 "NationalCalendars" => $nationalCalendars,
-                "DiocesanCalendars" => $diocesanCalendars
-            ],
+                "NationalCalendarsMetadata" => $nationalCalendarsMetadata,
+                "DiocesanCalendars" => $diocesanCalendars,
+                "DiocesanGroups"    => $diocesanGroups,
+                "WiderRegions"      => $widerRegionsNames,
+                "RomanMissals"      => RomanMissal::produceMetadata()
+            ]
         ], JSON_PRETTY_PRINT );
+        $responseHash = md5( $response );
+        header("Etag: \"{$responseHash}\"");
+        if (!empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
+            header( $_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified" );
+            header('Content-Length: 0');
+        } else {
+            echo $response;
+        }
     } else {
         http_response_code(503);
     }

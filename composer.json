@@ -1,0 +1,7 @@
+{
+    "require": {
+        "swaggest/json-schema": "^0.12",
+        "phpunit/phpunit": "^9",
+        "cboden/ratchet": "^0.4.4"
+    }
+}

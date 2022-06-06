@@ -2,11 +2,11 @@
     {
         "Festivity": {
             "TAG": "StMaryMagdalene",
-            "GRADE": 4,
-            "sinceYear": 2016
+            "GRADE": 4
         },
         "Metadata": {
             "action": "setProperty",
+            "sinceYear": 2016,
             "property": "grade",
             "decreeURL": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_%s.pdf",
             "decreeLangs": {
@@ -25,9 +25,9 @@
         "Festivity": {
             "TAG": "MaryMotherChurch",
             "GRADE": 3,
-            "COMMON": "Proper",
+            "COMMON": ["Proper"],
             "CALENDAR": "GENERAL ROMAN",
-            "COLOR": "white",
+            "COLOR": ["white"],
             "TYPE": "mobile",
             "READINGS": {
                 "FIRST_READING": "",
@@ -70,9 +70,9 @@
             "GRADE": 2,
             "MONTH": 10,
             "DAY": 11,
-            "COMMON": "Pastors:For a Pope",
+            "COMMON": ["Pastors:For a Pope"],
             "CALENDAR": "GENERAL ROMAN",
-            "COLOR": "white",
+            "COLOR": ["white"],
             "TYPE": "fixed",
             "READINGS": {
                 "FIRST_READING": "",
@@ -102,9 +102,9 @@
             "GRADE": 2,
             "MONTH": 10,
             "DAY": 22,
-            "COMMON": "Pastors:For a Pope",
+            "COMMON": ["Pastors:For a Pope"],
             "CALENDAR": "GENERAL ROMAN",
-            "COLOR": "white",
+            "COLOR": ["white"],
             "TYPE": "fixed",
             "READINGS": {
                 "FIRST_READING": "",
@@ -134,9 +134,9 @@
             "GRADE": 2,
             "MONTH": 12,
             "DAY": 10,
-            "COMMON": "Blessed Virgin Mary",
+            "COMMON": ["Blessed Virgin Mary"],
             "CALENDAR": "GENERAL ROMAN",
-            "COLOR": "white",
+            "COLOR": ["white"],
             "TYPE": "fixed",
             "READINGS": {
                 "FIRST_READING": "",
@@ -166,9 +166,9 @@
             "GRADE": 2,
             "MONTH": 5,
             "DAY": 29,
-            "COMMON": "Pastors:For a Pope",
+            "COMMON": ["Pastors:For a Pope"],
             "CALENDAR": "GENERAL ROMAN",
-            "COLOR": "white",
+            "COLOR": ["white"],
             "TYPE": "fixed",
             "READINGS": {
                 "FIRST_READING": "",
@@ -199,9 +199,9 @@
             "GRADE": 2,
             "MONTH": 10,
             "DAY": 5,
-            "COMMON": "Holy Men and Women:For Religious",
+            "COMMON": ["Holy Men and Women:For Religious"],
             "CALENDAR": "GENERAL ROMAN",
-            "COLOR": "white",
+            "COLOR": ["white"],
             "TYPE": "fixed",
             "READINGS": {
                 "FIRST_READING": "",
@@ -231,9 +231,9 @@
             "GRADE": 2,
             "MONTH": 2,
             "DAY": 27,
-            "COMMON": "Holy Men and Women:For an Abbot,Doctors",
+            "COMMON": ["Holy Men and Women:For an Abbot", "Doctors"],
             "CALENDAR": "GENERAL ROMAN",
-            "COLOR": "white",
+            "COLOR": ["white"],
             "TYPE": "fixed",
             "READINGS": {
                 "FIRST_READING": "",
@@ -264,9 +264,9 @@
             "GRADE": 2,
             "MONTH": 5,
             "DAY": 10,
-            "COMMON": "Pastors:For One Pastor,Doctors",
+            "COMMON": ["Pastors:For One Pastor", "Doctors"],
             "CALENDAR": "GENERAL ROMAN",
-            "COLOR": "white",
+            "COLOR": ["white"],
             "TYPE": "fixed",
             "READINGS": {
                 "FIRST_READING": "",
@@ -297,9 +297,9 @@
             "GRADE": 2,
             "MONTH": 9,
             "DAY": 17,
-            "COMMON": "Virgins:For One Virgin,Doctors",
+            "COMMON": ["Virgins:For One Virgin", "Doctors"],
             "CALENDAR": "GENERAL ROMAN",
-            "COLOR": "white",
+            "COLOR": ["white"],
             "TYPE": "fixed",
             "READINGS": {
                 "FIRST_READING": "",
@@ -327,7 +327,7 @@
     {
         "Festivity": {
             "TAG": "StThereseChildJesus",
-            "COMMON": "Proper"
+            "COMMON": ["Proper"]
         },
         "Metadata": {
             "action": "makeDoctor",
@@ -347,7 +347,7 @@
     {
         "Festivity": {
             "TAG": "StIrenaeus",
-            "COMMON": "Proper"
+            "COMMON": ["Proper"]
         },
         "Metadata": {
             "action": "makeDoctor",

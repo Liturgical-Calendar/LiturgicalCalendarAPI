@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "$ref": "#/definitions/PropriumDeTempore",
+    "definitions": {
+        "PropriumDeTempore": {
+            "type": "object",
+            "additionalProperties": {
+                "$ref": "#/definitions/LitEvent"
+            },
+            "title": "PropriumDeTempore"
+        },
+        "LitEvent": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "READINGS": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Readings"
+                }
+            },
+            "required": [
+                "READINGS"
+            ]
+        }
+    }
+}

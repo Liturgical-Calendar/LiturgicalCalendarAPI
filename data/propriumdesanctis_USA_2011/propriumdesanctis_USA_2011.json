@@ -6,9 +6,13 @@
         "NAME": "Saint Elizabeth Ann Seton, Religious",
         "GRADE": 3,
         "DISPLAYGRADE": "",
-        "COMMON": "Proper",
+        "COMMON": [
+            "Proper"
+        ],
         "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -24,9 +28,13 @@
         "NAME": "Saint John Neumann, Bishop",
         "GRADE": 3,
         "DISPLAYGRADE": "",
-        "COMMON": "Proper",
+        "COMMON": [
+            "Proper"
+        ],
         "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -42,9 +50,13 @@
         "NAME": "Saint André Bessette, Religious",
         "GRADE": 2,
         "DISPLAYGRADE": "",
-        "COMMON": "Holy Men and Women:For Religious",
+        "COMMON": [
+            "Holy Men and Women:For Religious"
+        ],
         "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -60,9 +72,15 @@
         "NAME": "Day of Prayer for the Legal Protection of Unborn Children",
         "GRADE": 3,
         "DISPLAYGRADE": "National Day of Prayer",
-        "COMMON": "Masses and Prayers for Various Needs and Occasions:For Giving Thanks to God for the Gift of Human Life,Preservation of Peace and Justice",
+        "COMMON": [
+            "Masses and Prayers for Various Needs and Occasions:For Giving Thanks to God for the Gift of Human Life",
+            "Preservation of Peace and Justice"
+        ],
         "CALENDAR": "",
-        "COLOR": "purple,white",
+        "COLOR": [
+            "purple",
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -78,9 +96,13 @@
         "NAME": "Saint Katharine Drexel, Virgin",
         "GRADE": 2,
         "DISPLAYGRADE": "",
-        "COMMON": "Virgins:For One Virgin",
+        "COMMON": [
+            "Virgins:For One Virgin"
+        ],
         "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -96,9 +118,13 @@
         "NAME": "Saint Damien de Veuster, Priest",
         "GRADE": 2,
         "DISPLAYGRADE": "",
-        "COMMON": "Pastors:For Missionaries",
+        "COMMON": [
+            "Pastors:For Missionaries"
+        ],
         "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -114,9 +140,13 @@
         "NAME": "Saint Isidore",
         "GRADE": 2,
         "DISPLAYGRADE": "",
-        "COMMON": "Holy Men and Women:For One Saint",
+        "COMMON": [
+            "Holy Men and Women:For One Saint"
+        ],
         "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -132,9 +162,14 @@
         "NAME": "Blessed Junípero Serra, Priest",
         "GRADE": 2,
         "DISPLAYGRADE": "",
-        "COMMON": "Pastors:For One Pastor,Pastors:For Missionaries",
+        "COMMON": [
+            "Pastors:For One Pastor",
+            "Pastors:For Missionaries"
+        ],
         "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -150,9 +185,13 @@
         "NAME": "Independence Day",
         "GRADE": 3,
         "DISPLAYGRADE": "National Holiday",
-        "COMMON": "",
+        "COMMON": [
+            "Proper"
+        ],
         "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -168,9 +207,13 @@
         "NAME": "Blessed Kateri Tekakwitha, Virgin",
         "GRADE": 3,
         "DISPLAYGRADE": "",
-        "COMMON": "Virgins:For One Virgin",
+        "COMMON": [
+            "Virgins:For One Virgin"
+        ],
         "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -186,9 +229,14 @@
         "NAME": "Saint Peter Claver, Priest",
         "GRADE": 3,
         "DISPLAYGRADE": "",
-        "COMMON": "Pastors:For One Pastor,Holy Men and Women:For Those Who Practiced Works of Mercy",
+        "COMMON": [
+            "Pastors:For One Pastor",
+            "Holy Men and Women:For Those Who Practiced Works of Mercy"
+        ],
         "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -204,9 +252,13 @@
         "NAME": "Blessed Marie Rose Durocher, Virgin",
         "GRADE": 2,
         "DISPLAYGRADE": "",
-        "COMMON": "Virgins:For One Virgin",
+        "COMMON": [
+            "Virgins:For One Virgin"
+        ],
         "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -222,9 +274,14 @@
         "NAME": "Saint Frances Xavier Cabrini, Virgin",
         "GRADE": 3,
         "DISPLAYGRADE": "",
-        "COMMON": "Virgins:For One Virgin,Holy Men and Women:For Those Who Practiced Works of Mercy",
+        "COMMON": [
+            "Virgins:For One Virgin",
+            "Holy Men and Women:For Those Who Practiced Works of Mercy"
+        ],
         "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -240,9 +297,13 @@
         "NAME": "Saint Rose Philippine Duchesne, Virgin",
         "GRADE": 2,
         "DISPLAYGRADE": "",
-        "COMMON": "Virgins:For One Virgin",
+        "COMMON": [
+            "Virgins:For One Virgin"
+        ],
         "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -258,27 +319,15 @@
         "NAME": "Blessed Miguel Agustín Pro, Priest and Martyr",
         "GRADE": 2,
         "DISPLAYGRADE": "",
-        "COMMON": "Martyrs:For One Martyr,Pastors:For One Pastor",
+        "COMMON": [
+            "Martyrs:For One Martyr",
+            "Pastors:For One Pastor"
+        ],
         "CALENDAR": "",
-        "COLOR": "white,red",
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
-        }
-    },
-    {
-        "MONTH": 12,
-        "DAY": 12,
-        "TAG": "LadyGuadalupe",
-        "NAME": "Our Lady of Guadalupe",
-        "GRADE": 4,
-        "DISPLAYGRADE": "",
-        "COMMON": "Proper",
-        "CALENDAR": "",
-        "COLOR": "white",
+        "COLOR": [
+            "white",
+            "red"
+        ],
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",

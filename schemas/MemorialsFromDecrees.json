@@ -1,0 +1,93 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "array",
+    "items": {
+        "$ref": "#/definitions/MemorialsFromDecrees"
+    },
+    "definitions": {
+        "MemorialsFromDecrees": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "Festivity": {
+                    "$ref": "#/definitions/Festivity"
+                },
+                "Metadata": {
+                    "$ref": "#/definitions/Metadata"
+                }
+            },
+            "required": [
+                "Festivity",
+                "Metadata"
+            ],
+            "title": "MemorialsFromDecrees"
+        },
+        "Festivity": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "TAG": {
+                    "type": "string"
+                },
+                "GRADE": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
+                },
+                "COMMON": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
+                },
+                "CALENDAR": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Calendar"
+                },
+                "COLOR": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
+                },
+                "TYPE": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitFeastType"
+                },
+                "READINGS": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Readings"
+                },
+                "MONTH": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Month"
+                },
+                "DAY": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Day"
+                }
+            },
+            "required": [
+                "TAG"
+            ],
+            "title": "Festivity"
+        },
+        "Metadata": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "action": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/MemorialFromDecreesAction"
+                },
+                "property": {
+                    "type": "string",
+                    "enum": [
+                        "name",
+                        "grade"
+                    ]
+                },
+                "decreeURL": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/DecreeURL"
+                },
+                "decreeLangs": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/DecreeLangs"
+                },
+                "sinceYear": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "action",
+                "decreeURL"
+            ],
+            "title": "Metadata"
+        }
+    }
+}

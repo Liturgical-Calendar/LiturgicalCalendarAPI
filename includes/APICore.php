@@ -113,6 +113,7 @@ class APICore {
     }
 
     public function setResponseContentTypeHeader() : void {
+        header( 'Cache-Control: must-revalidate, max-age=259200' ); //cache for 1 month
         header( "Content-Type: {$this->ResponseContentType}; charset=utf-8" );
     }
 

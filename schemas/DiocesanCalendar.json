@@ -1,0 +1,91 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$ref": "#/definitions/DiocesanCalendar",
+    "definitions": {
+        "DiocesanCalendar": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "LitCal": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/LitCal"
+                    }
+                },
+                "Overrides": {
+                    "$ref": "#/definitions/Overrides"
+                }
+            },
+            "required": [
+                "LitCal"
+            ],
+            "title": "DiocesanCalendar"
+        },
+        "LitCal": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "color": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
+                },
+                "grade": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
+                },
+                "common": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
+                },
+                "day": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Day"
+                },
+                "month": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Month"
+                },
+                "readings": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Readings"
+                },
+                "formRowNum": {
+                    "type": "integer"
+                },
+                "sinceYear": {
+                    "type": "integer"
+                },
+                "decreeURL": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/DecreeURL"
+                },
+                "decreeLangs": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/DecreeLangs"
+                }
+            },
+            "required": [
+                "color",
+                "common",
+                "day",
+                "formRowNum",
+                "grade",
+                "month",
+                "name",
+                "sinceYear"
+            ],
+            "title": "LitCal"
+        },
+        "Overrides": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "Epiphany": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
+                },
+                "Ascension": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Ascension"
+                },
+                "CorpusChristi": {
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
+                }
+            },
+            "title": "Overrides"
+        }
+    }
+}

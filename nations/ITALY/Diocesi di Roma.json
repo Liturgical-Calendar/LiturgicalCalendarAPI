@@ -1,1 +1,473 @@
-{"LitCal":{"BeatoGregorioXpapa":{"name":"Beato Gregorio X, papa","color":"white","grade":2,"common":"Pastors:For a Pope","day":9,"month":1,"formRowNum":0,"sinceYear":"1973"},"SanVincenzoPallottisacerdote":{"name":"San Vincenzo Pallotti, sacerdote","color":"white","grade":3,"common":"Proper","day":22,"month":1,"formRowNum":1,"sinceYear":"1973"},"BeataLudovicaAlbertoni":{"name":"Beata Ludovica Albertoni","color":"white","grade":2,"common":"Holy Men and Women:For Those Who Practiced Works of Mercy","day":1,"month":2,"formRowNum":1,"sinceYear":"1973"},"SantoIlaropapa":{"name":"Santo Ilaro, papa","color":"white","grade":2,"common":"Pastors:For a Pope","day":28,"month":2,"formRowNum":2,"sinceYear":"1973"},"SanFeliceIIIpapa":{"name":"San Felice III, papa","color":"white","grade":2,"common":"Pastors:For a Pope","day":1,"month":3,"formRowNum":3,"sinceYear":"1973"},"SanMartinoIpapaemartire":{"name":"San Martino I, papa e martire","color":"red,white","grade":3,"common":"Martyrs:For One Martyr,Pastors:For a Pope","day":13,"month":4,"formRowNum":2,"sinceYear":"1973"},"SanBenedettoGiuseppeLabre":{"name":"San Benedetto Giuseppe Labre","color":"white","grade":3,"common":"Proper","day":16,"month":4,"formRowNum":3,"sinceYear":"1973"},"SanLeoneIXpapa":{"name":"San Leone IX, papa","color":"white","grade":3,"common":"Proper","day":19,"month":4,"formRowNum":4,"sinceYear":"1973"},"SanPioVpapa":{"name":"San Pio V, papa","color":"white","grade":3,"common":"Pastors:For a Pope","day":30,"month":4,"formRowNum":5,"sinceYear":"1973"},"SanFelicedaCantalicereligioso":{"name":"San Felice da Cantalice, religioso","color":"white","grade":2,"common":"Proper","day":18,"month":5,"formRowNum":4,"sinceYear":"1973"},"SanGiovanniBattistadeRossisacerdote":{"name":"San Giovanni Battista de Rossi, sacerdote","color":"white","grade":3,"common":"Proper","day":23,"month":5,"formRowNum":6,"sinceYear":"1973"},"BeataMariaVergineAuxiliumChristianorum":{"name":"Beata Maria Vergine «Auxilium Christianorum»","color":"white","grade":2,"common":"Proper","day":24,"month":5,"formRowNum":5,"sinceYear":"1973"},"SanGregorioVIIpapa":{"name":"San Gregorio VII, papa","color":"white","grade":3,"common":"Pastors:For a Pope","day":25,"month":5,"formRowNum":7,"sinceYear":"1973"},"SantiMarcellinoePietromartiri":{"name":"Santi Marcellino e Pietro, martiri","color":"red","grade":3,"common":"Martyrs:For Several Martyrs","day":2,"month":6,"formRowNum":8,"sinceYear":"1973"},"BeataAnnaMariaTaigi":{"name":"Beata Anna Maria Taigi","color":"white","grade":3,"common":"Holy Men and Women:For Holy Women","day":9,"month":6,"formRowNum":9,"sinceYear":"1973"},"SantiGiovanniePaolomartiri":{"name":"Santi Giovanni e Paolo, martiri","color":"red","grade":2,"common":"Martyrs","day":26,"month":6,"formRowNum":6,"sinceYear":"1973"},"SantiPietroePaoloApostoliPatroniprincipalidiRoma":{"name":"Santi Pietro e Paolo, Apostoli, Patroni principali di Roma","color":"red","grade":6,"common":"Proper","day":29,"month":6,"formRowNum":0,"sinceYear":"1973"},"SantiPrimiMartiridellaChiesaRomana":{"name":"Santi Primi Martiri della Chiesa Romana","color":"red","grade":3,"common":"Martyrs:For Several Martyrs","day":30,"month":6,"formRowNum":10,"sinceYear":"1973"},"SantaBrigidareligiosa":{"name":"Santa Brigida, religiosa","color":"white","grade":3,"common":"Holy Men and Women:For Religious,Holy Men and Women:For Holy Women","day":23,"month":7,"formRowNum":11,"sinceYear":"1973"},"BeatoInnocenzoXIpapa":{"name":"Beato Innocenzo XI, papa","color":"white","grade":2,"common":"Pastors:For a Pope","day":12,"month":8,"formRowNum":8,"sinceYear":"1973"},"SanSistoIIIpapa":{"name":"San Sisto III, papa","color":"white","grade":2,"common":"Pastors:For a Pope","day":19,"month":8,"formRowNum":9,"sinceYear":"1973"},"SanGasparedelBufalosacerdote":{"name":"San Gaspare del Bufalo, sacerdote","color":"white","grade":3,"common":"Proper","day":21,"month":10,"formRowNum":13,"sinceYear":"1973"},"SanNicolaIpapa":{"name":"San Nicola I, papa","color":"white","grade":3,"common":"Pastors:For a Pope","day":13,"month":11,"formRowNum":14,"sinceYear":"1973"},"SanGelasioIpapa":{"name":"San Gelasio I, papa","color":"white","grade":2,"common":"Pastors:For a Pope","day":20,"month":11,"formRowNum":10,"sinceYear":"1973"},"SanClementeIpapaemartire":{"name":"San Clemente I, papa e martire","color":"red,white","grade":3,"common":"Martyrs:For One Martyr,Pastors:For a Pope","day":23,"month":11,"formRowNum":15,"sinceYear":"1973"},"SanSiriciopapa":{"name":"San Siricio, papa","color":"white","grade":2,"common":"Pastors:For a Pope","day":26,"month":11,"formRowNum":11,"sinceYear":"1973"},"SanLeonardodaPortoMauriziosacerdote":{"name":"San Leonardo da Porto Maurizio, sacerdote","color":"white","grade":2,"common":"Holy Men and Women:For Religious","day":26,"month":11,"formRowNum":12,"sinceYear":"1973"},"SanDamasoIpapa":{"name":"San Damaso I, papa","color":"white","grade":3,"common":"Pastors:For a Pope","day":11,"month":12,"formRowNum":16,"sinceYear":"1973"},"DedicazionedellaBasilicaPapaledelSSSalvatoreCattedralediRoma":{"name":"Dedicazione della Basilica Papale del SS. Salvatore, Cattedrale di Roma","color":"white","grade":4,"common":"Dedication of a Church","day":9,"month":11,"formRowNum":1,"sinceYear":"1973"},"SanGiovanniPaoloIIpapa":{"name":"San Giovanni Paolo II, papa","color":"white","grade":3,"common":"Pastors:For a Pope","day":22,"month":10,"formRowNum":17,"sinceYear":"2014"},"BeatoUrbanoIIpapa":{"name":"Beato Urbano II, papa","color":"white","grade":2,"common":"Pastors:For a Pope","day":28,"month":7,"formRowNum":7,"sinceYear":"1973"},"SantAgatonepapa":{"name":"Sant'Agatone, papa","color":"white","grade":3,"common":"Pastors:For a Pope","day":10,"month":1,"formRowNum":0,"sinceYear":"1973"},"SanCallistoIpapaemartire":{"name":"San Callisto I, papa e martire","color":"red,white","grade":3,"common":"Martyrs:For One Martyr,Pastors:For a Pope","day":14,"month":10,"formRowNum":12,"sinceYear":"1970"}}}
+{
+    "LitCal": {
+        "BeatoGregorioXpapa": {
+            "name": "Beato Gregorio X, papa",
+            "color": [
+                "white"
+            ],
+            "grade": 2,
+            "common": [
+                "Pastors:For a Pope"
+            ],
+            "day": 9,
+            "month": 1,
+            "formRowNum": 0,
+            "sinceYear": 1973
+        },
+        "SanVincenzoPallottisacerdote": {
+            "name": "San Vincenzo Pallotti, sacerdote",
+            "color": [
+                "white"
+            ],
+            "grade": 3,
+            "common": [
+                "Proper"
+            ],
+            "day": 22,
+            "month": 1,
+            "formRowNum": 1,
+            "sinceYear": 1973
+        },
+        "BeataLudovicaAlbertoni": {
+            "name": "Beata Ludovica Albertoni",
+            "color": [
+                "white"
+            ],
+            "grade": 2,
+            "common": [
+                "Holy Men and Women:For Those Who Practiced Works of Mercy"
+            ],
+            "day": 1,
+            "month": 2,
+            "formRowNum": 1,
+            "sinceYear": 1973
+        },
+        "SantoIlaropapa": {
+            "name": "Santo Ilaro, papa",
+            "color": [
+                "white"
+            ],
+            "grade": 2,
+            "common": [
+                "Pastors:For a Pope"
+            ],
+            "day": 28,
+            "month": 2,
+            "formRowNum": 2,
+            "sinceYear": 1973
+        },
+        "SanFeliceIIIpapa": {
+            "name": "San Felice III, papa",
+            "color": [
+                "white"
+            ],
+            "grade": 2,
+            "common": [
+                "Pastors:For a Pope"
+            ],
+            "day": 1,
+            "month": 3,
+            "formRowNum": 3,
+            "sinceYear": 1973
+        },
+        "SanMartinoIpapaemartire": {
+            "name": "San Martino I, papa e martire",
+            "color": [
+                "red",
+                "white"
+            ],
+            "grade": 3,
+            "common": [
+                "Martyrs:For One Martyr",
+                "Pastors:For a Pope"
+            ],
+            "day": 13,
+            "month": 4,
+            "formRowNum": 2,
+            "sinceYear": 1973
+        },
+        "SanBenedettoGiuseppeLabre": {
+            "name": "San Benedetto Giuseppe Labre",
+            "color": [
+                "white"
+            ],
+            "grade": 3,
+            "common": [
+                "Proper"
+            ],
+            "day": 16,
+            "month": 4,
+            "formRowNum": 3,
+            "sinceYear": 1973
+        },
+        "SanLeoneIXpapa": {
+            "name": "San Leone IX, papa",
+            "color": [
+                "white"
+            ],
+            "grade": 3,
+            "common": [
+                "Proper"
+            ],
+            "day": 19,
+            "month": 4,
+            "formRowNum": 4,
+            "sinceYear": 1973
+        },
+        "SanPioVpapa": {
+            "name": "San Pio V, papa",
+            "color": [
+                "white"
+            ],
+            "grade": 3,
+            "common": [
+                "Pastors:For a Pope"
+            ],
+            "day": 30,
+            "month": 4,
+            "formRowNum": 5,
+            "sinceYear": 1973
+        },
+        "SanFelicedaCantalicereligioso": {
+            "name": "San Felice da Cantalice, religioso",
+            "color": [
+                "white"
+            ],
+            "grade": 2,
+            "common": [
+                "Proper"
+            ],
+            "day": 18,
+            "month": 5,
+            "formRowNum": 4,
+            "sinceYear": 1973
+        },
+        "SanGiovanniBattistadeRossisacerdote": {
+            "name": "San Giovanni Battista de Rossi, sacerdote",
+            "color": [
+                "white"
+            ],
+            "grade": 3,
+            "common": [
+                "Proper"
+            ],
+            "day": 23,
+            "month": 5,
+            "formRowNum": 6,
+            "sinceYear": 1973
+        },
+        "BeataMariaVergineAuxiliumChristianorum": {
+            "name": "Beata Maria Vergine «Auxilium Christianorum»",
+            "color": [
+                "white"
+            ],
+            "grade": 2,
+            "common": [
+                "Proper"
+            ],
+            "day": 24,
+            "month": 5,
+            "formRowNum": 5,
+            "sinceYear": 1973
+        },
+        "SanGregorioVIIpapa": {
+            "name": "San Gregorio VII, papa",
+            "color": [
+                "white"
+            ],
+            "grade": 3,
+            "common": [
+                "Pastors:For a Pope"
+            ],
+            "day": 25,
+            "month": 5,
+            "formRowNum": 7,
+            "sinceYear": 1973
+        },
+        "SantiMarcellinoePietromartiri": {
+            "name": "Santi Marcellino e Pietro, martiri",
+            "color": [
+                "red"
+            ],
+            "grade": 3,
+            "common": [
+                "Martyrs:For Several Martyrs"
+            ],
+            "day": 2,
+            "month": 6,
+            "formRowNum": 8,
+            "sinceYear": 1973
+        },
+        "BeataAnnaMariaTaigi": {
+            "name": "Beata Anna Maria Taigi",
+            "color": [
+                "white"
+            ],
+            "grade": 3,
+            "common": [
+                "Holy Men and Women:For Holy Women"
+            ],
+            "day": 9,
+            "month": 6,
+            "formRowNum": 9,
+            "sinceYear": 1973
+        },
+        "SantiGiovanniePaolomartiri": {
+            "name": "Santi Giovanni e Paolo, martiri",
+            "color": [
+                "red"
+            ],
+            "grade": 2,
+            "common": [
+                "Martyrs"
+            ],
+            "day": 26,
+            "month": 6,
+            "formRowNum": 6,
+            "sinceYear": 1973
+        },
+        "SantiPietroePaoloApostoliPatroniprincipalidiRoma": {
+            "name": "Santi Pietro e Paolo, Apostoli, Patroni principali di Roma",
+            "color": [
+                "red"
+            ],
+            "grade": 6,
+            "common": [
+                "Proper"
+            ],
+            "day": 29,
+            "month": 6,
+            "formRowNum": 0,
+            "sinceYear": 1973
+        },
+        "SantiPrimiMartiridellaChiesaRomana": {
+            "name": "Santi Primi Martiri della Chiesa Romana",
+            "color": [
+                "red"
+            ],
+            "grade": 3,
+            "common": [
+                "Martyrs:For Several Martyrs"
+            ],
+            "day": 30,
+            "month": 6,
+            "formRowNum": 10,
+            "sinceYear": 1973
+        },
+        "SantaBrigidareligiosa": {
+            "name": "Santa Brigida, religiosa",
+            "color": [
+                "white"
+            ],
+            "grade": 3,
+            "common": [
+                "Holy Men and Women:For Religious",
+                "Holy Men and Women:For Holy Women"
+            ],
+            "day": 23,
+            "month": 7,
+            "formRowNum": 11,
+            "sinceYear": 1973
+        },
+        "BeatoInnocenzoXIpapa": {
+            "name": "Beato Innocenzo XI, papa",
+            "color": [
+                "white"
+            ],
+            "grade": 2,
+            "common": [
+                "Pastors:For a Pope"
+            ],
+            "day": 12,
+            "month": 8,
+            "formRowNum": 8,
+            "sinceYear": 1973
+        },
+        "SanSistoIIIpapa": {
+            "name": "San Sisto III, papa",
+            "color": [
+                "white"
+            ],
+            "grade": 2,
+            "common": [
+                "Pastors:For a Pope"
+            ],
+            "day": 19,
+            "month": 8,
+            "formRowNum": 9,
+            "sinceYear": 1973
+        },
+        "SanGasparedelBufalosacerdote": {
+            "name": "San Gaspare del Bufalo, sacerdote",
+            "color": [
+                "white"
+            ],
+            "grade": 3,
+            "common": [
+                "Proper"
+            ],
+            "day": 21,
+            "month": 10,
+            "formRowNum": 13,
+            "sinceYear": 1973
+        },
+        "SanNicolaIpapa": {
+            "name": "San Nicola I, papa",
+            "color": [
+                "white"
+            ],
+            "grade": 3,
+            "common": [
+                "Pastors:For a Pope"
+            ],
+            "day": 13,
+            "month": 11,
+            "formRowNum": 14,
+            "sinceYear": 1973
+        },
+        "SanGelasioIpapa": {
+            "name": "San Gelasio I, papa",
+            "color": [
+                "white"
+            ],
+            "grade": 2,
+            "common": [
+                "Pastors:For a Pope"
+            ],
+            "day": 20,
+            "month": 11,
+            "formRowNum": 10,
+            "sinceYear": 1973
+        },
+        "SanClementeIpapaemartire": {
+            "name": "San Clemente I, papa e martire",
+            "color": [
+                "red",
+                "white"
+            ],
+            "grade": 3,
+            "common": [
+                "Martyrs:For One Martyr",
+                "Pastors:For a Pope"
+            ],
+            "day": 23,
+            "month": 11,
+            "formRowNum": 15,
+            "sinceYear": 1973
+        },
+        "SanSiriciopapa": {
+            "name": "San Siricio, papa",
+            "color": [
+                "white"
+            ],
+            "grade": 2,
+            "common": [
+                "Pastors:For a Pope"
+            ],
+            "day": 26,
+            "month": 11,
+            "formRowNum": 11,
+            "sinceYear": 1973
+        },
+        "SanLeonardodaPortoMauriziosacerdote": {
+            "name": "San Leonardo da Porto Maurizio, sacerdote",
+            "color": [
+                "white"
+            ],
+            "grade": 2,
+            "common": [
+                "Holy Men and Women:For Religious"
+            ],
+            "day": 26,
+            "month": 11,
+            "formRowNum": 12,
+            "sinceYear": 1973
+        },
+        "SanDamasoIpapa": {
+            "name": "San Damaso I, papa",
+            "color": [
+                "white"
+            ],
+            "grade": 3,
+            "common": [
+                "Pastors:For a Pope"
+            ],
+            "day": 11,
+            "month": 12,
+            "formRowNum": 16,
+            "sinceYear": 1973
+        },
+        "DedicazionedellaBasilicaPapaledelSSSalvatoreCattedralediRoma": {
+            "name": "Dedicazione della Basilica Papale del SS. Salvatore, Cattedrale di Roma",
+            "color": [
+                "white"
+            ],
+            "grade": 4,
+            "common": [
+                "Dedication of a Church"
+            ],
+            "day": 9,
+            "month": 11,
+            "formRowNum": 1,
+            "sinceYear": 1973
+        },
+        "SanGiovanniPaoloIIpapa": {
+            "name": "San Giovanni Paolo II, papa",
+            "color": [
+                "white"
+            ],
+            "grade": 3,
+            "common": [
+                "Pastors:For a Pope"
+            ],
+            "day": 22,
+            "month": 10,
+            "formRowNum": 17,
+            "sinceYear": 2014
+        },
+        "BeatoUrbanoIIpapa": {
+            "name": "Beato Urbano II, papa",
+            "color": [
+                "white"
+            ],
+            "grade": 2,
+            "common": [
+                "Pastors:For a Pope"
+            ],
+            "day": 28,
+            "month": 7,
+            "formRowNum": 7,
+            "sinceYear": 1973
+        },
+        "SantAgatonepapa": {
+            "name": "Sant'Agatone, papa",
+            "color": [
+                "white"
+            ],
+            "grade": 3,
+            "common": [
+                "Pastors:For a Pope"
+            ],
+            "day": 10,
+            "month": 1,
+            "formRowNum": 0,
+            "sinceYear": 1973
+        },
+        "SanCallistoIpapaemartire": {
+            "name": "San Callisto I, papa e martire",
+            "color": [
+                "red",
+                "white"
+            ],
+            "grade": 3,
+            "common": [
+                "Martyrs:For One Martyr",
+                "Pastors:For a Pope"
+            ],
+            "day": 14,
+            "month": 10,
+            "formRowNum": 12,
+            "sinceYear": 1970
+        }
+    }
+}

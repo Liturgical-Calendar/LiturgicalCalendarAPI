@@ -17,11 +17,12 @@ include_once( "includes/FestivityCollection.php" );
 include_once( "includes/LitSettings.php" );
 include_once( "includes/LitFunc.php" );
 include_once( "includes/LitMessages.php" );
+include_once( "includes/LitDateTime.php" );
 include_once( "includes/pgettext.php" );
 
 class LitCalAPI {
 
-    const API_VERSION                               = '3.3';
+    const API_VERSION                               = '3.4';
     public APICore $APICore;
 
     private string $CacheDuration                   = "";
@@ -32,6 +33,8 @@ class LitCalAPI {
     private LitGrade $LitGrade;
 
     private ?object $DiocesanData                   = null;
+    private ?object $NationalData                   = null;
+    private ?object $WiderRegionData                = null;
     private ?object $GeneralIndex                   = null;
     private NumberFormatter $formatter;
     private NumberFormatter $formatterFem;
@@ -48,6 +51,10 @@ class LitCalAPI {
     public function __construct(){
         $this->APICore                              = new APICore();
         $this->CacheDuration                        = "_" . CacheDuration::MONTH . date( "m" );
+    }
+
+    private static function debugWrite( string $string ) {
+        file_put_contents( "debug.log", $string . PHP_EOL, FILE_APPEND );
     }
 
     private function initParameterData() {
@@ -172,7 +179,7 @@ class LitCalAPI {
     }
 
 
-    private function loadLocalCalendarData() : void {
+    private function loadDiocesanCalendarData() : void {
         if( $this->LitSettings->DiocesanCalendar !== null ){
             //since a Diocesan calendar is being requested, we need to retrieve the JSON data
             //first we need to discover the path, so let's retrieve our index file
@@ -220,14 +227,14 @@ class LitCalAPI {
         //with the Prima Editio Typica of the Roman Missal and the General Norms promulgated with the Motu Proprio "Mysterii Paschali" in 1969
         if ( $this->LitSettings->Year < 1970 ) {
             $this->Messages[] = sprintf( _( "Only years from 1970 and after are supported. You tried requesting the year %d." ), $this->LitSettings->Year );
-            $this->GenerateResponseToRequest();
+            $this->GenerateResponse();
         }
     }
 
     /**
      * Retrieve Higher Ranking Solemnities from Proprium de Tempore
      */
-    private function populatePropriumDeTempore() : void {
+    private function loadPropriumDeTemporeData() : void {
         $propriumdetemporeFile = strtolower( "data/propriumdetempore/{$this->LitSettings->Locale}.json" );
         if( file_exists( $propriumdetemporeFile ) ) {
             $PropriumDeTempore = json_decode( file_get_contents( $propriumdetemporeFile ), true );
@@ -241,7 +248,7 @@ class LitCalAPI {
         }
     }
 
-    private function readPropriumDeSanctisJSONData( string $missal ) : void {
+    private function loadPropriumDeSanctisData( string $missal ) : void {
         $propriumdesanctisFile = RomanMissal::getSanctoraleFileName( $missal );
         $propriumdesanctisI18nPath = RomanMissal::getSanctoraleI18nFilePath( $missal );
 
@@ -252,7 +259,19 @@ class LitCalAPI {
                 if( json_last_error() !== JSON_ERROR_NONE ) {
                     die( '{"ERROR": "There was an error trying to retrieve and decode JSON i18n data for the Proprium de Sanctis for the Missal ' . RomanMissal::getName( $missal ) . ': ' . json_last_error_msg() . '"}' );
                 }
+            } else {
+                $this->Messages[] = sprintf(
+                    /**translators: name of the Roman Missal */
+                    _( 'Data for the sanctorale from %s could not be found.' ),
+                    RomanMissal::getName( $missal )
+                );
             }
+        } else {
+            $this->Messages[] = sprintf(
+                /**translators: name of the Roman Missal */
+                _( 'Translation data for the sanctorale from %s could not be found.' ),
+                RomanMissal::getName( $missal )
+            );
         }
 
         if( file_exists( $propriumdesanctisFile ) ) {
@@ -271,7 +290,7 @@ class LitCalAPI {
         }
     }
 
-    private function readMemorialsFromDecreesJSONData() : void {
+    private function loadMemorialsFromDecreesData() : void {
         $memorialsFromDecreesFile       = "data/memorialsFromDecrees/memorialsFromDecrees.json";
         $memorialsFromDecreesI18nPath   = "data/memorialsFromDecrees/i18n/";
         $memorialsFromDecreesI18nFile = $memorialsFromDecreesI18nPath . strtolower( $this->LitSettings->Locale ) . ".json";
@@ -313,13 +332,13 @@ class LitCalAPI {
     }
 
     private function calculateEpiphanyJan6() : void {
-        $Epiphany = new Festivity( $this->PropriumDeTempore[ "Epiphany" ][ "NAME" ], DateTime::createFromFormat( '!j-n-Y', '6-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) ),  LitColor::WHITE, LitFeastType::FIXED,  LitGrade::HIGHER_SOLEMNITY );
+        $Epiphany = new Festivity( $this->PropriumDeTempore[ "Epiphany" ][ "NAME" ], LitDateTime::createFromFormat( '!j-n-Y', '6-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) ),  LitColor::WHITE, LitFeastType::FIXED,  LitGrade::HIGHER_SOLEMNITY );
         $this->Cal->addFestivity( "Epiphany",   $Epiphany );
         //If a Sunday occurs on a day from Jan. 2 through Jan. 5, it is called the "Second Sunday of Christmas"
         //Weekdays from Jan. 2 through Jan. 5 are called "*day before Epiphany"
         $nth = 0;
         for ( $i = 2; $i <= 5; $i++ ) {
-            $dateTime = DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+            $dateTime = LitDateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
             if ( self::DateIsSunday( $dateTime ) ) {
                 $Christmas2 = new Festivity( $this->PropriumDeTempore[ "Christmas2" ][ "NAME" ], $dateTime, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
                 $this->Cal->addFestivity( "Christmas2", $Christmas2 );
@@ -333,13 +352,13 @@ class LitCalAPI {
         }
 
         //Weekdays from Jan. 7 until the following Sunday are called "*day after Epiphany"
-        $SundayAfterEpiphany = (int)DateTime::createFromFormat( '!j-n-Y', '6-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'next Sunday' )->format( 'j' );
+        $SundayAfterEpiphany = (int)LitDateTime::createFromFormat( '!j-n-Y', '6-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'next Sunday' )->format( 'j' );
         if ( $SundayAfterEpiphany !== 7 ) { //this means January 7th, it does not refer to the day of the week which is obviously Sunday in this case
             $nth = 0;
             for ( $i = 7; $i < $SundayAfterEpiphany; $i++ ) {
                 $nth++;
                 $nthStr = $this->LitSettings->Locale === LitLocale::LATIN ? LitMessages::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
-                $dateTime = DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+                $dateTime = LitDateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
                 $name = $this->LitSettings->Locale === LitLocale::LATIN ? sprintf( "Dies %s post Epiphaniam", $nthStr ) : sprintf( _( "%s day after Epiphany" ), ucfirst( $nthStr ) );
                 $festivity = new Festivity( $name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
                 $this->Cal->addFestivity( "DayAfterEpiphany" . $nth, $festivity );
@@ -349,7 +368,7 @@ class LitCalAPI {
 
     private function calculateEpiphanySunday() : void {
         //If January 2nd is a Sunday, then go with Jan 2nd
-        $dateTime = DateTime::createFromFormat( '!j-n-Y', '2-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+        $dateTime = LitDateTime::createFromFormat( '!j-n-Y', '2-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
         if ( self::DateIsSunday( $dateTime ) ) {
             $Epiphany = new Festivity( $this->PropriumDeTempore[ "Epiphany" ][ "NAME" ], $dateTime, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
             $this->Cal->addFestivity( "Epiphany",   $Epiphany );
@@ -366,20 +385,20 @@ class LitCalAPI {
                 $nth++;
                 $nthStr = $this->LitSettings->Locale === LitLocale::LATIN ? LitMessages::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
                 $name = $this->LitSettings->Locale === LitLocale::LATIN ? sprintf( "Dies %s ante Epiphaniam", $nthStr ) : sprintf( _( "%s day before Epiphany" ), ucfirst( $nthStr ) );
-                $dateTime = DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+                $dateTime = LitDateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
                 $festivity = new Festivity( $name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
                 $this->Cal->addFestivity( "DayBeforeEpiphany" . $nth, $festivity );
             }
 
             //If Epiphany occurs on or before Jan. 6, then the days of the week following Epiphany are called "*day after Epiphany" and the Sunday following Epiphany is the Baptism of the Lord.
             if ( $DayOfEpiphany < 7 ) {
-                $SundayAfterEpiphany =  (int)DateTime::createFromFormat( '!j-n-Y', '2-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'next Sunday' )->modify( 'next Sunday' )->format( 'j' );
+                $SundayAfterEpiphany =  (int)LitDateTime::createFromFormat( '!j-n-Y', '2-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'next Sunday' )->modify( 'next Sunday' )->format( 'j' );
                 $nth = 0;
                 for ( $i = $DayOfEpiphany + 1; $i < $SundayAfterEpiphany; $i++ ) {
                     $nth++;
                     $nthStr = $this->LitSettings->Locale === LitLocale::LATIN ? LitMessages::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
                     $name = $this->LitSettings->Locale === LitLocale::LATIN ? sprintf( "Dies %s post Epiphaniam", $nthStr ) : sprintf( _( "%s day after Epiphany" ), ucfirst( $nthStr ) );
-                    $dateTime = DateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+                    $dateTime = LitDateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
                     $festivity = new Festivity( $name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
                     $this->Cal->addFestivity( "DayAfterEpiphany" . $nth, $festivity );
                 }
@@ -390,7 +409,7 @@ class LitCalAPI {
     private function calculateChristmasEpiphany() : void {
         $Christmas = new Festivity( 
             $this->PropriumDeTempore[ "Christmas" ][ "NAME" ],
-            DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) ),
+            LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) ),
             LitColor::WHITE,
             LitFeastType::FIXED,
             LitGrade::HIGHER_SOLEMNITY
@@ -421,10 +440,10 @@ class LitCalAPI {
     }
 
     private function calculateSundaysMajorSeasons() : void {
-        $this->Cal->addFestivity( "Advent1",    new Festivity( $this->PropriumDeTempore[ "Advent1" ][ "NAME" ],      DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 3 * 7 ) . 'D' ) ), LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "Advent2",    new Festivity( $this->PropriumDeTempore[ "Advent2" ][ "NAME" ],      DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 2 * 7 ) . 'D' ) ), LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "Advent3",    new Festivity( $this->PropriumDeTempore[ "Advent3" ][ "NAME" ],      DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P7D' ) ),                 LitColor::PINK,     LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
-        $this->Cal->addFestivity( "Advent4",    new Festivity( $this->PropriumDeTempore[ "Advent4" ][ "NAME" ],      DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' ),                                                   LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Advent1",    new Festivity( $this->PropriumDeTempore[ "Advent1" ][ "NAME" ],      LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 3 * 7 ) . 'D' ) ), LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Advent2",    new Festivity( $this->PropriumDeTempore[ "Advent2" ][ "NAME" ],      LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 2 * 7 ) . 'D' ) ), LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Advent3",    new Festivity( $this->PropriumDeTempore[ "Advent3" ][ "NAME" ],      LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P7D' ) ),                 LitColor::PINK,     LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
+        $this->Cal->addFestivity( "Advent4",    new Festivity( $this->PropriumDeTempore[ "Advent4" ][ "NAME" ],      LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' ),                                                   LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
         $this->Cal->addFestivity( "Lent1",      new Festivity( $this->PropriumDeTempore[ "Lent1" ][ "NAME" ],        LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P' . ( 6 * 7 ) . 'D' ) ),    LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
         $this->Cal->addFestivity( "Lent2",      new Festivity( $this->PropriumDeTempore[ "Lent2" ][ "NAME" ],        LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P' . ( 5 * 7 ) . 'D' ) ),    LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
         $this->Cal->addFestivity( "Lent3",      new Festivity( $this->PropriumDeTempore[ "Lent3" ][ "NAME" ],        LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P' . ( 4 * 7 ) . 'D' ) ),    LitColor::PURPLE,   LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY ) );
@@ -484,20 +503,20 @@ class LitCalAPI {
         $this->Cal->addFestivity( "SacredHeart", $SacredHeart );
 
         //Christ the King is calculated backwards from the first sunday of advent
-        $ChristKing = new Festivity( $this->PropriumDeTempore[ "ChristKing" ][ "NAME" ],     DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 4 * 7 ) . 'D' ) ),    LitColor::RED,  LitFeastType::MOBILE, LitGrade::SOLEMNITY );
+        $ChristKing = new Festivity( $this->PropriumDeTempore[ "ChristKing" ][ "NAME" ],     LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 4 * 7 ) . 'D' ) ),    LitColor::RED,  LitFeastType::MOBILE, LitGrade::SOLEMNITY );
         $this->Cal->addFestivity( "ChristKing", $ChristKing );
     }
 
     private function calculateFixedSolemnities() : void {
         //even though Mary Mother of God is a fixed date solemnity, however it is found in the Proprium de Tempore and not in the Proprium de Sanctis
-        $MotherGod = new Festivity( $this->PropriumDeTempore[ "MotherGod" ][ "NAME" ], DateTime::createFromFormat( '!j-n-Y', '1-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) ),      LitColor::WHITE,    LitFeastType::FIXED, LitGrade::SOLEMNITY );
+        $MotherGod = new Festivity( $this->PropriumDeTempore[ "MotherGod" ][ "NAME" ], LitDateTime::createFromFormat( '!j-n-Y', '1-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) ),      LitColor::WHITE,    LitFeastType::FIXED, LitGrade::SOLEMNITY );
         $this->Cal->addFestivity( "MotherGod", $MotherGod );
 
         $tempCalSolemnities = array_filter( $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ], function( $el ){ return $el->GRADE === LitGrade::SOLEMNITY; } );
         foreach( $tempCalSolemnities as $row ) {
-            $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+            $currentFeastDate = LitDateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
             $tempFestivity = new Festivity( $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
-
+            //LitCalAPI::debugWrite( "adding new fixed solemnity '$row->NAME', common vartype = " . gettype( $row->COMMON ) . ", common = " . implode(', ', $row->COMMON) );
             //A Solemnity impeded in any given year is transferred to the nearest day following designated in nn. 1-8 of the Tables given above ( LY 60 )
             //However if a solemnity is impeded by a Sunday of Advent, Lent or Easter Time, the solemnity is transferred to the Monday following,
             //or to the nearest free day, as laid down by the General Norms.
@@ -530,7 +549,8 @@ class LitCalAPI {
                     if( $row->TAG === "StJoseph" && $currentFeastDate >= $this->Cal->getFestivity("PalmSun")->date && $currentFeastDate <= $this->Cal->getFestivity("Easter")->date ){
                         $tempFestivity->date = LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P8D' ) );
                         $this->Messages[] = sprintf(
-                            _( "The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to %s (%s) as per the %s." ),
+                            /**translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship  */
+                            _( 'The Solemnity \'%1$s\' falls on %2$s in the year %3$d, the celebration has been transferred to %4$s (%5$s) as per the %6$s.' ),
                             $tempFestivity->name,
                             $this->Cal->solemnityFromDate( $currentFeastDate )->name,
                             $this->LitSettings->Year,
@@ -546,7 +566,8 @@ class LitCalAPI {
                         //if the Annunciation falls during Holy Week or within the Octave of Easter, it is transferred to the Monday after the Second Sunday of Easter.
                         $tempFestivity->date = LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P8D' ) );
                         $this->Messages[] = sprintf(
-                            _( "The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to %s (%s) as per the %s." ),
+                            /**translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship */
+                            _( 'The Solemnity \'%1$s\' falls on %2$s in the year %3$d, the celebration has been transferred to %4$s (%5$s) as per the %6$s.' ),
                             $tempFestivity->name,
                             $this->Cal->solemnityFromDate( $currentFeastDate )->name,
                             $this->LitSettings->Year,
@@ -572,7 +593,8 @@ class LitCalAPI {
                         $tempFestivity->date = clone( $currentFeastDate );
                         $tempFestivity->date->add( new DateInterval( 'P1D' ) );
                         $this->Messages[] = sprintf(
-                            _( "The Solemnity '%s' falls on %s in the year %d, the celebration has been transferred to %s (%s) as per the %s." ),
+                            /**translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Explicatory string for the transferral, 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship  */
+                            _( 'The Solemnity \'%1$s\' falls on %2$s in the year %3$d, the celebration has been transferred to %4$s (%5$s) as per the %6$s.' ),
                             $tempFestivity->name,
                             $this->Cal->solemnityFromDate( $currentFeastDate )->name,
                             $this->LitSettings->Year,
@@ -587,7 +609,8 @@ class LitCalAPI {
                     else{
                         //In all other cases, let's make a note of what's happening and ask the Congegation for Divine Worship
                         $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                            _( "The Solemnity '%s' coincides with the Solemnity '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!" ),
+                            /**translators: 1: Festivity name, 2: Coinciding Festivity name, 3: Requested calendar year */
+                            _( 'The Solemnity \'%1$s\' coincides with the Solemnity \'%2$s\' in the year %3$d. We should ask the Congregation for Divine Worship what to do about this!' ),
                             $row->NAME,
                             $this->Cal->solemnityFromDate( $currentFeastDate )->name,
                             $this->LitSettings->Year
@@ -605,7 +628,8 @@ class LitCalAPI {
                         if( !$this->Cal->inSolemnities( $NativityJohnBaptistNewDate->sub( new DateInterval( 'P1D' ) ) ) ) {
                             $tempFestivity->date->sub( new DateInterval( 'P1D' ) );
                             $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                _( "Seeing that the Solemnity '%s' coincides with the Solemnity '%s' in the year %d, it has been anticipated by one day as per %s." ),
+                                /**translators: 1: Festivity name, 2: Coinciding Festivity name, 3: Requested calendar year, 4: Decree of the Congregation for Divine Worship */
+                                _( 'Seeing that the Solemnity \'%1$s\' coincides with the Solemnity \'%2$s\' in the year %3$d, it has been anticipated by one day as per %4$s.' ),
                                 $tempFestivity->name,
                                 $SacredHeart->name,
                                 $this->LitSettings->Year,
@@ -645,8 +669,8 @@ class LitCalAPI {
         $this->BaptismLordMod = 'next Sunday';
         //If Epiphany is celebrated on Sunday between Jan. 2 - Jan 8, and Jan. 7 or Jan. 8 is Sunday, then Baptism of the Lord is celebrated on the Monday immediately following that Sunday
         if ( $this->LitSettings->Epiphany === Epiphany::SUNDAY_JAN2_JAN8 ) {
-            $dateJan7 = DateTime::createFromFormat( '!j-n-Y', '7-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-            $dateJan8 = DateTime::createFromFormat( '!j-n-Y', '8-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+            $dateJan7 = LitDateTime::createFromFormat( '!j-n-Y', '7-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+            $dateJan8 = LitDateTime::createFromFormat( '!j-n-Y', '8-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
             if ( self::DateIsSunday( $dateJan7 ) ) {
                 $this->BaptismLordFmt = '7-1-' . $this->LitSettings->Year;
                 $this->BaptismLordMod = 'next Monday';
@@ -655,7 +679,7 @@ class LitCalAPI {
                 $this->BaptismLordMod = 'next Monday';
             }
         }
-        $BaptismLord      = new Festivity( $this->PropriumDeTempore[ "BaptismLord" ][ "NAME" ], DateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod ), LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
+        $BaptismLord      = new Festivity( $this->PropriumDeTempore[ "BaptismLord" ][ "NAME" ], LitDateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod ), LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
         $this->Cal->addFestivity( "BaptismLord", $BaptismLord );
 
         //the other feasts of the Lord ( Presentation, Transfiguration and Triumph of the Holy Cross) are fixed date feasts
@@ -663,17 +687,18 @@ class LitCalAPI {
         $tempCal = array_filter( $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ], function( $el ){ return $el->GRADE === LitGrade::FEAST_LORD; } );
 
         foreach ( $tempCal as $row ) {
-            $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+            $currentFeastDate = LitDateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
             $festivity = new Festivity( $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
             $this->Cal->addFestivity( $row->TAG, $festivity );
         }
 
         //Holy Family is celebrated the Sunday after Christmas, unless Christmas falls on a Sunday, in which case it is celebrated Dec. 30
         if ( self::DateIsSunday( $this->Cal->getFestivity( "Christmas" )->date ) ) {
-            $holyFamilyDate = DateTime::createFromFormat( '!j-n-Y', '30-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+            $holyFamilyDate = LitDateTime::createFromFormat( '!j-n-Y', '30-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
             $HolyFamily = new Festivity( $this->PropriumDeTempore[ "HolyFamily" ][ "NAME" ], $holyFamilyDate, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
             $this->Messages[] = sprintf(
-                _( "'%s' falls on a Sunday in the year %d, therefore the Feast '%s' is celebrated on %s rather than on the Sunday after Christmas." ),
+                /**translators: 1: Festivity name (Christmas), 2: Requested calendar year, 3: Festivity name (Holy Family), 4: New date for Holy Family */
+                _( '\'%1$s\' falls on a Sunday in the year %2$d, therefore the Feast \'%3$s\' is celebrated on %4$s rather than on the Sunday after Christmas.' ),
                 $this->Cal->getFestivity( "Christmas" )->name,
                 $this->LitSettings->Year,
                 $HolyFamily->name,
@@ -683,7 +708,7 @@ class LitCalAPI {
                     )
             );
         } else {
-            $holyFamilyDate = DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'next Sunday' );
+            $holyFamilyDate = LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'next Sunday' );
             $HolyFamily = new Festivity( $this->PropriumDeTempore[ "HolyFamily" ][ "NAME" ], $holyFamilyDate, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
         }
         $this->Cal->addFestivity( "HolyFamily", $HolyFamily );
@@ -695,19 +720,20 @@ class LitCalAPI {
         //If a fixed date Feast of the Lord occurs on a Sunday in Ordinary Time, the feast is celebrated in place of the Sunday
 
         //Sundays of Ordinary Time in the First part of the year are numbered from after the Baptism of the Lord ( which begins the 1st week of Ordinary Time ) until Ash Wednesday
-        $firstOrdinary = DateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod );
+        $firstOrdinary = LitDateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod );
         //Basically we take Ash Wednesday as the limit...
         //Here is ( Ash Wednesday - 7 ) since one more cycle will complete...
         $firstOrdinaryLimit = LitFunc::calcGregEaster( $this->LitSettings->Year )->sub( new DateInterval( 'P53D' ) );
         $ordSun = 1;
         while ( $firstOrdinary >= $this->Cal->getFestivity( "BaptismLord" )->date && $firstOrdinary < $firstOrdinaryLimit ) {
-            $firstOrdinary = DateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod )->modify( 'next Sunday' )->add( new DateInterval( 'P' . ( ( $ordSun - 1 ) * 7 ) . 'D' ) );
+            $firstOrdinary = LitDateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod )->modify( 'next Sunday' )->add( new DateInterval( 'P' . ( ( $ordSun - 1 ) * 7 ) . 'D' ) );
             $ordSun++;
             if ( !$this->Cal->inSolemnities( $firstOrdinary ) ) {
                 $this->Cal->addFestivity( "OrdSunday" . $ordSun, new Festivity( $this->PropriumDeTempore[ "OrdSunday" . $ordSun ][ "NAME" ], $firstOrdinary, LitColor::GREEN, LitFeastType::MOBILE, LitGrade::FEAST_LORD ) );
             } else {
                 $this->Messages[] = sprintf(
-                    _( "'%s' is superseded by the %s '%s' in the year %d." ),
+                    /**translators: 1: Festivity name, 2: Superseding Festivity grade, 3: Superseding Festivity name, 4: Requested calendar year */
+                    _( '\'%1$s\' is superseded by the %2$s \'%3$s\' in the year %4$d.' ),
                     $this->PropriumDeTempore[ "OrdSunday" . $ordSun ][ "NAME" ],
                     $this->Cal->solemnityFromDate( $firstOrdinary )->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $this->Cal->solemnityFromDate( $firstOrdinary )->grade, false ) . '</i>' : $this->LitGrade->i18n( $this->Cal->solemnityFromDate( $firstOrdinary )->grade, false ),
                     $this->Cal->solemnityFromDate( $firstOrdinary )->name,
@@ -717,7 +743,7 @@ class LitCalAPI {
         }
 
         //Sundays of Ordinary Time in the Latter part of the year are numbered backwards from Christ the King ( 34th ) to Pentecost
-        $lastOrdinary = DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 4 * 7 ) . 'D' ) );
+        $lastOrdinary = LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 4 * 7 ) . 'D' ) );
         //We take Trinity Sunday as the limit...
         //Here is ( Trinity Sunday + 7 ) since one more cycle will complete...
         $lastOrdinaryLowerLimit = LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 9 ) . 'D' ) );
@@ -725,13 +751,14 @@ class LitCalAPI {
         $ordSunCycle = 4;
 
         while ( $lastOrdinary <= $this->Cal->getFestivity( "ChristKing" )->date && $lastOrdinary > $lastOrdinaryLowerLimit ) {
-            $lastOrdinary = DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( ++$ordSunCycle * 7 ) . 'D' ) );
+            $lastOrdinary = LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( ++$ordSunCycle * 7 ) . 'D' ) );
             $ordSun--;
             if ( !$this->Cal->inSolemnities( $lastOrdinary ) ) {
                 $this->Cal->addFestivity( "OrdSunday" . $ordSun, new Festivity( $this->PropriumDeTempore[ "OrdSunday" . $ordSun ][ "NAME" ], $lastOrdinary, LitColor::GREEN, LitFeastType::MOBILE, LitGrade::FEAST_LORD ) );
             } else {
                 $this->Messages[] = sprintf(
-                    _( "'%s' is superseded by the %s '%s' in the year %d." ),
+                    /**translators: 1: Festivity name, 2: Superseding Festivity grade, 3: Superseding Festivity name, 4: Requested calendar year */
+                    _( '\'%1$s\' is superseded by the %2$s \'%3$s\' in the year %4$d.' ),
                     $this->PropriumDeTempore[ "OrdSunday" . $ordSun ][ "NAME" ],
                     $this->Cal->solemnityFromDate( $lastOrdinary )->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $this->Cal->solemnityFromDate( $lastOrdinary )->grade, false ) . '</i>' : $this->LitGrade->i18n( $this->Cal->solemnityFromDate( $lastOrdinary )->grade, false ),
                     $this->Cal->solemnityFromDate( $lastOrdinary )->name,
@@ -746,7 +773,7 @@ class LitCalAPI {
         $tempCal = array_filter( $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ], function( $el ){ return $el->GRADE === LitGrade::FEAST; } );
 
         foreach ( $tempCal as $row ) {
-            $row->DATE = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+            $row->DATE = LitDateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
             //If a Feast ( not of the Lord ) occurs on a Sunday in Ordinary Time, the Sunday is celebrated.  ( e.g., St. Luke, 1992 )
             //obviously solemnities also have precedence
             if ( self::DateIsNotSunday( $row->DATE ) && !$this->Cal->inSolemnities( $row->DATE ) ) {
@@ -760,7 +787,7 @@ class LitCalAPI {
         //With the decree Apostolorum Apostola ( June 3rd 2016 ), the Congregation for Divine Worship
         //with the approval of Pope Francis elevated the memorial of Saint Mary Magdalen to a Feast
         //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf
-        //This is taken care of ahead when the memorials are created, see comment tag MARYMAGDALEN:
+        //This is taken care of ahead when the "memorials from decrees" are applied
 
     }
 
@@ -771,10 +798,10 @@ class LitCalAPI {
 
         $DoMAdvent1     = $this->Cal->getFestivity("Advent1")->date->format( 'j' ); //DoM == Day of Month
         $MonthAdvent1   = $this->Cal->getFestivity("Advent1")->date->format( 'n' );
-        $weekdayAdvent  = DateTime::createFromFormat( '!j-n-Y', $DoMAdvent1 . '-' . $MonthAdvent1 . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+        $weekdayAdvent  = LitDateTime::createFromFormat( '!j-n-Y', $DoMAdvent1 . '-' . $MonthAdvent1 . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
         $weekdayAdventCnt = 1;
         while ( $weekdayAdvent >= $this->Cal->getFestivity("Advent1")->date && $weekdayAdvent < $this->Cal->getFestivity("Christmas")->date ) {
-            $weekdayAdvent = DateTime::createFromFormat( '!j-n-Y', $DoMAdvent1 . '-' . $MonthAdvent1 . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayAdventCnt . 'D' ) );
+            $weekdayAdvent = LitDateTime::createFromFormat( '!j-n-Y', $DoMAdvent1 . '-' . $MonthAdvent1 . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayAdventCnt . 'D' ) );
 
             //if we're not dealing with a sunday or a solemnity, then create the weekday
             if ( $this->Cal->notInSolemnitiesFeastsOrMemorials( $weekdayAdvent ) && self::DateIsNotSunday( $weekdayAdvent ) ) {
@@ -795,10 +822,10 @@ class LitCalAPI {
     }
 
     private function calculateWeekdaysChristmasOctave() : void {
-        $weekdayChristmas = DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+        $weekdayChristmas = LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
         $weekdayChristmasCnt = 1;
-        while ( $weekdayChristmas >= $this->Cal->getFestivity( "Christmas" )->date && $weekdayChristmas < DateTime::createFromFormat( '!j-n-Y', '31-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) ) ) {
-            $weekdayChristmas = DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayChristmasCnt . 'D' ) );
+        while ( $weekdayChristmas >= $this->Cal->getFestivity( "Christmas" )->date && $weekdayChristmas < LitDateTime::createFromFormat( '!j-n-Y', '31-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) ) ) {
+            $weekdayChristmas = LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayChristmasCnt . 'D' ) );
             if ( $this->Cal->notInSolemnitiesFeastsOrMemorials( $weekdayChristmas ) && self::DateIsNotSunday( $weekdayChristmas ) ) {
                 $ordinal = ucfirst( LitMessages::getOrdinal( ( $weekdayChristmasCnt + 1 ), $this->LitSettings->Locale, $this->formatter, LitMessages::LATIN_ORDINAL ) );
                 $name = $this->LitSettings->Locale === LitLocale::LATIN ? sprintf( "Dies %s Octavæ Nativitatis", $ordinal ) : sprintf( _( "%s Day of the Octave of Christmas" ), $ordinal );
@@ -814,10 +841,10 @@ class LitCalAPI {
         //Day of the Month of Ash Wednesday
         $DoMAshWednesday = $this->Cal->getFestivity( "AshWednesday" )->date->format( 'j' );
         $MonthAshWednesday = $this->Cal->getFestivity( "AshWednesday" )->date->format( 'n' );
-        $weekdayLent = DateTime::createFromFormat( '!j-n-Y', $DoMAshWednesday . '-' . $MonthAshWednesday . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+        $weekdayLent = LitDateTime::createFromFormat( '!j-n-Y', $DoMAshWednesday . '-' . $MonthAshWednesday . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
         $weekdayLentCnt = 1;
         while ( $weekdayLent >= $this->Cal->getFestivity( "AshWednesday" )->date && $weekdayLent < $this->Cal->getFestivity( "PalmSun" )->date ) {
-            $weekdayLent = DateTime::createFromFormat( '!j-n-Y', $DoMAshWednesday . '-' . $MonthAshWednesday . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayLentCnt . 'D' ) );
+            $weekdayLent = LitDateTime::createFromFormat( '!j-n-Y', $DoMAshWednesday . '-' . $MonthAshWednesday . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayLentCnt . 'D' ) );
             if ( !$this->Cal->inSolemnities( $weekdayLent ) && self::DateIsNotSunday( $weekdayLent ) ) {
                 if ( $weekdayLent > $this->Cal->getFestivity("Lent1")->date ) {
                     $upper =  (int)$weekdayLent->format( 'z' );
@@ -848,7 +875,7 @@ class LitCalAPI {
          * 3. Day of the festivity
          * 4. Year from which the festivity has been added
          * 5. Source of the information
-         * 6. Current year
+         * 6. Requested calendar year
          */
         $message = _( 'The %1$s \'%2$s\' has been added on %3$s since the year %4$d (%5$s), applicable to the year %6$d.' );
         $this->Messages[] = sprintf(
@@ -872,9 +899,12 @@ class LitCalAPI {
         $tempCal = array_filter( $this->tempCal[ $missal ], function( $el ) use ( $grade ){ return $el->GRADE === $grade; } );
         foreach ( $tempCal as $row ) {
             //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord or a Feast or an obligatory memorial, then go ahead and create the optional memorial
-            $row->DATE = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+            $row->DATE = LitDateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
             if ( self::DateIsNotSunday( $row->DATE ) && $this->Cal->notInSolemnitiesFeastsOrMemorials( $row->DATE ) ) {
                 $newFestivity = new Festivity( $row->NAME, $row->DATE, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
+                //LitCalAPI::debugWrite( "adding new memorial '$row->NAME', common vartype = " . gettype( $row->COMMON ) . ", common = " . implode(', ', $row->COMMON) );
+                //LitCalAPI::debugWrite( ">>> added new memorial '$newFestivity->name', common vartype = " . gettype( $newFestivity->common ) . ", common = " . implode(', ', $newFestivity->common) );
+
                 $this->Cal->addFestivity( $row->TAG, $newFestivity );
 
                 $this->reduceMemorialsInAdventLentToCommemoration( $row->DATE, $row );
@@ -919,13 +949,13 @@ class LitCalAPI {
 
     private function reduceMemorialsInAdventLentToCommemoration( DateTime $currentFeastDate, stdClass $row ) {
         //If a fixed date optional memorial falls between 17 Dec. to 24 Dec., the Octave of Christmas or weekdays of the Lenten season,
-        //it is reduced in rank to a Commemoration ( only the collect can be used
+        //it is reduced in rank to a Commemoration ( only the collect can be used )
         if ( $this->Cal->inWeekdaysAdventChristmasLent( $currentFeastDate ) ) {
             $this->Cal->setProperty( $row->TAG, "grade", LitGrade::COMMEMORATION );
             /**translators:
              * 1. Grade or rank of the festivity
              * 2. Name of the festivity
-             * 3. Current year
+             * 3. Requested calendar year
              */
             $message = _( 'The %1$s \'%2$s\' either falls between 17 Dec. and 24 Dec., or during the Octave of Christmas, or on the weekdays of the Lenten season in the year %3$d, rank reduced to Commemoration.' );
             $this->Messages[] = sprintf(
@@ -947,7 +977,7 @@ class LitCalAPI {
                  * 2. Name of the festivity that has been superseded
                  * 3. Grade or rank of the festivity that is superseding
                  * 4. Name of the festivity that is superseding
-                 * 5. Current year
+                 * 5. Requested calendar year
                  */
                 $message = _( 'The %1$s \'%2$s\' is superseded by the %3$s \'%4$s\' in the year %5$d.' );
                 $this->Messages[] = sprintf(
@@ -989,7 +1019,7 @@ class LitCalAPI {
          * 6. Date in which the superseded festivity is usually celebrated
          * 7. Grade or rank of the festivity that is superseding
          * 8. Name of the festivity that is superseding
-         * 9. Current year
+         * 9. Requested calendar year
          */
         $message = _( 'The %1$s \'%2$s\', added in the %3$s of the Roman Missal since the year %4$d (%5$s) and usually celebrated on %6$s, is suppressed by the %7$s \'%8$s\' in the year %9$d.' );
         $this->Messages[] = sprintf(
@@ -1025,7 +1055,7 @@ class LitCalAPI {
              * 5. Source of the information
              * 6. Grade or rank of the superseding festivity
              * 7. Name of the superseding festivity
-             * 8. Current year
+             * 8. Requested calendar year
              */
             _( 'The %1$s \'%2$s\', added on %3$s since the year %4$d (%5$s), is however superseded by a %6$s \'%7$s\' in the year %8$d.' ),
             $this->LitGrade->i18n( $row->Festivity->GRADE ),
@@ -1063,7 +1093,7 @@ class LitCalAPI {
                         /**translators:
                          * 1. Name of the first coinciding Memorial
                          * 2. Name of the second coinciding Memorial
-                         * 3. Current year
+                         * 3. Requested calendar year
                          * 4. Source of the information
                          */
                         _( 'The Memorial \'%1$s\' coincides with another Memorial \'%2$s\' in the year %3$d. They are both reduced in rank to optional memorials (%4$s).' ),
@@ -1082,6 +1112,8 @@ class LitCalAPI {
     private function createFestivityFromDecree( object $row ) : void {
         if( $row->Festivity->TYPE === "mobile" ) {
             //we won't have a date defined for mobile festivites, we'll have to calculate them here case by case
+            //otherwise we'll have to create a language that we can interpret in an automated fashion...
+            //for example we can use strtotime
             switch( $row->Festivity->TAG ) {
                 case "MaryMotherChurch":
                     $row->Festivity->DATE = LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 7 + 1 ) . 'D' ) );
@@ -1091,7 +1123,7 @@ class LitCalAPI {
                 $this->createMobileFestivity( $row );
             }
         } else {
-            $row->Festivity->DATE = DateTime::createFromFormat( '!j-n-Y', "{$row->Festivity->DAY}-{$row->Festivity->MONTH}-{$this->LitSettings->Year}", new DateTimeZone( 'UTC' ) );
+            $row->Festivity->DATE = LitDateTime::createFromFormat( '!j-n-Y', "{$row->Festivity->DAY}-{$row->Festivity->MONTH}-{$this->LitSettings->Year}", new DateTimeZone( 'UTC' ) );
             $decree = $this->elaborateDecreeSource( $row );
             if( $row->Festivity->GRADE === LitGrade::MEMORIAL_OPT ) {
                 if( $this->Cal->notInSolemnitiesFeastsOrMemorials( $row->Festivity->DATE ) ) {
@@ -1104,7 +1136,7 @@ class LitCalAPI {
                          * 3. Day of the festivity
                          * 4. Year from which the festivity has been added
                          * 5. Source of the information
-                         * 6. Current year
+                         * 6. Requested calendar year
                          */
                         _( 'The %1$s \'%2$s\' has been added on %3$s since the year %4$d (%5$s), applicable to the year %6$d.' ),
                         $this->LitGrade->i18n( $row->Festivity->GRADE, false ),
@@ -1138,7 +1170,7 @@ class LitCalAPI {
                      * 2. Name of the festivity
                      * 3. New name of the festivity
                      * 4. Year from which the grade has been changed
-                     * 5. Current year
+                     * 5. Requested calendar year
                      * 6. Source of the information
                      */
                     $message = _( 'The name of the %1$s \'%2$s\' has been changed to %3$s since the year %4$d, applicable to the year %5$d (%6$s).' );
@@ -1160,7 +1192,7 @@ class LitCalAPI {
                          * 2. Name of the festivity
                          * 3. New grade of the festivity
                          * 4. Year from which the grade has been changed
-                         * 5. Current year
+                         * 5. Requested calendar year
                          * 6. Source of the information
                          */
                         $message = _( 'The %1$s \'%2$s\' has been raised to the rank of %3$s since the year %4$d, applicable to the year %5$d (%6$s).' );
@@ -1170,7 +1202,7 @@ class LitCalAPI {
                          * 2. Name of the festivity
                          * 3. New grade of the festivity
                          * 4. Year from which the grade has been changed
-                         * 5. Current year
+                         * 5. Requested calendar year
                          * 6. Source of the information
                          */
                         $message = _( 'The %1$s \'%2$s\' has been lowered to the rank of %3$s since the year %4$d, applicable to the year %5$d (%6$s).' );
@@ -1204,7 +1236,7 @@ class LitCalAPI {
                     /**translators:
                      * 1. Name of the festivity
                      * 2. Year in which was declared Doctor
-                     * 3. Current year
+                     * 3. Requested calendar year
                      * 4. Source of the information
                      */
                     $message = _( '\'%1$s\' has been declared a Doctor of the Church since the year %2$d, applicable to the year %3$d (%4$s).' );
@@ -1281,7 +1313,7 @@ class LitCalAPI {
              * 3. Indication of the mobile date for the festivity being created
              * 4. Year from which the festivity has been added
              * 5. Source of the information
-             * 6. Current year
+             * 6. Requested calendar year
              */
             _( 'The %1$s \'%2$s\' has been added on %3$s since the year %4$d (%5$s), applicable to the year %6$d.' ),
             $this->LitGrade->i18n( $row->Festivity->GRADE, false ),
@@ -1318,7 +1350,7 @@ class LitCalAPI {
                      * 5. Source of the information
                      * 6. Grade or rank of superseding festivity
                      * 7. Name of superseding festivity
-                     * 8. Current year
+                     * 8. Requested calendar year
                      */
                     _( 'The %1$s \'%2$s\', added on %3$s since the year %4$d (%5$s), is however superseded by the %6$s \'%7$s\' in the year %8$d.' ),
                     $this->LitGrade->i18n( $row->Festivity->GRADE, false ),
@@ -1339,7 +1371,7 @@ class LitCalAPI {
                         foreach( $coincidingFestivities as $coincidingFestivityKey => $coincidingFestivity ) {
                             $this->Messages[] = sprintf(
                                 /**translators:
-                                 * 1. Current year
+                                 * 1. Requested calendar year
                                  * 2. Grade or rank of suppressed festivity
                                  * 3. Name of suppressed festivity
                                  * 4. Grade or rank of the festivity being created
@@ -1398,15 +1430,16 @@ class LitCalAPI {
      * source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_lt.html
      */
     private function handleSaintJaneFrancesDeChantal() {
-        $StJaneFrancesNewDate = DateTime::createFromFormat( '!j-n-Y', '12-8-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+        $StJaneFrancesNewDate = LitDateTime::createFromFormat( '!j-n-Y', '12-8-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+        $langs = ["LA" => "lt", "ES" => "es"];
+        $lang = in_array( $this->LitSettings->Locale, array_keys($langs) ) ? $langs[$this->LitSettings->Locale] : "lt";
         if ( self::DateIsNotSunday( $StJaneFrancesNewDate ) && $this->Cal->notInSolemnitiesFeastsOrMemorials( $StJaneFrancesNewDate ) ) {
             $festivity = $this->Cal->getFestivity( "StJaneFrancesDeChantal" );
-            $langs = ["LA" => "lt", "ES" => "es"];
-            $lang = in_array( $this->LitSettings->Locale, array_keys($langs) ) ? $langs[$this->LitSettings->Locale] : "lt";
             if( $festivity !== null ) {
                 $this->Cal->moveFestivityDate( "StJaneFrancesDeChantal", $StJaneFrancesNewDate );
                 $this->Messages[] = sprintf(
-                    _( "The optional memorial '%s' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%s), applicable to the year %d." ),
+                    /**translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year  */
+                    _( 'The optional memorial \'%1$s\' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d.' ),
                     $festivity->name,
                     "<a href=\"http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\">" . _( 'Decree of the Congregation for Divine Worship' ) . '</a>',
                     $this->LitSettings->Year
@@ -1418,7 +1451,8 @@ class LitCalAPI {
                 $festivity = new Festivity( $row->NAME, $StJaneFrancesNewDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
                 $this->Cal->addFestivity( "StJaneFrancesDeChantal", $festivity );
                 $this->Messages[] = sprintf(
-                    _( "The optional memorial '%s', which would have been superseded this year by a Sunday or Solemnity were it on Dec. 12, has however been transferred to Aug. 12 since the year 2002 (%s), applicable to the year %d." ),
+                    /**translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year  */
+                    _( 'The optional memorial \'%1$s\', which would have been superseded this year by a Sunday or Solemnity were it on Dec. 12, has however been transferred to Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d.' ),
                     $festivity->name,
                     "<a href=\"http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\">" . _( 'Decree of the Congregation for Divine Worship' ) . '</a>',
                     $this->LitSettings->Year
@@ -1454,12 +1488,13 @@ class LitCalAPI {
         $festivity = $this->Cal->getFestivity( "ConversionStPaul" );
         if( $festivity === null ) {
             $row = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ "ConversionStPaul" ];
-            $festivity = new Festivity( $row->NAME, DateTime::createFromFormat( '!j-n-Y', '25-1-2009', new DateTimeZone( 'UTC' ) ), LitColor::WHITE, LitFeastType::FIXED, LitGrade::MEMORIAL_OPT, LitCommon::PROPRIO );
+            $festivity = new Festivity( $row->NAME, LitDateTime::createFromFormat( '!j-n-Y', '25-1-2009', new DateTimeZone( 'UTC' ) ), LitColor::WHITE, LitFeastType::FIXED, LitGrade::MEMORIAL_OPT, LitCommon::PROPRIO );
             $this->Cal->addFestivity( "ConversionStPaul", $festivity );
             $langs = ["FR" => "fr", "EN" => "en", "IT" => "it", "LA" => "lt", "PT" => "pt", "ES" => "sp", "DE" => "ge"];
             $lang = in_array( $this->LitSettings->Locale, array_keys($langs) ) ? $langs[$this->LitSettings->Locale] : "en";
             $this->Messages[] = sprintf(
-                _( 'The Feast \'%s\' would have been suppressed this year ( 2009 ) since it falls on a Sunday, however being the Year of the Apostle Paul, as per the %s it has been reinstated so that local churches can optionally celebrate the memorial.' ),
+                /**translators: 1: Festivity name, 2: Source of the information  */
+                _( 'The Feast \'%1$s\' would have been suppressed this year ( 2009 ) since it falls on a Sunday, however being the Year of the Apostle Paul, as per the %2$s it has been reinstated so that local churches can optionally celebrate the memorial.' ),
                 '<i>' . $row->NAME . '</i>',
                 "<a href=\"http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_$lang.html\">" . _( 'Decree of the Congregation for Divine Worship' ) . '</a>'
             );
@@ -1473,10 +1508,10 @@ class LitCalAPI {
         $DoMEaster = $this->Cal->getFestivity( "Easter" )->date->format( 'j' );      //day of the month of Easter
         $MonthEaster = $this->Cal->getFestivity( "Easter" )->date->format( 'n' );    //month of Easter
         //let's start cycling dates one at a time starting from Easter itself
-        $weekdayEaster = DateTime::createFromFormat( '!j-n-Y', $DoMEaster . '-' . $MonthEaster . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+        $weekdayEaster = LitDateTime::createFromFormat( '!j-n-Y', $DoMEaster . '-' . $MonthEaster . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
         $weekdayEasterCnt = 1;
         while ( $weekdayEaster >= $this->Cal->getFestivity( "Easter" )->date && $weekdayEaster < $this->Cal->getFestivity( "Pentecost" )->date ) {
-            $weekdayEaster = DateTime::createFromFormat( '!j-n-Y', $DoMEaster . '-' . $MonthEaster . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayEasterCnt . 'D' ) );
+            $weekdayEaster = LitDateTime::createFromFormat( '!j-n-Y', $DoMEaster . '-' . $MonthEaster . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayEasterCnt . 'D' ) );
             if ( $this->Cal->notInSolemnitiesFeastsOrMemorials( $weekdayEaster ) && self::DateIsNotSunday( $weekdayEaster ) ) {
                 $upper =  (int)$weekdayEaster->format( 'z' );
                 $diff = $upper - (int)$this->Cal->getFestivity( "Easter" )->date->format( 'z' ); //day count between current day and Easter Sunday
@@ -1503,12 +1538,12 @@ class LitCalAPI {
 
         $ordWeekday = 1;
         $currentOrdWeek = 1;
-        $firstOrdinary = DateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod );
-        $firstSunday = DateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod )->modify( 'next Sunday' );
+        $firstOrdinary = LitDateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod );
+        $firstSunday = LitDateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod )->modify( 'next Sunday' );
         $dayFirstSunday =  (int)$firstSunday->format( 'z' );
 
         while ( $firstOrdinary >= $FirstWeekdaysLowerLimit && $firstOrdinary < $FirstWeekdaysUpperLimit ) {
-            $firstOrdinary = DateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod )->add( new DateInterval( 'P' . $ordWeekday . 'D' ) );
+            $firstOrdinary = LitDateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod )->add( new DateInterval( 'P' . $ordWeekday . 'D' ) );
             if ( $this->Cal->notInSolemnitiesFeastsOrMemorials( $firstOrdinary ) ) {
                 //The Baptism of the Lord is the First Sunday, so the weekdays following are of the First Week of Ordinary Time
                 //After the Second Sunday, let's calculate which week of Ordinary Time we're in
@@ -1531,12 +1566,12 @@ class LitCalAPI {
         //In the second part of the year, weekdays of ordinary time begin the day after Pentecost
         $SecondWeekdaysLowerLimit = $this->Cal->getFestivity( "Pentecost" )->date;
         //and end with the Feast of Christ the King
-        $SecondWeekdaysUpperLimit = DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 3 * 7 ) . 'D' ) );
+        $SecondWeekdaysUpperLimit = LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 3 * 7 ) . 'D' ) );
 
         $ordWeekday = 1;
         //$currentOrdWeek = 1;
         $lastOrdinary = LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 7 ) . 'D' ) );
-        $dayLastSunday =  (int)DateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 3 * 7 ) . 'D' ) )->format( 'z' );
+        $dayLastSunday =  (int)LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 3 * 7 ) . 'D' ) )->format( 'z' );
 
         while ( $lastOrdinary >= $SecondWeekdaysLowerLimit && $lastOrdinary < $SecondWeekdaysUpperLimit ) {
             $lastOrdinary = LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 7 + $ordWeekday ) . 'D' ) );
@@ -1564,11 +1599,11 @@ class LitCalAPI {
     // so that our cycle using "next Saturday" logic will actually start from the first Saturday of the year ),
     // and then continue for every next Saturday until we reach the last Saturday of the year
     private function calculateSaturdayMemorialBVM() : void {
-        $currentSaturday = new DateTime( "previous Saturday January {$this->LitSettings->Year}", new DateTimeZone( 'UTC' ) );
-        $lastSatDT = new DateTime( "last Saturday December {$this->LitSettings->Year}", new DateTimeZone( 'UTC' ) );
+        $currentSaturday = new LitDateTime( "previous Saturday January {$this->LitSettings->Year}", new DateTimeZone( 'UTC' ) );
+        $lastSatDT = new LitDateTime( "last Saturday December {$this->LitSettings->Year}", new DateTimeZone( 'UTC' ) );
         $SatMemBVM_cnt = 0;
         while( $currentSaturday <= $lastSatDT ){
-            $currentSaturday = DateTime::createFromFormat( '!j-n-Y', $currentSaturday->format( 'j-n-Y' ),new DateTimeZone( 'UTC' ) )->modify( 'next Saturday' );
+            $currentSaturday = LitDateTime::createFromFormat( '!j-n-Y', $currentSaturday->format( 'j-n-Y' ),new DateTimeZone( 'UTC' ) )->modify( 'next Saturday' );
             if( $this->Cal->notInSolemnitiesFeastsOrMemorials( $currentSaturday ) ) {
                 $memID = "SatMemBVM" . ++$SatMemBVM_cnt;
                 $name = $this->LitSettings->Locale === LitLocale::LATIN ? "Memoria Sanctæ Mariæ in Sabbato" : _( "Saturday Memorial of the Blessed Virgin Mary" );
@@ -1578,308 +1613,476 @@ class LitCalAPI {
         }
     }
 
-    private function applyCalendarItaly() : void {
-        $this->applyPatronSaintsEurope();
-        $this->applyPatronSaintsItaly();
-        if( $this->LitSettings->Year >= 1983 && $this->LitSettings->Year < 2002 ) {
-            $this->readPropriumDeSanctisJSONData( RomanMissal::ITALY_EDITION_1983 );
-            //The extra liturgical events found in the 1983 edition of the Roman Missal in Italian,
-            //were then incorporated into the Latin edition in 2002 ( effectively being incorporated into the General Roman Calendar )
-            //so when dealing with Italy, we only need to add them from 1983 until 2002, after which it's taken care of by the General Calendar
-            $this->applyMessaleRomano1983();
+    private function loadNationalCalendarData() : void {
+        $nationalDataFile = "nations/{$this->LitSettings->NationalCalendar}/{$this->LitSettings->NationalCalendar}.json";
+        if( file_exists( $nationalDataFile ) ) {
+            $this->NationalData = json_decode( file_get_contents( $nationalDataFile ) );
+            if( json_last_error() === JSON_ERROR_NONE ) {
+                if( property_exists( $this->NationalData, "Metadata" ) && property_exists( $this->NationalData->Metadata, "WiderRegion" ) ){
+                    $widerRegionDataFile = $this->NationalData->Metadata->WiderRegion->jsonFile;
+                    $widerRegionI18nFile = $this->NationalData->Metadata->WiderRegion->i18nFile;
+                    if( file_exists( $widerRegionI18nFile ) ) {
+                        $widerRegionI18nData = json_decode( file_get_contents( $widerRegionI18nFile ) );
+                        if( json_last_error() === JSON_ERROR_NONE && file_exists( $widerRegionDataFile ) ) {
+                            $this->WiderRegionData = json_decode( file_get_contents( $widerRegionDataFile ) );
+                            if( json_last_error() === JSON_ERROR_NONE && property_exists( $this->WiderRegionData, "LitCal" ) ) {
+                                foreach( $this->WiderRegionData->LitCal as $idx => $value ) {
+                                    $tag = $value->Festivity->tag;
+                                    $this->WiderRegionData->LitCal[$idx]->Festivity->name = $widerRegionI18nData->{ $tag };
+                                }
+                            } else {
+                                $this->Messages[] = sprintf( _( "Error retrieving and decoding Wider Region data from file %s." ), $widerRegionDataFile ) . ": " . json_last_error_msg();
+                            }
+                        } else {
+                            $this->Messages[] = sprintf( _( "Error retrieving and decoding Wider Region data from file %s." ), $widerRegionI18nFile ) . ": " . json_last_error_msg();
+                        }
+                    }
+                } else {
+                    $this->Messages[] = "Could not find a WiderRegion property in the Metadata for the National Calendar {$this->LitSettings->NationalCalendar}";
+                }
+            } else {
+                $this->Messages[] = sprintf( _( "Error retrieving and decoding National data from file %s." ), $nationalDataFile ) . ": " . json_last_error_msg();
+            }
         }
-
-        //The Sanctorale in the 2020 edition Messale Romano is based on the Latin 2008 Edition,
-        // there isn't really anything different from preceding editions or from the 2008 edition
     }
 
-    private function makePatron( string $tag, string $nameSuffix, int $day, int $month, string $color, string $EditionRomanMissal = RomanMissal::EDITIO_TYPICA_1970 ) {
-        $festivity = $this->Cal->getFestivity( $tag );
-        if( $festivity !== null ) {
-            if( $festivity->grade < LitGrade::FEAST ) {
-                $this->Cal->setProperty( $tag, "grade", LitGrade::FEAST );
-            }
-            $this->Cal->setProperty( $tag, "name", $festivity->name . ", " . $nameSuffix );
-            $this->Cal->setProperty( $tag, "common", LitCommon::PROPRIO );
-        } else{
-            //check what's going on, for example, if it's a Sunday or Solemnity
-            $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', "{$day}-{$month}-" . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-            $row = $this->tempCal[ $EditionRomanMissal ][ $tag ];
-            //let's also get the name back from the database, so we can give some feedback and maybe even recreate the festivity
-            $FestivityName = $row->NAME . ", " .  $nameSuffix;
-            if( $this->Cal->inSolemnitiesFeastsOrMemorials( $currentFeastDate ) || self::DateIsSunday( $currentFeastDate ) ) {
-                $coincidingFestivity = new stdClass();
-                $coincidingFestivity->event = $this->Cal->solemnityFromDate( $currentFeastDate );
-                if ( self::DateIsSunday( $currentFeastDate ) && $coincidingFestivity->event->grade < LitGrade::SOLEMNITY ){
-                    //it's a Sunday
-                    $coincidingFestivity->grade = $this->LitSettings->Locale === LitLocale::LATIN ? 'Die Domini' : ucfirst( $this->dayOfTheWeek->format( $currentFeastDate->format( 'U' ) ) );
-                } else if ( $this->Cal->inSolemnities( $currentFeastDate ) ) {
-                    //it's a Feast of the Lord or a Solemnity
-                    $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $coincidingFestivity->event->grade, false ) . '</i>' : $this->LitGrade->i18n( $coincidingFestivity->grade, false ) );
-                } else if ( $this->Cal->inFeastsOrMemorials( $currentFeastDate ) ) {
-                    //we should probably be able to create it anyways in this case?
-                    $this->Cal->addFestivity( $tag, new Festivity( $FestivityName, $currentFeastDate, $color, LitFeastType::FIXED, LitGrade::FEAST, LitCommon::PROPRIO ) );
-                    $coincidingFestivity->grade = $this->LitGrade->i18n( $coincidingFestivity->event->grade, false );
-                }
-                $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                    /**translators:
-                     * 1. Grade of the festivity
-                     * 2. Name of the festivity
-                     * 3. Date on which the festivity is usually celebrated
-                     * 4. Grade of the superseding festivity
-                     * 5. Name of the superseding festivity
-                     * 6. Current year
-                     */
-                    _( 'The %1$s \'%2$s\', usually celebrated on %3$s, is suppressed by the %4$s \'%5$s\' in the year %6$d.' ),
-                    $this->LitGrade->i18n( LitGrade::FEAST, false ),
-                    $FestivityName,
-                    $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ),
-                    $coincidingFestivity->grade,
-                    $coincidingFestivity->event->name,
-                    $this->LitSettings->Year
+    private function handleMissingFestivity( object $row ) : void {
+        $currentFeastDate = LitDateTime::createFromFormat( '!j-n-Y', "{$row->Festivity->day}-{$row->Festivity->month}-" . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+        //let's also get the name back from the database, so we can give some feedback and maybe even recreate the festivity
+        if( $this->Cal->inSolemnitiesFeastsOrMemorials( $currentFeastDate ) || self::DateIsSunday( $currentFeastDate ) ) {
+            $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $currentFeastDate, $this->LitSettings );
+            if ( $this->Cal->inFeastsOrMemorials( $currentFeastDate ) ) {
+                //we should probably be able to create it anyways in this case?
+                $this->Cal->addFestivity(
+                    $row->Festivity->tag,
+                    new Festivity(
+                        $row->Festivity->name,
+                        $currentFeastDate,
+                        $row->Festivity->color,
+                        LitFeastType::FIXED,
+                        $row->Festivity->grade,
+                        LitCommon::PROPRIO
+                    )
                 );
             }
-        }
-    }
-
-
-    //Insert or elevate the Patron Saints of Europe
-    private function applyPatronSaintsEurope() : void {
-
-        //Saint Benedict, Saint Bridget, and Saint Cyril and Methodius elevated to Feast, with title "patrono/i d'Europa" added
-        //then from 1999, Saint Catherine of Siena and Saint Edith Stein, elevated to Feast with title "compatrona d'Europa" added
-        $this->makePatron( "StBenedict",        pgettext("Male singular", "patron of Europe"),   11, 7, LitColor::WHITE );
-        $this->makePatron( "StBridget",         pgettext("Female singular", "patron of Europe"), 23, 7, LitColor::WHITE );
-        $this->makePatron( "StsCyrilMethodius", pgettext("Male plural", "patrons of Europe"),    14, 2, LitColor::WHITE );
-
-        //In 1999, Pope John Paul II elevated Catherine of Siena from patron of Italy to patron of Europe
-        if( $this->LitSettings->Year >= 1999 ) {
-            if( $this->LitSettings->NationalCalendar === "ITALY" ) {
-                $name = "patrona d'Italia e d'Europa";
-            } else {
-                $name = pgettext("Female singular", "patron of Europe");
-            }
-            $this->makePatron( "StCatherineSiena", $name, 29, 4, LitColor::WHITE );
-            if( $this->LitSettings->Year >= 2002 ) {
-                $this->makePatron( "StEdithStein", pgettext("Female singular", "patron of Europe"), 9, 8, LitColor::WHITE, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
-            } else {
-                //between 1999 and 2002 we have to manually create StEdithStein
-                //since the makePatron method expects to find data from the Missals,
-                //we are going to have to fake this one as belonging to a Missal...
-                //let's add it to the future Missal that doesn't exist yet
-                $EdithStein = new stdClass();
-                $EdithStein->NAME       = _("Saint Teresa Benedicta of the Cross, Virgin and Martyr");
-                $EdithStein->MONTH      = 8;
-                $EdithStein->DAY        = 9;
-                $EdithStein->TAG        = "StEdithStein";
-                $EdithStein->GRADE      = LitGrade::MEMORIAL_OPT;
-                $EdithStein->COMMON     = LitCommon::AB( [LitCommon::PRO_VIRGINE_MARTYRE,LitCommon::PRO_UNA_VIRGINE] );
-                $EdithStein->CALENDAR   = "GENERAL ROMAN";
-                $EdithStein->COLOR  = "white,red";
-                $this->tempCal[ RomanMissal::EDITIO_TYPICA_TERTIA_2002 ][ "StEdithStein" ] = $EdithStein;
-                $EdithStein->DATE = DateTime::createFromFormat( '!j-n-Y', $EdithStein->DAY . '-' . $EdithStein->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-                if( !$this->Cal->inSolemnitiesFeastsOrMemorials( $EdithStein->DATE ) ) {
-                    $this->Cal->addFestivity( $EdithStein->TAG, new Festivity( $EdithStein->NAME, $EdithStein->DATE, $EdithStein->COLOR, LitFeastType::FIXED, $EdithStein->GRADE, $EdithStein->COMMON ) );
-                    $this->makePatron( "StEdithStein", pgettext("Female singular", "patron of Europe"), $EdithStein->DAY, $EdithStein->MONTH, $EdithStein->COLOR, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
-                }
-            }
-        }
-    }
-
-    //Insert or elevate the Patron Saints of Italy
-    private function applyPatronSaintsItaly() : void {
-        if ( $this->LitSettings->Year < 1999 ) {
-            //We only have to deal with years before 1999, because from 1999
-            //it will be taken care of by Patron saints of Europe
-            $this->makePatron( "StCatherineSiena", "patrona d'Italia", 29, 4, LitColor::WHITE );
-        }
-        $this->makePatron( "StFrancisAssisi", "patrono d'Italia", 4, 10, LitColor::WHITE );
-    }
-
-    private function applyMessaleRomano1983() : void {
-        //we have no solemnities or feasts in this data, at the most memorials
-        foreach ( $this->tempCal[ RomanMissal::ITALY_EDITION_1983 ] as $row ) {
-            $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-            if( !$this->Cal->inSolemnitiesOrFeasts( $currentFeastDate ) ) {
-                $festivity = new Festivity( "[ ITALIA ] " . $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON, $row->DISPLAYGRADE );
-                $this->Cal->addFestivity( $row->TAG, $festivity );
-            }
-            else{
-                $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $currentFeastDate, $this->LitSettings );
-                $this->Messages[] = sprintf(
-                    "ITALIA: la %s '%s' (%s), aggiunta al calendario nell'edizione del Messale Romano del 1983 pubblicata dalla CEI, è soppressa dalla %s '%s' nell'anno %d",
-                    $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : $this->LitGrade->i18n( $row->GRADE, false ),
-                    '<i>' . $row->NAME . '</i>',
-                    $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ),
-                    $coincidingFestivity->grade,
-                    $coincidingFestivity->event->name,
-                    $this->LitSettings->Year
-                );
-            }
-        }
-    }
-
-    private function applyCalendarUSA() : void {
-
-        //The Solemnity of the Immaculate Conception is the Patronal FeastDay of the United States of America
-        $festivity = $this->Cal->getFestivity( "ImmaculateConception" );
-        if( $festivity !== null ) {
-            $this->makePatron( "ImmaculateConception", "Patronal feastday of the United States of America", 8, 12, LitColor::WHITE );
-        }
-
-        //move Saint Vincent Deacon from Jan 22 to Jan 23 in order to allow for National Day of Prayer for the Unborn on Jan 22
-        //however if Jan 22 is a Sunday, National Day of Prayer for the Unborn is moved to Jan 23 ( in place of Saint Vincent Deacon )
-        $festivity = $this->Cal->getFestivity( "StVincentDeacon" );
-        if( $festivity !== null ){
-            //I believe we don't have to worry about suppressing, because if it's on a Sunday it won't exist already
-            //so if the National Day of Prayer happens on a Sunday and must be moved to Monday, Saint Vincent will be already gone anyways
-            $StVincentDeaconNewDate = $festivity->date->add( new DateInterval( 'P1D' ) );
-            $this->Cal->moveFestivityDate( "StVincentDeacon", $StVincentDeaconNewDate );
-            //let's not worry about translating these messages, just leave them in English
-            $this->Messages[] = sprintf(
-                "USA: The Memorial '%s' was moved from Jan 22 to Jan 23 to make room for the National Day of Prayer for the Unborn, as per the 2011 Roman Missal issued by the USCCB",
-                '<i>' . $festivity->name . '</i>'
-            );
-            $this->Cal->setProperty( "StVincentDeacon", "name", "[ USA ] " . $festivity->name );
-        }
-
-        $festivity = $this->Cal->getFestivity( "StsJeanBrebeuf" );
-        if( $festivity !== null ) {
-            //if it exists, it means it's not on a Sunday, so we can go ahead and elevate it to Memorial
-            $this->Cal->setProperty( "StsJeanBrebeuf", "grade", LitGrade::MEMORIAL );
-            $this->Messages[] = sprintf(
-                "USA: The optional memorial '%s' is elevated to Memorial on Oct 19 as per the 2011 Roman Missal issued by the USCCB, applicable to the year %d",
-                '<i>' . $festivity->name . '</i>',
+            $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                /**translators:
+                 * 1. Grade of the festivity
+                 * 2. Name of the festivity
+                 * 3. Date on which the festivity is usually celebrated
+                 * 4. Grade of the superseding festivity
+                 * 5. Name of the superseding festivity
+                 * 6. Requested calendar year
+                 */
+                _( 'The %1$s \'%2$s\', usually celebrated on %3$s, is suppressed by the %4$s \'%5$s\' in the year %6$d.' ),
+                $this->LitGrade->i18n( $row->Festivity->grade, false ),
+                $row->Festivity->name,
+                $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ),
+                $coincidingFestivity->grade,
+                $coincidingFestivity->event->name,
                 $this->LitSettings->Year
             );
-            $this->Cal->setProperty( "StsJeanBrebeuf", "name", "[ USA ] " . $festivity->name );
+        }
+    }
 
-            $festivity1 = $this->Cal->getFestivity( "StPaulCross" );
-            if( $festivity1 !== null ){ //of course it will exist if StsJeanBrebeuf exists, they are originally on the same day
-                $this->Cal->moveFestivityDate( "StPaulCross", $festivity1->date->add( new DateInterval( 'P1D' ) ) );
-                if( $this->Cal->inSolemnitiesFeastsOrMemorials( $festivity1->date ) ) {
-                    $this->Messages[] = sprintf(
-                        "USA: The optional memorial '%s' is transferred from Oct 19 to Oct 20 as per the 2011 Roman Missal issued by the USCCB, to make room for '%s' elevated to the rank of Memorial, however in the year %d it is superseded by a higher ranking liturgical event",
-                        '<i>' . $festivity1->name . '</i>',
-                        '<i>' . $festivity->name . '</i>',
-                        $this->LitSettings->Year
-                    );
-                    $this->Cal->removeFestivity( "StPaulCross" );
-                }else{
-                    $this->Messages[] = sprintf(
-                        'USA: The optional memorial \'%1$s\' is transferred from Oct 19 to Oct 20 as per the 2011 Roman Missal issued by the USCCB, to make room for \'%2$s\' elevated to the rank of Memorial: applicable to the year %3$d.',
-                        '<i>' . $festivity1->name . '</i>',
-                        '<i>' . $festivity->name . '</i>',
-                        $this->LitSettings->Year
-                    );
-                    $this->Cal->setProperty( "StPaulCross", "name", "[ USA ] " . $festivity1->name );
+    private function festivityCanBeCreated( object $row ) : bool {
+        switch( $row->Festivity->grade ) {
+            case LitGrade::MEMORIAL_OPT:
+                return $this->Cal->notInSolemnitiesFeastsOrMemorials( $row->Festivity->DATE );
+            case LitGrade::MEMORIAL:
+                return $this->Cal->notInSolemnitiesOrFeasts( $row->Festivity->DATE );
+                //however we still have to handle possible coincidences with another memorial
+            case LitGrade::FEAST:
+                return $this->Cal->notInSolemnities( $row->Festivity->DATE );
+                //however we still have to handle possible coincidences with another feast
+            case LitGrade::SOLEMNITY:
+                return true;
+                //however we still have to handle possible coincidences with another solemnity
+        }
+        return false;
+    }
+
+    private function festivityDoesNotCoincide( object $row ) : bool {
+        switch( $row->Festivity->grade ) {
+            case LitGrade::MEMORIAL_OPT:
+                return true;
+                //optional memorials never have problems as regards coincidence with another optional memorial
+            case LitGrade::MEMORIAL:
+                return $this->Cal->notInMemorials( $row->Festivity->DATE );
+            case LitGrade::FEAST:
+                return $this->Cal->notInFeasts( $row->Festivity->DATE );
+            case LitGrade::SOLEMNITY:
+                return $this->Cal->notInSolemnities( $row->Festivity->DATE );
+        }
+        //functions should generally have a default return value
+        //however, it would make no sense to give a default return value here
+        //we really need to cover all cases and give a sure return value
+    }
+
+    private function handleFestivityCreationWithCoincidence( object $row ) : void {
+        switch( $row->Festivity->grade ) {
+            case LitGrade::MEMORIAL:
+                //both memorials become optional memorials
+                $coincidingFestivities = $this->Cal->getCalEventsFromDate( $row->Festivity->DATE );
+                $coincidingMemorials = array_filter( $coincidingFestivities, function( $el ) { return $el->grade === LitGrade::MEMORIAL; } );
+                $coincidingMemorialName = '';
+                foreach( $coincidingMemorials as $key => $value ) {
+                    $this->Cal->setProperty( $key, "grade", LitGrade::MEMORIAL_OPT );
+                    $coincidingMemorialName = $value->name;
                 }
-            }
+                $festivity = new Festivity( $row->Festivity->name, $row->Festivity->DATE, $row->Festivity->color, LitFeastType::FIXED, LitGrade::MEMORIAL_OPT, $row->Festivity->common );
+                $this->Cal->addFestivity( $row->Festivity->tag, $festivity );
+                $this->Messages[] = sprintf(
+                    /**translators:
+                     * 1. Name of the first coinciding Memorial
+                     * 2. Name of the second coinciding Memorial
+                     * 3. Requested calendar year
+                     * 4. Source of the information
+                     */
+                    _( 'The Memorial \'%1$s\' coincides with another Memorial \'%2$s\' in the year %3$d. They are both reduced in rank to optional memorials.' ),
+                    $row->Festivity->name,
+                    $coincidingMemorialName,
+                    $this->LitSettings->Year
+                );
+                break;
+            case LitGrade::FEAST:
+                //there seems to be a coincidence with a different Feast on the same day!
+                //what should we do about this? perhaps move one of them?
+                $coincidingFestivities = $this->Cal->getCalEventsFromDate( $row->Festivity->DATE );
+                $coincidingFeasts = array_filter( $coincidingFestivities, function( $el ) { return $el->grade === LitGrade::FEAST; } );
+                $coincidingFeastName = '';
+                foreach( $coincidingFeasts as $key => $value ) {
+                    //$this->Cal->setProperty( $key, "grade", LitGrade::MEMORIAL_OPT );
+                    $coincidingFeastName = $value->name;
+                }
+                $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . $this->LitSettings->NationalCalendar . ": " . sprintf(
+                    /**translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year */
+                    'The Feast \'%1$s\', usually celebrated on %2$s, coincides with another Feast \'%3$s\' in the year %4$d! Does something need to be done about this?',
+                    '<b>' . $row->Festivity->name . '</b>',
+                    '<b>' . $this->dayAndMonth->format(  $row->Festivity->DATE->format( 'U' ) ) . '</b>',
+                    '<b>' . $coincidingFeastName . '</b>',
+                    $this->LitSettings->Year
+                );
+                break;
+            case LitGrade::SOLEMNITY:
+                //there seems to be a coincidence with a different Solemnity on the same day!
+                //should we attempt to move to the next open slot?
+                $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . $this->LitSettings->NationalCalendar . ": " . sprintf(
+                    /**translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year */
+                    'The Solemnity \'%1$s\', usually celebrated on %2$s, coincides with the Sunday or Solemnity \'%3$s\' in the year %4$d! Does something need to be done about this?',
+                    '<i>' . $row->Festivity->name . '</i>',
+                    '<b>' . $this->dayAndMonth->format(  $row->Festivity->DATE->format( 'U' ) ) . '</b>',
+                    '<i>' . $this->Cal->solemnityFromDate(  $row->Festivity->DATE )->name . '</i>',
+                    $this->LitSettings->Year
+                );
+                break;
         }
-        else{
-            //if Oct 19 is a Sunday or Solemnity, Saint Paul of the Cross won't exist. But it still needs to be moved to Oct 20 so we must create it again
-            //just keep in mind the StsJeanBrebeuf also won't exist, so we need to retrieve the name from the tempCal
-            $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', '20-10-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-            $festivity = $this->Cal->getFestivity( "StPaulCross" );
-            if( !$this->Cal->inSolemnities( $currentFeastDate ) && $festivity === null ) {
-                $row = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ "StPaulCross" ];
-                $row2 = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ "StsJeanBrebeuf" ];
-                $festivity = new Festivity( "[ USA ] " . $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
-                $this->Cal->addFestivity( "StPaulCross", $festivity );
-                $this->Messages[] = sprintf(
-                    'USA: The optional memorial \'%1$s\' is transferred from Oct 19 to Oct 20 as per the 2011 Roman Missal issued by the USCCB, to make room for \'%2$s\' elevated to the rank of Memorial: applicable to the year %3$d.',
-                    $row->NAME,
-                    '<i>' . $row2->NAME . '</i>',
-                    $this->LitSettings->Year
-                );
-            }
+    }
+
+    private function createNewRegionalOrNationalFestivity( object $row ) : void {
+        if(
+            property_exists( $row->Festivity, 'strtotime' )
+            && $row->Festivity->strtotime !== ''
+        ) {
+            $festivityDateTS = strtotime( $row->Festivity->strtotime . ' ' . $this->LitSettings->Year . ' UTC' );
+            $row->Festivity->DATE = new LitDateTime( "@$festivityDateTS" );
+            $row->Festivity->DATE->setTimeZone(new DateTimeZone('UTC'));
         }
-
-        //The fourth Thursday of November is Thanksgiving
-        $thanksgivingDateTS = strtotime( 'fourth thursday of november ' . $this->LitSettings->Year . ' UTC' );
-        $thanksgivingDate = new DateTime( "@$thanksgivingDateTS", new DateTimeZone( 'UTC' ) );
-        $festivity = new Festivity( "[ USA ] Thanksgiving", $thanksgivingDate, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL, '', 'National Holiday' );
-        $this->Cal->addFestivity( "ThanksgivingDay", $festivity );
-
-        $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', '18-7-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-        $this->moveFestivityDate( "StCamillusDeLellis", $currentFeastDate, "Blessed Kateri Tekakwitha" );
-
-        $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', '5-7-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-        $this->moveFestivityDate( "StElizabethPortugal", $currentFeastDate, "Independence Day" );
-
-        $this->readPropriumDeSanctisJSONData( RomanMissal::USA_EDITION_2011 );
-
-        foreach ( $this->tempCal[ RomanMissal::USA_EDITION_2011 ] as $row ) {
-            $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-            if( !$this->Cal->inSolemnities( $currentFeastDate ) ) {
-                $festivity = new Festivity( "[ USA ] " . $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON, $row->DISPLAYGRADE );
-                $this->Cal->addFestivity( $row->TAG, $festivity );
+        else if(
+            property_exists( $row->Festivity, 'month' )
+            && $row->Festivity->month >= 1
+            && $row->Festivity->month <= 12
+            && property_exists( $row->Festivity, 'day' )
+            && $row->Festivity->day >= 1
+            && $row->Festivity->day <= cal_days_in_month(CAL_GREGORIAN, $row->Festivity->month, $this->LitSettings->Year)
+        ) {
+            $row->Festivity->DATE = LitDateTime::createFromFormat( '!j-n-Y', "{$row->Festivity->day}-{$row->Festivity->month}-{$this->LitSettings->Year}", new DateTimeZone( 'UTC' ) );
+        } else {
+            ob_start();
+            var_dump($row);
+            $a=ob_get_contents();
+            ob_end_clean();
+            $this->Messages[] = _( 'We should be creating a new festivity, however we do not seem to have the correct date information in order to proceed' ) . ' :: ' . $a;
+            return;
+        }
+        if( $this->festivityCanBeCreated( $row ) ) {
+            if( $this->festivityDoesNotCoincide( $row ) ) {
+                if( !property_exists( $row->Festivity, 'type' ) || !LitFeastType::isValid( $row->Festivity->type ) ) {
+                    $row->Festivity->type = property_exists( $row->Festivity, 'strtotime' ) ? LitFeastType::MOBILE : LitFeastType::FIXED;
+                }
+                $festivity = new Festivity( $row->Festivity->name, $row->Festivity->DATE, $row->Festivity->color, $row->Festivity->type, $row->Festivity->grade, $row->Festivity->common );
+                $this->Cal->addFestivity( $row->Festivity->tag, $festivity );
+            } else {
+                $this->handleFestivityCreationWithCoincidence( $row );
             }
-            else if( self::DateIsSunday( $currentFeastDate ) && $row->TAG === "PrayerUnborn" ){
-                $festivity = new Festivity( "[ USA ] " . $row->NAME, $currentFeastDate->add( new DateInterval( 'P1D' ) ), $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON, $row->DISPLAYGRADE );
-                $this->Cal->addFestivity( $row->TAG, $festivity );
-                $this->Messages[] = sprintf(
-                    "USA: The National Day of Prayer for the Unborn is set to Jan 22 as per the 2011 Roman Missal issued by the USCCB, however since it coincides with a Sunday or a Solemnity in the year %d, it has been moved to Jan 23",
-                    $this->LitSettings->Year
-                );
+            $infoSource = 'unknown';
+            if( property_exists( $row->Metadata, 'decreeURL' ) ) {
+                $infoSource = $this->elaborateDecreeSource( $row );
             }
-            else{
-                $this->Messages[] = sprintf(
-                    "USA: the %s '%s', added to the calendar as per the 2011 Roman Missal issued by the USCCB, is superseded by a Sunday or a Solemnity in the year %d",
-                    $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : $this->LitGrade->i18n( $row->GRADE, false ),
-                    '<i>' . $row->NAME . '</i>',
-                    $this->LitSettings->Year
+            else if( property_exists( $row->Metadata, 'missal' ) ) {
+                $infoSource = RomanMissal::getName( $row->Metadata->missal );
+            }
+
+            $formattedDateStr = $this->LitSettings->Locale === LitLocale::LATIN ? ( $row->Festivity->DATE->format( 'j' ) . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->Festivity->DATE->format( 'n' ) ] ) :
+                ( $this->LitSettings->Locale === LitLocale::ENGLISH ? $row->Festivity->DATE->format( 'F jS' ) :
+                    $this->dayAndMonth->format( $row->Festivity->DATE->format( 'U' ) )
                 );
+            $dateStr = property_exists( $row->Festivity, 'strtotime' ) && $row->Festivity->strtotime !== '' ? '<i>' . $row->Festivity->strtotime . '</i>' : $formattedDateStr;
+            $this->Messages[] = sprintf(
+                /**translators:
+                 * 1. Grade or rank of the festivity
+                 * 2. Name of the festivity
+                 * 3. Day of the festivity
+                 * 4. Year from which the festivity has been added
+                 * 5. Source of the information
+                 * 6. Requested calendar year
+                 */
+                _( 'The %1$s \'%2$s\' has been added on %3$s since the year %4$d (%5$s), applicable to the year %6$d.' ),
+                $this->LitGrade->i18n( $row->Festivity->grade, false ),
+                $row->Festivity->name,
+                $dateStr,
+                $row->Metadata->sinceYear,
+                $infoSource,
+                $this->LitSettings->Year
+            );
+        }// else {
+            //$this->handleCoincidenceDecree( $row );
+        //}
+    }
+    
+    private function handleNationalCalendarRows( array $rows ) : void {
+        foreach( $rows as $row ) {
+            if( $this->LitSettings->Year >= $row->Metadata->sinceYear ) {
+                if( property_exists( $row->Metadata, "untilYear" ) && $this->LitSettings->Year >= $row->Metadata->untilYear ) {
+                    continue;
+                } else {
+                    //if either the property doesn't exist (so no limit is set)
+                    //or there is a limit but we are within those limits
+                    switch( $row->Metadata->action ) {
+                        case "makePatron":
+                            $festivity = $this->Cal->getFestivity( $row->Festivity->tag );
+                            if( $festivity !== null ) {
+                                if( $festivity->grade !== $row->Festivity->grade ) {
+                                    $this->Cal->setProperty( $row->Festivity->tag, "grade", $row->Festivity->grade );
+                                }
+                                $this->Cal->setProperty( $row->Festivity->tag, "name", $row->Festivity->name );
+                            } else {
+                                $this->handleMissingFestivity( $row );
+                            }
+                            break;
+                        case "createNew":
+                            $this->createNewRegionalOrNationalFestivity( $row );
+                            break;
+                        case "setProperty":
+                            switch( $row->Metadata->property ) {
+                                case "name":
+                                    $this->Cal->setProperty( $row->Festivity->tag, "name", $row->Festivity->name );
+                                    break;
+                                case "grade":
+                                    $this->Cal->setProperty( $row->Festivity->tag, "grade", $row->Festivity->grade );
+                                    break;
+                            }
+                            break;
+                        case "moveFestivity":
+                            $festivityNewDate = LitDateTime::createFromFormat( '!j-n-Y', $row->Festivity->day.'-'.$row->Festivity->month.'-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+                            $this->moveFestivityDate( $row->Festivity->tag, $festivityNewDate, $row->Metadata->reason, $row->Metadata->missal );
+                            break;
+                    }
+                }
             }
         }
     }
 
-    /**currently only using this for the USA calendar
-     * The celebrations being transferred are all from the 1970 Editio Typica
-     * 
-     * If it were to become useful for other national calendars,
-     * we might have to abstract out the Calendar that is the source
-     * of the festivity that is being transferred
+    private function applyNationalCalendar() : void {
+        //first thing is apply any wider region festivities, such as Patron Saints of the Wider Region (example: Europe)
+        if( $this->WiderRegionData !== null && property_exists( $this->WiderRegionData, "LitCal" ) ) {
+            $this->handleNationalCalendarRows( $this->WiderRegionData->LitCal );
+        }
+
+        if( $this->NationalData !== null && property_exists( $this->NationalData, "LitCal" ) ) {
+            $this->handleNationalCalendarRows( $this->NationalData->LitCal );
+        }
+
+        if( $this->NationalData !== null && property_exists( $this->NationalData, "Metadata" ) && property_exists( $this->NationalData->Metadata, "Missals" ) ) {
+            if( $this->NationalData->Metadata->Region === 'UNITED STATES' ) {
+                $this->NationalData->Metadata->Region = 'USA';
+            }
+            $this->Messages[] = "Found Missals for region " . $this->NationalData->Metadata->Region. ": " . implode(', ', $this->NationalData->Metadata->Missals);
+            foreach( $this->NationalData->Metadata->Missals as $missal ) {
+                $yearLimits = RomanMissal::getYearLimits( $missal );
+                if( $this->LitSettings->Year >= $yearLimits->sinceYear ) {
+                    if( property_exists( $yearLimits, "untilYear" ) && $this->LitSettings->Year >= $yearLimits->untilYear ) {
+                        continue;
+                    } else {
+                        if( RomanMissal::getSanctoraleFileName( $missal ) !== false ) {
+                            $this->Messages[] = sprintf(
+                                /**translators: Name of the Roman Missal */
+                                _( 'Found a sanctorale data file for %s' ),
+                                RomanMissal::getName( $missal )
+                            );
+                            $this->loadPropriumDeSanctisData( $missal );
+                            foreach ( $this->tempCal[ $missal ] as $row ) {
+                                $currentFeastDate = LitDateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+                                if( !$this->Cal->inSolemnitiesOrFeasts( $currentFeastDate ) ) {
+                                    $festivity = new Festivity( "[ {$this->NationalData->Metadata->Region} ] " . $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON, $row->DISPLAYGRADE );
+                                    $this->Cal->addFestivity( $row->TAG, $festivity );
+                                }
+                                else{
+                                    if( self::DateIsSunday( $currentFeastDate ) && $row->TAG === "PrayerUnborn" ) {
+                                        $festivity = new Festivity( "[ USA ] " . $row->NAME, $currentFeastDate->add( new DateInterval( 'P1D' ) ), $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON, $row->DISPLAYGRADE );
+                                        $this->Cal->addFestivity( $row->TAG, $festivity );
+                                        $this->Messages[] = sprintf(
+                                            "USA: The National Day of Prayer for the Unborn is set to Jan 22 as per the 2011 Roman Missal issued by the USCCB, however since it coincides with a Sunday or a Solemnity in the year %d, it has been moved to Jan 23",
+                                            $this->LitSettings->Year
+                                        );
+                                    } else {
+                                        $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $currentFeastDate, $this->LitSettings );
+                                        $this->Messages[] = sprintf(
+                                            /**translators:
+                                             * 1. Festivity grade
+                                             * 2. Festivity name
+                                             * 3. Festivity date
+                                             * 4. Edition of the Roman Missal
+                                             * 5. Superseding festivity grade
+                                             * 6. Superseding festivity name
+                                             * 7. Requested calendar year
+                                             */
+                                            $this->NationalData->Metadata->Region . ": " . _( 'The %1$s \'%2$s\' (%3$s), added to the national calendar in the %4$s, is superseded by the %5$s \'%6$s\' in the year %7$d' ),
+                                            $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : $this->LitGrade->i18n( $row->GRADE, false ),
+                                            '<i>' . $row->NAME . '</i>',
+                                            $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ),
+                                            RomanMissal::getName( $missal ),
+                                            $coincidingFestivity->grade,
+                                            $coincidingFestivity->event->name,
+                                            $this->LitSettings->Year
+                                        );
+                                    }
+                                }
+                            }
+                        } else {
+                            $this->Messages[] = sprintf(
+                                /**translators: Name of the Roman Missal */
+                                _( 'Could not find a sanctorale data file for %s' ),
+                                RomanMissal::getName( $missal )
+                            );
+                        }
+                    }
+                }
+            }
+        } else {
+            $this->Messages[] = "Did not find any Missals for region " . $this->NationalData->Metadata->Region;
+        }
+    }
+
+    // private function makePatron( string $tag, string $nameSuffix, int $day, int $month, array|string $color, string $EditionRomanMissal = RomanMissal::EDITIO_TYPICA_1970 ) {
+    //     $festivity = $this->Cal->getFestivity( $tag );
+    //     if( $festivity !== null ) {
+    //         if( $festivity->grade < LitGrade::FEAST ) {
+    //             $this->Cal->setProperty( $tag, "grade", LitGrade::FEAST );
+    //         }
+    //         $this->Cal->setProperty( $tag, "name", $festivity->name . ", " . $nameSuffix );
+    //         $this->Cal->setProperty( $tag, "common", LitCommon::PROPRIO );
+    //     } else{
+    //         //check what's going on, for example, if it's a Sunday or Solemnity
+    //         $currentFeastDate = LitDateTime::createFromFormat( '!j-n-Y', "{$day}-{$month}-" . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+    //         $row = $this->tempCal[ $EditionRomanMissal ][ $tag ];
+    //         //let's also get the name back from the database, so we can give some feedback and maybe even recreate the festivity
+    //         $FestivityName = $row->NAME . ", " .  $nameSuffix;
+    //         if( $this->Cal->inSolemnitiesFeastsOrMemorials( $currentFeastDate ) || self::DateIsSunday( $currentFeastDate ) ) {
+    //             $coincidingFestivity = new stdClass();
+    //             $coincidingFestivity->event = $this->Cal->solemnityFromDate( $currentFeastDate );
+    //             if ( self::DateIsSunday( $currentFeastDate ) && $coincidingFestivity->event->grade < LitGrade::SOLEMNITY ){
+    //                 //it's a Sunday
+    //                 $coincidingFestivity->grade = $this->LitSettings->Locale === LitLocale::LATIN ? 'Die Domini' : ucfirst( $this->dayOfTheWeek->format( $currentFeastDate->format( 'U' ) ) );
+    //             } else if ( $this->Cal->inSolemnities( $currentFeastDate ) ) {
+    //                 //it's a Feast of the Lord or a Solemnity
+    //                 $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $coincidingFestivity->event->grade, false ) . '</i>' : $this->LitGrade->i18n( $coincidingFestivity->grade, false ) );
+    //             } else if ( $this->Cal->inFeastsOrMemorials( $currentFeastDate ) ) {
+    //                 //we should probably be able to create it anyways in this case?
+    //                 $this->Cal->addFestivity( $tag, new Festivity( $FestivityName, $currentFeastDate, $color, LitFeastType::FIXED, LitGrade::FEAST, LitCommon::PROPRIO ) );
+    //                 $coincidingFestivity->grade = $this->LitGrade->i18n( $coincidingFestivity->event->grade, false );
+    //             }
+    //             $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+    //                 /**translators:
+    //                  * 1. Grade of the festivity
+    //                  * 2. Name of the festivity
+    //                  * 3. Date on which the festivity is usually celebrated
+    //                  * 4. Grade of the superseding festivity
+    //                  * 5. Name of the superseding festivity
+    //                  * 6. Requested calendar year
+    //                  */
+    //                 _( 'The %1$s \'%2$s\', usually celebrated on %3$s, is suppressed by the %4$s \'%5$s\' in the year %6$d.' ),
+    //                 $this->LitGrade->i18n( LitGrade::FEAST, false ),
+    //                 $FestivityName,
+    //                 $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ),
+    //                 $coincidingFestivity->grade,
+    //                 $coincidingFestivity->event->name,
+    //                 $this->LitSettings->Year
+    //             );
+    //         }
+    //     }
+    // }
+
+    /**
+     * So far, the celebrations being transferred are all originally from the 1970 Editio Typica
+     * and they are currently only celebrations from the USA calendar...
+     * However the method should work for any calendar
      */
-    private function moveFestivityDate( string $tag, DateTime $newDate, string $inFavorOf ) {
+    private function moveFestivityDate( string $tag, DateTime $newDate, string $inFavorOf, $missal ) {
         $festivity = $this->Cal->getFestivity( $tag );
         $newDateStr = $newDate->format('F jS');
-        if( !$this->Cal->inSolemnities( $newDate ) ) {
-            if( $festivity !== null ){
-                //Move from old date to new date, to make room for another celebration
-                $this->Cal->moveFestivityDate( $tag, $newDate );
+        if( !$this->Cal->inSolemnitiesFeastsOrMemorials( $newDate ) ) {
+            if( $festivity !== null ) {
                 $oldDateStr = $festivity->date->format('F jS');
+                $this->Cal->moveFestivityDate( $tag, $newDate );
             }
             else{
                 //if it was suppressed on the original date because of a higher ranking celebration,
                 //we should recreate it on the new date
-                $row = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ $tag ];
-                $festivity = new Festivity( $row->NAME, $newDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
-                $this->Cal->addFestivity( $tag, $festivity );
-                $oldDate = DateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-                $oldDateStr = $oldDate->format('F jS');
+                //except in the case of Saint Vincent Deacon when we're dealing with the Roman Missal USA edition,
+                //since the National Day of Prayer will take over the new date
+                if( $tag !== "StVincentDeacon" || $missal !== RomanMissal::USA_EDITION_2011 ) {
+                    $row = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ $tag ];
+                    $festivity = new Festivity( $row->NAME, $newDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
+                    $this->Cal->addFestivity( $tag, $festivity );
+                    $oldDate = LitDateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+                    $oldDateStr = $oldDate->format('F jS');
+                }
             }
-            $this->Messages[] = sprintf(
-                'USA: The optional memorial \'%1$s\' is transferred from %4$s to %5$s as per the 2011 Roman Missal issued by the USCCB, to make room for the Memorial \'%2$s\': applicable to the year %3$d.',
-                '<i>' . $festivity->name . '</i>',
-                '<i>' . $inFavorOf . '</i>',
-                $this->LitSettings->Year,
-                $oldDateStr,
-                $newDateStr
-            );
-            $this->Cal->setProperty( $tag, "name", "[ USA ] " . $festivity->name );
-        }
-        else{
+
+            //If the festivity has been successfully recreated, let's make a note about that
             if( $festivity !== null ) {
-                $oldDateStr = $festivity->date->format('F jS');
-                //If the new date is already covered by a Solmenity, then we can't move the celebration, so we simply suppress it
                 $this->Messages[] = sprintf(
-                    'USA: The optional memorial \'%1$s\' is transferred from %4$s to %5$s as per the 2011 Roman Missal issued by the USCCB, to make room for the Memorial \'%2$s\', however it is superseded by a higher ranking festivity in the year %3$d.',
+                    /**translators: 1. Festivity grade, 2. Festivity name, 3. New festivity name, 4: Requested calendar year, 5. Old date, 6. New date */
+                    _( 'The %1$s \'%2$s\' is transferred from %5$s to %6$s as per the %7$s, to make room for \'%3$s\': applicable to the year %4$d.' ),
+                    $this->LitGrade->i18n( $festivity->grade ),
                     '<i>' . $festivity->name . '</i>',
                     '<i>' . $inFavorOf . '</i>',
                     $this->LitSettings->Year,
                     $oldDateStr,
-                    $newDateStr
+                    $newDateStr,
+                    RomanMissal::getName( $missal )
+                );
+                //$this->Cal->setProperty( $tag, "name", "[ USA ] " . $festivity->name );
+            }
+        }
+        else{
+            if( $festivity !== null ) {
+                $oldDateStr = $festivity->date->format('F jS');
+                $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast( $newDate );
+                //If the new date is already covered by a Solemnity, Feast or Memorial, then we can't move the celebration, so we simply suppress it
+                $this->Messages[] = sprintf(
+                    /**translators: 1. Festivity grade, 2. Festivity name, 3. Old date, 4. New date, 5. Source of the information, 6. New festivity name, 7. Superseding festivity grade, 8. Superseding festivity name, 9: Requested calendar year */
+                    _( 'The %1$s \'%2$s\' would have been transferred from %3$s to %4$s as per the %5$s, to make room for \'%6$s\', however it is suppressed by the %7$s \'%8$s\' in the year %9$d.' ),
+                    $this->LitGrade->i18n( $festivity->grade ),
+                    '<i>' . $festivity->name . '</i>',
+                    $oldDateStr,
+                    $newDateStr,
+                    RomanMissal::getName( $missal ),
+                    '<i>' . $inFavorOf . '</i>',
+                    $coincidingFestivity->grade,
+                    $coincidingFestivity->event->name,
+                    $this->LitSettings->Year
                 );
                 $this->Cal->removeFestivity( $tag );
             }
@@ -1896,7 +2099,7 @@ class LitCalAPI {
 
     private function calculateUniversalCalendar() : void {
 
-        $this->populatePropriumDeTempore();
+        $this->loadPropriumDeTemporeData();
         /**
          *  CALCULATE LITURGICAL EVENTS BASED ON THE ORDER OF PRECEDENCE OF LITURGICAL DAYS ( LY 59 )
          *  General Norms for the Liturgical Year and the Calendar ( issued on Feb. 14 1969 )
@@ -1915,7 +2118,7 @@ class LitCalAPI {
         $this->calculateEasterOctave();
         //3. Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar
         $this->calculateMobileSolemnitiesOfTheLord();
-        $this->readPropriumDeSanctisJSONData( RomanMissal::EDITIO_TYPICA_1970 );
+        $this->loadPropriumDeSanctisData( RomanMissal::EDITIO_TYPICA_1970 );
         $this->calculateFixedSolemnities(); //this will also handle All Souls Day
 
         //4. PROPER SOLEMNITIES:
@@ -1949,16 +2152,16 @@ class LitCalAPI {
         $this->calculateMemorials( LitGrade::MEMORIAL, RomanMissal::EDITIO_TYPICA_1970 );
 
         if ( $this->LitSettings->Year >= 2002 ) {
-            $this->readPropriumDeSanctisJSONData( RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
+            $this->loadPropriumDeSanctisData( RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
             $this->calculateMemorials( LitGrade::MEMORIAL, RomanMissal::EDITIO_TYPICA_TERTIA_2002 );
         }
 
         if( $this->LitSettings->Year >= 2008 ) {
-            $this->readPropriumDeSanctisJSONData( RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 );
+            $this->loadPropriumDeSanctisData( RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 );
             $this->calculateMemorials( LitGrade::MEMORIAL, RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 );
         }
 
-        $this->readMemorialsFromDecreesJSONData();
+        $this->loadMemorialsFromDecreesData();
         $this->applyDecrees( LitGrade::MEMORIAL );
 
         //11. Proper obligatory memorials, and that is:
@@ -2001,33 +2204,34 @@ class LitCalAPI {
 
     private function applyDiocesanCalendar() {
         foreach( $this->DiocesanData->LitCal as $key => $obj ) {
-            if( is_array( $obj->color ) ) {
-                $obj->color = implode( ',', $obj->color );
-            }
             //if sinceYear is undefined or null or empty, let's go ahead and create the event in any case
             //creation will be restricted only if explicitly defined by the sinceYear property
-            if( $this->LitSettings->Year >= $obj->sinceYear || $obj->sinceYear === null || $obj->sinceYear == '' ) {
-                $currentFeastDate = DateTime::createFromFormat( '!j-n-Y', $obj->day . '-' . $obj->month . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+            if( $this->LitSettings->Year >= $obj->sinceYear || $obj->sinceYear === null || $obj->sinceYear === 0 ) {
+                $currentFeastDate = LitDateTime::createFromFormat( '!j-n-Y', $obj->day . '-' . $obj->month . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
                 if( $obj->grade > LitGrade::FEAST ) {
                     if( $this->Cal->inSolemnities( $currentFeastDate ) && $key != $this->Cal->solemnityKeyFromDate( $currentFeastDate ) ) {
                         //there seems to be a coincidence with a different Solemnity on the same day!
                         //should we attempt to move to the next open slot?
-                        $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                            $this->LitSettings->DiocesanCalendar . ": the Solemnity '%s', proper to the calendar of the " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " and usually celebrated on %s, coincides with the Sunday or Solemnity '%s' in the year %d! Does something need to be done about this?",
+                        $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . $this->LitSettings->DiocesanCalendar . ": " .  sprintf(
+                            /**translators: 1: Festivity name, 2: Name of the diocese, 3: Festivity date, 4: Coinciding festivity name, 5: Requested calendar year */
+                            'The Solemnity \'%1$s\', proper to the calendar of the %2$s and usually celebrated on %3$s, coincides with the Sunday or Solemnity \'%4$s\' in the year %5$d! Does something need to be done about this?',
                             '<i>' . $obj->name . '</i>',
+                            $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese,
                             '<b>' . $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ) . '</b>',
                             '<i>' . $this->Cal->solemnityFromDate( $currentFeastDate )->name . '</i>',
                             $this->LitSettings->Year
                         );
                     }
-                    $this->Cal->addFestivity( $this->LitSettings->DiocesanCalendar . "_" . $key, new Festivity( "[ " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " ] " . $obj->name, $currentFeastDate, strtolower( $obj->color ), LitFeastType::FIXED, $obj->grade, $obj->common ) );
+                    $this->Cal->addFestivity( $this->LitSettings->DiocesanCalendar . "_" . $key, new Festivity( "[ " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " ] " . $obj->name, $currentFeastDate, $obj->color, LitFeastType::FIXED, $obj->grade, $obj->common ) );
                 } else if ( $obj->grade <= LitGrade::FEAST && !$this->Cal->inSolemnities( $currentFeastDate ) ) {
-                    $this->Cal->addFestivity( $this->LitSettings->DiocesanCalendar . "_" . $key, new Festivity( "[ " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " ] " . $obj->name, $currentFeastDate, strtolower( $obj->color ), LitFeastType::FIXED, $obj->grade, $obj->common ) );
+                    $this->Cal->addFestivity( $this->LitSettings->DiocesanCalendar . "_" . $key, new Festivity( "[ " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " ] " . $obj->name, $currentFeastDate, $obj->color, LitFeastType::FIXED, $obj->grade, $obj->common ) );
                 } else {
-                    $this->Messages[] = sprintf(
-                        $this->LitSettings->DiocesanCalendar . ": the %s '%s', proper to the calendar of the " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " and usually celebrated on %s, is suppressed by the Sunday or Solemnity %s in the year %d",
+                    $this->Messages[] = $this->LitSettings->DiocesanCalendar . ": " . sprintf(
+                        /**translators: 1: Festivity grade, 2: Festivity name, 3: Name of the diocese, 4: Festivity date, 5: Coinciding festivity name, 6: Requested calendar year */
+                        'The %1$s \'%2$s\', proper to the calendar of the %3$s and usually celebrated on %4$s, is suppressed by the Sunday or Solemnity %5$s in the year %6$d',
                         $this->LitGrade->i18n( $obj->grade, false ),
                         '<i>' . $obj->name . '</i>',
+                        $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese,
                         '<b>' . $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ) . '</b>',
                         '<i>' . $this->Cal->solemnityFromDate( $currentFeastDate )->name . '</i>',
                         $this->LitSettings->Year
@@ -2160,44 +2364,48 @@ class LitCalAPI {
             $SerializeableLitCal->Settings->DiocesanCalendar = $this->LitSettings->DiocesanCalendar;
         }
 
-        $SerializeableLitCal->Metadata->VERSION           = self::API_VERSION;
-        $SerializeableLitCal->Metadata->RequestHeaders   = $this->APICore->getJsonEncodedRequestHeaders();
-        $SerializeableLitCal->Metadata->Solemnities       = $this->Cal->getSolemnities();
-        $SerializeableLitCal->Metadata->FeastsMemorials  = $this->Cal->getFeastsAndMemorials();
+        $SerializeableLitCal->Metadata->VERSION             = self::API_VERSION;
+        $SerializeableLitCal->Metadata->RequestHeaders      = $this->APICore->getJsonEncodedRequestHeaders();
+        $SerializeableLitCal->Metadata->Solemnities         = $this->Cal->getSolemnities();
+        $SerializeableLitCal->Metadata->FeastsMemorials     = $this->Cal->getFeastsAndMemorials();
 
         //make sure we have an engineCache folder for the current Version
-        if( realpath( "engineCache/v" . str_replace( ".","_",self::API_VERSION ) ) === false ){
-            mkdir( "engineCache/v" . str_replace( ".","_",self::API_VERSION ), 0755, true );
+        if( realpath( "engineCache/v" . str_replace( ".", "_", self::API_VERSION ) ) === false ) {
+            mkdir( "engineCache/v" . str_replace( ".", "_", self::API_VERSION ), 0755, true );
         }
 
         switch ( $this->LitSettings->ReturnType ) {
             case ReturnType::JSON:
-                file_put_contents( $this->CACHEFILE, json_encode( $SerializeableLitCal ) );
-                echo json_encode( $SerializeableLitCal );
+                $response = json_encode( $SerializeableLitCal );
                 break;
             case ReturnType::XML:
                 $jsonStr = json_encode( $SerializeableLitCal );
                 $jsonObj = json_decode( $jsonStr, true );
                 $xml = new SimpleXMLElement ( "<?xml version=\"1.0\" encoding=\"UTF-8\"?" . "><LiturgicalCalendar xmlns=\"https://www.bibleget.io/catholicliturgy\"/>" );
                 LitFunc::convertArray2XML( $jsonObj, $xml );
-                file_put_contents( $this->CACHEFILE, $xml->asXML() );
-                print $xml->asXML();
+                $response = $xml->asXML();
                 break;
             case ReturnType::ICS:
                 $infoObj = $this->getGithubReleaseInfo();
                 if( $infoObj->status === "success" ) {
-                    $ical = $this->produceIcal( $SerializeableLitCal, $infoObj->obj );
-                    file_put_contents( $this->CACHEFILE, $ical );
-                    echo $ical;
+                    $response = $this->produceIcal( $SerializeableLitCal, $infoObj->obj );
                 }
                 else{
                     die( 'Error receiving or parsing info from github about latest release: '.$infoObj->message );
                 }
                 break;
             default:
-                file_put_contents( $this->CACHEFILE, json_encode( $SerializeableLitCal ) );
-                echo json_encode( $SerializeableLitCal );
+                $response = json_encode( $SerializeableLitCal );
                 break;
+        }
+        file_put_contents( $this->CACHEFILE, $response );
+        $responseHash = md5( $response );
+        header("Etag: \"{$responseHash}\"");
+        if (!empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
+            header( $_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified" );
+            header('Content-Length: 0');
+        } else {
+            echo $response;
         }
         die();
     }
@@ -2247,13 +2455,23 @@ class LitCalAPI {
     public function Init(){
         $this->APICore->Init();
         $this->initParameterData();
-        $this->loadLocalCalendarData();
+        $this->loadDiocesanCalendarData();
         $this->APICore->setResponseContentTypeHeader();
+
         if( $this->cacheFileIsAvailable() ){
             //If we already have done the calculation
             //and stored the results in a cache file
             //then we're done, just output this and die
-            echo file_get_contents( $this->CACHEFILE );
+            //or better, make the client use it's own cache copy!
+            $response = file_get_contents( $this->CACHEFILE );
+            $responseHash = md5( $response );
+            header("Etag: \"{$responseHash}\"");
+            if (!empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
+                header( $_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified" );
+                header('Content-Length: 0');
+            } else {
+                echo $response;
+            }
             die();
         } else {
             $this->dieIfBeforeMinYear();
@@ -2261,18 +2479,8 @@ class LitCalAPI {
             $this->calculateUniversalCalendar();
 
             if( $this->LitSettings->NationalCalendar !== null ) {
-                switch( $this->LitSettings->NationalCalendar ){
-                    case 'ITALY':
-                        $this->applyCalendarItaly();
-                        break;
-                    case 'USA':
-                        //I don't have any data before 2011
-                        //I need copies of the calendar from the Missals printed before 2011...
-                        if( $this->LitSettings->Year >= 2011 ) {
-                            $this->applyCalendarUSA();
-                        }
-                        break;
-                }
+                $this->loadNationalCalendarData();
+                $this->applyNationalCalendar();
             }
 
             if( $this->LitSettings->DiocesanCalendar !== null && $this->DiocesanData !== null ) {
