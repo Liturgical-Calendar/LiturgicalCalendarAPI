@@ -108,76 +108,67 @@ class LitCalHealth implements MessageComponentInterface {
     }
 
     private function executeValidation( object $validation, ConnectionInterface $to ) {
-        //if( file_exists( $validation->sourceFile ) ) {
-            $dataPath = $validation->sourceFile;
-            switch( $validation->category ) {
-                case 'universalcalendar':
-                    $schema = LitCalHealth::DataPathToSchema[ $dataPath ];
-                    break;
-                case 'nationalcalendar':
-                    $schema = LitSchema::NATIONAL;
-                    break;
-                case 'diocesancalendar':
-                    $schema = LitSchema::DIOCESAN;
-                    break;
-                case 'widerregioncalendar':
-                    $schema = LitSchema::WIDERREGION;
-                    break;
-                case 'propriumdesanctis':
-                    $schema = LitSchema::PROPRIUMDESANCTIS;
-                    break;
-            }
-            $data = file_get_contents( $dataPath );
-            if( $data !== false ) {
+        $dataPath = $validation->sourceFile;
+        switch( $validation->category ) {
+            case 'universalcalendar':
+                $schema = LitCalHealth::DataPathToSchema[ $dataPath ];
+                break;
+            case 'nationalcalendar':
+                $schema = LitSchema::NATIONAL;
+                break;
+            case 'diocesancalendar':
+                $schema = LitSchema::DIOCESAN;
+                break;
+            case 'widerregioncalendar':
+                $schema = LitSchema::WIDERREGION;
+                break;
+            case 'propriumdesanctis':
+                $schema = LitSchema::PROPRIUMDESANCTIS;
+                break;
+        }
+        $data = file_get_contents( $dataPath );
+        if( $data !== false ) {
+            $message = new stdClass();
+            $message->type = "success";
+            $message->text = "The Data file $dataPath exists";
+            $message->classes = ".$validation->validate.file-exists";
+            $this->sendMessage( $to, $message );
+
+            $jsonData = json_decode( $data );
+            if( json_last_error() === JSON_ERROR_NONE ) {
                 $message = new stdClass();
                 $message->type = "success";
-                $message->text = "The Data file $dataPath exists";
-                $message->classes = ".$validation->validate.file-exists";
+                $message->text = "The Data file $dataPath was successfully decoded as JSON";
+                $message->classes = ".$validation->validate.json-valid";
                 $this->sendMessage( $to, $message );
 
-                $jsonData = json_decode( $data );
-                if( json_last_error() === JSON_ERROR_NONE ) {
+                $validationResult = $this->validateDataAgainstSchema( $jsonData, $schema );
+                if( gettype( $validationResult ) === 'boolean' && $validationResult === true ) {
                     $message = new stdClass();
                     $message->type = "success";
-                    $message->text = "The Data file $dataPath was successfully decoded as JSON";
-                    $message->classes = ".$validation->validate.json-valid";
-                    $this->sendMessage( $to, $message );
-
-                    $validationResult = $this->validateDataAgainstSchema( $jsonData, $schema );
-                    if( gettype( $validationResult ) === 'boolean' && $validationResult === true ) {
-                        $message = new stdClass();
-                        $message->type = "success";
-                        $message->text = "The Data file $dataPath was successfully validated against the Schema $schema";
-                        $message->classes = ".$validation->validate.schema-valid";
-                        $this->sendMessage( $to, $message );
-                    }
-                    else if( gettype( $validationResult === 'object' ) ) {
-                        $validationResult->classes = ".$validation->validate.schema-valid";
-                        $this->sendMessage( $to, $validationResult );
-                    }
-                } else {
-                    $message = new stdClass();
-                    $message->type = "error";
-                    $message->text = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg();
-                    $message->classes = ".$validation->validate.json-valid";
+                    $message->text = "The Data file $dataPath was successfully validated against the Schema $schema";
+                    $message->classes = ".$validation->validate.schema-valid";
                     $this->sendMessage( $to, $message );
                 }
-
+                else if( gettype( $validationResult === 'object' ) ) {
+                    $validationResult->classes = ".$validation->validate.schema-valid";
+                    $this->sendMessage( $to, $validationResult );
+                }
             } else {
                 $message = new stdClass();
                 $message->type = "error";
-                $message->text = "Data file $dataPath does not exist";
-                $message->classes = ".$validation->validate.file-exists";
+                $message->text = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg();
+                $message->classes = ".$validation->validate.json-valid";
                 $this->sendMessage( $to, $message );
             }
-        /*
+
         } else {
             $message = new stdClass();
             $message->type = "error";
-            $message->text = "The validation requested \"{$validation->validate}\" does not seem to be a supported validation, or the corresponding file to validate \"{$validation->sourceFile} does not exist\"";
+            $message->text = "Data file $dataPath does not exist";
+            $message->classes = ".$validation->validate.file-exists";
             $this->sendMessage( $to, $message );
         }
-        */
     }
 
     private function validateCalendar( string $Calendar, int $Year, string $category, ConnectionInterface $to ) : void {
