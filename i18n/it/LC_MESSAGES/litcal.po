@@ -2,13 +2,13 @@
 # Copyright (C) 2021 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Ubuntu <priest@johnromanodorazio.com>, 2021.
-#
+# John R. D'Orazio <priest@johnromanodorazio.com>, 2022.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2022-05-22 09:41+0000\n"
-"PO-Revision-Date: 2022-02-16 09:56+0000\n"
+"PO-Revision-Date: 2022-06-06 08:21+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.10.1\n"
+"X-Generator: Weblate 4.12.1\n"
 
 #: includes/LitCalAPI.php:229
 #, php-format
@@ -482,6 +482,8 @@ msgid ""
 "We should be creating a new festivity, however we do not seem to have the "
 "correct date information in order to proceed"
 msgstr ""
+"Dovremmo creare una nuova festività, tuttavia sembra che non ci sono le "
+"corrette informazioni sulla data per poter procedere"
 
 #: includes/LitCalAPI.php:1904
 #, php-format
@@ -512,31 +514,24 @@ msgid "Could not find a sanctorale data file for %s"
 msgstr "Non è stato trovato un file con i dati del santorale di: %s"
 
 #: includes/LitCalAPI.php:2039
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
-#| "applicable to the year %6$d."
+#, php-format
 msgid ""
 "The %1$s '%2$s' is transferred from %5$s to %6$s as per the %7$s, to make "
 "room for '%3$s': applicable to the year %4$d."
 msgstr ""
-"La %1$s '%2$s' è stata inserita il giorno %3$s a partire dall'anno %4$d "
-"(%5$s), applicabile pertanto all'anno %6$d."
+"La %1$s '%2$s' è stata trasferita da %5$s a %6$s secondo il %7$s, per "
+"lasciare luogo a '%3$s': applicabile pertanto all'anno %4$d."
 
 #: includes/LitCalAPI.php:2057
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s', added in the %3$s of the Roman Missal since the year "
-#| "%4$d (%5$s) and usually celebrated on %6$s, is suppressed by the %7$s "
-#| "'%8$s' in the year %9$d."
+#, php-format
 msgid ""
 "The %1$s '%2$s' would have been transferred from %3$s to %4$s as per the "
 "%5$s, to make room for '%6$s', however it is suppressed by the %7$s '%8$s' "
 "in the year %9$d."
 msgstr ""
-"La %1$s '%2$s', aggiunta nella %3$s del Messale Romano dall'anno %4$d (%5$s) "
-"e celebrata solitamente il giorno %6$s, è soppressa dalla %7$s '%8$s' "
-"nell'anno %9$d."
+"La %1$s '%2$s', sarebbe stata trasferita da %3$s a %4$s secondo il %5$s, per "
+"lasciare luogo a '%6$s', tuttavia è soppressa dalla %7$s '%8$s' nell'anno "
+"%9$d."
 
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
 #: includes/LitMessages.php:142 includes/LitMessages.php:153
