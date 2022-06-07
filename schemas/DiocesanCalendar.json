@@ -20,70 +20,74 @@
         },
         "LitCal": {
             "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "Festivity": {
+            "patternProperties": {
+                "": {
                     "type": "object",
-                    "additionalProperties": false,
                     "properties": {
-                        "name": {
-                            "type": "string"
+                        "Festivity": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "color": {
+                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
+                                },
+                                "grade": {
+                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
+                                },
+                                "common": {
+                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
+                                },
+                                "day": {
+                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Day"
+                                },
+                                "month": {
+                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Month"
+                                },
+                                "readings": {
+                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Readings"
+                                }
+                            },
+                            "required": [
+                                "name",
+                                "color",
+                                "grade",
+                                "common",
+                                "day",
+                                "month"
+                            ]
                         },
-                        "color": {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
-                        },
-                        "grade": {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
-                        },
-                        "common": {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
-                        },
-                        "day": {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Day"
-                        },
-                        "month": {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Month"
-                        },
-                        "readings": {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Readings"
+                        "Metadata": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "formRowNum": {
+                                    "type": "integer"
+                                },
+                                "sinceYear": {
+                                    "type": "integer"
+                                },
+                                "decreeURL": {
+                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/DecreeURL"
+                                },
+                                "decreeLangs": {
+                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/DecreeLangs"
+                                }
+                            },
+                            "required": [
+                                "formRowNum",
+                                "sinceYear"
+                            ]
                         }
                     },
                     "required": [
-                        "color",
-                        "common",
-                        "day",
-                        "grade",
-                        "month",
-                        "name"
-                    ]
-                },
-                "Metadata": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                        "formRowNum": {
-                            "type": "integer"
-                        },
-                        "sinceYear": {
-                            "type": "integer"
-                        },
-                        "decreeURL": {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/DecreeURL"
-                        },
-                        "decreeLangs": {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/DecreeLangs"
-                        }
-                    },
-                    "required": [
-                        "formRowNum",
-                        "sinceYear"
+                        "Festivity",
+                        "Metadata"
                     ]
                 }
             },
-            "required": [
-                "Festivity",
-                "Metadata"
-            ],
             "title": "LitCal"
         },
         "Overrides": {
