@@ -2206,31 +2206,31 @@ class LitCalAPI {
         foreach( $this->DiocesanData->LitCal as $key => $obj ) {
             //if sinceYear is undefined or null or empty, let's go ahead and create the event in any case
             //creation will be restricted only if explicitly defined by the sinceYear property
-            if( $this->LitSettings->Year >= $obj->sinceYear || $obj->sinceYear === null || $obj->sinceYear === 0 ) {
-                $currentFeastDate = LitDateTime::createFromFormat( '!j-n-Y', $obj->day . '-' . $obj->month . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-                if( $obj->grade > LitGrade::FEAST ) {
+            if( $this->LitSettings->Year >= $obj->Metadata->sinceYear || $obj->Metadata->sinceYear === null || $obj->Metadata->sinceYear === 0 ) {
+                $currentFeastDate = LitDateTime::createFromFormat( '!j-n-Y', $obj->Festivity->day . '-' . $obj->Festivity->month . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+                if( $obj->Festivity->grade > LitGrade::FEAST ) {
                     if( $this->Cal->inSolemnities( $currentFeastDate ) && $key != $this->Cal->solemnityKeyFromDate( $currentFeastDate ) ) {
                         //there seems to be a coincidence with a different Solemnity on the same day!
                         //should we attempt to move to the next open slot?
                         $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . $this->LitSettings->DiocesanCalendar . ": " .  sprintf(
                             /**translators: 1: Festivity name, 2: Name of the diocese, 3: Festivity date, 4: Coinciding festivity name, 5: Requested calendar year */
                             'The Solemnity \'%1$s\', proper to the calendar of the %2$s and usually celebrated on %3$s, coincides with the Sunday or Solemnity \'%4$s\' in the year %5$d! Does something need to be done about this?',
-                            '<i>' . $obj->name . '</i>',
+                            '<i>' . $obj->Festivity->name . '</i>',
                             $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese,
                             '<b>' . $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ) . '</b>',
                             '<i>' . $this->Cal->solemnityFromDate( $currentFeastDate )->name . '</i>',
                             $this->LitSettings->Year
                         );
                     }
-                    $this->Cal->addFestivity( $this->LitSettings->DiocesanCalendar . "_" . $key, new Festivity( "[ " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " ] " . $obj->name, $currentFeastDate, $obj->color, LitFeastType::FIXED, $obj->grade, $obj->common ) );
-                } else if ( $obj->grade <= LitGrade::FEAST && !$this->Cal->inSolemnities( $currentFeastDate ) ) {
-                    $this->Cal->addFestivity( $this->LitSettings->DiocesanCalendar . "_" . $key, new Festivity( "[ " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " ] " . $obj->name, $currentFeastDate, $obj->color, LitFeastType::FIXED, $obj->grade, $obj->common ) );
+                    $this->Cal->addFestivity( $this->LitSettings->DiocesanCalendar . "_" . $key, new Festivity( "[ " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " ] " . $obj->Festivity->name, $currentFeastDate, $obj->Festivity->color, LitFeastType::FIXED, $obj->Festivity->grade, $obj->Festivity->common ) );
+                } else if ( $obj->Festivity->grade <= LitGrade::FEAST && !$this->Cal->inSolemnities( $currentFeastDate ) ) {
+                    $this->Cal->addFestivity( $this->LitSettings->DiocesanCalendar . "_" . $key, new Festivity( "[ " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " ] " . $obj->Festivity->name, $currentFeastDate, $obj->Festivity->color, LitFeastType::FIXED, $obj->Festivity->grade, $obj->Festivity->common ) );
                 } else {
                     $this->Messages[] = $this->LitSettings->DiocesanCalendar . ": " . sprintf(
                         /**translators: 1: Festivity grade, 2: Festivity name, 3: Name of the diocese, 4: Festivity date, 5: Coinciding festivity name, 6: Requested calendar year */
                         'The %1$s \'%2$s\', proper to the calendar of the %3$s and usually celebrated on %4$s, is suppressed by the Sunday or Solemnity %5$s in the year %6$d',
-                        $this->LitGrade->i18n( $obj->grade, false ),
-                        '<i>' . $obj->name . '</i>',
+                        $this->LitGrade->i18n( $obj->Festivity->grade, false ),
+                        '<i>' . $obj->Festivity->name . '</i>',
                         $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese,
                         '<b>' . $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ) . '</b>',
                         '<i>' . $this->Cal->solemnityFromDate( $currentFeastDate )->name . '</i>',
