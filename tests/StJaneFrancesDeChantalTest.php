@@ -18,16 +18,6 @@ class StJaneFrancesDeChantalTest extends TestCase {
         2010 => 1281571200 //this test is significant since December 12th falls on a Sunday, so the memorial would have been suppressed if it hadn't been moved
     ];
 
-    //Years from 2002 in which August 12th is a Sunday
-    public static array $overriddenSince2002 = [
-        2012,
-        2018,
-        2029,
-        2035,
-        2040,
-        2046
-    ];
-
     //Years before 2002 in which December 12th is a Sunday
     public static array $overriddenBefore2002 = [
         1971,
@@ -37,6 +27,15 @@ class StJaneFrancesDeChantalTest extends TestCase {
         1999
     ];
 
+    //Years from 2002 in which August 12th is a Sunday
+    public static array $overriddenSince2002 = [
+        2012,
+        2018,
+        2029,
+        2035,
+        2040,
+        2046
+    ];
 
     public function testMovedOrNot() : bool|object {
         $res = false;

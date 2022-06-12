@@ -1114,13 +1114,86 @@ class LitCalAPI {
             //we won't have a date defined for mobile festivites, we'll have to calculate them here case by case
             //otherwise we'll have to create a language that we can interpret in an automated fashion...
             //for example we can use strtotime
-            switch( $row->Festivity->TAG ) {
-                case "MaryMotherChurch":
-                    $row->Festivity->DATE = LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 7 + 1 ) . 'D' ) );
-                    $row->Metadata->addedWhen = _( 'the Monday after Pentecost' );
-            }
-            if( true === $this->checkCoincidencesNewMobileFestivity( $row ) ) {
-                $this->createMobileFestivity( $row );
+            if( property_exists( $row->Metadata, 'strtotime' ) ) {
+                switch( gettype($row->Metadata->strtotime) ) {
+                    case 'object':
+                        if(
+                            property_exists( $row->Metadata->strtotime, 'dayOfTheWeek' )
+                            && property_exists( $row->Metadata->strtotime, 'relativeTime' )
+                            && property_exists( $row->Metadata->strtotime, 'festivityKey' )
+                        ) {
+                            $festivity = $this->Cal->getFestivity( $row->Metadata->strtotime->festivityKey );
+                            if( $festivity !== null ) {
+                                $relString = '';
+                                $row->Festivity->DATE = clone( $festivity->date );
+                                switch( $row->Metadata->strtotime->relativeTime ) {
+                                    case 'before':
+                                        $row->Festivity->DATE->modify("previous {$row->Metadata->strtotime->dayOfTheWeek}");
+                                         /**translators: e.g. 'Monday before Palm Sunday' */
+                                        $relString = _( 'before' );
+                                    break;
+                                    case 'after':
+                                        $row->Festivity->DATE->modify("next {$row->Metadata->strtotime->dayOfTheWeek}");
+                                        /**translators: e.g. 'Monday after Pentecost' */
+                                        $relString = _( 'after' );
+                                    break;
+                                    default:
+                                        $this->Messages[] = sprintf(
+                                            /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
+                                            _( 'Cannot create mobile festivity \'%1$s\': can only be relative to festivity with key \'%2$s\' using keywords %3$s' ),
+                                            $row->Festivity->name,
+                                            $row->Metadata->strtotime->festivityKey,
+                                            implode(', ', ['\'before\'', '\'after\''])
+                                        );
+                                    break;
+                                }
+                                $dayOfTheWeek = $this->LitSettings->Locale === LitLocale::LATIN ? LitMessages::LATIN_DAYOFTHEWEEK[ $row->Festivity->DATE->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $row->Festivity->DATE->format( 'U' ) ) );
+                                $row->Metadata->addedWhen = $dayOfTheWeek . ' ' . $relString . ' ' . $festivity->name;
+                                if( true === $this->checkCoincidencesNewMobileFestivity( $row ) ) {
+                                    $this->createMobileFestivity( $row );
+                                }
+                            } else {
+                                $this->Messages[] = sprintf(
+                                    /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
+                                    _( 'Cannot create mobile festivity \'%1$s\' relative to festivity with key \'%2$s\'' ),
+                                    $row->Festivity->name,
+                                    $row->Metadata->strtotime->festivityKey
+                                );
+                            }
+                        } else {
+                            $this->Messages[] = sprintf(
+                                /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created 2. list of properties */
+                                _( 'Cannot create mobile festivity \'%1$s\': when the \'strtotime\' property is an object, it must have properties %2$s' ),
+                                $row->Festivity->name,
+                                implode(', ', ['\'dayOfTheWeek\'', '\'relativeTime\'', '\'festivityKey\''])
+                            );
+                        }
+                        break;
+                    case 'string':
+                        if( $row->Metadata->strtotime !== '' ) {
+                            $festivityDateTS = strtotime( $row->Metadata->strtotime . ' ' . $this->LitSettings->Year . ' UTC' );
+                            $row->Festivity->DATE = new LitDateTime( "@$festivityDateTS" );
+                            $row->Festivity->DATE->setTimeZone(new DateTimeZone('UTC'));
+                            $row->Metadata->addedWhen = $row->Metadata->strtotime;
+                            if( true === $this->checkCoincidencesNewMobileFestivity( $row ) ) {
+                                $this->createMobileFestivity( $row );
+                            }
+                        }
+                        break;
+                    default:
+                        $this->Messages[] = sprintf(
+                            /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created */
+                            _( 'Cannot create mobile festivity \'%1$s\': \'strtotime\' property must be either an object or a string! Currently it has type \'%2$s\'' ),
+                            $row->Festivity->name,
+                            gettype( $row->Metadata->strtotime )
+                        );
+                }
+            } else {
+                $this->Messages[] = sprintf(
+                    /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created */
+                    _( 'Cannot create mobile festivity \'%1$s\' without a \'strtotime\' property!' ),
+                    $row->Festivity->name
+                );
             }
         } else {
             $row->Festivity->DATE = LitDateTime::createFromFormat( '!j-n-Y', "{$row->Festivity->DAY}-{$row->Festivity->MONTH}-{$this->LitSettings->Year}", new DateTimeZone( 'UTC' ) );
@@ -1973,55 +2046,6 @@ class LitCalAPI {
             $this->Messages[] = "Did not find any Missals for region " . $this->NationalData->Metadata->Region;
         }
     }
-
-    // private function makePatron( string $tag, string $nameSuffix, int $day, int $month, array|string $color, string $EditionRomanMissal = RomanMissal::EDITIO_TYPICA_1970 ) {
-    //     $festivity = $this->Cal->getFestivity( $tag );
-    //     if( $festivity !== null ) {
-    //         if( $festivity->grade < LitGrade::FEAST ) {
-    //             $this->Cal->setProperty( $tag, "grade", LitGrade::FEAST );
-    //         }
-    //         $this->Cal->setProperty( $tag, "name", $festivity->name . ", " . $nameSuffix );
-    //         $this->Cal->setProperty( $tag, "common", LitCommon::PROPRIO );
-    //     } else{
-    //         //check what's going on, for example, if it's a Sunday or Solemnity
-    //         $currentFeastDate = LitDateTime::createFromFormat( '!j-n-Y', "{$day}-{$month}-" . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-    //         $row = $this->tempCal[ $EditionRomanMissal ][ $tag ];
-    //         //let's also get the name back from the database, so we can give some feedback and maybe even recreate the festivity
-    //         $FestivityName = $row->NAME . ", " .  $nameSuffix;
-    //         if( $this->Cal->inSolemnitiesFeastsOrMemorials( $currentFeastDate ) || self::DateIsSunday( $currentFeastDate ) ) {
-    //             $coincidingFestivity = new stdClass();
-    //             $coincidingFestivity->event = $this->Cal->solemnityFromDate( $currentFeastDate );
-    //             if ( self::DateIsSunday( $currentFeastDate ) && $coincidingFestivity->event->grade < LitGrade::SOLEMNITY ){
-    //                 //it's a Sunday
-    //                 $coincidingFestivity->grade = $this->LitSettings->Locale === LitLocale::LATIN ? 'Die Domini' : ucfirst( $this->dayOfTheWeek->format( $currentFeastDate->format( 'U' ) ) );
-    //             } else if ( $this->Cal->inSolemnities( $currentFeastDate ) ) {
-    //                 //it's a Feast of the Lord or a Solemnity
-    //                 $coincidingFestivity->grade = ( $coincidingFestivity->event->grade > LitGrade::SOLEMNITY ? '<i>' . $this->LitGrade->i18n( $coincidingFestivity->event->grade, false ) . '</i>' : $this->LitGrade->i18n( $coincidingFestivity->grade, false ) );
-    //             } else if ( $this->Cal->inFeastsOrMemorials( $currentFeastDate ) ) {
-    //                 //we should probably be able to create it anyways in this case?
-    //                 $this->Cal->addFestivity( $tag, new Festivity( $FestivityName, $currentFeastDate, $color, LitFeastType::FIXED, LitGrade::FEAST, LitCommon::PROPRIO ) );
-    //                 $coincidingFestivity->grade = $this->LitGrade->i18n( $coincidingFestivity->event->grade, false );
-    //             }
-    //             $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-    //                 /**translators:
-    //                  * 1. Grade of the festivity
-    //                  * 2. Name of the festivity
-    //                  * 3. Date on which the festivity is usually celebrated
-    //                  * 4. Grade of the superseding festivity
-    //                  * 5. Name of the superseding festivity
-    //                  * 6. Requested calendar year
-    //                  */
-    //                 _( 'The %1$s \'%2$s\', usually celebrated on %3$s, is suppressed by the %4$s \'%5$s\' in the year %6$d.' ),
-    //                 $this->LitGrade->i18n( LitGrade::FEAST, false ),
-    //                 $FestivityName,
-    //                 $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ),
-    //                 $coincidingFestivity->grade,
-    //                 $coincidingFestivity->event->name,
-    //                 $this->LitSettings->Year
-    //             );
-    //         }
-    //     }
-    // }
 
     /**
      * So far, the celebrations being transferred are all originally from the 1970 Editio Typica

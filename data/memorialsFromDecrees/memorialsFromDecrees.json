@@ -40,7 +40,12 @@
         "Metadata": {
             "action": "createNew",
             "sinceYear": 2018,
-            "decreeURL": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2018/03/03/0168/00350.html"
+            "decreeURL": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2018/03/03/0168/00350.html",
+            "strtotime": {
+                "dayOfTheWeek": "Monday",
+                "relativeTime": "after",
+                "festivityKey": "Pentecost"
+            }
         }
     },
     {
