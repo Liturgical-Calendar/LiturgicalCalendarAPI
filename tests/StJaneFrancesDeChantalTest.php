@@ -52,7 +52,7 @@ class StJaneFrancesDeChantalTest extends TestCase {
                 property_exists( self::$testObject->Settings, 'DiocesanCalendar' ) ? self::$testObject->Settings->DiocesanCalendar : 'the Universal Roman Calendar'
             );
             $message->type = "error";
-            $message->text = "Saint Jane Frances de Chantal test (moved or not) failed for Year " . self::$testObject->Settings->Year . " in {$type}{$Calendar}. Expected value: {$expectedValue}, actual value: " . self::$testObject->LitCal->NativityJohnBaptist->date . PHP_EOL . $e->getMessage();
+            $message->text = "Saint Jane Frances de Chantal test (moved or not) failed for Year " . self::$testObject->Settings->Year . " in {$type}{$Calendar}. Expected value: {$expectedValue}, actual value: " . self::$testObject->LitCal->StJaneFrancesDeChantal->date . PHP_EOL . $e->getMessage();
             return $message;
         }
         return $res;
