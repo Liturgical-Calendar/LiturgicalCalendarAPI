@@ -2043,7 +2043,9 @@ class LitCalAPI {
                 }
             }
         } else {
-            $this->Messages[] = "Did not find any Missals for region " . $this->NationalData->Metadata->Region;
+            if( $this->NationalData !== null && property_exists( $this->NationalData, 'Metadata' ) && property_exists( $this->NationalData->Metadata, 'Region' ) ) {
+                $this->Messages[] = "Did not find any Missals for region " . $this->NationalData->Metadata->Region;
+            }
         }
     }
 
