@@ -129,25 +129,38 @@ class LitCalAPI {
 
     private function updateSettingsBasedOnNationalCalendar() : void {
         if( $this->LitSettings->NationalCalendar !== null ) {
-            switch( $this->LitSettings->NationalCalendar ) {
-                case 'VATICAN':
-                    $this->LitSettings->Epiphany        = Epiphany::JAN6;
-                    $this->LitSettings->Ascension       = Ascension::THURSDAY;
-                    $this->LitSettings->CorpusChristi   = CorpusChristi::THURSDAY;
-                    $this->LitSettings->Locale          = LitLocale::LATIN;
-                break;
-                case "ITALY":
-                    $this->LitSettings->Epiphany        = Epiphany::JAN6;
-                    $this->LitSettings->Ascension       = Ascension::SUNDAY;
-                    $this->LitSettings->CorpusChristi   = CorpusChristi::SUNDAY;
-                    $this->LitSettings->Locale          = LitLocale::ITALIAN;
-                break;
-                case "USA":
-                    $this->LitSettings->Epiphany        = Epiphany::SUNDAY_JAN2_JAN8;
-                    $this->LitSettings->Ascension       = Ascension::SUNDAY;
-                    $this->LitSettings->CorpusChristi   = CorpusChristi::SUNDAY;
-                    $this->LitSettings->Locale          = LitLocale::ENGLISH;
-                break;
+            if( $this->LitSettings->NationalCalendar === 'VATICAN' ) {
+                $this->LitSettings->Epiphany        = Epiphany::JAN6;
+                $this->LitSettings->Ascension       = Ascension::THURSDAY;
+                $this->LitSettings->CorpusChristi   = CorpusChristi::THURSDAY;
+                $this->LitSettings->Locale          = LitLocale::LATIN;
+            } else {
+                if( property_exists( $this->NationalData, 'Settings' ) ) {
+                    if(
+                        property_exists( $this->NationalData->Settings, 'Epiphany' )
+                        && Epiphany::isValid( $this->NationalData->Settings->Epiphany )
+                    ) {
+                        $this->LitSettings->Epiphany        = $this->NationalData->Settings->Epiphany;
+                    }
+                    if(
+                        property_exists( $this->NationalData->Settings, 'Ascension' )
+                        && Ascension::isValid( $this->NationalData->Settings->Ascension )
+                    ) {
+                        $this->LitSettings->Ascension       = $this->NationalData->Settings->Ascension;
+                    }
+                    if(
+                        property_exists( $this->NationalData->Settings, 'CorpusChristi' )
+                        && CorpusChristi::isValid( $this->NationalData->Settings->CorpusChristi )
+                    ) {
+                        $this->LitSettings->CorpusChristi   = $this->NationalData->Settings->CorpusChristi;
+                    }
+                    if(
+                        property_exists( $this->NationalData->Settings, 'Locale'  )
+                        && LitLocale::isValid( $this->NationalData->Settings->Locale )
+                    ) {
+                        $this->LitSettings->Locale          = $this->NationalData->Settings->Locale;
+                    }
+                }
             }
         }
     }
@@ -195,7 +208,6 @@ class LitCalAPI {
             }
         }
 
-        $this->updateSettingsBasedOnNationalCalendar();
         $this->updateSettingsBasedOnDiocesanCalendar();
     }
 
@@ -1691,7 +1703,7 @@ class LitCalAPI {
         if( file_exists( $nationalDataFile ) ) {
             $this->NationalData = json_decode( file_get_contents( $nationalDataFile ) );
             if( json_last_error() === JSON_ERROR_NONE ) {
-                if( property_exists( $this->NationalData, "Metadata" ) && property_exists( $this->NationalData->Metadata, "WiderRegion" ) ){
+                if( property_exists( $this->NationalData, "Metadata" ) && property_exists( $this->NationalData->Metadata, "WiderRegion" ) ) {
                     $widerRegionDataFile = $this->NationalData->Metadata->WiderRegion->jsonFile;
                     $widerRegionI18nFile = $this->NationalData->Metadata->WiderRegion->i18nFile;
                     if( file_exists( $widerRegionI18nFile ) ) {
@@ -1717,6 +1729,7 @@ class LitCalAPI {
                 $this->Messages[] = sprintf( _( "Error retrieving and decoding National data from file %s." ), $nationalDataFile ) . ": " . json_last_error_msg();
             }
         }
+        $this->updateSettingsBasedOnNationalCalendar();
     }
 
     private function handleMissingFestivity( object $row ) : void {
@@ -2481,6 +2494,7 @@ class LitCalAPI {
     public function Init(){
         $this->APICore->Init();
         $this->initParameterData();
+        $this->loadNationalCalendarData();
         $this->loadDiocesanCalendarData();
         $this->APICore->setResponseContentTypeHeader();
 
@@ -2504,8 +2518,7 @@ class LitCalAPI {
             $this->prepareL10N();
             $this->calculateUniversalCalendar();
 
-            if( $this->LitSettings->NationalCalendar !== null ) {
-                $this->loadNationalCalendarData();
+            if( $this->LitSettings->NationalCalendar !== null && $this->NationalData !== null ) {
                 $this->applyNationalCalendar();
             }
 
