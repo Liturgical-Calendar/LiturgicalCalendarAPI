@@ -242,10 +242,12 @@ class LitCalHealth implements MessageComponentInterface {
                 $message->type = "success";
                 $message->text = "$Test passed for the Calendar $Calendar for the year $Year";
                 $message->classes = ".$Test.year-{$Year}.test-valid";
+                $message->test = $Test;
                 $this->sendMessage( $to, $message );
             }
             else if( gettype( $testResult ) === 'object' ) {
                 $testResult->classes = ".$Test.year-{$Year}.test-valid";
+                $testResult->test = $Test;
                 $this->sendMessage( $to, $testResult );
             }
         }
