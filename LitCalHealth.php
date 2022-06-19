@@ -4,9 +4,13 @@ ini_set("display_errors", 1);
 
 include_once( 'vendor/autoload.php' );
 include_once( 'includes/enums/LitSchema.php' );
-include_once( 'tests/NativityJohnBaptistTest.php' );
-include_once( 'tests/StJaneFrancesDeChantalTest.php' );
-include_once( 'tests/MaryMotherChurchTest.php' );
+
+$testsFolder = dirname(__FILE__) . '/tests';
+$it = new DirectoryIterator("glob://$testsFolder/*Test.php");
+foreach($it as $f) {
+    $fileName = $f->getFilename();
+    include_once( 'tests/' . $fileName );
+}
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
@@ -54,7 +58,7 @@ class LitCalHealth implements MessageComponentInterface {
                             property_exists( $messageReceived, 'category' ) &&
                             property_exists( $messageReceived, 'test' )
                         ) {
-                            $this->executeUnitTest( $messageReceived->calendar, $messageReceived->year, $messageReceived->category, $messageReceived->test, $from );
+                            $this->executeUnitTest( $messageReceived->test, $messageReceived->calendar, $messageReceived->year, $messageReceived->category, $from );
                         }
                         break;
                     default:
@@ -222,23 +226,7 @@ class LitCalHealth implements MessageComponentInterface {
         }
     }
 
-    private function executeUnitTest( string $Calendar, int $Year, string $category, string $test, ConnectionInterface $to ) {
-        switch( $test ) {
-            case 'testJohnBaptist':
-                $this->testJohnBaptist( $Calendar, $Year, $category, $to );
-                break;
-            case 'testStJaneFrancesDeChantalMoved':
-            case 'testStJaneFrancesDeChantalOverridden':
-                $this->testStJaneFrancesDeChantalMoved( $Calendar, $Year, $category, $to, $test );
-                break;
-            case 'testMaryMotherChurchDoesNotExist':
-            case 'testMaryMotherChurchExists':
-                $this->testMaryMotherChurch( $Calendar, $Year, $category, $to, $test );
-                break;
-        }
-    }
-
-    private function testJohnBaptist( string $Calendar, int $Year, string $category, ConnectionInterface $to ) : void {
+    private function executeUnitTest( string $Test, string $Calendar, int $Year, string $category, ConnectionInterface $to ) : void {
         if( $Calendar === 'VATICAN' ) {
             $req = "?year=$Year";
         } else {
@@ -246,83 +234,21 @@ class LitCalHealth implements MessageComponentInterface {
         }
         $jsonData = json_decode( file_get_contents( self::LitCalBaseUrl . $req ) );
         if( json_last_error() === JSON_ERROR_NONE ) {
-            NativityJohnBaptistTest::$testObject = $jsonData;
-            $NativityJohnBaptistTest = new NativityJohnBaptistTest;
-            $testResult = $NativityJohnBaptistTest->testJune23();
+            $TestClass = new $Test;
+            $TestClass::$testObject = $jsonData;
+            $testResult = $TestClass->test();
             if( gettype( $testResult ) === 'boolean' && $testResult === true ) {
                 $message = new stdClass();
                 $message->type = "success";
-                $message->text = "Nativity of John the Baptist test passed for the Calendar $Calendar for the year $Year";
-                $message->classes = ".nativityjohnbaptist.year-{$Year}.test-valid";
+                $message->text = "$Test passed for the Calendar $Calendar for the year $Year";
+                $message->classes = ".$Test.year-{$Year}.test-valid";
                 $this->sendMessage( $to, $message );
             }
             else if( gettype( $testResult ) === 'object' ) {
-                $testResult->classes = ".nativityjohnbaptist.year-{$Year}.test-valid";
+                $testResult->classes = ".$Test.year-{$Year}.test-valid";
                 $this->sendMessage( $to, $testResult );
             }
         }
-    }
-
-    private function testStJaneFrancesDeChantalMoved( string $Calendar, int $Year, string $category, ConnectionInterface $to, string $test ) : void {
-        if( $Calendar === 'VATICAN' ) {
-            $req = "?year=$Year";
-        } else {
-            $req = "?$category=$Calendar&year=$Year";
-        }
-        $jsonData = json_decode( file_get_contents( self::LitCalBaseUrl . $req ) );
-        if( json_last_error() === JSON_ERROR_NONE ) {
-            StJaneFrancesDeChantalTest::$testObject = $jsonData;
-            $StJaneFrancesDeChantalTest = new StJaneFrancesDeChantalTest;
-            if( $test === 'testStJaneFrancesDeChantalMoved' ) {
-                $testResult = $StJaneFrancesDeChantalTest->testMovedOrNot();
-            }
-            else if( $test === 'testStJaneFrancesDeChantalOverridden' ) {
-                $testResult = $StJaneFrancesDeChantalTest->testOverridden();
-            }
-            if( gettype( $testResult ) === 'boolean' && $testResult === true ) {
-                $message = new stdClass();
-                $message->type = "success";
-                $message->text = "Saint Jane Frances de Chantal test ($test) passed for the Calendar $Calendar for the year $Year";
-                $message->classes = ".{$test}.year-{$Year}.test-valid";
-                $this->sendMessage( $to, $message );
-            }
-            else if( gettype( $testResult ) === 'object' ) {
-                $testResult->classes = ".{$test}.year-{$Year}.test-valid";
-                $this->sendMessage( $to, $testResult );
-            }
-        }
-    }
-
-    private function testMaryMotherChurch( string $Calendar, int $Year, string $category, ConnectionInterface $to, string $test ) : void {
-        if( $Calendar === 'VATICAN' ) {
-            $req = "?year=$Year";
-        } else {
-            $req = "?$category=$Calendar&year=$Year";
-        }
-        $jsonData = json_decode( file_get_contents( self::LitCalBaseUrl . $req ) );
-
-        if( json_last_error() === JSON_ERROR_NONE ) {
-            MaryMotherChurchTest::$testObject = $jsonData;
-            $MaryMotherChurchTest = new MaryMotherChurchTest;
-            if( $test === 'testMaryMotherChurchDoesNotExist' ) {
-                $testResult = $MaryMotherChurchTest->testDoesNotExist();
-            }
-            else if( $test === 'testMaryMotherChurchExists' ) {
-                $testResult = $MaryMotherChurchTest->testExists();
-            }
-            if( gettype( $testResult ) === 'boolean' && $testResult === true ) {
-                $message = new stdClass();
-                $message->type = "success";
-                $message->text = "Mary Mother of the Church test ($test) passed for the Calendar $Calendar for the year $Year";
-                $message->classes = ".{$test}.year-{$Year}.test-valid";
-                $this->sendMessage( $to, $message );
-            }
-            else if( gettype( $testResult ) === 'object' ) {
-                $testResult->classes = ".{$test}.year-{$Year}.test-valid";
-                $this->sendMessage( $to, $testResult );
-            }
-        }
-
     }
 
     private function validateDataAgainstSchema( object|array $data, string $schemaUrl ) : bool|object {
