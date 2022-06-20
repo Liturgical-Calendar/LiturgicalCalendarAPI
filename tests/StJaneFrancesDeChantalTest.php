@@ -80,7 +80,7 @@ class StJaneFrancesDeChantalTest extends TestCase {
          else {
             $message = new stdClass();
             $message->type = "error";
-            $message->text = get_class($this) . " out of bounds: this test only supports calendar years [ " . implode(', ', array_keys(self::ExpectedValues) ) . " ]";
+            $message->text = get_class($this) . " out of bounds: this test only supports calendar years [ " . implode(', ', array_keys(self::Assertions) ) . " ]";
             return $message;
         }
         return $res;
