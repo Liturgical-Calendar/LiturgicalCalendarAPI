@@ -132,11 +132,9 @@ class LitMessages {
         return $hex;
     }
 
-    public static function ParseColorString( string|array $string, string $LOCALE, bool $html=false) : string {
-        if( is_string( $string ) ) {
-            $colors = explode( ",", $string );
-        } else {
-            $colors = $string;
+    public static function ParseColorString( string|array $colors, string $LOCALE, bool $html=false) : string {
+        if( is_string( $colors ) ) {
+            $colors = explode( ",", $colors );
         }
         if( $html === true ) {
             $colors = array_map( function($txt) use ($LOCALE) {
@@ -149,7 +147,7 @@ class LitMessages {
             }, $colors );
             return implode( " " . _( "or" ) . " ", $colors );
         }
-        return $string; //should never get here
+        return ""; //should never get here
     }
 
     /**
