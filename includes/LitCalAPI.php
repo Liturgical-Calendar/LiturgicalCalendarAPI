@@ -2345,11 +2345,11 @@ class LitCalAPI {
 
             $description = $this->LitCommon->C( $CalEvent->common );
             $description .=  '\n' . $displayGrade;
-            $description .= $CalEvent->color != "" ? '\n' . LitMessages::ParseColorString( $CalEvent->color, $this->LitSettings->Locale, false ) : "";
+            $description .= (is_string($CalEvent->color) && $CalEvent->color != "") || (is_array($CalEvent->color) && count($CalEvent->color) > 0 ) ? '\n' . LitMessages::ParseColorString( $CalEvent->color, $this->LitSettings->Locale, false ) : "";
             $description .= property_exists( $CalEvent,'liturgicalyear' ) && $CalEvent->liturgicalYear !== null && $CalEvent->liturgicalYear != "" ? '\n' . $CalEvent->liturgicalYear : "";
             $htmlDescription = "<P DIR=LTR>" . $this->LitCommon->C( $CalEvent->common );
             $htmlDescription .=  '<BR>' . $displayGradeHTML;
-            $htmlDescription .= $CalEvent->color != "" ? "<BR>" . LitMessages::ParseColorString( $CalEvent->color, $this->LitSettings->Locale, true ) : "";
+            $htmlDescription .= (is_string($CalEvent->color) && $CalEvent->color != "") || (is_array($CalEvent->color) && count($CalEvent->color) > 0 ) ? "<BR>" . LitMessages::ParseColorString( $CalEvent->color, $this->LitSettings->Locale, true ) : "";
             $htmlDescription .= property_exists( $CalEvent,'liturgicalyear' ) && $CalEvent->liturgicalYear !== null && $CalEvent->liturgicalYear != "" ? '<BR>' . $CalEvent->liturgicalYear . "</P>" : "</P>";
             $ical .= "BEGIN:VEVENT\r\n";
             $ical .= "CLASS:PUBLIC\r\n";
