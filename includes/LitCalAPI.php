@@ -357,7 +357,13 @@ class LitCalAPI {
             } else {
                 $nth++;
                 $nthStr = $this->LitSettings->Locale === LitLocale::LATIN ? LitMessages::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
-                $name = $this->LitSettings->Locale === LitLocale::LATIN ? sprintf( "Dies %s ante Epiphaniam", $nthStr ) : sprintf( _( "%s day before Epiphany" ), ucfirst( $nthStr ) );
+                $name = $this->LitSettings->Locale === LitLocale::LATIN
+                    ? sprintf( "Dies %s ante Epiphaniam", $nthStr )
+                    : sprintf(
+                        /**translators: %s is an ordinal number (first, second...) */
+                        _( "%s day before Epiphany" ),
+                        ucfirst( $nthStr )
+                    );
                 $festivity = new Festivity( $name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
                 $this->Cal->addFestivity( "DayBeforeEpiphany" . $nth, $festivity );
             }
@@ -371,7 +377,13 @@ class LitCalAPI {
                 $nth++;
                 $nthStr = $this->LitSettings->Locale === LitLocale::LATIN ? LitMessages::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
                 $dateTime = LitDateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-                $name = $this->LitSettings->Locale === LitLocale::LATIN ? sprintf( "Dies %s post Epiphaniam", $nthStr ) : sprintf( _( "%s day after Epiphany" ), ucfirst( $nthStr ) );
+                $name = $this->LitSettings->Locale === LitLocale::LATIN
+                    ? sprintf( "Dies %s post Epiphaniam", $nthStr )
+                    : sprintf(
+                        /**translators: %s is an ordinal number (first, second...) */
+                        _( "%s day after Epiphany" ),
+                        ucfirst( $nthStr )
+                    );
                 $festivity = new Festivity( $name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
                 $this->Cal->addFestivity( "DayAfterEpiphany" . $nth, $festivity );
             }
@@ -396,7 +408,13 @@ class LitCalAPI {
             for ( $i = 2; $i < $DayOfEpiphany; $i++ ) {
                 $nth++;
                 $nthStr = $this->LitSettings->Locale === LitLocale::LATIN ? LitMessages::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
-                $name = $this->LitSettings->Locale === LitLocale::LATIN ? sprintf( "Dies %s ante Epiphaniam", $nthStr ) : sprintf( _( "%s day before Epiphany" ), ucfirst( $nthStr ) );
+                $name = $this->LitSettings->Locale === LitLocale::LATIN
+                    ? sprintf( "Dies %s ante Epiphaniam", $nthStr )
+                    : sprintf(
+                        /**translators: %s is an ordinal number (first, second...) */
+                        _( "%s day before Epiphany" ),
+                        ucfirst( $nthStr )
+                    );
                 $dateTime = LitDateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
                 $festivity = new Festivity( $name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
                 $this->Cal->addFestivity( "DayBeforeEpiphany" . $nth, $festivity );
@@ -409,7 +427,13 @@ class LitCalAPI {
                 for ( $i = $DayOfEpiphany + 1; $i < $SundayAfterEpiphany; $i++ ) {
                     $nth++;
                     $nthStr = $this->LitSettings->Locale === LitLocale::LATIN ? LitMessages::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
-                    $name = $this->LitSettings->Locale === LitLocale::LATIN ? sprintf( "Dies %s post Epiphaniam", $nthStr ) : sprintf( _( "%s day after Epiphany" ), ucfirst( $nthStr ) );
+                    $name = $this->LitSettings->Locale === LitLocale::LATIN
+                        ? sprintf( "Dies %s post Epiphaniam", $nthStr )
+                        : sprintf(
+                            /**translators: %s is an ordinal number (first, second...) */
+                            _( "%s day after Epiphany" ),
+                            ucfirst( $nthStr )
+                        );
                     $dateTime = LitDateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
                     $festivity = new Festivity( $name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
                     $this->Cal->addFestivity( "DayAfterEpiphany" . $nth, $festivity );
