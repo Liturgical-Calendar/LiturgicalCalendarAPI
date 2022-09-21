@@ -322,7 +322,7 @@ class LitCommon {
      * Function C
      * Returns a translated human readable string of the Common or the Proper
      */
-    public function C( string|array $common="" ) : string|array {
+    public function C( string|array $common="" ) : string {
         if ( ( is_string( $common ) && $common !== "" ) || is_array( $common ) ) {
             if( (is_string( $common ) && $common === LitCommon::PROPRIO) || ( is_array( $common ) && in_array( LitCommon::PROPRIO, $common ) ) ) {
                 $common = $this->i18n( $common );
@@ -346,7 +346,7 @@ class LitCommon {
                 $common = implode( "; " . _( "or" ) . " ", $commons );
             }
         }
-        return $common;
+        return is_string($common) ? $common : $common[0];
     }
 
 }

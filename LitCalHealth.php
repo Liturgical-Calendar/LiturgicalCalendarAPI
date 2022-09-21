@@ -2,10 +2,15 @@
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 
-include_once( 'includes/enums/LitSchema.php' );
-include_once( 'tests/NativityJohnBaptistTest.php' );
-include_once( 'tests/StJaneFrancesDeChantalTest.php' );
 include_once( 'vendor/autoload.php' );
+include_once( 'includes/enums/LitSchema.php' );
+
+$testsFolder = dirname(__FILE__) . '/tests';
+$it = new DirectoryIterator("glob://$testsFolder/*Test.php");
+foreach($it as $f) {
+    $fileName = $f->getFilename();
+    include_once( 'tests/' . $fileName );
+}
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
@@ -53,7 +58,7 @@ class LitCalHealth implements MessageComponentInterface {
                             property_exists( $messageReceived, 'category' ) &&
                             property_exists( $messageReceived, 'test' )
                         ) {
-                            $this->executeUnitTest( $messageReceived->calendar, $messageReceived->year, $messageReceived->category, $messageReceived->test, $from );
+                            $this->executeUnitTest( $messageReceived->test, $messageReceived->calendar, $messageReceived->year, $messageReceived->category, $from );
                         }
                         break;
                     default:
@@ -221,150 +226,30 @@ class LitCalHealth implements MessageComponentInterface {
         }
     }
 
-    private function executeUnitTest( string $Calendar, int $Year, string $category, string $test, ConnectionInterface $to ) {
-        switch( $test ) {
-            case 'testJohnBaptist':
-                $this->testJohnBaptist( $Calendar, $Year, $category, $to );
-                break;
-            case 'testStJaneFrancesDeChantalMoved':
-                $this->testStJaneFrancesDeChantalMoved( $Calendar, $Year, $category, $to, 'StJaneFrancesDeChantalMoved' );
-                break;
-            case 'testStJaneFrancesDeChantalOverridden':
-                $this->testStJaneFrancesDeChantalMoved( $Calendar, $Year, $category, $to, 'StJaneFrancesDeChantalOverridden' );
-                break;
-        }
-    }
-
-    private function testJohnBaptist( string $Calendar, int $Year, string $category, ConnectionInterface $to ) : void {
+    private function executeUnitTest( string $Test, string $Calendar, int $Year, string $category, ConnectionInterface $to ) : void {
         if( $Calendar === 'VATICAN' ) {
             $req = "?year=$Year";
         } else {
             $req = "?$category=$Calendar&year=$Year";
         }
-        $data = file_get_contents( self::LitCalBaseUrl . $req );
-        if( $data !== false ) {
-            $message = new stdClass();
-            $message->type = "success";
-            $message->text = "The Universal Calendar for the year $Year exists";
-            $message->classes = ".nativityjohnbaptist.year-{$Year}.file-exists";
-            $this->sendMessage( $to, $message );
-
-            $jsonData = json_decode( $data );
-            if( json_last_error() === JSON_ERROR_NONE ) {
+        $jsonData = json_decode( file_get_contents( self::LitCalBaseUrl . $req ) );
+        if( json_last_error() === JSON_ERROR_NONE ) {
+            $TestClass = new $Test;
+            $TestClass::$testObject = $jsonData;
+            $testResult = $TestClass->test();
+            if( gettype( $testResult ) === 'boolean' && $testResult === true ) {
                 $message = new stdClass();
                 $message->type = "success";
-                $message->text = "The Universal Calendar for the year $Year was successfully decoded as JSON";
-                $message->classes = ".nativityjohnbaptist.year-{$Year}.json-valid";
-                $this->sendMessage( $to, $message );
-
-                $validationResult = $this->validateDataAgainstSchema( $jsonData, LitSchema::LITCAL );
-                if( gettype( $validationResult ) === 'boolean' && $validationResult === true ) {
-                    $message = new stdClass();
-                    $message->type = "success";
-                    $message->text = "The Universal Calendar for the year $Year was successfully validated against the Schema " . LitSchema::LITCAL;
-                    $message->classes = ".nativityjohnbaptist.year-{$Year}.schema-valid";
-                    $this->sendMessage( $to, $message );
-                    NativityJohnBaptistTest::$testObject = $jsonData;
-                    $NativityJohnBaptistTest = new NativityJohnBaptistTest;
-                    $testResult = $NativityJohnBaptistTest->testJune23();
-                    if( gettype( $testResult ) === 'boolean' && $testResult === true ) {
-                        $message = new stdClass();
-                        $message->type = "success";
-                        $message->text = "Nativity of John the Baptist test passed for the Universal Calendar for the year $Year";
-                        $message->classes = ".nativityjohnbaptist.year-{$Year}.test-valid";
-                        $this->sendMessage( $to, $message );
-                    }
-                    else if( gettype( $testResult ) === 'object' ) {
-                        $testResult->classes = ".nativityjohnbaptist.year-{$Year}.test-valid";
-                        $this->sendMessage( $to, $testResult );
-                    }
-                }
-                else if( gettype( $validationResult === 'object' ) ) {
-                    $validationResult->classes = ".nativityjohnbaptist.year-{$Year}.schema-valid";
-                    $this->sendMessage( $to, $validationResult );
-                }
-            } else {
-                $message = new stdClass();
-                $message->type = "error";
-                $message->text = "There was an error decoding the Universal Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as JSON: " . json_last_error_msg();
-                $message->classes = ".nativityjohnbaptist.year-{$Year}.json-valid";
+                $message->text = "$Test passed for the Calendar $Calendar for the year $Year";
+                $message->classes = ".$Test.year-{$Year}.test-valid";
+                $message->test = $Test;
                 $this->sendMessage( $to, $message );
             }
-        } else {
-            $message = new stdClass();
-            $message->type = "error";
-            $message->text = "The Universal Calendar for the year $Year does not exist at the URL " . self::LitCalBaseUrl . $req;
-            $message->classes = ".nativityjohnbaptist.year-{$Year}.file-exists";
-            $this->sendMessage( $to, $message );
-        }
-    }
-
-    private function testStJaneFrancesDeChantalMoved( string $Calendar, int $Year, string $category, ConnectionInterface $to, string $test ) : void {
-        if( $Calendar === 'VATICAN' ) {
-            $req = "?year=$Year";
-        } else {
-            $req = "?$category=$Calendar&year=$Year";
-        }
-        $data = file_get_contents( self::LitCalBaseUrl . $req );
-        if( $data !== false ) {
-            $message = new stdClass();
-            $message->type = "success";
-            $message->text = "The Universal Calendar for the year $Year exists";
-            $message->classes = ".{$test}.year-{$Year}.file-exists";
-            $this->sendMessage( $to, $message );
-
-            $jsonData = json_decode( $data );
-            if( json_last_error() === JSON_ERROR_NONE ) {
-                $message = new stdClass();
-                $message->type = "success";
-                $message->text = "The Universal Calendar for the year $Year was successfully decoded as JSON";
-                $message->classes = ".{$test}.year-{$Year}.json-valid";
-                $this->sendMessage( $to, $message );
-
-                $validationResult = $this->validateDataAgainstSchema( $jsonData, LitSchema::LITCAL );
-                if( gettype( $validationResult ) === 'boolean' && $validationResult === true ) {
-                    $message = new stdClass();
-                    $message->type = "success";
-                    $message->text = "The Universal Calendar for the year $Year was successfully validated against the Schema " . LitSchema::LITCAL;
-                    $message->classes = ".{$test}.year-{$Year}.schema-valid";
-                    $this->sendMessage( $to, $message );
-                    StJaneFrancesDeChantalTest::$testObject = $jsonData;
-                    $StJaneFrancesDeChantalTest = new StJaneFrancesDeChantalTest;
-                    if( $test === 'StJaneFrancesDeChantalMoved' ) {
-                        $testResult = $StJaneFrancesDeChantalTest->testMovedOrNot();
-                    }
-                    else if( $test === 'StJaneFrancesDeChantalOverridden' ) {
-                        $testResult = $StJaneFrancesDeChantalTest->testOverridden();
-                    }
-                    if( gettype( $testResult ) === 'boolean' && $testResult === true ) {
-                        $message = new stdClass();
-                        $message->type = "success";
-                        $message->text = "Saint Jane Frances de Chantal test ($test) passed for the Universal Calendar for the year $Year";
-                        $message->classes = ".{$test}.year-{$Year}.test-valid";
-                        $this->sendMessage( $to, $message );
-                    }
-                    else if( gettype( $testResult ) === 'object' ) {
-                        $testResult->classes = ".{$test}.year-{$Year}.test-valid";
-                        $this->sendMessage( $to, $testResult );
-                    }
-                }
-                else if( gettype( $validationResult === 'object' ) ) {
-                    $validationResult->classes = ".{$test}.year-{$Year}.schema-valid";
-                    $this->sendMessage( $to, $validationResult );
-                }
-            } else {
-                $message = new stdClass();
-                $message->type = "error";
-                $message->text = "There was an error decoding the Universal Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as JSON: " . json_last_error_msg();
-                $message->classes = ".{$test}.year-{$Year}.json-valid";
-                $this->sendMessage( $to, $message );
+            else if( gettype( $testResult ) === 'object' ) {
+                $testResult->classes = ".$Test.year-{$Year}.test-valid";
+                $testResult->test = $Test;
+                $this->sendMessage( $to, $testResult );
             }
-        } else {
-            $message = new stdClass();
-            $message->type = "error";
-            $message->text = "The Universal Calendar for the year $Year does not exist at the URL " . self::LitCalBaseUrl . $req;
-            $message->classes = ".{$test}.year-{$Year}.file-exists";
-            $this->sendMessage( $to, $message );
         }
     }
 

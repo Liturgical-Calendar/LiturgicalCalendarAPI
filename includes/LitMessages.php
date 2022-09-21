@@ -132,31 +132,22 @@ class LitMessages {
         return $hex;
     }
 
-    public static function ParseColorString( string $string, string $LOCALE, bool $html=false) : string {
-        if( $html === true ) {
-            if( strpos( $string, "," ) ) {
-                $colors = explode( ",", $string );
-                $colors = array_map( function($txt) use ($LOCALE) {
-                    return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $txt ) . '">' . LitColor::i18n( $txt, $LOCALE ) . '</FONT></SPAN></I></B>';
-                }, $colors );
-                return implode( ' <I><FONT FACE="Calibri">' . _( "or" ) . "</FONT></I> ", $colors );
-            }
-            else{
-                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $string ) . '">' . LitColor::i18n( $string, $LOCALE ) . '</FONT></SPAN></I></B>';
-            }
-        } else{
-            if( strpos( $string, "," ) ) {
-                $colors = explode( ",", $string );
-                $colors = array_map( function($txt) use($LOCALE) {
-                    return LitColor::i18n( $txt, $LOCALE );
-                }, $colors );
-                return implode( " " . _( "or" ) . " ", $colors );
-            }
-            else{
-                return LitColor::i18n( $string, $LOCALE );
-            }
+    public static function ParseColorString( string|array $colors, string $LOCALE, bool $html=false) : string {
+        if( is_string( $colors ) ) {
+            $colors = explode( ",", $colors );
         }
-        return $string; //should never get here
+        if( $html === true ) {
+            $colors = array_map( function($txt) use ($LOCALE) {
+                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $txt ) . '">' . LitColor::i18n( $txt, $LOCALE ) . '</FONT></SPAN></I></B>';
+            }, $colors );
+            return implode( ' <I><FONT FACE="Calibri">' . _( "or" ) . "</FONT></I> ", $colors );
+        } else{
+            $colors = array_map( function($txt) use($LOCALE) {
+                return LitColor::i18n( $txt, $LOCALE );
+            }, $colors );
+            return implode( " " . _( "or" ) . " ", $colors );
+        }
+        return ""; //should never get here
     }
 
     /**
