@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2022-09-21 13:07+0000\n"
 "PO-Revision-Date: 2022-09-22 20:17+0000\n"
-"Last-Translator: Steven van Roode <stevenvanroode@gmail.com>\n"
+"Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Dutch <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/nl/>\n"
 "Language: nl\n"
@@ -831,7 +831,7 @@ msgstr "Gedachtenis"
 #. translators: liturgical rank. Keep Capitalized
 #: includes/enums/LitGrade.php:100
 msgid "Optional memorial"
-msgstr ""
+msgstr "Vrije gedachtenis"
 
 #. translators: liturgical rank. Keep Capitalized
 #: includes/enums/LitGrade.php:105
