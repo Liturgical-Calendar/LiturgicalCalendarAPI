@@ -7,10 +7,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2022-09-21 12:27+0000\n"
-"PO-Revision-Date: 2022-07-21 06:16+0000\n"
-"Last-Translator: Jeff Roedel <jeff.roedel.isp@gmail.com>\n"
+"PO-Revision-Date: 2022-09-21 13:05+0000\n"
+"Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Spanish <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/es/>\n"
 "Language: es\n"
@@ -54,16 +54,13 @@ msgstr "%s día después de la Epifanía"
 #. translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Explicatory string for the transferral, 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
 #: includes/LitCalAPI.php:565 includes/LitCalAPI.php:582
 #: includes/LitCalAPI.php:609
-#, fuzzy, php-format
-#| msgid ""
-#| "The Solemnity '%s' falls on %s in the year %d, the celebration has been "
-#| "transferred to %s (%s) as per the %s."
+#, php-format
 msgid ""
 "The Solemnity '%1$s' falls on %2$s in the year %3$d, the celebration has "
 "been transferred to %4$s (%5$s) as per the %6$s."
 msgstr ""
-"La Solemnidad <i>'%s'</i> coincide con <b>%s</b> en el año %d, por tanto, la "
-"celebración ha sido trasladada a %s (%s) según el %s."
+"La Solemnidad <i>'%1$s'</i> coincide con <b>%2$s</b> en el año %3$d, por "
+"tanto, la celebración ha sido trasladada a %4$s (%5$s) según el %6$s."
 
 #: includes/LitCalAPI.php:569
 msgid "the Saturday preceding Palm Sunday"
