@@ -356,7 +356,7 @@ class FestivityCollection {
             $festivity->hasVesperI = true;
             $coincidingFestivity->event->hasVesperII = false;
             $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As per %s, the first has precedence, therefore the Vigil Mass is confirmed as are I Vespers." ),
+                _( 'The Vigil Mass for the %1$s \'%2$s\' coincides with the %3$s \'%4$s\' in the year %5$d. As per %6$s, the first has precedence, therefore the Vigil Mass is confirmed as are I Vespers.' ),
                 $festivityGrade,
                 $festivity->name,
                 $coincidingFestivity->grade,
@@ -370,7 +370,7 @@ class FestivityCollection {
             $coincidingFestivity->event->hasVesperII = !$vigilTakesPrecedence;
             if( $vigilTakesPrecedence ) {
                 $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                    _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass." ),
+                    _( 'The Vigil Mass for the %1$s \'%2$s\' coincides with the %3$s \'%4$s\' in the year %5$d. Since the first Solemnity has precedence, it will have Vespers I and a vigil Mass, whereas the last Solemnity will not have either Vespers II or an evening Mass.' ),
                     $festivityGrade,
                     $festivity->name,
                     $coincidingFestivity->grade,
@@ -380,7 +380,7 @@ class FestivityCollection {
             } else {
                 unset( $this->festivities[ $key . "_vigil" ] );
                 $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                    _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while the first Solemnity will not have a Vigil Mass or Vespers I." ),
+                    _( 'The Vigil Mass for the %1$s \'%2$s\' coincides with the %3$s \'%4$s\' in the year %5$d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while the first Solemnity will not have a Vigil Mass or Vespers I.' ),
                     $festivityGrade,
                     $festivity->name,
                     $coincidingFestivity->grade,
@@ -440,7 +440,7 @@ class FestivityCollection {
                         }
                         else {
                             $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                _( "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We should ask the Congregation for Divine Worship what to do about this!" ),
+                                _( 'The Vigil Mass for the %1$s \'%2$s\' coincides with the %3$s \'%4$s\' in the year %5$d. We should ask the Congregation for Divine Worship what to do about this!' ),
                                 $festivityGrade,
                                 $festivity->name,
                                 $coincidingFestivity->grade,
