@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2022-09-21 12:27+0000\n"
-"PO-Revision-Date: 2022-06-06 08:59+0000\n"
+"PO-Revision-Date: 2022-09-21 13:05+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
@@ -274,12 +274,12 @@ msgstr ""
 #. translators: e.g. 'Monday before Palm Sunday'
 #: includes/LitCalAPI.php:1145
 msgid "before"
-msgstr ""
+msgstr "prima di"
 
 #. translators: e.g. 'Monday after Pentecost'
 #: includes/LitCalAPI.php:1150
 msgid "after"
-msgstr ""
+msgstr "dopo"
 
 #. translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to
 #: includes/LitCalAPI.php:1155
@@ -288,6 +288,8 @@ msgid ""
 "Cannot create mobile festivity '%1$s': can only be relative to festivity "
 "with key '%2$s' using keywords %3$s"
 msgstr ""
+"Impossibile creare la festività mobile '%1$s': può solo essere relativa alla "
+"festività con chiave '%2$s' utilizzando le parole chiave %3$s"
 
 #. translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to
 #: includes/LitCalAPI.php:1170
@@ -295,6 +297,8 @@ msgstr ""
 msgid ""
 "Cannot create mobile festivity '%1$s' relative to festivity with key '%2$s'"
 msgstr ""
+"Impossibile creare la festività mobile '%1$s' relativa alla festività con "
+"chiave '%2$s'"
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created 2. list of properties
 #: includes/LitCalAPI.php:1178
@@ -303,6 +307,8 @@ msgid ""
 "Cannot create mobile festivity '%1$s': when the 'strtotime' property is an "
 "object, it must have properties %2$s"
 msgstr ""
+"Impossibile creare la festività mobile '%1$s': quando la proprietà "
+"'strtotime' è un oggetto, deve avere le proprietà %2$s"
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created
 #: includes/LitCalAPI.php:1198
@@ -311,12 +317,15 @@ msgid ""
 "Cannot create mobile festivity '%1$s': 'strtotime' property must be either "
 "an object or a string! Currently it has type '%2$s'"
 msgstr ""
+"Impossibile creare la festività mobile '%1$s': la proprietà 'strtotime' deve "
+"essere un oggetto oppure una stringa! Attualmente è di tipo '%2$s'"
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created
 #: includes/LitCalAPI.php:1206
 #, php-format
 msgid "Cannot create mobile festivity '%1$s' without a 'strtotime' property!"
 msgstr ""
+"Impossibile creare la festività mobile '%1$s' senza la proprietà 'strtotime'!"
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -609,68 +618,52 @@ msgid "Vigil Mass"
 msgstr "Messa della vigilia"
 
 #: includes/FestivityCollection.php:359
-#, fuzzy, php-format
-#| msgid ""
-#| "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
-#| "As per %s, the first has precedence, therefore the Vigil Mass is "
-#| "confirmed as are I Vespers."
+#, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
 "year %5$d. As per %6$s, the first has precedence, therefore the Vigil Mass "
 "is confirmed as are I Vespers."
 msgstr ""
-"La Messa nella Vigilia per la %s '%s' coincide con la %s '%s' nell'anno %d. "
-"Secondo il %s, la prima ha la precedenza, pertanto la Messa nella Vigilia è "
-"confermata come anche i Primi Vespri."
+"La Messa nella Vigilia per la %1$s '%2$s' coincide con la %3$s '%4$s' "
+"nell'anno %5$d. Secondo il %6$s, la prima ha la precedenza, pertanto la "
+"Messa nella Vigilia è confermata come anche i Primi Vespri."
 
 #: includes/FestivityCollection.php:373
-#, fuzzy, php-format
-#| msgid ""
-#| "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
-#| "Since the first Solemnity has precedence, it will have Vespers I and a "
-#| "vigil Mass, whereas the last Solemnity will not have either Vespers II or "
-#| "an evening Mass."
+#, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
 "year %5$d. Since the first Solemnity has precedence, it will have Vespers I "
 "and a vigil Mass, whereas the last Solemnity will not have either Vespers II "
 "or an evening Mass."
 msgstr ""
-"La Messa nella Vigilia per la %s '%s' coincide con la %s '%s' nell'anno %d. "
-"Visto che la prima Solennità ha la precedenza, avrà i Primi Vespri e una "
-"Messa di Vigilia, mentre l'ultima Solennità non avrà né i Secondi Vespri né "
-"una Messa serale."
+"La Messa nella Vigilia per la %1$s '%2$s' coincide con la %3$s '%4$s' "
+"nell'anno %5$d. Visto che la prima Solennità ha la precedenza, avrà i Primi "
+"Vespri e una Messa di Vigilia, mentre l'ultima Solennità non avrà né i "
+"Secondi Vespri né una Messa serale."
 
 #: includes/FestivityCollection.php:383
-#, fuzzy, php-format
-#| msgid ""
-#| "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
-#| "This last Solemnity takes precedence, therefore it will maintain Vespers "
-#| "II and an evening Mass, while the first Solemnity will not have a Vigil "
-#| "Mass or Vespers I."
+#, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
 "year %5$d. This last Solemnity takes precedence, therefore it will maintain "
 "Vespers II and an evening Mass, while the first Solemnity will not have a "
 "Vigil Mass or Vespers I."
 msgstr ""
-"La Messa nella Vigilia per la %s '%s' coincide con la %s '%s' nell'anno %d. "
-"Quest'ultima Solennità ha la precedenza, pertanto manterrà i Secondi Vespri "
-"e una Messa serale, mentre la prima Solennità non avrà né una Messa di "
-"Vigilia né i Primi Vespri."
+"La Messa nella Vigilia per la %1$s '%2$s' coincide con la %3$s '%4$s' "
+"nell'anno %5$d. Quest'ultima Solennità ha la precedenza, pertanto manterrà i "
+"Secondi Vespri e una Messa serale, mentre la prima Solennità non avrà né una "
+"Messa di Vigilia né i Primi Vespri."
 
 #: includes/FestivityCollection.php:443
-#, fuzzy, php-format
-#| msgid ""
-#| "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
-#| "We should ask the Congregation for Divine Worship what to do about this!"
+#, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
 "year %5$d. We should ask the Congregation for Divine Worship what to do "
 "about this!"
 msgstr ""
-"La Messa nella Vigilia per la %s '%s' coincide con la %s'%s' nell'anno %d. "
-"Dovremmo chiedere alla Congregazione del Culto Divino cosa fare a riguardo!"
+"La Messa nella Vigilia per la %1$s '%2$s' coincide con la %3$s '%4$s' "
+"nell'anno %5$d. Dovremmo chiedere alla Congregazione del Culto Divino cosa "
+"fare a riguardo!"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:27
