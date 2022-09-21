@@ -2,13 +2,14 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # John R. D'Orazio <priest@johnromanodorazio.com>, 2022.
+# Steven van Roode <stevenvanroode@gmail.com>, 2022.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2022-09-21 13:07+0000\n"
-"PO-Revision-Date: 2022-09-21 12:27+0000\n"
-"Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2022-09-22 20:17+0000\n"
+"Last-Translator: Steven van Roode <stevenvanroode@gmail.com>\n"
 "Language-Team: Dutch <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/nl/>\n"
 "Language: nl\n"
@@ -24,30 +25,34 @@ msgid ""
 "Only years from 1970 and after are supported. You tried requesting the year "
 "%d."
 msgstr ""
+"Alleen jaren na 1970 worden ondersteund. U probeert het jaar %d op te vragen."
 
 #. translators: name of the Roman Missal
 #: includes/LitCalAPI.php:277
 #, php-format
 msgid "Data for the sanctorale from %s could not be found."
 msgstr ""
+"Gegevens voor het eigen van de heiligen van %s kon niet worden gevonden."
 
 #. translators: name of the Roman Missal
 #: includes/LitCalAPI.php:284
 #, php-format
 msgid "Translation data for the sanctorale from %s could not be found."
 msgstr ""
+"Vertaalgegevens voor het eigen van de heiligen van %s kon niet worden "
+"gevonden."
 
 #. translators: %s is an ordinal number (first, second...)
 #: includes/LitCalAPI.php:364 includes/LitCalAPI.php:415
 #, php-format
 msgid "%s day before Epiphany"
-msgstr ""
+msgstr "%s dag voor de Openbaring des Heren"
 
 #. translators: %s is an ordinal number (first, second...)
 #: includes/LitCalAPI.php:384 includes/LitCalAPI.php:434
 #, php-format
 msgid "%s day after Epiphany"
-msgstr ""
+msgstr "%s dag na de Openbaring des Heren"
 
 #. translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
 #. translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Explicatory string for the transferral, 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
@@ -58,10 +63,12 @@ msgid ""
 "The Solemnity '%1$s' falls on %2$s in the year %3$d, the celebration has "
 "been transferred to %4$s (%5$s) as per the %6$s."
 msgstr ""
+"Het hoogfeest van '%1$s' valt op %2$s in het jaar %3$d, de viering is "
+"verplaatst naar %4$s (%5$s) overeenkomstig %6$s."
 
 #: includes/LitCalAPI.php:593
 msgid "the Saturday preceding Palm Sunday"
-msgstr ""
+msgstr "de zaterdag voorafgaand aan Palmzondag"
 
 #: includes/LitCalAPI.php:598 includes/LitCalAPI.php:615
 #: includes/LitCalAPI.php:642 includes/LitCalAPI.php:672
@@ -72,15 +79,15 @@ msgstr ""
 #: includes/LitCalAPI.php:1599 includes/LitCalAPI.php:1626
 #: includes/FestivityCollection.php:365
 msgid "Decree of the Congregation for Divine Worship"
-msgstr ""
+msgstr "Decreet van de Congregatie voor de Goddelijke Eredienst"
 
 #: includes/LitCalAPI.php:610
 msgid "the Monday following the Second Sunday of Easter"
-msgstr ""
+msgstr "maandag na de tweede zondag van pasen"
 
 #: includes/LitCalAPI.php:637
 msgid "the following Monday"
-msgstr ""
+msgstr "de volgende maandag"
 
 #. translators: 1: Festivity name, 2: Coinciding Festivity name, 3: Requested calendar year
 #: includes/LitCalAPI.php:649
@@ -89,6 +96,9 @@ msgid ""
 "The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year %3$d. "
 "We should ask the Congregation for Divine Worship what to do about this!"
 msgstr ""
+"Het hoogfeest van '%1$s' valt samen met het hoogfeest van '%2$s' in het jaar "
+"%3$d. We moeten de Congregatie voor de Goddelijke Eredienst vragen hoe te "
+"handelen!"
 
 #. translators: 1: Festivity name, 2: Coinciding Festivity name, 3: Requested calendar year, 4: Decree of the Congregation for Divine Worship
 #: includes/LitCalAPI.php:668
@@ -97,6 +107,8 @@ msgid ""
 "Seeing that the Solemnity '%1$s' coincides with the Solemnity '%2$s' in the "
 "year %3$d, it has been anticipated by one day as per %4$s."
 msgstr ""
+"Omdat het hoogfeest van '%1$s' samenvalt met het hoogfeest van '%2$s' in het "
+"jaar %3$d, wordt het een dag eerder gevierd overeenkomstig %4$s."
 
 #. translators: 1: Festivity name (Christmas), 2: Requested calendar year, 3: Festivity name (Holy Family), 4: New date for Holy Family
 #: includes/LitCalAPI.php:737
@@ -105,34 +117,36 @@ msgid ""
 "'%1$s' falls on a Sunday in the year %2$d, therefore the Feast '%3$s' is "
 "celebrated on %4$s rather than on the Sunday after Christmas."
 msgstr ""
+"'%1$s' valt op een zondag in het jaar %2$d, daarom wordt het feest van '%3$"
+"s' gevierd op %4$s in plaats van op de zondag na Kerstmis."
 
 #. translators: 1: Festivity name, 2: Superseding Festivity grade, 3: Superseding Festivity name, 4: Requested calendar year
 #: includes/LitCalAPI.php:772 includes/LitCalAPI.php:797
 #, php-format
 msgid "'%1$s' is superseded by the %2$s '%3$s' in the year %4$d."
-msgstr ""
+msgstr "'%1$s' wordt vervangen door het %2$s van '%3$s' in het jaar %4$d."
 
 #. translators: %s is an ordinal number (first, second...)
 #: includes/LitCalAPI.php:854
 #, php-format
 msgid "of the %s Week of Advent"
-msgstr ""
+msgstr "in de %s week van de advent"
 
 #. translators: %s is an ordinal number (first, second...)
 #: includes/LitCalAPI.php:877
 #, php-format
 msgid "%s Day of the Octave of Christmas"
-msgstr ""
+msgstr "%s dag onder het octaaf van Kerstmis"
 
 #. translators: %s is an ordinal number (first, second...)
 #: includes/LitCalAPI.php:907
 #, php-format
 msgid "of the %s Week of Lent"
-msgstr ""
+msgstr "in de %s week van de veertigdagentijd"
 
 #: includes/LitCalAPI.php:914
 msgid "after Ash Wednesday"
-msgstr ""
+msgstr "na Aswoensdag"
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -171,6 +185,8 @@ msgid ""
 "Vatican Press conference: Presentation of the Editio Typica Tertia of the "
 "Roman Missal"
 msgstr ""
+"Persconferentie van het Vaticaan: presentatie van de derde standaarduitgave "
+"van het Romeins Missaal"
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -199,7 +215,7 @@ msgstr ""
 
 #: includes/LitCalAPI.php:1056
 msgid "Apostolic Constitution Missale Romanum"
-msgstr ""
+msgstr "Apostolische Constitutie Missale Romanum"
 
 #. translators:
 #.  1. Grade or rank of the festivity that has been superseded
@@ -253,12 +269,12 @@ msgstr ""
 #. translators: e.g. 'Monday before Palm Sunday'
 #: includes/LitCalAPI.php:1187
 msgid "before"
-msgstr ""
+msgstr "voor"
 
 #. translators: e.g. 'Monday after Pentecost'
 #: includes/LitCalAPI.php:1192
 msgid "after"
-msgstr ""
+msgstr "na"
 
 #. translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to
 #: includes/LitCalAPI.php:1197
@@ -357,7 +373,7 @@ msgstr ""
 
 #: includes/LitCalAPI.php:1377
 msgid "and Doctor of the Church"
-msgstr ""
+msgstr "en kerkleraar"
 
 #. translators:
 #.  1. Grade or rank of the festivity being created
@@ -431,16 +447,16 @@ msgstr ""
 #: includes/LitCalAPI.php:1648
 #, php-format
 msgid "of the %s Week of Easter"
-msgstr ""
+msgstr "na de %s zondag van pasen"
 
 #: includes/LitCalAPI.php:1684 includes/LitCalAPI.php:1713
 #, php-format
 msgid "of the %s Week of Ordinary Time"
-msgstr ""
+msgstr "in de %s week door het jaar"
 
 #: includes/LitCalAPI.php:1736
 msgid "Saturday Memorial of the Blessed Virgin Mary"
-msgstr ""
+msgstr "Maria op zaterdag"
 
 #: includes/LitCalAPI.php:1761 includes/LitCalAPI.php:1764
 #, php-format
@@ -535,16 +551,16 @@ msgstr ""
 #: includes/LitMessages.php:143 includes/LitMessages.php:148
 #: includes/enums/LitCommon.php:346
 msgid "or"
-msgstr ""
+msgstr "of"
 
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
 #: includes/FestivityCollection.php:44
 msgid "YEAR"
-msgstr ""
+msgstr "JAAR"
 
 #: includes/FestivityCollection.php:45
 msgid "Vigil Mass"
-msgstr ""
+msgstr "Vigiliemis"
 
 #: includes/FestivityCollection.php:359
 #, php-format
@@ -583,41 +599,41 @@ msgstr ""
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:27
 msgid "green"
-msgstr ""
+msgstr "groen"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:30
 msgid "purple"
-msgstr ""
+msgstr "paars"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:33
 msgid "white"
-msgstr ""
+msgstr "wit"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:36
 msgid "red"
-msgstr ""
+msgstr "rood"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:39
 msgid "pink"
-msgstr ""
+msgstr "roze"
 
 #: includes/enums/LitCommon.php:57
 msgid "Proper"
-msgstr ""
+msgstr "Eigen"
 
 #. translators: context = from the Common of nn
 #: includes/enums/LitCommon.php:59
 msgid "Dedication of a Church"
-msgstr ""
+msgstr "Kerkwijding"
 
 #. translators: context = from the Common of nn
 #: includes/enums/LitCommon.php:61
 msgid "Blessed Virgin Mary"
-msgstr ""
+msgstr "H. Maagd Maria"
 
 #. translators: context = from the Common of nn
 #: includes/enums/LitCommon.php:63
@@ -627,7 +643,7 @@ msgstr "Martelaren"
 #. translators: context = from the Common of nn
 #: includes/enums/LitCommon.php:65
 msgid "Pastors"
-msgstr ""
+msgstr "Herders"
 
 #. translators: context = from the Common of nn
 #: includes/enums/LitCommon.php:67
@@ -778,7 +794,7 @@ msgstr ""
 #: includes/enums/LitCommon.php:169 includes/enums/LitCommon.php:181
 msgctxt "(SING_FEMM)"
 msgid "of"
-msgstr ""
+msgstr "van"
 
 #. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: includes/enums/LitCommon.php:172
@@ -805,12 +821,12 @@ msgstr "Uit het Gemeenschappelijke"
 #. translators: liturgical rank. Keep lowercase
 #: includes/enums/LitGrade.php:90 includes/enums/LitGrade.php:129
 msgid "weekday"
-msgstr ""
+msgstr "weekdag"
 
 #. translators: liturgical rank. Keep Capitalized
 #: includes/enums/LitGrade.php:95
 msgid "Commemoration"
-msgstr ""
+msgstr "Gedachtenis"
 
 #. translators: liturgical rank. Keep Capitalized
 #: includes/enums/LitGrade.php:100
