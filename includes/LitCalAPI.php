@@ -847,7 +847,13 @@ class LitCalAPI {
 
                 $dayOfTheWeek = $this->LitSettings->Locale === LitLocale::LATIN ? LitMessages::LATIN_DAYOFTHEWEEK[ $weekdayAdvent->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $weekdayAdvent->format( 'U' ) ) );
                 $ordinal = ucfirst( LitMessages::getOrdinal( $currentAdvWeek, $this->LitSettings->Locale, $this->formatterFem, LitMessages::LATIN_ORDINAL_FEM_GEN ) );
-                $nthStr = $this->LitSettings->Locale === LitLocale::LATIN ? sprintf( "Hebdomadæ %s Adventus", $ordinal ) : sprintf( _( "of the %s Week of Advent" ), $ordinal );
+                $nthStr = $this->LitSettings->Locale === LitLocale::LATIN
+                    ? sprintf( "Hebdomadæ %s Adventus", $ordinal )
+                    : sprintf(
+                        /**translators: %s is an ordinal number (first, second...) */
+                        _( "of the %s Week of Advent" ),
+                        $ordinal
+                    );
                 $name = $dayOfTheWeek . " " . $nthStr;
                 $festivity = new Festivity( $name, $weekdayAdvent, LitColor::PURPLE, LitFeastType::MOBILE );
                 $this->Cal->addFestivity( "AdventWeekday" . $weekdayAdventCnt, $festivity );
@@ -864,7 +870,13 @@ class LitCalAPI {
             $weekdayChristmas = LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->add( new DateInterval( 'P' . $weekdayChristmasCnt . 'D' ) );
             if ( $this->Cal->notInSolemnitiesFeastsOrMemorials( $weekdayChristmas ) && self::DateIsNotSunday( $weekdayChristmas ) ) {
                 $ordinal = ucfirst( LitMessages::getOrdinal( ( $weekdayChristmasCnt + 1 ), $this->LitSettings->Locale, $this->formatter, LitMessages::LATIN_ORDINAL ) );
-                $name = $this->LitSettings->Locale === LitLocale::LATIN ? sprintf( "Dies %s Octavæ Nativitatis", $ordinal ) : sprintf( _( "%s Day of the Octave of Christmas" ), $ordinal );
+                $name = $this->LitSettings->Locale === LitLocale::LATIN
+                    ? sprintf( "Dies %s Octavæ Nativitatis", $ordinal )
+                    : sprintf(
+                        /**translators: %s is an ordinal number (first, second...) */
+                        _( "%s Day of the Octave of Christmas" ),
+                        $ordinal
+                    );
                 $festivity = new Festivity( $name, $weekdayChristmas, LitColor::WHITE, LitFeastType::MOBILE );
                 $this->Cal->addFestivity( "ChristmasWeekday" . $weekdayChristmasCnt, $festivity );
             }
@@ -888,7 +900,13 @@ class LitCalAPI {
                     $currentLentWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1; //week count between current day and First Sunday of Lent
                     $ordinal = ucfirst( LitMessages::getOrdinal( $currentLentWeek, $this->LitSettings->Locale, $this->formatterFem, LitMessages::LATIN_ORDINAL_FEM_GEN ) );
                     $dayOfTheWeek = $this->LitSettings->Locale == LitLocale::LATIN ? LitMessages::LATIN_DAYOFTHEWEEK[ $weekdayLent->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $weekdayLent->format( 'U' ) ) );
-                    $nthStr = $this->LitSettings->Locale === LitLocale::LATIN ? sprintf( "Hebdomadæ %s Quadragesimæ", $ordinal ) : sprintf( _( "of the %s Week of Lent" ), $ordinal );
+                    $nthStr = $this->LitSettings->Locale === LitLocale::LATIN
+                        ? sprintf( "Hebdomadæ %s Quadragesimæ", $ordinal )
+                        : sprintf(
+                            /**translators: %s is an ordinal number (first, second...) */
+                            _( "of the %s Week of Lent" ),
+                            $ordinal
+                        );
                     $name = $dayOfTheWeek . " ".  $nthStr;
                     $festivity = new Festivity( $name, $weekdayLent, LitColor::PURPLE, LitFeastType::MOBILE );
                 } else {
