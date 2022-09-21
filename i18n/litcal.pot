@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-07 07:40+0000\n"
+"POT-Creation-Date: 2022-09-21 12:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -543,34 +543,35 @@ msgstr ""
 #: includes/FestivityCollection.php:359
 #, php-format
 msgid ""
-"The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. As "
-"per %s, the first has precedence, therefore the Vigil Mass is confirmed as "
-"are I Vespers."
+"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
+"year %5$d. As per %6$s, the first has precedence, therefore the Vigil Mass "
+"is confirmed as are I Vespers."
 msgstr ""
 
 #: includes/FestivityCollection.php:373
 #, php-format
 msgid ""
-"The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
-"Since the first Solemnity has precedence, it will have Vespers I and a vigil "
-"Mass, whereas the last Solemnity will not have either Vespers II or an "
-"evening Mass."
+"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
+"year %5$d. Since the first Solemnity has precedence, it will have Vespers I "
+"and a vigil Mass, whereas the last Solemnity will not have either Vespers II "
+"or an evening Mass."
 msgstr ""
 
 #: includes/FestivityCollection.php:383
 #, php-format
 msgid ""
-"The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
-"This last Solemnity takes precedence, therefore it will maintain Vespers II "
-"and an evening Mass, while the first Solemnity will not have a Vigil Mass or "
-"Vespers I."
+"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
+"year %5$d. This last Solemnity takes precedence, therefore it will maintain "
+"Vespers II and an evening Mass, while the first Solemnity will not have a "
+"Vigil Mass or Vespers I."
 msgstr ""
 
 #: includes/FestivityCollection.php:443
 #, php-format
 msgid ""
-"The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. We "
-"should ask the Congregation for Divine Worship what to do about this!"
+"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
+"year %5$d. We should ask the Congregation for Divine Worship what to do "
+"about this!"
 msgstr ""
 
 #. translators: context = liturgical color
