@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2022-09-21 13:07+0000\n"
-"PO-Revision-Date: 2022-09-23 14:09+0000\n"
-"Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2022-09-24 16:17+0000\n"
+"Last-Translator: Steven van Roode <stevenvanroode@gmail.com>\n"
 "Language-Team: Dutch <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/nl/>\n"
 "Language: nl\n"
@@ -179,6 +179,8 @@ msgid ""
 "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
 "applicable to the year %6$d."
 msgstr ""
+"De %1$s '%2$s' is toegevoegd op %3$s vanaf %4$d (%5$s), van toepassing in "
+"het jaar %6$d."
 
 #: includes/LitCalAPI.php:968 includes/LitCalAPI.php:1060
 msgid ""
@@ -200,6 +202,9 @@ msgid ""
 "Octave of Christmas, or on the weekdays of the Lenten season in the year "
 "%3$d, rank reduced to Commemoration."
 msgstr ""
+"De %1$s '%2$s' valt tussen 17 en 24 december, of tijdens het Octaaf van "
+"Kerstmis, of op de weekdagen van de veertigdagentijd in %3$d, de rang is "
+"teruggebracht naar vrije gedachtenis."
 
 #. translators:
 #.  1. Grade or rank of the festivity that has been superseded
@@ -211,7 +216,7 @@ msgstr ""
 #: includes/LitCalAPI.php:1036
 #, php-format
 msgid "The %1$s '%2$s' is superseded by the %3$s '%4$s' in the year %5$d."
-msgstr ""
+msgstr "De %1$s '%2$s' heeft voorrang boven de %3$s '%4$s' in het jaar %5$d."
 
 #: includes/LitCalAPI.php:1056
 msgid "Apostolic Constitution Missale Romanum"
@@ -235,6 +240,9 @@ msgid ""
 "(%5$s) and usually celebrated on %6$s, is suppressed by the %7$s '%8$s' in "
 "the year %9$d."
 msgstr ""
+"De %1$s '%2$s', toegevoegd aan de %3$s aan het Romeins Missaal vanaf %4$d "
+"(%5$s) en gewoonlijk gevierd op %6$s, wordt vervangen door de %7$s '%8$s' in "
+"het jaar %9$d."
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -252,6 +260,8 @@ msgid ""
 "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
 "superseded by a %6$s '%7$s' in the year %8$d."
 msgstr ""
+"De %1$s '%2$s', toegevoegd op %3$s vanaf het jaar %4$d (%5$s), wordt echter "
+"vervangen door een %6$s '%7$s' in het jaar %8$d."
 
 #. translators:
 #.  1. Name of the first coinciding Memorial
@@ -265,6 +275,9 @@ msgid ""
 "The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
 "They are both reduced in rank to optional memorials (%4$s)."
 msgstr ""
+"De gedachtenis '%1$s' valt samen met een andere gedachtenis '%2$s' in het "
+"jaar %3$d. Zij worden beide in rang teruggebracht tot vrije gedachtenis "
+"(%4$s)."
 
 #. translators: e.g. 'Monday before Palm Sunday'
 #: includes/LitCalAPI.php:1187
@@ -283,6 +296,8 @@ msgid ""
 "Cannot create mobile festivity '%1$s': can only be relative to festivity "
 "with key '%2$s' using keywords %3$s"
 msgstr ""
+"Kan het verplaatsbare feest '%1$s' niet genereren: is alleen verbonden met "
+"het feest met sleutel '%2$s' met sleutelwoorden %3$s"
 
 #. translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to
 #: includes/LitCalAPI.php:1212
@@ -290,6 +305,8 @@ msgstr ""
 msgid ""
 "Cannot create mobile festivity '%1$s' relative to festivity with key '%2$s'"
 msgstr ""
+"Kan het verplaatsbare feest '%1$s' niet genereren dat verbonden is met het "
+"feest met sleutel '%2$s'"
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created 2. list of properties
 #: includes/LitCalAPI.php:1220
@@ -298,6 +315,8 @@ msgid ""
 "Cannot create mobile festivity '%1$s': when the 'strtotime' property is an "
 "object, it must have properties %2$s"
 msgstr ""
+"Kan het verplaatsbare feest '%1$s' niet genereren: indien de eigenschap "
+"'strtotime' een object is, moet het de eigenschappen '%2$s' hebben"
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created
 #: includes/LitCalAPI.php:1240
@@ -306,12 +325,16 @@ msgid ""
 "Cannot create mobile festivity '%1$s': 'strtotime' property must be either "
 "an object or a string! Currently it has type '%2$s'"
 msgstr ""
+"Kan het verplaatsbare feest '%1$s' niet genereren: de eigenschap 'strtotime' "
+"moet ofwel een object of een string zijn! Nu heeft hij type '%2$s'"
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created
 #: includes/LitCalAPI.php:1248
 #, php-format
 msgid "Cannot create mobile festivity '%1$s' without a 'strtotime' property!"
 msgstr ""
+"Kan het verplaatsbare feest '%1$s' niet genereren zonder de eigenschap "
+"'strtotime'!"
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -327,6 +350,8 @@ msgid ""
 "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
 "applicable to the year %5$d (%6$s)."
 msgstr ""
+"De naam van de %1$s '%2$s' is veranderd in %3$s vanaf het jaar %4$d, van "
+"toepassing in het jaar %5$d (%6$s)."
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -342,6 +367,8 @@ msgid ""
 "The %1$s '%2$s' has been raised to the rank of %3$s since the year %4$d, "
 "applicable to the year %5$d (%6$s)."
 msgstr ""
+"De %1$s '%2$s' is verhoogd tot de rang van %3$s vanaf het jaar %4$d, van "
+"toepassing in het jaar %5$d (%6$s)."
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -357,6 +384,8 @@ msgid ""
 "The %1$s '%2$s' has been lowered to the rank of %3$s since the year %4$d, "
 "applicable to the year %5$d (%6$s)."
 msgstr ""
+"De %1$s '%2$s' is in rang verlaagd tot %3$s vanaf het jaar %4$d, van "
+"toepassing in het jaar %5$d (%6$s)."
 
 #. translators:
 #.  1. Name of the festivity
@@ -370,6 +399,8 @@ msgid ""
 "'%1$s' has been declared a Doctor of the Church since the year %2$d, "
 "applicable to the year %3$d (%4$s)."
 msgstr ""
+"'%1$s' is tot Kerkleraar uitgeroepen vanaf het jaar %2$d, van toepassing in "
+"het jaar %3$d (%4$s)."
 
 #: includes/LitCalAPI.php:1377
 msgid "and Doctor of the Church"
@@ -391,6 +422,8 @@ msgid ""
 "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
 "superseded by the %6$s '%7$s' in the year %8$d."
 msgstr ""
+"De %1$s '%2$s', toegevoegd op %3$s vanaf het jaar %4$d (%5$s), wordt "
+"vervangen door het %6$s '%7$s' in het jaar %8$d."
 
 #. translators:
 #.  1. Requested calendar year
@@ -408,6 +441,8 @@ msgid ""
 "In the year %1$d, the %2$s '%3$s' has been suppressed by the %4$s '%5$s', "
 "added on %6$s since the year %7$d (%8$s)."
 msgstr ""
+"In het jaar %1$d, de %2$s '%3$s' is vervangen door de %4$s '%5$s', "
+"toegevoegd op %6$s vanaf het jaar %7$d (%8$s)."
 
 #. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
 #: includes/LitCalAPI.php:1569
@@ -416,6 +451,8 @@ msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
 "since the year 2002 (%2$s), applicable to the year %3$d."
 msgstr ""
+"De vrije gedachtenis '%1$s' is verplaatst van 12 december naar 12 augustus "
+"vanaf het jaar 2002 (%2$s), van toepassing in het jaar %3$d."
 
 #. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
 #: includes/LitCalAPI.php:1582
@@ -425,6 +462,10 @@ msgid ""
 "a Sunday or Solemnity were it on Dec. 12, has however been transferred to "
 "Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d."
 msgstr ""
+"De vrije gedachtenis '%1$s', die dit jaar vervangen zou worden door een "
+"zondag of hoogfeest als het op 12 december gevierd zou worden, is echter "
+"vanaf het jaar 2002 verplaatst naar 12 augustus (%2$s), van toepassing in "
+"het jaar %3$d."
 
 #: includes/LitCalAPI.php:1597
 #, php-format
@@ -433,6 +474,9 @@ msgid ""
 "since the year 2002 (%2$s), applicable to the year %3$d. However, it is "
 "superseded by a Sunday, a Solemnity, or a Feast '%4$s' in the year %3$d."
 msgstr ""
+"De vrije gedachtenis '%1$s' is verplaatst van 12 december naar 12 augustus "
+"vanaf het jaar 2002 (%2$s), van toepassing in het jaar %3$d. Echter, hij "
+"wordt vervangen door een zondag, hoogfeest of feest '%4$s' in het jaar %3$d."
 
 #. translators: 1: Festivity name, 2: Source of the information
 #: includes/LitCalAPI.php:1624
@@ -443,6 +487,9 @@ msgid ""
 "%2$s it has been reinstated so that local churches can optionally celebrate "
 "the memorial."
 msgstr ""
+"Het feest '%1$s' zou dit jaar (2009) komen te vervallen omdat het op een "
+"zondag valt, maar vanwege het Paulusjaar is het, overeenkomstig %2$s "
+"hersteld, zodat lokale kerken de gedachtenis naar keuze kunnen vieren."
 
 #: includes/LitCalAPI.php:1648
 #, php-format
@@ -461,12 +508,12 @@ msgstr "Maria op zaterdag"
 #: includes/LitCalAPI.php:1761 includes/LitCalAPI.php:1764
 #, php-format
 msgid "Error retrieving and decoding Wider Region data from file %s."
-msgstr ""
+msgstr "Fout bij het ophalen en decoderen van Wider Region data uit bestand %s."
 
 #: includes/LitCalAPI.php:1771
 #, php-format
 msgid "Error retrieving and decoding National data from file %s."
-msgstr ""
+msgstr "Fout bij het ophalen en decoderen van National data uit bestand %s."
 
 #. translators:
 #.  1. Grade of the festivity
@@ -482,6 +529,8 @@ msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
 "'%5$s' in the year %6$d."
 msgstr ""
+"De %1$s '%2$s', gewoonlijk gevierd op %3$s, wordt vervangen door de %4$s '%5$"
+"s' in het jaar %6$d."
 
 #. translators:
 #.  1. Name of the first coinciding Memorial
@@ -495,18 +544,22 @@ msgid ""
 "The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
 "They are both reduced in rank to optional memorials."
 msgstr ""
+"De gedachtenis '%1$s' valt samen met een andere gedachtenis '%2$s' in het "
+"jaar %3$d. Ze zijn beide teruggebracht naar de rang van vrije gedachtenis."
 
 #: includes/LitCalAPI.php:1933
 msgid ""
 "We should be creating a new festivity, however we do not seem to have the "
 "correct date information in order to proceed"
 msgstr ""
+"Er zou een nieuw feest moeten worden aangemaakt, maar de juiste gegevens om "
+"verder te gaan lijken niet beschikbaar"
 
 #. translators: Name of the Roman Missal
 #: includes/LitCalAPI.php:2048
 #, php-format
 msgid "Found a sanctorale data file for %s"
-msgstr ""
+msgstr "Er is een sanctorale data bestand gevonden voor %s"
 
 #. translators:
 #.  1. Festivity grade
@@ -523,12 +576,14 @@ msgid ""
 "The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
 "superseded by the %5$s '%6$s' in the year %7$d"
 msgstr ""
+"De %1$s '%2$s' (%3$s), toegevoegd aan de nationale kalender in de %4$s, "
+"wordt vervangen door de %5$s '%6$s' in het jaar %7$d"
 
 #. translators: Name of the Roman Missal
 #: includes/LitCalAPI.php:2093
 #, php-format
 msgid "Could not find a sanctorale data file for %s"
-msgstr ""
+msgstr "Een sanctorale data bestand voor %s is niet gevonden"
 
 #. translators: 1. Festivity grade, 2. Festivity name, 3. New festivity name, 4: Requested calendar year, 5. Old date, 6. New date
 #: includes/LitCalAPI.php:2138
@@ -537,6 +592,8 @@ msgid ""
 "The %1$s '%2$s' is transferred from %5$s to %6$s as per the %7$s, to make "
 "room for '%3$s': applicable to the year %4$d."
 msgstr ""
+"De %1$s '%2$s' wordt verplaatst van %5$s naar %6$s overeenkomstig de %7$s, "
+"om plaats te maken voor '%3$s': van toepassing in het jaar %4$d."
 
 #. translators: 1. Festivity grade, 2. Festivity name, 3. Old date, 4. New date, 5. Source of the information, 6. New festivity name, 7. Superseding festivity grade, 8. Superseding festivity name, 9: Requested calendar year
 #: includes/LitCalAPI.php:2157
@@ -546,6 +603,9 @@ msgid ""
 "%5$s, to make room for '%6$s', however it is suppressed by the %7$s '%8$s' "
 "in the year %9$d."
 msgstr ""
+"De %1$s '%2$s' zou verplaatst worden van %3$s naar %4$s overeenkomstig de %5$"
+"s, om plaats te maken voor '%6$s', maar wordt vervangen door %7$s '%8$s' in "
+"het jaar %9$d."
 
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
 #: includes/LitMessages.php:143 includes/LitMessages.php:148
@@ -569,6 +629,9 @@ msgid ""
 "year %5$d. As per %6$s, the first has precedence, therefore the Vigil Mass "
 "is confirmed as are I Vespers."
 msgstr ""
+"De vigiliemis voor de %1$s '%2$s' valt samen met de %3$s '%4$s' in het jaar "
+"%5$d. Overeenkomstig %6$s heeft de eerste voorrang, waardoor de vigiliemis "
+"en het avondgebed op de vooravond zijn vastgesteld."
 
 #: includes/FestivityCollection.php:373
 #, php-format
@@ -578,6 +641,10 @@ msgid ""
 "and a vigil Mass, whereas the last Solemnity will not have either Vespers II "
 "or an evening Mass."
 msgstr ""
+"De vigiliemis van de %1$s '%2$s' valt samen met de %3$s '%4$s' in het jaar "
+"%5$d. Omdat het eerste hoogfeest voorrang heeft, heeft het een avondgebed op "
+"de vooravond en een vigiliemis, terwijl het tweede hoogfeest geen avondgebed "
+"of een avondmis heeft."
 
 #: includes/FestivityCollection.php:383
 #, php-format
@@ -587,6 +654,10 @@ msgid ""
 "Vespers II and an evening Mass, while the first Solemnity will not have a "
 "Vigil Mass or Vespers I."
 msgstr ""
+"De vigiliemis voor de %1$s '%2$s' valt samen met de %3$s '%4$s' in het jaar "
+"%5$d. Het tweede hoogfeest heeft voorrang, waardoor het een avondgebed op de "
+"vooravond en een avondmis behoudt, terwijl het eerste hoogfeest geen "
+"vigiliemis of avondgebed heeft."
 
 #: includes/FestivityCollection.php:443
 #, php-format
@@ -595,6 +666,8 @@ msgid ""
 "year %5$d. We should ask the Congregation for Divine Worship what to do "
 "about this!"
 msgstr ""
+"De vigiliemis voor de %1$s '%2$s' valt samen met de %3$s '%4$s' in het jaar "
+"%5$d. Het Dicasterie van de Goddelijke Eredienst moet aangeven wat te doen!"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:27
@@ -733,7 +806,7 @@ msgstr ""
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:102
 msgid "For Missionaries"
-msgstr ""
+msgstr "Voor missionarissen"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:104
@@ -773,28 +846,28 @@ msgstr ""
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:118
 msgid "For Religious"
-msgstr ""
+msgstr "Voor kloosterlingen"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:120
 msgid "For Those Who Practiced Works of Mercy"
-msgstr ""
+msgstr "Voor hen die werken van barmhartigheid hebben verricht"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:122
 msgid "For Educators"
-msgstr ""
+msgstr "Voor opvoeders"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:124
 msgid "For Holy Women"
-msgstr ""
+msgstr "Voor heilige vrouwen"
 
 #. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: includes/enums/LitCommon.php:169 includes/enums/LitCommon.php:181
 msgctxt "(SING_FEMM)"
 msgid "of"
-msgstr "van"
+msgstr "voor"
 
 #. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: includes/enums/LitCommon.php:172
@@ -816,7 +889,7 @@ msgstr "voor"
 
 #: includes/enums/LitCommon.php:342
 msgid "From the Common"
-msgstr "Uit het Gemeenschappelijke"
+msgstr "Gemeenschappelijke"
 
 #. translators: liturgical rank. Keep lowercase
 #: includes/enums/LitGrade.php:90 includes/enums/LitGrade.php:129
@@ -825,9 +898,8 @@ msgstr "weekdag"
 
 #. translators: liturgical rank. Keep Capitalized
 #: includes/enums/LitGrade.php:95
-#, fuzzy
 msgid "Commemoration"
-msgstr "Gedachtenis"
+msgstr "Vrije gedachtenis"
 
 #. translators: liturgical rank. Keep Capitalized
 #: includes/enums/LitGrade.php:100
