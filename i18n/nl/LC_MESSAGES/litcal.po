@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2022-09-21 13:07+0000\n"
-"PO-Revision-Date: 2022-09-22 20:17+0000\n"
+"PO-Revision-Date: 2022-09-23 14:09+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Dutch <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/nl/>\n"
@@ -648,32 +648,32 @@ msgstr "Herders"
 #. translators: context = from the Common of nn
 #: includes/enums/LitCommon.php:67
 msgid "Doctors"
-msgstr ""
+msgstr "Kerkleraren"
 
 #. translators: context = from the Common of nn
 #: includes/enums/LitCommon.php:69
 msgid "Virgins"
-msgstr ""
+msgstr "Maagden"
 
 #. translators: context = from the Common of nn
 #: includes/enums/LitCommon.php:71
 msgid "Holy Men and Women"
-msgstr ""
+msgstr "Heilige mannen en vrouwen"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:74
 msgid "For One Martyr"
-msgstr ""
+msgstr "Voor een martelaar"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:76
 msgid "For Several Martyrs"
-msgstr ""
+msgstr "Voor meer martelaren"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:78
 msgid "For Missionary Martyrs"
-msgstr ""
+msgstr "Voor missionarissen-martelaren"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:80
@@ -688,7 +688,7 @@ msgstr ""
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:84
 msgid "For a Virgin Martyr"
-msgstr ""
+msgstr "Voor een maagd-martelares"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:86
@@ -718,7 +718,7 @@ msgstr ""
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:96
 msgid "For Founders of a Church"
-msgstr ""
+msgstr "Voor stichters van een plaatselijke kerk"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:98
@@ -743,7 +743,7 @@ msgstr ""
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:106
 msgid "For Several Virgins"
-msgstr ""
+msgstr "Voor meerdere maagden"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:108
@@ -825,6 +825,7 @@ msgstr "weekdag"
 
 #. translators: liturgical rank. Keep Capitalized
 #: includes/enums/LitGrade.php:95
+#, fuzzy
 msgid "Commemoration"
 msgstr "Gedachtenis"
 
@@ -856,4 +857,4 @@ msgstr "HOOGFEEST"
 #. translators: liturgical rank. Keep lowercase
 #: includes/enums/LitGrade.php:125
 msgid "celebration with precedence over solemnities"
-msgstr ""
+msgstr "viering met voorrang op hoogfesten"
