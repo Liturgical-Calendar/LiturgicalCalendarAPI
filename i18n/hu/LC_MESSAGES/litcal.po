@@ -1,0 +1,840 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# borazslo <eleklaszlosj@gmail.com>, 2022.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-09-21 13:07+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: includes/LitCalAPI.php:241
+#, php-format
+msgid ""
+"Only years from 1970 and after are supported. You tried requesting the year "
+"%d."
+msgstr ""
+
+#. translators: name of the Roman Missal
+#: includes/LitCalAPI.php:277
+#, php-format
+msgid "Data for the sanctorale from %s could not be found."
+msgstr ""
+
+#. translators: name of the Roman Missal
+#: includes/LitCalAPI.php:284
+#, php-format
+msgid "Translation data for the sanctorale from %s could not be found."
+msgstr ""
+
+#. translators: %s is an ordinal number (first, second...)
+#: includes/LitCalAPI.php:364 includes/LitCalAPI.php:415
+#, php-format
+msgid "%s day before Epiphany"
+msgstr ""
+
+#. translators: %s is an ordinal number (first, second...)
+#: includes/LitCalAPI.php:384 includes/LitCalAPI.php:434
+#, php-format
+msgid "%s day after Epiphany"
+msgstr ""
+
+#. translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
+#. translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Explicatory string for the transferral, 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
+#: includes/LitCalAPI.php:589 includes/LitCalAPI.php:606
+#: includes/LitCalAPI.php:633
+#, php-format
+msgid ""
+"The Solemnity '%1$s' falls on %2$s in the year %3$d, the celebration has "
+"been transferred to %4$s (%5$s) as per the %6$s."
+msgstr ""
+
+#: includes/LitCalAPI.php:593
+msgid "the Saturday preceding Palm Sunday"
+msgstr ""
+
+#: includes/LitCalAPI.php:598 includes/LitCalAPI.php:615
+#: includes/LitCalAPI.php:642 includes/LitCalAPI.php:672
+#: includes/LitCalAPI.php:982 includes/LitCalAPI.php:1101
+#: includes/LitCalAPI.php:1157 includes/LitCalAPI.php:1389
+#: includes/LitCalAPI.php:1434 includes/LitCalAPI.php:1461
+#: includes/LitCalAPI.php:1571 includes/LitCalAPI.php:1584
+#: includes/LitCalAPI.php:1599 includes/LitCalAPI.php:1626
+#: includes/FestivityCollection.php:365
+msgid "Decree of the Congregation for Divine Worship"
+msgstr ""
+
+#: includes/LitCalAPI.php:610
+msgid "the Monday following the Second Sunday of Easter"
+msgstr ""
+
+#: includes/LitCalAPI.php:637
+msgid "the following Monday"
+msgstr ""
+
+#. translators: 1: Festivity name, 2: Coinciding Festivity name, 3: Requested calendar year
+#: includes/LitCalAPI.php:649
+#, php-format
+msgid ""
+"The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year %3$d. "
+"We should ask the Congregation for Divine Worship what to do about this!"
+msgstr ""
+
+#. translators: 1: Festivity name, 2: Coinciding Festivity name, 3: Requested calendar year, 4: Decree of the Congregation for Divine Worship
+#: includes/LitCalAPI.php:668
+#, php-format
+msgid ""
+"Seeing that the Solemnity '%1$s' coincides with the Solemnity '%2$s' in the "
+"year %3$d, it has been anticipated by one day as per %4$s."
+msgstr ""
+
+#. translators: 1: Festivity name (Christmas), 2: Requested calendar year, 3: Festivity name (Holy Family), 4: New date for Holy Family
+#: includes/LitCalAPI.php:737
+#, php-format
+msgid ""
+"'%1$s' falls on a Sunday in the year %2$d, therefore the Feast '%3$s' is "
+"celebrated on %4$s rather than on the Sunday after Christmas."
+msgstr ""
+
+#. translators: 1: Festivity name, 2: Superseding Festivity grade, 3: Superseding Festivity name, 4: Requested calendar year
+#: includes/LitCalAPI.php:772 includes/LitCalAPI.php:797
+#, php-format
+msgid "'%1$s' is superseded by the %2$s '%3$s' in the year %4$d."
+msgstr ""
+
+#. translators: %s is an ordinal number (first, second...)
+#: includes/LitCalAPI.php:854
+#, php-format
+msgid "of the %s Week of Advent"
+msgstr ""
+
+#. translators: %s is an ordinal number (first, second...)
+#: includes/LitCalAPI.php:877
+#, php-format
+msgid "%s Day of the Octave of Christmas"
+msgstr ""
+
+#. translators: %s is an ordinal number (first, second...)
+#: includes/LitCalAPI.php:907
+#, php-format
+msgid "of the %s Week of Lent"
+msgstr ""
+
+#: includes/LitCalAPI.php:914
+msgid "after Ash Wednesday"
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity
+#.  2. Name of the festivity
+#.  3. Day of the festivity
+#.  4. Year from which the festivity has been added
+#.  5. Source of the information
+#.  6. Requested calendar year
+#.
+#. translators:
+#.  1. Grade or rank of the festivity being created
+#.  2. Name of the festivity being created
+#.  3. Indication of the mobile date for the festivity being created
+#.  4. Year from which the festivity has been added
+#.  5. Source of the information
+#.  6. Requested calendar year
+#.
+#. translators:
+#.  1. Grade or rank of the festivity
+#.  2. Name of the festivity
+#.  3. Day of the festivity
+#.  4. Year from which the festivity has been added
+#.  5. Source of the information
+#.  6. Requested calendar year
+#.
+#: includes/LitCalAPI.php:934 includes/LitCalAPI.php:1268
+#: includes/LitCalAPI.php:1445 includes/LitCalAPI.php:1968
+#, php-format
+msgid ""
+"The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
+"applicable to the year %6$d."
+msgstr ""
+
+#: includes/LitCalAPI.php:968 includes/LitCalAPI.php:1060
+msgid ""
+"Vatican Press conference: Presentation of the Editio Typica Tertia of the "
+"Roman Missal"
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity
+#.  2. Name of the festivity
+#.  3. Requested calendar year
+#.
+#: includes/LitCalAPI.php:1014
+#, php-format
+msgid ""
+"The %1$s '%2$s' either falls between 17 Dec. and 24 Dec., or during the "
+"Octave of Christmas, or on the weekdays of the Lenten season in the year "
+"%3$d, rank reduced to Commemoration."
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity that has been superseded
+#.  2. Name of the festivity that has been superseded
+#.  3. Grade or rank of the festivity that is superseding
+#.  4. Name of the festivity that is superseding
+#.  5. Requested calendar year
+#.
+#: includes/LitCalAPI.php:1036
+#, php-format
+msgid "The %1$s '%2$s' is superseded by the %3$s '%4$s' in the year %5$d."
+msgstr ""
+
+#: includes/LitCalAPI.php:1056
+msgid "Apostolic Constitution Missale Romanum"
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity that has been superseded
+#.  2. Name of the festivity that has been superseded
+#.  3. Edition of the Roman Missal
+#.  4. Year in which the Edition of the Roman Missal was published
+#.  5. Any possible decrees or sources about the edition of the Roman Missal
+#.  6. Date in which the superseded festivity is usually celebrated
+#.  7. Grade or rank of the festivity that is superseding
+#.  8. Name of the festivity that is superseding
+#.  9. Requested calendar year
+#.
+#: includes/LitCalAPI.php:1078
+#, php-format
+msgid ""
+"The %1$s '%2$s', added in the %3$s of the Roman Missal since the year %4$d "
+"(%5$s) and usually celebrated on %6$s, is suppressed by the %7$s '%8$s' in "
+"the year %9$d."
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity
+#.  2. Name of the festivity
+#.  3. Day of the festivity
+#.  4. Year from which the festivity has been added
+#.  5. Source of the information
+#.  6. Grade or rank of the superseding festivity
+#.  7. Name of the superseding festivity
+#.  8. Requested calendar year
+#.
+#: includes/LitCalAPI.php:1114
+#, php-format
+msgid ""
+"The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
+"superseded by a %6$s '%7$s' in the year %8$d."
+msgstr ""
+
+#. translators:
+#.  1. Name of the first coinciding Memorial
+#.  2. Name of the second coinciding Memorial
+#.  3. Requested calendar year
+#.  4. Source of the information
+#.
+#: includes/LitCalAPI.php:1153
+#, php-format
+msgid ""
+"The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
+"They are both reduced in rank to optional memorials (%4$s)."
+msgstr ""
+
+#. translators: e.g. 'Monday before Palm Sunday'
+#: includes/LitCalAPI.php:1187
+msgid "before"
+msgstr ""
+
+#. translators: e.g. 'Monday after Pentecost'
+#: includes/LitCalAPI.php:1192
+msgid "after"
+msgstr ""
+
+#. translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to
+#: includes/LitCalAPI.php:1197
+#, php-format
+msgid ""
+"Cannot create mobile festivity '%1$s': can only be relative to festivity "
+"with key '%2$s' using keywords %3$s"
+msgstr ""
+
+#. translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to
+#: includes/LitCalAPI.php:1212
+#, php-format
+msgid ""
+"Cannot create mobile festivity '%1$s' relative to festivity with key '%2$s'"
+msgstr ""
+
+#. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created 2. list of properties
+#: includes/LitCalAPI.php:1220
+#, php-format
+msgid ""
+"Cannot create mobile festivity '%1$s': when the 'strtotime' property is an "
+"object, it must have properties %2$s"
+msgstr ""
+
+#. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created
+#: includes/LitCalAPI.php:1240
+#, php-format
+msgid ""
+"Cannot create mobile festivity '%1$s': 'strtotime' property must be either "
+"an object or a string! Currently it has type '%2$s'"
+msgstr ""
+
+#. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created
+#: includes/LitCalAPI.php:1248
+#, php-format
+msgid "Cannot create mobile festivity '%1$s' without a 'strtotime' property!"
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity
+#.  2. Name of the festivity
+#.  3. New name of the festivity
+#.  4. Year from which the grade has been changed
+#.  5. Requested calendar year
+#.  6. Source of the information
+#.
+#: includes/LitCalAPI.php:1303
+#, php-format
+msgid ""
+"The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
+"applicable to the year %5$d (%6$s)."
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity
+#.  2. Name of the festivity
+#.  3. New grade of the festivity
+#.  4. Year from which the grade has been changed
+#.  5. Requested calendar year
+#.  6. Source of the information
+#.
+#: includes/LitCalAPI.php:1325
+#, php-format
+msgid ""
+"The %1$s '%2$s' has been raised to the rank of %3$s since the year %4$d, "
+"applicable to the year %5$d (%6$s)."
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity
+#.  2. Name of the festivity
+#.  3. New grade of the festivity
+#.  4. Year from which the grade has been changed
+#.  5. Requested calendar year
+#.  6. Source of the information
+#.
+#: includes/LitCalAPI.php:1335
+#, php-format
+msgid ""
+"The %1$s '%2$s' has been lowered to the rank of %3$s since the year %4$d, "
+"applicable to the year %5$d (%6$s)."
+msgstr ""
+
+#. translators:
+#.  1. Name of the festivity
+#.  2. Year in which was declared Doctor
+#.  3. Requested calendar year
+#.  4. Source of the information
+#.
+#: includes/LitCalAPI.php:1369
+#, php-format
+msgid ""
+"'%1$s' has been declared a Doctor of the Church since the year %2$d, "
+"applicable to the year %3$d (%4$s)."
+msgstr ""
+
+#: includes/LitCalAPI.php:1377
+msgid "and Doctor of the Church"
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity being created
+#.  2. Name of the festivity being created
+#.  3. Indication of the mobile date for the festivity being created
+#.  4. Year from which the festivity has been added
+#.  5. Source of the information
+#.  6. Grade or rank of superseding festivity
+#.  7. Name of superseding festivity
+#.  8. Requested calendar year
+#.
+#: includes/LitCalAPI.php:1482
+#, php-format
+msgid ""
+"The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
+"superseded by the %6$s '%7$s' in the year %8$d."
+msgstr ""
+
+#. translators:
+#.  1. Requested calendar year
+#.  2. Grade or rank of suppressed festivity
+#.  3. Name of suppressed festivity
+#.  4. Grade or rank of the festivity being created
+#.  5. Name of the festivity being created
+#.  6. Indication of the mobile date for the festivity being created
+#.  7. Year from which the festivity has been added
+#.  8. Source of the information
+#.
+#: includes/LitCalAPI.php:1510
+#, php-format
+msgid ""
+"In the year %1$d, the %2$s '%3$s' has been suppressed by the %4$s '%5$s', "
+"added on %6$s since the year %7$d (%8$s)."
+msgstr ""
+
+#. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
+#: includes/LitCalAPI.php:1569
+#, php-format
+msgid ""
+"The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
+"since the year 2002 (%2$s), applicable to the year %3$d."
+msgstr ""
+
+#. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
+#: includes/LitCalAPI.php:1582
+#, php-format
+msgid ""
+"The optional memorial '%1$s', which would have been superseded this year by "
+"a Sunday or Solemnity were it on Dec. 12, has however been transferred to "
+"Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d."
+msgstr ""
+
+#: includes/LitCalAPI.php:1597
+#, php-format
+msgid ""
+"The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
+"since the year 2002 (%2$s), applicable to the year %3$d. However, it is "
+"superseded by a Sunday, a Solemnity, or a Feast '%4$s' in the year %3$d."
+msgstr ""
+
+#. translators: 1: Festivity name, 2: Source of the information
+#: includes/LitCalAPI.php:1624
+#, php-format
+msgid ""
+"The Feast '%1$s' would have been suppressed this year ( 2009 ) since it "
+"falls on a Sunday, however being the Year of the Apostle Paul, as per the "
+"%2$s it has been reinstated so that local churches can optionally celebrate "
+"the memorial."
+msgstr ""
+
+#: includes/LitCalAPI.php:1648
+#, php-format
+msgid "of the %s Week of Easter"
+msgstr ""
+
+#: includes/LitCalAPI.php:1684 includes/LitCalAPI.php:1713
+#, php-format
+msgid "of the %s Week of Ordinary Time"
+msgstr ""
+
+#: includes/LitCalAPI.php:1736
+msgid "Saturday Memorial of the Blessed Virgin Mary"
+msgstr ""
+
+#: includes/LitCalAPI.php:1761 includes/LitCalAPI.php:1764
+#, php-format
+msgid "Error retrieving and decoding Wider Region data from file %s."
+msgstr ""
+
+#: includes/LitCalAPI.php:1771
+#, php-format
+msgid "Error retrieving and decoding National data from file %s."
+msgstr ""
+
+#. translators:
+#.  1. Grade of the festivity
+#.  2. Name of the festivity
+#.  3. Date on which the festivity is usually celebrated
+#.  4. Grade of the superseding festivity
+#.  5. Name of the superseding festivity
+#.  6. Requested calendar year
+#.
+#: includes/LitCalAPI.php:1805
+#, php-format
+msgid ""
+"The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
+"'%5$s' in the year %6$d."
+msgstr ""
+
+#. translators:
+#.  1. Name of the first coinciding Memorial
+#.  2. Name of the second coinciding Memorial
+#.  3. Requested calendar year
+#.  4. Source of the information
+#.
+#: includes/LitCalAPI.php:1870
+#, php-format
+msgid ""
+"The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
+"They are both reduced in rank to optional memorials."
+msgstr ""
+
+#: includes/LitCalAPI.php:1933
+msgid ""
+"We should be creating a new festivity, however we do not seem to have the "
+"correct date information in order to proceed"
+msgstr ""
+
+#. translators: Name of the Roman Missal
+#: includes/LitCalAPI.php:2048
+#, php-format
+msgid "Found a sanctorale data file for %s"
+msgstr ""
+
+#. translators:
+#.  1. Festivity grade
+#.  2. Festivity name
+#.  3. Festivity date
+#.  4. Edition of the Roman Missal
+#.  5. Superseding festivity grade
+#.  6. Superseding festivity name
+#.  7. Requested calendar year
+#.
+#: includes/LitCalAPI.php:2078
+#, php-format
+msgid ""
+"The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
+"superseded by the %5$s '%6$s' in the year %7$d"
+msgstr ""
+
+#. translators: Name of the Roman Missal
+#: includes/LitCalAPI.php:2093
+#, php-format
+msgid "Could not find a sanctorale data file for %s"
+msgstr ""
+
+#. translators: 1. Festivity grade, 2. Festivity name, 3. New festivity name, 4: Requested calendar year, 5. Old date, 6. New date
+#: includes/LitCalAPI.php:2138
+#, php-format
+msgid ""
+"The %1$s '%2$s' is transferred from %5$s to %6$s as per the %7$s, to make "
+"room for '%3$s': applicable to the year %4$d."
+msgstr ""
+
+#. translators: 1. Festivity grade, 2. Festivity name, 3. Old date, 4. New date, 5. Source of the information, 6. New festivity name, 7. Superseding festivity grade, 8. Superseding festivity name, 9: Requested calendar year
+#: includes/LitCalAPI.php:2157
+#, php-format
+msgid ""
+"The %1$s '%2$s' would have been transferred from %3$s to %4$s as per the "
+"%5$s, to make room for '%6$s', however it is suppressed by the %7$s '%8$s' "
+"in the year %9$d."
+msgstr ""
+
+#. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
+#: includes/LitMessages.php:143 includes/LitMessages.php:148
+#: includes/enums/LitCommon.php:346
+msgid "or"
+msgstr ""
+
+#. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
+#: includes/FestivityCollection.php:44
+msgid "YEAR"
+msgstr ""
+
+#: includes/FestivityCollection.php:45
+msgid "Vigil Mass"
+msgstr ""
+
+#: includes/FestivityCollection.php:359
+#, php-format
+msgid ""
+"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
+"year %5$d. As per %6$s, the first has precedence, therefore the Vigil Mass "
+"is confirmed as are I Vespers."
+msgstr ""
+
+#: includes/FestivityCollection.php:373
+#, php-format
+msgid ""
+"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
+"year %5$d. Since the first Solemnity has precedence, it will have Vespers I "
+"and a vigil Mass, whereas the last Solemnity will not have either Vespers II "
+"or an evening Mass."
+msgstr ""
+
+#: includes/FestivityCollection.php:383
+#, php-format
+msgid ""
+"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
+"year %5$d. This last Solemnity takes precedence, therefore it will maintain "
+"Vespers II and an evening Mass, while the first Solemnity will not have a "
+"Vigil Mass or Vespers I."
+msgstr ""
+
+#: includes/FestivityCollection.php:443
+#, php-format
+msgid ""
+"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
+"year %5$d. We should ask the Congregation for Divine Worship what to do "
+"about this!"
+msgstr ""
+
+#. translators: context = liturgical color
+#: includes/enums/LitColor.php:27
+msgid "green"
+msgstr ""
+
+#. translators: context = liturgical color
+#: includes/enums/LitColor.php:30
+msgid "purple"
+msgstr ""
+
+#. translators: context = liturgical color
+#: includes/enums/LitColor.php:33
+msgid "white"
+msgstr ""
+
+#. translators: context = liturgical color
+#: includes/enums/LitColor.php:36
+msgid "red"
+msgstr ""
+
+#. translators: context = liturgical color
+#: includes/enums/LitColor.php:39
+msgid "pink"
+msgstr ""
+
+#: includes/enums/LitCommon.php:57
+msgid "Proper"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:59
+msgid "Dedication of a Church"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:61
+msgid "Blessed Virgin Mary"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:63
+msgid "Martyrs"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:65
+msgid "Pastors"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:67
+msgid "Doctors"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:69
+msgid "Virgins"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: includes/enums/LitCommon.php:71
+msgid "Holy Men and Women"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:74
+msgid "For One Martyr"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:76
+msgid "For Several Martyrs"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:78
+msgid "For Missionary Martyrs"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:80
+msgid "For One Missionary Martyr"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:82
+msgid "For Several Missionary Martyrs"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:84
+msgid "For a Virgin Martyr"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:86
+msgid "For a Holy Woman Martyr"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:88
+msgid "For a Pope"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:90
+msgid "For a Bishop"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:92
+msgid "For One Pastor"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:94
+msgid "For Several Pastors"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:96
+msgid "For Founders of a Church"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:98
+msgid "For One Founder"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:100
+msgid "For Several Founders"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:102
+msgid "For Missionaries"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:104
+msgid "For One Virgin"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:106
+msgid "For Several Virgins"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:108
+msgid "For Several Saints"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:110
+msgid "For One Saint"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:112
+msgid "For an Abbot"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:114
+msgid "For a Monk"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:116
+msgid "For a Nun"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:118
+msgid "For Religious"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:120
+msgid "For Those Who Practiced Works of Mercy"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:122
+msgid "For Educators"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: includes/enums/LitCommon.php:124
+msgid "For Holy Women"
+msgstr ""
+
+#. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: includes/enums/LitCommon.php:169 includes/enums/LitCommon.php:181
+msgctxt "(SING_FEMM)"
+msgid "of"
+msgstr ""
+
+#. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: includes/enums/LitCommon.php:172
+msgctxt "(PLUR_FEMM)"
+msgid "of"
+msgstr ""
+
+#. translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: includes/enums/LitCommon.php:178
+msgctxt "(PLUR_MASC)"
+msgid "of"
+msgstr ""
+
+#. translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: includes/enums/LitCommon.php:184
+msgctxt "(SING_MASC)"
+msgid "of"
+msgstr ""
+
+#: includes/enums/LitCommon.php:342
+msgid "From the Common"
+msgstr ""
+
+#. translators: liturgical rank. Keep lowercase
+#: includes/enums/LitGrade.php:90 includes/enums/LitGrade.php:129
+msgid "weekday"
+msgstr ""
+
+#. translators: liturgical rank. Keep Capitalized
+#: includes/enums/LitGrade.php:95
+msgid "Commemoration"
+msgstr ""
+
+#. translators: liturgical rank. Keep Capitalized
+#: includes/enums/LitGrade.php:100
+msgid "Optional memorial"
+msgstr ""
+
+#. translators: liturgical rank. Keep Capitalized
+#: includes/enums/LitGrade.php:105
+msgid "Memorial"
+msgstr ""
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: includes/enums/LitGrade.php:110
+msgid "FEAST"
+msgstr ""
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: includes/enums/LitGrade.php:115
+msgid "FEAST OF THE LORD"
+msgstr ""
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: includes/enums/LitGrade.php:120
+msgid "SOLEMNITY"
+msgstr ""
+
+#. translators: liturgical rank. Keep lowercase
+#: includes/enums/LitGrade.php:125
+msgid "celebration with precedence over solemnities"
+msgstr ""
