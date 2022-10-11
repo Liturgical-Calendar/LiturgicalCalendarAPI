@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2022-10-11 16:24+0000\n"
-"PO-Revision-Date: 2022-09-21 13:05+0000\n"
+"PO-Revision-Date: 2022-10-11 16:28+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
@@ -866,7 +866,7 @@ msgstr "Per le sante"
 #: includes/enums/LitCommon.php:169 includes/enums/LitCommon.php:181
 msgctxt "(SING_FEMM)"
 msgid "of the"
-msgstr ""
+msgstr "della"
 
 #. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: includes/enums/LitCommon.php:172
@@ -884,7 +884,7 @@ msgstr "dei"
 #: includes/enums/LitCommon.php:184
 msgctxt "(SING_MASC)"
 msgid "of the"
-msgstr ""
+msgstr "del"
 
 #: includes/enums/LitCommon.php:342
 msgid "From the Common"
