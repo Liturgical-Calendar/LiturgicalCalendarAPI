@@ -361,7 +361,7 @@ class LitCalAPI {
                 $dayOfTheWeek = $this->LitSettings->Locale === LitLocale::LATIN
                     ? LitMessages::LATIN_DAYOFTHEWEEK[ $dateTime->format( 'w' ) ]
                     : ( $this->LitSettings->Locale === LitLocale::ITALIAN
-                        ? $dateTime->format( 'j F' )
+                        ? $this->dayAndMonth->format( $dateTime->format( 'U' ) )
                         : ucfirst( $this->dayOfTheWeek->format( $dateTime->format( 'U' ) ) )
                     );
                 $name = $this->LitSettings->Locale === LitLocale::LATIN
@@ -391,7 +391,7 @@ class LitCalAPI {
                 $dayOfTheWeek = $this->LitSettings->Locale === LitLocale::LATIN
                     ? LitMessages::LATIN_DAYOFTHEWEEK[ $dateTime->format( 'w' ) ]
                     : ( $this->LitSettings->Locale === LitLocale::ITALIAN
-                        ? $dateTime->format( 'j F' )
+                        ? $this->dayAndMonth->format( $dateTime->format( 'U' ) )
                         : ucfirst( $this->dayOfTheWeek->format( $dateTime->format( 'U' ) ) )
                     );
                 //$name = $this->LitSettings->Locale === LitLocale::LATIN ? sprintf( "Dies %s post Epiphaniam", $nthStr ) : sprintf( _( "%s day after Epiphany" ), ucfirst( $nthStr ) );
@@ -434,7 +434,7 @@ class LitCalAPI {
                 $dayOfTheWeek = $this->LitSettings->Locale === LitLocale::LATIN
                     ? LitMessages::LATIN_DAYOFTHEWEEK[ $dateTime->format( 'w' ) ]
                     : ( $this->LitSettings->Locale === LitLocale::ITALIAN
-                        ? $dateTime->format( 'j F' )
+                        ? $this->dayAndMonth->format( $dateTime->format( 'U' ) )
                         : ucfirst( $this->dayOfTheWeek->format( $dateTime->format( 'U' ) ) )
                     );
                 //$name = $this->LitSettings->Locale === LitLocale::LATIN ? sprintf( "Dies %s ante Epiphaniam", $nthStr ) : sprintf( _( "%s day before Epiphany" ), ucfirst( $nthStr ) );
@@ -465,7 +465,7 @@ class LitCalAPI {
                     $dayOfTheWeek = $this->LitSettings->Locale === LitLocale::LATIN
                         ? LitMessages::LATIN_DAYOFTHEWEEK[ $dateTime->format( 'w' ) ]
                         : ( $this->LitSettings->Locale === LitLocale::ITALIAN
-                            ? $dateTime->format( 'j F' )
+                            ? $this->dayAndMonth->format( $dateTime->format( 'U' ) )
                             : ucfirst( $this->dayOfTheWeek->format( $dateTime->format( 'U' ) ) )
                         );
                     //$name = $this->LitSettings->Locale === LitLocale::LATIN ? sprintf( "Dies %s post Epiphaniam", $nthStr ) : sprintf( _( "%s day after Epiphany" ), ucfirst( $nthStr ) );
