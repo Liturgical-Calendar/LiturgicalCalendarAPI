@@ -6,10 +6,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-11 09:29+0000\n"
-"PO-Revision-Date: 2022-09-24 16:17+0000\n"
-"Last-Translator: Steven van Roode <stevenvanroode@gmail.com>\n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
+"POT-Creation-Date: 2022-10-11 16:24+0000\n"
+"PO-Revision-Date: 2022-10-11 16:28+0000\n"
+"Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Dutch <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/nl/>\n"
 "Language: nl\n"
@@ -865,7 +865,7 @@ msgstr "Voor heilige vrouwen"
 #. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: includes/enums/LitCommon.php:169 includes/enums/LitCommon.php:181
 msgctxt "(SING_FEMM)"
-msgid "of"
+msgid "of the"
 msgstr "voor"
 
 #. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
@@ -883,7 +883,7 @@ msgstr "voor"
 #. translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: includes/enums/LitCommon.php:184
 msgctxt "(SING_MASC)"
-msgid "of"
+msgid "of the"
 msgstr "voor"
 
 #: includes/enums/LitCommon.php:342
@@ -929,6 +929,14 @@ msgstr "HOOGFEEST"
 #: includes/enums/LitGrade.php:125
 msgid "celebration with precedence over solemnities"
 msgstr "viering met voorrang op hoogfesten"
+
+#~ msgctxt "(SING_FEMM)"
+#~ msgid "of"
+#~ msgstr "voor"
+
+#~ msgctxt "(SING_MASC)"
+#~ msgid "of"
+#~ msgstr "voor"
 
 #~ msgid "%s day before Epiphany"
 #~ msgstr "%s dag voor de Openbaring des Heren"
