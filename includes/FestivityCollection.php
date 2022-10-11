@@ -102,7 +102,7 @@ class FestivityCollection {
         return null;
     }
 
-    public function getCalEventsFromDate( DateTime $date ) : array {
+    public function getCalEventsFromDate( LitDateTime $date ) : array {
         return array_filter( $this->festivities, function( $el ) use ( $date ) { return $el->date == $date; } );
     }
 
@@ -110,71 +110,71 @@ class FestivityCollection {
         return in_array( $key, $this->SolemnitiesLordBVM );
     }
 
-    public function isSundayAdventLentEaster( DateTime $date ) : bool {
+    public function isSundayAdventLentEaster( LitDateTime $date ) : bool {
         return in_array( $date, $this->SundaysAdventLentEaster );
     }
 
-    public function inSolemnities( DateTime $date ) : bool {
+    public function inSolemnities( LitDateTime $date ) : bool {
         return in_array( $date, $this->solemnities );
     }
 
-    public function notInSolemnities( DateTime $date ) : bool {
+    public function notInSolemnities( LitDateTime $date ) : bool {
         return !$this->inSolemnities( $date );
     }
 
-    public function inFeasts( DateTime $date ) : bool {
+    public function inFeasts( LitDateTime $date ) : bool {
         return in_array( $date, $this->feasts );
     }
 
-    public function notInFeasts( DateTime $date ) : bool {
+    public function notInFeasts( LitDateTime $date ) : bool {
         return !$this->inFeasts( $date );
     }
 
-    public function inSolemnitiesOrFeasts( DateTime $date ) : bool {
+    public function inSolemnitiesOrFeasts( LitDateTime $date ) : bool {
         return $this->inSolemnities( $date ) || $this->inFeasts( $date );
     }
 
-    public function notInSolemnitiesOrFeasts( DateTime $date ) : bool {
+    public function notInSolemnitiesOrFeasts( LitDateTime $date ) : bool {
         return !$this->inSolemnitiesOrFeasts( $date );
     }
 
-    public function inMemorials( DateTime $date ) : bool {
+    public function inMemorials( LitDateTime $date ) : bool {
         return in_array( $date, $this->memorials );
     }
 
-    public function notInMemorials( DateTime $date ) : bool {
+    public function notInMemorials( LitDateTime $date ) : bool {
         return !$this->inMemorials( $date );
     }
 
-    public function inFeastsOrMemorials( DateTime $date ) : bool {
+    public function inFeastsOrMemorials( LitDateTime $date ) : bool {
         return $this->inFeasts( $date ) || $this->inMemorials( $date );
     }
 
-    public function notInFeastsOrMemorials( DateTime $date ) : bool {
+    public function notInFeastsOrMemorials( LitDateTime $date ) : bool {
         return !$this->inFeastsOrMemorials( $date );
     }
 
-    public function inSolemnitiesFeastsOrMemorials( DateTime $date ) : bool {
+    public function inSolemnitiesFeastsOrMemorials( LitDateTime $date ) : bool {
         return $this->inSolemnities( $date ) || $this->inFeastsOrMemorials( $date );
     }
 
-    public function notInSolemnitiesFeastsOrMemorials( DateTime $date ) : bool {
+    public function notInSolemnitiesFeastsOrMemorials( LitDateTime $date ) : bool {
         return !$this->inSolemnitiesFeastsOrMemorials( $date );
     }
 
-    public function inWeekdaysAdventChristmasLent( DateTime $date ) : bool {
+    public function inWeekdaysAdventChristmasLent( LitDateTime $date ) : bool {
         return in_array( $date, $this->WeekdayAdventChristmasLent );
     }
 
-    public function inWeekdaysEpiphany( DateTime $date ) : bool {
+    public function inWeekdaysEpiphany( LitDateTime $date ) : bool {
         return in_array( $date, $this->WeekdaysEpiphany );
     }
 
-    public function inCalendar( DateTime $date ) : bool {
+    public function inCalendar( LitDateTime $date ) : bool {
         return count( array_filter( $this->festivities, function( $el ) use( $date ) { $el->date == $date; } ) ) > 0;
     }
 
-    public function solemnityFromDate( DateTime $date ) : ?Festivity {
+    public function solemnityFromDate( LitDateTime $date ) : ?Festivity {
         $key = array_search( $date, $this->solemnities );
         if( $key && array_key_exists( $key, $this->festivities ) ) {
             return $this->festivities[ $key ];
@@ -182,15 +182,15 @@ class FestivityCollection {
         return null;
     }
 
-    public function solemnityKeyFromDate( DateTime $date ) : string|int|false {
+    public function solemnityKeyFromDate( LitDateTime $date ) : string|int|false {
         return array_search( $date, $this->solemnities );
     }
 
-    public function weekdayEpiphanyKeyFromDate( DateTime $date ) : string|int|false {
+    public function weekdayEpiphanyKeyFromDate( LitDateTime $date ) : string|int|false {
         return array_search( $date, $this->WeekdaysEpiphany );
     }
 
-    public function feastOrMemorialFromDate( DateTime $date ) : ?Festivity {
+    public function feastOrMemorialFromDate( LitDateTime $date ) : ?Festivity {
         $key = array_search( $date, $this->feasts );
         if( $key && array_key_exists( $key, $this->festivities ) ) {
             return $this->festivities[ $key ];
@@ -202,7 +202,7 @@ class FestivityCollection {
         return null;
     }
 
-    public function feastOrMemorialKeyFromDate( DateTime $date ) : string|int|false {
+    public function feastOrMemorialKeyFromDate( LitDateTime $date ) : string|int|false {
         $key = array_search( $date, $this->feasts );
         if( $key ){
             return $key;
