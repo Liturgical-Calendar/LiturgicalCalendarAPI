@@ -166,7 +166,7 @@ class LitCommon {
         switch( $value ) {
             case "Blessed Virgin Mary":
                 /**translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                return pgettext( "(SING_FEMM)", "of" );
+                return pgettext( "(SING_FEMM)", "of the" );
             case "Virgins":
                 /**translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
                 return pgettext( "(PLUR_FEMM)", "of" );
@@ -178,10 +178,10 @@ class LitCommon {
                 return pgettext( "(PLUR_MASC)", "of" );
             case "Dedication of a Church":
                 /**translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                return pgettext( "(SING_FEMM)", "of" );
+                return pgettext( "(SING_FEMM)", "of the" );
             default:
                 /**translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                return pgettext( "(SING_MASC)", "of" );
+                return pgettext( "(SING_MASC)", "of the" );
         }
     }
 
