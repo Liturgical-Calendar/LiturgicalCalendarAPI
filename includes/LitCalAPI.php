@@ -367,7 +367,7 @@ class LitCalAPI {
                 $name = $this->LitSettings->Locale === LitLocale::LATIN
                     ? sprintf( "%s temporis Nativitatis", $dayOfTheWeek )
                     : ( $this->LitSettings->Locale === LitLocale::ITALIAN
-                        ? sprintf( "Feria propria del %s" )
+                        ? sprintf( "Feria propria del %s", $dayOfTheWeek )
                         : sprintf(
                             /**translators: days before Epiphany when Epiphany falls on Jan 6 (not useful in Italian!) */
                             _( "%s - Christmas Weekday" ),
@@ -398,7 +398,7 @@ class LitCalAPI {
                 $name = $this->LitSettings->Locale === LitLocale::LATIN
                     ? sprintf( "%s temporis Nativitatis", $dayOfTheWeek )
                     : ( $this->LitSettings->Locale === LitLocale::ITALIAN
-                        ? sprintf( "Feria propria del %s" )
+                        ? sprintf( "Feria propria del %s", $dayOfTheWeek )
                         : sprintf(
                             /**translators: days after Epiphany when Epiphany falls on Jan 6 (not useful in Italian!) */
                             _( "%s - Christmas Weekday" ),
@@ -416,7 +416,7 @@ class LitCalAPI {
         $dateTime = LitDateTime::createFromFormat( '!j-n-Y', '2-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
         if ( self::DateIsSunday( $dateTime ) ) {
             $Epiphany = new Festivity( $this->PropriumDeTempore[ "Epiphany" ][ "NAME" ], $dateTime, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
-            $this->Cal->addFestivity( "Epiphany",   $Epiphany );
+            $this->Cal->addFestivity( "Epiphany", $Epiphany );
         }
         //otherwise find the Sunday following Jan 2nd
         else {
@@ -441,7 +441,7 @@ class LitCalAPI {
                 $name = $this->LitSettings->Locale === LitLocale::LATIN
                     ? sprintf( "%s temporis Nativitatis", $dayOfTheWeek )
                     : ( $this->LitSettings->Locale === LitLocale::ITALIAN
-                        ? sprintf( "Feria propria del %s" )
+                        ? sprintf( "Feria propria del %s", $dayOfTheWeek )
                         : sprintf(
                             /**translators: days before Epiphany when Epiphany is on a Sunday (not useful in Italian!) */
                             _( "%s - Christmas Weekday" ),
@@ -472,7 +472,7 @@ class LitCalAPI {
                     $name = $this->LitSettings->Locale === LitLocale::LATIN
                         ? sprintf( "%s temporis Nativitatis", $dayOfTheWeek )
                         : ( $this->LitSettings->Locale === LitLocale::ITALIAN
-                            ? sprintf( "Feria propria del %s" )
+                            ? sprintf( "Feria propria del %s", $dayOfTheWeek )
                             : sprintf(
                                 /**translators: days after Epiphany when Epiphany is on a Sunday (not useful in Italian!) */
                                 _( "%s - Christmas Weekday" ),
