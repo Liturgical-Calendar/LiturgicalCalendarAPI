@@ -48,11 +48,11 @@ class FestivityCollection {
         $this->LitGrade = new LitGrade( $this->LitSettings->Locale );
     }
 
-    public static function DateIsSunday( DateTime $dt ) : bool {
+    public static function DateIsSunday( LitDateTime $dt ) : bool {
         return (int)$dt->format( 'N' ) === 7;
     }
 
-    public static function DateIsNotSunday( DateTime $dt ) : bool {
+    public static function DateIsNotSunday( LitDateTime $dt ) : bool {
         return (int)$dt->format( 'N' ) !== 7;
     }
 
@@ -210,7 +210,7 @@ class FestivityCollection {
         return array_search( $date, $this->memorials );
     }
 
-    public function moveFestivityDate( string $key, DateTime $newDate ) : void {
+    public function moveFestivityDate( string $key, LitDateTime $newDate ) : void {
         if( array_key_exists( $key, $this->festivities ) ) {
             $this->festivities[ $key ]->date = $newDate;
         }
@@ -320,7 +320,7 @@ class FestivityCollection {
         }
     }
 
-    private function createVigilMass( string $key, Festivity $festivity, DateTime $VigilDate ) : void {
+    private function createVigilMass( string $key, Festivity $festivity, LitDateTime $VigilDate ) : void {
         $this->festivities[ $key . "_vigil" ] = new Festivity( 
             $festivity->name . " " . $this->T[ "Vigil Mass" ],
             $VigilDate,
@@ -479,7 +479,7 @@ class FestivityCollection {
         return array_merge( $this->feasts, $this->memorials );
     }
 
-    public function determineSundaySolemnityOrFeast( DateTime $currentFeastDate ) : stdClass {
+    public function determineSundaySolemnityOrFeast( LitDateTime $currentFeastDate ) : stdClass {
         $coincidingFestivity = new stdClass();
         $coincidingFestivity->grade = '';
         if( self::DateIsSunday( $currentFeastDate ) && $this->solemnityFromDate( $currentFeastDate )->grade < LitGrade::SOLEMNITY ){
