@@ -283,7 +283,8 @@
                 "EDITIO_TYPICA_TERTIA_EMENDATA_2008",
                 "USA_EDITION_2011",
                 "ITALY_EDITION_1983",
-                "ITALY_EDITION_2020"
+                "ITALY_EDITION_2020",
+                "NETHERLANDS_EDITION_1978"
             ]
         },
         "Missal": {
@@ -296,7 +297,8 @@
                 "VATICAN_2008",
                 "USA_2011",
                 "ITALY_1983",
-                "ITALY_2020"
+                "ITALY_2020",
+                "NETHERLANDS_1978"
             ]
         },
         "MissalName": {
@@ -309,7 +311,8 @@
                 "Editio Typica Tertia Emendata 2008",
                 "2011 Roman Missal issued by the USCCB",
                 "Messale Romano ed. 1983 pubblicata dalla CEI",
-                "Messale Romano ed. 2020 pubblicata dalla CEI"
+                "Messale Romano ed. 2020 pubblicata dalla CEI",
+                "Romeins Missaal ed. 1978 goedgekeurd door de Nederlandse bisschoppenconferentie"
             ]
         },
         "MissalFileName": {
