@@ -417,6 +417,8 @@ class LitCalAPI {
         if ( self::DateIsSunday( $dateTime ) ) {
             $Epiphany = new Festivity( $this->PropriumDeTempore[ "Epiphany" ][ "NAME" ], $dateTime, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
             $this->Cal->addFestivity( "Epiphany", $Epiphany );
+            $DayOfEpiphany = (int)$Epiphany->date->format( 'j' );
+            $SundayAfterEpiphany =  (int)LitDateTime::createFromFormat( '!j-n-Y', '2-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'next Sunday' )->format( 'j' );
         }
         //otherwise find the Sunday following Jan 2nd
         else {
@@ -424,10 +426,11 @@ class LitCalAPI {
             $Epiphany = new Festivity( $this->PropriumDeTempore[ "Epiphany" ][ "NAME" ], $SundayOfEpiphany, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
             $this->Cal->addFestivity( "Epiphany",   $Epiphany );
             //Weekdays from Jan. 2 until the following Sunday are called "*day before Epiphany" (in which calendar? England?)
-            //Actually in Latin they are "Feria II temporis Nativitatis", in English "Monday - Christmas Weekday", in Italian "Feria propria del 3 gennaio" ecc.
+            //Actually in Latin they are "Feria II temporis Nativitatis", in English "Monday - Christmas Weekday", in Italian "Feria propria del 3 gennaio" etc.
             $DayOfEpiphany = (int)$SundayOfEpiphany->format( 'j' );
+            $SundayAfterEpiphany =  (int)LitDateTime::createFromFormat( '!j-n-Y', '2-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'next Sunday' )->modify( 'next Sunday' )->format( 'j' );
             $nth = 0;
-            for ( $i = 2; $i < $DayOfEpiphany; $i++ ) {
+            for ( $i = 2; $i < $DayOfEpiphany - 1; $i++ ) {
                 $nth++;
                 //$nthStr = $this->LitSettings->Locale === LitLocale::LATIN ? LitMessages::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
                 $dateTime = LitDateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
@@ -452,38 +455,35 @@ class LitCalAPI {
                 $this->Cal->addFestivity( "DayBeforeEpiphany" . $nth, $festivity );
             }
 
-            //If Epiphany occurs on or before Jan. 6, then the days of the week following Epiphany are called "*day after Epiphany" (in which calendar? England?)
-            //Actually in Latin they are still "Feria II temporis Nativitatis", in English "Monday - Christmas Weekday", in Italian "Feria propria del 3 gennaio" ecc.
-            // and the Sunday following Epiphany is the Baptism of the Lord.
-            if ( $DayOfEpiphany < 7 ) {
-                $SundayAfterEpiphany =  (int)LitDateTime::createFromFormat( '!j-n-Y', '2-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'next Sunday' )->modify( 'next Sunday' )->format( 'j' );
-                $nth = 0;
-                for ( $i = $DayOfEpiphany + 1; $i < $SundayAfterEpiphany; $i++ ) {
-                    $nth++;
-                    //$nthStr = $this->LitSettings->Locale === LitLocale::LATIN ? LitMessages::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
-                    $dateTime = LitDateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-                    $dayOfTheWeek = $this->LitSettings->Locale === LitLocale::LATIN
-                        ? LitMessages::LATIN_DAYOFTHEWEEK[ $dateTime->format( 'w' ) ]
-                        : ( $this->LitSettings->Locale === LitLocale::ITALIAN
-                            ? $this->dayAndMonth->format( $dateTime->format( 'U' ) )
-                            : ucfirst( $this->dayOfTheWeek->format( $dateTime->format( 'U' ) ) )
-                        );
-                    //$name = $this->LitSettings->Locale === LitLocale::LATIN ? sprintf( "Dies %s post Epiphaniam", $nthStr ) : sprintf( _( "%s day after Epiphany" ), ucfirst( $nthStr ) );
-                    $name = $this->LitSettings->Locale === LitLocale::LATIN
-                        ? sprintf( "%s temporis Nativitatis", $dayOfTheWeek )
-                        : ( $this->LitSettings->Locale === LitLocale::ITALIAN
-                            ? sprintf( "Feria propria del %s", $dayOfTheWeek )
-                            : sprintf(
-                                /**translators: days after Epiphany when Epiphany is on a Sunday (not useful in Italian!) */
-                                _( "%s - Christmas Weekday" ),
-                                ucfirst( $dayOfTheWeek )
-                            )
-                        );
-                    $festivity = new Festivity( $name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
-                    $this->Cal->addFestivity( "DayAfterEpiphany" . $nth, $festivity );
-                }
-            }
         }
+        //Weekday from the Sunday of Epiphany until Baptism of the Lord are called "*day after Epiphany" (in which calendar? England?)
+        //Actually in Latin they are still "Feria II temporis Nativitatis", in English "Monday - Christmas Weekday", in Italian "Feria propria del 3 gennaio" ecc.
+        $nth = 0;
+        for ( $i = $DayOfEpiphany + 1; $i < $SundayAfterEpiphany - 1; $i++ ) {
+            $nth++;
+            //$nthStr = $this->LitSettings->Locale === LitLocale::LATIN ? LitMessages::LATIN_ORDINAL[ $nth ] : $this->formatter->format( $nth );
+            $dateTime = LitDateTime::createFromFormat( '!j-n-Y', $i . '-1-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+            $dayOfTheWeek = $this->LitSettings->Locale === LitLocale::LATIN
+                ? LitMessages::LATIN_DAYOFTHEWEEK[ $dateTime->format( 'w' ) ]
+                : ( $this->LitSettings->Locale === LitLocale::ITALIAN
+                    ? $this->dayAndMonth->format( $dateTime->format( 'U' ) )
+                    : ucfirst( $this->dayOfTheWeek->format( $dateTime->format( 'U' ) ) )
+                );
+            //$name = $this->LitSettings->Locale === LitLocale::LATIN ? sprintf( "Dies %s post Epiphaniam", $nthStr ) : sprintf( _( "%s day after Epiphany" ), ucfirst( $nthStr ) );
+            $name = $this->LitSettings->Locale === LitLocale::LATIN
+                ? sprintf( "%s temporis Nativitatis", $dayOfTheWeek )
+                : ( $this->LitSettings->Locale === LitLocale::ITALIAN
+                    ? sprintf( "Feria propria del %s", $dayOfTheWeek )
+                    : sprintf(
+                        /**translators: days after Epiphany when Epiphany is on a Sunday (not useful in Italian!) */
+                        _( "%s - Christmas Weekday" ),
+                        ucfirst( $dayOfTheWeek )
+                    )
+                );
+            $festivity = new Festivity( $name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE );
+            $this->Cal->addFestivity( "DayAfterEpiphany" . $nth, $festivity );
+        }
+
     }
 
     private function calculateChristmasEpiphany() : void {
