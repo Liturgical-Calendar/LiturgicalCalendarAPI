@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-11 16:24+0000\n"
+"POT-Creation-Date: 2022-12-04 13:55+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -39,7 +39,7 @@ msgstr ""
 #. translators: days before Epiphany when Epiphany is on a Sunday (not useful in Italian!)
 #. translators: days after Epiphany when Epiphany is on a Sunday (not useful in Italian!)
 #: includes/LitCalAPI.php:373 includes/LitCalAPI.php:404
-#: includes/LitCalAPI.php:447 includes/LitCalAPI.php:478
+#: includes/LitCalAPI.php:450 includes/LitCalAPI.php:479
 #, php-format
 msgid "%s - Christmas Weekday"
 msgstr ""
