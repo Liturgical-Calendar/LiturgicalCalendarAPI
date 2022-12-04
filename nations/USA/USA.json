@@ -179,7 +179,7 @@
         "WiderRegion": {
             "name": "Americas",
             "jsonFile": "nations\/Americas.json",
-            "i18nFile": "nations\/AMERICAS\/en.json"
+            "i18nFile": "nations\/AMERICAS\/en_US.json"
         },
         "Missals": [
             "USA_2011"
