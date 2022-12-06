@@ -56,6 +56,23 @@
                                     "items": {
                                         "type": "string"
                                     }
+                                },
+                                "settings": {
+                                    "type": "object",
+                                    "properties": {
+                                        "Epiphany": {
+                                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
+                                        },
+                                        "Ascension": {
+                                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Ascension"
+                                        },
+                                        "CorpusChristi": {
+                                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
+                                        },
+                                        "Locale": {
+                                            "type": "string"
+                                        }
+                                    }
                                 }
                             }
                         }

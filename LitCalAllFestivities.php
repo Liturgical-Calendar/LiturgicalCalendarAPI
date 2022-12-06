@@ -21,7 +21,7 @@ $LatinMissals = array_filter( RomanMissal::$values, function($item){
     return str_starts_with( $item, "VATICAN_" );
 });
 
-$LOCALE = isset( $_GET["locale"] ) && LitLocale::isValid( strtoupper( $_GET["locale"] ) ) ? strtoupper( $_GET["locale"] ) : "LA";
+$LOCALE = isset( $_GET["locale"] ) && LitLocale::isValid( $_GET["locale"] ) ? $_GET["locale"] : "LA";
 
 foreach( $LatinMissals as $LatinMissal ) {
     $DataFile = RomanMissal::getSanctoraleFileName( $LatinMissal );

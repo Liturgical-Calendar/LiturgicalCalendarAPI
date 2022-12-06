@@ -27,8 +27,6 @@ class LitSettings {
         "DIOCESANCALENDAR"
     ];
 
-    const SUPPORTED_NATIONAL_CALENDARS = [ "ITALY", "USA", "VATICAN" ];
-
     //If we can get more data from 1582 (year of the Gregorian reform) to 1969
     // perhaps we can lower the limit to the year of the Gregorian reform
     //For now we'll just deal with the Liturgical Calendar from the Editio Typica 1970
@@ -41,6 +39,13 @@ class LitSettings {
     public function __construct( array $DATA ) {
         //we need at least a default value for the current year
         $this->Year = (int)date("Y");
+        $SUPPORTED_NATIONAL_CALENDARS = [ "VATICAN" ];
+        $directories = array_map('basename', glob( '../nations/*' , GLOB_ONLYDIR) );
+        foreach( $directories as $directory ) {
+            if( file_exists( "../nations/$directory/$directory.json" ) ) {
+                $baseNationalCalendars[] = $directory;
+            }
+        }
 
         foreach( $DATA as $key => $value ) {
             $key = strtoupper( $key );
@@ -59,13 +64,13 @@ class LitSettings {
                         $this->CorpusChristi    = CorpusChristi::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : CorpusChristi::THURSDAY;
                         break;
                     case "LOCALE":
-                        $this->Locale           = LitLocale::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : LitLocale::LATIN;
+                        $this->Locale           = LitLocale::isValid( $value ) ? $value : LitLocale::LATIN;
                         break;
                     case "RETURNTYPE":
                         $this->ReturnType       = ReturnType::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : ReturnType::JSON;
                         break;
                     case "NATIONALCALENDAR":
-                        $this->NationalCalendar = in_array( strtoupper( $value ), self::SUPPORTED_NATIONAL_CALENDARS ) ? strtoupper( $value ) : null;
+                        $this->NationalCalendar = in_array( strtoupper( $value ), $SUPPORTED_NATIONAL_CALENDARS ) ? strtoupper( $value ) : null;
                         break;
                     case "DIOCESANCALENDAR":
                         $this->DiocesanCalendar = strtoupper( $value );
@@ -75,8 +80,9 @@ class LitSettings {
         }
         if( $this->Locale === null ) {
             if( isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ) {
-                $value = explode("_", Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']) )[0];
-                $this->Locale = LitLocale::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : LitLocale::LATIN;
+                $value = Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+                //$mainLang = explode("_", $value )[0];
+                $this->Locale = LitLocale::isValid( $value ) ? $value : LitLocale::LATIN;
             } else {
                 $this->Locale = LitLocale::LATIN;
             }

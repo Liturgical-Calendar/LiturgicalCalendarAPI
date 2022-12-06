@@ -187,11 +187,11 @@ class LitMessages {
      */
     public static function getOrdinal(int $num, string $LOCALE, NumberFormatter $formatter, array $latinOrdinals) : string {
         $ordinal = "";
-        switch($LOCALE){
+        switch(strtoupper(explode("_", $LOCALE)[0])) {
             case LitLocale::LATIN:
                 $ordinal = $latinOrdinals[$num];
             break;
-            case LitLocale::ENGLISH:
+            case "EN":
                 $ordinal = $num . self::ordSuffix($num);
             break;
             default:
