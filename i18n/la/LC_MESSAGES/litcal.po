@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2022-12-06 19:01+0000\n"
-"PO-Revision-Date: 2022-09-24 16:17+0000\n"
+"PO-Revision-Date: 2022-12-06 23:10+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/la/>\n"
@@ -53,16 +53,13 @@ msgstr ""
 #. translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Explicatory string for the transferral, 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
 #: includes/LitCalAPI.php:641 includes/LitCalAPI.php:658
 #: includes/LitCalAPI.php:685
-#, fuzzy, php-format
-#| msgid ""
-#| "The Solemnity '%s' falls on %s in the year %d, the celebration has been "
-#| "transferred to %s (%s) as per the %s."
+#, php-format
 msgid ""
 "The Solemnity '%1$s' falls on %2$s in the year %3$d, the celebration has "
 "been transferred to %4$s (%5$s) as per the %6$s."
 msgstr ""
-"Coincidet enim Sollemnitas <i>'%s'</i> cum <b>%s</b> in anno %d, ergo "
-"traslata est celebratio ad %s (%s) secundum %s."
+"Coincidet enim Sollemnitas <i>'%1$s'</i> cum <b>%2$s</b> in anno %3$d, ergo "
+"traslata est celebratio ad %4$s (%5$s) secundum %6$s."
 
 #: includes/LitCalAPI.php:645
 msgid "the Saturday preceding Palm Sunday"
@@ -89,29 +86,23 @@ msgstr "diem Lunæ proximum"
 
 #. translators: 1: Festivity name, 2: Coinciding Festivity name, 3: Requested calendar year
 #: includes/LitCalAPI.php:701
-#, fuzzy, php-format
-#| msgid ""
-#| "The Solemnity '%s' coincides with the Solemnity '%s' in the year %d. We "
-#| "should ask the Congregation for Divine Worship what to do about this!"
+#, php-format
 msgid ""
 "The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year %3$d. "
 "We should ask the Congregation for Divine Worship what to do about this!"
 msgstr ""
-"Sollemnitas <i>'%s'</i> coincidet cum Sollemnitate <i>'%s'</i> in anno %d. "
-"Oportet quaerere a Congregatione Cultu Divino quid facere!"
+"Sollemnitas <i>'%1$s'</i> coincidet cum Sollemnitate <i>'%2$s'</i> in anno "
+"%3$d. Oportet quaerere a Congregatione Cultu Divino quid facere!"
 
 #. translators: 1: Festivity name, 2: Coinciding Festivity name, 3: Requested calendar year, 4: Decree of the Congregation for Divine Worship
 #: includes/LitCalAPI.php:720
-#, fuzzy, php-format
-#| msgid ""
-#| "Seeing that the Solemnity '%s' coincides with the Solemnity '%s' in the "
-#| "year %d, it has been anticipated by one day as per %s."
+#, php-format
 msgid ""
 "Seeing that the Solemnity '%1$s' coincides with the Solemnity '%2$s' in the "
 "year %3$d, it has been anticipated by one day as per %4$s."
 msgstr ""
-"Ex causa Sollemnitas <i>'%s'</i> coincidet cum Sollemnitate <i>'%s'</i> in "
-"anno %d, anticipata est ab uno die secundum %s."
+"Ex causa Sollemnitas <i>'%1$s'</i> coincidet cum Sollemnitate <i>'%2$s'</i> "
+"in anno %3$d, anticipata est ab uno die secundum %4$s."
 
 #. translators: 1: Festivity name (Christmas), 2: Requested calendar year, 3: Festivity name (Holy Family), 4: New date for Holy Family
 #: includes/LitCalAPI.php:790
@@ -125,10 +116,9 @@ msgstr ""
 
 #. translators: 1: Festivity name, 2: Superseding Festivity grade, 3: Superseding Festivity name, 4: Requested calendar year
 #: includes/LitCalAPI.php:825 includes/LitCalAPI.php:850
-#, fuzzy, php-format
-#| msgid "'%s' is superseded by the %s '%s' in the year %d."
+#, php-format
 msgid "'%1$s' is superseded by the %2$s '%3$s' in the year %4$d."
-msgstr "<i>'%s'</i> subplantata est ab %s <i>'%s'</i> in anno %d."
+msgstr "<i>'%1$s'</i> subplantata est ab %2$s <i>'%3$s'</i> in anno %4$d."
 
 #. translators: %s is an ordinal number (first, second...)
 #: includes/LitCalAPI.php:907
@@ -425,16 +415,13 @@ msgstr ""
 
 #. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
 #: includes/LitCalAPI.php:1626
-#, fuzzy, php-format
-#| msgid ""
-#| "The optional memorial '%s' has been transferred from Dec. 12 to Aug. 12 "
-#| "since the year 2002 (%s), applicable to the year %d."
+#, php-format
 msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
 "since the year 2002 (%2$s), applicable to the year %3$d."
 msgstr ""
-"Memoria ad libitum <i>'%s'</i> traslata est de 12 Dec. ad 12 Aug. ab anno "
-"2002 (%s), ergo viget in anno %d."
+"Memoria ad libitum <i>'%1$s'</i> traslata est de 12 Dec. ad 12 Aug. ab anno "
+"2002 (%2$s), ergo viget in anno %3$d."
 
 #. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
 #: includes/LitCalAPI.php:1639
@@ -566,31 +553,25 @@ msgstr ""
 
 #. translators: 1. Festivity grade, 2. Festivity name, 3. New festivity name, 4: Requested calendar year, 5. Old date, 6. New date
 #: includes/LitCalAPI.php:2196
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
-#| "applicable to the year %6$d."
+#, php-format
 msgid ""
 "The %1$s '%2$s' is transferred from %5$s to %6$s as per the %7$s, to make "
 "room for '%3$s': applicable to the year %4$d."
 msgstr ""
-"%1$s <i>'%2$s'</i> aggregata est igitur in die %3$s ab anno %4$d (%5$s), "
-"ergo viget in anno %6$d."
+"%1$s <i>'%2$s'</i> traslata est de die %5$s ad diem %6$s secundum %7$s, cum "
+"spatium facere in gratiam '%3$s': ergo viget in anno %4$d."
 
 #. translators: 1. Festivity grade, 2. Festivity name, 3. Old date, 4. New date, 5. Source of the information, 6. New festivity name, 7. Superseding festivity grade, 8. Superseding festivity name, 9: Requested calendar year
 #: includes/LitCalAPI.php:2215
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s', added in the %3$s of the Roman Missal since the year "
-#| "%4$d (%5$s) and usually celebrated on %6$s, is suppressed by the %7$s "
-#| "'%8$s' in the year %9$d."
+#, php-format
 msgid ""
 "The %1$s '%2$s' would have been transferred from %3$s to %4$s as per the "
 "%5$s, to make room for '%6$s', however it is suppressed by the %7$s '%8$s' "
 "in the year %9$d."
 msgstr ""
-"%1$s '%2$s' aggregata in %3$s Missalis Romani ab anno %4$d (%5$s) et "
-"plerumque celebrata in die %6$s subplantata est ab %7$s '%8$s' in anno %9$d."
+"%1$s '%2$s' transferretur de die %3$s ad diem %4$s secundum %5$s, cum "
+"spatium facere in gratiam '%6$s', sed subplantata est ab %7$s '%8$s' in anno "
+"%9$d."
 
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
 #: includes/LitMessages.php:143 includes/LitMessages.php:148
@@ -608,54 +589,41 @@ msgid "Vigil Mass"
 msgstr "Missa in Vigilia"
 
 #: includes/FestivityCollection.php:359
-#, fuzzy, php-format
-#| msgid ""
-#| "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
-#| "This last Solemnity takes precedence, therefore it will maintain Vespers "
-#| "II and an evening Mass, while the first Solemnity will not have a Vigil "
-#| "Mass or Vespers I."
+#, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
 "year %5$d. As per %6$s, the first has precedence, therefore the Vigil Mass "
 "is confirmed as are I Vespers."
 msgstr ""
-"Missa in Vigilia %s '%s' coincidet cum %s'%s' in anno %d. Sollemnitas ultima "
-"praecedentia habet, ergo servabit Secundis Vesperis atque Missa vesperum, "
-"cum Sollemnitas prima neque Missa in Vigilia neque Primis Vesperis servabit."
+"Missa in Vigilia %1$s '%2$s' coincidet cum %3$s'%4$s' in anno %5$d. Secundum "
+"%6$s, prima praecedentia habet, ergo Missa vesperum et Missa in Vigilia "
+"servabuntur."
 
 #: includes/FestivityCollection.php:373
-#, fuzzy, php-format
-#| msgid ""
-#| "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
-#| "This last Solemnity takes precedence, therefore it will maintain Vespers "
-#| "II and an evening Mass, while the first Solemnity will not have a Vigil "
-#| "Mass or Vespers I."
+#, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
 "year %5$d. Since the first Solemnity has precedence, it will have Vespers I "
 "and a vigil Mass, whereas the last Solemnity will not have either Vespers II "
 "or an evening Mass."
 msgstr ""
-"Missa in Vigilia %s '%s' coincidet cum %s'%s' in anno %d. Sollemnitas ultima "
-"praecedentia habet, ergo servabit Secundis Vesperis atque Missa vesperum, "
-"cum Sollemnitas prima neque Missa in Vigilia neque Primis Vesperis servabit."
+"Missa in Vigilia %1$s '%2$s' coincidet cum %3$s'%4$s' in anno %5$d. "
+"Sollemnitas prima praecedentia habet, ergo servabit Secundis Vesperis atque "
+"Missa vesperum, cum Sollemnitas ultima neque Missa in Vigilia neque Primis "
+"Vesperis servabit."
 
 #: includes/FestivityCollection.php:383
-#, fuzzy, php-format
-#| msgid ""
-#| "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "
-#| "This last Solemnity takes precedence, therefore it will maintain Vespers "
-#| "II and an evening Mass, while the first Solemnity will not have a Vigil "
-#| "Mass or Vespers I."
+#, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
 "year %5$d. This last Solemnity takes precedence, therefore it will maintain "
 "Vespers II and an evening Mass, while the first Solemnity will not have a "
 "Vigil Mass or Vespers I."
 msgstr ""
-"Missa in Vigilia %s '%s' coincidet cum %s'%s' in anno %d. Sollemnitas ultima "
-"praecedentia habet, ergo servabit Secundis Vesperis atque Missa vesperum, "
-"cum Sollemnitas prima neque Missa in Vigilia neque Primis Vesperis servabit."
+"Missa in Vigilia %1$s '%2$s' coincidet cum %3$s'%4$s' in anno %5$d. "
+"Sollemnitas ultima praecedentia habet, ergo servabit Secundis Vesperis atque "
+"Missa vesperum, cum Sollemnitas prima neque Missa in Vigilia neque Primis "
+"Vesperis servabit."
 
 #: includes/FestivityCollection.php:443
 #, fuzzy, php-format
@@ -667,8 +635,8 @@ msgid ""
 "year %5$d. We should ask the Congregation for Divine Worship what to do "
 "about this!"
 msgstr ""
-"Missa in Vigilia %s '%s' coincidet cum %s'%s' in anno %d. Oportet quaerere a "
-"Congregatione Cultu Divino quid facere!"
+"Missa in Vigilia %1$s '%2$s' coincidet cum %3$s'%4$s' in anno %5$d. Oportet "
+"quaerere a Congregatione Cultu Divino quid facere!"
 
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:27
