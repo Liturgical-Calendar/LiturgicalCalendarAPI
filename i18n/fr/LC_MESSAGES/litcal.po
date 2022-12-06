@@ -2,13 +2,13 @@
 # Copyright (C) 2021 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Ubuntu <priest@johnromanodorazio.com>, 2021.
-#
+# John R. D'Orazio <priest@johnromanodorazio.com>, 2022.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2022-12-04 13:55+0000\n"
-"PO-Revision-Date: 2022-02-16 09:56+0000\n"
+"PO-Revision-Date: 2022-12-06 19:01+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: French <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/fr/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 4.10.1\n"
+"X-Generator: Weblate 4.12.1\n"
 
 #: includes/LitCalAPI.php:241
 #, php-format
@@ -814,12 +814,12 @@ msgstr ""
 #. translators: liturgical rank. Keep Capitalized
 #: includes/enums/LitGrade.php:100
 msgid "Optional memorial"
-msgstr ""
+msgstr "Mémoire optionnelle"
 
 #. translators: liturgical rank. Keep Capitalized
 #: includes/enums/LitGrade.php:105
 msgid "Memorial"
-msgstr ""
+msgstr "Mémoire"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: includes/enums/LitGrade.php:110
