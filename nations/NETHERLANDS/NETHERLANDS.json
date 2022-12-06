@@ -1,0 +1,179 @@
+{
+    "LitCal": [
+        {
+            "Festivity": {
+                "tag": "StPeterCanisius",
+                "name": "Saint Peter Canisius, Priest and Doctor of the Church",
+                "grade": 3,
+                "day": 21,
+                "month": 12
+            },
+            "Metadata": {
+                "action": "setProperty",
+                "property": "grade",
+                "sinceYear": 1970
+            }
+        },
+        {
+            "Festivity": {
+                "tag": "H_Lidwina",
+                "name": "H. Lidwina, maagd",
+                "color": [
+                    "white"
+                ],
+                "grade": 4,
+                "day": 14,
+                "month": 6,
+                "common": [
+                    "Proper"
+                ],
+                "readings": {
+                    "FIRST_READING": "",
+                    "RESPONSORIAL_PSALM": "",
+                    "ALLELUIA_VERSE": "",
+                    "GOSPEL": ""
+                }
+            },
+            "Metadata": {
+                "action": "createNew",
+                "sinceYear": 1979
+            }
+        },
+        {
+            "Festivity": {
+                "tag": "MartelarenGorcum",
+                "name": "HH. Martelaren van Gorcum",
+                "color": [
+                    "red"
+                ],
+                "grade": 4,
+                "day": 9,
+                "month": 7,
+                "common": [
+                    "Proper"
+                ],
+                "readings": {
+                    "FIRST_READING": "",
+                    "RESPONSORIAL_PSALM": "",
+                    "ALLELUIA_VERSE": "",
+                    "GOSPEL": ""
+                }
+            },
+            "Metadata": {
+                "action": "createNew",
+                "sinceYear": 1979
+            }
+        },
+        {
+            "Festivity": {
+                "tag": "Brandsma",
+                "name": "Z. Titus Brandsma, priester en martelaar",
+                "color": [
+                    "red"
+                ],
+                "grade": 3,
+                "day": 27,
+                "month": 7,
+                "common": [
+                    "Martyrs"
+                ]
+            },
+            "Metadata": {
+                "action": "createNew",
+                "sinceYear": 1979
+            }
+        },
+        {
+            "Festivity": {
+                "tag": "Verjaardag_Wijding_kerken",
+                "name": "Verjaardag van de Wijding van alle kerken waarvan de wijdingsdatum niet bekend is",
+                "color": [
+                    "white"
+                ],
+                "grade": 6,
+                "day": 25,
+                "month": 10,
+                "common": [
+                    "Proper"
+                ],
+                "readings": {
+                    "FIRST_READING": "",
+                    "RESPONSORIAL_PSALM": "",
+                    "ALLELUIA_VERSE": "",
+                    "GOSPEL": ""
+                }
+            },
+            "Metadata": {
+                "action": "createNew",
+                "sinceYear": 1979
+            }
+        },
+        {
+            "Festivity": {
+                "tag": "Verkondigers",
+                "name": "Alle HH. Verkondigers van het geloof in onze streken",
+                "color": [
+                    "white"
+                ],
+                "grade": 4,
+                "day": 6,
+                "month": 11,
+                "common": [
+                    "Proper"
+                ],
+                "readings": {
+                    "FIRST_READING": "",
+                    "RESPONSORIAL_PSALM": "",
+                    "ALLELUIA_VERSE": "",
+                    "GOSPEL": ""
+                }
+            },
+            "Metadata": {
+                "action": "createNew",
+                "sinceYear": 1979
+            }
+        },
+        {
+            "Festivity": {
+                "tag": "Willibrord",
+                "name": "H. Willibrord, bisschop, verkondiger van ons geloof, patroon van de Nederlandse kerkprovincie",
+                "color": [
+                    "white"
+                ],
+                "grade": 6,
+                "day": 7,
+                "month": 11,
+                "common": [
+                    "Proper"
+                ],
+                "readings": {
+                    "FIRST_READING": "",
+                    "RESPONSORIAL_PSALM": "",
+                    "ALLELUIA_VERSE": "",
+                    "GOSPEL": ""
+                }
+            },
+            "Metadata": {
+                "action": "createNew",
+                "sinceYear": 1979
+            }
+        }
+    ],
+    "Settings": {
+        "Epiphany": "SUNDAY_JAN2_JAN8",
+        "Ascension": "SUNDAY",
+        "CorpusChristi": "SUNDAY",
+        "Locale": "nl_NL"
+    },
+    "Metadata": {
+        "Region": "NETHERLANDS",
+        "WiderRegion": {
+            "name": "Europe",
+            "jsonFile": "nations\/Europe.json",
+            "i18nFile": "nations\/EUROPE\/nl_NL.json"
+        },
+        "Missals": [
+            "NETHERLANDS_1978"
+        ]
+    }
+}

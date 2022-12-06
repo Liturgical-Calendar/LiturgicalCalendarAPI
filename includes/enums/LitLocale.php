@@ -1,16 +1,13 @@
 <?php
 
 class LitLocale {
-    const ENGLISH               = "EN";
-    const FRENCH                = "FR";
-    const GERMAN                = "DE";
-    const ITALIAN               = "IT";
     const LATIN                 = "LA";
-    const PORTUGUESE            = "PT";
-    const SPANISH               = "ES";
-    public static array $values = [ "EN", "FR", "DE", "IT", "LA", "PT", "ES" ];
+    public static array $values = [ "LA" ];
 
     public static function isValid( $value ) {
-        return in_array( $value, self::$values );
+        $AllAvailableLocales = array_filter(ResourceBundle::getLocales(''), function ($value) {
+            return strpos($value, 'POSIX') === false;
+        });
+        return in_array( $value, self::$values ) || in_array( $value, $AllAvailableLocales ) || in_array( strtolower( $value ), $AllAvailableLocales );
     }
 }

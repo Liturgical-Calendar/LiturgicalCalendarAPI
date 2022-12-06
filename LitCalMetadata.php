@@ -14,12 +14,18 @@ header( 'Access-Control-Max-Age: 86400' );    // cache for 1 day
 header( 'Cache-Control: must-revalidate, max-age=259200' );
 header( 'Content-Type: application/json' );
 
-//National Calendars are defined in the LitCalAPI engine itself,
-//so we don't really have any way of detecting them except declaring them explicitly here
-//If we eventually succeed in finding a rational way to separate national calendars from the central API,
-//then perhaps we will also be able to automatically detect which national calendars are defined
-//Until then, we'll just use this array, and add to it if a new national calendar is built into the LitCalAPI class
-$baseNationalCalendars = [ "ITALY", "USA", "VATICAN" ];
+$widerRegionCalendars = [];
+foreach (glob("nations/*.json") as $filename) {
+    $widerRegionCalendars[] = strtoupper( basename($filename, ".json") );
+}
+
+$baseNationalCalendars = [ "VATICAN" ];
+$directories = array_map('basename', glob( 'nations/*' , GLOB_ONLYDIR) );
+foreach( $directories as $directory ) {
+    if( file_exists( "nations/$directory/$directory.json" ) ) {
+        $baseNationalCalendars[] = $directory;
+    }
+}
 
 if( file_exists( 'nations/index.json' ) ) {
     $index = file_get_contents( 'nations/index.json' );
@@ -41,7 +47,8 @@ if( file_exists( 'nations/index.json' ) ) {
                 $nationalCalendarsMetadata[$diocesanCalendars[$key]["nation"]] = [
                     "missals" => [],
                     "widerRegions" => [],
-                    "dioceses" => []
+                    "dioceses" => [],
+                    "settings" => []
                 ];
             }
             $nationalCalendars[$diocesanCalendars[$key]["nation"]][] = $key;
@@ -56,6 +63,7 @@ if( file_exists( 'nations/index.json' ) ) {
                 $nationData = json_decode( file_get_contents( "nations/$nation/$nation.json" ) );
                 $nationalCalendarsMetadata[$nation]["missals"] = $nationData->Metadata->Missals;
                 $nationalCalendarsMetadata[$nation]["widerRegions"][] = $nationData->Metadata->WiderRegion->name;
+                $nationalCalendarsMetadata[$nation]["settings"] = $nationData->Settings;
             }
         }
         $filterDirResults = ['..', '.', 'index.json'];
