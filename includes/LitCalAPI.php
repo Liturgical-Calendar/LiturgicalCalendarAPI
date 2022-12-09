@@ -2552,9 +2552,9 @@ class LitCalAPI {
     private function prepareL10N() : void {
         $baseLocale = strtolower( explode( '_', $this->LitSettings->Locale )[0] );
         $localeArray = [
-            $this->LitSettings->Locale,
             $this->LitSettings->Locale . '.utf8',
             $this->LitSettings->Locale . '.UTF-8',
+            $this->LitSettings->Locale,
             $baseLocale . '_' . strtoupper( $baseLocale ) . '.utf8',
             $baseLocale . '_' . strtoupper( $baseLocale ) . '.UTF-8',
             $baseLocale . '_' . strtoupper( $baseLocale ),
