@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2022-12-06 19:01+0000\n"
-"PO-Revision-Date: 2022-12-06 06:17+0000\n"
+"PO-Revision-Date: 2022-12-09 22:17+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: German <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/de/>\n"
@@ -803,7 +803,7 @@ msgstr ""
 #. translators: liturgical rank. Keep Capitalized
 #: includes/enums/LitGrade.php:100
 msgid "Optional memorial"
-msgstr "Optionale Gedenkstät"
+msgstr "Nichtgebotener Gedenktag"
 
 #. translators: liturgical rank. Keep Capitalized
 #: includes/enums/LitGrade.php:105
@@ -823,7 +823,7 @@ msgstr "FEST DES HERRN"
 #. translators: liturgical rank. Keep UPPERCASE
 #: includes/enums/LitGrade.php:120
 msgid "SOLEMNITY"
-msgstr "FESTLICHKEIT"
+msgstr "HOCHFEST"
 
 #. translators: liturgical rank. Keep lowercase
 #: includes/enums/LitGrade.php:125
