@@ -21,14 +21,16 @@ $LatinMissals = array_filter( RomanMissal::$values, function($item){
     return str_starts_with( $item, "VATICAN_" );
 });
 
-$LOCALE = isset( $_GET["locale"] ) && LitLocale::isValid( $_GET["locale"] ) ? $_GET["locale"] : "LA";
+$LOCALE = isset( $_GET["locale"] ) ? $_GET["locale"] : "la";
+$LOCALE = strtolower( explode('_', $LOCALE)[0] );
+$LOCALE = LitLocale::isValid( $LOCALE ) ? $LOCALE : "la";
 
 foreach( $LatinMissals as $LatinMissal ) {
     $DataFile = RomanMissal::getSanctoraleFileName( $LatinMissal );
     if( $DataFile !== false ) {
         $I18nPath = RomanMissal::getSanctoraleI18nFilePath( $LatinMissal );
-        if( $I18nPath !== false && file_exists( $I18nPath . "/" . strtolower( $LOCALE ) . ".json" ) ) {
-            $NAME = json_decode( file_get_contents( $I18nPath . "/" . strtolower( $LOCALE ) . ".json" ), true );
+        if( $I18nPath !== false && file_exists( $I18nPath . "/" . $LOCALE . ".json" ) ) {
+            $NAME = json_decode( file_get_contents( $I18nPath . "/" . $LOCALE . ".json" ), true );
             $DATA = json_decode( file_get_contents( $DataFile ), true );
             foreach( $DATA as $idx => $festivity ) {
                 $key = $festivity[ "TAG" ];
@@ -39,6 +41,37 @@ foreach( $LatinMissals as $LatinMissal ) {
         }
     }
 }
+
+$DataFile = 'data/memorialsFromDecrees/memorialsFromDecrees.json';
+$I18nFile = 'data/memorialsFromDecrees/i18n/' . $LOCALE . ".json";
+$DATA = json_decode( file_get_contents( $DataFile ), true );
+$NAME = json_decode( file_get_contents( $I18nFile ), true );
+foreach( $DATA as $idx => $festivity ) {
+    $key = $festivity[ "Festivity" ][ "TAG" ];
+    if( false === array_key_exists( $key, $FestivityCollection ) ) {
+        $FestivityCollection[ $key ] = $festivity[ "Festivity" ];
+        $FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
+        if( array_key_exists( "decreeLangs", $festivity[ "Metadata" ] ) ) {
+            $decreeURL = sprintf( $festivity[ "Metadata" ][ "decreeURL" ], 'LA' );
+            if( array_key_exists(strtoupper($LOCALE), $festivity[ "Metadata" ][ "decreeLangs" ]) ) {
+                $decreeLang = $festivity[ "Metadata" ][ "decreeLangs" ][ strtoupper( $LOCALE ) ];
+                $decreeURL = sprintf( $festivity[ "Metadata" ][ "decreeURL" ], $decreeLang );
+            }
+        } else {
+            $decreeURL = $festivity[ "Metadata" ][ "decreeURL" ];
+        }
+        $FestivityCollection[ $key ][ "DECREE" ] = $decreeURL;
+    }
+    else if ( $festivity[ "Metadata" ][ "action" ] === 'setProperty' ) {
+        if( $festivity[ "Metadata" ][ "property" ] === 'name' ) {
+            $FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
+        }
+        else if( $festivity[ "Metadata" ][ "property" ] === 'grade' ) {
+            $FestivityCollection[ $key ][ "GRADE" ] = $festivity[ "Festivity" ][ "GRADE" ];
+        }
+    }
+}
+
 
 $responseObj = [ "LitCalAllFestivities" => $FestivityCollection ];
 
