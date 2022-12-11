@@ -42,6 +42,18 @@ foreach( $LatinMissals as $LatinMissal ) {
     }
 }
 
+$DataFile = 'data/propriumdetempore.json';
+$I18nFile = 'data/propriumdetempore/' . $LOCALE . ".json";
+$DATA = json_decode( file_get_contents( $DataFile ), true );
+$NAME = json_decode( file_get_contents( $I18nFile ), true );
+foreach( $DATA as $key => $readings ) {
+    if( false === array_key_exists( $key, $FestivityCollection ) ) {
+        $FestivityCollection[ $key ] = $readings;
+        $FestivityCollection[ $key ][ "TAG" ] = $key;
+        $FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
+    }
+}
+
 $DataFile = 'data/memorialsFromDecrees/memorialsFromDecrees.json';
 $I18nFile = 'data/memorialsFromDecrees/i18n/' . $LOCALE . ".json";
 $DATA = json_decode( file_get_contents( $DataFile ), true );
@@ -69,6 +81,9 @@ foreach( $DATA as $idx => $festivity ) {
         else if( $festivity[ "Metadata" ][ "property" ] === 'grade' ) {
             $FestivityCollection[ $key ][ "GRADE" ] = $festivity[ "Festivity" ][ "GRADE" ];
         }
+    }
+    else if( $festivity[ "Metadata" ][ "action" ] === 'makeDoctor' ) {
+        $FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
     }
 }
 
