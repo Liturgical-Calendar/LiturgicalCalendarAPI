@@ -35,15 +35,22 @@ class LitSettings {
 
     //The upper limit is determined by the limit of PHP in dealing with DateTime objects
     const YEAR_UPPER_LIMIT          = 9999;
-  
+
+    private static function debugWrite( string $string ) {
+        file_put_contents( "debug.log", $string . PHP_EOL, FILE_APPEND );
+    }
+
     public function __construct( array $DATA ) {
         //we need at least a default value for the current year
         $this->Year = (int)date("Y");
+
         $SUPPORTED_NATIONAL_CALENDARS = [ "VATICAN" ];
-        $directories = array_map('basename', glob( '../nations/*' , GLOB_ONLYDIR) );
+        $directories = array_map('basename', glob( 'nations/*' , GLOB_ONLYDIR) );
+        //self::debugWrite(json_encode($directories));
         foreach( $directories as $directory ) {
-            if( file_exists( "../nations/$directory/$directory.json" ) ) {
-                $baseNationalCalendars[] = $directory;
+            //self::debugWrite($directory);
+            if( file_exists( "nations/$directory/$directory.json" ) ) {
+                $SUPPORTED_NATIONAL_CALENDARS[] = $directory;
             }
         }
 
