@@ -2345,7 +2345,11 @@ class LitCalAPI {
         foreach( $this->DiocesanData->LitCal as $key => $obj ) {
             //if sinceYear is undefined or null or empty, let's go ahead and create the event in any case
             //creation will be restricted only if explicitly defined by the sinceYear property
-            if( $this->LitSettings->Year >= $obj->Metadata->sinceYear || $obj->Metadata->sinceYear === null || $obj->Metadata->sinceYear === 0 ) {
+            if(
+                ($this->LitSettings->Year >= $obj->Metadata->sinceYear || $obj->Metadata->sinceYear === null || $obj->Metadata->sinceYear === 0)
+                &&
+                (false === property_exists($obj->Metadata, 'untilYear') || $this->LitSettings->Year <= $obj->Metadata->untilYear || $obj->Metadata->untilYear === null || $obj->Metadata->untilYear === 0)
+            ) {
                 $currentFeastDate = LitDateTime::createFromFormat( '!j-n-Y', $obj->Festivity->day . '-' . $obj->Festivity->month . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
                 if( $obj->Festivity->grade > LitGrade::FEAST ) {
                     if( $this->Cal->inSolemnities( $currentFeastDate ) && $key != $this->Cal->solemnityKeyFromDate( $currentFeastDate ) ) {
