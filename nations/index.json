@@ -47,8 +47,8 @@
         "diocese": "Breda"
     },
     "HAARLEMAMSTERDAM": {
-        "path": "nations\/NETHERLANDS\/Haarlem- Amsterdam.json",
+        "path": "nations\/NETHERLANDS\/Haarlem-Amsterdam.json",
         "nation": "NETHERLANDS",
-        "diocese": "Haarlem- Amsterdam"
+        "diocese": "Haarlem-Amsterdam"
     }
 }
