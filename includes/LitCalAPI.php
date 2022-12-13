@@ -2405,23 +2405,33 @@ class LitCalAPI {
                 break;
             case 'string':
                 if( $row->Metadata->strtotime !== '' ) {
-                    if( preg_match('/(before|after)/', $row->Metadata->strtotime) !== false ) {
+                    if( preg_match('/(before|after)/', $row->Metadata->strtotime) !== false && preg_match('/(before|after)/', $row->Metadata->strtotime) !== 0 ) {
                         $match = preg_split( '/(before|after)/', $row->Metadata->strtotime, -1, PREG_SPLIT_DELIM_CAPTURE );
-                        $festivityDateTS = strtotime( $match[2] . ' ' . $this->LitSettings->Year . ' UTC'  );
-                        if( $festivityDateTS !== false ) {
-                            $DATE = new LitDateTime( "@$festivityDateTS" );
-                            $DATE->setTimeZone(new DateTimeZone('UTC'));
-                            if( $match[1] === 'before' ) {
-                                $DATE->modify( "previous {$match[0]}" );
-                            } else if ( $match[1] === 'after' ) {
-                                $DATE->modify( "next {$match[0]}" );
+                        if( $match !== false && count($match) === 3 ) {
+                            $festivityDateTS = strtotime( $match[2] . ' ' . $this->LitSettings->Year . ' UTC'  );
+                            if( $festivityDateTS !== false ) {
+                                $DATE = new LitDateTime( "@$festivityDateTS" );
+                                $DATE->setTimeZone(new DateTimeZone('UTC'));
+                                if( $match[1] === 'before' ) {
+                                    $DATE->modify( "previous {$match[0]}" );
+                                } else if ( $match[1] === 'after' ) {
+                                    $DATE->modify( "next {$match[0]}" );
+                                }
+                                return $DATE;
+                            } else {
+                                $this->Messages[] = sprintf(
+                                    /**translators: Do not translate 'strtotime'! */
+                                    'Could not interpret the \'strtotime\' property with value %1$s into a timestamp',
+                                    $row->Metadata->strtotime
+                                );
+                                return false;
                             }
-                            return $DATE;
                         } else {
                             $this->Messages[] = sprintf(
                                 /**translators: Do not translate 'strtotime'! */
-                                'Could not interpret the \'strtotime\' property with value %1$s into a timestamp',
-                                $row->Metadata->strtotime
+                                'Could not interpret the \'strtotime\' property with value %1$s into a timestamp. Splitting failed: %2$s',
+                                $row->Metadata->strtotime,
+                                json_encode($match)
                             );
                             return false;
                         }
