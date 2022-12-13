@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-06 19:01+0000\n"
+"POT-Creation-Date: 2022-12-13 14:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -237,17 +237,17 @@ msgid ""
 msgstr ""
 
 #. translators: e.g. 'Monday before Palm Sunday'
-#: includes/LitCalAPI.php:1243
+#: includes/LitCalAPI.php:1243 includes/LitCalAPI.php:2360
 msgid "before"
 msgstr ""
 
 #. translators: e.g. 'Monday after Pentecost'
-#: includes/LitCalAPI.php:1248
+#: includes/LitCalAPI.php:1248 includes/LitCalAPI.php:2366
 msgid "after"
 msgstr ""
 
 #. translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to
-#: includes/LitCalAPI.php:1253
+#: includes/LitCalAPI.php:1253 includes/LitCalAPI.php:2372
 #, php-format
 msgid ""
 "Cannot create mobile festivity '%1$s': can only be relative to festivity "
@@ -255,14 +255,14 @@ msgid ""
 msgstr ""
 
 #. translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to
-#: includes/LitCalAPI.php:1268
+#: includes/LitCalAPI.php:1268 includes/LitCalAPI.php:2390
 #, php-format
 msgid ""
 "Cannot create mobile festivity '%1$s' relative to festivity with key '%2$s'"
 msgstr ""
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created 2. list of properties
-#: includes/LitCalAPI.php:1276
+#: includes/LitCalAPI.php:1276 includes/LitCalAPI.php:2399
 #, php-format
 msgid ""
 "Cannot create mobile festivity '%1$s': when the 'strtotime' property is an "
@@ -270,7 +270,7 @@ msgid ""
 msgstr ""
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created
-#: includes/LitCalAPI.php:1296
+#: includes/LitCalAPI.php:1296 includes/LitCalAPI.php:2454
 #, php-format
 msgid ""
 "Cannot create mobile festivity '%1$s': 'strtotime' property must be either "
