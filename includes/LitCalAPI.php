@@ -76,8 +76,8 @@ class LitCalAPI {
         'chr', //Cherokee,
         'de', //German : has also spellout-ordinal-n, spellout-ordinal-r, spellout-ordinal-s 
               //        these seem to affect the article "the" preceding the ordinal, 
-              //        making it masculine, feminine, or neuter
-              //        but which is which between n-r-s?
+              //        making it masculine, feminine, or neuter (or plural)
+              //        but which is which between n-r-s? I believe r = masc, n = plural, s = neut?
               //        perhaps depends also on case: genitive, dative, etc.
         'dsb', //Lower Sorbian
         'dz', //Dzongha
