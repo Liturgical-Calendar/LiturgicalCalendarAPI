@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-13 14:01+0000\n"
+"POT-Creation-Date: 2022-12-13 15:13+0000\n"
 "PO-Revision-Date: 2022-12-06 23:10+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
@@ -72,7 +72,7 @@ msgstr "sabbatum ante Dominicam in Palmis"
 #: includes/LitCalAPI.php:1491 includes/LitCalAPI.php:1518
 #: includes/LitCalAPI.php:1628 includes/LitCalAPI.php:1641
 #: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:1683
-#: includes/FestivityCollection.php:365
+#: includes/FestivityCollection.php:366
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decretum Congregationis pro Cultu Divino"
 
@@ -580,15 +580,15 @@ msgid "or"
 msgstr "vel"
 
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
-#: includes/FestivityCollection.php:44
+#: includes/FestivityCollection.php:45
 msgid "YEAR"
 msgstr "ANNUM"
 
-#: includes/FestivityCollection.php:45
+#: includes/FestivityCollection.php:46
 msgid "Vigil Mass"
 msgstr "Missa in Vigilia"
 
-#: includes/FestivityCollection.php:359
+#: includes/FestivityCollection.php:360
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -599,7 +599,7 @@ msgstr ""
 "%6$s, prima praecedentia habet, ergo Missa vesperum et Missa in Vigilia "
 "servabuntur."
 
-#: includes/FestivityCollection.php:373
+#: includes/FestivityCollection.php:374
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -612,7 +612,7 @@ msgstr ""
 "Missa vesperum, cum Sollemnitas ultima neque Missa in Vigilia neque Primis "
 "Vesperis servabit."
 
-#: includes/FestivityCollection.php:383
+#: includes/FestivityCollection.php:384
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -625,7 +625,7 @@ msgstr ""
 "Missa vesperum, cum Sollemnitas prima neque Missa in Vigilia neque Primis "
 "Vesperis servabit."
 
-#: includes/FestivityCollection.php:443
+#: includes/FestivityCollection.php:444
 #, fuzzy, php-format
 #| msgid ""
 #| "The Vigil Mass for the %s '%s' coincides with the %s '%s' in the year %d. "

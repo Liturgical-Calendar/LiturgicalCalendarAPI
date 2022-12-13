@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-13 14:01+0000\n"
+"POT-Creation-Date: 2022-12-13 15:13+0000\n"
 "PO-Revision-Date: 2022-12-09 22:17+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Dutch <https://translate.johnromanodorazio.com/projects/"
@@ -75,7 +75,7 @@ msgstr "de zaterdag voorafgaand aan Palmzondag"
 #: includes/LitCalAPI.php:1491 includes/LitCalAPI.php:1518
 #: includes/LitCalAPI.php:1628 includes/LitCalAPI.php:1641
 #: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:1683
-#: includes/FestivityCollection.php:365
+#: includes/FestivityCollection.php:366
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decreet van de Congregatie voor de Goddelijke Eredienst"
 
@@ -602,15 +602,15 @@ msgid "or"
 msgstr "of"
 
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
-#: includes/FestivityCollection.php:44
+#: includes/FestivityCollection.php:45
 msgid "YEAR"
 msgstr "JAAR"
 
-#: includes/FestivityCollection.php:45
+#: includes/FestivityCollection.php:46
 msgid "Vigil Mass"
 msgstr "Vigiliemis"
 
-#: includes/FestivityCollection.php:359
+#: includes/FestivityCollection.php:360
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -621,7 +621,7 @@ msgstr ""
 "%5$d. Overeenkomstig %6$s heeft de eerste voorrang, waardoor de vigiliemis "
 "en het avondgebed op de vooravond zijn vastgesteld."
 
-#: includes/FestivityCollection.php:373
+#: includes/FestivityCollection.php:374
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -634,7 +634,7 @@ msgstr ""
 "de vooravond en een vigiliemis, terwijl het tweede hoogfeest geen avondgebed "
 "of een avondmis heeft."
 
-#: includes/FestivityCollection.php:383
+#: includes/FestivityCollection.php:384
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -647,7 +647,7 @@ msgstr ""
 "vooravond en een avondmis behoudt, terwijl het eerste hoogfeest geen "
 "vigiliemis of avondgebed heeft."
 
-#: includes/FestivityCollection.php:443
+#: includes/FestivityCollection.php:444
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "

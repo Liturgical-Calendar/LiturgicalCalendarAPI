@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-13 14:01+0000\n"
+"POT-Creation-Date: 2022-12-13 15:13+0000\n"
 "PO-Revision-Date: 2022-10-11 16:28+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -73,7 +73,7 @@ msgstr "sabato che precede la Domenica delle Palme"
 #: includes/LitCalAPI.php:1491 includes/LitCalAPI.php:1518
 #: includes/LitCalAPI.php:1628 includes/LitCalAPI.php:1641
 #: includes/LitCalAPI.php:1656 includes/LitCalAPI.php:1683
-#: includes/FestivityCollection.php:365
+#: includes/FestivityCollection.php:366
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decreto della Congregazione per il Culto Divino"
 
@@ -601,15 +601,15 @@ msgid "or"
 msgstr "oppure"
 
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
-#: includes/FestivityCollection.php:44
+#: includes/FestivityCollection.php:45
 msgid "YEAR"
 msgstr "ANNO"
 
-#: includes/FestivityCollection.php:45
+#: includes/FestivityCollection.php:46
 msgid "Vigil Mass"
 msgstr "Messa della vigilia"
 
-#: includes/FestivityCollection.php:359
+#: includes/FestivityCollection.php:360
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -620,7 +620,7 @@ msgstr ""
 "nell'anno %5$d. Secondo il %6$s, la prima ha la precedenza, pertanto la "
 "Messa nella Vigilia è confermata come anche i Primi Vespri."
 
-#: includes/FestivityCollection.php:373
+#: includes/FestivityCollection.php:374
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -633,7 +633,7 @@ msgstr ""
 "Vespri e una Messa di Vigilia, mentre l'ultima Solennità non avrà né i "
 "Secondi Vespri né una Messa serale."
 
-#: includes/FestivityCollection.php:383
+#: includes/FestivityCollection.php:384
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -646,7 +646,7 @@ msgstr ""
 "Secondi Vespri e una Messa serale, mentre la prima Solennità non avrà né una "
 "Messa di Vigilia né i Primi Vespri."
 
-#: includes/FestivityCollection.php:443
+#: includes/FestivityCollection.php:444
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
