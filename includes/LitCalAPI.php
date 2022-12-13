@@ -2351,21 +2351,21 @@ class LitCalAPI {
                 ) {
                     $festivity = $this->Cal->getFestivity( $row->Metadata->strtotime->festivityKey );
                     if( $festivity !== null ) {
-                        $relString = '';
+                        //$relString = '';
                         $DATE = clone( $festivity->date );
                         switch( $row->Metadata->strtotime->relativeTime ) {
                             case 'before':
                                 $DATE->modify("previous {$row->Metadata->strtotime->dayOfTheWeek}");
                                     /**translators: e.g. 'Monday before Palm Sunday' */
-                                $relString = _( 'before' );
+                                //$relString = _( 'before' );
                                 return $DATE;
-                            break;
+                                //break; //unnecessary seeing we are returning immediately
                             case 'after':
                                 $DATE->modify("next {$row->Metadata->strtotime->dayOfTheWeek}");
                                 /**translators: e.g. 'Monday after Pentecost' */
-                                $relString = _( 'after' );
+                                //$relString = _( 'after' );
                                 return $DATE;
-                            break;
+                                //break; //unnecessary seeing we are returning immediately
                             default:
                                 $this->Messages[] = sprintf(
                                     /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
@@ -2375,7 +2375,7 @@ class LitCalAPI {
                                     implode(', ', ['\'before\'', '\'after\''])
                                 );
                                 return false;
-                            break;
+                                //break; //unnecessary seeing we are returning immediately
                         }
                         /*
                         $dayOfTheWeek = $this->LitSettings->Locale === LitLocale::LATIN ? LitMessages::LATIN_DAYOFTHEWEEK[ $DATE->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $row->Festivity->DATE->format( 'U' ) ) );
