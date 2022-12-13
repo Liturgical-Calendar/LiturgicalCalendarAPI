@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-13 22:19+0000\n"
+"POT-Creation-Date: 2022-12-13 22:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,7 +67,7 @@ msgstr ""
 #: includes/LitCalAPI.php:1644 includes/LitCalAPI.php:1671
 #: includes/LitCalAPI.php:1781 includes/LitCalAPI.php:1794
 #: includes/LitCalAPI.php:1809 includes/LitCalAPI.php:1836
-#: includes/FestivityCollection.php:377
+#: includes/FestivityCollection.php:372
 msgid "Decree of the Congregation for Divine Worship"
 msgstr ""
 
@@ -532,7 +532,7 @@ msgstr ""
 msgid "Vigil Mass"
 msgstr ""
 
-#: includes/FestivityCollection.php:371
+#: includes/FestivityCollection.php:366
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -540,7 +540,7 @@ msgid ""
 "is confirmed as are I Vespers."
 msgstr ""
 
-#: includes/FestivityCollection.php:385
+#: includes/FestivityCollection.php:380
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -549,7 +549,7 @@ msgid ""
 "or an evening Mass."
 msgstr ""
 
-#: includes/FestivityCollection.php:395
+#: includes/FestivityCollection.php:390
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -558,7 +558,7 @@ msgid ""
 "Vigil Mass or Vespers I."
 msgstr ""
 
-#: includes/FestivityCollection.php:455
+#: includes/FestivityCollection.php:450
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
