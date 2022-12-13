@@ -6,6 +6,7 @@ include_once( 'includes/LitMessages.php' );
 include_once( 'includes/LitSettings.php' );
 include_once( 'includes/LitDateTime.php' );
 
+#[AllowDynamicProperties]
 class FestivityCollection {
 
     private array $festivities      = [];
