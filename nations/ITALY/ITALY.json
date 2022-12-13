@@ -47,7 +47,7 @@
         "WiderRegion": {
             "name": "Europe",
             "jsonFile": "nations\/Europe.json",
-            "i18nFile": "nations\/EUROPE\/it.json"
+            "i18nFile": "nations\/EUROPE\/it_IT.json"
         },
         "Missals": [
             "ITALY_1983",

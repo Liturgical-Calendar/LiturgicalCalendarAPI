@@ -6,6 +6,7 @@ include_once( 'includes/LitMessages.php' );
 include_once( 'includes/LitSettings.php' );
 include_once( 'includes/LitDateTime.php' );
 
+#[AllowDynamicProperties]
 class FestivityCollection {
 
     private array $festivities      = [];
@@ -26,7 +27,7 @@ class FestivityCollection {
     public function __construct( LitSettings $LitSettings ) {
         $this->LitSettings = $LitSettings;
         $this->dayOfTheWeek = IntlDateFormatter::create(
-            strtolower( $this->LitSettings->Locale ),
+            $this->LitSettings->Locale,
             IntlDateFormatter::FULL,
             IntlDateFormatter::NONE,
             'UTC',

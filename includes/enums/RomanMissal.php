@@ -11,6 +11,7 @@ class RomanMissal {
     const USA_EDITION_2011                      = "USA_2011";
     const ITALY_EDITION_1983                    = "ITALY_1983";
     const ITALY_EDITION_2020                    = "ITALY_2020";
+    const NETHERLANDS_EDITION_1978              = "NETHERLANDS_1978";
 
     public static array $values = [ 
         "VATICAN_1970",
@@ -20,7 +21,8 @@ class RomanMissal {
         "VATICAN_2008",
         "USA_2011",
         "ITALY_1983",
-        "ITALY_2020"
+        "ITALY_2020",
+        "NETHERLANDS_1978"
     ];
 
     public static array $names = [
@@ -31,7 +33,8 @@ class RomanMissal {
         self::EDITIO_TYPICA_TERTIA_EMENDATA_2008    => "Editio Typica Tertia Emendata 2008",
         self::USA_EDITION_2011                      => "2011 Roman Missal issued by the USCCB",
         self::ITALY_EDITION_1983                    => "Messale Romano ed. 1983 pubblicata dalla CEI",
-        self::ITALY_EDITION_2020                    => "Messale Romano ed. 2020 pubblicata dalla CEI"
+        self::ITALY_EDITION_2020                    => "Messale Romano ed. 2020 pubblicata dalla CEI",
+        self::NETHERLANDS_EDITION_1978              => "Romeins Missaal ed. 1978 goedgekeurd door de Nederlandse bisschoppenconferentie"
     ];
 
     public static array $jsonFiles = [
@@ -42,7 +45,8 @@ class RomanMissal {
         self::EDITIO_TYPICA_TERTIA_EMENDATA_2008    => "data/propriumdesanctis_2008/propriumdesanctis_2008.json",
         self::USA_EDITION_2011                      => "data/propriumdesanctis_USA_2011/propriumdesanctis_USA_2011.json",
         self::ITALY_EDITION_1983                    => "data/propriumdesanctis_ITALY_1983/propriumdesanctis_ITALY_1983.json",
-        self::ITALY_EDITION_2020                    => false
+        self::ITALY_EDITION_2020                    => false,
+        self::NETHERLANDS_EDITION_1978              => false
     ];
 
     public static array $i18nPath = [
@@ -53,7 +57,8 @@ class RomanMissal {
         self::EDITIO_TYPICA_TERTIA_EMENDATA_2008    => "data/propriumdesanctis_2008/i18n/",
         self::USA_EDITION_2011                      => false,
         self::ITALY_EDITION_1983                    => false,
-        self::ITALY_EDITION_2020                    => false
+        self::ITALY_EDITION_2020                    => false,
+        self::NETHERLANDS_EDITION_1978              => false
     ];
 
     public static array $yearLimits = [
@@ -66,7 +71,8 @@ class RomanMissal {
         //the festivities applied in the '83 edition were incorporated into the Latin 2002 edition,
         //therefore we no longer need to apply them after the year 2002 since the Latin edition takes precedence
         self::ITALY_EDITION_1983                    => [ "sinceYear" => 1983, "untilYear" => 2002 ],
-        self::ITALY_EDITION_2020                    => [ "sinceYear" => 2020 ]
+        self::ITALY_EDITION_2020                    => [ "sinceYear" => 2020 ],
+        self::NETHERLANDS_EDITION_1978              => [ "sinceYear" => 1979 ]
     ];
 
 

@@ -15,5 +15,40 @@
         "nation": "ITALY",
         "diocese": "Diocesi di Sora - Cassino - Aquino - Pontecorvo",
         "group": "Diocesi del Lazio"
+    },
+    "ROERMOND": {
+        "path": "nations\/NETHERLANDS\/Roermond.json",
+        "nation": "NETHERLANDS",
+        "diocese": "Roermond"
+    },
+    "SHERTOGENBOSCH": {
+        "path": "nations\/NETHERLANDS\/'s-Hertogenbosch.json",
+        "nation": "NETHERLANDS",
+        "diocese": "'s-Hertogenbosch"
+    },
+    "UTRECHT": {
+        "path": "nations\/NETHERLANDS\/Utrecht.json",
+        "nation": "NETHERLANDS",
+        "diocese": "Utrecht"
+    },
+    "ROTTERDAM": {
+        "path": "nations\/NETHERLANDS\/Rotterdam.json",
+        "nation": "NETHERLANDS",
+        "diocese": "Rotterdam"
+    },
+    "GRONINGENLEEUWARDEN": {
+        "path": "nations\/NETHERLANDS\/Groningen-Leeuwarden.json",
+        "nation": "NETHERLANDS",
+        "diocese": "Groningen-Leeuwarden"
+    },
+    "BREDA": {
+        "path": "nations\/NETHERLANDS\/Breda.json",
+        "nation": "NETHERLANDS",
+        "diocese": "Breda"
+    },
+    "HAARLEMAMSTERDAM": {
+        "path": "nations\/NETHERLANDS\/Haarlem-Amsterdam.json",
+        "nation": "NETHERLANDS",
+        "diocese": "Haarlem-Amsterdam"
     }
 }

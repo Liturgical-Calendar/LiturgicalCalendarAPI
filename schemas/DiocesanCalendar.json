@@ -54,9 +54,7 @@
                                 "name",
                                 "color",
                                 "grade",
-                                "common",
-                                "day",
-                                "month"
+                                "common"
                             ]
                         },
                         "Metadata": {
@@ -69,11 +67,17 @@
                                 "sinceYear": {
                                     "type": "integer"
                                 },
+                                "untilYear": {
+                                    "type": "integer"
+                                },
                                 "decreeURL": {
                                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/DecreeURL"
                                 },
                                 "decreeLangs": {
                                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/DecreeLangs"
+                                },
+                                "strtotime": {
+                                    "type": "string"
                                 }
                             },
                             "required": [
