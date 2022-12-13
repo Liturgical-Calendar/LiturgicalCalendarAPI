@@ -2341,6 +2341,124 @@ class LitCalAPI {
 
     }
 
+    private function interpretStrtotime( object $row, string $key ) : LitDateTime|false {
+        switch( gettype($row->Metadata->strtotime) ) {
+            case 'object':
+                if(
+                    property_exists( $row->Metadata->strtotime, 'dayOfTheWeek' )
+                    && property_exists( $row->Metadata->strtotime, 'relativeTime' )
+                    && property_exists( $row->Metadata->strtotime, 'festivityKey' )
+                ) {
+                    $festivity = $this->Cal->getFestivity( $row->Metadata->strtotime->festivityKey );
+                    if( $festivity !== null ) {
+                        $relString = '';
+                        $DATE = clone( $festivity->date );
+                        switch( $row->Metadata->strtotime->relativeTime ) {
+                            case 'before':
+                                $DATE->modify("previous {$row->Metadata->strtotime->dayOfTheWeek}");
+                                    /**translators: e.g. 'Monday before Palm Sunday' */
+                                $relString = _( 'before' );
+                                return $DATE;
+                            break;
+                            case 'after':
+                                $DATE->modify("next {$row->Metadata->strtotime->dayOfTheWeek}");
+                                /**translators: e.g. 'Monday after Pentecost' */
+                                $relString = _( 'after' );
+                                return $DATE;
+                            break;
+                            default:
+                                $this->Messages[] = sprintf(
+                                    /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
+                                    _( 'Cannot create mobile festivity \'%1$s\': can only be relative to festivity with key \'%2$s\' using keywords %3$s' ),
+                                    $row->Festivity->name,
+                                    $row->Metadata->strtotime->festivityKey,
+                                    implode(', ', ['\'before\'', '\'after\''])
+                                );
+                                return false;
+                            break;
+                        }
+                        /*
+                        $dayOfTheWeek = $this->LitSettings->Locale === LitLocale::LATIN ? LitMessages::LATIN_DAYOFTHEWEEK[ $DATE->format( 'w' ) ] : ucfirst( $this->dayOfTheWeek->format( $row->Festivity->DATE->format( 'U' ) ) );
+                        $row->Metadata->addedWhen = $dayOfTheWeek . ' ' . $relString . ' ' . $festivity->name;
+                        if( true === $this->checkCoincidencesNewMobileFestivity( $row ) ) {
+                            $this->createMobileFestivity( $row );
+                        }
+                        */
+                    } else {
+                        $this->Messages[] = sprintf(
+                            /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
+                            _( 'Cannot create mobile festivity \'%1$s\' relative to festivity with key \'%2$s\'' ),
+                            $row->Festivity->name,
+                            $row->Metadata->strtotime->festivityKey
+                        );
+                        return false;
+                    }
+                } else {
+                    $this->Messages[] = sprintf(
+                        /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created 2. list of properties */
+                        _( 'Cannot create mobile festivity \'%1$s\': when the \'strtotime\' property is an object, it must have properties %2$s' ),
+                        $row->Festivity->name,
+                        implode(', ', ['\'dayOfTheWeek\'', '\'relativeTime\'', '\'festivityKey\''])
+                    );
+                    return false;
+                }
+                break;
+            case 'string':
+                if( $row->Metadata->strtotime !== '' ) {
+                    if( preg_match('/(before|after)/', $row->Metadata->strtotime) !== false ) {
+                        $match = preg_split( '/(before|after)/', $row->Metadata->strtotime, -1, PREG_SPLIT_DELIM_CAPTURE );
+                        $festivityDateTS = strtotime( $match[2] . ' ' . $this->LitSettings->Year . ' UTC'  );
+                        if( $festivityDateTS !== false ) {
+                            $DATE = new LitDateTime( "@$festivityDateTS" );
+                            $DATE->setTimeZone(new DateTimeZone('UTC'));
+                            if( $match[1] === 'before' ) {
+                                $DATE->modify( "previous {$match[0]}" );
+                            } else if ( $match[1] === 'after' ) {
+                                $DATE->modify( "next {$match[0]}" );
+                            }
+                            return $DATE;
+                        } else {
+                            $this->Messages[] = sprintf(
+                                /**translators: Do not translate 'strtotime'! */
+                                'Could not interpret the \'strtotime\' property with value %1$s into a timestamp',
+                                $row->Metadata->strtotime
+                            );
+                            return false;
+                        }
+                    } else {
+                        $festivityDateTS = strtotime( $row->Metadata->strtotime . ' ' . $this->LitSettings->Year . ' UTC' );
+                        if( $festivityDateTS !== false ) {
+                            $DATE = new LitDateTime( "@$festivityDateTS" );
+                            $DATE->setTimeZone(new DateTimeZone('UTC'));
+                            //$row->Metadata->addedWhen = $row->Metadata->strtotime;
+                            /*if( true === $this->checkCoincidencesNewMobileFestivity( $row ) ) {
+                                $this->createMobileFestivity( $row );
+                            }*/
+                            return $DATE;
+                        } else {
+                            $this->Messages[] = sprintf(
+                                /**translators: Do not translate 'strtotime'! */
+                                'Could not interpret the \'strtotime\' property with value %1$s into a timestamp',
+                                $row->Metadata->strtotime
+                            );
+                            return false;
+                        }
+                    }
+                } else {
+                    return false;
+                }
+                break;
+            default:
+                $this->Messages[] = sprintf(
+                    /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created */
+                    _( 'Cannot create mobile festivity \'%1$s\': \'strtotime\' property must be either an object or a string! Currently it has type \'%2$s\'' ),
+                    $row->Festivity->name,
+                    gettype( $row->Metadata->strtotime )
+                );
+                return false;
+        }
+    }
+
     private function applyDiocesanCalendar() {
         foreach( $this->DiocesanData->LitCal as $key => $obj ) {
             //if sinceYear is undefined or null or empty, let's go ahead and create the event in any case
@@ -2348,16 +2466,36 @@ class LitCalAPI {
             if(
                 ($this->LitSettings->Year >= $obj->Metadata->sinceYear || $obj->Metadata->sinceYear === null || $obj->Metadata->sinceYear === 0)
                 &&
-                (false === property_exists($obj->Metadata, 'untilYear') || $this->LitSettings->Year <= $obj->Metadata->untilYear || $obj->Metadata->untilYear === null || $obj->Metadata->untilYear === 0)
+                (false === property_exists($obj->Metadata, 'untilYear') || $obj->Metadata->untilYear === null || $this->LitSettings->Year <= $obj->Metadata->untilYear || $obj->Metadata->untilYear === 0)
             ) {
-                $currentFeastDate = LitDateTime::createFromFormat( '!j-n-Y', $obj->Festivity->day . '-' . $obj->Festivity->month . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-                if( $obj->Festivity->grade > LitGrade::FEAST ) {
-                    if( $this->Cal->inSolemnities( $currentFeastDate ) && $key != $this->Cal->solemnityKeyFromDate( $currentFeastDate ) ) {
-                        //there seems to be a coincidence with a different Solemnity on the same day!
-                        //should we attempt to move to the next open slot?
-                        $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . $this->LitSettings->DiocesanCalendar . ": " .  sprintf(
-                            /**translators: 1: Festivity name, 2: Name of the diocese, 3: Festivity date, 4: Coinciding festivity name, 5: Requested calendar year */
-                            'The Solemnity \'%1$s\', proper to the calendar of the %2$s and usually celebrated on %3$s, coincides with the Sunday or Solemnity \'%4$s\' in the year %5$d! Does something need to be done about this?',
+                if( property_exists( $obj->Metadata, 'strtotime' ) ) {
+                    $currentFeastDate = $this->interpretStrtotime( $obj, $key );
+                } else {
+                    $currentFeastDate = LitDateTime::createFromFormat( '!j-n-Y', $obj->Festivity->day . '-' . $obj->Festivity->month . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
+                }
+                if( $currentFeastDate !== false ) {
+                    if( $obj->Festivity->grade > LitGrade::FEAST ) {
+                        if( $this->Cal->inSolemnities( $currentFeastDate ) && $key != $this->Cal->solemnityKeyFromDate( $currentFeastDate ) ) {
+                            //there seems to be a coincidence with a different Solemnity on the same day!
+                            //should we attempt to move to the next open slot?
+                            $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . $this->LitSettings->DiocesanCalendar . ": " .  sprintf(
+                                /**translators: 1: Festivity name, 2: Name of the diocese, 3: Festivity date, 4: Coinciding festivity name, 5: Requested calendar year */
+                                'The Solemnity \'%1$s\', proper to the calendar of the %2$s and usually celebrated on %3$s, coincides with the Sunday or Solemnity \'%4$s\' in the year %5$d! Does something need to be done about this?',
+                                '<i>' . $obj->Festivity->name . '</i>',
+                                $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese,
+                                '<b>' . $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ) . '</b>',
+                                '<i>' . $this->Cal->solemnityFromDate( $currentFeastDate )->name . '</i>',
+                                $this->LitSettings->Year
+                            );
+                        }
+                        $this->Cal->addFestivity( $this->LitSettings->DiocesanCalendar . "_" . $key, new Festivity( "[ " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " ] " . $obj->Festivity->name, $currentFeastDate, $obj->Festivity->color, LitFeastType::FIXED, $obj->Festivity->grade, $obj->Festivity->common ) );
+                    } else if ( $obj->Festivity->grade <= LitGrade::FEAST && !$this->Cal->inSolemnities( $currentFeastDate ) ) {
+                        $this->Cal->addFestivity( $this->LitSettings->DiocesanCalendar . "_" . $key, new Festivity( "[ " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " ] " . $obj->Festivity->name, $currentFeastDate, $obj->Festivity->color, LitFeastType::FIXED, $obj->Festivity->grade, $obj->Festivity->common ) );
+                    } else {
+                        $this->Messages[] = $this->LitSettings->DiocesanCalendar . ": " . sprintf(
+                            /**translators: 1: Festivity grade, 2: Festivity name, 3: Name of the diocese, 4: Festivity date, 5: Coinciding festivity name, 6: Requested calendar year */
+                            'The %1$s \'%2$s\', proper to the calendar of the %3$s and usually celebrated on %4$s, is suppressed by the Sunday or Solemnity %5$s in the year %6$d',
+                            $this->LitGrade->i18n( $obj->Festivity->grade, false ),
                             '<i>' . $obj->Festivity->name . '</i>',
                             $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese,
                             '<b>' . $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ) . '</b>',
@@ -2365,20 +2503,6 @@ class LitCalAPI {
                             $this->LitSettings->Year
                         );
                     }
-                    $this->Cal->addFestivity( $this->LitSettings->DiocesanCalendar . "_" . $key, new Festivity( "[ " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " ] " . $obj->Festivity->name, $currentFeastDate, $obj->Festivity->color, LitFeastType::FIXED, $obj->Festivity->grade, $obj->Festivity->common ) );
-                } else if ( $obj->Festivity->grade <= LitGrade::FEAST && !$this->Cal->inSolemnities( $currentFeastDate ) ) {
-                    $this->Cal->addFestivity( $this->LitSettings->DiocesanCalendar . "_" . $key, new Festivity( "[ " . $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese . " ] " . $obj->Festivity->name, $currentFeastDate, $obj->Festivity->color, LitFeastType::FIXED, $obj->Festivity->grade, $obj->Festivity->common ) );
-                } else {
-                    $this->Messages[] = $this->LitSettings->DiocesanCalendar . ": " . sprintf(
-                        /**translators: 1: Festivity grade, 2: Festivity name, 3: Name of the diocese, 4: Festivity date, 5: Coinciding festivity name, 6: Requested calendar year */
-                        'The %1$s \'%2$s\', proper to the calendar of the %3$s and usually celebrated on %4$s, is suppressed by the Sunday or Solemnity %5$s in the year %6$d',
-                        $this->LitGrade->i18n( $obj->Festivity->grade, false ),
-                        '<i>' . $obj->Festivity->name . '</i>',
-                        $this->GeneralIndex->{$this->LitSettings->DiocesanCalendar}->diocese,
-                        '<b>' . $this->dayAndMonth->format( $currentFeastDate->format( 'U' ) ) . '</b>',
-                        '<i>' . $this->Cal->solemnityFromDate( $currentFeastDate )->name . '</i>',
-                        $this->LitSettings->Year
-                    );
                 }
             }
         }
