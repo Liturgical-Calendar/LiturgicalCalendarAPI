@@ -1,0 +1,97 @@
+{
+    "LitCal": {
+        "HLaurentiusdiakenenmartelaarpatroonvanhetbisdom": {
+            "Festivity": {
+                "name": "H. Laurentius, diaken en martelaar, patroon van het bisdom",
+                "color": [
+                    "white",
+                    "red"
+                ],
+                "grade": 4,
+                "common": [
+                    "Proper"
+                ],
+                "day": 10,
+                "month": 8
+            },
+            "Metadata": {
+                "sinceYear": 1979,
+                "formRowNum": 0
+            }
+        },
+        "VerjaardagvandeWijdingvandekathedraal": {
+            "Festivity": {
+                "name": "Verjaardag van de Wijding van de kathedraal",
+                "color": [
+                    "white"
+                ],
+                "grade": 4,
+                "common": [
+                    "Dedication of a Church"
+                ],
+                "day": 8,
+                "month": 5
+            },
+            "Metadata": {
+                "sinceYear": 1979,
+                "formRowNum": 1
+            }
+        },
+        "HSwietbertbisschop": {
+            "Festivity": {
+                "name": "H. Swietbert, bisschop",
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Proper"
+                ],
+                "day": 1,
+                "month": 3
+            },
+            "Metadata": {
+                "sinceYear": 1979,
+                "formRowNum": 0
+            }
+        },
+        "HJeroenpriesterenmartelaar": {
+            "Festivity": {
+                "name": "H. Jeroen, priester en martelaar",
+                "color": [
+                    "red",
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Martyrs:For One Martyr",
+                    "Pastors:For Missionaries"
+                ],
+                "day": 17,
+                "month": 8
+            },
+            "Metadata": {
+                "sinceYear": 1979,
+                "formRowNum": 1
+            }
+        },
+        "MariaterWegheOnzeLieveVrouwvanHaastrecht": {
+            "Festivity": {
+                "name": "Maria ter Weghe – Onze Lieve Vrouw van Haastrecht",
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Proper"
+                ],
+                "day": 20,
+                "month": 10
+            },
+            "Metadata": {
+                "sinceYear": 2020,
+                "formRowNum": 2
+            }
+        }
+    }
+}
