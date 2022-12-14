@@ -348,8 +348,6 @@ class LitCalAPI {
                 }
             }
         }
-
-        $this->updateSettingsBasedOnDiocesanCalendar();
     }
 
     private function cacheFileIsAvailable() : bool {
@@ -1981,7 +1979,6 @@ class LitCalAPI {
                 $this->Messages[] = sprintf( _( "Error retrieving and decoding National data from file %s." ), $nationalDataFile ) . ": " . json_last_error_msg();
             }
         }
-        $this->updateSettingsBasedOnNationalCalendar();
     }
 
     private function handleMissingFestivity( object $row ) : void {
@@ -2891,8 +2888,10 @@ class LitCalAPI {
     public function Init(){
         $this->APICore->Init();
         $this->initParameterData();
-        $this->loadNationalCalendarData();
         $this->loadDiocesanCalendarData();
+        $this->loadNationalCalendarData();
+        $this->updateSettingsBasedOnNationalCalendar();
+        $this->updateSettingsBasedOnDiocesanCalendar();
         $this->APICore->setResponseContentTypeHeader();
 
         if( $this->cacheFileIsAvailable() ){
