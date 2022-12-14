@@ -5,7 +5,7 @@
  * Author: John Romano D'Orazio
  * Email: priest@johnromanodorazio.com
  * Licensed under the Apache 2.0 License
- * Version 3.6
+ * Version 3.7
  * Date Created: 27 December 2017
  */
 
