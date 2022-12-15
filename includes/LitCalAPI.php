@@ -22,7 +22,7 @@ include_once( "includes/pgettext.php" );
 
 class LitCalAPI {
 
-    const API_VERSION                               = '3.6';
+    const API_VERSION                               = '3.7';
     public APICore $APICore;
 
     private string $CacheDuration                   = "";
@@ -47,6 +47,147 @@ class LitCalAPI {
     private array $tempCal                          = [];
     private string $BaptismLordFmt;
     private string $BaptismLordMod;
+
+    /**
+     * The following schemas for ordinal spellouts have been taken from
+     * https://www.saxonica.com/html/documentation11/extensibility/localizing/ICU-numbering-dates/ICU-numbering.html
+     * 
+     * verbose forms supported by certain languages
+     *   (see https://www.saxonica.com/html/documentation9.6/extensibility/config-extend/localizing/ICU-numbering-dates/)
+     *   - such as "one hundred and two" of British English
+     *   - as opposed to the shorter "one hundred two" of US English
+     *   should not be necessary in this project,
+     *   as the weeks of the liturgical calendar don't get that far
+     *   so we will only consider the basic ordinal form, not the verbose form
+     * 
+     * plural forms supported by certain languages
+     *   - such as "los primeros hombres", "las primeras mujeres" in Spanish
+     *   also should not be necessary, since we refer to single weeks or days
+     *   so again in these cases we can stick with the singular masculine / feminine forms
+     */
+
+    private static $genericSpelloutOrdinal          = [
+        'af', //Afrikaans
+        'am', //Amharic
+        'as', //Assamese
+        'az', //Azerbaijani
+        'bn', //Bengali
+        'bo', //Tibetan
+        'chr', //Cherokee,
+        'de', //German : has also spellout-ordinal-n, spellout-ordinal-r, spellout-ordinal-s 
+              //        these seem to affect the article "the" preceding the ordinal, 
+              //        making it masculine, feminine, or neuter (or plural)
+              //        but which is which between n-r-s? I believe r = masc, n = plural, s = neut?
+              //        perhaps depends also on case: genitive, dative, etc.
+        'dsb', //Lower Sorbian
+        'dz', //Dzongha
+        'en', //English
+        'ee', //Ewe
+        'es', //Esperanto
+        'fi', //Finnish : also supports a myriad of other forms, too complicated to handle!
+        'fil', //Filipino
+        'gl', //Gallegan
+        'gu', //Gujarati
+        'ha', //Hausa
+        'haw', //Hawaiian
+        'hsb', //Upper Sorbian
+        'hu', //Hungarian
+        'id', //Indonesian
+        'ig', //Igbo
+        'ja', //Japanese
+        'kk', //Kazakh
+        'km', //Khmer
+        'kn', //Kannada
+        'kok', //Konkani
+        'jy', //Kirghiz
+        'lb', //Luxembourgish
+        'lkt', //Lakota
+        'ln', //Lingala
+        'lo', //Lao
+        'ml', //Malayalam
+        'mn', //Mongolian
+        'mr', //Marathi
+        'ms', //Malay
+        'my', //Burmese
+        'ne', //Nepali
+        'nl', //Dutch
+        'om', //Oromo
+        'or', //Oriva
+        'pa', //Panjabi
+        'ps', //Pushto
+        'si', //Sinhalese
+        'smn', //Inari Sami
+        'sr', //Serbian
+        'sw', //Swahili
+        'ta', //Tamil
+        'te', //Telugu
+        'th', //Thai
+        'to', //Tonga
+        'tr', //Turkish
+        'ug', //Uighur
+        'ur', //Urdu
+        'uz', //Uzbek
+        'vi', //Vietnamese
+        'wae', //Walser
+        'yi', //Yiddish
+        'yo', //Yoruba
+        'zh', //Chinese
+        'zu'  //Zulu
+    ];
+
+    private static $mascFemSpelloutOrdinal          = [
+        'ar', //Arabic
+        'ca', //Catalan
+        'es', //Spanish : also supports plural forms, as well as a masculine adjective form (? spellout-ordinal-masculine-adjective)
+        'fr', //French
+        'he', //Hebrew
+        'hi', //Hindi
+        'it', //Italian
+        'pt'  //Portuguese
+    ];
+
+    private static $mascFemNeutSpelloutOrdinal      = [
+        'be', //Belarusian
+        'el', //Greek
+        'hr', //Croatian
+        'nb', //Norwegian Bokmål
+        'ru', //Russian : also supports a myriad of other cases, too complicated to handle for now
+        'sv'  //Swedish : also supports spellout-ordinal-reale ?
+    ];
+
+    //even though these do not yet support spellout-ordinal, however they do support digits-ordinal
+    private static $noSpelloutOrdinal               = [
+        'bg', //Bulgarian
+        'bs', //Bosnian
+        'cs', //Czech
+        'cy', //Welsh
+        'et', //Estonian
+        'fa', //Persian
+        'fo', //Faroese
+        'ga', //Irish
+        'hy', //Armenian
+        'is', //Icelandic
+        'ka', //Georgian
+        'kl', //Greenlandic
+        'ko', //Korean : supports specific forms spellout-ordinal-native etc. but too complicated to handle for now
+        'lt', //Lithuanian
+        'lv', //Latvian
+        'mk', //Macedonian
+        'mt', //Maltese
+        'nn', //Norwegian Nynorsk
+        'pl', //Polish
+        'ro', //Romanian
+        'se', //Northern Sami
+        'sk', //Slovak
+        'sl', //Slovenian
+        'sq', //Albanian
+        'uq'  //Ukrainian
+    ];
+
+    //whatever does spellout-ordinal-common mean? perhaps it's common to both masculine and feminine? with neuter being different?
+    private static $commonNeutSpelloutOrdinal       = [
+        'da'  //Danish
+    ];
 
     public function __construct(){
         $this->APICore                              = new APICore();
@@ -207,8 +348,6 @@ class LitCalAPI {
                 }
             }
         }
-
-        $this->updateSettingsBasedOnDiocesanCalendar();
     }
 
     private function cacheFileIsAvailable() : bool {
@@ -219,18 +358,30 @@ class LitCalAPI {
     }
 
     private function createFormatters() : void {
-        $this->dayAndMonth = IntlDateFormatter::create( strtolower( $this->LitSettings->Locale ), IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "d MMMM" );
-        $this->dayOfTheWeek  = IntlDateFormatter::create( strtolower( $this->LitSettings->Locale ), IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEEE" );
-        $this->formatter = new NumberFormatter( strtolower( $this->LitSettings->Locale ), NumberFormatter::SPELLOUT );
-        switch( strtoupper(explode("_", $this->LitSettings->Locale)[0]) ){
-            case 'EN': //former LitLocale::ENGLISH
-                $this->formatter->setTextAttribute( NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal" );
-                $this->formatterFem = $this->formatter;
-            break;
-            default:
-                $this->formatter->setTextAttribute( NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal-masculine" );
-                $this->formatterFem = new NumberFormatter( strtolower( $this->LitSettings->Locale ), NumberFormatter::SPELLOUT );
-                $this->formatterFem->setTextAttribute( NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal-feminine" );
+        $baseLocale = Locale::getPrimaryLanguage($this->LitSettings->Locale);
+        $this->dayAndMonth = IntlDateFormatter::create( $baseLocale, IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "d MMMM" );
+        $this->dayOfTheWeek  = IntlDateFormatter::create( $baseLocale, IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEEE" );
+        $this->formatter = new NumberFormatter( $baseLocale, NumberFormatter::SPELLOUT );
+        //follow rules as indicated here: https://www.saxonica.com/html/documentation11/extensibility/localizing/ICU-numbering-dates/ICU-numbering.html
+        if( in_array( $baseLocale, self::$genericSpelloutOrdinal ) ) {
+            $this->formatter->setTextAttribute( NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal" );
+            //feminine version will be the same as masculine
+            $this->formatterFem = $this->formatter;
+        }
+        else if( in_array( $baseLocale, self::$mascFemSpelloutOrdinal ) || in_array( $baseLocale, self::$mascFemNeutSpelloutOrdinal ) ) {
+            $this->formatter->setTextAttribute( NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal-masculine" );
+            $this->formatterFem = new NumberFormatter( $baseLocale, NumberFormatter::SPELLOUT );
+            $this->formatterFem->setTextAttribute( NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal-feminine" );
+        }
+        else if( in_array( $baseLocale, self::$commonNeutSpelloutOrdinal ) ) {
+            $this->formatter->setTextAttribute( NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal-common" );
+            //feminine version will be the same as masculine
+            $this->formatterFem = $this->formatter;
+        }
+        else {
+            $this->formatter = new NumberFormatter( $baseLocale, NumberFormatter::ORDINAL );
+            //feminine version will be the same as masculine
+            $this->formatterFem = $this->formatter;
         }
     }
 
@@ -1828,7 +1979,6 @@ class LitCalAPI {
                 $this->Messages[] = sprintf( _( "Error retrieving and decoding National data from file %s." ), $nationalDataFile ) . ": " . json_last_error_msg();
             }
         }
-        $this->updateSettingsBasedOnNationalCalendar();
     }
 
     private function handleMissingFestivity( object $row ) : void {
@@ -2738,8 +2888,10 @@ class LitCalAPI {
     public function Init(){
         $this->APICore->Init();
         $this->initParameterData();
-        $this->loadNationalCalendarData();
         $this->loadDiocesanCalendarData();
+        $this->loadNationalCalendarData();
+        $this->updateSettingsBasedOnNationalCalendar();
+        $this->updateSettingsBasedOnDiocesanCalendar();
         $this->APICore->setResponseContentTypeHeader();
 
         if( $this->cacheFileIsAvailable() ){

@@ -187,7 +187,8 @@ class LitMessages {
      */
     public static function getOrdinal(int $num, string $LOCALE, NumberFormatter $formatter, array $latinOrdinals) : string {
         $ordinal = "";
-        switch(strtoupper(explode("_", $LOCALE)[0])) {
+        $baseLocale = $LOCALE !== "LA" && $LOCALE !== "la" ? Locale::getPrimaryLanguage($LOCALE) : "LA";
+        switch(strtoupper($baseLocale)) {
             case LitLocale::LATIN:
                 $ordinal = $latinOrdinals[$num];
             break;

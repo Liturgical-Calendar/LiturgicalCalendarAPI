@@ -283,13 +283,19 @@ class FestivityCollection {
         unset( $this->festivities[ $key ] );
     }
 
+    private function inOrdinaryTime( LitDateTime $date ) : bool {
+        return (
+            ( $date > $this->festivities[ "BaptismLord" ]->date && $date < $this->festivities[ "AshWednesday" ]->date )
+            ||
+            ( $date > $this->festivities[ "Pentecost" ]->date && $date < $this->festivities[ "Advent1" ]->date )
+        );
+    }
+
     public function setCyclesAndVigils() {
         foreach( $this->festivities as $key => $festivity ) {
             if ( self::DateIsNotSunday( $festivity->date ) && (int)$festivity->grade === LitGrade::WEEKDAY ) {
-                if ( $festivity->date < $this->festivities[ "Advent1" ]->date ) {
+                if( $this->inOrdinaryTime( $festivity->date ) ) {
                     $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::WEEKDAY_CYCLE[ ( $this->LitSettings->Year - 1 ) % 2 ] );
-                } else if ( $festivity->date >= $this->festivities[ "Advent1" ]->date ) {
-                    $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::WEEKDAY_CYCLE[ $this->LitSettings->Year % 2 ] );
                 }
             }
             //if we're dealing with a Sunday or a Solemnity or a Feast of the Lord, then we calculate the Sunday/Festive Cycle
