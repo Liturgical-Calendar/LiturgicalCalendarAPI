@@ -2702,7 +2702,7 @@ class LitCalAPI {
         $ical .= "CALSCALE:GREGORIAN\r\n";
         $ical .= "METHOD:PUBLISH\r\n";
         $ical .= "X-MS-OLK-FORCEINSPECTOROPEN:FALSE\r\n";
-        $ical .= "X-WR-CALNAME:Roman Catholic Universal Liturgical Calendar " . strtoupper( $this->LitSettings->Locale ) . "\r\n";
+        $ical .= "X-WR-CALNAME:Roman Catholic Universal Liturgical Calendar " . strtoupper( substr( $this->LitSettings->Locale, 0, 2 ) ) . "\r\n";
         $ical .= "X-WR-TIMEZONE:Europe/Vatican\r\n"; //perhaps allow this to be set through a GET or POST?
         $ical .= "X-PUBLISHED-TTL:PT1D\r\n";
         foreach( $SerializeableLitCal->LitCal as $FestivityKey => $CalEvent ){
@@ -2738,7 +2738,7 @@ class LitCalAPI {
             $htmlDescription = "<P DIR=LTR>" . $this->LitCommon->C( $CalEvent->common );
             $htmlDescription .=  '<BR>' . $displayGradeHTML;
             $htmlDescription .= (is_string($CalEvent->color) && $CalEvent->color != "") || (is_array($CalEvent->color) && count($CalEvent->color) > 0 ) ? "<BR>" . LitMessages::ParseColorString( $CalEvent->color, $this->LitSettings->Locale, true ) : "";
-            $htmlDescription .= property_exists( $CalEvent,'liturgicalyear' ) && $CalEvent->liturgicalYear !== null && $CalEvent->liturgicalYear != "" ? '<BR>' . $CalEvent->liturgicalYear . "</P>" : "</P>";
+            $htmlDescription .= property_exists( $CalEvent,'liturgicalYear' ) && $CalEvent->liturgicalYear !== null && $CalEvent->liturgicalYear != "" ? '<BR>' . $CalEvent->liturgicalYear . "</P>" : "</P>";
             $ical .= "BEGIN:VEVENT\r\n";
             $ical .= "CLASS:PUBLIC\r\n";
             $ical .= "DTSTART;VALUE=DATE:" . $CalEvent->date->format( 'Ymd' ) . "\r\n";// . "T" . $CalEvent->date->format( 'His' ) . "Z\r\n";
@@ -2754,7 +2754,7 @@ class LitCalAPI {
             $desc = "DESCRIPTION:" . str_replace( ',','\,', $description );
             $ical .= strlen( $desc ) > 75 ? rtrim( chunk_split( $desc,71,"\r\n\t" ) ) . "\r\n" : "$desc\r\n";
             $ical .= "LAST-MODIFIED:" . str_replace( ':' , '', str_replace( '-', '', $publishDate ) ) . "\r\n";
-            $summaryLang = ";LANGUAGE=" . strtolower( $this->LitSettings->Locale ); //strtolower( $this->LitSettings->Locale ) === "la" ? "" :
+            $summaryLang = ";LANGUAGE=" . strtolower( preg_replace('/_/', '-', $this->LitSettings->Locale ) );
             $summary = "SUMMARY".$summaryLang.":" . str_replace( ',','\,',str_replace( "\r\n"," ", $CalEvent->name ) );
             $ical .= strlen( $summary ) > 75 ? rtrim( chunk_split( $summary,75,"\r\n\t" ) ) . "\r\n" : $summary . "\r\n";
             $ical .= "TRANSP:TRANSPARENT\r\n";
