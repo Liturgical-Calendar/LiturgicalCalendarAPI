@@ -9,14 +9,6 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
-  - type: input
-    id: contact
-    attributes:
-      label: Contact Details
-      description: How can we get in touch with you if we need more info?
-      placeholder: ex. email@example.com
-    validations:
-      required: false
   - type: textarea
     id: what-happened
     attributes:
@@ -41,13 +33,13 @@ body:
   - type: dropdown
     id: browsers
     attributes:
-      label: Which browsers are you seeing the problem on?
+      label: Which browser or browsers are you seeing the problem on? (can select more than one)
       multiple: true
       options:
-        - Firefox
         - Chrome
+        - Edge
+        - Firefox
         - Safari
-        - Microsoft Edge
   - type: textarea
     id: error-messages
     attributes:
