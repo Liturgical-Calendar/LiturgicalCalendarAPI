@@ -41,8 +41,6 @@ body:
         - Firefox
         - Safari
         - N/A
-      value:
-        - N/A
   - type: textarea
     id: error-messages
     attributes:
