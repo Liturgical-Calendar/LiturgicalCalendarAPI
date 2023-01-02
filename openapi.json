@@ -1,12 +1,12 @@
 {
-  "openapi" : "3.0.0",
+  "openapi" : "3.1.0",
   "servers" : [ {
     "description" : "Liturgical Calendar API endpoint",
-    "url" : "https://johnromanodorazio.com/LiturgicalCalendar"
+    "url" : "https://litcal.johnromanodorazio.com/api/v3"
   } ],
   "info" : {
-    "description" : "An API which allows to retrieve data about the **Roman Calendar** for any given year, between 1970 and 9999. The data strives for historical accuracy (memorials and feast days are only generated from the year in which they were effectively introduced). The data is based on the original sources (Roman Missals, Decrees of the Congregation for Divine Worship, Mysterii Paschalis, etc.), not on data copied or retrieved from online sources which may not be accurate. The API offers multiple locales and multiple calendars, from the **General Roman Calendar** to national or diocesan calendars (as of v2.8 the only national calendars supported are **Italy** and **USA**, and the only diocesan calendar supported is **Diocese of Rome**).",
-    "version" : "2.8",
+    "description" : "An API which allows to retrieve data about the **Roman Calendar** for any given year, between 1970 and 9999. The data strives for historical accuracy (memorials and feast days are only generated from the year in which they were effectively introduced). The data is based on original sources (Roman Missals, Decrees of the Congregation for Divine Worship, Mysterii Paschalis, etc.), not on data copied or retrieved from online sources which may not be accurate. The API offers multiple locales and multiple calendars, from the **General Roman Calendar** to national or diocesan calendars.",
+    "version" : "3.8",
     "title" : "Liturgical Calendar",
     "contact" : {
       "email" : "priest@johnromanodorazio.com",
@@ -14,12 +14,12 @@
     },
     "license" : {
       "name" : "Apache 2.0",
-      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+      "url" : "https://www.apache.org/licenses/LICENSE-2.0"
     }
   },
   "tags" : [ {
     "name" : "Main API endpoint",
-    "description" : "All data is retrieve from this single endpoint"
+    "description" : "All liturgical data is retrieved from this endpoint"
   } ],
   "paths" : {
     "/LitCalEngine.php" : {
@@ -31,11 +31,10 @@
         "parameters" : [ {
           "in" : "query",
           "name" : "locale",
-          "description" : "request the localization of the returned events in a specific language (Latin, English, Italian)",
+          "description" : "request the localization of the returned events in a specific language; will not be considered if a National calendar or diocesan calendar is requested",
           "required" : false,
           "schema" : {
             "type" : "string",
-            "enum" : [ "LA", "EN", "IT" ],
             "default" : "LA"
           }
         }, {
@@ -91,22 +90,20 @@
           }
         }, {
           "in" : "query",
-          "name" : "nationalpreset",
+          "name" : "nationalcalendar",
           "description" : "requests liturgical calendar data for a particular geographic area, on a national level or according to specifications defined be one or more Episcopal Conferences or on a Roman Missal published for a certain language or geographic area.",
           "required" : false,
           "schema" : {
             "type" : "string",
-            "enum" : [ "", "VATICAN", "ITALY", "USA" ],
             "default" : ""
           }
         }, {
           "in" : "query",
-          "name" : "diocesanpreset",
+          "name" : "diocesancalendar",
           "description" : "requests liturgical calendar data for a particular diocese",
           "required" : false,
           "schema" : {
             "type" : "string",
-            "enum" : [ "", "DIOCESIDIROMA", "DIOCESILAZIO" ],
             "default" : ""
           }
         } ],
@@ -213,6 +210,42 @@
           }
         }
       }
+    },
+    "/LitCalMetadata.php" : {
+      "get" : {
+        "tags" : [ "Metadata API endpoint" ],
+        "summary" : "gives information about current supported national and diocesan calendars and relative locales",
+        "operationId" : "retrieveMetadataGET",
+        "responses" : {
+          "200" : {
+            "description" : "An index of currently supported national and diocesan calendars and relative locales",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LitCalMetadata"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Metadata API endpoint" ],
+        "summary" : "gives information about current supported national and diocesan calendars and relative locales",
+        "operationId" : "retrieveMetadataPOST",
+        "responses" : {
+          "200" : {
+            "description" : "An index of currently supported national and diocesan calendars and relative locales",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LitCalMetadata"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components" : {
@@ -227,14 +260,33 @@
               "type" : "object",
               "description" : "a liturgical event",
               "properties" : {
+                "eventIdx" : {
+                  "type" : "integer",
+                  "format" : "int32",
+                  "description" : "progressive index, one for each liturgical event. Not really very useful. The key that identifies the liturgical event is more useful."
+                },
                 "name" : {
                   "type" : "string",
                   "description" : "the name of the Liturgical Event, localized according to the requested locale or the requested calendar (will be in English for the national USA calendar, Italian for the national Italian calendar, etc.)"
                 },
+                "date" : {
+                  "type" : "integer",
+                  "description" : "a PHP style unix timestamp (seconds from the Unix Epoch) in UTC time. The time should be a zero value seeing that we deal only with all day events, and time is not of importance. For use in Javascript, multiply this value by 1000, because Javascript uses milliseconds as a base for timestamps, whereas PHP uses seconds. The timestamp value should be dealt with accordingly in each programming language used, as is if the language uses seconds as a base, or multiplying by 1000 if it uses milliseconds as a base."
+                },
                 "color" : {
-                  "type" : "string",
-                  "description" : "the liturgical color used for the current liturgical event. The color name is CSS ready, therefore it will always be in English. For display in other locales, the translation will need to be handled by the requesting application",
-                  "enum" : [ "green", "red", "white", "purple", "pink" ]
+                  "type" : "array",
+                  "description" : "the liturgical color used for the current liturgical event. The color name is CSS ready, therefore it will always be in English.",
+                  "items": {
+                    "type": "string",
+                    "enum" : [ "green", "red", "white", "purple", "pink" ]
+                  }
+                },
+                "colorLcl" : {
+                  "type" : "array",
+                  "description" : "Localized liturgical colors associated with the current liturgical event.",
+                  "items" : {
+                    "type" : "string"
+                  }
                 },
                 "type" : {
                   "type" : "string",
@@ -242,31 +294,74 @@
                   "enum" : [ "fixed", "mobile" ]
                 },
                 "grade" : {
-                  "description" : "The logical importance of the celebration, represented as a number from 0 to 7, used to calculate precedence compared to other possible events. The importance or precedence value will determine whether one event may suppress another event or have it moved to the next possible open slot according to certain criteria. A general association with liturgical terminology would be as follows * 0 = WEEKDAY * 1 = COMMEMORATION * 2 = OPTIONAL MEMORIAL * 3 = MEMORIAL * 4 = FEAST * 5 = FEAST OF THE LORD * 6 = SOLEMNITY * 7 = event that has precedence over a solemnity However this association is not suitable for displaying the actual *grade* (or *rank*) of the festivity in liturgical terms, because some events have a logical importance that does not correspond with their portrayed grade, for example \"All Souls Day\" is called a \"Commemoration\" and yet it is given the same importance as a solemnity. Thus \"All Souls Day\" will have a grade of 6, but should be displayed as \"Commemoration\" rather than as \"Solemnity\". Therefore the ***displayGrade*** property should be checked first, and if empty then the above indicated association should be valid and can be used",
+                  "description" : "The logical importance or rank of the current liturgical event, represented as a number from 0 to 7, used to calculate precedence compared to other possible events. The importance or precedence value will determine whether one event may suppress another event or have it moved to the next possible open slot according to certain criteria. A general association with liturgical terminology would be as follows * 0 = WEEKDAY * 1 = COMMEMORATION * 2 = OPTIONAL MEMORIAL * 3 = MEMORIAL * 4 = FEAST * 5 = FEAST OF THE LORD * 6 = SOLEMNITY * 7 = event that has precedence over a solemnity However this association is not suitable for displaying the actual *grade* (or *rank*) of the festivity in liturgical terms, because some events have a logical importance that does not correspond with their portrayed grade, for example \"All Souls Day\" is called a \"Commemoration\" and yet it is given the same importance as a solemnity. Thus \"All Souls Day\" will have a grade of 6, but should be displayed as \"Commemoration\" rather than as \"Solemnity\". Therefore the ***displayGrade*** property should be checked first, and if empty then the above indicated association should be valid and can be used",
                   "type" : "integer",
                   "format" : "int32",
                   "enum" : [ 0, 1, 2, 3, 4, 5, 6, 7 ]
                 },
-                "displaygrade" : {
+                "gradeLcl" : {
+                  "description" : "Localized string corresponding to the rank of the current liturgical event",
+                  "type": "string"
+                },
+                "displayGrade" : {
                   "type" : "string",
-                  "description" : "will often be empty, in which case the ***grade*** property can be used with the indicated association to liturgical terminology, for the purpose of displaying the rank of the current liturgical event. If non empty, will contain the localized rank of the liturgical event and should be used instead of the grade property for display purposes"
+                  "description" : "will often be empty, in which case the numeric ***grade*** property can be used to identify the liturgical rank, or the localized ***gradeLcl*** string can be used, for the purpose of displaying the rank of the current liturgical event. If non empty, will contain the localized rank of the liturgical event and should be used instead of the grade property or the gradeLcl property for display purposes"
                 },
                 "common" : {
                   "type" : "string",
                   "description" : "if the current liturgical event commemorates a saint, this value if non empty will indicate whether the readings are to be taken from the Proper of Saints (in which case it will have a value of \"Proper\") or from one of the Commons. In the latter case, if there is more than one possible common, the multiple possible commons will be listed as a comma separated list. Each common can be further specified by a particular category, in which case the specific category within the common will be separated from the common by a colon. Since we are dealing with a logical data structure the values are not localized, localization should be handled by the requesting application"
                 },
-                "date" : {
+                "commonLcl" : {
                   "type" : "string",
-                  "description" : "a PHP style unix timestamp (seconds from the Unix Epoch) in UTC time. The time should be a zero value seeing that we deal only with all day events, and time is not of importance. For use in Javascript, multiply this value by 1000, because Javascript uses milliseconds as a base for timestamps, whereas PHP uses seconds. The timestamp value should be dealt with accordingly in each programming language used, as is if the language uses seconds as a base, or multiplying by 1000 if it uses milliseconds as a base."
+                  "description" : "Localized string corresponding to the common used (if applicable) for the current liturgical event"
                 },
-                "eventidx" : {
+                "dayOfTheWeek_ISO8601" : {
                   "type" : "integer",
-                  "format" : "int32",
-                  "description" : "progressive index, one for each liturgical event. Not really very useful. The key that identifies the liturgical event is more useful."
+                  "description" : "ISO 8601 representation of the day of the week, 1 for Monday, 7 for Sunday",
+                  "minimum" : 1,
+                  "maximum" : 7
                 },
-                "liturgicalyear" : {
+                "month": {
+                  "type" : "integer",
+                  "description" : "Numeric representation of the month of the current liturgical event, 1 for January, 12 for December",
+                  "minimum" : 1,
+                  "maximum" : 12
+                },
+                "day": {
+                  "type" : "integer",
+                  "description" : "Numeric representation of the day of the month of the current liturgical event",
+                  "minimum" : 1,
+                  "maximum" : 31
+                },
+                "year": {
+                  "type" : "integer",
+                  "description" : "Numeric representation of the year for the current liturgical event",
+                  "minimum" : 1970,
+                  "maximum" : 9999
+                },
+                "monthShort" : {
+                  "type" : "string",
+                  "description" : "Localized short form of the month for the current liturgical event"
+                },
+                "monthLong" : {
+                  "type" : "string",
+                  "description" : "Localized long form of the month for the current liturgical event"
+                },
+                "dayOfTheWeekShort" : {
+                  "type" : "string",
+                  "description" : "Localized short form of the day of the month for the current liturgical event"
+                },
+                "dayOfTheWeekLong" : {
+                  "type" : "string",
+                  "description" : "Localized long form of the day of the month for the current liturgical event"
+                },
+                "liturgicalYear" : {
                   "type" : "string",
                   "description" : "description of the liturgical cycle localized according to the requested locale (or national calendar). This property will only be present for events where it is applicable (Sundays or weekdays of Ordinary Time, Solemnities, Feasts of the Lord, in practice those liturgical events the texts of which are based on the liturgical cycle). When present, it will have a localized value of `YEAR A`, `YEAR B`, or `YEAR C` for festive events or a value of `YEAR I`, `YEAR II` for weekday events (whereas if an application makes a request for the Italian language or the national Italian calendar, the values will contain `ANNO` instead of `YEAR`, and likewise for any localization requested)."
+                },
+                "isVigilMass" : {
+                  "type" : "boolean",
+                  "description" : "`true` if the current liturgical event is a Vigil Mass, `false` if not"
                 },
                 "hasVigilMass" : {
                   "type" : "boolean",
@@ -279,6 +374,12 @@
                 "hasVesperII" : {
                   "type" : "boolean",
                   "description" : "this property will be present for applicable events such as Solemnities or Sundays. Will have a boolean value of `true` if the expected Second Vespers are confirmed, and of `false` if the expected Second Vespers are superseded by another liturgical event. Sometimes this will be established from year to year for specific coincidences by the Congregation for Divine Worship."
+                },
+                "psalterWeek" : {
+                  "type" : "integer",
+                  "description" : "Psalter week in which the current liturgical event falls, if applicable",
+                  "minimum" : 1,
+                  "maximum" : 4
                 }
               }
             }
@@ -287,35 +388,44 @@
             "type" : "object",
             "description" : "echoes back the settings that were requested for the generation of this specific liturgical calendar, as feedback to be sure that the requested settings were correctly applied",
             "properties" : {
-              "YEAR" : {
+              "Year" : {
                 "type" : "integer",
                 "format" : "int32",
-                "description" : "the year for which the liturgical calendar was requested"
+                "description" : "the year for which the liturgical calendar was requested",
+                "minimum" : 1970,
+                "maximum" : 9999
               },
-              "EPIPHANY" : {
+              "Epiphany" : {
                 "type" : "string",
                 "enum" : [ "JAN6", "SUNDAY_JAN2_JAN8" ],
                 "description" : "whether Epiphany was set to be celebrated on January 6th or on the Sunday between January 2nd and January 8th"
               },
-              "ASCENSION" : {
+              "Ascension" : {
                 "type" : "string",
                 "enum" : [ "SUNDAY", "THURSDAY" ],
                 "description" : "whether Ascension was set to be celebrated on Thursday or on Sunday"
               },
-              "CORPUSCHRISTI" : {
+              "CorpusChristi" : {
                 "type" : "string",
                 "enum" : [ "SUNDAY", "THURSDAY" ],
                 "description" : "whether Corpus Christi was set to be celebrated on Thursday or on Sunday"
               },
-              "LOCALE" : {
+              "Locale" : {
                 "type" : "string",
-                "enum" : [ "LA", "IT", "EN" ],
-                "description" : "the locale which has either been specifically requested using the `locale` parameter, or set by the requested national calendar (national calendar of Italy will automatically set the locale to IT)"
+                "description" : "the locale which has either been specifically requested using the `locale` parameter, or set by the requested national or diocesan calendar"
               },
-              "returntype" : {
+              "ReturnType" : {
                 "type" : "string",
                 "enum" : [ "JSON", "XML", "ICS" ],
                 "description" : "the type of data that was requested"
+              },
+              "NationalCalendar" : {
+                "type" : "string",
+                "description" : "National calendar requested, if any"
+              },
+              "DiocesanCalendar" : {
+                "type" : "string",
+                "description" : "Diocesan Calendar requested, if any"
               }
             }
           },
@@ -323,32 +433,15 @@
             "type" : "object",
             "description" : "contains information about the current endpoint versioning, and keys of liturgical events that can have precedence over others, useful for further calculations of a local calendar",
             "properties" : {
-              "FEASTS_MEMORIALS" : {
-                "type" : "object",
-                "description" : "the keys of this object identify the liturgical event",
-                "additionalProperties" : {
-                  "type" : "object",
-                  "description" : "a liturgical event that has a rank of feast or memorial, and which can therefore supersede a feast (if this event is a higher ranking feast of the Lord, of the BVM, of John the Baptist etc.), a memorial (if this event is a feast) or an optional memorial  (if this event is a memorial)",
-                  "properties" : {
-                    "date" : {
-                      "type" : "string",
-                      "description" : "the date of the liturgical event in the liturgical calendar for the given year (the time will be zeroed out because it is not of importance). Expected pattern is `YYYY-MM-DD 00:00:00.000000`."
-                    },
-                    "timezone_type" : {
-                      "type" : "integer",
-                      "description" : "describes the timezone type set on the DateTime object in the endpoint's PHP backend (only DateTime objects with type 3 timezones attached will allow for DST correction). The timezone will always be set to \"UTC\" and therefore the timezone type should always be of type 3, see https://www.php.net/manual/en/timezones.others.php",
-                      "format" : "int32",
-                      "enum" : [ 3 ]
-                    },
-                    "timezone" : {
-                      "type" : "string",
-                      "description" : "the timezone set on the DateTime object in the endpoint's PHP backend (it will always be set to \"UTC\", in order to ensure the date will remain unchanged anywhere in the world)",
-                      "enum" : [ "UTC" ]
-                    }
-                  }
-                }
+              "VERSION" : {
+                "type" : "string",
+                "description" : "current endpoint version"
               },
-              "SOLEMNITIES" : {
+              "RequestHeaders" : {
+                "type" : "string",
+                "description" : "echoes back the request headers that were received by the endpoint, for debugging purposes"
+              },
+              "Solemnities" : {
                 "type" : "object",
                 "description" : "the keys of this object identify the liturgical event",
                 "additionalProperties" : {
@@ -373,9 +466,30 @@
                   }
                 }
               },
-              "VERSION" : {
-                "type" : "string",
-                "description" : "current endpoint version"
+              "FeastsMemorials" : {
+                "type" : "object",
+                "description" : "the keys of this object identify the liturgical event",
+                "additionalProperties" : {
+                  "type" : "object",
+                  "description" : "a liturgical event that has a rank of feast or memorial, and which can therefore supersede a feast (if this event is a higher ranking feast of the Lord, of the BVM, of John the Baptist etc.), a memorial (if this event is a feast) or an optional memorial  (if this event is a memorial)",
+                  "properties" : {
+                    "date" : {
+                      "type" : "string",
+                      "description" : "the date of the liturgical event in the liturgical calendar for the given year (the time will be zeroed out because it is not of importance). Expected pattern is `YYYY-MM-DD 00:00:00.000000`."
+                    },
+                    "timezone_type" : {
+                      "type" : "integer",
+                      "description" : "describes the timezone type set on the DateTime object in the endpoint's PHP backend (only DateTime objects with type 3 timezones attached will allow for DST correction). The timezone will always be set to \"UTC\" and therefore the timezone type should always be of type 3, see https://www.php.net/manual/en/timezones.others.php",
+                      "format" : "int32",
+                      "enum" : [ 3 ]
+                    },
+                    "timezone" : {
+                      "type" : "string",
+                      "description" : "the timezone set on the DateTime object in the endpoint's PHP backend (it will always be set to \"UTC\", in order to ensure the date will remain unchanged anywhere in the world)",
+                      "enum" : [ "UTC" ]
+                    }
+                  }
+                }
               }
             }
           },
@@ -401,7 +515,7 @@
                 "properties" : {
                   "eventkey" : {
                     "type" : "string",
-                    "example" : "StsBasilGreg",
+                    "examples" : ["StsBasilGreg"],
                     "xml" : {
                       "attribute" : true
                     }
@@ -409,67 +523,67 @@
                   "name" : {
                     "type" : "string",
                     "description" : "the name of the Liturgical Event, localized according to the requested locale or the requested calendar (will be in English for the national USA calendar, Italian for the national Italian calendar, etc.)",
-                    "example" : "Saints Basil the Great and Gregory Nazianzen, bishops and doctors"
+                    "examples" : ["Saints Basil the Great and Gregory Nazianzen, bishops and doctors"]
                   },
                   "color" : {
                     "type" : "string",
                     "description" : "the liturgical color used for the current liturgical event. The color name is CSS ready, therefore it will always be in English. For display in other locales, the translation will need to be handled by the requesting application",
                     "enum" : [ "green", "red", "white", "purple", "pink" ],
-                    "example" : "white"
+                    "examples" : ["white"]
                   },
                   "type" : {
                     "type" : "string",
                     "description" : "whether the liturgical event is a fixed or a mobile festivity",
                     "enum" : [ "fixed", "mobile" ],
-                    "example" : "fixed"
+                    "examples" : ["fixed"]
                   },
                   "grade" : {
                     "description" : "The logical importance of the celebration, represented as a number from 0 to 7, used to calculate precedence compared to other possible events. The importance or precedence value will determine whether one event may suppress another event or have it moved to the next possible open slot according to certain criteria. A general association with liturgical terminology would be as follows * 0 = WEEKDAY * 1 = COMMEMORATION * 2 = OPTIONAL MEMORIAL * 3 = MEMORIAL * 4 = FEAST * 5 = FEAST OF THE LORD * 6 = SOLEMNITY * 7 = event that has precedence over a solemnity However this association is not suitable for displaying the actual *grade* (or *rank*) of the festivity in liturgical terms, because some events have a logical importance that does not correspond with their portrayed grade, for example \"All Souls Day\" is called a \"Commemoration\" and yet it is given the same importance as a solemnity. Thus \"All Souls Day\" will have a grade of 6, but should be displayed as \"Commemoration\" rather than as \"Solemnity\". Therefore the ***displayGrade*** property should be checked first, and if empty then the above indicated association should be valid and can be used",
                     "type" : "integer",
                     "format" : "int32",
                     "enum" : [ 0, 1, 2, 3, 4, 5, 6, 7 ],
-                    "example" : 3
+                    "examples" : [3]
                   },
                   "displaygrade" : {
                     "type" : "string",
                     "description" : "will often be empty, in which case the ***grade*** property can be used with the indicated association to liturgical terminology, for the purpose of displaying the rank of the current liturgical event. If non empty, will contain the localized rank of the liturgical event and should be used instead of the grade property for display purposes",
-                    "example" : ""
+                    "examples" : [""]
                   },
                   "common" : {
                     "type" : "string",
                     "description" : "if the current liturgical event commemorates a saint, this value if non empty will indicate whether the readings are to be taken from the Proper of Saints (in which case it will have a value of \"Proper\") or from one of the Commons. In the latter case, if there is more than one possible common, the multiple possible commons will be listed as a comma separated list. Each common can be further specified by a particular category, in which case the specific category within the common will be separated from the common by a colon. Since we are dealing with a logical data structure the values are not localized, localization should be handled by the requesting application",
-                    "example" : "Proper"
+                    "examples" : ["Proper"]
                   },
                   "date" : {
                     "type" : "string",
                     "description" : "a PHP style unix timestamp (seconds from the Unix Epoch) in UTC time. The time should be a zero value seeing that we deal only with all day events, and time is not of importance. For use in Javascript, multiply this value by 1000, because Javascript uses milliseconds as a base for timestamps, whereas PHP uses seconds. The timestamp value should be dealt with accordingly in each programming language used, as is if the language uses seconds as a base, or multiplying by 1000 if it uses milliseconds as a base.",
-                    "example" : 1577923200
+                    "examples" : [1577923200]
                   },
                   "eventidx" : {
                     "type" : "integer",
                     "format" : "int32",
                     "description" : "progressive index, one for each liturgical event. Not really very useful. The key that identifies the liturgical event is more useful.",
-                    "example" : 157
+                    "examples" : [157]
                   },
                   "liturgicalyear" : {
                     "type" : "string",
                     "description" : "description of the liturgical cycle localized according to the requested locale (or national calendar). This property will only be present for events where it is applicable (Sundays or weekdays of Ordinary Time, Solemnities, Feasts of the Lord, in practice those liturgical events the texts of which are based on the liturgical cycle). When present, it will have a localized value of `YEAR A`, `YEAR B`, or `YEAR C` for festive events or a value of `YEAR I`, `YEAR II` for weekday events (whereas if an application makes a request for the Italian language or the national Italian calendar, the values will contain `ANNO` instead of `YEAR`, and likewise for any localization requested).",
-                    "example" : ""
+                    "examples" : [""]
                   },
                   "hasVigilMass" : {
                     "type" : "boolean",
                     "description" : "this property will be present for applicable events such as Solemnities or Sundays. Will have a boolean value of `true` if the expected Vigil Mass is confirmed, and of `false` if the expected Vigil Mass is superseded by another liturgical event. Sometimes this will be established from year to year for specific coincidences by the Congregation for Divine Worship.",
-                    "example" : ""
+                    "examples" : [""]
                   },
                   "hasVesperI" : {
                     "type" : "boolean",
                     "description" : "this property will be present for applicable events such as Solemnities or Sundays. Will have a boolean value of `true` if the expected First Vespers are confirmed, and of `false` if the expected First Vespers are superseded by another liturgical event. Sometimes this will be established from year to year for specific coincidences by the Congregation for Divine Worship.",
-                    "example" : ""
+                    "examples" : [""]
                   },
                   "hasVesperII" : {
                     "type" : "boolean",
                     "description" : "this property will be present for applicable events such as Solemnities or Sundays. Will have a boolean value of `true` if the expected Second Vespers are confirmed, and of `false` if the expected Second Vespers are superseded by another liturgical event. Sometimes this will be established from year to year for specific coincidences by the Congregation for Divine Worship.",
-                    "example" : ""
+                    "examples" : [""]
                   }
                 }
               }
@@ -483,37 +597,36 @@
                 "type" : "integer",
                 "format" : "int32",
                 "description" : "the year for which the liturgical calendar was requested",
-                "example" : 2020
+                "examples" : [2020]
               },
               "EPIPHANY" : {
                 "type" : "string",
                 "enum" : [ "JAN6", "SUNDAY_JAN2_JAN8" ],
                 "description" : "whether Epiphany was set to be celebrated on January 6th or on the Sunday between January 2nd and January 8th",
-                "example" : "SUNDAY_JAN2_JAN8"
+                "examples" : ["SUNDAY_JAN2_JAN8"]
               },
               "ASCENSION" : {
                 "type" : "string",
                 "enum" : [ "SUNDAY", "THURSDAY" ],
                 "description" : "whether Ascension was set to be celebrated on Thursday or on Sunday",
-                "example" : "SUNDAY"
+                "examples" : ["SUNDAY"]
               },
               "CORPUSCHRISTI" : {
                 "type" : "string",
                 "enum" : [ "SUNDAY", "THURSDAY" ],
                 "description" : "whether Corpus Christi was set to be celebrated on Thursday or on Sunday",
-                "example" : "SUNDAY"
+                "examples" : ["SUNDAY"]
               },
               "LOCALE" : {
                 "type" : "string",
-                "enum" : [ "LA", "IT", "EN" ],
-                "description" : "the locale which has either been specifically requested using the `locale` parameter, or set by the requested national calendar (national calendar of Italy will automatically set the locale to IT)",
-                "example" : "EN"
+                "description" : "the locale which has either been specifically requested using the `locale` parameter, or set by the requested national calendar",
+                "examples" : ["EN"]
               },
               "RETURNTYPE" : {
                 "type" : "string",
                 "enum" : [ "JSON", "XML", "ICS" ],
                 "description" : "the type of data that was requested",
-                "example" : "XML"
+                "examples" : ["XML"]
               }
             }
           },
@@ -603,7 +716,9 @@
                 "items" : {
                   "type" : "string"
                 },
-                "example" : [ "<i>'4th Sunday of Ordinary Time'</i> is superseded by the FEAST OF THE LORD <i>'Presentation of the Lord'</i> in the year 2020.", "<i>'31st Sunday of Ordinary Time'</i> is superseded by the SOLEMNITY <i>'All Saints Day'</i> in the year 2020.", "The FEAST <i>'Saints Philip and James, Apostles'</i>, usually celebrated on <b>May 3rd</b>, is suppressed by the <i>celebration with precedence over solemnities</i> <i>'Fourth Sunday of Easter'</i> in the year 2020." ]
+                "examples" : [
+                  [ "<i>'4th Sunday of Ordinary Time'</i> is superseded by the FEAST OF THE LORD <i>'Presentation of the Lord'</i> in the year 2020.", "<i>'31st Sunday of Ordinary Time'</i> is superseded by the SOLEMNITY <i>'All Saints Day'</i> in the year 2020.", "The FEAST <i>'Saints Philip and James, Apostles'</i>, usually celebrated on <b>May 3rd</b>, is suppressed by the <i>celebration with precedence over solemnities</i> <i>'Fourth Sunday of Easter'</i> in the year 2020." ]
+                ]
               }
             }
           }
@@ -611,6 +726,158 @@
         "xml" : {
           "name" : "LiturgicalCalendar",
           "namespace" : "https://www.bibleget.io/catholicliturgy"
+        }
+      },
+      "LitCalMetadata" : {
+        "type" : "object",
+        "description" : "",
+        "properties" : {
+          "NationalCalendars" : {
+            "type" : "object",
+            "description" : "each property corresponds to supported national calendars, the value of which is an array corresponding to the supported diocesan calendars for the given national calendar",
+            "properties" : {
+              "VATICAN" : {
+                "type" : "array",
+                "description" : "empty array because there are no associated dioceses"
+              }
+            },
+            "patternProperties" : {
+              "^[A-Z]{3,45}$": {
+                "type" : "array",
+                "description" : "English name of a nation with a corresponding liturgical calendar; value is an array of the related supported diocesan calendars",
+                "items" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "NationalCalendarsMetadata" : {
+            "type" : "object",
+            "description" : "",
+            "patternProperties" : {
+              "^[A-Z]{3,45}$": {
+                "type" : "object",
+                "properties" : {
+                  "missals" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string"
+                    }
+                  },
+                  "widerRegions" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string"
+                    }
+                  },
+                  "dioceses" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string"
+                    }
+                  },
+                  "settings" : {
+                    "type" : "object",
+                    "properties" : {
+                      "Epiphany" : {
+                        "type" : "string",
+                        "enum" : [ "JAN6", "SUNDAY_JAN2_JAN8" ]
+                      },
+                      "Ascension" : {
+                        "type" : "string",
+                        "enum" : [ "SUNDAY", "THURSDAY" ]
+                      },
+                      "CorpusChristi" : {
+                        "type" : "string",
+                        "enum" : [ "SUNDAY", "THURSDAY" ]
+                      },
+                      "Locale" : {
+                        "type" : "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+          },
+          "DiocesanCalendars" : {
+            "type" : "object",
+            "patternProperties" : {
+              "^[A-Z]{3,45}$" : {
+                "type" : "object",
+                "description" : "Normalized name of the diocese, only uppercase characters (no spaces, hyphens, apostrophes, or non alphabetic characters of any kind)",
+                "properties" : {
+                  "nation" : {
+                    "type" : "string",
+                    "description" : "Uppercase English name of the nation that corresponds to the current diocesan calendar"
+                  },
+                  "diocese" : {
+                    "type" : "string",
+                    "description" : "Actual name of the diocese, including spaces, hyphens, apostrophes or any other character"
+                  },
+                  "group" : {
+                    "type" : "string",
+                    "description" : "Named group of diocesan calendars which can be pooled together"
+                  }
+                },
+                "required" : [ "nation", "diocese" ]
+              }
+            }
+          },
+          "DiocesanGroups" : {
+            "type" : "object",
+            "patternProperties" : {
+              "^[A-Za-z ]{3,45}$" : {
+                "type" : "array",
+                "description" : "Named groups of diocesan calendars which can be pooled together",
+                "items" : {
+                  "type" : "string",
+                  "description" : "Normalized name of the diocese, only uppercase characters (no spaces, hyphens, apostrophes, or non alphabetic characters of any kind)"
+                }
+              }
+            }
+          },
+          "WiderRegions" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "RomanMissals" : {
+            "type" : "object",
+            "properties" : {
+              "value" : {
+                "type" : "string"
+              },
+              "name" : {
+                "type" : "string"
+              },
+              "sanctoraleFileName" : {
+                "oneOf" : [
+                  {
+                    "type" : "string"
+                  },
+                  {
+                    "type" : "boolean"
+                  }
+                ]
+              },
+              "yearLimits" : {
+                "type" : "object",
+                "properties" : {
+                  "sinceYear" : {
+                    "type" : "integer"
+                  },
+                  "untilYear" : {
+                    "type" : "integer"
+                  }
+                },
+                "required" : [ "sinceYear" ]
+              }
+            },
+            "required" : [ "value", "name", "sanctoraleFileName", "yearLimits" ]
+          }
         }
       }
     }
