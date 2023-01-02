@@ -702,6 +702,17 @@ class LitCalAPI {
         }
         $this->Cal->addFestivity( "CorpusChristi", $CorpusChristi );
 
+        if( $this->LitSettings->Year >= 2000 ) {
+            if( $this->LitSettings->Locale === LitLocale::LATIN ) {
+                $divineMercySunday = $this->PropriumDeTempore[ "Easter2" ][ "NAME" ] . " vel Dominica Divinæ Misericordiæ";
+            } else {
+                $or = _( "or" );
+                /**translators: as instituted on the day of the canonization of St Faustina Kowalska by Pope John Paul II in the year 2000 */
+                $divineMercySunday = $this->PropriumDeTempore[ "Easter2" ][ "NAME" ] . " $or " . _( "Divine Mercy Sunday" );
+            }
+            $this->Cal->setProperty( "Easter2", "name", $divineMercySunday );
+        }
+
     }
 
     private function calculateAshWednesday() : void {
@@ -2892,6 +2903,7 @@ class LitCalAPI {
         $this->loadNationalCalendarData();
         $this->updateSettingsBasedOnNationalCalendar();
         $this->updateSettingsBasedOnDiocesanCalendar();
+        Festivity::setLocale( $this->LitSettings->Locale );
         $this->APICore->setResponseContentTypeHeader();
 
         if( $this->cacheFileIsAvailable() ){
