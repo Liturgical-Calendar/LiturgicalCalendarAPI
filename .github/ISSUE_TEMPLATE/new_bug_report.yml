@@ -33,13 +33,14 @@ body:
   - type: dropdown
     id: browsers
     attributes:
-      label: Which browser or browsers are you seeing the problem on? (can select more than one)
+      label: Which browser or browsers are you seeing the problem on? (can select more than one, or N/A if not applicable)
       multiple: true
       options:
         - Chrome
         - Edge
         - Firefox
         - Safari
+        - N/A
   - type: textarea
     id: error-messages
     attributes:
