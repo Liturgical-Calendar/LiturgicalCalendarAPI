@@ -110,8 +110,8 @@ class Festivity implements JsonSerializable
             'colorLcl'      => $this->colorLcl,
             'type'          => $this->type,
             'grade'         => $this->grade,
-            'displayGrade'  => $this->displayGrade,
             'gradeLcl'      => $this->gradeLcl,
+            'displayGrade'  => $this->displayGrade,
             'common'        => $this->common,
             'commonLcl'     => $this->commonLcl,
             'dayOfTheWeek_ISO8601'  => (int) $this->date->format('N'), //1 for Monday, 7 for Sunday
