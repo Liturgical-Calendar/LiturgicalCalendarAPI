@@ -22,7 +22,7 @@ include_once( "includes/pgettext.php" );
 
 class LitCalAPI {
 
-    const API_VERSION                               = '3.7';
+    const API_VERSION                               = '3.8';
     public APICore $APICore;
 
     private string $CacheDuration                   = "";
