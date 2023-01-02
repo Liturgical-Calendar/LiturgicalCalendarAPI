@@ -118,8 +118,8 @@ class Festivity implements JsonSerializable
             'month'                 => (int) $this->date->format('n'), //1 for January, 12 for December
             'day'                   => (int) $this->date->format('j'),
             'year'                  => (int) $this->date->format('Y'),
-            'monthLclShort'         => self::$monthShort->format( $this->date->format('U') ),
-            'monthLclLong'          => self::$monthLong->format( $this->date->format('U') ),
+            'monthShort'            => self::$monthShort->format( $this->date->format('U') ),
+            'monthLong'             => self::$monthLong->format( $this->date->format('U') ),
             'dayOfTheWeekShort'     => self::$dayOfTheWeekShort->format( $this->date->format('U') ),
             'dayOfTheWeekLong'      => self::$dayOfTheWeekLong->format( $this->date->format('U') )
         ];
