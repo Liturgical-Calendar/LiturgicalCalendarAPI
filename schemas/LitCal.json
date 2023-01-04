@@ -25,16 +25,7 @@
                             "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
                         },
                         "Locale": {
-                            "type": "string",
-                            "enum": [
-                                "DE",
-                                "EN",
-                                "ES",
-                                "FR",
-                                "IT",
-                                "LA",
-                                "PT"
-                            ]
+                            "type": "string"
                         },
                         "ReturnType": {
                             "type": "string",
