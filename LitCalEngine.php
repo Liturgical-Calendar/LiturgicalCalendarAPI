@@ -5,7 +5,7 @@
  * Author: John Romano D'Orazio
  * Email: priest@johnromanodorazio.com
  * Licensed under the Apache 2.0 License
- * Version 3.7
+ * Version 3.8
  * Date Created: 27 December 2017
  */
 
@@ -35,11 +35,12 @@
  * Editio typica tertia, 2002                                                     *
  * Editio typica tertia emendata, 2008                                            *
  * -----------------------------------                                            *
- * Roman Missal [ USA ], 2011                                                       *
+ * Roman Missal [ USA ], 2011                                                     *
  * -----------------------------------                                            *
- * Messale Romano [ ITALIA ], 1983                                                  *
- * Messale Romano [ ITALIA ], 2020                                                  *
- *                                                                                *
+ * Messale Romano [ ITALIA ], 1983                                                *
+ * Messale Romano [ ITALIA ], 2020                                                *
+ * -----------------------------------                                            *
+ * Romeins Missaal [ NETHERLANDS ], 1978
  *********************************************************************************/
 
 error_reporting( E_ALL );
