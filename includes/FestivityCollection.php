@@ -59,6 +59,9 @@ class FestivityCollection {
 
     public function addFestivity( string $key, Festivity $festivity ) : void {
         $this->festivities[ $key ] = $festivity;
+        if( $festivity->grade === LitGrade::HIGHER_SOLEMNITY ) {
+            $this->festivities[ $key ]->displayGrade = "";
+        }
         if( $festivity->grade >= LitGrade::FEAST_LORD ) {
             $this->solemnities[ $key ]  = $festivity->date;
         }

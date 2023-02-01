@@ -25,16 +25,7 @@
                             "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
                         },
                         "Locale": {
-                            "type": "string",
-                            "enum": [
-                                "DE",
-                                "EN",
-                                "ES",
-                                "FR",
-                                "IT",
-                                "LA",
-                                "PT"
-                            ]
+                            "type": "string"
                         },
                         "ReturnType": {
                             "type": "string",
@@ -152,17 +143,53 @@
                 "color": {
                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                 },
+                "colorLcl": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "type": {
                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitFeastType"
                 },
                 "grade": {
                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                 },
+                "gradeLcl": {
+                    "type": "string"
+                },
                 "displayGrade": {
                     "type": "string"
                 },
                 "common": {
                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
+                },
+                "commonLcl": {
+                    "type": "string"
+                },
+                "dayOfTheWeek_ISO8601": {
+                    "type": "integer"
+                },
+                "month": {
+                    "type": "integer"
+                },
+                "day": {
+                    "type": "integer"
+                },
+                "year": {
+                    "type": "integer"
+                },
+                "monthShort": {
+                    "type": "string"
+                },
+                "monthLong": {
+                    "type": "string"
+                },
+                "dayOfTheWeekShort": {
+                    "type": "string"
+                },
+                "dayOfTheWeekLong": {
+                    "type": "string"
                 },
                 "liturgicalYear": {
                     "type": "string"
@@ -178,6 +205,9 @@
                 },
                 "hasVesperII":  {
                     "type": "boolean"
+                },
+                "psalterWeek": {
+                    "type": "integer"
                 }
             },
             "required": [

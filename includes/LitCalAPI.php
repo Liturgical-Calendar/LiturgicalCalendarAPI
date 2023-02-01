@@ -22,7 +22,7 @@ include_once( "includes/pgettext.php" );
 
 class LitCalAPI {
 
-    const API_VERSION                               = '3.7';
+    const API_VERSION                               = '3.8';
     public APICore $APICore;
 
     private string $CacheDuration                   = "";
@@ -701,6 +701,17 @@ class LitCalAPI {
             $CorpusChristi = new Festivity( $this->PropriumDeTempore[ "CorpusChristi" ][ "NAME" ], LitFunc::calcGregEaster( $this->LitSettings->Year )->add( new DateInterval( 'P' . ( 7 * 9 ) . 'D' ) ),    LitColor::WHITE,    LitFeastType::MOBILE, LitGrade::HIGHER_SOLEMNITY );
         }
         $this->Cal->addFestivity( "CorpusChristi", $CorpusChristi );
+
+        if( $this->LitSettings->Year >= 2000 ) {
+            if( $this->LitSettings->Locale === LitLocale::LATIN ) {
+                $divineMercySunday = $this->PropriumDeTempore[ "Easter2" ][ "NAME" ] . " vel Dominica Divinæ Misericordiæ";
+            } else {
+                $or = _( "or" );
+                /**translators: as instituted on the day of the canonization of St Faustina Kowalska by Pope John Paul II in the year 2000 */
+                $divineMercySunday = $this->PropriumDeTempore[ "Easter2" ][ "NAME" ] . " $or " . _( "Divine Mercy Sunday" );
+            }
+            $this->Cal->setProperty( "Easter2", "name", $divineMercySunday );
+        }
 
     }
 
@@ -2702,7 +2713,7 @@ class LitCalAPI {
         $ical .= "CALSCALE:GREGORIAN\r\n";
         $ical .= "METHOD:PUBLISH\r\n";
         $ical .= "X-MS-OLK-FORCEINSPECTOROPEN:FALSE\r\n";
-        $ical .= "X-WR-CALNAME:Roman Catholic Universal Liturgical Calendar " . strtoupper( $this->LitSettings->Locale ) . "\r\n";
+        $ical .= "X-WR-CALNAME:Roman Catholic Universal Liturgical Calendar " . strtoupper( substr( $this->LitSettings->Locale, 0, 2 ) ) . "\r\n";
         $ical .= "X-WR-TIMEZONE:Europe/Vatican\r\n"; //perhaps allow this to be set through a GET or POST?
         $ical .= "X-PUBLISHED-TTL:PT1D\r\n";
         foreach( $SerializeableLitCal->LitCal as $FestivityKey => $CalEvent ){
@@ -2738,7 +2749,7 @@ class LitCalAPI {
             $htmlDescription = "<P DIR=LTR>" . $this->LitCommon->C( $CalEvent->common );
             $htmlDescription .=  '<BR>' . $displayGradeHTML;
             $htmlDescription .= (is_string($CalEvent->color) && $CalEvent->color != "") || (is_array($CalEvent->color) && count($CalEvent->color) > 0 ) ? "<BR>" . LitMessages::ParseColorString( $CalEvent->color, $this->LitSettings->Locale, true ) : "";
-            $htmlDescription .= property_exists( $CalEvent,'liturgicalyear' ) && $CalEvent->liturgicalYear !== null && $CalEvent->liturgicalYear != "" ? '<BR>' . $CalEvent->liturgicalYear . "</P>" : "</P>";
+            $htmlDescription .= property_exists( $CalEvent,'liturgicalYear' ) && $CalEvent->liturgicalYear !== null && $CalEvent->liturgicalYear != "" ? '<BR>' . $CalEvent->liturgicalYear . "</P>" : "</P>";
             $ical .= "BEGIN:VEVENT\r\n";
             $ical .= "CLASS:PUBLIC\r\n";
             $ical .= "DTSTART;VALUE=DATE:" . $CalEvent->date->format( 'Ymd' ) . "\r\n";// . "T" . $CalEvent->date->format( 'His' ) . "Z\r\n";
@@ -2754,7 +2765,7 @@ class LitCalAPI {
             $desc = "DESCRIPTION:" . str_replace( ',','\,', $description );
             $ical .= strlen( $desc ) > 75 ? rtrim( chunk_split( $desc,71,"\r\n\t" ) ) . "\r\n" : "$desc\r\n";
             $ical .= "LAST-MODIFIED:" . str_replace( ':' , '', str_replace( '-', '', $publishDate ) ) . "\r\n";
-            $summaryLang = ";LANGUAGE=" . strtolower( $this->LitSettings->Locale ); //strtolower( $this->LitSettings->Locale ) === "la" ? "" :
+            $summaryLang = ";LANGUAGE=" . strtolower( preg_replace('/_/', '-', $this->LitSettings->Locale ) );
             $summary = "SUMMARY".$summaryLang.":" . str_replace( ',','\,',str_replace( "\r\n"," ", $CalEvent->name ) );
             $ical .= strlen( $summary ) > 75 ? rtrim( chunk_split( $summary,75,"\r\n\t" ) ) . "\r\n" : $summary . "\r\n";
             $ical .= "TRANSP:TRANSPARENT\r\n";
@@ -2892,6 +2903,7 @@ class LitCalAPI {
         $this->loadNationalCalendarData();
         $this->updateSettingsBasedOnNationalCalendar();
         $this->updateSettingsBasedOnDiocesanCalendar();
+        Festivity::setLocale( $this->LitSettings->Locale );
         $this->APICore->setResponseContentTypeHeader();
 
         if( $this->cacheFileIsAvailable() ){
