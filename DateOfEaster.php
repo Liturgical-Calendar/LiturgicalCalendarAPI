@@ -20,11 +20,17 @@ if(file_exists('engineCache/easter/' . $LOCALE . '.json') ){
 include_once( 'includes/LitFunc.php' );
 include_once( 'includes/LitMessages.php' );
 
+$baseLocale = strtolower( explode( '_', $LOCALE )[0] );
 $localeArray = [
-    strtolower( $LOCALE ) . '_' . $LOCALE . '.utf8',
-    strtolower( $LOCALE ) . '_' . $LOCALE . '.UTF-8',
-    strtolower( $LOCALE ) . '_' . $LOCALE,
-    strtolower( $LOCALE )
+    $LOCALE . '.utf8',
+    $LOCALE . '.UTF-8',
+    $LOCALE,
+    $baseLocale . '_' . strtoupper( $baseLocale ) . '.utf8',
+    $baseLocale . '_' . strtoupper( $baseLocale ) . '.UTF-8',
+    $baseLocale . '_' . strtoupper( $baseLocale ),
+    $baseLocale . '.utf8',
+    $baseLocale . '.UTF-8',
+    $baseLocale
 ];
 setlocale( LC_ALL, $localeArray );
 $dayOfTheWeekDayMonthYear   = IntlDateFormatter::create( strtolower( $LOCALE ), IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEEE d MMMM yyyy" );
@@ -52,7 +58,7 @@ for($i=1583;$i<=9999;$i++){
     $gregDateString                     = "";
     $julianDateString                   = "";
     $westernJulianDateString            = "";
-    switch ($LOCALE) {
+    switch (strtoupper($baseLocale)) {
         case LitLocale::LATIN:
             $month                      = (int)$gregorian_easter->format('n'); //n      = 1-January to 12-December
             $monthLatin                 = LitMessages::LATIN_MONTHS[$month];
@@ -64,7 +70,7 @@ for($i=1583;$i<=9999;$i++){
             $monthLatin                 = LitMessages::LATIN_MONTHS[$month];
             $westernJulianDateString    = 'Dies Domini, ' . $western_julian_easter->format('j') . ' ' . $monthLatin . ' ' . $western_julian_easter->format('Y');
             break;
-        case LitLocale::ENGLISH:
+        case 'EN':
             $gregDateString             = $gregorian_easter->format('l, F jS, Y');
             $julianDateString           = 'Sunday' . $julian_easter->format(', F jS, Y');
             $westernJulianDateString    = $western_julian_easter->format('l, F jS, Y');
