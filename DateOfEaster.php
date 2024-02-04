@@ -5,11 +5,7 @@ ini_set("display_errors", 1);
 ini_set('date.timezone', 'Europe/Vatican');
 
 include_once( 'includes/enums/LitLocale.php' );
-$AvailableLocales = array_filter(ResourceBundle::getLocales(''), function ($value) {
-    return strpos($value, '_') === false;
-});
-
-$LOCALE = isset($_GET["locale"]) && in_array( strtolower($_GET["locale"]), $AvailableLocales) ? strtoupper($_GET["locale"]) : LitLocale::LATIN;
+$LOCALE = isset($_GET["locale"]) && LitLocale::isValid($_GET["locale"]) ? $_GET["locale"] : LitLocale::LATIN;
 
 if(file_exists('engineCache/easter/' . $LOCALE . '.json') ){
     header('Content-Type: application/json');
@@ -20,7 +16,7 @@ if(file_exists('engineCache/easter/' . $LOCALE . '.json') ){
 include_once( 'includes/LitFunc.php' );
 include_once( 'includes/LitMessages.php' );
 
-$baseLocale = strtolower( explode( '_', $LOCALE )[0] );
+$baseLocale = Locale::getPrimaryLanguage($LOCALE);
 $localeArray = [
     $LOCALE . '.utf8',
     $LOCALE . '.UTF-8',
@@ -33,9 +29,9 @@ $localeArray = [
     $baseLocale
 ];
 setlocale( LC_ALL, $localeArray );
-$dayOfTheWeekDayMonthYear   = IntlDateFormatter::create( strtolower( $LOCALE ), IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEEE d MMMM yyyy" );
-$dayMonthYear               = IntlDateFormatter::create( strtolower( $LOCALE ), IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "d MMMM yyyy" );
-$dayOfTheWeek               = IntlDateFormatter::create( strtolower( $LOCALE ), IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEEE" );
+$dayOfTheWeekDayMonthYear   = IntlDateFormatter::create( $LOCALE, IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEEE d MMMM yyyy" );
+$dayMonthYear               = IntlDateFormatter::create( $LOCALE, IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "d MMMM yyyy" );
+$dayOfTheWeek               = IntlDateFormatter::create( $LOCALE, IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEEE" );
 
 $EasterDates                = new stdClass();
 $EasterDates->DatesArray    = [];
