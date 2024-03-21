@@ -752,7 +752,7 @@ class LitCalAPI {
         $this->Cal->addFestivity( "SacredHeart", $SacredHeart );
 
         //Christ the King is calculated backwards from the first sunday of advent
-        $ChristKing = new Festivity( $this->PropriumDeTempore[ "ChristKing" ][ "NAME" ],     LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 4 * 7 ) . 'D' ) ),    LitColor::RED,  LitFeastType::MOBILE, LitGrade::SOLEMNITY );
+        $ChristKing = new Festivity( $this->PropriumDeTempore[ "ChristKing" ][ "NAME" ],     LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 4 * 7 ) . 'D' ) ),    LitColor::WHITE,  LitFeastType::MOBILE, LitGrade::SOLEMNITY );
         $this->Cal->addFestivity( "ChristKing", $ChristKing );
     }
 
