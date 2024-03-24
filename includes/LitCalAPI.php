@@ -2804,6 +2804,8 @@ class LitCalAPI {
         }
 
         $SerializeableLitCal->Metadata->VERSION             = self::API_VERSION;
+        $SerializeableLitCal->Metadata->Timestamp           = time();
+        $SerializeableLitCal->Metadata->DateTime            = date('Y-m-d H:i:s');
         $SerializeableLitCal->Metadata->RequestHeaders      = $this->APICore->getJsonEncodedRequestHeaders();
         $SerializeableLitCal->Metadata->Solemnities         = $this->Cal->getSolemnities();
         $SerializeableLitCal->Metadata->FeastsMemorials     = $this->Cal->getFeastsAndMemorials();
