@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-24 21:47+0000\n"
+"POT-Creation-Date: 2024-03-24 22:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -78,7 +78,7 @@ msgstr ""
 #: includes/LitCalAPI.php:1655 includes/LitCalAPI.php:1682
 #: includes/LitCalAPI.php:1792 includes/LitCalAPI.php:1805
 #: includes/LitCalAPI.php:1820 includes/LitCalAPI.php:1847
-#: includes/FestivityCollection.php:400
+#: includes/FestivityCollection.php:401
 msgid "Decree of the Congregation for Divine Worship"
 msgstr ""
 
@@ -537,7 +537,7 @@ msgstr ""
 msgid "Vigil Mass"
 msgstr ""
 
-#: includes/FestivityCollection.php:394
+#: includes/FestivityCollection.php:395
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -545,7 +545,7 @@ msgid ""
 "is confirmed as are I Vespers."
 msgstr ""
 
-#: includes/FestivityCollection.php:408
+#: includes/FestivityCollection.php:409
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -554,7 +554,7 @@ msgid ""
 "or an evening Mass."
 msgstr ""
 
-#: includes/FestivityCollection.php:418
+#: includes/FestivityCollection.php:419
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
