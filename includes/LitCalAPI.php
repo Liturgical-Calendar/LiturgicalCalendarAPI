@@ -6,6 +6,7 @@ include_once( 'includes/enums/LitColor.php' );
 include_once( 'includes/enums/LitCommon.php' );
 include_once( 'includes/enums/LitFeastType.php' );
 include_once( 'includes/enums/LitGrade.php' );
+include_once( 'includes/enums/LitSeason.php' );
 include_once( 'includes/enums/RequestMethod.php' );
 include_once( 'includes/enums/RequestContentType.php' );
 include_once( 'includes/enums/ReturnType.php' );
@@ -2934,8 +2935,7 @@ class LitCalAPI {
                 $this->applyDiocesanCalendar();
             }
 
-            //$this->setCyclesAndVigils();
-            $this->Cal->setCyclesAndVigils();
+            $this->Cal->setCyclesVigilsSeasons();
             $this->generateResponse();
         }
     }

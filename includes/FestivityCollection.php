@@ -294,7 +294,7 @@ class FestivityCollection {
         );
     }
 
-    public function setCyclesAndVigils() {
+    public function setCyclesVigilsSeasons() {
         foreach( $this->festivities as $key => $festivity ) {
             if ( self::DateIsNotSunday( $festivity->date ) && (int)$festivity->grade === LitGrade::WEEKDAY ) {
                 if( $this->inOrdinaryTime( $festivity->date ) ) {
@@ -309,6 +309,25 @@ class FestivityCollection {
                     $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::SUNDAY_CYCLE[ $this->LitSettings->Year % 3 ] );
                 }
                 $this->calculateVigilMass( $key, $festivity );
+            }
+
+            if( $festivity->date >= $this->festivities[ "Advent1" ]->date && $festivity->date < $this->festivities[ "Christmas" ]->date ) {
+                $this->festivities[ $key ]->liturgicalSeason === LitSeason::ADVENT;
+            }
+            else if( $festivity->date >= $this->festivities[ "Christmas" ]->date || $festivity->date <= $this->festivities[ "BaptismLord" ]->date ) {
+                $this->festivities[ $key ]->liturgicalSeason === LitSeason::CHRISTMAS;
+            }
+            else if( $festivity->date >= $this->festivities[ "AshWednesday" ]->date && $festivity->date <= $this->festivities[ "HolyThurs" ]->date ) {
+                $this->festivities[ $key ]->liturgicalSeason === LitSeason::LENT;
+            }
+            else if( $festivity->date > $this->festivities[ "HolyThurs" ]->date && $festivity->date < $this->festivities[ "Easter" ]->date ) {
+                //the Easter Triduum doesn't really count as either Lent or Easter
+            }
+            else if( $festivity->date >= $this->festivities[ "Easter" ]->date && $festivity->date <= $this->festivities[ "Pentecost" ]->date ) {
+                $this->festivities[ $key ]->liturgicalSeason === LitSeason::EASTER;
+            }
+            else {
+                $this->festivities[ $key ]->liturgicalSeason === LitSeason::ORDINARY_TIME;
             }
         }
     }

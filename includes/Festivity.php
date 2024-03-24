@@ -6,6 +6,7 @@ include_once( 'enums/LitCommon.php' );
 include_once( 'enums/LitFeastType.php' );
 include_once( 'enums/LitGrade.php' );
 include_once( 'enums/LitLocale.php' );
+include_once( 'enums/LitSeason.php' );
 include_once( 'LitDateTime.php' );
 
 class Festivity implements JsonSerializable
@@ -13,27 +14,33 @@ class Festivity implements JsonSerializable
     public static $eventIdx = 0;
 
     public int      $idx;
+
+    /** The following properties are generally passed in the constructor */
     public string   $name;
     public LitDateTime $date;
     public array    $color = [];
-    public array    $colorLcl;
     public string   $type;
     public int      $grade;
-    public string   $gradeLcl;
     public string   $displayGrade;
     public array    $common;  //"Proper" or specified common(s) of saints...
-    public string   $commonLcl;
 
-    /** The following properties are not used in construction, they are only set externally */
+    /** The following properties are set externally, but may be optional and therefore may remain null */
     public ?string  $liturgicalYear = null;
     public ?bool    $isVigilMass    = null;
     public ?bool    $hasVigilMass   = null;
     public ?bool    $hasVesperI     = null;
     public ?bool    $hasVesperII    = null;
     public ?int     $psalterWeek    = null;
+    public ?string  $liturgicalSeason=null;
+
+    /** The following properties are set based on properties passed in the constructor or on properties set externally*/
+    public array    $colorLcl;
+    public string   $gradeLcl;
+    public string   $commonLcl;
 
     private static string $locale   = LitLocale::LATIN;
     private static LitGrade $LitGrade;
+    private static LitSeason $LitSeason;
     private static LitCommon $LitCommon;
     private static IntlDateFormatter $dayOfTheWeekShort;
     private static IntlDateFormatter $dayOfTheWeekLong;
@@ -141,6 +148,10 @@ class Festivity implements JsonSerializable
         if ( $this->psalterWeek !== null ) {
             $returnArr['psalterWeek']       = $this->psalterWeek;
         }
+        if ( $this->liturgicalSeason !== null ) {
+            $returnArr['liturgicalSeason']  = $this->liturgicalSeason;
+            $returnArr['liturgicalSeasonLcl'] = LitSeason::i18n($this->liturgicalSeason, self::$locale);
+        }
         return $returnArr;
     }
 
@@ -150,7 +161,7 @@ class Festivity implements JsonSerializable
             self::$LitGrade             = new LitGrade( $locale );
             self::$LitCommon            = new LitCommon( $locale );
             self::$dayOfTheWeekShort    = IntlDateFormatter::create( $locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEE" );
-            self::$dayOfTheWeekLong     = IntlDateFormatter::create( $locale, IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEEE" );
+            self::$dayOfTheWeekLong     = IntlDateFormatter::create( $locale, IntlDateFormatter::FULL,   IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEEE" );
             self::$monthShort           = IntlDateFormatter::create( $locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "MMM" );
             self::$monthLong            = IntlDateFormatter::create( $locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "MMMM" );
         }
