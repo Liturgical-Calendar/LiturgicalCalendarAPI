@@ -296,21 +296,7 @@ class FestivityCollection {
 
     public function setCyclesVigilsSeasons() {
         foreach( $this->festivities as $key => $festivity ) {
-            if ( self::DateIsNotSunday( $festivity->date ) && (int)$festivity->grade === LitGrade::WEEKDAY ) {
-                if( $this->inOrdinaryTime( $festivity->date ) ) {
-                    $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::WEEKDAY_CYCLE[ ( $this->LitSettings->Year - 1 ) % 2 ] );
-                }
-            }
-            //if we're dealing with a Sunday or a Solemnity or a Feast of the Lord, then we calculate the Sunday/Festive Cycle
-            else if( self::DateIsSunday( $festivity->date ) || (int)$festivity->grade > LitGrade::FEAST ) {
-                if ( $festivity->date < $this->festivities[ "Advent1" ]->date ) {
-                    $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::SUNDAY_CYCLE[ ( $this->LitSettings->Year - 1 ) % 3 ] );
-                } else if ( $festivity->date >= $this->festivities[ "Advent1" ]->date ) {
-                    $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::SUNDAY_CYCLE[ $this->LitSettings->Year % 3 ] );
-                }
-                $this->calculateVigilMass( $key, $festivity );
-            }
-
+            // DEFINE LITURGICAL SEASONS
             if( $festivity->date >= $this->festivities[ "Advent1" ]->date && $festivity->date < $this->festivities[ "Christmas" ]->date ) {
                 $this->festivities[ $key ]->liturgicalSeason = LitSeason::ADVENT;
             }
@@ -321,7 +307,7 @@ class FestivityCollection {
                 $this->festivities[ $key ]->liturgicalSeason = LitSeason::LENT;
             }
             else if( $festivity->date > $this->festivities[ "HolyThurs" ]->date && $festivity->date < $this->festivities[ "Easter" ]->date ) {
-                //the Easter Triduum doesn't really count as either Lent or Easter
+                $this->festivities[ $key ]->liturgicalSeason = LitSeason::EASTER_TRIDUUM;
             }
             else if( $festivity->date >= $this->festivities[ "Easter" ]->date && $festivity->date <= $this->festivities[ "Pentecost" ]->date ) {
                 $this->festivities[ $key ]->liturgicalSeason = LitSeason::EASTER;
@@ -329,6 +315,26 @@ class FestivityCollection {
             else {
                 $this->festivities[ $key ]->liturgicalSeason = LitSeason::ORDINARY_TIME;
             }
+
+            // DEFINE YEAR CYCLES (except for Holy Week and Easter Octave)
+            if( $festivity->date <= $this->festivities[ "PalmSun" ]->date && $festivity->date >= $this->festivities[ "Easter2" ]->date ) {
+                if ( self::DateIsNotSunday( $festivity->date ) && (int)$festivity->grade === LitGrade::WEEKDAY ) {
+                    if( $this->inOrdinaryTime( $festivity->date ) ) {
+                        $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::WEEKDAY_CYCLE[ ( $this->LitSettings->Year - 1 ) % 2 ] );
+                    }
+                }
+                //if we're dealing with a Sunday or a Solemnity or a Feast of the Lord, then we calculate the Sunday/Festive Cycle
+                else if( self::DateIsSunday( $festivity->date ) || (int)$festivity->grade > LitGrade::FEAST ) {
+                    if ( $festivity->date < $this->festivities[ "Advent1" ]->date ) {
+                        $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::SUNDAY_CYCLE[ ( $this->LitSettings->Year - 1 ) % 3 ] );
+                    } else if ( $festivity->date >= $this->festivities[ "Advent1" ]->date ) {
+                        $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::SUNDAY_CYCLE[ $this->LitSettings->Year % 3 ] );
+                    }
+                    // DEFINE VIGIL MASSES
+                    $this->calculateVigilMass( $key, $festivity );
+                }
+            }
+
         }
     }
 
@@ -534,6 +540,30 @@ class FestivityCollection {
      */
     public static function psalterWeek( int $weekOfOrdinaryTimeOrSeason ) : int {
         return $weekOfOrdinaryTimeOrSeason % 4 === 0 ? 4 : $weekOfOrdinaryTimeOrSeason % 4;
+    }
+
+    public function isAdventSeason( Festivity $festivity ) {
+        return $festivity->liturgicalSeason === LitSeason::ADVENT;
+    }
+
+    public function isChristmasSeason( Festivity $festivity ) {
+        return $festivity->liturgicalSeason === LitSeason::CHRISTMAS;
+    }
+
+    public function isLentSeason( Festivity $festivity ) {
+        return $festivity->liturgicalSeason === LitSeason::LENT;
+    }
+
+    public function isEasterTriduum( Festivity $festivity ) {
+        return $festivity->liturgicalSeason === LitSeason::EASTER_TRIDUUM;
+    }
+
+    public function isEasterSeason( Festivity $festivity ) {
+        return $festivity->liturgicalSeason === LitSeason::EASTER;
+    }
+
+    public function isOrdinaryTime( Festivity $festivity ) {
+        return $festivity->liturgicalSeason === LitSeason::ORDINARY_TIME;
     }
 
 }
