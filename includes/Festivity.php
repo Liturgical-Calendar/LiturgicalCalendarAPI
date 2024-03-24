@@ -165,5 +165,33 @@ class Festivity implements JsonSerializable
             self::$monthLong            = IntlDateFormatter::create( $locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "MMMM" );
         }
     }
+/**
+ * The following functions might be somehow useful
+ * Leaving them commented for the time being since we aren't actually using them
+ * 
+    public static function isAdventSeason( Festivity $festivity ) {
+        return $festivity->liturgicalSeason !== null && $festivity->liturgicalSeason === LitSeason::ADVENT;
+    }
+
+    public static function isChristmasSeason( Festivity $festivity ) {
+        return $festivity->liturgicalSeason !== null && $festivity->liturgicalSeason === LitSeason::CHRISTMAS;
+    }
+
+    public static function isLentSeason( Festivity $festivity ) {
+        return $festivity->liturgicalSeason !== null && $festivity->liturgicalSeason === LitSeason::LENT;
+    }
+
+    public static function isEasterTriduum( Festivity $festivity ) {
+        return $festivity->liturgicalSeason !== null && $festivity->liturgicalSeason === LitSeason::EASTER_TRIDUUM;
+    }
+
+    public static function isEasterSeason( Festivity $festivity ) {
+        return $festivity->liturgicalSeason !== null && $festivity->liturgicalSeason === LitSeason::EASTER;
+    }
+
+    public static function isOrdinaryTime( Festivity $festivity ) {
+        return $festivity->liturgicalSeason !== null && $festivity->liturgicalSeason === LitSeason::ORDINARY_TIME;
+    }
+ */
 
 }
