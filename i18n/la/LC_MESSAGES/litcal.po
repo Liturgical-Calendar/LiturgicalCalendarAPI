@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-24 21:47+0000\n"
+"POT-Creation-Date: 2024-03-24 22:51+0000\n"
 "PO-Revision-Date: 2022-12-15 03:17+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
@@ -83,7 +83,7 @@ msgstr "sabbatum ante Dominicam in Palmis"
 #: includes/LitCalAPI.php:1655 includes/LitCalAPI.php:1682
 #: includes/LitCalAPI.php:1792 includes/LitCalAPI.php:1805
 #: includes/LitCalAPI.php:1820 includes/LitCalAPI.php:1847
-#: includes/FestivityCollection.php:400
+#: includes/FestivityCollection.php:401
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decretum Congregationis pro Cultu Divino"
 
@@ -593,7 +593,7 @@ msgstr "ANNUM"
 msgid "Vigil Mass"
 msgstr "Missa in Vigilia"
 
-#: includes/FestivityCollection.php:394
+#: includes/FestivityCollection.php:395
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -604,7 +604,7 @@ msgstr ""
 "%6$s, prima praecedentia habet, ergo Missa vesperum et Missa in Vigilia "
 "servabuntur."
 
-#: includes/FestivityCollection.php:408
+#: includes/FestivityCollection.php:409
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -617,7 +617,7 @@ msgstr ""
 "Missa vesperum, cum Sollemnitas ultima neque Missa in Vigilia neque Primis "
 "Vesperis servabit."
 
-#: includes/FestivityCollection.php:418
+#: includes/FestivityCollection.php:419
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
