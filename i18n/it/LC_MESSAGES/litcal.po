@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-24 16:53+0000\n"
+"POT-Creation-Date: 2024-03-24 18:28+0000\n"
 "PO-Revision-Date: 2023-01-02 14:09+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -84,7 +84,7 @@ msgstr "sabato che precede la Domenica delle Palme"
 #: includes/LitCalAPI.php:1654 includes/LitCalAPI.php:1681
 #: includes/LitCalAPI.php:1791 includes/LitCalAPI.php:1804
 #: includes/LitCalAPI.php:1819 includes/LitCalAPI.php:1846
-#: includes/FestivityCollection.php:394
+#: includes/FestivityCollection.php:400
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decreto della Congregazione per il Culto Divino"
 
@@ -614,7 +614,7 @@ msgstr "ANNO"
 msgid "Vigil Mass"
 msgstr "Messa della vigilia"
 
-#: includes/FestivityCollection.php:388
+#: includes/FestivityCollection.php:394
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -625,7 +625,7 @@ msgstr ""
 "nell'anno %5$d. Secondo il %6$s, la prima ha la precedenza, pertanto la "
 "Messa nella Vigilia è confermata come anche i Primi Vespri."
 
-#: includes/FestivityCollection.php:402
+#: includes/FestivityCollection.php:408
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -638,7 +638,7 @@ msgstr ""
 "Vespri e una Messa di Vigilia, mentre l'ultima Solennità non avrà né i "
 "Secondi Vespri né una Messa serale."
 
-#: includes/FestivityCollection.php:412
+#: includes/FestivityCollection.php:418
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -651,7 +651,7 @@ msgstr ""
 "Secondi Vespri e una Messa serale, mentre la prima Solennità non avrà né una "
 "Messa di Vigilia né i Primi Vespri."
 
-#: includes/FestivityCollection.php:472
+#: includes/FestivityCollection.php:478
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "

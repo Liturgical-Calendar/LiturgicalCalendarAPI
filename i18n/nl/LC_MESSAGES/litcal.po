@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-24 16:53+0000\n"
+"POT-Creation-Date: 2024-03-24 18:28+0000\n"
 "PO-Revision-Date: 2023-01-02 14:09+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: Dutch <https://translate.johnromanodorazio.com/projects/"
@@ -86,7 +86,7 @@ msgstr "de zaterdag voorafgaand aan Palmzondag"
 #: includes/LitCalAPI.php:1654 includes/LitCalAPI.php:1681
 #: includes/LitCalAPI.php:1791 includes/LitCalAPI.php:1804
 #: includes/LitCalAPI.php:1819 includes/LitCalAPI.php:1846
-#: includes/FestivityCollection.php:394
+#: includes/FestivityCollection.php:400
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decreet van de Congregatie voor de Goddelijke Eredienst"
 
@@ -615,7 +615,7 @@ msgstr "JAAR"
 msgid "Vigil Mass"
 msgstr "Vigiliemis"
 
-#: includes/FestivityCollection.php:388
+#: includes/FestivityCollection.php:394
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -626,7 +626,7 @@ msgstr ""
 "%5$d. Overeenkomstig %6$s heeft de eerste voorrang, waardoor de vigiliemis "
 "en het avondgebed op de vooravond zijn vastgesteld."
 
-#: includes/FestivityCollection.php:402
+#: includes/FestivityCollection.php:408
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -639,7 +639,7 @@ msgstr ""
 "de vooravond en een vigiliemis, terwijl het tweede hoogfeest geen avondgebed "
 "of een avondmis heeft."
 
-#: includes/FestivityCollection.php:412
+#: includes/FestivityCollection.php:418
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -652,7 +652,7 @@ msgstr ""
 "vooravond en een avondmis behoudt, terwijl het eerste hoogfeest geen "
 "vigiliemis of avondgebed heeft."
 
-#: includes/FestivityCollection.php:472
+#: includes/FestivityCollection.php:478
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
