@@ -340,7 +340,15 @@ class LitCommon {
                         $commonSpecific = "";
                     }
                     $fromTheCommon = $this->locale === LitLocale::LATIN ? "De Commune" : _( "From the Common" );
-                    return $fromTheCommon . " " . $this->getPossessive( $commonGeneral ) . " " . $this->i18n( $commonGeneral ) . ($commonSpecific != "" ? ": " . $this->i18n( $commonSpecific ) : "");
+                    $commonGeneralStringParts = [ $fromTheCommon ];
+                    if( $this->getPossessive( $commonGeneral ) !== "" ) {
+                        array_push( $commonGeneralStringParts, $this->getPossessive( $commonGeneral ) );
+                    }
+                    if( $this->i18n( $commonGeneral ) !== "" ) {
+                        array_push( $commonGeneralStringParts, $this->i18n( $commonGeneral ) );
+                    }
+                    $commonGeneralString = implode(" ", $commonGeneralStringParts);
+                    return $commonGeneralString . ($commonSpecific != "" ? ": " . $this->i18n( $commonSpecific ) : "");
                 }, $commons);
                 /**translators: when there are multiple possible commons, this will be the glue "or from the common of..." */
                 $common = implode( "; " . _( "or" ) . " ", $commons );
