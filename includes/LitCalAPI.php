@@ -1040,6 +1040,7 @@ class LitCalAPI {
         //with the approval of Pope Francis elevated the memorial of Saint Mary Magdalen to a Feast
         //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf
         //This is taken care of ahead when the "memorials from decrees" are applied
+        // see :MEMORIALS_FROM_DECREES
 
     }
 
@@ -1951,7 +1952,7 @@ class LitCalAPI {
         $SatMemBVM_cnt = 0;
         while( $currentSaturday <= $lastSatDT ){
             $currentSaturday = LitDateTime::createFromFormat( '!j-n-Y', $currentSaturday->format( 'j-n-Y' ),new DateTimeZone( 'UTC' ) )->modify( 'next Saturday' );
-            if( $this->Cal->notInSolemnitiesFeastsOrMemorials( $currentSaturday ) ) {
+            if( $this->Cal->inOrdinaryTime( $currentSaturday ) && $this->Cal->notInSolemnitiesFeastsOrMemorials( $currentSaturday ) ) {
                 $memID = "SatMemBVM" . ++$SatMemBVM_cnt;
                 $name = $this->LitSettings->Locale === LitLocale::LATIN ? "Memoria Sanctæ Mariæ in Sabbato" : _( "Saturday Memorial of the Blessed Virgin Mary" );
                 $festivity = new Festivity( $name, $currentSaturday, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL_OPT, LitCommon::BEATAE_MARIAE_VIRGINIS );
@@ -2462,6 +2463,7 @@ class LitCalAPI {
             $this->calculateMemorials( LitGrade::MEMORIAL, RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 );
         }
 
+        // :MEMORIALS_FROM_DECREES
         $this->loadMemorialsFromDecreesData();
         $this->applyDecrees( LitGrade::MEMORIAL );
 
@@ -2499,8 +2501,8 @@ class LitCalAPI {
         $this->calculateWeekdaysOrdinaryTime();
 
         //15. On Saturdays in Ordinary Time when there is no obligatory memorial, an optional memorial of the Blessed Virgin Mary is allowed.
-        $this->calculateSaturdayMemorialBVM();
-
+        // We will handle this after having set National and Diocesan calendar data
+        // see :SATURDAY_MEMORIAL_BVM
     }
 
     private function interpretStrtotime( object $row, string $key ) : LitDateTime|false {
@@ -2936,6 +2938,9 @@ class LitCalAPI {
             if( $this->LitSettings->DiocesanCalendar !== null && $this->DiocesanData !== null ) {
                 $this->applyDiocesanCalendar();
             }
+
+            // :SATURDAY_MEMORIAL_BVM
+            $this->calculateSaturdayMemorialBVM();
 
             $this->Cal->setCyclesVigilsSeasons();
             $this->generateResponse();

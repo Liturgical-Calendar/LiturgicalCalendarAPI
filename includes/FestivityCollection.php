@@ -286,7 +286,7 @@ class FestivityCollection {
         unset( $this->festivities[ $key ] );
     }
 
-    private function inOrdinaryTime( LitDateTime $date ) : bool {
+    public function inOrdinaryTime( LitDateTime $date ) : bool {
         return (
             ( $date > $this->festivities[ "BaptismLord" ]->date && $date < $this->festivities[ "AshWednesday" ]->date )
             ||
@@ -540,30 +540,6 @@ class FestivityCollection {
      */
     public static function psalterWeek( int $weekOfOrdinaryTimeOrSeason ) : int {
         return $weekOfOrdinaryTimeOrSeason % 4 === 0 ? 4 : $weekOfOrdinaryTimeOrSeason % 4;
-    }
-
-    public function isAdventSeason( Festivity $festivity ) {
-        return $festivity->liturgicalSeason === LitSeason::ADVENT;
-    }
-
-    public function isChristmasSeason( Festivity $festivity ) {
-        return $festivity->liturgicalSeason === LitSeason::CHRISTMAS;
-    }
-
-    public function isLentSeason( Festivity $festivity ) {
-        return $festivity->liturgicalSeason === LitSeason::LENT;
-    }
-
-    public function isEasterTriduum( Festivity $festivity ) {
-        return $festivity->liturgicalSeason === LitSeason::EASTER_TRIDUUM;
-    }
-
-    public function isEasterSeason( Festivity $festivity ) {
-        return $festivity->liturgicalSeason === LitSeason::EASTER;
-    }
-
-    public function isOrdinaryTime( Festivity $festivity ) {
-        return $festivity->liturgicalSeason === LitSeason::ORDINARY_TIME;
     }
 
 }
