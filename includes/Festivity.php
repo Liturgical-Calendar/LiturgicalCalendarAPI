@@ -40,7 +40,6 @@ class Festivity implements JsonSerializable
 
     private static string $locale   = LitLocale::LATIN;
     private static LitGrade $LitGrade;
-    private static LitSeason $LitSeason;
     private static LitCommon $LitCommon;
     private static IntlDateFormatter $dayOfTheWeekShort;
     private static IntlDateFormatter $dayOfTheWeekLong;

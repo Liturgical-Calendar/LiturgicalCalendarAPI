@@ -18,8 +18,11 @@ class APICore {
         $this->AllowedAcceptHeaders             = AcceptHeader::$values;
         $this->AllowedRequestMethods            = RequestMethod::$values;
         $this->AllowedRequestContentTypes       = RequestContentType::$values;
-        $this->RequestHeaders                  = getallheaders();
-        $this->JsonEncodedRequestHeaders     = json_encode( $this->RequestHeaders );
+        $this->RequestHeaders                   = getallheaders();
+        unset($this->RequestHeaders["X-Real-Ip"]);
+        //unset($this->RequestHeaders["Host"]);
+        unset($this->RequestHeaders["Authorization"]);
+        $this->JsonEncodedRequestHeaders        = json_encode( $this->RequestHeaders );
         if( isset( $_SERVER[ 'CONTENT_TYPE' ] ) ) {
             $this->RequestContentType = $_SERVER[ 'CONTENT_TYPE' ];
         }
