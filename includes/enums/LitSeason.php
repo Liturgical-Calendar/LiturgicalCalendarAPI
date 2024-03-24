@@ -4,9 +4,10 @@ class LitSeason {
     const ADVENT        = "ADVENT";
     const CHRISTMAS     = "CHRISTMAS";
     const LENT          = "LENT";
+    const EASTER_TRIDUUM= "EASTER_TRIDUUM";
     const EASTER        = "EASTER";
     const ORDINARY_TIME = "ORDINARY_TIME";
-    public static array $values = [ "ADVENT", "CHRISTMAS", "LENT", "EASTER", "ORDINARY_TIME" ];
+    public static array $values = [ "ADVENT", "CHRISTMAS", "LENT", "EASTER_TRIDUUM", "EASTER", "ORDINARY_TIME" ];
 
     public static function isValid( string $value ) {
         return in_array( $value, self::$values );
@@ -23,6 +24,9 @@ class LitSeason {
             case self::LENT:
                 /**translators: context = liturgical season */
                 return $locale === LitLocale::LATIN ? 'Tempus Quadragesima' : _( "Lent" );
+            case self::EASTER_TRIDUUM:
+                /**translators: context = liturgical season */
+                return $locale === LitLocale::LATIN ? 'Triduum Paschale'     : _( "Easter Triduum" );
             case self::EASTER:
                 /**translators: context = liturgical season */
                 return $locale === LitLocale::LATIN ? 'Tempus Paschale'     : _( "Easter" );
