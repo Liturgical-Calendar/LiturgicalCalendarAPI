@@ -368,6 +368,7 @@ class FestivityCollection {
         $this->festivities[ $key ]->hasVesperI                   = true;
         $this->festivities[ $key ]->hasVesperII                  = true;
         $this->festivities[ $key . "_vigil" ]->isVigilMass       = true;
+        $this->festivities[ $key . "_vigil" ]->isVigilFor        = $key;
         $this->festivities[ $key . "_vigil" ]->liturgicalYear    = $this->festivities[ $key ]->liturgicalYear;
     }
 
@@ -428,8 +429,7 @@ class FestivityCollection {
 
     private function calculateVigilMass( string $key, Festivity $festivity ) {
 
-        //Let's calculate Vigil Masses while we're at it
-        //We'll both create new events and add metadata to existing events
+        //Not only will we create new events, we will also add metadata to existing events
         $VigilDate = clone( $festivity->date );
         $VigilDate->sub( new DateInterval( 'P1D' ) );
         $festivityGrade = '';

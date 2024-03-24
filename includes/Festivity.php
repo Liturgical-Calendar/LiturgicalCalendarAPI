@@ -31,6 +31,7 @@ class Festivity implements JsonSerializable
     public ?bool    $hasVesperI     = null;
     public ?bool    $hasVesperII    = null;
     public ?int     $psalterWeek    = null;
+    public ?string  $isVigilFor     = null;
     public ?string  $liturgicalSeason=null;
 
     /** The following properties are set based on properties passed in the constructor or on properties set externally*/
@@ -134,6 +135,9 @@ class Festivity implements JsonSerializable
         }
         if ( $this->isVigilMass !== null ) {
             $returnArr['isVigilMass']       = $this->isVigilMass;
+        }
+        if ( $this->isVigilFor !== null ) {
+            $returnArr['isVigilFor']       = $this->isVigilFor;
         }
         if ( $this->hasVigilMass !== null ) {
             $returnArr['hasVigilMass']      = $this->hasVigilMass;
