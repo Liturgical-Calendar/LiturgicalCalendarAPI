@@ -2936,12 +2936,12 @@ class LitCalAPI {
                 $this->applyNationalCalendar();
             }
 
+            // :SATURDAY_MEMORIAL_BVM
+            $this->calculateSaturdayMemorialBVM();
+
             if( $this->LitSettings->DiocesanCalendar !== null && $this->DiocesanData !== null ) {
                 $this->applyDiocesanCalendar();
             }
-
-            // :SATURDAY_MEMORIAL_BVM
-            $this->calculateSaturdayMemorialBVM();
 
             $this->Cal->setCyclesVigilsSeasons();
             $this->generateResponse();
