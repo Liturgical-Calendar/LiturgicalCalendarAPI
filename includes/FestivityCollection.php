@@ -317,7 +317,7 @@ class FestivityCollection {
             }
 
             // DEFINE YEAR CYCLES (except for Holy Week and Easter Octave)
-            if( $festivity->date <= $this->festivities[ "PalmSun" ]->date && $festivity->date >= $this->festivities[ "Easter2" ]->date ) {
+            if( $festivity->date <= $this->festivities[ "PalmSun" ]->date || $festivity->date >= $this->festivities[ "Easter2" ]->date ) {
                 if ( self::DateIsNotSunday( $festivity->date ) && (int)$festivity->grade === LitGrade::WEEKDAY ) {
                     if( $this->inOrdinaryTime( $festivity->date ) ) {
                         $this->festivities[ $key ]->liturgicalYear = $this->T[ "YEAR" ] . " " . ( self::WEEKDAY_CYCLE[ ( $this->LitSettings->Year - 1 ) % 2 ] );
