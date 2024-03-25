@@ -49,6 +49,9 @@ class LitCalAPI {
     private string $BaptismLordFmt;
     private string $BaptismLordMod;
 
+    private int $startTime                          = hrtime(true);
+    private int $endTime;
+
     /**
      * The following schemas for ordinal spellouts have been taken from
      * https://www.saxonica.com/html/documentation11/extensibility/localizing/ICU-numbering-dates/ICU-numbering.html
@@ -2808,6 +2811,7 @@ class LitCalAPI {
         $SerializeableLitCal->Metadata->VERSION             = self::API_VERSION;
         $SerializeableLitCal->Metadata->Timestamp           = time();
         $SerializeableLitCal->Metadata->DateTime            = date('Y-m-d H:i:s');
+
         //$SerializeableLitCal->Metadata->RequestHeaders      = $this->APICore->getJsonEncodedRequestHeaders();
         $SerializeableLitCal->Metadata->RequestHeaders      = $this->APICore->getRequestHeaders();
         $SerializeableLitCal->Metadata->Solemnities         = $this->Cal->getSolemnities();
@@ -2844,6 +2848,11 @@ class LitCalAPI {
         }
         file_put_contents( $this->CACHEFILE, $response );
         $responseHash = md5( $response );
+
+        $this->endTime = hrtime(true);
+        $executionTime = $this->endTime - $this->startTime;
+        header('X-LitCal-ExecutionTime: ' . $executionTime);
+
         header("Etag: \"{$responseHash}\"");
         if (!empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
             header( $_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified" );
@@ -2917,8 +2926,13 @@ class LitCalAPI {
             //and stored the results in a cache file
             //then we're done, just output this and die
             //or better, make the client use it's own cache copy!
-            $response = file_get_contents( $this->CACHEFILE );
-            $responseHash = md5( $response );
+            $response       = file_get_contents( $this->CACHEFILE );
+            $responseHash   = md5( $response );
+
+            $this->endTime  = hrtime(true);
+            $executionTime  = $this->endTime - $this->startTime;
+            header('X-LitCal-ExecutionTime: ' . $executionTime);
+
             header("Etag: \"{$responseHash}\"");
             if (!empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
                 header( $_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified" );
