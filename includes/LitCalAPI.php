@@ -2852,7 +2852,9 @@ class LitCalAPI {
 
         $this->endTime = hrtime(true);
         $executionTime = $this->endTime - $this->startTime;
-        header('X-LitCal-ExecutionTime: ' . $executionTime);
+        header('X-LitCal-Starttime: ' . $this->startTime);
+        header('X-LitCal-Endtime: ' . $this->endTime);
+        header('X-LitCal-Executiontime: ' . $executionTime);
 
         header("Etag: \"{$responseHash}\"");
         if (!empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
@@ -2932,7 +2934,9 @@ class LitCalAPI {
 
             $this->endTime  = hrtime(true);
             $executionTime  = $this->endTime - $this->startTime;
-            header('X-LitCal-ExecutionTime: ' . $executionTime);
+            header('X-LitCal-Starttime: ' . $this->startTime);
+            header('X-LitCal-Endtime: ' . $this->endTime);
+            header('X-LitCal-Executiontime: ' . $executionTime);
 
             header("Etag: \"{$responseHash}\"");
             if (!empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
