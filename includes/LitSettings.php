@@ -5,9 +5,11 @@ include_once( 'enums/Ascension.php' );
 include_once( 'enums/CorpusChristi.php' );
 include_once( 'enums/LitLocale.php' );
 include_once( 'enums/ReturnType.php' );
+include_once( 'enums/CalendarType.php' );
 
 class LitSettings {
     public int $Year;
+    public string $CalendarType         = CalendarType::LITURGICAL;
     public string $Epiphany             = Epiphany::JAN6;
     public string $Ascension            = Ascension::THURSDAY;
     public string $CorpusChristi        = CorpusChristi::THURSDAY;
@@ -18,6 +20,7 @@ class LitSettings {
 
     const ALLOWED_PARAMS  = [
         "YEAR",
+        "CALENDARTYPE",
         "EPIPHANY",
         "ASCENSION",
         "CORPUSCHRISTI",
@@ -81,6 +84,9 @@ class LitSettings {
                         break;
                     case "DIOCESANCALENDAR":
                         $this->DiocesanCalendar = strtoupper( $value );
+                        break;
+                    case "CALENDARTYPE":
+                        $this->CalendarType     = CalendarType::isValid( $value ) ? $value : CalendarType::LITURGICAL;
                         break;
                 }
             }

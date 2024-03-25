@@ -510,6 +510,30 @@ class FestivityCollection {
         return $this->solemnities;
     }
 
+    public function getFeasts() : array {
+        return $this->feasts;
+    }
+
+    public function getMemorials() : array {
+        return $this->memorials;
+    }
+
+    public function getWeekdaysAdventChristmasLent() : array {
+        return $this->WeekdayAdventChristmasLent;
+    }
+
+    public function getWeekdaysEpiphany() : array {
+        return $this->WeekdaysEpiphany;
+    }
+
+    public function getSolemnitiesLordBVM(): array {
+        return $this->SolemnitiesLordBVM;
+    }
+
+    public function getSundaysAdventLentEaster(): array {
+        return $this->SundaysAdventLentEaster;
+    }
+
     public function getFeastsAndMemorials() : array {
         return array_merge( $this->feasts, $this->memorials );
     }
@@ -540,6 +564,71 @@ class FestivityCollection {
      */
     public static function psalterWeek( int $weekOfOrdinaryTimeOrSeason ) : int {
         return $weekOfOrdinaryTimeOrSeason % 4 === 0 ? 4 : $weekOfOrdinaryTimeOrSeason % 4;
+    }
+
+    public function purgeDataBeforeAdvent( int|null $buffer = null ) : void {
+        foreach( $this->festivities as $key => $festivity ) {
+            if( $festivity->date < $this->festivities[ "Advent1" ]->date ) {
+                //remove all except the Vigil Mass for the first Sunday of Advent
+                if(
+                    ( null === $festivity->isVigilMass )
+                    ||
+                    ( $festivity->isVigilMass && $festivity->isVigilFor !== "Advent1" )
+                ) {
+                    unset( $this->festivities[ $key ] );
+                    // make sure it isn't still contained in another collection
+                    unset( $this->solemnities[ $key ] );
+                    unset( $this->feasts[ $key ] );
+                    unset( $this->memorials[ $key ] );
+                    unset( $this->WeekdayAdventChristmasLent[ $key ] );
+                    unset( $this->WeekdaysEpiphany[ $key ] );
+                    unset( $this->SolemnitiesLordBVM[ $key ] );
+                    unset( $this->SundaysAdventLentEaster[ $key ] );
+                }
+            }
+        }
+    }
+
+    public function purgeDataAdventChristmas( int|null $buffer = null ) {
+        // the buffer should allow for 
+        foreach( $this->festivities as $key => $festivity ) {
+            if( $festivity->date >= $this->festivities[ "Advent1" ]->date ) {
+                unset( $this->festivities[ $key ] );
+                    // make sure it isn't still contained in another collection
+                    unset( $this->solemnities[ $key ] );
+                    unset( $this->feasts[ $key ] );
+                    unset( $this->memorials[ $key ] );
+                    unset( $this->WeekdayAdventChristmasLent[ $key ] );
+                    unset( $this->SolemnitiesLordBVM[ $key ] );
+                    unset( $this->SundaysAdventLentEaster[ $key ] );
+            }
+            /* Perhaps we shouldn't remove the Vigil Mass for the first Sunday of Advent?
+            // also remove the Vigil Mass for the first Sunday of Advent
+            if(
+                null !== $festivity->isVigilMass
+                &&
+                $festivity->isVigilMass
+                &&
+                $festivity->isVigilFor === "Advent1"
+            ) {
+                unset( $this->festivities[ $key ] );
+            }
+            */
+        }
+    }
+
+    public function mergeFestivityCollection( FestivityCollection $festivities ) {
+        $this->solemnities  = array_merge( $this->solemnities, $festivities->getSolemnities() );
+        $this->feasts       = array_merge( $this->feasts, $festivities->getFeasts() );
+        $this->memorials    = array_merge( $this->memorials, $festivities->getMemorials() );
+        $this->WeekdayAdventChristmasLent = array_merge(
+                                                $this->WeekdayAdventChristmasLent,
+                                                $festivities->getWeekdaysAdventChristmasLent()
+                                            );
+        $this->WeekdaysEpiphany         = array_merge( $this->WeekdaysEpiphany, $festivities->getWeekdaysEpiphany() );
+        $this->SolemnitiesLordBVM       = array_merge( $this->SolemnitiesLordBVM, $festivities->getSolemnitiesLordBVM() );
+        $this->SundaysAdventLentEaster  = array_merge( $this->SundaysAdventLentEaster, $festivities->getSundaysAdventLentEaster() );
+        $this->festivities = array_merge( $this->festivities, $festivities->getFestivities() );
     }
 
 }

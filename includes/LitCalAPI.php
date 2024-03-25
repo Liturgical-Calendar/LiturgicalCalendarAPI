@@ -2789,7 +2789,6 @@ class LitCalAPI {
         $SerializeableLitCal->Settings                = new stdClass();
         $SerializeableLitCal->Metadata                = new stdClass();
 
-        $this->Cal->sortFestivities();
         $SerializeableLitCal->LitCal                  = $this->Cal->getFestivities();
         $SerializeableLitCal->Messages                = $this->Messages;
         $SerializeableLitCal->Settings->Year          = $this->LitSettings->Year;
@@ -2944,7 +2943,47 @@ class LitCalAPI {
             }
 
             $this->Cal->setCyclesVigilsSeasons();
-            $this->generateResponse();
+
+            if ( $this->LitSettings->CalendarType === CalendarType::LITURGICAL ) {
+                // Save the state of the current Calendar calculation
+                $this->Cal->sortFestivities();
+                $CalBackup = clone( $this->Cal );
+
+                // let's calculate the calendar for the previous year
+                $this->LitSettings->Year--;
+                $this->Cal           = new FestivityCollection( $this->LitSettings );
+
+                $this->calculateUniversalCalendar();
+
+                if( $this->LitSettings->NationalCalendar !== null && $this->NationalData !== null ) {
+                    $this->applyNationalCalendar();
+                }
+
+                // :SATURDAY_MEMORIAL_BVM
+                $this->calculateSaturdayMemorialBVM();
+
+                if( $this->LitSettings->DiocesanCalendar !== null && $this->DiocesanData !== null ) {
+                    $this->applyDiocesanCalendar();
+                }
+
+                $this->Cal->setCyclesVigilsSeasons();
+                $this->Cal->sortFestivities();
+
+                $this->Cal->purgeDataBeforeAdvent();
+                $CalBackup->purgeDataAdventChristmas();
+
+                // Now we have to combine the two
+                // the backup (which represents the main portion) should be appended to the calendar that was just generated
+                $this->Cal->mergeFestivityCollection( $CalBackup );
+
+                // let's reset the year back to the original request before outputting results
+                $this->LitSettings->Year++
+                $this->generateResponse();
+            }
+            else {
+                $this->Cal->sortFestivities();
+                $this->generateResponse();
+            }
         }
     }
 
