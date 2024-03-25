@@ -594,16 +594,14 @@ class FestivityCollection {
         foreach( $this->festivities as $key => $festivity ) {
             if( $festivity->date > $this->festivities[ "Advent1" ]->date ) {
                 unset( $this->festivities[ $key ] );
-                    // make sure it isn't still contained in another collection
-                    unset( $this->solemnities[ $key ] );
-                    unset( $this->feasts[ $key ] );
-                    unset( $this->memorials[ $key ] );
-                    unset( $this->WeekdayAdventChristmasLent[ $key ] );
-                    unset( $this->SolemnitiesLordBVM[ $key ] );
-                    unset( $this->SundaysAdventLentEaster[ $key ] );
+                // make sure it isn't still contained in another collection
+                unset( $this->solemnities[ $key ] );
+                unset( $this->feasts[ $key ] );
+                unset( $this->memorials[ $key ] );
+                unset( $this->WeekdayAdventChristmasLent[ $key ] );
+                unset( $this->SolemnitiesLordBVM[ $key ] );
+                unset( $this->SundaysAdventLentEaster[ $key ] );
             }
-            //lastly remove First Sunday of Advent
-            unset( $this->festivities[ "Advent1" ] );
             /* Perhaps we shouldn't remove the Vigil Mass for the first Sunday of Advent?
             // also remove the Vigil Mass for the first Sunday of Advent
             if(
@@ -617,6 +615,8 @@ class FestivityCollection {
             }
             */
         }
+        //lastly remove First Sunday of Advent
+        unset( $this->festivities[ "Advent1" ] );
     }
 
     public function mergeFestivityCollection( FestivityCollection $festivities ) {
