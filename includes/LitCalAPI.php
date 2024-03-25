@@ -2977,7 +2977,7 @@ class LitCalAPI {
                 $this->Cal->mergeFestivityCollection( $CalBackup );
 
                 // let's reset the year back to the original request before outputting results
-                $this->LitSettings->Year++
+                $this->LitSettings->Year++;
                 $this->generateResponse();
             }
             else {
