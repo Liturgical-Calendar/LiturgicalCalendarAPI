@@ -49,7 +49,7 @@ class LitCalAPI {
     private string $BaptismLordFmt;
     private string $BaptismLordMod;
 
-    private int $startTime                          = hrtime(true);
+    private int $startTime;
     private int $endTime;
 
     /**
@@ -194,8 +194,9 @@ class LitCalAPI {
     ];
 
     public function __construct(){
-        $this->APICore                              = new APICore();
-        $this->CacheDuration                        = "_" . CacheDuration::MONTH . date( "m" );
+        $this->startTime        = hrtime(true);
+        $this->APICore          = new APICore();
+        $this->CacheDuration    = "_" . CacheDuration::MONTH . date( "m" );
     }
 
     private static function debugWrite( string $string ) {
