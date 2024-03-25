@@ -592,7 +592,7 @@ class FestivityCollection {
     public function purgeDataAdventChristmas( int|null $buffer = null ) {
         // the buffer should allow for 
         foreach( $this->festivities as $key => $festivity ) {
-            if( $festivity->date >= $this->festivities[ "Advent1" ]->date ) {
+            if( $festivity->date > $this->festivities[ "Advent1" ]->date ) {
                 unset( $this->festivities[ $key ] );
                     // make sure it isn't still contained in another collection
                     unset( $this->solemnities[ $key ] );
@@ -602,6 +602,8 @@ class FestivityCollection {
                     unset( $this->SolemnitiesLordBVM[ $key ] );
                     unset( $this->SundaysAdventLentEaster[ $key ] );
             }
+            //lastly remove First Sunday of Advent
+            unset( $this->festivities[ "Advent1" ] );
             /* Perhaps we shouldn't remove the Vigil Mass for the first Sunday of Advent?
             // also remove the Vigil Mass for the first Sunday of Advent
             if(
