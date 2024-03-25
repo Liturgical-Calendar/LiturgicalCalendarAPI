@@ -602,8 +602,8 @@ class FestivityCollection {
                 unset( $this->SolemnitiesLordBVM[ $key ] );
                 unset( $this->SundaysAdventLentEaster[ $key ] );
             }
-            /* Perhaps we shouldn't remove the Vigil Mass for the first Sunday of Advent?
             // also remove the Vigil Mass for the first Sunday of Advent
+            // unfortunately we cannot keep it, because it would have the same key as for the other calendar year
             if(
                 null !== $festivity->isVigilMass
                 &&
@@ -613,10 +613,10 @@ class FestivityCollection {
             ) {
                 unset( $this->festivities[ $key ] );
             }
-            */
         }
         //lastly remove First Sunday of Advent
         unset( $this->festivities[ "Advent1" ] );
+        unset( $this->solemnities[ "Advent1" ] );
     }
 
     public function mergeFestivityCollection( FestivityCollection $festivities ) {
