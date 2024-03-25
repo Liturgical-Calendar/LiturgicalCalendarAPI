@@ -2860,7 +2860,9 @@ class LitCalAPI {
         if (!empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
             header( $_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified" );
             header('Content-Length: 0');
+            header('X-LitCal-Generated: ClientCache');
         } else {
+            header('X-LitCal-Generated: Calculation');
             echo $response;
         }
         die();
@@ -2942,7 +2944,9 @@ class LitCalAPI {
             if (!empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
                 header( $_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified" );
                 header('Content-Length: 0');
+                header('X-LitCal-Generated: ClientCache');
             } else {
+                header('X-LitCal-Generated: ServerCache');
                 echo $response;
             }
             die();
