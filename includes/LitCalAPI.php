@@ -2948,6 +2948,8 @@ class LitCalAPI {
                 // Save the state of the current Calendar calculation
                 $this->Cal->sortFestivities();
                 $CalBackup = clone( $this->Cal );
+                $Messages  = $this->Messages;
+                $this->Messages = [];
 
                 // let's calculate the calendar for the previous year
                 $this->LitSettings->Year--;
@@ -2978,6 +2980,8 @@ class LitCalAPI {
 
                 // let's reset the year back to the original request before outputting results
                 $this->LitSettings->Year++;
+                // and append the backed up messages
+                array_push( $this->Messages, ...$Messages );
                 $this->generateResponse();
             }
             else {
