@@ -86,7 +86,7 @@ class LitSettings {
                         $this->DiocesanCalendar = strtoupper( $value );
                         break;
                     case "CALENDARTYPE":
-                        $this->CalendarType     = CalendarType::isValid( $value ) ? $value : CalendarType::LITURGICAL;
+                        $this->CalendarType     = CalendarType::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : CalendarType::LITURGICAL;
                         break;
                 }
             }
