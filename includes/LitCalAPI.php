@@ -937,13 +937,18 @@ class LitCalAPI {
         $BaptismLord      = new Festivity( $this->PropriumDeTempore[ "BaptismLord" ][ "NAME" ], LitDateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod ), LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
         $this->Cal->addFestivity( "BaptismLord", $BaptismLord );
 
-        //the other feasts of the Lord ( Presentation, Transfiguration and Triumph of the Holy Cross) are fixed date feasts
-        //and are found in the Proprium de Sanctis
+        // the other feasts of the Lord ( Presentation, Transfiguration and Triumph of the Holy Cross) are fixed date feasts
+        // and are found in the Proprium de Sanctis
+        // :DedicationLateran is a specific case, we consider it a Feast of the Lord even though it is displayed as FEAST
+        //  source: in the Missale Romanum, in the section Index Alphabeticus Celebrationum, under Iesus Christus D. N., the Dedicatio Basilicae Lateranensis is also listed
         $tempCal = array_filter( $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ], function( $el ){ return $el->GRADE === LitGrade::FEAST_LORD; } );
 
         foreach ( $tempCal as $row ) {
             $currentFeastDate = LitDateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
             $festivity = new Festivity( $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
+            if( $row->TAG === 'DedicationLateran' ) {
+                $festivity->displayGrade = $this->LitGrade->i18n( LitGrade::FEAST, false );
+            }
             $this->Cal->addFestivity( $row->TAG, $festivity );
         }
 
@@ -1030,8 +1035,12 @@ class LitCalAPI {
 
         foreach ( $tempCal as $row ) {
             $row->DATE = LitDateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-            //If a Feast ( not of the Lord ) occurs on a Sunday in Ordinary Time, the Sunday is celebrated.  ( e.g., St. Luke, 1992 )
-            //obviously solemnities also have precedence
+            // If a Feast ( not of the Lord ) occurs on a Sunday in Ordinary Time, the Sunday is celebrated.  ( e.g., St. Luke, 1992 )
+            // obviously solemnities also have precedence
+            // The Dedication of the Lateran Basilica is an exceptional case, where it is treated as a Feast of the Lord, even if it is displayed as a Feast
+            //  source: in the Missale Romanum, in the section Index Alphabeticus Celebrationum, under Iesus Christus D. N., the Dedicatio Basilicae Lateranensis is also listed
+            //  so we give it a grade of 5 === FEAST_LORD but a displayGrade of FEAST
+            //  it should therefore have already been handled in $this->calculateFeastsOfTheLord(), see :DedicationLateran
             if ( self::DateIsNotSunday( $row->DATE ) && !$this->Cal->inSolemnities( $row->DATE ) ) {
                 $festivity = new Festivity( $row->NAME, $row->DATE, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
                 $this->Cal->addFestivity( $row->TAG, $festivity );
@@ -1040,10 +1049,10 @@ class LitCalAPI {
             }
         }
 
-        //With the decree Apostolorum Apostola ( June 3rd 2016 ), the Congregation for Divine Worship
-        //with the approval of Pope Francis elevated the memorial of Saint Mary Magdalen to a Feast
-        //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf
-        //This is taken care of ahead when the "memorials from decrees" are applied
+        // With the decree Apostolorum Apostola ( June 3rd 2016 ), the Congregation for Divine Worship
+        // with the approval of Pope Francis elevated the memorial of Saint Mary Magdalen to a Feast
+        // source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf
+        // This is taken care of ahead when the "memorials from decrees" are applied
         // see :MEMORIALS_FROM_DECREES
 
     }
@@ -2726,12 +2735,16 @@ class LitCalAPI {
         foreach( $SerializeableLitCal->LitCal as $FestivityKey => $CalEvent ){
             $displayGrade = "";
             $displayGradeHTML = "";
-            if( $FestivityKey === 'AllSouls' ){
+            if( $FestivityKey === 'AllSouls' ) {
                 $displayGrade = $this->LitGrade->i18n( LitGrade::COMMEMORATION, false );
                 $displayGradeHTML = $this->LitGrade->i18n( LitGrade::COMMEMORATION, true );
             }
-            else if( (int)$CalEvent->date->format( 'N' ) !==7 ){
-                if( property_exists( $CalEvent,'displayGrade' ) && $CalEvent->displayGrade !== "" ){
+            else if( $FestivityKey === 'DedicationLateran' ) {
+                $displayGrade = $this->LitGrade->i18n( LitGrade::FEAST, false );
+                $displayGradeHTML = $this->LitGrade->i18n( LitGrade::FEAST, true );
+            }
+            else if( (int)$CalEvent->date->format( 'N' ) !==7 ) {
+                if( property_exists( $CalEvent,'displayGrade' ) && $CalEvent->displayGrade !== "" ) {
                     $displayGrade = $CalEvent->displayGrade;
                     $displayGradeHTML = '<B>' . $CalEvent->displayGrade . '</B>';
                 } else {
@@ -2740,7 +2753,7 @@ class LitCalAPI {
                 }
             }
             else if( (int)$CalEvent->grade > LitGrade::MEMORIAL ){
-                if( property_exists( $CalEvent,'displayGrade' ) && $CalEvent->displayGrade !== "" ){
+                if( property_exists( $CalEvent,'displayGrade' ) && $CalEvent->displayGrade !== "" ) {
                     $displayGrade = $CalEvent->displayGrade;
                     $displayGradeHTML = '<B>' . $CalEvent->displayGrade . '</B>';
                 } else {
