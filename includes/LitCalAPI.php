@@ -974,6 +974,30 @@ class LitCalAPI {
         }
         $this->Cal->addFestivity( "HolyFamily", $HolyFamily );
 
+        // In 2012, Pope Benedict XVI gave faculty to the Episcopal Conferences
+        //  to insert the Feast of Our Lord Jesus Christ, the Eternal High Priest
+        //  in their own liturgical calendars on the Thursday after Pentecost,
+        //  see http://notitiae.ipsissima-verba.org/pdf/notitiae-2012-335-368.pdf
+        if( $this->LitSettings->Year >= 2012 && true === $this->LitSettings->EternalHighPriest ) {
+            $EternalHighPriestDate = clone( $this->Cal->getFestivity( "Pentecost" )->date );
+            $EternalHighPriestDate->modify('next Thursday');
+            $locale = strtoupper( explode('_', $this->LitSettings->Locale)[0] );
+            $EternalHighPriestName = $locale === LitLocale::LATIN ? 'Domini Nostri Iesu Christi Summi et Aeterni Sacerdotis' :
+                /**translators: You can ignore this translation if the Feast has not been inserted by the Episcopal Conference */
+                _( 'Our Lord Jesus Christ, The Eternal High Priest' );
+            $festivity = new Festivity( $EternalHighPriestName, $EternalHighPriestDate, LitColor::WHITE, LitFeastType::FIXED, LitGrade::FEAST_LORD, LitCommon::PROPRIO );
+            $this->Cal->addFestivity( 'JesusChristEternalHighPriest', $festivity );
+            $this->Messages[] = sprintf(
+                /**translators: 1: National Calendar, 2: Requested calendar year, 3: source of the rule */
+                _( 'In 2012, Pope Benedict XVI gave faculty to the Episcopal Conferences' .
+                   ' to insert the Feast of Our Lord Jesus Christ the Eternal High Priest in their own liturgical calendars' .
+                   ' on the Thursday after Pentecost: applicable to the calendar \'%1$s\' in the year \'%2$d\' (%3$s).' ),
+                $this->LitSettings->NationalCalendar,
+                $this->LitSettings->Year,
+                '<a href="http://notitiae.ipsissima-verba.org/pdf/notitiae-2012-335-368.pdf" target="_blank">notitiae-2012-335-368.pdf</a>'
+            );
+        }
+
     }
 
     private function calculateSundaysChristmasOrdinaryTime() : void {

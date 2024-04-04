@@ -9,14 +9,15 @@ include_once( 'enums/CalendarType.php' );
 
 class LitSettings {
     public int $Year;
-    public string $CalendarType         = CalendarType::LITURGICAL;
-    public string $Epiphany             = Epiphany::JAN6;
-    public string $Ascension            = Ascension::THURSDAY;
-    public string $CorpusChristi        = CorpusChristi::THURSDAY;
-    public ?string $Locale              = null;
-    public ?string $ReturnType          = null;
-    public ?string $NationalCalendar    = null;
-    public ?string $DiocesanCalendar    = null;
+    public string $CalendarType          = CalendarType::LITURGICAL;
+    public string $Epiphany              = Epiphany::JAN6;
+    public string $Ascension             = Ascension::THURSDAY;
+    public string $CorpusChristi         = CorpusChristi::THURSDAY;
+    public bool   $EternalHighPriest     = false;
+    public ?string $Locale               = null;
+    public ?string $ReturnType           = null;
+    public ?string $NationalCalendar     = null;
+    public ?string $DiocesanCalendar     = null;
 
     const ALLOWED_PARAMS  = [
         "YEAR",
@@ -24,16 +25,17 @@ class LitSettings {
         "EPIPHANY",
         "ASCENSION",
         "CORPUSCHRISTI",
+        "ETERNALHIGHPRIEST",
         "LOCALE",
         "RETURNTYPE",
         "NATIONALCALENDAR",
         "DIOCESANCALENDAR"
     ];
 
-    //If we can get more data from 1582 (year of the Gregorian reform) to 1969
-    // perhaps we can lower the limit to the year of the Gregorian reform
-    //For now we'll just deal with the Liturgical Calendar from the Editio Typica 1970
-    //const YEAR_LOWER_LIMIT          = 1583;
+    // If we can get more data from 1582 (year of the Gregorian reform) to 1969
+    //  perhaps we can lower the limit to the year of the Gregorian reform
+    //  const YEAR_LOWER_LIMIT          = 1583;
+    // For now we'll just deal with the Liturgical Calendar from the Editio Typica 1970
     const YEAR_LOWER_LIMIT          = 1970;
 
     //The upper limit is determined by the limit of PHP in dealing with DateTime objects
@@ -87,6 +89,9 @@ class LitSettings {
                         break;
                     case "CALENDARTYPE":
                         $this->CalendarType     = CalendarType::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : CalendarType::LITURGICAL;
+                        break;
+                    case "ETERNALHIGHPRIEST":
+                        $this->EternalHighPriest = (bool)$value;
                         break;
                 }
             }
