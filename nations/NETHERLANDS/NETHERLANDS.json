@@ -163,7 +163,8 @@
         "Epiphany": "SUNDAY_JAN2_JAN8",
         "Ascension": "THURSDAY",
         "CorpusChristi": "SUNDAY",
-        "Locale": "nl_NL"
+        "Locale": "nl_NL",
+        "EternalHighPriest": true
     },
     "Metadata": {
         "Region": "NETHERLANDS",
