@@ -301,6 +301,12 @@ class LitCalAPI {
                         $this->LitSettings->CorpusChristi   = $this->NationalData->Settings->CorpusChristi;
                     }
                     if(
+                        property_exists( $this->NationalData->Settings, 'EternalHighPriest' )
+                        && is_bool( $this->NationalData->Settings->EternalHighPriest )
+                    ) {
+                        $this->LitSettings->EternalHighPriest = $this->NationalData->Settings->EternalHighPriest;
+                    }
+                    if(
                         property_exists( $this->NationalData->Settings, 'Locale'  )
                         && LitLocale::isValid( $this->NationalData->Settings->Locale )
                     ) {
