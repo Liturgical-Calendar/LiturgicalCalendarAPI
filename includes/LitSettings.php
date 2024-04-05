@@ -91,7 +91,7 @@ class LitSettings {
                         $this->CalendarType     = CalendarType::isValid( strtoupper( $value ) ) ? strtoupper( $value ) : CalendarType::LITURGICAL;
                         break;
                     case "ETERNALHIGHPRIEST":
-                        $this->EternalHighPriest = (bool)$value;
+                        $this->EternalHighPriest = filter_var( $value, FILTER_VALIDATE_BOOLEAN);
                         break;
                 }
             }
