@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # John R. D'Orazio <priest@johnromanodorazio.com>, 2022, 2023.
 # Steven van Roode <stevenvanroode@gmail.com>, 2022.
+# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-04-04 23:20+0000\n"
-"PO-Revision-Date: 2023-01-02 14:09+0000\n"
-"Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2024-04-05 00:25+0000\n"
+"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Dutch <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/nl/>\n"
 "Language: nl\n"
@@ -17,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.12.1\n"
+"X-Generator: Weblate 5.4.2\n"
 
 #: includes/LitCalAPI.php:403
 #, php-format
@@ -143,6 +144,11 @@ msgid ""
 "own liturgical calendars on the Thursday after Pentecost: applicable to the "
 "calendar '%1$s' in the year '%2$d' (%3$s)."
 msgstr ""
+"In 2012 verleende paus Benedictus XVI de bevoegdheid aan de bisschoppelijke "
+"conferenties om het feest van Onze Heer Jezus Christus, de Eeuwige "
+"Hogepriester, in hun eigen liturgische kalenders in te voegen op de "
+"donderdag na Pinksteren: van toepassing op de kalender '%1$s' in het jaar "
+"'%2$d' (%3$s)."
 
 #. translators: 1: Festivity name, 2: Superseding Festivity grade, 3: Superseding Festivity name, 4: Requested calendar year
 #: includes/LitCalAPI.php:1027 includes/LitCalAPI.php:1052
