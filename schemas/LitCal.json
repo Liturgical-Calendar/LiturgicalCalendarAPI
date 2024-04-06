@@ -15,6 +15,13 @@
                             "minimum": 1969,
                             "maximum": 9999
                         },
+                        "CalendarType": {
+                            "type": "string",
+                            "enum": [
+                                "CIVIL",
+                                "LITURGICAL"
+                            ]
+                        },
                         "Epiphany": {
                             "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
                         },
