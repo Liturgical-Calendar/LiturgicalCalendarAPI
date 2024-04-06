@@ -178,9 +178,9 @@ class LitCalHealth implements MessageComponentInterface {
 
     private function validateCalendar( string $Calendar, int $Year, string $category, ConnectionInterface $to ) : void {
         if( $Calendar === 'VATICAN' ) {
-            $req = "?year=$Year";
+            $req = "?year=$Year&calendartype=CIVIL";
         } else {
-            $req = "?$category=$Calendar&year=$Year";
+            $req = "?$category=$Calendar&year=$Year&calendartype=CIVIL";
         }
         $data = file_get_contents( self::LitCalBaseUrl . $req );
         if( $data !== false ) {
