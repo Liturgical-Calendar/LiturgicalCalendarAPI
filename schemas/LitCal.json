@@ -204,6 +204,9 @@
                 "isVigilMass": {
                     "type": "boolean"
                 },
+                "isVigilFor": {
+                    "type": "string"
+                },
                 "hasVigilMass":  {
                     "type": "boolean"
                 },
@@ -215,6 +218,17 @@
                 },
                 "psalterWeek": {
                     "type": "integer"
+                },
+                "liturgicalSeason": {
+                    "type": "string",
+                    "enum": [
+                        "ADVENT",
+                        "CHRISTMAS",
+                        "LENT",
+                        "EASTER_TRIDUUM",
+                        "EASTER",
+                        "ORDINARY_TIME"
+                    ]
                 }
             },
             "required": [
