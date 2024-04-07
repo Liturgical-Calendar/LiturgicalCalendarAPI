@@ -248,6 +248,7 @@ class LitCalHealth implements MessageComponentInterface {
             else if( gettype( $testResult ) === 'object' ) {
                 $testResult->classes = ".$Test.year-{$Year}.test-valid";
                 $testResult->test = $Test;
+                $testResult->jsonData = $jsonData;
                 $this->sendMessage( $to, $testResult );
             }
         }
