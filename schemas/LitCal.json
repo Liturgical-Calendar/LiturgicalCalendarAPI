@@ -68,6 +68,13 @@
                             "maxLength": 5,
                             "pattern": "^(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)$"
                         },
+                        "Timestamp": {
+                            "type": "integer"
+                        },
+                        "DateTime": {
+                            "type": "string",
+                            "pattern": "^2\\d\\d\\d\\-\\d\\d\\-\\d\\d (?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d"
+                        },
                         "RequestHeaders": {
                             "type": "string",
                             "contentMediaType": "application/json"
