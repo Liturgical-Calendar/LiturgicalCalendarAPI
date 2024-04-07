@@ -206,7 +206,7 @@
                 },
                 "date": {
                     "type": "integer",
-                    "minimum": -86400,
+                    "minimum": -2851200,
                     "maximum": 253402214400
                 },
                 "color": {
