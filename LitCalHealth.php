@@ -178,7 +178,7 @@ class LitCalHealth implements MessageComponentInterface {
 
     private function validateCalendar( string $Calendar, int $Year, string $category, ConnectionInterface $to ) : void {
         if( $Calendar === 'VATICAN' ) {
-            $req = "?year=$Year&calendartype=CIVIL";
+            $req = "?nationalcalendar=VATICAN&year=$Year&calendartype=CIVIL";
         } else {
             $req = "?$category=$Calendar&year=$Year&calendartype=CIVIL";
         }
@@ -228,7 +228,7 @@ class LitCalHealth implements MessageComponentInterface {
 
     private function executeUnitTest( string $Test, string $Calendar, int $Year, string $category, ConnectionInterface $to ) : void {
         if( $Calendar === 'VATICAN' ) {
-            $req = "?year=$Year&calendartype=CIVIL";
+            $req = "?nationalcalendar=VATICAN&year=$Year&calendartype=CIVIL";
         } else {
             $req = "?$category=$Calendar&year=$Year&calendartype=CIVIL";
         }
