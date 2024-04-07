@@ -78,6 +78,9 @@
                         "RequestHeaders": {
                             "type": "object",
                             "properties": {
+                                "Cookie": {
+                                    "type": "string"
+                                },
                                 "Accept-Language": {
                                     "type": "string"
                                 },
