@@ -76,8 +76,60 @@
                             "pattern": "^2\\d\\d\\d\\-\\d\\d\\-\\d\\d (?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d"
                         },
                         "RequestHeaders": {
-                            "type": "string",
-                            "contentMediaType": "application/json"
+                            "type": "object",
+                            "properties": {
+                                "Accept-Language": {
+                                    "type": "string"
+                                },
+                                "Accept-Encoding": {
+                                    "type": "string"
+                                },
+                                "Sec-Fetch-Dest": {
+                                    "type": "string"
+                                },
+                                "Sec-Fetch-User": {
+                                    "type": "string"
+                                },
+                                "Sec-Fetch-Mode": {
+                                    "type": "string"
+                                },
+                                "Sec-Fetch-Site": {
+                                    "type": "string"
+                                },
+                                "Accept": {
+                                    "type": "string"
+                                },
+                                "User-Agent": {
+                                    "type": "string"
+                                },
+                                "Upgrade-Insecure-Requests": {
+                                    "type": "string"
+                                },
+                                "Sec-Ch-Ua-Platform": {
+                                    "type": "string"
+                                },
+                                "Sec-Ch-Ua-Mobile": {
+                                    "type": "string"
+                                },
+                                "Sec-Ch-Ua": {
+                                    "type": "string"
+                                },
+                                "Cache-Control": {
+                                    "type": "string"
+                                },
+                                "Pragma": {
+                                    "type": "string"
+                                },
+                                "Connection": {
+                                    "type": "string"
+                                },
+                                "X-Accel-Internal": {
+                                    "type": "string"
+                                },
+                                "Host": {
+                                    "type": "string"
+                                }
+                            }
                         },
                         "Solemnities": {
                             "$ref": "#/definitions/DateTimeObjectCollection"
