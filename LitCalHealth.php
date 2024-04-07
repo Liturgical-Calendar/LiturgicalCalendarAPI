@@ -269,6 +269,3 @@ class LitCalHealth implements MessageComponentInterface {
     }
 
 }
-
-
-$LitCalHealth = new LitCalHealth();
