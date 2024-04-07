@@ -196,7 +196,7 @@
                 "eventIdx": {
                     "type": "integer",
                     "minimum": 0,
-                    "maximum": 999
+                    "maximum": 2000
                 },
                 "name": {
                     "type": "string"
