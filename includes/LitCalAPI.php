@@ -6,6 +6,7 @@ include_once( 'includes/enums/LitColor.php' );
 include_once( 'includes/enums/LitCommon.php' );
 include_once( 'includes/enums/LitFeastType.php' );
 include_once( 'includes/enums/LitGrade.php' );
+include_once( 'includes/enums/LitSeason.php' );
 include_once( 'includes/enums/RequestMethod.php' );
 include_once( 'includes/enums/RequestContentType.php' );
 include_once( 'includes/enums/ReturnType.php' );
@@ -22,7 +23,7 @@ include_once( "includes/pgettext.php" );
 
 class LitCalAPI {
 
-    const API_VERSION                               = '3.8';
+    const API_VERSION                               = '3.9';
     public APICore $APICore;
 
     private string $CacheDuration                   = "";
@@ -47,6 +48,9 @@ class LitCalAPI {
     private array $tempCal                          = [];
     private string $BaptismLordFmt;
     private string $BaptismLordMod;
+
+    private int $startTime;
+    private int $endTime;
 
     /**
      * The following schemas for ordinal spellouts have been taken from
@@ -190,8 +194,9 @@ class LitCalAPI {
     ];
 
     public function __construct(){
-        $this->APICore                              = new APICore();
-        $this->CacheDuration                        = "_" . CacheDuration::MONTH . date( "m" );
+        $this->startTime        = hrtime(true);
+        $this->APICore          = new APICore();
+        $this->CacheDuration    = "_" . CacheDuration::MONTH . date( "m" );
     }
 
     private static function debugWrite( string $string ) {
@@ -294,6 +299,12 @@ class LitCalAPI {
                         && CorpusChristi::isValid( $this->NationalData->Settings->CorpusChristi )
                     ) {
                         $this->LitSettings->CorpusChristi   = $this->NationalData->Settings->CorpusChristi;
+                    }
+                    if(
+                        property_exists( $this->NationalData->Settings, 'EternalHighPriest' )
+                        && is_bool( $this->NationalData->Settings->EternalHighPriest )
+                    ) {
+                        $this->LitSettings->EternalHighPriest = $this->NationalData->Settings->EternalHighPriest;
                     }
                     if(
                         property_exists( $this->NationalData->Settings, 'Locale'  )
@@ -752,7 +763,7 @@ class LitCalAPI {
         $this->Cal->addFestivity( "SacredHeart", $SacredHeart );
 
         //Christ the King is calculated backwards from the first sunday of advent
-        $ChristKing = new Festivity( $this->PropriumDeTempore[ "ChristKing" ][ "NAME" ],     LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 4 * 7 ) . 'D' ) ),    LitColor::RED,  LitFeastType::MOBILE, LitGrade::SOLEMNITY );
+        $ChristKing = new Festivity( $this->PropriumDeTempore[ "ChristKing" ][ "NAME" ],     LitDateTime::createFromFormat( '!j-n-Y', '25-12-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) )->modify( 'last Sunday' )->sub( new DateInterval( 'P' . ( 4 * 7 ) . 'D' ) ),    LitColor::WHITE,  LitFeastType::MOBILE, LitGrade::SOLEMNITY );
         $this->Cal->addFestivity( "ChristKing", $ChristKing );
     }
 
@@ -932,13 +943,18 @@ class LitCalAPI {
         $BaptismLord      = new Festivity( $this->PropriumDeTempore[ "BaptismLord" ][ "NAME" ], LitDateTime::createFromFormat( '!j-n-Y', $this->BaptismLordFmt, new DateTimeZone( 'UTC' ) )->modify( $this->BaptismLordMod ), LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
         $this->Cal->addFestivity( "BaptismLord", $BaptismLord );
 
-        //the other feasts of the Lord ( Presentation, Transfiguration and Triumph of the Holy Cross) are fixed date feasts
-        //and are found in the Proprium de Sanctis
+        // the other feasts of the Lord ( Presentation, Transfiguration and Triumph of the Holy Cross) are fixed date feasts
+        // and are found in the Proprium de Sanctis
+        // :DedicationLateran is a specific case, we consider it a Feast of the Lord even though it is displayed as FEAST
+        //  source: in the Missale Romanum, in the section Index Alphabeticus Celebrationum, under Iesus Christus D. N., the Dedicatio Basilicae Lateranensis is also listed
         $tempCal = array_filter( $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ], function( $el ){ return $el->GRADE === LitGrade::FEAST_LORD; } );
 
         foreach ( $tempCal as $row ) {
             $currentFeastDate = LitDateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
             $festivity = new Festivity( $row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
+            if( $row->TAG === 'DedicationLateran' ) {
+                $festivity->displayGrade = $this->LitGrade->i18n( LitGrade::FEAST, false );
+            }
             $this->Cal->addFestivity( $row->TAG, $festivity );
         }
 
@@ -963,6 +979,30 @@ class LitCalAPI {
             $HolyFamily = new Festivity( $this->PropriumDeTempore[ "HolyFamily" ][ "NAME" ], $holyFamilyDate, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::FEAST_LORD );
         }
         $this->Cal->addFestivity( "HolyFamily", $HolyFamily );
+
+        // In 2012, Pope Benedict XVI gave faculty to the Episcopal Conferences
+        //  to insert the Feast of Our Lord Jesus Christ, the Eternal High Priest
+        //  in their own liturgical calendars on the Thursday after Pentecost,
+        //  see http://notitiae.ipsissima-verba.org/pdf/notitiae-2012-335-368.pdf
+        if( $this->LitSettings->Year >= 2012 && true === $this->LitSettings->EternalHighPriest ) {
+            $EternalHighPriestDate = clone( $this->Cal->getFestivity( "Pentecost" )->date );
+            $EternalHighPriestDate->modify('next Thursday');
+            $locale = strtoupper( explode('_', $this->LitSettings->Locale)[0] );
+            $EternalHighPriestName = $locale === LitLocale::LATIN ? 'Domini Nostri Iesu Christi Summi et Aeterni Sacerdotis' :
+                /**translators: You can ignore this translation if the Feast has not been inserted by the Episcopal Conference */
+                _( 'Our Lord Jesus Christ, The Eternal High Priest' );
+            $festivity = new Festivity( $EternalHighPriestName, $EternalHighPriestDate, LitColor::WHITE, LitFeastType::FIXED, LitGrade::FEAST_LORD, LitCommon::PROPRIO );
+            $this->Cal->addFestivity( 'JesusChristEternalHighPriest', $festivity );
+            $this->Messages[] = sprintf(
+                /**translators: 1: National Calendar, 2: Requested calendar year, 3: source of the rule */
+                _( 'In 2012, Pope Benedict XVI gave faculty to the Episcopal Conferences' .
+                   ' to insert the Feast of Our Lord Jesus Christ the Eternal High Priest in their own liturgical calendars' .
+                   ' on the Thursday after Pentecost: applicable to the calendar \'%1$s\' in the year \'%2$d\' (%3$s).' ),
+                $this->LitSettings->NationalCalendar,
+                $this->LitSettings->Year,
+                '<a href="http://notitiae.ipsissima-verba.org/pdf/notitiae-2012-335-368.pdf" target="_blank">notitiae-2012-335-368.pdf</a>'
+            );
+        }
 
     }
 
@@ -1025,8 +1065,12 @@ class LitCalAPI {
 
         foreach ( $tempCal as $row ) {
             $row->DATE = LitDateTime::createFromFormat( '!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->LitSettings->Year, new DateTimeZone( 'UTC' ) );
-            //If a Feast ( not of the Lord ) occurs on a Sunday in Ordinary Time, the Sunday is celebrated.  ( e.g., St. Luke, 1992 )
-            //obviously solemnities also have precedence
+            // If a Feast ( not of the Lord ) occurs on a Sunday in Ordinary Time, the Sunday is celebrated.  ( e.g., St. Luke, 1992 )
+            // obviously solemnities also have precedence
+            // The Dedication of the Lateran Basilica is an exceptional case, where it is treated as a Feast of the Lord, even if it is displayed as a Feast
+            //  source: in the Missale Romanum, in the section Index Alphabeticus Celebrationum, under Iesus Christus D. N., the Dedicatio Basilicae Lateranensis is also listed
+            //  so we give it a grade of 5 === FEAST_LORD but a displayGrade of FEAST
+            //  it should therefore have already been handled in $this->calculateFeastsOfTheLord(), see :DedicationLateran
             if ( self::DateIsNotSunday( $row->DATE ) && !$this->Cal->inSolemnities( $row->DATE ) ) {
                 $festivity = new Festivity( $row->NAME, $row->DATE, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON );
                 $this->Cal->addFestivity( $row->TAG, $festivity );
@@ -1035,10 +1079,11 @@ class LitCalAPI {
             }
         }
 
-        //With the decree Apostolorum Apostola ( June 3rd 2016 ), the Congregation for Divine Worship
-        //with the approval of Pope Francis elevated the memorial of Saint Mary Magdalen to a Feast
-        //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf
-        //This is taken care of ahead when the "memorials from decrees" are applied
+        // With the decree Apostolorum Apostola ( June 3rd 2016 ), the Congregation for Divine Worship
+        // with the approval of Pope Francis elevated the memorial of Saint Mary Magdalen to a Feast
+        // source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf
+        // This is taken care of ahead when the "memorials from decrees" are applied
+        // see :MEMORIALS_FROM_DECREES
 
     }
 
@@ -1950,7 +1995,7 @@ class LitCalAPI {
         $SatMemBVM_cnt = 0;
         while( $currentSaturday <= $lastSatDT ){
             $currentSaturday = LitDateTime::createFromFormat( '!j-n-Y', $currentSaturday->format( 'j-n-Y' ),new DateTimeZone( 'UTC' ) )->modify( 'next Saturday' );
-            if( $this->Cal->notInSolemnitiesFeastsOrMemorials( $currentSaturday ) ) {
+            if( $this->Cal->inOrdinaryTime( $currentSaturday ) && $this->Cal->notInSolemnitiesFeastsOrMemorials( $currentSaturday ) ) {
                 $memID = "SatMemBVM" . ++$SatMemBVM_cnt;
                 $name = $this->LitSettings->Locale === LitLocale::LATIN ? "Memoria Sanctæ Mariæ in Sabbato" : _( "Saturday Memorial of the Blessed Virgin Mary" );
                 $festivity = new Festivity( $name, $currentSaturday, LitColor::WHITE, LitFeastType::MOBILE, LitGrade::MEMORIAL_OPT, LitCommon::BEATAE_MARIAE_VIRGINIS );
@@ -2461,6 +2506,7 @@ class LitCalAPI {
             $this->calculateMemorials( LitGrade::MEMORIAL, RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008 );
         }
 
+        // :MEMORIALS_FROM_DECREES
         $this->loadMemorialsFromDecreesData();
         $this->applyDecrees( LitGrade::MEMORIAL );
 
@@ -2498,8 +2544,8 @@ class LitCalAPI {
         $this->calculateWeekdaysOrdinaryTime();
 
         //15. On Saturdays in Ordinary Time when there is no obligatory memorial, an optional memorial of the Blessed Virgin Mary is allowed.
-        $this->calculateSaturdayMemorialBVM();
-
+        // We will handle this after having set National and Diocesan calendar data
+        // see :SATURDAY_MEMORIAL_BVM
     }
 
     private function interpretStrtotime( object $row, string $key ) : LitDateTime|false {
@@ -2719,12 +2765,16 @@ class LitCalAPI {
         foreach( $SerializeableLitCal->LitCal as $FestivityKey => $CalEvent ){
             $displayGrade = "";
             $displayGradeHTML = "";
-            if( $FestivityKey === 'AllSouls' ){
+            if( $FestivityKey === 'AllSouls' ) {
                 $displayGrade = $this->LitGrade->i18n( LitGrade::COMMEMORATION, false );
                 $displayGradeHTML = $this->LitGrade->i18n( LitGrade::COMMEMORATION, true );
             }
-            else if( (int)$CalEvent->date->format( 'N' ) !==7 ){
-                if( property_exists( $CalEvent,'displayGrade' ) && $CalEvent->displayGrade !== "" ){
+            else if( $FestivityKey === 'DedicationLateran' ) {
+                $displayGrade = $this->LitGrade->i18n( LitGrade::FEAST, false );
+                $displayGradeHTML = $this->LitGrade->i18n( LitGrade::FEAST, true );
+            }
+            else if( (int)$CalEvent->date->format( 'N' ) !==7 ) {
+                if( property_exists( $CalEvent,'displayGrade' ) && $CalEvent->displayGrade !== "" ) {
                     $displayGrade = $CalEvent->displayGrade;
                     $displayGradeHTML = '<B>' . $CalEvent->displayGrade . '</B>';
                 } else {
@@ -2733,7 +2783,7 @@ class LitCalAPI {
                 }
             }
             else if( (int)$CalEvent->grade > LitGrade::MEMORIAL ){
-                if( property_exists( $CalEvent,'displayGrade' ) && $CalEvent->displayGrade !== "" ){
+                if( property_exists( $CalEvent,'displayGrade' ) && $CalEvent->displayGrade !== "" ) {
                     $displayGrade = $CalEvent->displayGrade;
                     $displayGradeHTML = '<B>' . $CalEvent->displayGrade . '</B>';
                 } else {
@@ -2786,7 +2836,6 @@ class LitCalAPI {
         $SerializeableLitCal->Settings                = new stdClass();
         $SerializeableLitCal->Metadata                = new stdClass();
 
-        $this->Cal->sortFestivities();
         $SerializeableLitCal->LitCal                  = $this->Cal->getFestivities();
         $SerializeableLitCal->Messages                = $this->Messages;
         $SerializeableLitCal->Settings->Year          = $this->LitSettings->Year;
@@ -2795,6 +2844,7 @@ class LitCalAPI {
         $SerializeableLitCal->Settings->CorpusChristi = $this->LitSettings->CorpusChristi;
         $SerializeableLitCal->Settings->Locale        = $this->LitSettings->Locale;
         $SerializeableLitCal->Settings->ReturnType    = $this->LitSettings->ReturnType;
+        $SerializeableLitCal->Settings->CalendarType  = $this->LitSettings->CalendarType;
         if( $this->LitSettings->NationalCalendar !== null ){
             $SerializeableLitCal->Settings->NationalCalendar = $this->LitSettings->NationalCalendar;
         }
@@ -2803,7 +2853,11 @@ class LitCalAPI {
         }
 
         $SerializeableLitCal->Metadata->VERSION             = self::API_VERSION;
-        $SerializeableLitCal->Metadata->RequestHeaders      = $this->APICore->getJsonEncodedRequestHeaders();
+        $SerializeableLitCal->Metadata->Timestamp           = time();
+        $SerializeableLitCal->Metadata->DateTime            = date('Y-m-d H:i:s');
+
+        //$SerializeableLitCal->Metadata->RequestHeaders      = $this->APICore->getJsonEncodedRequestHeaders();
+        $SerializeableLitCal->Metadata->RequestHeaders      = $this->APICore->getRequestHeaders();
         $SerializeableLitCal->Metadata->Solemnities         = $this->Cal->getSolemnities();
         $SerializeableLitCal->Metadata->FeastsMemorials     = $this->Cal->getFeastsAndMemorials();
 
@@ -2838,11 +2892,20 @@ class LitCalAPI {
         }
         file_put_contents( $this->CACHEFILE, $response );
         $responseHash = md5( $response );
+
+        $this->endTime = hrtime(true);
+        $executionTime = $this->endTime - $this->startTime;
+        header('X-LitCal-Starttime: ' . $this->startTime);
+        header('X-LitCal-Endtime: ' . $this->endTime);
+        header('X-LitCal-Executiontime: ' . $executionTime);
+
         header("Etag: \"{$responseHash}\"");
         if (!empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
             header( $_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified" );
             header('Content-Length: 0');
+            header('X-LitCal-Generated: ClientCache');
         } else {
+            header('X-LitCal-Generated: Calculation');
             echo $response;
         }
         die();
@@ -2911,13 +2974,22 @@ class LitCalAPI {
             //and stored the results in a cache file
             //then we're done, just output this and die
             //or better, make the client use it's own cache copy!
-            $response = file_get_contents( $this->CACHEFILE );
-            $responseHash = md5( $response );
+            $response       = file_get_contents( $this->CACHEFILE );
+            $responseHash   = md5( $response );
+
+            $this->endTime  = hrtime(true);
+            $executionTime  = $this->endTime - $this->startTime;
+            header('X-LitCal-Starttime: ' . $this->startTime);
+            header('X-LitCal-Endtime: ' . $this->endTime);
+            header('X-LitCal-Executiontime: ' . $executionTime);
+
             header("Etag: \"{$responseHash}\"");
             if (!empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
                 header( $_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified" );
                 header('Content-Length: 0');
+                header('X-LitCal-Generated: ClientCache');
             } else {
+                header('X-LitCal-Generated: ServerCache');
                 echo $response;
             }
             die();
@@ -2930,13 +3002,59 @@ class LitCalAPI {
                 $this->applyNationalCalendar();
             }
 
+            // :SATURDAY_MEMORIAL_BVM
+            $this->calculateSaturdayMemorialBVM();
+
             if( $this->LitSettings->DiocesanCalendar !== null && $this->DiocesanData !== null ) {
                 $this->applyDiocesanCalendar();
             }
 
-            //$this->setCyclesAndVigils();
-            $this->Cal->setCyclesAndVigils();
-            $this->generateResponse();
+            $this->Cal->setCyclesVigilsSeasons();
+
+            if ( $this->LitSettings->CalendarType === CalendarType::LITURGICAL ) {
+                // Save the state of the current Calendar calculation
+                $this->Cal->sortFestivities();
+                $CalBackup = clone( $this->Cal );
+                $Messages  = $this->Messages;
+                $this->Messages = [];
+
+                // let's calculate the calendar for the previous year
+                $this->LitSettings->Year--;
+                $this->Cal           = new FestivityCollection( $this->LitSettings );
+
+                $this->calculateUniversalCalendar();
+
+                if( $this->LitSettings->NationalCalendar !== null && $this->NationalData !== null ) {
+                    $this->applyNationalCalendar();
+                }
+
+                // :SATURDAY_MEMORIAL_BVM
+                $this->calculateSaturdayMemorialBVM();
+
+                if( $this->LitSettings->DiocesanCalendar !== null && $this->DiocesanData !== null ) {
+                    $this->applyDiocesanCalendar();
+                }
+
+                $this->Cal->setCyclesVigilsSeasons();
+                $this->Cal->sortFestivities();
+
+                $this->Cal->purgeDataBeforeAdvent();
+                $CalBackup->purgeDataAdventChristmas();
+
+                // Now we have to combine the two
+                // the backup (which represents the main portion) should be appended to the calendar that was just generated
+                $this->Cal->mergeFestivityCollection( $CalBackup );
+
+                // let's reset the year back to the original request before outputting results
+                $this->LitSettings->Year++;
+                // and append the backed up messages
+                array_push( $this->Messages, ...$Messages );
+                $this->generateResponse();
+            }
+            else {
+                $this->Cal->sortFestivities();
+                $this->generateResponse();
+            }
         }
     }
 

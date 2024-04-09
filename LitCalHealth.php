@@ -178,9 +178,9 @@ class LitCalHealth implements MessageComponentInterface {
 
     private function validateCalendar( string $Calendar, int $Year, string $category, ConnectionInterface $to ) : void {
         if( $Calendar === 'VATICAN' ) {
-            $req = "?year=$Year";
+            $req = "?nationalcalendar=VATICAN&year=$Year&calendartype=CIVIL";
         } else {
-            $req = "?$category=$Calendar&year=$Year";
+            $req = "?$category=$Calendar&year=$Year&calendartype=CIVIL";
         }
         $data = file_get_contents( self::LitCalBaseUrl . $req );
         if( $data !== false ) {
@@ -228,9 +228,9 @@ class LitCalHealth implements MessageComponentInterface {
 
     private function executeUnitTest( string $Test, string $Calendar, int $Year, string $category, ConnectionInterface $to ) : void {
         if( $Calendar === 'VATICAN' ) {
-            $req = "?year=$Year";
+            $req = "?nationalcalendar=VATICAN&year=$Year&calendartype=CIVIL";
         } else {
-            $req = "?$category=$Calendar&year=$Year";
+            $req = "?$category=$Calendar&year=$Year&calendartype=CIVIL";
         }
         $jsonData = json_decode( file_get_contents( self::LitCalBaseUrl . $req ) );
         if( json_last_error() === JSON_ERROR_NONE ) {
@@ -248,6 +248,7 @@ class LitCalHealth implements MessageComponentInterface {
             else if( gettype( $testResult ) === 'object' ) {
                 $testResult->classes = ".$Test.year-{$Year}.test-valid";
                 $testResult->test = $Test;
+                $testResult->jsonData = $jsonData;
                 $this->sendMessage( $to, $testResult );
             }
         }
@@ -269,6 +270,3 @@ class LitCalHealth implements MessageComponentInterface {
     }
 
 }
-
-
-$LitCalHealth = new LitCalHealth();

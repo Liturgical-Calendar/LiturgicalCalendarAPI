@@ -15,6 +15,13 @@
                             "minimum": 1969,
                             "maximum": 9999
                         },
+                        "CalendarType": {
+                            "type": "string",
+                            "enum": [
+                                "CIVIL",
+                                "LITURGICAL"
+                            ]
+                        },
                         "Epiphany": {
                             "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
                         },
@@ -61,9 +68,71 @@
                             "maxLength": 5,
                             "pattern": "^(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)$"
                         },
-                        "RequestHeaders": {
+                        "Timestamp": {
+                            "type": "integer"
+                        },
+                        "DateTime": {
                             "type": "string",
-                            "contentMediaType": "application/json"
+                            "pattern": "^2\\d\\d\\d\\-\\d\\d\\-\\d\\d (?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d"
+                        },
+                        "RequestHeaders": {
+                            "type": "object",
+                            "properties": {
+                                "Cookie": {
+                                    "type": "string"
+                                },
+                                "Accept-Language": {
+                                    "type": "string"
+                                },
+                                "Accept-Encoding": {
+                                    "type": "string"
+                                },
+                                "Sec-Fetch-Dest": {
+                                    "type": "string"
+                                },
+                                "Sec-Fetch-User": {
+                                    "type": "string"
+                                },
+                                "Sec-Fetch-Mode": {
+                                    "type": "string"
+                                },
+                                "Sec-Fetch-Site": {
+                                    "type": "string"
+                                },
+                                "Accept": {
+                                    "type": "string"
+                                },
+                                "User-Agent": {
+                                    "type": "string"
+                                },
+                                "Upgrade-Insecure-Requests": {
+                                    "type": "string"
+                                },
+                                "Sec-Ch-Ua-Platform": {
+                                    "type": "string"
+                                },
+                                "Sec-Ch-Ua-Mobile": {
+                                    "type": "string"
+                                },
+                                "Sec-Ch-Ua": {
+                                    "type": "string"
+                                },
+                                "Cache-Control": {
+                                    "type": "string"
+                                },
+                                "Pragma": {
+                                    "type": "string"
+                                },
+                                "Connection": {
+                                    "type": "string"
+                                },
+                                "X-Accel-Internal": {
+                                    "type": "string"
+                                },
+                                "Host": {
+                                    "type": "string"
+                                }
+                            }
                         },
                         "Solemnities": {
                             "$ref": "#/definitions/DateTimeObjectCollection"
@@ -130,14 +199,14 @@
                 "eventIdx": {
                     "type": "integer",
                     "minimum": 0,
-                    "maximum": 999
+                    "maximum": 2000
                 },
                 "name": {
                     "type": "string"
                 },
                 "date": {
                     "type": "integer",
-                    "minimum": -86400,
+                    "minimum": -2851200,
                     "maximum": 253402214400
                 },
                 "color": {
@@ -197,6 +266,9 @@
                 "isVigilMass": {
                     "type": "boolean"
                 },
+                "isVigilFor": {
+                    "type": "string"
+                },
                 "hasVigilMass":  {
                     "type": "boolean"
                 },
@@ -208,6 +280,17 @@
                 },
                 "psalterWeek": {
                     "type": "integer"
+                },
+                "liturgicalSeason": {
+                    "type": "string",
+                    "enum": [
+                        "ADVENT",
+                        "CHRISTMAS",
+                        "LENT",
+                        "EASTER_TRIDUUM",
+                        "EASTER",
+                        "ORDINARY_TIME"
+                    ]
                 }
             },
             "required": [

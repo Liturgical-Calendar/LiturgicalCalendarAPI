@@ -1,7 +1,7 @@
 <table>
     <thead>
-        <tr><th colspan="2">Code quality</th><th>Translation status</th></tr>
-        <tr><th style="text-align:center;"><a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/master">main branch</a></th><th style="text-align:center;"><a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/development">development branch</a></th><th></th></tr>
+        <tr><th colspan="2">Code quality</th><th>Translation status</th><th>OpenAPI validation</th></tr>
+        <tr><th style="text-align:center;"><a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/master">main branch</a></th><th style="text-align:center;"><a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/development">development branch</a></th><th></th><th></th></tr>
     </thead>
     <tbody>
         <tr>
@@ -14,6 +14,7 @@
             <td><a href="https://translate.johnromanodorazio.com/engage/liturgical-calendar/">
 <img src="https://translate.johnromanodorazio.com/widgets/liturgical-calendar/-/287x66-white.png" alt="Translation status" />
 </a></td>
+            <td> <a href="https://validator.swagger.io/validator?url=https://raw.githubusercontent.com/Liturgical-Calendar/LiturgicalCalendarAPI/master/schemas/openapi.json"><img src="https://validator.swagger.io/validator?url=https://raw.githubusercontent.com/Liturgical-Calendar/LiturgicalCalendarAPI/master/schemas/openapi.json" alt="OpenAPI validation result" /></a></td>
         </tr>
     </tbody>
 </table>
