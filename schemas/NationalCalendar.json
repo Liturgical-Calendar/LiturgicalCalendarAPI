@@ -192,6 +192,9 @@
                 "CorpusChristi": {
                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
                 },
+                "EternalHighPriest": {
+                    "type": "boolean"
+                },
                 "Locale": {
                     "type": "string"
                 }
