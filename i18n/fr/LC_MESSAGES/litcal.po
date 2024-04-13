@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # Ubuntu <priest@johnromanodorazio.com>, 2021.
 # John R. D'Orazio <priest@johnromanodorazio.com>, 2022, 2023.
+# Weblate Admin <admin@example.com>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-04-04 23:20+0000\n"
-"PO-Revision-Date: 2023-01-02 14:09+0000\n"
-"Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2024-04-14 00:22+0000\n"
+"Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: French <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/fr/>\n"
 "Language: fr\n"
@@ -17,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 4.12.1\n"
+"X-Generator: Weblate 5.4.3\n"
 
 #: includes/LitCalAPI.php:403
 #, php-format
@@ -611,7 +612,7 @@ msgstr "rouge"
 #. translators: context = liturgical color
 #: includes/enums/LitColor.php:39
 msgid "pink"
-msgstr ""
+msgstr "rose"
 
 #: includes/enums/LitCommon.php:57
 msgid "Proper"
