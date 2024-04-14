@@ -596,7 +596,7 @@
                   },
                   "Upgrade-Insecure-Requests" : {
                     "type" : "string",
-                    "example" : [ "1" ]
+                    "examples" : [ "1" ]
                   },
                   "Sec-Ch-Ua-Platform" : {
                     "type" : "string",
