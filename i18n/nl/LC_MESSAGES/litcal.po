@@ -4,13 +4,14 @@
 # John R. D'Orazio <priest@johnromanodorazio.com>, 2022, 2023.
 # Steven van Roode <stevenvanroode@gmail.com>, 2022.
 # "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024.
+# Weblate Admin <admin@example.com>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-04-14 22:46+0000\n"
-"PO-Revision-Date: 2024-04-05 00:25+0000\n"
-"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2024-04-15 23:33+0000\n"
+"Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: Dutch <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/nl/>\n"
 "Language: nl\n"
@@ -18,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4.2\n"
+"X-Generator: Weblate 5.4.3\n"
 
 #: includes/LitCalAPI.php:403
 #, php-format
@@ -133,7 +134,7 @@ msgstr ""
 #. translators: You can ignore this translation if the Feast has not been inserted by the Episcopal Conference
 #: includes/LitCalAPI.php:993
 msgid "Our Lord Jesus Christ, The Eternal High Priest"
-msgstr ""
+msgstr "Onze Heer Christus Eeuwige Hogepriester"
 
 #. translators: 1: National Calendar, 2: Requested calendar year, 3: source of the rule
 #: includes/LitCalAPI.php:998
@@ -948,32 +949,32 @@ msgstr "viering met voorrang op hoogfesten"
 #. translators: context = liturgical season
 #: includes/enums/LitSeason.php:20
 msgid "Advent"
-msgstr ""
+msgstr "Adventstijd"
 
 #. translators: context = liturgical season
 #: includes/enums/LitSeason.php:23
 msgid "Christmas"
-msgstr ""
+msgstr "Kersttijd"
 
 #. translators: context = liturgical season
 #: includes/enums/LitSeason.php:26
 msgid "Lent"
-msgstr ""
+msgstr "Vastentijd"
 
 #. translators: context = liturgical season
 #: includes/enums/LitSeason.php:29
 msgid "Easter Triduum"
-msgstr ""
+msgstr "Paastriduüm"
 
 #. translators: context = liturgical season
 #: includes/enums/LitSeason.php:32
 msgid "Easter"
-msgstr ""
+msgstr "Paasseizoen"
 
 #. translators: context = liturgical season
 #: includes/enums/LitSeason.php:35
 msgid "Ordinary Time"
-msgstr ""
+msgstr "Gewone tijd"
 
 #~ msgctxt "(SING_FEMM)"
 #~ msgid "of"
