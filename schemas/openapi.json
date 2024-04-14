@@ -398,17 +398,22 @@
               "Epiphany" : {
                 "type" : "string",
                 "enum" : [ "JAN6", "SUNDAY_JAN2_JAN8" ],
-                "description" : "whether Epiphany was set to be celebrated on January 6th or on the Sunday between January 2nd and January 8th"
+                "description" : "whether Epiphany is set to be celebrated on January 6th or on the Sunday between January 2nd and January 8th"
               },
               "Ascension" : {
                 "type" : "string",
                 "enum" : [ "SUNDAY", "THURSDAY" ],
-                "description" : "whether Ascension was set to be celebrated on Thursday or on Sunday"
+                "description" : "whether Ascension is set to be celebrated on Thursday or on Sunday"
               },
               "CorpusChristi" : {
                 "type" : "string",
                 "enum" : [ "SUNDAY", "THURSDAY" ],
-                "description" : "whether Corpus Christi was set to be celebrated on Thursday or on Sunday"
+                "description" : "whether Corpus Christi is set to be celebrated on Thursday or on Sunday"
+              },
+              "CalendarType" : {
+                "type" : "string",
+                "enum" : [ "CIVIL", "LITURGICAL" ],
+                "description" : "whether the API should calculate a calendar for the solar year (Jan 1 - Dec 31) or the liturgical year (First Sunday of Advent of the preceding year including vigil Mass - Saturday of the 34th week of Ordinary Time)"
               },
               "Locale" : {
                 "type" : "string",
