@@ -2845,6 +2845,7 @@ class LitCalAPI {
         $SerializeableLitCal->Settings->Locale        = $this->LitSettings->Locale;
         $SerializeableLitCal->Settings->ReturnType    = $this->LitSettings->ReturnType;
         $SerializeableLitCal->Settings->CalendarType  = $this->LitSettings->CalendarType;
+        $SerializeableLitCal->Settings->EternalHighPriest = $this->LitSettings->EternalHighPriest;
         if( $this->LitSettings->NationalCalendar !== null ){
             $SerializeableLitCal->Settings->NationalCalendar = $this->LitSettings->NationalCalendar;
         }
