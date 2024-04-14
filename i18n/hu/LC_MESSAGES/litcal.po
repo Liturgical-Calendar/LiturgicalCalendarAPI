@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-04 23:20+0000\n"
+"POT-Creation-Date: 2024-04-14 22:46+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -844,4 +844,34 @@ msgstr ""
 #. translators: liturgical rank. Keep lowercase
 #: includes/enums/LitGrade.php:125
 msgid "celebration with precedence over solemnities"
+msgstr ""
+
+#. translators: context = liturgical season
+#: includes/enums/LitSeason.php:20
+msgid "Advent"
+msgstr ""
+
+#. translators: context = liturgical season
+#: includes/enums/LitSeason.php:23
+msgid "Christmas"
+msgstr ""
+
+#. translators: context = liturgical season
+#: includes/enums/LitSeason.php:26
+msgid "Lent"
+msgstr ""
+
+#. translators: context = liturgical season
+#: includes/enums/LitSeason.php:29
+msgid "Easter Triduum"
+msgstr ""
+
+#. translators: context = liturgical season
+#: includes/enums/LitSeason.php:32
+msgid "Easter"
+msgstr ""
+
+#. translators: context = liturgical season
+#: includes/enums/LitSeason.php:35
+msgid "Ordinary Time"
 msgstr ""

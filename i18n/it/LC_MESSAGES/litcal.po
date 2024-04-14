@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
-"POT-Creation-Date: 2024-04-04 23:20+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-04-14 22:46+0000\n"
 "PO-Revision-Date: 2024-04-05 00:25+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -943,6 +943,36 @@ msgstr "SOLENNITÀ"
 #: includes/enums/LitGrade.php:125
 msgid "celebration with precedence over solemnities"
 msgstr "celebrazione con precedenza sulle solennità"
+
+#. translators: context = liturgical season
+#: includes/enums/LitSeason.php:20
+msgid "Advent"
+msgstr ""
+
+#. translators: context = liturgical season
+#: includes/enums/LitSeason.php:23
+msgid "Christmas"
+msgstr ""
+
+#. translators: context = liturgical season
+#: includes/enums/LitSeason.php:26
+msgid "Lent"
+msgstr ""
+
+#. translators: context = liturgical season
+#: includes/enums/LitSeason.php:29
+msgid "Easter Triduum"
+msgstr ""
+
+#. translators: context = liturgical season
+#: includes/enums/LitSeason.php:32
+msgid "Easter"
+msgstr ""
+
+#. translators: context = liturgical season
+#: includes/enums/LitSeason.php:35
+msgid "Ordinary Time"
+msgstr ""
 
 #~ msgctxt "(SING_FEMM)"
 #~ msgid "of"
