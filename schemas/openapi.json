@@ -106,10 +106,59 @@
             "type" : "string",
             "default" : ""
           }
+        }, {
+          "in" : "query",
+          "name" : "calendartype",
+          "description" : "indicates whether the API should calculate a calendar for the solar year (Jan 1 - Dec 31) or the liturgical year (First Sunday of Advent of the preceding year including vigil Mass - Saturday of the 34th week of Ordinary Time)",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "CIVIL", "LITURGICAL" ],
+            "default" : "LITURGICAL"
+          }
+        }, {
+          "in" : "query",
+          "name" : "eternalhighpriest",
+          "description" : "indicates whether the festivity of Jesus Christ Eternal High Priest should apply to the current calendar (may be overriden by national calendar settings)",
+          "required" : false,
+          "schema" : {
+            "type" : "boolean",
+            "default" : false
+          }
         } ],
         "responses" : {
           "200" : {
-            "description" : "liturgical events for a given year according to the requested criteria",
+            "description" : "OK: liturgical events for a given year according to the requested criteria",
+            "headers" : {
+              "X-LitCal-Starttime" : {
+                "schema" : {
+                  "type" : "integer",
+                  "format" : "int64"
+                },
+                "description" : "High resolution timestamp in nanoseconds that indicates the start time of the calculation of the current liturgical calendar response"
+              },
+              "X-LitCal-Endtime" : {
+                "schema" : {
+                  "type" : "integer",
+                  "format" : "int64"
+                },
+                "description" : "High resolution timestamp in nanoseconds that indicates the end time of the calculation of the current liturgical calendar response"
+              },
+              "X-LitCal-Executiontime" : {
+                "schema" : {
+                  "type" : "integer",
+                  "format" : "int64"
+                },
+                "description" : "Total time in nanoseconds in which the calculation of the current liturgical calendar response was produced (difference between X-LitCal-Starttime and X-LitCal-Endtime, average is usually about 5ms!)"
+              },
+              "X-LitCal-Generated" : {
+                "schema" : {
+                  "type" : "string",
+                  "enum" : [ "Calculation", "ClientCache", "ServerCache" ]
+                },
+                "description" : "Indicates whether the current response was produced from: a fresh calculation since the response to the given request had not yet been calculated, or from client cache since the response has not changed since last request, or from server cache since the client had not yet made this same request but the calculation had already been done formerly on the server"
+              }
+            },
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -128,8 +177,23 @@
               }
             }
           },
+          "304" : {
+            "description" : "Not Modified: client should use cached results seeing that the response has not changed"
+          },
           "400" : {
-            "description" : "bad input parameter"
+            "description" : "Bad Request: invalid parameters or malformed data in request body"
+          },
+          "405" : {
+            "description" : "Method Not Allowed"
+          },
+          "406" : {
+            "description" : "Not Acceptable: Accept header requests a response Content Type which this API cannot produce"
+          },
+          "415" : {
+            "description" : "Unsupported Media Type: Content Type of request not valid"
+          },
+          "418" : {
+            "description" : "I'm a teapot: request in this case must be an AJAX request, but AJAX request not detected"
           }
         }
       },
@@ -143,50 +207,49 @@
           "content" : {
             "application/x-www-form-urlencoded" : {
               "schema" : {
-                "type" : "object",
-                "properties" : {
-                  "locale" : {
-                    "type" : "string",
-                    "enum" : [ "LA", "EN", "IT" ]
-                  },
-                  "epiphany" : {
-                    "type" : "string",
-                    "enum" : [ "JAN6", "SUNDAY_JAN2_JAN8" ]
-                  },
-                  "ascension" : {
-                    "type" : "string",
-                    "enum" : [ "THURSDAY", "SUNDAY" ]
-                  },
-                  "corpuschristi" : {
-                    "type" : "string",
-                    "enum" : [ "THURSDAY", "SUNDAY" ]
-                  },
-                  "year" : {
-                    "type" : "integer",
-                    "format" : "int32",
-                    "minimum" : 1970,
-                    "maximum" : 9999
-                  },
-                  "nationalpreset" : {
-                    "type" : "string",
-                    "enum" : [ "", "VATICAN", "ITALY", "USA" ]
-                  },
-                  "diocesanpreset" : {
-                    "type" : "string",
-                    "enum" : [ "", "DIOCESIDIROMA", "DIOCESILAZIO" ]
-                  },
-                  "returntype" : {
-                    "type" : "string",
-                    "enum" : [ "JSON", "XML", "ICS" ]
-                  }
-                }
+                "$ref" : "#/components/schemas/RequestBody"
+              }
+            },
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RequestBody"
               }
             }
           }
         },
         "responses" : {
           "200" : {
-            "description" : "search results matching criteria",
+            "description" : "OK: liturgical events for a given year according to the requested criteria",
+            "headers" : {
+              "X-LitCal-Starttime" : {
+                "schema" : {
+                  "type" : "integer",
+                  "format" : "int64"
+                },
+                "description" : "High resolution timestamp in nanoseconds that indicates the start time of the calculation of the current liturgical calendar response"
+              },
+              "X-LitCal-Endtime" : {
+                "schema" : {
+                  "type" : "integer",
+                  "format" : "int64"
+                },
+                "description" : "High resolution timestamp in nanoseconds that indicates the end time of the calculation of the current liturgical calendar response"
+              },
+              "X-LitCal-Executiontime" : {
+                "schema" : {
+                  "type" : "integer",
+                  "format" : "int64"
+                },
+                "description" : "Total time in nanoseconds in which the calculation of the current liturgical calendar response was produced (difference between X-LitCal-Starttime and X-LitCal-Endtime, average is usually about 5ms!)"
+              },
+              "X-LitCal-Generated" : {
+                "schema" : {
+                  "type" : "string",
+                  "enum" : [ "Calculation", "ClientCache", "ServerCache" ]
+                },
+                "description" : "Indicates whether the current response was produced from: a fresh calculation since the response to the given request had not yet been calculated, or from client cache since the response has not changed since last request, or from server cache since the client had not yet made this same request but the calculation had already been done formerly on the server"
+              }
+            },
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -205,8 +268,23 @@
               }
             }
           },
+          "304" : {
+            "description" : "Not Modified: client should use cached results seeing that the response has not changed"
+          },
           "400" : {
-            "description" : "bad input parameter"
+            "description" : "Bad Request: invalid parameters or malformed data in request body"
+          },
+          "405" : {
+            "description" : "Method Not Allowed"
+          },
+          "406" : {
+            "description" : "Not Acceptable: Accept header requests a response Content Type which this API cannot produce"
+          },
+          "415" : {
+            "description" : "Unsupported Media Type: Content Type of request not valid"
+          },
+          "418" : {
+            "description" : "I'm a teapot: request in this case must be an AJAX request, but AJAX request not detected"
           }
         }
       }
@@ -218,7 +296,7 @@
         "operationId" : "retrieveMetadataGET",
         "responses" : {
           "200" : {
-            "description" : "An index of currently supported national and diocesan calendars and relative locales",
+            "description" : "OK: An index of currently supported national and diocesan calendars and relative locales",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -235,7 +313,7 @@
         "operationId" : "retrieveMetadataPOST",
         "responses" : {
           "200" : {
-            "description" : "An index of currently supported national and diocesan calendars and relative locales",
+            "description" : "OK: An index of currently supported national and diocesan calendars and relative locales",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -271,6 +349,9 @@
                 },
                 "date" : {
                   "type" : "integer",
+                  "format" : "int64",
+                  "minimum" : 0,
+                  "maximum" : 253402300799,
                   "description" : "a PHP style unix timestamp (seconds from the Unix Epoch) in UTC time. The time should be a zero value seeing that we deal only with all day events, and time is not of importance. For use in Javascript, multiply this value by 1000, because Javascript uses milliseconds as a base for timestamps, whereas PHP uses seconds. The timestamp value should be dealt with accordingly in each programming language used, as is if the language uses seconds as a base, or multiplying by 1000 if it uses milliseconds as a base."
                 },
                 "color" : {
@@ -283,7 +364,7 @@
                 },
                 "colorLcl" : {
                   "type" : "array",
-                  "description" : "Localized liturgical colors associated with the current liturgical event.",
+                  "description" : "Liturgical colors associated with the current liturgical event, localized according to the current locale.",
                   "items" : {
                     "type" : "string"
                   }
@@ -300,12 +381,12 @@
                   "enum" : [ 0, 1, 2, 3, 4, 5, 6, 7 ]
                 },
                 "gradeLcl" : {
-                  "description" : "Localized string corresponding to the rank of the current liturgical event",
+                  "description" : "Logical importance or rank of the current liturgical event, localized according to the current locale",
                   "type": "string"
                 },
                 "displayGrade" : {
                   "type" : "string",
-                  "description" : "will often be empty, in which case the numeric ***grade*** property can be used to identify the liturgical rank, or the localized ***gradeLcl*** string can be used, for the purpose of displaying the rank of the current liturgical event. If non empty, will contain the localized rank of the liturgical event and should be used instead of the grade property or the gradeLcl property for display purposes"
+                  "description" : "will often be empty, in which case the numeric ***grade*** property can be used to identify the liturgical rank, or the localized ***gradeLcl*** string can be used, for the purpose of displaying the rank of the current liturgical event. If non empty, will contain the localized rank of the liturgical event and should be used instead of the grade property or the gradeLcl property for display purposes; see for example \"All Souls Day\" which logically is treated like a SOLEMNITY but displays as a \"Commemoration\""
                 },
                 "common" : {
                   "type" : "string",
@@ -313,7 +394,7 @@
                 },
                 "commonLcl" : {
                   "type" : "string",
-                  "description" : "Localized string corresponding to the common used (if applicable) for the current liturgical event"
+                  "description" : "Common used (if applicable) for the current liturgical event, localized according to the current locale"
                 },
                 "dayOfTheWeek_ISO8601" : {
                   "type" : "integer",
@@ -341,23 +422,32 @@
                 },
                 "monthShort" : {
                   "type" : "string",
-                  "description" : "Localized short form of the month for the current liturgical event"
+                  "description" : "Short form of the month for the current liturgical event, localized according to the current locale"
                 },
                 "monthLong" : {
                   "type" : "string",
-                  "description" : "Localized long form of the month for the current liturgical event"
+                  "description" : "Long form of the month for the current liturgical event, localized according to the current locale"
                 },
                 "dayOfTheWeekShort" : {
                   "type" : "string",
-                  "description" : "Localized short form of the day of the month for the current liturgical event"
+                  "description" : "Short form of the day of the month for the current liturgical event, localized according to the current locale"
                 },
                 "dayOfTheWeekLong" : {
                   "type" : "string",
-                  "description" : "Localized long form of the day of the month for the current liturgical event"
+                  "description" : "Long form of the day of the month for the current liturgical event, localized according to the current locale"
                 },
                 "liturgicalYear" : {
                   "type" : "string",
-                  "description" : "description of the liturgical cycle localized according to the requested locale (or national calendar). This property will only be present for events where it is applicable (Sundays or weekdays of Ordinary Time, Solemnities, Feasts of the Lord, in practice those liturgical events the texts of which are based on the liturgical cycle). When present, it will have a localized value of `YEAR A`, `YEAR B`, or `YEAR C` for festive events or a value of `YEAR I`, `YEAR II` for weekday events (whereas if an application makes a request for the Italian language or the national Italian calendar, the values will contain `ANNO` instead of `YEAR`, and likewise for any localization requested)."
+                  "description" : "Liturgical cycle localized according to the current locale (or national calendar). This property will only be present for events where it is applicable (Sundays or weekdays of Ordinary Time, Solemnities, Feasts of the Lord, in practice those liturgical events the texts of which are based on the liturgical cycle). When present, it will have a localized value of `YEAR A`, `YEAR B`, or `YEAR C` for festive events or a value of `YEAR I`, `YEAR II` for weekday events (whereas if an application makes a request for the Italian language or the national Italian calendar, the values will contain `ANNO` instead of `YEAR`, and similarly for any other localization requested)."
+                },
+                "liturgicalSeason" : {
+                  "type" : "string",
+                  "enum" : [ "ORDINARY_TIME", "ADVENT", "CHRISTMAS", "LENT", "EASTER_TRIDUUM", "EASTER" ],
+                  "description" : "Liturgical season that the current liturgical event falls in. Is not present for Vigil Mass events, however in this case it can be retrieved from the 'parent' event using the `isVigilFor` property"
+                },
+                "liturgicalSeasonLcl" : {
+                  "type" : "string",
+                  "description" : "Liturgical season that the current liturgical event falls in, localized according to the current locale"
                 },
                 "isVigilMass" : {
                   "type" : "boolean",
@@ -366,6 +456,10 @@
                 "hasVigilMass" : {
                   "type" : "boolean",
                   "description" : "this property will be present for applicable events such as Solemnities or Sundays. Will have a boolean value of `true` if the expected Vigil Mass is confirmed, and of `false` if the expected Vigil Mass is superseded by another liturgical event. Sometimes this will be established from year to year for specific coincidences by the Congregation for Divine Worship."
+                },
+                "isVigilFor" : {
+                  "type" : "string",
+                  "description" : "`name` of the corresponding liturgical event for which the current liturgical event is a Vigil Mass"
                 },
                 "hasVesperI" : {
                   "type" : "boolean",
@@ -417,7 +511,7 @@
               },
               "Locale" : {
                 "type" : "string",
-                "description" : "the locale which has either been specifically requested using the `locale` parameter, or set by the requested national or diocesan calendar"
+                "description" : "the locale which has either been specifically requested using the `locale` parameter, or set by the requested national or diocesan calendar, or solicited in the request through the `Accept-Language` header"
               },
               "ReturnType" : {
                 "type" : "string",
@@ -431,20 +525,104 @@
               "DiocesanCalendar" : {
                 "type" : "string",
                 "description" : "Diocesan Calendar requested, if any"
+              },
+              "EternalHighPriest" : {
+                "type" : "boolean",
+                "description" : "whether the festivity of Jesus Christ Eternal High Priest is applicable to the current calendar"
               }
             }
           },
           "Metadata" : {
             "type" : "object",
-            "description" : "contains information about the current endpoint versioning, and keys of liturgical events that can have precedence over others, useful for further calculations of a local calendar",
+            "description" : "contains information about the current API version, how and when the current response was produced, and keys of liturgical events that can have precedence over others, useful for further calculations of a local calendar",
             "properties" : {
               "VERSION" : {
                 "type" : "string",
-                "description" : "current endpoint version"
+                "description" : "current API version"
+              },
+              "Timestamp" : {
+                "type" : "integer",
+                "format" : "int64",
+                "minimum" : 0,
+                "maximum" : 253402300799
+              },
+              "DateTime" : {
+                "type" : "string",
+                "pattern" : "^(19[7-9][0-9]|[2-9][0-9][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) ([0-1][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$"
               },
               "RequestHeaders" : {
-                "type" : "string",
-                "description" : "echoes back the request headers that were received by the endpoint, for debugging purposes"
+                "type" : "object",
+                "description" : "echoes back the request headers that were received by the endpoint, for debugging purposes",
+                "properties" : {
+                  "Cookie" : {
+                    "type" : "string",
+                    "examples" : [ "currentLocale=it-IT;" ]
+                  },
+                  "Accept-Language" : {
+                    "type" : "string",
+                    "examples" : [ "it-IT,it;" ]
+                  },
+                  "Accept-Encoding" : {
+                    "type" : "string",
+                    "examples" : [ "gzip, deflate, br, zstd" ]
+                  },
+                  "Referer" : {
+                    "type" : "string",
+                    "examples" : [ "https://litcal-staging.johnromanodorazio.com/" ]
+                  },
+                  "Sec-Fetch-Dest" : {
+                    "type" : "string",
+                    "examples" : [ "document" ]
+                  },
+                  "Sec-Fetch-User" : {
+                    "type" : "string",
+                    "examples" : [ "?1" ]
+                  },
+                  "Sec-Fetch-Mode" : {
+                    "type" : "string",
+                    "examples" : [ "navigate" ]
+                  },
+                  "Sec-Fetch-Site" : {
+                    "type" : "string",
+                    "examples" : [ "same-site" ]
+                  },
+                  "Accept" : {
+                    "type" : "string",
+                    "examples" : [ "application/json" ]
+                  },
+                  "User-Agent" : {
+                    "type" : "string",
+                    "examples" : [ "Mozilla/5.0" ]
+                  },
+                  "Upgrade-Insecure-Requests" : {
+                    "type" : "string",
+                    "example" : [ "1" ]
+                  },
+                  "Sec-Ch-Ua-Platform" : {
+                    "type" : "string",
+                    "examples" : [ "\"Windows\"" ]
+                  },
+                  "Sec-Ch-Ua-Mobile" : {
+                    "type" : "string",
+                    "examples" : [ "?0" ]
+                  },
+                  "Sec-Ch-Ua" : {
+                    "type" : "string",
+                    "examples" : [ "\"Google Chrome\";" ]
+                  },
+                  "Connection" : {
+                    "type" : "string",
+                    "examples" : [ "close" ]
+                  },
+                  "X-Accel-Internal" : {
+                    "type" : "string",
+                    "examples" : [ "/internal-nginx-static-location" ]
+                  },
+                  "Host" : {
+                    "type" : "string",
+                    "examples" : [ "litcal.johnromanodorazio.com" ]
+                  }
+                }
               },
               "Solemnities" : {
                 "type" : "object",
@@ -551,8 +729,7 @@
                   },
                   "displaygrade" : {
                     "type" : "string",
-                    "description" : "will often be empty, in which case the ***grade*** property can be used with the indicated association to liturgical terminology, for the purpose of displaying the rank of the current liturgical event. If non empty, will contain the localized rank of the liturgical event and should be used instead of the grade property for display purposes",
-                    "examples" : [""]
+                    "description" : "will often be empty, in which case the ***grade*** property can be used with the indicated association to liturgical terminology, for the purpose of displaying the rank of the current liturgical event. If non empty, will contain the localized rank of the liturgical event and should be used instead of the grade property for display purposes"
                   },
                   "common" : {
                     "type" : "string",
@@ -574,6 +751,11 @@
                     "type" : "string",
                     "description" : "description of the liturgical cycle localized according to the requested locale (or national calendar). This property will only be present for events where it is applicable (Sundays or weekdays of Ordinary Time, Solemnities, Feasts of the Lord, in practice those liturgical events the texts of which are based on the liturgical cycle). When present, it will have a localized value of `YEAR A`, `YEAR B`, or `YEAR C` for festive events or a value of `YEAR I`, `YEAR II` for weekday events (whereas if an application makes a request for the Italian language or the national Italian calendar, the values will contain `ANNO` instead of `YEAR`, and likewise for any localization requested).",
                     "examples" : [""]
+                  },
+                  "liturgicalseason" : {
+                    "type" : "string",
+                    "enum" : [ "ORDINARY_TIME", "ADVENT", "CHRISTMAS", "LENT", "EASTER_TRIDUUM", "EASTER" ],
+                    "description" : "Liturgical season that the current liturgical event falls in. Is not present for Vigil Mass events, however in this case it can be retrieved from the 'parent' event using the `isVigilFor` property"
                   },
                   "hasVigilMass" : {
                     "type" : "boolean",
@@ -621,6 +803,11 @@
                 "enum" : [ "SUNDAY", "THURSDAY" ],
                 "description" : "whether Corpus Christi was set to be celebrated on Thursday or on Sunday",
                 "examples" : ["SUNDAY"]
+              },
+              "CALENDARTYPE" : {
+                "type" : "string",
+                "enum" : [ "CIVIL", "LITURGICAL" ],
+                "description" : "whether the API calculated a calendar for the solar year (Jan 1 - Dec 31) or the liturgical year (First Sunday of Advent of the preceding year including vigil Mass - Saturday of the 34th week of Ordinary Time)"
               },
               "LOCALE" : {
                 "type" : "string",
@@ -882,6 +1069,49 @@
               }
             },
             "required" : [ "value", "name", "sanctoraleFileName", "yearLimits" ]
+          }
+        }
+      },
+      "RequestBody" : {
+        "type" : "object",
+        "properties" : {
+          "locale" : {
+            "type" : "string"
+          },
+          "epiphany" : {
+            "type" : "string",
+            "enum" : [ "JAN6", "SUNDAY_JAN2_JAN8" ]
+          },
+          "ascension" : {
+            "type" : "string",
+            "enum" : [ "THURSDAY", "SUNDAY" ]
+          },
+          "corpuschristi" : {
+            "type" : "string",
+            "enum" : [ "THURSDAY", "SUNDAY" ]
+          },
+          "year" : {
+            "type" : "integer",
+            "format" : "int32",
+            "minimum" : 1970,
+            "maximum" : 9999
+          },
+          "calendartype" : {
+            "type" : "string",
+            "enum" : [ "CIVIL", "LITURGICAL" ]
+          },
+          "eternalhighpriest" : {
+            "type" : "boolean"
+          },
+          "nationalcalendar" : {
+            "type" : "string"
+          },
+          "diocesancalendar" : {
+            "type" : "string"
+          },
+          "returntype" : {
+            "type" : "string",
+            "enum" : [ "JSON", "XML", "ICS" ]
           }
         }
       }
