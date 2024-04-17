@@ -378,10 +378,11 @@ class LitCommon {
                     LitCommon::debugWrite( "Common was empty, setting final value to empty string" );
                     $common = "";
                 }
-                LitCommon::debugWrite( "Final common value is now of type string and has value: " . $common );
+                LitCommon::debugWrite( "Final common value is now of type string and has value: <" . $common . ">" );
             }
         }
-        LitCommon::debugWrite( "common should now be of type string: " . (is_string($common) ? "true" : "false") );
+        $isString = is_string($common) ? "true" : "false";
+        LitCommon::debugWrite( "common should now be of type string: " . $isString );
         return (is_string($common) ? $common : $common[0]);
     }
 
