@@ -50,6 +50,8 @@ class LitCommon {
 
     private string $locale;
     private array $GTXT;
+    public static string $HASH_REQUEST          = "";
+    public static array $REQUEST_PARAMS         = [];
 
     public function __construct( string $locale ) {
         $this->locale = strtoupper( $locale );
@@ -323,23 +325,32 @@ class LitCommon {
      * Returns a translated human readable string of the Common or the Proper
      */
     public function C( string|array $common="" ) : string {
+        LitCommon::debugWrite( "Common param func LitCommon->C is of type " . gettype( $common ) );
+        LitCommon::debugWrite( "Value of param is: " . json_encode( $common ) );
         if ( ( is_string( $common ) && $common !== "" ) || is_array( $common ) ) {
             if( (is_string( $common ) && $common === LitCommon::PROPRIO) || ( is_array( $common ) && in_array( LitCommon::PROPRIO, $common ) ) ) {
                 $common = $this->i18n( $common );
+                LitCommon::debugWrite( "Common is of liturgical type LitCommon:PROPRIO and now has type " . gettype( $common ) . " and value: " . json_encode( $common ) );
             } else {
+                LitCommon::debugWrite( "Common is not of liturgical type LitCommon::PROPRIO" );
                 if( is_string( $common ) ) {
+                    LitCommon::debugWrite( "Common was of type string, this should never happen?" );
                     $commons = explode(",", $common);
                 } else {
+                    LitCommon::debugWrite( "Common is of type array, as it should be" );
                     $commons = $common;
                 }
                 $commons = array_map(function ($txt) {
-                    if( strpos($txt, ":") !== false ){
+                    if( strpos($txt, ":") !== false ) {
                         [$commonGeneral, $commonSpecific] = explode(":", $txt);
+                        LitCommon::debugWrite( "Common has a specific common: GENERAL = $commonGeneral, SPECIFIC = $commonSpecific" );
                     } else {
                         $commonGeneral = $txt;
                         $commonSpecific = "";
+                        LitCommon::debugWrite( "Common does not have a specific common: GENERAL = $commonGeneral, SPECIFIC = $commonSpecific" );
                     }
                     $fromTheCommon = $this->locale === LitLocale::LATIN ? "De Commune" : _( "From the Common" );
+                    LitCommon::debugWrite( "translated intro to common: " . $fromTheCommon );
                     $commonGeneralStringParts = [ $fromTheCommon ];
                     if( $this->getPossessive( $commonGeneral ) !== "" ) {
                         array_push( $commonGeneralStringParts, $this->getPossessive( $commonGeneral ) );
@@ -347,14 +358,25 @@ class LitCommon {
                     if( $this->i18n( $commonGeneral ) !== "" ) {
                         array_push( $commonGeneralStringParts, $this->i18n( $commonGeneral ) );
                     }
+                    LitCommon::debugWrite( "commonGeneralStringParts = " . json_encode( $commonGeneralStringParts ) );
                     $commonGeneralString = implode(" ", $commonGeneralStringParts);
-                    return $commonGeneralString . ($commonSpecific != "" ? ": " . $this->i18n( $commonSpecific ) : "");
+                    LitCommon::debugWrite( "commonGeneralString = " . $commonGeneralString );
+                    $commonSpecificLcl = $commonSpecific != "" ? ": " . $this->i18n( $commonSpecific ) : "";
+                    LitCommon::debugWrite( "commonSpecificLcl = " . $commonSpecificLcl );
+                    return $commonGeneralString . $commonSpecificLcl;
                 }, $commons);
                 /**translators: when there are multiple possible commons, this will be the glue "or from the common of..." */
                 $common = implode( "; " . _( "or" ) . " ", $commons );
+                LitCommon::debugWrite( "Final common value is now a string: " . $common );
             }
         }
-        return is_string($common) ? $common : $common[0];
+        LitCommon::debugWrite( "common should now be of type string: " . is_string($common) );
+        return (is_string($common) ? $common : $common[0]);
+    }
+
+    private static function debugWrite( string $string ) {
+        $debugFile = "LitCommonDebug_" . LitCommon::$HASH_REQUEST . ".log";
+        file_put_contents( $debugFile, date('c') . "\t" . $string . PHP_EOL, FILE_APPEND );
     }
 
 }
