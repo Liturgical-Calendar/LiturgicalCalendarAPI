@@ -40,11 +40,7 @@ class LitFunc {
         if( is_numeric( $key ) ) {
           $key = "numeric_$key";
         }
-        try {
-          $xml->addChild( $key, htmlspecialchars( $value ) );
-        } catch ( Exception $ex ) {
-          throw $ex;
-        }
+        $xml->addChild( $key, htmlspecialchars( $value ) );
       }
     }
   }

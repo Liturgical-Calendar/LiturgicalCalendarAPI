@@ -2878,7 +2878,12 @@ class LitCalAPI {
                 $jsonObj = json_decode( $jsonStr, true );
                 $xml = new SimpleXMLElement ( "<?xml version=\"1.0\" encoding=\"UTF-8\"?" . "><LiturgicalCalendar xmlns=\"https://www.bibleget.io/catholicliturgy\"/>" );
                 LitFunc::convertArray2XML( $jsonObj, $xml );
-                $response = $xml->asXML();
+                $rawXML = $xml->asXML();
+                $dom = new DOMDocument;
+                $dom->preserveWhiteSpace = false;
+                $dom->formatOutput = true;
+                $dom->loadXML($rawXML);
+                $response = $dom->saveXML();
                 break;
             case ReturnType::ICS:
                 $infoObj = $this->getGithubReleaseInfo();
