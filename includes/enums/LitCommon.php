@@ -340,34 +340,39 @@ class LitCommon {
                     LitCommon::debugWrite( "Common is of type array, as it should be" );
                     $commons = $common;
                 }
-                $commons = array_map(function ($txt) {
-                    if( strpos($txt, ":") !== false ) {
-                        [$commonGeneral, $commonSpecific] = explode(":", $txt);
-                        LitCommon::debugWrite( "Common has a specific common: GENERAL = $commonGeneral, SPECIFIC = $commonSpecific" );
-                    } else {
-                        $commonGeneral = $txt;
-                        $commonSpecific = "";
-                        LitCommon::debugWrite( "Common does not have a specific common: GENERAL = $commonGeneral, SPECIFIC = $commonSpecific" );
-                    }
-                    $fromTheCommon = $this->locale === LitLocale::LATIN ? "De Commune" : _( "From the Common" );
-                    LitCommon::debugWrite( "translated intro to common: " . $fromTheCommon );
-                    $commonGeneralStringParts = [ $fromTheCommon ];
-                    if( $this->getPossessive( $commonGeneral ) !== "" ) {
-                        array_push( $commonGeneralStringParts, $this->getPossessive( $commonGeneral ) );
-                    }
-                    if( $this->i18n( $commonGeneral ) !== "" ) {
-                        array_push( $commonGeneralStringParts, $this->i18n( $commonGeneral ) );
-                    }
-                    LitCommon::debugWrite( "commonGeneralStringParts = " . json_encode( $commonGeneralStringParts ) );
-                    $commonGeneralString = implode(" ", $commonGeneralStringParts);
-                    LitCommon::debugWrite( "commonGeneralString = " . $commonGeneralString );
-                    $commonSpecificLcl = $commonSpecific != "" ? ": " . $this->i18n( $commonSpecific ) : "";
-                    LitCommon::debugWrite( "commonSpecificLcl = " . $commonSpecificLcl );
-                    return $commonGeneralString . $commonSpecificLcl;
-                }, $commons);
-                /**translators: when there are multiple possible commons, this will be the glue "or from the common of..." */
-                $common = implode( "; " . _( "or" ) . " ", $commons );
-                LitCommon::debugWrite( "Final common value is now a string: " . $common );
+                if( count( $commons ) > 0 ) {
+                    $commons = array_map(function ($txt) {
+                        if( strpos($txt, ":") !== false ) {
+                            [$commonGeneral, $commonSpecific] = explode(":", $txt);
+                            LitCommon::debugWrite( "Common has a specific common: GENERAL = $commonGeneral, SPECIFIC = $commonSpecific" );
+                        } else {
+                            $commonGeneral = $txt;
+                            $commonSpecific = "";
+                            LitCommon::debugWrite( "Common does not have a specific common: GENERAL = $commonGeneral, SPECIFIC = $commonSpecific" );
+                        }
+                        $fromTheCommon = $this->locale === LitLocale::LATIN ? "De Commune" : _( "From the Common" );
+                        LitCommon::debugWrite( "translated intro to common: " . $fromTheCommon );
+                        $commonGeneralStringParts = [ $fromTheCommon ];
+                        if( $this->getPossessive( $commonGeneral ) !== "" ) {
+                            array_push( $commonGeneralStringParts, $this->getPossessive( $commonGeneral ) );
+                        }
+                        if( $this->i18n( $commonGeneral ) !== "" ) {
+                            array_push( $commonGeneralStringParts, $this->i18n( $commonGeneral ) );
+                        }
+                        LitCommon::debugWrite( "commonGeneralStringParts = " . json_encode( $commonGeneralStringParts ) );
+                        $commonGeneralString = implode(" ", $commonGeneralStringParts);
+                        LitCommon::debugWrite( "commonGeneralString = " . $commonGeneralString );
+                        $commonSpecificLcl = $commonSpecific != "" ? ": " . $this->i18n( $commonSpecific ) : "";
+                        LitCommon::debugWrite( "commonSpecificLcl = " . $commonSpecificLcl );
+                        return $commonGeneralString . $commonSpecificLcl;
+                    }, $commons);
+                    /**translators: when there are multiple possible commons, this will be the glue "or from the common of..." */
+                    $common = implode( "; " . _( "or" ) . " ", $commons );
+                } else {
+                    LitCommon::debugWrite( "Common was empty, setting final value to empty string" );
+                    $common = "";
+                }
+                LitCommon::debugWrite( "Final common value is now of type string and has value: " . $common );
             }
         }
         LitCommon::debugWrite( "common should now be of type string: " . is_string($common) ? "true" : "false" );
