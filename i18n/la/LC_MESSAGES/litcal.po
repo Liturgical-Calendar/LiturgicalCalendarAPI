@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-17 19:21+0000\n"
+"POT-Creation-Date: 2024-04-17 20:43+0000\n"
 "PO-Revision-Date: 2024-04-15 23:33+0000\n"
 "Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
@@ -52,7 +52,7 @@ msgstr ""
 
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
 #: includes/LitCalAPI.php:722 includes/LitMessages.php:143
-#: includes/LitMessages.php:148 includes/enums/LitCommon.php:370
+#: includes/LitMessages.php:148 includes/enums/LitCommon.php:375
 msgid "or"
 msgstr "vel"
 
@@ -893,7 +893,7 @@ msgctxt "(SING_MASC)"
 msgid "of the"
 msgstr ""
 
-#: includes/enums/LitCommon.php:353
+#: includes/enums/LitCommon.php:358
 msgid "From the Common"
 msgstr "De Commune"
 
