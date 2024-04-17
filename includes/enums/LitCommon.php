@@ -383,6 +383,9 @@ class LitCommon {
         }
         $isString = is_string($common) ? "and yes it is" : "but it's not?";
         LitCommon::debugWrite( "common should now be of type string: " . $isString );
+        if( is_array( $common ) ) {
+            LitCommon::debugWrite( "common is an array, and has value: " . json_encode( $common ) );
+        }
         return (is_string($common) ? $common : $common[0]);
     }
 
