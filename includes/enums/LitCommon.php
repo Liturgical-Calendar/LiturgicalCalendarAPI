@@ -301,15 +301,19 @@ class LitCommon {
 
     private function i18n( string|array $value ) : string|array {
         if( is_array( $value ) && self::areValid( $value ) ) {
+            LitCommon::debugWrite( "FUNCTION LitCommon->i18n: value for translation is an array, mapping all values to translation function" );
             return array_map( [$this, 'i18n'], $value );
         }
         else if( self::isValid( $value ) ) {
             if( $this->locale === LitLocale::LATIN ) {
+                LitCommon::debugWrite( "translating value $value to LATIN = " . self::LATIN[ $value ]);
                 return self::LATIN[ $value ];
             } else{
+                LitCommon::debugWrite( "translating value $value to locale $this->locale : " . $this->GTXT[ $value ]);
                 return $this->GTXT[ $value ];
             }
         }
+        LitCommon::debugWrite( "final value from FUNCTION LitCommon->i18n is of type " . gettype( $value ) . " :: we should never get here?" );
         return $value;
     }
 
@@ -325,12 +329,12 @@ class LitCommon {
      * Returns a translated human readable string of the Common or the Proper
      */
     public function C( string|array $common="" ) : string {
-        LitCommon::debugWrite( "Common param func LitCommon->C is of type " . gettype( $common ) );
+        LitCommon::debugWrite( "FUNCTION LitCommon->C: Common param is of type " . gettype( $common ) );
         LitCommon::debugWrite( "Value of param is: " . json_encode( $common ) );
         if ( ( is_string( $common ) && $common !== "" ) || is_array( $common ) ) {
             if( (is_string( $common ) && $common === LitCommon::PROPRIO) || ( is_array( $common ) && in_array( LitCommon::PROPRIO, $common ) ) ) {
                 $common = $this->i18n( $common );
-                LitCommon::debugWrite( "Common is of liturgical type LitCommon:PROPRIO and now has type " . gettype( $common ) . " and value: " . json_encode( $common ) );
+                LitCommon::debugWrite( "Common is of liturgical type LitCommon:PROPRIO, and after translation has type " . gettype( $common ) . " and value: " . json_encode( $common ) );
             } else {
                 LitCommon::debugWrite( "Common is not of liturgical type LitCommon::PROPRIO" );
                 if( is_string( $common ) ) {
@@ -341,6 +345,7 @@ class LitCommon {
                     $commons = $common;
                 }
                 if( count( $commons ) > 0 ) {
+                    LitCommon::debugWrite( "Common is an array with " . count( $commons ) . " elements" );
                     $commons = array_map(function ($txt) {
                         if( strpos($txt, ":") !== false ) {
                             [$commonGeneral, $commonSpecific] = explode(":", $txt);
@@ -368,6 +373,7 @@ class LitCommon {
                     }, $commons);
                     /**translators: when there are multiple possible commons, this will be the glue "or from the common of..." */
                     $common = implode( "; " . _( "or" ) . " ", $commons );
+                    LitCommon::debugWrite( "Common was not empty, now imploding translated value..." );
                 } else {
                     LitCommon::debugWrite( "Common was empty, setting final value to empty string" );
                     $common = "";
@@ -375,7 +381,7 @@ class LitCommon {
                 LitCommon::debugWrite( "Final common value is now of type string and has value: " . $common );
             }
         }
-        LitCommon::debugWrite( "common should now be of type string: " . is_string($common) ? "true" : "false" );
+        LitCommon::debugWrite( "common should now be of type string: " . (is_string($common) ? "true" : "false") );
         return (is_string($common) ? $common : $common[0]);
     }
 
