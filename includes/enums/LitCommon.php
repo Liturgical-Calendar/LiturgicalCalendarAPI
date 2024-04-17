@@ -381,7 +381,7 @@ class LitCommon {
                 LitCommon::debugWrite( "Final common value is now of type string and has value: <" . $common . ">" );
             }
         }
-        $isString = is_string($common) ? "true" : "false";
+        $isString = is_string($common) ? "and yes it is" : "but it's not?";
         LitCommon::debugWrite( "common should now be of type string: " . $isString );
         return (is_string($common) ? $common : $common[0]);
     }
