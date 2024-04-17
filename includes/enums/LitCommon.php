@@ -53,8 +53,10 @@ class LitCommon {
     public static string $HASH_REQUEST          = "";
     public static array $REQUEST_PARAMS         = [];
 
-    public function __construct( string $locale ) {
+    public function __construct( string $locale, string|false $systemLocale ) : void {
         $this->locale = $locale;//strtoupper( $locale );
+        LitCommon::debugWrite( "INSTANTIATING NEW INSTANCE OF LITCOMMON CLASS" );
+        LitCommon::debugWrite( "current system locale = $systemLocale" );
         $this->GTXT = [
             self::PROPRIO                           => _( "Proper" ),
             /**translators: context = from the Common of nn */
@@ -125,7 +127,7 @@ class LitCommon {
             /**translators: context = from the Common of nn: nn */
             self::PRO_SANCTIS_MULIERIBUS                => _( "For Holy Women" )
         ];
-        LitCommon::debugWrite( "INSTANTIATING NEW INSTANCE OF LITCOMMON CLASS, value of this->GTXT:" );
+        LitCommon::debugWrite( "value of this->GTXT:" );
         LitCommon::debugWrite( json_encode( $this->GTXT, JSON_PRETTY_PRINT ) );
     }
 

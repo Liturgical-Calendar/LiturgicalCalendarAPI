@@ -2927,12 +2927,12 @@ class LitCalAPI {
             $baseLocale . '.UTF-8',
             $baseLocale
         ];
-        setlocale( LC_ALL, $localeArray );
+        $systemLocale = setlocale( LC_ALL, $localeArray );
         $this->createFormatters();
         bindtextdomain("litcal", "i18n");
         textdomain("litcal");
         $this->Cal          = new FestivityCollection( $this->LitSettings );
-        $this->LitCommon    = new LitCommon( $this->LitSettings->Locale );
+        $this->LitCommon    = new LitCommon( $this->LitSettings->Locale, $systemLocale );
         $this->LitGrade     = new LitGrade( $this->LitSettings->Locale );
     }
 
