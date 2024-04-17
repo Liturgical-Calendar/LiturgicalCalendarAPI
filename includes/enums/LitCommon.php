@@ -54,7 +54,7 @@ class LitCommon {
     public static array $REQUEST_PARAMS         = [];
 
     public function __construct( string $locale ) {
-        $this->locale = strtoupper( $locale );
+        $this->locale = $locale;//strtoupper( $locale );
         $this->GTXT = [
             self::PROPRIO                           => _( "Proper" ),
             /**translators: context = from the Common of nn */
