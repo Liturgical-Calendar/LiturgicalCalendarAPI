@@ -1,0 +1,162 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="https://www.bibleget.io/catholicliturgy">
+  <xs:element name="LiturgicalCalendar">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Settings">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Year" type="xs:string" />
+              <xs:element name="Epiphany" type="xs:string" />
+              <xs:element name="Ascension" type="xs:string" />
+              <xs:element name="CorpusChristi" type="xs:string" />
+              <xs:element name="Locale" type="xs:string" />
+              <xs:element name="ReturnType" type="xs:string" />
+              <xs:element name="CalendarType" type="xs:string" />
+              <xs:element name="EternalHighPriest" type="xs:string" />
+              <xs:element name="NationalCalendar" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Metadata">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="VERSION" type="xs:string" />
+              <xs:element name="Timestamp" type="xs:string" />
+              <xs:element name="DateTime" type="xs:string" />
+              <xs:element name="RequestHeaders">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Cookie" type="xs:string" />
+                    <xs:element name="Accept-Language" type="xs:string" />
+                    <xs:element name="Accept-Encoding" type="xs:string" />
+                    <xs:element name="Sec-Fetch-Dest" type="xs:string" />
+                    <xs:element name="Sec-Fetch-User" type="xs:string" />
+                    <xs:element name="Sec-Fetch-Mode" type="xs:string" />
+                    <xs:element name="Sec-Fetch-Site" type="xs:string" />
+                    <xs:element name="Accept" type="xs:string" />
+                    <xs:element name="User-Agent" type="xs:string" />
+                    <xs:element name="Upgrade-Insecure-Requests" type="xs:string" />
+                    <xs:element name="Sec-Ch-Ua-Platform" type="xs:string" />
+                    <xs:element name="Sec-Ch-Ua-Mobile" type="xs:string" />
+                    <xs:element name="Sec-Ch-Ua" type="xs:string" />
+                    <xs:element name="Cache-Control" type="xs:string" />
+                    <xs:element name="Pragma" type="xs:string" />
+                    <xs:element name="Connection" type="xs:string" />
+                    <xs:element name="X-Accel-Internal" type="xs:string" />
+                    <xs:element name="Host" type="xs:string" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Solemnities">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="LitCalEvent" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="date" type="xs:string" />
+                          <xs:element name="timezone_type" type="xs:string" />
+                          <xs:element name="timezone" type="xs:string" />
+                        </xs:sequence>
+                        <xs:attribute name="eventkey" type="xs:ID" use="required" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="FeastsMemorials">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="LitCalEvent" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="date" type="xs:string" />
+                          <xs:element name="timezone_type" type="xs:integer" />
+                          <xs:element name="timezone" type="xs:string" />
+                        </xs:sequence>
+                        <xs:attribute name="eventkey" type="xs:ID" use="required" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="LitCal">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="LitCalEvent" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="eventIdx" type="xs:string" />
+                    <xs:element name="name" type="xs:string" />
+                    <xs:element name="date" type="xs:string" />
+                    <xs:element name="color">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="numeric_0" type="xs:string" />
+                          <xs:element name="numeric_1" minOccurs="0" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="colorLcl">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="numeric_0" type="xs:string" />
+                          <xs:element name="numeric_1" minOccurs="0" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="type" type="xs:string" />
+                    <xs:element name="grade" type="xs:string" />
+                    <xs:element name="gradeLcl" type="xs:string" />
+                    <xs:element name="displayGrade" type="xs:string" />
+                    <xs:element name="common">
+                      <xs:complexType>
+                        <xs:sequence minOccurs="0">
+                          <xs:element name="numeric_0" minOccurs="0" type="xs:string" />
+                          <xs:element name="numeric_1" minOccurs="0" type="xs:string" />
+                          <xs:element name="numeric_2" minOccurs="0" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="commonLcl" type="xs:string" />
+                    <xs:element name="dayOfTheWeek_ISO8601" type="xs:string" />
+                    <xs:element name="month" type="xs:string" />
+                    <xs:element name="day" type="xs:string" />
+                    <xs:element name="year" type="xs:string" />
+                    <xs:element name="monthShort" type="xs:string" />
+                    <xs:element name="monthLong" type="xs:string" />
+                    <xs:element name="dayOfTheWeekShort" type="xs:string" />
+                    <xs:element name="dayOfTheWeekLong" type="xs:string" />
+                    <xs:element name="liturgicalYear" minOccurs="0" type="xs:string" />
+                    <xs:element name="isVigilMass" minOccurs="0" type="xs:string" />
+                    <xs:element name="isVigilFor" minOccurs="0" type="xs:string" />
+                    <xs:element name="hasVigilMass" minOccurs="0" type="xs:string" />
+                    <xs:element name="hasVesperI" minOccurs="0" type="xs:string" />
+                    <xs:element name="hasVesperII" minOccurs="0" type="xs:string" />
+                    <xs:element name="psalterWeek" minOccurs="0" type="xs:string" />
+                    <xs:element name="liturgicalSeason" minOccurs="0" type="xs:string" />
+                    <xs:element name="liturgicalSeasonLcl" minOccurs="0" type="xs:string" />
+                  </xs:sequence>
+                  <xs:attribute name="eventkey" type="xs:ID" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Messages">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:any maxOccurs="unbounded"/>
+            </xs:sequence>
+            <!-- <xs:assert test="every $e in * 
+                         satisfies matches(local-name($e), 'numeric_[0-9]+')"/> -->
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
