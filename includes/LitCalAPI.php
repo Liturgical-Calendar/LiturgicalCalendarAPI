@@ -2914,7 +2914,7 @@ class LitCalAPI {
         die();
     }
 
-    private function prepareL10N() : void {
+    private function prepareL10N() : string|false {
         $baseLocale = strtolower( explode( '_', $this->LitSettings->Locale )[0] );
         $localeArray = [
             $this->LitSettings->Locale . '.utf8',
@@ -2934,6 +2934,7 @@ class LitCalAPI {
         $this->Cal          = new FestivityCollection( $this->LitSettings );
         $this->LitCommon    = new LitCommon( $this->LitSettings->Locale, $systemLocale );
         $this->LitGrade     = new LitGrade( $this->LitSettings->Locale );
+        return $systemLocale;
     }
 
     public function setCacheDuration( string $duration ) : void {
@@ -2969,7 +2970,6 @@ class LitCalAPI {
         $this->loadNationalCalendarData();
         $this->updateSettingsBasedOnNationalCalendar();
         $this->updateSettingsBasedOnDiocesanCalendar();
-        Festivity::setLocale( $this->LitSettings->Locale );
         $this->APICore->setResponseContentTypeHeader();
 
         if( $this->cacheFileIsAvailable() ){
@@ -2998,7 +2998,8 @@ class LitCalAPI {
             die();
         } else {
             $this->dieIfBeforeMinYear();
-            $this->prepareL10N();
+            $systemLocale = $this->prepareL10N();
+            Festivity::setLocale( $this->LitSettings->Locale, $systemLocale );
             $this->calculateUniversalCalendar();
 
             if( $this->LitSettings->NationalCalendar !== null && $this->NationalData !== null ) {
