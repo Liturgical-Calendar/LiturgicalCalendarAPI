@@ -53,7 +53,7 @@ class LitCommon {
     public static string $HASH_REQUEST          = "";
     public static array $REQUEST_PARAMS         = [];
 
-    public function __construct( string $locale, string|false $systemLocale ) : void {
+    public function __construct( string $locale, string|false $systemLocale ) {
         $this->locale = $locale;//strtoupper( $locale );
         LitCommon::debugWrite( "INSTANTIATING NEW INSTANCE OF LITCOMMON CLASS" );
         LitCommon::debugWrite( "current system locale = $systemLocale" );
