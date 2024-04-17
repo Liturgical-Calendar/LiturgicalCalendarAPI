@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-17 20:43+0000\n"
+"POT-Creation-Date: 2024-04-17 21:09+0000\n"
 "PO-Revision-Date: 2023-01-02 14:09+0000\n"
 "Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
 "Language-Team: German <https://translate.johnromanodorazio.com/projects/"
@@ -50,7 +50,7 @@ msgstr ""
 
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
 #: includes/LitCalAPI.php:722 includes/LitMessages.php:143
-#: includes/LitMessages.php:148 includes/enums/LitCommon.php:375
+#: includes/LitMessages.php:148 includes/enums/LitCommon.php:377
 msgid "or"
 msgstr ""
 
@@ -783,30 +783,30 @@ msgid "For Holy Women"
 msgstr ""
 
 #. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/enums/LitCommon.php:171 includes/enums/LitCommon.php:183
+#: includes/enums/LitCommon.php:173 includes/enums/LitCommon.php:185
 msgctxt "(SING_FEMM)"
 msgid "of the"
 msgstr ""
 
 #. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/enums/LitCommon.php:174
+#: includes/enums/LitCommon.php:176
 msgctxt "(PLUR_FEMM)"
 msgid "of"
 msgstr ""
 
 #. translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/enums/LitCommon.php:180
+#: includes/enums/LitCommon.php:182
 msgctxt "(PLUR_MASC)"
 msgid "of"
 msgstr ""
 
 #. translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: includes/enums/LitCommon.php:186
+#: includes/enums/LitCommon.php:188
 msgctxt "(SING_MASC)"
 msgid "of the"
 msgstr ""
 
-#: includes/enums/LitCommon.php:358
+#: includes/enums/LitCommon.php:360
 msgid "From the Common"
 msgstr ""
 
