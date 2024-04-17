@@ -125,6 +125,8 @@ class LitCommon {
             /**translators: context = from the Common of nn: nn */
             self::PRO_SANCTIS_MULIERIBUS                => _( "For Holy Women" )
         ];
+        LitCommon::debugWrite( "INSTANTIATING NEW INSTANCE OF LITCOMMON CLASS, value of this->GTXT:" );
+        LitCommon::debugWrite( json_encode( $this->GTXT, JSON_PRETTY_PRINT ) );
     }
 
     const LATIN = [
