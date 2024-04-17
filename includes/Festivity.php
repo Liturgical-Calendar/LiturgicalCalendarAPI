@@ -158,11 +158,11 @@ class Festivity implements JsonSerializable
         return $returnArr;
     }
 
-    public static function setLocale( string $locale ) : void {
+    public static function setLocale( string $locale, string|false $systemLocale ) : void {
         if( LitLocale::isValid( $locale ) ) {
             self::$locale               = $locale;
             self::$LitGrade             = new LitGrade( $locale );
-            self::$LitCommon            = new LitCommon( $locale );
+            self::$LitCommon            = new LitCommon( $locale, $systemLocale );
             self::$dayOfTheWeekShort    = IntlDateFormatter::create( $locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEE" );
             self::$dayOfTheWeekLong     = IntlDateFormatter::create( $locale, IntlDateFormatter::FULL,   IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEEE" );
             self::$monthShort           = IntlDateFormatter::create( $locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "MMM" );
