@@ -39,7 +39,7 @@
                     </xs:restriction>
                   </xs:simpleContent>
                 </xs:complexType>
-              </xs:string>
+              </xs:element>
               <xs:element name="Locale" type="xs:string" />
               <xs:element name="ReturnType">
                 <xs:complexType>
