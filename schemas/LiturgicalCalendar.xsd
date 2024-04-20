@@ -101,16 +101,19 @@
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element name="option" minOccurs="1" maxOccurs="3">
-                            <xs:simpleType>
-                              <xs:restriction base="xs:string">
-                                  <xs:enumeration value="green" />
-                                  <xs:enumeration value="red" />
-                                  <xs:enumeration value="white" />
-                                  <xs:enumeration value="purple" />
-                                  <xs:enumeration value="pink" />
-                              </xs:restriction>
-                              <xs:attribute name="idx" type="xs:ID" use="required" />
-                            </xs:simpleType>
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="option" maxOccurs="unbounded" minOccurs="0">
+                                  <xs:complexType>
+                                    <xs:simpleContent>
+                                      <xs:extension base="xs:string">
+                                        <xs:attribute type="xs:byte" name="idx" use="required" />
+                                      </xs:extension>
+                                    </xs:simpleContent>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
                           </xs:element>
                         </xs:sequence>
                       </xs:complexType>
@@ -118,8 +121,14 @@
                     <xs:element name="colorLcl">
                       <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="option" type="xs:string" minOccurs="1" maxOccurs="3">
-                            <xs:attribute name="idx" type="xs:ID" use="required" />
+                          <xs:element name="option" maxOccurs="unbounded" minOccurs="0">
+                            <xs:complexType>
+                              <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                  <xs:attribute type="xs:byte" name="idx" use="required" />
+                                </xs:extension>
+                              </xs:simpleContent>
+                            </xs:complexType>
                           </xs:element>
                         </xs:sequence>
                       </xs:complexType>
@@ -129,10 +138,16 @@
                     <xs:element name="gradeLcl" type="xs:string" />
                     <xs:element name="displayGrade" type="xs:string" />
                     <xs:element name="common">
-                      <xs:complexType>
+                      <xs:complexType mixed="true">
                         <xs:sequence>
-                          <xs:element name="option" type="xs:string" minOccurs="0" maxOccurs="3">
-                            <xs:attribute name="idx" type="xs:ID" use="required" />
+                          <xs:element name="option" maxOccurs="unbounded" minOccurs="0">
+                            <xs:complexType>
+                              <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                  <xs:attribute type="xs:byte" name="idx" use="required" />
+                                </xs:extension>
+                              </xs:simpleContent>
+                            </xs:complexType>
                           </xs:element>
                         </xs:sequence>
                       </xs:complexType>
@@ -165,8 +180,14 @@
         <xs:element name="Messages">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="message" maxOccurs="unbounded">
-                <xs:attribute name="idx" type="xs:ID" use="required" />
+              <xs:element name="message" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                      <xs:attribute type="xs:short" name="idx" use="required" />
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
               </xs:element>
             </xs:sequence>
           </xs:complexType>
