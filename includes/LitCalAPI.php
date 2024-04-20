@@ -2882,7 +2882,7 @@ class LitCalAPI {
                 // then create an XML representation from the Array
                 $xml = new SimpleXMLElement ( "<?xml version=\"1.0\" encoding=\"UTF-8\"?" . "><LiturgicalCalendar xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" .
                     " xsi:schemaLocation=\"http://www.bibleget.io/catholicliturgy https://litcal.johnromanodorazio.com/api/dev/schemas/LiturgicalCalendar.xsd\"" .
-                    " xmlns=\"https://www.bibleget.io/catholicliturgy\"/>" );
+                    " xmlns=\"http://www.bibleget.io/catholicliturgy\"/>" );
                 LitFunc::convertArray2XML( $jsonObj, $xml );
                 $rawXML = $xml->asXML(); //this gives us non pretty XML, basically a single long string
 
