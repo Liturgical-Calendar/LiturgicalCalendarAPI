@@ -16,16 +16,17 @@
               <xs:element name="ReturnType" type="xs:string" />
               <xs:element name="CalendarType" type="xs:string" />
               <xs:element name="EternalHighPriest" type="xs:string" />
-              <xs:element name="NationalCalendar" type="xs:string" />
+              <xs:element name="NationalCalendar" minOccurs="0" type="xs:string" />
+              <xs:element name="DiocesanCalendar" minOccurs="0" type="xs:string" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
         <xs:element name="Metadata">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="VERSION" type="xs:string" />
-              <xs:element name="Timestamp" type="xs:string" />
-              <xs:element name="DateTime" type="xs:string" />
+              <xs:element name="Version" type="xs:string" />
+              <xs:element name="Timestamp" type="xs:long" />
+              <xs:element name="DateTime" type="xs:dateTime" />
               <xs:element name="RequestHeaders">
                 <xs:complexType>
                   <xs:sequence>
@@ -93,21 +94,21 @@
                   <xs:sequence>
                     <xs:element name="eventIdx" type="xs:string" />
                     <xs:element name="name" type="xs:string" />
-                    <xs:element name="date" type="xs:string" />
+                    <xs:element name="date" type="xs:long" />
                     <xs:element name="color">
                       <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="numeric_0" type="xs:string" />
-                          <xs:element name="numeric_1" minOccurs="0" type="xs:string" />
+                          <xs:element name="option" type="xs:string" minOccurs="1" maxOccurs="3" />
                         </xs:sequence>
+                        <xs:attribute name="idx" type="xs:ID" use="required" />
                       </xs:complexType>
                     </xs:element>
                     <xs:element name="colorLcl">
                       <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="numeric_0" type="xs:string" />
-                          <xs:element name="numeric_1" minOccurs="0" type="xs:string" />
+                          <xs:element name="option" type="xs:string" minOccurs="1" maxOccurs="3" />
                         </xs:sequence>
+                        <xs:attribute name="idx" type="xs:ID" use="required" />
                       </xs:complexType>
                     </xs:element>
                     <xs:element name="type" type="xs:string" />
@@ -116,18 +117,17 @@
                     <xs:element name="displayGrade" type="xs:string" />
                     <xs:element name="common">
                       <xs:complexType>
-                        <xs:sequence minOccurs="0">
-                          <xs:element name="numeric_0" minOccurs="0" type="xs:string" />
-                          <xs:element name="numeric_1" minOccurs="0" type="xs:string" />
-                          <xs:element name="numeric_2" minOccurs="0" type="xs:string" />
+                        <xs:sequence>
+                          <xs:element name="option" type="xs:string" minOccurs="0" maxOccurs="3" />
                         </xs:sequence>
+                        <xs:attribute name="idx" type="xs:ID" use="required" />
                       </xs:complexType>
                     </xs:element>
                     <xs:element name="commonLcl" type="xs:string" />
                     <xs:element name="dayOfTheWeek_ISO8601" type="xs:string" />
-                    <xs:element name="month" type="xs:string" />
-                    <xs:element name="day" type="xs:string" />
-                    <xs:element name="year" type="xs:string" />
+                    <xs:element name="month" type="xs:byte" />
+                    <xs:element name="day" type="xs:byte" />
+                    <xs:element name="year" type="xs:positiveInteger" />
                     <xs:element name="monthShort" type="xs:string" />
                     <xs:element name="monthLong" type="xs:string" />
                     <xs:element name="dayOfTheWeekShort" type="xs:string" />
@@ -138,7 +138,7 @@
                     <xs:element name="hasVigilMass" minOccurs="0" type="xs:string" />
                     <xs:element name="hasVesperI" minOccurs="0" type="xs:string" />
                     <xs:element name="hasVesperII" minOccurs="0" type="xs:string" />
-                    <xs:element name="psalterWeek" minOccurs="0" type="xs:string" />
+                    <xs:element name="psalterWeek" minOccurs="0" type="xs:byte" />
                     <xs:element name="liturgicalSeason" minOccurs="0" type="xs:string" />
                     <xs:element name="liturgicalSeasonLcl" minOccurs="0" type="xs:string" />
                   </xs:sequence>
@@ -151,10 +151,9 @@
         <xs:element name="Messages">
           <xs:complexType>
             <xs:sequence>
-              <xs:any maxOccurs="unbounded"/>
+              <xs:element name="message" maxOccurs="unbounded" />
             </xs:sequence>
-            <!-- <xs:assert test="every $e in * 
-                         satisfies matches(local-name($e), 'numeric_[0-9]+')"/> -->
+            <xs:attribute name="idx" type="xs:ID" use="required" />
           </xs:complexType>
         </xs:element>
       </xs:sequence>
