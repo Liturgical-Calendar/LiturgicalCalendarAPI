@@ -2875,15 +2875,24 @@ class LitCalAPI {
                 $response = json_encode( $SerializeableLitCal );
                 break;
             case ReturnType::XML:
+                // first convert the Object to an Array
                 $jsonStr = json_encode( $SerializeableLitCal );
                 $jsonObj = json_decode( $jsonStr, true );
-                $xml = new SimpleXMLElement ( "<?xml version=\"1.0\" encoding=\"UTF-8\"?" . "><LiturgicalCalendar xmlns=\"https://www.bibleget.io/catholicliturgy\"/>" );
+
+                // then create an XML representation from the Array
+                $xml = new SimpleXMLElement ( "<?xml version=\"1.0\" encoding=\"UTF-8\"?" . "><LiturgicalCalendar xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" .
+                    " xsi:schemaLocation=\"http://www.bibleget.io/catholicliturgy https://litcal.johnromanodorazio.com/api/dev/schemas/LiturgicalCalendar.xsd\"" .
+                    " xmlns=\"https://www.bibleget.io/catholicliturgy\"/>" );
                 LitFunc::convertArray2XML( $jsonObj, $xml );
-                $rawXML = $xml->asXML();
+                $rawXML = $xml->asXML(); //this gives us non pretty XML, basically a single long string
+
+                // finally let's pretty print the XML to make the cached file more readable
                 $dom = new DOMDocument;
                 $dom->preserveWhiteSpace = false;
                 $dom->formatOutput = true;
                 $dom->loadXML($rawXML);
+
+                // in the response we return the pretty printed version
                 $response = $dom->saveXML();
                 break;
             case ReturnType::ICS:
