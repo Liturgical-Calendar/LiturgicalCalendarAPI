@@ -13,7 +13,7 @@
                 <xs:complexType>
                   <xs:simpleContent>
                     <xs:restriction base="xs:positiveInteger">
-                      <xs:minInclusive value="1969" />
+                      <xs:minInclusive value="1970" />
                       <xs:maxInclusive value="9999" />
                     </xs:restriction>
                   </xs:simpleContent>
@@ -258,7 +258,7 @@
                       <xs:complexType>
                         <xs:simpleContent>
                           <xs:restriction base="xs:positiveInteger">
-                            <xs:minInclusive value="1969" />
+                            <xs:minInclusive value="1970" />
                             <xs:maxInclusive value="9999" />
                           </xs:restriction>
                         </xs:simpleContent>
