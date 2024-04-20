@@ -2856,9 +2856,9 @@ class LitCalAPI {
             $SerializeableLitCal->Settings->DiocesanCalendar = $this->LitSettings->DiocesanCalendar;
         }
 
-        $SerializeableLitCal->Metadata->VERSION             = self::API_VERSION;
+        $SerializeableLitCal->Metadata->Version             = self::API_VERSION;
         $SerializeableLitCal->Metadata->Timestamp           = time();
-        $SerializeableLitCal->Metadata->DateTime            = date('Y-m-d H:i:s');
+        $SerializeableLitCal->Metadata->DateTime            = date(DATE_ATOM);
 
         //$SerializeableLitCal->Metadata->RequestHeaders      = $this->APICore->getJsonEncodedRequestHeaders();
         $SerializeableLitCal->Metadata->RequestHeaders      = $this->APICore->getRequestHeaders();

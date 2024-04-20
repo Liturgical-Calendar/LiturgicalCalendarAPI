@@ -56,9 +56,6 @@ class LitFunc {
             $el->addAttribute( "idx", $key );
           }
         } else {
-          if( $key === "VERSION" ) {
-            $key = "Version";
-          }
           $xml->addChild( $key, htmlspecialchars( $value ) );
         }
       }
