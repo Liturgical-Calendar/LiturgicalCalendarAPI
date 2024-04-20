@@ -119,14 +119,22 @@
                             <xs:complexType>
                               <xs:simpleContent>
                                 <xs:restriction base="xs:byte">
-                                  <xs:enumeration value="1" />
-                                  <xs:enumeration value="2" />
+                                  <!-- <xs:enumeration value="1" /> -->
+                                  <!-- <xs:enumeration value="2" /> -->
                                   <xs:enumeration value="3" />
                                 </xs:restriction>
                               </xs:simpleContent>
                             </xs:complexType>
                           </xs:element>
-                          <xs:element name="timezone" type="xs:string" />
+                          <xs:element name="timezone">
+                            <xs:complexType>
+                              <xs:simpleContent>
+                                <xs:restriction base="xs:string">
+                                  <xs:enumeration value="UTC" />
+                                </xs:restriction>
+                              </xs:simpleContent>
+                            </xs:complexType>
+                          </xs:element>
                         </xs:sequence>
                         <xs:attribute name="eventkey" type="xs:ID" use="required" />
                       </xs:complexType>
@@ -145,14 +153,22 @@
                             <xs:complexType>
                               <xs:simpleContent>
                                 <xs:restriction base="xs:byte">
-                                  <xs:enumeration value="1" />
-                                  <xs:enumeration value="2" />
+                                  <!-- <xs:enumeration value="1" /> -->
+                                  <!-- <xs:enumeration value="2" /> -->
                                   <xs:enumeration value="3" />
                                 </xs:restriction>
                               </xs:simpleContent>
                             </xs:complexType>
                           </xs:element>
-                          <xs:element name="timezone" type="xs:string" />
+                          <xs:element name="timezone">
+                            <xs:complexType>
+                              <xs:simpleContent>
+                                <xs:restriction base="xs:string">
+                                  <xs:enumeration value="UTC" />
+                                </xs:restriction>
+                              </xs:simpleContent>
+                            </xs:complexType>
+                          </xs:element>
                         </xs:sequence>
                         <xs:attribute name="eventkey" type="xs:ID" use="required" />
                       </xs:complexType>
@@ -251,9 +267,36 @@
                       </xs:complexType>
                     </xs:element>
                     <xs:element name="commonLcl" type="xs:string" />
-                    <xs:element name="dayOfTheWeek_ISO8601" type="xs:string" />
-                    <xs:element name="month" type="xs:byte" />
-                    <xs:element name="day" type="xs:byte" />
+                    <xs:element name="dayOfTheWeek_ISO8601">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:restriction base="xs:positiveInteger">
+                            <xs:minInclusive value="1" />
+                            <xs:maxInclusive value="7" />
+                          </xs:restriction>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="month">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:restriction base="xs:positiveInteger">
+                            <xs:minInclusive value="1" />
+                            <xs:maxInclusive value="12" />
+                          </xs:restriction>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="day">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:restriction base="xs:positiveInteger">
+                            <xs:minInclusive value="1" />
+                            <xs:maxInclusive value="31" />
+                          </xs:restriction>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
                     <xs:element name="year">
                       <xs:complexType>
                         <xs:simpleContent>
