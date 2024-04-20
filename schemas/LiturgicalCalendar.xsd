@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
   targetNamespace="http://www.bibleget.io/catholicliturgy"
-  xmlns="http://www.bibleget.io/catholicliturgy">
+  xmlns="http://www.bibleget.io/catholicliturgy"
+  elementFormDefault="qualified">
   <xs:element name="LiturgicalCalendar">
     <xs:complexType>
       <xs:sequence>
