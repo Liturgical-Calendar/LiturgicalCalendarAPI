@@ -187,7 +187,7 @@
                     <xs:element name="liturgicalYear" minOccurs="0" type="xs:string" />
                     <xs:element name="isVigilMass" minOccurs="0" type="xs:boolean" />
                     <xs:element name="isVigilFor" minOccurs="0" type="xs:string" />
-                    <xs:element name="hasVigilMass" minOccurs="0" type="xs:string" />
+                    <xs:element name="hasVigilMass" minOccurs="0" type="xs:boolean" />
                     <xs:element name="hasVesperI" minOccurs="0" type="xs:boolean" />
                     <xs:element name="hasVesperII" minOccurs="0" type="xs:boolean" />
                     <xs:element name="psalterWeek" minOccurs="0">
