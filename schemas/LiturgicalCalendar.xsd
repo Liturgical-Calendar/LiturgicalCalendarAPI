@@ -110,16 +110,17 @@
                                     <xs:enumeration value="pink" />
                                 </xs:restriction>
                             </xs:simpleType>
+                            <xs:attribute name="idx" type="xs:ID" use="required" />
                           </xs:element>
-                          <xs:attribute name="idx" type="xs:ID" use="required" />
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
                     <xs:element name="colorLcl">
                       <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="option" type="xs:string" minOccurs="1" maxOccurs="3" />
-                          <xs:attribute name="idx" type="xs:ID" use="required" />
+                          <xs:element name="option" type="xs:string" minOccurs="1" maxOccurs="3">
+                            <xs:attribute name="idx" type="xs:ID" use="required" />
+                          </xs:element>
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
@@ -130,8 +131,9 @@
                     <xs:element name="common">
                       <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="option" type="xs:string" minOccurs="0" maxOccurs="3" />
-                          <xs:attribute name="idx" type="xs:ID" use="required" />
+                          <xs:element name="option" type="xs:string" minOccurs="0" maxOccurs="3">
+                            <xs:attribute name="idx" type="xs:ID" use="required" />
+                          </xs:element>
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
@@ -163,8 +165,9 @@
         <xs:element name="Messages">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="message" maxOccurs="unbounded" />
-              <xs:attribute name="idx" type="xs:ID" use="required" />
+              <xs:element name="message" maxOccurs="unbounded">
+                <xs:attribute name="idx" type="xs:ID" use="required" />
+              </xs:element>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
