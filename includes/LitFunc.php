@@ -47,9 +47,9 @@ class LitFunc {
         if( is_numeric( $key ) ) {
           self::debugWrite( "key <$key> is numerical, have to deal with this..." );
           if( self::$LAST_ARRAY_KEY === 'Messages' ) {
-            self::debugWrite( "key <$key> seems to belong to the Messages array: will create a corresponding <message> element with attribute 'msgid'" );
+            self::debugWrite( "key <$key> seems to belong to the Messages array: will create a corresponding <message> element with attribute 'idx'" );
             $el = $xml->addChild( 'message', htmlspecialchars( $value ) );
-            $el->addAttribute( "msgid", $key );
+            $el->addAttribute( "idx", $key );
           } else {
             self::debugWrite( "key <$key> does not seem to belong to the Messages array: will create a corresponding <option> element with attribute 'idx'" );
             $el = $xml->addChild( 'option', $value );
