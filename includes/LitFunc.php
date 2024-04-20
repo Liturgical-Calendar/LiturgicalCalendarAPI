@@ -21,6 +21,7 @@ class LitFunc {
 
   const NON_EVENT_KEYS = [ 'LitCal', 'Settings', 'Messages', 'Metadata', 'Solemnities', 'FeastsMemorials', 'RequestHeaders', 'color', 'colorLcl', 'common' ];
   private static string $LAST_ARRAY_KEY = '';
+  public static string $HASH_REQUEST    = '';
 
   public static function isNotLitCalEventKey( string $key ) : bool {
     return in_array( $key, self::NON_EVENT_KEYS );
@@ -30,22 +31,30 @@ class LitFunc {
     foreach( $data as $key => $value ) {
       if( is_array( $value ) ) {
         self::$LAST_ARRAY_KEY = $key;
+        self::debugWrite( "value of key <$key> is an array" );
         if( self::isNotLitCalEventKey( $key ) ) {
+          self::debugWrite( "key <$key> is not a LitCalEvent" );
           $new_object = $xml->addChild( $key );
         } else {
+          self::debugWrite( "key <$key> is a LitCalEvent" );
           $new_object = $xml->addChild( "LitCalEvent" );
           $new_object->addAttribute( "eventkey", $key );
         }
+        self::debugWrite( "proceeding to convert array value of <$key> to xml sequence..." );
         self::convertArray2XML( $value, $new_object );
       } else {
         // XML elements cannot have numerical names, they must have text
         if( is_numeric( $key ) ) {
+          self::debugWrite( "key <$key> is numerical, have to deal with this..." );
           if( self::$LAST_ARRAY_KEY === 'Messages' ) {
+            self::debugWrite( "key <$key> seems to belong to the Messages array: will create a corresponding <message> element with attribute 'msgid'" );
             $el = $xml->addChild( 'message', htmlspecialchars( $value ) );
             $el->addAttribute( "msgid", $key );
           } else {
-            $key = "numeric_$key";
-            $xml->addChild( $key, htmlspecialchars( $value ) );
+            $attribute = self::$LAST_ARRAY_KEY . "id";
+            self::debugWrite( "key <$key> does not seem to belong to the Messages array: will create a corresponding <option> element with attribute '$attribute'" );
+            $el = $xml->addChild( 'option', $value );
+            $el->addAttribute( $attribute, $key );
           }
         }
       }
@@ -129,6 +138,11 @@ class LitFunc {
         */
     }
     return $dateObj;
+  }
+
+  private static function debugWrite( string $string ) {
+    $debugFile = "LitFuncDebug_" . LitFunc::$HASH_REQUEST . ".log";
+    file_put_contents( $debugFile, date('c') . "\t" . $string . PHP_EOL, FILE_APPEND );
   }
 
 }

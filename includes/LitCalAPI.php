@@ -365,6 +365,7 @@ class LitCalAPI {
         $cacheFilePath = "engineCache/v" . str_replace( ".", "_", self::API_VERSION ) . "/";
         $paramsHash = md5( serialize( $this->LitSettings) );
         LitCommon::$HASH_REQUEST = $paramsHash;
+        LitFunc::$HASH_REQUEST = $paramsHash;
         $cacheFileName = $paramsHash . $this->CacheDuration . "." . strtolower( $this->LitSettings->ReturnType );
         $this->CACHEFILE = $cacheFilePath . $cacheFileName;
         return file_exists( $this->CACHEFILE );
