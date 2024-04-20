@@ -100,19 +100,13 @@
                     <xs:element name="color">
                       <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="option" minOccurs="1" maxOccurs="3">
+                          <xs:element name="option" minOccurs="0" maxOccurs="3">
                             <xs:complexType>
-                              <xs:sequence>
-                                <xs:element name="option" maxOccurs="unbounded" minOccurs="0">
-                                  <xs:complexType>
-                                    <xs:simpleContent>
-                                      <xs:extension base="xs:string">
-                                        <xs:attribute type="xs:byte" name="idx" use="required" />
-                                      </xs:extension>
-                                    </xs:simpleContent>
-                                  </xs:complexType>
-                                </xs:element>
-                              </xs:sequence>
+                              <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                  <xs:attribute type="xs:byte" name="idx" use="required" />
+                                </xs:extension>
+                              </xs:simpleContent>
                             </xs:complexType>
                           </xs:element>
                         </xs:sequence>
@@ -121,7 +115,7 @@
                     <xs:element name="colorLcl">
                       <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="option" maxOccurs="unbounded" minOccurs="0">
+                          <xs:element name="option" minOccurs="0" maxOccurs="3">
                             <xs:complexType>
                               <xs:simpleContent>
                                 <xs:extension base="xs:string">
@@ -171,7 +165,7 @@
                     <xs:element name="liturgicalSeason" minOccurs="0" type="xs:string" />
                     <xs:element name="liturgicalSeasonLcl" minOccurs="0" type="xs:string" />
                   </xs:sequence>
-                  <xs:attribute name="eventkey" type="xs:ID" use="required" />
+                  <xs:attribute name="eventkey" type="xs:string" use="required" />
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
