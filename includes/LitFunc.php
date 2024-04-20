@@ -55,7 +55,12 @@ class LitFunc {
             $el = $xml->addChild( 'option', $value );
             $el->addAttribute( "idx", $key );
           }
-        } else {
+        }
+        else if ( is_bool( $value ) ) {
+          $boolVal = $value ? 1 : 0;
+          $xml->addChild( $key, $boolVal );
+        }
+         else {
           $xml->addChild( $key, htmlspecialchars( $value ) );
         }
       }
