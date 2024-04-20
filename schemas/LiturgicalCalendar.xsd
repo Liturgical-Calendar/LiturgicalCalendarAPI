@@ -132,8 +132,32 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
-                    <xs:element name="type" type="xs:string" />
-                    <xs:element name="grade" type="xs:byte" />
+                    <xs:element name="type">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:restriction base="xs:string">
+                            <xs:enumeration value="mobile" />
+                            <xs:enumeration value="fixed" />
+                          </xs:restriction>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="grade">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:restriction base="xs:byte">
+                            <xs:enumeration value="0" />
+                            <xs:enumeration value="1" />
+                            <xs:enumeration value="2" />
+                            <xs:enumeration value="3" />
+                            <xs:enumeration value="4" />
+                            <xs:enumeration value="5" />
+                            <xs:enumeration value="6" />
+                            <xs:enumeration value="7" />
+                          </xs:restriction>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
                     <xs:element name="gradeLcl" type="xs:string" />
                     <xs:element name="displayGrade" type="xs:string" />
                     <xs:element name="common">
@@ -161,12 +185,23 @@
                     <xs:element name="dayOfTheWeekShort" type="xs:string" />
                     <xs:element name="dayOfTheWeekLong" type="xs:string" />
                     <xs:element name="liturgicalYear" minOccurs="0" type="xs:string" />
-                    <xs:element name="isVigilMass" minOccurs="0" type="xs:string" />
+                    <xs:element name="isVigilMass" minOccurs="0" type="xs:boolean" />
                     <xs:element name="isVigilFor" minOccurs="0" type="xs:string" />
                     <xs:element name="hasVigilMass" minOccurs="0" type="xs:string" />
-                    <xs:element name="hasVesperI" minOccurs="0" type="xs:string" />
-                    <xs:element name="hasVesperII" minOccurs="0" type="xs:string" />
-                    <xs:element name="psalterWeek" minOccurs="0" type="xs:byte" />
+                    <xs:element name="hasVesperI" minOccurs="0" type="xs:boolean" />
+                    <xs:element name="hasVesperII" minOccurs="0" type="xs:boolean" />
+                    <xs:element name="psalterWeek" minOccurs="0">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:restriction base="xs:byte">
+                            <xs:enumeration value="1" />
+                            <xs:enumeration value="2" />
+                            <xs:enumeration value="3" />
+                            <xs:enumeration value="4" />
+                          </xs:restriction>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
                     <xs:element name="liturgicalSeason" minOccurs="0" type="xs:string" />
                     <xs:element name="liturgicalSeasonLcl" minOccurs="0" type="xs:string" />
                   </xs:sequence>
