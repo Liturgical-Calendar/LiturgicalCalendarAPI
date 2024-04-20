@@ -19,8 +19,8 @@ ini_set('date.timezone', 'Europe/Vatican');
 
 class LitFunc {
 
-  const NON_EVENT_KEYS = [ 'LitCal', 'Settings', 'Messages', 'Metadata', 'Solemnities', 'FeastsMemorials', 'RequestHeaders', 'color', 'colorLcl', 'common' ];
-  private static string $LAST_KEY = '';
+  const NON_EVENT_KEYS = [ 'LitCal', 'Settings', 'Messages', 'Metadata' ]; //'Solemnities', 'FeastsMemorials', 'RequestHeaders', 'color', 'colorLcl', 'common'
+  private static string $LAST_ARRAY_KEY = '';
 
   public static function isNotLitCalEventKey( string $key ) : bool {
     return in_array( $key, self::NON_EVENT_KEYS );
@@ -29,7 +29,7 @@ class LitFunc {
   public static function convertArray2XML(array $data, ?SimpleXMLElement &$xml) : void {
     foreach( $data as $key => $value ) {
       if( is_array( $value ) ) {
-        self::$LAST_KEY = $key;
+        self::$LAST_ARRAY_KEY = $key;
         if( self::isNotLitCalEventKey( $key ) ) {
           $new_object = $xml->addChild( $key );
         } else {
@@ -40,7 +40,7 @@ class LitFunc {
       } else {
         // XML elements cannot have numerical names, they must have text
         if( is_numeric( $key ) ) {
-          if( self::$LAST_KEY === 'Messages' ) {
+          if( self::$LAST_ARRAY_KEY === 'Messages' ) {
             $el = $xml->addChild( 'message', htmlspecialchars( $value ) );
             $el->addAttribute( "msgid", $key );
           } else {
