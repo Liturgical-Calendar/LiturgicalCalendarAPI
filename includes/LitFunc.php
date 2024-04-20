@@ -56,6 +56,8 @@ class LitFunc {
             $el = $xml->addChild( 'option', $value );
             $el->addAttribute( $attribute, $key );
           }
+        } else {
+          $xml->addChild( $key, htmlspecialchars( $value ) );
         }
       }
     }
