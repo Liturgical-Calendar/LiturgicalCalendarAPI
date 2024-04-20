@@ -789,7 +789,7 @@
                   },
                   "commonLcl" : {
                     "type" : "string",
-                    "description" : "human readable form of the ***common***",
+                    "description" : "human readable form of the ***common***, localized according to the current requested locale",
                     "examples" : ["Proprio"]
                   },
                   "date" : {
@@ -801,7 +801,7 @@
                   "eventIdx" : {
                     "type" : "integer",
                     "format" : "int32",
-                    "description" : "progressive index, one for each liturgical event. Not really very useful. The key that identifies the liturgical event is more useful.",
+                    "description" : "progressive index, one for each liturgical event. Not really very useful. The ***eventkey*** attribute that identifies the liturgical event is more useful.",
                     "examples" : [157]
                   },
                   "liturgicalYear" : {
@@ -860,7 +860,7 @@
                   },
                   "isVigilFor" : {
                     "type" : "string",
-                    "description" : "present for applicable events such as Solemnities or Sundays. If the event is a Vigil Mass, will indicate the 'eventkey' of the 'LitCalEvent' for which the current event is a Vigil Mass",
+                    "description" : "present for applicable events such as Solemnities or Sundays. If the event is a Vigil Mass, will indicate the `eventkey` attribute of the `LitCalEvent` for which the current event is a Vigil Mass",
                     "examples" : [ "Advent3", "Christmas" ]
                   }
                 }
@@ -938,7 +938,8 @@
                       },
                       "date" : {
                         "type" : "string",
-                        "description" : "the date of the liturgical event in the liturgical calendar for the given year (the time will be zeroed out because it is not of importance). Expected pattern is `YYYY-MM-DD 00:00:00.000000`."
+                        "format" : "date-time",
+                        "description" : "the date of the liturgical event in the liturgical calendar for the given year (the time will be zeroed out because it is not of importance), in RFC 3339 format"
                       },
                       "timezone_type" : {
                         "type" : "integer",
@@ -971,7 +972,8 @@
                       },
                       "date" : {
                         "type" : "string",
-                        "description" : "the date of the liturgical event in the liturgical calendar for the given year (the time will be zeroed out because it is not of importance). Expected pattern is `YYYY-MM-DD 00:00:00.000000`"
+                        "format" : "date-time",
+                        "description" : "the date of the liturgical event in the liturgical calendar for the given year (the time will be zeroed out because it is not of importance), in RFC 3339 fomat"
                       },
                       "timezone_type" : {
                         "type" : "integer",
