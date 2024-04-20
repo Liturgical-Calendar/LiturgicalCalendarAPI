@@ -237,16 +237,24 @@
                     "type": "string"
                 },
                 "dayOfTheWeek_ISO8601": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 7
                 },
                 "month": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 12
                 },
                 "day": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 31
                 },
                 "year": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1970,
+                    "maxItems": 9999
                 },
                 "monthShort": {
                     "type": "string"
