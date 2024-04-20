@@ -51,12 +51,14 @@ class LitFunc {
             $el = $xml->addChild( 'message', htmlspecialchars( $value ) );
             $el->addAttribute( "msgid", $key );
           } else {
-            $attribute = self::$LAST_ARRAY_KEY . "id";
-            self::debugWrite( "key <$key> does not seem to belong to the Messages array: will create a corresponding <option> element with attribute '$attribute'" );
+            self::debugWrite( "key <$key> does not seem to belong to the Messages array: will create a corresponding <option> element with attribute 'idx'" );
             $el = $xml->addChild( 'option', $value );
-            $el->addAttribute( $attribute, $key );
+            $el->addAttribute( "idx", $key );
           }
         } else {
+          if( $key === "VERSION" ) {
+            $key = "Version";
+          }
           $xml->addChild( $key, htmlspecialchars( $value ) );
         }
       }
