@@ -19,7 +19,7 @@ ini_set('date.timezone', 'Europe/Vatican');
 
 class LitFunc {
 
-  const NON_EVENT_KEYS = [ 'LitCal', 'Settings', 'Messages', 'Metadata' ]; //'Solemnities', 'FeastsMemorials', 'RequestHeaders', 'color', 'colorLcl', 'common'
+  const NON_EVENT_KEYS = [ 'LitCal', 'Settings', 'Messages', 'Metadata', 'Solemnities', 'FeastsMemorials', 'RequestHeaders', 'color', 'colorLcl', 'common' ];
   private static string $LAST_ARRAY_KEY = '';
 
   public static function isNotLitCalEventKey( string $key ) : bool {
