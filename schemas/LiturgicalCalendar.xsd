@@ -103,9 +103,14 @@
                           <xs:element name="option" minOccurs="0" maxOccurs="3">
                             <xs:complexType>
                               <xs:simpleContent>
-                                <xs:extension base="xs:string">
+                                <xs:restriction base="xs:string">
+                                  <xs:enumeration value="green" />
+                                  <xs:enumeration value="red" />
+                                  <xs:enumeration value="white" />
+                                  <xs:enumeration value="purple" />
+                                  <xs:enumeration value="pink" />
                                   <xs:attribute type="xs:byte" name="idx" use="required" />
-                                </xs:extension>
+                                </xs:restriction>
                               </xs:simpleContent>
                             </xs:complexType>
                           </xs:element>
