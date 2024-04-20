@@ -98,7 +98,17 @@
                     <xs:element name="color">
                       <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="option" type="xs:string" minOccurs="1" maxOccurs="3" />
+                          <xs:element name="option" minOccurs="1" maxOccurs="3">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:enumeration value="green" />
+                                    <xs:enumeration value="red" />
+                                    <xs:enumeration value="white" />
+                                    <xs:enumeration value="purple" />
+                                    <xs:enumeration value="pink" />
+                                </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
                         </xs:sequence>
                         <xs:attribute name="idx" type="xs:ID" use="required" />
                       </xs:complexType>
@@ -112,7 +122,7 @@
                       </xs:complexType>
                     </xs:element>
                     <xs:element name="type" type="xs:string" />
-                    <xs:element name="grade" type="xs:string" />
+                    <xs:element name="grade" type="xs:byte" />
                     <xs:element name="gradeLcl" type="xs:string" />
                     <xs:element name="displayGrade" type="xs:string" />
                     <xs:element name="common">
