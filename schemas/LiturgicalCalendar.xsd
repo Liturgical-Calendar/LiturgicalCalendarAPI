@@ -9,7 +9,16 @@
         <xs:element name="Settings">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="Year" type="xs:positiveInteger" />
+              <xs:element name="Year">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:restriction base="xs:positiveInteger">
+                      <xs:minInclusive value="1969" />
+                      <xs:maxInclusive value="9999" />
+                    </xs:restriction>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
               <xs:element name="Epiphany">
                 <xs:complexType>
                   <xs:simpleContent>
@@ -245,7 +254,16 @@
                     <xs:element name="dayOfTheWeek_ISO8601" type="xs:string" />
                     <xs:element name="month" type="xs:byte" />
                     <xs:element name="day" type="xs:byte" />
-                    <xs:element name="year" type="xs:positiveInteger" />
+                    <xs:element name="year">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:restriction base="xs:positiveInteger">
+                            <xs:minInclusive value="1969" />
+                            <xs:maxInclusive value="9999" />
+                          </xs:restriction>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
                     <xs:element name="monthShort" type="xs:string" />
                     <xs:element name="monthLong" type="xs:string" />
                     <xs:element name="dayOfTheWeekShort" type="xs:string" />
