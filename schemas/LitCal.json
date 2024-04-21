@@ -42,6 +42,9 @@
                                 "XML"
                             ]
                         },
+                        "EternalHighPriest": {
+                            "type": "boolean"
+                        },
                         "NationalCalendar": {
                             "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Region"
                         },
