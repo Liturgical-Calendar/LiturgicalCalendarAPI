@@ -1,4 +1,9 @@
 <?php
+/*
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
+*/
+
 $requestHeaders = getallheaders();
 if( isset( $requestHeaders[ "Origin" ] ) ) {
     header( "Access-Control-Allow-Origin: {$requestHeaders[ "Origin" ]}" );
@@ -19,7 +24,7 @@ foreach($it as $f) {
     $fileName = $f->getFilename();
     include_once( 'tests/' . $fileName );
     $basename =  $f->getBasename('.php');
-    $testClass = new $basename;
+    $testClass = new $basename( $basename );
     $yearsOther = array_filter( $testClass::Assertions, function($k) use($testClass){ return !in_array($k, array_keys( $testClass::ExpectedValues )); }, ARRAY_FILTER_USE_KEY);
     $assertions = array_filter( $testClass::Assertions, function($k) use($testClass){ return in_array($k, array_keys( $testClass::ExpectedValues )); }, ARRAY_FILTER_USE_KEY);
     $testSuite[$basename] = [
