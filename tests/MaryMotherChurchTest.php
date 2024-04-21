@@ -28,7 +28,13 @@ class MaryMotherChurchTest extends TestCase {
         if( self::$testObject->Settings->Year < $sinceYear ) {
             $assertion = self::Assertions["before"];
             try {
-                $this->assertObjectNotHasAttribute( 'MaryMotherChurch', self::$testObject->LitCal );
+                $phpUnitVersion = \PHPUnit\Runner\Version::id();
+                if( version_compare( $phpUnitVersion, '10.1', '>=' ) ) {
+                    $this->assertObjectNotHasProperty( 'MaryMotherChurch', self::$testObject->LitCal );
+                } else {
+                    $this->assertObjectNotHasAttribute( 'MaryMotherChurch', self::$testObject->LitCal );
+                }
+                //$this->assertFalse(property_exists(self::$testObject->LitCal, 'MaryMotherChurch'));
                 $res = true;
             } catch(Exception $e) {
                 $message = new stdClass();
