@@ -192,7 +192,7 @@ class LitCalHealth implements MessageComponentInterface {
                     $errorStr .= "Fatal Error $error->code: ";
                     break;
             }
-            $errorStr .= trim($error->message) . " (Line: $error->line, Column: $error->column, Src: {$xml[$error->line - 1]})";
+            $errorStr .= htmlspecialchars(trim($error->message)) . " (Line: $error->line, Column: $error->column, Src: {$xml[$error->line - 1]})";
             if ($error->file) {
                 $errorStr .= " in file: $error->file";
             }
