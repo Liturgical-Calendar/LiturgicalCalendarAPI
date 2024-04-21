@@ -391,7 +391,7 @@
                 "schema": {
                   "$ref": "#/components/schemas/LitCalTestsIndex"
                 },
-                "examples": [
+                "examples": [{
                   {
                     "MaryMotherChurchTest": {
                       "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Congregation for Divine Worship",
@@ -469,7 +469,7 @@
                       }
                     }
                   }
-                ]
+                }]
               }
             }
           }
