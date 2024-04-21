@@ -390,7 +390,86 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/LitCalTestsIndex"
-                }
+                },
+                "examples": [
+                  {
+                    "MaryMotherChurchTest": {
+                      "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Congregation for Divine Worship",
+                      "testType": "exactCorrespondenceSince",
+                      "years": [
+                        2018,
+                        2019
+                      ],
+                      "expectedValues": [
+                        1526860800,
+                        1560124800
+                      ],
+                      "assertions": {
+                        "2018": "The memorial 'Mary Mother of the Church' should be created on the expected date",
+                        "2019": "The memorial 'Mary Mother of the Church' should be created on the expected date"
+                      },
+                      "yearsOther": {
+                        "before": "The memorial 'Mary Mother of the Church' should not exist before the year 2018"
+                      }
+                    }
+                  },
+                  {
+                    "NativityJohnBaptistTest": {
+                      "description": "When the Nativity of John the Baptist coincides with the Solemnity of the Sacred Heart, is it correctly moved to June 23?",
+                      "testType": "exactCorrespondence",
+                      "years": [
+                        2022,
+                        2033,
+                        2044
+                      ],
+                      "expectedValues": [
+                        1655942400,
+                        2003097600,
+                        2350252800
+                      ],
+                      "assertions": {
+                        "2022": "Nativity of John the Baptist should be moved to expected date",
+                        "2033": "Nativity of John the Baptist should be moved to expected date",
+                        "2044": "Nativity of John the Baptist should be moved to expected date"
+                      },
+                      "yearsOther": null
+                    }
+                  },
+                  {
+                    "StJaneFrancesDeChantalTest": {
+                      "description": "Saint Jane Frances de Chantal was moved from December 12 to August 12 in the 2002 Latin Edition of the Roman Missal, to allow bishops conferences to insert Our Lady of Guadalupe as an optional memorial on December 12. DOES ST JANE FRANCES DE CHANTAL FALL ON THE RIGHT DAY BOTH BEFORE AND AFTER 2002, OR IT CORRECTLY OVERRIDEN BY GREATER FESTIVITIES?",
+                      "testType": "variableCorrespondence",
+                      "years": [
+                        2001,
+                        2002,
+                        2010
+                      ],
+                      "expectedValues": [
+                        1008115200,
+                        1029110400,
+                        1281571200
+                      ],
+                      "assertions": {
+                        "2001": "should fall on expected date",
+                        "2002": "should fall on expected date",
+                        "2010": "should fall on expected date"
+                      },
+                      "yearsOther": {
+                        "1971": "should not exist, December 12th is a Sunday",
+                        "1976": "should not exist, December 12th is a Sunday",
+                        "1982": "should not exist, December 12th is a Sunday",
+                        "1993": "should not exist, December 12th is a Sunday",
+                        "1999": "should not exist, December 12th is a Sunday",
+                        "2012": "should not exist, August 12th is a Sunday",
+                        "2018": "should not exist, August 12th is a Sunday",
+                        "2029": "should not exist, August 12th is a Sunday",
+                        "2035": "should not exist, August 12th is a Sunday",
+                        "2040": "should not exist, August 12th is a Sunday",
+                        "2046": "should not exist, August 12th is a Sunday"
+                      }
+                    }
+                  }
+                ]
               }
             }
           }
@@ -1695,86 +1774,7 @@
               }
             }
           }
-        },
-        "examples": [
-          {
-            "MaryMotherChurchTest": {
-              "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Congregation for Divine Worship",
-              "testType": "exactCorrespondenceSince",
-              "years": [
-                2018,
-                2019
-              ],
-              "expectedValues": [
-                1526860800,
-                1560124800
-              ],
-              "assertions": {
-                "2018": "The memorial 'Mary Mother of the Church' should be created on the expected date",
-                "2019": "The memorial 'Mary Mother of the Church' should be created on the expected date"
-              },
-              "yearsOther": {
-                "before": "The memorial 'Mary Mother of the Church' should not exist before the year 2018"
-              }
-            }
-          },
-          {
-            "NativityJohnBaptistTest": {
-              "description": "When the Nativity of John the Baptist coincides with the Solemnity of the Sacred Heart, is it correctly moved to June 23?",
-              "testType": "exactCorrespondence",
-              "years": [
-                2022,
-                2033,
-                2044
-              ],
-              "expectedValues": [
-                1655942400,
-                2003097600,
-                2350252800
-              ],
-              "assertions": {
-                "2022": "Nativity of John the Baptist should be moved to expected date",
-                "2033": "Nativity of John the Baptist should be moved to expected date",
-                "2044": "Nativity of John the Baptist should be moved to expected date"
-              },
-              "yearsOther": null
-            }
-          },
-          {
-            "StJaneFrancesDeChantalTest": {
-              "description": "Saint Jane Frances de Chantal was moved from December 12 to August 12 in the 2002 Latin Edition of the Roman Missal, to allow bishops conferences to insert Our Lady of Guadalupe as an optional memorial on December 12. DOES ST JANE FRANCES DE CHANTAL FALL ON THE RIGHT DAY BOTH BEFORE AND AFTER 2002, OR IT CORRECTLY OVERRIDEN BY GREATER FESTIVITIES?",
-              "testType": "variableCorrespondence",
-              "years": [
-                2001,
-                2002,
-                2010
-              ],
-              "expectedValues": [
-                1008115200,
-                1029110400,
-                1281571200
-              ],
-              "assertions": {
-                "2001": "should fall on expected date",
-                "2002": "should fall on expected date",
-                "2010": "should fall on expected date"
-              },
-              "yearsOther": {
-                "1971": "should not exist, December 12th is a Sunday",
-                "1976": "should not exist, December 12th is a Sunday",
-                "1982": "should not exist, December 12th is a Sunday",
-                "1993": "should not exist, December 12th is a Sunday",
-                "1999": "should not exist, December 12th is a Sunday",
-                "2012": "should not exist, August 12th is a Sunday",
-                "2018": "should not exist, August 12th is a Sunday",
-                "2029": "should not exist, August 12th is a Sunday",
-                "2035": "should not exist, August 12th is a Sunday",
-                "2040": "should not exist, August 12th is a Sunday",
-                "2046": "should not exist, August 12th is a Sunday"
-              }
-            }
-          }
-        ]
+        }
       }
     }
   }
