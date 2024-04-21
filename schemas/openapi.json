@@ -330,6 +330,25 @@
           }
         }
       }
+    },
+    "/LitCalTestsIndex.php" : {
+      "get" : {
+        "tags" : [ "Unit Test Index endpoint" ],
+        "summary" : "retrieves all the unit tests defined in the API `tests` folder and serves an index useful for frontend processing",
+        "operationId" : "retrieveTestIndexGET",
+        "reponses" : {
+          "200" : {
+            "description" : "OK: An index of currently defined Unit Tests useful for guaranteeing the health of the API",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LitCalTestsIndex"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components" : {
@@ -356,7 +375,7 @@
                 "date" : {
                   "type" : "integer",
                   "format" : "int64",
-                  "minimum" : 0,
+                  "minimum" : -2851200,
                   "maximum" : 253402300799,
                   "description" : "a PHP style unix timestamp (seconds from the Unix Epoch) in UTC time. The time should be a zero value seeing that we deal only with all day events, and time is not of importance. For use in Javascript, multiply this value by 1000, because Javascript uses milliseconds as a base for timestamps, whereas PHP uses seconds. The timestamp value should be dealt with accordingly in each programming language used, as is if the language uses seconds as a base, or multiplying by 1000 if it uses milliseconds as a base."
                 },
@@ -549,7 +568,7 @@
               "Timestamp" : {
                 "type" : "integer",
                 "format" : "int64",
-                "minimum" : 0,
+                "minimum" : 1501027200,
                 "maximum" : 253402300799
               },
               "DateTime" : {
@@ -796,6 +815,8 @@
                     "type" : "integer",
                     "format": "int64",
                     "description" : "a PHP style unix timestamp (seconds from the Unix Epoch) in UTC time. The time should be a zero value seeing that we deal only with all day events, and time is not of importance. For use in Javascript, multiply this value by 1000, because Javascript uses milliseconds as a base for timestamps, whereas PHP uses seconds. The timestamp value should be dealt with accordingly in each programming language used, as is if the language uses seconds as a base, or multiplying by 1000 if it uses milliseconds as a base.",
+                    "minimum" : -2851200,
+                    "maximum" : 253402300799,
                     "examples" : [1577923200]
                   },
                   "eventIdx" : {
@@ -995,9 +1016,11 @@
                 "description" : "current endpoint version"
               },
               "Timestamp" : {
+                "description" : "timestamp at which the current calendar calculation was first requested / produced",
                 "type" : "integer",
                 "format" : "int64",
-                "description" : "timestamp at which the current calendar calculation was first requested / produced"
+                "minimum" : 1501027200,
+                "maximum" : 253402300799
               },
               "DateTime" : {
                 "type" : "string",
@@ -1296,6 +1319,65 @@
           "returntype" : {
             "type" : "string",
             "enum" : [ "JSON", "XML", "ICS" ]
+          }
+        }
+      },
+      "LitCalTestsIndex" : {
+        "type" : "object",
+        "description" : "the keys of this object identify the Unit Test, and follow the pattern `{TestName}Test`",
+        "additionalProperties" : {
+          "type" : "object",
+          "properties" : {
+            "description" : {
+              "type" : "string"
+            },
+            "testType" : {
+              "type" : "string",
+              "description" : "* `exactCorrespondence`: the test or tests will only be performed against the years defined in the `expectedValues` array, and the only assertions for this test will be found in the `assertions` object with a one to one correspondence to the years defined in the `expectedValues` array; in this case the `yearsOther` key will have a `null` value\n* `exactCorrespondenceSince`: the test or tests will not only test against the years defined in the `expectedValues` array, but will also handle any year prior to the first year defined in the `expectedValues` array; in this case the `yearsOther` object will have a `before` key\n* `variableCorrespondence`: different tests with different assertions will be performed depending on the year that the test is being performed against. Definite expected date values for when the festivity should exist will be defined in the `expectedValues` array; any other years that might be tested with assertions of their own (usually for non existence of the festivity in a given year) might be defined in the `yearsOther` object",
+              "enum": [
+                "exactCorrespondence",
+                "exactCorrespondenceSince",
+                "variableCorrespondence"
+              ]
+            },
+            "years" : {
+              "type" : "array",
+              "items" : {
+                "type" : "integer",
+                "minimum" : 1970,
+                "maximum" : 9999
+              }
+            },
+            "expectedValues" : {
+              "type" : "array",
+              "items" : {
+                "type" : "integer",
+                "format" : "int64",
+                "minimum" : -2851200,
+                "maximum" : 253402300799
+              }
+            },
+            "assertions" : {
+              "type" : "object",
+              "additionalProperties" : {
+                "type" : "string",
+                "description" : "text description of the assertion which if true will validate the test"
+              }
+            },
+            "yearsOther" : {
+              "type" : ["null", "object"],
+              "description" : "value will be `null` in the case of an `exactCorrespondence` type test; otherwise an object",
+              "properties" : {
+                "before" : {
+                  "type" : "string",
+                  "description" : "assertion being made for any years prior to the first year defined in the `expectedValues` array; this key can only be present in the case of an `exactCorrespondenceSince` type test"
+                }
+              },
+              "additionalProperties" : {
+                "type" : "string",
+                "description" : "assertions for any other years that fall outside of the `expectedValues` array; these keys will only be present in the case of a `variableCorrespondence` type test"
+              }
+            }
           }
         }
       }
