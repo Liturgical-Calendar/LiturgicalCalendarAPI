@@ -309,7 +309,7 @@ class LitCalHealth implements MessageComponentInterface {
         }
         $jsonData = json_decode( file_get_contents( self::LitCalBaseUrl . $req ) );
         if( json_last_error() === JSON_ERROR_NONE ) {
-            $TestClass = new $Test;
+            $TestClass = new $Test( $Test );
             $TestClass::$testObject = $jsonData;
             $testResult = $TestClass->test();
             if( gettype( $testResult ) === 'boolean' && $testResult === true ) {
