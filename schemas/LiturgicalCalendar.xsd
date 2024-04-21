@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:cl="http://www.bibleget.io/catholicliturgy"
   targetNamespace="http://www.bibleget.io/catholicliturgy"
   attributeFormDefault="unqualified"
   elementFormDefault="qualified">
@@ -171,24 +172,23 @@
                     <xs:element name="color">
                       <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="option" minOccurs="0" maxOccurs="3" type="optionType">
-                            <xs:complexType name="optionType" mixed="true">
-                              <xs:simpleContent>
-                                <xs:extension base="colorEnumType">
-                                  <xs:attribute type="xs:byte" name="idx" use="required" />
-                                </xs:extension>
-                              </xs:simpleContent>
-                            </xs:complexType>
-                            <xs:simpleType name="colorEnumType">
-                              <xs:restriction base="xs:string">
-                                <xs:enumeration value="green" />
-                                <xs:enumeration value="red" />
-                                <xs:enumeration value="white" />
-                                <xs:enumeration value="purple" />
-                                <xs:enumeration value="pink" />
-                              </xs:restriction>
-                            </xs:simpleType>
-                          </xs:element>
+                          <xs:element name="option" minOccurs="0" maxOccurs="3" type="cl:optionType" />
+                          <xs:complexType name="optionType" mixed="true">
+                            <xs:simpleContent>
+                              <xs:extension base="colorEnumType">
+                                <xs:attribute type="xs:byte" name="idx" use="required" />
+                              </xs:extension>
+                            </xs:simpleContent>
+                          </xs:complexType>
+                          <xs:simpleType name="colorEnumType">
+                            <xs:restriction base="xs:string">
+                              <xs:enumeration value="green" />
+                              <xs:enumeration value="red" />
+                              <xs:enumeration value="white" />
+                              <xs:enumeration value="purple" />
+                              <xs:enumeration value="pink" />
+                            </xs:restriction>
+                          </xs:simpleType>
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
