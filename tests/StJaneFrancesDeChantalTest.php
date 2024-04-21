@@ -66,7 +66,8 @@ class StJaneFrancesDeChantalTest extends TestCase {
                 if( version_compare( $phpUnitVersion, '10.1', '>=' ) ) {
                     $this->assertObjectNotHasProperty( 'StJaneFrancesDeChantal', self::$testObject->LitCal );
                 } else {
-                    $this->assertObjectNotHasAttribute( 'StJaneFrancesDeChantal', self::$testObject->LitCal );
+                    //$this->assertObjectNotHasAttribute( 'StJaneFrancesDeChantal', self::$testObject->LitCal );
+                    $this->assertFalse(property_exists(self::$testObject->LitCal, 'StJaneFrancesDeChantal'));
                 }
                 $res = true;
             } catch(Exception $e) {
