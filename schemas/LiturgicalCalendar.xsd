@@ -266,7 +266,7 @@
                     <xs:element name="year">
                       <xs:simpleType>
                         <xs:restriction base="xs:positiveInteger">
-                          <xs:minInclusive value="1970" />
+                          <xs:minInclusive value="1969" />
                           <xs:maxInclusive value="9999" />
                         </xs:restriction>
                       </xs:simpleType>
