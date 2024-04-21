@@ -336,7 +336,7 @@
         "tags" : [ "Unit Test Index endpoint" ],
         "summary" : "retrieves all the unit tests defined in the API `tests` folder and serves an index useful for frontend processing",
         "operationId" : "retrieveTestIndexGET",
-        "reponses" : {
+        "responses" : {
           "200" : {
             "description" : "OK: An index of currently defined Unit Tests useful for guaranteeing the health of the API",
             "content" : {
