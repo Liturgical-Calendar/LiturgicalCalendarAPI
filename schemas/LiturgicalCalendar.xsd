@@ -173,7 +173,7 @@
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element name="option" minOccurs="0" maxOccurs="3">
-                            <xs:complexType name="optionType" mixed="true">
+                            <xs:complexType mixed="true">
                               <xs:simpleContent>
                                 <xs:extension base="colorEnumType">
                                   <xs:attribute type="xs:byte" name="idx" use="required" />
