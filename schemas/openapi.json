@@ -1329,11 +1329,12 @@
           "type" : "object",
           "properties" : {
             "description" : {
-              "type" : "string"
+              "type" : "string",
+              "description" : "describes what the test intends to accomplish"
             },
             "testType" : {
               "type" : "string",
-              "description" : "* `exactCorrespondence`: the test or tests will only be performed against the years defined in the `expectedValues` array, and the only assertions for this test will be found in the `assertions` object with a one to one correspondence to the years defined in the `expectedValues` array; in this case the `yearsOther` key will have a `null` value\n* `exactCorrespondenceSince`: the test or tests will not only test against the years defined in the `expectedValues` array, but will also handle any year prior to the first year defined in the `expectedValues` array; in this case the `yearsOther` object will have a `before` key\n* `variableCorrespondence`: different tests with different assertions will be performed depending on the year that the test is being performed against. Definite expected date values for when the festivity should exist will be defined in the `expectedValues` array; any other years that might be tested with assertions of their own (usually for non existence of the festivity in a given year) might be defined in the `yearsOther` object",
+              "description" : "* `exactCorrespondence`: the test or tests will only be performed against the years defined in the `years` array, and the only assertions for this test will be found in the `assertions` object with a one to one correspondence to the years defined in the `years` array; in this case the `yearsOther` key will have a `null` value\n* `exactCorrespondenceSince`: the test or tests will not only test against the years defined in the `years` array, but will also handle any year prior to the first year defined in the `years` array; in this case the `yearsOther` object will have a `before` key\n* `variableCorrespondence`: different tests with different assertions will be performed depending on the year that the test is being performed against. Definite expected date values for when the festivity should exist will be defined in the `years` array; any other years that might be tested with assertions of their own (usually for non existence of the festivity in a given year) might be defined in the `yearsOther` object",
               "enum": [
                 "exactCorrespondence",
                 "exactCorrespondenceSince",
