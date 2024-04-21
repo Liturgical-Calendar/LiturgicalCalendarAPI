@@ -62,7 +62,12 @@ class StJaneFrancesDeChantalTest extends TestCase {
         } else if( array_key_exists( self::$testObject->Settings->Year, self::Assertions ) ) {
             $assertion = self::Assertions[ self::$testObject->Settings->Year ];
             try {
-                $this->assertObjectNotHasAttribute( 'StJaneFrancesDeChantal', self::$testObject->LitCal );
+                $phpUnitVersion = \PHPUnit\Runner\Version::id();
+                if( version_compare( $phpUnitVersion, '10.1', '>=' ) ) {
+                    $this->assertObjectNotHasProperty( 'StJaneFrancesDeChantal', self::$testObject->LitCal );
+                } else {
+                    $this->assertObjectNotHasAttribute( 'StJaneFrancesDeChantal', self::$testObject->LitCal );
+                }
                 $res = true;
             } catch(Exception $e) {
                 $message = new stdClass();
