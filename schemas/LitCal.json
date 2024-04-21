@@ -12,7 +12,7 @@
                     "properties": {
                         "Year": {
                             "type": "integer",
-                            "minimum": 1969,
+                            "minimum": 1970,
                             "maximum": 9999
                         },
                         "CalendarType": {
@@ -256,7 +256,7 @@
                 },
                 "year": {
                     "type": "integer",
-                    "minimum": 1970,
+                    "minimum": 1969,
                     "maxItems": 9999
                 },
                 "monthShort": {
