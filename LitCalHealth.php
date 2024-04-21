@@ -46,9 +46,10 @@ class LitCalHealth implements MessageComponentInterface {
                         if(
                             property_exists( $messageReceived, 'calendar' ) &&
                             property_exists( $messageReceived, 'year' ) &&
-                            property_exists( $messageReceived, 'category' )
+                            property_exists( $messageReceived, 'category' ) &&
+                            property_exists( $messageReceived, 'responsetype' )
                         ) {
-                            $this->validateCalendar( $messageReceived->calendar, $messageReceived->year, $messageReceived->category, $from );
+                            $this->validateCalendar( $messageReceived->calendar, $messageReceived->year, $messageReceived->category, $messageReceived->responsetype, $from );
                         }
                         break;
                     case 'executeUnitTest':
@@ -176,11 +177,35 @@ class LitCalHealth implements MessageComponentInterface {
         }
     }
 
-    private function validateCalendar( string $Calendar, int $Year, string $category, ConnectionInterface $to ) : void {
+    private static function retrieve_xml_errors( array $errors, array $xml ) : string {
+        $return = [];
+        foreach( $errors as $error ) {
+            $errorStr = "";
+            switch ($error->level) {
+                case LIBXML_ERR_WARNING:
+                    $errorStr .= "Warning $error->code: ";
+                    break;
+                 case LIBXML_ERR_ERROR:
+                    $errorStr .= "Error $error->code: ";
+                    break;
+                case LIBXML_ERR_FATAL:
+                    $errorStr .= "Fatal Error $error->code: ";
+                    break;
+            }
+            $errorStr .= trim($error->message) . " (Line: $error->line, Column: $error->column, Src: {$xml[$error->line - 1]})";
+            if ($error->file) {
+                $errorStr .= " in file: $error->file";
+            }
+            array_push($return, $errorStr);
+        }
+        return implode('&#013;', $return);
+    }
+
+    private function validateCalendar( string $Calendar, int $Year, string $category, string $responseType, ConnectionInterface $to ) : void {
         if( $Calendar === 'VATICAN' ) {
-            $req = "?nationalcalendar=VATICAN&year=$Year&calendartype=CIVIL";
+            $req = "?nationalcalendar=VATICAN&year=$Year&calendartype=CIVIL&returntype=$responseType";
         } else {
-            $req = "?$category=$Calendar&year=$Year&calendartype=CIVIL";
+            $req = "?$category=$Calendar&year=$Year&calendartype=CIVIL&returntype=$responseType";
         }
         $data = file_get_contents( self::LitCalBaseUrl . $req );
         if( $data !== false ) {
@@ -190,32 +215,82 @@ class LitCalHealth implements MessageComponentInterface {
             $message->classes = ".calendar-$Calendar.file-exists.year-$Year";
             $this->sendMessage( $to, $message );
 
-            $jsonData = json_decode( $data );
-            if( json_last_error() === JSON_ERROR_NONE ) {
-                $message = new stdClass();
-                $message->type = "success";
-                $message->text = "The $category of $Calendar for the year $Year was successfully decoded as JSON";
-                $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
-                $this->sendMessage( $to, $message );
+            switch( $responseType ) {
+                case "XML":
+                    libxml_use_internal_errors(true);
+                    $xml = new DOMDocument();
+                    $xml->loadXML( $data );
+                    //$xml = simplexml_load_string( $data );
+                    $xmlArr = explode("\n", $data);
+                    if ($xml === false) {
+                        $message = new stdClass();
+                        $message->type = "error";
+                        $errors = libxml_get_errors();
+                        $errorString = self::retrieve_xml_errors( $errors, $xmlArr );
+                        libxml_clear_errors();
+                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as XML: " . $errorString;
+                        $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $this->sendMessage( $to, $message );
+                    } else {
+                        $message = new stdClass();
+                        $message->type = "success";
+                        $message->text = "The $category of $Calendar for the year $Year was successfully decoded as XML";
+                        $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $this->sendMessage( $to, $message );
 
-                $validationResult = $this->validateDataAgainstSchema( $jsonData, LitSchema::LITCAL );
-                if( gettype( $validationResult ) === 'boolean' && $validationResult === true ) {
-                    $message = new stdClass();
-                    $message->type = "success";
-                    $message->text = "The $category of $Calendar for the year $Year was successfully validated against the Schema " . LitSchema::LITCAL;
-                    $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
-                    $this->sendMessage( $to, $message );
-                }
-                else if( gettype( $validationResult === 'object' ) ) {
-                    $validationResult->classes = ".calendar-$Calendar.schema-valid.year-$Year";
-                    $this->sendMessage( $to, $validationResult );
-                }
-            } else {
-                $message = new stdClass();
-                $message->type = "error";
-                $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as JSON: " . json_last_error_msg();
-                $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
-                $this->sendMessage( $to, $message );
+                        $validationResult = $xml->schemaValidate('https://litcal.johnromanodorazio.com/api/dev/schemas/LiturgicalCalendar.xsd');
+                        if( $validationResult ) {
+                            $message = new stdClass();
+                            $message->type = "success";
+                            $message->text = "The $category of $Calendar for the year $Year was successfully validated against the Schema https://litcal.johnromanodorazio.com/api/dev/schemas/LiturgicalCalendar.xsd";
+                            $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
+                            $this->sendMessage( $to, $message );
+                        } else {
+                            $errors = libxml_get_errors();
+                            $errorString = self::retrieve_xml_errors( $errors, $xmlArr );
+                            libxml_clear_errors();
+                            $message = new stdClass();
+                            $message->type = "error";
+                            $message->text = $errorString;
+                            $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
+                            $this->sendMessage( $to, $message );
+                        }
+                    }
+                break;
+                case "ICS":
+                    //https://sabre.io/vobject/icalendar/
+                    //https://sabre.io/vobject/icalendar/#validating-icalendar
+                    //https://github.com/fruux/sabre-vobject
+                break;
+                case "JSON":
+                default:
+                    $jsonData = json_decode( $data );
+                    if( json_last_error() === JSON_ERROR_NONE ) {
+                        $message = new stdClass();
+                        $message->type = "success";
+                        $message->text = "The $category of $Calendar for the year $Year was successfully decoded as JSON";
+                        $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $this->sendMessage( $to, $message );
+        
+                        $validationResult = $this->validateDataAgainstSchema( $jsonData, LitSchema::LITCAL );
+                        if( gettype( $validationResult ) === 'boolean' && $validationResult === true ) {
+                            $message = new stdClass();
+                            $message->type = "success";
+                            $message->text = "The $category of $Calendar for the year $Year was successfully validated against the Schema " . LitSchema::LITCAL;
+                            $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
+                            $this->sendMessage( $to, $message );
+                        }
+                        else if( gettype( $validationResult === 'object' ) ) {
+                            $validationResult->classes = ".calendar-$Calendar.schema-valid.year-$Year";
+                            $this->sendMessage( $to, $validationResult );
+                        }
+                    } else {
+                        $message = new stdClass();
+                        $message->type = "error";
+                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as JSON: " . json_last_error_msg();
+                        $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $this->sendMessage( $to, $message );
+                    }
             }
         } else {
             $message = new stdClass();
