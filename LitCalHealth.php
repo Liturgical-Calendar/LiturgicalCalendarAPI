@@ -259,7 +259,12 @@ class LitCalHealth implements MessageComponentInterface {
                     }
                 break;
                 case "ICS":
-                    $vcalendar = VObject\Reader::read( $data );
+                    set_error_handler(array('LitCalHealth', 'warning_handler'), E_WARNING);
+                    try {
+                        $vcalendar = VObject\Reader::read( $data );
+                    } catch (ErrorException $ex) {
+                        $vcalendar = null;
+                    }
                     if( $vcalendar instanceof VObject\Document ) {
                         $message = new stdClass();
                         $message->type = "success";
@@ -267,13 +272,11 @@ class LitCalHealth implements MessageComponentInterface {
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $this->sendMessage( $to, $message );
 
-                        set_error_handler(array('LitCalHealth', 'warning_handler'), E_WARNING);
                         try {
                             $result = $vcalendar->validate();
                         } catch (ErrorException $ex) {
                             $result = [json_encode( $ex )];
                         }
-                        restore_error_handler();
                         if( count($result) === 0 ) {
                             $message = new stdClass();
                             $message->type = "success";
@@ -295,7 +298,8 @@ class LitCalHealth implements MessageComponentInterface {
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $this->sendMessage( $to, $message );
                     }
-                break;
+                    restore_error_handler();
+                    break;
                 case "JSON":
                 default:
                     $jsonData = json_decode( $data );
