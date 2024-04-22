@@ -1,6 +1,6 @@
 <?php
-error_reporting(E_ALL);
-ini_set("display_errors", 1);
+/*error_reporting(E_ALL);
+ini_set("display_errors", 1);*/
 
 include_once( 'vendor/autoload.php' );
 include_once( 'includes/enums/LitSchema.php' );
@@ -267,7 +267,11 @@ class LitCalHealth implements MessageComponentInterface {
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $this->sendMessage( $to, $message );
 
-                        $result = $vcalendar->validate();
+                        try {
+                            $result = $vcalendar->validate();
+                        } catch (Exception $ex) {
+                            $result = [json_encode( $ex )];
+                        }
                         if( count($result) === 0 ) {
                             $message = new stdClass();
                             $message->type = "success";
