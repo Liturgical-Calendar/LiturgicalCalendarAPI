@@ -277,7 +277,8 @@ class LitCalHealth implements MessageComponentInterface {
                         } else {
                             $message = new stdClass();
                             $message->type = "error";
-                            $message->text = json_encode( $result );
+                            $errorString = json_encode( $result );
+                            $message->text = $errorString || "validation encountered " . count( $result ) . " errors";
                             $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
                             $this->sendMessage( $to, $message );
                         }
