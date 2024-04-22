@@ -267,7 +267,7 @@ class LitCalHealth implements MessageComponentInterface {
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $this->sendMessage( $to, $message );
 
-                        set_error_handler("warning_handler", E_WARNING);
+                        set_error_handler(array('LitCalHealth', 'warning_handler'), E_WARNING);
                         try {
                             $result = $vcalendar->validate();
                         } catch (ErrorException $ex) {
@@ -335,7 +335,7 @@ class LitCalHealth implements MessageComponentInterface {
         }
     }
 
-    private function warning_handler( $errno, $errstr, $errfile, $errline ) {
+    private static function warning_handler( $errno, $errstr, $errfile, $errline ) {
         throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
     }
 
