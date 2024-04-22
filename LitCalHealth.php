@@ -267,11 +267,13 @@ class LitCalHealth implements MessageComponentInterface {
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $this->sendMessage( $to, $message );
 
+                        set_error_handler("warning_handler", E_WARNING);
                         try {
                             $result = $vcalendar->validate();
-                        } catch (Exception $ex) {
+                        } catch (ErrorException $ex) {
                             $result = [json_encode( $ex )];
                         }
+                        restore_error_handler();
                         if( count($result) === 0 ) {
                             $message = new stdClass();
                             $message->type = "success";
@@ -331,6 +333,10 @@ class LitCalHealth implements MessageComponentInterface {
             $message->classes = ".calendar-$Calendar.file-exists.year-$Year";
             $this->sendMessage( $to, $message );
         }
+    }
+
+    private function warning_handler( $errno, $errstr, $errfile, $errline ) {
+        throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
     }
 
     private function executeUnitTest( string $Test, string $Calendar, int $Year, string $category, ConnectionInterface $to ) : void {
