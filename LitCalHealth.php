@@ -1,6 +1,6 @@
 <?php
-/*error_reporting(E_ALL);
-ini_set("display_errors", 1);*/
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
 
 include_once( 'vendor/autoload.php' );
 include_once( 'includes/enums/LitSchema.php' );
@@ -17,6 +17,7 @@ use Swaggest\JsonSchema\Schema;
 use Sabre\VObject;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
+use Sabre\VObject\InvalidDataException;
 
 class LitCalHealth implements MessageComponentInterface {
     protected $clients;
@@ -202,6 +203,10 @@ class LitCalHealth implements MessageComponentInterface {
         return implode('&#013;', $return);
     }
 
+    public static function warning_handler( $errno, $errstr, $errfile, $errline ) {
+        throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+    }
+
     private function validateCalendar( string $Calendar, int $Year, string $category, string $responseType, ConnectionInterface $to ) : void {
         if( $Calendar === 'VATICAN' ) {
             $req = "?nationalcalendar=VATICAN&year=$Year&calendartype=CIVIL&returntype=$responseType";
@@ -259,10 +264,10 @@ class LitCalHealth implements MessageComponentInterface {
                     }
                 break;
                 case "ICS":
-                    set_error_handler(array('LitCalHealth', 'warning_handler'), E_WARNING);
+                    //set_error_handler(array('LitCalHealth', 'warning_handler'));
                     try {
                         $vcalendar = VObject\Reader::read( $data );
-                    } catch (ErrorException $ex) {
+                    } catch (InvalidDataException $ex) {
                         $vcalendar = json_encode( $ex );
                     }
                     if( $vcalendar instanceof VObject\Document ) {
@@ -274,7 +279,7 @@ class LitCalHealth implements MessageComponentInterface {
 
                         try {
                             $result = $vcalendar->validate();
-                        } catch (ErrorException $ex) {
+                        } catch (InvalidDataException $ex) {
                             $result = [json_encode( $ex )];
                         }
                         if( count($result) === 0 ) {
@@ -298,7 +303,7 @@ class LitCalHealth implements MessageComponentInterface {
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $this->sendMessage( $to, $message );
                     }
-                    restore_error_handler();
+                    //restore_error_handler();
                     break;
                 case "JSON":
                 default:
@@ -337,10 +342,6 @@ class LitCalHealth implements MessageComponentInterface {
             $message->classes = ".calendar-$Calendar.file-exists.year-$Year";
             $this->sendMessage( $to, $message );
         }
-    }
-
-    public static function warning_handler( $errno, $errstr, $errfile, $errline ) {
-        throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
     }
 
     private function executeUnitTest( string $Test, string $Calendar, int $Year, string $category, ConnectionInterface $to ) : void {
