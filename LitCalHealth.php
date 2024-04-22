@@ -263,7 +263,7 @@ class LitCalHealth implements MessageComponentInterface {
                     try {
                         $vcalendar = VObject\Reader::read( $data );
                     } catch (ErrorException $ex) {
-                        $vcalendar = null;
+                        $vcalendar = json_encode( $ex );
                     }
                     if( $vcalendar instanceof VObject\Document ) {
                         $message = new stdClass();
@@ -294,7 +294,7 @@ class LitCalHealth implements MessageComponentInterface {
                     } else {
                         $message = new stdClass();
                         $message->type = "error";
-                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as ICS: parsing resulted in type " .gettype( $vcalendar );
+                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as ICS: parsing resulted in type " .gettype( $vcalendar ) . " | " . $vcalendar;
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $this->sendMessage( $to, $message );
                     }
