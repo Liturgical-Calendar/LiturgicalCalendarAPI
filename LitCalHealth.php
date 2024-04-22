@@ -14,6 +14,7 @@ foreach($it as $f) {
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
+use Sabre\VObject;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
@@ -258,9 +259,35 @@ class LitCalHealth implements MessageComponentInterface {
                     }
                 break;
                 case "ICS":
-                    //https://sabre.io/vobject/icalendar/
-                    //https://sabre.io/vobject/icalendar/#validating-icalendar
-                    //https://github.com/fruux/sabre-vobject
+                    $vcalendar = VObject\Reader::read( $data );
+                    if( $vcalendar instanceof VObject\Document ) {
+                        $message = new stdClass();
+                        $message->type = "success";
+                        $message->text = "The $category of $Calendar for the year $Year was successfully decoded as ICS";
+                        $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $this->sendMessage( $to, $message );
+
+                        $result = $vcalendar->validate();
+                        if( count($result) === 0 ) {
+                            $message = new stdClass();
+                            $message->type = "success";
+                            $message->text = "The $category of $Calendar for the year $Year was successfully validated according the iCalendar Schema https://tools.ietf.org/html/rfc5545";
+                            $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
+                            $this->sendMessage( $to, $message );
+                        } else {
+                            $message = new stdClass();
+                            $message->type = "error";
+                            $message->text = implode('&#013;', $result);
+                            $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
+                            $this->sendMessage( $to, $message );
+                        }
+                    } else {
+                        $message = new stdClass();
+                        $message->type = "error";
+                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as ICS: parsing resulted in type " .gettype( $vcalendar );
+                        $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $this->sendMessage( $to, $message );
+                    }
                 break;
                 case "JSON":
                 default:

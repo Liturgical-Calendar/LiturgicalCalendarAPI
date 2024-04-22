@@ -2,6 +2,7 @@
     "require": {
         "swaggest/json-schema": "^0.12",
         "phpunit/phpunit": "^10",
-        "cboden/ratchet": "^0.4.4"
+        "cboden/ratchet": "^0.4.4",
+        "sabre/vobject": "~4.1"
     }
 }
