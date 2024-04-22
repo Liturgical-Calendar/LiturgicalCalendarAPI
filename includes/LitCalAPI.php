@@ -404,7 +404,7 @@ class LitCalAPI {
         //with the Prima Editio Typica of the Roman Missal and the General Norms promulgated with the Motu Proprio "Mysterii Paschali" in 1969
         if ( $this->LitSettings->Year < 1970 ) {
             $this->Messages[] = sprintf( _( "Only years from 1970 and after are supported. You tried requesting the year %d." ), $this->LitSettings->Year );
-            $this->GenerateResponse();
+            $this->generateResponse();
         }
     }
 
@@ -2730,20 +2730,26 @@ class LitCalAPI {
 
     private function getGithubReleaseInfo() : stdClass {
         $returnObj = new stdClass();
-        $GithubReleasesAPI = "https://api.github.com/repos/Liturgical-Calendar/LiturgicalCalendarAPI/releases/latest";
-        $ch = curl_init();
-        curl_setopt( $ch, CURLOPT_URL, $GithubReleasesAPI );
-        curl_setopt( $ch, CURLOPT_USERAGENT, 'LiturgicalCalendar' );
-        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-        $currentVersionForDownload = curl_exec( $ch );
+        $ghReleaseCacheFile = "engineCache/v" . str_replace( ".", "_", self::API_VERSION ) . "/GHRelease" . $this->CacheDuration . ".json";
+        if( file_exists( $ghReleaseCacheFile ) ) {
+            $ghReleaseJsonStr = file_get_contents( $ghReleaseCacheFile );
+            $GitHubReleasesObj = json_decode( $ghReleaseJsonStr );
+        } else {
+            $GithubReleasesAPI = "https://api.github.com/repos/Liturgical-Calendar/LiturgicalCalendarAPI/releases/latest";
+            $ch = curl_init();
+            curl_setopt( $ch, CURLOPT_URL, $GithubReleasesAPI );
+            curl_setopt( $ch, CURLOPT_USERAGENT, 'LiturgicalCalendar' );
+            curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+            $currentVersionForDownload = curl_exec( $ch );
 
-        if ( curl_errno( $ch ) ) {
-          $returnObj->status = "error";
-          $returnObj->message = curl_error( $ch );
+            if ( curl_errno( $ch ) ) {
+              $returnObj->status = "error";
+              $returnObj->message = curl_error( $ch );
+            }
+            curl_close( $ch );
+            file_put_contents( $ghReleaseCacheFile, $currentVersionForDownload );
+            $GitHubReleasesObj = json_decode( $currentVersionForDownload );
         }
-        curl_close( $ch );
-
-        $GitHubReleasesObj = json_decode( $currentVersionForDownload );
         if( json_last_error() !== JSON_ERROR_NONE ){
             $returnObj->status = "error";
             $returnObj->message = json_last_error_msg();
