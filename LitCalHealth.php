@@ -339,7 +339,7 @@ class LitCalHealth implements MessageComponentInterface {
         }
     }
 
-    private static function warning_handler( $errno, $errstr, $errfile, $errline ) {
+    public static function warning_handler( $errno, $errstr, $errfile, $errline ) {
         throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
     }
 
