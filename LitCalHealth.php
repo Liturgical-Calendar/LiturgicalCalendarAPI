@@ -397,7 +397,7 @@ class ICSErrorLevel {
         $this->errorString = static::ERROR_STRING[ $errorLevel ];
     }
 
-    private function __toString() {
+    public function __toString() {
         return $this->errorString;
     }
 }
