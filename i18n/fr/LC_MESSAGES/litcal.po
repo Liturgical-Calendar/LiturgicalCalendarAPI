@@ -7,9 +7,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-04-20 15:45+0000\n"
-"PO-Revision-Date: 2024-04-14 00:22+0000\n"
+"PO-Revision-Date: 2024-04-23 02:53+0000\n"
 "Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: French <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/fr/>\n"
@@ -636,7 +636,7 @@ msgstr "Martyrs"
 #. translators: context = from the Common of nn
 #: includes/enums/LitCommon.php:69
 msgid "Pastors"
-msgstr ""
+msgstr "Pasteurs"
 
 #. translators: context = from the Common of nn
 #: includes/enums/LitCommon.php:71
@@ -656,12 +656,12 @@ msgstr ""
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:78
 msgid "For One Martyr"
-msgstr ""
+msgstr "Pour un martyr"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:80
 msgid "For Several Martyrs"
-msgstr ""
+msgstr "Pour plusieurs martyrs"
 
 #. translators: context = from the Common of nn: nn
 #: includes/enums/LitCommon.php:82
