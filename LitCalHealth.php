@@ -1,6 +1,4 @@
 <?php
-error_reporting(E_ALL);
-ini_set("display_errors", 1);
 
 include_once( 'vendor/autoload.php' );
 include_once( 'includes/enums/LitSchema.php' );
@@ -203,10 +201,6 @@ class LitCalHealth implements MessageComponentInterface {
         return implode('&#013;', $return);
     }
 
-    public static function warning_handler( $errno, $errstr, $errfile, $errline ) {
-        throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
-    }
-
     private function validateCalendar( string $Calendar, int $Year, string $category, string $responseType, ConnectionInterface $to ) : void {
         if( $Calendar === 'VATICAN' ) {
             $req = "?nationalcalendar=VATICAN&year=$Year&calendartype=CIVIL&returntype=$responseType";
@@ -264,7 +258,6 @@ class LitCalHealth implements MessageComponentInterface {
                     }
                 break;
                 case "ICS":
-                    //set_error_handler(array('LitCalHealth', 'warning_handler'));
                     try {
                         $vcalendar = VObject\Reader::read( $data );
                     } catch (InvalidDataException $ex) {
@@ -277,11 +270,7 @@ class LitCalHealth implements MessageComponentInterface {
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $this->sendMessage( $to, $message );
 
-                        try {
-                            $result = $vcalendar->validate();
-                        } catch (InvalidDataException $ex) {
-                            $result = [json_encode( $ex )];
-                        }
+                        $result = $vcalendar->validate();
                         if( count($result) === 0 ) {
                             $message = new stdClass();
                             $message->type = "success";
@@ -291,8 +280,12 @@ class LitCalHealth implements MessageComponentInterface {
                         } else {
                             $message = new stdClass();
                             $message->type = "error";
-                            $errorString = json_encode( $result );
-                            $message->text = $errorString || "validation encountered " . count( $result ) . " errors";
+                            $errorStrings = [];
+                            foreach( $result as $error ) {
+                                $errorLevel = new ICSErrorLevel( $error['level'] );
+                                $errorStrings[] = $errorLevel . ": " . $error['message'] . " ::: " . $error['node']->getValue();
+                            }
+                            $message->text = implode('&#013;', $errorStrings ) || "validation encountered " . count( $result ) . " errors";
                             $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
                             $this->sendMessage( $to, $message );
                         }
@@ -303,7 +296,6 @@ class LitCalHealth implements MessageComponentInterface {
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $this->sendMessage( $to, $message );
                     }
-                    //restore_error_handler();
                     break;
                 case "JSON":
                 default:
@@ -387,4 +379,25 @@ class LitCalHealth implements MessageComponentInterface {
         return $res;
     }
 
+}
+
+class ICSErrorLevel {
+    const int REPAIRED = 1;
+    const int WARNING = 2;
+    const int FATAL = 3;
+    const ERROR_STRING = [
+        null,
+        'Repaired value',
+        'Warning',
+        'Fatal Error'
+    ];
+    private string $errorString;
+
+    public function __construct( int $errorLevel ) {
+        $this->errorString = static::ERROR_STRING[ $errorLevel ];
+    }
+
+    private function __toString() {
+        return $this->errorString;
+    }
 }
