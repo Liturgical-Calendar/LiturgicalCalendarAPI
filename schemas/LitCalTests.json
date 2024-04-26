@@ -24,49 +24,66 @@
                     ]
                 },
                 "appliesTo": {
-                    "$ref": "#/definitions/appliesToOrExcludes"
+                    "$ref": "#/definitions/AppliesToOrExcludes"
                 },
                 "excludes": {
-                    "$ref": "#/definitions/appliesToOrExcludes"
+                    "$ref": "#/definitions/AppliesToOrExcludes"
                 },
                 "assertions": {
                     "type": "array",
                     "items": {
-                        "type": "object",
-                        "properties": {
-                            "year": {
-                                "type": "integer",
-                                "minimum": 1970,
-                                "maximum": 9999
+                        "anyOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "year": {
+                                        "$ref": "#/definitions/Year"
+                                    },
+                                    "expectedValue": {
+                                        "type": "null"
+                                    },
+                                    "assert": {
+                                        "type": "string",
+                                        "enum": [
+                                            "eventNotExists"
+                                        ]
+                                    },
+                                    "assertion": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [ "year", "expectedValue", "assert", "assertion" ]
                             },
-                            "expectedValue": {
-                                "anyOf": [
-                                    { "type": "null" },
-                                    {
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "year": {
+                                        "$ref": "#/definitions/Year"
+                                    },
+                                    "expectedValue": {
                                         "type": "integer",
                                         "minimum": -2851200,
                                         "maximum": 253402214400
+                                    },
+                                    "assert": {
+                                        "type": "string",
+                                        "enum": [
+                                            "eventExists AND hasExpectedTimestamp"
+                                        ]
+                                    },
+                                    "assertion": {
+                                        "type": "string"
                                     }
-                                ]
-                            },
-                            "assert": {
-                                "type": "string",
-                                "enum": [
-                                    "eventExists AND hasExpectedTimestamp",
-                                    "eventNotExists"
-                                ]
-                            },
-                            "assertion": {
-                                "type": "string"
+                                },
+                                "required": [ "year", "expectedValue", "assert", "assertion" ]
                             }
-                        },
-                        "required": [ "year", "expectedValue", "assert", "assertion" ]
+                        ]
                     }
                 }
             },
             "required": [ "name", "eventkey", "description", "testType", "assertions" ]
         },
-        "appliesToOrExcludes": {
+        "AppliesToOrExcludes": {
             "type": "object",
             "minProperties": 1,
             "properties": {
@@ -95,6 +112,11 @@
                 { "required": ["diocesancalendar"] },
                 { "required": ["diocesancalendars"] }
             ]
+        },
+        "Year": {
+            "type": "integer",
+            "minimum": 1970,
+            "maximum": 9999
         }
     }
 }
