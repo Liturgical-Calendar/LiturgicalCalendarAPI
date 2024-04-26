@@ -37,7 +37,7 @@
                                 "type": "object",
                                 "properties": {
                                     "year": {
-                                        "$ref": "#/definitions/Year"
+                                        "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Year"
                                     },
                                     "expectedValue": {
                                         "type": "null"
@@ -62,12 +62,10 @@
                                 "type": "object",
                                 "properties": {
                                     "year": {
-                                        "$ref": "#/definitions/Year"
+                                        "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Year"
                                     },
                                     "expectedValue": {
-                                        "type": "integer",
-                                        "minimum": -2851200,
-                                        "maximum": 253402214400
+                                        "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Timestamp"
                                     },
                                     "assert": {
                                         "type": "string",
@@ -122,11 +120,6 @@
                 { "required": ["diocesancalendars"] }
             ],
             "additionalProperties": false
-        },
-        "Year": {
-            "type": "integer",
-            "minimum": 1970,
-            "maximum": 9999
         }
     }
 }
