@@ -11,9 +11,7 @@
                     "additionalProperties": false,
                     "properties": {
                         "Year": {
-                            "type": "integer",
-                            "minimum": 1970,
-                            "maximum": 9999
+                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Year"
                         },
                         "CalendarType": {
                             "type": "string",
@@ -32,7 +30,7 @@
                             "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
                         },
                         "Locale": {
-                            "type": "string"
+                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Locale"
                         },
                         "ReturnType": {
                             "type": "string",
@@ -58,7 +56,9 @@
                         "Ascension",
                         "CorpusChristi",
                         "Locale",
-                        "ReturnType"
+                        "ReturnType",
+                        "CalendarType",
+                        "EternalHighPriest"
                     ]
                 },
                 "Metadata": {
@@ -154,10 +154,11 @@
                 "LitCal": {
                     "type": "object",
                     "patternProperties": {
-                        "": {
+                        "^[A-Z][a-zA-Z1-9]+$": {
                             "$ref": "#/definitions/Festivity"
                         }
-                    }
+                    },
+                    "additionalProperties": false
                 },
                 "Messages": {
                     "type": "array",
@@ -176,7 +177,7 @@
         "DateTimeObjectCollection": {
             "type": "object",
             "patternProperties": {
-                "": {
+                "^[A-Z][a-zA-Z1-9]+$": {
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
@@ -194,7 +195,8 @@
                         }
                     }
                 }
-            }
+            },
+            "additionalProperties": false
         },
         "Festivity": {
             "type": "object",
@@ -208,9 +210,7 @@
                     "type": "string"
                 },
                 "date": {
-                    "type": "integer",
-                    "minimum": -2851200,
-                    "maximum": 253402214400
+                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Timestamp"
                 },
                 "color": {
                     "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
@@ -280,10 +280,10 @@
                 "isVigilFor": {
                     "type": "string"
                 },
-                "hasVigilMass":  {
+                "hasVigilMass": {
                     "type": "boolean"
                 },
-                "hasVesperI":  {
+                "hasVesperI": {
                     "type": "boolean"
                 },
                 "hasVesperII":  {
@@ -302,6 +302,9 @@
                         "EASTER",
                         "ORDINARY_TIME"
                     ]
+                },
+                "liturgicalSeasonLcl": {
+                    "type": "string"
                 }
             },
             "required": [
@@ -309,11 +312,24 @@
                 "name",
                 "date",
                 "color",
+                "colorLcl",
                 "type",
                 "grade",
                 "displayGrade",
-                "common"
-            ]
+                "common",
+                "commonLcl",
+                "dayOfTheWeek_ISO8601",
+                "month",
+                "day",
+                "year",
+                "monthShort",
+                "monthLong",
+                "dayOfTheWeekShort",
+                "dayOfTheWeekLong",
+                "liturgicalSeason",
+                "liturgicalSeasonLcl"
+            ],
+            "additionalProperties": false
         }
     }
 }
