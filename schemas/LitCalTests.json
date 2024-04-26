@@ -50,9 +50,13 @@
                                     },
                                     "assertion": {
                                         "type": "string"
+                                    },
+                                    "comment": {
+                                        "type": "string"
                                     }
                                 },
-                                "required": [ "year", "expectedValue", "assert", "assertion" ]
+                                "required": [ "year", "expectedValue", "assert", "assertion" ],
+                                "additionalProperties": false
                             },
                             {
                                 "type": "object",
@@ -73,15 +77,20 @@
                                     },
                                     "assertion": {
                                         "type": "string"
+                                    },
+                                    "comment": {
+                                        "type": "string"
                                     }
                                 },
-                                "required": [ "year", "expectedValue", "assert", "assertion" ]
+                                "required": [ "year", "expectedValue", "assert", "assertion" ],
+                                "additionalProperties": false
                             }
                         ]
                     }
                 }
             },
-            "required": [ "name", "eventkey", "description", "testType", "assertions" ]
+            "required": [ "name", "eventkey", "description", "testType", "assertions" ],
+            "additionalProperties": false
         },
         "AppliesToOrExcludes": {
             "type": "object",
@@ -111,7 +120,8 @@
                 { "required": ["nationalcalendars"] },
                 { "required": ["diocesancalendar"] },
                 { "required": ["diocesancalendars"] }
-            ]
+            ],
+            "additionalProperties": false
         },
         "Year": {
             "type": "integer",
