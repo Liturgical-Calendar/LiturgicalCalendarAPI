@@ -7,7 +7,7 @@
             "properties": {
                 "name" : {
                     "type": "string",
-                    "pattern": "*Test$"
+                    "pattern": "[A-Z][a-zA-Z]*Test$"
                 },
                 "eventkey": {
                     "type": "string"
@@ -30,37 +30,41 @@
                     "$ref": "#/definitions/appliesToOrExcludes"
                 },
                 "assertions": {
-                    "type": "object",
-                    "properties": {
-                        "year": {
-                            "type": "integer",
-                            "minimum": 1970,
-                            "maximum": 9999
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "year": {
+                                "type": "integer",
+                                "minimum": 1970,
+                                "maximum": 9999
+                            },
+                            "expectedValue": {
+                                "anyOf": [
+                                    { "type": "null" },
+                                    {
+                                        "type": "integer",
+                                        "minimum": -2851200,
+                                        "maximum": 253402214400
+                                    }
+                                ]
+                            },
+                            "assert": {
+                                "type": "string",
+                                "enum": [
+                                    "eventExists AND hasExpectedTimestamp",
+                                    "eventNotExists"
+                                ]
+                            },
+                            "assertion": {
+                                "type": "string"
+                            }
                         },
-                        "expectedValue": {
-                            "anyOf": [
-                                { "type": "null" },
-                                {
-                                    "type": "integer",
-                                    "minimum": -2851200,
-                                    "maximum": 253402214400
-                                }
-                            ]
-                        },
-                        "assert": {
-                            "type": "string",
-                            "enum": [
-                                "eventExists AND hasExpectedTimestamp",
-                                "eventNotExists"
-                            ]
-                        },
-                        "assertion": {
-                            "type": "string"
-                        }
+                        "required": [ "year", "expectedValue", "assert", "assertion" ]
                     }
                 }
             },
-            "required": [ "name", "eventkey", "description", "testType", "assert", "assertion" ]
+            "required": [ "name", "eventkey", "description", "testType", "assertions" ]
         },
         "appliesToOrExcludes": {
             "type": "object",

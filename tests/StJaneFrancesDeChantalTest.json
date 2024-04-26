@@ -62,6 +62,7 @@
         {
             "year": 2018,
             "expectedValue": null,
+            "assert": "eventNotExists",
             "assertion": "should not exist, December 12th is a Sunday"
         },
         {
