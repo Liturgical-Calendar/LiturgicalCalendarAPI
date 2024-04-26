@@ -1,0 +1,96 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$ref": "#/definitions/LitCalTests",
+    "definitions": {
+        "LitCalTests": {
+            "type": "object",
+            "properties": {
+                "name" : {
+                    "type": "string",
+                    "pattern": "*Test$"
+                },
+                "eventkey": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "testType": {
+                    "type": "string",
+                    "enum": [
+                        "exactCorrespondence",
+                        "exactCorrespondenceSince",
+                        "variableCorrespondence"
+                    ]
+                },
+                "appliesTo": {
+                    "$ref": "#/definitions/appliesToOrExcludes"
+                },
+                "excludes": {
+                    "$ref": "#/definitions/appliesToOrExcludes"
+                },
+                "assertions": {
+                    "type": "object",
+                    "properties": {
+                        "year": {
+                            "type": "integer",
+                            "minimum": 1970,
+                            "maximum": 9999
+                        },
+                        "expectedValue": {
+                            "anyOf": [
+                                { "type": "null" },
+                                {
+                                    "type": "integer",
+                                    "minimum": -2851200,
+                                    "maximum": 253402214400
+                                }
+                            ]
+                        },
+                        "assert": {
+                            "type": "string",
+                            "enum": [
+                                "eventExists AND hasExpectedTimestamp",
+                                "eventNotExists"
+                            ]
+                        },
+                        "assertion": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "required": [ "name", "eventkey", "description", "testType", "assert", "assertion" ]
+        },
+        "appliesToOrExcludes": {
+            "type": "object",
+            "minProperties": 1,
+            "properties": {
+                "nationalcalendar": {
+                    "type": "string"
+                },
+                "diocesancalendar": {
+                    "type": "string"
+                },
+                "nationalcalendars": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "diocesancalendars": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "anyOf": [
+                { "required": ["nationalcalendar"] },
+                { "required": ["nationalcalendars"] },
+                { "required": ["diocesancalendar"] },
+                { "required": ["diocesancalendars"] }
+            ]
+        }
+    }
+}
