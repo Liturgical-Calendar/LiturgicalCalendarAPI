@@ -47,7 +47,7 @@ class LitCalTestsIndex {
         foreach( $data as $prop => $value ) {
             if( in_array( $prop, self::$propsToSanitize ) ) {
                 if( is_object( $value ) ) {
-                    self::sanitizeObjectValues( $data[ $prop ] );
+                    self::sanitizeObjectValues( $data->{$prop} );
                 }
                 else if( is_array( $value ) ) {
                     foreach( $value as $idx => $item ) {
