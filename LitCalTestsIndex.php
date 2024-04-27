@@ -18,7 +18,7 @@ class STATUS_CODE {
 }
 
 class LitCalTestsIndex {
-    private static array $acceptedRequestMethods = [ 'GET', 'POST' ];
+    private static array $acceptedRequestMethods = [ 'GET', 'PUT' ];
     private static array $propsToSanitize = [
         "description",
         "appliesTo",
