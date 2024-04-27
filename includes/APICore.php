@@ -39,7 +39,7 @@ class APICore {
             header( 'Access-Control-Allow-Origin: *' );
         }
         elseif( $this->isAllowedOrigin() ) {
-            header( 'Access-Control-Allow-Origin: ' . $this->RequestHeaders[ "Origin" ] );
+            header( 'Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN'] );
         }
         else {
             header( "Access-Control-Allow-Origin: {$_SERVER['HTTP_HOST']}" );
