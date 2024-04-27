@@ -51,11 +51,11 @@ class LitCalTestsIndex {
                 }
                 else if( is_array( $value ) ) {
                     foreach( $value as $idx => $item ) {
-                        $data[ $prop ][ $idx ] = self::sanitizeString( $item );
+                        $data->{$prop}[ $idx ] = self::sanitizeString( $item );
                     }
                 }
                 else if ( is_string( $value ) ) {
-                    $data[ $prop ] = self::sanitizeString( $value );
+                    $data->{$prop} = self::sanitizeString( $value );
                 }
             }
         }
