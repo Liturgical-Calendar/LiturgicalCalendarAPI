@@ -14,7 +14,7 @@
                             "pattern": "^nations\\\/[A-Z &()\\-]+\\\/[a-zA-Z0-9 ()'-]+\\.json$"
                         },
                         "nation": {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Region"
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
                         },
                         "diocese": {
                             "type": "string"

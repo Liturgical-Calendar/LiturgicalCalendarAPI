@@ -37,7 +37,7 @@
                                 "type": "object",
                                 "properties": {
                                     "year": {
-                                        "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Year"
+                                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
                                     },
                                     "expectedValue": {
                                         "type": "null"
@@ -60,10 +60,10 @@
                                 "type": "object",
                                 "properties": {
                                     "year": {
-                                        "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Year"
+                                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
                                     },
                                     "expectedValue": {
-                                        "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Timestamp"
+                                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Timestamp"
                                     },
                                     "assert": {
                                         "type": "string",

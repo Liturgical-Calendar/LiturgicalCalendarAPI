@@ -30,28 +30,28 @@
                     "type": "string"
                 },
                 "GRADE": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                 },
                 "COMMON": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
                 },
                 "CALENDAR": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Calendar"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Calendar"
                 },
                 "COLOR": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                 },
                 "TYPE": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitFeastType"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitFeastType"
                 },
                 "READINGS": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Readings"
                 },
                 "MONTH": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Month"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Month"
                 },
                 "DAY": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Day"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Day"
                 }
             },
             "required": [
@@ -64,7 +64,7 @@
             "additionalProperties": false,
             "properties": {
                 "action": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/MemorialFromDecreesAction"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/MemorialFromDecreesAction"
                 },
                 "property": {
                     "type": "string",
@@ -74,10 +74,10 @@
                     ]
                 },
                 "decreeURL": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/DecreeURL"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DecreeURL"
                 },
                 "decreeLangs": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/DecreeLangs"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DecreeLangs"
                 },
                 "sinceYear": {
                     "type": "integer"
