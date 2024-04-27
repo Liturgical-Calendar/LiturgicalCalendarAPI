@@ -4,10 +4,10 @@ include_once( 'includes/enums/RequestContentType.php' );
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
-/*
+
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
-*/
+
 
 
 class STATUS_CODE {
