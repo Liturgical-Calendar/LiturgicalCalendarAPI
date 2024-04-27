@@ -72,7 +72,10 @@
                             "pattern": "^(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)$"
                         },
                         "Timestamp": {
-                            "type": "integer"
+                            "type": "integer",
+                            "description": "Certainly cannot be any earlier than the start of the project itself July 26, 2017; we'll set the max to Dec 12th, 9999",
+                            "minimum": 1501108382,
+                            "maximum": 253402214400
                         },
                         "DateTime": {
                             "type": "string",
@@ -81,61 +84,25 @@
                         "RequestHeaders": {
                             "type": "object",
                             "properties": {
-                                "Cookie": {
-                                    "type": "string"
+                                "Accept": {
+                                    "type": "string",
+                                    "description": "If present, must contain at least one of the following",
+                                    "pattern": "(?:text/html|application/xml|application/json|text/calendar)"
                                 },
                                 "Accept-Language": {
-                                    "type": "string"
-                                },
-                                "Accept-Encoding": {
-                                    "type": "string"
-                                },
-                                "Sec-Fetch-Dest": {
-                                    "type": "string"
-                                },
-                                "Sec-Fetch-User": {
-                                    "type": "string"
-                                },
-                                "Sec-Fetch-Mode": {
-                                    "type": "string"
-                                },
-                                "Sec-Fetch-Site": {
-                                    "type": "string"
-                                },
-                                "Accept": {
-                                    "type": "string"
-                                },
-                                "User-Agent": {
-                                    "type": "string"
-                                },
-                                "Upgrade-Insecure-Requests": {
-                                    "type": "string"
-                                },
-                                "Sec-Ch-Ua-Platform": {
-                                    "type": "string"
-                                },
-                                "Sec-Ch-Ua-Mobile": {
-                                    "type": "string"
-                                },
-                                "Sec-Ch-Ua": {
-                                    "type": "string"
-                                },
-                                "Cache-Control": {
-                                    "type": "string"
-                                },
-                                "Pragma": {
-                                    "type": "string"
-                                },
-                                "Connection": {
-                                    "type": "string"
-                                },
-                                "X-Accel-Internal": {
-                                    "type": "string"
+                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/AcceptLanguage"
                                 },
                                 "Host": {
-                                    "type": "string"
+                                    "type": "string",
+                                    "const": "litcal.johnromanodorazio.com"
+                                },
+                                "X-Requested-With": {
+                                    "type": "string",
+                                    "description": "Will only appear for AJAX requests, and will only ever have a value of XMLHttpRequest",
+                                    "const": "XMLHttpRequest"
                                 }
-                            }
+                            },
+                            "additionalProperties": false
                         },
                         "Solemnities": {
                             "$ref": "#/definitions/DateTimeObjectCollection"

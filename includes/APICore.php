@@ -7,10 +7,10 @@ class APICore {
     private array $AllowedAcceptHeaders;
     private array $AllowedRequestMethods;
     private array $AllowedRequestContentTypes;
-    private array $RequestHeaders;
-    private ?string $JsonEncodedRequestHeaders   = null;
-    private ?string $RequestContentType           = null;
-    private ?string $ResponseContentType          = null;
+    private array $RequestHeaders               = [];
+    private ?string $JsonEncodedRequestHeaders  = null;
+    private ?string $RequestContentType         = null;
+    private ?string $ResponseContentType        = null;
 
     public function __construct(){
         $this->AllowedOrigins                   = [ "*" ];
@@ -18,11 +18,15 @@ class APICore {
         $this->AllowedAcceptHeaders             = AcceptHeader::$values;
         $this->AllowedRequestMethods            = RequestMethod::$values;
         $this->AllowedRequestContentTypes       = RequestContentType::$values;
-        $this->RequestHeaders                   = getallheaders();
-        unset($this->RequestHeaders["X-Real-Ip"]);
-        //unset($this->RequestHeaders["Host"]);
-        unset($this->RequestHeaders["Authorization"]);
-        $this->JsonEncodedRequestHeaders        = json_encode( $this->RequestHeaders );
+        $usefulHeaders = [
+            "Accept", "Accept-Language", "Host"
+        ];
+        foreach( getallheaders() as $header => $value ) {
+            if( in_array( $header, $usefulHeaders ) ) {
+                $this->RequestHeaders[$header] = $value;
+            }
+        }
+        $this->JsonEncodedRequestHeaders       = json_encode( $this->RequestHeaders );
         if( isset( $_SERVER[ 'CONTENT_TYPE' ] ) ) {
             $this->RequestContentType = $_SERVER[ 'CONTENT_TYPE' ];
         }
