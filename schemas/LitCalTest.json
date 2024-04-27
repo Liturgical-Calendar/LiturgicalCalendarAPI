@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$ref": "#/definitions/LitCalTests",
+    "$ref": "#/definitions/LitCalTest",
     "definitions": {
-        "LitCalTests": {
+        "LitCalTest": {
             "type": "object",
             "properties": {
                 "name" : {
@@ -44,9 +44,7 @@
                                     },
                                     "assert": {
                                         "type": "string",
-                                        "enum": [
-                                            "eventNotExists"
-                                        ]
+                                        "enum": [ "eventNotExists" ]
                                     },
                                     "assertion": {
                                         "type": "string"
@@ -69,9 +67,7 @@
                                     },
                                     "assert": {
                                         "type": "string",
-                                        "enum": [
-                                            "eventExists AND hasExpectedTimestamp"
-                                        ]
+                                        "enum": [ "eventExists AND hasExpectedTimestamp" ]
                                     },
                                     "assertion": {
                                         "type": "string"
