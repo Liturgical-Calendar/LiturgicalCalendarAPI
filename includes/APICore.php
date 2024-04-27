@@ -12,17 +12,19 @@ class APICore {
     private ?string $RequestContentType         = null;
     private ?string $ResponseContentType        = null;
 
+    private static array $onlyUsefulHeaders = [
+        "Accept", "Accept-Language", "X-Requested-With", "Host"
+    ];
+
     public function __construct(){
         $this->AllowedOrigins                   = [ "*" ];
         $this->AllowedReferers                  = [ "*" ];
         $this->AllowedAcceptHeaders             = AcceptHeader::$values;
         $this->AllowedRequestMethods            = RequestMethod::$values;
         $this->AllowedRequestContentTypes       = RequestContentType::$values;
-        $usefulHeaders = [
-            "Accept", "Accept-Language", "Host"
-        ];
+        
         foreach( getallheaders() as $header => $value ) {
-            if( in_array( $header, $usefulHeaders ) ) {
+            if( in_array( $header, self::$onlyUsefulHeaders ) ) {
                 $this->RequestHeaders[$header] = $value;
             }
         }
