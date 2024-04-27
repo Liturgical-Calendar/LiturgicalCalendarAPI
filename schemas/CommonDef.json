@@ -618,6 +618,7 @@
         },
         "Timestamp": {
             "type": "integer",
+            "description": "Earliest possible event timestamp is Nov 29th 1969, saturday vigil of the First Sunday of Advent",
             "minimum": -2851200,
             "maximum": 253402214400
         },
@@ -627,33 +628,33 @@
             "anyOf": [
                 {
                     "enum": [
-                        "af","af_NA","af_ZA","agq","agq_CM","ak","ak_GH","am","am_ET",
-                        "ar","ar_001","ar_AE","ar_BH","ar_DJ","ar_DZ","ar_EG","ar_EH",
+                        "af_NA","af_ZA","agq_CM","ak_GH","am_ET",
+                        "ar_001","ar_AE","ar_BH","ar_DJ","ar_DZ","ar_EG","ar_EH",
                         "ar_ER","ar_IL","ar_IQ","ar_JO","ar_KM","ar_KW","ar_LB",
                         "ar_LY","ar_MA","ar_MR","ar_OM","ar_PS","ar_QA","ar_SA",
                         "ar_SD","ar_SO","ar_SS","ar_SY","ar_TD","ar_TN","ar_YE",
-                        "as","as_IN","asa","asa_TZ","ast","ast_ES",
-                        "az","az_Cyrl","az_Cyrl_AZ","az_Latn","az_Latn_AZ",
-                        "bas","bas_CM","be","be_BY","bem","bem_ZM","bez","bez_TZ",
-                        "bg","bg_BG","bm","bm_ML","bn","bn_BD","bn_IN"
+                        "as_IN","asa_TZ","ast_ES",
+                        "az_Cyrl","az_Cyrl_AZ","az_Latn","az_Latn_AZ",
+                        "bas_CM","be_BY","bem_ZM","bez_TZ",
+                        "bg_BG","bm_ML","bn_BD","bn_IN"
                     ]
                 },
                 {
                     "enum": [
-                        "bo","bo_CN","bo_IN",
-                        "br","br_FR","brx","brx_IN","bs","bs_Cyrl","bs_Cyrl_BA","bs_Latn","bs_Latn_BA",
-                        "ca","ca_AD","ca_ES","ca_FR","ca_IT","ccp","ccp_BD","ccp_IN",
-                        "ce","ce_RU","ceb","ceb_PH","cgg","cgg_UG","chr","chr_US",
-                        "ckb","ckb_IQ","ckb_IR","cs","cs_CZ","cy","cy_GB",
-                        "da","da_DK","da_GL","dav","dav_KE",
-                        "de","de_AT","de_BE","de_CH","de_DE","de_IT","de_LI","de_LU",
-                        "dje","dje_NE","dsb","dsb_DE","dua","dua_CM","dyo","dyo_SN","dz","dz_BT"
+                        "bo_CN","bo_IN",
+                        "br_FR","brx_IN","bs_Cyrl","bs_Cyrl_BA","bs_Latn","bs_Latn_BA",
+                        "ca_AD","ca_ES","ca_FR","ca_IT","ccp_BD","ccp_IN",
+                        "ce_RU","ceb_PH","cgg_UG","chr_US",
+                        "ckb_IQ","ckb_IR","cs_CZ","cy_GB",
+                        "da_DK","da_GL","dav_KE",
+                        "de_AT","de_BE","de_CH","de_DE","de_IT","de_LI","de_LU",
+                        "dje_NE","dsb_DE","dua_CM","dyo_SN","dz_BT"
                     ]
                 },
                 {
                     "enum": [
-                        "ebu","ebu_KE","ee","ee_GH","ee_TG","el","el_CY","el_GR",
-                        "en","en_001","en_150","en_AE","en_AG","en_AI","en_AS","en_AT","en_AU",
+                        "ebu_KE","ee_GH","ee_TG","el_CY","el_GR",
+                        "en_001","en_150","en_AE","en_AG","en_AI","en_AS","en_AT","en_AU",
                         "en_BB","en_BE","en_BI","en_BM","en_BS","en_BW","en_BZ",
                         "en_CA","en_CC","en_CH","en_CK","en_CM","en_CX","en_CY",
                         "en_DE","en_DG","en_DK","en_DM","en_ER","en_FI","en_FJ","en_FK","en_FM",
@@ -674,103 +675,103 @@
                 },
                 {
                     "enum": [
-                        "eo","eo_001",
-                        "es","es_419","es_AR","es_BO","es_BR","es_BZ","es_CL","es_CO","es_CR","es_CU",
+                        "eo_001",
+                        "es_419","es_AR","es_BO","es_BR","es_BZ","es_CL","es_CO","es_CR","es_CU",
                         "es_DO","es_EA","es_EC","es_ES","es_GQ","es_GT","es_HN","es_IC","es_MX",
                         "es_NI","es_PA","es_PE","es_PH","es_PR","es_PY","es_SV","es_US","es_UY","es_VE",
-                        "et","et_EE","eu","eu_ES","ewo","ewo_CM",
-                        "fa","fa_AF","fa_IR",
-                        "ff","ff_Latn","ff_Latn_BF","ff_Latn_CM","ff_Latn_GH","ff_Latn_GM",
+                        "et_EE","eu_ES","ewo_CM",
+                        "fa_AF","fa_IR",
+                        "ff_Latn","ff_Latn_BF","ff_Latn_CM","ff_Latn_GH","ff_Latn_GM",
                         "ff_Latn_GN","ff_Latn_GW","ff_Latn_LR","ff_Latn_MR","ff_Latn_NE",
-                        "ff_Latn_NG","ff_Latn_SL","ff_Latn_SN","fi","fi_FI","fil","fil_PH",
-                        "fo","fo_DK","fo_FO"
+                        "ff_Latn_NG","ff_Latn_SL","ff_Latn_SN","fi_FI","fil_PH",
+                        "fo_DK","fo_FO"
                     ]
                 },
                 {
                     "enum": [
-                        "fr","fr_BE","fr_BF","fr_BI","fr_BJ","fr_BL",
+                        "fr_BE","fr_BF","fr_BI","fr_BJ","fr_BL",
                         "fr_CA","fr_CD","fr_CF","fr_CG","fr_CH","fr_CI","fr_CM","fr_DJ","fr_DZ",
                         "fr_FR","fr_GA","fr_GF","fr_GN","fr_GP","fr_GQ","fr_HT","fr_KM","fr_LU",
                         "fr_MA","fr_MC","fr_MF","fr_MG","fr_ML","fr_MQ","fr_MR","fr_MU",
                         "fr_NC","fr_NE","fr_PF","fr_PM","fr_RE","fr_RW","fr_SC","fr_SN","fr_SY",
                         "fr_TD","fr_TG","fr_TN","fr_VU","fr_WF","fr_YT",
-                        "fur","fur_IT","fy","fy_NL"
+                        "fur_IT","fy_NL"
                     ]
                 },
                 {
                     "enum": [
-                        "ga","ga_GB","ga_IE","gd","gd_GB","gl","gl_ES","gsw","gsw_CH","gsw_FR","gsw_LI",
-                        "gu","gu_IN","guz","guz_KE","gv","gv_IM",
-                        "ha","ha_GH","ha_NE","ha_NG","haw","haw_US","he","he_IL","hi","hi_IN",
-                        "hr","hr_BA","hr_HR","hsb","hsb_DE","hu","hu_HU","hy","hy_AM",
-                        "ia","ia_001","id","id_ID","ig","ig_NG","ii","ii_CN","is","is_IS",
-                        "it","it_CH","it_IT","it_SM","it_VA",
-                        "ja","ja_JP","jgo","jgo_CM","jmc","jmc_TZ","jv","jv_ID"
+                        "ga_GB","ga_IE","gd_GB","gl_ES","gsw_CH","gsw_FR","gsw_LI",
+                        "gu_IN","guz_KE","gv_IM",
+                        "ha_GH","ha_NE","ha_NG","haw_US","he_IL","hi_IN",
+                        "hr_BA","hr_HR","hsb_DE","hu_HU","hy_AM",
+                        "ia_001","id_ID","ig_NG","ii_CN","is_IS",
+                        "it_CH","it_IT","it_SM","it_VA",
+                        "ja_JP","jgo_CM","jmc_TZ","jv_ID"
                     ]
                 },
                 {
                     "enum": [
-                        "ka","ka_GE","kab","kab_DZ","kam","kam_KE","kde","kde_TZ","kea","kea_CV",
-                        "khq","khq_ML","ki","ki_KE","kk","kk_KZ","kkj","kkj_CM","kl","kl_GL","kln","kln_KE",
-                        "km","km_KH","kn","kn_IN","ko","ko_KP","ko_KR","kok","kok_IN","ks","ks_IN",
-                        "ksb","ksb_TZ","ksf","ksf_CM","ksh","ksh_DE","ku","ku_TR","kw","kw_GB",
-                        "ky","ky_KG"
+                        "ka_GE","kab_DZ","kam_KE","kde_TZ","kea_CV",
+                        "khq_ML","ki_KE","kk_KZ","kkj_CM","kl_GL","kln_KE",
+                        "km_KH","kn_IN","ko_KP","ko_KR","kok_IN","ks_IN",
+                        "ksb_TZ","ksf_CM","ksh_DE","ku_TR","kw_GB",
+                        "ky_KG"
                     ]
                 },
                 {
                     "enum": [
-                        "lag","lag_TZ","lb","lb_LU","lg","lg_UG","lkt","lkt_US",
-                        "ln","ln_AO","ln_CD","ln_CF","ln_CG","lo","lo_LA","lrc","lrc_IQ","lrc_IR",
-                        "lt","lt_LT","lu","lu_CD","luo","luo_KE","luy","luy_KE","lv","lv_LV",
-                        "mas","mas_KE","mas_TZ","mer","mer_KE","mfe","mfe_MU",
-                        "mg","mg_MG","mgh","mgh_MZ","mgo","mgo_CM","mi","mi_NZ","mk","mk_MK",
-                        "ml","ml_IN","mn","mn_MN","mr","mr_IN","ms","ms_BN","ms_MY","ms_SG",
-                        "mt","mt_MT","mua","mua_CM","my","my_MM","mzn","mzn_IR"
+                        "lag_TZ","lb_LU","lg_UG","lkt_US",
+                        "ln_AO","ln_CD","ln_CF","ln_CG","lo_LA","lrc_IQ","lrc_IR",
+                        "lt_LT","lu_CD","luo_KE","luy_KE","lv_LV",
+                        "mas_KE","mas_TZ","mer_KE","mfe_MU",
+                        "mg_MG","mgh_MZ","mgo_CM","mi_NZ","mk_MK",
+                        "ml_IN","mn_MN","mr_IN","ms_BN","ms_MY","ms_SG",
+                        "mt_MT","mua_CM","my_MM","mzn_IR"
                     ]
                 },
                 {
                     "enum": [
-                        "naq","naq_NA","nb","nb_NO","nb_SJ","nd","nd_ZW","nds","nds_DE","nds_NL",
-                        "ne","ne_IN","ne_NP","nl","nl_AW","nl_BE","nl_BQ","nl_CW","nl_NL","nl_SR","nl_SX",
-                        "nmg","nmg_CM","nn","nn_NO","nnh","nnh_CM","nus","nus_SS","nyn","nyn_UG",
-                        "om","om_ET","om_KE","or","or_IN","os","os_GE","os_RU",
-                        "pa","pa_Arab","pa_Arab_PK","pa_Guru","pa_Guru_IN",
-                        "pl","pl_PL","ps","ps_AF","ps_PK",
-                        "pt","pt_AO","pt_BR","pt_CH","pt_CV","pt_GQ","pt_GW","pt_LU","pt_MO","pt_MZ","pt_PT","pt_ST","pt_TL"
+                        "naq_NA","nb_NO","nb_SJ","nd_ZW","nds_DE","nds_NL",
+                        "ne_IN","ne_NP","nl_AW","nl_BE","nl_BQ","nl_CW","nl_NL","nl_SR","nl_SX",
+                        "nmg_CM","nn_NO","nnh_CM","nus_SS","nyn_UG",
+                        "om_ET","om_KE","or_IN","os_GE","os_RU",
+                        "pa_Arab","pa_Arab_PK","pa_Guru","pa_Guru_IN",
+                        "pl_PL","ps_AF","ps_PK",
+                        "pt_AO","pt_BR","pt_CH","pt_CV","pt_GQ","pt_GW","pt_LU","pt_MO","pt_MZ","pt_PT","pt_ST","pt_TL"
                     ]
                 },
                 {
                     "enum": [
-                        "qu","qu_BO","qu_EC","qu_PE",
-                        "rm","rm_CH","rn","rn_BI","ro","ro_MD","ro_RO","rof","rof_TZ",
-                        "ru","ru_BY","ru_KG","ru_KZ","ru_MD","ru_RU","ru_UA","rw","rw_RW","rwk","rwk_TZ",
-                        "sah","sah_RU","saq","saq_KE","sbp","sbp_TZ","sd","sd_PK",
-                        "se","se_FI","se_NO","se_SE","seh","seh_MZ","ses","ses_ML",
-                        "sg","sg_CF","shi","shi_Latn","shi_Latn_MA","shi_Tfng","shi_Tfng_MA",
-                        "si","si_LK","sk","sk_SK","sl","sl_SI","smn","smn_FI","sn","sn_ZW"
+                        "qu_BO","qu_EC","qu_PE",
+                        "rm_CH","rn_BI","ro_MD","ro_RO","rof_TZ",
+                        "ru_BY","ru_KG","ru_KZ","ru_MD","ru_RU","ru_UA","rw_RW","rwk_TZ",
+                        "sah_RU","saq_KE","sbp_TZ","sd_PK",
+                        "se_FI","se_NO","se_SE","seh_MZ","ses_ML",
+                        "sg_CF","shi_Latn","shi_Latn_MA","shi_Tfng","shi_Tfng_MA",
+                        "si_LK","sk_SK","sl_SI","smn_FI","sn_ZW"
                     ]
                 },
                 {
                     "enum": [
-                        "so","so_DJ","so_ET","so_KE","so_SO","sq","sq_AL","sq_MK","sq_XK",
-                        "sr","sr_Cyrl","sr_Cyrl_BA","sr_Cyrl_ME","sr_Cyrl_RS","sr_Cyrl_XK",
+                        "so_DJ","so_ET","so_KE","so_SO","sq_AL","sq_MK","sq_XK",
+                        "sr_Cyrl","sr_Cyrl_BA","sr_Cyrl_ME","sr_Cyrl_RS","sr_Cyrl_XK",
                         "sr_Latn","sr_Latn_BA","sr_Latn_ME","sr_Latn_RS","sr_Latn_XK",
-                        "sv","sv_AX","sv_FI","sv_SE","sw","sw_CD","sw_KE","sw_TZ","sw_UG",
-                        "ta","ta_IN","ta_LK","ta_MY","ta_SG","te","te_IN","teo","teo_KE","teo_UG",
-                        "tg","tg_TJ","th","th_TH","ti","ti_ER","ti_ET","tk","tk_TM","to","to_TO",
-                        "tr","tr_CY","tr_TR","tt","tt_RU","twq","twq_NE","tzm","tzm_MA"
+                        "sv_AX","sv_FI","sv_SE","sw_CD","sw_KE","sw_TZ","sw_UG",
+                        "ta_IN","ta_LK","ta_MY","ta_SG","te_IN","teo_KE","teo_UG",
+                        "tg_TJ","th_TH","ti_ER","ti_ET","tk_TM","to_TO",
+                        "tr_CY","tr_TR","tt_RU","twq_NE","tzm_MA"
                     ]
                 },
                 {
                     "enum": [
-                        "ug","ug_CN","uk","uk_UA",
-                        "ur","ur_IN","ur_PK","uz","uz_Arab","uz_Arab_AF","uz_Cyrl","uz_Cyrl_UZ","uz_Latn","uz_Latn_UZ",
-                        "vai","vai_Latn","vai_Latn_LR","vai_Vaii","vai_Vaii_LR","vi","vi_VN","vun","vun_TZ",
-                        "wae","wae_CH","wo","wo_SN","xh","xh_ZA","xog","xog_UG",
-                        "yav","yav_CM","yi","yi_001","yo","yo_BJ","yo_NG",
-                        "yue","yue_Hans","yue_Hans_CN","yue_Hant","yue_Hant_HK",
-                        "zgh","zgh_MA","zh","zh_Hans","zh_Hans_CN","zh_Hans_HK","zh_Hans_MO","zh_Hans_SG","zh_Hant","zh_Hant_HK","zh_Hant_MO","zh_Hant_TW",
-                        "zu","zu_ZA"
+                        "ug_CN","uk_UA",
+                        "ur_IN","ur_PK","uz_Arab","uz_Arab_AF","uz_Cyrl","uz_Cyrl_UZ","uz_Latn","uz_Latn_UZ",
+                        "vai_Latn","vai_Latn_LR","vai_Vaii","vai_Vaii_LR","vi_VN","vun_TZ",
+                        "wae_CH","wo_SN","xh_ZA","xog_UG",
+                        "yav_CM","yi_001","yo_BJ","yo_NG",
+                        "yue_Hans","yue_Hans_CN","yue_Hant","yue_Hant_HK",
+                        "zgh_MA","zh_Hans","zh_Hans_CN","zh_Hans_HK","zh_Hans_MO","zh_Hans_SG","zh_Hant","zh_Hant_HK","zh_Hant_MO","zh_Hant_TW",
+                        "zu_ZA"
                     ]
                 },
                 {
@@ -796,7 +797,7 @@
                 {
                     "enum": [
                         "MK",   "ML",   "MN",   "MR",   "MS",   "MT",   "MUA",  "MY",   "MZN",  "NAQ",
-                        "NB",   "ND",   "NDS",  "NE",   "NL",   "NMG",  "NN",   "NNH",  "NUS", "NYN",
+                        "NB",   "ND",   "NDS",  "NE",   "NL",   "NMG",  "NN",   "NNH",  "NUS",  "NYN",
                         "OM",   "OR",   "OS",   "PA",   "PL",   "PS",   "PT",   "QU",   "RM",   "RN",
                         "RO",   "ROF",  "RU",   "RW",   "RWK",  "SAH",  "SAQ",  "SBP",  "SD",   "SE",
                         "SEH",  "SES",  "SG",   "SHI",  "SI",   "SK",   "SL",   "SMN",  "SN",   "SO",
@@ -809,8 +810,57 @@
                         "VAI",  "VI",   "VUN",  "WAE",  "WO",   "XH",   "XOG",  "YAV",  "YI",   "YO",
                         "YUE",  "ZGH",  "ZH",   "ZU"
                     ]
+                },
+                {
+                    "enum": [
+                        "af",   "agq", "ak",    "am",   "ar",   "as",   "asa",   "ast", "az",   "bas",
+                        "be",   "bem", "bez",   "bg",   "bm",   "bn",   "bo",    "br",  "brx",  "bs",
+                        "ca",   "ccp", "ce",    "ceb",  "cgg",  "chr",  "ckb",   "cs",  "cy",   "da",
+                        "dav",  "de",  "dje",   "dsb",  "dua",  "dyo",  "dz",    "ebu", "ee",   "el",
+                        "en",   "eo",  "es",    "et",   "eu",   "ewo",  "fa",    "ff",  "fi",   "fil",
+                        "fo",   "fr",  "fur",   "fy",   "ga",   "gd",   "gl",    "gsw", "gu",   "guz"
+                    ]
+                },
+                {
+                    "enum": [
+                        "gv",   "ha",  "haw",   "he",   "hi",   "hr",   "hsb",   "hu",  "hy",   "ia",
+                        "id",   "ig",  "ii",    "is",   "it",   "ja",   "jgo",   "jmc", "jv",   "ka",
+                        "kab",  "kam", "kde",   "kea",  "khq",  "ki",   "kk",    "kkj", "kl",   "kln",
+                        "km",   "kn",  "ko",    "kok",  "ks",   "ksb",  "ksf",   "ksh", "ku",   "kw",
+                        "ky",   "lag", "lb",    "lg",   "lkt",  "ln",   "lo",    "lrc", "lt",   "lu",
+                        "luo",  "luy", "lv",    "mas",  "mer",  "mfe",  "mg",    "mgh", "mgo",  "mi"
+                    ]
+                },
+                {
+                    "enum": [
+                        "mk",   "ml",  "mn",    "mr",   "ms",   "mt",   "mua",   "my",  "mzn",  "naq",
+                        "nb",   "nd",  "nds",   "ne",   "nl",   "nmg",  "nn",    "nnh", "nus",  "nyn",
+                        "om",   "or",  "os",    "pa",   "pl",   "ps",   "pt",    "qu",  "rm",   "rn",
+                        "ro",   "rof", "ru",    "rw",   "rwk",  "sah",  "saq",   "sbp", "sd",   "se",
+                        "seh",  "ses", "sg",    "shi",  "si",   "sk",   "sl",    "smn", "sn",   "so",
+                        "sq",   "sr",  "sv",    "sw",   "ta",   "te",   "teo",   "tg",  "th",   "ti"
+                    ]
+                },
+                {
+                    "enum": [
+                        "tk",   "to",  "tr",    "tt",   "twq",  "tzm",  "ug",    "uk",  "ur",   "uz",
+                        "vai",  "vi",  "vun",   "wae",  "wo",   "xh",   "xog",   "yav", "yi",   "yo",
+                        "yue",  "zgh", "zh",    "zu"
+                    ]
+                }
+            ]
+        },
+        "AcceptLanguage": {
+            "type": "string",
+            "anyOf": [
+                {
+                    "pattern": "^(?:AF|AGQ|AK|AM|AR|AS|ASA|AST|AZ|BAS|BE|BEM|BEZ|BG|BM|BN|BO|BR|BRX|BS|CA|CCP|CE|CEB|CGG|CHR|CKB|CS|CY|DA|DAV|DE|DJE|DSB|DUA|DYO|DZ|EBU|EE|EL|EN|EO|ES|ET|EU|EWO|FA|FF|FI|FIL|FO|FR|FUR|FY|GA|GD|GL|GSW|GU|GUZ|GV|HA|HAW|HE|HI|HR|HSB|HU|HY|IA|ID|IG|II|IS|IT|JA|JGO|JMC|JV|KA|KAB|KAM|KDE|KEA|KHQ|KI|KK|KKJ|KL|KLN|KM|KN|KO|KOK|KS|KSB|KSF|KSH|KU|KW|KY|LAG|LB|LG|LKT|LN|LO|LRC|LT|LU|LUO|LUY|LV|MAS|MER|MFE|MG|MGH|MGO|MI|MK|ML|MN|MR|MS|MT|MUA|MY|MZN|NAQ|NB|ND|NDS|NE|NL|NMG|NN|NNH|NUS|NYN|OM|OR|OS|PA|PL|PS|PT|QU|RM|RN|RO|ROF|RU|RW|RWK|SAH|SAQ|SBP|SD|SE|SEH|SES|SG|SHI|SI|SK|SL|SMN|SN|SO|SQ|SR|SV|SW|TA|TE|TEO|TG|TH|TI|TK|TO|TR|TT|TWQ|TZM|UG|UK|UR|UZ|VAI|VI|VUN|WAE|WO|XH|XOG|YAV|YI|YO|YUE|ZGH|ZH|ZU)$"
+                },
+                {
+                    "pattern": "^(?:af|agq|ak|am|ar|as|asa|ast|az|bas|be|bem|bez|bg|bm|bn|bo|br|brx|bs|ca|ccp|ce|ceb|cgg|chr|ckb|cs|cy|da|dav|de|dje|dsb|dua|dyo|dz|ebu|ee|el|en|eo|es|et|eu|ewo|fa|ff|fi|fil|fo|fr|fur|fy|ga|gd|gl|gsw|gu|guz|gv|ha|haw|he|hi|hr|hsb|hu|hy|ia|id|ig|ii|is|it|ja|jgo|jmc|jv|ka|kab|kam|kde|kea|khq|ki|kk|kkj|kl|kln|km|kn|ko|kok|ks|ksb|ksf|ksh|ku|kw|ky|lag|lb|lg|lkt|ln|lo|lrc|lt|lu|luo|luy|lv|mas|mer|mfe|mg|mgh|mgo|mi|mk|ml|mn|mr|ms|mt|mua|my|mzn|naq|nb|nd|nds|ne|nl|nmg|nn|nnh|nus|nyn|om|or|os|pa|pl|ps|pt|qu|rm|rn|ro|rof|ru|rw|rwk|sah|saq|sbp|sd|se|seh|ses|sg|shi|si|sk|sl|smn|sn|so|sq|sr|sv|sw|ta|te|teo|tg|th|ti|tk|to|tr|tt|twq|tzm|ug|uk|ur|uz|vai|vi|vun|wae|wo|xh|xog|yav|yi|yo|yue|zgh|zh|zu)(?:-(?:001|150|419|AD|AE|AF|AG|AI|AL|AM|AO|AR|AS|AT|AU|AW|AX|Arab|Arab-AF|Arab-PK|BA|BB|BD|BE|BF|BG|BH|BI|BJ|BL|BM|BN|BO|BQ|BR|BS|BT|BW|BY|BZ|CA|CC|CD|CF|CG|CH|CI|CK|CL|CM|CN|CO|CR|CU|CV|CW|CX|CY|CZ|Cyrl|Cyrl-AZ|Cyrl-BA|Cyrl-ME|Cyrl-RS|Cyrl-UZ|Cyrl-XK|DE|DG|DJ|DK|DM|DO|DZ|EA|EC|EE|EG|EH|ER|ES|ET|FI|FJ|FK|FM|FO|FR|GA|GB|GD|GE|GF|GG|GH|GI|GL|GM|GN|GP|GQ|GR|GT|GU|GW|GY|Guru|Guru-IN|HK|HN|HR|HT|HU|Hans|Hans-CN|Hans-HK|Hans-MO|Hans-SG|Hant|Hant-HK|Hant-MO|Hant-TW|IC|ID|IE|IL|IM|IN|IO|IQ|IR|IS|IT|JE|JM|JO|JP|KE|KG|KH|KI|KM|KN|KP|KR|KW|KY|KZ|LA|LB|LC|LI|LK|LR|LS|LT|LU|LV|LY|Latn|Latn-AZ|Latn-BA|Latn-BF|Latn-CM|Latn-GH|Latn-GM|Latn-GN|Latn-GW|Latn-LR|Latn-MA|Latn-ME|Latn-MR|Latn-NE|Latn-NG|Latn-RS|Latn-SL|Latn-SN|Latn-UZ|Latn-XK|MA|MC|MD|MF|MG|MH|MK|ML|MM|MN|MO|MP|MQ|MR|MS|MT|MU|MW|MX|MY|MZ|NA|NC|NE|NF|NG|NI|NL|NO|NP|NR|NU|NZ|OM|PA|PE|PF|PG|PH|PK|PL|PM|PN|PR|PS|PT|PW|PY|QA|RE|RO|RU|RW|SA|SB|SC|SD|SE|SG|SH|SI|SJ|SK|SL|SM|SN|SO|SR|SS|ST|SV|SX|SY|SZ|TC|TD|TG|TH|TJ|TK|TL|TM|TN|TO|TR|TT|TV|TZ|Tfng|Tfng-MA|UA|UG|UM|US|UY|VA|VC|VE|VG|VI|VN|VU|Vaii|Vaii-LR|WF|WS|XK|YE|YT|ZA|ZM|ZW))?"
                 }
             ]
         }
     }
 }
+
