@@ -119,7 +119,7 @@ class LitCalTestsIndex {
             // Sanitize data to avoid any possibility of script injection
             self::sanitizeObjectValues( $data );
 
-            $bytesWritten = file_put_contents( 'tests/' . $data->name . '.json', $json );
+            $bytesWritten = file_put_contents( 'tests/' . $data->name . '.json', json_encode( $data, JSON_PRETTY_PRINT ) );
             if( false === $bytesWritten ) {
                 return self::produceErrorResponse( STATUS_CODE::SERVICE_UNAVAILABLE, "The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support." );
             } else {
