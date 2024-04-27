@@ -7,10 +7,11 @@
             "properties": {
                 "name" : {
                     "type": "string",
-                    "pattern": "[A-Z][a-zA-Z]*Test$"
+                    "pattern": "^[A-Z][a-zA-Z0-9]+Test$"
                 },
                 "eventkey": {
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^[A-Z][a-zA-Z0-9]+$"
                 },
                 "description": {
                     "type": "string"
