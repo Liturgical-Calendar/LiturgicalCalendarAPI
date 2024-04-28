@@ -15,7 +15,7 @@
             "additionalProperties": false,
             "properties": {
                 "READINGS": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Readings"
                 }
             },
             "required": [

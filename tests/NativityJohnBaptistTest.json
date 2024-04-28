@@ -1,0 +1,26 @@
+{
+    "name": "NativityJohnBaptistTest",
+    "eventkey": "NativityJohnBaptist",
+    "description": "When the Nativity of John the Baptist coincides with the Solemnity of the Sacred Heart, is it correctly moved to June 23?",
+    "testType": "exactCorrespondence",
+    "assertions": [
+        {
+            "year": 2022,
+            "expectedValue": 1655942400,
+            "assert": "eventExists AND hasExpectedTimestamp",
+            "assertion": "Nativity of John the Baptist should be moved to June 23"
+        },
+        {
+            "year": 2033,
+            "expectedValue": 2003097600,
+            "assert": "eventExists AND hasExpectedTimestamp",
+            "assertion": "Nativity of John the Baptist should be moved to June 23"
+        },
+        {
+            "year": 2044,
+            "expectedValue": 2350252800,
+            "assert": "eventExists AND hasExpectedTimestamp",
+            "assertion": "Nativity of John the Baptist should be moved to June 23"
+        }
+    ]
+}

@@ -1,6 +1,7 @@
 <?php
 
 include_once( 'vendor/autoload.php' );
+include_once( 'includes/LitCalTest.php' );
 include_once( 'includes/enums/LitSchema.php' );
 
 $testsFolder = dirname(__FILE__) . '/tests';
@@ -283,7 +284,8 @@ class LitCalHealth implements MessageComponentInterface {
                             $errorStrings = [];
                             foreach( $result as $error ) {
                                 $errorLevel = new ICSErrorLevel( $error['level'] );
-                                $errorStrings[] = $errorLevel . ": " . $error['message'] . " ::: " . $error['node']->getValue();
+                                //TODO: implement $error['node']->lineIndex and $error['node']->lineString if and when the PR is accepted upstream...
+                                $errorStrings[] = $errorLevel . ": " . $error['message'];// . " at line {$error['node']->lineIndex} ({$error['node']->lineString})"
                             }
                             $message->text = implode('&#013;', $errorStrings ) || "validation encountered " . count( $result ) . " errors";
                             $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
@@ -344,9 +346,12 @@ class LitCalHealth implements MessageComponentInterface {
         }
         $jsonData = json_decode( file_get_contents( self::LitCalBaseUrl . $req ) );
         if( json_last_error() === JSON_ERROR_NONE ) {
-            $TestClass = new $Test( $Test );
-            $TestClass::$testObject = $jsonData;
-            $testResult = $TestClass->test();
+            $UnitTest = new LitCalTest( $Test, $jsonData );
+            if( $UnitTest->isReady() ) {
+                $testResult = $UnitTest->runTest();
+            } else {
+                $testResult = $UnitTest->getError();
+            }
             if( gettype( $testResult ) === 'boolean' && $testResult === true ) {
                 $message = new stdClass();
                 $message->type = "success";
@@ -382,10 +387,10 @@ class LitCalHealth implements MessageComponentInterface {
 }
 
 class ICSErrorLevel {
-    const int REPAIRED = 1;
-    const int WARNING = 2;
-    const int FATAL = 3;
-    const ERROR_STRING = [
+    const int REPAIRED  = 1;
+    const int WARNING   = 2;
+    const int FATAL     = 3;
+    const ERROR_STRING  = [
         null,
         'Repaired value',
         'Warning',

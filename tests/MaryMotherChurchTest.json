@@ -1,0 +1,38 @@
+{
+    "name": "MaryMotherChurchTest",
+    "eventkey": "MaryMotherChurch",
+    "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Congregation for Divine Worship",
+    "testType": "exactCorrespondenceSince",
+    "assertions": [
+        {
+            "year": 2015,
+            "expectedValue": null,
+            "assert": "eventNotExists",
+            "assertion": "The memorial 'Mary Mother of the Church' should not exist before the year 2018"
+        },
+        {
+            "year": 2016,
+            "expectedValue": null,
+            "assert": "eventNotExists",
+            "assertion": "The memorial 'Mary Mother of the Church' should not exist before the year 2018"
+        },
+        {
+            "year": 2017,
+            "expectedValue": null,
+            "assert": "eventNotExists",
+            "assertion": "The memorial 'Mary Mother of the Church' should not exist before the year 2018"
+        },
+        {
+            "year": 2018,
+            "expectedValue": 1526860800,
+            "assert": "eventExists AND hasExpectedTimestamp",
+            "assertion": "The memorial 'Mary Mother of the Church' should be created on the expected date"
+        },
+        {
+            "year": 2019,
+            "expectedValue": 1560124800,
+            "assert": "eventExists AND hasExpectedTimestamp",
+            "assertion": "The memorial 'Mary Mother of the Church' should be created on the expected date"
+        }
+    ]
+}

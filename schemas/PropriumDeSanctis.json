@@ -10,10 +10,10 @@
             "additionalProperties": false,
             "properties": {
                 "MONTH": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Month"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Month"
                 },
                 "DAY": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Day"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Day"
                 },
                 "TAG": {
                     "type": "string"
@@ -22,19 +22,19 @@
                     "type": "string"
                 },
                 "GRADE": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                 },
                 "DISPLAYGRADE": {
                     "type": "string"
                 },
                 "COMMON": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
                 },
                 "CALENDAR": {
                     "$ref": "#/definitions/Calendar"
                 },
                 "COLOR": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                 },
                 "READINGS": {
                     "oneOf": [
@@ -42,7 +42,7 @@
                             "$ref": "#/definitions/LiturgicalEventWithVigilMass"
                         },
                         {
-                            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Readings"
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Readings"
                         }
                     ]
                 }
@@ -64,10 +64,10 @@
             "additionalProperties": false,
             "properties": {
                 "VIGIL": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Readings"
                 },
                 "DAY": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Readings"
                 }
             },
             "required": [
@@ -77,7 +77,7 @@
             "title": "LiturgicalEventWithMass"
         },
         "Calendar": {
-            "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Calendar"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Calendar"
         }
     }
 }

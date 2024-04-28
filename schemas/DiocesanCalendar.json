@@ -32,22 +32,22 @@
                                     "type": "string"
                                 },
                                 "color": {
-                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitColor"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                                 },
                                 "grade": {
-                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                                 },
                                 "common": {
-                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
                                 },
                                 "day": {
-                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Day"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Day"
                                 },
                                 "month": {
-                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Month"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Month"
                                 },
                                 "readings": {
-                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Readings"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Readings"
                                 }
                             },
                             "required": [
@@ -71,10 +71,10 @@
                                     "type": "integer"
                                 },
                                 "decreeURL": {
-                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/DecreeURL"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DecreeURL"
                                 },
                                 "decreeLangs": {
-                                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/DecreeLangs"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DecreeLangs"
                                 },
                                 "strtotime": {
                                     "type": "string"
@@ -99,13 +99,13 @@
             "additionalProperties": false,
             "properties": {
                 "Epiphany": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
                 },
                 "Ascension": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/Ascension"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Ascension"
                 },
                 "CorpusChristi": {
-                    "$ref": "https://litcal.org/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
                 }
             },
             "title": "Overrides"
