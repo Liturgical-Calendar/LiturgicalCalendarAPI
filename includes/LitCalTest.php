@@ -101,7 +101,7 @@ class LitCalTest
                             $rule2 = ($actualValue === $assertion->expectedValue);
                             try {
                                 if( true === assert( $rule2, $messageIfError . $secondErrorMessage ) ) {
-                                    $this->setSuccess( "expectedValue = {$assertion->expectedValue}, actualValue = {$actualValue}" );
+                                    $this->setSuccess( "expectedValue = {$assertion->expectedValue}, actualValue = {$actualValue}, rule result is of type " .gettype($rule2). " with a value of " . ($rule2 ? 'true' : 'false') );
                                 }
                             } catch (AssertionError $e) {
                                 $this->setError( $e->getMessage() );
