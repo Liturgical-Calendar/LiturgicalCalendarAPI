@@ -62,25 +62,18 @@ class LitCalTest
     }
 
     public function runTest(): true|object {
-        //$res = false;
+
         if( $this->readyState ) {
-            $yearBeingTested = $this->dataToTest->Settings->Year;
-            $assertion = $this->retrieveAssertionForYear( $yearBeingTested );
+
+            $assertion = $this->retrieveAssertionForYear( $this->dataToTest->Settings->Year );
             if( is_null( $assertion ) ) {
                 $this->setError( "Out of bounds error: {$this->Test} only supports calendar years [ " . implode(', ', self::$testCache->{$this->Test}->yearsSupported ) . " ]" );
                 return $this->getError();
             }
 
-            $calendarType = property_exists( $this->dataToTest->Settings, 'NationalCalendar' ) ? 'the national calendar of ' : (
-                property_exists( $this->dataToTest->Settings, 'DiocesanCalendar' ) ? 'the diocesan calendar of ' : ''
-            );
-
-            $calendarName = property_exists( $this->dataToTest->Settings, 'NationalCalendar' ) ? $this->dataToTest->Settings->NationalCalendar : (
-                property_exists( $this->dataToTest->Settings, 'DiocesanCalendar' ) ? $this->dataToTest->Settings->DiocesanCalendar : 'the Universal Roman Calendar'
-            );
-
+            $calendarType = $this->getCalendarTypeStr();
+            $calendarName = $this->getCalendarName();
             $messageIfError = "{$this->Test} Assertion '{$assertion->assertion}' failed for Year " . $this->dataToTest->Settings->Year . " in {$calendarType}{$calendarName}.";
-
             $eventKey = self::$testCache->{$this->Test}->testInstructions->eventkey;
 
             switch( $assertion->assert ) {
@@ -127,6 +120,18 @@ class LitCalTest
             }
             return $this->getError();
         }
+    }
+
+    private function getCalendarTypeStr(): string {
+        return property_exists( $this->dataToTest->Settings, 'NationalCalendar' ) ? 'the national calendar of ' : (
+            property_exists( $this->dataToTest->Settings, 'DiocesanCalendar' ) ? 'the diocesan calendar of ' : ''
+        );
+    }
+
+    private function getCalendarName(): string {
+        return property_exists( $this->dataToTest->Settings, 'NationalCalendar' ) ? $this->dataToTest->Settings->NationalCalendar : (
+            property_exists( $this->dataToTest->Settings, 'DiocesanCalendar' ) ? $this->dataToTest->Settings->DiocesanCalendar : 'the Universal Roman Calendar'
+        );
     }
 
     private function setError( string $text ): void {
