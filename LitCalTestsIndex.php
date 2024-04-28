@@ -18,7 +18,7 @@ class STATUS_CODE {
 }
 
 class LitCalTestsIndex {
-    private static array $acceptedRequestMethods = [ 'GET', 'PUT' ];
+    private static array $acceptedRequestMethods = [ 'GET', 'PUT', 'OPTIONS' ];
     private static array $propsToSanitize = [
         "description",
         "appliesTo",
@@ -162,6 +162,14 @@ class LitCalTestsIndex {
                 case 'PUT':
                     $response = self::handlePutRequest();
                     break;
+                case 'OPTIONS':
+                    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
+                        header("Access-Control-Allow-Methods: GET, PUT, OPTIONS");
+                    }
+                    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
+                        header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+                    }
+                    continue;
                 default:
                     $response = self::produceErrorResponse( STATUS_CODE::METHOD_NOT_ALLOWED, "This endpoint can only accept requests utilizing methods GET or PUT" );
             }
