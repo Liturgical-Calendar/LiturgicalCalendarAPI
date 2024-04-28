@@ -1,6 +1,7 @@
 <?php
 
 include_once( 'vendor/autoload.php' );
+include_once( 'includes/LitCalTest.php' );
 include_once( 'includes/enums/LitSchema.php' );
 
 $testsFolder = dirname(__FILE__) . '/tests';
@@ -345,11 +346,11 @@ class LitCalHealth implements MessageComponentInterface {
         }
         $jsonData = json_decode( file_get_contents( self::LitCalBaseUrl . $req ) );
         if( json_last_error() === JSON_ERROR_NONE ) {
-            $TestClass = new LitCalTest( $Test, $jsonData );
-            if( $TestClass->isReady() ) {
-                $testResult = $TestClass->runTest();
+            $UnitTest = new LitCalTest( $Test, $jsonData );
+            if( $UnitTest->isReady() ) {
+                $testResult = $UnitTest->runTest();
             } else {
-                $testResult = $TestClass->getError();
+                $testResult = $UnitTest->getError();
             }
             if( gettype( $testResult ) === 'boolean' && $testResult === true ) {
                 $message = new stdClass();
