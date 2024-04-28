@@ -64,7 +64,7 @@
         },
         {
             "year": 2017,
-            "expectedValue": 1485101681,
+            "expectedValue": 1485129600,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 23",
             "comment": "this test is significant since January 22nd falls on a Sunday, so the National Day of Prayer for the Unborn should have been moved to January 23rd"
@@ -101,7 +101,7 @@
         },
         {
             "year": 2023,
-            "expectedValue": 1674404081,
+            "expectedValue": 1674432000,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 23",
             "comment": "this test is significant since January 22nd falls on a Sunday, so the National Day of Prayer for the Unborn should have been moved to January 23rd"
@@ -168,7 +168,7 @@
         },
         {
             "year": 2034,
-            "expectedValue": 2021559281,
+            "expectedValue": 2021587200,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 23",
             "comment": "this test is significant since January 22nd falls on a Sunday, so the National Day of Prayer for the Unborn should have been moved to January 23rd"
@@ -193,50 +193,50 @@
         },
         {
             "year": 2038,
-            "expectedValue": 2147483647,
+            "expectedValue": 2147731200,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2039,
-            "expectedValue": 2147483647,
+            "expectedValue": 2179267200,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2040,
-            "expectedValue": 2147483647,
+            "expectedValue": 2210889600,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 23",
             "comment": "this test is significant since January 22nd falls on a Sunday, so the National Day of Prayer for the Unborn should have been moved to January 23rd"
         },
         {
             "year": 2041,
-            "expectedValue": 2147483647,
+            "expectedValue": 2242425600,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2042,
-            "expectedValue": 2147483647,
+            "expectedValue": 2273961600,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2043,
-            "expectedValue": 2147483647,
+            "expectedValue": 2305497600,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2044,
-            "expectedValue": 2147483647,
+            "expectedValue": 2337033600,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2045,
-            "expectedValue": 2147483647,
+            "expectedValue": 2368742400,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 23",
             "comment": "this test is significant since January 22nd falls on a Sunday, so the National Day of Prayer for the Unborn should have been moved to January 23rd"
