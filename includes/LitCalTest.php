@@ -129,8 +129,8 @@ class LitCalTest
     }
 
     private function getCalendarName(): string {
-        return property_exists( $this->dataToTest->Settings, 'NationalCalendar' ) ? $this->dataToTest->Settings->NationalCalendar : (
-            property_exists( $this->dataToTest->Settings, 'DiocesanCalendar' ) ? $this->dataToTest->Settings->DiocesanCalendar : 'the Universal Roman Calendar'
+        return property_exists( $this->dataToTest->Settings, 'DiocesanCalendar' ) ? $this->dataToTest->Settings->DiocesanCalendar : (
+            property_exists( $this->dataToTest->Settings, 'NationalCalendar' ) ? $this->dataToTest->Settings->NationalCalendar : 'the Universal Roman Calendar'
         );
     }
 
