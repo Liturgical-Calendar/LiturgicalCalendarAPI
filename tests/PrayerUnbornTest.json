@@ -27,75 +27,75 @@
         },
         {
             "year": 2011,
-            "expectedValue": 1295711890,
+            "expectedValue": 1295654400,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2012,
-            "expectedValue": 1327334311,
+            "expectedValue": 1327276800,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 23",
             "comment": "this test is significant since January 22nd falls on a Sunday, so the National Day of Prayer for the Unborn should have been moved to January 23rd"
         },
         {
             "year": 2013,
-            "expectedValue": 1358870415,
+            "expectedValue": 1358812800,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2014,
-            "expectedValue": 1390406428,
+            "expectedValue": 1390348800,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2015,
-            "expectedValue": 1421942441,
+            "expectedValue": 1421884800,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2016,
-            "expectedValue": 1453478458,
+            "expectedValue": 1453420800,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2017,
-            "expectedValue": 1485043200,
+            "expectedValue": 1485129600,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 23",
             "comment": "this test is significant since January 22nd falls on a Sunday, so the National Day of Prayer for the Unborn should have been moved to January 23rd"
         },
         {
             "year": 2018,
-            "expectedValue": 1516637681,
+            "expectedValue": 1516579200,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2019,
-            "expectedValue": 1548173681,
+            "expectedValue": 1548115200,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2020,
-            "expectedValue": 1579709681,
+            "expectedValue": 1579651200,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2021,
-            "expectedValue": 1611332081,
+            "expectedValue": 1611273600,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2022,
-            "expectedValue": 1642868081,
+            "expectedValue": 1642809600,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
@@ -108,61 +108,61 @@
         },
         {
             "year": 2024,
-            "expectedValue": 1705940081,
+            "expectedValue": 1705881600,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2025,
-            "expectedValue": 1737562481,
+            "expectedValue": 1737504000,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2026,
-            "expectedValue": 1769098481,
+            "expectedValue": 1769040000,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2027,
-            "expectedValue": 1800634481,
+            "expectedValue": 1800576000,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2028,
-            "expectedValue": 1832170481,
+            "expectedValue": 1832112000,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2029,
-            "expectedValue": 1863792881,
+            "expectedValue": 1863734400,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2030,
-            "expectedValue": 1895328881,
+            "expectedValue": 1895270400,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2031,
-            "expectedValue": 1926864881,
+            "expectedValue": 1926806400,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2032,
-            "expectedValue": 1958400881,
+            "expectedValue": 1958342400,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2033,
-            "expectedValue": 1990023281,
+            "expectedValue": 1989964800,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
@@ -175,19 +175,19 @@
         },
         {
             "year": 2035,
-            "expectedValue": 2053095281,
+            "expectedValue": 2053036800,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2036,
-            "expectedValue": 2084631281,
+            "expectedValue": 2084572800,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
         {
             "year": 2037,
-            "expectedValue": 2116253681,
+            "expectedValue": 2116195200,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 22"
         },
