@@ -350,8 +350,10 @@ class LitCalHealth implements MessageComponentInterface {
             if( $UnitTest->isReady() ) {
                 $testResult = $UnitTest->runTest();
             } else {
-                $testResult = $UnitTest->getError();
+                $testResult = $UnitTest->getMessage();
             }
+            $this->sendMessage( $to, $testResult );
+            /*
             if( gettype( $testResult ) === 'boolean' && $testResult === true ) {
                 $message = new stdClass();
                 $message->type = "success";
@@ -361,11 +363,8 @@ class LitCalHealth implements MessageComponentInterface {
                 $this->sendMessage( $to, $message );
             }
             else if( gettype( $testResult ) === 'object' ) {
-                $testResult->classes = ".$Test.year-{$Year}.test-valid";
-                $testResult->test = $Test;
-                $testResult->jsonData = $jsonData;
                 $this->sendMessage( $to, $testResult );
-            }
+            }*/
         }
     }
 

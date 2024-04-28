@@ -9,7 +9,7 @@ class LitCalTest
     private bool $readyState            = false;
     private ?object $testInstructions   = null;
     private ?object $dataToTest         = null;
-    private ?object $errorMessage       = null;
+    private ?object $Message            = null;
     private ?string $Test               = null;
 
     private static ?object $testCache   = null;
@@ -68,7 +68,7 @@ class LitCalTest
             $assertion = $this->retrieveAssertionForYear( $this->dataToTest->Settings->Year );
             if( is_null( $assertion ) ) {
                 $this->setError( "Out of bounds error: {$this->Test} only supports calendar years [ " . implode(', ', self::$testCache->{$this->Test}->yearsSupported ) . " ]" );
-                return $this->getError();
+                return $this->getMessage();
             }
 
             $calendarType = $this->getCalendarTypeStr();
@@ -84,41 +84,41 @@ class LitCalTest
 
                     $rule = ( false === property_exists( $this->dataToTest->LitCal, $eventKey ) );
                     try {
-                        $res = assert( $rule, $messageIfError . $errorMessage );
+                        if( true === assert( $rule, $messageIfError . $errorMessage ) ) {
+                            $this->setSuccess();
+                        }
                     } catch (AssertionError $e) {
                         $this->setError( $e->getMessage() );
-                        $res = $this->getError();
                     }
-                    return $res;
+                    return $this->getMessage();
                 case 'eventExists AND hasExpectedTimestamp':
                     $firstErrorMessage = " The event {$eventKey} should exist, instead it was not found";
                     $rule = property_exists( $this->dataToTest->LitCal, $eventKey );
                     try {
-                        $res = assert( $rule, $messageIfError . $firstErrorMessage );
+                        if( true === assert( $rule, $messageIfError . $firstErrorMessage ) ) {
+                            $actualValue = $this->dataToTest->LitCal->{$eventKey}->date;
+                            $secondErrorMessage = " The event {$eventKey} was expected to have timestamp {$assertion->expectedValue}, instead it had timestamp {$actualValue}";
+                            try {
+                                if( true === assert( $actualValue === $assertion->expectedValue, $messageIfError . $secondErrorMessage ) ) {
+                                    $this->setSuccess();
+                                }
+                            } catch (AssertionError $e) {
+                                $this->setError( $e->getMessage() );
+                            }
+                        }
                     } catch (AssertionError $e) {
                         $this->setError( $e->getMessage() );
-                        $res = $this->getError();
                     }
-                    if( true === $res ) {
-                        $actualValue = $this->dataToTest->LitCal->{$eventKey}->date;
-                        $secondErrorMessage = " The event {$eventKey} was expected to have timestamp {$assertion->expectedValue}, instead it had timestamp {$actualValue}";
-                        try {
-                            $res = assert( $actualValue === $assertion->expectedValue, $messageIfError . $secondErrorMessage );
-                        } catch (AssertionError $e) {
-                            $this->setError( $e->getMessage() );
-                            $res = $this->getError();
-                        }
-                    }
-                    return $res;
+                    return $this->getMessage();
                 default:
                     $this->setError( 'This should never happen. We can only test whether an event does not exist, OR (does exist AND has an expected timestamp)' );
-                    return $this->getError();
+                    return $this->getMessage();
             }
         } else {
-            if( is_null( $this->errorMessage ) ) {
+            if( is_null( $this->Message ) ) {
                 $this->setError( 'An unknown error occurred while trying to run the test' );
             }
-            return $this->getError();
+            return $this->getMessage();
         }
     }
 
@@ -134,14 +134,30 @@ class LitCalTest
         );
     }
 
-    private function setError( string $text ): void {
-        $this->errorMessage = new stdClass;
-        $this->errorMessage->type = "error";
-        $this->errorMessage->text = $text;
+    private function setMessage( string $type, ?string $text = null ): void {
+        $this->Message = new stdClass;
+        $this->Message->type = $type;
+        $this->Message->classes = ".$this->Test.year-{$this->dataToTest->Settings->Year}.test-valid";
+        $this->Message->test = $this->Test;
+        if( $type === 'success' && is_null( $text ) ) {
+            $this->Message->text = "$this->Test passed for the Calendar {$this->getCalendarName()} for the year {$this->dataToTest->Settings->Year}";
+
+        } else {
+            $this->Message->text = $text;
+            $this->Message->jsonData = $this->dataToTest;
+        }
     }
 
-    public function getError(): ?object {
-        return $this->errorMessage;
+    private function setError( string $text ): void {
+        $this->setMessage( 'error', $text );
+    }
+
+    private function setSuccess(): void {
+        $this->setMessage( 'success' );
+    }
+
+    public function getMessage(): ?object {
+        return $this->Message;
     }
 
     private function retrieveAssertionForYear( int $year ): ?object {
