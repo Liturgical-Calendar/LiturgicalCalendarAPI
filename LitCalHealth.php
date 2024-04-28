@@ -348,23 +348,9 @@ class LitCalHealth implements MessageComponentInterface {
         if( json_last_error() === JSON_ERROR_NONE ) {
             $UnitTest = new LitCalTest( $Test, $jsonData );
             if( $UnitTest->isReady() ) {
-                $testResult = $UnitTest->runTest();
-            } else {
-                $testResult = $UnitTest->getMessage();
+                $UnitTest->runTest();
             }
-            $this->sendMessage( $to, $testResult );
-            /*
-            if( gettype( $testResult ) === 'boolean' && $testResult === true ) {
-                $message = new stdClass();
-                $message->type = "success";
-                $message->text = "$Test passed for the Calendar $Calendar for the year $Year";
-                $message->classes = ".$Test.year-{$Year}.test-valid";
-                $message->test = $Test;
-                $this->sendMessage( $to, $message );
-            }
-            else if( gettype( $testResult ) === 'object' ) {
-                $this->sendMessage( $to, $testResult );
-            }*/
+            $this->sendMessage( $to, $UnitTest->getMessage() );
         }
     }
 
