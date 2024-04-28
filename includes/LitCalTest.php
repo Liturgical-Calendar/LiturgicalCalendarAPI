@@ -82,35 +82,26 @@ class LitCalTest
                         ? " The event {$eventKey} should not exist, instead the event has a timestamp of {$this->dataToTest->LitCal->{$eventKey}->date}"
                         : " What is going on here? We expected the event not to exist, and in fact it doesn't. We should never get here!";
 
-                    $rule = ( false === property_exists( $this->dataToTest->LitCal, $eventKey ) );
-                    try {
-                        if( true === assert( $rule, $messageIfError . $errorMessage ) ) {
-                            $this->setSuccess();
-                        }
-                    } catch (AssertionError $e) {
-                        $this->setError( $e->getMessage() );
+                    if( false === property_exists( $this->dataToTest->LitCal, $eventKey ) ) {
+                        $this->setSuccess();
+                    } else {
+                        $this->setError( $messageIfError . $errorMessage );
                     }
-                    break;;
+                break;;
                 case 'eventExists AND hasExpectedTimestamp':
                     $firstErrorMessage = " The event {$eventKey} should exist, instead it was not found";
-                    $rule = property_exists( $this->dataToTest->LitCal, $eventKey );
-                    try {
-                        if( true === assert( $rule, $messageIfError . $firstErrorMessage ) ) {
-                            $actualValue = $this->dataToTest->LitCal->{$eventKey}->date;
-                            $secondErrorMessage = " The event {$eventKey} was expected to have timestamp {$assertion->expectedValue}, instead it had timestamp {$actualValue}";
-                            $rule2 = ($actualValue === $assertion->expectedValue);
-                            try {
-                                if( true === assert( $rule2, $messageIfError . $secondErrorMessage ) ) {
-                                    $this->setSuccess( "expectedValue = {$assertion->expectedValue}, actualValue = {$actualValue}, rule result is of type " .gettype($rule2). " with a value of " . ($rule2 ? 'true' : 'false') );
-                                }
-                            } catch (AssertionError $e) {
-                                $this->setError( $e->getMessage() );
-                            }
+                    if( property_exists( $this->dataToTest->LitCal, $eventKey ) ) {
+                        $actualValue = $this->dataToTest->LitCal->{$eventKey}->date;
+                        $secondErrorMessage = " The event {$eventKey} was expected to have timestamp {$assertion->expectedValue}, instead it had timestamp {$actualValue}";
+                        if( $actualValue === $assertion->expectedValue ) {
+                            $this->setSuccess( "expectedValue = {$assertion->expectedValue}, actualValue = {$actualValue}, rule result is of type " .gettype($rule2). " with a value of " . ($rule2 ? 'true' : 'false') );
+                        } else {
+                            $this->setError( $messageIfError . $secondErrorMessage );
                         }
-                    } catch (AssertionError $e) {
-                        $this->setError( $e->getMessage() );
+                    } else {
+                        $this->setError( $messageIfError . $firstErrorMessage );
                     }
-                    break;
+                break;
                 default:
                     $this->setError( 'This should never happen. We can only test whether an event does not exist, OR (does exist AND has an expected timestamp)' );
                     break;
