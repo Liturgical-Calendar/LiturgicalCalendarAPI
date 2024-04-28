@@ -101,7 +101,7 @@ class LitCalTest
                             $rule2 = ($actualValue === $assertion->expectedValue);
                             try {
                                 if( true === assert( $rule2, $messageIfError . $secondErrorMessage ) ) {
-                                    $this->setSuccess();
+                                    $this->setSuccess( "expectedValue = {$assertion->expectedValue}, actualValue = {$actualValue}" );
                                 }
                             } catch (AssertionError $e) {
                                 $this->setError( $e->getMessage() );
@@ -135,8 +135,12 @@ class LitCalTest
         $this->Message->type = $type;
         $this->Message->classes = ".$this->Test.year-{$this->dataToTest->Settings->Year}.test-valid";
         $this->Message->test = $this->Test;
-        if( $type === 'success' && is_null( $text ) ) {
-            $this->Message->text = "$this->Test passed for the Calendar {$this->getCalendarName()} for the year {$this->dataToTest->Settings->Year}";
+        if( $type === 'success' ) {
+            if( is_null( $text ) ) {
+                $this->Message->text = "$this->Test passed for the Calendar {$this->getCalendarName()} for the year {$this->dataToTest->Settings->Year}";
+            } else {
+                $this->Message->text = "$this->Test passed for the Calendar {$this->getCalendarName()} for the year {$this->dataToTest->Settings->Year}: " . $text;
+            }
         } else {
             $this->Message->text = $text;
             $this->Message->jsonData = $this->dataToTest;
@@ -147,8 +151,8 @@ class LitCalTest
         $this->setMessage( 'error', $text );
     }
 
-    private function setSuccess(): void {
-        $this->setMessage( 'success' );
+    private function setSuccess( ?string $text = null ): void {
+        $this->setMessage( 'success', $text );
     }
 
     public function getMessage(): object {
