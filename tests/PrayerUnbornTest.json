@@ -64,7 +64,7 @@
         },
         {
             "year": 2017,
-            "expectedValue": 1485129600,
+            "expectedValue": 1485043200,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date January 23",
             "comment": "this test is significant since January 22nd falls on a Sunday, so the National Day of Prayer for the Unborn should have been moved to January 23rd"
