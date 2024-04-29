@@ -13,7 +13,7 @@ class APICore {
     private ?string $ResponseContentType        = null;
 
     private static array $onlyUsefulHeaders = [
-        "Accept", "Accept-Language", "X-Requested-With", "Host"
+        "Accept", "Accept-Language", "X-Requested-With", "Host", "Origin"
     ];
 
     public function __construct(){
