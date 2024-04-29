@@ -40,6 +40,7 @@ class LitCalRegionalData {
     private object $RESPONSE;
     //The General Index is currently only used for diocesan calendars
     private ?stdClass $GeneralIndex                 = null;
+    private array $AllowedRequestMethods = [ 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS' ];
 
     public APICore $APICore;
 
@@ -65,9 +66,14 @@ class LitCalRegionalData {
                 $this->handlePutPatchDeleteRequests( RequestMethod::DELETE );
                 break;
             case RequestMethod::OPTIONS:
-                //continue;
-                break;
-            default:
+                if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
+                    header("Access-Control-Allow-Methods: " . implode( ', ', $this->AllowedRequestMethods ));
+                }
+                if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
+                    header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+                }
+                continue;
+        default:
                 header( $_SERVER[ "SERVER_PROTOCOL" ]." 405 Method Not Allowed", true, 405 );
                 $errorMessage = '{"error":"You seem to be forming a strange kind of request? Allowed Request Methods are ';
                 $errorMessage .= implode( ' and ', $this->AllowedRequestMethods );
