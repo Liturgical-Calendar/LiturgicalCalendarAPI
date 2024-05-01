@@ -5,7 +5,7 @@
         "LitCalTest": {
             "oneOf": [
                 { "$ref": "#/definitions/ExactCorrespondenceType" },
-                { "$ref": "#/definitions/ExactCorrespondenceSinceType" }
+                { "$ref": "#/definitions/ExactCorrespondenceSinceUntilType" }
             ]
         },
         "AppliesToOrExcludes": {
@@ -73,7 +73,7 @@
             "required": [ "name", "eventkey", "description", "testType", "assertions" ],
             "additionalProperties": false
         },
-        "ExactCorrespondenceSinceType": {
+        "ExactCorrespondenceSinceUntilType": {
             "type": "object",
             "properties": {
                 "name" : {
@@ -89,9 +89,15 @@
                 },
                 "testType": {
                     "type": "string",
-                    "const": "exactCorrespondenceSince"
+                    "enum": [
+                        "exactCorrespondenceSince",
+                        "exactCorrespondenceUntil"
+                    ]
                 },
                 "yearSince": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
+                },
+                "yearUntil": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
                 },
                 "appliesTo": {
@@ -104,7 +110,10 @@
                     "$ref": "#/definitions/Assertions"
                 }
             },
-            "required": [ "name", "eventkey", "description", "testType", "assertions", "yearSince" ],
+            "oneOf": [
+                {"required": [ "name", "eventkey", "description", "testType", "assertions", "yearSince" ]},
+                {"required": [ "name", "eventkey", "description", "testType", "assertions", "yearUntil" ]}
+            ],
             "additionalProperties": false
         },
         "Assertions": {
