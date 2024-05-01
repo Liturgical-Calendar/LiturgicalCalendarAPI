@@ -87,14 +87,14 @@ class LitCalTest
                     } else {
                         $this->setError( $messageIfError . $errorMessage );
                     }
-                break;;
+                break;
                 case 'eventExists AND hasExpectedTimestamp':
                     $firstErrorMessage = " The event {$eventKey} should exist, instead it was not found";
                     if( property_exists( $this->dataToTest->LitCal, $eventKey ) ) {
                         $actualValue = $this->dataToTest->LitCal->{$eventKey}->date;
                         $secondErrorMessage = " The event {$eventKey} was expected to have timestamp {$assertion->expectedValue}, instead it had timestamp {$actualValue}";
                         if( $actualValue === $assertion->expectedValue ) {
-                            $this->setSuccess( "expectedValue = {$assertion->expectedValue}, actualValue = {$actualValue}, rule result is of type " .gettype($rule2). " with a value of " . ($rule2 ? 'true' : 'false') );
+                            $this->setSuccess( "expectedValue = {$assertion->expectedValue}, actualValue = {$actualValue}" );
                         } else {
                             $this->setError( $messageIfError . $secondErrorMessage );
                         }
