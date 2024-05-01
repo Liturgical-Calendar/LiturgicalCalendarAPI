@@ -1,8 +1,9 @@
 {
     "name": "MaryMotherChurchTest",
     "eventkey": "MaryMotherChurch",
-    "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Congregation for Divine Worship",
+    "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Congregation for Divine Worship on the Monday after Pentecost",
     "testType": "exactCorrespondenceSince",
+    "yearSince": 2018,
     "assertions": [
         {
             "year": 2015,

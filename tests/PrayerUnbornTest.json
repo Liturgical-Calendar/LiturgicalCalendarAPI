@@ -3,6 +3,7 @@
     "eventkey": "PrayerUnborn",
     "description": "USA: The National Day of Prayer for the Unborn is set to Jan 22 as per the 2011 Roman Missal issued by the USCCB, however if it coincides with a Sunday or a Solemnity, it should be moved to Jan 23",
     "testType": "exactCorrespondenceSince",
+    "yearSince": 2011,
     "appliesTo": {
         "nationalcalendar": "USA"
     },
