@@ -391,79 +391,132 @@
                 "schema": {
                   "$ref": "#/components/schemas/LitCalTestsIndex"
                 },
-                "example": {
-                  "MaryMotherChurchTest": {
-                    "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Congregation for Divine Worship",
+                "example": [
+                  {
+                    "name": "MaryMotherChurchTest",
+                    "eventkey": "MaryMotherChurch",
+                    "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Congregation for Divine Worship on the Monday after Pentecost",
                     "testType": "exactCorrespondenceSince",
-                    "years": [
-                      2018,
-                      2019
-                    ],
-                    "expectedValues": [
-                      1526860800,
-                      1560124800
-                    ],
-                    "assertions": {
-                      "2018": "The memorial 'Mary Mother of the Church' should be created on the expected date",
-                      "2019": "The memorial 'Mary Mother of the Church' should be created on the expected date"
-                    },
-                    "yearsOther": {
-                      "before": "The memorial 'Mary Mother of the Church' should not exist before the year 2018"
-                    }
+                    "yearSince": 2018,
+                    "assertions": [
+                      {
+                        "year": 2017,
+                        "expectedValue": null,
+                        "assert": "eventNotExists",
+                        "assertion": "The memorial 'Mary Mother of the Church' should not exist before the year 2018"
+                      },
+                      {
+                        "year": 2018,
+                        "expectedValue": 1526860800,
+                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "assertion": "The memorial 'Mary Mother of the Church' should be created on the expected date"
+                      },
+                      {
+                        "year": 2019,
+                        "expectedValue": 1560124800,
+                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "assertion": "The memorial 'Mary Mother of the Church' should be created on the expected date"
+                      }
+                    ]
                   },
-                  "NativityJohnBaptistTest": {
+                  {
+                    "name": "NativityJohnBaptistTest",
+                    "eventkey": "NativityJohnBaptist",
                     "description": "When the Nativity of John the Baptist coincides with the Solemnity of the Sacred Heart, is it correctly moved to June 23?",
                     "testType": "exactCorrespondence",
-                    "years": [
-                      2022,
-                      2033,
-                      2044
-                    ],
-                    "expectedValues": [
-                      1655942400,
-                      2003097600,
-                      2350252800
-                    ],
-                    "assertions": {
-                      "2022": "Nativity of John the Baptist should be moved to expected date",
-                      "2033": "Nativity of John the Baptist should be moved to expected date",
-                      "2044": "Nativity of John the Baptist should be moved to expected date"
-                    },
-                    "yearsOther": null
+                    "assertions": [
+                      {
+                        "year": 2022,
+                        "expectedValue": 1655942400,
+                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "assertion": "Nativity of John the Baptist should be moved to June 23"
+                      },
+                      {
+                        "year": 2033,
+                        "expectedValue": 2003097600,
+                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "assertion": "Nativity of John the Baptist should be moved to June 23"
+                      },
+                      {
+                        "year": 2044,
+                        "expectedValue": 2350252800,
+                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "assertion": "Nativity of John the Baptist should be moved to June 23"
+                      }
+                    ]
                   },
-                  "StJaneFrancesDeChantalTest": {
+                  {
+                    "name": "PrayerUnbornTest",
+                    "eventkey": "PrayerUnborn",
+                    "description": "USA: The National Day of Prayer for the Unborn is set to Jan 22 as per the 2011 Roman Missal issued by the USCCB, however if it coincides with a Sunday or a Solemnity, it should be moved to Jan 23",
+                    "testType": "exactCorrespondenceSince",
+                    "yearSince": 2011,
+                    "appliesTo": {
+                      "nationalcalendar": "USA"
+                    },
+                    "assertions": [
+                      {
+                        "year": 2010,
+                        "expectedValue": null,
+                        "assert": "eventNotExists",
+                        "assertion": "should not exist before 2011"
+                      },
+                      {
+                        "year": 2011,
+                        "expectedValue": 1295654400,
+                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "assertion": "should fall on expected date January 22"
+                      },
+                      {
+                        "year": 2012,
+                        "expectedValue": 1327276800,
+                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "assertion": "should fall on expected date January 23",
+                        "comment": "this test is significant since January 22nd falls on a Sunday, so the National Day of Prayer for the Unborn should have been moved to January 23rd"
+                      },
+                      {
+                        "year": 2045,
+                        "expectedValue": 2368742400,
+                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "assertion": "should fall on expected date January 23",
+                        "comment": "this test is significant since January 22nd falls on a Sunday, so the National Day of Prayer for the Unborn should have been moved to January 23rd"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "StJaneFrancesDeChantalTest",
+                    "eventkey": "StJaneFrancesDeChantal",
                     "description": "Saint Jane Frances de Chantal was moved from December 12 to August 12 in the 2002 Latin Edition of the Roman Missal, to allow bishops conferences to insert Our Lady of Guadalupe as an optional memorial on December 12. DOES ST JANE FRANCES DE CHANTAL FALL ON THE RIGHT DAY BOTH BEFORE AND AFTER 2002, OR IT CORRECTLY OVERRIDEN BY GREATER FESTIVITIES?",
                     "testType": "variableCorrespondence",
-                    "years": [
-                      2001,
-                      2002,
-                      2010
-                    ],
-                    "expectedValues": [
-                      1008115200,
-                      1029110400,
-                      1281571200
-                    ],
-                    "assertions": {
-                      "2001": "should fall on expected date",
-                      "2002": "should fall on expected date",
-                      "2010": "should fall on expected date"
-                    },
-                    "yearsOther": {
-                      "1971": "should not exist, December 12th is a Sunday",
-                      "1976": "should not exist, December 12th is a Sunday",
-                      "1982": "should not exist, December 12th is a Sunday",
-                      "1993": "should not exist, December 12th is a Sunday",
-                      "1999": "should not exist, December 12th is a Sunday",
-                      "2012": "should not exist, August 12th is a Sunday",
-                      "2018": "should not exist, August 12th is a Sunday",
-                      "2029": "should not exist, August 12th is a Sunday",
-                      "2035": "should not exist, August 12th is a Sunday",
-                      "2040": "should not exist, August 12th is a Sunday",
-                      "2046": "should not exist, August 12th is a Sunday"
-                    }
+                    "assertions": [
+                      {
+                        "year": 2001,
+                        "expectedValue": 1008115200,
+                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "assertion": "should fall on expected date December 12"
+                      },
+                      {
+                        "year": 2002,
+                        "expectedValue": 1029110400,
+                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "assertion": "should fall on expected date August 12"
+                      },
+                      {
+                        "year": 2010,
+                        "expectedValue": 1281571200,
+                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "assertion": "should fall on expected date August 12",
+                        "comment": "this test is significant since December 12th falls on a Sunday, so the memorial would have been suppressed if it hadn't been moved"
+                      },
+                      {
+                        "year": 1971,
+                        "expectedValue": null,
+                        "assert": "eventNotExists",
+                        "assertion": "should not exist, December 12th is a Sunday"
+                      }
+                    ]
                   }
-                }
+                ]
               }
             }
           }
