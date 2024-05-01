@@ -86,10 +86,7 @@ foreach( $DATA as $idx => $festivity ) {
     }
 }
 
-
-$responseObj = [ "LitCalAllFestivities" => $FestivityCollection ];
-
-$response = json_encode( $responseObj );
+$response = json_encode( $FestivityCollection );
 $responseHash = md5( $response );
 header("Etag: \"{$responseHash}\"");
 if (!empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
