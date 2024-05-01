@@ -1764,66 +1764,95 @@
         }
       },
       "LitCalTestsIndex": {
-        "type": "object",
-        "description": "the keys of this object identify the Unit Test, and follow the pattern `{TestName}Test`",
-        "additionalProperties": {
+        "type": "array",
+        "itmes": {
           "type": "object",
           "properties": {
+            "name": {
+              "type": "string",
+              "description": "identifies the Unit Test, and follow the pattern `{eventkey}Test`",
+              "pattern": "^[A-Z][a-zA-Z0-9]+Test$"
+            },
+            "eventkey": {
+              "type": "string",
+              "description": "the liturgical event we are testing, must be the exact key of a corresponding liturgical event in the LitCal API",
+              "pattern": "^[A-Z][a-zA-Z0-9]+$"
+            },
             "description": {
               "type": "string",
               "description": "describes what the test intends to accomplish"
             },
             "testType": {
               "type": "string",
-              "description": "* `exactCorrespondence`: the test or tests will only be performed against the years defined in the `years` array, and the only assertions for this test will be found in the `assertions` object with a one to one correspondence to the years defined in the `years` array; in this case the `yearsOther` key will have a `null` value\n* `exactCorrespondenceSince`: the test or tests will not only test against the years defined in the `years` array, but will also handle any year prior to the first year defined in the `years` array; in this case the `yearsOther` object will have a `before` key\n* `variableCorrespondence`: different tests with different assertions will be performed depending on the year that the test is being performed against. Definite expected date values for when the festivity should exist will be defined in the `years` array; any other years that might be tested with assertions of their own (usually for non existence of the festivity in a given year) might be defined in the `yearsOther` object",
+              "description": "* `exactCorrespondence`: the liturgical event should exist on an expected date for each of the years defined in the `years` array\n* `exactCorrespondenceSince`: the liturgical event should exist on an expected date starting from the year indicated in the `yearSince` key, before such year the liturgical event should not exist\n* `exactCorrespondenceUntil`: the liturgical event should exist on an expected date until the year indicated in the `yearUntil` key, after such year the liturgical event should not exist\n* `variableCorrespondence`: the liturgical event should not exist for certain years, and should exist on an expected date for other years",
               "enum": [
                 "exactCorrespondence",
                 "exactCorrespondenceSince",
+                "exactCorrespondenceUntil",
                 "variableCorrespondence"
               ]
             },
-            "years": {
-              "type": "array",
-              "items": {
-                "type": "integer",
-                "minimum": 1970,
-                "maximum": 9999
-              }
+            "yearSince": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1970,
+              "maximum": 9999
             },
-            "expectedValues": {
-              "type": "array",
-              "items": {
-                "type": "integer",
-                "format": "int64",
-                "minimum": -2851200,
-                "maximum": 253402300799
-              }
+            "yearUntil": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1970,
+              "maximum": 9999
             },
             "assertions": {
               "type": "object",
-              "additionalProperties": {
-                "type": "string",
-                "description": "text description of the assertion which if true will validate the test"
-              }
-            },
-            "yearsOther": {
-              "type": [
-                "null",
-                "object"
-              ],
-              "description": "value will be `null` in the case of an `exactCorrespondence` type test; otherwise an object",
               "properties": {
-                "before": {
+                "year": {
+                  "description": "the year we are testing against",
+                  "type": "integer",
+                  "format": "int32",
+                  "minimum": 1970,
+                  "maximum": 9999
+                },
+                "expectedValue": {
+                  "oneOf": [
+                    {
+                      "type": "integer",
+                      "format": "int64",
+                      "minimum": -2851200,
+                      "maximum": 253402300799
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "assert": {
                   "type": "string",
-                  "description": "assertion being made for any years prior to the first year defined in the `expectedValues` array; this key can only be present in the case of an `exactCorrespondenceSince` type test"
+                  "enum": [
+                    "eventNotExists",
+                    "eventExists AND hasExpectedTimestamp"
+                  ]
+                },
+                "assertion": {
+                  "type": "string",
+                  "description": "descriptive form of the `assert` statement"
+                },
+                "comment": {
+                  "type": "string",
+                  "description": "any extra information about the significance of the expected value for this year compared to other years"
                 }
               },
-              "additionalProperties": {
-                "type": "string",
-                "description": "assertions for any other years that fall outside of the `expectedValues` array; these keys will only be present in the case of a `variableCorrespondence` type test"
-              }
+              "required": [ "year", "expectedValue", "assert", "assertion" ],
+              "additionalProperties": false
             }
-          }
+          },
+          "oneOf": [
+            { "required": [ "name", "eventkey", "description", "testType", "assertions" ] },
+            { "required": [ "name", "eventkey", "description", "testType", "yearSince", "assertions" ] },
+            { "required": [ "name", "eventkey", "description", "testType", "yearUntil", "assertions" ] }
+          ],
+          "additionalProperties": false
         }
       }
     }
