@@ -2902,6 +2902,14 @@ class LitCalAPI {
                 // in the response we return the pretty printed version
                 $response = $dom->saveXML();
                 break;
+            case ReturnType::YML:
+                // first convert the Object to an Array
+                $jsonStr = json_encode( $SerializeableLitCal );
+                $jsonObj = json_decode( $jsonStr, true );
+
+                // then create a YAML representation from the Array
+                $response = yaml_emit( $jsonObj, YAML_UTF8_ENCODING );
+                break;
             case ReturnType::ICS:
                 $infoObj = $this->getGithubReleaseInfo();
                 if( $infoObj->status === "success" ) {
