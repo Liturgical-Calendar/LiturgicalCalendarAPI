@@ -523,7 +523,7 @@
         }
       }
     },
-    "./LitCalAllFestivities.php": {
+    "/LitCalAllFestivities.php": {
       "get": {
         "tags": [
           "All possible liturgical events endpoint"
