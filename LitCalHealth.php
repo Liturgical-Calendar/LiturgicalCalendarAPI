@@ -299,6 +299,37 @@ class LitCalHealth implements MessageComponentInterface {
                         $this->sendMessage( $to, $message );
                     }
                     break;
+                case "YAML":
+                    try {
+                        $yamlData = yaml_parse( $data );
+                        if( $yamlData ) {
+                            $message = new stdClass();
+                            $message->type = "success";
+                            $message->text = "The $category of $Calendar for the year $Year was successfully decoded as YAML";
+                            $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                            $this->sendMessage( $to, $message );
+
+                            $validationResult = $this->validateDataAgainstSchema( $yamlData, LitSchema::LITCAL );
+                            if( gettype( $validationResult ) === 'boolean' && $validationResult === true ) {
+                                $message = new stdClass();
+                                $message->type = "success";
+                                $message->text = "The $category of $Calendar for the year $Year was successfully validated against the Schema " . LitSchema::LITCAL;
+                                $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
+                                $this->sendMessage( $to, $message );
+                            }
+                            else if( gettype( $validationResult === 'object' ) ) {
+                                $validationResult->classes = ".calendar-$Calendar.schema-valid.year-$Year";
+                                $this->sendMessage( $to, $validationResult );
+                            }
+                        }
+                    } catch (Exception $ex) {
+                        $message = new stdClass();
+                        $message->type = "error";
+                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as YAML: " . $ex->getMessage();
+                        $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $this->sendMessage( $to, $message );
+                    }
+                    break;
                 case "JSON":
                 default:
                     $jsonData = json_decode( $data );
