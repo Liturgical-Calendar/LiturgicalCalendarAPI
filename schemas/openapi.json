@@ -528,7 +528,7 @@
         "tags": [
           "All possible liturgical events endpoint"
         ],
-        "summary": "retrieves all possible liturgical events that are calculated to produce the Liturgical Calendar; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
+        "summary": "retrieves all possible liturgical events that may or may not appear in the Liturgical Calendar for any given year, based on the calculations done by the LitCal API; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
         "operationId": "retrieveAllEventsGET",
         "responses": {
           "200": {
@@ -1776,93 +1776,110 @@
       "LitCalTestsIndex": {
         "type": "array",
         "items": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string",
-              "description": "identifies the Unit Test, and follow the pattern `{eventkey}Test`",
-              "pattern": "^[A-Z][a-zA-Z0-9]+Test$"
-            },
-            "eventkey": {
-              "type": "string",
-              "description": "the liturgical event we are testing, must be the exact key of a corresponding liturgical event in the LitCal API",
-              "pattern": "^[A-Z][a-zA-Z0-9]+$"
-            },
-            "description": {
-              "type": "string",
-              "description": "describes what the test intends to accomplish"
-            },
-            "testType": {
-              "type": "string",
-              "description": "* `exactCorrespondence`: the liturgical event should exist on an expected date for each of the years defined in the `years` array\n* `exactCorrespondenceSince`: the liturgical event should exist on an expected date starting from the year indicated in the `yearSince` key, before such year the liturgical event should not exist\n* `exactCorrespondenceUntil`: the liturgical event should exist on an expected date until the year indicated in the `yearUntil` key, after such year the liturgical event should not exist\n* `variableCorrespondence`: the liturgical event should not exist for certain years, and should exist on an expected date for other years",
-              "enum": [
-                "exactCorrespondence",
-                "exactCorrespondenceSince",
-                "exactCorrespondenceUntil",
-                "variableCorrespondence"
-              ]
-            },
-            "yearSince": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 1970,
-              "maximum": 9999
-            },
-            "yearUntil": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 1970,
-              "maximum": 9999
-            },
-            "assertions": {
+          "oneOf": [
+            {
               "type": "object",
               "properties": {
-                "year": {
-                  "description": "the year we are testing against",
+                "name": {
+                  "type": "string",
+                  "description": "identifies the Unit Test, and follows the pattern `{eventkey}Test`",
+                  "pattern": "^[A-Z][a-zA-Z0-9]+Test$"
+                },
+                "eventkey": {
+                  "type": "string",
+                  "description": "the liturgical event we are testing, must be the exact key of a corresponding liturgical event in the LitCal API",
+                  "pattern": "^[A-Z][a-zA-Z0-9]+$"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "describes what the test intends to accomplish"
+                },
+                "testType": {
+                  "type": "string",
+                  "description": "* `exactCorrespondence`: the liturgical event should exist on an expected date for each of the years defined in the `years` array\n* `variableCorrespondence`: the liturgical event should not exist for certain years, and should exist on an expected date for other years",
+                  "enum": [
+                    "exactCorrespondence",
+                    "variableCorrespondence"
+                  ]
+                },
+                "assertions": {
+                  "$ref": "#/components/schemas/Assertions"
+                }
+              },
+              "required": [ "name", "eventkey", "description", "testType", "assertions" ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "identifies the Unit Test, and follows the pattern `{eventkey}Test`",
+                  "pattern": "^[A-Z][a-zA-Z0-9]+Test$"
+                },
+                "eventkey": {
+                  "type": "string",
+                  "description": "the liturgical event we are testing, must be the exact key of a corresponding liturgical event in the LitCal API",
+                  "pattern": "^[A-Z][a-zA-Z0-9]+$"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "describes what the test intends to accomplish"
+                },
+                "testType": {
+                  "type": "string",
+                  "description": "the liturgical event should exist on an expected date starting from the year indicated in the `yearSince` key, before such year the liturgical event should not exist",
+                  "const": "exactCorrespondenceSince"
+                },
+                "yearSince": {
                   "type": "integer",
                   "format": "int32",
                   "minimum": 1970,
                   "maximum": 9999
                 },
-                "expectedValue": {
-                  "oneOf": [
-                    {
-                      "type": "integer",
-                      "format": "int64",
-                      "minimum": -2851200,
-                      "maximum": 253402300799
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "assert": {
-                  "type": "string",
-                  "enum": [
-                    "eventNotExists",
-                    "eventExists AND hasExpectedTimestamp"
-                  ]
-                },
-                "assertion": {
-                  "type": "string",
-                  "description": "descriptive form of the `assert` statement"
-                },
-                "comment": {
-                  "type": "string",
-                  "description": "any extra information about the significance of the expected value for this year compared to other years"
+                "assertions": {
+                  "$ref": "#/components/schemas/Assertions"
                 }
               },
-              "required": [ "year", "expectedValue", "assert", "assertion" ],
+              "required": [ "name", "eventkey", "description", "testType", "assertions", "yearSince" ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "identifies the Unit Test, and follows the pattern `{eventkey}Test`",
+                  "pattern": "^[A-Z][a-zA-Z0-9]+Test$"
+                },
+                "eventkey": {
+                  "type": "string",
+                  "description": "the liturgical event we are testing, must be the exact key of a corresponding liturgical event in the LitCal API",
+                  "pattern": "^[A-Z][a-zA-Z0-9]+$"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "describes what the test intends to accomplish"
+                },
+                "testType": {
+                  "type": "string",
+                  "description": "the liturgical event should exist on an expected date until the year indicated in the `yearUntil` key, after such year the liturgical event should not exist",
+                  "const": "exactCorrespondenceUntil"
+                },
+                "yearUntil": {
+                  "type": "integer",
+                  "format": "int32",
+                  "minimum": 1970,
+                  "maximum": 9999
+                },
+                "assertions": {
+                  "$ref": "#/components/schemas/Assertions"
+                }
+              },
+              "required": [ "name", "eventkey", "description", "testType", "assertions", "yearUntil" ],
               "additionalProperties": false
             }
-          },
-          "oneOf": [
-            { "required": [ "name", "eventkey", "description", "testType", "assertions" ] },
-            { "required": [ "name", "eventkey", "description", "testType", "yearSince", "assertions" ] },
-            { "required": [ "name", "eventkey", "description", "testType", "yearUntil", "assertions" ] }
-          ],
-          "additionalProperties": false
+          ]
         }
       },
       "LitCalAllFestivitiesResponse": {
@@ -1995,6 +2012,48 @@
             }
           }
         },
+        "additionalProperties": false
+      },
+      "Assertions": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "description": "the year we are testing against",
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1970,
+            "maximum": 9999
+          },
+          "expectedValue": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "format": "int64",
+                "minimum": -2851200,
+                "maximum": 253402300799
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "assert": {
+            "type": "string",
+            "enum": [
+              "eventNotExists",
+              "eventExists AND hasExpectedTimestamp"
+            ]
+          },
+          "assertion": {
+            "type": "string",
+            "description": "descriptive form of the `assert` statement"
+          },
+          "comment": {
+            "type": "string",
+            "description": "any extra information about the significance of the expected value for this year compared to other years"
+          }
+        },
+        "required": [ "year", "expectedValue", "assert", "assertion" ],
         "additionalProperties": false
       }
     }
