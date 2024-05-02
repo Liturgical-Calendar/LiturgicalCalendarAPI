@@ -1775,7 +1775,7 @@
       },
       "LitCalTestsIndex": {
         "type": "array",
-        "itmes": {
+        "items": {
           "type": "object",
           "properties": {
             "name": {
