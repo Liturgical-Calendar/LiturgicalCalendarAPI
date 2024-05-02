@@ -5,6 +5,7 @@ class AcceptHeader {
     const JSON      = "application/json";
     const XML       = "application/xml";
     const PDF       = "application/pdf";
+    const YML       = "application/yaml";
     const HTML      = "text/html";
     const ICS       = "text/calendar";
     const TEXT      = "text/plain";
@@ -30,6 +31,7 @@ class AcceptHeader {
         "application/octet-stream",
         "application/json",
         "application/xml",
+        "application/yml",
         "application/pdf",
         "text/html",
         "text/calendar",
