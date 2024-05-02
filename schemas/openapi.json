@@ -206,6 +206,11 @@
                   "$ref": "#/components/schemas/LitCal"
                 }
               },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/LitCal"
+                }
+              },
               "text/calendar": {
                 "schema": {
                   "type": "string"
@@ -299,6 +304,11 @@
             },
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LitCal"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/LitCal"
                 }
@@ -857,100 +867,19 @@
                 "type": "object",
                 "description": "echoes back the request headers that were received by the endpoint, for debugging purposes",
                 "properties": {
-                  "Cookie": {
-                    "type": "string",
-                    "examples": [
-                      "currentLocale=it-IT;"
-                    ]
-                  },
                   "Accept-Language": {
                     "type": "string",
                     "examples": [
                       "it-IT,it;"
                     ]
                   },
-                  "Accept-Encoding": {
-                    "type": "string",
-                    "examples": [
-                      "gzip, deflate, br, zstd"
-                    ]
-                  },
-                  "Referer": {
-                    "type": "string",
-                    "examples": [
-                      "https://litcal-staging.johnromanodorazio.com/"
-                    ]
-                  },
-                  "Sec-Fetch-Dest": {
-                    "type": "string",
-                    "examples": [
-                      "document"
-                    ]
-                  },
-                  "Sec-Fetch-User": {
-                    "type": "string",
-                    "examples": [
-                      "?1"
-                    ]
-                  },
-                  "Sec-Fetch-Mode": {
-                    "type": "string",
-                    "examples": [
-                      "navigate"
-                    ]
-                  },
-                  "Sec-Fetch-Site": {
-                    "type": "string",
-                    "examples": [
-                      "same-site"
-                    ]
-                  },
                   "Accept": {
                     "type": "string",
                     "examples": [
-                      "application/json"
-                    ]
-                  },
-                  "User-Agent": {
-                    "type": "string",
-                    "examples": [
-                      "Mozilla/5.0"
-                    ]
-                  },
-                  "Upgrade-Insecure-Requests": {
-                    "type": "string",
-                    "examples": [
-                      "1"
-                    ]
-                  },
-                  "Sec-Ch-Ua-Platform": {
-                    "type": "string",
-                    "examples": [
-                      "\"Windows\""
-                    ]
-                  },
-                  "Sec-Ch-Ua-Mobile": {
-                    "type": "string",
-                    "examples": [
-                      "?0"
-                    ]
-                  },
-                  "Sec-Ch-Ua": {
-                    "type": "string",
-                    "examples": [
-                      "\"Google Chrome\";"
-                    ]
-                  },
-                  "Connection": {
-                    "type": "string",
-                    "examples": [
-                      "close"
-                    ]
-                  },
-                  "X-Accel-Internal": {
-                    "type": "string",
-                    "examples": [
-                      "/internal-nginx-static-location"
+                      "application/json",
+                      "application/yaml",
+                      "application/xml",
+                      "text/calendar"
                     ]
                   },
                   "Host": {
@@ -1412,100 +1341,19 @@
                 "type": "object",
                 "description": "echoes back the request headers that were received by the endpoint, for debugging purposes",
                 "properties": {
-                  "Cookie": {
-                    "type": "string",
-                    "examples": [
-                      "currentLocale=it-IT;"
-                    ]
-                  },
                   "Accept-Language": {
                     "type": "string",
                     "examples": [
                       "it-IT,it;"
                     ]
                   },
-                  "Accept-Encoding": {
-                    "type": "string",
-                    "examples": [
-                      "gzip, deflate, br, zstd"
-                    ]
-                  },
-                  "Referer": {
-                    "type": "string",
-                    "examples": [
-                      "https://litcal-staging.johnromanodorazio.com/"
-                    ]
-                  },
-                  "Sec-Fetch-Dest": {
-                    "type": "string",
-                    "examples": [
-                      "document"
-                    ]
-                  },
-                  "Sec-Fetch-User": {
-                    "type": "string",
-                    "examples": [
-                      "?1"
-                    ]
-                  },
-                  "Sec-Fetch-Mode": {
-                    "type": "string",
-                    "examples": [
-                      "navigate"
-                    ]
-                  },
-                  "Sec-Fetch-Site": {
-                    "type": "string",
-                    "examples": [
-                      "same-site"
-                    ]
-                  },
                   "Accept": {
                     "type": "string",
                     "examples": [
-                      "application/json"
-                    ]
-                  },
-                  "User-Agent": {
-                    "type": "string",
-                    "examples": [
-                      "Mozilla/5.0"
-                    ]
-                  },
-                  "Upgrade-Insecure-Requests": {
-                    "type": "string",
-                    "examples": [
-                      "1"
-                    ]
-                  },
-                  "Sec-Ch-Ua-Platform": {
-                    "type": "string",
-                    "examples": [
-                      "\"Windows\""
-                    ]
-                  },
-                  "Sec-Ch-Ua-Mobile": {
-                    "type": "string",
-                    "examples": [
-                      "?0"
-                    ]
-                  },
-                  "Sec-Ch-Ua": {
-                    "type": "string",
-                    "examples": [
-                      "\"Google Chrome\";"
-                    ]
-                  },
-                  "Connection": {
-                    "type": "string",
-                    "examples": [
-                      "close"
-                    ]
-                  },
-                  "X-Accel-Internal": {
-                    "type": "string",
-                    "examples": [
-                      "/internal-nginx-static-location"
+                      "application/json",
+                      "application/yml",
+                      "application/xml",
+                      "text/calendar"
                     ]
                   },
                   "Host": {
