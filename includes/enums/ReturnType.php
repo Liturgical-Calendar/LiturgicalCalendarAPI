@@ -13,6 +13,7 @@ class ReturnType {
     const ATTACHMENT    = "ATTACHMENT";
     const JSON          = "JSON";
     const XML           = "XML";
+    const YML           = "YML";
     const PDF           = "PDF";
     const HTML          = "HTML";
     const ICS           = "ICS";
@@ -39,6 +40,7 @@ class ReturnType {
         "ATTACHMENT",
         "JSON",
         "XML",
+        "YML",
         "PDF",
         "HTML",
         "ICS",
