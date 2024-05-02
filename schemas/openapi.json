@@ -1554,7 +1554,8 @@
             "properties": {
               "VATICAN": {
                 "type": "array",
-                "description": "empty array because there are no associated dioceses"
+                "description": "empty array because there are no associated dioceses",
+                "maxItems": 0
               }
             },
             "patternProperties": {
