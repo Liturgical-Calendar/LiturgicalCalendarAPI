@@ -1561,7 +1561,7 @@
             "patternProperties": {
               "^[A-Z]{3,45}$": {
                 "type": "array",
-                "description": "English name of a nation with a corresponding liturgical calendar; value is an array of the related supported diocesan calendars",
+                "description": "English uppercase name of a nation with a corresponding liturgical calendar; value is an array of the related supported diocesan calendars",
                 "items": {
                   "type": "string"
                 }
@@ -1619,10 +1619,16 @@
                       },
                       "Locale": {
                         "type": "string"
+                      },
+                      "EternalHighPriest": {
+                        "type": "boolean"
                       }
-                    }
+                    },
+                    "additionalProperties": false,
+                    "required": [ "Epiphany", "Ascension", "CorpusChristi", "Locale" ]
                   }
-                }
+                },
+                "additionalProperties": false
               }
             }
           },
