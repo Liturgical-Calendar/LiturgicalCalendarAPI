@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 include_once( 'includes/enums/LitLocale.php' );
 include_once( 'includes/enums/RomanMissal.php' );
@@ -17,7 +20,7 @@ header( 'Content-Type: application/json' );
 
 $FestivityCollection = [];
 
-$LatinMissals = array_filter( RomanMissal::$values, function($item){
+$LatinMissals = array_filter( RomanMissal::$values, function($item) {
     return str_starts_with( $item, "VATICAN_" );
 });
 
