@@ -412,7 +412,7 @@ class LitCalAPI {
      * Retrieve Higher Ranking Solemnities from Proprium de Tempore
      */
     private function loadPropriumDeTemporeData() : void {
-        $locale = strtolower( explode('_', $this->LitSettings->Locale)[0] );
+        $locale = Locale::getPrimaryLanguage( $this->LitSettings->Locale );
         $propriumdetemporeFile = "data/propriumdetempore/{$locale}.json";
         if( file_exists( $propriumdetemporeFile ) ) {
             $PropriumDeTempore = json_decode( file_get_contents( $propriumdetemporeFile ), true );
