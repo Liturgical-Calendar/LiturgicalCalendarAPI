@@ -185,7 +185,14 @@ if( $DiocesanCalendar !== null && $DiocesanData !== null ) {
 }
 
 
-$responseObj = [ "LitCalAllFestivities" => $FestivityCollection ];
+$responseObj = [
+    "LitCalAllFestivities" => $FestivityCollection,
+    "Settings" => [
+        "Locale" => $LOCALE,
+        "NationalCalendar" => $NationalCalendar,
+        "DiocesanCalendar" => $DiocesanCalendar
+    ]
+];
 
 $response = json_encode( $responseObj );
 $responseHash = md5( $response );
