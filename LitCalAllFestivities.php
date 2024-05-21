@@ -35,7 +35,6 @@ foreach( $directories as $directory ) {
 $GeneralIndex = file_exists( "nations/index.json" ) ? json_decode( file_get_contents( "nations/index.json" ) ) : null;
 
 $Locale = isset( $_GET["locale"] ) && LitLocale::isValid( $_GET["locale"] ) ? $_GET["locale"] : "la";
-$Locale = $Locale !== "LA" && $Locale !== "la" ? Locale::getPrimaryLanguage( $Locale ) : "la";
 
 $NationalCalendar = isset( $_GET["nationalcalendar"] ) && in_array( strtoupper( $_GET["nationalcalendar"] ), $SUPPORTED_NATIONAL_CALENDARS ) ? strtoupper( $_GET["nationalcalendar"] ) : null;
 $DiocesanCalendar = isset( $_GET["diocesancalendar"] ) ? strtoupper( $_GET["diocesancalendar"] ) : null;
@@ -80,12 +79,14 @@ if( $NationalCalendar !== null ) {
     }
 }
 
+$Locale = $Locale !== "LA" && $Locale !== "la" ? Locale::getPrimaryLanguage( $Locale ) : "la";
+
 foreach( $LatinMissals as $LatinMissal ) {
     $DataFile = RomanMissal::getSanctoraleFileName( $LatinMissal );
     if( $DataFile !== false ) {
         $I18nPath = RomanMissal::getSanctoraleI18nFilePath( $LatinMissal );
-        if( $I18nPath !== false && file_exists( $I18nPath . "/" . $Locale . ".json" ) ) {
-            $NAME = json_decode( file_get_contents( $I18nPath . "/" . $Locale . ".json" ), true );
+        if( $I18nPath !== false && file_exists( $I18nPath . "/" . $lcl . ".json" ) ) {
+            $NAME = json_decode( file_get_contents( $I18nPath . "/" . $lcl . ".json" ), true );
             $DATA = json_decode( file_get_contents( $DataFile ), true );
             foreach( $DATA as $idx => $festivity ) {
                 $key = $festivity[ "TAG" ];
@@ -98,7 +99,6 @@ foreach( $LatinMissals as $LatinMissal ) {
 }
 
 $DataFile = 'data/propriumdetempore.json';
-$lcl = strtolower( explode('_', $Locale )[0] );
 $I18nFile = 'data/propriumdetempore/' . $lcl . ".json";
 $DATA = json_decode( file_get_contents( $DataFile ), true );
 $NAME = json_decode( file_get_contents( $I18nFile ), true );
@@ -111,7 +111,7 @@ foreach( $DATA as $key => $readings ) {
 }
 
 $DataFile = 'data/memorialsFromDecrees/memorialsFromDecrees.json';
-$I18nFile = 'data/memorialsFromDecrees/i18n/' . $Locale . ".json";
+$I18nFile = 'data/memorialsFromDecrees/i18n/' . $lcl . ".json";
 $DATA = json_decode( file_get_contents( $DataFile ), true );
 $NAME = json_decode( file_get_contents( $I18nFile ), true );
 foreach( $DATA as $idx => $festivity ) {
@@ -121,8 +121,8 @@ foreach( $DATA as $idx => $festivity ) {
         $FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
         if( array_key_exists( "decreeLangs", $festivity[ "Metadata" ] ) ) {
             $decreeURL = sprintf( $festivity[ "Metadata" ][ "decreeURL" ], 'LA' );
-            if( array_key_exists(strtoupper($Locale), $festivity[ "Metadata" ][ "decreeLangs" ]) ) {
-                $decreeLang = $festivity[ "Metadata" ][ "decreeLangs" ][ strtoupper( $Locale ) ];
+            if( array_key_exists(strtoupper($lcl), $festivity[ "Metadata" ][ "decreeLangs" ]) ) {
+                $decreeLang = $festivity[ "Metadata" ][ "decreeLangs" ][ strtoupper( $lcl ) ];
                 $decreeURL = sprintf( $festivity[ "Metadata" ][ "decreeURL" ], $decreeLang );
             }
         } else {
