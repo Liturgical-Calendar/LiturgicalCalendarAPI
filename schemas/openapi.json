@@ -1986,6 +1986,63 @@
                 "required": [ "MONTH", "DAY", "TAG", "GRADE", "COMMON", "CALENDAR", "COLOR", "READINGS", "NAME" ]
               }
             }
+          },
+          "Settings": {
+            "type": "object",
+            "additionalProperties": false,
+            "oneOf": [
+              {
+                "properties": {
+                  "Locale": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z]$",
+                    "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
+                  },
+                  "NationalCalendar": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3,45}$",
+                    "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
+                  },
+                  "DiocesanCalendar": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3,45}$",
+                    "description": "indicates the Diocesan Calendar used to produce the data in LitCalAllFestivities"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "Locale": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z]$",
+                    "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
+                  },
+                  "NationalCalendar": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3,45}$",
+                    "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
+                  },
+                  "DiocesanCalendar": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "Locale": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z]$",
+                    "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
+                  },
+                  "NationalCalendar": {
+                    "type": "null"
+                  },
+                  "DiocesanCalendar": {
+                    "type": "null"
+                  }
+                }
+              }
+            ]
           }
         },
         "additionalProperties": false
