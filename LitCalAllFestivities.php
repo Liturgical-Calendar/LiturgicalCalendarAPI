@@ -85,8 +85,8 @@ foreach( $LatinMissals as $LatinMissal ) {
     $DataFile = RomanMissal::getSanctoraleFileName( $LatinMissal );
     if( $DataFile !== false ) {
         $I18nPath = RomanMissal::getSanctoraleI18nFilePath( $LatinMissal );
-        if( $I18nPath !== false && file_exists( $I18nPath . "/" . $lcl . ".json" ) ) {
-            $NAME = json_decode( file_get_contents( $I18nPath . "/" . $lcl . ".json" ), true );
+        if( $I18nPath !== false && file_exists( $I18nPath . "/" . $Locale . ".json" ) ) {
+            $NAME = json_decode( file_get_contents( $I18nPath . "/" . $Locale . ".json" ), true );
             $DATA = json_decode( file_get_contents( $DataFile ), true );
             foreach( $DATA as $idx => $festivity ) {
                 $key = $festivity[ "TAG" ];
@@ -99,7 +99,7 @@ foreach( $LatinMissals as $LatinMissal ) {
 }
 
 $DataFile = 'data/propriumdetempore.json';
-$I18nFile = 'data/propriumdetempore/' . $lcl . ".json";
+$I18nFile = 'data/propriumdetempore/' . $Locale . ".json";
 $DATA = json_decode( file_get_contents( $DataFile ), true );
 $NAME = json_decode( file_get_contents( $I18nFile ), true );
 foreach( $DATA as $key => $readings ) {
@@ -111,7 +111,7 @@ foreach( $DATA as $key => $readings ) {
 }
 
 $DataFile = 'data/memorialsFromDecrees/memorialsFromDecrees.json';
-$I18nFile = 'data/memorialsFromDecrees/i18n/' . $lcl . ".json";
+$I18nFile = 'data/memorialsFromDecrees/i18n/' . $Locale . ".json";
 $DATA = json_decode( file_get_contents( $DataFile ), true );
 $NAME = json_decode( file_get_contents( $I18nFile ), true );
 foreach( $DATA as $idx => $festivity ) {
@@ -121,8 +121,8 @@ foreach( $DATA as $idx => $festivity ) {
         $FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
         if( array_key_exists( "decreeLangs", $festivity[ "Metadata" ] ) ) {
             $decreeURL = sprintf( $festivity[ "Metadata" ][ "decreeURL" ], 'LA' );
-            if( array_key_exists(strtoupper($lcl), $festivity[ "Metadata" ][ "decreeLangs" ]) ) {
-                $decreeLang = $festivity[ "Metadata" ][ "decreeLangs" ][ strtoupper( $lcl ) ];
+            if( array_key_exists(strtoupper($Locale), $festivity[ "Metadata" ][ "decreeLangs" ]) ) {
+                $decreeLang = $festivity[ "Metadata" ][ "decreeLangs" ][ strtoupper( $Locale ) ];
                 $decreeURL = sprintf( $festivity[ "Metadata" ][ "decreeURL" ], $decreeLang );
             }
         } else {
