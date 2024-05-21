@@ -34,8 +34,8 @@ foreach( $directories as $directory ) {
 
 $GeneralIndex = file_exists( "nations/index.json" ) ? json_decode( file_get_contents( "nations/index.json" ) ) : null;
 
-$LOCALE = isset( $_GET["locale"] ) && LitLocale::isValid( $_GET["locale"] ) ? $_GET["locale"] : "la";
-$LOCALE = $LOCALE !== "LA" && $LOCALE !== "la" ? Locale::getPrimaryLanguage( $LOCALE ) : "la";
+$Locale = isset( $_GET["locale"] ) && LitLocale::isValid( $_GET["locale"] ) ? $_GET["locale"] : "la";
+$Locale = $Locale !== "LA" && $Locale !== "la" ? Locale::getPrimaryLanguage( $Locale ) : "la";
 
 $NationalCalendar = isset( $_GET["nationalcalendar"] ) && in_array( strtoupper( $_GET["nationalcalendar"] ), $SUPPORTED_NATIONAL_CALENDARS ) ? strtoupper( $_GET["nationalcalendar"] ) : null;
 $DiocesanCalendar = isset( $_GET["diocesancalendar"] ) ? strtoupper( $_GET["diocesancalendar"] ) : null;
@@ -58,7 +58,7 @@ if( $NationalCalendar !== null ) {
         $NationalData = json_decode( file_get_contents( $nationalDataFile ) );
         if( json_last_error() === JSON_ERROR_NONE ) {
             if( property_exists( $NationalData, "Settings" ) && property_exists( $NationalData->Settings, "Locale" ) ) {
-                $LOCALE = $NationalData->Settings->Locale;
+                $Locale = $NationalData->Settings->Locale;
             }
             if( property_exists( $NationalData, "Metadata" ) && property_exists( $NationalData->Metadata, "WiderRegion" ) ) {
                 $widerRegionDataFile = $NationalData->Metadata->WiderRegion->jsonFile;
@@ -84,8 +84,8 @@ foreach( $LatinMissals as $LatinMissal ) {
     $DataFile = RomanMissal::getSanctoraleFileName( $LatinMissal );
     if( $DataFile !== false ) {
         $I18nPath = RomanMissal::getSanctoraleI18nFilePath( $LatinMissal );
-        if( $I18nPath !== false && file_exists( $I18nPath . "/" . $LOCALE . ".json" ) ) {
-            $NAME = json_decode( file_get_contents( $I18nPath . "/" . $LOCALE . ".json" ), true );
+        if( $I18nPath !== false && file_exists( $I18nPath . "/" . $Locale . ".json" ) ) {
+            $NAME = json_decode( file_get_contents( $I18nPath . "/" . $Locale . ".json" ), true );
             $DATA = json_decode( file_get_contents( $DataFile ), true );
             foreach( $DATA as $idx => $festivity ) {
                 $key = $festivity[ "TAG" ];
@@ -98,7 +98,8 @@ foreach( $LatinMissals as $LatinMissal ) {
 }
 
 $DataFile = 'data/propriumdetempore.json';
-$I18nFile = 'data/propriumdetempore/' . $LOCALE . ".json";
+$lcl = strtolower( explode('_', $Locale )[0] );
+$I18nFile = 'data/propriumdetempore/' . $lcl . ".json";
 $DATA = json_decode( file_get_contents( $DataFile ), true );
 $NAME = json_decode( file_get_contents( $I18nFile ), true );
 foreach( $DATA as $key => $readings ) {
@@ -110,7 +111,7 @@ foreach( $DATA as $key => $readings ) {
 }
 
 $DataFile = 'data/memorialsFromDecrees/memorialsFromDecrees.json';
-$I18nFile = 'data/memorialsFromDecrees/i18n/' . $LOCALE . ".json";
+$I18nFile = 'data/memorialsFromDecrees/i18n/' . $Locale . ".json";
 $DATA = json_decode( file_get_contents( $DataFile ), true );
 $NAME = json_decode( file_get_contents( $I18nFile ), true );
 foreach( $DATA as $idx => $festivity ) {
@@ -120,8 +121,8 @@ foreach( $DATA as $idx => $festivity ) {
         $FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
         if( array_key_exists( "decreeLangs", $festivity[ "Metadata" ] ) ) {
             $decreeURL = sprintf( $festivity[ "Metadata" ][ "decreeURL" ], 'LA' );
-            if( array_key_exists(strtoupper($LOCALE), $festivity[ "Metadata" ][ "decreeLangs" ]) ) {
-                $decreeLang = $festivity[ "Metadata" ][ "decreeLangs" ][ strtoupper( $LOCALE ) ];
+            if( array_key_exists(strtoupper($Locale), $festivity[ "Metadata" ][ "decreeLangs" ]) ) {
+                $decreeLang = $festivity[ "Metadata" ][ "decreeLangs" ][ strtoupper( $Locale ) ];
                 $decreeURL = sprintf( $festivity[ "Metadata" ][ "decreeURL" ], $decreeLang );
             }
         } else {
@@ -191,7 +192,7 @@ if( $DiocesanCalendar !== null && $DiocesanData !== null ) {
 $responseObj = [
     "LitCalAllFestivities" => $FestivityCollection,
     "Settings" => [
-        "Locale" => $LOCALE,
+        "Locale" => $Locale,
         "NationalCalendar" => $NationalCalendar,
         "DiocesanCalendar" => $DiocesanCalendar
     ]
