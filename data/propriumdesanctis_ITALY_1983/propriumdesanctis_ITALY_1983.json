@@ -10,7 +10,7 @@
             "Martyrs:For One Martyr",
             "Pastors:For a Bishop"
         ],
-        "CALENDAR": "",
+        "CALENDAR": "ITALY",
         "COLOR": [
             "white",
             "red"
@@ -33,7 +33,7 @@
         "COMMON": [
             "Pastors:For One Pastor"
         ],
-        "CALENDAR": "",
+        "CALENDAR": "ITALY",
         "COLOR": [
             "white"
         ],
@@ -56,7 +56,7 @@
             "Pastors:For One Pastor",
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "",
+        "CALENDAR": "ITALY",
         "COLOR": [
             "white"
         ],
@@ -78,7 +78,7 @@
         "COMMON": [
             "Proper"
         ],
-        "CALENDAR": "",
+        "CALENDAR": "ITALY",
         "COLOR": [
             "white",
             "red"
@@ -102,7 +102,7 @@
             "Pastors:For One Pastor",
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
         ],
-        "CALENDAR": "",
+        "CALENDAR": "ITALY",
         "COLOR": [
             "white"
         ],
@@ -124,7 +124,7 @@
         "COMMON": [
             "Proper"
         ],
-        "CALENDAR": "",
+        "CALENDAR": "ITALY",
         "COLOR": [
             "white"
         ],
@@ -146,7 +146,7 @@
         "COMMON": [
             "Martyrs:For Several Martyrs"
         ],
-        "CALENDAR": "",
+        "CALENDAR": "ITALY",
         "COLOR": [
             "red"
         ],
@@ -168,7 +168,7 @@
         "COMMON": [
             "Proper"
         ],
-        "CALENDAR": "",
+        "CALENDAR": "ITALY",
         "COLOR": [
             "red"
         ],
