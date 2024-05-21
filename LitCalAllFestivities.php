@@ -173,7 +173,7 @@ if( $NationalCalendar !== null && $NationalData !== null ) {
                 $PropriumDeSanctis = json_decode( file_get_contents( $DataFile ) );
                 foreach( $PropriumDeSanctis as $idx => $festivity ) {
                     $key = $festivity->TAG;
-                    $FestivityCollection[ $key ] = $festivity;
+                    $FestivityCollection[ $key ] = (array) $festivity;
                     $FestivityCollection[ $key ][ "MISSAL" ] = $missal;
                 }
             }
