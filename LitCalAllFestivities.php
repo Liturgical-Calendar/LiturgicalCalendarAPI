@@ -21,8 +21,61 @@ $LatinMissals = array_filter( RomanMissal::$values, function($item){
     return str_starts_with( $item, "VATICAN_" );
 });
 
+$SUPPORTED_NATIONAL_CALENDARS = [ "VATICAN" ];
+$directories = array_map('basename', glob( 'nations/*' , GLOB_ONLYDIR) );
+foreach( $directories as $directory ) {
+    if( file_exists( "nations/$directory/$directory.json" ) ) {
+        $SUPPORTED_NATIONAL_CALENDARS[] = $directory;
+    }
+}
+
+$GeneralIndex = file_exists( "nations/index.json" ) ? json_decode( file_get_contents( "nations/index.json" ) ) : null;
+
 $LOCALE = isset( $_GET["locale"] ) && LitLocale::isValid( $_GET["locale"] ) ? $_GET["locale"] : "la";
 $LOCALE = $LOCALE !== "LA" && $LOCALE !== "la" ? Locale::getPrimaryLanguage( $LOCALE ) : "la";
+
+$NationalCalendar = isset( $_GET["nationalcalendar"] ) && in_array( strtoupper( $value ), $SUPPORTED_NATIONAL_CALENDARS ) ? strtoupper( $value ) : null;
+$DiocesanCalendar = isset( $_GET["diocesancalendar"] ) ? strtoupper( $_GET["diocesancalendar"] ) : null;
+
+$NationalData       = null;
+$WiderRegionData    = null;
+$DiocesanData       = null;
+
+if( $DiocesanCalendar !== null && property_exists( $GeneralIndex, $DiocesanCalendar ) ) {
+    $NationalCalendar = $GeneralIndex->{$DiocesanCalendar}->nation;
+    $diocesanDataFile = $GeneralIndex->{$DiocesanCalendar}->path;
+    if( file_exists( $diocesanDataFile ) ){
+        $DiocesanData = json_decode( file_get_contents( $diocesanDataFile ) );
+    }
+}
+
+if( $NationalCalendar !== null ) {
+    $nationalDataFile = "nations/{$NationalCalendar}/{$NationalCalendar}.json";
+    if( file_exists( $nationalDataFile ) ) {
+        $NationalData = json_decode( file_get_contents( $nationalDataFile ) );
+        if( json_last_error() === JSON_ERROR_NONE ) {
+            if( property_exists( $NationalData, "Settings" ) && property_exists( $NationalData->Settings, "Locale" ) ) {
+                $LOCALE = $NationalData->Settings->Locale;
+            }
+            if( property_exists( $NationalData, "Metadata" ) && property_exists( $NationalData->Metadata, "WiderRegion" ) ) {
+                $widerRegionDataFile = $NationalData->Metadata->WiderRegion->jsonFile;
+                $widerRegionI18nFile = $NationalData->Metadata->WiderRegion->i18nFile;
+                if( file_exists( $widerRegionI18nFile ) ) {
+                    $widerRegionI18nData = json_decode( file_get_contents( $widerRegionI18nFile ) );
+                    if( json_last_error() === JSON_ERROR_NONE && file_exists( $widerRegionDataFile ) ) {
+                        $WiderRegionData = json_decode( file_get_contents( $widerRegionDataFile ) );
+                        if( json_last_error() === JSON_ERROR_NONE && property_exists( $WiderRegionData, "LitCal" ) ) {
+                            foreach( $WiderRegionData->LitCal as $idx => $value ) {
+                                $tag = $value->Festivity->tag;
+                                $WiderRegionData->LitCal[$idx]->Festivity->name = $widerRegionI18nData->{ $tag };
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 foreach( $LatinMissals as $LatinMissal ) {
     $DataFile = RomanMissal::getSanctoraleFileName( $LatinMissal );
@@ -83,6 +136,51 @@ foreach( $DATA as $idx => $festivity ) {
     }
     else if( $festivity[ "Metadata" ][ "action" ] === 'makeDoctor' ) {
         $FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
+    }
+}
+
+if( $NationalCalendar !== null && $NationalData !== null ) {
+    if( $WiderRegionData !== null && property_exists( $WiderRegionData, "LitCal" ) ) {
+        foreach( $WiderRegionData->LitCal as $row ) {
+            if( $row->Metadata->action === 'createNew' ) {
+                $key = $row->Festivity->tag;
+                $FestivityCollection[ $key ] = [];
+                foreach( $row->Festivity as $prop => $value ) {
+                    $prop = strtoupper( $prop );
+                    $FestivityCollection[ $key ][ $prop ] = $value;
+                }
+            }
+        }
+    }
+    foreach( $NationalData->LitCal as $row ) {
+        if( $row->Metadata->action === 'createNew' ) {
+            $key = $row->Festivity->tag;
+            $temp = (array) $row->Festivity;
+            $FestivityCollection[ $key ] = array_change_key_case( $temp, CASE_UPPER );
+        }
+    }
+    if( property_exists( $NationalData, "Metadata" ) && property_exists( $NationalData->Metadata, "Missals" ) ) {
+        if( $NationalData->Metadata->Region === 'UNITED STATES' ) {
+            $NationalData->Metadata->Region = 'USA';
+        }
+        foreach( $NationalData->Metadata->Missals as $missal ) {
+            $DataFile = RomanMissal::getSanctoraleFileName( $missal );
+            if( $DataFile !== false ) {
+                $PropriumDeSanctis = json_decode( file_get_contents( $DataFile ) );
+                foreach( $PropriumDeSanctis as $idx => $festivity ) {
+                    $key = $festivity[ "TAG" ];
+                    $FestivityCollection[ $key ] = $festivity;
+                    $FestivityCollection[ $key ][ "MISSAL" ] = $missal;
+                }
+            }
+        }
+    }
+}
+
+if( $DiocesanCalendar !== null && $DiocesanData !== null ) {
+    foreach( $DiocesanData->LitCal as $key => $festivity ) {
+        $temp = (array) $festivity->Festivity;
+        $FestivityCollection[ $key ] = array_change_key_case( $temp, CASE_UPPER );
     }
 }
 

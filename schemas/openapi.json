@@ -540,6 +540,46 @@
         ],
         "summary": "retrieves all possible liturgical events that may or may not appear in the Liturgical Calendar for any given year, based on the calculations done by the LitCal API; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
         "operationId": "retrieveAllEventsGET",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "settings",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "object",
+              "oneOf": [
+                {
+                  "properties": {
+                    "locale": {
+                      "type": "string",
+                      "description": "request the localization of the returned events in a specific language; will not be considered if a National calendar or diocesan calendar is requested",
+                      "default": "la"
+                    },
+                    "nationalcalendar": {
+                      "type": "string",
+                      "description": "requests liturgical calendar data for a particular geographic area, on a national level or according to specifications defined be one or more Episcopal Conferences or on a Roman Missal published for a certain language or geographic area.",
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "locale": {
+                      "type": "string",
+                      "description": "request the localization of the returned events in a specific language; will not be considered if a National calendar or diocesan calendar is requested",
+                      "default": "la"
+                    },
+                    "diocesancalendar": {
+                      "type": "string",
+                      "description": "requests liturgical calendar data for a particular diocese"
+                    }
+                  }
+                }
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK: A collection of all possible liturgical events that can be found in a liturgical calendar produced by the LitCal API",
