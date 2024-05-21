@@ -34,7 +34,7 @@ $GeneralIndex = file_exists( "nations/index.json" ) ? json_decode( file_get_cont
 $LOCALE = isset( $_GET["locale"] ) && LitLocale::isValid( $_GET["locale"] ) ? $_GET["locale"] : "la";
 $LOCALE = $LOCALE !== "LA" && $LOCALE !== "la" ? Locale::getPrimaryLanguage( $LOCALE ) : "la";
 
-$NationalCalendar = isset( $_GET["nationalcalendar"] ) && in_array( strtoupper( $value ), $SUPPORTED_NATIONAL_CALENDARS ) ? strtoupper( $value ) : null;
+$NationalCalendar = isset( $_GET["nationalcalendar"] ) && in_array( strtoupper( $_GET["nationalcalendar"] ), $SUPPORTED_NATIONAL_CALENDARS ) ? strtoupper( $_GET["nationalcalendar"] ) : null;
 $DiocesanCalendar = isset( $_GET["diocesancalendar"] ) ? strtoupper( $_GET["diocesancalendar"] ) : null;
 
 $NationalData       = null;
