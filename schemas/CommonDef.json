@@ -257,7 +257,10 @@
             "type": "string",
             "enum": [
                 "",
-                "GENERAL ROMAN"
+                "GENERAL ROMAN",
+                "ITALY",
+                "USA",
+                "NETHERLANDS"
             ],
             "title": "Calendar"
         },
