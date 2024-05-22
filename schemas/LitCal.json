@@ -37,7 +37,8 @@
                             "enum": [
                                 "ICS",
                                 "JSON",
-                                "XML"
+                                "XML",
+                                "YML"
                             ]
                         },
                         "EternalHighPriest": {
@@ -87,7 +88,7 @@
                                 "Accept": {
                                     "type": "string",
                                     "description": "If present, must contain at least one of the following",
-                                    "pattern": "(?:text/html|application/xml|application/json|text/calendar)"
+                                    "pattern": "(?:text/html|application/xml|application/json|text/calendar|application/yaml)"
                                 },
                                 "Accept-Language": {
                                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/AcceptLanguage"
