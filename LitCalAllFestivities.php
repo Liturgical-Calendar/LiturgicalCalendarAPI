@@ -191,6 +191,7 @@ foreach( $DATA as $key => $readings ) {
         $FestivityCollection[ $key ][ "TAG" ] = $key;
         $FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
         $FestivityCollection[ $key ][ "GRADE" ] = $PropriumDeTemporeRanks[ $key ];
+        $FestivityCollection[ $key ][ "COMMON" ] = [];
     }
 }
 
