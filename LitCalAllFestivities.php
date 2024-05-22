@@ -98,6 +98,88 @@ foreach( $LatinMissals as $LatinMissal ) {
     }
 }
 
+// The liturgical rank of Proprium de Tempore events is defined in LitCalAPI rather than in resource files
+// So we can't gather this information just from the resource files
+// Which means we need to define them here manually
+$PropriumDeTemporeRanks = [
+    "HolyThurs"         => LitGrade::HIGHER_SOLEMNITY,
+    "GoodFri"           => LitGrade::HIGHER_SOLEMNITY,
+    "EasterVigil"       => LitGrade::HIGHER_SOLEMNITY,
+    "Easter"            => LitGrade::HIGHER_SOLEMNITY,
+    "Christmas"         => LitGrade::HIGHER_SOLEMNITY,
+    "Christmas2"        => LitGrade::FEAST_LORD,
+    "MotherGod"         => LitGrade::SOLEMNITY,
+    "Epiphany"          => LitGrade::HIGHER_SOLEMNITY,
+    "Easter2"           => LitGrade::HIGHER_SOLEMNITY,
+    "Easter3"           => LitGrade::HIGHER_SOLEMNITY,
+    "Easter4"           => LitGrade::HIGHER_SOLEMNITY,
+    "Easter5"           => LitGrade::HIGHER_SOLEMNITY,
+    "Easter6"           => LitGrade::HIGHER_SOLEMNITY,
+    "Easter7"           => LitGrade::HIGHER_SOLEMNITY,
+    "Ascension"         => LitGrade::HIGHER_SOLEMNITY,
+    "Pentecost"         => LitGrade::HIGHER_SOLEMNITY,
+    "Advent1"           => LitGrade::HIGHER_SOLEMNITY,
+    "Advent2"           => LitGrade::HIGHER_SOLEMNITY,
+    "Advent3"           => LitGrade::HIGHER_SOLEMNITY,
+    "Advent4"           => LitGrade::HIGHER_SOLEMNITY,
+    "Lent1"             => LitGrade::HIGHER_SOLEMNITY,
+    "Lent2"             => LitGrade::HIGHER_SOLEMNITY,
+    "Lent3"             => LitGrade::HIGHER_SOLEMNITY,
+    "Lent4"             => LitGrade::HIGHER_SOLEMNITY,
+    "Lent5"             => LitGrade::HIGHER_SOLEMNITY,
+    "PalmSun"           => LitGrade::HIGHER_SOLEMNITY,
+    "Trinity"           => LitGrade::HIGHER_SOLEMNITY,
+    "CorpusChristi"     => LitGrade::HIGHER_SOLEMNITY,
+    "AshWednesday"      => LitGrade::HIGHER_SOLEMNITY,
+    "MonHolyWeek"       => LitGrade::HIGHER_SOLEMNITY,
+    "TueHolyWeek"       => LitGrade::HIGHER_SOLEMNITY,
+    "WedHolyWeek"       => LitGrade::HIGHER_SOLEMNITY,
+    "MonOctaveEaster"   => LitGrade::HIGHER_SOLEMNITY,
+    "TueOctaveEaster"   => LitGrade::HIGHER_SOLEMNITY,
+    "WedOctaveEaster"   => LitGrade::HIGHER_SOLEMNITY,
+    "ThuOctaveEaster"   => LitGrade::HIGHER_SOLEMNITY,
+    "FriOctaveEaster"   => LitGrade::HIGHER_SOLEMNITY,
+    "SatOctaveEaster"   => LitGrade::HIGHER_SOLEMNITY,
+    "SacredHeart"       => LitGrade::SOLEMNITY,
+    "ChristKing"        => LitGrade::SOLEMNITY,
+    "BaptismLord"       => LitGrade::FEAST_LORD,
+    "HolyFamily"        => LitGrade::FEAST_LORD,
+    "OrdSunday2"        => LitGrade::FEAST_LORD,
+    "OrdSunday3"        => LitGrade::FEAST_LORD,
+    "OrdSunday4"        => LitGrade::FEAST_LORD,
+    "OrdSunday5"        => LitGrade::FEAST_LORD,
+    "OrdSunday6"        => LitGrade::FEAST_LORD,
+    "OrdSunday7"        => LitGrade::FEAST_LORD,
+    "OrdSunday8"        => LitGrade::FEAST_LORD,
+    "OrdSunday9"        => LitGrade::FEAST_LORD,
+    "OrdSunday10"       => LitGrade::FEAST_LORD,
+    "OrdSunday11"       => LitGrade::FEAST_LORD,
+    "OrdSunday12"       => LitGrade::FEAST_LORD,
+    "OrdSunday13"       => LitGrade::FEAST_LORD,
+    "OrdSunday14"       => LitGrade::FEAST_LORD,
+    "OrdSunday15"       => LitGrade::FEAST_LORD,
+    "OrdSunday16"       => LitGrade::FEAST_LORD,
+    "OrdSunday17"       => LitGrade::FEAST_LORD,
+    "OrdSunday18"       => LitGrade::FEAST_LORD,
+    "OrdSunday19"       => LitGrade::FEAST_LORD,
+    "OrdSunday20"       => LitGrade::FEAST_LORD,
+    "OrdSunday21"       => LitGrade::FEAST_LORD,
+    "OrdSunday22"       => LitGrade::FEAST_LORD,
+    "OrdSunday23"       => LitGrade::FEAST_LORD,
+    "OrdSunday24"       => LitGrade::FEAST_LORD,
+    "OrdSunday25"       => LitGrade::FEAST_LORD,
+    "OrdSunday26"       => LitGrade::FEAST_LORD,
+    "OrdSunday27"       => LitGrade::FEAST_LORD,
+    "OrdSunday28"       => LitGrade::FEAST_LORD,
+    "OrdSunday29"       => LitGrade::FEAST_LORD,
+    "OrdSunday30"       => LitGrade::FEAST_LORD,
+    "OrdSunday31"       => LitGrade::FEAST_LORD,
+    "OrdSunday32"       => LitGrade::FEAST_LORD,
+    "OrdSunday33"       => LitGrade::FEAST_LORD,
+    "OrdSunday34"       => LitGrade::FEAST_LORD,
+    "ImmaculateHeart"   => LitGrade::MEMORIAL
+];
+
 $DataFile = 'data/propriumdetempore.json';
 $I18nFile = 'data/propriumdetempore/' . $Locale . ".json";
 $DATA = json_decode( file_get_contents( $DataFile ), true );
@@ -107,6 +189,7 @@ foreach( $DATA as $key => $readings ) {
         $FestivityCollection[ $key ] = $readings;
         $FestivityCollection[ $key ][ "TAG" ] = $key;
         $FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
+        $FestivityCollection[ $key ][ "GRADE" ] = $PropriumDeTemporeRanks[ $key ];
     }
 }
 
