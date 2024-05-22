@@ -121,24 +121,15 @@
                 },
                 "LitCal": {
                     "type": "object",
-                    "anyOf": [
-                        {
-                            "patternProperties": {
-                                "^[A-Z][a-zA-Z1-9]+[0]?_vigil$": {
-                                    "$ref": "#/definitions/FestivityVigil"
-                                }
-                            },
-                            "additionalProperties": false
+                    "patternProperties": {
+                        "^[A-Z][a-zA-Z1-9]+[0]?_vigil$": {
+                            "$ref": "#/definitions/FestivityVigil"
                         },
-                        {
-                            "patternProperties": {
-                                "^[A-Z][a-zA-Z1-9]+[0]?$": {
-                                    "$ref": "#/definitions/FestivityWithSeason"
-                                }
-                            },
-                            "additionalProperties": false
+                        "^[A-Z][a-zA-Z1-9]+[0]?$": {
+                            "$ref": "#/definitions/FestivityWithSeason"
                         }
-                    ]
+                    },
+                    "additionalProperties": false
                 },
                 "Messages": {
                     "type": "array",

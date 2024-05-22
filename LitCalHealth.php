@@ -17,9 +17,9 @@ foreach($it as $f) {
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
 use Sabre\VObject;
+use Sabre\VObject\InvalidDataException;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
-use Sabre\VObject\InvalidDataException;
 
 class LitCalHealth implements MessageComponentInterface {
     protected $clients;
