@@ -3,8 +3,9 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-include_once( 'includes/enums/LitLocale.php' );
-include_once( 'includes/enums/RomanMissal.php' );
+include_once 'includes/enums/LitLocale.php';
+include_once 'includes/enums/RomanMissal.php';
+include_once 'includes/enums/LitGrade.php';
 
 $requestHeaders = getallheaders();
 if( isset( $requestHeaders[ "Origin" ] ) ) {
