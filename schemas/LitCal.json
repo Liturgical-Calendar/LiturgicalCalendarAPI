@@ -121,11 +121,22 @@
                 },
                 "LitCal": {
                     "type": "object",
-                    "patternProperties": {
-                        "^[A-Z][a-zA-Z1-9]+(?:0|_vigil)?$": {
-                            "$ref": "#/definitions/Festivity"
+                    "anyOf": [
+                        {
+                            "patternProperties": {
+                                "^[A-Z][a-zA-Z1-9]+[0]?$": {
+                                    "$ref": "#/definitions/FestivityWithSeason"
+                                }
+                            }
+                        },
+                        {
+                            "patternProperties": {
+                                "^[A-Z][a-zA-Z1-9]+(?:_vigil)?$": {
+                                    "$ref": "#/definitions/Festivity"
+                                }
+                            }
                         }
-                    },
+                    ],
                     "additionalProperties": false
                 },
                 "Messages": {
@@ -259,20 +270,6 @@
                 },
                 "psalterWeek": {
                     "type": "integer"
-                },
-                "liturgicalSeason": {
-                    "type": "string",
-                    "enum": [
-                        "ADVENT",
-                        "CHRISTMAS",
-                        "LENT",
-                        "EASTER_TRIDUUM",
-                        "EASTER",
-                        "ORDINARY_TIME"
-                    ]
-                },
-                "liturgicalSeasonLcl": {
-                    "type": "string"
                 }
             },
             "required": [
@@ -293,11 +290,38 @@
                 "monthShort",
                 "monthLong",
                 "dayOfTheWeekShort",
-                "dayOfTheWeekLong",
-                "liturgicalSeason",
-                "liturgicalSeasonLcl"
+                "dayOfTheWeekLong"
             ],
             "additionalProperties": false
+        },
+        "FestivityWithSeason": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Festivity"
+                },
+                {
+                    "properties": {
+                        "liturgicalSeason": {
+                            "type": "string",
+                            "enum": [
+                                "ADVENT",
+                                "CHRISTMAS",
+                                "LENT",
+                                "EASTER_TRIDUUM",
+                                "EASTER",
+                                "ORDINARY_TIME"
+                            ]
+                        },
+                        "liturgicalSeasonLcl": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "liturgicalSeason",
+                        "liturgicalSeasonLcl"
+                    ]
+                }
+            ]
         }
     }
 }
