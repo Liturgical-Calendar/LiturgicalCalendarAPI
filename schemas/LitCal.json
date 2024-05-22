@@ -122,7 +122,7 @@
                 "LitCal": {
                     "type": "object",
                     "patternProperties": {
-                        "^[A-Z][a-zA-Z1-9]+[0]?$": {
+                        "^[A-Z][a-zA-Z1-9]+(?:0|_vigil)?$": {
                             "$ref": "#/definitions/Festivity"
                         }
                     },
@@ -145,7 +145,7 @@
         "DateTimeObjectCollection": {
             "type": "object",
             "patternProperties": {
-                "^[A-Z][a-zA-Z1-9]+[0]?$": {
+                "^[A-Z][a-zA-Z1-9]+(?:0|_vigil)?$": {
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
