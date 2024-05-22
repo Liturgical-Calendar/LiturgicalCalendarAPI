@@ -664,7 +664,7 @@
             "type": "object",
             "description": "the liturgical events that make up the requested Liturgical Calendar for the given year",
             "patternProperties": {
-              "^[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$": {
+              "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$": {
                 "type": "object",
                 "description": "a liturgical event",
                 "properties": {
@@ -1922,7 +1922,7 @@
           "LitCalAllFestivities": {
             "type": "object",
             "patternProperties": {
-              "^[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$": {
+              "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$": {
                 "type": "object",
                 "properties": {
                   "MONTH": {
@@ -1939,7 +1939,7 @@
                   },
                   "TAG": {
                     "type": "string",
-                    "pattern": "^[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$",
+                    "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$",
                     "description": "corresponds to the `eventkey` property of liturgical events in the output of the LitCal API and similar endpoints"
                   },
                   "GRADE": {
@@ -2076,7 +2076,7 @@
         "type": "object",
         "description": "the keys of this object identify the liturgical event",
         "patternProperties": {
-          "^[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$": {
+          "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$": {
             "type": "object",
             "description": "a liturgical event that has a rank of solemnity, and which can therefore supersede a feast or a memorial",
             "properties": {
