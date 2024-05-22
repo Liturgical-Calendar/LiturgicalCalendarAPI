@@ -124,15 +124,15 @@
                     "anyOf": [
                         {
                             "patternProperties": {
-                                "^[A-Z][a-zA-Z1-9]+[0]?$": {
-                                    "$ref": "#/definitions/FestivityWithSeason"
+                                "^[A-Z][a-zA-Z1-9]+_vigil$": {
+                                    "$ref": "#/definitions/Festivity"
                                 }
                             }
                         },
                         {
                             "patternProperties": {
-                                "^[A-Z][a-zA-Z1-9]+(?:_vigil)?$": {
-                                    "$ref": "#/definitions/Festivity"
+                                "^[A-Z][a-zA-Z1-9]+[0]?$": {
+                                    "$ref": "#/definitions/FestivityWithSeason"
                                 }
                             }
                         }
@@ -174,8 +174,7 @@
                         }
                     }
                 }
-            },
-            "additionalProperties": false
+            }
         },
         "Festivity": {
             "type": "object",
