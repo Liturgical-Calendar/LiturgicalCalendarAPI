@@ -231,6 +231,7 @@ class LitCalHealth implements MessageComponentInterface {
                         libxml_clear_errors();
                         $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as XML: " . $errorString;
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $message->responsetype = $responseType;
                         $this->sendMessage( $to, $message );
                     } else {
                         $message = new stdClass();
@@ -257,7 +258,7 @@ class LitCalHealth implements MessageComponentInterface {
                             $this->sendMessage( $to, $message );
                         }
                     }
-                break;
+                    break;
                 case "ICS":
                     try {
                         $vcalendar = VObject\Reader::read( $data );
@@ -296,6 +297,7 @@ class LitCalHealth implements MessageComponentInterface {
                         $message->type = "error";
                         $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as ICS: parsing resulted in type " .gettype( $vcalendar ) . " | " . $vcalendar;
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $message->responsetype = $responseType;
                         $this->sendMessage( $to, $message );
                     }
                     break;
@@ -327,6 +329,7 @@ class LitCalHealth implements MessageComponentInterface {
                         $message->type = "error";
                         $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as YAML: " . $ex->getMessage();
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $message->responsetype = $responseType;
                         $this->sendMessage( $to, $message );
                     }
                     break;
@@ -357,6 +360,7 @@ class LitCalHealth implements MessageComponentInterface {
                         $message->type = "error";
                         $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as JSON: " . json_last_error_msg();
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $message->responsetype = $responseType;
                         $this->sendMessage( $to, $message );
                     }
             }
