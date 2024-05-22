@@ -299,7 +299,7 @@ class LitCalHealth implements MessageComponentInterface {
                         $this->sendMessage( $to, $message );
                     }
                     break;
-                case "YAML":
+                case "YML":
                     try {
                         $yamlData = yaml_parse( $data );
                         if( $yamlData ) {
