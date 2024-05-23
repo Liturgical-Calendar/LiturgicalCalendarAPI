@@ -1,0 +1,199 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "LitCalAllFestivities",
+    "type": "object",
+    "properties": {
+        "LitCalAllFestivities": {
+            "$ref": "#/definitions/LitCalAllFestivities"
+        },
+        "Settings": {
+            "type": "object",
+            "oneOf": [
+              {
+                "properties": {
+                  "Locale": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z]$",
+                    "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
+                  },
+                  "NationalCalendar": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3,45}$",
+                    "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
+                  },
+                  "DiocesanCalendar": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3,45}$",
+                    "description": "indicates the Diocesan Calendar used to produce the data in LitCalAllFestivities"
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "properties": {
+                  "Locale": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z]$",
+                    "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
+                  },
+                  "NationalCalendar": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3,45}$",
+                    "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
+                  },
+                  "DiocesanCalendar": {
+                    "type": "null"
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "properties": {
+                  "Locale": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z]$",
+                    "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
+                  },
+                  "NationalCalendar": {
+                    "type": "null"
+                  },
+                  "DiocesanCalendar": {
+                    "type": "null"
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+        }
+    },
+    "required": [
+        "LitCalAllFestivities",
+        "Settings"
+    ],
+    "additionalProperties": false,
+    "definitions": {
+        "LitCalAllFestivities": {
+            "type": "object",
+            "patternProperties": {
+              "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$": {
+                "type": "object",
+                "properties": {
+                  "MONTH": {
+                    "type": "integer",
+                    "format": "int32",
+                    "minimum": 1,
+                    "maximum": 12
+                  },
+                  "DAY": {
+                    "type": "integer",
+                    "format": "int32",
+                    "minimum": 1,
+                    "maximum": 31
+                  },
+                  "TAG": {
+                    "type": "string",
+                    "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$",
+                    "description": "corresponds to the `eventkey` property of liturgical events in the output of the LitCal API and similar endpoints"
+                  },
+                  "GRADE": {
+                    "type": "integer",
+                    "format": "int32",
+                    "minimum": 1,
+                    "maximum": 7
+                  },
+                  "DISPLAYGRADE": {
+                    "type": "string"
+                  },
+                  "COMMON": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "CALENDAR": {
+                    "type": "string",
+                    "enum": [
+                        "GENERAL ROMAN",
+                        "ITALY",
+                        "USA"
+                    ]
+                  },
+                  "COLOR": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [ "white", "red", "green", "pink", "purple" ]
+                    }
+                  },
+                  "READINGS": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/READINGS"
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "VIGIL": {
+                                    "$ref": "#/definitions/READINGS"
+                                },
+                                "DAY": {
+                                    "$ref": "#/definitions/READINGS"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    ]
+                  },
+                  "NAME": {
+                    "type": "string",
+                    "description": "The actual name of the liturgical event as defined in the latest edition of the source Roman Missal indicated in the key `MISSAL` (i.e. if the Missal is the Latin edition of the Roman Missal, the name should be from the latest edition of the Latin Roman Missal)"
+                  },
+                  "TYPE": {
+                    "type": "string",
+                    "enum": [ "mobile", "fixed" ]
+                  },
+                  "MISSAL": {
+                    "type": "string",
+                    "enum": [ "VATICAN_1970", "VATICAN_2002", "VATICAN_2008", "USA_2011", "ITALY_1983" ],
+                    "description": "When a liturgical event is defined in a Roman Missal, this property will be present with an indication of the Roman Missal in question"
+                  },
+                  "DECREE": {
+                    "type": "string",
+                    "description": "When a liturgical event is defined ex-novo by a decree of the Congregation of Divine Worship rather than by a Roman Missal, this property will be present with a reference to the decree"
+                  },
+                  "STRTOTIME": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [ "TAG", "GRADE", "COMMON", "COLOR", "NAME" ]
+              }
+            }
+        },
+        "READINGS": {
+            "type": "object",
+            "properties": {
+                "FIRST_READING": { "type": "string" },
+                "RESPONSORIAL_PSALM": { "type": "string" },
+                "SECOND_READING": { "type": "string" },
+                "RESPONSORIAL_PSALM_2": { "type": "string" },
+                "THIRD_READING": { "type": "string" },
+                "RESPONSORIAL_PSALM_3": { "type": "string" },
+                "FOURTH_READING": { "type": "string" },
+                "RESPONSORIAL_PSALM_4": { "type": "string" },
+                "FIFTH_READING": { "type": "string" },
+                "RESPONSORIAL_PSALM_5": { "type": "string" },
+                "SIXTH_READING": { "type": "string" },
+                "RESPONSORIAL_PSALM_6": { "type": "string" },
+                "SEVENTH_READING": { "type": "string" },
+                "RESPONSORIAL_PSALM_7": { "type": "string" },
+                "EPISTLE": { "type": "string" },
+                "RESPONSORIAL_PSALM_EPISTLE": { "type": "string" },
+                "ALLELUIA_VERSE": { "type": "string" },
+                "GOSPEL": { "type": "string" },
+                "PALM_GOSPEL": { "type": "string" }
+            },
+            "additionalProperties": false
+        }
+    }
+}
