@@ -181,6 +181,10 @@ $PropriumDeTemporeRanks = [
     "ImmaculateHeart"   => LitGrade::MEMORIAL
 ];
 
+$PropriumDeTemporeRed = [ "SacredHeart", "Pentecost", "GoodFri", "PalmSun", "SacredHeart" ];
+$PropriumDeTemporePurple = [ "Advent1", "Advent2", "Advent4", "AshWednesday", "Lent1", "Lent2", "Lent3", "Lent5" ];
+$PropriumDeTemporePink = [ "Advent3", "Lent4" ];
+
 $DataFile = 'data/propriumdetempore.json';
 $I18nFile = 'data/propriumdetempore/' . $Locale . ".json";
 $DATA = json_decode( file_get_contents( $DataFile ), true );
@@ -193,6 +197,18 @@ foreach( $DATA as $key => $readings ) {
         $FestivityCollection[ $key ][ "GRADE" ] = $PropriumDeTemporeRanks[ $key ];
         $FestivityCollection[ $key ][ "COMMON" ] = [];
         $FestivityCollection[ $key ][ "CALENDAR" ] = "GENERAL ROMAN";
+        if( in_array( $key, $PropriumDeTemporeRed ) ) {
+            $FestivityCollection[ $key ][ "COLOR" ] = [ "RED" ];
+        }
+        else if( in_array( $key, $PropriumDeTemporePurple ) ) {
+            $FestivityCollection[ $key ][ "COLOR" ] = [ "PURPLE" ];
+        }
+        else if( in_array( $key, $PropriumDeTemporePink ) ) {
+            $FestivityCollection[ $key ][ "COLOR" ] = [ "PINK" ];
+        }
+        else {
+            $FestivityCollection[ $key ][ "COLOR" ] = [ "WHITE" ];
+        }
     }
 }
 
