@@ -198,16 +198,16 @@ foreach( $DATA as $key => $readings ) {
         $FestivityCollection[ $key ][ "COMMON" ] = [];
         $FestivityCollection[ $key ][ "CALENDAR" ] = "GENERAL ROMAN";
         if( in_array( $key, $PropriumDeTemporeRed ) ) {
-            $FestivityCollection[ $key ][ "COLOR" ] = [ "RED" ];
+            $FestivityCollection[ $key ][ "COLOR" ] = [ "red" ];
         }
         else if( in_array( $key, $PropriumDeTemporePurple ) ) {
-            $FestivityCollection[ $key ][ "COLOR" ] = [ "PURPLE" ];
+            $FestivityCollection[ $key ][ "COLOR" ] = [ "purple" ];
         }
         else if( in_array( $key, $PropriumDeTemporePink ) ) {
-            $FestivityCollection[ $key ][ "COLOR" ] = [ "PINK" ];
+            $FestivityCollection[ $key ][ "COLOR" ] = [ "pink" ];
         }
         else {
-            $FestivityCollection[ $key ][ "COLOR" ] = [ "WHITE" ];
+            $FestivityCollection[ $key ][ "COLOR" ] = [ "white" ];
         }
     }
 }
