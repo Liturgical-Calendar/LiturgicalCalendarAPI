@@ -36,6 +36,23 @@ foreach( $directories as $directory ) {
 $GeneralIndex = file_exists( "nations/index.json" ) ? json_decode( file_get_contents( "nations/index.json" ) ) : null;
 
 $Locale = isset( $_GET["locale"] ) && LitLocale::isValid( $_GET["locale"] ) ? $_GET["locale"] : "la";
+$baseLocale = $Locale !== LitLocale::LATIN ? strtolower( Locale::getPrimaryLanguage( $Locale ) ) : strtolower( LitLocale::LATIN );
+LitLocale::$PRIMARY_LANGUAGE = $baseLocale;
+$localeArray = [
+    $Locale . '.utf8',
+    $Locale . '.UTF-8',
+    $Locale,
+    $baseLocale . '_' . strtoupper( $baseLocale ) . '.utf8',
+    $baseLocale . '_' . strtoupper( $baseLocale ) . '.UTF-8',
+    $baseLocale . '_' . strtoupper( $baseLocale ),
+    $baseLocale . '.utf8',
+    $baseLocale . '.UTF-8',
+    $baseLocale
+];
+$systemLocale = setlocale( LC_ALL, $localeArray );
+bindtextdomain("litcal", "i18n");
+textdomain("litcal");
+
 $LitGrade = new LitGrade( $Locale );
 
 $NationalCalendar = isset( $_GET["nationalcalendar"] ) && in_array( strtoupper( $_GET["nationalcalendar"] ), $SUPPORTED_NATIONAL_CALENDARS ) ? strtoupper( $_GET["nationalcalendar"] ) : null;
