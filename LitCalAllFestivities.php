@@ -274,6 +274,7 @@ if( $NationalCalendar !== null && $NationalData !== null ) {
                     $prop = strtoupper( $prop );
                     $FestivityCollection[ $key ][ $prop ] = $value;
                 }
+                $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n( $row->Festivity->grade );
             }
         }
     }
