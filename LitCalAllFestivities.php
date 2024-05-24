@@ -286,8 +286,8 @@ if( $NationalCalendar !== null && $NationalData !== null ) {
 if( $DiocesanCalendar !== null && $DiocesanData !== null ) {
     foreach( $DiocesanData->LitCal as $key => $festivity ) {
         $temp = (array) $festivity->Festivity;
-        $FestivityCollection[ $key ] = array_change_key_case( $temp, CASE_UPPER );
-        $FestivityCollection[ $key ][ "TAG" ] = $key;
+        $FestivityCollection[ $DiocesanCalendar . '_' . $key ] = array_change_key_case( $temp, CASE_UPPER );
+        $FestivityCollection[ $DiocesanCalendar . '_' .$key ][ "TAG" ] = $DiocesanCalendar . '_' .$key;
     }
 }
 
