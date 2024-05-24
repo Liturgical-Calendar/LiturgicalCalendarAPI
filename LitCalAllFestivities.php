@@ -110,7 +110,7 @@ foreach( $LatinMissals as $LatinMissal ) {
                 $FestivityCollection[ $key ] = $festivity;
                 $FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
                 $FestivityCollection[ $key ][ "MISSAL" ] = $LatinMissal;
-                $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n($festivity["GRADE"]);
+                $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n( $festivity["GRADE"], false );
             }
         }
     }
@@ -212,7 +212,7 @@ foreach( $DATA as $key => $readings ) {
         $FestivityCollection[ $key ][ "TAG" ] = $key;
         $FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
         $FestivityCollection[ $key ][ "GRADE" ] = $PropriumDeTemporeRanks[ $key ];
-        $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n( $PropriumDeTemporeRanks[ $key ] );
+        $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n( $PropriumDeTemporeRanks[ $key ], false );
         $FestivityCollection[ $key ][ "COMMON" ] = [];
         $FestivityCollection[ $key ][ "CALENDAR" ] = "GENERAL ROMAN";
         if( in_array( $key, $PropriumDeTemporeRed ) ) {
@@ -261,7 +261,7 @@ foreach( $DATA as $idx => $festivity ) {
     else if( $festivity[ "Metadata" ][ "action" ] === 'makeDoctor' ) {
         $FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
     }
-    $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n( $FestivityCollection[ $key ][ "GRADE" ] );
+    $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n( $FestivityCollection[ $key ][ "GRADE" ], false );
 }
 
 if( $NationalCalendar !== null && $NationalData !== null ) {
@@ -274,7 +274,7 @@ if( $NationalCalendar !== null && $NationalData !== null ) {
                     $prop = strtoupper( $prop );
                     $FestivityCollection[ $key ][ $prop ] = $value;
                 }
-                $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n( $row->Festivity->grade );
+                $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n( $row->Festivity->grade, false );
             }
         }
     }
@@ -283,7 +283,7 @@ if( $NationalCalendar !== null && $NationalData !== null ) {
             $key = $row->Festivity->tag;
             $temp = (array) $row->Festivity;
             $FestivityCollection[ $key ] = array_change_key_case( $temp, CASE_UPPER );
-            $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n( $row->Festivity->grade );
+            $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n( $row->Festivity->grade, false );
         }
     }
     if( property_exists( $NationalData, "Metadata" ) && property_exists( $NationalData->Metadata, "Missals" ) ) {
@@ -297,7 +297,7 @@ if( $NationalCalendar !== null && $NationalData !== null ) {
                 foreach( $PropriumDeSanctis as $idx => $festivity ) {
                     $key = $festivity->TAG;
                     $FestivityCollection[ $key ] = (array) $festivity;
-                    $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n( $festivity->GRADE );
+                    $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n( $festivity->GRADE, false );
                     $FestivityCollection[ $key ][ "MISSAL" ] = $missal;
                 }
             }
@@ -310,7 +310,7 @@ if( $DiocesanCalendar !== null && $DiocesanData !== null ) {
         $temp = (array) $festivity->Festivity;
         $FestivityCollection[ $DiocesanCalendar . '_' . $key ] = array_change_key_case( $temp, CASE_UPPER );
         $FestivityCollection[ $DiocesanCalendar . '_' . $key ][ "TAG" ] = $DiocesanCalendar . '_' .$key;
-        $FestivityCollection[ $DiocesanCalendar . '_' . $key ][ "GRADE_LCL" ] = $LitGrade->i18n( $festivity->Festivity->grade );
+        $FestivityCollection[ $DiocesanCalendar . '_' . $key ][ "GRADE_LCL" ] = $LitGrade->i18n( $festivity->Festivity->grade, false );
     }
 }
 
