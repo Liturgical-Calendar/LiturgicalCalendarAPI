@@ -163,10 +163,13 @@
                   },
                   "STRTOTIME": {
                     "type": "string"
+                  },
+                  "GRADE_LCL": {
+                    "type": "string"
                   }
                 },
                 "additionalProperties": false,
-                "required": [ "TAG", "GRADE", "COMMON", "COLOR", "NAME" ]
+                "required": [ "TAG", "GRADE", "COMMON", "COLOR", "NAME", "GRADE_LCL" ]
               }
             }
         },

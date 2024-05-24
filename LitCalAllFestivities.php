@@ -256,12 +256,12 @@ foreach( $DATA as $idx => $festivity ) {
         }
         else if( $festivity[ "Metadata" ][ "property" ] === 'grade' ) {
             $FestivityCollection[ $key ][ "GRADE" ] = $festivity[ "Festivity" ][ "GRADE" ];
-            $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n( $festivity[ "Festivity" ][ "GRADE" ] );
         }
     }
     else if( $festivity[ "Metadata" ][ "action" ] === 'makeDoctor' ) {
         $FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
     }
+    $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n( $FestivityCollection[ $key ][ "GRADE" ] );
 }
 
 if( $NationalCalendar !== null && $NationalData !== null ) {
