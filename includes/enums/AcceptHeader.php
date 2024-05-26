@@ -1,7 +1,8 @@
 <?php
 
-class AcceptHeader {
-    const ATTACHMENT= "application/octet-stream";
+class AcceptHeader
+{
+    const ATTACHMENT = "application/octet-stream";
     const JSON      = "application/json";
     const XML       = "application/xml";
     const YML       = "application/yaml";
@@ -25,7 +26,7 @@ class AcceptHeader {
     const WEBP      = "image/webp";
     const MP4       = "video/mp4";
     const VIDEO_OGG = "video/ogg";
-    const VIDEO_WEBM= "video/webm";
+    const VIDEO_WEBM = "video/webm";
 
     public static array $values = [
         "application/octet-stream",
@@ -55,7 +56,8 @@ class AcceptHeader {
         "video/webm"
     ];
 
-    public static function isValid( $value ) {
-        return in_array( $value, self::$values );
+    public static function isValid($value)
+    {
+        return in_array($value, self::$values);
     }
 }

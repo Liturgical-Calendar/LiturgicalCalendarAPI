@@ -1,10 +1,10 @@
 <?php
 
-include_once( 'includes/enums/LitColor.php' );
-include_once( 'includes/enums/LitLocale.php' );
+include_once('includes/enums/LitColor.php');
+include_once('includes/enums/LitLocale.php');
 
-class LitMessages {
-
+class LitMessages
+{
     const LATIN_ORDINAL = [
         "",
         "primus",
@@ -42,7 +42,7 @@ class LitMessages {
         "trigesimus tertius",
         "trigesimus quartus",
     ];
-    
+
     const LATIN_ORDINAL_FEM_GEN = [
         "",
         "primæ",
@@ -80,7 +80,7 @@ class LitMessages {
         "trigesimæ tertiæ",
         "trigesimæ quartæ",
     ];
-    
+
     const LATIN_DAYOFTHEWEEK = [
         "Feria I",     //0=Sunday
         "Feria II",    //1=Monday
@@ -90,7 +90,7 @@ class LitMessages {
         "Feria VI",    //5=Friday
         "Feria VII"    //6=Saturday
     ];
-    
+
     const LATIN_MONTHS = [
         "",
         "Ianuarius",
@@ -108,44 +108,46 @@ class LitMessages {
     ];
 
 
-    public static function ColorToHex( string $color ) : string {
+    public static function ColorToHex(string $color): string
+    {
         $hex = "#";
-        switch($color){
+        switch ($color) {
             case "red":
                 $hex .= "FF0000";
-            break;
+                break;
             case "green":
                 $hex .= "00AA00";
-            break;
+                break;
             case "white":
                 $hex .= "AAAAAA";
-            break;
+                break;
             case "purple":
                 $hex .= "AA00AA";
-            break;
+                break;
             case "pink":
                 $hex .= "FFAAAA";
-            break;
+                break;
             default:
                 $hex .= "000000";
         }
         return $hex;
     }
 
-    public static function ParseColorString( string|array $colors, string $LOCALE, bool $html=false) : string {
-        if( is_string( $colors ) ) {
-            $colors = explode( ",", $colors );
+    public static function ParseColorString(string|array $colors, string $LOCALE, bool $html = false): string
+    {
+        if (is_string($colors)) {
+            $colors = explode(",", $colors);
         }
-        if( $html === true ) {
-            $colors = array_map( function($txt) use ($LOCALE) {
-                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex( $txt ) . '">' . LitColor::i18n( $txt, $LOCALE ) . '</FONT></SPAN></I></B>';
-            }, $colors );
-            return implode( ' <I><FONT FACE="Calibri">' . _( "or" ) . "</FONT></I> ", $colors );
-        } else{
-            $colors = array_map( function($txt) use($LOCALE) {
-                return LitColor::i18n( $txt, $LOCALE );
-            }, $colors );
-            return implode( " " . _( "or" ) . " ", $colors );
+        if ($html === true) {
+            $colors = array_map(function ($txt) use ($LOCALE) {
+                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex($txt) . '">' . LitColor::i18n($txt, $LOCALE) . '</FONT></SPAN></I></B>';
+            }, $colors);
+            return implode(' <I><FONT FACE="Calibri">' . _("or") . "</FONT></I> ", $colors);
+        } else {
+            $colors = array_map(function ($txt) use ($LOCALE) {
+                return LitColor::i18n($txt, $LOCALE);
+            }, $colors);
+            return implode(" " . _("or") . " ", $colors);
         }
         return ""; //should never get here
     }
@@ -156,16 +158,17 @@ class LitMessages {
      * in the English language
      * @Author: John Romano D'Orazio
      */
-    public static function ordSuffix(int $ord) : string {
+    public static function ordSuffix(int $ord): string
+    {
         $ord_suffix = ''; //st, nd, rd, th
         if ($ord === 1 || ($ord % 10 === 1  && $ord <> 11)) {
-        $ord_suffix = 'st';
-        } else if ($ord === 2 || ($ord % 10 === 2  && $ord <> 12)) {
-        $ord_suffix = 'nd';
-        } else if ($ord === 3 || ($ord % 10 === 3  && $ord <> 13)) {
-        $ord_suffix = 'rd';
+            $ord_suffix = 'st';
+        } elseif ($ord === 2 || ($ord % 10 === 2  && $ord <> 12)) {
+            $ord_suffix = 'nd';
+        } elseif ($ord === 3 || ($ord % 10 === 3  && $ord <> 13)) {
+            $ord_suffix = 'rd';
         } else {
-        $ord_suffix = 'th';
+            $ord_suffix = 'th';
         }
         return $ord_suffix;
     }
@@ -185,20 +188,20 @@ class LitMessages {
      * @param NumberFormatter $formatter
      * @param string[] $latinOrdinals
      */
-    public static function getOrdinal(int $num, string $LOCALE, NumberFormatter $formatter, array $latinOrdinals) : string {
+    public static function getOrdinal(int $num, string $LOCALE, NumberFormatter $formatter, array $latinOrdinals): string
+    {
         $ordinal = "";
         $baseLocale = $LOCALE !== "LA" && $LOCALE !== "la" ? Locale::getPrimaryLanguage($LOCALE) : "LA";
-        switch(strtoupper($baseLocale)) {
+        switch (strtoupper($baseLocale)) {
             case LitLocale::LATIN:
                 $ordinal = $latinOrdinals[$num];
-            break;
+                break;
             case "EN":
                 $ordinal = $num . self::ordSuffix($num);
-            break;
+                break;
             default:
                 $ordinal = $formatter->format($num);
         }
         return $ordinal;
     }
-
 }

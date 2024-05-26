@@ -1,17 +1,18 @@
 <?php
+
 // ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL);
 
-include_once( 'vendor/autoload.php' );
-include_once( 'includes/LitCalTest.php' );
-include_once( 'includes/enums/LitSchema.php' );
+include_once('vendor/autoload.php');
+include_once('includes/LitCalTest.php');
+include_once('includes/enums/LitSchema.php');
 
 $testsFolder = dirname(__FILE__) . '/tests';
 $it = new DirectoryIterator("glob://$testsFolder/*Test.php");
-foreach($it as $f) {
+foreach ($it as $f) {
     $fileName = $f->getFilename();
-    include_once( 'tests/' . $fileName );
+    include_once('tests/' . $fileName);
 }
 
 use Swaggest\JsonSchema\InvalidValue;
@@ -21,77 +22,82 @@ use Sabre\VObject\InvalidDataException;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
-class LitCalHealth implements MessageComponentInterface {
+class LitCalHealth implements MessageComponentInterface
+{
     protected $clients;
 
-    public function onOpen(ConnectionInterface $conn) {
+    public function onOpen(ConnectionInterface $conn)
+    {
         // Store the new connection to send messages to later
         $this->clients->attach($conn);
 
         echo "New connection! ({$conn->resourceId})\n";
     }
 
-    public function onMessage(ConnectionInterface $from, $msg) {
+    public function onMessage(ConnectionInterface $from, $msg)
+    {
         echo sprintf('Receiving message "%s" from connection %d', $msg, $from->resourceId);
-        $messageReceived = json_decode( $msg );
-        if( json_last_error() === JSON_ERROR_NONE ) {
-            if( property_exists( $messageReceived, 'action' ) ) {
-                switch( $messageReceived->action ) {
+        $messageReceived = json_decode($msg);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            if (property_exists($messageReceived, 'action')) {
+                switch ($messageReceived->action) {
                     case 'executeValidation':
-                        if(
-                            property_exists( $messageReceived, 'validate' ) &&
-                            property_exists( $messageReceived, 'sourceFile' ) &&
-                            property_exists( $messageReceived, 'category' )
+                        if (
+                            property_exists($messageReceived, 'validate') &&
+                            property_exists($messageReceived, 'sourceFile') &&
+                            property_exists($messageReceived, 'category')
                         ) {
-                            $this->executeValidation( $messageReceived, $from );
+                            $this->executeValidation($messageReceived, $from);
                         }
                         break;
                     case 'validateCalendar':
-                        if(
-                            property_exists( $messageReceived, 'calendar' ) &&
-                            property_exists( $messageReceived, 'year' ) &&
-                            property_exists( $messageReceived, 'category' ) &&
-                            property_exists( $messageReceived, 'responsetype' )
+                        if (
+                            property_exists($messageReceived, 'calendar') &&
+                            property_exists($messageReceived, 'year') &&
+                            property_exists($messageReceived, 'category') &&
+                            property_exists($messageReceived, 'responsetype')
                         ) {
-                            $this->validateCalendar( $messageReceived->calendar, $messageReceived->year, $messageReceived->category, $messageReceived->responsetype, $from );
+                            $this->validateCalendar($messageReceived->calendar, $messageReceived->year, $messageReceived->category, $messageReceived->responsetype, $from);
                         }
                         break;
                     case 'executeUnitTest':
-                        if(
-                            property_exists( $messageReceived, 'calendar' ) &&
-                            property_exists( $messageReceived, 'year' ) &&
-                            property_exists( $messageReceived, 'category' ) &&
-                            property_exists( $messageReceived, 'test' )
+                        if (
+                            property_exists($messageReceived, 'calendar') &&
+                            property_exists($messageReceived, 'year') &&
+                            property_exists($messageReceived, 'category') &&
+                            property_exists($messageReceived, 'test')
                         ) {
-                            $this->executeUnitTest( $messageReceived->test, $messageReceived->calendar, $messageReceived->year, $messageReceived->category, $from );
+                            $this->executeUnitTest($messageReceived->test, $messageReceived->calendar, $messageReceived->year, $messageReceived->category, $from);
                         }
                         break;
                     default:
                         $message = new stdClass();
                         $message->type = "echobot";
                         $message->text = $msg;
-                        $this->sendMessage( $from, $message );
+                        $this->sendMessage($from, $message);
                 }
             }
         }
-
     }
 
-    public function onClose(ConnectionInterface $conn) {
+    public function onClose(ConnectionInterface $conn)
+    {
         // The connection is closed, remove it, as we can no longer send it messages
         $this->clients->detach($conn);
 
         echo "Connection {$conn->resourceId} has disconnected\n";
     }
 
-    public function onError(ConnectionInterface $conn, \Exception $e) {
+    public function onError(ConnectionInterface $conn, \Exception $e)
+    {
         echo "An error has occurred: {$e->getMessage()}\n";
         $conn->close();
     }
 
-    private function sendMessage( ConnectionInterface $from, string|stdClass $msg ) {
-        if( gettype( $msg ) !== 'string' ) {
-            $msg = json_encode( $msg );
+    private function sendMessage(ConnectionInterface $from, string|stdClass $msg)
+    {
+        if (gettype($msg) !== 'string') {
+            $msg = json_encode($msg);
         }
         foreach ($this->clients as $client) {
             if ($from === $client) {
@@ -113,13 +119,15 @@ class LitCalHealth implements MessageComponentInterface {
 
     const LitCalBaseUrl = "https://litcal.johnromanodorazio.com/api/dev/LitCalEngine.php";
 
-    public function __construct() {
-        $this->clients = new \SplObjectStorage;
+    public function __construct()
+    {
+        $this->clients = new \SplObjectStorage();
     }
 
-    private function executeValidation( object $validation, ConnectionInterface $to ) {
+    private function executeValidation(object $validation, ConnectionInterface $to)
+    {
         $dataPath = $validation->sourceFile;
-        switch( $validation->category ) {
+        switch ($validation->category) {
             case 'universalcalendar':
                 $schema = LitCalHealth::DataPathToSchema[ $dataPath ];
                 break;
@@ -136,60 +144,59 @@ class LitCalHealth implements MessageComponentInterface {
                 $schema = LitSchema::PROPRIUMDESANCTIS;
                 break;
         }
-        $data = file_get_contents( $dataPath );
-        if( $data !== false ) {
+        $data = file_get_contents($dataPath);
+        if ($data !== false) {
             $message = new stdClass();
             $message->type = "success";
             $message->text = "The Data file $dataPath exists";
             $message->classes = ".$validation->validate.file-exists";
-            $this->sendMessage( $to, $message );
+            $this->sendMessage($to, $message);
 
-            $jsonData = json_decode( $data );
-            if( json_last_error() === JSON_ERROR_NONE ) {
+            $jsonData = json_decode($data);
+            if (json_last_error() === JSON_ERROR_NONE) {
                 $message = new stdClass();
                 $message->type = "success";
                 $message->text = "The Data file $dataPath was successfully decoded as JSON";
                 $message->classes = ".$validation->validate.json-valid";
-                $this->sendMessage( $to, $message );
+                $this->sendMessage($to, $message);
 
-                $validationResult = $this->validateDataAgainstSchema( $jsonData, $schema );
-                if( gettype( $validationResult ) === 'boolean' && $validationResult === true ) {
+                $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
+                if (gettype($validationResult) === 'boolean' && $validationResult === true) {
                     $message = new stdClass();
                     $message->type = "success";
                     $message->text = "The Data file $dataPath was successfully validated against the Schema $schema";
                     $message->classes = ".$validation->validate.schema-valid";
-                    $this->sendMessage( $to, $message );
-                }
-                else if( gettype( $validationResult === 'object' ) ) {
+                    $this->sendMessage($to, $message);
+                } elseif (gettype($validationResult === 'object')) {
                     $validationResult->classes = ".$validation->validate.schema-valid";
-                    $this->sendMessage( $to, $validationResult );
+                    $this->sendMessage($to, $validationResult);
                 }
             } else {
                 $message = new stdClass();
                 $message->type = "error";
                 $message->text = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg();
                 $message->classes = ".$validation->validate.json-valid";
-                $this->sendMessage( $to, $message );
+                $this->sendMessage($to, $message);
             }
-
         } else {
             $message = new stdClass();
             $message->type = "error";
             $message->text = "Data file $dataPath does not exist";
             $message->classes = ".$validation->validate.file-exists";
-            $this->sendMessage( $to, $message );
+            $this->sendMessage($to, $message);
         }
     }
 
-    private static function retrieve_xml_errors( array $errors, array $xml ) : string {
+    private static function retrieve_xml_errors(array $errors, array $xml): string
+    {
         $return = [];
-        foreach( $errors as $error ) {
+        foreach ($errors as $error) {
             $errorStr = "";
             switch ($error->level) {
                 case LIBXML_ERR_WARNING:
                     $errorStr .= "Warning $error->code: ";
                     break;
-                 case LIBXML_ERR_ERROR:
+                case LIBXML_ERR_ERROR:
                     $errorStr .= "Error $error->code: ";
                     break;
                 case LIBXML_ERR_FATAL:
@@ -205,126 +212,126 @@ class LitCalHealth implements MessageComponentInterface {
         return implode('&#013;', $return);
     }
 
-    private function validateCalendar( string $Calendar, int $Year, string $category, string $responseType, ConnectionInterface $to ) : void {
-        if( $Calendar === 'VATICAN' ) {
+    private function validateCalendar(string $Calendar, int $Year, string $category, string $responseType, ConnectionInterface $to): void
+    {
+        if ($Calendar === 'VATICAN') {
             $req = "?nationalcalendar=VATICAN&year=$Year&calendartype=CIVIL&returntype=$responseType";
         } else {
             $req = "?$category=$Calendar&year=$Year&calendartype=CIVIL&returntype=$responseType";
         }
-        $data = file_get_contents( self::LitCalBaseUrl . $req );
-        if( $data !== false ) {
+        $data = file_get_contents(self::LitCalBaseUrl . $req);
+        if ($data !== false) {
             $message = new stdClass();
             $message->type = "success";
             $message->text = "The $category of $Calendar for the year $Year exists";
             $message->classes = ".calendar-$Calendar.file-exists.year-$Year";
-            $this->sendMessage( $to, $message );
+            $this->sendMessage($to, $message);
 
-            switch( $responseType ) {
+            switch ($responseType) {
                 case "XML":
                     libxml_use_internal_errors(true);
                     $xml = new DOMDocument();
-                    $xml->loadXML( $data );
+                    $xml->loadXML($data);
                     //$xml = simplexml_load_string( $data );
                     $xmlArr = explode("\n", $data);
                     if ($xml === false) {
                         $message = new stdClass();
                         $message->type = "error";
                         $errors = libxml_get_errors();
-                        $errorString = self::retrieve_xml_errors( $errors, $xmlArr );
+                        $errorString = self::retrieve_xml_errors($errors, $xmlArr);
                         libxml_clear_errors();
                         $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as XML: " . $errorString;
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $message->responsetype = $responseType;
-                        $this->sendMessage( $to, $message );
+                        $this->sendMessage($to, $message);
                     } else {
                         $message = new stdClass();
                         $message->type = "success";
                         $message->text = "The $category of $Calendar for the year $Year was successfully decoded as XML";
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
-                        $this->sendMessage( $to, $message );
+                        $this->sendMessage($to, $message);
 
                         $validationResult = $xml->schemaValidate('https://litcal.johnromanodorazio.com/api/dev/schemas/LiturgicalCalendar.xsd');
-                        if( $validationResult ) {
+                        if ($validationResult) {
                             $message = new stdClass();
                             $message->type = "success";
                             $message->text = "The $category of $Calendar for the year $Year was successfully validated against the Schema https://litcal.johnromanodorazio.com/api/dev/schemas/LiturgicalCalendar.xsd";
                             $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
-                            $this->sendMessage( $to, $message );
+                            $this->sendMessage($to, $message);
                         } else {
                             $errors = libxml_get_errors();
-                            $errorString = self::retrieve_xml_errors( $errors, $xmlArr );
+                            $errorString = self::retrieve_xml_errors($errors, $xmlArr);
                             libxml_clear_errors();
                             $message = new stdClass();
                             $message->type = "error";
                             $message->text = $errorString;
                             $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
-                            $this->sendMessage( $to, $message );
+                            $this->sendMessage($to, $message);
                         }
                     }
                     break;
                 case "ICS":
                     try {
-                        $vcalendar = VObject\Reader::read( $data );
+                        $vcalendar = VObject\Reader::read($data);
                     } catch (InvalidDataException $ex) {
-                        $vcalendar = json_encode( $ex );
+                        $vcalendar = json_encode($ex);
                     }
-                    if( $vcalendar instanceof VObject\Document ) {
+                    if ($vcalendar instanceof VObject\Document) {
                         $message = new stdClass();
                         $message->type = "success";
                         $message->text = "The $category of $Calendar for the year $Year was successfully decoded as ICS";
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
-                        $this->sendMessage( $to, $message );
+                        $this->sendMessage($to, $message);
 
                         $result = $vcalendar->validate();
-                        if( count($result) === 0 ) {
+                        if (count($result) === 0) {
                             $message = new stdClass();
                             $message->type = "success";
                             $message->text = "The $category of $Calendar for the year $Year was successfully validated according the iCalendar Schema https://tools.ietf.org/html/rfc5545";
                             $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
-                            $this->sendMessage( $to, $message );
+                            $this->sendMessage($to, $message);
                         } else {
                             $message = new stdClass();
                             $message->type = "error";
                             $errorStrings = [];
-                            foreach( $result as $error ) {
-                                $errorLevel = new ICSErrorLevel( $error['level'] );
+                            foreach ($result as $error) {
+                                $errorLevel = new ICSErrorLevel($error['level']);
                                 //TODO: implement $error['node']->lineIndex and $error['node']->lineString if and when the PR is accepted upstream...
                                 $errorStrings[] = $errorLevel . ": " . $error['message'];// . " at line {$error['node']->lineIndex} ({$error['node']->lineString})"
                             }
-                            $message->text = implode('&#013;', $errorStrings ) || "validation encountered " . count( $result ) . " errors";
+                            $message->text = implode('&#013;', $errorStrings) || "validation encountered " . count($result) . " errors";
                             $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
-                            $this->sendMessage( $to, $message );
+                            $this->sendMessage($to, $message);
                         }
                     } else {
                         $message = new stdClass();
                         $message->type = "error";
-                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as ICS: parsing resulted in type " .gettype( $vcalendar ) . " | " . $vcalendar;
+                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as ICS: parsing resulted in type " . gettype($vcalendar) . " | " . $vcalendar;
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $message->responsetype = $responseType;
-                        $this->sendMessage( $to, $message );
+                        $this->sendMessage($to, $message);
                     }
                     break;
                 case "YML":
                     try {
-                        $yamlData = json_decode( json_encode( yaml_parse( $data ) ) );
-                        if( $yamlData ) {
+                        $yamlData = json_decode(json_encode(yaml_parse($data)));
+                        if ($yamlData) {
                             $message = new stdClass();
                             $message->type = "success";
                             $message->text = "The $category of $Calendar for the year $Year was successfully decoded as YAML";
                             $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
-                            $this->sendMessage( $to, $message );
+                            $this->sendMessage($to, $message);
 
-                            $validationResult = $this->validateDataAgainstSchema( $yamlData, LitSchema::LITCAL );
-                            if( gettype( $validationResult ) === 'boolean' && $validationResult === true ) {
+                            $validationResult = $this->validateDataAgainstSchema($yamlData, LitSchema::LITCAL);
+                            if (gettype($validationResult) === 'boolean' && $validationResult === true) {
                                 $message = new stdClass();
                                 $message->type = "success";
                                 $message->text = "The $category of $Calendar for the year $Year was successfully validated against the Schema " . LitSchema::LITCAL;
                                 $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
-                                $this->sendMessage( $to, $message );
-                            }
-                            else if( gettype( $validationResult === 'object' ) ) {
+                                $this->sendMessage($to, $message);
+                            } elseif (gettype($validationResult === 'object')) {
                                 $validationResult->classes = ".calendar-$Calendar.schema-valid.year-$Year";
-                                $this->sendMessage( $to, $validationResult );
+                                $this->sendMessage($to, $validationResult);
                             }
                         }
                     } catch (Exception $ex) {
@@ -333,30 +340,29 @@ class LitCalHealth implements MessageComponentInterface {
                         $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as YAML: " . $ex->getMessage();
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $message->responsetype = $responseType;
-                        $this->sendMessage( $to, $message );
+                        $this->sendMessage($to, $message);
                     }
                     break;
                 case "JSON":
                 default:
-                    $jsonData = json_decode( $data );
-                    if( json_last_error() === JSON_ERROR_NONE ) {
+                    $jsonData = json_decode($data);
+                    if (json_last_error() === JSON_ERROR_NONE) {
                         $message = new stdClass();
                         $message->type = "success";
                         $message->text = "The $category of $Calendar for the year $Year was successfully decoded as JSON";
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
-                        $this->sendMessage( $to, $message );
-        
-                        $validationResult = $this->validateDataAgainstSchema( $jsonData, LitSchema::LITCAL );
-                        if( gettype( $validationResult ) === 'boolean' && $validationResult === true ) {
+                        $this->sendMessage($to, $message);
+
+                        $validationResult = $this->validateDataAgainstSchema($jsonData, LitSchema::LITCAL);
+                        if (gettype($validationResult) === 'boolean' && $validationResult === true) {
                             $message = new stdClass();
                             $message->type = "success";
                             $message->text = "The $category of $Calendar for the year $Year was successfully validated against the Schema " . LitSchema::LITCAL;
                             $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
-                            $this->sendMessage( $to, $message );
-                        }
-                        else if( gettype( $validationResult === 'object' ) ) {
+                            $this->sendMessage($to, $message);
+                        } elseif (gettype($validationResult === 'object')) {
                             $validationResult->classes = ".calendar-$Calendar.schema-valid.year-$Year";
-                            $this->sendMessage( $to, $validationResult );
+                            $this->sendMessage($to, $validationResult);
                         }
                     } else {
                         $message = new stdClass();
@@ -364,7 +370,7 @@ class LitCalHealth implements MessageComponentInterface {
                         $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as JSON: " . json_last_error_msg();
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $message->responsetype = $responseType;
-                        $this->sendMessage( $to, $message );
+                        $this->sendMessage($to, $message);
                     }
             }
         } else {
@@ -372,33 +378,35 @@ class LitCalHealth implements MessageComponentInterface {
             $message->type = "error";
             $message->text = "The $category of $Calendar for the year $Year does not exist at the URL " . self::LitCalBaseUrl . $req;
             $message->classes = ".calendar-$Calendar.file-exists.year-$Year";
-            $this->sendMessage( $to, $message );
+            $this->sendMessage($to, $message);
         }
     }
 
-    private function executeUnitTest( string $Test, string $Calendar, int $Year, string $category, ConnectionInterface $to ) : void {
-        if( $Calendar === 'VATICAN' ) {
+    private function executeUnitTest(string $Test, string $Calendar, int $Year, string $category, ConnectionInterface $to): void
+    {
+        if ($Calendar === 'VATICAN') {
             $req = "?nationalcalendar=VATICAN&year=$Year&calendartype=CIVIL";
         } else {
             $req = "?$category=$Calendar&year=$Year&calendartype=CIVIL";
         }
-        $jsonData = json_decode( file_get_contents( self::LitCalBaseUrl . $req ) );
-        if( json_last_error() === JSON_ERROR_NONE ) {
-            $UnitTest = new LitCalTest( $Test, $jsonData );
-            if( $UnitTest->isReady() ) {
+        $jsonData = json_decode(file_get_contents(self::LitCalBaseUrl . $req));
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $UnitTest = new LitCalTest($Test, $jsonData);
+            if ($UnitTest->isReady()) {
                 $UnitTest->runTest();
             }
-            $this->sendMessage( $to, $UnitTest->getMessage() );
+            $this->sendMessage($to, $UnitTest->getMessage());
         }
     }
 
-    private function validateDataAgainstSchema( object|array $data, string $schemaUrl ) : bool|object {
+    private function validateDataAgainstSchema(object|array $data, string $schemaUrl): bool|object
+    {
         $res = false;
         try {
-            $schema = Schema::import( $schemaUrl );
+            $schema = Schema::import($schemaUrl);
             $schema->in($data);
             $res = true;
-        } catch (InvalidValue|Exception $e) {
+        } catch (InvalidValue | Exception $e) {
             $message = new stdClass();
             $message->type = "error";
             $message->text = LitSchema::ERROR_MESSAGES[ $schemaUrl ] . PHP_EOL . $e->getMessage();
@@ -406,10 +414,10 @@ class LitCalHealth implements MessageComponentInterface {
         }
         return $res;
     }
-
 }
 
-class ICSErrorLevel {
+class ICSErrorLevel
+{
     const int REPAIRED  = 1;
     const int WARNING   = 2;
     const int FATAL     = 3;
@@ -421,11 +429,13 @@ class ICSErrorLevel {
     ];
     private string $errorString;
 
-    public function __construct( int $errorLevel ) {
+    public function __construct(int $errorLevel)
+    {
         $this->errorString = static::ERROR_STRING[ $errorLevel ];
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return $this->errorString;
     }
 }

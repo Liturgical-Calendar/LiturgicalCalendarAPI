@@ -9,7 +9,8 @@
  *  in the ACCEPT_HEADER class, so that conversions can be made
  */
 
-class ReturnType {
+class ReturnType
+{
     const ATTACHMENT    = "ATTACHMENT";
     const JSON          = "JSON";
     const XML           = "XML";
@@ -64,7 +65,8 @@ class ReturnType {
         "VIDEO_WEBM"
     ];
 
-    public static function isValid( $value ) {
-        return in_array( $value, self::$values );
+    public static function isValid($value)
+    {
+        return in_array($value, self::$values);
     }
 }

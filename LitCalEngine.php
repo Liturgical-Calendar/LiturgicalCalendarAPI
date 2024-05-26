@@ -9,7 +9,6 @@
  * Date Created: 27 December 2017
  */
 
-
 /**********************************************************************************
  *                          ABBREVIATIONS                                         *
  * CB     Cerimonial of Bishops                                                   *
@@ -43,20 +42,20 @@
  * Romeins Missaal [ NETHERLANDS ], 1978
  *********************************************************************************/
 
-error_reporting( E_ALL );
-ini_set( 'display_errors', 1 );
-ini_set( 'date.timezone', 'Europe/Vatican' );
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+// ini_set('date.timezone', 'Europe/Vatican');
 
-include_once( 'includes/enums/AcceptHeader.php' );
-include_once( 'includes/enums/CacheDuration.php' );
-include_once( 'includes/enums/RequestMethod.php' );
-include_once( 'includes/enums/RequestContentType.php' );
-include_once( 'includes/enums/ReturnType.php' );
+include_once('includes/enums/AcceptHeader.php');
+include_once('includes/enums/CacheDuration.php');
+include_once('includes/enums/RequestMethod.php');
+include_once('includes/enums/RequestContentType.php');
+include_once('includes/enums/ReturnType.php');
 
-include_once( "includes/LitCalAPI.php" );
+include_once("includes/LitCalAPI.php");
 
-if( file_exists("allowedOrigins.php") ) {
-    include_once( 'allowedOrigins.php' );
+if (file_exists("allowedOrigins.php")) {
+    include_once('allowedOrigins.php');
 }
 
 $allowedOrigins = [
@@ -66,15 +65,15 @@ $allowedOrigins = [
     "https://litcal-staging.johnromanodorazio.com"
 ];
 
-if( defined('ALLOWED_ORIGINS') && is_array( ALLOWED_ORIGINS ) ) {
-    $allowedOrigins = array_merge( $allowedOrigins, ALLOWED_ORIGINS );
+if (defined('ALLOWED_ORIGINS') && is_array(ALLOWED_ORIGINS)) {
+    $allowedOrigins = array_merge($allowedOrigins, ALLOWED_ORIGINS);
 }
 
 $LitCalEngine = new LitCalAPI();
-$LitCalEngine->APICore->setAllowedOrigins( $allowedOrigins );
-$LitCalEngine->APICore->setAllowedRequestMethods( [ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ] );
-$LitCalEngine->APICore->setAllowedRequestContentTypes( [ RequestContentType::JSON, RequestContentType::FORMDATA ] );
-$LitCalEngine->APICore->setAllowedAcceptHeaders( [ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS, AcceptHeader::YML ] );
-$LitCalEngine->setAllowedReturnTypes( [ ReturnType::JSON, ReturnType::XML, ReturnType::ICS, ReturnType::YML ] );
-$LitCalEngine->setCacheDuration( CacheDuration::MONTH );
+$LitCalEngine->APICore->setAllowedOrigins($allowedOrigins);
+$LitCalEngine->APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
+$LitCalEngine->APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
+$LitCalEngine->APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS, AcceptHeader::YML ]);
+$LitCalEngine->setAllowedReturnTypes([ ReturnType::JSON, ReturnType::XML, ReturnType::ICS, ReturnType::YML ]);
+$LitCalEngine->setCacheDuration(CacheDuration::MONTH);
 $LitCalEngine->Init();

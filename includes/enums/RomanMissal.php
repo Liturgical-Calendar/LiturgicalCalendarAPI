@@ -1,7 +1,7 @@
 <?php
 
-class RomanMissal {
-
+class RomanMissal
+{
     const EDITIO_TYPICA_1970                    = "VATICAN_1970";
     const REIMPRESSIO_EMENDATA_1971             = "VATICAN_1971";
     const EDITIO_TYPICA_SECUNDA_1975            = "VATICAN_1975";
@@ -13,7 +13,7 @@ class RomanMissal {
     const ITALY_EDITION_2020                    = "ITALY_2020";
     const NETHERLANDS_EDITION_1978              = "NETHERLANDS_1978";
 
-    public static array $values = [ 
+    public static array $values = [
         "VATICAN_1970",
         "VATICAN_1971",
         "VATICAN_1975",
@@ -76,35 +76,43 @@ class RomanMissal {
     ];
 
 
-    public static function isValid( $value ) : bool {
-        return in_array( $value, self::$values );
+    public static function isValid($value): bool
+    {
+        return in_array($value, self::$values);
     }
 
-    public static function isLatinMissal( $value ) : bool {
-        return in_array( $value, self::$values ) && strpos( $value, "VATICAN_" );
+    public static function isLatinMissal($value): bool
+    {
+        return in_array($value, self::$values) && strpos($value, "VATICAN_");
     }
 
-    public static function getName( $value ) : string {
+    public static function getName($value): string
+    {
         return self::$names[ $value ];
     }
 
-    public static function getSanctoraleFileName( $value ) : string|false {
+    public static function getSanctoraleFileName($value): string|false
+    {
         return self::$jsonFiles[ $value ];
     }
 
-    public static function getSanctoraleI18nFilePath( $value ) : string|false {
+    public static function getSanctoraleI18nFilePath($value): string|false
+    {
         return self::$i18nPath[ $value ];
     }
 
-    public static function getYearLimits( $value ) : object {
+    public static function getYearLimits($value): object
+    {
         return (object) self::$yearLimits[ $value ];
     }
 
-    public static function produceMetadata() : array {
+    public static function produceMetadata(): array
+    {
         $reflectionClass = new ReflectionClass(static::class);
         $metadata = $reflectionClass->getConstants();
-        array_walk($metadata, function(string &$v){ $v = [ "value" => $v, "name" => self::getName( $v ), "sanctoraleFileName" => self::getSanctoraleFileName( $v ), "yearLimits" => self::$yearLimits[ $v ] ]; });
+        array_walk($metadata, function (string &$v) {
+            $v = [ "value" => $v, "name" => self::getName($v), "sanctoraleFileName" => self::getSanctoraleFileName($v), "yearLimits" => self::$yearLimits[ $v ] ];
+        });
         return $metadata;
     }
-
 }

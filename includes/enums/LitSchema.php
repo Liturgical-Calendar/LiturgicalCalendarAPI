@@ -1,7 +1,7 @@
 <?php
 
-class LitSchema {
-
+class LitSchema
+{
     const INDEX             = "https://litcal.johnromanodorazio.com/api/dev/schemas/Index.json";
     const DIOCESAN          = "https://litcal.johnromanodorazio.com/api/dev/schemas/DiocesanCalendar.json";
     const NATIONAL          = "https://litcal.johnromanodorazio.com/api/dev/schemas/NationalCalendar.json";
@@ -25,5 +25,4 @@ class LitSchema {
         LitSchema::METADATA          => "Schema validation error: LitCalMetadata not valid",
         LitSchema::LITCAL            => "Schema validation error: LitCal not valid"
     ];
-
 }
