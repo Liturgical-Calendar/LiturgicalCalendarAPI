@@ -2592,13 +2592,13 @@
       "NationalDiocesanWiderRegionCalendar": {
         "oneOf": [
           {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/NationalCalendar.json"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/NationalCalendar.json#/definitions/NationalCalendar"
           },
           {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/DiocesanCalendar.json"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/DiocesanCalendar.json#/definitions/DiocesanCalendar"
           },
           {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/WiderRegionCalendar.json"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/WiderRegionCalendar.json#/definitions/WiderRegionCalendar"
           }
         ]
       }
