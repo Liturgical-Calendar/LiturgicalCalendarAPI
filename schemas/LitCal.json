@@ -37,7 +37,8 @@
                             "enum": [
                                 "ICS",
                                 "JSON",
-                                "XML"
+                                "XML",
+                                "YML"
                             ]
                         },
                         "EternalHighPriest": {
@@ -87,7 +88,7 @@
                                 "Accept": {
                                     "type": "string",
                                     "description": "If present, must contain at least one of the following",
-                                    "pattern": "(?:text/html|application/xml|application/json|text/calendar)"
+                                    "pattern": "(?:text/html|application/xml|application/json|text/calendar|application/yaml)"
                                 },
                                 "Accept-Language": {
                                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/AcceptLanguage"
@@ -121,8 +122,11 @@
                 "LitCal": {
                     "type": "object",
                     "patternProperties": {
-                        "^[A-Z][a-zA-Z1-9]+$": {
-                            "$ref": "#/definitions/Festivity"
+                        "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}_vigil$": {
+                            "$ref": "#/definitions/FestivityVigil"
+                        },
+                        "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}$": {
+                            "$ref": "#/definitions/FestivityWithSeason"
                         }
                     },
                     "additionalProperties": false
@@ -144,7 +148,7 @@
         "DateTimeObjectCollection": {
             "type": "object",
             "patternProperties": {
-                "^[A-Z][a-zA-Z1-9]+$": {
+                "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+(?:0|_vigil)?$": {
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
@@ -162,10 +166,9 @@
                         }
                     }
                 }
-            },
-            "additionalProperties": false
+            }
         },
-        "Festivity": {
+        "FestivityVigil": {
             "type": "object",
             "properties": {
                 "eventIdx": {
@@ -246,18 +249,106 @@
                 },
                 "isVigilFor": {
                     "type": "string"
+                }
+            },
+            "required": [
+                "eventIdx",
+                "name",
+                "date",
+                "color",
+                "colorLcl",
+                "type",
+                "grade",
+                "displayGrade",
+                "common",
+                "commonLcl",
+                "dayOfTheWeek_ISO8601",
+                "month",
+                "day",
+                "year",
+                "monthShort",
+                "monthLong",
+                "dayOfTheWeekShort",
+                "dayOfTheWeekLong",
+                "isVigilMass",
+                "isVigilFor"
+            ],
+            "additionalProperties": false
+        },
+        "FestivityWithSeason": {
+            "properties": {
+                "eventIdx": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2000
                 },
-                "hasVigilMass": {
-                    "type": "boolean"
+                "name": {
+                    "type": "string"
                 },
-                "hasVesperI": {
-                    "type": "boolean"
+                "date": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Timestamp"
                 },
-                "hasVesperII":  {
-                    "type": "boolean"
+                "color": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                 },
-                "psalterWeek": {
-                    "type": "integer"
+                "colorLcl": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "type": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitFeastType"
+                },
+                "grade": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
+                },
+                "gradeLcl": {
+                    "type": "string"
+                },
+                "displayGrade": {
+                    "type": "string"
+                },
+                "common": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
+                },
+                "commonLcl": {
+                    "type": "string"
+                },
+                "dayOfTheWeek_ISO8601": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 7
+                },
+                "month": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 12
+                },
+                "day": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 31
+                },
+                "year": {
+                    "type": "integer",
+                    "minimum": 1969,
+                    "maxItems": 9999
+                },
+                "monthShort": {
+                    "type": "string"
+                },
+                "monthLong": {
+                    "type": "string"
+                },
+                "dayOfTheWeekShort": {
+                    "type": "string"
+                },
+                "dayOfTheWeekLong": {
+                    "type": "string"
+                },
+                "liturgicalYear": {
+                    "type": "string"
                 },
                 "liturgicalSeason": {
                     "type": "string",
@@ -272,6 +363,18 @@
                 },
                 "liturgicalSeasonLcl": {
                     "type": "string"
+                },
+                "hasVigilMass": {
+                    "type": "boolean"
+                },
+                "hasVesperI": {
+                    "type": "boolean"
+                },
+                "hasVesperII":  {
+                    "type": "boolean"
+                },
+                "psalterWeek": {
+                    "type": "integer"
                 }
             },
             "required": [

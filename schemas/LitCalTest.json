@@ -44,11 +44,11 @@
             "properties": {
                 "name" : {
                     "type": "string",
-                    "pattern": "^[A-Z][a-zA-Z0-9]+Test$"
+                    "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
                 },
                 "eventkey": {
                     "type": "string",
-                    "pattern": "^[A-Z][a-zA-Z0-9]+$"
+                    "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
                 },
                 "description": {
                     "type": "string"
@@ -78,11 +78,11 @@
             "properties": {
                 "name" : {
                     "type": "string",
-                    "pattern": "^[A-Z][a-zA-Z0-9]+Test$"
+                    "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
                 },
                 "eventkey": {
                     "type": "string",
-                    "pattern": "^[A-Z][a-zA-Z0-9]+$"
+                    "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
                 },
                 "description": {
                     "type": "string"

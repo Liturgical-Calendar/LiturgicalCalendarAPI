@@ -16,7 +16,7 @@
         },
         {
             "Festivity": {
-                "tag": "H_Lidwina",
+                "tag": "HLidwina",
                 "name": "H. Lidwina, maagd",
                 "color": [
                     "white"
@@ -85,7 +85,7 @@
         },
         {
             "Festivity": {
-                "tag": "Verjaardag_Wijding_kerken",
+                "tag": "VerjaardagWijdingKerken",
                 "name": "Verjaardag van de Wijding van alle kerken waarvan de wijdingsdatum niet bekend is",
                 "color": [
                     "white"

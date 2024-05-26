@@ -35,6 +35,7 @@
         "tags": [
           "Main API endpoint"
         ],
+        "security": [{}],
         "summary": "retrieves liturgical events for each day of the year",
         "operationId": "retrieveEventsGET",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
@@ -113,7 +114,8 @@
               "enum": [
                 "JSON",
                 "XML",
-                "ICS"
+                "ICS",
+                "YML"
               ],
               "default": "JSON"
             }
@@ -247,6 +249,7 @@
         "tags": [
           "Main API endpoint"
         ],
+        "security": [{}],
         "summary": "retrieves liturgical events for each day of the year",
         "operationId": "retrieveEventsPOST",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
@@ -351,6 +354,7 @@
         "tags": [
           "Metadata API endpoint"
         ],
+        "security": [{}],
         "summary": "gives information about current supported national and diocesan calendars and relative locales",
         "operationId": "retrieveMetadataGET",
         "responses": {
@@ -370,6 +374,7 @@
         "tags": [
           "Metadata API endpoint"
         ],
+        "security": [{}],
         "summary": "gives information about current supported national and diocesan calendars and relative locales",
         "operationId": "retrieveMetadataPOST",
         "responses": {
@@ -391,6 +396,7 @@
         "tags": [
           "Unit Test Index endpoint"
         ],
+        "security": [{}],
         "summary": "retrieves all the unit tests defined in the API `tests` folder and serves an index useful for frontend processing",
         "operationId": "retrieveTestIndexGET",
         "responses": {
@@ -399,7 +405,20 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LitCalTestsIndex"
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/components/schemas/ExactOrVariableCorrespondenceUnitTest"
+                      },
+                      {
+                        "$ref": "#/components/schemas/ExactCorrespondenceSinceUnitTest"
+                      },
+                      {
+                        "$ref": "#/components/schemas/ExactCorrespondenceUntilUnitTest"
+                      }
+                    ]
+                  }
                 },
                 "example": [
                   {
@@ -538,8 +557,49 @@
         "tags": [
           "All possible liturgical events endpoint"
         ],
+        "security": [{}],
         "summary": "retrieves all possible liturgical events that may or may not appear in the Liturgical Calendar for any given year, based on the calculations done by the LitCal API; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
         "operationId": "retrieveAllEventsGET",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "settings",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "object",
+              "oneOf": [
+                {
+                  "properties": {
+                    "locale": {
+                      "type": "string",
+                      "description": "request the localization of the returned events in a specific language; will not be considered if a National calendar or diocesan calendar is requested",
+                      "default": "la"
+                    },
+                    "nationalcalendar": {
+                      "type": "string",
+                      "description": "requests liturgical calendar data for a particular geographic area, on a national level or according to specifications defined be one or more Episcopal Conferences or on a Roman Missal published for a certain language or geographic area."
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "locale": {
+                      "type": "string",
+                      "description": "request the localization of the returned events in a specific language; will not be considered if a National calendar or diocesan calendar is requested",
+                      "default": "la"
+                    },
+                    "diocesancalendar": {
+                      "type": "string",
+                      "description": "requests liturgical calendar data for a particular diocese"
+                    }
+                  }
+                }
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK: A collection of all possible liturgical events that can be found in a liturgical calendar produced by the LitCal API",
@@ -604,7 +664,7 @@
             "type": "object",
             "description": "the liturgical events that make up the requested Liturgical Calendar for the given year",
             "patternProperties": {
-              "^[A-Z][a-zA-Z1-9]+$": {
+              "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$": {
                 "type": "object",
                 "description": "a liturgical event",
                 "properties": {
@@ -827,7 +887,8 @@
                 "enum": [
                   "JSON",
                   "XML",
-                  "ICS"
+                  "ICS",
+                  "YML"
                 ],
                 "description": "the type of data that was requested"
               },
@@ -1338,7 +1399,8 @@
                 "enum": [
                   "JSON",
                   "XML",
-                  "ICS"
+                  "ICS",
+                  "YML"
                 ],
                 "description": "the type of data that was requested",
                 "examples": [
@@ -1737,119 +1799,122 @@
             "enum": [
               "JSON",
               "XML",
-              "ICS"
+              "ICS",
+              "YML"
             ]
           }
         }
       },
-      "LitCalTestsIndex": {
-        "type": "array",
-        "items": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "description": "identifies the Unit Test, and follows the pattern `{eventkey}Test`",
-                  "pattern": "^[A-Z][a-zA-Z0-9]+Test$"
-                },
-                "eventkey": {
-                  "type": "string",
-                  "description": "the liturgical event we are testing, must be the exact key of a corresponding liturgical event in the LitCal API",
-                  "pattern": "^[A-Z][a-zA-Z0-9]+$"
-                },
-                "description": {
-                  "type": "string",
-                  "description": "describes what the test intends to accomplish"
-                },
-                "testType": {
-                  "type": "string",
-                  "description": "* `exactCorrespondence`: the liturgical event should exist on an expected date for each of the years defined in the `years` array\n* `variableCorrespondence`: the liturgical event should not exist for certain years, and should exist on an expected date for other years",
-                  "enum": [
-                    "exactCorrespondence",
-                    "variableCorrespondence"
-                  ]
-                },
-                "assertions": {
-                  "$ref": "#/components/schemas/Assertions"
-                }
-              },
-              "required": [ "name", "eventkey", "description", "testType", "assertions" ],
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "description": "identifies the Unit Test, and follows the pattern `{eventkey}Test`",
-                  "pattern": "^[A-Z][a-zA-Z0-9]+Test$"
-                },
-                "eventkey": {
-                  "type": "string",
-                  "description": "the liturgical event we are testing, must be the exact key of a corresponding liturgical event in the LitCal API",
-                  "pattern": "^[A-Z][a-zA-Z0-9]+$"
-                },
-                "description": {
-                  "type": "string",
-                  "description": "describes what the test intends to accomplish"
-                },
-                "testType": {
-                  "type": "string",
-                  "description": "the liturgical event should exist on an expected date starting from the year indicated in the `yearSince` key, before such year the liturgical event should not exist",
-                  "const": "exactCorrespondenceSince"
-                },
-                "yearSince": {
-                  "type": "integer",
-                  "format": "int32",
-                  "minimum": 1970,
-                  "maximum": 9999
-                },
-                "assertions": {
-                  "$ref": "#/components/schemas/Assertions"
-                }
-              },
-              "required": [ "name", "eventkey", "description", "testType", "assertions", "yearSince" ],
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "description": "identifies the Unit Test, and follows the pattern `{eventkey}Test`",
-                  "pattern": "^[A-Z][a-zA-Z0-9]+Test$"
-                },
-                "eventkey": {
-                  "type": "string",
-                  "description": "the liturgical event we are testing, must be the exact key of a corresponding liturgical event in the LitCal API",
-                  "pattern": "^[A-Z][a-zA-Z0-9]+$"
-                },
-                "description": {
-                  "type": "string",
-                  "description": "describes what the test intends to accomplish"
-                },
-                "testType": {
-                  "type": "string",
-                  "description": "the liturgical event should exist on an expected date until the year indicated in the `yearUntil` key, after such year the liturgical event should not exist",
-                  "const": "exactCorrespondenceUntil"
-                },
-                "yearUntil": {
-                  "type": "integer",
-                  "format": "int32",
-                  "minimum": 1970,
-                  "maximum": 9999
-                },
-                "assertions": {
-                  "$ref": "#/components/schemas/Assertions"
-                }
-              },
-              "required": [ "name", "eventkey", "description", "testType", "assertions", "yearUntil" ],
-              "additionalProperties": false
+      "ExactOrVariableCorrespondenceUnitTest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "identifies the Unit Test, and follows the pattern `{eventkey}Test`",
+            "pattern": "^[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
+          },
+          "eventkey": {
+            "type": "string",
+            "description": "the liturgical event we are testing, must be the exact key of a corresponding liturgical event in the LitCal API",
+            "pattern": "^[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
+          },
+          "description": {
+            "type": "string",
+            "description": "describes what the test intends to accomplish"
+          },
+          "testType": {
+            "type": "string",
+            "description": "* `exactCorrespondence`: the liturgical event should exist on an expected date for each of the years defined in the `years` array\n* `variableCorrespondence`: the liturgical event should not exist for certain years, and should exist on an expected date for other years",
+            "enum": [
+              "exactCorrespondence",
+              "variableCorrespondence"
+            ]
+          },
+          "assertions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Assertions"
             }
-          ]
-        }
+          }
+        },
+        "required": [ "name", "eventkey", "description", "testType", "assertions" ]
+      },
+      "ExactCorrespondenceSinceUnitTest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "identifies the Unit Test, and follows the pattern `{eventkey}Test`",
+            "pattern": "^[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
+          },
+          "eventkey": {
+            "type": "string",
+            "description": "the liturgical event we are testing, must be the exact key of a corresponding liturgical event in the LitCal API",
+            "pattern": "^[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
+          },
+          "description": {
+            "type": "string",
+            "description": "describes what the test intends to accomplish"
+          },
+          "testType": {
+            "type": "string",
+            "description": "the liturgical event should exist on an expected date starting from the year indicated in the `yearSince` key, before such year the liturgical event should not exist",
+            "const": "exactCorrespondenceSince"
+          },
+          "yearSince": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1970,
+            "maximum": 9999
+          },
+          "assertions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Assertions"
+            }
+          }
+        },
+        "required": [ "name", "eventkey", "description", "testType", "assertions", "yearSince" ]
+      },
+      "ExactCorrespondenceUntilUnitTest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "identifies the Unit Test, and follows the pattern `{eventkey}Test`",
+            "pattern": "^[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
+          },
+          "eventkey": {
+            "type": "string",
+            "description": "the liturgical event we are testing, must be the exact key of a corresponding liturgical event in the LitCal API",
+            "pattern": "^[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
+          },
+          "description": {
+            "type": "string",
+            "description": "describes what the test intends to accomplish"
+          },
+          "testType": {
+            "type": "string",
+            "description": "the liturgical event should exist on an expected date until the year indicated in the `yearUntil` key, after such year the liturgical event should not exist",
+            "const": "exactCorrespondenceUntil"
+          },
+          "yearUntil": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1970,
+            "maximum": 9999
+          },
+          "assertions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Assertions"
+            }
+          }
+        },
+        "required": [ "name", "eventkey", "description", "testType", "assertions", "yearUntil" ]
       },
       "LitCalAllFestivitiesResponse": {
         "type": "object",
@@ -1857,7 +1922,7 @@
           "LitCalAllFestivities": {
             "type": "object",
             "patternProperties": {
-              "^[A-Z][a-zA-Z1-9]+$": {
+              "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$": {
                 "type": "object",
                 "properties": {
                   "MONTH": {
@@ -1874,7 +1939,7 @@
                   },
                   "TAG": {
                     "type": "string",
-                    "pattern": "^[A-Z][a-zA-Z1-9]+$",
+                    "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$",
                     "description": "corresponds to the `eventkey` property of liturgical events in the output of the LitCal API and similar endpoints"
                   },
                   "GRADE": {
@@ -1946,6 +2011,63 @@
                 "required": [ "MONTH", "DAY", "TAG", "GRADE", "COMMON", "CALENDAR", "COLOR", "READINGS", "NAME" ]
               }
             }
+          },
+          "Settings": {
+            "type": "object",
+            "additionalProperties": false,
+            "oneOf": [
+              {
+                "properties": {
+                  "Locale": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z]$",
+                    "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
+                  },
+                  "NationalCalendar": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3,45}$",
+                    "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
+                  },
+                  "DiocesanCalendar": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3,45}$",
+                    "description": "indicates the Diocesan Calendar used to produce the data in LitCalAllFestivities"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "Locale": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z]$",
+                    "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
+                  },
+                  "NationalCalendar": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3,45}$",
+                    "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
+                  },
+                  "DiocesanCalendar": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "Locale": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z]$",
+                    "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
+                  },
+                  "NationalCalendar": {
+                    "type": "null"
+                  },
+                  "DiocesanCalendar": {
+                    "type": "null"
+                  }
+                }
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -1954,7 +2076,7 @@
         "type": "object",
         "description": "the keys of this object identify the liturgical event",
         "patternProperties": {
-          "^[A-Z][a-zA-Z1-9]+$": {
+          "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$": {
             "type": "object",
             "description": "a liturgical event that has a rank of solemnity, and which can therefore supersede a feast or a memorial",
             "properties": {
@@ -1985,43 +2107,63 @@
       },
       "Assertions": {
         "type": "object",
-        "properties": {
-          "year": {
-            "description": "the year we are testing against",
-            "type": "integer",
-            "format": "int32",
-            "minimum": 1970,
-            "maximum": 9999
-          },
-          "expectedValue": {
-            "oneOf": [
-              {
+        "anyOf": [
+          {
+            "properties": {
+              "year": {
+                "description": "the year we are testing against",
+                "type": "integer",
+                "format": "int32",
+                "minimum": 1970,
+                "maximum": 9999
+              },
+              "expectedValue": {
                 "type": "integer",
                 "format": "int64",
                 "minimum": -2851200,
                 "maximum": 253402300799
               },
-              {
-                "type": "null"
+              "assert": {
+                "type": "string",
+                "const": "eventExists AND hasExpectedTimestamp"
+              },
+              "assertion": {
+                "type": "string",
+                "description": "descriptive form of the `assert` statement"
+              },
+              "comment": {
+                "type": "string",
+                "description": "any extra information about the significance of the expected value for this year compared to other years"
               }
-            ]
+            }
           },
-          "assert": {
-            "type": "string",
-            "enum": [
-              "eventNotExists",
-              "eventExists AND hasExpectedTimestamp"
-            ]
-          },
-          "assertion": {
-            "type": "string",
-            "description": "descriptive form of the `assert` statement"
-          },
-          "comment": {
-            "type": "string",
-            "description": "any extra information about the significance of the expected value for this year compared to other years"
+          {
+            "properties": {
+              "year": {
+                "description": "the year we are testing against",
+                "type": "integer",
+                "format": "int32",
+                "minimum": 1970,
+                "maximum": 9999
+              },
+              "expectedValue": {
+                "type": "null"
+              },
+              "assert": {
+                "type": "string",
+                "const": "eventNotExists"
+              },
+              "assertion": {
+                "type": "string",
+                "description": "descriptive form of the `assert` statement"
+              },
+              "comment": {
+                "type": "string",
+                "description": "any extra information about the significance of the expected value for this year compared to other years"
+              }
+            }
           }
-        },
+        ],
         "required": [ "year", "expectedValue", "assert", "assertion" ],
         "additionalProperties": false
       }

@@ -1,4 +1,7 @@
 <?php
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
 
 include_once( 'vendor/autoload.php' );
 include_once( 'includes/LitCalTest.php' );
@@ -14,9 +17,9 @@ foreach($it as $f) {
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
 use Sabre\VObject;
+use Sabre\VObject\InvalidDataException;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
-use Sabre\VObject\InvalidDataException;
 
 class LitCalHealth implements MessageComponentInterface {
     protected $clients;
@@ -231,6 +234,7 @@ class LitCalHealth implements MessageComponentInterface {
                         libxml_clear_errors();
                         $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as XML: " . $errorString;
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $message->responsetype = $responseType;
                         $this->sendMessage( $to, $message );
                     } else {
                         $message = new stdClass();
@@ -257,7 +261,7 @@ class LitCalHealth implements MessageComponentInterface {
                             $this->sendMessage( $to, $message );
                         }
                     }
-                break;
+                    break;
                 case "ICS":
                     try {
                         $vcalendar = VObject\Reader::read( $data );
@@ -296,12 +300,13 @@ class LitCalHealth implements MessageComponentInterface {
                         $message->type = "error";
                         $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as ICS: parsing resulted in type " .gettype( $vcalendar ) . " | " . $vcalendar;
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $message->responsetype = $responseType;
                         $this->sendMessage( $to, $message );
                     }
                     break;
-                case "YAML":
+                case "YML":
                     try {
-                        $yamlData = yaml_parse( $data );
+                        $yamlData = json_decode( json_encode( yaml_parse( $data ) ) );
                         if( $yamlData ) {
                             $message = new stdClass();
                             $message->type = "success";
@@ -327,6 +332,7 @@ class LitCalHealth implements MessageComponentInterface {
                         $message->type = "error";
                         $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as YAML: " . $ex->getMessage();
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $message->responsetype = $responseType;
                         $this->sendMessage( $to, $message );
                     }
                     break;
@@ -357,6 +363,7 @@ class LitCalHealth implements MessageComponentInterface {
                         $message->type = "error";
                         $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as JSON: " . json_last_error_msg();
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $message->responsetype = $responseType;
                         $this->sendMessage( $to, $message );
                     }
             }

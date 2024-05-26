@@ -2,16 +2,16 @@
 
 class LitSchema {
 
-    const INDEX             = "https://litcal.org/api/dev/schemas/Index.json";
-    const DIOCESAN          = "https://litcal.org/api/dev/schemas/DiocesanCalendar.json";
-    const NATIONAL          = "https://litcal.org/api/dev/schemas/NationalCalendar.json";
-    const PROPRIUMDESANCTIS = "https://litcal.org/api/dev/schemas/PropriumDeSanctis.json";
-    const PROPRIUMDETEMPORE = "https://litcal.org/api/dev/schemas/PropriumDeTempore.json";
-    const WIDERREGION       = "https://litcal.org/api/dev/schemas/WiderRegionCalendar.json";
-    const DECREEMEMORIALS   = "https://litcal.org/api/dev/schemas/MemorialsFromDecrees.json";
-    const I18N              = "https://litcal.org/api/dev/schemas/LitCalTranslation.json";
-    const METADATA          = "https://litcal.org/api/dev/schemas/LitCalMetadata.json";
-    const LITCAL            = "https://litcal.org/api/dev/schemas/LitCal.json";
+    const INDEX             = "https://litcal.johnromanodorazio.com/api/dev/schemas/Index.json";
+    const DIOCESAN          = "https://litcal.johnromanodorazio.com/api/dev/schemas/DiocesanCalendar.json";
+    const NATIONAL          = "https://litcal.johnromanodorazio.com/api/dev/schemas/NationalCalendar.json";
+    const PROPRIUMDESANCTIS = "https://litcal.johnromanodorazio.com/api/dev/schemas/PropriumDeSanctis.json";
+    const PROPRIUMDETEMPORE = "https://litcal.johnromanodorazio.com/api/dev/schemas/PropriumDeTempore.json";
+    const WIDERREGION       = "https://litcal.johnromanodorazio.com/api/dev/schemas/WiderRegionCalendar.json";
+    const DECREEMEMORIALS   = "https://litcal.johnromanodorazio.com/api/dev/schemas/MemorialsFromDecrees.json";
+    const I18N              = "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTranslation.json";
+    const METADATA          = "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalMetadata.json";
+    const LITCAL            = "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCal.json";
 
     const ERROR_MESSAGES = [
         LitSchema::INDEX             => "Schema validation error: Index not updated",
