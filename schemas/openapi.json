@@ -656,9 +656,7 @@
     },
     "/LitCalRegionalData.php": {
       "get": {
-        "tags": [
-          "National and Diocesan Calendar data definition"
-        ],
+        "tags": [ "RegionalData" ],
         "security": [{}],
         "summary": "retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataGET",
