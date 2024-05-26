@@ -11,6 +11,10 @@
  * @link      https://litcal.johnromanodorazio.com
  */
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 $allowedOrigins = [
     "https://johnromanodorazio.com",
     "https://www.johnromanodorazio.com",
