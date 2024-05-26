@@ -1,8 +1,9 @@
 <?php
+
 /**
  * Output requested JSON schema resource
  * PHP version 8.3
- * 
+ *
  * @package   LitCal
  * @author    John Romano D'Orazio <priest@johnromanodorazio.com>
  * @copyright 2024 John Romano D'Orazio
@@ -23,7 +24,8 @@ $allowedOrigins = [
 ];
 
 // Allow from specified origins
-if (isset($_SERVER['HTTP_ORIGIN'])
+if (
+    isset($_SERVER['HTTP_ORIGIN'])
     && in_array($_SERVER['HTTP_ORIGIN'], $allowedOrigins)
 ) {
     // Decide if the origin in $_SERVER['HTTP_ORIGIN'] is one
@@ -35,7 +37,6 @@ if (isset($_SERVER['HTTP_ORIGIN'])
 
 // Access-Control headers are received during OPTIONS requests
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    
     if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
         header("Access-Control-Allow-Methods: GET, OPTIONS");
     }

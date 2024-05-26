@@ -656,7 +656,9 @@
     },
     "/LitCalRegionalData.php": {
       "get": {
-        "tags": [ "RegionalData" ],
+        "tags": [
+          "RegionalData"
+        ],
         "security": [{}],
         "summary": "retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataGET",
@@ -667,7 +669,7 @@
             "schema": {
               "type": "string",
               "enum": [ "nationalCalendar", "diocesanCalendar", "widerRegionCalendar" ],
-              "example": "diocesanCalendar"
+              "examples": [ "diocesanCalendar", "nationalCalendar", "widerRegionCalendar" ]
             },
             "required": true
           },
@@ -677,9 +679,9 @@
             "schema": {
               "type": "string",
               "pattern": "^[A-Z]{3,45}$",
-              "example": "DIOCESIDIROMA"
+              "examples": [ "DIOCESIDIROMA", "NETHERLANDS", "AMERICAS" ]
             },
-            "description": "national or diocesan calendar name as an normalized uppercase key without any spaces",
+            "description": "national, diocesan or wider region calendar name as a normalized uppercase key without spaces or any non alphabetic characters",
             "required": true
           }
         ],
@@ -756,7 +758,8 @@
                   "key": {
                     "type": "string",
                     "pattern": "^[A-Z]{3,45}$",
-                    "example": "DIOCESIDIROMA"
+                    "example": "DIOCESIDIROMA",
+                    "description": "national, diocesan, or wider region calendar name as a normalized uppercase key without spaces or any non alphabetic characters"
                   }
                 },
                 "additionalProperties": false
