@@ -23,7 +23,9 @@ $allowedOrigins = [
 ];
 
 // Allow from specified origins
-if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $AllowedOrigins) ) {
+if (isset($_SERVER['HTTP_ORIGIN'])
+    && in_array($_SERVER['HTTP_ORIGIN'], $allowedOrigins)
+) {
     // Decide if the origin in $_SERVER['HTTP_ORIGIN'] is one
     // you want to allow, and if so:
     header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
