@@ -18,9 +18,9 @@ require_once '../includes/enums/RequestMethod.php';
 require_once '../includes/enums/RequestContentType.php';
 require_once '../includes/enums/ReturnType.php';
 require_once '../includes/APICore.php';
-require_once '../LitCalRegionalData.php';
+require_once '../RegionalData.php';
 
-use LitCal\LitCalRegionalData;
+use LitCal\RegionalData;
 
 if (file_exists("../allowedOrigins.php")) {
     include_once '../allowedOrigins.php';
@@ -37,7 +37,7 @@ if (defined('ALLOWED_ORIGINS') && is_array(ALLOWED_ORIGINS)) {
     $allowedOrigins = array_merge($allowedOrigins, ALLOWED_ORIGINS);
 }
 
-$LitCalRegionalData = new LitCalRegionalData();
+$LitCalRegionalData = new RegionalData();
 
 $LitCalRegionalData->APICore->setAllowedOrigins($allowedOrigins);
 $LitCalRegionalData->APICore->setAllowedReferers(
