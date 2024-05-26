@@ -6,7 +6,7 @@ use Swaggest\JsonSchema\Schema;
 use Swaggest\JsonSchema\InvalidValue;
 
 /**
- * LitCalRegionalData
+ * RegionalData
  * PHP version 8.3
  *
  * @package  LitCal
@@ -15,7 +15,7 @@ use Swaggest\JsonSchema\InvalidValue;
  * @version  GIT: 3.9
  * @link     https://litcal.johnromanodorazio.com
  */
-class LitCalRegionalData
+class RegionalData
 {
     private object $data;
     private object $response;
@@ -137,13 +137,13 @@ class LitCalRegionalData
             $key = $this->data->key;
             switch ($category) {
                 case "diocesanCalendar":
-                    $calendarDataFile = $this->generalIndex->$key->path;
+                    $calendarDataFile = "../" . $this->generalIndex->$key->path;
                     break;
                 case "widerRegionCalendar":
-                    $calendarDataFile = "nations/{$key}.json";
+                    $calendarDataFile = "../nations/{$key}.json";
                     break;
                 case "nationalCalendar":
-                    $calendarDataFile = "nations/{$key}/{$key}.json";
+                    $calendarDataFile = "../nations/{$key}/{$key}.json";
                     break;
             }
 
@@ -157,8 +157,8 @@ class LitCalRegionalData
                     if ($category === "widerRegionCalendar") {
                         $this->response->isMultilingual = is_dir("nations/{$uKey}");
                         $locale = strtolower($this->data->locale);
-                        if (file_exists("nations/{$uKey}/{$locale}.json")) {
-                            $localeData = json_decode(file_get_contents("nations/{$uKey}/{$locale}.json"));
+                        if (file_exists("../nations/{$uKey}/{$locale}.json")) {
+                            $localeData = json_decode(file_get_contents("../nations/{$uKey}/{$locale}.json"));
                             foreach ($this->response->LitCal as $idx => $el) {
                                 $this->response->LitCal[$idx]->Festivity->name =
                                     $localeData->{$this->response->LitCal[$idx]->Festivity->tag};
@@ -206,7 +206,7 @@ class LitCalRegionalData
             if ($region === 'UNITED STATES') {
                 $region = 'USA';
             }
-            $path = "nations/{$region}";
+            $path = "../nations/{$region}";
             if (!file_exists($path)) {
                 mkdir($path, 0755, true);
             }
@@ -231,7 +231,7 @@ class LitCalRegionalData
             $this->data->Metadata->WiderRegion = ucfirst(strtolower($this->data->Metadata->WiderRegion));
             $widerRegion = strtoupper($this->data->Metadata->WiderRegion);
             if ($this->data->Metadata->IsMultilingual === true) {
-                $path = "nations/{$widerRegion}";
+                $path = "../nations/{$widerRegion}";
                 if (!file_exists($path)) {
                     mkdir($path, 0755, true);
                 }
@@ -241,9 +241,9 @@ class LitCalRegionalData
                 }
                 if (count($this->data->Metadata->Languages) > 0) {
                     foreach ($this->data->Metadata->Languages as $iso) {
-                        if (!file_exists("nations/{$widerRegion}/{$iso}.json")) {
+                        if (!file_exists("../nations/{$widerRegion}/{$iso}.json")) {
                             file_put_contents(
-                                "nations/{$widerRegion}/{$iso}.json",
+                                "../nations/{$widerRegion}/{$iso}.json",
                                 json_encode($translationJSON, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
                             );
                         }
@@ -254,7 +254,7 @@ class LitCalRegionalData
             $test = $this->validateDataAgainstSchema($this->data, \LitSchema::WIDERREGION);
             if ($test === true) {
                 $data = json_encode($this->data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                file_put_contents("nations/{$this->data->Metadata->WiderRegion}.json", $data . PHP_EOL);
+                file_put_contents("../nations/{$this->data->Metadata->WiderRegion}.json", $data . PHP_EOL);
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
                 $response->success = "Wider region calendar created or updated"
                     . " for region \"{$this->data->Metadata->WiderRegion}\"";
@@ -283,7 +283,7 @@ class LitCalRegionalData
             if (property_exists($this->data, 'group')) {
                 $this->response->Group = strip_tags($this->data->group);
             }
-            $path = "nations/{$this->response->Nation}";
+            $path = "../nations/{$this->response->Nation}";
             if (!file_exists($path)) {
                 mkdir($path, 0755, true);
             }
@@ -330,7 +330,7 @@ class LitCalRegionalData
         } else {
             $this->response->Nation = strip_tags($this->data->Nation);
             $this->response->Diocese = strip_tags($this->data->Diocese);
-            $path = "nations/{$this->response->Nation}";
+            $path = "../nations/{$this->response->Nation}";
             if (file_exists($path . "/{$this->response->Diocese}.json")) {
                 unlink($path . "/{$this->response->Diocese}.json");
             } else {
@@ -354,8 +354,8 @@ class LitCalRegionalData
      */
     private function loadIndex()
     {
-        if (file_exists("nations/index.json")) {
-            $this->generalIndex = json_decode(file_get_contents("nations/index.json"));
+        if (file_exists("../nations/index.json")) {
+            $this->generalIndex = json_decode(file_get_contents("../nations/index.json"));
         }
     }
 
@@ -393,7 +393,7 @@ class LitCalRegionalData
         $test = $this->validateDataAgainstSchema($this->generalIndex, \LitSchema::INDEX);
         if ($test === true) {
             $jsonEncodedContents = json_encode($this->generalIndex, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            file_put_contents("nations/index.json", $jsonEncodedContents . PHP_EOL);
+            file_put_contents("../nations/index.json", $jsonEncodedContents . PHP_EOL);
         } else {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 422 Unprocessable Entity", true, 422);
             die(json_encode($test));
