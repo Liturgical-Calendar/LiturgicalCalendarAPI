@@ -9,6 +9,7 @@ include_once('includes/APICore.php');
 include_once('vendor/autoload.php');
 
 use Swaggest\JsonSchema\Schema;
+use Swaggest\JsonSchema\InvalidValue;
 
 if (file_exists("allowedOrigins.php")) {
     include_once('allowedOrigins.php');
@@ -34,7 +35,7 @@ $LitCalRegionalData->APICore->setAllowedReferers(array_map(function ($el) {
 
 $LitCalRegionalData->APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON ]);
 $LitCalRegionalData->APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
-$LitCalRegionalData->Init();
+$LitCalRegionalData->init();
 
 class LitCalRegionalData
 {
@@ -158,6 +159,16 @@ class LitCalRegionalData
                 echo "{\"message\":\"file $calendarDataFile does not exist\"}";
                 die();
             }
+        } else {
+            $missingParams = [];
+            if( false === property_exists($this->DATA, 'category') ) {
+                array_push($missingParams, 'category');
+            }
+            if( false === property_exists($this->DATA, 'key') ) {
+                array_push($missingParams, 'key');
+            }
+            header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad request", true, 400);
+            die('{"error":"Missing required parameter(s) `' . implode('` and `', $missingParams) . '`"}');
         }
     }
 
@@ -247,7 +258,7 @@ class LitCalRegionalData
             die('{"success":"Diocesan calendar created or updated for diocese \"' . $this->RESPONSE->Diocese . '\""}');
         } else {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad request", true, 400);
-            die('{"error":"Not all required parameters were received (LitCal, Metadata, Settings|NationalCalendars OR LitCal, diocese, nation)"}');
+            die('{"error":"Not all required parameters were received (LitCal, Metadata, Settings|NationalCalendars OR LitCal, Diocese, Nation)"}');
         }
     }
 
@@ -262,11 +273,14 @@ class LitCalRegionalData
             $path = "nations/{$this->RESPONSE->Nation}";
             if (file_exists($path . "/{$this->RESPONSE->Diocese}.json")) {
                 unlink($path . "/{$this->RESPONSE->Diocese}.json");
+            } else {
+                header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
+                die('{"error":"The resource requested for deletion was not found on this server"}');
             }
 
             $this->createOrUpdateIndex($path, true);
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 200 OK", true, 200);
-            die('{"success":"Diocesan calendar deleted for nation \"' . $this->RESPONSE->Diocese . '\""}');
+            die('{"success":"Diocesan calendar \"' . $this->RESPONSE->Diocese . '\" deleted from nation \"' . $this->RESPONSE->Nation . '\""}');
         }
     }
 
@@ -314,16 +328,16 @@ class LitCalRegionalData
         $result = new stdClass();
         $schema = Schema::import($schemaUrl);
         try {
-            $validation = $schema->in($data);
+            $schema->in($data);
             return true;
-        } catch (Exception $e) {
+        } catch (InvalidValue|Exception $e) {
             $result->error = LitSchema::ERROR_MESSAGES[ $schemaUrl ] . PHP_EOL . $e->getMessage();
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 422 Unprocessable Entity", true, 422);
             die(json_encode($result));
         }
     }
 
-    public function Init()
+    public function init()
     {
         $this->APICore->Init();
         $this->APICore->setResponseContentTypeHeader();
