@@ -654,7 +654,7 @@
         }
       }
     },
-    "/LitCalRegionalData.php": {
+    "/LitCalRegionalData": {
       "get": {
         "tags": [
           "RegionalData"
