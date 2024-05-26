@@ -1,18 +1,29 @@
 <?php
+/**
+ * LitCal\LitCalRegionalData
+ * PHP version 8.3
+ * 
+ * @category API
+ * @package  LitCal
+ * @author   John Romano D'Orazio <priest@johnromanodorazio.com>
+ * @license  https://www.apache.org/licenses/LICENSE-2.0.txt Apache License 2.0
+ * @version  GIT: 3.9
+ * @link     https://litcal.johnromanodorazio.com
+ */
 
-include_once('includes/enums/AcceptHeader.php');
-include_once('includes/enums/LitSchema.php');
-include_once('includes/enums/RequestMethod.php');
-include_once('includes/enums/RequestContentType.php');
-include_once('includes/enums/ReturnType.php');
-include_once('includes/APICore.php');
-include_once('vendor/autoload.php');
+require_once 'includes/enums/AcceptHeader.php';
+require_once 'includes/enums/LitSchema.php';
+require_once 'includes/enums/RequestMethod.php';
+require_once 'includes/enums/RequestContentType.php';
+require_once 'includes/enums/ReturnType.php';
+require_once 'includes/APICore.php';
+require_once 'vendor/autoload.php';
 
 use Swaggest\JsonSchema\Schema;
 use Swaggest\JsonSchema\InvalidValue;
 
 if (file_exists("allowedOrigins.php")) {
-    include_once('allowedOrigins.php');
+    include_once 'allowedOrigins.php';
 }
 
 $allowedOrigins = [
@@ -29,50 +40,74 @@ if (defined('ALLOWED_ORIGINS') && is_array(ALLOWED_ORIGINS)) {
 $LitCalRegionalData = new LitCalRegionalData();
 
 $LitCalRegionalData->APICore->setAllowedOrigins($allowedOrigins);
-$LitCalRegionalData->APICore->setAllowedReferers(array_map(function ($el) {
-    return $el . "/";
-}, $allowedOrigins));
+$LitCalRegionalData->APICore->setAllowedReferers(
+    array_map(
+        function ($el) {
+            return $el . "/";
+        },
+        $allowedOrigins
+    )
+);
 
 $LitCalRegionalData->APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON ]);
 $LitCalRegionalData->APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
 $LitCalRegionalData->init();
 
+/**
+ * LitCalRegionalData
+ * PHP version 8.3
+ * 
+ * @category API
+ * @package  LitCal
+ * @author   John Romano D'Orazio <priest@johnromanodorazio.com>
+ * @license  https://www.apache.org/licenses/LICENSE-2.0.txt Apache License 2.0
+ * @version  GIT: 3.9
+ * @link     https://litcal.johnromanodorazio.com
+ */
 class LitCalRegionalData
 {
-    private object $DATA;
-    private object $RESPONSE;
+    private object $_data;
+    private object $_response;
     //The General Index is currently only used for diocesan calendars
-    private ?stdClass $GeneralIndex                 = null;
-    private array $AllowedRequestMethods = [ 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS' ];
+    private ?stdClass $_generalIndex      = null;
+    private array $_allowedRequestMethods = [ 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS' ];
 
     public APICore $APICore;
 
+    /**
+     * LitCalRegionalData Constructor
+     */
     public function __construct()
     {
         $this->APICore                              = new APICore();
-        $this->RESPONSE                             = new stdClass();
-        $this->RESPONSE->requestHeadersReceived     = $this->APICore->getJsonEncodedRequestHeaders();
+        $this->_response                             = new stdClass();
+        $this->_response->requestHeadersReceived     = $this->APICore->getJsonEncodedRequestHeaders();
     }
 
-    private function handleRequestedMethod()
+    /**
+     * Function _handleRequestedMethod
+     *
+     * @return void
+     */
+    private function _handleRequestedMethod()
     {
         switch (strtoupper($_SERVER[ "REQUEST_METHOD" ])) {
             case RequestMethod::GET:
-                $this->handleGetPostRequests($_GET);
+                $this->_handleGetPostRequests($_GET);
                 break;
             case RequestMethod::POST:
-                $this->handleGetPostRequests($_POST);
+                $this->_handleGetPostRequests($_POST);
                 break;
             case RequestMethod::PUT:
             case RequestMethod::PATCH:
-                $this->handlePutPatchDeleteRequests(RequestMethod::PUT);
+                $this->_handlePutPatchDeleteRequests(RequestMethod::PUT);
                 break;
             case RequestMethod::DELETE:
-                $this->handlePutPatchDeleteRequests(RequestMethod::DELETE);
+                $this->_handlePutPatchDeleteRequests(RequestMethod::DELETE);
                 break;
             case RequestMethod::OPTIONS:
                 if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
-                    header("Access-Control-Allow-Methods: " . implode(', ', $this->AllowedRequestMethods));
+                    header("Access-Control-Allow-Methods: " . implode(', ', $this->_allowedRequestMethods));
                 }
                 if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
                     header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
@@ -81,35 +116,49 @@ class LitCalRegionalData
             default:
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 405 Method Not Allowed", true, 405);
                 $errorMessage = '{"error":"You seem to be forming a strange kind of request? Allowed Request Methods are ';
-                $errorMessage .= implode(' and ', $this->AllowedRequestMethods);
+                $errorMessage .= implode(' and ', $this->_allowedRequestMethods);
                 $errorMessage .= ', but your Request Method was ' . strtoupper($_SERVER[ 'REQUEST_METHOD' ]) . '"}';
                 die($errorMessage);
         }
     }
 
-    private function handleGetPostRequests(array $REQUEST)
+    /**
+     * Function _handleGetPostRequests
+     *
+     * @param array $REQUEST represents the Request Body object
+     * 
+     * @return void
+     */
+    private function _handleGetPostRequests(array $REQUEST)
     {
 
         $this->APICore->validateAcceptHeader(true);
         if ($this->APICore->getRequestContentType() === 'application/json') {
-            $this->DATA = $this->APICore->retrieveRequestParamsFromJsonBody();
+            $this->_data = $this->APICore->retrieveRequestParamsFromJsonBody();
         } else {
-            $this->DATA = (object)$REQUEST;
+            $this->_data = (object)$REQUEST;
         }
-        $this->retrieveRegionalCalendar();
+        $this->_retrieveRegionalCalendar();
     }
 
-    private function handlePutPatchDeleteRequests(string $requestMethod)
+    /**
+     * Function _handlePutPatchDeleteRequests
+     *
+     * @param string $requestMethod Method of the current request
+     * 
+     * @return void
+     */
+    private function _handlePutPatchDeleteRequests(string $requestMethod)
     {
         $this->APICore->validateAcceptHeader(false);
         $this->APICore->enforceAjaxRequest();
         $this->APICore->enforceReferer();
         if ($this->APICore->getRequestContentType() === 'application/json') {
-            $this->DATA = $this->APICore->retrieveRequestParamsFromJsonBody();
+            $this->_data = $this->APICore->retrieveRequestParamsFromJsonBody();
             if (RequestMethod::PUT === $requestMethod) {
-                $this->writeRegionalCalendar();
+                $this->_writeRegionalCalendar();
             } elseif (RequestMethod::DELETE === $requestMethod) {
-                $this->deleteRegionalCalendar();
+                $this->_deleteRegionalCalendar();
             }
         } else {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 415 Unsupported Media Type", true, 415);
@@ -117,14 +166,19 @@ class LitCalRegionalData
         }
     }
 
-    private function retrieveRegionalCalendar()
+    /**
+     * Function _retrieveRegionalCalendar
+     *
+     * @return void
+     */
+    private function _retrieveRegionalCalendar()
     {
-        if (property_exists($this->DATA, 'category') && property_exists($this->DATA, 'key')) {
-            $category = $this->DATA->category;
-            $key = $this->DATA->key;
+        if (property_exists($this->_data, 'category') && property_exists($this->_data, 'key')) {
+            $category = $this->_data->category;
+            $key = $this->_data->key;
             switch ($category) {
                 case "diocesanCalendar":
-                    $calendarDataFile = $this->GeneralIndex->$key->path;
+                    $calendarDataFile = $this->_generalIndex->$key->path;
                     break;
                 case "widerRegionCalendar":
                     $calendarDataFile = "nations/{$key}.json";
@@ -139,19 +193,19 @@ class LitCalRegionalData
                     echo file_get_contents($calendarDataFile);
                     die();
                 } else {
-                    $this->RESPONSE = json_decode(file_get_contents($calendarDataFile));
+                    $this->_response = json_decode(file_get_contents($calendarDataFile));
                     $uKey = strtoupper($key);
                     if ($category === "widerRegionCalendar") {
-                        $this->RESPONSE->isMultilingual = is_dir("nations/{$uKey}");
-                        $locale = strtolower($this->DATA->locale);
+                        $this->_response->isMultilingual = is_dir("nations/{$uKey}");
+                        $locale = strtolower($this->_data->locale);
                         if (file_exists("nations/{$uKey}/{$locale}.json")) {
                             $localeData = json_decode(file_get_contents("nations/{$uKey}/{$locale}.json"));
-                            foreach ($this->RESPONSE->LitCal as $idx => $el) {
-                                $this->RESPONSE->LitCal[$idx]->Festivity->name = $localeData->{$this->RESPONSE->LitCal[$idx]->Festivity->tag};
+                            foreach ($this->_response->LitCal as $idx => $el) {
+                                $this->_response->LitCal[$idx]->Festivity->name = $localeData->{$this->_response->LitCal[$idx]->Festivity->tag};
                             }
                         }
                     }
-                    echo json_encode($this->RESPONSE);
+                    echo json_encode($this->_response);
                     die();
                 }
             } else {
@@ -161,10 +215,10 @@ class LitCalRegionalData
             }
         } else {
             $missingParams = [];
-            if( false === property_exists($this->DATA, 'category') ) {
+            if (false === property_exists($this->_data, 'category') ) {
                 array_push($missingParams, 'category');
             }
-            if( false === property_exists($this->DATA, 'key') ) {
+            if (false === property_exists($this->_data, 'key') ) {
                 array_push($missingParams, 'key');
             }
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad request", true, 400);
@@ -172,10 +226,15 @@ class LitCalRegionalData
         }
     }
 
-    private function writeRegionalCalendar()
+    /**
+     * Function _writeRegionalCalendar
+     *
+     * @return void
+     */
+    private function _writeRegionalCalendar()
     {
-        if (property_exists($this->DATA, 'LitCal') && property_exists($this->DATA, 'Metadata') && property_exists($this->DATA, 'Settings')) {
-            $region = $this->DATA->Metadata->Region;
+        if (property_exists($this->_data, 'LitCal') && property_exists($this->_data, 'Metadata') && property_exists($this->_data, 'Settings')) {
+            $region = $this->_data->Metadata->Region;
             if ($region === 'UNITED STATES') {
                 $region = 'USA';
             }
@@ -184,30 +243,30 @@ class LitCalRegionalData
                 mkdir($path, 0755, true);
             }
 
-            $test = $this->validateDataAgainstSchema($this->DATA, LitSchema::NATIONAL);
+            $test = $this->_validateDataAgainstSchema($this->_data, LitSchema::NATIONAL);
             if ($test === true) {
-                $data = json_encode($this->DATA, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                $data = json_encode($this->_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
                 file_put_contents($path . "/{$region}.json", $data . PHP_EOL);
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
-                die('{"success":"National calendar created or updated for nation \"' . $this->DATA->Metadata->Region . '\""}');
+                die('{"success":"National calendar created or updated for nation \"' . $this->_data->Metadata->Region . '\""}');
             } else {
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 422 Unprocessable Entity", true, 422);
                 die(json_encode($test));
             }
-        } elseif (property_exists($this->DATA, 'LitCal') && property_exists($this->DATA, 'Metadata') && property_exists($this->DATA, 'NationalCalendars')) {
-            $this->DATA->Metadata->WiderRegion = ucfirst(strtolower($this->DATA->Metadata->WiderRegion));
-            $widerRegion = strtoupper($this->DATA->Metadata->WiderRegion);
-            if ($this->DATA->Metadata->IsMultilingual === true) {
+        } elseif (property_exists($this->_data, 'LitCal') && property_exists($this->_data, 'Metadata') && property_exists($this->_data, 'NationalCalendars')) {
+            $this->_data->Metadata->WiderRegion = ucfirst(strtolower($this->_data->Metadata->WiderRegion));
+            $widerRegion = strtoupper($this->_data->Metadata->WiderRegion);
+            if ($this->_data->Metadata->IsMultilingual === true) {
                 $path = "nations/{$widerRegion}";
                 if (!file_exists($path)) {
                     mkdir($path, 0755, true);
                 }
                 $translationJSON = new stdClass();
-                foreach ($this->DATA->LitCal as $CalEvent) {
+                foreach ($this->_data->LitCal as $CalEvent) {
                     $translationJSON->{ $CalEvent->Festivity->tag } = '';
                 }
-                if (count($this->DATA->Metadata->Languages) > 0) {
-                    foreach ($this->DATA->Metadata->Languages as $iso) {
+                if (count($this->_data->Metadata->Languages) > 0) {
+                    foreach ($this->_data->Metadata->Languages as $iso) {
                         if (!file_exists("nations/{$widerRegion}/{$iso}.json")) {
                             file_put_contents("nations/{$widerRegion}/{$iso}.json", json_encode($translationJSON, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
                         }
@@ -215,115 +274,141 @@ class LitCalRegionalData
                 }
             }
 
-            $test = $this->validateDataAgainstSchema($this->DATA, LitSchema::WIDERREGION);
+            $test = $this->_validateDataAgainstSchema($this->_data, LitSchema::WIDERREGION);
             if ($test === true) {
-                $data = json_encode($this->DATA, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                file_put_contents("nations/{$this->DATA->Metadata->WiderRegion}.json", $data . PHP_EOL);
+                $data = json_encode($this->_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                file_put_contents("nations/{$this->_data->Metadata->WiderRegion}.json", $data . PHP_EOL);
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
-                die('{"success":"Wider region calendar created or updated for region \"' . $this->DATA->Metadata->WiderRegion . '\""}');
+                die('{"success":"Wider region calendar created or updated for region \"' . $this->_data->Metadata->WiderRegion . '\""}');
             } else {
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 422 Unprocessable Entity", true, 422);
                 die(json_encode($test));
             }
-        } elseif (property_exists($this->DATA, 'LitCal') && property_exists($this->DATA, 'Diocese') && property_exists($this->DATA, 'Nation')) {
-            $this->RESPONSE->Nation = strip_tags($this->DATA->Nation);
-            $this->RESPONSE->Diocese = strip_tags($this->DATA->Diocese);
-            $CalData = json_decode($this->DATA->LitCal);
+        } elseif (property_exists($this->_data, 'LitCal') && property_exists($this->_data, 'Diocese') && property_exists($this->_data, 'Nation')) {
+            $this->_response->Nation = strip_tags($this->_data->Nation);
+            $this->_response->Diocese = strip_tags($this->_data->Diocese);
+            $CalData = json_decode($this->_data->LitCal);
             if (json_last_error() !== JSON_ERROR_NONE) {
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad request", true, 400);
                 die('{"error":"Malformed data received in <LitCal> parameters"}');
             }
-            if (property_exists($this->DATA, 'Overrides')) {
-                $CalData->Overrides = $this->DATA->Overrides;
+            if (property_exists($this->_data, 'Overrides')) {
+                $CalData->Overrides = $this->_data->Overrides;
             }
-            $this->RESPONSE->Calendar = json_encode($CalData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            if (property_exists($this->DATA, 'group')) {
-                $this->RESPONSE->Group = strip_tags($this->DATA->group);
+            $this->_response->Calendar = json_encode($CalData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            if (property_exists($this->_data, 'group')) {
+                $this->_response->Group = strip_tags($this->_data->group);
             }
-            $path = "nations/{$this->RESPONSE->Nation}";
+            $path = "nations/{$this->_response->Nation}";
             if (!file_exists($path)) {
                 mkdir($path, 0755, true);
             }
 
-            $test = $this->validateDataAgainstSchema($CalData, LitSchema::DIOCESAN);
+            $test = $this->_validateDataAgainstSchema($CalData, LitSchema::DIOCESAN);
             if ($test === true) {
-                file_put_contents($path . "/{$this->RESPONSE->Diocese}.json", $this->RESPONSE->Calendar . PHP_EOL);
+                file_put_contents($path . "/{$this->_response->Diocese}.json", $this->_response->Calendar . PHP_EOL);
             } else {
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 422 Unprocessable Entity", true, 422);
                 die(json_encode($test));
             }
 
-            $this->createOrUpdateIndex($path);
+            $this->_createOrUpdateIndex($path);
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
-            die('{"success":"Diocesan calendar created or updated for diocese \"' . $this->RESPONSE->Diocese . '\""}');
+            die('{"success":"Diocesan calendar created or updated for diocese \"' . $this->_response->Diocese . '\""}');
         } else {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad request", true, 400);
             die('{"error":"Not all required parameters were received (LitCal, Metadata, Settings|NationalCalendars OR LitCal, Diocese, Nation)"}');
         }
     }
 
-    private function deleteRegionalCalendar()
+    /**
+     * Function _deleteRegionalCalendar
+     *
+     * @return void
+     */
+    private function _deleteRegionalCalendar()
     {
-        if (!property_exists($this->DATA, 'LitCal') || !property_exists($this->DATA, 'Diocese') || !property_exists($this->DATA, 'Nation')) {
+        if (!property_exists($this->_data, 'LitCal') || !property_exists($this->_data, 'Diocese') || !property_exists($this->_data, 'Nation')) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad request", true, 400);
             die('{"error":"Required parameters were not received"}');
         } else {
-            $this->RESPONSE->Nation = strip_tags($this->DATA->Nation);
-            $this->RESPONSE->Diocese = strip_tags($this->DATA->Diocese);
-            $path = "nations/{$this->RESPONSE->Nation}";
-            if (file_exists($path . "/{$this->RESPONSE->Diocese}.json")) {
-                unlink($path . "/{$this->RESPONSE->Diocese}.json");
+            $this->_response->Nation = strip_tags($this->_data->Nation);
+            $this->_response->Diocese = strip_tags($this->_data->Diocese);
+            $path = "nations/{$this->_response->Nation}";
+            if (file_exists($path . "/{$this->_response->Diocese}.json")) {
+                unlink($path . "/{$this->_response->Diocese}.json");
             } else {
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
                 die('{"error":"The resource requested for deletion was not found on this server"}');
             }
 
-            $this->createOrUpdateIndex($path, true);
+            $this->_createOrUpdateIndex($path, true);
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 200 OK", true, 200);
-            die('{"success":"Diocesan calendar \"' . $this->RESPONSE->Diocese . '\" deleted from nation \"' . $this->RESPONSE->Nation . '\""}');
+            die('{"success":"Diocesan calendar \"' . $this->_response->Diocese . '\" deleted from nation \"' . $this->_response->Nation . '\""}');
         }
     }
 
-    private function loadIndex()
+    /**
+     * Function _loadIndex
+     *
+     * @return void
+     */
+    private function _loadIndex()
     {
         if (file_exists("nations/index.json")) {
-            $this->GeneralIndex = json_decode(file_get_contents("nations/index.json"));
+            $this->_generalIndex = json_decode(file_get_contents("nations/index.json"));
         }
     }
 
-    private function createOrUpdateIndex(string $path, bool $delete = false)
+    /**
+     * Function _createOrUpdateIndex
+     *
+     * @param string  $path   Path of the resource file
+     * @param boolean $delete Delete from the index rather than create/update the index
+     * 
+     * @return void
+     */
+    private function _createOrUpdateIndex(string $path, bool $delete = false)
     {
-        if (null === $this->GeneralIndex) {
-            $this->GeneralIndex = new stdClass();
+        if (null === $this->_generalIndex) {
+            $this->_generalIndex = new stdClass();
         }
-        $key = strtoupper(preg_replace("/[^a-zA-Z]/", "", $this->RESPONSE->Diocese));
+        $key = strtoupper(preg_replace("/[^a-zA-Z]/", "", $this->_response->Diocese));
 
         if ($delete) {
-            if (property_exists($this->GeneralIndex, $key)) {
-                unset($this->GeneralIndex->$key);
+            if (property_exists($this->_generalIndex, $key)) {
+                unset($this->_generalIndex->$key);
             }
         } else {
-            if (!property_exists($this->GeneralIndex, $key)) {
-                $this->GeneralIndex->$key = new stdClass();
+            if (!property_exists($this->_generalIndex, $key)) {
+                $this->_generalIndex->$key = new stdClass();
             }
-            $this->GeneralIndex->$key->path = $path . "/{$this->RESPONSE->Diocese}.json";
-            $this->GeneralIndex->$key->nation = $this->RESPONSE->Nation;
-            $this->GeneralIndex->$key->diocese = $this->RESPONSE->Diocese;
-            if (property_exists($this->RESPONSE, 'Group')) {
-                $this->GeneralIndex->$key->group = $this->RESPONSE->Group;
+            $this->_generalIndex->$key->path = $path . "/{$this->_response->Diocese}.json";
+            $this->_generalIndex->$key->nation = $this->_response->Nation;
+            $this->_generalIndex->$key->diocese = $this->_response->Diocese;
+            if (property_exists($this->_response, 'Group')) {
+                $this->_generalIndex->$key->group = $this->_response->Group;
             }
         }
 
-        $test = $this->validateDataAgainstSchema($this->GeneralIndex, LitSchema::INDEX);
+        $test = $this->_validateDataAgainstSchema($this->_generalIndex, LitSchema::INDEX);
         if ($test === true) {
-            file_put_contents("nations/index.json", json_encode($this->GeneralIndex, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL);
+            file_put_contents("nations/index.json", json_encode($this->_generalIndex, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL);
         } else {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 422 Unprocessable Entity", true, 422);
             die(json_encode($test));
         }
     }
 
-    private function validateDataAgainstSchema(object $data, string $schemaUrl): bool
+    /**
+     * Function _validateDataAgainstSchema
+     *
+     * @param object $data      Data to validate
+     * @param string $schemaUrl Schema to validate against
+     * 
+     * @return boolean
+     */
+    private function _validateDataAgainstSchema(object $data, string $schemaUrl): bool
     {
         $result = new stdClass();
         $schema = Schema::import($schemaUrl);
@@ -337,11 +422,16 @@ class LitCalRegionalData
         }
     }
 
+    /**
+     * Function init
+     *
+     * @return void
+     */
     public function init()
     {
         $this->APICore->Init();
         $this->APICore->setResponseContentTypeHeader();
-        $this->loadIndex();
-        $this->handleRequestedMethod();
+        $this->_loadIndex();
+        $this->_handleRequestedMethod();
     }
 }
