@@ -7,7 +7,7 @@ namespace LitCal;
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
 
-class LitCalTest
+class LitTest
 {
     private bool $readyState            = false;
     private ?object $testInstructions   = null;
@@ -31,7 +31,7 @@ class LitCalTest
                 if ($testInstructions) {
                     $this->testInstructions = json_decode($testInstructions);
                     if (JSON_ERROR_NONE === json_last_error()) {
-                        $schemaFile = 'schemas/LitCalTest.json';
+                        $schemaFile = 'schemas/LitTest.json';
                         $schemaContents = file_get_contents($schemaFile);
                         $jsonSchema = json_decode($schemaContents);
                         try {

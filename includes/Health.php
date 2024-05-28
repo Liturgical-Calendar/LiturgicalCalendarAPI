@@ -10,6 +10,7 @@ use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 use LitCal\enum\ICSErrorLevel;
 use LitCal\enum\LitSchema;
+use LitCal\LitTest;
 
 class Health implements MessageComponentInterface
 {
@@ -380,7 +381,7 @@ class Health implements MessageComponentInterface
         }
         $jsonData = json_decode(file_get_contents(self::LITCAL_BASE_URL . $req));
         if (json_last_error() === JSON_ERROR_NONE) {
-            $UnitTest = new LitCalTest($Test, $jsonData);
+            $UnitTest = new LitTest($Test, $jsonData);
             if ($UnitTest->isReady()) {
                 $UnitTest->runTest();
             }

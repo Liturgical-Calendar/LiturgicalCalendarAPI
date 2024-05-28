@@ -2,6 +2,8 @@
 
 include_once('includes/enums/RomanMissal.php');
 
+use LitCal\enum\RomanMissal;
+
 $requestHeaders = getallheaders();
 if (isset($requestHeaders[ "Origin" ])) {
     header("Access-Control-Allow-Origin: {$requestHeaders[ "Origin" ]}");

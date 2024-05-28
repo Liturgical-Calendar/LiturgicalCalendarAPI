@@ -7,7 +7,7 @@
 require_once 'vendor/autoload.php';
 require_once 'includes/enums/LitSchema.php';
 require_once 'includes/enums/ICSErrorLevel.php';
-require_once 'includes/LitCalTest.php';
+require_once 'includes/LitTest.php';
 require_once 'includes/Health.php';
 /*$testsFolder = dirname(__FILE__) . '/tests';
 $it = new DirectoryIterator("glob://$testsFolder/*Test.php");

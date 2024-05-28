@@ -30,7 +30,7 @@
     }
   ],
   "paths": {
-    "/LitCalEngine.php": {
+    "/": {
       "get": {
         "tags": [
           "Main API endpoint"
@@ -349,7 +349,7 @@
         }
       }
     },
-    "/LitCalMetadata.php": {
+    "/metadata": {
       "get": {
         "tags": [
           "Metadata API endpoint"
@@ -391,7 +391,7 @@
         }
       }
     },
-    "/LitCalTestsIndex.php": {
+    "/testsindex": {
       "get": {
         "tags": [
           "Unit Test Index endpoint"
@@ -552,7 +552,7 @@
         }
       }
     },
-    "/LitCalAllFestivities.php": {
+    "/allevents": {
       "get": {
         "tags": [
           "All possible liturgical events endpoint"
@@ -1070,6 +1070,89 @@
                     }
                   },
                   "required": [ "error" ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/easter": {
+      "get": {
+        "tags": [ "Easter" ],
+        "security": [{}],
+        "summary": "retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
+        "operationId": "easterGET",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string",
+              "enum": [ "de", "en", "es", "fr", "it", "pt", "la", "nl" ]
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "dates of easter whether gregorian or julian from 1583 to 1999",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "EasterDates": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "gregorianEaster": {
+                            "type": "integer",
+                            "format": "int64",
+                            "minimum": -12204000000,
+                            "maximum": 253378195200
+                          },
+                          "julianEaster": {
+                            "type": "integer",
+                            "format": "int64",
+                            "minimum": -12204864000,
+                            "maximum": 253379750400
+                          },
+                          "westernJulianEaster": {
+                            "type": "integer",
+                            "format": "int64",
+                            "minimum": -12204000000,
+                            "maximum": 253386057600
+                          },
+                          "coinciding": {
+                            "type": "boolean"
+                          },
+                          "gregorianDateString": {
+                            "type": "string"
+                          },
+                          "julianDateString": {
+                            "type": "string"
+                          },
+                          "westernJulianDateString": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "minItems": 8417,
+                      "maxItems": 8417
+                    },
+                    "lastCoincidenceString": {
+                      "type": "string",
+                      "const": "Sunday, April 24th, 2698"
+                    },
+                    "lastCoincidence": {
+                      "type": "integer",
+                      "const": 22983264000
+                    }
+                  }
                 }
               }
             }

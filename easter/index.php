@@ -4,7 +4,10 @@
 // ini_set("display_errors", 1);
 // ini_set('date.timezone', 'Europe/Vatican');
 
-include_once('includes/enums/LitLocale.php');
+include_once('../includes/enums/LitLocale.php');
+
+use LitCal\enum\LitLocale;
+
 $LOCALE = isset($_GET["locale"]) && LitLocale::isValid($_GET["locale"]) ? $_GET["locale"] : LitLocale::LATIN;
 
 if (file_exists('engineCache/easter/' . $LOCALE . '.json')) {
@@ -15,6 +18,9 @@ if (file_exists('engineCache/easter/' . $LOCALE . '.json')) {
 
 include_once('includes/LitFunc.php');
 include_once('includes/LitMessages.php');
+
+use LitCal\LitFunc;
+use LitCal\LitMessages;
 
 $baseLocale = Locale::getPrimaryLanguage($LOCALE);
 $localeArray = [
@@ -29,31 +35,37 @@ $localeArray = [
     $baseLocale
 ];
 setlocale(LC_ALL, $localeArray);
-$dayOfTheWeekDayMonthYear   = IntlDateFormatter::create($LOCALE, IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEEE d MMMM yyyy");
+$dayOfTheWeekDayMonthYear   = IntlDateFormatter::create(
+    $LOCALE,
+    IntlDateFormatter::FULL,
+    IntlDateFormatter::NONE,
+    'UTC',
+    IntlDateFormatter::GREGORIAN,
+    "EEEE d MMMM yyyy"
+);
 $dayMonthYear               = IntlDateFormatter::create($LOCALE, IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "d MMMM yyyy");
 $dayOfTheWeek               = IntlDateFormatter::create($LOCALE, IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEEE");
 
 $EasterDates                = new stdClass();
-$EasterDates->DatesArray    = [];
-$last_coincidence           = "";
+$EasterDates->EasterDates   = [];
 $dateLastCoincidence        = null;
 
+$gregDateString                     = "";
+$julianDateString                   = "";
+$westernJulianDateString            = "";
+
 for ($i = 1583; $i <= 9999; $i++) {
-    $EasterDates->DatesArray[$i - 1583]   = new stdClass();
-    $gregorian_easter                   = LitFunc::calcGregEaster($i);
-    $julian_easter                      = LitFunc::calcJulianEaster($i);
-    $western_julian_easter              = LitFunc::calcJulianEaster($i, true);
-    $same_easter                        = false;
+    $EasterDates->EasterDates[$i - 1583] = new stdClass();
+    $gregorian_easter                    = LitFunc::calcGregEaster($i);
+    $julian_easter                       = LitFunc::calcJulianEaster($i);
+    $western_julian_easter               = LitFunc::calcJulianEaster($i, true);
+    $same_easter                         = false;
 
     if ($gregorian_easter->format('l, F jS, Y') === $western_julian_easter->format('l, F jS, Y')) {
         $same_easter                    = true;
-        $last_coincidence               = $gregorian_easter->format('l, F jS, Y');
         $dateLastCoincidence            = $gregorian_easter;
     }
 
-    $gregDateString                     = "";
-    $julianDateString                   = "";
-    $westernJulianDateString            = "";
     switch (strtoupper($baseLocale)) {
         case LitLocale::LATIN:
             $month                      = (int)$gregorian_easter->format('n'); //n      = 1-January to 12-December
@@ -77,22 +89,22 @@ for ($i = 1583; $i <= 9999; $i++) {
             $westernJulianDateString    = $dayOfTheWeekDayMonthYear->format($western_julian_easter->format('U'));
     }
 
-    $EasterDates->DatesArray[$i - 1583]->gregorianEaster          = $gregorian_easter->format('U');
-    $EasterDates->DatesArray[$i - 1583]->julianEaster             = $julian_easter->format('U');
-    $EasterDates->DatesArray[$i - 1583]->westernJulianEaster      = $western_julian_easter->format('U');
-    $EasterDates->DatesArray[$i - 1583]->coinciding               = $same_easter;
-    $EasterDates->DatesArray[$i - 1583]->gregorianDateString      = $gregDateString;
-    $EasterDates->DatesArray[$i - 1583]->julianDateString         = $julianDateString;
-    $EasterDates->DatesArray[$i - 1583]->westernJulianDateString  = $westernJulianDateString;
+    $EasterDates->EasterDates[$i - 1583]->gregorianEaster          = (int) $gregorian_easter->format('U');
+    $EasterDates->EasterDates[$i - 1583]->julianEaster             = (int) $julian_easter->format('U');
+    $EasterDates->EasterDates[$i - 1583]->westernJulianEaster      = (int) $western_julian_easter->format('U');
+    $EasterDates->EasterDates[$i - 1583]->coinciding               = $same_easter;
+    $EasterDates->EasterDates[$i - 1583]->gregorianDateString      = $gregDateString;
+    $EasterDates->EasterDates[$i - 1583]->julianDateString         = $julianDateString;
+    $EasterDates->EasterDates[$i - 1583]->westernJulianDateString  = $westernJulianDateString;
 }
 
 $EasterDates->lastCoincidenceString     = $dateLastCoincidence->format('l, F jS, Y');
-$EasterDates->lastCoincidence           = $dateLastCoincidence->format('U');
+$EasterDates->lastCoincidence           = (int) $dateLastCoincidence->format('U');
 
-if (!is_dir('engineCache/easter/')) {
-    mkdir('engineCache/easter/', 0774, true);
+if (!is_dir('../engineCache/easter/')) {
+    mkdir('../engineCache/easter/', 0774, true);
 }
-file_put_contents('engineCache/easter/' . $LOCALE . '.json', json_encode($EasterDates));
+file_put_contents('../engineCache/easter/' . $LOCALE . '.json', json_encode($EasterDates));
 
 header('Content-Type: application/json');
 echo json_encode($EasterDates);
