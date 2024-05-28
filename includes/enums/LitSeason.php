@@ -1,13 +1,17 @@
 <?php
 
+namespace LitCal\enum;
+
+use LitCal\enum\LitLocale;
+
 class LitSeason
 {
-    const ADVENT        = "ADVENT";
-    const CHRISTMAS     = "CHRISTMAS";
-    const LENT          = "LENT";
-    const EASTER_TRIDUUM = "EASTER_TRIDUUM";
-    const EASTER        = "EASTER";
-    const ORDINARY_TIME = "ORDINARY_TIME";
+    public const ADVENT         = "ADVENT";
+    public const CHRISTMAS      = "CHRISTMAS";
+    public const LENT           = "LENT";
+    public const EASTER_TRIDUUM = "EASTER_TRIDUUM";
+    public const EASTER         = "EASTER";
+    public const ORDINARY_TIME  = "ORDINARY_TIME";
     public static array $values = [ "ADVENT", "CHRISTMAS", "LENT", "EASTER_TRIDUUM", "EASTER", "ORDINARY_TIME" ];
 
     public static function isValid(string $value)

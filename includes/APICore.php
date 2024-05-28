@@ -1,5 +1,11 @@
 <?php
 
+namespace LitCal;
+
+use LitCal\enum\AcceptHeader;
+use LitCal\enum\RequestMethod;
+use LitCal\enum\RequestContentType;
+
 class APICore
 {
     private array $AllowedOrigins;
@@ -62,19 +68,33 @@ class APICore
 
     private function validateRequestContentType()
     {
-        if (isset($_SERVER[ 'CONTENT_TYPE' ]) && $_SERVER[ 'CONTENT_TYPE' ] !== '' && !in_array(explode(';', $_SERVER[ 'CONTENT_TYPE' ])[ 0 ], $this->AllowedRequestContentTypes)) {
+        if (
+            isset($_SERVER[ 'CONTENT_TYPE' ])
+            && $_SERVER[ 'CONTENT_TYPE' ] !== ''
+            && !in_array(
+                explode(';', $_SERVER[ 'CONTENT_TYPE' ])[ 0 ],
+                $this->AllowedRequestContentTypes
+            )
+        ) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 415 Unsupported Media Type", true, 415);
-            die('{"error":"You seem to be forming a strange kind of request? Allowed Content Types are ' . implode(' and ', $this->AllowedRequestContentTypes) . ', but your Content Type was ' . $_SERVER[ 'CONTENT_TYPE' ] . '"}');
+            $response = new \stdClass();
+            $response->error = "You seem to be forming a strange kind of request? Allowed Content Types are "
+            . implode(' and ', $this->AllowedRequestContentTypes)
+            . ', but your Content Type was '
+            . $_SERVER[ 'CONTENT_TYPE' ];
+            die(json_encode($response));
         }
     }
 
     private function sendHeaderNotAcceptable(): void
     {
         header($_SERVER[ "SERVER_PROTOCOL" ] . " 406 Not Acceptable", true, 406);
-        $errorMessage = '{"error":"You are requesting a content type which this API cannot produce. Allowed Accept headers are ';
-        $errorMessage .= implode(' and ', $this->AllowedAcceptHeaders);
-        $errorMessage .= ', but you have issued an request with an Accept header of ' . $this->RequestHeaders[ "Accept" ] . '"}';
-        die($errorMessage);
+        $response = new \stdClass();
+        $response->error = "You are requesting a content type which this API cannot produce. Allowed Accept headers are "
+            . implode(' and ', $this->AllowedAcceptHeaders)
+            . ', but you have issued an request with an Accept header of '
+            . $this->RequestHeaders[ "Accept" ];
+        die(json_encode($response));
     }
 
     public function validateAcceptHeader(bool $beLaxAboutIt)
@@ -165,7 +185,11 @@ class APICore
 
     public function isAjaxRequest(): bool
     {
-        return ( !isset($_SERVER['HTTP_X_REQUESTED_WITH']) || empty($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest' ) === false;
+        return false === (
+            !isset($_SERVER['HTTP_X_REQUESTED_WITH'])
+            || empty($_SERVER['HTTP_X_REQUESTED_WITH'])
+            || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest'
+        );
     }
 
     public function enforceAjaxRequest(): void
@@ -246,7 +270,7 @@ class APICore
         return $data;
     }
 
-    public function Init()
+    public function init()
     {
         $this->setAllowedOriginHeader();
         $this->setAccessControlAllowMethods();

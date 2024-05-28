@@ -1,19 +1,21 @@
 <?php
 
+namespace LitCal\enum;
+
 class LitSchema
 {
-    const INDEX             = "https://litcal.johnromanodorazio.com/api/dev/schemas/Index.json";
-    const DIOCESAN          = "https://litcal.johnromanodorazio.com/api/dev/schemas/DiocesanCalendar.json";
-    const NATIONAL          = "https://litcal.johnromanodorazio.com/api/dev/schemas/NationalCalendar.json";
-    const PROPRIUMDESANCTIS = "https://litcal.johnromanodorazio.com/api/dev/schemas/PropriumDeSanctis.json";
-    const PROPRIUMDETEMPORE = "https://litcal.johnromanodorazio.com/api/dev/schemas/PropriumDeTempore.json";
-    const WIDERREGION       = "https://litcal.johnromanodorazio.com/api/dev/schemas/WiderRegionCalendar.json";
-    const DECREEMEMORIALS   = "https://litcal.johnromanodorazio.com/api/dev/schemas/MemorialsFromDecrees.json";
-    const I18N              = "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTranslation.json";
-    const METADATA          = "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalMetadata.json";
-    const LITCAL            = "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCal.json";
+    public const INDEX             = "https://litcal.johnromanodorazio.com/api/dev/schemas/Index.json";
+    public const DIOCESAN          = "https://litcal.johnromanodorazio.com/api/dev/schemas/DiocesanCalendar.json";
+    public const NATIONAL          = "https://litcal.johnromanodorazio.com/api/dev/schemas/NationalCalendar.json";
+    public const PROPRIUMDESANCTIS = "https://litcal.johnromanodorazio.com/api/dev/schemas/PropriumDeSanctis.json";
+    public const PROPRIUMDETEMPORE = "https://litcal.johnromanodorazio.com/api/dev/schemas/PropriumDeTempore.json";
+    public const WIDERREGION       = "https://litcal.johnromanodorazio.com/api/dev/schemas/WiderRegionCalendar.json";
+    public const DECREEMEMORIALS   = "https://litcal.johnromanodorazio.com/api/dev/schemas/MemorialsFromDecrees.json";
+    public const I18N              = "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTranslation.json";
+    public const METADATA          = "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalMetadata.json";
+    public const LITCAL            = "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCal.json";
 
-    const ERROR_MESSAGES = [
+    public const ERROR_MESSAGES = [
         LitSchema::INDEX             => "Schema validation error: Index not updated",
         LitSchema::DIOCESAN          => "Schema validation error: Diocesan Calendar not created / updated",
         LitSchema::NATIONAL          => "Schema validation error: National Calendar not created / updated",

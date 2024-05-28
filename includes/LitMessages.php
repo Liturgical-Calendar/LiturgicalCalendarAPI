@@ -1,11 +1,13 @@
 <?php
 
-include_once('includes/enums/LitColor.php');
-include_once('includes/enums/LitLocale.php');
+namespace LitCal;
+
+use LitCal\enum\LitColor;
+use LitCal\enum\LitLocale;
 
 class LitMessages
 {
-    const LATIN_ORDINAL = [
+    public const LATIN_ORDINAL = [
         "",
         "primus",
         "secundus",
@@ -43,7 +45,7 @@ class LitMessages
         "trigesimus quartus",
     ];
 
-    const LATIN_ORDINAL_FEM_GEN = [
+    public const LATIN_ORDINAL_FEM_GEN = [
         "",
         "primæ",
         "secundæ",
@@ -81,7 +83,7 @@ class LitMessages
         "trigesimæ quartæ",
     ];
 
-    const LATIN_DAYOFTHEWEEK = [
+    public const LATIN_DAYOFTHEWEEK = [
         "Feria I",     //0=Sunday
         "Feria II",    //1=Monday
         "Feria III",   //2=Tuesday
@@ -91,7 +93,7 @@ class LitMessages
         "Feria VII"    //6=Saturday
     ];
 
-    const LATIN_MONTHS = [
+    public const LATIN_MONTHS = [
         "",
         "Ianuarius",
         "Februarius",
@@ -108,7 +110,7 @@ class LitMessages
     ];
 
 
-    public static function ColorToHex(string $color): string
+    public static function colorToHex(string $color): string
     {
         $hex = "#";
         switch ($color) {
@@ -133,14 +135,16 @@ class LitMessages
         return $hex;
     }
 
-    public static function ParseColorString(string|array $colors, string $LOCALE, bool $html = false): string
+    public static function parseColorString(string|array $colors, string $LOCALE, bool $html = false): string
     {
         if (is_string($colors)) {
             $colors = explode(",", $colors);
         }
         if ($html === true) {
             $colors = array_map(function ($txt) use ($LOCALE) {
-                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::ColorToHex($txt) . '">' . LitColor::i18n($txt, $LOCALE) . '</FONT></SPAN></I></B>';
+                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::colorToHex($txt) . '">'
+                    . LitColor::i18n($txt, $LOCALE)
+                    . '</FONT></SPAN></I></B>';
             }, $colors);
             return implode(' <I><FONT FACE="Calibri">' . _("or") . "</FONT></I> ", $colors);
         } else {
@@ -185,13 +189,13 @@ class LitMessages
     /**
      * @param int $num
      * @param string $LOCALE
-     * @param NumberFormatter $formatter
+     * @param \NumberFormatter $formatter
      * @param string[] $latinOrdinals
      */
-    public static function getOrdinal(int $num, string $LOCALE, NumberFormatter $formatter, array $latinOrdinals): string
+    public static function getOrdinal(int $num, string $LOCALE, \NumberFormatter $formatter, array $latinOrdinals): string
     {
         $ordinal = "";
-        $baseLocale = $LOCALE !== "LA" && $LOCALE !== "la" ? Locale::getPrimaryLanguage($LOCALE) : "LA";
+        $baseLocale = $LOCALE !== "LA" && $LOCALE !== "la" ? \Locale::getPrimaryLanguage($LOCALE) : "LA";
         switch (strtoupper($baseLocale)) {
             case LitLocale::LATIN:
                 $ordinal = $latinOrdinals[$num];

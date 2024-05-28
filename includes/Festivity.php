@@ -1,16 +1,16 @@
 <?php
 
-ini_set('date.timezone', 'Europe/Vatican');
+namespace LitCal;
 
-include_once('enums/LitColor.php');
-include_once('enums/LitCommon.php');
-include_once('enums/LitFeastType.php');
-include_once('enums/LitGrade.php');
-include_once('enums/LitLocale.php');
-include_once('enums/LitSeason.php');
-include_once('LitDateTime.php');
+use LitCal\DateTime;
+use LitCal\enum\LitColor;
+use LitCal\enum\LitFeastType;
+use LitCal\enum\LitLocale;
+use LitCal\enum\LitGrade;
+use LitCal\enum\LitCommon;
+use LitCal\enum\LitSeason;
 
-class Festivity implements JsonSerializable
+class Festivity implements \JsonSerializable
 {
     public static $eventIdx = 0;
 
@@ -18,7 +18,7 @@ class Festivity implements JsonSerializable
 
     /** The following properties are generally passed in the constructor */
     public string $name;
-    public LitDateTime $date;
+    public DateTime $date;
     public array $color = [];
     public string $type;
     public int $grade;
@@ -43,13 +43,20 @@ class Festivity implements JsonSerializable
     private static string $locale   = LitLocale::LATIN;
     private static LitGrade $LitGrade;
     private static LitCommon $LitCommon;
-    private static IntlDateFormatter $dayOfTheWeekShort;
-    private static IntlDateFormatter $dayOfTheWeekLong;
-    private static IntlDateFormatter $monthShort;
-    private static IntlDateFormatter $monthLong;
+    private static \IntlDateFormatter $dayOfTheWeekShort;
+    private static \IntlDateFormatter $dayOfTheWeekLong;
+    private static \IntlDateFormatter $monthShort;
+    private static \IntlDateFormatter $monthLong;
 
-    function __construct(string $name, LitDateTime $date, string|array $color = [ '???' ], string $type = '???', int $grade = LitGrade::WEEKDAY, string|array $common = [ '???' ], string $displayGrade = '')
-    {
+    public function __construct(
+        string $name,
+        DateTime $date,
+        string|array $color = [ '???' ],
+        string $type = '???',
+        int $grade = LitGrade::WEEKDAY,
+        string|array $common = [ '???' ],
+        string $displayGrade = ''
+    ) {
         $this->idx          = self::$eventIdx++;
         $this->name         = $name;
         $this->date         = $date; //DateTime object
@@ -81,7 +88,7 @@ class Festivity implements JsonSerializable
                 $this->common = [];
             }
         }
-        $this->commonLcl = self::$LitCommon->C($this->common);
+        $this->commonLcl = self::$LitCommon->c($this->common);
     }
     /*
     private static function debugWrite( string $string ) {
@@ -95,7 +102,7 @@ class Festivity implements JsonSerializable
      * Tiene conto non soltanto del valore della data,
      * ma anche del grado della festa qualora ci fosse una concomitanza
      * * * * * * * * * * * * * * * * * * * * * * * * * */
-    public static function comp_date(Festivity $a, Festivity $b)
+    public static function compDate(Festivity $a, Festivity $b)
     {
         if ($a->date == $b->date) {
             if ($a->grade == $b->grade) {
@@ -165,10 +172,10 @@ class Festivity implements JsonSerializable
             self::$locale               = $locale;
             self::$LitGrade             = new LitGrade($locale);
             self::$LitCommon            = new LitCommon($locale, $systemLocale);
-            self::$dayOfTheWeekShort    = IntlDateFormatter::create($locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEE");
-            self::$dayOfTheWeekLong     = IntlDateFormatter::create($locale, IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "EEEE");
-            self::$monthShort           = IntlDateFormatter::create($locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "MMM");
-            self::$monthLong            = IntlDateFormatter::create($locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, "MMMM");
+            self::$dayOfTheWeekShort    = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, "EEE");
+            self::$dayOfTheWeekLong     = \IntlDateFormatter::create($locale, \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, "EEEE");
+            self::$monthShort           = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, "MMM");
+            self::$monthLong            = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, "MMMM");
         }
     }
 /**

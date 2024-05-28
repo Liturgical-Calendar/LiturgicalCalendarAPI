@@ -1,13 +1,15 @@
 <?php
 
+namespace LitCal\enum;
+
 class RequestMethod
 {
-    const POST      = "POST";   //Create / read
-    const GET       = "GET";    //Read
-    const PATCH     = "PATCH";  //Update / modify
-    const PUT       = "PUT";    //Update / replace
-    const DELETE    = "DELETE"; //Delete
-    const OPTIONS   = "OPTIONS";
+    public const POST      = "POST";   //Create / read
+    public const GET       = "GET";    //Read
+    public const PATCH     = "PATCH";  //Update / modify
+    public const PUT       = "PUT";    //Update / replace
+    public const DELETE    = "DELETE"; //Delete
+    public const OPTIONS   = "OPTIONS";
     public static array $values = [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ];
 
     public static function isValid($value)

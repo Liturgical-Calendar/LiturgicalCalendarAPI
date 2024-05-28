@@ -1,17 +1,19 @@
 <?php
 
+namespace LitCal\enum;
+
 class RomanMissal
 {
-    const EDITIO_TYPICA_1970                    = "VATICAN_1970";
-    const REIMPRESSIO_EMENDATA_1971             = "VATICAN_1971";
-    const EDITIO_TYPICA_SECUNDA_1975            = "VATICAN_1975";
-    const EDITIO_TYPICA_TERTIA_2002             = "VATICAN_2002";
-    const EDITIO_TYPICA_TERTIA_EMENDATA_2008    = "VATICAN_2008";
+    public const EDITIO_TYPICA_1970                    = "VATICAN_1970";
+    public const REIMPRESSIO_EMENDATA_1971             = "VATICAN_1971";
+    public const EDITIO_TYPICA_SECUNDA_1975            = "VATICAN_1975";
+    public const EDITIO_TYPICA_TERTIA_2002             = "VATICAN_2002";
+    public const EDITIO_TYPICA_TERTIA_EMENDATA_2008    = "VATICAN_2008";
 
-    const USA_EDITION_2011                      = "USA_2011";
-    const ITALY_EDITION_1983                    = "ITALY_1983";
-    const ITALY_EDITION_2020                    = "ITALY_2020";
-    const NETHERLANDS_EDITION_1978              = "NETHERLANDS_1978";
+    public const USA_EDITION_2011                      = "USA_2011";
+    public const ITALY_EDITION_1983                    = "ITALY_1983";
+    public const ITALY_EDITION_2020                    = "ITALY_2020";
+    public const NETHERLANDS_EDITION_1978              = "NETHERLANDS_1978";
 
     public static array $values = [
         "VATICAN_1970",
@@ -108,7 +110,7 @@ class RomanMissal
 
     public static function produceMetadata(): array
     {
-        $reflectionClass = new ReflectionClass(static::class);
+        $reflectionClass = new \ReflectionClass(static::class);
         $metadata = $reflectionClass->getConstants();
         array_walk($metadata, function (string &$v) {
             $v = [ "value" => $v, "name" => self::getName($v), "sanctoraleFileName" => self::getSanctoraleFileName($v), "yearLimits" => self::$yearLimits[ $v ] ];

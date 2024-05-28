@@ -1,9 +1,11 @@
 <?php
 
+namespace LitCal\enum;
+
 class Ascension
 {
-    const THURSDAY          = "THURSDAY";
-    const SUNDAY            = "SUNDAY";
+    public const THURSDAY       = "THURSDAY";
+    public const SUNDAY         = "SUNDAY";
     public static array $values = [ "THURSDAY", "SUNDAY" ];
 
     public static function isValid($value)
