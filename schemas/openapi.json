@@ -550,6 +550,158 @@
             }
           }
         }
+      },
+      "put": {
+        "tags": [
+          "Unit Test Index endpoint"
+        ],
+        "security": [{}],
+        "summary": "create a new unit test in the API `tests` folder",
+        "operationId": "testsIndexPUT",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/LitCalTest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created. Even when updating an existing resource, we will still get the same 201 Created because we are basically overwriting the previous resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "const": "OK"
+                    },
+                    "response": {
+                      "type": "string",
+                      "const": "Resource Created"
+                    }
+                  },
+                  "required": [ "status", "response" ]
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "405 Method Not Allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "const": "ERROR"
+                    },
+                    "response": {
+                      "type": "string",
+                      "const": "Resource not Created"
+                    },
+                    "description": {
+                      "type": "string",
+                      "const": "This endpoint can only accept requests utilizing methods GET or PUT"
+                    }
+                  },
+                  "required": [ "status", "response", "description" ]
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "415 Unsupported Media Type: This endpoint can only handle PUT requests with Content Type application/json",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "const": "ERROR"
+                    },
+                    "response": {
+                      "type": "string",
+                      "const": "Resource not Created"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "This endpoint can only handle PUT requests with Content Type application/json, instead the request had a Content Type of {CONTENT TYPE}"
+                    }
+                  },
+                  "required": [ "status", "response", "description" ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422 Unprocessable Entity. The request body content is not valid JSON or does not conform to it's defined schema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "const": "ERROR"
+                    },
+                    "response": {
+                      "type": "string",
+                      "const": "Resource not Created"
+                    },
+                    "description": {
+                      "type": "string",
+                      "examples": [
+                        "The Unit Test you are attempting to create was not valid JSON",
+                        "The Unit Test you are attempting to create was incorrectly validated against schema {SCHEMA}: {ERROR MESSAGE}"
+                      ]
+                    }
+                  },
+                  "required": [ "status", "response", "description" ]
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "503 Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "const": "ERROR"
+                    },
+                    "response": {
+                      "type": "string",
+                      "const": "Resource not Created"
+                    },
+                    "description": {
+                      "type": "string",
+                      "examples": [
+                        "The server errored out while attempting to process your request; this a server error, not an error in the request. Please report the incident to the system administrator.",
+                        "The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support."
+                      ]
+                    }
+                  },
+                  "required": [ "status", "response", "description" ]
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/allevents": {
