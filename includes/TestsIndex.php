@@ -64,11 +64,11 @@ class TestsIndex
     {
         $testSuite = [];
 
-        $testsFolder = dirname(__FILE__) . '/tests';
+        $testsFolder = '../tests';
         $it = new \DirectoryIterator("glob://$testsFolder/*Test.json");
         foreach ($it as $f) {
             $fileName       = $f->getFilename();
-            $testContents   = file_get_contents('tests/' . $fileName);
+            $testContents   = file_get_contents('../tests/' . $fileName);
             $testSuite[]    = json_decode($testContents, true);
         }
         return json_encode($testSuite, JSON_PRETTY_PRINT);
@@ -97,7 +97,7 @@ class TestsIndex
             }
 
             // Validate incoming data against unit test schema
-            $schemaFile = dirname(__FILE__) . '/schemas/LitCalTest.json';
+            $schemaFile = '../schemas/LitCalTest.json';
             $schemaContents = file_get_contents($schemaFile);
             $jsonSchema = json_decode($schemaContents);
 
@@ -120,7 +120,7 @@ class TestsIndex
             // Sanitize data to avoid any possibility of script injection
             self::sanitizeObjectValues($data);
 
-            $bytesWritten = file_put_contents('tests/' . $data->name . '.json', json_encode($data, JSON_PRETTY_PRINT));
+            $bytesWritten = file_put_contents('../tests/' . $data->name . '.json', json_encode($data, JSON_PRETTY_PRINT));
             if (false === $bytesWritten) {
                 return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.");
             } else {
