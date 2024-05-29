@@ -35,7 +35,9 @@
         "tags": [
           "Main API endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "retrieves liturgical events for each day of the year",
         "operationId": "retrieveEventsGET",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
@@ -250,7 +252,9 @@
         "tags": [
           "Main API endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "retrieves liturgical events for each day of the year",
         "operationId": "retrieveEventsPOST",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
@@ -356,7 +360,9 @@
         "tags": [
           "Metadata API endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "gives information about current supported national and diocesan calendars and relative locales",
         "operationId": "retrieveMetadataGET",
         "responses": {
@@ -376,7 +382,9 @@
         "tags": [
           "Metadata API endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "gives information about current supported national and diocesan calendars and relative locales",
         "operationId": "retrieveMetadataPOST",
         "responses": {
@@ -398,7 +406,9 @@
         "tags": [
           "Unit Test Index endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "retrieves all the unit tests defined in the API `tests` folder and serves an index useful for frontend processing",
         "operationId": "retrieveTestIndexGET",
         "responses": {
@@ -557,7 +567,9 @@
         "tags": [
           "Unit Test Index endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "create a new unit test in the API `tests` folder",
         "operationId": "testsIndexPUT",
         "requestBody": {
@@ -565,7 +577,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/LitCalTest"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ExactOrVariableCorrespondenceUnitTest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ExactCorrespondenceSinceUnitTest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ExactCorrespondenceUntilUnitTest"
+                  }
+                ]
               }
             }
           }
@@ -588,7 +610,10 @@
                       "const": "Resource Created"
                     }
                   },
-                  "required": [ "status", "response" ]
+                  "required": [
+                    "status",
+                    "response"
+                  ]
                 }
               }
             }
@@ -614,7 +639,11 @@
                       "const": "This endpoint can only accept requests utilizing methods GET or PUT"
                     }
                   },
-                  "required": [ "status", "response", "description" ]
+                  "required": [
+                    "status",
+                    "response",
+                    "description"
+                  ]
                 }
               }
             }
@@ -640,7 +669,11 @@
                       "example": "This endpoint can only handle PUT requests with Content Type application/json, instead the request had a Content Type of {CONTENT TYPE}"
                     }
                   },
-                  "required": [ "status", "response", "description" ]
+                  "required": [
+                    "status",
+                    "response",
+                    "description"
+                  ]
                 }
               }
             }
@@ -669,7 +702,11 @@
                       ]
                     }
                   },
-                  "required": [ "status", "response", "description" ]
+                  "required": [
+                    "status",
+                    "response",
+                    "description"
+                  ]
                 }
               }
             }
@@ -698,7 +735,11 @@
                       ]
                     }
                   },
-                  "required": [ "status", "response", "description" ]
+                  "required": [
+                    "status",
+                    "response",
+                    "description"
+                  ]
                 }
               }
             }
@@ -711,7 +752,9 @@
         "tags": [
           "All possible liturgical events endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "retrieves all possible liturgical events that may or may not appear in the Liturgical Calendar for any given year, based on the calculations done by the LitCal API; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
         "operationId": "retrieveAllEventsGET",
         "parameters": [
@@ -769,9 +812,13 @@
                       "DAY": 2,
                       "TAG": "StsBasilGreg",
                       "GRADE": 3,
-                      "COMMON": ["Proper"],
+                      "COMMON": [
+                        "Proper"
+                      ],
                       "CALENDAR": "GENERAL ROMAN",
-                      "COLOR": ["white"],
+                      "COLOR": [
+                        "white"
+                      ],
                       "READINGS": {
                         "FIRST_READING": "Ef 4, 1-7.11-13",
                         "RESPONSORIAL_PSALM": "Salmo 23",
@@ -787,9 +834,13 @@
                       "DAY": 7,
                       "TAG": "StRayPenyafort",
                       "GRADE": 2,
-                      "COMMON": ["Pastors:For One Pastor"],
+                      "COMMON": [
+                        "Pastors:For One Pastor"
+                      ],
                       "CALENDAR": "GENERAL ROMAN",
-                      "COLOR": ["white"],
+                      "COLOR": [
+                        "white"
+                      ],
                       "READINGS": {
                         "FIRST_READING": "2 Cor 5, 14-20",
                         "RESPONSORIAL_PSALM": "Salmo 103",
@@ -813,7 +864,9 @@
         "tags": [
           "RegionalData"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataGET",
         "parameters": [
@@ -822,8 +875,16 @@
             "name": "category",
             "schema": {
               "type": "string",
-              "enum": [ "nationalCalendar", "diocesanCalendar", "widerRegionCalendar" ],
-              "examples": [ "diocesanCalendar", "nationalCalendar", "widerRegionCalendar" ]
+              "enum": [
+                "nationalCalendar",
+                "diocesanCalendar",
+                "widerRegionCalendar"
+              ],
+              "examples": [
+                "diocesanCalendar",
+                "nationalCalendar",
+                "widerRegionCalendar"
+              ]
             },
             "required": true
           },
@@ -833,7 +894,11 @@
             "schema": {
               "type": "string",
               "pattern": "^[A-Z]{3,45}$",
-              "examples": [ "DIOCESIDIROMA", "NETHERLANDS", "AMERICAS" ]
+              "examples": [
+                "DIOCESIDIROMA",
+                "NETHERLANDS",
+                "AMERICAS"
+              ]
             },
             "description": "national, diocesan or wider region calendar name as a normalized uppercase key without spaces or any non alphabetic characters",
             "required": true
@@ -894,7 +959,9 @@
         "tags": [
           "RegionalData"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataPOST",
         "requestBody": {
@@ -906,7 +973,11 @@
                 "properties": {
                   "category": {
                     "type": "string",
-                    "enum": [ "nationalCalendar", "diocesanCalendar", "widerRegionCalendar" ],
+                    "enum": [
+                      "nationalCalendar",
+                      "diocesanCalendar",
+                      "widerRegionCalendar"
+                    ],
                     "example": "diocesanCalendar"
                   },
                   "key": {
@@ -976,7 +1047,9 @@
         "tags": [
           "RegionalData"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "create a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataPUT",
         "requestBody": {
@@ -1007,7 +1080,9 @@
                       ]
                     }
                   },
-                  "required": [ "success" ]
+                  "required": [
+                    "success"
+                  ]
                 }
               }
             }
@@ -1028,7 +1103,9 @@
                       ]
                     }
                   },
-                  "required": [ "error" ]
+                  "required": [
+                    "error"
+                  ]
                 }
               }
             }
@@ -1046,7 +1123,9 @@
                       "description": "the error message will contain the reason for which the request body does not conform to it's defined schema"
                     }
                   },
-                  "required": [ "error" ]
+                  "required": [
+                    "error"
+                  ]
                 }
               }
             }
@@ -1057,7 +1136,9 @@
         "tags": [
           "RegionalData"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "update a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataPATCH",
         "requestBody": {
@@ -1088,7 +1169,9 @@
                       ]
                     }
                   },
-                  "required": [ "success" ]
+                  "required": [
+                    "success"
+                  ]
                 }
               }
             }
@@ -1109,7 +1192,9 @@
                       ]
                     }
                   },
-                  "required": [ "error" ]
+                  "required": [
+                    "error"
+                  ]
                 }
               }
             }
@@ -1127,7 +1212,9 @@
                       "description": "the error message will contain the reason for which the request body does not conform to it's defined schema"
                     }
                   },
-                  "required": [ "error" ]
+                  "required": [
+                    "error"
+                  ]
                 }
               }
             }
@@ -1138,7 +1225,9 @@
         "tags": [
           "RegionalData"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "delete a diocesan calendar data resource (national calendar and wider region calendar deletion not currently supported)",
         "operationId": "regionalDataDELETE",
         "requestBody": {
@@ -1168,7 +1257,12 @@
                     "const": "diocesanCalendar"
                   }
                 },
-                "required": [ "LitCal", "Diocese", "Nation", "category" ]
+                "required": [
+                  "LitCal",
+                  "Diocese",
+                  "Nation",
+                  "category"
+                ]
               }
             }
           }
@@ -1187,7 +1281,9 @@
                       "example": "Diocesan calendar {DIOCESE} deleted from nation {NATION}"
                     }
                   },
-                  "required": [ "success" ]
+                  "required": [
+                    "success"
+                  ]
                 }
               }
             }
@@ -1205,7 +1301,9 @@
                       "const": "Required parameters were not received"
                     }
                   },
-                  "required": [ "error" ]
+                  "required": [
+                    "error"
+                  ]
                 }
               }
             }
@@ -1223,7 +1321,9 @@
                       "const": "The resource requested for deletion was not found on this server"
                     }
                   },
-                  "required": [ "error" ]
+                  "required": [
+                    "error"
+                  ]
                 }
               }
             }
@@ -1233,8 +1333,12 @@
     },
     "/easter": {
       "get": {
-        "tags": [ "Easter" ],
-        "security": [{}],
+        "tags": [
+          "Easter"
+        ],
+        "security": [
+          {}
+        ],
         "summary": "retrieve the date of Easter, both gregorian and julian, for the years 1583 to 1999",
         "operationId": "easterGET",
         "parameters": [
@@ -1243,7 +1347,16 @@
             "name": "locale",
             "schema": {
               "type": "string",
-              "enum": [ "de", "en", "es", "fr", "it", "pt", "la", "nl" ]
+              "enum": [
+                "de",
+                "en",
+                "es",
+                "fr",
+                "it",
+                "pt",
+                "la",
+                "nl"
+              ]
             },
             "required": false
           }
@@ -1403,7 +1516,8 @@
                       "mobile"
                     ],
                     "examples": [
-                      "fixed", "mobile"
+                      "fixed",
+                      "mobile"
                     ]
                   },
                   "grade": {
@@ -1421,14 +1535,23 @@
                       7
                     ],
                     "examples": [
-                      0, 1, 2, 3, 4, 5, 6, 7
+                      0,
+                      1,
+                      2,
+                      3,
+                      4,
+                      5,
+                      6,
+                      7
                     ]
                   },
                   "gradeLcl": {
                     "description": "The logical importance of the celebration, represented in human readable form and localized according to the current requested locale",
                     "type": "string",
                     "examples": [
-                      "weekday", "Feast", "SOLEMNITY"
+                      "weekday",
+                      "Feast",
+                      "SOLEMNITY"
                     ]
                   },
                   "displayGrade": {
@@ -1458,7 +1581,8 @@
                     "type": "string",
                     "description": "human readable form of the ***common***, localized according to the current requested locale",
                     "examples": [
-                      "Proprio", "Martiri"
+                      "Proprio",
+                      "Martiri"
                     ]
                   },
                   "date": {
@@ -1483,7 +1607,11 @@
                     "type": "string",
                     "description": "description of the liturgical cycle localized according to the requested locale (or national calendar). This property will only be present for events where it is applicable (Sundays or weekdays of Ordinary Time, Solemnities, Feasts of the Lord, in practice those liturgical events the texts of which are based on the liturgical cycle). When present, it will have a localized value of `YEAR A`, `YEAR B`, or `YEAR C` for festive events or a value of `YEAR I`, `YEAR II` for weekday events (whereas if an application makes a request for the Italian language or the national Italian calendar, the values will contain `ANNO` instead of `YEAR`, and likewise for any localization requested).",
                     "examples": [
-                      "YEAR I", "YEAR II", "YEAR A", "YEAR B", "YEAR C"
+                      "YEAR I",
+                      "YEAR II",
+                      "YEAR A",
+                      "YEAR B",
+                      "YEAR C"
                     ]
                   },
                   "liturgicalSeason": {
@@ -1586,7 +1714,8 @@
                 ],
                 "description": "whether Epiphany was set to be celebrated on January 6th or on the Sunday between January 2nd and January 8th",
                 "examples": [
-                  "JAN6", "SUNDAY_JAN2_JAN8"
+                  "JAN6",
+                  "SUNDAY_JAN2_JAN8"
                 ]
               },
               "Ascension": {
@@ -1597,7 +1726,8 @@
                 ],
                 "description": "whether Ascension was set to be celebrated on Thursday or on Sunday",
                 "examples": [
-                  "SUNDAY", "THURSDAY"
+                  "SUNDAY",
+                  "THURSDAY"
                 ]
               },
               "CorpusChristi": {
@@ -1608,7 +1738,8 @@
                 ],
                 "description": "whether Corpus Christi was set to be celebrated on Thursday or on Sunday",
                 "examples": [
-                  "SUNDAY", "THURSDAY"
+                  "SUNDAY",
+                  "THURSDAY"
                 ]
               },
               "CalendarType": {
@@ -1618,15 +1749,17 @@
                   "LITURGICAL"
                 ],
                 "description": "whether the API calculated a calendar for the solar year (Jan 1 - Dec 31) or the liturgical year (First Sunday of Advent of the preceding year including vigil Mass - Saturday of the 34th week of Ordinary Time)",
-                "examples" : [
-                  "CIVIL", "LITURGICAL"
+                "examples": [
+                  "CIVIL",
+                  "LITURGICAL"
                 ]
               },
               "Locale": {
                 "type": "string",
                 "description": "the locale which has either been specifically requested using the `locale` parameter, or set by the requested national calendar",
                 "examples": [
-                  "EN", "nl_NL"
+                  "EN",
+                  "nl_NL"
                 ]
               },
               "ReturnType": {
@@ -1884,7 +2017,12 @@
                       }
                     },
                     "additionalProperties": false,
-                    "required": [ "Epiphany", "Ascension", "CorpusChristi", "Locale" ]
+                    "required": [
+                      "Epiphany",
+                      "Ascension",
+                      "CorpusChristi",
+                      "Locale"
+                    ]
                   }
                 },
                 "additionalProperties": false
@@ -2073,7 +2211,13 @@
             }
           }
         },
-        "required": [ "name", "eventkey", "description", "testType", "assertions" ]
+        "required": [
+          "name",
+          "eventkey",
+          "description",
+          "testType",
+          "assertions"
+        ]
       },
       "ExactCorrespondenceSinceUnitTest": {
         "type": "object",
@@ -2111,7 +2255,14 @@
             }
           }
         },
-        "required": [ "name", "eventkey", "description", "testType", "assertions", "yearSince" ]
+        "required": [
+          "name",
+          "eventkey",
+          "description",
+          "testType",
+          "assertions",
+          "yearSince"
+        ]
       },
       "ExactCorrespondenceUntilUnitTest": {
         "type": "object",
@@ -2149,7 +2300,14 @@
             }
           }
         },
-        "required": [ "name", "eventkey", "description", "testType", "assertions", "yearUntil" ]
+        "required": [
+          "name",
+          "eventkey",
+          "description",
+          "testType",
+          "assertions",
+          "yearUntil"
+        ]
       },
       "LitCalAllFestivitiesResponse": {
         "type": "object",
@@ -2197,30 +2355,72 @@
                     "type": "array",
                     "items": {
                       "type": "string",
-                      "enum": [ "white", "red", "green", "pink", "purple" ]
+                      "enum": [
+                        "white",
+                        "red",
+                        "green",
+                        "pink",
+                        "purple"
+                      ]
                     }
                   },
                   "READINGS": {
                     "type": "object",
                     "properties": {
-                      "FIRST_READING": { "type": "string" },
-                      "RESPONSORIAL_PSALM": { "type": "string" },
-                      "SECOND_READING": { "type": "string" },
-                      "RESPONSORIAL_PSALM_2": { "type": "string" },
-                      "THIRD_READING": { "type": "string" },
-                      "RESPONSORIAL_PSALM_3": { "type": "string" },
-                      "FOURTH_READING": { "type": "string" },
-                      "RESPONSORIAL_PSALM_4": { "type": "string" },
-                      "FIFTH_READING": { "type": "string" },
-                      "RESPONSORIAL_PSALM_5": { "type": "string" },
-                      "SIXTH_READING": { "type": "string" },
-                      "RESPONSORIAL_PSALM_6": { "type": "string" },
-                      "SEVENTH_READING": { "type": "string" },
-                      "RESPONSORIAL_PSALM_7": { "type": "string" },
-                      "EPISTLE": { "type": "string" },
-                      "RESPONSORIAL_PSALM_EPISTLE": { "type": "string" },
-                      "ALLELUIA_VERSE": { "type": "string" },
-                      "GOSPEL": { "type": "string" }
+                      "FIRST_READING": {
+                        "type": "string"
+                      },
+                      "RESPONSORIAL_PSALM": {
+                        "type": "string"
+                      },
+                      "SECOND_READING": {
+                        "type": "string"
+                      },
+                      "RESPONSORIAL_PSALM_2": {
+                        "type": "string"
+                      },
+                      "THIRD_READING": {
+                        "type": "string"
+                      },
+                      "RESPONSORIAL_PSALM_3": {
+                        "type": "string"
+                      },
+                      "FOURTH_READING": {
+                        "type": "string"
+                      },
+                      "RESPONSORIAL_PSALM_4": {
+                        "type": "string"
+                      },
+                      "FIFTH_READING": {
+                        "type": "string"
+                      },
+                      "RESPONSORIAL_PSALM_5": {
+                        "type": "string"
+                      },
+                      "SIXTH_READING": {
+                        "type": "string"
+                      },
+                      "RESPONSORIAL_PSALM_6": {
+                        "type": "string"
+                      },
+                      "SEVENTH_READING": {
+                        "type": "string"
+                      },
+                      "RESPONSORIAL_PSALM_7": {
+                        "type": "string"
+                      },
+                      "EPISTLE": {
+                        "type": "string"
+                      },
+                      "RESPONSORIAL_PSALM_EPISTLE": {
+                        "type": "string"
+                      },
+                      "ALLELUIA_VERSE": {
+                        "type": "string"
+                      },
+                      "GOSPEL": {
+                        "type": "string"
+                      }
                     },
                     "additionalProperties": false
                   },
@@ -2230,11 +2430,18 @@
                   },
                   "TYPE": {
                     "type": "string",
-                    "enum": [ "mobile", "fixed" ]
+                    "enum": [
+                      "mobile",
+                      "fixed"
+                    ]
                   },
                   "MISSAL": {
                     "type": "string",
-                    "enum": [ "VATICAN_1970", "VATICAN_2002", "VATICAN_2008" ],
+                    "enum": [
+                      "VATICAN_1970",
+                      "VATICAN_2002",
+                      "VATICAN_2008"
+                    ],
                     "description": "When a liturgical event is defined in a Roman Missal, this property will be present with an indication of the Roman Missal in question"
                   },
                   "DECREE": {
@@ -2243,7 +2450,17 @@
                   }
                 },
                 "additionalProperties": false,
-                "required": [ "MONTH", "DAY", "TAG", "GRADE", "COMMON", "CALENDAR", "COLOR", "READINGS", "NAME" ]
+                "required": [
+                  "MONTH",
+                  "DAY",
+                  "TAG",
+                  "GRADE",
+                  "COMMON",
+                  "CALENDAR",
+                  "COLOR",
+                  "READINGS",
+                  "NAME"
+                ]
               }
             }
           },
@@ -2399,7 +2616,12 @@
             }
           }
         ],
-        "required": [ "year", "expectedValue", "assert", "assertion" ],
+        "required": [
+          "year",
+          "expectedValue",
+          "assert",
+          "assertion"
+        ],
         "additionalProperties": false
       },
       "NationalDiocesanWiderRegionCalendar": {
