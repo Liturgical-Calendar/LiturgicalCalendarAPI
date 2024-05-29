@@ -11,4 +11,5 @@
     <exclude-pattern>*Test.php</exclude-pattern>
     <exclude-pattern>allowedOrigins.php</exclude-pattern>
     <arg name="encoding" value="utf-8"/>
+    <arg name="extensions" value="php"/>
 </ruleset>
