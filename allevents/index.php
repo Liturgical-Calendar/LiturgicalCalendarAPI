@@ -61,12 +61,12 @@ foreach ($directories as $directory) {
 
 $GeneralIndexContents = file_exists("../nations/index.json") ? file_get_contents("../nations/index.json") : null;
 if (null === $GeneralIndexContents || false === $GeneralIndexContents) {
-    produceErrorResponse(StatusCode::NOT_FOUND, "path ../nations/index.json not found");
+    echo produceErrorResponse(StatusCode::NOT_FOUND, "path ../nations/index.json not found");
     die();
 }
 $GeneralIndex = json_decode($GeneralIndexContents);
 if (json_last_error() !== JSON_ERROR_NONE) {
-    produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
+    echo produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
     die();
 }
 
@@ -133,9 +133,17 @@ bindtextdomain("litcal", "../i18n");
 textdomain("litcal");
 $LitGrade = new LitGrade($Locale);
 foreach ($LatinMissals as $LatinMissal) {
-    $DataFile = '../' . RomanMissal::getSanctoraleFileName($LatinMissal);
+    $DataFile = RomanMissal::getSanctoraleFileName($LatinMissal);
     if ($DataFile !== false) {
-        $DATA = json_decode(file_get_contents($DataFile), true);
+        if (!file_exists('../' . $DataFile)) {
+            echo produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource $DataFile");
+            die();
+        }
+        $DATA = json_decode(file_get_contents('../' . $DataFile), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            echo produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
+            die();
+        }
         foreach ($DATA as $idx => $festivity) {
             $key = $festivity[ "TAG" ];
             $FestivityCollection[ $key ] = $festivity;
@@ -143,17 +151,22 @@ foreach ($LatinMissals as $LatinMissal) {
             $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n($festivity["GRADE"], false);
         }
         // There may or may not be a related translation file; if there is, we get the translated name from here
-        $I18nPath = '../' . RomanMissal::getSanctoraleI18nFilePath($LatinMissal);
-        if ($I18nPath !== false && file_exists($I18nPath . "/" . $Locale . ".json")) {
-            $NAME = json_decode(file_get_contents($I18nPath . "/" . $Locale . ".json"), true);
+        $I18nPath = RomanMissal::getSanctoraleI18nFilePath($LatinMissal);
+        if ($I18nPath !== false) {
+            if (false === file_exists('../' . $I18nPath . "/" . $Locale . ".json")) {
+                echo produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource $I18nPath");
+                die();
+            }
+            $NAME = json_decode(file_get_contents('../' . $I18nPath . "/" . $Locale . ".json"), true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                echo produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
+                die();
+            }
             foreach ($DATA as $idx => $festivity) {
                 $key = $festivity[ "TAG" ];
                 $FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
             }
         }
-    } else {
-        produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource $DataFile");
-        die();
     }
 }
 
@@ -245,17 +258,17 @@ $DataFile = '../data/propriumdetempore.json';
 $I18nFile = '../data/propriumdetempore/' . $Locale . ".json";
 
 if (!file_exists($DataFile) || !file_exists($I18nFile)) {
-    produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DataFile or resource file $I18nFile");
+    echo produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DataFile or resource file $I18nFile");
     die();
 }
 $DATA = json_decode(file_get_contents($DataFile), true);
 if (json_last_error() !== JSON_ERROR_NONE) {
-    produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
+    echo produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
     die();
 }
 $NAME = json_decode(file_get_contents($I18nFile), true);
 if (json_last_error() !== JSON_ERROR_NONE) {
-    produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
+    echo produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
     die();
 }
 
@@ -283,18 +296,18 @@ foreach ($DATA as $key => $readings) {
 $DataFile = '../data/memorialsFromDecrees/memorialsFromDecrees.json';
 $I18nFile = '../data/memorialsFromDecrees/i18n/' . $Locale . ".json";
 if (!file_exists($DataFile) || !file_exists($I18nFile)) {
-    produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DataFile or resource file $I18nFile");
+    echo produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DataFile or resource file $I18nFile");
     die();
 }
 
 $DATA = json_decode(file_get_contents($DataFile), true);
 if (json_last_error() !== JSON_ERROR_NONE) {
-    produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
+    echo produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
     die();
 }
 $NAME = json_decode(file_get_contents($I18nFile), true);
 if (json_last_error() !== JSON_ERROR_NONE) {
-    produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
+    echo produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
     die();
 }
 foreach ($DATA as $idx => $festivity) {
