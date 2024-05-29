@@ -1081,7 +1081,7 @@
       "get": {
         "tags": [ "Easter" ],
         "security": [{}],
-        "summary": "retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
+        "summary": "retrieve the date of Easter, both gregorian and julian, for the years 1583 to 1999",
         "operationId": "easterGET",
         "parameters": [
           {
