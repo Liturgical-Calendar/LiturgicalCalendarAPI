@@ -42,9 +42,8 @@
  * Romeins Missaal [ NETHERLANDS ], 1978
  *********************************************************************************/
 
-// error_reporting(E_ALL);
-// ini_set('display_errors', 1);
-// ini_set('date.timezone', 'Europe/Vatican');
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 ini_set('date.timezone', 'Europe/Vatican');
 
 include_once('includes/enums/AcceptHeader.php');
