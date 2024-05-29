@@ -26,16 +26,23 @@ header('Access-Control-Max-Age: 86400');
 header('Cache-Control: must-revalidate, max-age=259200');
 header('Content-Type: application/json');
 
+
+const STATUS_CODES = [
+    StatusCode::METHOD_NOT_ALLOWED     => " 405 Method Not Allowed",
+    StatusCode::UNSUPPORTED_MEDIA_TYPE => " 415 Unsupported Media Type",
+    StatusCode::UNPROCESSABLE_CONTENT  => " 422 Unprocessable Content",
+    StatusCode::SERVICE_UNAVAILABLE    => " 503 Service Unavailable"
+];
+
 function produceErrorResponse(int $statusCode, string $description): string
 {
-    header($_SERVER[ "SERVER_PROTOCOL" ] . self::STATUS_CODES[ $statusCode ], true, $statusCode);
+    header($_SERVER[ "SERVER_PROTOCOL" ] . STATUS_CODES[ $statusCode ], true, $statusCode);
     $message = new \stdClass();
     $message->status = "ERROR";
     $message->response = $statusCode === 404 ? "Resource not Found" : "Service Unavailable";
     $message->description = $description;
     return json_encode($message);
 }
-
 
 $FestivityCollection = [];
 
