@@ -907,7 +907,7 @@
             "description": "404 Not Found: resource file not found"
           },
           "503": {
-            "description": "503 Service Unavailable: could not read resource files"
+            "description": "503 Service Unavailable: could not decode resource files"
           }
         }
       }
@@ -2632,6 +2632,8 @@
         "additionalProperties": false
       },
       "EventExistsAndHasExpectedTimestampAssertion": {
+        "title": "Event exists and has expected timestamp",
+        "description": "Expect that a liturgical event be present in the calendar on the expected date in the given year",
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -2664,6 +2666,8 @@
         "required": [ "year", "expectedValue", "assert", "assertion" ]
       },
       "EventNotExistsAssertion": {
+        "title": "Event not exists",
+        "description": "Expect that the liturgical event not be present in the calendar in the given year",
         "type": "object",
         "additionalProperties": false,
         "properties": {
