@@ -40,7 +40,7 @@ function produceErrorResponse(int $statusCode, string $description): string
     header($_SERVER[ "SERVER_PROTOCOL" ] . STATUS_CODES[ $statusCode ], true, $statusCode);
     $message = new \stdClass();
     $message->status = "ERROR";
-    $message->response = $statusCode === 404 ? "Resource not Found" : "Service Unavailable";
+    $message->response = STATUS_CODES[ $statusCode ];
     $message->description = $description;
     return json_encode($message);
 }
