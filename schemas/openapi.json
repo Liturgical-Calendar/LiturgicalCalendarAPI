@@ -2533,39 +2533,6 @@
         },
         "additionalProperties": false
       },
-      "SolemnitiesFeastsMemorials": {
-        "type": "object",
-        "description": "the keys of this object identify the liturgical event",
-        "patternProperties": {
-          "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$": {
-            "type": "object",
-            "description": "a liturgical event that has a rank of solemnity, and which can therefore supersede a feast or a memorial",
-            "properties": {
-              "date": {
-                "type": "string",
-                "format": "date-time",
-                "description": "the date of the liturgical event in the liturgical calendar for the given year (the time will be zeroed out because it is not of importance). Expected pattern is `YYYY-MM-DD 00:00:00.000000`"
-              },
-              "timezone_type": {
-                "type": "integer",
-                "description": "describes the timezone type set on the DateTime object in the endpoint's PHP backend (only DateTime objects with type 3 timezones attached will allow for DST correction). The timezone will always be set to \"UTC\" and therefore the timezone type should always be of type 3, see https://www.php.net/manual/en/timezones.others.php",
-                "format": "int32",
-                "enum": [
-                  3
-                ]
-              },
-              "timezone": {
-                "type": "string",
-                "description": "the timezone set on the DateTime object in the endpoint's PHP backend (it will always be set to \"UTC\", in order to ensure the date will remain unchanged anywhere in the world)",
-                "enum": [
-                  "UTC"
-                ]
-              }
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "Assertions": {
         "type": "object",
         "anyOf": [
