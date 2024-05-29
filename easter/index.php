@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 ini_set("display_errors", 1);
 ini_set('date.timezone', 'Europe/Vatican');
 
-include_once('../includes/enums/LitLocale.php');
+require_once '../includes/enums/LitLocale.php';
 
 use LitCal\enum\LitLocale;
 
@@ -16,8 +16,9 @@ if (file_exists('../engineCache/easter/' . $LOCALE . '.json')) {
     die();
 }
 
-include_once('../includes/LitFunc.php');
-include_once('../includes/LitMessages.php');
+include_once '../includes/DateTime.php';
+include_once '../includes/LitFunc.php';
+include_once '../includes/LitMessages.php';
 
 use LitCal\LitFunc;
 use LitCal\LitMessages;
