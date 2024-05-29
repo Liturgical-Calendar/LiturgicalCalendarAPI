@@ -2179,7 +2179,7 @@
         }
       },
       "ExactOrVariableCorrespondenceUnitTest": {
-        "title": "Exact or Variable Existence Unit Test",
+        "description": "Exact or Variable Existence Unit Test",
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -2221,7 +2221,7 @@
         ]
       },
       "ExactCorrespondenceSinceUnitTest": {
-        "title": "Exact Existence Since Year Unit Test",
+        "description": "Exact Existence Since Year Unit Test",
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -2267,7 +2267,7 @@
         ]
       },
       "ExactCorrespondenceUntilUnitTest": {
-        "title": "Exact Existence Since Until Unit Test",
+        "description": "Exact Existence Since Until Unit Test",
         "type": "object",
         "additionalProperties": false,
         "properties": {
