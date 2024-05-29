@@ -1,6 +1,6 @@
 <?php
 
-include_once('includes/enums/RomanMissal.php');
+include_once('../includes/enums/RomanMissal.php');
 
 use LitCal\enum\RomanMissal;
 
@@ -16,20 +16,20 @@ header('Cache-Control: must-revalidate, max-age=259200');
 header('Content-Type: application/json');
 
 $widerRegionCalendars = [];
-foreach (glob("nations/*.json") as $filename) {
+foreach (glob("../nations/*.json") as $filename) {
     $widerRegionCalendars[] = strtoupper(basename($filename, ".json"));
 }
 
 $baseNationalCalendars = [ "VATICAN" ];
-$directories = array_map('basename', glob('nations/*', GLOB_ONLYDIR));
+$directories = array_map('basename', glob('../nations/*', GLOB_ONLYDIR));
 foreach ($directories as $directory) {
-    if (file_exists("nations/$directory/$directory.json")) {
+    if (file_exists("../nations/$directory/$directory.json")) {
         $baseNationalCalendars[] = $directory;
     }
 }
 
-if (file_exists('nations/index.json')) {
-    $index = file_get_contents('nations/index.json');
+if (file_exists('../nations/index.json')) {
+    $index = file_get_contents('../nations/index.json');
     if ($index !== false) {
         $diocesanCalendars  = json_decode($index, true);
         $nationalCalendars  = [];
@@ -60,20 +60,20 @@ if (file_exists('nations/index.json')) {
             if (!array_key_exists($nation, $nationalCalendars)) {
                 $nationalCalendars[$nation] = [];
             }
-            if (file_exists("nations/$nation/$nation.json")) {
-                $nationData = json_decode(file_get_contents("nations/$nation/$nation.json"));
+            if (file_exists("../nations/$nation/$nation.json")) {
+                $nationData = json_decode(file_get_contents("../nations/$nation/$nation.json"));
                 $nationalCalendarsMetadata[$nation]["missals"] = $nationData->Metadata->Missals;
                 $nationalCalendarsMetadata[$nation]["widerRegions"][] = $nationData->Metadata->WiderRegion->name;
                 $nationalCalendarsMetadata[$nation]["settings"] = $nationData->Settings;
             }
         }
         $filterDirResults = ['..', '.', 'index.json'];
-        $dirResults = array_diff(scandir('nations'), $filterDirResults);
+        $dirResults = array_diff(scandir('../nations'), $filterDirResults);
         $widerRegionsFiles = array_values(array_filter($dirResults, function ($el) {
-            return !is_dir('nations/' . $el) && pathinfo('nations/' . $el, PATHINFO_EXTENSION) === 'json';
+            return !is_dir('../nations/' . $el) && pathinfo('../nations/' . $el, PATHINFO_EXTENSION) === 'json';
         }));
         $widerRegionsNames = array_map(function ($el) {
-            return pathinfo('nations/' . $el, PATHINFO_FILENAME);
+            return pathinfo('../nations/' . $el, PATHINFO_FILENAME);
         }, $widerRegionsFiles);
 
         $response = json_encode([
