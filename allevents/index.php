@@ -7,10 +7,12 @@ ini_set('date.timezone', 'Europe/Vatican');
 require_once '../includes/enums/LitLocale.php';
 require_once '../includes/enums/RomanMissal.php';
 require_once '../includes/enums/LitGrade.php';
+require_once '../includes/enums/StatusCode.php';
 
 use LitCal\enum\RomanMissal;
 use LitCal\enum\LitLocale;
 use LitCal\enum\LitGrade;
+use LitCal\enum\StatusCode;
 
 $requestHeaders = getallheaders();
 if (isset($requestHeaders[ "Origin" ])) {
@@ -23,6 +25,17 @@ header('Access-Control-Max-Age: 86400');
 // cache for 1 day
 header('Cache-Control: must-revalidate, max-age=259200');
 header('Content-Type: application/json');
+
+function produceErrorResponse(int $statusCode, string $description): string
+{
+    header($_SERVER[ "SERVER_PROTOCOL" ] . self::STATUS_CODES[ $statusCode ], true, $statusCode);
+    $message = new \stdClass();
+    $message->status = "ERROR";
+    $message->response = $statusCode === 404 ? "Resource not Found" : "Service Unavailable";
+    $message->description = $description;
+    return json_encode($message);
+}
+
 
 $FestivityCollection = [];
 
@@ -39,8 +52,12 @@ foreach ($directories as $directory) {
 }
 
 $GeneralIndex = file_exists("../nations/index.json") ? json_decode(file_get_contents("../nations/index.json")) : null;
-if (null === $GeneralIndex || json_last_error() !== JSON_ERROR_NONE) {
-    header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
+if (null === $GeneralIndex) {
+    produceErrorResponse(StatusCode::NOT_FOUND, "path ../nations/index.json not found");
+    die();
+}
+if (json_last_error() !== JSON_ERROR_NONE) {
+    produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
     die();
 }
 
@@ -121,11 +138,11 @@ foreach ($LatinMissals as $LatinMissal) {
                 $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n($festivity["GRADE"], false);
             }
         } else {
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
+            produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource $I18nPath");
             die();
         }
     } else {
-        header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
+        produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource $DataFile");
         die();
     }
 }
@@ -218,17 +235,17 @@ $DataFile = '../data/propriumdetempore.json';
 $I18nFile = '../data/propriumdetempore/' . $Locale . ".json";
 
 if (!file_exists($DataFile) || !file_exists($I18nFile)) {
-    header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
+    produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DataFile or resource file $I18nFile");
     die();
 }
 $DATA = json_decode(file_get_contents($DataFile), true);
 if (json_last_error() !== JSON_ERROR_NONE) {
-    header($_SERVER[ "SERVER_PROTOCOL" ] . " 503 Service Unavailable", true, 503);
+    produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
     die();
 }
 $NAME = json_decode(file_get_contents($I18nFile), true);
 if (json_last_error() !== JSON_ERROR_NONE) {
-    header($_SERVER[ "SERVER_PROTOCOL" ] . " 503 Service Unavailable", true, 503);
+    produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
     die();
 }
 
@@ -256,18 +273,18 @@ foreach ($DATA as $key => $readings) {
 $DataFile = '../data/memorialsFromDecrees/memorialsFromDecrees.json';
 $I18nFile = '../data/memorialsFromDecrees/i18n/' . $Locale . ".json";
 if (!file_exists($DataFile) || !file_exists($I18nFile)) {
-    header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
+    produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DataFile or resource file $I18nFile");
     die();
 }
 
 $DATA = json_decode(file_get_contents($DataFile), true);
 if (json_last_error() !== JSON_ERROR_NONE) {
-    header($_SERVER[ "SERVER_PROTOCOL" ] . " 503 Service Unavailable", true, 503);
+    produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
     die();
 }
 $NAME = json_decode(file_get_contents($I18nFile), true);
 if (json_last_error() !== JSON_ERROR_NONE) {
-    header($_SERVER[ "SERVER_PROTOCOL" ] . " 503 Service Unavailable", true, 503);
+    produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
     die();
 }
 foreach ($DATA as $idx => $festivity) {
