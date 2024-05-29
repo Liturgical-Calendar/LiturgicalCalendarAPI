@@ -28,7 +28,7 @@ jobs:
         id: update_pot
         run: |
           sudo apt-get install -y gettext
-          xgettext --from-code=UTF-8 --add-comments='translators:' --keyword="pgettext:1c,2" -o i18n/litcal.pot includes/LitCalAPI.php includes/LitMessages.php includes/FestivityCollection.php includes/enums/LitColor.php includes/enums/LitCommon.php includes/enums/LitGrade.php includes/enums/LitSeason.php
+          xgettext --from-code=UTF-8 --add-comments='translators:' --keyword="pgettext:1c,2" -o i18n/litcal.pot includes/API.php includes/LitMessages.php includes/FestivityCollection.php includes/enums/LitColor.php includes/enums/LitCommon.php includes/enums/LitGrade.php includes/enums/LitSeason.php
           echo "POT_LINES_CHANGED=$(git diff -U0 | grep '^[+|-][^+|-]' | grep -Ev '^[+-]"POT-Creation-Date' | wc -l)" >> $GITHUB_OUTPUT
 
       # push the output folder to your repo

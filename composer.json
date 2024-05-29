@@ -4,5 +4,8 @@
         "phpunit/phpunit": "^10",
         "cboden/ratchet": "^0.4.4",
         "sabre/vobject": "~4.1"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "*"
     }
 }

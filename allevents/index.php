@@ -1,7 +1,7 @@
 <?php
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+// error_reporting(E_ALL);
 ini_set('date.timezone', 'Europe/Vatican');
 
 require_once '../includes/enums/LitLocale.php';

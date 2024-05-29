@@ -1,7 +1,5 @@
 <?php
 
-include_once('vendor/autoload.php');
-
 namespace LitCal;
 
 use Swaggest\JsonSchema\InvalidValue;

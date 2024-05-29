@@ -1,11 +1,12 @@
 <?php
 
 /**
- * Liturgical Calendar PHP engine script
- * Author: John Romano D'Orazio
- * Email: priest@johnromanodorazio.com
- * Licensed under the Apache 2.0 License
- * Version 3.8
+ * Liturgical Calendar API main script
+ * PHP version 8.3
+ * @author  John Romano D'Orazio <priest@johnromanodorazio.com>
+ * @link    https://litcal.johnromanodorazio.com
+ * @license Apache 2.0 License
+ * @version 3.9
  * Date Created: 27 December 2017
  */
 
@@ -42,8 +43,8 @@
  * Romeins Missaal [ NETHERLANDS ], 1978
  *********************************************************************************/
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
 ini_set('date.timezone', 'Europe/Vatican');
 
 include_once('includes/enums/AcceptHeader.php');
