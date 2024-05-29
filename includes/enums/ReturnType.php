@@ -1,5 +1,7 @@
 <?php
 
+namespace LitCal\enum;
+
 /**
  * class ReturnType
  * Represents possible Content Types for the Response
@@ -11,31 +13,31 @@
 
 class ReturnType
 {
-    const ATTACHMENT    = "ATTACHMENT";
-    const JSON          = "JSON";
-    const XML           = "XML";
-    const YML           = "YML";
-    const PDF           = "PDF";
-    const HTML          = "HTML";
-    const ICS           = "ICS";
-    const TEXT          = "TEXT";
-    const CSV           = "CSV";
-    const CSS           = "CSS";
-    const JS            = "JS";
-    const MPEG          = "MPEG";
-    const VORBIS        = "VORBIS";
-    const OGG           = "OGG";
-    const WEBM          = "WEBM";
-    const JPG           = "JPG";
-    const PNG           = "PNG";
-    const APNG          = "APNG";
-    const AVIF          = "AVIF";
-    const GIF           = "GIF";
-    const SVG           = "SVG";
-    const WEBP          = "WEBP";
-    const MP4           = "MP4";
-    const VIDEO_OGG     = "VIDEO_OGG";
-    const VIDEO_WEBM    = "VIDEO_WEBM";
+    public const ATTACHMENT    = "ATTACHMENT";
+    public const JSON          = "JSON";
+    public const XML           = "XML";
+    public const YML           = "YML";
+    public const PDF           = "PDF";
+    public const HTML          = "HTML";
+    public const ICS           = "ICS";
+    public const TEXT          = "TEXT";
+    public const CSV           = "CSV";
+    public const CSS           = "CSS";
+    public const JS            = "JS";
+    public const MPEG          = "MPEG";
+    public const VORBIS        = "VORBIS";
+    public const OGG           = "OGG";
+    public const WEBM          = "WEBM";
+    public const JPG           = "JPG";
+    public const PNG           = "PNG";
+    public const APNG          = "APNG";
+    public const AVIF          = "AVIF";
+    public const GIF           = "GIF";
+    public const SVG           = "SVG";
+    public const WEBP          = "WEBP";
+    public const MP4           = "MP4";
+    public const VIDEO_OGG     = "VIDEO_OGG";
+    public const VIDEO_WEBM    = "VIDEO_WEBM";
 
     public static array $values = [
         "ATTACHMENT",

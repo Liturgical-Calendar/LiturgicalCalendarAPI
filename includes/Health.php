@@ -1,19 +1,6 @@
 <?php
 
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
-
-include_once('vendor/autoload.php');
-include_once('includes/LitCalTest.php');
-include_once('includes/enums/LitSchema.php');
-
-$testsFolder = dirname(__FILE__) . '/tests';
-$it = new DirectoryIterator("glob://$testsFolder/*Test.php");
-foreach ($it as $f) {
-    $fileName = $f->getFilename();
-    include_once('tests/' . $fileName);
-}
+namespace LitCal;
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
@@ -21,8 +8,11 @@ use Sabre\VObject;
 use Sabre\VObject\InvalidDataException;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
+use LitCal\enum\ICSErrorLevel;
+use LitCal\enum\LitSchema;
+use LitCal\LitTest;
 
-class LitCalHealth implements MessageComponentInterface
+class Health implements MessageComponentInterface
 {
     protected $clients;
 
@@ -71,7 +61,7 @@ class LitCalHealth implements MessageComponentInterface
                         }
                         break;
                     default:
-                        $message = new stdClass();
+                        $message = new \stdClass();
                         $message->type = "echobot";
                         $message->text = $msg;
                         $this->sendMessage($from, $message);
@@ -94,7 +84,7 @@ class LitCalHealth implements MessageComponentInterface
         $conn->close();
     }
 
-    private function sendMessage(ConnectionInterface $from, string|stdClass $msg)
+    private function sendMessage(ConnectionInterface $from, string|\stdClass $msg)
     {
         if (gettype($msg) !== 'string') {
             $msg = json_encode($msg);
@@ -107,7 +97,7 @@ class LitCalHealth implements MessageComponentInterface
         }
     }
 
-    const DataPathToSchema = [
+    public const DATA_PATH_TO_SCHEMA = [
         "https://litcal.johnromanodorazio.com/api/dev/LitCalMetadata.php"       => LitSchema::METADATA,
         "data/propriumdetempore.json"                                           => LitSchema::PROPRIUMDETEMPORE,
         "data/propriumdesanctis_1970/propriumdesanctis_1970.json"               => LitSchema::PROPRIUMDESANCTIS,
@@ -117,7 +107,7 @@ class LitCalHealth implements MessageComponentInterface
         "nations/index.json"                                                    => LitSchema::INDEX
     ];
 
-    const LitCalBaseUrl = "https://litcal.johnromanodorazio.com/api/dev/LitCalEngine.php";
+    public const LITCAL_BASE_URL = "https://litcal.johnromanodorazio.com/api/dev/LitCalEngine.php";
 
     public function __construct()
     {
@@ -129,7 +119,7 @@ class LitCalHealth implements MessageComponentInterface
         $dataPath = $validation->sourceFile;
         switch ($validation->category) {
             case 'universalcalendar':
-                $schema = LitCalHealth::DataPathToSchema[ $dataPath ];
+                $schema = Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
                 break;
             case 'nationalcalendar':
                 $schema = LitSchema::NATIONAL;
@@ -146,7 +136,7 @@ class LitCalHealth implements MessageComponentInterface
         }
         $data = file_get_contents($dataPath);
         if ($data !== false) {
-            $message = new stdClass();
+            $message = new \stdClass();
             $message->type = "success";
             $message->text = "The Data file $dataPath exists";
             $message->classes = ".$validation->validate.file-exists";
@@ -154,7 +144,7 @@ class LitCalHealth implements MessageComponentInterface
 
             $jsonData = json_decode($data);
             if (json_last_error() === JSON_ERROR_NONE) {
-                $message = new stdClass();
+                $message = new \stdClass();
                 $message->type = "success";
                 $message->text = "The Data file $dataPath was successfully decoded as JSON";
                 $message->classes = ".$validation->validate.json-valid";
@@ -162,7 +152,7 @@ class LitCalHealth implements MessageComponentInterface
 
                 $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
                 if (gettype($validationResult) === 'boolean' && $validationResult === true) {
-                    $message = new stdClass();
+                    $message = new \stdClass();
                     $message->type = "success";
                     $message->text = "The Data file $dataPath was successfully validated against the Schema $schema";
                     $message->classes = ".$validation->validate.schema-valid";
@@ -172,14 +162,14 @@ class LitCalHealth implements MessageComponentInterface
                     $this->sendMessage($to, $validationResult);
                 }
             } else {
-                $message = new stdClass();
+                $message = new \stdClass();
                 $message->type = "error";
                 $message->text = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg();
                 $message->classes = ".$validation->validate.json-valid";
                 $this->sendMessage($to, $message);
             }
         } else {
-            $message = new stdClass();
+            $message = new \stdClass();
             $message->type = "error";
             $message->text = "Data file $dataPath does not exist";
             $message->classes = ".$validation->validate.file-exists";
@@ -187,7 +177,7 @@ class LitCalHealth implements MessageComponentInterface
         }
     }
 
-    private static function retrieve_xml_errors(array $errors, array $xml): string
+    private static function retrieveXmlErrors(array $errors, array $xml): string
     {
         $return = [];
         foreach ($errors as $error) {
@@ -219,9 +209,9 @@ class LitCalHealth implements MessageComponentInterface
         } else {
             $req = "?$category=$Calendar&year=$Year&calendartype=CIVIL&returntype=$responseType";
         }
-        $data = file_get_contents(self::LitCalBaseUrl . $req);
+        $data = file_get_contents(self::LITCAL_BASE_URL . $req);
         if ($data !== false) {
-            $message = new stdClass();
+            $message = new \stdClass();
             $message->type = "success";
             $message->text = "The $category of $Calendar for the year $Year exists";
             $message->classes = ".calendar-$Calendar.file-exists.year-$Year";
@@ -230,22 +220,22 @@ class LitCalHealth implements MessageComponentInterface
             switch ($responseType) {
                 case "XML":
                     libxml_use_internal_errors(true);
-                    $xml = new DOMDocument();
+                    $xml = new \DOMDocument();
                     $xml->loadXML($data);
                     //$xml = simplexml_load_string( $data );
                     $xmlArr = explode("\n", $data);
                     if ($xml === false) {
-                        $message = new stdClass();
+                        $message = new \stdClass();
                         $message->type = "error";
                         $errors = libxml_get_errors();
-                        $errorString = self::retrieve_xml_errors($errors, $xmlArr);
+                        $errorString = self::retrieveXmlErrors($errors, $xmlArr);
                         libxml_clear_errors();
-                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as XML: " . $errorString;
+                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LITCAL_BASE_URL . $req . " as XML: " . $errorString;
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
                     } else {
-                        $message = new stdClass();
+                        $message = new \stdClass();
                         $message->type = "success";
                         $message->text = "The $category of $Calendar for the year $Year was successfully decoded as XML";
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
@@ -253,16 +243,16 @@ class LitCalHealth implements MessageComponentInterface
 
                         $validationResult = $xml->schemaValidate('https://litcal.johnromanodorazio.com/api/dev/schemas/LiturgicalCalendar.xsd');
                         if ($validationResult) {
-                            $message = new stdClass();
+                            $message = new \stdClass();
                             $message->type = "success";
                             $message->text = "The $category of $Calendar for the year $Year was successfully validated against the Schema https://litcal.johnromanodorazio.com/api/dev/schemas/LiturgicalCalendar.xsd";
                             $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
                             $this->sendMessage($to, $message);
                         } else {
                             $errors = libxml_get_errors();
-                            $errorString = self::retrieve_xml_errors($errors, $xmlArr);
+                            $errorString = self::retrieveXmlErrors($errors, $xmlArr);
                             libxml_clear_errors();
-                            $message = new stdClass();
+                            $message = new \stdClass();
                             $message->type = "error";
                             $message->text = $errorString;
                             $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
@@ -277,7 +267,7 @@ class LitCalHealth implements MessageComponentInterface
                         $vcalendar = json_encode($ex);
                     }
                     if ($vcalendar instanceof VObject\Document) {
-                        $message = new stdClass();
+                        $message = new \stdClass();
                         $message->type = "success";
                         $message->text = "The $category of $Calendar for the year $Year was successfully decoded as ICS";
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
@@ -285,13 +275,13 @@ class LitCalHealth implements MessageComponentInterface
 
                         $result = $vcalendar->validate();
                         if (count($result) === 0) {
-                            $message = new stdClass();
+                            $message = new \stdClass();
                             $message->type = "success";
                             $message->text = "The $category of $Calendar for the year $Year was successfully validated according the iCalendar Schema https://tools.ietf.org/html/rfc5545";
                             $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
                             $this->sendMessage($to, $message);
                         } else {
-                            $message = new stdClass();
+                            $message = new \stdClass();
                             $message->type = "error";
                             $errorStrings = [];
                             foreach ($result as $error) {
@@ -304,9 +294,9 @@ class LitCalHealth implements MessageComponentInterface
                             $this->sendMessage($to, $message);
                         }
                     } else {
-                        $message = new stdClass();
+                        $message = new \stdClass();
                         $message->type = "error";
-                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as ICS: parsing resulted in type " . gettype($vcalendar) . " | " . $vcalendar;
+                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LITCAL_BASE_URL . $req . " as ICS: parsing resulted in type " . gettype($vcalendar) . " | " . $vcalendar;
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
@@ -316,7 +306,7 @@ class LitCalHealth implements MessageComponentInterface
                     try {
                         $yamlData = json_decode(json_encode(yaml_parse($data)));
                         if ($yamlData) {
-                            $message = new stdClass();
+                            $message = new \stdClass();
                             $message->type = "success";
                             $message->text = "The $category of $Calendar for the year $Year was successfully decoded as YAML";
                             $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
@@ -324,7 +314,7 @@ class LitCalHealth implements MessageComponentInterface
 
                             $validationResult = $this->validateDataAgainstSchema($yamlData, LitSchema::LITCAL);
                             if (gettype($validationResult) === 'boolean' && $validationResult === true) {
-                                $message = new stdClass();
+                                $message = new \stdClass();
                                 $message->type = "success";
                                 $message->text = "The $category of $Calendar for the year $Year was successfully validated against the Schema " . LitSchema::LITCAL;
                                 $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
@@ -334,10 +324,10 @@ class LitCalHealth implements MessageComponentInterface
                                 $this->sendMessage($to, $validationResult);
                             }
                         }
-                    } catch (Exception $ex) {
-                        $message = new stdClass();
+                    } catch (\Exception $ex) {
+                        $message = new \stdClass();
                         $message->type = "error";
-                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as YAML: " . $ex->getMessage();
+                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LITCAL_BASE_URL . $req . " as YAML: " . $ex->getMessage();
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
@@ -347,7 +337,7 @@ class LitCalHealth implements MessageComponentInterface
                 default:
                     $jsonData = json_decode($data);
                     if (json_last_error() === JSON_ERROR_NONE) {
-                        $message = new stdClass();
+                        $message = new \stdClass();
                         $message->type = "success";
                         $message->text = "The $category of $Calendar for the year $Year was successfully decoded as JSON";
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
@@ -355,7 +345,7 @@ class LitCalHealth implements MessageComponentInterface
 
                         $validationResult = $this->validateDataAgainstSchema($jsonData, LitSchema::LITCAL);
                         if (gettype($validationResult) === 'boolean' && $validationResult === true) {
-                            $message = new stdClass();
+                            $message = new \stdClass();
                             $message->type = "success";
                             $message->text = "The $category of $Calendar for the year $Year was successfully validated against the Schema " . LitSchema::LITCAL;
                             $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
@@ -365,18 +355,18 @@ class LitCalHealth implements MessageComponentInterface
                             $this->sendMessage($to, $validationResult);
                         }
                     } else {
-                        $message = new stdClass();
+                        $message = new \stdClass();
                         $message->type = "error";
-                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LitCalBaseUrl . $req . " as JSON: " . json_last_error_msg();
+                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LITCAL_BASE_URL . $req . " as JSON: " . json_last_error_msg();
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
                     }
             }
         } else {
-            $message = new stdClass();
+            $message = new \stdClass();
             $message->type = "error";
-            $message->text = "The $category of $Calendar for the year $Year does not exist at the URL " . self::LitCalBaseUrl . $req;
+            $message->text = "The $category of $Calendar for the year $Year does not exist at the URL " . self::LITCAL_BASE_URL . $req;
             $message->classes = ".calendar-$Calendar.file-exists.year-$Year";
             $this->sendMessage($to, $message);
         }
@@ -389,9 +379,9 @@ class LitCalHealth implements MessageComponentInterface
         } else {
             $req = "?$category=$Calendar&year=$Year&calendartype=CIVIL";
         }
-        $jsonData = json_decode(file_get_contents(self::LitCalBaseUrl . $req));
+        $jsonData = json_decode(file_get_contents(self::LITCAL_BASE_URL . $req));
         if (json_last_error() === JSON_ERROR_NONE) {
-            $UnitTest = new LitCalTest($Test, $jsonData);
+            $UnitTest = new LitTest($Test, $jsonData);
             if ($UnitTest->isReady()) {
                 $UnitTest->runTest();
             }
@@ -406,36 +396,12 @@ class LitCalHealth implements MessageComponentInterface
             $schema = Schema::import($schemaUrl);
             $schema->in($data);
             $res = true;
-        } catch (InvalidValue | Exception $e) {
-            $message = new stdClass();
+        } catch (InvalidValue | \Exception $e) {
+            $message = new \stdClass();
             $message->type = "error";
             $message->text = LitSchema::ERROR_MESSAGES[ $schemaUrl ] . PHP_EOL . $e->getMessage();
             return $message;
         }
         return $res;
-    }
-}
-
-class ICSErrorLevel
-{
-    const int REPAIRED  = 1;
-    const int WARNING   = 2;
-    const int FATAL     = 3;
-    const ERROR_STRING  = [
-        null,
-        'Repaired value',
-        'Warning',
-        'Fatal Error'
-    ];
-    private string $errorString;
-
-    public function __construct(int $errorLevel)
-    {
-        $this->errorString = static::ERROR_STRING[ $errorLevel ];
-    }
-
-    public function __toString()
-    {
-        return $this->errorString;
     }
 }

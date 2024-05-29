@@ -1,20 +1,13 @@
 <?php
 
-include_once('vendor/autoload.php');
-include_once('includes/enums/RequestContentType.php');
+namespace LitCal;
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
+use LitCal\enum\RequestContentType;
+use LitCal\enum\StatusCode;
 
-class STATUS_CODE
-{
-    const UNPROCESSABLE_CONTENT = 422;
-    const SERVICE_UNAVAILABLE   = 503;
-    const METHOD_NOT_ALLOWED    = 405;
-    const UNSUPPORTED_MEDIA_TYPE = 415;
-}
-
-class LitCalTestsIndex
+class TestsIndex
 {
     private static array $acceptedRequestMethods = [ 'GET', 'PUT', 'OPTIONS' ];
     private static array $propsToSanitize = [
@@ -30,11 +23,11 @@ class LitCalTestsIndex
         "comment"
     ];
 
-    const STATUS_CODES = [
-        STATUS_CODE::METHOD_NOT_ALLOWED     => " 405 Method Not Allowed",
-        STATUS_CODE::UNSUPPORTED_MEDIA_TYPE => " 415 Unsupported Media Type",
-        STATUS_CODE::UNPROCESSABLE_CONTENT  => " 422 Unprocessable Content",
-        STATUS_CODE::SERVICE_UNAVAILABLE    => " 503 Service Unavailable"
+    public const STATUS_CODES = [
+        StatusCode::METHOD_NOT_ALLOWED     => " 405 Method Not Allowed",
+        StatusCode::UNSUPPORTED_MEDIA_TYPE => " 415 Unsupported Media Type",
+        StatusCode::UNPROCESSABLE_CONTENT  => " 422 Unprocessable Content",
+        StatusCode::SERVICE_UNAVAILABLE    => " 503 Service Unavailable"
     ];
 
     private static function sanitizeString(string $str): string
@@ -71,11 +64,11 @@ class LitCalTestsIndex
     {
         $testSuite = [];
 
-        $testsFolder = dirname(__FILE__) . '/tests';
-        $it = new DirectoryIterator("glob://$testsFolder/*Test.json");
+        $testsFolder = '../tests';
+        $it = new \DirectoryIterator("glob://$testsFolder/*Test.json");
         foreach ($it as $f) {
             $fileName       = $f->getFilename();
-            $testContents   = file_get_contents('tests/' . $fileName);
+            $testContents   = file_get_contents('../tests/' . $fileName);
             $testSuite[]    = json_decode($testContents, true);
         }
         return json_encode($testSuite, JSON_PRETTY_PRINT);
@@ -84,7 +77,7 @@ class LitCalTestsIndex
     private static function produceErrorResponse(int $statusCode, string $description): string
     {
         header($_SERVER[ "SERVER_PROTOCOL" ] . self::STATUS_CODES[ $statusCode ], true, $statusCode);
-        $message = new stdClass();
+        $message = new \stdClass();
         $message->status = "ERROR";
         $message->response = "Resource not Created";
         $message->description = $description;
@@ -94,45 +87,45 @@ class LitCalTestsIndex
     private static function handlePutRequest(): string|false
     {
         if ($_SERVER[ 'CONTENT_TYPE' ] !== RequestContentType::JSON) {
-            return self::produceErrorResponse(STATUS_CODE::UNSUPPORTED_MEDIA_TYPE, "This endpoint can only handle PUT requests with Content Type application/json, instead the request had a Content Type of " . $_SERVER[ 'CONTENT_TYPE' ]);
+            return self::produceErrorResponse(StatusCode::UNSUPPORTED_MEDIA_TYPE, "This endpoint can only handle PUT requests with Content Type application/json, instead the request had a Content Type of " . $_SERVER[ 'CONTENT_TYPE' ]);
         } else {
             $json = file_get_contents('php://input');
             $data = json_decode($json);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
-                return self::produceErrorResponse(STATUS_CODE::UNPROCESSABLE_CONTENT, "The Unit Test you are attempting to create was not valid JSON");
+                return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "The Unit Test you are attempting to create was not valid JSON");
             }
 
             // Validate incoming data against unit test schema
-            $schemaFile = dirname(__FILE__) . '/schemas/LitCalTest.json';
+            $schemaFile = '../schemas/LitCalTest.json';
             $schemaContents = file_get_contents($schemaFile);
             $jsonSchema = json_decode($schemaContents);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
-                return self::produceErrorResponse(STATUS_CODE::SERVICE_UNAVAILABLE, "The server errored out while attempting to process your request; this a server error, not an error in the request. Please report the incident to the system administrator.");
+                return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The server errored out while attempting to process your request; this a server error, not an error in the request. Please report the incident to the system administrator.");
             }
 
             try {
                 $result = [];
                 $schema = Schema::import($jsonSchema);
                 $schema->in($data);
-                $message = new stdClass();
+                $message = new \stdClass();
                 $message->status = "SUCCESS";
                 $message->response = "Unit Test {$data->name} was correctly validated against schema " . $schemaFile;
                 $result[] = $message;
-            } catch (InvalidValue | Exception $e) {
-                return self::produceErrorResponse(STATUS_CODE::UNPROCESSABLE_CONTENT, "The Unit Test you are attempting to create was incorrectly validated against schema " . $schemaFile . ": " . $e->getMessage());
+            } catch (InvalidValue | \Exception $e) {
+                return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "The Unit Test you are attempting to create was incorrectly validated against schema " . $schemaFile . ": " . $e->getMessage());
             }
 
             // Sanitize data to avoid any possibility of script injection
             self::sanitizeObjectValues($data);
 
-            $bytesWritten = file_put_contents('tests/' . $data->name . '.json', json_encode($data, JSON_PRETTY_PRINT));
+            $bytesWritten = file_put_contents('../tests/' . $data->name . '.json', json_encode($data, JSON_PRETTY_PRINT));
             if (false === $bytesWritten) {
-                return self::produceErrorResponse(STATUS_CODE::SERVICE_UNAVAILABLE, "The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.");
+                return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.");
             } else {
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
-                $message = new stdClass();
+                $message = new \stdClass();
                 $message->status = "OK";
                 $message->response = "Resource Created";
                 return json_encode($message);
@@ -169,14 +162,11 @@ class LitCalTestsIndex
                     }
                     continue;
                 default:
-                    $response = self::produceErrorResponse(STATUS_CODE::METHOD_NOT_ALLOWED, "This endpoint can only accept requests utilizing methods GET or PUT");
+                    $response = self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, "This endpoint can only accept requests utilizing methods GET or PUT");
             }
         } else {
-            $response = self::produceErrorResponse(STATUS_CODE::METHOD_NOT_ALLOWED, "This endpoint can only accept requests utilizing methods GET or PUT");
+            $response = self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, "This endpoint can only accept requests utilizing methods GET or PUT");
         }
         return $response;
     }
 }
-
-echo LitCalTestsIndex::handleRequest();
-exit(0);

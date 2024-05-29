@@ -1,25 +1,20 @@
 <?php
 
-include_once('includes/LitDateTime.php');
+namespace LitCal;
+
+use LitCal\DateTime;
 
 /**
- * Useful functions for LitCalEngine.php
- * @Author: John Romano D'Orazio
- * @Date:   2017-2018
+ * Class LitFunc
+ * Useful functions for LitCal\API
+ * @author: John Romano D'Orazio
+ * THE ENTIRE LITURGICAL CALENDAR DEPENDS MAINLY ON THE DATE OF EASTER
+ * This class defines among other things the function
+ *  for calculating Gregorian Easter for a given year as used by the latin rite
  */
-
-ini_set('date.timezone', 'Europe/Vatican');
-
-/**
- *  THE ENTIRE LITURGICAL CALENDAR DEPENDS MAINLY ON THE DATE OF EASTER
- *  THE FOLLOWING LITCALFUNCTIONS.PHP DEFINES AMONG OTHER THINGS THE FUNCTION
- *  FOR CALCULATING GREGORIAN EASTER FOR A GIVEN YEAR AS USED BY THE LATIN RITE
- */
-
-
 class LitFunc
 {
-    const NON_EVENT_KEYS = [ 'LitCal', 'Settings', 'Messages', 'Metadata', 'Solemnities', 'FeastsMemorials', 'RequestHeaders', 'color', 'colorLcl', 'common' ];
+    private const NON_EVENT_KEYS = [ 'LitCal', 'Settings', 'Messages', 'Metadata', 'Solemnities', 'FeastsMemorials', 'RequestHeaders', 'color', 'colorLcl', 'common' ];
     private static string $LAST_ARRAY_KEY = '';
     public static string $HASH_REQUEST    = '';
 
@@ -28,7 +23,7 @@ class LitFunc
         return in_array($key, self::NON_EVENT_KEYS);
     }
 
-    public static function convertArray2XML(array $data, ?SimpleXMLElement &$xml): void
+    public static function convertArray2XML(array $data, ?\SimpleXMLElement &$xml): void
     {
         foreach ($data as $key => $value) {
             if (is_array($value)) {
@@ -86,7 +81,7 @@ class LitFunc
         $month = floor(($h + $l - 7 * $m + 114) / 31);
         $day = (($h + $l - 7 * $m + 114) % 31) + 1;
 
-        $dateObj   = LitDateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new DateTimeZone('UTC'));
+        $dateObj   = DateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new \DateTimeZone('UTC'));
 
         return $dateObj;
     }
@@ -106,7 +101,7 @@ class LitFunc
         $month = floor(($d + $e + 114) / 31);
         $day = ( ($d + $e + 114) % 31 ) + 1;
 
-        $dateObj   = LitDateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new DateTimeZone('UTC'));
+        $dateObj   = DateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new \DateTimeZone('UTC'));
         if ($gregCal) {
             //from February 29th 2100 Julian (March 14th 2100 Gregorian),
             //the difference between the Julian and Gregorian calendars will increase to 14 days
@@ -115,18 +110,18 @@ class LitFunc
             $dateObj->add(new DateInterval($dateDiff));
             */
             $GregDateDiff = array();
-            $GregDateDiff[0] = [LitDateTime::createFromFormat('!j-n-Y', '4-10-1582'),"P10D"]; //add 10 == GREGORIAN CUTOVER DATE
+            $GregDateDiff[0] = [DateTime::createFromFormat('!j-n-Y', '4-10-1582'),"P10D"]; //add 10 == GREGORIAN CUTOVER DATE
             $idx = 0;
             $cc = 10;
             for ($cent = 17; $cent <= 99; $cent++) {
                 if ($cent % 4 > 0) {
-                    $GregDateDiff[++$idx] = [LitDateTime::createFromFormat('!j-n-Y', '28-2-' . $cent . '00'),"P" . ++$cc . "D"];
+                    $GregDateDiff[++$idx] = [DateTime::createFromFormat('!j-n-Y', '28-2-' . $cent . '00'),"P" . ++$cc . "D"];
                 }
             }
 
             for ($i = count($GregDateDiff); $i > 0; $i--) {
                 if ($dateObj > $GregDateDiff[$i - 1][0]) {
-                    $dateObj->add(new DateInterval($GregDateDiff[$i - 1][1]));
+                    $dateObj->add(new \DateInterval($GregDateDiff[$i - 1][1]));
                     break;
                 }
             }

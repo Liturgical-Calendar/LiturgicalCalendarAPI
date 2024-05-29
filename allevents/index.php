@@ -1,11 +1,17 @@
 <?php
 
 // ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL);
-include_once 'includes/enums/LitLocale.php';
-include_once 'includes/enums/RomanMissal.php';
-include_once 'includes/enums/LitGrade.php';
+ini_set('date.timezone', 'Europe/Vatican');
+
+require_once '../includes/enums/LitLocale.php';
+require_once '../includes/enums/RomanMissal.php';
+require_once '../includes/enums/LitGrade.php';
+
+use LitCal\enum\RomanMissal;
+use LitCal\enum\LitLocale;
+use LitCal\enum\LitGrade;
+
 $requestHeaders = getallheaders();
 if (isset($requestHeaders[ "Origin" ])) {
     header("Access-Control-Allow-Origin: {$requestHeaders[ "Origin" ]}");
@@ -23,14 +29,14 @@ $LatinMissals = array_filter(RomanMissal::$values, function ($item) {
     return str_starts_with($item, "VATICAN_");
 });
 $SUPPORTED_NATIONAL_CALENDARS = [ "VATICAN" ];
-$directories = array_map('basename', glob('nations/*', GLOB_ONLYDIR));
+$directories = array_map('basename', glob('../nations/*', GLOB_ONLYDIR));
 foreach ($directories as $directory) {
-    if (file_exists("nations/$directory/$directory.json")) {
+    if (file_exists("../nations/$directory/$directory.json")) {
         $SUPPORTED_NATIONAL_CALENDARS[] = $directory;
     }
 }
 
-$GeneralIndex = file_exists("nations/index.json") ? json_decode(file_get_contents("nations/index.json")) : null;
+$GeneralIndex = file_exists("../nations/index.json") ? json_decode(file_get_contents("../nations/index.json")) : null;
 $Locale = isset($_GET["locale"]) && LitLocale::isValid($_GET["locale"]) ? $_GET["locale"] : "la";
 $NationalCalendar = isset($_GET["nationalcalendar"]) && in_array(strtoupper($_GET["nationalcalendar"]), $SUPPORTED_NATIONAL_CALENDARS) ? strtoupper($_GET["nationalcalendar"]) : null;
 $DiocesanCalendar = isset($_GET["diocesancalendar"]) ? strtoupper($_GET["diocesancalendar"]) : null;
@@ -46,7 +52,7 @@ if ($DiocesanCalendar !== null && property_exists($GeneralIndex, $DiocesanCalend
 }
 
 if ($NationalCalendar !== null) {
-    $nationalDataFile = "nations/{$NationalCalendar}/{$NationalCalendar}.json";
+    $nationalDataFile = "../nations/{$NationalCalendar}/{$NationalCalendar}.json";
     if (file_exists($nationalDataFile)) {
         $NationalData = json_decode(file_get_contents($nationalDataFile));
         if (json_last_error() === JSON_ERROR_NONE) {
@@ -86,13 +92,13 @@ $localeArray = [
     $Locale
 ];
 $systemLocale = setlocale(LC_ALL, $localeArray);
-bindtextdomain("litcal", "i18n");
+bindtextdomain("litcal", "../i18n");
 textdomain("litcal");
 $LitGrade = new LitGrade($Locale);
 foreach ($LatinMissals as $LatinMissal) {
-    $DataFile = RomanMissal::getSanctoraleFileName($LatinMissal);
+    $DataFile = '../' . RomanMissal::getSanctoraleFileName($LatinMissal);
     if ($DataFile !== false) {
-        $I18nPath = RomanMissal::getSanctoraleI18nFilePath($LatinMissal);
+        $I18nPath = '../' . RomanMissal::getSanctoraleI18nFilePath($LatinMissal);
         if ($I18nPath !== false && file_exists($I18nPath . "/" . $Locale . ".json")) {
             $NAME = json_decode(file_get_contents($I18nPath . "/" . $Locale . ".json"), true);
             $DATA = json_decode(file_get_contents($DataFile), true);
@@ -191,8 +197,8 @@ $PropriumDeTemporeRanks = [
 $PropriumDeTemporeRed = [ "SacredHeart", "Pentecost", "GoodFri", "PalmSun", "SacredHeart" ];
 $PropriumDeTemporePurple = [ "Advent1", "Advent2", "Advent4", "AshWednesday", "Lent1", "Lent2", "Lent3", "Lent5" ];
 $PropriumDeTemporePink = [ "Advent3", "Lent4" ];
-$DataFile = 'data/propriumdetempore.json';
-$I18nFile = 'data/propriumdetempore/' . $Locale . ".json";
+$DataFile = '../data/propriumdetempore.json';
+$I18nFile = '../data/propriumdetempore/' . $Locale . ".json";
 $DATA = json_decode(file_get_contents($DataFile), true);
 $NAME = json_decode(file_get_contents($I18nFile), true);
 foreach ($DATA as $key => $readings) {
@@ -216,8 +222,8 @@ foreach ($DATA as $key => $readings) {
     }
 }
 
-$DataFile = 'data/memorialsFromDecrees/memorialsFromDecrees.json';
-$I18nFile = 'data/memorialsFromDecrees/i18n/' . $Locale . ".json";
+$DataFile = '../data/memorialsFromDecrees/memorialsFromDecrees.json';
+$I18nFile = '../data/memorialsFromDecrees/i18n/' . $Locale . ".json";
 $DATA = json_decode(file_get_contents($DataFile), true);
 $NAME = json_decode(file_get_contents($I18nFile), true);
 foreach ($DATA as $idx => $festivity) {

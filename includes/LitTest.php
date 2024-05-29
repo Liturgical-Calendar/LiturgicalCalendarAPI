@@ -1,11 +1,11 @@
 <?php
 
-include_once('vendor/autoload.php');
+namespace LitCal;
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
 
-class LitCalTest
+class LitTest
 {
     private bool $readyState            = false;
     private ?object $testInstructions   = null;
@@ -20,7 +20,7 @@ class LitCalTest
         $this->Test = $Test;
         $this->dataToTest = $testData;
         if (self::$testCache === null) {
-            self::$testCache = new stdClass();
+            self::$testCache = new \stdClass();
         }
         if (false === property_exists(self::$testCache, $Test)) {
             $testPath = "tests/{$Test}.json";
@@ -29,17 +29,17 @@ class LitCalTest
                 if ($testInstructions) {
                     $this->testInstructions = json_decode($testInstructions);
                     if (JSON_ERROR_NONE === json_last_error()) {
-                        $schemaFile = 'schemas/LitCalTest.json';
+                        $schemaFile = 'schemas/LitTest.json';
                         $schemaContents = file_get_contents($schemaFile);
                         $jsonSchema = json_decode($schemaContents);
                         try {
                             $schema = Schema::import($jsonSchema);
                             $schema->in($this->testInstructions);
-                            self::$testCache->{$Test} = new stdClass();
+                            self::$testCache->{$Test} = new \stdClass();
                             self::$testCache->{$Test}->testInstructions     = $this->testInstructions;
                             self::$testCache->{$this->Test}->yearsSupported = $this->detectYearsSupported();
                             $this->readyState = true;
-                        } catch (InvalidValue | Exception $e) {
+                        } catch (InvalidValue | \Exception $e) {
                             $this->setError("Cannot proceed with {$Test}, the Test instructions were incorrectly validated against schema " . $schemaFile . ": " . $e->getMessage());
                         }
                     } else {
@@ -127,7 +127,7 @@ class LitCalTest
 
     private function setMessage(string $type, ?string $text = null): void
     {
-        $this->Message = new stdClass();
+        $this->Message = new \stdClass();
         $this->Message->type = $type;
         $this->Message->classes = ".$this->Test.year-{$this->dataToTest->Settings->Year}.test-valid";
         $this->Message->test = $this->Test;

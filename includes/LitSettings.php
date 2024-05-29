@@ -1,11 +1,13 @@
 <?php
 
-include_once('enums/Epiphany.php');
-include_once('enums/Ascension.php');
-include_once('enums/CorpusChristi.php');
-include_once('enums/LitLocale.php');
-include_once('enums/ReturnType.php');
-include_once('enums/CalendarType.php');
+namespace LitCal;
+
+use LitCal\enum\CalendarType;
+use LitCal\enum\Epiphany;
+use LitCal\enum\Ascension;
+use LitCal\enum\CorpusChristi;
+use LitCal\enum\LitLocale;
+use LitCal\enum\ReturnType;
 
 class LitSettings
 {
@@ -14,13 +16,13 @@ class LitSettings
     public string $Epiphany              = Epiphany::JAN6;
     public string $Ascension             = Ascension::THURSDAY;
     public string $CorpusChristi         = CorpusChristi::THURSDAY;
-    public bool $EternalHighPriest     = false;
+    public bool $EternalHighPriest       = false;
     public ?string $Locale               = null;
     public ?string $ReturnType           = null;
     public ?string $NationalCalendar     = null;
     public ?string $DiocesanCalendar     = null;
 
-    const ALLOWED_PARAMS  = [
+    public const ALLOWED_PARAMS  = [
         "YEAR",
         "CALENDARTYPE",
         "EPIPHANY",
@@ -35,17 +37,17 @@ class LitSettings
 
     // If we can get more data from 1582 (year of the Gregorian reform) to 1969
     //  perhaps we can lower the limit to the year of the Gregorian reform
-    //  const YEAR_LOWER_LIMIT          = 1583;
+    //  public const YEAR_LOWER_LIMIT          = 1583;
     // For now we'll just deal with the Liturgical Calendar from the Editio Typica 1970
-    const YEAR_LOWER_LIMIT          = 1970;
+    public const YEAR_LOWER_LIMIT          = 1970;
 
     //The upper limit is determined by the limit of PHP in dealing with DateTime objects
-    const YEAR_UPPER_LIMIT          = 9999;
+    public const YEAR_UPPER_LIMIT          = 9999;
 
-    private static function debugWrite(string $string)
+    /*private static function debugWrite(string $string)
     {
         file_put_contents("debug.log", $string . PHP_EOL, FILE_APPEND);
-    }
+    }*/
 
     public function __construct(array $DATA)
     {
@@ -101,7 +103,7 @@ class LitSettings
         }
         if ($this->Locale === null) {
             if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-                $value = Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+                $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
                 //$mainLang = explode("_", $value )[0];
                 $this->Locale = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
             } else {

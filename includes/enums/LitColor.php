@@ -1,14 +1,16 @@
 <?php
 
-include_once("includes/enums/LitLocale.php");
+namespace LitCal\enum;
+
+use LitCal\enum\LitLocale;
 
 class LitColor
 {
-    const GREEN     = "green";
-    const PURPLE    = "purple";
-    const WHITE     = "white";
-    const RED       = "red";
-    const PINK      = "pink";
+    public const GREEN     = "green";
+    public const PURPLE    = "purple";
+    public const WHITE     = "white";
+    public const RED       = "red";
+    public const PINK      = "pink";
     public static array $values = [ "green", "purple", "white", "red", "pink" ];
 
     public static function isValid(string $value)

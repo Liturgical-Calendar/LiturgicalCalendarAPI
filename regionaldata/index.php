@@ -1,7 +1,7 @@
 <?php
 
 /**
- * LitCalRegionalData
+ * /regionaldata API resource
  * PHP version 8.3
  *
  * @package  LitCal
@@ -18,9 +18,11 @@ require_once '../includes/enums/RequestMethod.php';
 require_once '../includes/enums/RequestContentType.php';
 require_once '../includes/enums/ReturnType.php';
 require_once '../includes/APICore.php';
-require_once '../RegionalData.php';
+require_once '../includes/RegionalData.php';
 
 use LitCal\RegionalData;
+use LitCal\enum\AcceptHeader;
+use LitCal\enum\RequestContentType;
 
 if (file_exists("../allowedOrigins.php")) {
     include_once '../allowedOrigins.php';

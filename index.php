@@ -1,11 +1,12 @@
 <?php
 
 /**
- * Liturgical Calendar PHP engine script
- * Author: John Romano D'Orazio
- * Email: priest@johnromanodorazio.com
- * Licensed under the Apache 2.0 License
- * Version 3.8
+ * Liturgical Calendar API main script
+ * PHP version 8.3
+ * @author  John Romano D'Orazio <priest@johnromanodorazio.com>
+ * @link    https://litcal.johnromanodorazio.com
+ * @license Apache 2.0 License
+ * @version 3.9
  * Date Created: 27 December 2017
  */
 
@@ -44,15 +45,43 @@
 
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
-// ini_set('date.timezone', 'Europe/Vatican');
+ini_set('date.timezone', 'Europe/Vatican');
 
 include_once('includes/enums/AcceptHeader.php');
 include_once('includes/enums/CacheDuration.php');
+include_once('includes/enums/LitColor.php');
+include_once('includes/enums/LitCommon.php');
+include_once('includes/enums/LitFeastType.php');
+include_once('includes/enums/LitGrade.php');
+include_once('includes/enums/LitLocale.php');
+include_once('includes/enums/LitSeason.php');
 include_once('includes/enums/RequestMethod.php');
 include_once('includes/enums/RequestContentType.php');
 include_once('includes/enums/ReturnType.php');
+include_once('includes/enums/RomanMissal.php');
+include_once('includes/enums/Ascension.php');
+include_once('includes/enums/Epiphany.php');
+include_once('includes/enums/CorpusChristi.php');
+include_once('includes/enums/CalendarType.php');
 
-include_once("includes/LitCalAPI.php");
+include_once('includes/APICore.php');
+include_once("includes/API.php");
+include_once('includes/DateTime.php');
+
+include_once("includes/Festivity.php");
+include_once("includes/FestivityCollection.php");
+include_once("includes/LitSettings.php");
+include_once("includes/LitFunc.php");
+include_once("includes/LitMessages.php");
+include_once("includes/DateTime.php");
+include_once("includes/pgettext.php");
+
+use LitCal\API;
+use LitCal\enum\RequestMethod;
+use LitCal\enum\RequestContentType;
+use LitCal\enum\AcceptHeader;
+use LitCal\enum\ReturnType;
+use LitCal\enum\CacheDuration;
 
 if (file_exists("allowedOrigins.php")) {
     include_once('allowedOrigins.php');
@@ -69,11 +98,11 @@ if (defined('ALLOWED_ORIGINS') && is_array(ALLOWED_ORIGINS)) {
     $allowedOrigins = array_merge($allowedOrigins, ALLOWED_ORIGINS);
 }
 
-$LitCalEngine = new LitCalAPI();
+$LitCalEngine = new API();
 $LitCalEngine->APICore->setAllowedOrigins($allowedOrigins);
 $LitCalEngine->APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
 $LitCalEngine->APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
 $LitCalEngine->APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS, AcceptHeader::YML ]);
 $LitCalEngine->setAllowedReturnTypes([ ReturnType::JSON, ReturnType::XML, ReturnType::ICS, ReturnType::YML ]);
 $LitCalEngine->setCacheDuration(CacheDuration::MONTH);
-$LitCalEngine->Init();
+$LitCalEngine->init();

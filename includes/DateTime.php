@@ -1,6 +1,8 @@
 <?php
 
-class LitDateTime extends \DateTime implements \JsonSerializable
+namespace LitCal;
+
+class DateTime extends \DateTime implements \JsonSerializable
 {
     public function jsonSerialize(): array
     {

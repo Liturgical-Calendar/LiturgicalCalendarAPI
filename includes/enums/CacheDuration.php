@@ -1,11 +1,13 @@
 <?php
 
+namespace LitCal\enum;
+
 class CacheDuration
 {
-    const DAY       = "DAY";
-    const WEEK      = "WEEK";
-    const MONTH     = "MONTH";
-    const YEAR      = "YEAR";
+    public const DAY       = "DAY";
+    public const WEEK      = "WEEK";
+    public const MONTH     = "MONTH";
+    public const YEAR      = "YEAR";
     public static array $values = [ "DAY", "WEEK", "MONTH", "YEAR" ];
 
     public static function isValid($value)
