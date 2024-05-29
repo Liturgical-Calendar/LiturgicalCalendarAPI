@@ -534,7 +534,7 @@ class FestivityCollection
     //So in order to sort by date we have to be sure to maintain the association with the proper key, uasort allows us to do this
     public function sortFestivities(): void
     {
-        uasort($this->festivities, array( "Festivity", "compDate" ));
+        uasort($this->festivities, array( "LitCal\Festivity", "compDate" ));
     }
 
     public function getFestivities(): array
