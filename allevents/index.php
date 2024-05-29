@@ -96,9 +96,9 @@ bindtextdomain("litcal", "../i18n");
 textdomain("litcal");
 $LitGrade = new LitGrade($Locale);
 foreach ($LatinMissals as $LatinMissal) {
-    $DataFile = RomanMissal::getSanctoraleFileName($LatinMissal);
+    $DataFile = '../' . RomanMissal::getSanctoraleFileName($LatinMissal);
     if ($DataFile !== false) {
-        $I18nPath = RomanMissal::getSanctoraleI18nFilePath($LatinMissal);
+        $I18nPath = '../' . RomanMissal::getSanctoraleI18nFilePath($LatinMissal);
         if ($I18nPath !== false && file_exists($I18nPath . "/" . $Locale . ".json")) {
             $NAME = json_decode(file_get_contents($I18nPath . "/" . $Locale . ".json"), true);
             $DATA = json_decode(file_get_contents($DataFile), true);
