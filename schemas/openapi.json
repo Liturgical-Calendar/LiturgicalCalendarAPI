@@ -1372,6 +1372,7 @@
                   "properties": {
                     "EasterDates": {
                       "type": "array",
+                      "description": "will contain exactly 8417 items, however cannot define so in schema otherwise it will generate 8417 example items!",
                       "items": {
                         "type": "object",
                         "additionalProperties": false,
@@ -1407,8 +1408,7 @@
                             "type": "string"
                           }
                         }
-                      },
-                      "maxItems": 8417
+                      }
                     },
                     "lastCoincidenceString": {
                       "type": "string",
