@@ -29,7 +29,7 @@ class LitTest
                 if ($testInstructions) {
                     $this->testInstructions = json_decode($testInstructions);
                     if (JSON_ERROR_NONE === json_last_error()) {
-                        $schemaFile = 'schemas/LitTest.json';
+                        $schemaFile = 'schemas/LitCalTest.json';
                         $schemaContents = file_get_contents($schemaFile);
                         $jsonSchema = json_decode($schemaContents);
                         try {
