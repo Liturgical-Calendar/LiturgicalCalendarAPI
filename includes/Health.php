@@ -98,7 +98,7 @@ class Health implements MessageComponentInterface
     }
 
     public const DATA_PATH_TO_SCHEMA = [
-        "https://litcal.johnromanodorazio.com/api/dev/LitCalMetadata.php"       => LitSchema::METADATA,
+        "https://litcal.johnromanodorazio.com/api/dev/metadata/"       => LitSchema::METADATA,
         "data/propriumdetempore.json"                                           => LitSchema::PROPRIUMDETEMPORE,
         "data/propriumdesanctis_1970/propriumdesanctis_1970.json"               => LitSchema::PROPRIUMDESANCTIS,
         "data/propriumdesanctis_2002/propriumdesanctis_2002.json"               => LitSchema::PROPRIUMDESANCTIS,
@@ -107,7 +107,7 @@ class Health implements MessageComponentInterface
         "nations/index.json"                                                    => LitSchema::INDEX
     ];
 
-    public const LITCAL_BASE_URL = "https://litcal.johnromanodorazio.com/api/dev/LitCalEngine.php";
+    public const LITCAL_BASE_URL = "https://litcal.johnromanodorazio.com/api/dev/";
 
     public function __construct()
     {
