@@ -375,6 +375,15 @@
                 }
               }
             }
+          },
+          "304": {
+            "description": "304 Not Modified"
+          },
+          "404": {
+            "description": "404 Not Found: index file resource not found"
+          },
+          "503": {
+            "description": "503 Service Unavailable: could not read index file resource"
           }
         }
       },
@@ -397,6 +406,15 @@
                 }
               }
             }
+          },
+          "304": {
+            "description": "304 Not Modified"
+          },
+          "404": {
+            "description": "404 Not Found: index file resource not found"
+          },
+          "503": {
+            "description": "503 Service Unavailable: could not read index file resource"
           }
         }
       }
@@ -558,6 +576,32 @@
                     ]
                   }
                 ]
+              }
+            }
+          },
+          "404": {
+            "description": "404 Not Found: tests folder path could not be opened",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "const": "ERROR"
+                    },
+                    "response": {
+                      "type": "string",
+                      "const": "Resource not Found"
+                    },
+                    "description": {
+                      "type": "string",
+                      "const": "Tests folder path cannot be opened"
+                    }
+                  },
+                  "required": [ "status", "response", "description" ]
+                }
               }
             }
           }
@@ -855,6 +899,15 @@
                 }
               }
             }
+          },
+          "304": {
+            "description": "304 Not Modified"
+          },
+          "404": {
+            "description": "404 Not Found: resource file not found"
+          },
+          "503": {
+            "description": "503 Service Unavailable: could not read resource files"
           }
         }
       }
@@ -1444,6 +1497,9 @@
                 }
               }
             }
+          },
+          "405": {
+            "description": "405 Method Not Allowed: this endpoint will only accept GET requests"
           }
         }
       }
@@ -2230,7 +2286,14 @@
           "assertions": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Assertions"
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EventExistsAndHasExpectedTimestampAssertion"
+                },
+                {
+                  "$ref": "#/components/schemas/EventNotExistsAssertion"
+                }
+              ]
             }
           }
         },
@@ -2276,7 +2339,14 @@
           "assertions": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Assertions"
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EventExistsAndHasExpectedTimestampAssertion"
+                },
+                {
+                  "$ref": "#/components/schemas/EventNotExistsAssertion"
+                }
+              ]
             }
           }
         },
@@ -2323,7 +2393,14 @@
           "assertions": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Assertions"
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EventExistsAndHasExpectedTimestampAssertion"
+                },
+                {
+                  "$ref": "#/components/schemas/EventNotExistsAssertion"
+                }
+              ]
             }
           }
         },
@@ -2554,72 +2631,66 @@
         },
         "additionalProperties": false
       },
-      "Assertions": {
+      "EventExistsAndHasExpectedTimestampAssertion": {
         "type": "object",
-        "anyOf": [
-          {
-            "properties": {
-              "year": {
-                "description": "the year we are testing against",
-                "type": "integer",
-                "format": "int32",
-                "minimum": 1970,
-                "maximum": 9999
-              },
-              "expectedValue": {
-                "type": "integer",
-                "format": "int64",
-                "minimum": -2851200,
-                "maximum": 253402300799
-              },
-              "assert": {
-                "type": "string",
-                "const": "eventExists AND hasExpectedTimestamp"
-              },
-              "assertion": {
-                "type": "string",
-                "description": "descriptive form of the `assert` statement"
-              },
-              "comment": {
-                "type": "string",
-                "description": "any extra information about the significance of the expected value for this year compared to other years"
-              }
-            }
+        "additionalProperties": false,
+        "properties": {
+          "year": {
+            "description": "the year we are testing against",
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1970,
+            "maximum": 9999
           },
-          {
-            "properties": {
-              "year": {
-                "description": "the year we are testing against",
-                "type": "integer",
-                "format": "int32",
-                "minimum": 1970,
-                "maximum": 9999
-              },
-              "expectedValue": {
-                "type": "null"
-              },
-              "assert": {
-                "type": "string",
-                "const": "eventNotExists"
-              },
-              "assertion": {
-                "type": "string",
-                "description": "descriptive form of the `assert` statement"
-              },
-              "comment": {
-                "type": "string",
-                "description": "any extra information about the significance of the expected value for this year compared to other years"
-              }
-            }
+          "expectedValue": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": -2851200,
+            "maximum": 253402300799
+          },
+          "assert": {
+            "type": "string",
+            "const": "eventExists AND hasExpectedTimestamp"
+          },
+          "assertion": {
+            "type": "string",
+            "description": "descriptive form of the `assert` statement"
+          },
+          "comment": {
+            "type": "string",
+            "description": "any extra information about the significance of the expected value for this year compared to other years"
           }
-        ],
-        "required": [
-          "year",
-          "expectedValue",
-          "assert",
-          "assertion"
-        ],
-        "additionalProperties": false
+        },
+        "required": [ "year", "expectedValue", "assert", "assertion" ]
+      },
+      "EventNotExistsAssertion": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "year": {
+            "description": "the year we are testing against",
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1970,
+            "maximum": 9999
+          },
+          "expectedValue": {
+            "type": "null"
+          },
+          "assert": {
+            "type": "string",
+            "const": "eventNotExists"
+          },
+          "assertion": {
+            "type": "string",
+            "description": "descriptive form of the `assert` statement"
+          },
+          "comment": {
+            "type": "string",
+            "description": "any extra information about the significance of the expected value for this year compared to other years"
+          }
+        },
+        "required": [ "year", "expectedValue", "assert", "assertion" ]
       },
       "NationalDiocesanWiderRegionCalendar": {
         "oneOf": [

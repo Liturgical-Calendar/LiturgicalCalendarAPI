@@ -65,13 +65,17 @@ class TestsIndex
         $testSuite = [];
 
         $testsFolder = '../tests';
-        $it = new \DirectoryIterator("glob://$testsFolder/*Test.json");
-        foreach ($it as $f) {
-            $fileName       = $f->getFilename();
-            $testContents   = file_get_contents('../tests/' . $fileName);
-            $testSuite[]    = json_decode($testContents, true);
+        try {
+            $it = new \DirectoryIterator("glob://$testsFolder/*Test.json");
+            foreach ($it as $f) {
+                $fileName       = $f->getFilename();
+                $testContents   = file_get_contents('../tests/' . $fileName);
+                $testSuite[]    = json_decode($testContents, true);
+            }
+            return json_encode($testSuite, JSON_PRETTY_PRINT);
+        } catch (\UnexpectedValueException $e) {
+            return self::produceErrorResponse(StatusCode::NOT_FOUND, "Tests folder path cannot be opened");
         }
-        return json_encode($testSuite, JSON_PRETTY_PRINT);
     }
 
     private static function produceErrorResponse(int $statusCode, string $description): string
@@ -79,7 +83,7 @@ class TestsIndex
         header($_SERVER[ "SERVER_PROTOCOL" ] . self::STATUS_CODES[ $statusCode ], true, $statusCode);
         $message = new \stdClass();
         $message->status = "ERROR";
-        $message->response = "Resource not Created";
+        $message->response = $statusCode === 404 ? "Resource not Found" : "Resource not Created";
         $message->description = $description;
         return json_encode($message);
     }

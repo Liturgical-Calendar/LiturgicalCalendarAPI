@@ -23,11 +23,13 @@ header('Access-Control-Max-Age: 86400');
 // cache for 1 day
 header('Cache-Control: must-revalidate, max-age=259200');
 header('Content-Type: application/json');
-$FestivityCollection = [];
-$LatinMissals = array_filter(RomanMissal::$values, function ($item) {
 
+$FestivityCollection = [];
+
+$LatinMissals = array_filter(RomanMissal::$values, function ($item) {
     return str_starts_with($item, "VATICAN_");
 });
+
 $SUPPORTED_NATIONAL_CALENDARS = [ "VATICAN" ];
 $directories = array_map('basename', glob('../nations/*', GLOB_ONLYDIR));
 foreach ($directories as $directory) {
@@ -37,9 +39,18 @@ foreach ($directories as $directory) {
 }
 
 $GeneralIndex = file_exists("../nations/index.json") ? json_decode(file_get_contents("../nations/index.json")) : null;
+if (null === $GeneralIndex || json_last_error() !== JSON_ERROR_NONE) {
+    header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
+    die();
+}
+
 $Locale = isset($_GET["locale"]) && LitLocale::isValid($_GET["locale"]) ? $_GET["locale"] : "la";
-$NationalCalendar = isset($_GET["nationalcalendar"]) && in_array(strtoupper($_GET["nationalcalendar"]), $SUPPORTED_NATIONAL_CALENDARS) ? strtoupper($_GET["nationalcalendar"]) : null;
-$DiocesanCalendar = isset($_GET["diocesancalendar"]) ? strtoupper($_GET["diocesancalendar"]) : null;
+$NationalCalendar = isset($_GET["nationalcalendar"]) && in_array(strtoupper($_GET["nationalcalendar"]), $SUPPORTED_NATIONAL_CALENDARS)
+    ? strtoupper($_GET["nationalcalendar"])
+    : null;
+$DiocesanCalendar = isset($_GET["diocesancalendar"])
+    ? strtoupper($_GET["diocesancalendar"])
+    : null;
 $NationalData       = null;
 $WiderRegionData    = null;
 $DiocesanData       = null;
@@ -109,7 +120,13 @@ foreach ($LatinMissals as $LatinMissal) {
                 $FestivityCollection[ $key ][ "MISSAL" ] = $LatinMissal;
                 $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n($festivity["GRADE"], false);
             }
+        } else {
+            header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
+            die();
         }
+    } else {
+        header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
+        die();
     }
 }
 
@@ -199,8 +216,22 @@ $PropriumDeTemporePurple = [ "Advent1", "Advent2", "Advent4", "AshWednesday", "L
 $PropriumDeTemporePink = [ "Advent3", "Lent4" ];
 $DataFile = '../data/propriumdetempore.json';
 $I18nFile = '../data/propriumdetempore/' . $Locale . ".json";
+
+if (!file_exists($DataFile) || !file_exists($I18nFile)) {
+    header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
+    die();
+}
 $DATA = json_decode(file_get_contents($DataFile), true);
+if (json_last_error() !== JSON_ERROR_NONE) {
+    header($_SERVER[ "SERVER_PROTOCOL" ] . " 503 Service Unavailable", true, 503);
+    die();
+}
 $NAME = json_decode(file_get_contents($I18nFile), true);
+if (json_last_error() !== JSON_ERROR_NONE) {
+    header($_SERVER[ "SERVER_PROTOCOL" ] . " 503 Service Unavailable", true, 503);
+    die();
+}
+
 foreach ($DATA as $key => $readings) {
     if (false === array_key_exists($key, $FestivityCollection)) {
         $FestivityCollection[ $key ] = $readings;
@@ -224,8 +255,21 @@ foreach ($DATA as $key => $readings) {
 
 $DataFile = '../data/memorialsFromDecrees/memorialsFromDecrees.json';
 $I18nFile = '../data/memorialsFromDecrees/i18n/' . $Locale . ".json";
+if (!file_exists($DataFile) || !file_exists($I18nFile)) {
+    header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
+    die();
+}
+
 $DATA = json_decode(file_get_contents($DataFile), true);
+if (json_last_error() !== JSON_ERROR_NONE) {
+    header($_SERVER[ "SERVER_PROTOCOL" ] . " 503 Service Unavailable", true, 503);
+    die();
+}
 $NAME = json_decode(file_get_contents($I18nFile), true);
+if (json_last_error() !== JSON_ERROR_NONE) {
+    header($_SERVER[ "SERVER_PROTOCOL" ] . " 503 Service Unavailable", true, 503);
+    die();
+}
 foreach ($DATA as $idx => $festivity) {
     $key = $festivity[ "Festivity" ][ "TAG" ];
     if (false === array_key_exists($key, $FestivityCollection)) {
