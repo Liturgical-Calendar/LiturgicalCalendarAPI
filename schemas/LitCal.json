@@ -147,6 +147,122 @@
                 "Metadata",
                 "LitCal",
                 "Messages"
+            ],
+            "examples": [
+                {
+                    "Settings": {
+                        "Year": 1970,
+                        "Epiphany": "JAN6",
+                        "Ascension": "SUNDAY",
+                        "CorpusChristi": "SUNDAY",
+                        "CalendarType": "CIVIL",
+                        "Locale": "string",
+                        "ReturnType": "JSON",
+                        "NationalCalendar": "string",
+                        "DiocesanCalendar": "string",
+                        "EternalHighPriest": true
+                    },
+                    "Metadata": {
+                        "Version": "string",
+                        "Timestamp": 1501027200,
+                        "DateTime": "2024-05-02T03:32:58.936Z",
+                        "RequestHeaders": {
+                            "Accept-Language": "it-IT,it;",
+                            "Accept": "application/json",
+                            "Host": "litcal.johnromanodorazio.com"
+                        },
+                        "Solemnities": {
+                            "Christmas": {
+                                "date": "2023-12-25T00:00:00+00:00",
+                                "timezone_type": 3,
+                                "timezone": "UTC"
+                            },
+                            "Advent1": {
+                                "date": "2023-12-03T00:00:00+00:00",
+                                "timezone_type": 3,
+                                "timezone": "UTC"
+                            }
+                        },
+                        "FeastsMemorials": {
+                            "StStephenProtomartyr": {
+                                "date": "2023-12-26T00:00:00+00:00",
+                                "timezone_type": 3,
+                                "timezone": "UTC"
+                            },
+                            "StJohnEvangelist": {
+                                "date": "2023-12-27T00:00:00+00:00",
+                                "timezone_type": 3,
+                                "timezone": "UTC"
+                            }
+                        }
+                    },
+                    "LitCal": {
+                        "Advent1_vigil": {
+                            "eventIdx": 1076,
+                            "name": "Dominica Prima Adventus Missa in Vigilia",
+                            "date": 1701475200,
+                            "color": [
+                                "purple"
+                            ],
+                            "colorLcl": [
+                                "purpura"
+                            ],
+                            "type": "mobile",
+                            "grade": 7,
+                            "gradeLcl": "celebratio altioris ordinis quam sollemnitatis",
+                            "displayGrade": "",
+                            "common": [],
+                            "commonLcl": "",
+                            "dayOfTheWeek_ISO8601": 6,
+                            "month": 12,
+                            "day": 2,
+                            "year": 2023,
+                            "monthShort": "Dec",
+                            "monthLong": "December",
+                            "dayOfTheWeekShort": "Sat",
+                            "dayOfTheWeekLong": "Saturday",
+                            "liturgicalYear": "ANNUM B",
+                            "isVigilMass": true,
+                            "isVigilFor": "Advent1"
+                        },
+                        "Advent1": {
+                            "eventIdx": 583,
+                            "name": "Dominica Prima Adventus",
+                            "date": 1701561600,
+                            "color": [
+                                "purple"
+                            ],
+                            "colorLcl": [
+                                "purpura"
+                            ],
+                            "type": "mobile",
+                            "grade": 7,
+                            "gradeLcl": "celebratio altioris ordinis quam sollemnitatis",
+                            "displayGrade": "",
+                            "common": [],
+                            "commonLcl": "",
+                            "dayOfTheWeek_ISO8601": 7,
+                            "month": 12,
+                            "day": 3,
+                            "year": 2023,
+                            "monthShort": "Dec",
+                            "monthLong": "December",
+                            "dayOfTheWeekShort": "Sun",
+                            "dayOfTheWeekLong": "Sunday",
+                            "liturgicalYear": "ANNUM B",
+                            "hasVigilMass": true,
+                            "hasVesperI": true,
+                            "hasVesperII": true,
+                            "psalterWeek": 1,
+                            "liturgicalSeason": "ADVENT",
+                            "liturgicalSeasonLcl": "Tempus Adventus"
+                        }
+                    },
+                    "Messages": [
+                        "The Solemnity 'Sancti Ioseph Sponsi Beatæ Mariæ Virginis' falls on Dominica IV in Quadragesima in the year 2023, the celebration has been transferred to the following Monday (20 Martius) as per the <a href=\"http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/1990/284-285.html\">Decree of the Congregation for Divine Worship</a>.",
+                        "'Dominica XVIII «Per Annum»' is superseded by the FESTUM DOMINI 'In Transfiguratione Domini' in the year 2023."
+                    ]
+                }
             ]
         },
         "DateTimeObjectCollection": {
@@ -374,7 +490,7 @@
                 "hasVesperI": {
                     "type": "boolean"
                 },
-                "hasVesperII":  {
+                "hasVesperII": {
                     "type": "boolean"
                 },
                 "psalterWeek": {
