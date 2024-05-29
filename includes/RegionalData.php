@@ -136,16 +136,16 @@ class RegionalData
     private function retrieveRegionalCalendar()
     {
         if (property_exists($this->data, 'category') && property_exists($this->data, 'key')) {
-            $category = $this->data->category;
+            $category = strtolower($this->data->category);
             $key = $this->data->key;
             switch ($category) {
-                case "diocesanCalendar":
+                case "diocesancalendar":
                     $calendarDataFile = "../" . $this->generalIndex->$key->path;
                     break;
-                case "widerRegionCalendar":
+                case "widerregioncalendar":
                     $calendarDataFile = "../nations/{$key}.json";
                     break;
-                case "nationalCalendar":
+                case "nationalcalendar":
                     $calendarDataFile = "../nations/{$key}/{$key}.json";
                     break;
             }
@@ -175,6 +175,7 @@ class RegionalData
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
                 $response = new \stdClass();
                 $response->message = "file $calendarDataFile does not exist";
+                $response->cwd = getcwd();
                 die(json_encode($response));
             }
         } else {
