@@ -2179,7 +2179,8 @@
         }
       },
       "ExactOrVariableCorrespondenceUnitTest": {
-        "description": "Exact or Variable Existence Unit Test",
+        "title": "Exact or Variable Existence",
+        "description": "test that the liturgical event exists on an expected date in a given year or does not exist in a given year",
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -2221,7 +2222,8 @@
         ]
       },
       "ExactCorrespondenceSinceUnitTest": {
-        "description": "Exact Existence Since Year Unit Test",
+        "title": "Exact Existence Since Year",
+        "description": "test that the liturgical event exists on an expected date starting from a given year",
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -2267,7 +2269,8 @@
         ]
       },
       "ExactCorrespondenceUntilUnitTest": {
-        "description": "Exact Existence Since Until Unit Test",
+        "title": "Exact Existence Until Year",
+        "description": "test that the liturgical event exists on an expected date up until a given year",
         "type": "object",
         "additionalProperties": false,
         "properties": {
