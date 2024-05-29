@@ -1,11 +1,12 @@
 <?php
 
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
-include_once '../includes/enums/LitLocale.php';
-include_once '../includes/enums/RomanMissal.php';
-include_once '../includes/enums/LitGrade.php';
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+ini_set('date.timezone', 'Europe/Vatican');
+
+require_once '../includes/enums/LitLocale.php';
+require_once '../includes/enums/RomanMissal.php';
+require_once '../includes/enums/LitGrade.php';
 
 use LitCal\enum\RomanMissal;
 use LitCal\enum\LitLocale;
