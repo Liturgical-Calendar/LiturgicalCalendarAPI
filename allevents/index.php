@@ -135,20 +135,21 @@ $LitGrade = new LitGrade($Locale);
 foreach ($LatinMissals as $LatinMissal) {
     $DataFile = '../' . RomanMissal::getSanctoraleFileName($LatinMissal);
     if ($DataFile !== false) {
+        $DATA = json_decode(file_get_contents($DataFile), true);
+        foreach ($DATA as $idx => $festivity) {
+            $key = $festivity[ "TAG" ];
+            $FestivityCollection[ $key ] = $festivity;
+            $FestivityCollection[ $key ][ "MISSAL" ] = $LatinMissal;
+            $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n($festivity["GRADE"], false);
+        }
+        // There may or may not be a related translation file; if there is, we get the translated name from here
         $I18nPath = '../' . RomanMissal::getSanctoraleI18nFilePath($LatinMissal);
         if ($I18nPath !== false && file_exists($I18nPath . "/" . $Locale . ".json")) {
             $NAME = json_decode(file_get_contents($I18nPath . "/" . $Locale . ".json"), true);
-            $DATA = json_decode(file_get_contents($DataFile), true);
             foreach ($DATA as $idx => $festivity) {
                 $key = $festivity[ "TAG" ];
-                $FestivityCollection[ $key ] = $festivity;
                 $FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
-                $FestivityCollection[ $key ][ "MISSAL" ] = $LatinMissal;
-                $FestivityCollection[ $key ][ "GRADE_LCL" ] = $LitGrade->i18n($festivity["GRADE"], false);
             }
-        } else {
-            produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource $I18nPath");
-            die();
         }
     } else {
         produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource $DataFile");
