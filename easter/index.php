@@ -2,6 +2,12 @@
 
 // error_reporting(E_ALL);
 // ini_set("display_errors", 1);
+$allowedMethods = [ "GET", "OPTIONS" ];
+if (!in_array($_SERVER['REQUEST_METHOD'], $allowedMethods)) {
+    header($_SERVER[ "SERVER_PROTOCOL" ] . " 405 Method Not Allowed", true, 405);
+    die();
+}
+
 ini_set('date.timezone', 'Europe/Vatican');
 
 require_once '../includes/enums/LitLocale.php';
