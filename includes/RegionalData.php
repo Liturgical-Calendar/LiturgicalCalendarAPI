@@ -39,7 +39,7 @@ class RegionalData
     }
 
     /**
-     * Function _handleRequestedMethod
+     * Function handleRequestedMethod
      *
      * @return void
      */
@@ -79,7 +79,7 @@ class RegionalData
     }
 
     /**
-     * Function _handleGetPostRequests
+     * Function handleGetPostRequests
      *
      * @param array $REQUEST represents the Request Body object
      *
@@ -98,7 +98,7 @@ class RegionalData
     }
 
     /**
-     * Function _handlePutPatchDeleteRequests
+     * Function handlePutPatchDeleteRequests
      *
      * @param string $requestMethod Method of the current request
      *
@@ -129,36 +129,36 @@ class RegionalData
     }
 
     /**
-     * Function _retrieveRegionalCalendar
+     * Function retrieveRegionalCalendar
      *
      * @return void
      */
     private function retrieveRegionalCalendar()
     {
         if (property_exists($this->data, 'category') && property_exists($this->data, 'key')) {
-            $category = strtolower($this->data->category);
+            $category = strtoupper($this->data->category);
             $key = $this->data->key;
             switch ($category) {
-                case "diocesancalendar":
+                case "DIOCESANCALENDAR":
                     $calendarDataFile = "../" . $this->generalIndex->$key->path;
                     break;
-                case "widerregioncalendar":
+                case "WIDERREGIONCALENDAR":
                     $calendarDataFile = "../nations/{$key}.json";
                     break;
-                case "nationalcalendar":
+                case "NATIONALCALENDAR":
                     $calendarDataFile = "../nations/{$key}/{$key}.json";
                     break;
             }
 
             if (file_exists($calendarDataFile)) {
-                if ($category === "diocesanCalendar") {
+                if ($category === "DIOCESANCALENDAR") {
                     echo file_get_contents($calendarDataFile);
                     die();
                 } else {
                     $this->response = json_decode(file_get_contents($calendarDataFile));
                     $uKey = strtoupper($key);
-                    if ($category === "widerRegionCalendar") {
-                        $this->response->isMultilingual = is_dir("nations/{$uKey}");
+                    if ($category === "WIDERREGIONCALENDAR") {
+                        $this->response->isMultilingual = is_dir("../nations/{$uKey}");
                         $locale = strtolower($this->data->locale);
                         if (file_exists("../nations/{$uKey}/{$locale}.json")) {
                             $localeData = json_decode(file_get_contents("../nations/{$uKey}/{$locale}.json"));
@@ -175,7 +175,6 @@ class RegionalData
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
                 $response = new \stdClass();
                 $response->message = "file $calendarDataFile does not exist";
-                $response->cwd = getcwd();
                 die(json_encode($response));
             }
         } else {
@@ -194,7 +193,7 @@ class RegionalData
     }
 
     /**
-     * Function _writeRegionalCalendar
+     * Function writeRegionalCalendar
      *
      * @return void
      */
@@ -220,8 +219,7 @@ class RegionalData
                 $data = json_encode($this->data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
                 file_put_contents($path . "/{$region}.json", $data . PHP_EOL);
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
-                $response->success = "National calendar created or updated"
-                    . " for nation \"{$this->data->Metadata->Region}\"";
+                $response->success = "National calendar created or updated for nation \"{$this->data->Metadata->Region}\"";
                 die(json_encode($response));
             } else {
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 422 Unprocessable Entity", true, 422);
@@ -260,8 +258,7 @@ class RegionalData
                 $data = json_encode($this->data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
                 file_put_contents("../nations/{$this->data->Metadata->WiderRegion}.json", $data . PHP_EOL);
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
-                $response->success = "Wider region calendar created or updated"
-                    . " for region \"{$this->data->Metadata->WiderRegion}\"";
+                $response->success = "Wider region calendar created or updated for region \"{$this->data->Metadata->WiderRegion}\"";
                 die(json_encode($response));
             } else {
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 422 Unprocessable Entity", true, 422);
@@ -309,14 +306,13 @@ class RegionalData
             die(json_encode($response));
         } else {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad request", true, 400);
-            $response->error = "Not all required parameters were received"
-                . " (LitCal, Metadata, Settings|NationalCalendars OR LitCal, Diocese, Nation)";
+            $response->error = "Not all required parameters were received (LitCal, Metadata, Settings|NationalCalendars OR LitCal, Diocese, Nation)";
             die(json_encode($response));
         }
     }
 
     /**
-     * Function _deleteRegionalCalendar
+     * Function deleteRegionalCalendar
      *
      * @return void
      */
@@ -352,7 +348,7 @@ class RegionalData
     }
 
     /**
-     * Function _loadIndex
+     * Function loadIndex
      *
      * @return void
      */
@@ -364,7 +360,7 @@ class RegionalData
     }
 
     /**
-     * Function _createOrUpdateIndex
+     * Function createOrUpdateIndex
      *
      * @param string  $path   Path of the resource file
      * @param boolean $delete Delete from the index rather than create/update the index
@@ -405,7 +401,7 @@ class RegionalData
     }
 
     /**
-     * Function _validateDataAgainstSchema
+     * Function validateDataAgainstSchema
      *
      * @param object $data      Data to validate
      * @param string $schemaUrl Schema to validate against
