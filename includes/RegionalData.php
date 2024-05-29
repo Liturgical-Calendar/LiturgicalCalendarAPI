@@ -187,7 +187,7 @@ class RegionalData
             }
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad request", true, 400);
             $response = new \stdClass();
-            $response->error = "Missing required parameter(s) `' . implode('` and `', $missingParams) . '`";
+            $response->error = "Missing required parameter(s) `" . implode("` and `", $missingParams) . "`";
             die(json_encode($response));
         }
     }
