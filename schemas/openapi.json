@@ -1408,7 +1408,6 @@
                           }
                         }
                       },
-                      "minItems": 8417,
                       "maxItems": 8417
                     },
                     "lastCoincidenceString": {
@@ -1420,6 +1419,28 @@
                       "const": 22983264000
                     }
                   }
+                },
+                "example": {
+                  "EasterDates": [
+                    {
+                      "gregorianEaster": -12204000000,
+                      "julianEaster": -12204864000,
+                      "westernJulianEaster": -12204000000,
+                      "coinciding": true,
+                      "gregorianDateString": "string",
+                      "julianDateString": "string",
+                      "westernJulianDateString": "string"
+                    },
+                    {
+                      "gregorianEaster": -12204000000,
+                      "julianEaster": -12204864000,
+                      "westernJulianEaster": -12204000000,
+                      "coinciding": true,
+                      "gregorianDateString": "string",
+                      "julianDateString": "string",
+                      "westernJulianDateString": "string"
+                    }
+                  ]
                 }
               }
             }
