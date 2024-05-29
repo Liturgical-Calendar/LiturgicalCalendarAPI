@@ -254,6 +254,7 @@ $PropriumDeTemporeRanks = [
 $PropriumDeTemporeRed = [ "SacredHeart", "Pentecost", "GoodFri", "PalmSun", "SacredHeart" ];
 $PropriumDeTemporePurple = [ "Advent1", "Advent2", "Advent4", "AshWednesday", "Lent1", "Lent2", "Lent3", "Lent5" ];
 $PropriumDeTemporePink = [ "Advent3", "Lent4" ];
+
 $DataFile = '../data/propriumdetempore.json';
 $I18nFile = '../data/propriumdetempore/' . $Locale . ".json";
 
@@ -366,7 +367,11 @@ if ($NationalCalendar !== null && $NationalData !== null) {
         foreach ($NationalData->Metadata->Missals as $missal) {
             $DataFile = RomanMissal::getSanctoraleFileName($missal);
             if ($DataFile !== false) {
-                $PropriumDeSanctis = json_decode(file_get_contents($DataFile));
+                if (!file_exists('../' . $DataFile)) {
+                    echo produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DataFile");
+                    die();
+                }
+                $PropriumDeSanctis = json_decode(file_get_contents('../' . $DataFile));
                 foreach ($PropriumDeSanctis as $idx => $festivity) {
                     $key = $festivity->TAG;
                     $FestivityCollection[ $key ] = (array) $festivity;
