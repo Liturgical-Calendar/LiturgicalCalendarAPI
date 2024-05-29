@@ -31,7 +31,8 @@ const STATUS_CODES = [
     StatusCode::METHOD_NOT_ALLOWED     => " 405 Method Not Allowed",
     StatusCode::UNSUPPORTED_MEDIA_TYPE => " 415 Unsupported Media Type",
     StatusCode::UNPROCESSABLE_CONTENT  => " 422 Unprocessable Content",
-    StatusCode::SERVICE_UNAVAILABLE    => " 503 Service Unavailable"
+    StatusCode::SERVICE_UNAVAILABLE    => " 503 Service Unavailable",
+    StatusCode::NOT_FOUND              => " 404 Not Found"
 ];
 
 function produceErrorResponse(int $statusCode, string $description): string
@@ -58,11 +59,12 @@ foreach ($directories as $directory) {
     }
 }
 
-$GeneralIndex = file_exists("../nations/index.json") ? json_decode(file_get_contents("../nations/index.json")) : null;
-if (null === $GeneralIndex) {
+$GeneralIndexContents = file_exists("../nations/index.json") ? file_get_contents("../nations/index.json") : null;
+if (null === $GeneralIndexContents || false === $GeneralIndexContents) {
     produceErrorResponse(StatusCode::NOT_FOUND, "path ../nations/index.json not found");
     die();
 }
+$GeneralIndex = json_decode($GeneralIndexContents);
 if (json_last_error() !== JSON_ERROR_NONE) {
     produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
     die();
