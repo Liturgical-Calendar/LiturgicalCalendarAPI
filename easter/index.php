@@ -1,8 +1,8 @@
 <?php
 
-// error_reporting(E_ALL);
-// ini_set("display_errors", 1);
-// ini_set('date.timezone', 'Europe/Vatican');
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
+ini_set('date.timezone', 'Europe/Vatican');
 
 include_once('../includes/enums/LitLocale.php');
 
@@ -10,14 +10,14 @@ use LitCal\enum\LitLocale;
 
 $LOCALE = isset($_GET["locale"]) && LitLocale::isValid($_GET["locale"]) ? $_GET["locale"] : LitLocale::LATIN;
 
-if (file_exists('engineCache/easter/' . $LOCALE . '.json')) {
+if (file_exists('../engineCache/easter/' . $LOCALE . '.json')) {
     header('Content-Type: application/json');
-    echo file_get_contents('engineCache/easter/' . $LOCALE . '.json');
+    echo file_get_contents('../engineCache/easter/' . $LOCALE . '.json');
     die();
 }
 
-include_once('includes/LitFunc.php');
-include_once('includes/LitMessages.php');
+include_once('../includes/LitFunc.php');
+include_once('../includes/LitMessages.php');
 
 use LitCal\LitFunc;
 use LitCal\LitMessages;
