@@ -2475,6 +2475,7 @@
             "additionalProperties": false,
             "oneOf": [
               {
+                "title": "Diocesan Calendar requested",
                 "properties": {
                   "Locale": {
                     "type": "string",
@@ -2494,6 +2495,7 @@
                 }
               },
               {
+                "title": "National Calendar requested",
                 "properties": {
                   "Locale": {
                     "type": "string",
@@ -2511,6 +2513,7 @@
                 }
               },
               {
+                "title": "Universal Roman Calendar requested",
                 "properties": {
                   "Locale": {
                     "type": "string",
