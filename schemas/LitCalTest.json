@@ -73,7 +73,7 @@
             "required": [ "name", "eventkey", "description", "testType", "assertions" ],
             "additionalProperties": false
         },
-        "ExactCorrespondenceSinceUntilType": {
+        "ExactCorrespondenceSinceType": {
             "type": "object",
             "properties": {
                 "name" : {
@@ -89,13 +89,41 @@
                 },
                 "testType": {
                     "type": "string",
-                    "enum": [
-                        "exactCorrespondenceSince",
-                        "exactCorrespondenceUntil"
-                    ]
+                    "const": "exactCorrespondenceSince"
                 },
                 "yearSince": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Year"
+                },
+                "appliesTo": {
+                    "$ref": "#/definitions/AppliesToOrExcludes"
+                },
+                "excludes": {
+                    "$ref": "#/definitions/AppliesToOrExcludes"
+                },
+                "assertions": {
+                    "$ref": "#/definitions/Assertions"
+                }
+            },
+            "required": [ "name", "eventkey", "description", "testType", "assertions", "yearSince" ],
+            "additionalProperties": false
+        },
+        "ExactCorrespondenceUntilType": {
+            "type": "object",
+            "properties": {
+                "name" : {
+                    "type": "string",
+                    "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
+                },
+                "eventkey": {
+                    "type": "string",
+                    "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "testType": {
+                    "type": "string",
+                    "const": "exactCorrespondenceUntil"
                 },
                 "yearUntil": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Year"
@@ -110,10 +138,7 @@
                     "$ref": "#/definitions/Assertions"
                 }
             },
-            "oneOf": [
-                {"required": [ "name", "eventkey", "description", "testType", "assertions", "yearSince" ]},
-                {"required": [ "name", "eventkey", "description", "testType", "assertions", "yearUntil" ]}
-            ],
+            "required": [ "name", "eventkey", "description", "testType", "assertions", "yearUntil" ],
             "additionalProperties": false
         },
         "Assertions": {

@@ -387,20 +387,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "$ref": "#/components/schemas/ExactOrVariableCorrespondenceUnitTest"
-                      },
-                      {
-                        "$ref": "#/components/schemas/ExactCorrespondenceSinceUnitTest"
-                      },
-                      {
-                        "$ref": "#/components/schemas/ExactCorrespondenceUntilUnitTest"
-                      }
-                    ]
-                  }
+                  "$ref": "#/components/schemas/UnitTestArray"
                 },
                 "example": [
                   {
@@ -2322,6 +2309,22 @@
           }
         }
       },
+      "UnitTestArray": {
+        "type": "array",
+        "items": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/ExactOrVariableCorrespondenceUnitTest"
+            },
+            {
+              "$ref": "#/components/schemas/ExactCorrespondenceSinceUnitTest"
+            },
+            {
+              "$ref": "#/components/schemas/ExactCorrespondenceUntilUnitTest"
+            }
+          ]
+        }
+      },
       "ExactOrVariableCorrespondenceUnitTest": {
         "title": "Exact or Variable Existence",
         "description": "test that the liturgical event exists on an expected date in a given year or does not exist in a given year",
@@ -2362,6 +2365,12 @@
                 }
               ]
             }
+          },
+          "appliesTo": {
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
+          },
+          "excludes": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
           }
         },
         "required": [
@@ -2415,6 +2424,12 @@
                 }
               ]
             }
+          },
+          "appliesTo": {
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
+          },
+          "excludes": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
           }
         },
         "required": [
@@ -2469,6 +2484,12 @@
                 }
               ]
             }
+          },
+          "appliesTo": {
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
+          },
+          "excludes": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
           }
         },
         "required": [
