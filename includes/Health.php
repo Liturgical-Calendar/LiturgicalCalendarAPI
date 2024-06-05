@@ -5,7 +5,6 @@ namespace LitCal;
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
 use Sabre\VObject;
-use Sabre\VObject\InvalidDataException;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 use LitCal\enum\ICSErrorLevel;
@@ -47,7 +46,13 @@ class Health implements MessageComponentInterface
                             property_exists($messageReceived, 'category') &&
                             property_exists($messageReceived, 'responsetype')
                         ) {
-                            $this->validateCalendar($messageReceived->calendar, $messageReceived->year, $messageReceived->category, $messageReceived->responsetype, $from);
+                            $this->validateCalendar(
+                                $messageReceived->calendar,
+                                $messageReceived->year,
+                                $messageReceived->category,
+                                $messageReceived->responsetype,
+                                $from
+                            );
                         }
                         break;
                     case 'executeUnitTest':
@@ -98,13 +103,13 @@ class Health implements MessageComponentInterface
     }
 
     public const DATA_PATH_TO_SCHEMA = [
-        "https://litcal.johnromanodorazio.com/api/dev/metadata/"       => LitSchema::METADATA,
-        "data/propriumdetempore.json"                                           => LitSchema::PROPRIUMDETEMPORE,
-        "data/propriumdesanctis_1970/propriumdesanctis_1970.json"               => LitSchema::PROPRIUMDESANCTIS,
-        "data/propriumdesanctis_2002/propriumdesanctis_2002.json"               => LitSchema::PROPRIUMDESANCTIS,
-        "data/propriumdesanctis_2008/propriumdesanctis_2008.json"               => LitSchema::PROPRIUMDESANCTIS,
-        "data/memorialsFromDecrees/memorialsFromDecrees.json"                   => LitSchema::DECREEMEMORIALS,
-        "nations/index.json"                                                    => LitSchema::INDEX
+        "https://litcal.johnromanodorazio.com/api/dev/metadata/"    => LitSchema::METADATA,
+        "data/propriumdetempore.json"                               => LitSchema::PROPRIUMDETEMPORE,
+        "data/propriumdesanctis_1970/propriumdesanctis_1970.json"   => LitSchema::PROPRIUMDESANCTIS,
+        "data/propriumdesanctis_2002/propriumdesanctis_2002.json"   => LitSchema::PROPRIUMDESANCTIS,
+        "data/propriumdesanctis_2008/propriumdesanctis_2008.json"   => LitSchema::PROPRIUMDESANCTIS,
+        "data/memorialsFromDecrees/memorialsFromDecrees.json"       => LitSchema::DECREEMEMORIALS,
+        "nations/index.json"                                        => LitSchema::INDEX
     ];
 
     public const LITCAL_BASE_URL = "https://litcal.johnromanodorazio.com/api/dev/";
@@ -193,7 +198,9 @@ class Health implements MessageComponentInterface
                     $errorStr .= "Fatal Error $error->code: ";
                     break;
             }
-            $errorStr .= htmlspecialchars(trim($error->message)) . " (Line: $error->line, Column: $error->column, Src: " . htmlspecialchars(trim($xml[$error->line - 1])) . ")";
+            $errorStr .= htmlspecialchars(trim($error->message))
+                      . " (Line: $error->line, Column: $error->column, Src: "
+                      . htmlspecialchars(trim($xml[$error->line - 1])) . ")";
             if ($error->file) {
                 $errorStr .= " in file: $error->file";
             }
@@ -230,7 +237,8 @@ class Health implements MessageComponentInterface
                         $errors = libxml_get_errors();
                         $errorString = self::retrieveXmlErrors($errors, $xmlArr);
                         libxml_clear_errors();
-                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LITCAL_BASE_URL . $req . " as XML: " . $errorString;
+                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL "
+                                        . self::LITCAL_BASE_URL . $req . " as XML: " . $errorString;
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
@@ -245,7 +253,10 @@ class Health implements MessageComponentInterface
                         if ($validationResult) {
                             $message = new \stdClass();
                             $message->type = "success";
-                            $message->text = "The $category of $Calendar for the year $Year was successfully validated against the Schema https://litcal.johnromanodorazio.com/api/dev/schemas/LiturgicalCalendar.xsd";
+                            $message->text = sprintf(
+                                "The $category of $Calendar for the year $Year was successfully validated against the Schema %s",
+                                "https://litcal.johnromanodorazio.com/api/dev/schemas/LiturgicalCalendar.xsd"
+                            );
                             $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
                             $this->sendMessage($to, $message);
                         } else {
@@ -263,7 +274,7 @@ class Health implements MessageComponentInterface
                 case "ICS":
                     try {
                         $vcalendar = VObject\Reader::read($data);
-                    } catch (InvalidDataException $ex) {
+                    } catch (VObject\ParseException $ex) {
                         $vcalendar = json_encode($ex);
                     }
                     if ($vcalendar instanceof VObject\Document) {
@@ -277,7 +288,10 @@ class Health implements MessageComponentInterface
                         if (count($result) === 0) {
                             $message = new \stdClass();
                             $message->type = "success";
-                            $message->text = "The $category of $Calendar for the year $Year was successfully validated according the iCalendar Schema https://tools.ietf.org/html/rfc5545";
+                            $message->text = sprintf(
+                                "The $category of $Calendar for the year $Year was successfully validated according the iCalendar Schema %s",
+                                "https://tools.ietf.org/html/rfc5545"
+                            );
                             $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
                             $this->sendMessage($to, $message);
                         } else {
@@ -296,7 +310,8 @@ class Health implements MessageComponentInterface
                     } else {
                         $message = new \stdClass();
                         $message->type = "error";
-                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LITCAL_BASE_URL . $req . " as ICS: parsing resulted in type " . gettype($vcalendar) . " | " . $vcalendar;
+                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL "
+                                        . self::LITCAL_BASE_URL . $req . " as ICS: parsing resulted in type " . gettype($vcalendar) . " | " . $vcalendar;
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
@@ -327,7 +342,8 @@ class Health implements MessageComponentInterface
                     } catch (\Exception $ex) {
                         $message = new \stdClass();
                         $message->type = "error";
-                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LITCAL_BASE_URL . $req . " as YAML: " . $ex->getMessage();
+                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL "
+                                        . self::LITCAL_BASE_URL . $req . " as YAML: " . $ex->getMessage();
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
@@ -357,7 +373,8 @@ class Health implements MessageComponentInterface
                     } else {
                         $message = new \stdClass();
                         $message->type = "error";
-                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL " . self::LITCAL_BASE_URL . $req . " as JSON: " . json_last_error_msg();
+                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL "
+                                        . self::LITCAL_BASE_URL . $req . " as JSON: " . json_last_error_msg();
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
