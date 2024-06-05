@@ -155,9 +155,8 @@
             "description": "indicates the format of the data that will be returned by the endpoint. N.B. it's preferable to indicate the desired data type in the Accept header rather than use the returntype parameter",
             "required": false,
             "schema": {
-              "type": "string",
+              "type": ["string", "null"],
               "enum": [
-                "",
                 "JSON",
                 "XML",
                 "ICS",
@@ -2234,9 +2233,8 @@
             ]
           },
           "returntype": {
-            "type": "string",
+            "type": ["string", "null"],
             "enum": [
-              "",
               "JSON",
               "XML",
               "ICS",
@@ -2269,9 +2267,8 @@
             ]
           },
           "returntype": {
-            "type": "string",
+            "type": ["string", "null"],
             "enum": [
-              "",
               "JSON",
               "XML",
               "ICS",
@@ -2301,9 +2298,8 @@
             ]
           },
           "returntype": {
-            "type": "string",
+            "type": ["string", "null"],
             "enum": [
-              "",
               "JSON",
               "XML",
               "ICS",
@@ -2365,9 +2361,8 @@
             ]
           },
           "returntype": {
-            "type": "string",
+            "type": ["string", "null"],
             "enum": [
-              "",
               "JSON",
               "XML",
               "ICS",
