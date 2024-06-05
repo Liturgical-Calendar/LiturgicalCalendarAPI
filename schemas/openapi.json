@@ -157,6 +157,7 @@
             "schema": {
               "type": ["string", "null"],
               "enum": [
+                null,
                 "JSON",
                 "XML",
                 "ICS",
@@ -2235,6 +2236,7 @@
           "returntype": {
             "type": ["string", "null"],
             "enum": [
+              null,
               "JSON",
               "XML",
               "ICS",
@@ -2269,6 +2271,7 @@
           "returntype": {
             "type": ["string", "null"],
             "enum": [
+              null,
               "JSON",
               "XML",
               "ICS",
@@ -2300,6 +2303,7 @@
           "returntype": {
             "type": ["string", "null"],
             "enum": [
+              null,
               "JSON",
               "XML",
               "ICS",
@@ -2363,6 +2367,7 @@
           "returntype": {
             "type": ["string", "null"],
             "enum": [
+              null,
               "JSON",
               "XML",
               "ICS",
