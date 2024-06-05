@@ -2209,6 +2209,31 @@
           {
             "$ref": "#/components/schemas/GeneralRomanCalendarTranslatedRequestBody"
           }
+        ],
+        "examples": [
+          {
+            "nationalcalendar": "USA",
+            "calendartype": "LITURGICAL",
+            "year": 2024
+          },
+          {
+            "diocesancalendar": "DIOCESIDIROMA",
+            "calendartype": "LITURGICAL",
+            "year": 2024
+          },
+          {
+            "calendartype": "LITURGICAL",
+            "year": 2024
+          },
+          {
+            "calendartype": "CIVIL",
+            "year": 2000,
+            "locale": "IT",
+            "epiphany": "SUNDAY_JAN2_JAN8",
+            "ascension": "SUNDAY",
+            "corpuschristi": "THURSDAY",
+            "eternalhighpriest": true
+          }
         ]
       },
       "NationalCalendarRequestBody": {
@@ -2344,12 +2369,6 @@
           },
           "eternalhighpriest": {
             "type": "boolean"
-          },
-          "nationalcalendar": {
-            "type": "string"
-          },
-          "diocesancalendar": {
-            "type": "string"
           },
           "year": {
             "type": "integer",
