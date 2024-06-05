@@ -155,7 +155,7 @@
             "description": "indicates the format of the data that will be returned by the endpoint. N.B. it's preferable to indicate the desired data type in the Accept header rather than use the returntype parameter",
             "required": false,
             "schema": {
-              "type": "string",
+              "type": ["string", "null"],
               "enum": [
                 "JSON",
                 "XML",
@@ -2195,10 +2195,127 @@
         }
       },
       "RequestBody": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/NationalCalendarRequestBody"
+          },
+          {
+            "$ref": "#/components/schemas/DiocesanCalendarRequestBody"
+          },
+          {
+            "$ref": "#/components/schemas/GeneralRomanCalendarRequestBody"
+          },
+          {
+            "$ref": "#/components/schemas/GeneralRomanCalendarTranslatedRequestBody"
+          }
+        ]
+      },
+      "NationalCalendarRequestBody": {
         "type": "object",
+        "title": "National Calendar",
+        "description": "When requesting a national calendar, the only other parameters allowed are `year`, `calendartype`, and `returntype` (though it's preferable to request the media type using the `Accept` header)",
+        "additionalProperties": false,
+        "properties": {
+          "nationalcalendar": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1970,
+            "maximum": 9999
+          },
+          "calendartype": {
+            "type": "string",
+            "enum": [
+              "CIVIL",
+              "LITURGICAL"
+            ]
+          },
+          "returntype": {
+            "type": ["string", "null"],
+            "enum": [
+              "JSON",
+              "XML",
+              "ICS",
+              "YML"
+            ]
+          }
+        },
+        "required": [ "nationalcalendar" ]
+      },
+      "DiocesanCalendarRequestBody": {
+        "type": "object",
+        "title": "Diocesan Calendar",
+        "description": "When requesting a diocesan calendar, the only other parameters allowed are `year`, `calendartype`, and `returntype` (though it's preferable to request the media type using the `Accept` header)",
+        "additionalProperties": false,
+        "properties": {
+          "diocesancalendar": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1970,
+            "maximum": 9999
+          },
+          "calendartype": {
+            "type": "string",
+            "enum": [
+              "CIVIL",
+              "LITURGICAL"
+            ]
+          },
+          "returntype": {
+            "type": ["string", "null"],
+            "enum": [
+              "JSON",
+              "XML",
+              "ICS",
+              "YML"
+            ]
+          }
+        },
+        "required": [ "diocesancalendar" ]
+      },
+      "GeneralRomanCalendarRequestBody": {
+        "type": "object",
+        "title": "General Roman Calendar",
+        "description": "The liturgical calendar in Latin, as used in the Vatican, basis of all other national and diocesan calendars. The only permitted parameters are `year`, `calendartype`, and `returntype` (though it's preferable to request the media type using the `Accept` header)",
+        "additionalProperties": false,
+        "properties": {
+          "year": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1970,
+            "maximum": 9999
+          },
+          "calendartype": {
+            "type": "string",
+            "enum": [
+              "CIVIL",
+              "LITURGICAL"
+            ]
+          },
+          "returntype": {
+            "type": ["string", "null"],
+            "enum": [
+              "JSON",
+              "XML",
+              "ICS",
+              "YML"
+            ]
+          }
+        }
+      },
+      "GeneralRomanCalendarTranslatedRequestBody": {
+        "type": "object",
+        "title": "General Roman Calendar translated",
+        "description": "General Roman Calendar in another language or with tweaked parameters, perhaps for testing purposes",
+        "additionalProperties": false,
         "properties": {
           "locale": {
-            "type": "string"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Locale"
           },
           "epiphany": {
             "type": "string",
@@ -2221,6 +2338,15 @@
               "SUNDAY"
             ]
           },
+          "eternalhighpriest": {
+            "type": "boolean"
+          },
+          "nationalcalendar": {
+            "type": "string"
+          },
+          "diocesancalendar": {
+            "type": "string"
+          },
           "year": {
             "type": "integer",
             "format": "int32",
@@ -2234,17 +2360,8 @@
               "LITURGICAL"
             ]
           },
-          "eternalhighpriest": {
-            "type": "boolean"
-          },
-          "nationalcalendar": {
-            "type": "string"
-          },
-          "diocesancalendar": {
-            "type": "string"
-          },
           "returntype": {
-            "type": "string",
+            "type": ["string", "null"],
             "enum": [
               "JSON",
               "XML",
