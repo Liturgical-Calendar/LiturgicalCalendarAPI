@@ -44,126 +44,42 @@
         "parameters": [
           {
             "in": "query",
-            "name": "year",
-            "description": "indicates the year for which the liturgical calendar data is being requested. For the time being, this endpoint only calculates the Liturgical Calendar that follows the reform of the Second Vatican Council, starting from the publishing of the Editio Typica of the Roman Missal in 1970. Perhaps in future updates information from the calendar preceding the Second Vatican Council will be added, in order to have a greater historical range from the endpoint. ***If not indicated will default to the current year.***",
-            "required": false,
+            "name": "parameters",
+            "style": "form",
+            "explode": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 1970,
-              "maximum": 9999
-            }
-          },
-          {
-            "in": "query",
-            "name": "calendartype",
-            "description": "indicates whether the API should calculate a calendar for the solar year (Jan 1 - Dec 31) or the liturgical year (First Sunday of Advent of the preceding year including vigil Mass - Saturday of the 34th week of Ordinary Time)",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "CIVIL",
-                "LITURGICAL"
-              ],
-              "default": "LITURGICAL"
-            }
-          },
-          {
-            "in": "query",
-            "name": "nationalcalendar",
-            "description": "requests liturgical calendar data for a particular geographic area, on a national level or according to specifications defined by one or more Episcopal Conferences or in a Roman Missal published for a certain language or geographic area. A national calendar will override the following settings which will therefore be effectively ignored by the API: `epiphany`, `ascension`, `corpuschristi`, `eternalhighpriest`, `locale`",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": ""
-            }
-          },
-          {
-            "in": "query",
-            "name": "diocesancalendar",
-            "description": "requests liturgical calendar data for a particular diocese. A diocesan calendar inherits from a national calendar, so setting this will effectively override the `nationalcalendar` setting which will be effectively ignored / overwritten by the API; the `nationalcalendar` set by `diocesancalendar` will in turn override the settings `epiphany`, `ascension`, `corpuschristi`, `eternalhighpriest`, `locale`",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": ""
-            }
-          },
-          {
-            "in": "query",
-            "name": "locale",
-            "description": "requests the localization of the liturgical events in a specific language; can only be used for the General Roman Calendar (when no national or diocesan calendar is requested)",
-            "required": false,
-            "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Locale"
-            }
-          },
-          {
-            "in": "query",
-            "name": "epiphany",
-            "description": "indicates whether **Epiphany** should fall exactly on **January 6th** or instead on the **Sunday between January 2nd and January 8th**. Traditionally it falls on January 6th in the **Vatican**, but each regional Conference of Bishops can opt to celebrate on the Sunday.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "JAN6",
-                "SUNDAY_JAN2_JAN8"
-              ],
-              "default": "JAN6"
-            }
-          },
-          {
-            "in": "query",
-            "name": "ascension",
-            "description": "indicates whether the feast of the **Ascension** should fall on a **Thursday** or on a **Sunday**. Traditionally in the **Vatican** it falls on a Thursday, but for pastoral reasons each regional Conference of Bishops can opt to celebrate on Sunday.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "SUNDAY",
-                "THURSDAY"
-              ],
-              "default": "SUNDAY"
-            }
-          },
-          {
-            "in": "query",
-            "name": "corpuschristi",
-            "description": "indicates whether the feast of **Corpus Christi** should fall on a **Thursday** or on a **Sunday**. Traditionally in the **Vatican** it falls on a Thursday, but for pastoral reasons each regional Conference of Bishops can opt to celebrate on Sunday.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "SUNDAY",
-                "THURSDAY"
-              ],
-              "default": "SUNDAY"
-            }
-          },
-          {
-            "in": "query",
-            "name": "eternalhighpriest",
-            "description": "indicates whether the festivity of Jesus Christ Eternal High Priest should apply to the current calendar (may be overriden by national calendar settings)",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "in": "query",
-            "name": "returntype",
-            "description": "indicates the format of the data that will be returned by the endpoint. N.B. it's preferable to indicate the desired data type in the Accept header rather than use the returntype parameter",
-            "required": false,
-            "schema": {
-              "type": ["string", "null"],
-              "enum": [
-                null,
-                "JSON",
-                "XML",
-                "ICS",
-                "YML"
-              ],
-              "default": "JSON"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/GeneralRomanCalendarRequestBody"
+                },
+                {
+                  "$ref": "#/components/schemas/NationalCalendarRequestBody"
+                },
+                {
+                  "$ref": "#/components/schemas/DiocesanCalendarRequestBody"
+                },
+                {
+                  "$ref": "#/components/schemas/GeneralRomanCalendarTranslatedRequestBody"
+                }
+              ]
+            },
+            "examples": {
+              "GeneralRomanCalendar":
+                {
+                  "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
+                },
+              "NationalCalendar":
+                {
+                  "$ref": "#/components/examples/NationalCalendarRequestBody"
+                },
+              "DiocesanCalendar":
+                {
+                  "$ref": "#/components/examples/DiocesanCalendarRequestBody"
+                },
+              "GeneralRomanCalendarTranslated":
+                {
+                  "$ref": "#/components/examples/GeneralRomanCalendarTranslatedRequestBody"
+                }
             }
           }
         ],
