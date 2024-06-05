@@ -23,7 +23,7 @@
             "uniqueItems": true,
             "items": {
                 "type": "string",
-                "enum": [ 
+                "enum": [
                     "Proper",
                     "Dedication of a Church",
                     "Blessed Virgin Mary",
@@ -628,6 +628,7 @@
         "Locale": {
             "type": "string",
             "description": "must have a value corresponding to a locale enabled on the LitCal server; splitting into multiple enums of max 67 values each to avoid any possibility of segmentation faults (see https://www.ibm.com/support/pages/apar/IT32422)",
+            "default": "LA",
             "anyOf": [
                 {
                     "enum": [
@@ -780,7 +781,7 @@
                 {
                     "enum": [
                         "AF",   "AGQ",  "AK",   "AM",   "AR",   "AS",   "ASA",  "AST",  "AZ",   "BAS",
-                        "BE",   "BEM",  "BEZ",  "BG",   "BM",   "BN",   "BO",   "BR",   "BRX",  "BS", 
+                        "BE",   "BEM",  "BEZ",  "BG",   "BM",   "BN",   "BO",   "BR",   "BRX",  "BS",
                         "CA",   "CCP",  "CE",   "CEB",  "CGG",  "CHR",  "CKB",  "CS",   "CY",   "DA",
                         "DAV",  "DE",   "DJE",  "DSB",  "DUA",  "DYO",  "DZ",   "EBU",  "EE",   "EL",
                         "EN",   "EO",   "ES",   "ET",   "EU",   "EWO",  "FA",   "FF",   "FI",   "FIL",
