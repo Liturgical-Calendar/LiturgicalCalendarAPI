@@ -2,10 +2,6 @@
   "openapi": "3.1.0",
   "servers": [
     {
-      "description": "Liturgical Calendar API endpoint (latest stable)",
-      "url": "https://litcal.johnromanodorazio.com/api/v3"
-    },
-    {
       "description": "Liturgical Calendar API endpoint (development - unstable)",
       "url": "https://litcal.johnromanodorazio.com/api/dev"
     }
@@ -26,7 +22,27 @@
   "tags": [
     {
       "name": "Main API endpoint",
-      "description": "All liturgical data is retrieved from this endpoint"
+      "description": "Retrieve a liturgical calendar"
+    },
+    {
+      "name": "Metadata API endpoint",
+      "description": "Retrieve information about available calendars"
+    },
+    {
+      "name": "Unit Test Index endpoint",
+      "description": "Retrieve or create unit tests"
+    },
+    {
+      "name": "All possible liturgical events endpoint",
+      "description": "All liturgical events by key without the calendar calculation"
+    },
+    {
+      "name": "RegionalData",
+      "description": "Retrieve / create / update National, Diocesan or Wider Region calendars "
+    },
+    {
+      "name": "Easter",
+      "description": "dates of easter whether gregorian or julian from 1583 to 1999"
     }
   ],
   "paths": {
@@ -35,10 +51,8 @@
         "tags": [
           "Main API endpoint"
         ],
-        "security": [
-          {}
-        ],
-        "summary": "retrieves liturgical events for each day of the year",
+        "security": [{}],
+        "summary": "Retrieve liturgical events for each day of a given year",
         "operationId": "retrieveEventsGET",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
         "parameters": [
@@ -168,9 +182,7 @@
         "tags": [
           "Main API endpoint"
         ],
-        "security": [
-          {}
-        ],
+        "security": [{}],
         "summary": "retrieves liturgical events for each day of the year",
         "operationId": "retrieveEventsPOST",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
@@ -312,9 +324,7 @@
         "tags": [
           "Metadata API endpoint"
         ],
-        "security": [
-          {}
-        ],
+        "security": [{}],
         "summary": "gives information about current supported national and diocesan calendars and relative locales",
         "operationId": "retrieveMetadataGET",
         "responses": {
@@ -343,9 +353,7 @@
         "tags": [
           "Metadata API endpoint"
         ],
-        "security": [
-          {}
-        ],
+        "security": [{}],
         "summary": "gives information about current supported national and diocesan calendars and relative locales",
         "operationId": "retrieveMetadataPOST",
         "responses": {
@@ -376,9 +384,7 @@
         "tags": [
           "Unit Test Index endpoint"
         ],
-        "security": [
-          {}
-        ],
+        "security": [{}],
         "summary": "retrieves all the unit tests defined in the API `tests` folder and serves an index useful for frontend processing",
         "operationId": "retrieveTestIndexGET",
         "responses": {
@@ -550,9 +556,7 @@
         "tags": [
           "Unit Test Index endpoint"
         ],
-        "security": [
-          {}
-        ],
+        "security": [{}],
         "summary": "create a new unit test in the API `tests` folder",
         "operationId": "testsIndexPUT",
         "requestBody": {
@@ -735,9 +739,7 @@
         "tags": [
           "All possible liturgical events endpoint"
         ],
-        "security": [
-          {}
-        ],
+        "security": [{}],
         "summary": "retrieves all possible liturgical events that may or may not appear in the Liturgical Calendar for any given year, based on the calculations done by the LitCal API; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
         "operationId": "retrieveAllEventsGET",
         "parameters": [
@@ -856,9 +858,7 @@
         "tags": [
           "RegionalData"
         ],
-        "security": [
-          {}
-        ],
+        "security": [{}],
         "summary": "retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataGET",
         "parameters": [
@@ -951,9 +951,7 @@
         "tags": [
           "RegionalData"
         ],
-        "security": [
-          {}
-        ],
+        "security": [{}],
         "summary": "retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataPOST",
         "requestBody": {
@@ -1039,9 +1037,7 @@
         "tags": [
           "RegionalData"
         ],
-        "security": [
-          {}
-        ],
+        "security": [{}],
         "summary": "create a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataPUT",
         "requestBody": {
@@ -1128,9 +1124,7 @@
         "tags": [
           "RegionalData"
         ],
-        "security": [
-          {}
-        ],
+        "security": [{}],
         "summary": "update a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataPATCH",
         "requestBody": {
@@ -1217,9 +1211,7 @@
         "tags": [
           "RegionalData"
         ],
-        "security": [
-          {}
-        ],
+        "security": [{}],
         "summary": "delete a diocesan calendar data resource (national calendar and wider region calendar deletion not currently supported)",
         "operationId": "regionalDataDELETE",
         "requestBody": {
@@ -1328,9 +1320,7 @@
         "tags": [
           "Easter"
         ],
-        "security": [
-          {}
-        ],
+        "security": [{}],
         "summary": "retrieve the date of Easter, both gregorian and julian, for the years 1583 to 1999",
         "operationId": "easterGET",
         "parameters": [
