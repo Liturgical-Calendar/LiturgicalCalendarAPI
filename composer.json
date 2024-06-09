@@ -28,8 +28,10 @@
     "minimum-stability": "stable",
     "scripts": {
         "post-install-cmd": [
-            "# \\033[0;32mCatholic Liturgical Calendar\\033[0m: \\033[0;31mAd Majorem Dei Gloriam\\033[0m",
-            "# \\033[0;36mOremus pro Pontifice nostro Francisco Dominus conservet eum et vivificet eum et beatum faciat eum in terra et non tradat eum in animam inimicorum ejus\\033[0m"
+            "Johnrdorazio\\LitCal\\LitMessages::postInstall"
+        ],
+        "post-update-cmd": [
+            "Johnrdorazio\\LitCal\\LitMessages::postInstall"
         ]
     }
 }

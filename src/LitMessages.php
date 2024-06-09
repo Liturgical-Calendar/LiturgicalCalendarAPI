@@ -208,4 +208,11 @@ class LitMessages
         }
         return $ordinal;
     }
+
+    public static function postInstall(): void
+    {
+        printf("\033[0;32mCatholic Liturgical Calendar\033[0m\n");
+        printf("\033[0;33mAd Majorem Dei Gloriam\033[0m\n");
+        printf("\t\033[0;36mOremus pro Pontifice nostro Francisco Dominus\n\tconservet eum et vivificet eum et beatum faciat eum in terra\n\tet non tradat eum in animam inimicorum ejus\033[0m\n");
+    }
 }

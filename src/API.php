@@ -10,7 +10,7 @@ use Johnrdorazio\LitCal\LitSettings;
 use Johnrdorazio\LitCal\LitMessages;
 use Johnrdorazio\LitCal\Enum\Ascension;
 use Johnrdorazio\LitCal\Enum\CorpusChristi;
-use Litcal\enum\Epiphany;
+use Johnrdorazio\LitCal\Enum\Epiphany;
 use Johnrdorazio\LitCal\Enum\AcceptHeader;
 use Johnrdorazio\LitCal\Enum\CacheDuration;
 use Johnrdorazio\LitCal\Enum\CalendarType;
@@ -20,7 +20,7 @@ use Johnrdorazio\LitCal\Enum\LitFeastType;
 use Johnrdorazio\LitCal\Enum\LitGrade;
 use Johnrdorazio\LitCal\Enum\LitLocale;
 use Johnrdorazio\LitCal\Enum\RequestContentType;
-use Litcal\enum\RequestMethod;
+use Johnrdorazio\LitCal\Enum\RequestMethod;
 use Johnrdorazio\LitCal\Enum\ReturnType;
 use Johnrdorazio\LitCal\Enum\RomanMissal;
 
