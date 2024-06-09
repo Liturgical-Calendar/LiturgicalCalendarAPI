@@ -1,4 +1,7 @@
 {
+    "name": "johnrdorazio/litcal",
+    "description": "an API for a perpetual Catholic Liturgical Calendar",
+    "type": "library",
     "require": {
         "swaggest/json-schema": "^0.12",
         "phpunit/phpunit": "^10",
@@ -7,5 +10,18 @@
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "*"
-    }
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Litcal\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "John R. D'Orazio",
+            "email": "priest@johnromanodorazio.com"
+        }
+    ],
+    "minimum-stability": "stable"
 }
