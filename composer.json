@@ -16,8 +16,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Johnrdorazio\\LitCal\\": "src/",
-            "Johnrdorazio\\LitCal\\enum\\": "src/enum"
+            "Johnrdorazio\\LitCal\\": "src/"
         }
     },
     "authors": [
@@ -29,8 +28,8 @@
     "minimum-stability": "stable",
     "scripts": {
         "post-install-cmd": [
-            "echo '# Catholic Liturgical Calendar: Ad Majorem Dei Gloriam'",
-            "echo '# Oremus pro Pontifice nostro Francisco Dominus conservet eum et vivificet eum et beatum faciat eum in terra et non tradat eum in animam inimicorum ejus'"
+            "# \\033[0;32mCatholic Liturgical Calendar\\033[0m: \\033[0;31mAd Majorem Dei Gloriam\\033[0m",
+            "# \\033[0;36mOremus pro Pontifice nostro Francisco Dominus conservet eum et vivificet eum et beatum faciat eum in terra et non tradat eum in animam inimicorum ejus\\033[0m"
         ]
     }
 }

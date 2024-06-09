@@ -1,11 +1,11 @@
 <?php
 
-namespace Johnrdorazio\LitCal\enum;
+namespace Johnrdorazio\LitCal\Enum;
 
-class CorpusChristi
+class Ascension
 {
-    public const THURSDAY          = "THURSDAY";
-    public const SUNDAY            = "SUNDAY";
+    public const THURSDAY       = "THURSDAY";
+    public const SUNDAY         = "SUNDAY";
     public static array $values = [ "THURSDAY", "SUNDAY" ];
 
     public static function isValid($value)

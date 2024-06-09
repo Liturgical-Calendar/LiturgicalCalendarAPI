@@ -8,11 +8,11 @@ use Johnrdorazio\LitCal\TestsIndex;
 use Johnrdorazio\LitCal\AllEvents;
 use Johnrdorazio\LitCal\RegionalData;
 use Johnrdorazio\LitCal\Easter;
-use Johnrdorazio\LitCal\enum\RequestMethod;
-use Johnrdorazio\LitCal\enum\RequestContentType;
-use Johnrdorazio\LitCal\enum\AcceptHeader;
-use Johnrdorazio\LitCal\enum\ReturnType;
-use Johnrdorazio\LitCal\enum\CacheDuration;
+use Johnrdorazio\LitCal\Enum\RequestMethod;
+use Johnrdorazio\LitCal\Enum\RequestContentType;
+use Johnrdorazio\LitCal\Enum\AcceptHeader;
+use Johnrdorazio\LitCal\Enum\ReturnType;
+use Johnrdorazio\LitCal\Enum\CacheDuration;
 
 class Router
 {

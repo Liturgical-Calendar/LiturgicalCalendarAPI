@@ -1,6 +1,6 @@
 <?php
 
-namespace Johnrdorazio\LitCal\enum;
+namespace Johnrdorazio\LitCal\Enum;
 
 class LitCommon
 {

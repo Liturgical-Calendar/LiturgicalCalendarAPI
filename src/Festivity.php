@@ -3,12 +3,12 @@
 namespace Johnrdorazio\LitCal;
 
 use Johnrdorazio\LitCal\DateTime;
-use Johnrdorazio\LitCal\enum\LitColor;
-use Johnrdorazio\LitCal\enum\LitFeastType;
-use Johnrdorazio\LitCal\enum\LitLocale;
-use Johnrdorazio\LitCal\enum\LitGrade;
-use Johnrdorazio\LitCal\enum\LitCommon;
-use Johnrdorazio\LitCal\enum\LitSeason;
+use Johnrdorazio\LitCal\Enum\LitColor;
+use Johnrdorazio\LitCal\Enum\LitFeastType;
+use Johnrdorazio\LitCal\Enum\LitLocale;
+use Johnrdorazio\LitCal\Enum\LitGrade;
+use Johnrdorazio\LitCal\Enum\LitCommon;
+use Johnrdorazio\LitCal\Enum\LitSeason;
 
 class Festivity implements \JsonSerializable
 {

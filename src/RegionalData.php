@@ -5,8 +5,8 @@ namespace Johnrdorazio\LitCal;
 use Swaggest\JsonSchema\Schema;
 use Swaggest\JsonSchema\InvalidValue;
 use Johnrdorazio\LitCal\APICore;
-use Johnrdorazio\LitCal\enum\RequestMethod;
-use Johnrdorazio\LitCal\enum\LitSchema;
+use Johnrdorazio\LitCal\Enum\RequestMethod;
+use Johnrdorazio\LitCal\Enum\LitSchema;
 
 /**
  * RegionalData

@@ -2,7 +2,7 @@
 
 namespace Johnrdorazio\LitCal;
 
-use Johnrdorazio\LitCal\enum\RomanMissal;
+use Johnrdorazio\LitCal\Enum\RomanMissal;
 
 class Metadata
 {

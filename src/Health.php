@@ -7,8 +7,8 @@ use Swaggest\JsonSchema\Schema;
 use Sabre\VObject;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
-use Johnrdorazio\LitCal\enum\ICSErrorLevel;
-use Johnrdorazio\LitCal\enum\LitSchema;
+use Johnrdorazio\LitCal\Enum\ICSErrorLevel;
+use Johnrdorazio\LitCal\Enum\LitSchema;
 use Johnrdorazio\LitCal\LitTest;
 
 class Health implements MessageComponentInterface

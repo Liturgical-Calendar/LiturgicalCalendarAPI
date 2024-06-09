@@ -2,10 +2,10 @@
 
 namespace Johnrdorazio\LitCal;
 
-use Johnrdorazio\LitCal\enum\RomanMissal;
-use Johnrdorazio\LitCal\enum\LitLocale;
-use Johnrdorazio\LitCal\enum\LitGrade;
-use Johnrdorazio\LitCal\enum\StatusCode;
+use Johnrdorazio\LitCal\Enum\RomanMissal;
+use Johnrdorazio\LitCal\Enum\LitLocale;
+use Johnrdorazio\LitCal\Enum\LitGrade;
+use Johnrdorazio\LitCal\Enum\StatusCode;
 
 class AllEvents
 {

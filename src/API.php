@@ -8,21 +8,21 @@ use Johnrdorazio\LitCal\FestivityCollection;
 use Johnrdorazio\LitCal\LitFunc;
 use Johnrdorazio\LitCal\LitSettings;
 use Johnrdorazio\LitCal\LitMessages;
-use Johnrdorazio\LitCal\enum\Ascension;
-use Johnrdorazio\LitCal\enum\CorpusChristi;
+use Johnrdorazio\LitCal\Enum\Ascension;
+use Johnrdorazio\LitCal\Enum\CorpusChristi;
 use Litcal\enum\Epiphany;
-use Johnrdorazio\LitCal\enum\AcceptHeader;
-use Johnrdorazio\LitCal\enum\CacheDuration;
-use Johnrdorazio\LitCal\enum\CalendarType;
-use Johnrdorazio\LitCal\enum\LitColor;
-use Johnrdorazio\LitCal\enum\LitCommon;
-use Johnrdorazio\LitCal\enum\LitFeastType;
-use Johnrdorazio\LitCal\enum\LitGrade;
-use Johnrdorazio\LitCal\enum\LitLocale;
-use Johnrdorazio\LitCal\enum\RequestContentType;
+use Johnrdorazio\LitCal\Enum\AcceptHeader;
+use Johnrdorazio\LitCal\Enum\CacheDuration;
+use Johnrdorazio\LitCal\Enum\CalendarType;
+use Johnrdorazio\LitCal\Enum\LitColor;
+use Johnrdorazio\LitCal\Enum\LitCommon;
+use Johnrdorazio\LitCal\Enum\LitFeastType;
+use Johnrdorazio\LitCal\Enum\LitGrade;
+use Johnrdorazio\LitCal\Enum\LitLocale;
+use Johnrdorazio\LitCal\Enum\RequestContentType;
 use Litcal\enum\RequestMethod;
-use Johnrdorazio\LitCal\enum\ReturnType;
-use Johnrdorazio\LitCal\enum\RomanMissal;
+use Johnrdorazio\LitCal\Enum\ReturnType;
+use Johnrdorazio\LitCal\Enum\RomanMissal;
 
 class API
 {

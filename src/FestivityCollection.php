@@ -5,9 +5,9 @@ namespace Johnrdorazio\LitCal;
 use Johnrdorazio\LitCal\LitSettings;
 use Johnrdorazio\LitCal\DateTime;
 use Johnrdorazio\LitCal\Festivity;
-use Johnrdorazio\LitCal\enum\LitGrade;
-use Johnrdorazio\LitCal\enum\LitLocale;
-use Johnrdorazio\LitCal\enum\LitSeason;
+use Johnrdorazio\LitCal\Enum\LitGrade;
+use Johnrdorazio\LitCal\Enum\LitLocale;
+use Johnrdorazio\LitCal\Enum\LitSeason;
 
 #[\AllowDynamicProperties]
 class FestivityCollection

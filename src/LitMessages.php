@@ -2,8 +2,8 @@
 
 namespace Johnrdorazio\LitCal;
 
-use Johnrdorazio\LitCal\enum\LitColor;
-use Johnrdorazio\LitCal\enum\LitLocale;
+use Johnrdorazio\LitCal\Enum\LitColor;
+use Johnrdorazio\LitCal\Enum\LitLocale;
 
 class LitMessages
 {

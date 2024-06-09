@@ -4,8 +4,8 @@ namespace Johnrdorazio\LitCal;
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
-use Johnrdorazio\LitCal\enum\RequestContentType;
-use Johnrdorazio\LitCal\enum\StatusCode;
+use Johnrdorazio\LitCal\Enum\RequestContentType;
+use Johnrdorazio\LitCal\Enum\StatusCode;
 
 class TestsIndex
 {

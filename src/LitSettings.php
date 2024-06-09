@@ -2,12 +2,12 @@
 
 namespace Johnrdorazio\LitCal;
 
-use Johnrdorazio\LitCal\enum\CalendarType;
-use Johnrdorazio\LitCal\enum\Epiphany;
-use Johnrdorazio\LitCal\enum\Ascension;
-use Johnrdorazio\LitCal\enum\CorpusChristi;
-use Johnrdorazio\LitCal\enum\LitLocale;
-use Johnrdorazio\LitCal\enum\ReturnType;
+use Johnrdorazio\LitCal\Enum\CalendarType;
+use Johnrdorazio\LitCal\Enum\Epiphany;
+use Johnrdorazio\LitCal\Enum\Ascension;
+use Johnrdorazio\LitCal\Enum\CorpusChristi;
+use Johnrdorazio\LitCal\Enum\LitLocale;
+use Johnrdorazio\LitCal\Enum\ReturnType;
 
 class LitSettings
 {

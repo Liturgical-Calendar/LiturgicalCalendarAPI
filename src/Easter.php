@@ -2,7 +2,7 @@
 
 namespace Johnrdorazio\LitCal;
 
-use Johnrdorazio\LitCal\enum\LitLocale;
+use Johnrdorazio\LitCal\Enum\LitLocale;
 use Johnrdorazio\LitCal\LitFunc;
 use Johnrdorazio\LitCal\LitMessages;
 
