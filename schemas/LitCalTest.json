@@ -5,7 +5,8 @@
         "LitCalTest": {
             "oneOf": [
                 { "$ref": "#/definitions/ExactCorrespondenceType" },
-                { "$ref": "#/definitions/ExactCorrespondenceSinceUntilType" }
+                { "$ref": "#/definitions/ExactCorrespondenceSinceType" },
+                { "$ref": "#/definitions/ExactCorrespondenceUntilType" }
             ]
         },
         "AppliesToOrExcludes": {
