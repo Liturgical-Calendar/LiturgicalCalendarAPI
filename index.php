@@ -81,9 +81,10 @@ if (defined('ALLOWED_ORIGINS') && is_array(ALLOWED_ORIGINS)) {
     $allowedOrigins = array_merge($allowedOrigins, ALLOWED_ORIGINS);
 }
 
-$request = preg_replace('/^\/api\/(?:dev|v[4-9])/', '', $_SERVER['REQUEST_URI']);
+$requestPath = explode('?', $_SERVER['REQUEST_URI'])[0];
+$requestPath = preg_replace('/^\/api\/(?:dev|v[4-9])/', '', $requestPath);
 
-switch ($request) {
+switch ($requestPath) {
     case '/':
         include_once('includes/enums/RomanMissal.php');
         include_once('includes/DateTime.php');
