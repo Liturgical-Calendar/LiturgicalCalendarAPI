@@ -47,9 +47,9 @@ class Schema
         self::enforceOrigin();
         self::enforceRequestMethod();
         if (isset($_GET['schema'])) {
-            if (file_exists($_GET['schema'])) {
+            if (file_exists('schemas/' . $_GET['schema'])) {
                 header('Content-Type: application/json; charset=utf-8');
-                echo file_get_contents($_GET['schema']);
+                echo file_get_contents('schemas/' . $_GET['schema']);
             } else {
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
                 die('File not found');
