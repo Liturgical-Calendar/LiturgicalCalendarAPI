@@ -2,12 +2,6 @@
 
 namespace Johnrdorazio\LitCal;
 
-use Johnrdorazio\LitCal\API;
-use Johnrdorazio\LitCal\Metadata;
-use Johnrdorazio\LitCal\TestsIndex;
-use Johnrdorazio\LitCal\AllEvents;
-use Johnrdorazio\LitCal\RegionalData;
-use Johnrdorazio\LitCal\Easter;
 use Johnrdorazio\LitCal\Enum\RequestMethod;
 use Johnrdorazio\LitCal\Enum\RequestContentType;
 use Johnrdorazio\LitCal\Enum\AcceptHeader;
@@ -16,7 +10,7 @@ use Johnrdorazio\LitCal\Enum\CacheDuration;
 
 class Router
 {
-    private static array $allowedOrigins = [];
+    public static array $allowedOrigins = [];
 
     public static function setAllowedOrigins(?string $originsFile = null, ?array $origins = null): void
     {
@@ -85,6 +79,10 @@ class Router
             case '/easter':
             case '/easter/':
                 Easter::init();
+                break;
+            case '/schemas':
+            case '/schemas/':
+                Schema::retrieve();
                 break;
             default:
                 http_response_code(404);

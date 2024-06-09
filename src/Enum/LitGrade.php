@@ -10,8 +10,6 @@
 
 namespace Johnrdorazio\LitCal\Enum;
 
-use Johnrdorazio\LitCal\Enum\LitLocale;
-
 /*****************************************************
  * DEFINE THE ORDER OF IMPORTANCE OF THE FESTIVITIES *
  ****************************************************/

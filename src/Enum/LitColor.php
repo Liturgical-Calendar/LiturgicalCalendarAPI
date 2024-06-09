@@ -2,8 +2,6 @@
 
 namespace Johnrdorazio\LitCal\Enum;
 
-use Johnrdorazio\LitCal\Enum\LitLocale;
-
 class LitColor
 {
     public const GREEN     = "green";
