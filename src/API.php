@@ -1,28 +1,28 @@
 <?php
 
-namespace LitCal;
+namespace Johnrdorazio\LitCal;
 
-use LitCal\APICore;
-use LitCal\DateTime;
-use LitCal\FestivityCollection;
-use LitCal\LitFunc;
-use LitCal\LitSettings;
-use LitCal\LitMessages;
-use LitCal\enum\Ascension;
-use LitCal\enum\CorpusChristi;
+use Johnrdorazio\LitCal\APICore;
+use Johnrdorazio\LitCal\DateTime;
+use Johnrdorazio\LitCal\FestivityCollection;
+use Johnrdorazio\LitCal\LitFunc;
+use Johnrdorazio\LitCal\LitSettings;
+use Johnrdorazio\LitCal\LitMessages;
+use Johnrdorazio\LitCal\enum\Ascension;
+use Johnrdorazio\LitCal\enum\CorpusChristi;
 use Litcal\enum\Epiphany;
-use LitCal\enum\AcceptHeader;
-use LitCal\enum\CacheDuration;
-use LitCal\enum\CalendarType;
-use LitCal\enum\LitColor;
-use LitCal\enum\LitCommon;
-use LitCal\enum\LitFeastType;
-use LitCal\enum\LitGrade;
-use LitCal\enum\LitLocale;
-use LitCal\enum\RequestContentType;
+use Johnrdorazio\LitCal\enum\AcceptHeader;
+use Johnrdorazio\LitCal\enum\CacheDuration;
+use Johnrdorazio\LitCal\enum\CalendarType;
+use Johnrdorazio\LitCal\enum\LitColor;
+use Johnrdorazio\LitCal\enum\LitCommon;
+use Johnrdorazio\LitCal\enum\LitFeastType;
+use Johnrdorazio\LitCal\enum\LitGrade;
+use Johnrdorazio\LitCal\enum\LitLocale;
+use Johnrdorazio\LitCal\enum\RequestContentType;
 use Litcal\enum\RequestMethod;
-use LitCal\enum\ReturnType;
-use LitCal\enum\RomanMissal;
+use Johnrdorazio\LitCal\enum\ReturnType;
+use Johnrdorazio\LitCal\enum\RomanMissal;
 
 class API
 {

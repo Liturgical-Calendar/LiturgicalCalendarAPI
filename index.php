@@ -15,7 +15,7 @@
 ini_set('date.timezone', 'Europe/Vatican');
 require_once 'vendor/autoload.php';
 
-use LitCal\Router;
+use Johnrdorazio\LitCal\Router;
 
 Router::setAllowedOrigins('allowedOrigins.php');
 Router::route();

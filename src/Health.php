@@ -1,15 +1,15 @@
 <?php
 
-namespace LitCal;
+namespace Johnrdorazio\LitCal;
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
 use Sabre\VObject;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
-use LitCal\enum\ICSErrorLevel;
-use LitCal\enum\LitSchema;
-use LitCal\LitTest;
+use Johnrdorazio\LitCal\enum\ICSErrorLevel;
+use Johnrdorazio\LitCal\enum\LitSchema;
+use Johnrdorazio\LitCal\LitTest;
 
 class Health implements MessageComponentInterface
 {

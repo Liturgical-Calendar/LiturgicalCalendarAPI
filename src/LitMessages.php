@@ -1,9 +1,9 @@
 <?php
 
-namespace LitCal;
+namespace Johnrdorazio\LitCal;
 
-use LitCal\enum\LitColor;
-use LitCal\enum\LitLocale;
+use Johnrdorazio\LitCal\enum\LitColor;
+use Johnrdorazio\LitCal\enum\LitLocale;
 
 class LitMessages
 {

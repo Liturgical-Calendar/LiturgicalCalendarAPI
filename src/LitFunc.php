@@ -1,8 +1,8 @@
 <?php
 
-namespace LitCal;
+namespace Johnrdorazio\LitCal;
 
-use LitCal\DateTime;
+use Johnrdorazio\LitCal\DateTime;
 
 /**
  * Class LitFunc

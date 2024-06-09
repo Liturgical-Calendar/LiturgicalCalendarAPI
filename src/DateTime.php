@@ -1,6 +1,6 @@
 <?php
 
-namespace LitCal;
+namespace Johnrdorazio\LitCal;
 
 class DateTime extends \DateTime implements \JsonSerializable
 {

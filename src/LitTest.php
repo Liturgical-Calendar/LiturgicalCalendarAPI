@@ -1,6 +1,6 @@
 <?php
 
-namespace LitCal;
+namespace Johnrdorazio\LitCal;
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;

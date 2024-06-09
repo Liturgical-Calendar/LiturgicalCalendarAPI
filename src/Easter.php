@@ -1,10 +1,10 @@
 <?php
 
-namespace LitCal;
+namespace Johnrdorazio\LitCal;
 
-use LitCal\enum\LitLocale;
-use LitCal\LitFunc;
-use LitCal\LitMessages;
+use Johnrdorazio\LitCal\enum\LitLocale;
+use Johnrdorazio\LitCal\LitFunc;
+use Johnrdorazio\LitCal\LitMessages;
 
 class Easter
 {

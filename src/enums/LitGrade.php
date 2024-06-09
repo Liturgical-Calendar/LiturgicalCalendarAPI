@@ -8,9 +8,9 @@
  *  A COPY OF THE DOCUMENT IS INCLUDED ALONGSIDE THIS ENGINE, SEEING THAT THERE IS NO DIRECT ONLINE LINK TO THE ACTUAL NORMS
  */
 
-namespace LitCal\enum;
+namespace Johnrdorazio\LitCal\enum;
 
-use LitCal\enum\LitLocale;
+use Johnrdorazio\LitCal\enum\LitLocale;
 
 /*****************************************************
  * DEFINE THE ORDER OF IMPORTANCE OF THE FESTIVITIES *

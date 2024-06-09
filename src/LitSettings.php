@@ -1,13 +1,13 @@
 <?php
 
-namespace LitCal;
+namespace Johnrdorazio\LitCal;
 
-use LitCal\enum\CalendarType;
-use LitCal\enum\Epiphany;
-use LitCal\enum\Ascension;
-use LitCal\enum\CorpusChristi;
-use LitCal\enum\LitLocale;
-use LitCal\enum\ReturnType;
+use Johnrdorazio\LitCal\enum\CalendarType;
+use Johnrdorazio\LitCal\enum\Epiphany;
+use Johnrdorazio\LitCal\enum\Ascension;
+use Johnrdorazio\LitCal\enum\CorpusChristi;
+use Johnrdorazio\LitCal\enum\LitLocale;
+use Johnrdorazio\LitCal\enum\ReturnType;
 
 class LitSettings
 {

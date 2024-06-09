@@ -1,18 +1,18 @@
 <?php
 
-namespace LitCal;
+namespace Johnrdorazio\LitCal;
 
-use LitCal\API;
-use LitCal\Metadata;
-use LitCal\TestsIndex;
-use LitCal\AllEvents;
-use LitCal\RegionalData;
-use LitCal\Easter;
-use LitCal\enum\RequestMethod;
-use LitCal\enum\RequestContentType;
-use LitCal\enum\AcceptHeader;
-use LitCal\enum\ReturnType;
-use LitCal\enum\CacheDuration;
+use Johnrdorazio\LitCal\API;
+use Johnrdorazio\LitCal\Metadata;
+use Johnrdorazio\LitCal\TestsIndex;
+use Johnrdorazio\LitCal\AllEvents;
+use Johnrdorazio\LitCal\RegionalData;
+use Johnrdorazio\LitCal\Easter;
+use Johnrdorazio\LitCal\enum\RequestMethod;
+use Johnrdorazio\LitCal\enum\RequestContentType;
+use Johnrdorazio\LitCal\enum\AcceptHeader;
+use Johnrdorazio\LitCal\enum\ReturnType;
+use Johnrdorazio\LitCal\enum\CacheDuration;
 
 class Router
 {

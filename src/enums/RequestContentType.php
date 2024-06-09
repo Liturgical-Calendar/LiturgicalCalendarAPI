@@ -6,7 +6,7 @@
  * for a Request that the API might receive
  */
 
-namespace LitCal\enum;
+namespace Johnrdorazio\LitCal\enum;
 
 class RequestContentType
 {

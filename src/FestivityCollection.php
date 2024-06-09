@@ -1,13 +1,13 @@
 <?php
 
-namespace LitCal;
+namespace Johnrdorazio\LitCal;
 
-use LitCal\LitSettings;
-use LitCal\DateTime;
-use LitCal\Festivity;
-use LitCal\enum\LitGrade;
-use LitCal\enum\LitLocale;
-use LitCal\enum\LitSeason;
+use Johnrdorazio\LitCal\LitSettings;
+use Johnrdorazio\LitCal\DateTime;
+use Johnrdorazio\LitCal\Festivity;
+use Johnrdorazio\LitCal\enum\LitGrade;
+use Johnrdorazio\LitCal\enum\LitLocale;
+use Johnrdorazio\LitCal\enum\LitSeason;
 
 #[\AllowDynamicProperties]
 class FestivityCollection

@@ -1,8 +1,8 @@
 <?php
 
-namespace LitCal\enum;
+namespace Johnrdorazio\LitCal\enum;
 
-use LitCal\enum\LitLocale;
+use Johnrdorazio\LitCal\enum\LitLocale;
 
 class LitColor
 {

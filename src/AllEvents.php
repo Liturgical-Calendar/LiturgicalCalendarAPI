@@ -1,11 +1,11 @@
 <?php
 
-namespace LitCal;
+namespace Johnrdorazio\LitCal;
 
-use LitCal\enum\RomanMissal;
-use LitCal\enum\LitLocale;
-use LitCal\enum\LitGrade;
-use LitCal\enum\StatusCode;
+use Johnrdorazio\LitCal\enum\RomanMissal;
+use Johnrdorazio\LitCal\enum\LitLocale;
+use Johnrdorazio\LitCal\enum\LitGrade;
+use Johnrdorazio\LitCal\enum\StatusCode;
 
 class AllEvents
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace LitCal;
+namespace Johnrdorazio\LitCal;
 
-use LitCal\enum\AcceptHeader;
-use LitCal\enum\RequestMethod;
-use LitCal\enum\RequestContentType;
+use Johnrdorazio\LitCal\enum\AcceptHeader;
+use Johnrdorazio\LitCal\enum\RequestMethod;
+use Johnrdorazio\LitCal\enum\RequestContentType;
 
 class APICore
 {

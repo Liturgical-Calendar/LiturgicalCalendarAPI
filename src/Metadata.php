@@ -1,8 +1,8 @@
 <?php
 
-namespace LitCal;
+namespace Johnrdorazio\LitCal;
 
-use LitCal\enum\RomanMissal;
+use Johnrdorazio\LitCal\enum\RomanMissal;
 
 class Metadata
 {

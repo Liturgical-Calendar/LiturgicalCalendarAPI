@@ -1,11 +1,11 @@
 <?php
 
-namespace LitCal;
+namespace Johnrdorazio\LitCal;
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
-use LitCal\enum\RequestContentType;
-use LitCal\enum\StatusCode;
+use Johnrdorazio\LitCal\enum\RequestContentType;
+use Johnrdorazio\LitCal\enum\StatusCode;
 
 class TestsIndex
 {

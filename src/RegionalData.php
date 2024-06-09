@@ -1,12 +1,12 @@
 <?php
 
-namespace LitCal;
+namespace Johnrdorazio\LitCal;
 
 use Swaggest\JsonSchema\Schema;
 use Swaggest\JsonSchema\InvalidValue;
-use LitCal\APICore;
-use LitCal\enum\RequestMethod;
-use LitCal\enum\LitSchema;
+use Johnrdorazio\LitCal\APICore;
+use Johnrdorazio\LitCal\enum\RequestMethod;
+use Johnrdorazio\LitCal\enum\LitSchema;
 
 /**
  * RegionalData
