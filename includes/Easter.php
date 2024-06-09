@@ -31,9 +31,9 @@ class Easter
 
     private static function serveCachedFileIfExists(): void
     {
-        if (file_exists('engineCache/easter/' . self::$Locale . '.json')) {
+        if (file_exists('engineCache/easter/' . self::$baseLocale . '.json')) {
             header('Content-Type: application/json');
-            echo file_get_contents('engineCache/easter/' . self::$Locale . '.json');
+            echo file_get_contents('engineCache/easter/' . self::$baseLocale . '.json');
             die();
         }
     }
@@ -142,7 +142,7 @@ class Easter
         if (!is_dir('engineCache/easter/')) {
             mkdir('engineCache/easter/', 0774, true);
         }
-        file_put_contents('engineCache/easter/' . self::$Locale . '.json', json_encode(self::$EasterDates));
+        file_put_contents('engineCache/easter/' . self::$baseLocale . '.json', json_encode(self::$EasterDates));
 
         header('Content-Type: application/json');
         echo json_encode(self::$EasterDates);
