@@ -23,13 +23,6 @@ class TestsIndex
         "comment"
     ];
 
-    public const STATUS_CODES = [
-        StatusCode::METHOD_NOT_ALLOWED     => " 405 Method Not Allowed",
-        StatusCode::UNSUPPORTED_MEDIA_TYPE => " 415 Unsupported Media Type",
-        StatusCode::UNPROCESSABLE_CONTENT  => " 422 Unprocessable Content",
-        StatusCode::SERVICE_UNAVAILABLE    => " 503 Service Unavailable"
-    ];
-
     private static function sanitizeString(string $str): string
     {
         return htmlspecialchars(strip_tags($str));
@@ -64,12 +57,12 @@ class TestsIndex
     {
         $testSuite = [];
 
-        $testsFolder = '../tests';
+        $testsFolder = 'tests';
         try {
             $it = new \DirectoryIterator("glob://$testsFolder/*Test.json");
             foreach ($it as $f) {
                 $fileName       = $f->getFilename();
-                $testContents   = file_get_contents('../tests/' . $fileName);
+                $testContents   = file_get_contents('tests/' . $fileName);
                 $testSuite[]    = json_decode($testContents, true);
             }
             return json_encode($testSuite, JSON_PRETTY_PRINT);
@@ -80,7 +73,7 @@ class TestsIndex
 
     private static function produceErrorResponse(int $statusCode, string $description): string
     {
-        header($_SERVER[ "SERVER_PROTOCOL" ] . self::STATUS_CODES[ $statusCode ], true, $statusCode);
+        header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
         $message = new \stdClass();
         $message->status = "ERROR";
         $message->response = $statusCode === 404 ? "Resource not Found" : "Resource not Created";
@@ -101,7 +94,7 @@ class TestsIndex
             }
 
             // Validate incoming data against unit test schema
-            $schemaFile = '../schemas/LitCalTest.json';
+            $schemaFile = 'schemas/LitCalTest.json';
             $schemaContents = file_get_contents($schemaFile);
             $jsonSchema = json_decode($schemaContents);
 
@@ -124,7 +117,7 @@ class TestsIndex
             // Sanitize data to avoid any possibility of script injection
             self::sanitizeObjectValues($data);
 
-            $bytesWritten = file_put_contents('../tests/' . $data->name . '.json', json_encode($data, JSON_PRETTY_PRINT));
+            $bytesWritten = file_put_contents('tests/' . $data->name . '.json', json_encode($data, JSON_PRETTY_PRINT));
             if (false === $bytesWritten) {
                 return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.");
             } else {

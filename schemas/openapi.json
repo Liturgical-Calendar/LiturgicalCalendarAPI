@@ -2182,7 +2182,8 @@
         "additionalProperties": false,
         "properties": {
           "diocesancalendar": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[A-Z]{3,45}$"
           },
           "year": {
             "type": "integer",
