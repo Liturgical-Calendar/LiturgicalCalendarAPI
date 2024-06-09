@@ -2,8 +2,6 @@
 
 namespace Johnrdorazio\LitCal\Enum;
 
-use Johnrdorazio\LitCal\Enum\LitLocale;
-
 class LitSeason
 {
     public const ADVENT         = "ADVENT";

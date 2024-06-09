@@ -2,12 +2,7 @@
 
 namespace Johnrdorazio\LitCal;
 
-use Johnrdorazio\LitCal\APICore;
 use Johnrdorazio\LitCal\DateTime;
-use Johnrdorazio\LitCal\FestivityCollection;
-use Johnrdorazio\LitCal\LitFunc;
-use Johnrdorazio\LitCal\LitSettings;
-use Johnrdorazio\LitCal\LitMessages;
 use Johnrdorazio\LitCal\Enum\Ascension;
 use Johnrdorazio\LitCal\Enum\CorpusChristi;
 use Johnrdorazio\LitCal\Enum\Epiphany;
