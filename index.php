@@ -83,7 +83,7 @@ if (defined('ALLOWED_ORIGINS') && is_array(ALLOWED_ORIGINS)) {
 
 $request = preg_replace('/^\/api\/(?:dev|v[4-9])/', '', $_SERVER['REQUEST_URI']);
 
-switch ($_SERVER['REQUEST_URI']) {
+switch ($request) {
     case '/':
         include_once('includes/enums/RomanMissal.php');
         include_once('includes/DateTime.php');
