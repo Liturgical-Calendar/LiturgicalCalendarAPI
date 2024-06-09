@@ -163,6 +163,7 @@ switch ($requestPath) {
         break;
     case '/easter':
     case '/easter/':
+        include_once('includes/enums/LitLocale.php');
         include_once('includes/DateTime.php');
         include_once('includes/LitFunc.php');
         include_once('includes/LitMessages.php');
