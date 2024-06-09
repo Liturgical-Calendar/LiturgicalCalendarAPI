@@ -9,4 +9,15 @@ class StatusCode
     public const NOT_FOUND              = 404;
     public const METHOD_NOT_ALLOWED     = 405;
     public const UNSUPPORTED_MEDIA_TYPE = 415;
+    private const STATUS_CODES = [
+        StatusCode::NOT_FOUND              => " 404 Not Found",
+        StatusCode::METHOD_NOT_ALLOWED     => " 405 Method Not Allowed",
+        StatusCode::UNSUPPORTED_MEDIA_TYPE => " 415 Unsupported Media Type",
+        StatusCode::UNPROCESSABLE_CONTENT  => " 422 Unprocessable Content",
+        StatusCode::SERVICE_UNAVAILABLE    => " 503 Service Unavailable"
+    ];
+    public static function toString(int $code): string
+    {
+        return StatusCode::STATUS_CODES[ $code ];
+    }
 }
