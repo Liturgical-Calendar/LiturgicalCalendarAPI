@@ -2,9 +2,11 @@
     "name": "johnrdorazio/litcal",
     "description": "an API for a perpetual Catholic Liturgical Calendar",
     "type": "library",
+    "keywords": ["api","rest","restful","liturgy","calendar","liturgical","universal","roman","catholic"],
+    "homepage": "https://litcal.johnromanodorazio.com",
     "require": {
+        "php": ">=7.4",
         "swaggest/json-schema": "^0.12",
-        "phpunit/phpunit": "^10",
         "cboden/ratchet": "^0.4.4",
         "sabre/vobject": "~4.1"
     },
@@ -14,7 +16,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Johnrdorazio\\Litcal\\": "src/"
+            "Johnrdorazio\\LitCal\\": "src/"
         }
     },
     "authors": [
@@ -23,5 +25,11 @@
             "email": "priest@johnromanodorazio.com"
         }
     ],
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "scripts": {
+        "post-install-cmd": [
+            "echo '# Catholic Liturgical Calendar: Ad Majorem Dei Gloriam'",
+            "echo '# Oremus pro Pontifice nostro Francisco Dominus conservet eum et vivificet eum et beatum faciat eum in terra et non tradat eum in animam inimicorum ejus'"
+        ]
+    }
 }
