@@ -16,7 +16,8 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Johnrdorazio\\LitCal\\": "src/"
+            "Johnrdorazio\\LitCal\\": "src/",
+            "Johnrdorazio\\LitCal\\enum": "src/enum"
         }
     },
     "authors": [
