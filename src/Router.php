@@ -35,7 +35,8 @@ class Router
     public static function route(): void
     {
         $requestPath = explode('?', $_SERVER['REQUEST_URI'])[0];
-        $requestPath = preg_replace('/^\/api\/(?:dev|v[4-9])/', '', $requestPath);
+        $pathInfo = str_replace('/index.php', '', $_SERVER['SCRIPT_NAME']); //can also use $_SERVER['DOCUMENT_URI'] or $_SERVER['PHP_SELF']
+        $requestPath = preg_replace('/^' . preg_quote($pathInfo, '/') . '/', '', $requestPath);
 
         switch ($requestPath) {
             case '/':

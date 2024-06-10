@@ -38,7 +38,7 @@ Some characteristics of this API:
 * **The data is historically accurate**, *i.e.* the liturgical calendar produced for the year 1979 will reflect the calendar as it was in that year, and not as it would be today (obviously future years will reflect the calendar as it is generated in the current year; as new decrees are issued by the Congregation for Divine Worship or new editions of the Roman Missal are published, the script will need to be updated to account for any new criteria)
 
 
-# Examples applications
+# Example applications
 There are a few proof of concept example applications for usage of the API at https://litcal.johnromanodorazio.com/usage.php, which demonstrate generating an HTML representation of the Liturgical Calendar.
 
 * The [first example](https://litcal.johnromanodorazio.com/examples/php/) uses cURL in PHP to make a request to the endpoint and handle the results.
@@ -73,7 +73,6 @@ _(See [usage.php#calSubscription](https://litcal.johnromanodorazio.com/usage.php
 * fix XML response, implement XML and ICS validation
 * update the OpenAPI schema
 * add timing to response output and to response headers
-* simplify the request headers that are echoed back in the responses
 ## [v3.9](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.9) (April 9th 2024)
 * update PHP dependencies (`swaggest/json-schema`, `phpunit/phpunit`)
 * add swagger validation badge to README
