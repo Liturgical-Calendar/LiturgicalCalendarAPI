@@ -4,7 +4,6 @@ namespace Johnrdorazio\LitCal\Params;
 
 use Johnrdorazio\LitCal\Enum\CalendarType;
 use Johnrdorazio\LitCal\Enum\LitLocale;
-use Johnrdorazio\LitCal\Enum\ReturnType;
 
 class EventsParams
 {
@@ -42,8 +41,15 @@ class EventsParams
 
     public function __construct(array $DATA = [])
     {
-        //we need at least a default value for the current year
+        //we need at least a default value for the current year and for the locale
         $this->Year = (int)date("Y");
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+            //$mainLang = explode("_", $value )[0];
+            $this->Locale = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
+        } else {
+            $this->Locale = LitLocale::LATIN;
+        }
 
         $directories = array_map('basename', glob('nations/*', GLOB_ONLYDIR));
         //self::debugWrite(json_encode($directories));
@@ -83,15 +89,6 @@ class EventsParams
                         $this->EternalHighPriest = filter_var($value, FILTER_VALIDATE_BOOLEAN);
                         break;
                 }
-            }
-        }
-        if ($this->Locale === null) {
-            if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-                $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-                //$mainLang = explode("_", $value )[0];
-                $this->Locale = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
-            } else {
-                $this->Locale = LitLocale::LATIN;
             }
         }
     }
