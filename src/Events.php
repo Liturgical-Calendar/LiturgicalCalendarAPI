@@ -3,23 +3,27 @@
 namespace Johnrdorazio\LitCal;
 
 use Johnrdorazio\LitCal\Enum\RomanMissal;
-use Johnrdorazio\LitCal\Enum\LitLocale;
 use Johnrdorazio\LitCal\Enum\LitGrade;
+use Johnrdorazio\LitCal\Enum\LitCommon;
 use Johnrdorazio\LitCal\Enum\StatusCode;
+use Johnrdorazio\LitCal\Enum\RequestMethod;
+use Johnrdorazio\LitCal\Enum\RequestContentType;
+use Johnrdorazio\LitCal\Params\EventsParams;
 
-class AllEvents
+class Events
 {
+    public static APICore $APICore;
     private static array $SupportedNationalCalendars = [ "VATICAN" ];
     private static array $FestivityCollection        = [];
     private static array $LatinMissals               = [];
     private static ?object $GeneralIndex             = null;
     private static ?object $WiderRegionData          = null;
-    private static ?string $NationalCalendar         = null;
     private static ?object $NationalData             = null;
-    private static ?string $DiocesanCalendar         = null;
     private static ?object $DiocesanData             = null;
     private static ?LitGrade $LitGrade               = null;
-    private static string $Locale                    = "la";
+    private static ?LitCommon $LitCommon             = null;
+    private static array $requestPathParts           = [];
+    private EventsParams $EventsParams;
 
     // The liturgical rank of Proprium de Tempore events is defined in LitCalAPI rather than in resource files
     // So we can't gather this information just from the resource files
@@ -106,21 +110,18 @@ class AllEvents
     private const PROPROIUM_DE_TEMPORE_PURPLE = [ "Advent1", "Advent2", "Advent4", "AshWednesday", "Lent1", "Lent2", "Lent3", "Lent5" ];
     private const PROPRIUM_DE_TEMPORE_PINK = [ "Advent3", "Lent4" ];
 
+    public function __construct(array $requestPathParts = [])
+    {
+        self::$APICore = new APICore();
+        self::$requestPathParts = $requestPathParts;
+        $this->EventsParams = new EventsParams();
+    }
+
     private static function retrieveLatinMissals(): void
     {
         self::$LatinMissals = array_filter(RomanMissal::$values, function ($item) {
             return str_starts_with($item, "VATICAN_");
         });
-    }
-
-    private static function retrieveNationalCalendars(): void
-    {
-        $directories = array_map('basename', glob('nations/*', GLOB_ONLYDIR));
-        foreach ($directories as $directory) {
-            if (file_exists("nations/$directory/$directory.json")) {
-                self::$SupportedNationalCalendars[] = $directory;
-            }
-        }
     }
 
     private static function retrieveGeneralIndex(): void
@@ -137,37 +138,78 @@ class AllEvents
         }
     }
 
-    private static function handleRequestParams(): void
+    private function handleRequestParams(): void
     {
-        self::$Locale = isset($_GET["locale"]) && LitLocale::isValid($_GET["locale"]) ? $_GET["locale"] : "la";
-        self::$NationalCalendar = isset($_GET["nationalcalendar"]) && in_array(strtoupper($_GET["nationalcalendar"]), self::$SupportedNationalCalendars)
-            ? strtoupper($_GET["nationalcalendar"])
-            : null;
-        self::$DiocesanCalendar = isset($_GET["diocesancalendar"]) && preg_match("/^[a-zA-Z]{3,45}$/", $_GET["diocesancalendar"])
-            ? strtoupper($_GET["diocesancalendar"])
-            : null;
+        if (count(self::$requestPathParts) === 2) {
+            if (self::$requestPathParts[0] === "nation") {
+                $data = [ "NATIONALCALENDAR" => self::$requestPathParts[1] ];
+                $this->EventsParams->setData($data);
+            } elseif (self::$requestPathParts[0] === "diocese") {
+                $data = [ "DIOCESANCALENDAR" => self::$requestPathParts[1] ];
+                $this->EventsParams->setData($data);
+            }
+        }
+
+        switch ($this->APICore->getRequestMethod()) {
+            case RequestMethod::POST:
+                if ($this->APICore->getRequestContentType() === RequestContentType::JSON) {
+                    $json = file_get_contents('php://input');
+                    if (false !== $json && "" !== $json) {
+                        $data = json_decode($json, true);
+                        if (json_last_error() !== JSON_ERROR_NONE) {
+                            $response = new \stdClass();
+                            $response->error = "Malformed JSON data received in the request: <$json>, " . json_last_error_msg();
+                            header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
+                            die(json_encode($response));
+                        } else {
+                            $this->EventsParams->setData($data);
+                        }
+                    }
+                } elseif ($this->APICore->getRequestContentType() === RequestContentType::FORMDATA) {
+                    if (count($_POST)) {
+                        $this->EventsParams->setData($_POST);
+                    }
+                }
+                break;
+            case RequestMethod::GET:
+                if (count($_GET)) {
+                    $this->EventsParams->setData($_GET);
+                }
+                break;
+            case RequestMethod::OPTIONS:
+                //continue
+                break;
+            default:
+                header($_SERVER[ "SERVER_PROTOCOL" ] . " 405 Method Not Allowed", true, 405);
+                $response = new \stdClass();
+                $response->error = "You seem to be forming a strange kind of request? Allowed Request Methods are "
+                    . implode(' and ', $this->APICore->getAllowedRequestMethods())
+                    . ', but your Request Method was '
+                    . $this->APICore->getRequestMethod();
+                die(json_encode($response));
+        }
     }
 
-    private static function loadDiocesanData(): void
+    private function loadDiocesanData(): void
     {
-        if (self::$DiocesanCalendar !== null && property_exists(self::$GeneralIndex, self::$DiocesanCalendar)) {
-            self::$NationalCalendar = self::$GeneralIndex->{self::$DiocesanCalendar}->nation;
-            $diocesanDataFile = self::$GeneralIndex->{self::$DiocesanCalendar}->path;
+        if ($this->EventsParams->DiocesanCalendar !== null && property_exists(self::$GeneralIndex, $this->EventsParams->DiocesanCalendar)) {
+            $this->EventsParams->NationalCalendar = self::$GeneralIndex->{$this->EventsParams->DiocesanCalendar}->nation;
+            $diocesanDataFile = self::$GeneralIndex->{$this->EventsParams->DiocesanCalendar}->path;
             if (file_exists($diocesanDataFile)) {
                 self::$DiocesanData = json_decode(file_get_contents($diocesanDataFile));
             }
         }
     }
 
-    private static function loadNationalAndWiderRegionData(): void
+    private function loadNationalAndWiderRegionData(): void
     {
-        if (self::$NationalCalendar !== null) {
-            $nationalDataFile = "nations/" . self::$NationalCalendar . "/" . self::$NationalCalendar . ".json";
+        if ($this->EventsParams->NationalCalendar !== null) {
+            $nationalDataFile = "nations/" . $this->EventsParams->NationalCalendar . "/" . $this->EventsParams->NationalCalendar . ".json";
             if (file_exists($nationalDataFile)) {
                 self::$NationalData = json_decode(file_get_contents($nationalDataFile));
                 if (json_last_error() === JSON_ERROR_NONE) {
                     if (property_exists(self::$NationalData, "Settings") && property_exists(self::$NationalData->Settings, "Locale")) {
-                        self::$Locale = self::$NationalData->Settings->Locale;
+                        $this->EventsParams->Locale = self::$NationalData->Settings->Locale;
                     }
                     if (property_exists(self::$NationalData, "Metadata") && property_exists(self::$NationalData->Metadata, "WiderRegion")) {
                         $widerRegionDataFile = self::$NationalData->Metadata->WiderRegion->jsonFile;
@@ -190,27 +232,28 @@ class AllEvents
         }
     }
 
-    private static function setLocale(): void
+    private function setLocale(): void
     {
-        self::$Locale = self::$Locale !== "LA" && self::$Locale !== "la" ? \Locale::getPrimaryLanguage(self::$Locale) : "la";
+        $this->EventsParams->Locale = $this->EventsParams->Locale !== "LA" && $this->EventsParams->Locale !== "la" ? \Locale::getPrimaryLanguage($this->EventsParams->Locale) : "la";
         $localeArray = [
-            self::$Locale . '.utf8',
-            self::$Locale . '.UTF-8',
-            self::$Locale,
-            self::$Locale . '_' . strtoupper(self::$Locale) . '.utf8',
-            self::$Locale . '_' . strtoupper(self::$Locale) . '.UTF-8',
-            self::$Locale . '_' . strtoupper(self::$Locale),
-            self::$Locale . '.utf8',
-            self::$Locale . '.UTF-8',
-            self::$Locale
+            $this->EventsParams->Locale . '.utf8',
+            $this->EventsParams->Locale . '.UTF-8',
+            $this->EventsParams->Locale,
+            $this->EventsParams->Locale . '_' . strtoupper($this->EventsParams->Locale) . '.utf8',
+            $this->EventsParams->Locale . '_' . strtoupper($this->EventsParams->Locale) . '.UTF-8',
+            $this->EventsParams->Locale . '_' . strtoupper($this->EventsParams->Locale),
+            $this->EventsParams->Locale . '.utf8',
+            $this->EventsParams->Locale . '.UTF-8',
+            $this->EventsParams->Locale
         ];
         setlocale(LC_ALL, $localeArray);
         bindtextdomain("litcal", "i18n");
         textdomain("litcal");
-        self::$LitGrade = new LitGrade(self::$Locale);
+        self::$LitGrade = new LitGrade($this->EventsParams->Locale);
+        self::$LitCommon = new LitCommon($this->EventsParams->Locale);
     }
 
-    private static function processMissalData(): void
+    private function processMissalData(): void
     {
         foreach (self::$LatinMissals as $LatinMissal) {
             $DataFile = RomanMissal::getSanctoraleFileName($LatinMissal);
@@ -229,15 +272,16 @@ class AllEvents
                     self::$FestivityCollection[ $key ] = $festivity;
                     self::$FestivityCollection[ $key ][ "MISSAL" ] = $LatinMissal;
                     self::$FestivityCollection[ $key ][ "GRADE_LCL" ] = self::$LitGrade->i18n($festivity["GRADE"], false);
+                    self::$FestivityCollection[ $key ][ "COMMON_LCL" ] = self::$LitCommon->c($festivity["COMMON"]);
                 }
                 // There may or may not be a related translation file; if there is, we get the translated name from here
                 $I18nPath = RomanMissal::getSanctoraleI18nFilePath($LatinMissal);
                 if ($I18nPath !== false) {
-                    if (false === file_exists($I18nPath . "/" . self::$Locale . ".json")) {
+                    if (false === file_exists($I18nPath . "/" . $this->EventsParams->Locale . ".json")) {
                         echo self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource $I18nPath");
                         die();
                     }
-                    $NAME = json_decode(file_get_contents($I18nPath . "/" . self::$Locale . ".json"), true);
+                    $NAME = json_decode(file_get_contents($I18nPath . "/" . $this->EventsParams->Locale . ".json"), true);
                     if (json_last_error() !== JSON_ERROR_NONE) {
                         echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
                         die();
@@ -251,10 +295,10 @@ class AllEvents
         }
     }
 
-    private static function processPropriumDeTemporeData(): void
+    private function processPropriumDeTemporeData(): void
     {
         $DataFile = 'data/propriumdetempore.json';
-        $I18nFile = 'data/propriumdetempore/' . self::$Locale . ".json";
+        $I18nFile = 'data/propriumdetempore/' . $this->EventsParams->Locale . ".json";
         if (!file_exists($DataFile) || !file_exists($I18nFile)) {
             echo self::produceErrorResponse(
                 StatusCode::NOT_FOUND,
@@ -281,6 +325,7 @@ class AllEvents
                 self::$FestivityCollection[ $key ][ "GRADE" ] = self::PROPRIUM_DE_TEMPORE_RANKS[ $key ];
                 self::$FestivityCollection[ $key ][ "GRADE_LCL" ] = self::$LitGrade->i18n(self::PROPRIUM_DE_TEMPORE_RANKS[ $key ], false);
                 self::$FestivityCollection[ $key ][ "COMMON" ] = [];
+                self::$FestivityCollection[ $key ][ "COMMON_LCL" ] = "";
                 self::$FestivityCollection[ $key ][ "CALENDAR" ] = "GENERAL ROMAN";
                 if (in_array($key, self::PROPRIUM_DE_TEMPORE_RED)) {
                     self::$FestivityCollection[ $key ][ "COLOR" ] = [ "red" ];
@@ -295,10 +340,10 @@ class AllEvents
         }
     }
 
-    private static function processMemorialsFromDecreesData(): void
+    private function processMemorialsFromDecreesData(): void
     {
         $DataFile = 'data/memorialsFromDecrees/memorialsFromDecrees.json';
-        $I18nFile = 'data/memorialsFromDecrees/i18n/' . self::$Locale . ".json";
+        $I18nFile = 'data/memorialsFromDecrees/i18n/' . $this->EventsParams->Locale . ".json";
         if (!file_exists($DataFile) || !file_exists($I18nFile)) {
             echo self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DataFile or resource file $I18nFile");
             die();
@@ -321,8 +366,8 @@ class AllEvents
                 self::$FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
                 if (array_key_exists("decreeLangs", $festivity[ "Metadata" ])) {
                     $decreeURL = sprintf($festivity[ "Metadata" ][ "decreeURL" ], 'LA');
-                    if (array_key_exists(strtoupper(self::$Locale), $festivity[ "Metadata" ][ "decreeLangs" ])) {
-                        $decreeLang = $festivity[ "Metadata" ][ "decreeLangs" ][ strtoupper(self::$Locale) ];
+                    if (array_key_exists(strtoupper($this->EventsParams->Locale), $festivity[ "Metadata" ][ "decreeLangs" ])) {
+                        $decreeLang = $festivity[ "Metadata" ][ "decreeLangs" ][ strtoupper($this->EventsParams->Locale) ];
                         $decreeURL = sprintf($festivity[ "Metadata" ][ "decreeURL" ], $decreeLang);
                     }
                 } else {
@@ -339,12 +384,15 @@ class AllEvents
                 self::$FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
             }
             self::$FestivityCollection[ $key ][ "GRADE_LCL" ] = self::$LitGrade->i18n(self::$FestivityCollection[ $key ][ "GRADE" ], false);
+            if (property_exists(self::$FestivityCollection[ $key ], 'COMMON')) {
+                self::$FestivityCollection[ $key ][ "COMMON_LCL" ] = self::$LitCommon->c(self::$FestivityCollection[ $key ][ "COMMON" ]);
+            }
         }
     }
 
-    private static function processNationalCalendarData(): void
+    private function processNationalCalendarData(): void
     {
-        if (self::$NationalCalendar !== null && self::$NationalData !== null) {
+        if ($this->EventsParams->NationalCalendar !== null && self::$NationalData !== null) {
             if (self::$WiderRegionData !== null && property_exists(self::$WiderRegionData, "LitCal")) {
                 foreach (self::$WiderRegionData->LitCal as $row) {
                     if ($row->Metadata->action === 'createNew') {
@@ -355,6 +403,7 @@ class AllEvents
                             self::$FestivityCollection[ $key ][ $prop ] = $value;
                         }
                         self::$FestivityCollection[ $key ][ "GRADE_LCL" ] = self::$LitGrade->i18n($row->Festivity->grade, false);
+                        self::$FestivityCollection[ $key ][ "COMMON_LCL" ] = self::$LitCommon->c($row->Festivity->common);
                     }
                 }
             }
@@ -364,6 +413,7 @@ class AllEvents
                     $temp = (array) $row->Festivity;
                     self::$FestivityCollection[ $key ] = array_change_key_case($temp, CASE_UPPER);
                     self::$FestivityCollection[ $key ][ "GRADE_LCL" ] = self::$LitGrade->i18n($row->Festivity->grade, false);
+                    self::$FestivityCollection[ $key ][ "COMMON_LCL" ] = self::$LitCommon->c($row->Festivity->common);
                 }
             }
             if (property_exists(self::$NationalData, "Metadata") && property_exists(self::$NationalData->Metadata, "Missals")) {
@@ -382,6 +432,7 @@ class AllEvents
                             $key = $festivity->TAG;
                             self::$FestivityCollection[ $key ] = (array) $festivity;
                             self::$FestivityCollection[ $key ][ "GRADE_LCL" ] = self::$LitGrade->i18n($festivity->GRADE, false);
+                            self::$FestivityCollection[ $key ][ "COMMON_LCL" ] = self::$LitCommon->c($festivity->COMMON);
                             self::$FestivityCollection[ $key ][ "MISSAL" ] = $missal;
                         }
                     }
@@ -390,14 +441,15 @@ class AllEvents
         }
     }
 
-    private static function processDiocesanCalendarData(): void
+    private function processDiocesanCalendarData(): void
     {
-        if (self::$DiocesanCalendar !== null && self::$DiocesanData !== null) {
+        if ($this->EventsParams->DiocesanCalendar !== null && self::$DiocesanData !== null) {
             foreach (self::$DiocesanData->LitCal as $key => $festivity) {
                 $temp = (array) $festivity->Festivity;
-                self::$FestivityCollection[ self::$DiocesanCalendar . '_' . $key ] = array_change_key_case($temp, CASE_UPPER);
-                self::$FestivityCollection[ self::$DiocesanCalendar . '_' . $key ][ "TAG" ] = self::$DiocesanCalendar . '_' . $key;
-                self::$FestivityCollection[ self::$DiocesanCalendar . '_' . $key ][ "GRADE_LCL" ] = self::$LitGrade->i18n($festivity->Festivity->grade, false);
+                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ] = array_change_key_case($temp, CASE_UPPER);
+                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ][ "TAG" ] = $this->EventsParams->DiocesanCalendar . '_' . $key;
+                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ][ "GRADE_LCL" ] = self::$LitGrade->i18n($festivity->Festivity->grade, false);
+                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ][ "COMMON_LCL" ] = self::$LitCommon->c($festivity->Festivity->common);
             }
         }
     }
@@ -412,14 +464,14 @@ class AllEvents
         return json_encode($message);
     }
 
-    private static function produceResponse(): void
+    private function produceResponse(): void
     {
         $responseObj = [
             "LitCalAllFestivities" => self::$FestivityCollection,
             "Settings" => [
-                "Locale" => self::$Locale,
-                "NationalCalendar" => self::$NationalCalendar,
-                "DiocesanCalendar" => self::$DiocesanCalendar
+                "Locale" => $this->EventsParams->Locale,
+                "NationalCalendar" => $this->EventsParams->NationalCalendar,
+                "DiocesanCalendar" => $this->EventsParams->DiocesanCalendar
             ]
         ];
         $response = json_encode($responseObj);
@@ -433,32 +485,22 @@ class AllEvents
         }
     }
 
-    public static function init()
+    public function init(array $requestPathParts = [])
     {
-        $requestHeaders = getallheaders();
-        if (isset($requestHeaders[ "Origin" ])) {
-            header("Access-Control-Allow-Origin: {$requestHeaders[ "Origin" ]}");
-            header('Access-Control-Allow-Credentials: true');
-        } else {
-            header('Access-Control-Allow-Origin: *');
-        }
-        header('Access-Control-Max-Age: 86400');
-        // cache for 1 day
-        header('Cache-Control: must-revalidate, max-age=259200');
-        header('Content-Type: application/json');
+        $this->APICore->init();
 
+        self::$requestPathParts = $requestPathParts;
         self::retrieveLatinMissals();
-        self::retrieveNationalCalendars();
         self::retrieveGeneralIndex();
-        self::handleRequestParams();
-        self::loadDiocesanData();
-        self::loadNationalAndWiderRegionData();
-        self::setLocale();
-        self::processMissalData();
-        self::processPropriumDeTemporeData();
-        self::processMemorialsFromDecreesData();
-        self::processNationalCalendarData();
-        self::processDiocesanCalendarData();
+        $this->handleRequestParams();
+        $this->loadDiocesanData();
+        $this->loadNationalAndWiderRegionData();
+        $this->setLocale();
+        $this->processMissalData();
+        $this->processPropriumDeTemporeData();
+        $this->processMemorialsFromDecreesData();
+        $this->processNationalCalendarData();
+        $this->processDiocesanCalendarData();
         self::produceResponse();
     }
 }

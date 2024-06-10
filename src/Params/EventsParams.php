@@ -1,36 +1,27 @@
 <?php
 
-namespace Johnrdorazio\LitCal;
+namespace Johnrdorazio\LitCal\Params;
 
 use Johnrdorazio\LitCal\Enum\CalendarType;
-use Johnrdorazio\LitCal\Enum\Epiphany;
-use Johnrdorazio\LitCal\Enum\Ascension;
-use Johnrdorazio\LitCal\Enum\CorpusChristi;
 use Johnrdorazio\LitCal\Enum\LitLocale;
 use Johnrdorazio\LitCal\Enum\ReturnType;
 
-class LitSettings
+class EventsParams
 {
     public int $Year;
-    public string $CalendarType          = CalendarType::LITURGICAL;
-    public string $Epiphany              = Epiphany::JAN6;
-    public string $Ascension             = Ascension::THURSDAY;
-    public string $CorpusChristi         = CorpusChristi::THURSDAY;
-    public bool $EternalHighPriest       = false;
-    public ?string $Locale               = null;
-    public ?string $ReturnType           = null;
-    public ?string $NationalCalendar     = null;
-    public ?string $DiocesanCalendar     = null;
+    public string $CalendarType               = CalendarType::LITURGICAL;
+    public bool $EternalHighPriest            = false;
+    public ?string $Locale                    = null;
+    public ?string $ReturnType                = null;
+    public ?string $NationalCalendar          = null;
+    public ?string $DiocesanCalendar          = null;
+    private array $SupportedNationalCalendars = [ "VATICAN" ];
 
     public const ALLOWED_PARAMS  = [
         "YEAR",
         "CALENDARTYPE",
-        "EPIPHANY",
-        "ASCENSION",
-        "CORPUSCHRISTI",
         "ETERNALHIGHPRIEST",
         "LOCALE",
-        "RETURNTYPE",
         "NATIONALCALENDAR",
         "DIOCESANCALENDAR"
     ];
@@ -49,21 +40,26 @@ class LitSettings
         file_put_contents("debug.log", $string . PHP_EOL, FILE_APPEND);
     }*/
 
-    public function __construct(array $DATA)
+    public function __construct(array $DATA = [])
     {
         //we need at least a default value for the current year
         $this->Year = (int)date("Y");
 
-        $SUPPORTED_NATIONAL_CALENDARS = [ "VATICAN" ];
         $directories = array_map('basename', glob('nations/*', GLOB_ONLYDIR));
         //self::debugWrite(json_encode($directories));
         foreach ($directories as $directory) {
             //self::debugWrite($directory);
             if (file_exists("nations/$directory/$directory.json")) {
-                $SUPPORTED_NATIONAL_CALENDARS[] = $directory;
+                $this->SupportedNationalCalendars[] = $directory;
             }
         }
+        if (count($DATA)) {
+            $this->setData($DATA);
+        }
+    }
 
+    public function setData(array $DATA)
+    {
         foreach ($DATA as $key => $value) {
             $key = strtoupper($key);
             if (in_array($key, self::ALLOWED_PARAMS)) {
@@ -71,23 +67,11 @@ class LitSettings
                     case "YEAR":
                         $this->enforceYearValidity($value);
                         break;
-                    case "EPIPHANY":
-                        $this->Epiphany         = Epiphany::isValid(strtoupper($value)) ? strtoupper($value) : Epiphany::JAN6;
-                        break;
-                    case "ASCENSION":
-                        $this->Ascension        = Ascension::isValid(strtoupper($value)) ? strtoupper($value) : Ascension::THURSDAY;
-                        break;
-                    case "CORPUSCHRISTI":
-                        $this->CorpusChristi    = CorpusChristi::isValid(strtoupper($value)) ? strtoupper($value) : CorpusChristi::THURSDAY;
-                        break;
                     case "LOCALE":
                         $this->Locale           = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
                         break;
-                    case "RETURNTYPE":
-                        $this->ReturnType       = ReturnType::isValid(strtoupper($value)) ? strtoupper($value) : ReturnType::JSON;
-                        break;
                     case "NATIONALCALENDAR":
-                        $this->NationalCalendar = in_array(strtoupper($value), $SUPPORTED_NATIONAL_CALENDARS) ? strtoupper($value) : null;
+                        $this->NationalCalendar = in_array(strtoupper($value), $this->SupportedNationalCalendars) ? strtoupper($value) : null;
                         break;
                     case "DIOCESANCALENDAR":
                         $this->DiocesanCalendar = strtoupper($value);

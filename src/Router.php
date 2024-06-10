@@ -32,37 +32,53 @@ class Router
         }
     }
 
+    private static function buildRequestPathParts(): array
+    {
+        // 1) The script name will actually include the base path of the API (e.g. /api/dev/index.php),
+        //      so in order to obtain the base path we remove /index.php and are left with /api/dev
+        $apiBasePath = str_replace('/index.php', '', $_SERVER['SCRIPT_NAME']); //can also use $_SERVER['DOCUMENT_URI'] or $_SERVER['PHP_SELF']
+        // 2) remove any request params from the REQUEST_URI
+        $requestPath = explode('?', $_SERVER['REQUEST_URI'])[0];
+        // 3) remove any trailing slashes from the request path
+        $requestPath = preg_replace('/\/$/', '', $requestPath);
+        // 4) remove the API base path (/api/dev/ or /api/v3/ or whatever it is)
+        $requestPath = preg_replace('/^' . preg_quote($apiBasePath, '/') . '/', '', $requestPath);
+        return explode('/', $requestPath);
+    }
+
     public static function route(): void
     {
-        $requestPath = explode('?', $_SERVER['REQUEST_URI'])[0];
-        $pathInfo = str_replace('/index.php', '', $_SERVER['SCRIPT_NAME']); //can also use $_SERVER['DOCUMENT_URI'] or $_SERVER['PHP_SELF']
-        $requestPath = preg_replace('/^' . preg_quote($pathInfo, '/') . '/', '', $requestPath);
-
-        switch ($requestPath) {
-            case '/':
-                $LitCalEngine = new API();
+        $requestPathParts = self::buildRequestPathParts();
+        $route = array_shift($requestPathParts);
+        switch ($route) {
+            case '':
+            case 'calendar':
+                $LitCalEngine = new Calendar();
                 $LitCalEngine->APICore->setAllowedOrigins(self::$allowedOrigins);
                 $LitCalEngine->APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
                 $LitCalEngine->APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
                 $LitCalEngine->APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS, AcceptHeader::YML ]);
                 $LitCalEngine->setAllowedReturnTypes([ ReturnType::JSON, ReturnType::XML, ReturnType::ICS, ReturnType::YML ]);
                 $LitCalEngine->setCacheDuration(CacheDuration::MONTH);
-                $LitCalEngine->init();
+                $LitCalEngine->init(); //TODO: pass in $requestPathParts and use the path information for our settings
                 break;
-            case '/metadata':
-            case '/metadata/':
+            case 'metadata':
+            case 'calendars':
                 Metadata::init();
                 break;
-            case '/testsindex':
-            case '/testsindex/':
+            case 'testsindex':
+            case 'tests':
                 echo TestsIndex::handleRequest();
                 break;
-            case '/allevents':
-            case '/allevents/':
-                AllEvents::init();
+            case 'events':
+                $Events = new Events();
+                $Events::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                $Events::$APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
+                $Events::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
+                $Events::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON ]);
+                $Events->init($requestPathParts);
                 break;
-            case '/regionaldata':
-            case '/regionaldata/':
+            case 'regionaldata':
                 $LitCalRegionalData = new RegionalData();
                 $LitCalRegionalData->APICore->setAllowedOrigins(self::$allowedOrigins);
                 $LitCalRegionalData->APICore->setAllowedReferers(
@@ -77,12 +93,10 @@ class Router
                 $LitCalRegionalData->APICore->setAllowedRequestContentTypes([RequestContentType::JSON, RequestContentType::FORMDATA]);
                 $LitCalRegionalData->init();
                 break;
-            case '/easter':
-            case '/easter/':
+            case 'easter':
                 Easter::init();
                 break;
-            case '/schemas':
-            case '/schemas/':
+            case 'schemas':
                 Schema::retrieve();
                 break;
             default:

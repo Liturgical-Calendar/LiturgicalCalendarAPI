@@ -53,9 +53,16 @@
         ],
         "security": [{}],
         "summary": "Retrieve liturgical events for each day of a given year",
-        "operationId": "retrieveEventsGET",
+        "operationId": "retrieveCalendarGET",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
         "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Locale"
+            }
+          },
           {
             "in": "query",
             "name": "parameters",
@@ -184,14 +191,23 @@
         ],
         "security": [{}],
         "summary": "retrieves liturgical events for each day of the year",
-        "operationId": "retrieveEventsPOST",
+        "operationId": "retrieveCalendarPOST",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Locale"
+            }
+          }
+        ],
         "requestBody": {
           "required": false,
           "content": {
             "application/x-www-form-urlencoded": {
               "schema": {
-                "$ref": "#/components/schemas/RequestBody"
+                "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
               },
               "examples": {
                 "GeneralRomanCalendar":
@@ -214,7 +230,7 @@
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RequestBody"
+                "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
               },
               "examples": {
                 "GeneralRomanCalendar":
@@ -734,54 +750,127 @@
         }
       }
     },
-    "/allevents": {
+    "/events": {
       "get": {
         "tags": [
           "All possible liturgical events endpoint"
         ],
         "security": [{}],
         "summary": "retrieves all possible liturgical events that may or may not appear in the Liturgical Calendar for any given year, based on the calculations done by the LitCal API; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
-        "operationId": "retrieveAllEventsGET",
+        "operationId": "retrieveEventsGET",
         "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Locale"
+            }
+          },
           {
             "in": "query",
             "name": "settings",
             "style": "form",
             "explode": true,
             "schema": {
-              "type": "object",
-              "oneOf": [
-                {
-                  "properties": {
-                    "locale": {
-                      "type": "string",
-                      "description": "request the localization of the returned events in a specific language; will not be considered if a National calendar or diocesan calendar is requested",
-                      "default": "la"
-                    },
-                    "nationalcalendar": {
-                      "type": "string",
-                      "description": "requests liturgical calendar data for a particular geographic area, on a national level or according to specifications defined be one or more Episcopal Conferences or on a Roman Missal published for a certain language or geographic area."
-                    }
-                  }
-                },
-                {
-                  "properties": {
-                    "locale": {
-                      "type": "string",
-                      "description": "request the localization of the returned events in a specific language; will not be considered if a National calendar or diocesan calendar is requested",
-                      "default": "la"
-                    },
-                    "diocesancalendar": {
-                      "type": "string",
-                      "description": "requests liturgical calendar data for a particular diocese"
-                    }
-                  }
-                }
-              ],
-              "additionalProperties": false
+              "$ref": "#/components/schemas/EventsRequestBody"
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK: A collection of all possible liturgical events that can be found in a liturgical calendar produced by the LitCal API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
+                },
+                "example": {
+                  "LitCalAllFestivities": {
+                    "StsBasilGreg": {
+                      "MONTH": 1,
+                      "DAY": 2,
+                      "TAG": "StsBasilGreg",
+                      "GRADE": 3,
+                      "COMMON": [
+                        "Proper"
+                      ],
+                      "CALENDAR": "GENERAL ROMAN",
+                      "COLOR": [
+                        "white"
+                      ],
+                      "READINGS": {
+                        "FIRST_READING": "Ef 4, 1-7.11-13",
+                        "RESPONSORIAL_PSALM": "Salmo 23",
+                        "SECOND_READING": "",
+                        "ALLELUIA_VERSE": "Mt 23, 9b.10b",
+                        "GOSPEL": "Mt 23, 8-12"
+                      },
+                      "NAME": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
+                      "MISSAL": "VATICAN_1970"
+                    },
+                    "StRayPenyafort": {
+                      "MONTH": 1,
+                      "DAY": 7,
+                      "TAG": "StRayPenyafort",
+                      "GRADE": 2,
+                      "COMMON": [
+                        "Pastors:For One Pastor"
+                      ],
+                      "CALENDAR": "GENERAL ROMAN",
+                      "COLOR": [
+                        "white"
+                      ],
+                      "READINGS": {
+                        "FIRST_READING": "2 Cor 5, 14-20",
+                        "RESPONSORIAL_PSALM": "Salmo 103",
+                        "SECOND_READING": "",
+                        "ALLELUIA_VERSE": "Mt 24, 42a.44",
+                        "GOSPEL": "Lc 12, 35-40"
+                      },
+                      "NAME": "Sancti Raimundi de Penyafort, presbyteri",
+                      "MISSAL": "VATICAN_1970"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "304 Not Modified"
+          },
+          "404": {
+            "description": "404 Not Found: resource file not found"
+          },
+          "503": {
+            "description": "503 Service Unavailable: could not decode resource files"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "All possible liturgical events endpoint"
+        ],
+        "security": [{}],
+        "summary": "retrieves all possible liturgical events that may or may not appear in the Liturgical Calendar for any given year, based on the calculations done by the LitCal API; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
+        "operationId": "retrieveEventsPOST",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Locale"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/EventsRequestBody"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK: A collection of all possible liturgical events that can be found in a liturgical calendar produced by the LitCal API",
@@ -2124,7 +2213,7 @@
           }
         }
       },
-      "RequestBody": {
+      "RetrieveCalendarRequestBody": {
         "anyOf": [
           {
             "$ref": "#/components/schemas/NationalCalendarRequestBody"
@@ -2299,6 +2388,39 @@
             ]
           }
         }
+      },
+      "EventsRequestBody": {
+        "type": "object",
+        "title": "",
+        "description": "",
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "nationalcalendar": {
+                "type": "string",
+                "description": "requests liturgical calendar data for a particular geographic area, on a national level or according to specifications defined be one or more Episcopal Conferences or on a Roman Missal published for a certain language or geographic area."
+              }
+            }
+          },
+          {
+            "properties": {
+              "diocesancalendar": {
+                "type": "string",
+                "description": "requests liturgical calendar data for a particular diocese"
+              }
+            }
+          },
+          {
+            "properties": {
+              "locale": {
+                "type": "string",
+                "description": "request the localization of the General Roman Calendar; however it is preferable to set the Accept-Language header",
+                "default": "la"
+              }
+            }
+          }
+        ]
       },
       "UnitTestArray": {
         "type": "array",
