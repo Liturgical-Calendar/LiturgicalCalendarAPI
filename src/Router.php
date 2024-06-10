@@ -36,13 +36,13 @@ class Router
     {
         // 1) The script name will actually include the base path of the API (e.g. /api/dev/index.php),
         //      so in order to obtain the base path we remove /index.php and are left with /api/dev
-        $apiBasePath = str_replace('/index.php', '', $_SERVER['SCRIPT_NAME']); //can also use $_SERVER['DOCUMENT_URI'] or $_SERVER['PHP_SELF']
+        $apiBasePath = str_replace('index.php', '', $_SERVER['SCRIPT_NAME']); //can also use $_SERVER['DOCUMENT_URI'] or $_SERVER['PHP_SELF']
         // 2) remove any request params from the REQUEST_URI
         $requestPath = explode('?', $_SERVER['REQUEST_URI'])[0];
-        // 3) remove any trailing slashes from the request path
-        $requestPath = preg_replace('/\/$/', '', $requestPath);
-        // 4) remove the API base path (/api/dev/ or /api/v3/ or whatever it is)
+        // 3) remove the API base path (/api/dev/ or /api/v3/ or whatever it is)
         $requestPath = preg_replace('/^' . preg_quote($apiBasePath, '/') . '/', '', $requestPath);
+        // 4) remove any trailing slashes from the request path
+        $requestPath = preg_replace('/\/$/', '', $requestPath);
         return explode('/', $requestPath);
     }
 
