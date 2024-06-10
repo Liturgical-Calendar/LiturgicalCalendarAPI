@@ -481,7 +481,7 @@ class Events
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified");
             header('Content-Length: 0');
         } else {
-            self::$APICore->setResponseContentType(self::$APICore->getResponseContentType());
+            self::$APICore->setResponseContentTypeHeader();
             switch (self::$APICore->getResponseContentType()) {
                 case AcceptHeader::YML:
                     echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
