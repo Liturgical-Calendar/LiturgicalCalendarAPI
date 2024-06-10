@@ -13,7 +13,6 @@ use Johnrdorazio\LitCal\Params\EventsParams;
 class Events
 {
     public static APICore $APICore;
-    private static array $SupportedNationalCalendars = [ "VATICAN" ];
     private static array $FestivityCollection        = [];
     private static array $LatinMissals               = [];
     private static ?object $GeneralIndex             = null;
@@ -150,9 +149,9 @@ class Events
             }
         }
 
-        switch ($this->APICore->getRequestMethod()) {
+        switch (self::$APICore->getRequestMethod()) {
             case RequestMethod::POST:
-                if ($this->APICore->getRequestContentType() === RequestContentType::JSON) {
+                if (self::$APICore->getRequestContentType() === RequestContentType::JSON) {
                     $json = file_get_contents('php://input');
                     if (false !== $json && "" !== $json) {
                         $data = json_decode($json, true);
@@ -165,7 +164,7 @@ class Events
                             $this->EventsParams->setData($data);
                         }
                     }
-                } elseif ($this->APICore->getRequestContentType() === RequestContentType::FORMDATA) {
+                } elseif (self::$APICore->getRequestContentType() === RequestContentType::FORMDATA) {
                     if (count($_POST)) {
                         $this->EventsParams->setData($_POST);
                     }
@@ -183,9 +182,9 @@ class Events
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 405 Method Not Allowed", true, 405);
                 $response = new \stdClass();
                 $response->error = "You seem to be forming a strange kind of request? Allowed Request Methods are "
-                    . implode(' and ', $this->APICore->getAllowedRequestMethods())
+                    . implode(' and ', self::$APICore->getAllowedRequestMethods())
                     . ', but your Request Method was '
-                    . $this->APICore->getRequestMethod();
+                    . self::$APICore->getRequestMethod();
                 die(json_encode($response));
         }
     }
@@ -487,7 +486,7 @@ class Events
 
     public function init(array $requestPathParts = [])
     {
-        $this->APICore->init();
+        self::$APICore->init();
 
         self::$requestPathParts = $requestPathParts;
         self::retrieveLatinMissals();
