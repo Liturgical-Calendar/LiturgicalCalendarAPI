@@ -75,7 +75,7 @@ class Router
                 $Events::$APICore->setAllowedOrigins(self::$allowedOrigins);
                 $Events::$APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
                 $Events::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
-                $Events::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON ]);
+                $Events::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YML ]);
                 $Events->init($requestPathParts);
                 break;
             case 'regionaldata':

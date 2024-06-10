@@ -99,7 +99,6 @@ class APICore
 
     public function validateAcceptHeader(bool $beLaxAboutIt)
     {
-
         if ($this->hasAcceptHeader()) {
             if ($this->isAllowedAcceptHeader()) {
                 $this->ResponseContentType = explode(',', $this->RequestHeaders[ "Accept" ])[0];
@@ -145,6 +144,11 @@ class APICore
     public function setAllowedRequestContentTypes(array $requestContentTypes): void
     {
         $this->AllowedRequestContentTypes = array_values(array_intersect(RequestContentType::$values, $requestContentTypes));
+    }
+
+    public function getResponseContentType(): string
+    {
+        return $this->ResponseContentType;
     }
 
     public function setResponseContentType(string $responseContentType): void

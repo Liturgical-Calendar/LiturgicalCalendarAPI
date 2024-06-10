@@ -8,6 +8,7 @@ use Johnrdorazio\LitCal\Enum\LitCommon;
 use Johnrdorazio\LitCal\Enum\StatusCode;
 use Johnrdorazio\LitCal\Enum\RequestMethod;
 use Johnrdorazio\LitCal\Enum\RequestContentType;
+use Johnrdorazio\LitCal\Enum\AcceptHeader;
 use Johnrdorazio\LitCal\Params\EventsParams;
 
 class Events
@@ -480,13 +481,23 @@ class Events
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified");
             header('Content-Length: 0');
         } else {
-            echo $response;
+            self::$APICore->setResponseContentType(self::$APICore->getAcceptHeader());
+            switch (self::$APICore->getResponseContentType()) {
+                case AcceptHeader::YML:
+                    echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
+                    break;
+                case AcceptHeader::JSON:
+                default:
+                    echo $response;
+                    break;
+            }
         }
     }
 
     public function init(array $requestPathParts = [])
     {
         self::$APICore->init();
+        self::$APICore->validateAcceptHeader(true);
 
         self::$requestPathParts = $requestPathParts;
         self::retrieveLatinMissals();
