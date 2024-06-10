@@ -383,7 +383,7 @@ class Events
                 self::$FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
             }
             self::$FestivityCollection[ $key ][ "GRADE_LCL" ] = self::$LitGrade->i18n(self::$FestivityCollection[ $key ][ "GRADE" ], false);
-            if (property_exists(self::$FestivityCollection[ $key ], 'COMMON')) {
+            if (array_key_exists('COMMON', self::$FestivityCollection[ $key ])) {
                 self::$FestivityCollection[ $key ][ "COMMON_LCL" ] = self::$LitCommon->c(self::$FestivityCollection[ $key ][ "COMMON" ]);
             }
         }
