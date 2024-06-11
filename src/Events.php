@@ -188,7 +188,7 @@ class Events
                     }
                 } elseif (self::$APICore->getRequestContentType() === RequestContentType::FORMDATA) {
                     if (count($_POST)) {
-                        if (false === $this->EventsParams->setData($data)) {
+                        if (false === $this->EventsParams->setData($_POST)) {
                             echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
                             die();
                         }
@@ -197,7 +197,7 @@ class Events
                 break;
             case RequestMethod::GET:
                 if (count($_GET)) {
-                    if (false === $this->EventsParams->setData($data)) {
+                    if (false === $this->EventsParams->setData($_GET)) {
                         echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
                         die();
                     }
