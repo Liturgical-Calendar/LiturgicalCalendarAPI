@@ -218,17 +218,22 @@ class Events
 
     private function loadDiocesanData(): void
     {
-        if ($this->EventsParams->DiocesanCalendar !== null && property_exists(self::$GeneralIndex, $this->EventsParams->DiocesanCalendar)) {
-            $this->EventsParams->NationalCalendar = self::$GeneralIndex->{$this->EventsParams->DiocesanCalendar}->nation;
-            $diocesanDataFile = self::$GeneralIndex->{$this->EventsParams->DiocesanCalendar}->path;
-            if (file_exists($diocesanDataFile)) {
-                self::$DiocesanData = json_decode(file_get_contents($diocesanDataFile));
+        if ($this->EventsParams->DiocesanCalendar !== null) {
+            if (property_exists(self::$GeneralIndex, $this->EventsParams->DiocesanCalendar)) {
+                $this->EventsParams->NationalCalendar = self::$GeneralIndex->{$this->EventsParams->DiocesanCalendar}->nation;
+                $diocesanDataFile = self::$GeneralIndex->{$this->EventsParams->DiocesanCalendar}->path;
+                if (file_exists($diocesanDataFile)) {
+                    self::$DiocesanData = json_decode(file_get_contents($diocesanDataFile));
+                } else {
+                    echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "no data file found for diocese {$this->EventsParams->DiocesanCalendar}");
+                    die();
+                }
+            } else {
+                $description = "uknown diocese `{$this->EventsParams->DiocesanCalendar}`, supported values are: ["
+                    . implode(',', array_keys(get_object_vars(self::$GeneralIndex))) . "]";
+                echo self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+                die();
             }
-        } else {
-            $description = "uknown diocese `{$this->EventsParams->DiocesanCalendar}`, supported values are: ["
-                . implode(',', array_keys(get_object_vars(self::$GeneralIndex))) . "]";
-            echo self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-            die();
         }
     }
 
