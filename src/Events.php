@@ -141,6 +141,10 @@ class Events
     private function handleRequestParams(): void
     {
         if (count(self::$requestPathParts)) {
+            if (false === in_array(self::$requestPathParts[0], ['nation','diocese'])) {
+                echo self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "unknown resource path: " . self::$requestPathParts[0]);
+                die();
+            }
             if (count(self::$requestPathParts) === 2) {
                 if (self::$requestPathParts[0] === "nation") {
                     $data = [ "NATIONALCALENDAR" => self::$requestPathParts[1] ];
@@ -159,7 +163,8 @@ class Events
                     die();
                 }
             } else {
-                echo self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "wrong number of path parameters, needed two but got " . json_encode(self::$requestPathParts));
+                $description = "wrong number of path parameters, needed two but got " . count(self::$requestPathParts) . ": [" . implode(',', self::$requestPathParts) . "]";
+                echo self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $description);
                 die();
             }
         }
@@ -220,8 +225,8 @@ class Events
                 self::$DiocesanData = json_decode(file_get_contents($diocesanDataFile));
             }
         } else {
-            $description = "uknown diocese `{$this->EventsParams->DiocesanCalendar}`, supported values are: "
-                . json_encode(get_object_vars(self::$GeneralIndex));
+            $description = "uknown diocese `{$this->EventsParams->DiocesanCalendar}`, supported values are: ["
+                . implode(',', get_object_vars(self::$GeneralIndex)) . "]";
             echo self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
             die();
         }

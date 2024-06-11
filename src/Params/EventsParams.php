@@ -17,8 +17,6 @@ class EventsParams
     private static string $lastError          = '';
 
     public const ALLOWED_PARAMS  = [
-        "YEAR",
-        "CALENDARTYPE",
         "ETERNALHIGHPRIEST",
         "LOCALE",
         "NATIONALCALENDAR",
@@ -70,16 +68,13 @@ class EventsParams
             $key = strtoupper($key);
             if (in_array($key, self::ALLOWED_PARAMS)) {
                 switch ($key) {
-                    case "YEAR":
-                        $this->enforceYearValidity($value);
-                        break;
                     case "LOCALE":
                         $this->Locale           = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
                         break;
                     case "NATIONALCALENDAR":
                         if (false === in_array(strtoupper($value), $this->SupportedNationalCalendars)) {
-                            self::$lastError = "uknown value `$value` for nation parameter, supported national calendars are: "
-                                . json_encode($this->SupportedNationalCalendars);
+                            self::$lastError = "uknown value `$value` for nation parameter, supported national calendars are: ["
+                                . implode(',', $this->SupportedNationalCalendars) . "]";
                             return false;
                         }
                         $this->NationalCalendar =  strtoupper($value);
@@ -99,21 +94,5 @@ class EventsParams
     public static function getLastErrorMessage(): string
     {
         return self::$lastError;
-    }
-
-    private function enforceYearValidity(int|string $value)
-    {
-        if (gettype($value) === 'string') {
-            if (is_numeric($value) && ctype_digit($value) && strlen($value) === 4) {
-                $value = (int)$value;
-                if ($value >= self::YEAR_LOWER_LIMIT && $value <= self::YEAR_UPPER_LIMIT) {
-                    $this->Year = $value;
-                }
-            }
-        } elseif (gettype($value) === 'integer') {
-            if ($value >= self::YEAR_LOWER_LIMIT && $value <= self::YEAR_UPPER_LIMIT) {
-                $this->Year = $value;
-            }
-        }
     }
 }
