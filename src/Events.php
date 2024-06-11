@@ -140,13 +140,27 @@ class Events
 
     private function handleRequestParams(): void
     {
-        if (count(self::$requestPathParts) === 2) {
-            if (self::$requestPathParts[0] === "nation") {
-                $data = [ "NATIONALCALENDAR" => self::$requestPathParts[1] ];
-                $this->EventsParams->setData($data);
-            } elseif (self::$requestPathParts[0] === "diocese") {
-                $data = [ "DIOCESANCALENDAR" => self::$requestPathParts[1] ];
-                $this->EventsParams->setData($data);
+        if (count(self::$requestPathParts)) {
+            if (count(self::$requestPathParts) === 2) {
+                if (self::$requestPathParts[0] === "nation") {
+                    $data = [ "NATIONALCALENDAR" => self::$requestPathParts[1] ];
+                    if (false === $this->EventsParams->setData($data)) {
+                        echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
+                        die();
+                    }
+                } elseif (self::$requestPathParts[0] === "diocese") {
+                    $data = [ "DIOCESANCALENDAR" => self::$requestPathParts[1] ];
+                    if (false === $this->EventsParams->setData($data)) {
+                        echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
+                        die();
+                    }
+                } else {
+                    echo self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "unknown resource path: " . self::$requestPathParts[0]);
+                    die();
+                }
+            } else {
+                echo self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "wrong number of path parameters, needed two but got " . json_encode(self::$requestPathParts));
+                die();
             }
         }
 
@@ -157,36 +171,43 @@ class Events
                     if (false !== $json && "" !== $json) {
                         $data = json_decode($json, true);
                         if (json_last_error() !== JSON_ERROR_NONE) {
-                            $response = new \stdClass();
-                            $response->error = "Malformed JSON data received in the request: <$json>, " . json_last_error_msg();
-                            header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
-                            die(json_encode($response));
+                            $description = "Malformed JSON data received in the request: <$json>, " . json_last_error_msg();
+                            echo self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+                            die();
                         } else {
-                            $this->EventsParams->setData($data);
+                            if (false === $this->EventsParams->setData($data)) {
+                                echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
+                                die();
+                            }
                         }
                     }
                 } elseif (self::$APICore->getRequestContentType() === RequestContentType::FORMDATA) {
                     if (count($_POST)) {
-                        $this->EventsParams->setData($_POST);
+                        if (false === $this->EventsParams->setData($data)) {
+                            echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
+                            die();
+                        }
                     }
                 }
                 break;
             case RequestMethod::GET:
                 if (count($_GET)) {
-                    $this->EventsParams->setData($_GET);
+                    if (false === $this->EventsParams->setData($data)) {
+                        echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
+                        die();
+                    }
                 }
                 break;
             case RequestMethod::OPTIONS:
                 //continue
                 break;
             default:
-                header($_SERVER[ "SERVER_PROTOCOL" ] . " 405 Method Not Allowed", true, 405);
-                $response = new \stdClass();
-                $response->error = "You seem to be forming a strange kind of request? Allowed Request Methods are "
+                $description = "You seem to be forming a strange kind of request? Allowed Request Methods are "
                     . implode(' and ', self::$APICore->getAllowedRequestMethods())
                     . ', but your Request Method was '
                     . self::$APICore->getRequestMethod();
-                die(json_encode($response));
+                echo self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, $description);
+                die();
         }
     }
 
@@ -198,6 +219,11 @@ class Events
             if (file_exists($diocesanDataFile)) {
                 self::$DiocesanData = json_decode(file_get_contents($diocesanDataFile));
             }
+        } else {
+            $description = "uknown diocese `{$this->EventsParams->DiocesanCalendar}`, supported values are: "
+                . json_encode(get_object_vars(self::$GeneralIndex));
+            echo self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+            die();
         }
     }
 
@@ -461,7 +487,17 @@ class Events
         $message->status = "ERROR";
         $message->response = StatusCode::toString($statusCode);
         $message->description = $description;
-        return json_encode($message);
+        $errResponse = json_encode($message);
+        switch (self::$APICore->getResponseContentType()) {
+            case AcceptHeader::YML:
+                $response = json_decode($errResponse, true);
+                return yaml_emit($response, YAML_UTF8_ENCODING);
+                break;
+            case AcceptHeader::JSON:
+            default:
+                return $errResponse;
+                break;
+        }
     }
 
     private function produceResponse(): void
@@ -481,7 +517,6 @@ class Events
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified");
             header('Content-Length: 0');
         } else {
-            self::$APICore->setResponseContentTypeHeader();
             switch (self::$APICore->getResponseContentType()) {
                 case AcceptHeader::YML:
                     echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
@@ -498,6 +533,7 @@ class Events
     {
         self::$APICore->init();
         self::$APICore->validateAcceptHeader(true);
+        self::$APICore->setResponseContentTypeHeader();
 
         self::$requestPathParts = $requestPathParts;
         self::retrieveLatinMissals();

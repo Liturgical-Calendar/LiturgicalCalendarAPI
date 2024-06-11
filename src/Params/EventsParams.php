@@ -8,13 +8,13 @@ use Johnrdorazio\LitCal\Enum\LitLocale;
 class EventsParams
 {
     public int $Year;
-    public string $CalendarType               = CalendarType::LITURGICAL;
     public bool $EternalHighPriest            = false;
     public ?string $Locale                    = null;
     public ?string $ReturnType                = null;
     public ?string $NationalCalendar          = null;
     public ?string $DiocesanCalendar          = null;
     private array $SupportedNationalCalendars = [ "VATICAN" ];
+    private static string $lastError          = '';
 
     public const ALLOWED_PARAMS  = [
         "YEAR",
@@ -64,7 +64,7 @@ class EventsParams
         }
     }
 
-    public function setData(array $DATA)
+    public function setData(array $DATA): bool
     {
         foreach ($DATA as $key => $value) {
             $key = strtoupper($key);
@@ -77,13 +77,15 @@ class EventsParams
                         $this->Locale           = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
                         break;
                     case "NATIONALCALENDAR":
-                        $this->NationalCalendar = in_array(strtoupper($value), $this->SupportedNationalCalendars) ? strtoupper($value) : null;
+                        if (false === in_array(strtoupper($value), $this->SupportedNationalCalendars)) {
+                            self::$lastError = "uknown value `$value` for nation parameter, supported national calendars are: "
+                                . json_encode($this->SupportedNationalCalendars);
+                            return false;
+                        }
+                        $this->NationalCalendar =  strtoupper($value);
                         break;
                     case "DIOCESANCALENDAR":
                         $this->DiocesanCalendar = strtoupper($value);
-                        break;
-                    case "CALENDARTYPE":
-                        $this->CalendarType     = CalendarType::isValid(strtoupper($value)) ? strtoupper($value) : CalendarType::LITURGICAL;
                         break;
                     case "ETERNALHIGHPRIEST":
                         $this->EternalHighPriest = filter_var($value, FILTER_VALIDATE_BOOLEAN);
@@ -91,6 +93,12 @@ class EventsParams
                 }
             }
         }
+        return true;
+    }
+
+    public static function getLastErrorMessage(): string
+    {
+        return self::$lastError;
     }
 
     private function enforceYearValidity(int|string $value)
