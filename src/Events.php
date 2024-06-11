@@ -226,7 +226,7 @@ class Events
             }
         } else {
             $description = "uknown diocese `{$this->EventsParams->DiocesanCalendar}`, supported values are: ["
-                . implode(',', get_object_vars(self::$GeneralIndex)) . "]";
+                . implode(',', array_keys(get_object_vars(self::$GeneralIndex))) . "]";
             echo self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
             die();
         }
