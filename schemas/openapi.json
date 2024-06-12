@@ -60,7 +60,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Locale"
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
             }
           },
           {
@@ -144,12 +144,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCal.json#/definitions/LitCal"
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCal.json#/definitions/LitCal"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCal.json#/definitions/LitCal"
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCal.json#/definitions/LitCal"
                 }
               },
               "text/calendar": {
@@ -198,7 +198,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Locale"
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
             }
           }
         ],
@@ -293,12 +293,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCal.json#/definitions/LitCal"
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCal.json#/definitions/LitCal"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCal.json#/definitions/LitCal"
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCal.json#/definitions/LitCal"
                 }
               },
               "text/calendar": {
@@ -763,7 +763,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Locale"
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
             }
           },
           {
@@ -858,7 +858,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Locale"
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
             }
           }
         ],
@@ -2338,7 +2338,7 @@
         "additionalProperties": false,
         "properties": {
           "locale": {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Locale"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
           },
           "epiphany": {
             "type": "string",
@@ -2480,10 +2480,10 @@
             }
           },
           "appliesTo": {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
           },
           "excludes": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
           }
         },
         "required": [
@@ -2539,10 +2539,10 @@
             }
           },
           "appliesTo": {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
           },
           "excludes": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
           }
         },
         "required": [
@@ -2599,10 +2599,10 @@
             }
           },
           "appliesTo": {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
           },
           "excludes": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
           }
         },
         "required": [
@@ -2900,13 +2900,13 @@
       "NationalDiocesanWiderRegionCalendar": {
         "oneOf": [
           {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=NationalCalendar.json#/definitions/NationalCalendar"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/NationalCalendar.json#/definitions/NationalCalendar"
           },
           {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=DiocesanCalendar.json#/definitions/DiocesanCalendar"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/DiocesanCalendar.json#/definitions/DiocesanCalendar"
           },
           {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=WiderRegionCalendar.json#/definitions/WiderRegionCalendar"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/WiderRegionCalendar.json#/definitions/WiderRegionCalendar"
           }
         ]
       }

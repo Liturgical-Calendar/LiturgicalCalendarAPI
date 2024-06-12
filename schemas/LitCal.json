@@ -12,7 +12,7 @@
                     "additionalProperties": false,
                     "properties": {
                         "Year": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Year"
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
                         },
                         "CalendarType": {
                             "type": "string",
@@ -22,16 +22,16 @@
                             ]
                         },
                         "Epiphany": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Epiphany"
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
                         },
                         "Ascension": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Ascension"
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Ascension"
                         },
                         "CorpusChristi": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/CorpusChristi"
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
                         },
                         "Locale": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Locale"
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
                         },
                         "ReturnType": {
                             "type": "string",
@@ -46,7 +46,7 @@
                             "type": "boolean"
                         },
                         "NationalCalendar": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Region"
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
                         },
                         "DiocesanCalendar": {
                             "type": "string"
@@ -93,7 +93,7 @@
                                     "pattern": "(?:text/html|application/xml|application/json|text/calendar|application/yaml)"
                                 },
                                 "Accept-Language": {
-                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/AcceptLanguage"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/AcceptLanguage"
                                 },
                                 "Host": {
                                     "type": "string",
@@ -300,10 +300,10 @@
                     "type": "string"
                 },
                 "date": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Timestamp"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Timestamp"
                 },
                 "color": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitColor"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                 },
                 "colorLcl": {
                     "type": "array",
@@ -312,10 +312,10 @@
                     }
                 },
                 "type": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitFeastType"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitFeastType"
                 },
                 "grade": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitGrade"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                 },
                 "gradeLcl": {
                     "type": "string"
@@ -324,7 +324,7 @@
                     "type": "string"
                 },
                 "common": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitCommon"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
                 },
                 "commonLcl": {
                     "type": "string"
@@ -406,10 +406,10 @@
                     "type": "string"
                 },
                 "date": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Timestamp"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Timestamp"
                 },
                 "color": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitColor"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                 },
                 "colorLcl": {
                     "type": "array",
@@ -418,10 +418,10 @@
                     }
                 },
                 "type": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitFeastType"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitFeastType"
                 },
                 "grade": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitGrade"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                 },
                 "gradeLcl": {
                     "type": "string"
@@ -430,7 +430,7 @@
                     "type": "string"
                 },
                 "common": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitCommon"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
                 },
                 "commonLcl": {
                     "type": "string"
