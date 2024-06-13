@@ -7,6 +7,7 @@ use Swaggest\JsonSchema\Schema;
 use Johnrdorazio\LitCal\APICore;
 use Johnrdorazio\LitCal\Enum\StatusCode;
 use Johnrdorazio\LitCal\Enum\RequestMethod;
+use Johnrdorazio\LitCal\Enum\AcceptHeader;
 
 class Tests
 {
@@ -94,6 +95,20 @@ class Tests
         return json_encode($message);
     }
 
+    private static function produceResponse(string $response)
+    {
+        switch (self::$APICore->getResponseContentType()) {
+            case AcceptHeader::YML:
+                $responseObj = json_decode($response, true);
+                echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
+                break;
+            case AcceptHeader::JSON:
+            default:
+                echo $response;
+                break;
+        }
+    }
+
     private static function handlePutRequest(): string|false
     {
         $json = file_get_contents('php://input');
@@ -160,7 +175,7 @@ class Tests
             default:
                 $response = self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, "The method " . $_SERVER['REQUEST_METHOD'] . " cannot be handled by this endpoint");
         }
-        return $response;
+        self::produceResponse($response);
     }
 
     public static function init(array $requestPathParts = []): void

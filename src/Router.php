@@ -78,7 +78,7 @@ class Router
                 Tests::$APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE, RequestMethod::OPTIONS]);
                 Tests::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON ]);
                 Tests::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YML ]);
-                echo Tests::handleRequest();
+                Tests::handleRequest();
                 break;
             case 'events':
                 $Events = new Events();
