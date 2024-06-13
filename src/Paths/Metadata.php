@@ -1,6 +1,6 @@
 <?php
 
-namespace Johnrdorazio\LitCal;
+namespace Johnrdorazio\LitCal\Paths;
 
 use Johnrdorazio\LitCal\Enum\RomanMissal;
 

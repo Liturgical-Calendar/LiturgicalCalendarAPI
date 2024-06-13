@@ -7,6 +7,11 @@ use Johnrdorazio\LitCal\Enum\RequestContentType;
 use Johnrdorazio\LitCal\Enum\AcceptHeader;
 use Johnrdorazio\LitCal\Enum\ReturnType;
 use Johnrdorazio\LitCal\Enum\CacheDuration;
+use Johnrdorazio\LitCal\Paths\Calendar;
+use Johnrdorazio\LitCal\Paths\Easter;
+use Johnrdorazio\LitCal\Paths\Events;
+use Johnrdorazio\LitCal\Paths\Metadata;
+use Johnrdorazio\LitCal\Paths\Tests;
 
 class Router
 {
@@ -66,9 +71,14 @@ class Router
             case 'calendars':
                 Metadata::init();
                 break;
-            case 'testsindex':
             case 'tests':
-                echo TestsIndex::handleRequest();
+                Tests::init($requestPathParts);
+                Tests::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                Tests::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                Tests::$APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE, RequestMethod::OPTIONS]);
+                Tests::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON ]);
+                Tests::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YML ]);
+                echo Tests::handleRequest();
                 break;
             case 'events':
                 $Events = new Events();

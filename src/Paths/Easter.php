@@ -1,7 +1,9 @@
 <?php
 
-namespace Johnrdorazio\LitCal;
+namespace Johnrdorazio\LitCal\Paths;
 
+use Johnrdorazio\LitCal\LitFunc;
+use Johnrdorazio\LitCal\LitMessages;
 use Johnrdorazio\LitCal\Enum\LitLocale;
 
 class Easter

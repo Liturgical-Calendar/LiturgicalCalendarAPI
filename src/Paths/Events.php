@@ -1,7 +1,8 @@
 <?php
 
-namespace Johnrdorazio\LitCal;
+namespace Johnrdorazio\LitCal\Paths;
 
+use Johnrdorazio\LitCal\APICore;
 use Johnrdorazio\LitCal\Enum\RomanMissal;
 use Johnrdorazio\LitCal\Enum\LitGrade;
 use Johnrdorazio\LitCal\Enum\LitCommon;

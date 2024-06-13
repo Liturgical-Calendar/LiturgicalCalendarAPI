@@ -10,7 +10,6 @@ class EventsParams
     public int $Year;
     public bool $EternalHighPriest            = false;
     public ?string $Locale                    = null;
-    public ?string $ReturnType                = null;
     public ?string $NationalCalendar          = null;
     public ?string $DiocesanCalendar          = null;
     private array $SupportedNationalCalendars = [ "VATICAN" ];
