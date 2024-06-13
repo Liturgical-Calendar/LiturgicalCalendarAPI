@@ -111,6 +111,9 @@ class Tests
 
     private static function handlePutRequest(): string|false
     {
+        if (count(self::$requestPathParts)) {
+            return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "Path parameters not acceptable, please use the base path `/tests` for PUT or PATCH requests");
+        }
         $json = file_get_contents('php://input');
         $data = json_decode($json);
 
