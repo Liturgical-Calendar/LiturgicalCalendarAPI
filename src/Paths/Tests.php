@@ -149,7 +149,7 @@ class Tests
         }
     }
 
-    public static function handleRequest(): string|false
+    public static function handleRequest(): void
     {
         self::$APICore->init();
         self::$APICore->validateAcceptHeader(true);
@@ -167,7 +167,7 @@ class Tests
                 break;
             case RequestMethod::DELETE:
                 //TODO: not yet implemented
-                return false;
+                $response = self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, "DELETE Method not yet implemented, come back later");
                 break;
             case RequestMethod::OPTIONS:
                 // nothing to do here, should be handled by APICore
