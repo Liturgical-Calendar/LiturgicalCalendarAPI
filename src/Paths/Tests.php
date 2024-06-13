@@ -6,6 +6,7 @@ use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
 use Johnrdorazio\LitCal\APICore;
 use Johnrdorazio\LitCal\Enum\StatusCode;
+use Johnrdorazio\LitCal\Enum\RequestMethod;
 
 class Tests
 {
@@ -136,22 +137,24 @@ class Tests
     public static function handleRequest(): string|false
     {
         self::$APICore->init();
+        self::$APICore->validateAcceptHeader(true);
+        self::$APICore->setResponseContentTypeHeader();
         $response = '';
-        switch ($_SERVER['REQUEST_METHOD']) {
-            case 'GET':
+        switch (self::$APICore->getRequestMethod()) {
+            case RequestMethod::GET:
                 $response = self::handleGetRequest();
                 break;
-            case 'PUT':
+            case RequestMethod::PUT:
                 $response = self::handlePutRequest();
                 break;
-            case 'PATCH':
+            case RequestMethod::PATCH:
                 $response = self::handlePutRequest();
                 break;
-            case 'DELETE':
+            case RequestMethod::DELETE:
                 //TODO: not yet implemented
                 return false;
                 break;
-            case 'OPTIONS':
+            case RequestMethod::OPTIONS:
                 // nothing to do here, should be handled by APICore
                 break;
             default:
