@@ -79,7 +79,7 @@ class Tests
                 $testContents = file_get_contents("{$testsFolder}{$testFile}.json");
                 return $testContents;
             } else {
-                return self::produceErrorResponse(StatusCode::BAD_REQUEST, "Test {$testFile} not found");
+                return self::produceErrorResponse(StatusCode::NOT_FOUND, "Test {$testFile} not found");
             }
         }
     }
