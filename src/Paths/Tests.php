@@ -85,27 +85,25 @@ class Tests
         }
     }
 
-    private static function produceErrorResponse(int $statusCode, string $description): string
+    private static function handleDeleteRequest(): string
     {
-        header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
-        $message = new \stdClass();
-        $message->status = "ERROR";
-        $message->response = $statusCode === 404 ? "Resource not Found" : "Resource not Created";
-        $message->description = $description;
-        return json_encode($message);
-    }
-
-    private static function produceResponse(string $response)
-    {
-        switch (self::$APICore->getResponseContentType()) {
-            case AcceptHeader::YML:
-                $responseObj = json_decode($response, true);
-                echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
-                break;
-            case AcceptHeader::JSON:
-            default:
-                echo $response;
-                break;
+        $testsFolder = 'tests/';
+        if (count(self::$requestPathParts) === 1) {
+            $testName = self::$requestPathParts[0];
+            if (file_exists("{$testsFolder}{$testName}.json")) {
+                if (unlink("{$testsFolder}{$testName}.json")) {
+                    $message = new \stdClass();
+                    $message->status = "OK";
+                    $message->response = "Resource Deleted";
+                    return self::produceResponse(json_encode($message));
+                } else {
+                    return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "For some reason the server did not succeed in deleting the Test $testName");
+                }
+            } else {
+                return self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find test to delete {$testName}");
+            }
+        } else {
+            return self::produceErrorResponse(StatusCode::BAD_REQUEST, "Cannot process a DELETE request without one and only one path parameter containing the name of the Test to delete");
         }
     }
 
@@ -148,7 +146,7 @@ class Tests
             $message = new \stdClass();
             $message->status = "OK";
             $message->response = "Resource Created";
-            return json_encode($message);
+            return self::produceResponse(json_encode($message));
         }
     }
 
@@ -170,7 +168,7 @@ class Tests
                 break;
             case RequestMethod::DELETE:
                 //TODO: not yet implemented
-                $response = self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, "DELETE Method not yet implemented, come back later");
+                $response = self::handleDeleteRequest();
                 break;
             case RequestMethod::OPTIONS:
                 // nothing to do here, should be handled by APICore
@@ -179,6 +177,44 @@ class Tests
                 $response = self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, "The method " . $_SERVER['REQUEST_METHOD'] . " cannot be handled by this endpoint");
         }
         self::produceResponse($response);
+    }
+
+    private static function produceErrorResponse(int $statusCode, string $description): string
+    {
+        header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
+        $message = new \stdClass();
+        $message->status = "ERROR";
+        $statusMessage = "";
+        switch (self::$APICore->getRequestMethod()) {
+            case RequestMethod::PUT:
+                $statusMessage = "Resource not Created";
+                break;
+            case RequestMethod::PATCH:
+                $statusMessage = "Resource not Updated";
+                break;
+            case RequestMethod::DELETE:
+                $statusMessage = "Resource not Deleted";
+                break;
+            default:
+                $statusMessage = "Sorry what was it you wanted to do with this resource?";
+        }
+        $message->response = $statusCode === 404 ? "Resource not Found" : $statusMessage;
+        $message->description = $description;
+        return json_encode($message);
+    }
+
+    private static function produceResponse(string $response)
+    {
+        switch (self::$APICore->getResponseContentType()) {
+            case AcceptHeader::YML:
+                $responseObj = json_decode($response, true);
+                echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
+                break;
+            case AcceptHeader::JSON:
+            default:
+                echo $response;
+                break;
+        }
     }
 
     public static function init(array $requestPathParts = []): void
