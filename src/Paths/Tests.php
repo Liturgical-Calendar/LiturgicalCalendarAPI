@@ -56,7 +56,7 @@ class Tests
         }
     }
 
-    private static function handleGetRequest(): string|false
+    private static function handleGetRequest(): string
     {
         $testsFolder = 'tests/';
         if (count(self::$requestPathParts) === 0) {
@@ -95,7 +95,7 @@ class Tests
                     $message = new \stdClass();
                     $message->status = "OK";
                     $message->response = "Resource Deleted";
-                    return self::produceResponse(json_encode($message));
+                    return json_encode($message, JSON_PRETTY_PRINT);
                 } else {
                     return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "For some reason the server did not succeed in deleting the Test $testName");
                 }
@@ -107,7 +107,7 @@ class Tests
         }
     }
 
-    private static function handlePutRequest(): string|false
+    private static function handlePutRequest(): string
     {
         if (count(self::$requestPathParts)) {
             return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "Path parameters not acceptable, please use the base path `/tests` for PUT or PATCH requests");
@@ -145,8 +145,8 @@ class Tests
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
             $message = new \stdClass();
             $message->status = "OK";
-            $message->response = "Resource Created";
-            return self::produceResponse(json_encode($message));
+            $message->response = self::$APICore->getRequestMethod() === RequestMethod::PUT ? "Resource Created" : "Resource Updated";
+            return json_encode($message, JSON_PRETTY_PRINT);
         }
     }
 
@@ -203,7 +203,7 @@ class Tests
         return json_encode($message);
     }
 
-    private static function produceResponse(string $response)
+    private static function produceResponse(string $response): void
     {
         switch (self::$APICore->getResponseContentType()) {
             case AcceptHeader::YML:
