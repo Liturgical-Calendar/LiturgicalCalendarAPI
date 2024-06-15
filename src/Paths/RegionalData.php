@@ -1,9 +1,10 @@
 <?php
 
-namespace Johnrdorazio\LitCal;
+namespace Johnrdorazio\LitCal\Paths;
 
 use Swaggest\JsonSchema\Schema;
 use Swaggest\JsonSchema\InvalidValue;
+use Johnrdorazio\LitCal\APICore;
 use Johnrdorazio\LitCal\Enum\RequestMethod;
 use Johnrdorazio\LitCal\Enum\AcceptHeader;
 use Johnrdorazio\LitCal\Enum\StatusCode;
@@ -330,7 +331,7 @@ class RegionalData
         }
     }
 
-    private function handleRequestParams(array $requestPathParts): void
+    private function handleRequestParams(array $requestPathParts = []): void
     {
         if (count($requestPathParts)) {
             if (count($requestPathParts) !== 2) {

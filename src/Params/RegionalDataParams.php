@@ -2,7 +2,7 @@
 
 namespace Johnrdorazio\LitCal\Params;
 
-use Johnrdorazio\LitCal\RegionalData;
+use Johnrdorazio\LitCal\Paths\RegionalData;
 use Johnrdorazio\LitCal\Enum\Route;
 use Johnrdorazio\LitCal\Enum\StatusCode;
 use Johnrdorazio\LitCal\Enum\LitLocale;

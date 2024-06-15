@@ -12,6 +12,7 @@ use Johnrdorazio\LitCal\Paths\Easter;
 use Johnrdorazio\LitCal\Paths\Events;
 use Johnrdorazio\LitCal\Paths\Metadata;
 use Johnrdorazio\LitCal\Paths\Tests;
+use Johnrdorazio\LitCal\Paths\RegionalData;
 
 class Router
 {
