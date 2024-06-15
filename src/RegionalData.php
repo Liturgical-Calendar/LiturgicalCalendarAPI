@@ -79,6 +79,8 @@ class RegionalData
             case "NATIONALCALENDAR":
                 $calendarDataFile = "nations/{$this->params->key}/{$this->params->key}.json";
                 break;
+            default:
+                self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value <{$this->params->category}> for param `category`: valid values are: " . implode(', ', array_values(RegionalDataParams::EXPECTED_CATEGORIES)));
         }
 
         if (file_exists($calendarDataFile)) {
