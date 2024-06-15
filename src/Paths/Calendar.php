@@ -3487,7 +3487,7 @@ class Calendar
                 // in the response we return the pretty printed version
                 $response = $dom->saveXML();
                 break;
-            case ReturnType::YML:
+            case ReturnType::YAML:
                 // first convert the Object to an Array
                 $jsonStr = json_encode($SerializeableLitCal);
                 $jsonObj = json_decode($jsonStr, true);

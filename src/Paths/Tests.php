@@ -205,7 +205,7 @@ class Tests
     private static function produceResponse(string $response): void
     {
         switch (self::$APICore->getResponseContentType()) {
-            case AcceptHeader::YML:
+            case AcceptHeader::YAML:
                 $responseObj = json_decode($response, true);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
                 break;

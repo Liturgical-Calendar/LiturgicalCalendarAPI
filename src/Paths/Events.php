@@ -500,7 +500,7 @@ class Events
         $message->description = $description;
         $errResponse = json_encode($message);
         switch (self::$APICore->getResponseContentType()) {
-            case AcceptHeader::YML:
+            case AcceptHeader::YAML:
                 $response = json_decode($errResponse, true);
                 return yaml_emit($response, YAML_UTF8_ENCODING);
                 break;
@@ -529,7 +529,7 @@ class Events
             header('Content-Length: 0');
         } else {
             switch (self::$APICore->getResponseContentType()) {
-                case AcceptHeader::YML:
+                case AcceptHeader::YAML:
                     echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
                     break;
                 case AcceptHeader::JSON:

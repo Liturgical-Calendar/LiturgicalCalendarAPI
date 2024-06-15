@@ -15,8 +15,8 @@ class ReturnType
 {
     public const ATTACHMENT    = "ATTACHMENT";
     public const JSON          = "JSON";
+    public const YAML          = "YML";
     public const XML           = "XML";
-    public const YML           = "YML";
     public const PDF           = "PDF";
     public const HTML          = "HTML";
     public const ICS           = "ICS";
@@ -42,8 +42,8 @@ class ReturnType
     public static array $values = [
         "ATTACHMENT",
         "JSON",
-        "XML",
         "YML",
+        "XML",
         "PDF",
         "HTML",
         "ICS",
