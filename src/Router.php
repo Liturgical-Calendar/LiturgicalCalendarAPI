@@ -62,8 +62,8 @@ class Router
                 $LitCalEngine->APICore->setAllowedOrigins(self::$allowedOrigins);
                 $LitCalEngine->APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
                 $LitCalEngine->APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
-                $LitCalEngine->APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS, AcceptHeader::YML ]);
-                $LitCalEngine->setAllowedReturnTypes([ ReturnType::JSON, ReturnType::XML, ReturnType::ICS, ReturnType::YML ]);
+                $LitCalEngine->APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS, AcceptHeader::YAML ]);
+                $LitCalEngine->setAllowedReturnTypes([ ReturnType::JSON, ReturnType::XML, ReturnType::ICS, ReturnType::YAML ]);
                 $LitCalEngine->setCacheDuration(CacheDuration::MONTH);
                 $LitCalEngine->init(); //TODO: pass in $requestPathParts and use the path information for our settings
                 break;
@@ -76,7 +76,7 @@ class Router
                 Tests::$APICore->setAllowedOrigins(self::$allowedOrigins);
                 Tests::$APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE, RequestMethod::OPTIONS]);
                 Tests::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON ]);
-                Tests::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YML ]);
+                Tests::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 Tests::handleRequest();
                 break;
             case 'events':
@@ -84,7 +84,7 @@ class Router
                 $Events::$APICore->setAllowedOrigins(self::$allowedOrigins);
                 $Events::$APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
                 $Events::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
-                $Events::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YML ]);
+                $Events::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 $Events->init($requestPathParts);
                 break;
             case 'data':
@@ -106,8 +106,15 @@ class Router
                     RequestMethod::DELETE,
                     RequestMethod::OPTIONS
                 ]);
-                $LitCalRegionalData->APICore->setAllowedRequestContentTypes([RequestContentType::JSON, RequestContentType::FORMDATA]);
-                $LitCalRegionalData->APICore->setAllowedAcceptHeaders([AcceptHeader::JSON, AcceptHeader::YML]);
+                $LitCalRegionalData->APICore->setAllowedRequestContentTypes([
+                    RequestContentType::JSON,
+                    RequestContentType::YAML,
+                    RequestContentType::FORMDATA
+                ]);
+                $LitCalRegionalData->APICore->setAllowedAcceptHeaders([
+                    AcceptHeader::JSON,
+                    AcceptHeader::YAML
+                ]);
                 $LitCalRegionalData->init($requestPathParts);
                 break;
             case 'easter':
