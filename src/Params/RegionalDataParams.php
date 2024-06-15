@@ -50,7 +50,8 @@ class RegionalDataParams
             switch ($data->category) {
                 case 'NATIONALCALENDAR':
                     if (false === property_exists($this->calendars->NationalCalendars, $data->key)) {
-                        RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`");
+                        $validVals = implode(', ', get_object_vars($this->calendars->NationalCalendars));
+                        RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`, valid values are: {$validVals}");
                     } else {
                         $this->key = $data->key;
                     }
@@ -65,14 +66,16 @@ class RegionalDataParams
                     break;
                 case 'DIOCESANCALENDAR':
                     if (false === property_exists($this->calendars->DiocesanCalendars, $data->key)) {
-                        RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`");
+                        $validVals = implode(', ', get_object_vars($this->calendars->DiocesanCalendars));
+                        RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`, valid values are: {$validVals}");
                     } else {
                         $this->key = $data->key;
                     }
                     break;
                 case 'WIDERREGIONCALENDAR':
-                    if (false === property_exists($this->calendars->WiderRegions, $data->key)) {
-                        RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`");
+                    if (false === in_array($data->key, $this->calendars->WiderRegions)) {
+                        $validVals = implode(', ', $this->calendars->WiderRegions);
+                        RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`, valid values are: {$validVals}");
                     } else {
                         $this->key = $data->key;
                     }
