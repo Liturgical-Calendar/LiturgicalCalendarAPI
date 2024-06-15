@@ -26,7 +26,7 @@ class RegionalDataParams
         $metadataRaw = file_get_contents(API_BASE_PATH .  Route::CALENDARS->value);
         if ($metadataRaw) {
             $metadata = json_decode($metadataRaw);
-            if (JSON_ERROR_NONE === json_last_error() && property_exists('LitCalMetadata', $metadata)) {
+            if (JSON_ERROR_NONE === json_last_error() && property_exists($metadata, 'LitCalMetadata')) {
                 $this->calendars = $metadata->LitCalMetadata;
             }
         }
