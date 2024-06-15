@@ -130,7 +130,7 @@ class RegionalDataParams
                 case 'NATIONALCALENDAR':
                     if (
                         false === property_exists($data->payload, 'LitCal')
-                        || false === property_exists($data->paylod, 'Metadata')
+                        || false === property_exists($data->payload, 'Metadata')
                         || false === property_exists($data->payload, 'Settings')
                     ) {
                         $message = "Cannot create or update National calendar data when the payload does not have required properties `LitCal`, `Metadata` or `Settings`. Payload was:\n" . json_encode($data->payload, JSON_PRETTY_PRINT);
@@ -140,7 +140,7 @@ class RegionalDataParams
                 case 'DIOCESANCALENDAR':
                     if (
                         false === property_exists($data->payload, 'LitCal')
-                        || false === property_exists($data->paylod, 'Diocese')
+                        || false === property_exists($data->payload, 'Diocese')
                         || false === property_exists($data->payload, 'Nation')
                     ) {
                         $message = "Cannot create or update Diocesan calendar data when the payload does not have required properties `LitCal`, `Diocese` or `Nation`. Payload was:\n" . json_encode($data->payload, JSON_PRETTY_PRINT);
@@ -150,7 +150,7 @@ class RegionalDataParams
                 case 'WIDERREGIONCALENDAR':
                     if (
                         false === property_exists($data->payload, 'LitCal')
-                        || false === property_exists($data->paylod, 'Metadata')
+                        || false === property_exists($data->payload, 'Metadata')
                         || false === property_exists($data->payload, 'NationalCalendars')
                     ) {
                         $message = "Cannot create or update Wider Region calendar data when the payload does not have required properties `LitCal`, `Metadata` or `NationalCalendars`. Payload was:\n" . json_encode($data->payload, JSON_PRETTY_PRINT);
