@@ -88,9 +88,9 @@ class Router
                 $Events->init($requestPathParts);
                 break;
             case 'data':
-                $LitCalRegionalData = new RegionalData();
-                $LitCalRegionalData->APICore->setAllowedOrigins(self::$allowedOrigins);
-                $LitCalRegionalData->APICore->setAllowedReferers(
+                $RegionalData = new RegionalData();
+                $RegionalData::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                $RegionalData::$APICore->setAllowedReferers(
                     array_map(
                         function ($el) {
                             return $el . "/";
@@ -98,7 +98,7 @@ class Router
                         self::$allowedOrigins
                     )
                 );
-                $LitCalRegionalData->APICore->setAllowedRequestMethods([
+                $RegionalData::$APICore->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST,
                     RequestMethod::PUT,
@@ -106,16 +106,16 @@ class Router
                     RequestMethod::DELETE,
                     RequestMethod::OPTIONS
                 ]);
-                $LitCalRegionalData->APICore->setAllowedRequestContentTypes([
+                $RegionalData::$APICore->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
                 ]);
-                $LitCalRegionalData->APICore->setAllowedAcceptHeaders([
+                $RegionalData::$APICore->setAllowedAcceptHeaders([
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
-                $LitCalRegionalData->init($requestPathParts);
+                $RegionalData->init($requestPathParts);
                 break;
             case 'easter':
                 Easter::init();
