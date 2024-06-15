@@ -49,13 +49,14 @@ class RegionalDataParams
             $this->category = $data->category;
             switch ($data->category) {
                 case 'NATIONALCALENDAR':
-                    if (RegionalData::$APICore->getRequestMethod() !== RequestMethod::PUT) {
-                        if (false === property_exists($this->calendars->NationalCalendars, $data->key)) {
-                            $validVals = implode(', ', get_object_vars($this->calendars->NationalCalendars));
-                            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`, valid values are: {$validVals}");
-                        } else {
-                            $this->key = $data->key;
-                        }
+                    if (
+                        false === property_exists($this->calendars->NationalCalendars, $data->key)
+                        && RegionalData::$APICore->getRequestMethod() !== RequestMethod::PUT
+                    ) {
+                        $validVals = implode(', ', get_object_vars($this->calendars->NationalCalendars));
+                        RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`, valid values are: {$validVals}");
+                    } else {
+                        $this->key = $data->key;
                     }
                     // Check the request method: cannot DELETE National calendar data if it is still in use by a Diocesan calendar
                     if (RegionalData::$APICore->getRequestMethod() === RequestMethod::DELETE) {
@@ -67,23 +68,25 @@ class RegionalDataParams
                     }
                     break;
                 case 'DIOCESANCALENDAR':
-                    if (RegionalData::$APICore->getRequestMethod() !== RequestMethod::PUT) {
-                        if (false === property_exists($this->calendars->DiocesanCalendars, $data->key)) {
-                            $validVals = implode(', ', get_object_vars($this->calendars->DiocesanCalendars));
-                            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`, valid values are: {$validVals}");
-                        } else {
-                            $this->key = $data->key;
-                        }
+                    if (
+                        false === property_exists($this->calendars->DiocesanCalendars, $data->key)
+                        && RegionalData::$APICore->getRequestMethod() !== RequestMethod::PUT
+                    ) {
+                        $validVals = implode(', ', get_object_vars($this->calendars->DiocesanCalendars));
+                        RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`, valid values are: {$validVals}");
+                    } else {
+                        $this->key = $data->key;
                     }
                     break;
                 case 'WIDERREGIONCALENDAR':
-                    if (RegionalData::$APICore->getRequestMethod() !== RequestMethod::PUT) {
-                        if (false === in_array($data->key, $this->calendars->WiderRegions)) {
-                            $validVals = implode(', ', $this->calendars->WiderRegions);
-                            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`, valid values are: {$validVals}");
-                        } else {
-                            $this->key = $data->key;
-                        }
+                    if (
+                        false === in_array($data->key, $this->calendars->WiderRegions)
+                        && RegionalData::$APICore->getRequestMethod() !== RequestMethod::PUT
+                    ) {
+                        $validVals = implode(', ', $this->calendars->WiderRegions);
+                        RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`, valid values are: {$validVals}");
+                    } else {
+                        $this->key = $data->key;
                     }
                     // A locale parameter is required for WiderRegion data, whether supplied by the Accept-Language header or by a `locale` parameter
                     if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
