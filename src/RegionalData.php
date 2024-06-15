@@ -22,10 +22,8 @@ use Johnrdorazio\LitCal\Params\RegionalDataParams;
  */
 class RegionalData
 {
-    private ?object $response     = null;
     private ?object $generalIndex = null;
     private RegionalDataParams $params;
-
     public static APICore $APICore;
 
     /**
@@ -34,7 +32,6 @@ class RegionalData
     public function __construct()
     {
         self::$APICore                              = new APICore();
-        $this->response->requestHeadersReceived     = self::$APICore->getJsonEncodedRequestHeaders();
         $this->params                               = new RegionalDataParams();
     }
 
@@ -86,23 +83,22 @@ class RegionalData
 
         if (file_exists($calendarDataFile)) {
             if ($this->params->category === "DIOCESANCALENDAR") {
-                echo file_get_contents($calendarDataFile);
-                die();
+                self::produceResponse(file_get_contents($calendarDataFile));
             } else {
-                $this->response = json_decode(file_get_contents($calendarDataFile));
+                $response = json_decode(file_get_contents($calendarDataFile));
                 $uKey = strtoupper($this->params->key);
                 if ($this->params->category === "WIDERREGIONCALENDAR") {
-                    $this->response->isMultilingual = is_dir("nations/{$uKey}");
+                    $response->isMultilingual = is_dir("nations/{$uKey}");
                     $locale = strtolower($this->params->locale);
                     if (file_exists("nations/{$uKey}/{$locale}.json")) {
                         $localeData = json_decode(file_get_contents("nations/{$uKey}/{$locale}.json"));
-                        foreach ($this->response->LitCal as $idx => $el) {
-                            $this->response->LitCal[$idx]->Festivity->name =
-                                $localeData->{$this->response->LitCal[$idx]->Festivity->tag};
+                        foreach ($response->LitCal as $idx => $el) {
+                            $response->LitCal[$idx]->Festivity->name =
+                                $localeData->{$response->LitCal[$idx]->Festivity->tag};
                         }
                     }
                 }
-                self::produceResponse(json_encode($this->response));
+                self::produceResponse(json_encode($response));
             }
         } else {
             self::produceErrorResponse(StatusCode::NOT_FOUND, "file $calendarDataFile does not exist");
@@ -397,7 +393,7 @@ class RegionalData
         $message->description = $description;
         $response = json_encode($message);
         switch (self::$APICore->getResponseContentType()) {
-            case AcceptHeader::YML:
+            case AcceptHeader::YAML:
                 $responseObj = json_decode($response, true);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
                 break;
@@ -414,7 +410,7 @@ class RegionalData
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
         }
         switch (self::$APICore->getRequestContentType()) {
-            case AcceptHeader::YML:
+            case AcceptHeader::YAML:
                 $responseObj = json_decode($jsonEncodedResponse, true);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
                 break;
