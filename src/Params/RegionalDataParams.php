@@ -59,7 +59,7 @@ class RegionalDataParams
                     if (RegionalData::$APICore->getRequestMethod() === RequestMethod::DELETE) {
                         foreach ($this->calendars->DiocesanCalendars as $key => $value) {
                             if ($value->nation === $data->key) {
-                                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Cannot DELETE National Calendar data is a Diocesan Calendar depends on it. Currently, {$data->key} is in use by {$key}");
+                                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Cannot DELETE National Calendar data while there are Diocesan calendars that depend on it. Currently, {$data->key} is in use by Diocesan calendar {$key}");
                             }
                         }
                     }
@@ -104,7 +104,7 @@ class RegionalDataParams
                     if (RegionalData::$APICore->getRequestMethod() === RequestMethod::DELETE) {
                         foreach ($this->calendars->NationalCalendarsMetadata as $key => $value) {
                             if (in_array($data->key, $value->widerRegions)) {
-                                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Cannot DELETE Wider Region calendar data as long as it is in use by a National Calendar. Currently {$data->key} is in use by {$key}");
+                                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Cannot DELETE Wider Region calendar data while there are National calendars that depend on it. Currently {$data->key} is in use by {$key}");
                             }
                         }
                     }
