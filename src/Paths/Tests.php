@@ -167,7 +167,6 @@ class Tests
                 $response = self::handlePutRequest();
                 break;
             case RequestMethod::DELETE:
-                //TODO: not yet implemented
                 $response = self::handleDeleteRequest();
                 break;
             case RequestMethod::OPTIONS:

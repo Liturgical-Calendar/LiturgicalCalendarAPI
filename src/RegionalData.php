@@ -5,7 +5,10 @@ namespace Johnrdorazio\LitCal;
 use Swaggest\JsonSchema\Schema;
 use Swaggest\JsonSchema\InvalidValue;
 use Johnrdorazio\LitCal\Enum\RequestMethod;
+use Johnrdorazio\LitCal\Enum\AcceptHeader;
+use Johnrdorazio\LitCal\Enum\StatusCode;
 use Johnrdorazio\LitCal\Enum\LitSchema;
+use Johnrdorazio\LitCal\Params\RegionalDataParams;
 
 /**
  * RegionalData
@@ -19,37 +22,33 @@ use Johnrdorazio\LitCal\Enum\LitSchema;
  */
 class RegionalData
 {
-    private object $data;
-    private object $response;
-    //The General Index is currently only used for diocesan calendars
-    private ?\stdClass $generalIndex      = null;
-    private array $allowedRequestMethods = [ 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS' ];
+    private ?object $response     = null;
+    private ?object $generalIndex = null;
+    private RegionalDataParams $params;
 
-    public APICore $APICore;
+    public static APICore $APICore;
 
     /**
      * LitCalRegionalData Constructor
      */
     public function __construct()
     {
-        $this->APICore                              = new APICore();
-        $this->response                             = new \stdClass();
-        $this->response->requestHeadersReceived     = $this->APICore->getJsonEncodedRequestHeaders();
+        self::$APICore                              = new APICore();
+        $this->response->requestHeadersReceived     = self::$APICore->getJsonEncodedRequestHeaders();
+        $this->params                               = new RegionalDataParams();
     }
 
     /**
-     * Function handleRequestedMethod
+     * Function handleRequestMethod
      *
      * @return void
      */
-    private function handleRequestedMethod()
+    private function handleRequestMethod()
     {
-        switch (strtoupper($_SERVER[ "REQUEST_METHOD" ])) {
+        switch (self::$APICore->getRequestMethod()) {
             case RequestMethod::GET:
-                $this->handleGetPostRequests($_GET);
-                break;
             case RequestMethod::POST:
-                $this->handleGetPostRequests($_POST);
+                $this->handleGetPostRequests();
                 break;
             case RequestMethod::PUT:
             case RequestMethod::PATCH:
@@ -59,41 +58,55 @@ class RegionalData
                 $this->handlePutPatchDeleteRequests(RequestMethod::DELETE);
                 break;
             case RequestMethod::OPTIONS:
-                if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
-                    header("Access-Control-Allow-Methods: " . implode(', ', $this->allowedRequestMethods));
-                }
-                if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
-                    header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
-                }
+                // nothing to do here, should be handled by APICore
                 break;
             default:
-                header($_SERVER[ "SERVER_PROTOCOL" ] . " 405 Method Not Allowed", true, 405);
-                $response = new \stdClass();
-                $response->error = "You seem to be forming a strange kind of request? Allowed Request Methods are "
-                    . implode(',', $this->allowedRequestMethods)
-                    . " but your Request Method was "
-                    . strtoupper($_SERVER[ 'REQUEST_METHOD' ]);
-                die(json_encode($response));
+                self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, "The method " . $_SERVER['REQUEST_METHOD'] . " cannot be handled by this endpoint");
         }
     }
 
     /**
      * Function handleGetPostRequests
      *
-     * @param array $REQUEST represents the Request Body object
-     *
      * @return void
      */
-    private function handleGetPostRequests(array $REQUEST)
+    private function handleGetPostRequests(): void
     {
-
-        $this->APICore->validateAcceptHeader(true);
-        if ($this->APICore->getRequestContentType() === 'application/json') {
-            $this->data = $this->APICore->retrieveRequestParamsFromJsonBody();
-        } else {
-            $this->data = (object)$REQUEST;
+        switch ($this->params->category) {
+            case "DIOCESANCALENDAR":
+                $calendarDataFile = $this->generalIndex->{$this->params->key}->path;
+                break;
+            case "WIDERREGIONCALENDAR":
+                $calendarDataFile = "nations/{$this->params->key}.json";
+                break;
+            case "NATIONALCALENDAR":
+                $calendarDataFile = "nations/{$this->params->key}/{$this->params->key}.json";
+                break;
         }
-        $this->retrieveRegionalCalendar();
+
+        if (file_exists($calendarDataFile)) {
+            if ($this->params->category === "DIOCESANCALENDAR") {
+                echo file_get_contents($calendarDataFile);
+                die();
+            } else {
+                $this->response = json_decode(file_get_contents($calendarDataFile));
+                $uKey = strtoupper($this->params->key);
+                if ($this->params->category === "WIDERREGIONCALENDAR") {
+                    $this->response->isMultilingual = is_dir("nations/{$uKey}");
+                    $locale = strtolower($this->params->locale);
+                    if (file_exists("nations/{$uKey}/{$locale}.json")) {
+                        $localeData = json_decode(file_get_contents("nations/{$uKey}/{$locale}.json"));
+                        foreach ($this->response->LitCal as $idx => $el) {
+                            $this->response->LitCal[$idx]->Festivity->name =
+                                $localeData->{$this->response->LitCal[$idx]->Festivity->tag};
+                        }
+                    }
+                }
+                self::produceResponse(json_encode($this->response));
+            }
+        } else {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "file $calendarDataFile does not exist");
+        }
     }
 
     /**
@@ -105,91 +118,15 @@ class RegionalData
      */
     private function handlePutPatchDeleteRequests(string $requestMethod)
     {
-        $this->APICore->validateAcceptHeader(false);
-        $this->APICore->enforceAjaxRequest();
-        $this->APICore->enforceReferer();
-        if ($this->APICore->getRequestContentType() === 'application/json') {
-            $this->data = $this->APICore->retrieveRequestParamsFromJsonBody();
-            if (RequestMethod::PUT === $requestMethod) {
-                $this->writeRegionalCalendar();
-            } elseif (RequestMethod::DELETE === $requestMethod) {
-                $this->deleteRegionalCalendar();
-            }
-        } else {
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 415 Unsupported Media Type", true, 415);
-            $response = new \stdClass();
-            $response->error = "You seem to be forming a strange kind of request?"
-                . " Only 'application/json' is allowed as the Content Type"
-                . " for the body of the Request when using Request Methods PUT, PATCH, or DELETE:"
-                . " the Content Type for the body of your Request was {$_SERVER[ 'CONTENT_TYPE' ]}"
-                . " and you are using Request Method {$_SERVER[ 'REQUEST_METHOD' ]}";
-            die(json_encode($response));
+        self::$APICore->enforceAjaxRequest();
+        self::$APICore->enforceReferer();
+        if (RequestMethod::PUT === $requestMethod) {
+            $this->writeRegionalCalendar();
+        } elseif (RequestMethod::DELETE === $requestMethod) {
+            $this->deleteRegionalCalendar();
         }
     }
 
-    /**
-     * Function retrieveRegionalCalendar
-     *
-     * @return void
-     */
-    private function retrieveRegionalCalendar()
-    {
-        if (property_exists($this->data, 'category') && property_exists($this->data, 'key')) {
-            $category = strtoupper($this->data->category);
-            $key = $this->data->key;
-            switch ($category) {
-                case "DIOCESANCALENDAR":
-                    $calendarDataFile = $this->generalIndex->$key->path;
-                    break;
-                case "WIDERREGIONCALENDAR":
-                    $calendarDataFile = "nations/{$key}.json";
-                    break;
-                case "NATIONALCALENDAR":
-                    $calendarDataFile = "nations/{$key}/{$key}.json";
-                    break;
-            }
-
-            if (file_exists($calendarDataFile)) {
-                if ($category === "DIOCESANCALENDAR") {
-                    echo file_get_contents($calendarDataFile);
-                    die();
-                } else {
-                    $this->response = json_decode(file_get_contents($calendarDataFile));
-                    $uKey = strtoupper($key);
-                    if ($category === "WIDERREGIONCALENDAR") {
-                        $this->response->isMultilingual = is_dir("nations/{$uKey}");
-                        $locale = strtolower($this->data->locale);
-                        if (file_exists("nations/{$uKey}/{$locale}.json")) {
-                            $localeData = json_decode(file_get_contents("nations/{$uKey}/{$locale}.json"));
-                            foreach ($this->response->LitCal as $idx => $el) {
-                                $this->response->LitCal[$idx]->Festivity->name =
-                                    $localeData->{$this->response->LitCal[$idx]->Festivity->tag};
-                            }
-                        }
-                    }
-                    echo json_encode($this->response);
-                    die();
-                }
-            } else {
-                header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
-                $response = new \stdClass();
-                $response->message = "file $calendarDataFile does not exist";
-                die(json_encode($response));
-            }
-        } else {
-            $missingParams = [];
-            if (false === property_exists($this->data, 'category')) {
-                array_push($missingParams, 'category');
-            }
-            if (false === property_exists($this->data, 'key')) {
-                array_push($missingParams, 'key');
-            }
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad request", true, 400);
-            $response = new \stdClass();
-            $response->error = "Missing required parameter(s) `" . implode("` and `", $missingParams) . "`";
-            die(json_encode($response));
-        }
-    }
 
     /**
      * Function writeRegionalCalendar
@@ -199,114 +136,95 @@ class RegionalData
     private function writeRegionalCalendar()
     {
         $response = new \stdClass();
-        if (
-            property_exists($this->data, 'LitCal')
-            && property_exists($this->data, 'Metadata')
-            && property_exists($this->data, 'Settings')
-        ) {
-            $region = $this->data->Metadata->Region;
-            if ($region === 'UNITED STATES') {
-                $region = 'USA';
-            }
-            $path = "nations/{$region}";
-            if (!file_exists($path)) {
-                mkdir($path, 0755, true);
-            }
-
-            $test = $this->validateDataAgainstSchema($this->data, LitSchema::NATIONAL);
-            if ($test === true) {
-                $data = json_encode($this->data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                file_put_contents($path . "/{$region}.json", $data . PHP_EOL);
-                header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
-                $response->success = "National calendar created or updated for nation \"{$this->data->Metadata->Region}\"";
-                die(json_encode($response));
-            } else {
-                header($_SERVER[ "SERVER_PROTOCOL" ] . " 422 Unprocessable Entity", true, 422);
-                die(json_encode($test));
-            }
-        } elseif (
-            property_exists($this->data, 'LitCal')
-            && property_exists($this->data, 'Metadata')
-            && property_exists($this->data, 'NationalCalendars')
-        ) {
-            $this->data->Metadata->WiderRegion = ucfirst(strtolower($this->data->Metadata->WiderRegion));
-            $widerRegion = strtoupper($this->data->Metadata->WiderRegion);
-            if ($this->data->Metadata->IsMultilingual === true) {
-                $path = "nations/{$widerRegion}";
+        switch ($this->params->category) {
+            case 'NATIONALCALENDAR':
+                $region = $this->params->payload->Metadata->Region;
+                if ($region === 'UNITED STATES') {
+                    $region = 'USA';
+                }
+                $path = "nations/{$region}";
                 if (!file_exists($path)) {
                     mkdir($path, 0755, true);
                 }
-                $translationJSON = new \stdClass();
-                foreach ($this->data->LitCal as $CalEvent) {
-                    $translationJSON->{ $CalEvent->Festivity->tag } = '';
+
+                $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::NATIONAL);
+                if ($test === true) {
+                    $data = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                    file_put_contents($path . "/{$region}.json", $data . PHP_EOL);
+                    $response->success = "Calendar data created or updated for Nation \"{$this->params->payload->Metadata->Region}\"";
+                    self::produceResponse(json_encode($response));
+                } else {
+                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
                 }
-                if (count($this->data->Metadata->Languages) > 0) {
-                    foreach ($this->data->Metadata->Languages as $iso) {
-                        if (!file_exists("nations/{$widerRegion}/{$iso}.json")) {
-                            file_put_contents(
-                                "nations/{$widerRegion}/{$iso}.json",
-                                json_encode($translationJSON, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
-                            );
+                break;
+            case 'WIDERREGIONCALENDAR':
+                $this->params->payload->Metadata->WiderRegion = ucfirst(strtolower($this->params->payload->Metadata->WiderRegion));
+                $widerRegion = strtoupper($this->params->payload->Metadata->WiderRegion);
+                if ($this->params->payload->Metadata->IsMultilingual === true) {
+                    $path = "nations/{$widerRegion}";
+                    if (!file_exists($path)) {
+                        mkdir($path, 0755, true);
+                    }
+                    $translationJSON = new \stdClass();
+                    foreach ($this->params->payload->LitCal as $CalEvent) {
+                        $translationJSON->{ $CalEvent->Festivity->tag } = '';
+                    }
+                    if (count($this->params->payload->Metadata->Languages) > 0) {
+                        foreach ($this->params->payload->Metadata->Languages as $iso) {
+                            if (!file_exists("nations/{$widerRegion}/{$iso}.json")) {
+                                file_put_contents(
+                                    "nations/{$widerRegion}/{$iso}.json",
+                                    json_encode($translationJSON, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+                                );
+                            }
                         }
                     }
                 }
-            }
 
-            $test = $this->validateDataAgainstSchema($this->data, LitSchema::WIDERREGION);
-            if ($test === true) {
-                $data = json_encode($this->data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                file_put_contents("nations/{$this->data->Metadata->WiderRegion}.json", $data . PHP_EOL);
-                header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
-                $response->success = "Wider region calendar created or updated for region \"{$this->data->Metadata->WiderRegion}\"";
-                die(json_encode($response));
-            } else {
-                header($_SERVER[ "SERVER_PROTOCOL" ] . " 422 Unprocessable Entity", true, 422);
-                die(json_encode($test));
-            }
-        } elseif (
-            property_exists($this->data, 'LitCal')
-            && property_exists($this->data, 'Diocese')
-            && property_exists($this->data, 'Nation')
-        ) {
-            $this->response->Nation = strip_tags($this->data->Nation);
-            $this->response->Diocese = strip_tags($this->data->Diocese);
-            $CalData = json_decode($this->data->LitCal);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad request", true, 400);
-                $response->error = "Malformed data received in <LitCal> parameters";
-                die(json_encode($response));
-            }
-            if (property_exists($this->data, 'Overrides')) {
-                $CalData->Overrides = $this->data->Overrides;
-            }
-            $this->response->Calendar = json_encode($CalData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            if (property_exists($this->data, 'group')) {
-                $this->response->Group = strip_tags($this->data->group);
-            }
-            $path = "nations/{$this->response->Nation}";
-            if (!file_exists($path)) {
-                mkdir($path, 0755, true);
-            }
+                $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::WIDERREGION);
+                if ($test === true) {
+                    $data = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                    file_put_contents("nations/{$this->params->payload->Metadata->WiderRegion}.json", $data . PHP_EOL);
+                    $response->success = "Calendar data created or updated for Wider Region \"{$this->params->payload->Metadata->WiderRegion}\"";
+                    self::produceResponse(json_encode($response));
+                } else {
+                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+                }
+                break;
+            case 'DIOCESANCALENDAR':
+                $updateData = new \stdClass();
+                $updateData->Nation = strip_tags($this->params->payload->Nation);
+                $updateData->Diocese = strip_tags($this->params->payload->Diocese);
+                $CalData = json_decode($this->params->payload->LitCal);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad request", true, 400);
+                    $response->error = "Malformed data received in <LitCal> parameters";
+                    die(json_encode($response));
+                }
+                if (property_exists($this->params->payload, 'Overrides')) {
+                    $CalData->Overrides = $this->params->payload->Overrides;
+                }
+                if (property_exists($this->params->payload, 'group')) {
+                    $updateData->Group = strip_tags($this->params->payload->group);
+                }
+                $updateData->path = "nations/{$updateData->Nation}";
+                if (!file_exists($updateData->path)) {
+                    mkdir($updateData->path, 0755, true);
+                }
 
-            $test = $this->validateDataAgainstSchema($CalData, LitSchema::DIOCESAN);
-            if ($test === true) {
-                file_put_contents(
-                    $path . "/{$this->response->Diocese}.json",
-                    $this->response->Calendar . PHP_EOL
-                );
-            } else {
-                header($_SERVER[ "SERVER_PROTOCOL" ] . " 422 Unprocessable Entity", true, 422);
-                die(json_encode($test));
-            }
-
-            $this->createOrUpdateIndex($path);
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
-            $response->success = "Diocesan calendar created or updated for diocese \"{$this->response->Diocese}\"";
-            die(json_encode($response));
-        } else {
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad request", true, 400);
-            $response->error = "Not all required parameters were received (LitCal, Metadata, Settings|NationalCalendars OR LitCal, Diocese, Nation)";
-            die(json_encode($response));
+                $test = $this->validateDataAgainstSchema($CalData, LitSchema::DIOCESAN);
+                if ($test === true) {
+                    $calendarData = json_encode($CalData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                    file_put_contents(
+                        $updateData->path . "/{$updateData->Diocese}.json",
+                        $calendarData . PHP_EOL
+                    );
+                    $this->createOrUpdateIndex($updateData);
+                    $response->success = "Calendar data created or updated for Diocese \"{$updateData->Diocese}\" (Nation: \"$updateData->Nation\")";
+                    self::produceResponse(json_encode($response));
+                } else {
+                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+                }
         }
     }
 
@@ -318,32 +236,27 @@ class RegionalData
     private function deleteRegionalCalendar()
     {
         $response = new \stdClass();
-        if (
-            !property_exists($this->data, 'LitCal')
-            || !property_exists($this->data, 'Diocese')
-            || !property_exists($this->data, 'Nation')
-        ) {
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad request", true, 400);
-            $response->error = "Required parameters were not received";
-            die(json_encode($response));
-        } else {
-            $this->response->Nation = strip_tags($this->data->Nation);
-            $this->response->Diocese = strip_tags($this->data->Diocese);
-            $path = "nations/{$this->response->Nation}";
-            if (file_exists($path . "/{$this->response->Diocese}.json")) {
-                unlink($path . "/{$this->response->Diocese}.json");
-            } else {
-                header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
-                $response->error = "The resource requested for deletion was not found on this server";
-                die(json_encode($response));
-            }
-
-            $this->createOrUpdateIndex($path, true);
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 200 OK", true, 200);
-            $response->success = "Diocesan calendar \"{$this->response->Diocese}\""
-                . " deleted from nation \"{$this->response->Nation}\"";
-            die(json_encode($response));
+        switch ($this->params->category) {
+            case "DIOCESANCALENDAR":
+                $calendarDataFile = $this->generalIndex->{$this->params->key}->path;
+                break;
+            case "WIDERREGIONCALENDAR":
+                $calendarDataFile = "nations/{$this->params->key}.json";
+                break;
+            case "NATIONALCALENDAR":
+                $calendarDataFile = "nations/{$this->params->key}/{$this->params->key}.json";
+                break;
         }
+        if (file_exists($calendarDataFile)) {
+            unlink($calendarDataFile);
+            if ($this->params->category === 'DIOCESANCALENDAR') {
+                $this->createOrUpdateIndex(null, true);
+            }
+        } else {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "The resource '{$this->params->key}' requested for deletion was not found on this server");
+        }
+        $response->success = "Calendar data \"{$this->params->key}\" deleted successfully";
+        self::produceResponse(json_encode($response));
     }
 
     /**
@@ -360,18 +273,18 @@ class RegionalData
 
     /**
      * Function createOrUpdateIndex
-     *
-     * @param string  $path   Path of the resource file
+     *  only needed when a diocesan calendar is created, updated or deleted
+     * @param object  $data   Path of the resource file, Nation, Diocese, Group
      * @param boolean $delete Delete from the index rather than create/update the index
      *
      * @return void
      */
-    private function createOrUpdateIndex(string $path, bool $delete = false)
+    private function createOrUpdateIndex(?object $data = null, bool $delete = false)
     {
         if (null === $this->generalIndex) {
             $this->generalIndex = new \stdClass();
         }
-        $key = strtoupper(preg_replace("/[^a-zA-Z]/", "", $this->response->Diocese));
+        $key = strtoupper(preg_replace("/[^a-zA-Z]/", "", $data->Diocese));
 
         if ($delete) {
             if (property_exists($this->generalIndex, $key)) {
@@ -381,11 +294,11 @@ class RegionalData
             if (!property_exists($this->generalIndex, $key)) {
                 $this->generalIndex->$key = new \stdClass();
             }
-            $this->generalIndex->$key->path = $path . "/{$this->response->Diocese}.json";
-            $this->generalIndex->$key->nation = $this->response->Nation;
-            $this->generalIndex->$key->diocese = $this->response->Diocese;
-            if (property_exists($this->response, 'Group')) {
-                $this->generalIndex->$key->group = $this->response->Group;
+            $this->generalIndex->$key->path = $data->path . "/{$data->Diocese}.json";
+            $this->generalIndex->$key->nation = $data->Nation;
+            $this->generalIndex->$key->diocese = $data->Diocese;
+            if (property_exists($data, 'Group')) {
+                $this->generalIndex->$key->group = $data->Group;
             }
         }
 
@@ -394,8 +307,7 @@ class RegionalData
             $jsonEncodedContents = json_encode($this->generalIndex, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             file_put_contents("nations/index.json", $jsonEncodedContents . PHP_EOL);
         } else {
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 422 Unprocessable Entity", true, 422);
-            die(json_encode($test));
+            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, json_encode($test));
         }
     }
 
@@ -416,9 +328,101 @@ class RegionalData
             return true;
         } catch (InvalidValue | \Exception $e) {
             $result->error = LitSchema::ERROR_MESSAGES[ $schemaUrl ] . PHP_EOL . $e->getMessage();
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 422 Unprocessable Entity", true, 422);
-            die(json_encode($result));
+            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, json_encode($result));
         }
+    }
+
+    private function handleRequestParams(array $requestPathParts): void
+    {
+        if (count($requestPathParts)) {
+            if (count($requestPathParts) !== 2) {
+                self::produceErrorResponse(StatusCode::BAD_REQUEST, "Expected two and exactly two path params, received " . count($requestPathParts));
+            } else {
+                $data = new \stdClass();
+                if (false === array_key_exists($requestPathParts[0], RegionalDataParams::EXPECTED_CATEGORIES)) {
+                    self::produceErrorResponse(
+                        StatusCode::BAD_REQUEST,
+                        "Unexpected path param {$requestPathParts[0]}, acceptable values are: " . implode(', ', array_keys(RegionalDataParams::EXPECTED_CATEGORIES))
+                    );
+                } else {
+                    $data->category = RegionalDataParams::EXPECTED_CATEGORIES[$requestPathParts[0]];
+                    $data->key = $requestPathParts[1];
+                }
+            }
+            if (self::$APICore->getRequestMethod() === RequestMethod::PUT || self::$APICore->getRequestMethod() === RequestMethod::PATCH) {
+                // the payload MUST be in the body of the request, either JSON encoded or YAML encoded
+                switch (self::$APICore->getRequestContentType()) {
+                    case 'application/json':
+                        $data->payload = self::$APICore->retrieveRequestParamsFromJsonBody();
+                        break;
+                    case 'application/yaml':
+                        $data->payload = self::$APICore->retrieveRequestParamsFromYamlBody();
+                        break;
+                    default:
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Expected payload in body of request, either JSON encoded or YAML encoded");
+                }
+            }
+        } elseif (self::$APICore->getRequestContentType() === 'application/json') {
+            $data = self::$APICore->retrieveRequestParamsFromJsonBody();
+        } elseif (self::$APICore->getRequestContentType() === 'application/yaml') {
+            $data = self::$APICore->retrieveRequestParamsFromYamlBody();
+        } else {
+            $data = (object)$_REQUEST;
+        }
+        if (false === $this->params->setData($data)) {
+            self::produceErrorResponse(StatusCode::BAD_REQUEST, "The params do not seem to be correct, must have params `category` and `key` with acceptable values");
+        }
+    }
+
+    public static function produceErrorResponse(int $statusCode, string $description): void
+    {
+        header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
+        $message = new \stdClass();
+        $message->status = "ERROR";
+        $statusMessage = "";
+        switch (self::$APICore->getRequestMethod()) {
+            case RequestMethod::PUT:
+                $statusMessage = "Resource not Created";
+                break;
+            case RequestMethod::PATCH:
+                $statusMessage = "Resource not Updated";
+                break;
+            case RequestMethod::DELETE:
+                $statusMessage = "Resource not Deleted";
+                break;
+            default:
+                $statusMessage = "Sorry what was it you wanted to do with this resource?";
+        }
+        $message->response = $statusCode === 404 ? "Resource not Found" : $statusMessage;
+        $message->description = $description;
+        $response = json_encode($message);
+        switch (self::$APICore->getResponseContentType()) {
+            case AcceptHeader::YML:
+                $responseObj = json_decode($response, true);
+                echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
+                break;
+            case AcceptHeader::JSON:
+            default:
+                echo $response;
+        }
+        die();
+    }
+
+    private static function produceResponse(string $jsonEncodedResponse): void
+    {
+        if (in_array(self::$APICore->getRequestMethod(), ['PUT','PATCH'])) {
+            header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
+        }
+        switch (self::$APICore->getRequestContentType()) {
+            case AcceptHeader::YML:
+                $responseObj = json_decode($jsonEncodedResponse, true);
+                echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
+                break;
+            case AcceptHeader::JSON:
+            default:
+                echo $jsonEncodedResponse;
+        }
+        die();
     }
 
     /**
@@ -426,11 +430,17 @@ class RegionalData
      *
      * @return void
      */
-    public function init()
+    public function init(array $requestPathParts = [])
     {
-        $this->APICore->init();
-        $this->APICore->setResponseContentTypeHeader();
+        self::$APICore->init();
+        if (self::$APICore->getRequestMethod() === RequestMethod::GET) {
+            self::$APICore->validateAcceptHeader(true);
+        } else {
+            self::$APICore->validateAcceptHeader(false);
+        }
+        self::$APICore->setResponseContentTypeHeader();
         $this->loadIndex();
-        $this->handleRequestedMethod();
+        $this->handleRequestParams($requestPathParts);
+        $this->handleRequestMethod();
     }
 }

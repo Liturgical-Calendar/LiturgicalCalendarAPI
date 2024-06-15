@@ -261,17 +261,53 @@ class APICore
 
     public function retrieveRequestParamsFromJsonBody(): object
     {
-
-        $json = file_get_contents('php://input');
-        $data = json_decode($json);
-        if ("" === $json) {
+        $rawData = file_get_contents('php://input');
+        if ("" === $rawData) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
-            die('{"error":"No JSON data received in the request"');
-        } elseif (json_last_error() !== JSON_ERROR_NONE) {
+            die('{"error":"No JSON data received in the request"}');
+        }
+        $data = json_decode($rawData);
+        if (json_last_error() !== JSON_ERROR_NONE) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
-            die('{"error":"Malformed JSON data received in the request: <' . $json . '>, ' . json_last_error_msg() . '"}');
+            die('{"error":"Malformed JSON data received in the request: <' . $rawData . '>, ' . json_last_error_msg() . '"}');
         }
         return $data;
+    }
+
+    private static function warningHandler($errno, $errstr)
+    {
+        throw new \Exception($errstr, $errno);
+    }
+
+    public function retrieveRequestParamsFromYamlBody(): object
+    {
+        $rawData = file_get_contents('php://input');
+        if ("" === $rawData) {
+            header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
+            die('{"error":"No YAML data received in the request"}');
+        }
+
+        set_error_handler(array('self', 'warningHandler'), E_WARNING);
+        try {
+            $data = yaml_parse($rawData);
+            if (false === $data) {
+                header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
+                $response = new \stdClass();
+                $response->error = "Malformed YAML data received in the request";
+                die(json_encode($response));
+            } else {
+                return json_decode(json_encode($data));
+            }
+        } catch (\Exception $e) {
+            header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
+            $response = new \stdClass();
+            $response->status = "error";
+            $response->message = "Malformed YAML data received in the request";
+            $response->error = $e->getMessage();
+            $response->line = $e->getLine();
+            $response->code = $e->getCode();
+            die(json_encode($response));
+        }
     }
 
     public function init()

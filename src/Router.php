@@ -39,8 +39,8 @@ class Router
 
     private static function buildRequestPathParts(): array
     {
-        // 1) The script name will actually include the base path of the API (e.g. /api/dev/index.php),
-        //      so in order to obtain the base path we remove /index.php and are left with /api/dev
+        // 1) The script name will actually include the base path of the API (e.g. /api/{apiVersion}/index.php),
+        //      so in order to obtain the base path we remove index.php and are left with /api/{apiVersion}/
         $apiBasePath = str_replace('index.php', '', $_SERVER['SCRIPT_NAME']); //can also use $_SERVER['DOCUMENT_URI'] or $_SERVER['PHP_SELF']
         // 2) remove any request params from the REQUEST_URI
         $requestPath = explode('?', $_SERVER['REQUEST_URI'])[0];
@@ -74,7 +74,6 @@ class Router
             case 'tests':
                 Tests::init($requestPathParts);
                 Tests::$APICore->setAllowedOrigins(self::$allowedOrigins);
-                Tests::$APICore->setAllowedOrigins(self::$allowedOrigins);
                 Tests::$APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE, RequestMethod::OPTIONS]);
                 Tests::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON ]);
                 Tests::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YML ]);
@@ -88,7 +87,7 @@ class Router
                 $Events::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YML ]);
                 $Events->init($requestPathParts);
                 break;
-            case 'regionaldata':
+            case 'data':
                 $LitCalRegionalData = new RegionalData();
                 $LitCalRegionalData->APICore->setAllowedOrigins(self::$allowedOrigins);
                 $LitCalRegionalData->APICore->setAllowedReferers(
@@ -99,9 +98,17 @@ class Router
                         self::$allowedOrigins
                     )
                 );
-                $LitCalRegionalData->APICore->setAllowedAcceptHeaders([AcceptHeader::JSON]);
+                $LitCalRegionalData->APICore->setAllowedRequestMethods([
+                    RequestMethod::GET,
+                    RequestMethod::POST,
+                    RequestMethod::PUT,
+                    RequestMethod::PATCH,
+                    RequestMethod::DELETE,
+                    RequestMethod::OPTIONS
+                ]);
                 $LitCalRegionalData->APICore->setAllowedRequestContentTypes([RequestContentType::JSON, RequestContentType::FORMDATA]);
-                $LitCalRegionalData->init();
+                $LitCalRegionalData->APICore->setAllowedAcceptHeaders([AcceptHeader::JSON, AcceptHeader::YML]);
+                $LitCalRegionalData->init($requestPathParts);
                 break;
             case 'easter':
                 Easter::init();

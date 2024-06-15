@@ -2,7 +2,6 @@
 
 namespace Johnrdorazio\LitCal\Params;
 
-use Johnrdorazio\LitCal\Enum\CalendarType;
 use Johnrdorazio\LitCal\Enum\LitLocale;
 
 class EventsParams
@@ -68,7 +67,7 @@ class EventsParams
             if (in_array($key, self::ALLOWED_PARAMS)) {
                 switch ($key) {
                     case "LOCALE":
-                        $this->Locale           = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
+                        $this->Locale = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
                         break;
                     case "NATIONALCALENDAR":
                         if (false === in_array(strtoupper($value), $this->SupportedNationalCalendars)) {
