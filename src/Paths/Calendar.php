@@ -23,12 +23,13 @@ use Johnrdorazio\LitCal\Enum\RequestContentType;
 use Johnrdorazio\LitCal\Enum\RequestMethod;
 use Johnrdorazio\LitCal\Enum\ReturnType;
 use Johnrdorazio\LitCal\Enum\RomanMissal;
+use Johnrdorazio\LitCal\Enum\StatusCode;
 use Johnrdorazio\LitCal\Params\CalendarParams;
 
 class Calendar
 {
     public const API_VERSION                        = '3.9';
-    public APICore $APICore;
+    public static APICore $APICore;
 
     private string $CacheDuration                   = "";
     private string $CACHEFILE                       = "";
@@ -200,8 +201,8 @@ class Calendar
     public function __construct()
     {
         $this->startTime        = hrtime(true);
-        $this->APICore          = new APICore();
         $this->CacheDuration    = "_" . CacheDuration::MONTH . date("m");
+        self::$APICore          = new APICore();
     }
 
     private static function debugWrite(string $string)
@@ -209,26 +210,39 @@ class Calendar
         file_put_contents("debug.log", $string . PHP_EOL, FILE_APPEND);
     }
 
-    private function initParameterData()
+    public static function produceErrorResponse(int $statusCode, string $description): void
     {
-        if ($this->APICore->getRequestContentType() === RequestContentType::JSON) {
-            $json = file_get_contents('php://input');
-            $data = json_decode($json, true);
-            if (null === $json || "" === $json) {
-                header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
-                $response = new \stdClass();
-                $response->error = "No JSON data received in the request: <$json>";
-                die(json_encode($response));
-            } elseif (json_last_error() !== JSON_ERROR_NONE) {
-                $response = new \stdClass();
-                $response->error = "Malformed JSON data received in the request: <$json>, " . json_last_error_msg();
-                header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
-                die(json_encode($response));
-            } else {
-                $this->CalendarParams = new CalendarParams($data);
-            }
+        header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
+        $message = new \stdClass();
+        $message->status = "ERROR";
+        $message->description = $description;
+        $response = json_encode($message);
+        switch (self::$APICore->getResponseContentType()) {
+            case AcceptHeader::YAML:
+                $responseObj = json_decode($response, true);
+                echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
+                break;
+            case AcceptHeader::JSON:
+                echo $response;
+                break;
+            case AcceptHeader::ICS:
+            case AcceptHeader::XML:
+            default:
+                // do not emit anything, the header should be enough
+        }
+        die();
+    }
+
+    private function initParameterData(array $requestPathParts = [])
+    {
+        if (self::$APICore->getRequestContentType() === RequestContentType::JSON) {
+            $data = self::$APICore->retrieveRequestParamsFromJsonBody(true);
+            $this->CalendarParams = new CalendarParams($data);
+        } elseif (self::$APICore->getRequestContentType() === RequestContentType::YAML) {
+            $data = self::$APICore->retrieveRequestParamsFromYamlBody(true);
+            $this->CalendarParams = new CalendarParams($data);
         } else {
-            switch ($this->APICore->getRequestMethod()) {
+            switch (self::$APICore->getRequestMethod()) {
                 case RequestMethod::POST:
                     $this->CalendarParams = new CalendarParams($_POST);
                     break;
@@ -239,54 +253,105 @@ class Calendar
                     //continue
                     break;
                 default:
-                    header($_SERVER[ "SERVER_PROTOCOL" ] . " 405 Method Not Allowed", true, 405);
-                    $response = new \stdClass();
-                    $response->error = "You seem to be forming a strange kind of request? Allowed Request Methods are "
-                        . implode(' and ', $this->APICore->getAllowedRequestMethods())
-                        . ', but your Request Method was '
-                        . $this->APICore->getRequestMethod();
-                    die(json_encode($response));
+                    $description = "Allowed Request Methods are "
+                    . implode(' and ', self::$APICore->getAllowedRequestMethods())
+                    . ', but your Request Method was '
+                    . self::$APICore->getRequestMethod();
+                    self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, $description);
+            }
+        }
+        // path will have precedence over params
+        $numPathParts = count($requestPathParts);
+        if ($numPathParts > 0) {
+            $DATA = [];
+            if ($numPathParts === 1) {
+                if (
+                    false === in_array(gettype($requestPathParts[0]), ['string', 'integer'])
+                    || (
+                        gettype($requestPathParts[0]) === 'string'
+                        && (
+                            false === is_numeric($requestPathParts[0])
+                            || false === ctype_digit($requestPathParts[0])
+                            || strlen($requestPathParts[0]) !== 4
+                        )
+                    )
+                ) {
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "path parameter expected to represent Year value but did not have type Integer or numeric String");
+                } else {
+                    $DATA["YEAR"] = $requestPathParts[0];
+                }
+            } elseif ($numPathParts > 3) {
+                $description = "Expected at least one and at most three path parameters, instead found " . $numPathParts;
+                self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+            } else {
+                if (false === in_array($requestPathParts[0], ['nation','diocese'])) {
+                    $description = "Invalid value `{$requestPathParts[0]}` for path parameter in position 1,"
+                        . " the first parameter should have a value of either `nation` or `diocese`";
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+                } else {
+                    if ($requestPathParts[0] === 'nation') {
+                        $DATA['NATIONALCALENDAR'] = $requestPathParts[1];
+                    } elseif ($requestPathParts[0] === 'diocese') {
+                        $DATA['DIOCESANCALENDAR'] = $requestPathParts[1];
+                    }
+                }
+                if ($numPathParts === 3) {
+                    if (
+                        false === in_array(gettype($requestPathParts[2]), ['string', 'integer'])
+                        || (
+                            gettype($requestPathParts[2]) === 'string'
+                            && (
+                                false === is_numeric($requestPathParts[2])
+                                || false === ctype_digit($requestPathParts[2])
+                                || strlen($requestPathParts[2]) !== 4
+                            )
+                        )
+                    ) {
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "path parameter expected to represent Year value but did not have type Integer or numeric String");
+                    } else {
+                        $DATA["YEAR"] = $requestPathParts[2];
+                    }
+                }
+            }
+            if (count($DATA)) {
+                $this->CalendarParams->setData($DATA);
             }
         }
         if ($this->CalendarParams->ReturnType !== null) {
             if (in_array($this->CalendarParams->ReturnType, $this->AllowedReturnTypes)) {
-                $this->APICore->setResponseContentType(
-                    $this->APICore->getAllowedAcceptHeaders()[ array_search($this->CalendarParams->ReturnType, $this->AllowedReturnTypes) ]
+                self::$APICore->setResponseContentType(
+                    self::$APICore->getAllowedAcceptHeaders()[ array_search($this->CalendarParams->ReturnType, $this->AllowedReturnTypes) ]
                 );
             } else {
-                header($_SERVER[ "SERVER_PROTOCOL" ] . " 406 Not Acceptable", true, 406);
-                $response = new \stdClass();
-                $response->error = "You are requesting a content type which this API cannot produce. Allowed content types are "
+                $description = "You are requesting a content type which this API cannot produce. Allowed content types are "
                     . implode(' and ', $this->AllowedReturnTypes)
                     . ', but you have issued a parameter requesting a Content Type of '
                     . strtoupper($this->CalendarParams->ReturnType);
-                die(json_encode($response));
+                self::produceErrorResponse(StatusCode::NOT_ACCEPTABLE, $description);
             }
         } else {
-            if ($this->APICore->hasAcceptHeader()) {
-                if ($this->APICore->isAllowedAcceptHeader()) {
-                    $this->CalendarParams->ReturnType = $this->AllowedReturnTypes[ $this->APICore->getIdxAcceptHeaderInAllowed() ];
-                    $this->APICore->setResponseContentType($this->APICore->getAcceptHeader());
+            if (self::$APICore->hasAcceptHeader()) {
+                if (self::$APICore->isAllowedAcceptHeader()) {
+                    $this->CalendarParams->ReturnType = $this->AllowedReturnTypes[ self::$APICore->getIdxAcceptHeaderInAllowed() ];
+                    self::$APICore->setResponseContentType(self::$APICore->getAcceptHeader());
                 } else {
                     //Requests from browser windows using the address bar will probably have an Accept header of text/html
                     //In order to not be too drastic, let's treat text/html as though it were application/json
-                    $acceptHeaders = explode(",", $this->APICore->getAcceptHeader());
+                    $acceptHeaders = explode(",", self::$APICore->getAcceptHeader());
                     if (in_array('text/html', $acceptHeaders) || in_array('text/plain', $acceptHeaders) || in_array('*/*', $acceptHeaders)) {
                         $this->CalendarParams->ReturnType = ReturnType::JSON;
-                        $this->APICore->setResponseContentType(AcceptHeader::JSON);
+                        self::$APICore->setResponseContentType(AcceptHeader::JSON);
                     } else {
-                        header($_SERVER[ "SERVER_PROTOCOL" ] . " 406 Not Acceptable", true, 406);
-                        $response = new \stdClass();
-                        $response->error = "You are requesting a content type which this API cannot produce. Allowed Accept headers are "
-                            . implode(' and ', $this->APICore->getAllowedAcceptHeaders())
+                        $description = "You are requesting a content type which this API cannot produce. Allowed Accept headers are "
+                            . implode(' and ', self::$APICore->getAllowedAcceptHeaders())
                             . ', but you have issued an request with an Accept header of '
-                            . $this->APICore->getAcceptHeader();
-                        die(json_encode($response));
+                            . self::$APICore->getAcceptHeader();
+                        self::produceErrorResponse(StatusCode::NOT_ACCEPTABLE, $description);
                     }
                 }
             } else {
                 $this->CalendarParams->ReturnType = $this->AllowedReturnTypes[ 0 ];
-                $this->APICore->setResponseContentType($this->APICore->getAllowedAcceptHeaders()[ 0 ]);
+                self::$APICore->setResponseContentType(self::$APICore->getAllowedAcceptHeaders()[ 0 ]);
             }
         }
     }
@@ -3449,8 +3514,8 @@ class Calendar
         $SerializeableLitCal->Metadata->Timestamp           = time();
         $SerializeableLitCal->Metadata->DateTime            = date(DATE_ATOM);
 
-        //$SerializeableLitCal->Metadata->RequestHeaders      = $this->APICore->getJsonEncodedRequestHeaders();
-        $SerializeableLitCal->Metadata->RequestHeaders      = $this->APICore->getRequestHeaders();
+        //$SerializeableLitCal->Metadata->RequestHeaders      = self::$APICore->getJsonEncodedRequestHeaders();
+        $SerializeableLitCal->Metadata->RequestHeaders      = self::$APICore->getRequestHeaders();
         $SerializeableLitCal->Metadata->Solemnities         = $this->Cal->getSolemnities();
         $SerializeableLitCal->Metadata->FeastsMemorials     = $this->Cal->getFeastsAndMemorials();
 
@@ -3583,15 +3648,15 @@ class Calendar
      * Do not change the order of the methods that follow,
      * each one can depend on the one before it in order to function correctly!
      */
-    public function init()
+    public function init(array $requestPathParts = [])
     {
-        $this->APICore->init();
-        $this->initParameterData();
+        self::$APICore->init();
+        $this->initParameterData($requestPathParts);
         $this->loadDiocesanCalendarData();
         $this->loadNationalCalendarData();
         $this->updateSettingsBasedOnNationalCalendar();
         $this->updateSettingsBasedOnDiocesanCalendar();
-        $this->APICore->setResponseContentTypeHeader();
+        self::$APICore->setResponseContentTypeHeader();
 
         if ($this->cacheFileIsAvailable()) {
             //If we already have done the calculation

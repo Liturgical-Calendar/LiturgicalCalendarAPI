@@ -60,13 +60,13 @@ class Router
             case '':
             case 'calendar':
                 $LitCalEngine = new Calendar();
-                $LitCalEngine->APICore->setAllowedOrigins(self::$allowedOrigins);
-                $LitCalEngine->APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
-                $LitCalEngine->APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
-                $LitCalEngine->APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS, AcceptHeader::YAML ]);
+                Calendar::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                Calendar::$APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
+                Calendar::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
+                Calendar::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS, AcceptHeader::YAML ]);
                 $LitCalEngine->setAllowedReturnTypes([ ReturnType::JSON, ReturnType::XML, ReturnType::ICS, ReturnType::YAML ]);
                 $LitCalEngine->setCacheDuration(CacheDuration::MONTH);
-                $LitCalEngine->init(); //TODO: pass in $requestPathParts and use the path information for our settings
+                $LitCalEngine->init($requestPathParts);
                 break;
             case 'metadata':
             case 'calendars':
@@ -82,16 +82,16 @@ class Router
                 break;
             case 'events':
                 $Events = new Events();
-                $Events::$APICore->setAllowedOrigins(self::$allowedOrigins);
-                $Events::$APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
-                $Events::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
-                $Events::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                Events::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                Events::$APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
+                Events::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
+                Events::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 $Events->init($requestPathParts);
                 break;
             case 'data':
                 $RegionalData = new RegionalData();
-                $RegionalData::$APICore->setAllowedOrigins(self::$allowedOrigins);
-                $RegionalData::$APICore->setAllowedReferers(
+                RegionalData::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                RegionalData::$APICore->setAllowedReferers(
                     array_map(
                         function ($el) {
                             return $el . "/";
@@ -99,7 +99,7 @@ class Router
                         self::$allowedOrigins
                     )
                 );
-                $RegionalData::$APICore->setAllowedRequestMethods([
+                RegionalData::$APICore->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST,
                     RequestMethod::PUT,
@@ -107,12 +107,12 @@ class Router
                     RequestMethod::DELETE,
                     RequestMethod::OPTIONS
                 ]);
-                $RegionalData::$APICore->setAllowedRequestContentTypes([
+                RegionalData::$APICore->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
                 ]);
-                $RegionalData::$APICore->setAllowedAcceptHeaders([
+                RegionalData::$APICore->setAllowedAcceptHeaders([
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);

@@ -258,14 +258,14 @@ class APICore
         }
     }
 
-    public function retrieveRequestParamsFromJsonBody(): object
+    public function retrieveRequestParamsFromJsonBody(bool $assoc = false): object|array
     {
         $rawData = file_get_contents('php://input');
         if ("" === $rawData) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
             die('{"error":"No JSON data received in the request"}');
         }
-        $data = json_decode($rawData);
+        $data = json_decode($rawData, $assoc);
         if (json_last_error() !== JSON_ERROR_NONE) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
             die('{"error":"Malformed JSON data received in the request: <' . $rawData . '>, ' . json_last_error_msg() . '"}');
@@ -278,7 +278,7 @@ class APICore
         throw new \Exception($errstr, $errno);
     }
 
-    public function retrieveRequestParamsFromYamlBody(): object
+    public function retrieveRequestParamsFromYamlBody(bool $assoc = false): object|array
     {
         $rawData = file_get_contents('php://input');
         if ("" === $rawData) {
@@ -295,7 +295,7 @@ class APICore
                 $response->error = "Malformed YAML data received in the request";
                 die(json_encode($response));
             } else {
-                return json_decode(json_encode($data));
+                return $assoc ? $data : json_decode(json_encode($data));
             }
         } catch (\Exception $e) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);

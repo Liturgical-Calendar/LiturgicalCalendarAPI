@@ -8,17 +8,21 @@ use Johnrdorazio\LitCal\Enum\Ascension;
 use Johnrdorazio\LitCal\Enum\CorpusChristi;
 use Johnrdorazio\LitCal\Enum\LitLocale;
 use Johnrdorazio\LitCal\Enum\ReturnType;
+use Johnrdorazio\LitCal\Enum\Route;
+use Johnrdorazio\LitCal\Enum\StatusCode;
+use Johnrdorazio\LitCal\Paths\Calendar;
 
 class CalendarParams
 {
+    private ?object $calendars;
     public int $Year;
     public string $CalendarType          = CalendarType::LITURGICAL;
     public string $Epiphany              = Epiphany::JAN6;
     public string $Ascension             = Ascension::THURSDAY;
     public string $CorpusChristi         = CorpusChristi::THURSDAY;
     public bool $EternalHighPriest       = false;
-    public ?string $Locale               = null;
     public ?string $ReturnType           = null;
+    public ?string $Locale               = null;
     public ?string $NationalCalendar     = null;
     public ?string $DiocesanCalendar     = null;
 
@@ -51,63 +55,125 @@ class CalendarParams
 
     public function __construct(array $DATA)
     {
-        //we need at least a default value for the current year
+        // set a default value for the Year parameter, defaulting to current year
         $this->Year = (int)date("Y");
 
-        $SUPPORTED_NATIONAL_CALENDARS = [ "VATICAN" ];
-        $directories = array_map('basename', glob('nations/*', GLOB_ONLYDIR));
-        //self::debugWrite(json_encode($directories));
-        foreach ($directories as $directory) {
-            //self::debugWrite($directory);
-            if (file_exists("nations/$directory/$directory.json")) {
-                $SUPPORTED_NATIONAL_CALENDARS[] = $directory;
+        $calendarsRoute = (defined('API_BASE_PATH') ? API_BASE_PATH : 'https://litcal.johnromanodorazio.com/api/dev') . Route::CALENDARS->value;
+        $metadataRaw = file_get_contents($calendarsRoute);
+        if ($metadataRaw) {
+            $metadata = json_decode($metadataRaw);
+            if (JSON_ERROR_NONE === json_last_error() && property_exists($metadata, 'LitCalMetadata')) {
+                $this->calendars = $metadata->LitCalMetadata;
             }
         }
 
+        // set a default value for language starting from Accept-Language header
+        // a LOCALE parameter can then override this value
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+            $this->Locale = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
+        } else {
+            $this->Locale = LitLocale::LATIN;
+        }
+
+        $this->setData($DATA);
+    }
+
+    public function setData(array $DATA = [])
+    {
         foreach ($DATA as $key => $value) {
             $key = strtoupper($key);
             if (in_array($key, self::ALLOWED_PARAMS)) {
+                if ($key !== 'YEAR' && $key !== 'ETERNALHIGHPRIEST') {
+                    // all other parameters expect a string value
+                    if (gettype($value) !== 'string') {
+                        $description = "Expected value of type String for parameter `{$key}`, instead found type " . gettype($value);
+                        Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+                    }
+                    $value = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
+                }
                 switch ($key) {
                     case "YEAR":
                         $this->enforceYearValidity($value);
                         break;
                     case "EPIPHANY":
-                        $this->Epiphany         = Epiphany::isValid(strtoupper($value)) ? strtoupper($value) : Epiphany::JAN6;
+                        if (Epiphany::isValid(strtoupper($value))) {
+                            $this->Epiphany = strtoupper($value);
+                        } else {
+                            $description = "Invalid value `{$value}` for parameter `EPIPHANY`, valid values are: " . implode(', ', Epiphany::$values);
+                            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+                        }
                         break;
                     case "ASCENSION":
-                        $this->Ascension        = Ascension::isValid(strtoupper($value)) ? strtoupper($value) : Ascension::THURSDAY;
+                        if (Ascension::isValid(strtoupper($value))) {
+                            $this->Ascension = strtoupper($value);
+                        } else {
+                            $description = "Invalid value `{$value}` for parameter `ASCENSION`, valid values are: " . implode(', ', Ascension::$values);
+                            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+                        }
                         break;
                     case "CORPUSCHRISTI":
-                        $this->CorpusChristi    = CorpusChristi::isValid(strtoupper($value)) ? strtoupper($value) : CorpusChristi::THURSDAY;
+                        if (CorpusChristi::isValid(strtoupper($value))) {
+                            $this->CorpusChristi = strtoupper($value);
+                        } else {
+                            $description = "Invalid value `{$value}` for parameter `CORPUSCHRISTI`, valid values are: " . implode(', ', CorpusChristi::$values);
+                            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+                        }
                         break;
                     case "LOCALE":
-                        $value                  = \Locale::canonicalize($value);
-                        $this->Locale           = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
+                        $value = \Locale::canonicalize($value);
+                        if (LitLocale::isValid($value)) {
+                            $this->Locale = $value;
+                        } else {
+                            $description = "Invalid value `{$value}` for parameter `LOCALE`, valid values are: " . implode(', ', LitLocale::$values);
+                            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+                        }
                         break;
                     case "RETURNTYPE":
-                        $this->ReturnType       = ReturnType::isValid(strtoupper($value)) ? strtoupper($value) : ReturnType::JSON;
+                        if (ReturnType::isValid(strtoupper($value))) {
+                            $this->ReturnType = strtoupper($value);
+                        } else {
+                            $description = "Invalid value `{$value}` for parameter `RETURNTYPE`, valid values are: " . implode(', ', ReturnType::$values);
+                            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+                        }
                         break;
                     case "NATIONALCALENDAR":
-                        $this->NationalCalendar = in_array(strtoupper($value), $SUPPORTED_NATIONAL_CALENDARS) ? strtoupper($value) : null;
+                        if (property_exists($this->calendars->NationalCalendars, $value)) {
+                            $this->NationalCalendar = $value;
+                        } else {
+                            $validVals = array_keys(get_object_vars($this->calendars->NationalCalendars));
+                            $description = "Invalid value `{$value}` for parameter `NATIONALCALENDAR`, valid values are: " . implode(', ', $validVals);
+                            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+                        }
                         break;
                     case "DIOCESANCALENDAR":
-                        $this->DiocesanCalendar = strtoupper($value);
+                        if (property_exists($this->calendars->DiocesanCalendars, $value)) {
+                            $this->DiocesanCalendar = $value;
+                        } else {
+                            $validVals = array_keys(get_object_vars($this->calendars->DiocesanCalendars));
+                            $description = "Invalid value `{$value}` for parameter `DIOCESANCALENDAR`, valid values are: " . implode(', ', $validVals);
+                            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+                        }
                         break;
                     case "CALENDARTYPE":
-                        $this->CalendarType     = CalendarType::isValid(strtoupper($value)) ? strtoupper($value) : CalendarType::LITURGICAL;
+                        if (CalendarType::isValid(strtoupper($value))) {
+                            $this->CalendarType = strtoupper($value);
+                        } else {
+                            $description = "Invalid value `{$value}` for parameter `CALENDARTYPE`, valid values are: " . implode(', ', CalendarType::$values);
+                            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+                        }
                         break;
                     case "ETERNALHIGHPRIEST":
-                        $this->EternalHighPriest = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+                        if (gettype($value) !== 'boolean') {
+                            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN | FILTER_NULL_ON_FAILURE);
+                            if (null === $value) {
+                                $description = "Invalid value for parameter `ETERNALHIGHPRIEST`, valid values are `true` and `false`";
+                                Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+                            }
+                        }
+                        $this->EternalHighPriest = $value;
                         break;
                 }
-            }
-        }
-        if ($this->Locale === null) {
-            if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-                $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-                $this->Locale = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
-            } else {
-                $this->Locale = LitLocale::LATIN;
             }
         }
     }
@@ -116,15 +182,20 @@ class CalendarParams
     {
         if (gettype($value) === 'string') {
             if (is_numeric($value) && ctype_digit($value) && strlen($value) === 4) {
-                $value = (int)$value;
-                if ($value >= self::YEAR_LOWER_LIMIT && $value <= self::YEAR_UPPER_LIMIT) {
-                    $this->Year = $value;
-                }
+                $this->Year = (int)$value;
+            } else {
+                $description = 'Year parameter is of type String, but is not a numeric String with 4 digits';
+                Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
             }
         } elseif (gettype($value) === 'integer') {
-            if ($value >= self::YEAR_LOWER_LIMIT && $value <= self::YEAR_UPPER_LIMIT) {
-                $this->Year = $value;
-            }
+            $this->Year = $value;
+        } else {
+            $description = 'Year parameter must be of type Integer or numeric String, instead it was of type ' . gettype($value);
+            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+        }
+        if ($this->Year < self::YEAR_LOWER_LIMIT || $this->Year > self::YEAR_UPPER_LIMIT) {
+            $description = 'Year parameter out of bounds, must have a value betwen ' . self::YEAR_LOWER_LIMIT . ' and ' . self::YEAR_UPPER_LIMIT;
+            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
         }
     }
 }
