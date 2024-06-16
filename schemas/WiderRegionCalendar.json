@@ -10,7 +10,8 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/LitCal"
-                    }
+                    },
+                    "minItems": 1
                 },
                 "NationalCalendars": {
                     "$ref": "#/definitions/NationalCalendars"
@@ -371,6 +372,7 @@
                     "pattern": "[A-Z1-9]{2,3}"
                 }
             },
+            "minProperties": 1,
             "title": "NationalCalendars"
         },
         "CalendarMetadata": {
@@ -385,10 +387,18 @@
                     "items": {
                         "type": "string",
                         "pattern": "[a-z]{2}_[A-Z1-9]{2,3}"
-                    }
+                    },
+                    "minItems": 1
                 },
                 "WiderRegion": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "Africa",
+                        "Americas",
+                        "Asia",
+                        "Europe",
+                        "Oceania"
+                    ]
                 }
             },
             "required": [
