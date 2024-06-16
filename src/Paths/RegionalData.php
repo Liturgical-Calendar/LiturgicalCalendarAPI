@@ -201,7 +201,7 @@ class RegionalData
                     || gettype($this->params->payload->Diocese) !== 'string'
                     || gettype($this->params->payload->LitCal) !== 'string'
                 ) {
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Params `Nation` and `Diocese` in payload are expected to be of type string");
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Params `Nation`, `Diocese`, and `LitCal` in payload are expected to be of type string");
                 }
                 $updateData->Nation = strip_tags($this->params->payload->Nation);
                 $updateData->Diocese = strip_tags($this->params->payload->Diocese);
