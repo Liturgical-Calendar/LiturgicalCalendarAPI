@@ -153,8 +153,11 @@ class RegionalDataParams
                         false === property_exists($data->payload, 'LitCal')
                         || false === property_exists($data->payload, 'Metadata')
                         || false === property_exists($data->payload, 'NationalCalendars')
+                        || false === property_exists($data->payload->Metadata, 'WiderRegion')
+                        || false === property_exists($data->payload->Metadata, 'IsMultilingual')
+                        || false === property_exists($data->payload->Metadata, 'Languages')
                     ) {
-                        $message = "Cannot create or update Wider Region calendar data when the payload does not have required properties `LitCal`, `Metadata` or `NationalCalendars`. Payload was:\n" . json_encode($data->payload, JSON_PRETTY_PRINT);
+                        $message = "Cannot create or update Wider Region calendar data when the payload does not have required properties `LitCal`, `NationalCalendars`, `Metadata`, `Metadata->WiderRegion`, `Metadata->IsMultilingual`, `Metadata->Languages`. Payload was:\n" . json_encode($data->payload, JSON_PRETTY_PRINT);
                         RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                     }
                     break;
