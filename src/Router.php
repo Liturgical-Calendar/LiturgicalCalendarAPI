@@ -139,6 +139,7 @@ class Router
                 ]);
                 Missal::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
                 Missal::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                Missal::handleRequest();
                 break;
             case 'easter':
                 Easter::init();

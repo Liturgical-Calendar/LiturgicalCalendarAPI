@@ -13,10 +13,11 @@ class Missal
     public static APICore $APICore;
     public static MissalParams $params;
     public static object $missalsIndex;
+    private static array $requestPathParts = [];
 
-    public static function initParams(array $requestPathParts = [])
+    public static function initParams()
     {
-        $numPathParts = count($requestPathParts);
+        $numPathParts = count(self::$requestPathParts);
         if ($numPathParts > 0) {
             if ($numPathParts === 1) {
                 // We should expect a Year value
@@ -75,8 +76,11 @@ class Missal
         die();
     }
 
-    public static function init()
+    public static function init(array $requestPathParts = [])
     {
+        if (count($requestPathParts)) {
+            self::$requestPathParts = $requestPathParts;
+        }
         self::$missalsIndex = new \stdClass();
         self::$missalsIndex->GeneralRoman = [];
         $directories = array_map('basename', glob('data/propriumdesanctis*', GLOB_ONLYDIR));
@@ -103,7 +107,7 @@ class Missal
         self::$APICore = new APICore();
     }
 
-    public static function handleRequest(array $requestPathParts = [])
+    public static function handleRequest()
     {
         self::$APICore->init();
         if (self::$APICore->getRequestMethod() === RequestMethod::GET) {
@@ -112,9 +116,9 @@ class Missal
             self::$APICore->validateAcceptHeader(false);
         }
         self::$APICore->setResponseContentTypeHeader();
-        if (count($requestPathParts) === 0) {
+        if (count(self::$requestPathParts) === 0) {
             self::produceResponse(json_encode(self::$missalsIndex));
         }
-        self::initParams($requestPathParts);
+        self::initParams();
     }
 }
