@@ -4,7 +4,7 @@ namespace Johnrdorazio\LitCal\Enum;
 
 class LitSchema
 {
-    private const SCHEMA_BASE_PATH = (defined('API_BASE_PATH') ? API_BASE_PATH : 'https://litcal.johnromanodorazio.com/api/dev') . Route::SCHEMAS->value;
+    private const SCHEMA_BASE_PATH = API_BASE_PATH . Route::SCHEMAS->value;
     public const INDEX             = self::SCHEMA_BASE_PATH . "/Index.json";
     public const DIOCESAN          = self::SCHEMA_BASE_PATH . "/DiocesanCalendar.json";
     public const NATIONAL          = self::SCHEMA_BASE_PATH . "/NationalCalendar.json";
