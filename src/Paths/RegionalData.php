@@ -196,13 +196,17 @@ class RegionalData
                 break;
             case 'DIOCESANCALENDAR':
                 $updateData = new \stdClass();
+                if (
+                    gettype($this->params->payload->Nation) !== 'string'
+                    || gettype($this->params->payload->Diocese !== 'string')
+                ) {
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Params `Nation` and `Diocese` in payload are expected to be of type string");
+                }
                 $updateData->Nation = strip_tags($this->params->payload->Nation);
                 $updateData->Diocese = strip_tags($this->params->payload->Diocese);
                 $CalData = json_decode($this->params->payload->LitCal);
                 if (json_last_error() !== JSON_ERROR_NONE) {
-                    header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad request", true, 400);
-                    $response->error = "Malformed data received in <LitCal> parameters";
-                    die(json_encode($response));
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Malformed data received in `LitCal` parameter: " . json_last_error_msg());
                 }
                 if (property_exists($this->params->payload, 'Overrides')) {
                     $CalData->Overrides = $this->params->payload->Overrides;
