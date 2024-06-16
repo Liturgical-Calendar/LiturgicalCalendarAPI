@@ -54,10 +54,9 @@ class RegionalDataParams
                         false === property_exists($this->calendars->NationalCalendars, $data->key)
                         && RegionalData::$APICore->getRequestMethod() !== RequestMethod::PUT
                     ) {
-                        $nationalCalendarsArr = array_keys(get_object_vars($this->calendars->NationalCalendars));
-                        if (($key = array_search('VATICAN', $nationalCalendarsArr)) !== false) {
-                            unset($nationalCalendarsArr[$key]);
-                        }
+                        $nationalCalendarsArr = array_filter(array_keys(get_object_vars($this->calendars->NationalCalendars)), function ($v) {
+                            return $v !== 'VATICAN';
+                        });
                         $validVals = implode(', ', $nationalCalendarsArr);
                         RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`, valid values are: {$validVals}");
                     } else {
