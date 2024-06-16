@@ -209,6 +209,10 @@ class RegionalData
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     self::produceErrorResponse(StatusCode::BAD_REQUEST, "Malformed data received in `LitCal` parameter: " . json_last_error_msg());
                 }
+                if (false === $CalData instanceof \stdClass) {
+                    $type = gettype($CalData);
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "`LitCal` param in payload expected to be serialized object, instead it was of type `{$type}` after unserialization");
+                }
                 if (property_exists($this->params->payload, 'Overrides')) {
                     $CalData->Overrides = $this->params->payload->Overrides;
                 }
