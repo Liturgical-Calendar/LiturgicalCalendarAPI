@@ -121,11 +121,13 @@ class CalendarParams
                         }
                         break;
                     case "LOCALE":
-                        $value = \Locale::canonicalize($value);
+                        if ($value !== 'LA' && $value !== 'la') {
+                            $value = \Locale::canonicalize($value);
+                        }
                         if (LitLocale::isValid($value)) {
                             $this->Locale = $value;
                         } else {
-                            $description = "Invalid value `{$value}` for parameter `LOCALE`, valid values are: " . implode(', ', LitLocale::$values);
+                            $description = "Invalid value `{$value}` for parameter `LOCALE`, valid values are: LA, " . implode(', ', LitLocale::$AllAvailableLocales);
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
