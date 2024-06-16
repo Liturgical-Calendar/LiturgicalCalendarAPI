@@ -167,7 +167,7 @@ class CalendarParams
                         break;
                     case "ETERNALHIGHPRIEST":
                         if (gettype($value) !== 'boolean') {
-                            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN | FILTER_NULL_ON_FAILURE);
+                            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                             if (null === $value) {
                                 $description = "Invalid value for parameter `ETERNALHIGHPRIEST`, valid values are `true` and `false`";
                                 Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
