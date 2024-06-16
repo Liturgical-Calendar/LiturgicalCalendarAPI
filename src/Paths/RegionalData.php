@@ -320,14 +320,12 @@ class RegionalData
      */
     private function validateDataAgainstSchema(object $data, string $schemaUrl): bool
     {
-        $result = new \stdClass();
         $schema = Schema::import($schemaUrl);
         try {
             $schema->in($data);
             return true;
         } catch (InvalidValue | \Exception $e) {
-            $result->error = LitSchema::ERROR_MESSAGES[ $schemaUrl ] . PHP_EOL . $e->getMessage();
-            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, json_encode($result));
+            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, LitSchema::ERROR_MESSAGES[ $schemaUrl ] . PHP_EOL . $e->getMessage());
         }
     }
 
