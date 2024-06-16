@@ -9,6 +9,7 @@ use Johnrdorazio\LitCal\Enum\RequestMethod;
 use Johnrdorazio\LitCal\Enum\AcceptHeader;
 use Johnrdorazio\LitCal\Enum\StatusCode;
 use Johnrdorazio\LitCal\Enum\LitSchema;
+use Johnrdorazio\LitCal\Enum\RequestContentType;
 use Johnrdorazio\LitCal\Params\RegionalDataParams;
 
 /**
@@ -346,18 +347,31 @@ class RegionalData
                     $data->key = $requestPathParts[1];
                 }
             }
-            if (self::$APICore->getRequestMethod() === RequestMethod::PUT || self::$APICore->getRequestMethod() === RequestMethod::PATCH) {
-                // the payload MUST be in the body of the request, either JSON encoded or YAML encoded
+            if (in_array(self::$APICore->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH])) {
+                $payload = null;
                 switch (self::$APICore->getRequestContentType()) {
-                    case 'application/json':
-                        $data->payload = self::$APICore->retrieveRequestParamsFromJsonBody();
+                    case RequestContentType::JSON:
+                        $payload = self::$APICore->retrieveRequestParamsFromJsonBody();
                         break;
-                    case 'application/yaml':
-                        $data->payload = self::$APICore->retrieveRequestParamsFromYamlBody();
+                    case RequestContentType::YAML:
+                        $payload = self::$APICore->retrieveRequestParamsFromYamlBody();
                         break;
                     default:
-                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Expected payload in body of request, either JSON encoded or YAML encoded");
+                        if (in_array(self::$APICore->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
+                            // the payload MUST be in the body of the request, either JSON encoded or YAML encoded
+                            self::produceErrorResponse(StatusCode::BAD_REQUEST, "Expected payload in body of request, either JSON encoded or YAML encoded");
+                        }
                 }
+                if (self::$APICore->getRequestMethod() === RequestMethod::POST && $payload !== null) {
+                    if (property_exists($payload, 'locale')) {
+                        $data->locale = $payload->locale;
+                    }
+                } else {
+                    $data->payload = $payload;
+                }
+            }
+            if (isset($_REQUEST['locale'])) {
+                $data->locale = $_REQUEST['locale'];
             }
         } elseif (self::$APICore->getRequestContentType() === 'application/json') {
             $data = self::$APICore->retrieveRequestParamsFromJsonBody();
