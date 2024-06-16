@@ -13,6 +13,7 @@ use Johnrdorazio\LitCal\Paths\Events;
 use Johnrdorazio\LitCal\Paths\Metadata;
 use Johnrdorazio\LitCal\Paths\Tests;
 use Johnrdorazio\LitCal\Paths\RegionalData;
+use Johnrdorazio\LitCal\Paths\Missal;
 
 class Router
 {
@@ -75,7 +76,14 @@ class Router
             case 'tests':
                 Tests::init($requestPathParts);
                 Tests::$APICore->setAllowedOrigins(self::$allowedOrigins);
-                Tests::$APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE, RequestMethod::OPTIONS]);
+                Tests::$APICore->setAllowedRequestMethods([
+                    RequestMethod::GET,
+                    RequestMethod::POST,
+                    RequestMethod::PUT,
+                    RequestMethod::PATCH,
+                    RequestMethod::DELETE,
+                    RequestMethod::OPTIONS
+                ]);
                 Tests::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON ]);
                 Tests::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 Tests::handleRequest();
@@ -117,6 +125,20 @@ class Router
                     AcceptHeader::YAML
                 ]);
                 $RegionalData->init($requestPathParts);
+                break;
+            case 'missals':
+                Missal::init($requestPathParts);
+                Missal::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                Missal::$APICore->setAllowedRequestMethods([
+                    RequestMethod::GET,
+                    RequestMethod::POST,
+                    RequestMethod::PUT,
+                    RequestMethod::PATCH,
+                    RequestMethod::DELETE,
+                    RequestMethod::OPTIONS
+                ]);
+                Missal::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
+                Missal::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 break;
             case 'easter':
                 Easter::init();
