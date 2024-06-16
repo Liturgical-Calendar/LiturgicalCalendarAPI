@@ -145,7 +145,7 @@ class APICore
         $this->AllowedRequestContentTypes = array_values(array_intersect(RequestContentType::$values, $requestContentTypes));
     }
 
-    public function getResponseContentType(): string
+    public function getResponseContentType(): ?string
     {
         return $this->ResponseContentType;
     }
