@@ -20,7 +20,7 @@ class Router
 
     public static function setAllowedOrigins(?string $originsFile = null, ?array $origins = null): void
     {
-        if (file_exists($originsFile)) {
+        if ($originsFile !== null && file_exists($originsFile)) {
             include_once($originsFile);
         }
 

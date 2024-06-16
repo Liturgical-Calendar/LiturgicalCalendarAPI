@@ -4,16 +4,17 @@ namespace Johnrdorazio\LitCal\Enum;
 
 class LitSchema
 {
-    public const INDEX             = "https://litcal.johnromanodorazio.com/api/dev/schemas/Index.json";
-    public const DIOCESAN          = "https://litcal.johnromanodorazio.com/api/dev/schemas/DiocesanCalendar.json";
-    public const NATIONAL          = "https://litcal.johnromanodorazio.com/api/dev/schemas/NationalCalendar.json";
-    public const PROPRIUMDESANCTIS = "https://litcal.johnromanodorazio.com/api/dev/schemas/PropriumDeSanctis.json";
-    public const PROPRIUMDETEMPORE = "https://litcal.johnromanodorazio.com/api/dev/schemas/PropriumDeTempore.json";
-    public const WIDERREGION       = "https://litcal.johnromanodorazio.com/api/dev/schemas/WiderRegionCalendar.json";
-    public const DECREEMEMORIALS   = "https://litcal.johnromanodorazio.com/api/dev/schemas/MemorialsFromDecrees.json";
-    public const I18N              = "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTranslation.json";
-    public const METADATA          = "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalMetadata.json";
-    public const LITCAL            = "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCal.json";
+    private const SCHEMA_BASE_PATH = (defined('API_BASE_PATH') ? API_BASE_PATH : 'https://litcal.johnromanodorazio.com/api/dev') . Route::SCHEMAS->value;
+    public const INDEX             = self::SCHEMA_BASE_PATH . "/Index.json";
+    public const DIOCESAN          = self::SCHEMA_BASE_PATH . "/DiocesanCalendar.json";
+    public const NATIONAL          = self::SCHEMA_BASE_PATH . "/NationalCalendar.json";
+    public const PROPRIUMDESANCTIS = self::SCHEMA_BASE_PATH . "/PropriumDeSanctis.json";
+    public const PROPRIUMDETEMPORE = self::SCHEMA_BASE_PATH . "/PropriumDeTempore.json";
+    public const WIDERREGION       = self::SCHEMA_BASE_PATH . "/WiderRegionCalendar.json";
+    public const DECREEMEMORIALS   = self::SCHEMA_BASE_PATH . "/MemorialsFromDecrees.json";
+    public const I18N              = self::SCHEMA_BASE_PATH . "/LitCalTranslation.json";
+    public const METADATA          = self::SCHEMA_BASE_PATH . "/LitCalMetadata.json";
+    public const LITCAL            = self::SCHEMA_BASE_PATH . "/LitCal.json";
 
     public const ERROR_MESSAGES = [
         LitSchema::INDEX             => "Schema validation error: Index not updated",

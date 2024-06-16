@@ -23,7 +23,8 @@ class RegionalDataParams
 
     public function __construct()
     {
-        $metadataRaw = file_get_contents(API_BASE_PATH .  Route::CALENDARS->value);
+        $calendarsRoute = (defined('API_BASE_PATH') ? API_BASE_PATH : 'https://litcal.johnromanodorazio.com/api/dev') . Route::CALENDARS->value;
+        $metadataRaw = file_get_contents($calendarsRoute);
         if ($metadataRaw) {
             $metadata = json_decode($metadataRaw);
             if (JSON_ERROR_NONE === json_last_error() && property_exists($metadata, 'LitCalMetadata')) {

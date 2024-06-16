@@ -17,7 +17,6 @@ class APICore
     private ?string $JsonEncodedRequestHeaders  = null;
     private ?string $RequestContentType         = null;
     private ?string $ResponseContentType        = null;
-
     private static array $onlyUsefulHeaders = [
         "Accept", "Accept-Language", "X-Requested-With", "Host", "Origin"
     ];

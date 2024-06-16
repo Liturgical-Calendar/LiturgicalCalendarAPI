@@ -22,6 +22,8 @@ if (preg_match('/^\/api\/(.*?)\/index.php$/', $_SERVER['SCRIPT_NAME'], $matches)
     $apiVersion = $matches[1];
 }
 
+// !!IMPORTANT!! There are classes that depend on this! Do NOT remove
+// Perhaps we could find a better way to set this in a class such as APICore ...
 define('API_BASE_PATH', "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}/api/{$apiVersion}");
 
 Router::setAllowedOrigins('allowedOrigins.php');

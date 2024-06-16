@@ -10,4 +10,6 @@ enum Route: string
     case EVENTS     = '/events';
     case DATA       = '/data';
     case EASTER     = '/easter';
+    case SCHEMAS    = '/schemas';
+    case MISSALS    = '/missals';
 }
