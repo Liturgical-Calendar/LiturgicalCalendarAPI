@@ -81,6 +81,7 @@ class CalendarParams
                         $this->CorpusChristi    = CorpusChristi::isValid(strtoupper($value)) ? strtoupper($value) : CorpusChristi::THURSDAY;
                         break;
                     case "LOCALE":
+                        $value                  = \Locale::canonicalize($value);
                         $this->Locale           = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
                         break;
                     case "RETURNTYPE":
@@ -104,7 +105,6 @@ class CalendarParams
         if ($this->Locale === null) {
             if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
                 $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-                //$mainLang = explode("_", $value )[0];
                 $this->Locale = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
             } else {
                 $this->Locale = LitLocale::LATIN;

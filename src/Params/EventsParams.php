@@ -41,7 +41,6 @@ class EventsParams
         $this->Year = (int)date("Y");
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-            //$mainLang = explode("_", $value )[0];
             $this->Locale = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
         } else {
             $this->Locale = LitLocale::LATIN;
@@ -67,6 +66,7 @@ class EventsParams
             if (in_array($key, self::ALLOWED_PARAMS)) {
                 switch ($key) {
                     case "LOCALE":
+                        $this->Locale = \Locale::canonicalize($this->Locale);
                         $this->Locale = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
                         break;
                     case "NATIONALCALENDAR":

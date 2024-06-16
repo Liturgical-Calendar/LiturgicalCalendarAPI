@@ -91,6 +91,7 @@ class RegionalDataParams
                     }
                     // A locale parameter is required for WiderRegion data, whether supplied by the Accept-Language header or by a `locale` parameter
                     if (property_exists($data, 'locale')) {
+                        $data->locale = \Locale::canonicalize($data->locale);
                         if (LitLocale::isValid($data->locale)) {
                             $this->locale = $data->locale;
                         } else {
@@ -98,7 +99,6 @@ class RegionalDataParams
                         }
                     } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
                         $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-                        //$mainLang = explode("_", $value )[0];
                         if (LitLocale::isValid($value)) {
                             $this->locale = $value;
                         } else {
