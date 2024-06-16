@@ -212,6 +212,11 @@ class Calendar
 
     public static function produceErrorResponse(int $statusCode, string $description): void
     {
+        if (self::$APICore->getResponseContentType() === null) {
+            // set a default response content type that can be overriden by a parameter or an accept header
+            self::$APICore->setResponseContentType(self::$APICore->getAllowedAcceptHeaders()[ 0 ]);
+            self::$APICore->setResponseContentTypeHeader();
+        }
         header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
         $message = new \stdClass();
         $message->status = "ERROR";
@@ -235,8 +240,6 @@ class Calendar
 
     private function initParameterData(array $requestPathParts = [])
     {
-        // set a default response content type that can be overriden by a parameter or an accept header
-        self::$APICore->setResponseContentType(self::$APICore->getAllowedAcceptHeaders()[ 0 ]);
         if (self::$APICore->getRequestContentType() === RequestContentType::JSON) {
             $data = self::$APICore->retrieveRequestParamsFromJsonBody(true);
             $this->CalendarParams = new CalendarParams($data);
