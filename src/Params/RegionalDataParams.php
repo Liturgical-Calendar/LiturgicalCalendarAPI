@@ -139,11 +139,11 @@ class RegionalDataParams
                     break;
                 case 'DIOCESANCALENDAR':
                     if (
-                        false === property_exists($data->payload, 'LitCal')
+                        false === property_exists($data->payload, 'CalData')
                         || false === property_exists($data->payload, 'Diocese')
                         || false === property_exists($data->payload, 'Nation')
                     ) {
-                        $message = "Cannot create or update Diocesan calendar data when the payload does not have required properties `LitCal`, `Diocese` or `Nation`. Payload was:\n" . json_encode($data->payload, JSON_PRETTY_PRINT);
+                        $message = "Cannot create or update Diocesan calendar data when the payload does not have required properties `CalData`, `Diocese` or `Nation`. Payload was:\n" . json_encode($data->payload, JSON_PRETTY_PRINT);
                         RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                     }
                     break;
