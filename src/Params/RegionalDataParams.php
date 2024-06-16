@@ -90,7 +90,13 @@ class RegionalDataParams
                         $this->key = $data->key;
                     }
                     // A locale parameter is required for WiderRegion data, whether supplied by the Accept-Language header or by a `locale` parameter
-                    if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+                    if (property_exists($data, 'locale')) {
+                        if (LitLocale::isValid($data->locale)) {
+                            $this->locale = $data->locale;
+                        } else {
+                            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->locale} for param `locale`");
+                        }
+                    } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
                         $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
                         //$mainLang = explode("_", $value )[0];
                         if (LitLocale::isValid($value)) {
@@ -99,16 +105,7 @@ class RegionalDataParams
                             RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$value} for Accept-Language header");
                         }
                     } else {
-                        // if the locale is not set in the Accept-Language header, let's see if it was set in a `locale` parameter
-                        if (property_exists($data, 'locale')) {
-                            if (LitLocale::isValid($data->locale)) {
-                                $this->locale = $data->locale;
-                            } else {
-                                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->locale} for param `locale`");
-                            }
-                        } else {
-                            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "`locale` param or `Accept-Language` header required for Wider Region calendar data");
-                        }
+                        RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "`locale` param or `Accept-Language` header required for Wider Region calendar data");
                     }
                     // Check the request method: cannot DELETE Wider Region calendar data if there are national calendars that depend on it
                     if (RegionalData::$APICore->getRequestMethod() === RequestMethod::DELETE) {
