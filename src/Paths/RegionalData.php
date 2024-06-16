@@ -92,13 +92,16 @@ class RegionalData
                 $response = json_decode(file_get_contents($calendarDataFile));
                 $uKey = strtoupper($this->params->key);
                 if ($this->params->category === "WIDERREGIONCALENDAR") {
-                    $response->isMultilingual = is_dir("nations/{$uKey}");
-                    $locale = strtolower($this->params->locale);
-                    if (file_exists("nations/{$uKey}/{$locale}.json")) {
-                        $localeData = json_decode(file_get_contents("nations/{$uKey}/{$locale}.json"));
-                        foreach ($response->LitCal as $idx => $el) {
-                            $response->LitCal[$idx]->Festivity->name =
-                                $localeData->{$response->LitCal[$idx]->Festivity->tag};
+                    $isMultilingual = is_dir("nations/{$uKey}");
+                    if ($isMultilingual) {
+                        if (false === in_array($this->params->locale, $response->Metadata->Languages)) {
+                            self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value `{$this->params->locale}` for param `locale`. Valid values for current requested Wider region calendar data `{$this->params->key}` are: " . implode(', ', $response->Metadata->Languages));
+                        }
+                        if (file_exists("nations/{$uKey}/{$this->params->locale}.json")) {
+                            $localeData = json_decode(file_get_contents("nations/{$uKey}/{$this->params->locale}.json"));
+                            foreach ($response->LitCal as $idx => $el) {
+                                $response->LitCal[$idx]->Festivity->name = $localeData->{$response->LitCal[$idx]->Festivity->tag};
+                            }
                         }
                     }
                 }
@@ -356,6 +359,9 @@ class RegionalData
                     case RequestContentType::YAML:
                         $payload = self::$APICore->retrieveRequestParamsFromYamlBody();
                         break;
+                    case RequestContentType::FORMDATA:
+                        $payload = (object)$_POST;
+                        break;
                     default:
                         if (in_array(self::$APICore->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
                             // the payload MUST be in the body of the request, either JSON encoded or YAML encoded
@@ -369,13 +375,14 @@ class RegionalData
                 } else {
                     $data->payload = $payload;
                 }
+            } elseif (self::$APICore->getRequestMethod() === RequestMethod::GET) {
+                if (isset($_GET['locale'])) {
+                    $data->locale = $_GET['locale'];
+                }
             }
-            if (isset($_REQUEST['locale'])) {
-                $data->locale = $_REQUEST['locale'];
-            }
-        } elseif (self::$APICore->getRequestContentType() === 'application/json') {
+        } elseif (self::$APICore->getRequestContentType() === RequestContentType::JSON) {
             $data = self::$APICore->retrieveRequestParamsFromJsonBody();
-        } elseif (self::$APICore->getRequestContentType() === 'application/yaml') {
+        } elseif (self::$APICore->getRequestContentType() === RequestContentType::YAML) {
             $data = self::$APICore->retrieveRequestParamsFromYamlBody();
         } else {
             $data = (object)$_REQUEST;
