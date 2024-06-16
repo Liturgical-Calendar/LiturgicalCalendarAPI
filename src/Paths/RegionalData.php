@@ -196,27 +196,23 @@ class RegionalData
                 break;
             case 'DIOCESANCALENDAR':
                 $updateData = new \stdClass();
-                if (
-                    gettype($this->params->payload->Nation) !== 'string'
-                    || gettype($this->params->payload->Diocese) !== 'string'
-                    || gettype($this->params->payload->LitCal) !== 'string'
-                ) {
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Params `Nation`, `Diocese`, and `LitCal` in payload are expected to be of type string");
+                $nationType = gettype($this->params->payload->Nation);
+                $dioceseType = gettype($this->params->payload->Diocese);
+                if ($nationType !== 'string' || $dioceseType !== 'string') {
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Params `Nation` and `Diocese` in payload are expected to be of type string, instead `Nation` was of type `{$nationType}` and `Diocese` was of type `{$dioceseType}`");
                 }
                 $updateData->Nation = strip_tags($this->params->payload->Nation);
                 $updateData->Diocese = strip_tags($this->params->payload->Diocese);
-                $CalData = json_decode($this->params->payload->LitCal);
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Malformed data received in `LitCal` parameter: " . json_last_error_msg());
-                }
+                $CalData = $this->params->payload->CalData;
                 if (false === $CalData instanceof \stdClass) {
-                    $type = gettype($CalData);
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "`LitCal` param in payload expected to be serialized object, instead it was of type `{$type}` after unserialization");
-                }
-                if (property_exists($this->params->payload, 'Overrides')) {
-                    $CalData->Overrides = $this->params->payload->Overrides;
+                    $calType = gettype($CalData);
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "`CalData` param in payload expected to be serialized object, instead it was of type `{$calType}` after unserialization");
                 }
                 if (property_exists($this->params->payload, 'group')) {
+                    $groupType = gettype($this->params->payload->group);
+                    if ($groupType !== 'string') {
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Param `group` in payload is expected to be of type `string`, instead it was of type `{$groupType}`");
+                    }
                     $updateData->Group = strip_tags($this->params->payload->group);
                 }
                 $updateData->path = "nations/{$updateData->Nation}";
