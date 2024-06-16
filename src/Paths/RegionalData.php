@@ -198,7 +198,7 @@ class RegionalData
                 $updateData = new \stdClass();
                 if (
                     gettype($this->params->payload->Nation) !== 'string'
-                    || gettype($this->params->payload->Diocese !== 'string')
+                    || gettype($this->params->payload->Diocese) !== 'string'
                 ) {
                     self::produceErrorResponse(StatusCode::BAD_REQUEST, "Params `Nation` and `Diocese` in payload are expected to be of type string");
                 }
