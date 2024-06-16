@@ -235,6 +235,8 @@ class Calendar
 
     private function initParameterData(array $requestPathParts = [])
     {
+        // set a default response content type that can be overriden by a parameter or an accept header
+        self::$APICore->setResponseContentType(self::$APICore->getAllowedAcceptHeaders()[ 0 ]);
         if (self::$APICore->getRequestContentType() === RequestContentType::JSON) {
             $data = self::$APICore->retrieveRequestParamsFromJsonBody(true);
             $this->CalendarParams = new CalendarParams($data);
@@ -330,6 +332,9 @@ class Calendar
                 self::produceErrorResponse(StatusCode::NOT_ACCEPTABLE, $description);
             }
         } else {
+            // if the return type was not explicitly set through a parameter,
+            //   check if we have an accept header
+            //   and if not, use default value
             if (self::$APICore->hasAcceptHeader()) {
                 if (self::$APICore->isAllowedAcceptHeader()) {
                     $this->CalendarParams->ReturnType = $this->AllowedReturnTypes[ self::$APICore->getIdxAcceptHeaderInAllowed() ];
