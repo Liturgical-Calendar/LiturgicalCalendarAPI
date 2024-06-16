@@ -29,6 +29,7 @@ class RegionalDataParams
             $metadata = json_decode($metadataRaw);
             if (JSON_ERROR_NONE === json_last_error() && property_exists($metadata, 'LitCalMetadata')) {
                 $this->calendars = $metadata->LitCalMetadata;
+                unset($this->calendars->NationalCalendars->VATICAN);
             }
         }
     }
@@ -54,9 +55,7 @@ class RegionalDataParams
                         false === property_exists($this->calendars->NationalCalendars, $data->key)
                         && RegionalData::$APICore->getRequestMethod() !== RequestMethod::PUT
                     ) {
-                        $nationalCalendarsArr = array_filter(array_keys(get_object_vars($this->calendars->NationalCalendars)), function ($v) {
-                            return $v !== 'VATICAN';
-                        });
+                        $nationalCalendarsArr = array_keys(get_object_vars($this->calendars->NationalCalendars));
                         $validVals = implode(', ', $nationalCalendarsArr);
                         RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`, valid values are: {$validVals}");
                     } else {
