@@ -30,7 +30,7 @@
     },
     {
       "name": "Unit Test Index endpoint",
-      "description": "Retrieve or create unit tests"
+      "description": "Retrieve / create / update / delete unit tests"
     },
     {
       "name": "All possible liturgical events endpoint",
@@ -38,7 +38,7 @@
     },
     {
       "name": "RegionalData",
-      "description": "Retrieve / create / update National, Diocesan or Wider Region calendars "
+      "description": "Retrieve / create / update / delete National, Diocesan or Wider Region calendars "
     },
     {
       "name": "Easter",
@@ -46,7 +46,7 @@
     }
   ],
   "paths": {
-    "/": {
+    "/calendar": {
       "get": {
         "tags": [
           "Main API endpoint"
@@ -335,7 +335,7 @@
         }
       }
     },
-    "/metadata": {
+    "/calendars": {
       "get": {
         "tags": [
           "Metadata API endpoint"
@@ -395,7 +395,7 @@
         }
       }
     },
-    "/testsindex": {
+    "/tests": {
       "get": {
         "tags": [
           "Unit Test Index endpoint"
@@ -942,7 +942,7 @@
         }
       }
     },
-    "/regionaldata": {
+    "/data": {
       "get": {
         "tags": [
           "RegionalData"
