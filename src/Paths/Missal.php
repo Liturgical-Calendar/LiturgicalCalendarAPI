@@ -24,7 +24,7 @@ class Missal
             }
             if ($numPathParts === 1) {
                 // We should expect a Year value
-                self::$params = new MissalParams(["Year" => self::$requestPathParts[0]]);
+                self::$params = new MissalParams(["YEAR" => self::$requestPathParts[0]]);
                 if (property_exists(self::$missalsIndex->GeneralRoman, self::$params->Year)) {
                     $dataPath = self::$missalsIndex->GeneralRoman->{self::$params->Year}->path;
                     if (file_exists($dataPath)) {
@@ -45,6 +45,11 @@ class Missal
                 // We should expect a Nation value
                 if (self::$requestPathParts[0] !== 'nation') {
                     self::produceErrorResponse(StatusCode::BAD_REQUEST, "Unexpected path parameter `/" . self::$requestPathParts[0] . "/`, expected `/nation/`");
+                } else {
+                    self::$params = new MissalParams(["NATION" => self::$requestPathParts[1]]);
+                    if (property_exists(self::$missalsIndex, self::$params->Nation)) {
+                        self::produceResponse(json_encode(self::$missalsIndex->GeneralRoman->{self::$params->Nation}));
+                    }
                 }
             }
         }

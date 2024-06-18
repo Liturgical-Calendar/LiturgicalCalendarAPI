@@ -34,6 +34,7 @@ class MissalParams
                         }
                         break;
                     case 'NATION':
+                        $this->Nation = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
                         break;
                     case 'YEAR':
                         $this->enforceYearValidity($value);
