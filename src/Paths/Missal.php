@@ -15,7 +15,7 @@ class Missal
     public static object $missalsIndex;
     private static array $requestPathParts = [];
 
-    public static function initParams()
+    public static function initParams(string $route)
     {
         $numPathParts = count(self::$requestPathParts);
         if ($numPathParts > 0) {
@@ -107,7 +107,7 @@ class Missal
         self::$APICore = new APICore();
     }
 
-    public static function handleRequest()
+    public static function handleRequest(string $route)
     {
         self::$APICore->init();
         if (self::$APICore->getRequestMethod() === RequestMethod::GET) {
@@ -116,9 +116,11 @@ class Missal
             self::$APICore->validateAcceptHeader(false);
         }
         self::$APICore->setResponseContentTypeHeader();
-        if (count(self::$requestPathParts) === 0) {
+        if ($route === 'missals' && count(self::$requestPathParts) === 0) {
             self::produceResponse(json_encode(self::$missalsIndex));
+        } elseif ($route === 'missal' && count(self::$requestPathParts) === 0) {
+            self::produceResponse(json_encode(self::$missalsIndex->GeneralRoman));
         }
-        self::initParams();
+        self::initParams($route);
     }
 }
