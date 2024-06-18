@@ -18,7 +18,7 @@ class APICore
     private ?string $RequestContentType         = null;
     private ?string $ResponseContentType        = null;
     private static array $onlyUsefulHeaders = [
-        "Accept", "Accept-Language", "X-Requested-With", "Host", "Origin"
+        "Accept", "Accept-Language", "X-Requested-With", "Origin"
     ];
 
     public function __construct()
@@ -47,7 +47,7 @@ class APICore
         } elseif ($this->isAllowedOrigin()) {
             header('Access-Control-Allow-Origin: ' . $this->RequestHeaders[ "Origin" ]);
         } else {
-            header("Access-Control-Allow-Origin: {$_SERVER['HTTP_HOST']}");
+            header("Access-Control-Allow-Origin: {$_SERVER['SERVER_NAME']}");
         }
         header('Access-Control-Allow-Credentials: true');
         header('Access-Control-Max-Age: 86400');    // cache for 1 day
