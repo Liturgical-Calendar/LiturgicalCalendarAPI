@@ -107,25 +107,25 @@ class Missal
             self::$requestPathParts = $requestPathParts;
         }
         self::$missalsIndex = new \stdClass();
-        self::$missalsIndex->GeneralRoman = [];
+        self::$missalsIndex->GeneralRoman = new \stdClass();
         $directories = array_map('basename', glob('data/propriumdesanctis*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
             if (file_exists("data/$directory/$directory.json")) {
                 if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
-                    self::$missalsIndex->GeneralRoman[$matches[1]] = new \stdClass();
-                    self::$missalsIndex->GeneralRoman[$matches[1]]->path = "data/$directory/$directory.json";
+                    self::$missalsIndex->GeneralRoman->{$matches[1]} = new \stdClass();
+                    self::$missalsIndex->GeneralRoman->{$matches[1]}->path = "data/$directory/$directory.json";
                     $it = new \DirectoryIterator("glob://data/$directory/i18n/*.json");
                     $languages = [];
                     foreach ($it as $f) {
                         $languages[] = $f->getBasename('.json');
                     }
-                    self::$missalsIndex->GeneralRoman[$matches[1]]->languages = $languages;
+                    self::$missalsIndex->GeneralRoman->{$matches[1]}->languages = $languages;
                 } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
                     if (false === property_exists(self::$missalsIndex, $matches[1])) {
-                        self::$missalsIndex->{$matches[1]} = [];
+                        self::$missalsIndex->{$matches[1]} = new \stdClass();
                     }
-                    self::$missalsIndex->{$matches[1]}[$matches[2]] = new \stdClass();
-                    self::$missalsIndex->{$matches[1]}[$matches[2]]->path = "data/$directory/$directory.json";
+                    self::$missalsIndex->{$matches[1]}->{$matches[2]} = new \stdClass();
+                    self::$missalsIndex->{$matches[1]}->{$matches[2]}->path = "data/$directory/$directory.json";
                 }
             }
         }
