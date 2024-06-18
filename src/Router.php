@@ -127,7 +127,6 @@ class Router
                 $RegionalData->init($requestPathParts);
                 break;
             case 'missals':
-            case 'missal':
                 Missal::init($requestPathParts);
                 Missal::$APICore->setAllowedOrigins(self::$allowedOrigins);
                 Missal::$APICore->setAllowedRequestMethods([
@@ -140,7 +139,7 @@ class Router
                 ]);
                 Missal::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
                 Missal::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
-                Missal::handleRequest($route);
+                Missal::handleRequest();
                 break;
             case 'easter':
                 Easter::init();

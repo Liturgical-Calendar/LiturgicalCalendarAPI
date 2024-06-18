@@ -15,45 +15,39 @@ class Missal
     public static object $missalsIndex;
     private static array $requestPathParts = [];
 
-    public static function initParams(string $route)
+    public static function initParams()
     {
         $numPathParts = count(self::$requestPathParts);
         if ($numPathParts > 0) {
-            if ($route === 'missals') {
-                self::produceErrorResponse(StatusCode::BAD_REQUEST, "No path parameters available for `/missals` route, maybe you meant `/missal`?");
-            }
-            if ($numPathParts === 1) {
-                // We should expect a Year value
-                if ('nation' === self::$requestPathParts[0]) {
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Missing value for /missal/nation/{value} path");
-                }
-                self::$params = new MissalParams(["YEAR" => self::$requestPathParts[0]]);
-                if (property_exists(self::$missalsIndex->EditioTypica, self::$params->Year)) {
-                    $dataPath = self::$missalsIndex->EditioTypica->{self::$params->Year}->path;
-                    if (file_exists($dataPath)) {
-                        $dataRaw = file_get_contents($dataPath);
-                        if ($dataRaw) {
-                            self::produceResponse($dataRaw);
+            switch ($numPathParts) {
+                case 1:
+                    if (property_exists(self::$missalsIndex, self::$requestPathParts[0])) {
+                        self::produceResponse(json_encode(self::$missalsIndex->{self::$requestPathParts[0]}));
+                    } else {
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "No Roman Missal found corresponding to " . self::$requestPathParts[0]);
+                    }
+                    break;
+                case 2:
+                    if (false === property_exists(self::$missalsIndex, self::$requestPathParts[0])) {
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "No Roman Missal found corresponding to " . self::$requestPathParts[0]);
+                    }
+                    self::$params = new MissalParams(["YEAR" => self::$requestPathParts[1]]);
+                    if (property_exists(self::$missalsIndex->{self::$requestPathParts[0]}, self::$params->Year)) {
+                        $dataPath = self::$missalsIndex->{self::$requestPathParts[0]}->{self::$params->Year}->path;
+                        if (file_exists($dataPath)) {
+                            $dataRaw = file_get_contents($dataPath);
+                            if ($dataRaw) {
+                                self::produceResponse($dataRaw);
+                            }
+                        } else {
+                            self::produceErrorResponse(StatusCode::NOT_FOUND, "This is a server error, not a request error: the expected file {$dataPath} was not found");
                         }
                     } else {
-                        self::produceErrorResponse(StatusCode::NOT_FOUND, "This is a server error, not a request error: the expected file {$dataPath} was not found");
+                        $RomanMissalYears = array_keys(get_object_vars(self::$missalsIndex->{self::$requestPathParts[0]}));
+                        $error = "No Roman Missal was found for the year " . self::$params->Year . ", valid values are: " . implode(', ', $RomanMissalYears);
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
                     }
-                } else {
-                    $LatinRomanMissalYears = array_keys(get_object_vars(self::$missalsIndex->EditioTypica));
-                    $error = "No Latin edition of the Roman Missal was found for the year "
-                        . self::$params->Year . ", valid values are: " . implode(', ', $LatinRomanMissalYears);
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
-                }
-            } elseif ($numPathParts === 2) {
-                // We should expect a Nation value
-                if (self::$requestPathParts[0] !== 'nation') {
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Unexpected path parameter `/" . self::$requestPathParts[0] . "/`, expected `/nation/`");
-                } else {
-                    self::$params = new MissalParams(["NATION" => self::$requestPathParts[1]]);
-                    if (property_exists(self::$missalsIndex, self::$params->Nation)) {
-                        self::produceResponse(json_encode(self::$missalsIndex->EditioTypica->{self::$params->Nation}));
-                    }
-                }
+                    break;
             }
         }
     }
@@ -140,7 +134,7 @@ class Missal
         self::$APICore = new APICore();
     }
 
-    public static function handleRequest(string $route)
+    public static function handleRequest()
     {
         self::$APICore->init();
         if (self::$APICore->getRequestMethod() === RequestMethod::GET) {
@@ -149,11 +143,9 @@ class Missal
             self::$APICore->validateAcceptHeader(false);
         }
         self::$APICore->setResponseContentTypeHeader();
-        if ($route === 'missals' && count(self::$requestPathParts) === 0) {
+        if (count(self::$requestPathParts) === 0) {
             self::produceResponse(json_encode(self::$missalsIndex));
-        } elseif ($route === 'missal' && count(self::$requestPathParts) === 0) {
-            self::produceResponse(json_encode(self::$missalsIndex->EditioTypica));
         }
-        self::initParams($route);
+        self::initParams();
     }
 }
