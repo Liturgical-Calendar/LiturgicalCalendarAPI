@@ -24,7 +24,9 @@ class Missal
                     if (property_exists(self::$missalsIndex, self::$requestPathParts[0])) {
                         self::produceResponse(json_encode(self::$missalsIndex->{self::$requestPathParts[0]}));
                     } else {
-                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "No Roman Missal found corresponding to " . self::$requestPathParts[0]);
+                        $missals = array_keys(get_object_vars(self::$missalsIndex));
+                        $error = "No Roman Missal found corresponding to " . self::$requestPathParts[0] . ", valid values are: " . implode(', ', $missals);
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
                     }
                     break;
                 case 2:
