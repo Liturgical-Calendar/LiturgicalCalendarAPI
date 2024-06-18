@@ -20,13 +20,16 @@ class Missal
         $numPathParts = count(self::$requestPathParts);
         if ($numPathParts > 0) {
             if ($route === 'missals') {
-                self::produceErrorResponse(StatusCode::BAD_REQUEST, "No path parameters available for `/missals` route");
+                self::produceErrorResponse(StatusCode::BAD_REQUEST, "No path parameters available for `/missals` route, maybe you meant `/missal`?");
             }
             if ($numPathParts === 1) {
                 // We should expect a Year value
+                if ('nation' === self::$requestPathParts[0]) {
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Missing value for /missal/nation/{value} path");
+                }
                 self::$params = new MissalParams(["YEAR" => self::$requestPathParts[0]]);
-                if (property_exists(self::$missalsIndex->GeneralRoman, self::$params->Year)) {
-                    $dataPath = self::$missalsIndex->GeneralRoman->{self::$params->Year}->path;
+                if (property_exists(self::$missalsIndex->EditioTypica, self::$params->Year)) {
+                    $dataPath = self::$missalsIndex->EditioTypica->{self::$params->Year}->path;
                     if (file_exists($dataPath)) {
                         $dataRaw = file_get_contents($dataPath);
                         if ($dataRaw) {
@@ -36,7 +39,7 @@ class Missal
                         self::produceErrorResponse(StatusCode::NOT_FOUND, "This is a server error, not a request error: the expected file {$dataPath} was not found");
                     }
                 } else {
-                    $LatinRomanMissalYears = array_keys(get_object_vars(self::$missalsIndex->GeneralRoman));
+                    $LatinRomanMissalYears = array_keys(get_object_vars(self::$missalsIndex->EditioTypica));
                     $error = "No Latin edition of the Roman Missal was found for the year "
                         . self::$params->Year . ", valid values are: " . implode(', ', $LatinRomanMissalYears);
                     self::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
@@ -48,7 +51,7 @@ class Missal
                 } else {
                     self::$params = new MissalParams(["NATION" => self::$requestPathParts[1]]);
                     if (property_exists(self::$missalsIndex, self::$params->Nation)) {
-                        self::produceResponse(json_encode(self::$missalsIndex->GeneralRoman->{self::$params->Nation}));
+                        self::produceResponse(json_encode(self::$missalsIndex->EditioTypica->{self::$params->Nation}));
                     }
                 }
             }
@@ -112,19 +115,19 @@ class Missal
             self::$requestPathParts = $requestPathParts;
         }
         self::$missalsIndex = new \stdClass();
-        self::$missalsIndex->GeneralRoman = new \stdClass();
+        self::$missalsIndex->EditioTypica = new \stdClass();
         $directories = array_map('basename', glob('data/propriumdesanctis*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
             if (file_exists("data/$directory/$directory.json")) {
                 if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
-                    self::$missalsIndex->GeneralRoman->{$matches[1]} = new \stdClass();
-                    self::$missalsIndex->GeneralRoman->{$matches[1]}->path = "data/$directory/$directory.json";
+                    self::$missalsIndex->EditioTypica->{$matches[1]} = new \stdClass();
+                    self::$missalsIndex->EditioTypica->{$matches[1]}->path = "data/$directory/$directory.json";
                     $it = new \DirectoryIterator("glob://data/$directory/i18n/*.json");
                     $languages = [];
                     foreach ($it as $f) {
                         $languages[] = $f->getBasename('.json');
                     }
-                    self::$missalsIndex->GeneralRoman->{$matches[1]}->languages = $languages;
+                    self::$missalsIndex->EditioTypica->{$matches[1]}->languages = $languages;
                 } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
                     if (false === property_exists(self::$missalsIndex, $matches[1])) {
                         self::$missalsIndex->{$matches[1]} = new \stdClass();
@@ -149,7 +152,7 @@ class Missal
         if ($route === 'missals' && count(self::$requestPathParts) === 0) {
             self::produceResponse(json_encode(self::$missalsIndex));
         } elseif ($route === 'missal' && count(self::$requestPathParts) === 0) {
-            self::produceResponse(json_encode(self::$missalsIndex->GeneralRoman));
+            self::produceResponse(json_encode(self::$missalsIndex->EditioTypica));
         }
         self::initParams($route);
     }
