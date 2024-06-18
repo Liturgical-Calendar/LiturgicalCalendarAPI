@@ -19,8 +19,33 @@ class Missal
     {
         $numPathParts = count(self::$requestPathParts);
         if ($numPathParts > 0) {
+            if ($route === 'missals') {
+                self::produceErrorResponse(StatusCode::BAD_REQUEST, "No path parameters available for `/missals` route");
+            }
             if ($numPathParts === 1) {
                 // We should expect a Year value
+                self::$params = new MissalParams(["Year" => self::$requestPathParts[0]]);
+                if (property_exists(self::$missalsIndex->GeneralRoman, self::$params->Year)) {
+                    $dataPath = self::$missalsIndex->GeneralRoman->{self::$params->Year}->path;
+                    if (file_exists($dataPath)) {
+                        $dataRaw = file_get_contents($dataPath);
+                        if ($dataRaw) {
+                            self::produceResponse($dataRaw);
+                        }
+                    } else {
+                        self::produceErrorResponse(StatusCode::NOT_FOUND, "This is a server error, not a request error: the expected file {$dataPath} was not found");
+                    }
+                } else {
+                    $LatinRomanMissalYears = array_keys(get_object_vars(self::$missalsIndex->GeneralRoman));
+                    $error = "No Latin edition of the Roman Missal was found for the year "
+                        . self::$params->Year . ", valid values are: " . implode(', ', $LatinRomanMissalYears);
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
+                }
+            } elseif ($numPathParts === 2) {
+                // We should expect a Nation value
+                if (self::$requestPathParts[0] !== 'nation') {
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Unexpected path parameter `/" . self::$requestPathParts[0] . "/`, expected `/nation/`");
+                }
             }
         }
     }
