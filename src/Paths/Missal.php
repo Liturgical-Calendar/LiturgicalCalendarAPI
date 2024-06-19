@@ -108,7 +108,7 @@ class Missal
                                     } else {
                                         foreach ($data as $idx => $row) {
                                             $key = $row->TAG;
-                                            $data[$idx]->NAME = $i18n->{$key} || '';
+                                            $data[$idx]->NAME = property_exists($i18n, $key) ? $i18n->{$key} : '';
                                         }
                                         self::produceResponse(json_encode($data));
                                     }
