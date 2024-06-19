@@ -436,7 +436,7 @@ class RegionalData
         if (in_array(self::$APICore->getRequestMethod(), ['PUT','PATCH'])) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
         }
-        switch (self::$APICore->getRequestContentType()) {
+        switch (self::$APICore->getResponseContentType()) {
             case AcceptHeader::YAML:
                 $responseObj = json_decode($jsonEncodedResponse, true);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);

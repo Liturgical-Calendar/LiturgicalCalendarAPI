@@ -30,7 +30,7 @@ class Missal
                     $payload = self::$APICore->retrieveRequestParamsFromYamlBody();
                     break;
                 case RequestContentType::FORMDATA:
-                    $payload = $_POST;
+                    $payload = (object)$_POST;
                     break;
                 default:
                     if (in_array(self::$APICore->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
@@ -38,8 +38,8 @@ class Missal
                         self::produceErrorResponse(StatusCode::BAD_REQUEST, "Expected payload in body of request, either JSON encoded or YAML encoded");
                     }
             }
-            if (self::$APICore->getRequestMethod() === RequestMethod::POST && $payload !== null) {
-                if (array_key_exists('locale', $payload)) {
+            if (self::$APICore->getRequestMethod() === RequestMethod::POST) {
+                if ($payload !== null && property_exists($payload, 'locale')) {
                     $data["LOCALE"] = $payload->locale;
                 } else {
                     $data["LOCALE"] = LitLocale::LATIN;
@@ -172,7 +172,7 @@ class Missal
         if (in_array(self::$APICore->getRequestMethod(), ['PUT','PATCH'])) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
         }
-        switch (self::$APICore->getAcceptHeader()) {
+        switch (self::$APICore->getResponseContentType()) {
             case AcceptHeader::YAML:
                 $responseObj = json_decode($jsonEncodedResponse, true);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
