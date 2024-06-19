@@ -4,9 +4,11 @@ namespace Johnrdorazio\LitCal\Paths;
 
 use Johnrdorazio\LitCal\APICore;
 use Johnrdorazio\LitCal\Params\MissalParams;
-use Johnrdorazio\LitCal\Enum\StatusCode;
 use Johnrdorazio\LitCal\Enum\AcceptHeader;
+use Johnrdorazio\LitCal\Enum\LitLocale;
+use Johnrdorazio\LitCal\Enum\RequestContentType;
 use Johnrdorazio\LitCal\Enum\RequestMethod;
+use Johnrdorazio\LitCal\Enum\StatusCode;
 
 class Missal
 {
@@ -15,7 +17,47 @@ class Missal
     public static object $missalsIndex;
     private static array $requestPathParts = [];
 
-    public static function initParams()
+    private static function initRequestParams(): array
+    {
+        $data = [];
+        if (in_array(self::$APICore->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH])) {
+            $payload = null;
+            switch (self::$APICore->getRequestContentType()) {
+                case RequestContentType::JSON:
+                    $payload = self::$APICore->retrieveRequestParamsFromJsonBody();
+                    break;
+                case RequestContentType::YAML:
+                    $payload = self::$APICore->retrieveRequestParamsFromYamlBody();
+                    break;
+                case RequestContentType::FORMDATA:
+                    $payload = $_POST;
+                    break;
+                default:
+                    if (in_array(self::$APICore->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
+                        // the payload MUST be in the body of the request, either JSON encoded or YAML encoded
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Expected payload in body of request, either JSON encoded or YAML encoded");
+                    }
+            }
+            if (self::$APICore->getRequestMethod() === RequestMethod::POST && $payload !== null) {
+                if (array_key_exists('locale', $payload)) {
+                    $data["LOCALE"] = $payload->locale;
+                } else {
+                    $data["LOCALE"] = LitLocale::LATIN;
+                }
+            } else {
+                $data["PAYLOAD"] = $payload;
+            }
+        } elseif (self::$APICore->getRequestMethod() === RequestMethod::GET) {
+            if (isset($_GET['locale'])) {
+                $data["LOCALE"] = $_GET['locale'];
+            } else {
+                $data["LOCALE"] = LitLocale::LATIN;
+            }
+        }
+        return $data;
+    }
+
+    private static function handlePathParams()
     {
         $numPathParts = count(self::$requestPathParts);
         if ($numPathParts > 0) {
@@ -36,10 +78,45 @@ class Missal
                     self::$params = new MissalParams(["YEAR" => self::$requestPathParts[1]]);
                     if (property_exists(self::$missalsIndex->{self::$requestPathParts[0]}, self::$params->Year)) {
                         $dataPath = self::$missalsIndex->{self::$requestPathParts[0]}->{self::$params->Year}->path;
+                        $i18n = null;
+                        if (property_exists(self::$missalsIndex->{self::$requestPathParts[0]}->{self::$params->Year}, 'languages')) {
+                            $languages = self::$missalsIndex->{self::$requestPathParts[0]}->{self::$params->Year}->languages;
+                            self::$params->setData(self::initRequestParams());
+                            $baseLocale = \Locale::getPrimaryLanguage(self::$params->Locale);
+                            if (in_array($baseLocale, $languages) && property_exists(self::$missalsIndex->{self::$requestPathParts[0]}->{self::$params->Year}, 'i18nPath')) {
+                                $i18nFile = self::$missalsIndex->{self::$requestPathParts[0]}->{self::$params->Year}->i18nPath . $baseLocale . ".json";
+                                $i18nData = file_get_contents($i18nFile);
+                                if ($i18nData) {
+                                    $i18n = json_decode($i18nData);
+                                    if (JSON_ERROR_NONE !== json_last_error()) {
+                                        $error = "Error while processing localized data from file {$i18nFile}: " . json_last_error_msg();
+                                        self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $error);
+                                    }
+                                } else {
+                                    self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Unable to read localized data from file {$i18nFile}");
+                                }
+                            }
+                        }
                         if (file_exists($dataPath)) {
                             $dataRaw = file_get_contents($dataPath);
                             if ($dataRaw) {
-                                self::produceResponse($dataRaw);
+                                if (null !== $i18n) {
+                                    $data = json_decode($dataRaw);
+                                    if (JSON_ERROR_NONE !== json_last_error()) {
+                                        $error = "Error while processing decoding json data from file {$dataPath}: " . json_last_error_msg();
+                                        self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $error);
+                                    } else {
+                                        foreach ($data as $idx => $row) {
+                                            $key = $row->TAG;
+                                            $data[$idx]->NAME = $i18n->{$key};
+                                        }
+                                        self::produceResponse(json_encode($data));
+                                    }
+                                } else {
+                                    self::produceResponse($dataRaw);
+                                }
+                            } else {
+                                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Unable to read Missal data from file {$dataPath}");
                             }
                         } else {
                             self::produceErrorResponse(StatusCode::NOT_FOUND, "This is a server error, not a request error: the expected file {$dataPath} was not found");
@@ -124,6 +201,7 @@ class Missal
                         $languages[] = $f->getBasename('.json');
                     }
                     self::$missalsIndex->EditioTypica->{$matches[1]}->languages = $languages;
+                    self::$missalsIndex->EditioTypica->{$matches[1]}->i18nPath = "data/$directory/i18n/";
                 } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
                     if (false === property_exists(self::$missalsIndex, $matches[1])) {
                         self::$missalsIndex->{$matches[1]} = new \stdClass();
@@ -148,6 +226,6 @@ class Missal
         if (count(self::$requestPathParts) === 0) {
             self::produceResponse(json_encode(self::$missalsIndex));
         }
-        self::initParams();
+        self::handlePathParams();
     }
 }

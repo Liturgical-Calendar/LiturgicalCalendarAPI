@@ -9,7 +9,6 @@ use Johnrdorazio\LitCal\Paths\Missal;
 class MissalParams
 {
     public ?string $Locale = null;
-    public ?string $Nation = null;
     public ?string $Year   = null;
 
     public function __construct(array $DATA = [])
@@ -30,11 +29,8 @@ class MissalParams
                         if (LitLocale::isValid($value)) {
                             $this->Locale = $value;
                         } else {
-                            //
+                            Missal::produceErrorResponse(StatusCode::BAD_REQUEST, "Not a valid value for param `locale`");
                         }
-                        break;
-                    case 'NATION':
-                        $this->Nation = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
                         break;
                     case 'YEAR':
                         $this->enforceYearValidity($value);
