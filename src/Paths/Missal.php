@@ -82,18 +82,20 @@ class Missal
                         if (property_exists(self::$missalsIndex->{self::$requestPathParts[0]}->{self::$params->Year}, 'languages')) {
                             $languages = self::$missalsIndex->{self::$requestPathParts[0]}->{self::$params->Year}->languages;
                             self::$params->setData(self::initRequestParams());
-                            $baseLocale = \Locale::getPrimaryLanguage(self::$params->Locale);
-                            if (in_array($baseLocale, $languages) && property_exists(self::$missalsIndex->{self::$requestPathParts[0]}->{self::$params->Year}, 'i18nPath')) {
-                                $i18nFile = self::$missalsIndex->{self::$requestPathParts[0]}->{self::$params->Year}->i18nPath . $baseLocale . ".json";
-                                $i18nData = file_get_contents($i18nFile);
-                                if ($i18nData) {
-                                    $i18n = json_decode($i18nData);
-                                    if (JSON_ERROR_NONE !== json_last_error()) {
-                                        $error = "Error while processing localized data from file {$i18nFile}: " . json_last_error_msg();
-                                        self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $error);
+                            if (null !== self::$params->Locale) {
+                                $baseLocale = \Locale::getPrimaryLanguage(self::$params->Locale);
+                                if (in_array($baseLocale, $languages) && property_exists(self::$missalsIndex->{self::$requestPathParts[0]}->{self::$params->Year}, 'i18nPath')) {
+                                    $i18nFile = self::$missalsIndex->{self::$requestPathParts[0]}->{self::$params->Year}->i18nPath . $baseLocale . ".json";
+                                    $i18nData = file_get_contents($i18nFile);
+                                    if ($i18nData) {
+                                        $i18n = json_decode($i18nData);
+                                        if (JSON_ERROR_NONE !== json_last_error()) {
+                                            $error = "Error while processing localized data from file {$i18nFile}: " . json_last_error_msg();
+                                            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $error);
+                                        }
+                                    } else {
+                                        self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Unable to read localized data from file {$i18nFile}");
                                     }
-                                } else {
-                                    self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Unable to read localized data from file {$i18nFile}");
                                 }
                             }
                         }
