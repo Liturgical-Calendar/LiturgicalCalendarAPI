@@ -29,7 +29,7 @@ class MissalParams
                         if (LitLocale::isValid($value)) {
                             $this->Locale = $value;
                         } else {
-                            Missal::produceErrorResponse(StatusCode::BAD_REQUEST, "Not a valid value for param `locale`");
+                            Missal::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value `$value` for param `locale`");
                         }
                         break;
                     case 'YEAR':
