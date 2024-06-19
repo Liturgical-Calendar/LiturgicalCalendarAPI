@@ -23,14 +23,13 @@ class MissalParams
                 $key = strtoupper($key);
                 switch ($key) {
                     case 'LOCALE':
-                        $oldValue = $value;
                         if ($value !== 'la' && $value !== 'LA') {
-                            $value === \Locale::canonicalize($value);
+                            $value = \Locale::canonicalize($value);
                         }
                         if (LitLocale::isValid($value)) {
                             $this->Locale = $value;
                         } else {
-                            $error = "Invalid value `$value` for param `locale` (value before canonicalization was: $oldValue), valid values are: "
+                            $error = "Invalid value `$value` for param `locale`, valid values are: "
                                 . implode(', ', LitLocale::$AllAvailableLocales);
                             Missal::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
                         }
