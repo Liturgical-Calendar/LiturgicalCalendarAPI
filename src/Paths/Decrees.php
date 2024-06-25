@@ -131,12 +131,16 @@ class Decrees
         if (count($requestPathParts)) {
             self::$requestPathParts = $requestPathParts;
         }
-        self::$decreesIndex = [];
+        self::$decreesIndex = new \stdClass();
         $decreesFile = 'data/memorialsFromDecrees/memorialsFromDecrees.json';
         if (file_exists($decreesFile)) {
             $rawData = file_get_contents($decreesFile);
-            self::$decreesIndex = json_decode($rawData);
+            self::$decreesIndex->LitCalDecrees = json_decode($rawData);
+        } else {
+            header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
+            die('Decrees file not found');
         }
+        self::$decreesIndex->{'$schema'} = API_BASE_PATH . "/schemas/DecreesIndex.json";
         self::$APICore = new APICore();
     }
 
