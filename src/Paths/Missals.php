@@ -208,7 +208,7 @@ class Missals
                     self::$missalsIndex->LitCalMissals->EditioTypica->{$matches[1]}->i18nPath = "data/$directory/i18n/";
                 } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
                     if (false === property_exists(self::$missalsIndex, $matches[1])) {
-                        self::$missalsIndex->{$matches[1]} = new \stdClass();
+                        self::$missalsIndex->LitCalMissals->{$matches[1]} = new \stdClass();
                     }
                     self::$missalsIndex->LitCalMissals->{$matches[1]}->{$matches[2]} = new \stdClass();
                     self::$missalsIndex->LitCalMissals->{$matches[1]}->{$matches[2]}->path = "data/$directory/$directory.json";
