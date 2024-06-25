@@ -190,6 +190,7 @@ class Missals
             self::$requestPathParts = $requestPathParts;
         }
         self::$missalsIndex = new \stdClass();
+        self::$missalsIndex->description = "Roman Missals that contribute to generating the Liturgical Calendar are found under the `LitCalMissals` property. Use those property names as the next parameter on the API request path to refine your request.";
         self::$missalsIndex->LitCalMissals = new \stdClass();
         self::$missalsIndex->{'$schema'} = "https://litcal.johnromanodorazio.com/api/dev/schemas/MissalsIndex.json";
         self::$missalsIndex->LitCalMissals->EditioTypica = new \stdClass();
