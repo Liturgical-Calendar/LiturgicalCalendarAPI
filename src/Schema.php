@@ -49,7 +49,15 @@ class Schema
         $pathParamCount = count($requestPathParts);
         switch ($pathParamCount) {
             case 0:
-                //create an index of all existing schema files
+                $schemaIndex = new \stdClass();
+                $schemaIndex->LitCalSchemas = [];
+                $it = new \DirectoryIterator("glob://schemas/*.json");
+                foreach ($it as $f) {
+                    $schemaIndex->LitCalSchemas[] = API_BASE_PATH . '/schemas/' . $f->getFilename();
+                }
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode($schemaIndex);
+                die();
                 break;
             case 1:
                 if (file_exists('schemas/' . $requestPathParts[0])) {
