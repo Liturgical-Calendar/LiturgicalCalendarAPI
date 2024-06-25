@@ -207,14 +207,14 @@ class Missals
                     }
                     self::$missalsIndex->LitCalMissals->EditioTypica->{$matches[1]}->languages = $languages;
                     self::$missalsIndex->LitCalMissals->EditioTypica->{$matches[1]}->i18nPath = "data/$directory/i18n/";
-                    self::$missalsIndex->LitCalMissals->EditioTypica->{$matches[1]}->apiPath = "https://litcal.johnromanodorazio.com/api/v9/missals/EditioTypica/{$matches[1]}";
+                    self::$missalsIndex->LitCalMissals->EditioTypica->{$matches[1]}->apiPath = API_BASE_PATH . "/missals/EditioTypica/{$matches[1]}";
                 } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
                     if (false === property_exists(self::$missalsIndex, $matches[1])) {
                         self::$missalsIndex->LitCalMissals->{$matches[1]} = new \stdClass();
                     }
                     self::$missalsIndex->LitCalMissals->{$matches[1]}->{$matches[2]} = new \stdClass();
                     self::$missalsIndex->LitCalMissals->{$matches[1]}->{$matches[2]}->path = "data/$directory/$directory.json";
-                    self::$missalsIndex->LitCalMissals->{$matches[1]}->{$matches[2]}->apiPath = "https://litcal.johnromanodorazio.com/api/v9/missals/{$matches[1]}/{$matches[2]}";
+                    self::$missalsIndex->LitCalMissals->{$matches[1]}->{$matches[2]}->apiPath = API_BASE_PATH . "/missals/{$matches[1]}/{$matches[2]}";
                 }
             }
         }
