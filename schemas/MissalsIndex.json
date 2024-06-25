@@ -3,11 +3,42 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-        "LitCalSchemas": {
-            "type": "array",
-            "items": {
-                "type": "string",
-                "pattern": "^https?:\\\/\\\/litcal\\.johnromanodorazio\\.com\\\/api\\\/(dev|v[3-9])\\\/schemas\\\/[a-zA-Z]+\\.json"
+        "LitCalMissals": {
+            "additionalProperties": false,
+            "patternProperties": {
+                "EDITIO_TYPICA": {
+                    "$ref": "#/definitions/MissalsCollection"
+                },
+                "^(ITALY|USA|NETHERLANDS)$": {
+                    "$ref": "#/definitions/MissalsCollection"
+                }
+            }
+        },
+        "$schema": {
+            "type": "string",
+            "pattern": "^https?:\\\/\\\/litcal\\.johnromanodorazio\\.com\\\/api\\\/(dev|v[3-9])\\\/schemas\\\/MissalsIndex.json$"
+        }
+    },
+    "required": [ "LitCalMissals", "$schema" ],
+    "definitions": {
+        "MissalsCollection": {
+            "type": "object",
+            "additionalProperties": false,
+            "patternProperties": {
+                "^(19[7-9]|20[0-9])[0-9]$": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "dataPath": {
+                            "type": "string",
+                            "pattern": "^data\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\.json$"
+                        },
+                        "apiPath": {
+                            "type": "string",
+                            "pattern": "^https?:\\\/\\\/litcal\\.johnromanodorazio\\.com\\\/api\\\/(dev|v[3-9])\\\/data\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\.json$"
+                        }
+                    }
+                }
             }
         }
     }
