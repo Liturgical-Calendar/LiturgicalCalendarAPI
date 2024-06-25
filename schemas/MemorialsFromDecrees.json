@@ -1,27 +1,80 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "array",
-    "items": {
-        "$ref": "#/definitions/MemorialsFromDecrees"
-    },
-    "definitions": {
-        "MemorialsFromDecrees": {
+    "title": "MemorialsFromDecrees",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "LitCalDecrees": {
             "type": "object",
             "additionalProperties": false,
-            "properties": {
-                "Festivity": {
-                    "$ref": "#/definitions/Festivity"
+            "patternProperties": {
+                "[A-Z][A-Za-z]+_Upgrade": {
+                    "properties": {
+                        "Festivity": {
+                            "$ref": "#/definitions/Festivity"
+                        },
+                        "Metadata": {
+                            "$ref": "#/definitions/Metadata"
+                        }
+                    },
+                    "required": [
+                        "Festivity",
+                        "Metadata"
+                    ]
                 },
-                "Metadata": {
-                    "$ref": "#/definitions/Metadata"
+                "[A-Z][A-Za-z]+_Create": {
+                    "properties": {
+                        "Festivity": {
+                            "$ref": "#/definitions/Festivity"
+                        },
+                        "Metadata": {
+                            "$ref": "#/definitions/Metadata"
+                        }
+                    },
+                    "required": [
+                        "Festivity",
+                        "Metadata"
+                    ]
+                },
+                "[A-Z][A-Za-z]+_NameChange": {
+                    "properties": {
+                        "Festivity": {
+                            "$ref": "#/definitions/Festivity"
+                        },
+                        "Metadata": {
+                            "$ref": "#/definitions/Metadata"
+                        }
+                    },
+                    "required": [
+                        "Festivity",
+                        "Metadata"
+                    ]
+                },
+                "[A-Z][A-Za-z]+_Doctor": {
+                    "properties": {
+                        "Festivity": {
+                            "$ref": "#/definitions/Festivity"
+                        },
+                        "Metadata": {
+                            "$ref": "#/definitions/Metadata"
+                        }
+                    },
+                    "required": [
+                        "Festivity",
+                        "Metadata"
+                    ]
                 }
-            },
-            "required": [
-                "Festivity",
-                "Metadata"
-            ],
-            "title": "MemorialsFromDecrees"
+            }
         },
+        "$schema": {
+            "type": "string",
+            "const": "https://litcal.johnromanodorazio.com/dev/schemas/MemorialsFromDecrees.json"
+        }
+    },
+    "required": [
+        "LitCalDecrees"
+    ],
+    "definitions": {
         "Festivity": {
             "type": "object",
             "additionalProperties": false,
@@ -64,7 +117,7 @@
             "additionalProperties": false,
             "properties": {
                 "action": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/MemorialFromDecreesAction"
+                    "$ref": "#/definitions/MemorialFromDecreesAction"
                 },
                 "property": {
                     "type": "string",
@@ -74,10 +127,16 @@
                     ]
                 },
                 "decreeURL": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DecreeURL"
+                    "$ref": "#/definitions/DecreeURL"
                 },
                 "decreeLangs": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DecreeLangs"
+                    "$ref": "#/definitions/DecreeLangs"
+                },
+                "decreeURLS": {
+                    "$ref": "#/definitions/DecreeURLS"
+                },
+                "description": {
+                    "type": "string"
                 },
                 "sinceYear": {
                     "type": "integer"
@@ -127,9 +186,108 @@
             },
             "required": [
                 "action",
-                "decreeURL"
+                "decreeURL",
+                "description"
             ],
             "title": "Metadata"
+        },
+        "MemorialFromDecreesAction": {
+            "type": "string",
+            "enum": [
+                "createNew",
+                "setProperty",
+                "makeDoctor"
+            ],
+            "title": "MemorialFromDecreesAction"
+        },
+        "DecreeURL": {
+            "type": "string",
+            "pattern": "^https?:\\\/\\\/(www|press)\\.vatican\\.va\\\/((roman_curia\\\/congregations\\\/ccdds\\\/documents\\\/[-_%a-z0-9]+)|(content\\\/salastampa\\\/it\\\/bollettino\\\/pubblico\\\/[0-9\\\/]+)|(content\\\/[-_%\\\/a-z0-9]+))\\.(html|pdf)(#[%a-zD]+)?$",
+            "title": "DecreeURL"
+        },
+        "DecreeURLS": {
+            "type": "object",
+            "additionalProperties": false,
+            "patternProperties": {
+                "(de|en|es|fr|it|la|pl|pt)": {
+                    "type": "string",
+                    "pattern": "^https?:\\\/\\\/(www|press)\\.vatican\\.va\\\/((roman_curia\\\/congregations\\\/ccdds\\\/documents\\\/[-_%a-z0-9]+)|(content\\\/salastampa\\\/it\\\/bollettino\\\/pubblico\\\/[0-9\\\/]+)|(content\\\/[-_%\\\/a-z0-9]+))\\.(html|pdf)(#[%a-zD]+)?$"
+                }
+            }
+        },
+        "DecreeLangs": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "de": {
+                    "type": "string",
+                    "description": "German",
+                    "enum": [
+                        "de",
+                        "ge",
+                        "tedeD"
+                    ]
+                },
+                "en": {
+                    "type": "string",
+                    "description": "English",
+                    "enum": [
+                        "en",
+                        "ingD"
+                    ]
+                },
+                "es": {
+                    "type": "string",
+                    "description": "Spanish",
+                    "enum": [
+                        "es",
+                        "sp",
+                        "spagnD"
+                    ]
+                },
+                "fr": {
+                    "type": "string",
+                    "description": "French",
+                    "enum": [
+                        "fr",
+                        "francD"
+                    ]
+                },
+                "it": {
+                    "type": "string",
+                    "description": "Italian",
+                    "enum": [
+                        "it",
+                        "italD"
+                    ]
+                },
+                "la": {
+                    "type": "string",
+                    "description": "Latin",
+                    "enum": [
+                        "la",
+                        "lat"
+                    ]
+                },
+                "pl": {
+                    "type": "string",
+                    "description": "Polish",
+                    "enum": [
+                        "pl"
+                    ]
+                },
+                "pt": {
+                    "type": "string",
+                    "description": "Portuguese",
+                    "enum": [
+                        "po",
+                        "pt",
+                        "portD"
+                    ]
+                }
+            },
+            "description": "mapping between two-letter ISO code for a language, and the actual two-letter representation used in the Decree URL",
+            "title": "DecreeLangs"
         }
     }
 }

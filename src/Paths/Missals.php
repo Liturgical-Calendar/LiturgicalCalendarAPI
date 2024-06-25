@@ -3,17 +3,17 @@
 namespace Johnrdorazio\LitCal\Paths;
 
 use Johnrdorazio\LitCal\APICore;
-use Johnrdorazio\LitCal\Params\MissalParams;
+use Johnrdorazio\LitCal\Params\MissalsParams;
 use Johnrdorazio\LitCal\Enum\AcceptHeader;
 use Johnrdorazio\LitCal\Enum\LitLocale;
 use Johnrdorazio\LitCal\Enum\RequestContentType;
 use Johnrdorazio\LitCal\Enum\RequestMethod;
 use Johnrdorazio\LitCal\Enum\StatusCode;
 
-class Missal
+class Missals
 {
     public static APICore $APICore;
-    public static MissalParams $params;
+    public static MissalsParams $params;
     public static object $missalsIndex;
     private static array $requestPathParts = [];
 
@@ -64,7 +64,7 @@ class Missal
             switch ($numPathParts) {
                 case 1:
                     if (property_exists(self::$missalsIndex, self::$requestPathParts[0])) {
-                        self::produceResponse(json_encode(self::$missalsIndex->{self::$requestPathParts[0]}));
+                        self::produceResponse(json_encode(self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}));
                     } else {
                         $missals = array_keys(get_object_vars(self::$missalsIndex));
                         $error = "No Roman Missal found corresponding to " . self::$requestPathParts[0] . ", valid values are: " . implode(', ', $missals);
@@ -75,17 +75,17 @@ class Missal
                     if (false === property_exists(self::$missalsIndex, self::$requestPathParts[0])) {
                         self::produceErrorResponse(StatusCode::BAD_REQUEST, "No Roman Missal found corresponding to " . self::$requestPathParts[0]);
                     }
-                    self::$params = new MissalParams(["YEAR" => self::$requestPathParts[1]]);
-                    if (property_exists(self::$missalsIndex->{self::$requestPathParts[0]}, self::$params->Year)) {
-                        $dataPath = self::$missalsIndex->{self::$requestPathParts[0]}->{self::$params->Year}->path;
+                    self::$params = new MissalsParams(["YEAR" => self::$requestPathParts[1]]);
+                    if (property_exists(self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}, self::$params->Year)) {
+                        $dataPath = self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}->{self::$params->Year}->path;
                         $i18n = null;
-                        if (property_exists(self::$missalsIndex->{self::$requestPathParts[0]}->{self::$params->Year}, 'languages')) {
-                            $languages = self::$missalsIndex->{self::$requestPathParts[0]}->{self::$params->Year}->languages;
+                        if (property_exists(self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}->{self::$params->Year}, 'languages')) {
+                            $languages = self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}->{self::$params->Year}->languages;
                             self::$params->setData(self::initRequestParams());
                             if (null !== self::$params->Locale) {
                                 $baseLocale = \Locale::getPrimaryLanguage(self::$params->Locale);
-                                if (in_array($baseLocale, $languages) && property_exists(self::$missalsIndex->{self::$requestPathParts[0]}->{self::$params->Year}, 'i18nPath')) {
-                                    $i18nFile = self::$missalsIndex->{self::$requestPathParts[0]}->{self::$params->Year}->i18nPath . $baseLocale . ".json";
+                                if (in_array($baseLocale, $languages) && property_exists(self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}->{self::$params->Year}, 'i18nPath')) {
+                                    $i18nFile = self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}->{self::$params->Year}->i18nPath . $baseLocale . ".json";
                                     $i18nData = file_get_contents($i18nFile);
                                     if ($i18nData) {
                                         $i18n = json_decode($i18nData);
@@ -124,7 +124,7 @@ class Missal
                             self::produceErrorResponse(StatusCode::NOT_FOUND, "This is a server error, not a request error: the expected file {$dataPath} was not found");
                         }
                     } else {
-                        $RomanMissalYears = array_keys(get_object_vars(self::$missalsIndex->{self::$requestPathParts[0]}));
+                        $RomanMissalYears = array_keys(get_object_vars(self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}));
                         $error = "No Roman Missal was found for the year " . self::$params->Year . ", valid values are: " . implode(', ', $RomanMissalYears);
                         self::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
                     }
@@ -190,26 +190,28 @@ class Missal
             self::$requestPathParts = $requestPathParts;
         }
         self::$missalsIndex = new \stdClass();
-        self::$missalsIndex->EditioTypica = new \stdClass();
+        self::$missalsIndex->LitCalMissals = new \stdClass();
+        self::$missalsIndex->{'$schema'} = "https://litcal.johnromanodorazio.com/api/dev/schemas/MissalsIndex.json";
+        self::$missalsIndex->LitCalMissals->EditioTypica = new \stdClass();
         $directories = array_map('basename', glob('data/propriumdesanctis*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
             if (file_exists("data/$directory/$directory.json")) {
                 if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
-                    self::$missalsIndex->EditioTypica->{$matches[1]} = new \stdClass();
-                    self::$missalsIndex->EditioTypica->{$matches[1]}->path = "data/$directory/$directory.json";
+                    self::$missalsIndex->LitCalMissals->EditioTypica->{$matches[1]} = new \stdClass();
+                    self::$missalsIndex->LitCalMissals->EditioTypica->{$matches[1]}->path = "data/$directory/$directory.json";
                     $it = new \DirectoryIterator("glob://data/$directory/i18n/*.json");
                     $languages = [];
                     foreach ($it as $f) {
                         $languages[] = $f->getBasename('.json');
                     }
-                    self::$missalsIndex->EditioTypica->{$matches[1]}->languages = $languages;
-                    self::$missalsIndex->EditioTypica->{$matches[1]}->i18nPath = "data/$directory/i18n/";
+                    self::$missalsIndex->LitCalMissals->EditioTypica->{$matches[1]}->languages = $languages;
+                    self::$missalsIndex->LitCalMissals->EditioTypica->{$matches[1]}->i18nPath = "data/$directory/i18n/";
                 } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
                     if (false === property_exists(self::$missalsIndex, $matches[1])) {
                         self::$missalsIndex->{$matches[1]} = new \stdClass();
                     }
-                    self::$missalsIndex->{$matches[1]}->{$matches[2]} = new \stdClass();
-                    self::$missalsIndex->{$matches[1]}->{$matches[2]}->path = "data/$directory/$directory.json";
+                    self::$missalsIndex->LitCalMissals->{$matches[1]}->{$matches[2]} = new \stdClass();
+                    self::$missalsIndex->LitCalMissals->{$matches[1]}->{$matches[2]}->path = "data/$directory/$directory.json";
                 }
             }
         }

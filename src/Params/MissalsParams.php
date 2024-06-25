@@ -4,9 +4,9 @@ namespace Johnrdorazio\LitCal\Params;
 
 use Johnrdorazio\LitCal\Enum\LitLocale;
 use Johnrdorazio\LitCal\Enum\StatusCode;
-use Johnrdorazio\LitCal\Paths\Missal;
+use Johnrdorazio\LitCal\Paths\Missals;
 
-class MissalParams
+class MissalsParams
 {
     public ?string $Locale = null;
     public ?string $Year   = null;
@@ -31,7 +31,7 @@ class MissalParams
                         } else {
                             $error = "Invalid value `$value` for param `locale`, valid values are: "
                                 . implode(', ', LitLocale::$AllAvailableLocales);
-                            Missal::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
+                            Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
                         }
                         break;
                     case 'YEAR':
@@ -48,7 +48,7 @@ class MissalParams
             $this->Year = $value;
         } else {
             $description = 'Year parameter is of type String, but is not a numeric String with 4 digits';
-            Missal::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+            Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
         }
     }
 }

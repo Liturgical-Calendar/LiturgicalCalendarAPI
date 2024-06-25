@@ -186,73 +186,6 @@
             ],
             "title": "CorpusChristi"
         },
-        "DecreeLangs": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "DE": {
-                    "type": "string",
-                    "description": "German",
-                    "enum": [
-                        "de",
-                        "ge"
-                    ]
-                },
-                "EN": {
-                    "type": "string",
-                    "description": "English",
-                    "enum": [
-                        "en"
-                    ]
-                },
-                "ES": {
-                    "type": "string",
-                    "description": "Spanish",
-                    "enum": [
-                        "es",
-                        "sp"
-                    ]
-                },
-                "FR": {
-                    "type": "string",
-                    "description": "French",
-                    "enum": [
-                        "fr"
-                    ]
-                },
-                "IT": {
-                    "type": "string",
-                    "description": "Italian",
-                    "enum": [
-                        "it"
-                    ]
-                },
-                "LA": {
-                    "type": "string",
-                    "description": "Latin",
-                    "enum": [
-                        "la"
-                    ]
-                },
-                "PL": {
-                    "type": "string",
-                    "description": "Polish",
-                    "enum": [
-                        "pl"
-                    ]
-                },
-                "PT": {
-                    "type": "string",
-                    "description": "Portuguese",
-                    "enum": [
-                        "po",
-                        "pt"
-                    ]
-                }
-            },
-            "description": "mapping between two-letter ISO code for a language, and the actual two-letter representation used in the Decree URL",
-            "title": "DecreeLangs"
-        },
         "Calendar": {
             "type": "string",
             "enum": [
@@ -263,11 +196,6 @@
                 "NETHERLANDS"
             ],
             "title": "Calendar"
-        },
-        "DecreeURL": {
-            "type": "string",
-            "pattern": "^https?:\\\/\\\/(www\\.)?[a-zA-Z]{1,50}\\.[a-zA-Z]{1,6}([-a-zA-Z0-9()@:%._+~\\\/]*)\\.(html|pdf)$",
-            "title": "DecreeURL"
         },
         "Missals": {
             "type": "array",
@@ -586,15 +514,6 @@
                 "ZAMBIA",
                 "ZIMBABWE"
             ]
-        },
-        "MemorialFromDecreesAction": {
-            "type": "string",
-            "enum": [
-                "createNew",
-                "setProperty",
-                "makeDoctor"
-            ],
-            "title": "MemorialFromDecreesAction"
         },
         "WiderRegionCalendarAction": {
             "type": "string",

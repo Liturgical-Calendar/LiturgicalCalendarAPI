@@ -13,7 +13,8 @@ use Johnrdorazio\LitCal\Paths\Events;
 use Johnrdorazio\LitCal\Paths\Metadata;
 use Johnrdorazio\LitCal\Paths\Tests;
 use Johnrdorazio\LitCal\Paths\RegionalData;
-use Johnrdorazio\LitCal\Paths\Missal;
+use Johnrdorazio\LitCal\Paths\Missals;
+use Johnrdorazio\LitCal\Paths\Decrees;
 
 class Router
 {
@@ -127,9 +128,9 @@ class Router
                 $RegionalData->init($requestPathParts);
                 break;
             case 'missals':
-                Missal::init($requestPathParts);
-                Missal::$APICore->setAllowedOrigins(self::$allowedOrigins);
-                Missal::$APICore->setAllowedRequestMethods([
+                Missals::init($requestPathParts);
+                Missals::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                Missals::$APICore->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST,
                     RequestMethod::PUT,
@@ -137,15 +138,30 @@ class Router
                     RequestMethod::DELETE,
                     RequestMethod::OPTIONS
                 ]);
-                Missal::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
-                Missal::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
-                Missal::handleRequest();
+                Missals::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
+                Missals::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                Missals::handleRequest();
                 break;
             case 'easter':
                 Easter::init();
                 break;
             case 'schemas':
                 Schema::retrieve();
+                break;
+            case 'decrees':
+                Decrees::init($requestPathParts);
+                Decrees::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                Decrees::$APICore->setAllowedRequestMethods([
+                    RequestMethod::GET,
+                    RequestMethod::POST,
+                    RequestMethod::PUT,
+                    RequestMethod::PATCH,
+                    RequestMethod::DELETE,
+                    RequestMethod::OPTIONS
+                ]);
+                Decrees::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
+                Decrees::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                Decrees::handleRequest();
                 break;
             default:
                 http_response_code(404);
