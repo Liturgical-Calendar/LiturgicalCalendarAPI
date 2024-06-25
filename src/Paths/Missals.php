@@ -77,7 +77,7 @@ class Missals
                     }
                     self::$params = new MissalsParams(["YEAR" => self::$requestPathParts[1]]);
                     if (property_exists(self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}, self::$params->Year)) {
-                        $dataPath = self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}->{self::$params->Year}->path;
+                        $dataPath = self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}->{self::$params->Year}->dataPath;
                         $i18n = null;
                         if (property_exists(self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}->{self::$params->Year}, 'languages')) {
                             $languages = self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}->{self::$params->Year}->languages;
@@ -198,7 +198,7 @@ class Missals
             if (file_exists("data/$directory/$directory.json")) {
                 if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
                     self::$missalsIndex->LitCalMissals->EDITIO_TYPICA->{$matches[1]} = new \stdClass();
-                    self::$missalsIndex->LitCalMissals->EDITIO_TYPICA->{$matches[1]}->path = "data/$directory/$directory.json";
+                    self::$missalsIndex->LitCalMissals->EDITIO_TYPICA->{$matches[1]}->dataPath = "data/$directory/$directory.json";
                     $it = new \DirectoryIterator("glob://data/$directory/i18n/*.json");
                     $languages = [];
                     foreach ($it as $f) {
@@ -212,7 +212,7 @@ class Missals
                         self::$missalsIndex->LitCalMissals->{$matches[1]} = new \stdClass();
                     }
                     self::$missalsIndex->LitCalMissals->{$matches[1]}->{$matches[2]} = new \stdClass();
-                    self::$missalsIndex->LitCalMissals->{$matches[1]}->{$matches[2]}->path = "data/$directory/$directory.json";
+                    self::$missalsIndex->LitCalMissals->{$matches[1]}->{$matches[2]}->dataPath = "data/$directory/$directory.json";
                     self::$missalsIndex->LitCalMissals->{$matches[1]}->{$matches[2]}->apiPath = API_BASE_PATH . "/missals/{$matches[1]}/{$matches[2]}";
                 }
             }
