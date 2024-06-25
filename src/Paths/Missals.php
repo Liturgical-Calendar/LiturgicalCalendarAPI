@@ -63,7 +63,7 @@ class Missals
         if ($numPathParts > 0) {
             switch ($numPathParts) {
                 case 1:
-                    if (property_exists(self::$missalsIndex, self::$requestPathParts[0])) {
+                    if (property_exists(self::$missalsIndex->LitCalMissals, self::$requestPathParts[0])) {
                         self::produceResponse(json_encode(self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}));
                     } else {
                         $missals = array_keys(get_object_vars(self::$missalsIndex));
@@ -72,7 +72,7 @@ class Missals
                     }
                     break;
                 case 2:
-                    if (false === property_exists(self::$missalsIndex, self::$requestPathParts[0])) {
+                    if (false === property_exists(self::$missalsIndex->LitCalMissals, self::$requestPathParts[0])) {
                         self::produceErrorResponse(StatusCode::BAD_REQUEST, "No Roman Missal found corresponding to " . self::$requestPathParts[0]);
                     }
                     self::$params = new MissalsParams(["YEAR" => self::$requestPathParts[1]]);
