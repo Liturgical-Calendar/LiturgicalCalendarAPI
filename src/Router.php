@@ -146,7 +146,7 @@ class Router
                 Easter::init();
                 break;
             case 'schemas':
-                Schema::retrieve();
+                Schema::retrieve($requestPathParts);
                 break;
             case 'decrees':
                 Decrees::init($requestPathParts);

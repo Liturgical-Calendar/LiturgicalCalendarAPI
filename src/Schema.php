@@ -42,21 +42,25 @@ class Schema
         }
     }
 
-    public static function retrieve(): void
+    public static function retrieve(array $requestPathParts = []): void
     {
         self::enforceOrigin();
         self::enforceRequestMethod();
-        if (isset($_GET['schema'])) {
-            if (file_exists('schemas/' . $_GET['schema'])) {
-                header('Content-Type: application/json; charset=utf-8');
-                echo file_get_contents('schemas/' . $_GET['schema']);
-            } else {
-                header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
-                die('File not found');
-            }
-        } else {
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
-            die('Schema parameter is required');
+        $pathParamCount = count($requestPathParts);
+        switch ($pathParamCount) {
+            case 0:
+                //create an index of all existing schema files
+                break;
+            case 1:
+                if (file_exists('schemas/' . $requestPathParts[0])) {
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo file_get_contents('schemas/' . $requestPathParts[0]);
+                    die();
+                } else {
+                    header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
+                    die("Schema file '{$requestPathParts[0]}' not found");
+                }
+                break;
         }
     }
 }
