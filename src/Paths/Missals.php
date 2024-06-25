@@ -66,7 +66,7 @@ class Missals
                     if (property_exists(self::$missalsIndex->LitCalMissals, self::$requestPathParts[0])) {
                         self::produceResponse(json_encode(self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}));
                     } else {
-                        $missals = array_keys(get_object_vars(self::$missalsIndex));
+                        $missals = array_keys(get_object_vars(self::$missalsIndex->LitCalMissals));
                         $error = "No Roman Missal found corresponding to " . self::$requestPathParts[0] . ", valid values are: " . implode(', ', $missals);
                         self::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
                     }
