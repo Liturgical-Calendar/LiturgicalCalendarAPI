@@ -14,7 +14,7 @@
 
 namespace Johnrdorazio\LitCal;
 
-class Schema
+class Schemas
 {
     private static function enforceOrigin(): void
     {
@@ -50,11 +50,13 @@ class Schema
         switch ($pathParamCount) {
             case 0:
                 $schemaIndex = new \stdClass();
-                $schemaIndex->LitCalSchemas = [];
+                $schemaIndex->LitCalSchemas = new \stdClass();
+                $schemaIndex->LitCalSchemas->items = [];
                 $it = new \DirectoryIterator("glob://schemas/*.json");
                 foreach ($it as $f) {
-                    $schemaIndex->LitCalSchemas[] = API_BASE_PATH . '/schemas/' . $f->getFilename();
+                    $schemaIndex->LitCalSchemas->items[] = API_BASE_PATH . '/schemas/' . $f->getFilename();
                 }
+                $schemaIndex->{'$schema'} = API_BASE_PATH . '/schemas/LitCalSchemas.json';
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode($schemaIndex);
                 die();

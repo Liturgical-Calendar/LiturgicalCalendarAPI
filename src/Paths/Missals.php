@@ -191,7 +191,7 @@ class Missals
         }
         self::$missalsIndex = new \stdClass();
         self::$missalsIndex->LitCalMissals = new \stdClass();
-        self::$missalsIndex->{'$schema'} = API_BASE_PATH . "/schemas/MissalsIndex.json";
+        self::$missalsIndex->{'$schema'} = API_BASE_PATH . "/schemas/LitCalMissals.json";
         self::$missalsIndex->LitCalMissals->EDITIO_TYPICA = new \stdClass();
         $directories = array_map('basename', glob('data/propriumdesanctis*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
