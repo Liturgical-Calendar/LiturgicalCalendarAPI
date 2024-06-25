@@ -190,24 +190,23 @@ class Missals
             self::$requestPathParts = $requestPathParts;
         }
         self::$missalsIndex = new \stdClass();
-        self::$missalsIndex->description = "Roman Missals that contribute to generating the Liturgical Calendar are found under the `LitCalMissals` property. Use those property names as the next parameter on the API request path to refine your request.";
         self::$missalsIndex->LitCalMissals = new \stdClass();
-        self::$missalsIndex->{'$schema'} = "https://litcal.johnromanodorazio.com/api/dev/schemas/MissalsIndex.json";
-        self::$missalsIndex->LitCalMissals->EditioTypica = new \stdClass();
+        self::$missalsIndex->{'$schema'} = API_BASE_PATH . "/schemas/MissalsIndex.json";
+        self::$missalsIndex->LitCalMissals->EDITIO_TYPICA = new \stdClass();
         $directories = array_map('basename', glob('data/propriumdesanctis*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
             if (file_exists("data/$directory/$directory.json")) {
                 if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
-                    self::$missalsIndex->LitCalMissals->EditioTypica->{$matches[1]} = new \stdClass();
-                    self::$missalsIndex->LitCalMissals->EditioTypica->{$matches[1]}->path = "data/$directory/$directory.json";
+                    self::$missalsIndex->LitCalMissals->EDITIO_TYPICA->{$matches[1]} = new \stdClass();
+                    self::$missalsIndex->LitCalMissals->EDITIO_TYPICA->{$matches[1]}->path = "data/$directory/$directory.json";
                     $it = new \DirectoryIterator("glob://data/$directory/i18n/*.json");
                     $languages = [];
                     foreach ($it as $f) {
                         $languages[] = $f->getBasename('.json');
                     }
-                    self::$missalsIndex->LitCalMissals->EditioTypica->{$matches[1]}->languages = $languages;
-                    self::$missalsIndex->LitCalMissals->EditioTypica->{$matches[1]}->i18nPath = "data/$directory/i18n/";
-                    self::$missalsIndex->LitCalMissals->EditioTypica->{$matches[1]}->apiPath = API_BASE_PATH . "/missals/EditioTypica/{$matches[1]}";
+                    self::$missalsIndex->LitCalMissals->EDITIO_TYPICA->{$matches[1]}->languages = $languages;
+                    self::$missalsIndex->LitCalMissals->EDITIO_TYPICA->{$matches[1]}->i18nPath = "data/$directory/i18n/";
+                    self::$missalsIndex->LitCalMissals->EDITIO_TYPICA->{$matches[1]}->apiPath = API_BASE_PATH . "/missals/EDITIO_TYPICA/{$matches[1]}";
                 } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
                     if (false === property_exists(self::$missalsIndex, $matches[1])) {
                         self::$missalsIndex->LitCalMissals->{$matches[1]} = new \stdClass();
