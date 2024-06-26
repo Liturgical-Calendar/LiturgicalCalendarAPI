@@ -8,10 +8,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-06-09 09:19+0000\n"
-"PO-Revision-Date: 2024-04-15 23:33+0000\n"
-"Last-Translator: Weblate Admin <admin@example.com>\n"
+"PO-Revision-Date: 2024-06-27 22:33+0000\n"
+"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
 "Language: it\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4.3\n"
+"X-Generator: Weblate 5.6.1\n"
 
 #: src/API.php:442
 #, php-format
@@ -562,32 +562,24 @@ msgstr ""
 
 #. translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year
 #: src/API.php:2575
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
-#| "'%5$s' in the year %6$d."
+#, php-format
 msgid ""
 "The Feast '%1$s', usually celebrated on %2$s, coincides with another Feast "
 "'%3$s' in the year %4$d! Does something need to be done about this?"
 msgstr ""
-"La %1$s '%2$s', celebrata solitamente il giorno %3$s, è soppressa dalla %4$s "
-"'%5$s' nell'anno %6$d."
+"La Festa '%1$s', celebrata solitamente il giorno %2$s, è soppressa dalla "
+"Festa '%3$s' nell'anno %4$d. Dobbiamo rimediare?"
 
 #. translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year
 #: src/API.php:2589
-#, fuzzy, php-format
-#| msgid ""
-#| "The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year "
-#| "%3$d. We should ask the Congregation for Divine Worship what to do about "
-#| "this!"
+#, php-format
 msgid ""
 "The Solemnity '%1$s', usually celebrated on %2$s, coincides with the Sunday "
 "or Solemnity '%3$s' in the year %4$d! Does something need to be done about "
 "this?"
 msgstr ""
-"La Solennità <i>'%1$s'</i> coincide con la Solennità <i>'%2$s'</i> nell'anno "
-"%3$d. Dovremmo chiedere alla Congregazione del Culto Divino cosa fare a "
-"riguardo!"
+"La Solennità '%1$s', solitamente celebrate il %2$s, coincide con la Domenica "
+"o Solennità '%3$s' nell'anno %4$d. Dobbiamo rimediare in qualche modo?"
 
 #: src/API.php:2622
 msgid ""
@@ -660,16 +652,13 @@ msgstr ""
 
 #. translators: 1: Festivity grade, 2: Festivity name, 3: Name of the diocese, 4: Festivity date, 5: Coinciding festivity name, 6: Requested calendar year
 #: src/API.php:3208
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
-#| "'%5$s' in the year %6$d."
+#, php-format
 msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
 "on %4$s, is suppressed by the Sunday or Solemnity %5$s in the year %6$d"
 msgstr ""
-"La %1$s '%2$s', celebrata solitamente il giorno %3$s, è soppressa dalla %4$s "
-"'%5$s' nell'anno %6$d."
+"La %1$s '%2$s', propria del calendario %3$s e solitamente celebrate il "
+"giorno %4$s, è soppressa dalla Domenica o Solennità '%5$s' nell'anno %6$d"
 
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
 #: src/FestivityCollection.php:47
