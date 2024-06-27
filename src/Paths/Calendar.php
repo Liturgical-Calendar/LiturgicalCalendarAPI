@@ -630,8 +630,8 @@ class Calendar
                 foreach ($memorialsFromDecrees->litcal_decrees as $row) {
                     if (
                         (
-                            $row->decree_metadata->action === "createNew"
-                            || ($row->decree_metadata->action === "setProperty" && $row->decree_metadata->property === "name" )
+                            $row->metadata->action === "createNew"
+                            || ($row->metadata->action === "setProperty" && $row->metadata->property === "name" )
                         )
                         && $NAME !== null
                     ) {
