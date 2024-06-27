@@ -63,14 +63,21 @@ class Decrees
         if ($numPathParts > 0) {
             switch ($numPathParts) {
                 case 1:
-                    if (property_exists(self::$decreesIndex, self::$requestPathParts[0])) {
-                        self::produceResponse(json_encode(self::$decreesIndex->{self::$requestPathParts[0]}));
-                    } else {
-                        $decrees = array_keys(get_object_vars(self::$decreesIndex));
-                        $error = "No Decree of the Congregation for Divine Worship found corresponding to " . self::$requestPathParts[0] . ", valid values are: " . implode(', ', $decrees);
-                        self::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
+                    $decreeIds = [];
+                    foreach (self::$decreesIndex->LitCalDecrees as $idx => $decree) {
+                        if ($decree->decree_id === self::$requestPathParts[0]) {
+                            self::produceResponse(json_encode(self::$decreesIndex->LitCalDecrees[$idx]));
+                        }
+                        $decreeIds[] = $decree->decree_id;
                     }
+
+                    $error = "No Decree of the Congregation for Divine Worship found corresponding to "
+                        . self::$requestPathParts[0]
+                        . ", valid values are found in the `decree_id` properties of the `LitCalDecrees` collection: " . implode(', ', $decreeIds);
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
                     break;
+                default:
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Only one path parameter expected on the `/decrees` path, instead $numPathParts found");
             }
         }
     }
@@ -134,8 +141,8 @@ class Decrees
         $decreesFile = 'data/memorialsFromDecrees/memorialsFromDecrees.json';
         if (file_exists($decreesFile)) {
             $rawData = file_get_contents($decreesFile);
-            self::$decreesIndex = json_decode($rawData);
-            self::$decreesIndex->{'$schema'} = API_BASE_PATH . "/schemas/DecreesIndex.json";
+            self::$decreesIndex = new \stdClass();
+            self::$decreesIndex->LitCalDecrees = json_decode($rawData);
         } else {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
             die('Decrees file not found');

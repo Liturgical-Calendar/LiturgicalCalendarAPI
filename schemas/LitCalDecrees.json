@@ -1,74 +1,38 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "MemorialsFromDecrees",
+    "title": "LitCalDecrees",
+    "description": "Decrees issued by the Congregation for Divine Worship or Apostolic Letters and similar dispositions from the Supreme that determine new data in the calculation of the Liturgical Calendar",
     "type": "object",
     "additionalProperties": false,
     "properties": {
         "LitCalDecrees": {
             "type": "object",
             "additionalProperties": false,
-            "patternProperties": {
-                "[A-Z][A-Za-z]+_Upgrade": {
-                    "properties": {
-                        "Festivity": {
-                            "$ref": "#/definitions/Festivity"
-                        },
-                        "Metadata": {
-                            "$ref": "#/definitions/Metadata"
-                        }
-                    },
-                    "required": [
-                        "Festivity",
-                        "Metadata"
-                    ]
+            "properties": {
+                "decree_id": {
+                    "type": "string",
+                    "pattern": "[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)"
                 },
-                "[A-Z][A-Za-z]+_Create": {
-                    "properties": {
-                        "Festivity": {
-                            "$ref": "#/definitions/Festivity"
-                        },
-                        "Metadata": {
-                            "$ref": "#/definitions/Metadata"
-                        }
-                    },
-                    "required": [
-                        "Festivity",
-                        "Metadata"
-                    ]
+                "decree_date": {},
+                "decree_protocol": {},
+                "description": {
+                    "type": "string"
                 },
-                "[A-Z][A-Za-z]+_NameChange": {
-                    "properties": {
-                        "Festivity": {
-                            "$ref": "#/definitions/Festivity"
-                        },
-                        "Metadata": {
-                            "$ref": "#/definitions/Metadata"
-                        }
-                    },
-                    "required": [
-                        "Festivity",
-                        "Metadata"
-                    ]
+                "festivity": {
+                    "$ref": "#/definitions/Festivity"
                 },
-                "[A-Z][A-Za-z]+_Doctor": {
-                    "properties": {
-                        "Festivity": {
-                            "$ref": "#/definitions/Festivity"
-                        },
-                        "Metadata": {
-                            "$ref": "#/definitions/Metadata"
-                        }
-                    },
-                    "required": [
-                        "Festivity",
-                        "Metadata"
-                    ]
+                "decree_metadata": {
+                    "$ref": "#/definitions/Metadata"
                 }
-            }
-        },
-        "$schema": {
-            "type": "string",
-            "const": "https://litcal.johnromanodorazio.com/dev/schemas/MemorialsFromDecrees.json"
+            },
+            "required": [
+                "decree_id",
+                "decree_date",
+                "decree_protocol",
+                "description",
+                "festivity",
+                "decree_metadata"
+            ]
         }
     },
     "required": [
@@ -126,19 +90,16 @@
                         "grade"
                     ]
                 },
-                "decreeURL": {
+                "url": {
                     "$ref": "#/definitions/DecreeURL"
                 },
-                "decreeLangs": {
+                "url_lang_map": {
                     "$ref": "#/definitions/DecreeLangs"
                 },
-                "decreeURLS": {
+                "urls_langs": {
                     "$ref": "#/definitions/DecreeURLS"
                 },
-                "description": {
-                    "type": "string"
-                },
-                "sinceYear": {
+                "since_year": {
                     "type": "integer"
                 },
                 "strtotime": {
@@ -151,7 +112,7 @@
                             "type": "object",
                             "additionalProperties": false,
                             "properties": {
-                                "dayOfTheWeek": {
+                                "day_of_the_week": {
                                     "type": "string",
                                     "enum": [
                                         "Sunday",
@@ -163,22 +124,22 @@
                                         "Saturday"
                                     ]
                                 },
-                                "relativeTime": {
+                                "relative_time": {
                                     "type": "string",
                                     "enum": [
                                         "before",
                                         "after"
                                     ]
                                 },
-                                "festivityKey": {
+                                "festivity_tey": {
                                     "type": "string",
                                     "description": "Must be a valid key for a festivity in the Universal Calendar"
                                 }
                             },
                             "required": [
-                                "dayOfTheWeek",
-                                "relativeTime",
-                                "festivityKey"
+                                "day_of_the_week",
+                                "relative_time",
+                                "festivity_key"
                             ]
                         }
                     ]
@@ -186,8 +147,7 @@
             },
             "required": [
                 "action",
-                "decreeURL",
-                "description"
+                "url"
             ],
             "title": "Metadata"
         },
