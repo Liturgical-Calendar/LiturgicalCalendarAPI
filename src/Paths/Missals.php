@@ -44,7 +44,7 @@ class Missals
                 } else {
                     $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
                     if ($locale && LitLocale::isValid($locale)) {
-                        $data["LOCALE"] = $_GET['locale'];
+                        $data["LOCALE"] = $locale;
                     } else {
                         $data["LOCALE"] = LitLocale::LATIN;
                     }
@@ -58,7 +58,7 @@ class Missals
             } else {
                 $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
                 if ($locale && LitLocale::isValid($locale)) {
-                    $data["LOCALE"] = $_GET['locale'];
+                    $data["LOCALE"] = $locale;
                 } else {
                     $data["LOCALE"] = LitLocale::LATIN;
                 }
