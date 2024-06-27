@@ -21,7 +21,7 @@
                 "festivity": {
                     "$ref": "#/definitions/Festivity"
                 },
-                "decree_metadata": {
+                "metadata": {
                     "$ref": "#/definitions/Metadata"
                 },
                 "api_path": {

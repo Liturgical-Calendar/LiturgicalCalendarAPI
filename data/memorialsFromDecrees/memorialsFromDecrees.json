@@ -8,7 +8,7 @@
             "TAG": "StMaryMagdalene",
             "GRADE": 4
         },
-        "decree_metadata": {
+        "metadata": {
             "action": "setProperty",
             "since_year": 2016,
             "property": "grade",
@@ -55,7 +55,7 @@
                 "GOSPEL": ""
             }
         },
-        "decree_metadata": {
+        "metadata": {
             "action": "createNew",
             "since_year": 2018,
             "url": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2018/03/03/0168/00350.html#%s",
@@ -93,7 +93,7 @@
             "TAG": "StMartha",
             "GRADE": 3
         },
-        "decree_metadata": {
+        "metadata": {
             "action": "setProperty",
             "property": "name",
             "since_year": 2021,
@@ -140,7 +140,7 @@
                 "GOSPEL": ""
             }
         },
-        "decree_metadata": {
+        "metadata": {
             "action": "createNew",
             "since_year": 2014,
             "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_%s.html",
@@ -184,7 +184,7 @@
                 "GOSPEL": ""
             }
         },
-        "decree_metadata": {
+        "metadata": {
             "action": "createNew",
             "since_year": 2014,
             "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_%s.html",
@@ -228,7 +228,7 @@
                 "GOSPEL": ""
             }
         },
-        "decree_metadata": {
+        "metadata": {
             "action": "createNew",
             "since_year": 2019,
             "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_%s.html",
@@ -272,7 +272,7 @@
                 "GOSPEL": ""
             }
         },
-        "decree_metadata": {
+        "metadata": {
             "action": "createNew",
             "since_year": 2019,
             "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_%s.html",
@@ -318,7 +318,7 @@
                 "GOSPEL": ""
             }
         },
-        "decree_metadata": {
+        "metadata": {
             "action": "createNew",
             "since_year": 2020,
             "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_%s.html",
@@ -362,7 +362,7 @@
                 "GOSPEL": ""
             }
         },
-        "decree_metadata": {
+        "metadata": {
             "action": "createNew",
             "since_year": 2021,
             "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_%s.html",
@@ -408,7 +408,7 @@
                 "GOSPEL": ""
             }
         },
-        "decree_metadata": {
+        "metadata": {
             "action": "createNew",
             "since_year": 2021,
             "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_%s.html",
@@ -454,7 +454,7 @@
                 "GOSPEL": ""
             }
         },
-        "decree_metadata": {
+        "metadata": {
             "action": "createNew",
             "since_year": 2021,
             "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_%s.html",
@@ -487,7 +487,7 @@
             "TAG": "StThereseChildJesus",
             "COMMON": ["Proper"]
         },
-        "decree_metadata": {
+        "metadata": {
             "action": "makeDoctor",
             "since_year": 1998,
             "url": "https://www.vatican.va/content/john-paul-ii/%s/apost_letters/1997/documents/hf_jp-ii_apl_19101997_divini-amoris.html",
@@ -520,7 +520,7 @@
             "TAG": "StIrenaeus",
             "COMMON": ["Proper"]
         },
-        "decree_metadata": {
+        "metadata": {
             "action": "makeDoctor",
             "since_year": 2022,
             "url": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2022/01/21/0048/00099.html"

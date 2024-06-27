@@ -625,19 +625,19 @@ class Calendar
 
         if (file_exists($memorialsFromDecreesFile)) {
             $memorialsFromDecrees = json_decode(file_get_contents($memorialsFromDecreesFile));
-            if (json_last_error() === JSON_ERROR_NONE) {
+            if (json_last_error() !== JSON_ERROR_NONE) {
                 $this->tempCal[ "MEMORIALS_FROM_DECREES" ] = [];
-                foreach ($memorialsFromDecrees as $row) {
+                foreach ($memorialsFromDecrees->litcal_decrees as $row) {
                     if (
                         (
-                            $row->Metadata->action === "createNew"
-                            || ($row->Metadata->action === "setProperty" && $row->Metadata->property === "name" )
+                            $row->decree_metadata->action === "createNew"
+                            || ($row->decree_metadata->action === "setProperty" && $row->decree_metadata->property === "name" )
                         )
                         && $NAME !== null
                     ) {
-                        $row->Festivity->NAME = $NAME[ $row->Festivity->TAG ];
+                        $row->festivity->NAME = $NAME[ $row->festivity->TAG ];
                     }
-                    $this->tempCal[ "MEMORIALS_FROM_DECREES" ][ $row->Festivity->TAG ] = $row;
+                    $this->tempCal[ "MEMORIALS_FROM_DECREES" ][ $row->festivity->TAG ] = $row;
                 }
             } else {
                 $response = new \stdClass();
@@ -1878,7 +1878,7 @@ class Calendar
 
     private function createFestivityFromDecree(object $row): void
     {
-        if ($row->Festivity->TYPE === "mobile") {
+        if ($row->festivity->TYPE === "mobile") {
             //we won't have a date defined for mobile festivites, we'll have to calculate them here case by case
             //otherwise we'll have to create a language that we can interpret in an automated fashion...
             //for example we can use strtotime
@@ -1935,7 +1935,7 @@ class Calendar
                                 /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created 2. list of properties */
                                 _('Cannot create mobile festivity \'%1$s\': when the \'strtotime\' property is an object, it must have properties %2$s'),
                                 $row->Festivity->name,
-                                implode(', ', ['\'dayOfTheWeek\'', '\'relativeTime\'', '\'festivityKey\''])
+                                implode(', ', ['\'day_of_the_week\'', '\'relative_time\'', '\'festivity_key\''])
                             );
                         }
                         break;
@@ -2114,10 +2114,10 @@ class Calendar
 
     private function elaborateDecreeSource(object $row): string
     {
-        $lang = ( property_exists($row->Metadata, 'decreeLangs') && property_exists($row->Metadata->decreeLangs, $this->CalendarParams->Locale) ) ?
-            $row->Metadata->decreeLangs->{$this->CalendarParams->Locale} :
+        $lang = ( property_exists($row->metadata, 'url_lang_map') && property_exists($row->metadata->url_lang_map, LitLocale::$PRIMARY_LANGUAGE) ) ?
+            $row->metadata->url_lang_map->{LitLocale::$PRIMARY_LANGUAGE} :
             "en";
-        $url = str_contains($row->Metadata->decreeURL, '%s') ? sprintf($row->Metadata->decreeURL, $lang) : $row->Metadata->decreeURL;
+        $url = str_contains($row->metadata->url, '%s') ? sprintf($row->metadata->url, $lang) : $row->metadata->url;
         return '<a href="' . $url . '">' . _("Decree of the Congregation for Divine Worship") . '</a>';
     }
 
@@ -2130,12 +2130,36 @@ class Calendar
             $MemorialsFromDecrees = array_filter(
                 $this->tempCal[ "MEMORIALS_FROM_DECREES" ],
                 function ($row) use ($grade) {
-                    return $row->Metadata->action !== "makeDoctor" && $row->Festivity->GRADE === $grade;
+                    return $row->decree_metadata->action !== "makeDoctor" && $row->festivity->GRADE === $grade;
                 }
             );
             foreach ($MemorialsFromDecrees as $row) {
-                if ($this->CalendarParams->Year >= $row->Metadata->sinceYear) {
-                    switch ($row->Metadata->action) {
+                if ($this->CalendarParams->Year >= $row->decree_metadata->since_year) {
+                    // TODO: until we update all JSON resources with a snake case schema, we'll just convert those that are using snake case schema to our old schema
+                    if (property_exists($row, "festivity")) {
+                        $row->Festivity = $row->festivity;
+                    }
+                    if (property_exists($row, "metadata")) {
+                        $row->Metadata = $row->metadata;
+                        if (property_exists($row->metadata, 'strototime') && gettype($row->metadata->strtotime === 'object')) {
+                            foreach ($row->metadata->strtotime as $key => $value) {
+                                switch ($key) {
+                                    case 'day_of_the_week':
+                                        $row->Metadata->strtotime->dayOfTheWeek = $value;
+                                        break;
+                                    case 'relative_time':
+                                        $row->Metadata->strtotime->relativeTime = $value;
+                                        break;
+                                    case 'festivity_key':
+                                        $row->Metadata->strtotime->festivityKey = $value;
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                    // END TODO
+
+                    switch ($row->metadata->action) {
                         case "createNew":
                             //example: MaryMotherChurch in 2018
                             $this->createFestivityFromDecree($row);
