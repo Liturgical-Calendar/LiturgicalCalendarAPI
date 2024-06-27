@@ -23,6 +23,10 @@
                 },
                 "decree_metadata": {
                     "$ref": "#/definitions/Metadata"
+                },
+                "api_path": {
+                    "type": "string",
+                    "pattern": "^https:\\\/\\\/litcal\\.johnromanodorazio\\.com\\\/decrees\\\/[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$"
                 }
             },
             "required": [
