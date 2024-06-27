@@ -84,7 +84,10 @@ class Missals
         $numPathParts = count(self::$requestPathParts);
         $missalIDs = [];
         if ($numPathParts > 1) {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "Only one path parameter expected for the `/missals` path but $numPathParts path parameters were found");
+            self::produceErrorResponse(
+                StatusCode::NOT_FOUND,
+                "Only one path parameter expected for the `/missals` path but $numPathParts path parameters were found"
+            );
         } else {
             // the only path parameter we expect is the ID of the Missal
             foreach (self::$missalsIndex->litcal_missals as $idx => $missal) {
@@ -92,10 +95,8 @@ class Missals
                     $missalData = file_get_contents($missal->data_path);
                     if ($missalData) {
                         if (property_exists($missal, 'languages') && self::$params->baseLocale !== null) {
-                            header("X-Litcal-Missals-I18n: yes", false);
                             if (in_array(self::$params->baseLocale, $missal->languages) && property_exists($missal, 'i18n_path')) {
                                 $i18nFile = $missal->i18n_path . self::$params->baseLocale . ".json";
-                                header("X-Litcal-Missals-I18n-Path: $i18nFile", false);
                                 $i18nData = file_get_contents($i18nFile);
                                 if ($i18nData) {
                                     $i18nObj = json_decode($i18nData);
@@ -108,7 +109,6 @@ class Missals
                                         $error = "Error while processing Missal data from file '{$missalData}': " . json_last_error_msg();
                                         self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $error);
                                     }
-                                    header("X-Litcal-Missals-I18n-Status: success", false);
                                     foreach ($missalRows as $idx => $row) {
                                         $key = $row->TAG;
                                         if (property_exists($i18nObj, $key)) {
@@ -213,7 +213,7 @@ class Missals
                     foreach ($it as $f) {
                         $languages[] = $f->getBasename('.json');
                     }
-                    $missal->langs          = $languages;
+                    $missal->langsuages     = $languages;
                     $missal->i18n_path      = "data/$directory/i18n/";
                     $missal->api_path       = API_BASE_PATH . "/missals/EDITIO_TYPICA_{$matches[1]}";
                 } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
