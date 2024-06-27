@@ -213,7 +213,7 @@ class Missals
                     foreach ($it as $f) {
                         $languages[] = $f->getBasename('.json');
                     }
-                    $missal->langsuages     = $languages;
+                    $missal->languages      = $languages;
                     $missal->i18n_path      = "data/$directory/i18n/";
                     $missal->api_path       = API_BASE_PATH . "/missals/EDITIO_TYPICA_{$matches[1]}";
                 } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
