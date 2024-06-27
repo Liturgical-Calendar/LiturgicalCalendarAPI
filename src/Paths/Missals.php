@@ -108,7 +108,7 @@ class Missals
             }
             self::produceErrorResponse(
                 StatusCode::NOT_FOUND,
-                "Could not find a Missal with id $missal->missal_id, available values are: " . implode(', ', $missalIDs)
+                "Could not find a Missal with id '" . self::$requestPathParts[0] . "', available values are: " . implode(', ', $missalIDs)
             );
         }
     }
