@@ -235,14 +235,16 @@ class Missals
                         $filteredResults->litcal_missals,
                         fn ($missal) => $missal->region === self::$params->Region
                     );
-                    header("X-Litcal-Missals-Region: " . self::$params->Region);
+                    header("X-Litcal-Missals-Region: " . self::$params->Region, false);
+                    header('Set-Cookie: region=' . self::$params->Region . '; Secure; Path=/; SameSite=Strict;');
                 }
                 if (null !== self::$params->Year) {
                     $filteredResults->litcal_missals = array_filter(
                         $filteredResults->litcal_missals,
                         fn ($missal) => $missal->year_published === self::$params->Year
                     );
-                    header("X-Litcal-Missals-Year: " . self::$params->Year);
+                    header("X-Litcal-Missals-Year: " . self::$params->Year, false);
+                    header('Set-Cookie: year=' . self::$params->Year . '; Secure; Path=/; SameSite=Strict;');
                 }
                 self::produceResponse(json_encode($filteredResults));
             }
