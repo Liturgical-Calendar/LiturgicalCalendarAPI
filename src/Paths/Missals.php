@@ -49,6 +49,12 @@ class Missals
                         $data["LOCALE"] = LitLocale::LATIN;
                     }
                 }
+                if (property_exists($payload, 'region')) {
+                    $data["REGION"] = $payload->region;
+                }
+                if (property_exists($payload, 'year')) {
+                    $data["YEAR"] = $payload->year;
+                }
             } else {
                 $data["PAYLOAD"] = $payload;
             }
@@ -62,6 +68,12 @@ class Missals
                 } else {
                     $data["LOCALE"] = LitLocale::LATIN;
                 }
+            }
+            if (isset($_GET['region'])) {
+                $data["REGION"] = $_GET["region"];
+            }
+            if (isset($_GET['year'])) {
+                $data["YEAR"] = $_GET['year'];
             }
         }
         return $data;
@@ -236,7 +248,6 @@ class Missals
                         fn ($missal) => $missal->region === self::$params->Region
                     );
                     header("X-Litcal-Missals-Region: " . self::$params->Region, false);
-                    header('Set-Cookie: region=' . self::$params->Region . '; Secure; Path=/; SameSite=Strict;');
                 }
                 if (null !== self::$params->Year) {
                     $filteredResults->litcal_missals = array_filter(
@@ -244,7 +255,6 @@ class Missals
                         fn ($missal) => $missal->year_published === self::$params->Year
                     );
                     header("X-Litcal-Missals-Year: " . self::$params->Year, false);
-                    header('Set-Cookie: year=' . self::$params->Year . '; Secure; Path=/; SameSite=Strict;');
                 }
                 self::produceResponse(json_encode($filteredResults));
             }
