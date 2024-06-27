@@ -209,7 +209,7 @@ class Missals
                 }
                 self::$missalsIndex->litcal_missals[] = $missal;
                 self::$params->setMissalRegion($missal->region);
-                self::$params->setMissalYear($missal->year);
+                self::$params->setMissalYear($missal->year_published);
             }
         }
         // we only set the request parameters after we have collected the MissalRegions and MissalYears
