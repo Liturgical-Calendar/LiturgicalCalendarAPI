@@ -143,6 +143,10 @@ class Decrees
             $rawData = file_get_contents($decreesFile);
             self::$decreesIndex = new \stdClass();
             self::$decreesIndex->litcal_decrees = json_decode($rawData);
+            foreach (self::$decreesIndex->litcal_decrees as $idx => $decree) {
+                $decreeId = $decree->decree_id;
+                self::$decreesIndex->litcal_decrees[$idx]->api_path = API_BASE_PATH . "/decrees/$decreeId";
+            }
         } else {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
             die('Decrees file not found');
