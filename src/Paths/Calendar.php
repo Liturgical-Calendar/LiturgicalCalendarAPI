@@ -626,6 +626,12 @@ class Calendar
         if (file_exists($memorialsFromDecreesFile)) {
             $memorialsFromDecrees = json_decode(file_get_contents($memorialsFromDecreesFile));
             if (json_last_error() !== JSON_ERROR_NONE) {
+                $response = new \stdClass();
+                $response->ERROR = "There was an error trying to retrieve"
+                    . " and decode JSON data for Memorials based on Decrees: "
+                    . json_last_error_msg();
+                die(json_encode($response));
+            } else {
                 $this->tempCal[ "MEMORIALS_FROM_DECREES" ] = [];
                 foreach ($memorialsFromDecrees->litcal_decrees as $row) {
                     if (
@@ -639,12 +645,6 @@ class Calendar
                     }
                     $this->tempCal[ "MEMORIALS_FROM_DECREES" ][ $row->festivity->TAG ] = $row;
                 }
-            } else {
-                $response = new \stdClass();
-                $response->ERROR = "There was an error trying to retrieve"
-                    . " and decode JSON data for Memorials based on Decrees: "
-                    . json_last_error_msg();
-                die(json_encode($response));
             }
         }
     }
