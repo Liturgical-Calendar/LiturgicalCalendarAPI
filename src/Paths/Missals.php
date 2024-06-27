@@ -256,6 +256,11 @@ class Missals
                     );
                     header("X-Litcal-Missals-Year: " . self::$params->Year, false);
                 }
+                if (null !== self::$params->Year) {
+                    header("X-Litcal-Missals-Locale: " . self::$params->Locale, false);
+                } else {
+                    header("X-Litcal-Missals-Locale: none", false);
+                }
                 self::produceResponse(json_encode($filteredResults));
             }
         }
