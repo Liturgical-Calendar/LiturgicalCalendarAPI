@@ -64,16 +64,16 @@ class Decrees
             switch ($numPathParts) {
                 case 1:
                     $decreeIds = [];
-                    foreach (self::$decreesIndex->LitCalDecrees as $idx => $decree) {
+                    foreach (self::$decreesIndex->litcal_decrees as $idx => $decree) {
                         if ($decree->decree_id === self::$requestPathParts[0]) {
-                            self::produceResponse(json_encode(self::$decreesIndex->LitCalDecrees[$idx]));
+                            self::produceResponse(json_encode(self::$decreesIndex->litcal_decrees[$idx]));
                         }
                         $decreeIds[] = $decree->decree_id;
                     }
 
                     $error = "No Decree of the Congregation for Divine Worship found corresponding to "
                         . self::$requestPathParts[0]
-                        . ", valid values are found in the `decree_id` properties of the `LitCalDecrees` collection: " . implode(', ', $decreeIds);
+                        . ", valid values are found in the `decree_id` properties of the `litcal_decrees` collection: " . implode(', ', $decreeIds);
                     self::produceErrorResponse(StatusCode::NOT_FOUND, $error);
                     break;
                 default:
@@ -142,7 +142,7 @@ class Decrees
         if (file_exists($decreesFile)) {
             $rawData = file_get_contents($decreesFile);
             self::$decreesIndex = new \stdClass();
-            self::$decreesIndex->LitCalDecrees = json_decode($rawData);
+            self::$decreesIndex->litcal_decrees = json_decode($rawData);
         } else {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
             die('Decrees file not found');
