@@ -37,16 +37,18 @@ class MissalsParams
                     case 'LOCALE':
                         if ($value !== 'la' && $value !== 'LA') {
                             $value = \Locale::canonicalize($value);
+                        } else {
+                            $value = strtoupper($value);
                         }
                         if (LitLocale::isValid($value)) {
                             $this->Locale = $value;
+                            $this->baseLocale = \Locale::getPrimaryLanguage($value);
                         } else {
                             $error = "Locale `$value` set in param `locale` is not supported by this server, supported locales are: "
                                 . implode(', ', LitLocale::$AllAvailableLocales);
                             //$this->setLastError(StatusCode::BAD_REQUEST, $error);
                             Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
                         }
-                        $this->baseLocale = \Locale::getPrimaryLanguage($value);
                         if (count($this->availableLangs) && false === in_array($this->baseLocale, $this->availableLangs)) {
                             $message = "Locale `$value` ({$this->baseLocale}) set in param `locale` is not a valid locale for the requested Missal, valid locales are: "
                                     . implode(', ', $this->availableLangs);
