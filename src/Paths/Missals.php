@@ -256,7 +256,7 @@ class Missals
                     );
                     header("X-Litcal-Missals-Year: " . self::$params->Year, false);
                 }
-                if (null !== self::$params->Year) {
+                if (null !== self::$params->Locale) {
                     header("X-Litcal-Missals-Locale: " . self::$params->Locale, false);
                 } else {
                     header("X-Litcal-Missals-Locale: none", false);
