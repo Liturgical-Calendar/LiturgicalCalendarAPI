@@ -238,6 +238,11 @@ class Missals
         }
         self::$APICore->setResponseContentTypeHeader();
         if (count(self::$requestPathParts) === 0) {
+            if (null !== self::$params->Locale) {
+                header("X-Litcal-Missals-Locale: " . self::$params->Locale, false);
+            } else {
+                header("X-Litcal-Missals-Locale: none", false);
+            }
             if (null === self::$params->Region && null === self::$params->Year) {
                 self::produceResponse(json_encode(self::$missalsIndex));
             } else {
@@ -255,11 +260,6 @@ class Missals
                         fn ($missal) => $missal->year_published === self::$params->Year
                     );
                     header("X-Litcal-Missals-Year: " . self::$params->Year, false);
-                }
-                if (null !== self::$params->Locale) {
-                    header("X-Litcal-Missals-Locale: " . self::$params->Locale, false);
-                } else {
-                    header("X-Litcal-Missals-Locale: none", false);
                 }
                 self::produceResponse(json_encode($filteredResults));
             }
