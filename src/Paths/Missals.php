@@ -235,12 +235,14 @@ class Missals
                         $filteredResults->litcal_missals,
                         fn ($missal) => $missal->region === self::$params->Region
                     );
+                    header("X-Litcal-Missals-Region: " . self::$params->Region);
                 }
                 if (null !== self::$params->Year) {
                     $filteredResults->litcal_missals = array_filter(
                         $filteredResults->litcal_missals,
                         fn ($missal) => $missal->year_published === self::$params->Year
                     );
+                    header("X-Litcal-Missals-Year: " . self::$params->Year);
                 }
                 self::produceResponse(json_encode($filteredResults));
             }
