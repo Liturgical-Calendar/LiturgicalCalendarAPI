@@ -1,7 +1,7 @@
 [
     {
         "decree_id": "StMaryMagdalene_Upgrade",
-        "decree_date": "2016-06-03T00:00:00.000Z",
+        "decree_date": "2016-06-03",
         "decree_protocol": "Prot. N. 257/16",
         "description": "By the express wish of the Holy Father, Pope Francis, the Congregation for Divine Worship and the Discipline of the Sacraments published a new Decree on the Solemnity of the Most Sacred Heart of Jesus, 3 June 2016, in which the celebration of Saint Mary Magdalene was elevated and inscribed in the General Roman Calendar with the rank of Feast.",
         "festivity": {
@@ -37,7 +37,7 @@
     },
     {
         "decree_id": "MaryMotherChurch_Create",
-        "decree_date": "2018-02-11T00:00:00.000Z",
+        "decree_date": "2018-02-11",
         "decree_protocol": "Prot. N. 10/18",
         "description": "Pope Francis has decreed that the Memorial of the Blessed Virgin Mary, Mother of the Church, should be inscribed in the Roman Calendar on the Monday after Pentecost and be now celebrated every year.",
         "festivity": {
@@ -86,7 +86,7 @@
     },
     {
         "decree_id": "StMartha_NameChange",
-        "decree_date": "2021-01-26T00:00:00.000Z",
+        "decree_date": "2021-01-26",
         "decree_protocol": "Prot. N. 35/21",
         "description": "The Supreme Pontiff Pope FRANCIS, considering the important evangelical witness offered by Martha, Mary and Lazarus in welcoming the Lord Jesus into their home, in listening to him attentively, in believing that he is the resurrection and the life, and accepting the proposal of this Dicastery, has decreed that 29 July be designated in the General Roman Calendar as the Memorial of Saints Martha, Mary and Lazarus.",
         "festivity": {
@@ -120,7 +120,7 @@
     },
     {
         "decree_id": "StJohnXXIII_Create",
-        "decree_date": "2014-05-29T00:00:00.000Z",
+        "decree_date": "2014-05-29",
         "decree_protocol": "Prot. N. 309/14",
         "description": "The Supreme Pontiff Francis, taking into consideration the universal whishes of the People of God from many and diverse regions of the world, has decreed that the celebrations of Pope Saint John XXIII and Pope Saint John Paul II should be inserted into the General Roman Calendar, to be observed annually with the rank of Optional Memorial, the first on 11 October, the second on 22 October.",
         "festivity": {
@@ -164,7 +164,7 @@
     },
     {
         "decree_id": "StJohnPaulII_Create",
-        "decree_date": "2014-05-29T00:00:00.000Z",
+        "decree_date": "2014-05-29",
         "decree_protocol": "Prot. N. 309/14",
         "description": "The Supreme Pontiff Francis, taking into consideration the universal whishes of the People of God from many and diverse regions of the world, has decreed that the celebrations of Pope Saint John XXIII and Pope Saint John Paul II should be inserted into the General Roman Calendar, to be observed annually with the rank of Optional Memorial, the first on 11 October, the second on 22 October.",
         "festivity": {
@@ -208,7 +208,7 @@
     },
     {
         "decree_id": "LadyLoreto_Create",
-        "decree_date": "2019-10-07T00:00:00.000Z",
+        "decree_date": "2019-10-07",
         "decree_protocol": "Prot. N. 404/19",
         "description": "Pope Francis has decreed, by his own authority, that the optional memorial of the Blessed Virgin Mary of Loreto should be inscribed in the Roman Calendar on 10 December, the day on which the feast falls in Loreto, and celebrated every year.",
         "festivity": {
@@ -252,7 +252,7 @@
     },
     {
         "decree_id": "StPaulVI_Create",
-        "decree_date": "2019-01-25T00:00:00.000Z",
+        "decree_date": "2019-01-25",
         "decree_protocol": "Prot. N. 29/19",
         "description": "Pope Francis, assenting to the petitions and desires of the People of God, has decreed that the celebration of Pope Saint Paul VI, should be inserted into the Roman Calendar on 29 May with the rank of optional memorial.",
         "festivity": {
@@ -298,7 +298,7 @@
     },
     {
         "decree_id": "StFaustinaKowalska_Create",
-        "decree_date": "2020-01-18T00:00:00.000Z",
+        "decree_date": "2020-01-18",
         "decree_protocol": "Prot. N. 229/20",
         "description": "The Supreme Pontiff Francis, accepting the petitions and wishes of Pastors, religious women and men, as well as associations of the faithful and having considered the influence exercised by the spirituality of Saint Faustina in different parts of the world, has decreed that the name of Saint Maria Faustina (Helena) Kowalska, virgin, be inscribed in the General Roman Calendar and that her optional memorial be celebrated by all on 5 October.",
         "festivity": {
@@ -342,7 +342,7 @@
     },
     {
         "decree_id": "StGregoryNarek_Create",
-        "decree_date": "25-01-2021T00:00:00.000Z",
+        "decree_date": "25-01-2021",
         "decree_protocol": "Prot. N. 40/21",
         "description": "The Supreme Pontiff Pope FRANCIS has decreed the following celebrations to be inscribed in the General Roman Calendar with the rank of Optional Memorial: Saint Gregory of Narek, Abbot and Doctor of the Church, on 27 February",
         "festivity": {
@@ -388,7 +388,7 @@
     },
     {
         "decree_id": "StJohnAvila_Create",
-        "decree_date": "2021-01-25T00:00:00.000Z",
+        "decree_date": "2021-01-25",
         "decree_protocol": "Prot. N. 40/21",
         "description": "The Supreme Pontiff Pope FRANCIS has decreed the following celebrations to be inscribed in the General Roman Calendar with the rank of Optional Memorial: Saint John De Avila, Priest and Doctor of the Church, on 10 May",
         "festivity": {
@@ -434,7 +434,7 @@
     },
     {
         "decree_id": "StHildegardBingen_Create",
-        "decree_date": "2021-01-25T00:00:00.000Z",
+        "decree_date": "2021-01-25",
         "decree_protocol": "Prot. N. 40/21",
         "description": "The Supreme Pontiff Pope FRANCIS has decreed the following celebrations to be inscribed in the General Roman Calendar with the rank of Optional Memorial: Saint Hildegard of Bingen, Virgin and Doctor of the Church, on 17 September",
         "festivity": {
@@ -480,7 +480,7 @@
     },
     {
         "decree_id": "StThereseChildJesus_Doctor",
-        "decree_date": "1997-10-19T00:00:00.000Z",
+        "decree_date": "1997-10-19",
         "decree_protocol": "",
         "description": "Fulfilling the wishes of many Brothers in the Episcopate and of a great number of the faithful throughout the world, after consulting the Congregation for the Causes of Saints and hearing the opinion of the Congregation for the Doctrine of the Faith regarding her eminent doctrine, with certain knowledge and after lengthy reflection, with the fullness of Our apostolic authority We declare Saint Thérèse of the Child Jesus and the Holy Face, virgin, to be a Doctor of the Universal Church.",
         "festivity": {
@@ -513,7 +513,7 @@
     },
     {
         "decree_id": "StIrenaeus_Doctor",
-        "decree_date": "2022-01-22T00:00:00.000Z",
+        "decree_date": "2022-01-22",
         "decree_protocol": "B0048-XX.01 00099-IT.01",
         "description": "Dopo aver avuto il parere della Congregazione delle Cause dei Santi, con la mia Autorità Apostolica lo DICHIARO Sant'Ireneo di Lione Dottore della Chiesa con il titolo di Doctor unitatis.",
         "festivity": {

@@ -5,7 +5,18 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-        "LitCalDecrees": {
+        "litcal_decrees": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/LitCalDecree"
+            }
+        }
+    },
+    "required": [
+        "litcal_decrres"
+    ],
+    "definitions": {
+        "LitCalDecree": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -13,8 +24,13 @@
                     "type": "string",
                     "pattern": "[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)"
                 },
-                "decree_date": {},
-                "decree_protocol": {},
+                "decree_date": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "decree_protocol": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -35,14 +51,9 @@
                 "decree_protocol",
                 "description",
                 "festivity",
-                "decree_metadata"
+                "metadata"
             ]
-        }
-    },
-    "required": [
-        "LitCalDecrees"
-    ],
-    "definitions": {
+        },
         "Festivity": {
             "type": "object",
             "additionalProperties": false,
