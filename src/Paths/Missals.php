@@ -42,7 +42,12 @@ class Missals
                 if ($payload !== null && property_exists($payload, 'locale')) {
                     $data["LOCALE"] = $payload->locale;
                 } else {
-                    $data["LOCALE"] = LitLocale::LATIN;
+                    $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+                    if ($locale && LitLocale::isValid($locale)) {
+                        $data["LOCALE"] = $_GET['locale'];
+                    } else {
+                        $data["LOCALE"] = LitLocale::LATIN;
+                    }
                 }
             } else {
                 $data["PAYLOAD"] = $payload;
@@ -51,7 +56,12 @@ class Missals
             if (isset($_GET['locale'])) {
                 $data["LOCALE"] = $_GET['locale'];
             } else {
-                $data["LOCALE"] = LitLocale::LATIN;
+                $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+                if ($locale && LitLocale::isValid($locale)) {
+                    $data["LOCALE"] = $_GET['locale'];
+                } else {
+                    $data["LOCALE"] = LitLocale::LATIN;
+                }
             }
         }
         return $data;
@@ -70,7 +80,6 @@ class Missals
                     $missalData = file_get_contents($missal->data_path);
                     if ($missalData) {
                         if (property_exists($missal, 'languages')) {
-                            self::$params->setData(self::initRequestParams());
                             if (null !== self::$params->Locale) {
                                 $baseLocale = \Locale::getPrimaryLanguage(self::$params->Locale);
                                 if (in_array($baseLocale, $missal->languages) && property_exists($missal, 'i18n_path')) {
@@ -166,6 +175,8 @@ class Missals
 
     public static function init(array $requestPathParts = [])
     {
+        self::$APICore = new APICore();
+        self::$params = new MissalsParams();
         if (count($requestPathParts)) {
             self::$requestPathParts = $requestPathParts;
         }
@@ -197,9 +208,12 @@ class Missals
                     $missal->api_path       = API_BASE_PATH . "/missals/{$matches[1]}_{$matches[2]}";
                 }
                 self::$missalsIndex->litcal_missals[] = $missal;
+                self::$params->setMissalRegion($missal->region);
+                self::$params->setMissalYear($missal->year);
             }
         }
-        self::$APICore = new APICore();
+        // we only set the request parameters after we have collected the MissalRegions and MissalYears
+        self::$params->setData(self::initRequestParams());
     }
 
     public static function handleRequest()
@@ -212,7 +226,24 @@ class Missals
         }
         self::$APICore->setResponseContentTypeHeader();
         if (count(self::$requestPathParts) === 0) {
-            self::produceResponse(json_encode(self::$missalsIndex));
+            if (null === self::$params->Region && null === self::$params->Year) {
+                self::produceResponse(json_encode(self::$missalsIndex));
+            } else {
+                $filteredResults = self::$missalsIndex;
+                if (null !== self::$params->Region) {
+                    $filteredResults->litcal_missals = array_filter(
+                        $filteredResults->litcal_missals,
+                        fn ($missal) => $missal->region === self::$params->Region
+                    );
+                }
+                if (null !== self::$params->Year) {
+                    $filteredResults->litcal_missals = array_filter(
+                        $filteredResults->litcal_missals,
+                        fn ($missal) => $missal->year_published === self::$params->Year
+                    );
+                }
+                self::produceResponse(json_encode($filteredResults));
+            }
         }
         self::handlePathParams();
     }
