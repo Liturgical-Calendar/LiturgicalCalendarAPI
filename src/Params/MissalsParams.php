@@ -11,12 +11,12 @@ class MissalsParams
     public ?string $Region              = null;
     public ?string $Year                = null;
     public ?string $Locale              = null;
-    public const int ERROR_NONE         = 0;
-    public const int ERROR              = 1;
-    private ?string $baseLocale         = null;
+    public ?string $baseLocale          = null;
     private array $availableLangs       = [];
     private static array $MissalRegions = [];
     private static array $MissalYears   = [];
+    // public const int ERROR_NONE         = 0;
+    // public const int ERROR              = 1;
     // private static int $last_error      = MissalsParams::ERROR_NONE;
     // private static StatusCode $last_error_status;
     // private static string $last_error_msg;

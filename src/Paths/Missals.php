@@ -91,38 +91,43 @@ class Missals
                 if ($missal->missal_id === self::$requestPathParts[0]) {
                     $missalData = file_get_contents($missal->data_path);
                     if ($missalData) {
-                        if (property_exists($missal, 'languages')) {
-                            if (null !== self::$params->Locale) {
-                                $baseLocale = \Locale::getPrimaryLanguage(self::$params->Locale);
-                                if (in_array($baseLocale, $missal->languages) && property_exists($missal, 'i18n_path')) {
-                                    $i18nFile = $missal->i18n_path . $baseLocale . ".json";
-                                    $i18nData = file_get_contents($i18nFile);
-                                    if ($i18nData) {
-                                        $i18nObj = json_decode($i18nData);
-                                        if (JSON_ERROR_NONE !== json_last_error()) {
-                                            $error = "Error while processing localized data from file {$i18nFile}: " . json_last_error_msg();
-                                            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $error);
-                                        }
-                                        $missalObj = json_decode($missalData);
-                                        if (JSON_ERROR_NONE !== json_last_error()) {
-                                            $error = "Error while processing Missal data from file '{$missalData}': " . json_last_error_msg();
-                                        }
-                                        foreach ($missalObj as $idx => $row) {
-                                            $key = $row->TAG;
-                                            if (property_exists($i18nObj, $key)) {
-                                                $missalObj[$idx]->NAME = $i18nObj->{$key};
-                                            }
-                                        }
-                                        self::produceResponse(json_encode($missalObj));
-                                    } else {
-                                        self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Unable to read localized data from file {$i18nFile}");
+                        if (property_exists($missal, 'languages') && self::$params->baseLocale !== null) {
+                            header("X-Litcal-Missals-I18n: yes", false);
+                            if (in_array(self::$params->baseLocale, $missal->languages) && property_exists($missal, 'i18n_path')) {
+                                $i18nFile = $missal->i18n_path . self::$params->baseLocale . ".json";
+                                header("X-Litcal-Missals-I18n-Path: $i18nFile", false);
+                                $i18nData = file_get_contents($i18nFile);
+                                if ($i18nData) {
+                                    $i18nObj = json_decode($i18nData);
+                                    if (json_last_error() !== JSON_ERROR_NONE) {
+                                        $error = "Error while processing localized data from file {$i18nFile}: " . json_last_error_msg();
+                                        self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $error);
                                     }
+                                    $missalRows = json_decode($missalData);
+                                    if (json_last_error() !== JSON_ERROR_NONE) {
+                                        $error = "Error while processing Missal data from file '{$missalData}': " . json_last_error_msg();
+                                        self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $error);
+                                    }
+                                    header("X-Litcal-Missals-I18n-Status: success", false);
+                                    foreach ($missalRows as $idx => $row) {
+                                        $key = $row->TAG;
+                                        if (property_exists($i18nObj, $key)) {
+                                            $missalRows[$idx]->NAME = $i18nObj->{$key};
+                                        }
+                                    }
+                                    self::produceResponse(json_encode($missalRows));
+                                } else {
+                                    self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Unable to read localized data from file {$i18nFile}");
                                 }
                             }
+                        } else {
+                            self::produceResponse($missalData);
                         }
-                        self::produceResponse($missalData);
                     } else {
-                        self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Unable to retrieve the Missal for region $missal->region published in the year $missal->year_published");
+                        self::produceErrorResponse(
+                            StatusCode::SERVICE_UNAVAILABLE,
+                            "Unable to retrieve the Missal for region $missal->region published in the year $missal->year_published"
+                        );
                     }
                 }
                 $missalIDs[] = $missal->missal_id;
