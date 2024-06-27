@@ -60,76 +60,56 @@ class Missals
     private static function handlePathParams()
     {
         $numPathParts = count(self::$requestPathParts);
-        if ($numPathParts > 0) {
-            switch ($numPathParts) {
-                case 1:
-                    if (property_exists(self::$missalsIndex->LitCalMissals, self::$requestPathParts[0])) {
-                        self::produceResponse(json_encode(self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}));
-                    } else {
-                        $missals = array_keys(get_object_vars(self::$missalsIndex->LitCalMissals));
-                        $error = "No Roman Missal found corresponding to " . self::$requestPathParts[0] . ", valid values are: " . implode(', ', $missals);
-                        self::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
-                    }
-                    break;
-                case 2:
-                    if (false === property_exists(self::$missalsIndex->LitCalMissals, self::$requestPathParts[0])) {
-                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "No Roman Missal found corresponding to " . self::$requestPathParts[0]);
-                    }
-                    self::$params = new MissalsParams(["YEAR" => self::$requestPathParts[1]]);
-                    if (property_exists(self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}, self::$params->Year)) {
-                        $dataPath = self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}->{self::$params->Year}->dataPath;
-                        $i18n = null;
-                        if (property_exists(self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}->{self::$params->Year}, 'languages')) {
-                            $languages = self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}->{self::$params->Year}->languages;
+        $missalIDs = [];
+        if ($numPathParts > 1) {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Only one path parameter expected for the `/missals` path but $numPathParts path parameters were found");
+        } else {
+            // the only path parameter we expect is the ID of the Missal
+            foreach (self::$missalsIndex->litcal_missals as $idx => $missal) {
+                if ($missal->missal_id === self::$requestPathParts[0]) {
+                    $missalData = file_get_contents($missal->data_path);
+                    if ($missalData) {
+                        if (property_exists($missal, 'languages')) {
                             self::$params->setData(self::initRequestParams());
                             if (null !== self::$params->Locale) {
                                 $baseLocale = \Locale::getPrimaryLanguage(self::$params->Locale);
-                                if (in_array($baseLocale, $languages) && property_exists(self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}->{self::$params->Year}, 'i18nPath')) {
-                                    $i18nFile = self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}->{self::$params->Year}->i18nPath . $baseLocale . ".json";
+                                if (in_array($baseLocale, $missal->languages) && property_exists($missal, 'i18n_path')) {
+                                    $i18nFile = $missal->i18n_path . $baseLocale . ".json";
                                     $i18nData = file_get_contents($i18nFile);
                                     if ($i18nData) {
-                                        $i18n = json_decode($i18nData);
+                                        $i18nObj = json_decode($i18nData);
                                         if (JSON_ERROR_NONE !== json_last_error()) {
                                             $error = "Error while processing localized data from file {$i18nFile}: " . json_last_error_msg();
                                             self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $error);
                                         }
+                                        $missalObj = json_decode($missalData);
+                                        if (JSON_ERROR_NONE !== json_last_error()) {
+                                            $error = "Error while processing Missal data from file '{$missalData}': " . json_last_error_msg();
+                                        }
+                                        foreach ($missalObj as $idx => $row) {
+                                            $key = $row->TAG;
+                                            if (property_exists($i18nObj, $key)) {
+                                                $missalObj[$idx]->NAME = $i18nObj->{$key};
+                                            }
+                                        }
+                                        self::produceResponse(json_encode($missalObj));
                                     } else {
                                         self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Unable to read localized data from file {$i18nFile}");
                                     }
                                 }
                             }
                         }
-                        if (file_exists($dataPath)) {
-                            $dataRaw = file_get_contents($dataPath);
-                            if ($dataRaw) {
-                                if (null !== $i18n) {
-                                    $data = json_decode($dataRaw);
-                                    if (JSON_ERROR_NONE !== json_last_error()) {
-                                        $error = "Error while processing decoding json data from file {$dataPath}: " . json_last_error_msg();
-                                        self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $error);
-                                    } else {
-                                        foreach ($data as $idx => $row) {
-                                            $key = $row->TAG;
-                                            $data[$idx]->NAME = property_exists($i18n, $key) ? $i18n->{$key} : '';
-                                        }
-                                        self::produceResponse(json_encode($data));
-                                    }
-                                } else {
-                                    self::produceResponse($dataRaw);
-                                }
-                            } else {
-                                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Unable to read Missal data from file {$dataPath}");
-                            }
-                        } else {
-                            self::produceErrorResponse(StatusCode::NOT_FOUND, "This is a server error, not a request error: the expected file {$dataPath} was not found");
-                        }
+                        self::produceResponse($missalData);
                     } else {
-                        $RomanMissalYears = array_keys(get_object_vars(self::$missalsIndex->LitCalMissals->{self::$requestPathParts[0]}));
-                        $error = "No Roman Missal was found for the year " . self::$params->Year . ", valid values are: " . implode(', ', $RomanMissalYears);
-                        self::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
+                        self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Unable to retrieve the Missal for region $missal->region published in the year $missal->year_published");
                     }
-                    break;
+                }
+                $missalIDs[] = $missal->missal_id;
             }
+            self::produceErrorResponse(
+                StatusCode::NOT_FOUND,
+                "Could not find a Missal with id $missal->missal_id, available values are: " . implode(', ', $missalIDs)
+            );
         }
     }
 
@@ -190,31 +170,33 @@ class Missals
             self::$requestPathParts = $requestPathParts;
         }
         self::$missalsIndex = new \stdClass();
-        self::$missalsIndex->LitCalMissals = new \stdClass();
-        self::$missalsIndex->{'$schema'} = API_BASE_PATH . "/schemas/LitCalMissals.json";
-        self::$missalsIndex->LitCalMissals->EDITIO_TYPICA = new \stdClass();
+        self::$missalsIndex->litcal_missals = [];
         $directories = array_map('basename', glob('data/propriumdesanctis*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
             if (file_exists("data/$directory/$directory.json")) {
                 if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
-                    self::$missalsIndex->LitCalMissals->EDITIO_TYPICA->{$matches[1]} = new \stdClass();
-                    self::$missalsIndex->LitCalMissals->EDITIO_TYPICA->{$matches[1]}->dataPath = "data/$directory/$directory.json";
+                    $missal                 = new \stdClass();
+                    $missal->missal_id      = "EDITIO_TYPICA_{$matches[1]}";
+                    $missal->region         = "EDITIO_TYPICA";
+                    $missal->year_published = $matches[1];
+                    $missal->data_path      = "data/$directory/$directory.json";
                     $it = new \DirectoryIterator("glob://data/$directory/i18n/*.json");
                     $languages = [];
                     foreach ($it as $f) {
                         $languages[] = $f->getBasename('.json');
                     }
-                    self::$missalsIndex->LitCalMissals->EDITIO_TYPICA->{$matches[1]}->languages = $languages;
-                    self::$missalsIndex->LitCalMissals->EDITIO_TYPICA->{$matches[1]}->i18nPath = "data/$directory/i18n/";
-                    self::$missalsIndex->LitCalMissals->EDITIO_TYPICA->{$matches[1]}->apiPath = API_BASE_PATH . "/missals/EDITIO_TYPICA/{$matches[1]}";
+                    $missal->langs          = $languages;
+                    $missal->i18n_path      = "data/$directory/i18n/";
+                    $missal->api_path       = API_BASE_PATH . "/missals/EDITIO_TYPICA_{$matches[1]}";
                 } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
-                    if (false === property_exists(self::$missalsIndex, $matches[1])) {
-                        self::$missalsIndex->LitCalMissals->{$matches[1]} = new \stdClass();
-                    }
-                    self::$missalsIndex->LitCalMissals->{$matches[1]}->{$matches[2]} = new \stdClass();
-                    self::$missalsIndex->LitCalMissals->{$matches[1]}->{$matches[2]}->dataPath = "data/$directory/$directory.json";
-                    self::$missalsIndex->LitCalMissals->{$matches[1]}->{$matches[2]}->apiPath = API_BASE_PATH . "/missals/{$matches[1]}/{$matches[2]}";
+                    $missal                 = new \stdClass();
+                    $missal->missal_id      = "{$matches[1]}_{$matches[2]}";
+                    $missal->region         = $matches[1];
+                    $missal->year_published = $matches[2];
+                    $missal->data_path      = "data/$directory/$directory.json";
+                    $missal->api_path       = API_BASE_PATH . "/missals/{$matches[1]}_{$matches[2]}";
                 }
+                self::$missalsIndex->litcal_missals[] = $missal;
             }
         }
         self::$APICore = new APICore();

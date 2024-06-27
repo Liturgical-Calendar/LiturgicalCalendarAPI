@@ -8,8 +8,10 @@ use Johnrdorazio\LitCal\Paths\Missals;
 
 class MissalsParams
 {
-    public ?string $Locale = null;
-    public ?string $Year   = null;
+    public ?string $Year          = null;
+    public ?string $Locale        = null;
+    private ?string $baseLocale   = null;
+    private array $availableLangs = [];
 
     public function __construct(array $DATA = [])
     {
@@ -29,17 +31,33 @@ class MissalsParams
                         if (LitLocale::isValid($value)) {
                             $this->Locale = $value;
                         } else {
-                            $error = "Invalid value `$value` for param `locale`, valid values are: "
+                            $error = "Locale `$value` set in param `locale` is not supported by this server, supported locales are: "
                                 . implode(', ', LitLocale::$AllAvailableLocales);
                             Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
+                        }
+                        $this->baseLocale = \Locale::getPrimaryLanguage($value);
+                        if (false === in_array($this->baseLocale, $this->availableLangs)) {
+                            Missals::produceErrorResponse(
+                                StatusCode::BAD_REQUEST,
+                                "Locale `$value` ({$this->baseLocale}) set in param `locale` is not a valid locale for the requested Missal, valid locales are: "
+                                    . implode(', ', $this->availableLangs)
+                            );
                         }
                         break;
                     case 'YEAR':
                         $this->enforceYearValidity($value);
                         break;
+                    case 'REGION':
+                        //TODO:
+                        break;
                 }
             }
         }
+    }
+
+    public function setAvailableLangs(array $langs)
+    {
+        $this->availableLangs = $langs;
     }
 
     private function enforceYearValidity(string $value)

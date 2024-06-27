@@ -1,45 +1,70 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "LitCalMissals",
+    "description": "A collection of the Missals from which sanctorale data is used to define one or another Liturgical Calendar",
     "type": "object",
     "additionalProperties": false,
     "properties": {
-        "LitCalMissals": {
-            "additionalProperties": false,
-            "patternProperties": {
-                "EDITIO_TYPICA": {
-                    "$ref": "#/definitions/MissalsCollection"
-                },
-                "^(ITALY|USA|NETHERLANDS)$": {
-                    "$ref": "#/definitions/MissalsCollection"
-                }
-            }
-        },
-        "$schema": {
-            "type": "string",
-            "pattern": "^https?:\\\/\\\/litcal\\.johnromanodorazio\\.com\\\/api\\\/(dev|v[3-9])\\\/schemas\\\/LitCalMissals.json$"
+        "litcal_missals": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Missal"
+            },
+            "additionalItems": false
         }
     },
-    "required": [ "LitCalMissals", "$schema" ],
+    "required": [ "litcal_missals" ],
     "definitions": {
-        "MissalsCollection": {
+        "Missal": {
             "type": "object",
             "additionalProperties": false,
-            "patternProperties": {
-                "^(19[7-9]|20[0-9])[0-9]$": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                        "dataPath": {
-                            "type": "string",
-                            "pattern": "^data\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\.json$"
-                        },
-                        "apiPath": {
-                            "type": "string",
-                            "pattern": "^https?:\\\/\\\/litcal\\.johnromanodorazio\\.com\\\/api\\\/(dev|v[3-9])\\\/data\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\.json$"
-                        }
+            "properties": {
+                "missal_id": {
+                    "type": "string",
+                    "pattern": "^(EDITIO_TYPICA|ITALY|USA|NETHERLANDS)_(19[7-9]|[2-9][0-9][0-9])[0-9]$"
+                },
+                "region": {
+                    "type": "string",
+                    "enum": [
+                        "EDITIO_TYPICA",
+                        "ITALY",
+                        "USA",
+                        "NETHERLANDS"
+                    ]
+                },
+                "year_published": {
+                    "type": "integer",
+                    "minimum": 1970,
+                    "maximum": 9999
+                },
+                "data_path": {
+                    "type": "string",
+                    "pattern": "^data\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\.json$"
+                },
+                "languages": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "pattern": "^[a-z]{2}$"
                     }
+                },
+                "i18n_path": {
+                    "type": "string",
+                    "pattern": "^data\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\\/i18n\\\/$"
+                },
+                "api_path": {
+                    "type": "string",
+                    "format": "uri",
+                    "pattern": "https?:\\\/\\\/litcal\\.johnromanodorazio\\.com\\\/api\\\/(dev|v[3-9])\\\/missals\\\/(EDITIO_TYPICA|ITALY|USA|NETHERLANDS)_(19[7-9]|[2-9][0-9][0-9])[0-9]$"
                 }
-            }
+            },
+            "required": [
+                "missal_id",
+                "region",
+                "year_published",
+                "data_path",
+                "api_path"
+            ]
         }
     }
 }
