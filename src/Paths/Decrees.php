@@ -74,7 +74,7 @@ class Decrees
                     $error = "No Decree of the Congregation for Divine Worship found corresponding to "
                         . self::$requestPathParts[0]
                         . ", valid values are found in the `decree_id` properties of the `LitCalDecrees` collection: " . implode(', ', $decreeIds);
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
+                    self::produceErrorResponse(StatusCode::NOT_FOUND, $error);
                     break;
                 default:
                     self::produceErrorResponse(StatusCode::BAD_REQUEST, "Only one path parameter expected on the `/decrees` path, instead $numPathParts found");
