@@ -17,9 +17,9 @@ class MissalsParams
     private array $availableLangs       = [];
     private static array $MissalRegions = [];
     private static array $MissalYears   = [];
-    private static int $last_error      = MissalsParams::ERROR_NONE;
-    private static StatusCode $last_error_status;
-    private static string $last_error_msg;
+    // private static int $last_error      = MissalsParams::ERROR_NONE;
+    // private static StatusCode $last_error_status;
+    // private static string $last_error_msg;
 
     public function __construct(?array $DATA = null)
     {
@@ -47,7 +47,7 @@ class MissalsParams
                             Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
                         }
                         $this->baseLocale = \Locale::getPrimaryLanguage($value);
-                        if (false === in_array($this->baseLocale, $this->availableLangs)) {
+                        if (count($this->availableLangs) && false === in_array($this->baseLocale, $this->availableLangs)) {
                             $message = "Locale `$value` ({$this->baseLocale}) set in param `locale` is not a valid locale for the requested Missal, valid locales are: "
                                     . implode(', ', $this->availableLangs);
                             //$this->setLastError(StatusCode::BAD_REQUEST, $message);
