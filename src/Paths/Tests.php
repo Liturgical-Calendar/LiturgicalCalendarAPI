@@ -61,6 +61,7 @@ class Tests
         $testsFolder = 'tests/';
         if (count(self::$requestPathParts) === 0) {
             try {
+                $response = new \stdClass();
                 $testSuite = [];
                 $it = new \DirectoryIterator("glob://{$testsFolder}*Test.json");
                 foreach ($it as $f) {
@@ -68,7 +69,8 @@ class Tests
                     $testContents   = file_get_contents("{$testsFolder}$fileName");
                     $testSuite[]    = json_decode($testContents, true);
                 }
-                return json_encode($testSuite, JSON_PRETTY_PRINT);
+                $response->litcal_tests = $testSuite;
+                return json_encode($response, JSON_PRETTY_PRINT);
             } catch (\UnexpectedValueException $e) {
                 return self::produceErrorResponse(StatusCode::NOT_FOUND, "Tests folder path cannot be opened: " . $e->getMessage());
             }

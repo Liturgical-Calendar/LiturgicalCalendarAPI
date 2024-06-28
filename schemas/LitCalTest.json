@@ -54,14 +54,14 @@
                 "description": {
                     "type": "string"
                 },
-                "testType": {
+                "test_type": {
                     "type": "string",
                     "enum": [
                         "exactCorrespondence",
                         "variableCorrespondence"
                     ]
                 },
-                "appliesTo": {
+                "applies_to": {
                     "$ref": "#/definitions/AppliesToOrExcludes"
                 },
                 "excludes": {
@@ -71,7 +71,7 @@
                     "$ref": "#/definitions/Assertions"
                 }
             },
-            "required": [ "name", "eventkey", "description", "testType", "assertions" ],
+            "required": [ "name", "eventkey", "description", "test_type", "assertions" ],
             "additionalProperties": false
         },
         "ExactCorrespondenceSinceType": {
@@ -88,14 +88,14 @@
                 "description": {
                     "type": "string"
                 },
-                "testType": {
+                "test_type": {
                     "type": "string",
                     "const": "exactCorrespondenceSince"
                 },
-                "yearSince": {
+                "year_since": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
                 },
-                "appliesTo": {
+                "applies_to": {
                     "$ref": "#/definitions/AppliesToOrExcludes"
                 },
                 "excludes": {
@@ -105,7 +105,7 @@
                     "$ref": "#/definitions/Assertions"
                 }
             },
-            "required": [ "name", "eventkey", "description", "testType", "assertions", "yearSince" ],
+            "required": [ "name", "eventkey", "description", "test_type", "assertions", "year_since" ],
             "additionalProperties": false
         },
         "ExactCorrespondenceUntilType": {
@@ -122,14 +122,14 @@
                 "description": {
                     "type": "string"
                 },
-                "testType": {
+                "test_type": {
                     "type": "string",
                     "const": "exactCorrespondenceUntil"
                 },
-                "yearUntil": {
+                "year_until": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
                 },
-                "appliesTo": {
+                "applies_to": {
                     "$ref": "#/definitions/AppliesToOrExcludes"
                 },
                 "excludes": {
@@ -139,7 +139,7 @@
                     "$ref": "#/definitions/Assertions"
                 }
             },
-            "required": [ "name", "eventkey", "description", "testType", "assertions", "yearUntil" ],
+            "required": [ "name", "eventkey", "description", "test_type", "assertions", "year_until" ],
             "additionalProperties": false
         },
         "Assertions": {
@@ -152,7 +152,7 @@
                             "year": {
                                 "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
                             },
-                            "expectedValue": {
+                            "expected_value": {
                                 "type": "null"
                             },
                             "assert": {
@@ -166,7 +166,7 @@
                                 "type": "string"
                             }
                         },
-                        "required": [ "year", "expectedValue", "assert", "assertion" ],
+                        "required": [ "year", "expected_value", "assert", "assertion" ],
                         "additionalProperties": false
                     },
                     {
@@ -175,7 +175,7 @@
                             "year": {
                                 "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
                             },
-                            "expectedValue": {
+                            "expected_value": {
                                 "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Timestamp"
                             },
                             "assert": {
@@ -189,7 +189,7 @@
                                 "type": "string"
                             }
                         },
-                        "required": [ "year", "expectedValue", "assert", "assertion" ],
+                        "required": [ "year", "expected_value", "assert", "assertion" ],
                         "additionalProperties": false
                     }
                 ]

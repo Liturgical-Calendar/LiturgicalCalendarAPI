@@ -7,13 +7,16 @@ use Swaggest\JsonSchema\Schema;
 use Sabre\VObject;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
+use Johnrdorazio\LitCal\Enum\AcceptHeader;
 use Johnrdorazio\LitCal\Enum\ICSErrorLevel;
 use Johnrdorazio\LitCal\Enum\LitSchema;
+use Johnrdorazio\LitCal\Enum\ReturnType;
+use Johnrdorazio\LitCal\Enum\Route;
 
 class Health implements MessageComponentInterface
 {
     protected $clients;
-
+    private const REQPATH = API_BASE_PATH . Route::CALENDAR->value;
     public function onOpen(ConnectionInterface $conn)
     {
         // Store the new connection to send messages to later
@@ -102,7 +105,7 @@ class Health implements MessageComponentInterface
     }
 
     public const DATA_PATH_TO_SCHEMA = [
-        "https://litcal.johnromanodorazio.com/api/dev/metadata/"    => LitSchema::METADATA,
+        "https://litcal.johnromanodorazio.com/api/dev/calendars/"   => LitSchema::METADATA,
         "data/propriumdetempore.json"                               => LitSchema::PROPRIUMDETEMPORE,
         "data/propriumdesanctis_1970/propriumdesanctis_1970.json"   => LitSchema::PROPRIUMDESANCTIS,
         "data/propriumdesanctis_2002/propriumdesanctis_2002.json"   => LitSchema::PROPRIUMDESANCTIS,
@@ -110,8 +113,6 @@ class Health implements MessageComponentInterface
         "data/memorialsFromDecrees/memorialsFromDecrees.json"       => LitSchema::DECREEMEMORIALS,
         "nations/index.json"                                        => LitSchema::INDEX
     ];
-
-    public const LITCAL_BASE_URL = "https://litcal.johnromanodorazio.com/api/dev/";
 
     public function __construct()
     {
@@ -210,12 +211,32 @@ class Health implements MessageComponentInterface
 
     private function validateCalendar(string $Calendar, int $Year, string $category, string $responseType, ConnectionInterface $to): void
     {
+        //get the index of the responsetype from the ReturnType class
+        $responseTypeIdx = array_search($responseType, ReturnType::$values);
+        //get the corresponding accept mime type
+        $acceptMimeType = AcceptHeader::$values[$responseTypeIdx];
+        $opts = [
+            "http" => [
+                "method" => "GET",
+                "header" => "Accept: $acceptMimeType\r\n"
+            ]
+        ];
+        $context = stream_context_create($opts);
         if ($Calendar === 'VATICAN') {
-            $req = "?nationalcalendar=VATICAN&year=$Year&calendartype=CIVIL&returntype=$responseType";
+            $req = "/$Year?calendartype=CIVIL";
         } else {
-            $req = "?$category=$Calendar&year=$Year&calendartype=CIVIL&returntype=$responseType";
+            switch ($category) {
+                case 'nationalcalendar':
+                    $req = "/nation/$Calendar/$Year&calendartype=CIVIL";
+                    break;
+                case 'diocesancalendar':
+                    $req = "/diocese/$Calendar/$Year&calendartype=CIVIL";
+                    break;
+                default:
+                    //we shouldn't ever get any other categories
+            }
         }
-        $data = file_get_contents(self::LITCAL_BASE_URL . $req);
+        $data = file_get_contents(self::REQPATH . $req, false, $context);
         if ($data !== false) {
             $message = new \stdClass();
             $message->type = "success";
@@ -237,7 +258,7 @@ class Health implements MessageComponentInterface
                         $errorString = self::retrieveXmlErrors($errors, $xmlArr);
                         libxml_clear_errors();
                         $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL "
-                                        . self::LITCAL_BASE_URL . $req . " as XML: " . $errorString;
+                                        . self::REQPATH . $req . " as XML: " . $errorString;
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
@@ -310,7 +331,7 @@ class Health implements MessageComponentInterface
                         $message = new \stdClass();
                         $message->type = "error";
                         $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL "
-                                        . self::LITCAL_BASE_URL . $req . " as ICS: parsing resulted in type " . gettype($vcalendar) . " | " . $vcalendar;
+                                        . self::REQPATH . $req . " as ICS: parsing resulted in type " . gettype($vcalendar) . " | " . $vcalendar;
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
@@ -342,7 +363,7 @@ class Health implements MessageComponentInterface
                         $message = new \stdClass();
                         $message->type = "error";
                         $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL "
-                                        . self::LITCAL_BASE_URL . $req . " as YAML: " . $ex->getMessage();
+                                        . self::REQPATH . $req . " as YAML: " . $ex->getMessage();
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
@@ -373,7 +394,7 @@ class Health implements MessageComponentInterface
                         $message = new \stdClass();
                         $message->type = "error";
                         $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL "
-                                        . self::LITCAL_BASE_URL . $req . " as JSON: " . json_last_error_msg();
+                                        . self::REQPATH . $req . " as JSON: " . json_last_error_msg();
                         $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
@@ -382,7 +403,7 @@ class Health implements MessageComponentInterface
         } else {
             $message = new \stdClass();
             $message->type = "error";
-            $message->text = "The $category of $Calendar for the year $Year does not exist at the URL " . self::LITCAL_BASE_URL . $req;
+            $message->text = "The $category of $Calendar for the year $Year does not exist at the URL " . self::REQPATH . $req;
             $message->classes = ".calendar-$Calendar.file-exists.year-$Year";
             $this->sendMessage($to, $message);
         }
@@ -395,7 +416,7 @@ class Health implements MessageComponentInterface
         } else {
             $req = "?$category=$Calendar&year=$Year&calendartype=CIVIL";
         }
-        $jsonData = json_decode(file_get_contents(self::LITCAL_BASE_URL . $req));
+        $jsonData = json_decode(file_get_contents(API_BASE_PATH . $req));
         if (json_last_error() === JSON_ERROR_NONE) {
             $UnitTest = new LitTest($Test, $jsonData);
             if ($UnitTest->isReady()) {

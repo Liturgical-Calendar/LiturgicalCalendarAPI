@@ -2,90 +2,90 @@
     "name": "StJaneFrancesDeChantalTest",
     "eventkey": "StJaneFrancesDeChantal",
     "description": "Saint Jane Frances de Chantal was moved from December 12 to August 12 in the 2002 Latin Edition of the Roman Missal, to allow bishops conferences to insert Our Lady of Guadalupe as an optional memorial on December 12. DOES ST JANE FRANCES DE CHANTAL FALL ON THE RIGHT DAY BOTH BEFORE AND AFTER 2002, OR IT CORRECTLY OVERRIDEN BY GREATER FESTIVITIES?",
-    "testType": "variableCorrespondence",
+    "test_type": "variableCorrespondence",
     "assertions": [
         {
             "year": 2001,
-            "expectedValue": 1008115200,
+            "expected_value": 1008115200,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date December 12"
         },
         {
             "year": 2002,
-            "expectedValue": 1029110400,
+            "expected_value": 1029110400,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date August 12"
         },
         {
             "year": 2010,
-            "expectedValue": 1281571200,
+            "expected_value": 1281571200,
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "should fall on expected date August 12",
             "comment": "this test is significant since December 12th falls on a Sunday, so the memorial would have been suppressed if it hadn't been moved"
         },
         {
             "year": 1971,
-            "expectedValue": null,
+            "expected_value": null,
             "assert": "eventNotExists",
             "assertion": "should not exist, December 12th is a Sunday"
         },
         {
             "year": 1976,
-            "expectedValue": null,
+            "expected_value": null,
             "assert": "eventNotExists",
             "assertion": "should not exist, December 12th is a Sunday"
         },
         {
             "year": 1982,
-            "expectedValue": null,
+            "expected_value": null,
             "assert": "eventNotExists",
             "assertion": "should not exist, December 12th is a Sunday"
         },
         {
             "year": 1993,
-            "expectedValue": null,
+            "expected_value": null,
             "assert": "eventNotExists",
             "assertion": "should not exist, December 12th is a Sunday"
         },
         {
             "year": 1999,
-            "expectedValue": null,
+            "expected_value": null,
             "assert": "eventNotExists",
             "assertion": "should not exist, December 12th is a Sunday"
         },
         {
             "year": 2012,
-            "expectedValue": null,
+            "expected_value": null,
             "assert": "eventNotExists",
             "assertion": "should not exist, December 12th is a Sunday"
         },
         {
             "year": 2018,
-            "expectedValue": null,
+            "expected_value": null,
             "assert": "eventNotExists",
             "assertion": "should not exist, December 12th is a Sunday"
         },
         {
             "year": 2029,
-            "expectedValue": null,
+            "expected_value": null,
             "assert": "eventNotExists",
             "assertion": "should not exist, December 12th is a Sunday"
         },
         {
             "year": 2035,
-            "expectedValue": null,
+            "expected_value": null,
             "assert": "eventNotExists",
             "assertion": "should not exist, December 12th is a Sunday"
         },
         {
             "year": 2040,
-            "expectedValue": null,
+            "expected_value": null,
             "assert": "eventNotExists",
             "assertion": "should not exist, December 12th is a Sunday"
         },
         {
             "year": 2046,
-            "expectedValue": null,
+            "expected_value": null,
             "assert": "eventNotExists",
             "assertion": "should not exist, December 12th is a Sunday"
         }

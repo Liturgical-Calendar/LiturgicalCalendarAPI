@@ -8,7 +8,7 @@ namespace Johnrdorazio\LitCal\Enum;
  *  as indicated in a parameter in the request
  *  rather than in the Accept header
  * The $values array must follow exactly the $values array
- *  in the ACCEPT_HEADER class, so that conversions can be made
+ *  in the \LitCal\Enum\AcceptHeader class, so that conversions can be made
  */
 
 class ReturnType
