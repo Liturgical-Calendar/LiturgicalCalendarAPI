@@ -202,26 +202,26 @@
                     "color": [
                         "purple"
                     ],
-                    "colorLcl": [
+                    "color_lcl": [
                         "purpura"
                     ],
                     "type": "mobile",
                     "grade": 7,
-                    "gradeLcl": "celebratio altioris ordinis quam sollemnitatis",
+                    "grade_lcl": "celebratio altioris ordinis quam sollemnitatis",
                     "display_grade": "",
                     "common": [],
-                    "commonLcl": "",
-                    "dayOfTheWeek_ISO8601": 6,
+                    "common_lcl": "",
+                    "day_of_the_week_iso8601": 6,
                     "month": 12,
                     "day": 2,
                     "year": 2023,
-                    "monthShort": "Dec",
-                    "monthLong": "December",
-                    "dayOfTheWeekShort": "Sat",
-                    "dayOfTheWeekLong": "Saturday",
-                    "liturgicalYear": "ANNUM B",
-                    "isVigilMass": true,
-                    "isVigilFor": "Advent1"
+                    "month_short": "Dec",
+                    "month_long": "December",
+                    "day_of_the_week_short": "Sat",
+                    "day_of_the_week_long": "Saturday",
+                    "liturgical_year": "ANNUM B",
+                    "is_vigil_mass": true,
+                    "is_vigil_for": "Advent1"
                 },
                 "Advent1": {
                     "eventidx": 583,
@@ -230,30 +230,30 @@
                     "color": [
                         "purple"
                     ],
-                    "colorLcl": [
+                    "color_lcl": [
                         "purpura"
                     ],
                     "type": "mobile",
                     "grade": 7,
-                    "gradeLcl": "celebratio altioris ordinis quam sollemnitatis",
+                    "grade_lcl": "celebratio altioris ordinis quam sollemnitatis",
                     "display_grade": "",
                     "common": [],
-                    "commonLcl": "",
-                    "dayOfTheWeek_ISO8601": 7,
+                    "common_lcl": "",
+                    "day_of_the_week_iso8601": 7,
                     "month": 12,
                     "day": 3,
                     "year": 2023,
-                    "monthShort": "Dec",
-                    "monthLong": "December",
-                    "dayOfTheWeekShort": "Sun",
-                    "dayOfTheWeekLong": "Sunday",
-                    "liturgicalYear": "ANNUM B",
-                    "hasVigilMass": true,
-                    "hasVesperI": true,
-                    "hasVesperII": true,
-                    "psalterWeek": 1,
-                    "liturgicalSeason": "ADVENT",
-                    "liturgicalSeasonLcl": "Tempus Adventus"
+                    "month_short": "Dec",
+                    "month_long": "December",
+                    "day_of_the_week_short": "Sun",
+                    "day_of_the_week_long": "Sunday",
+                    "liturgical_year": "ANNUM B",
+                    "has_vigil_mass": true,
+                    "has_vesper_i": true,
+                    "has_vesper_ii": true,
+                    "psalter_week": 1,
+                    "liturgical_season": "ADVENT",
+                    "liturgical_season_lcl": "Tempus Adventus"
                 }
             },
             "messages": [
@@ -303,7 +303,7 @@
                 "color": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                 },
-                "colorLcl": {
+                "color_lcl": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -315,7 +315,7 @@
                 "grade": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                 },
-                "gradeLcl": {
+                "grade_lcl": {
                     "type": "string"
                 },
                 "display_grade": {
@@ -324,10 +324,10 @@
                 "common": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
                 },
-                "commonLcl": {
+                "common_lcl": {
                     "type": "string"
                 },
-                "dayOfTheWeek_ISO8601": {
+                "day_of_the_week_iso8601": {
                     "type": "integer",
                     "minimum": 1,
                     "maximum": 7
@@ -347,25 +347,25 @@
                     "minimum": 1969,
                     "maxItems": 9999
                 },
-                "monthShort": {
+                "month_short": {
                     "type": "string"
                 },
-                "monthLong": {
+                "month_long": {
                     "type": "string"
                 },
-                "dayOfTheWeekShort": {
+                "day_of_the_week_short": {
                     "type": "string"
                 },
-                "dayOfTheWeekLong": {
+                "day_of_the_week_long": {
                     "type": "string"
                 },
-                "liturgicalYear": {
+                "liturgical_year": {
                     "type": "string"
                 },
-                "isVigilMass": {
+                "is_vigil_mass": {
                     "type": "boolean"
                 },
-                "isVigilFor": {
+                "is_vigil_for": {
                     "type": "string"
                 }
             },
@@ -374,22 +374,22 @@
                 "name",
                 "date",
                 "color",
-                "colorLcl",
+                "color_lcl",
                 "type",
                 "grade",
                 "display_grade",
                 "common",
-                "commonLcl",
-                "dayOfTheWeek_ISO8601",
+                "common_lcl",
+                "day_of_the_week_iso8601",
                 "month",
                 "day",
                 "year",
-                "monthShort",
-                "monthLong",
-                "dayOfTheWeekShort",
-                "dayOfTheWeekLong",
-                "isVigilMass",
-                "isVigilFor"
+                "month_short",
+                "month_long",
+                "day_of_the_week_short",
+                "day_of_the_week_long",
+                "is_vigil_mass",
+                "is_vigil_for"
             ],
             "additionalProperties": false
         },
@@ -409,7 +409,7 @@
                 "color": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                 },
-                "colorLcl": {
+                "color_lcl": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -421,7 +421,7 @@
                 "grade": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                 },
-                "gradeLcl": {
+                "grade_lcl": {
                     "type": "string"
                 },
                 "display_grade": {
@@ -430,10 +430,10 @@
                 "common": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
                 },
-                "commonLcl": {
+                "common_lcl": {
                     "type": "string"
                 },
-                "dayOfTheWeek_ISO8601": {
+                "day_of_the_week_iso8601": {
                     "type": "integer",
                     "minimum": 1,
                     "maximum": 7
@@ -453,22 +453,22 @@
                     "minimum": 1969,
                     "maxItems": 9999
                 },
-                "monthShort": {
+                "month_short": {
                     "type": "string"
                 },
-                "monthLong": {
+                "month_long": {
                     "type": "string"
                 },
-                "dayOfTheWeekShort": {
+                "day_of_the_week_short": {
                     "type": "string"
                 },
-                "dayOfTheWeekLong": {
+                "day_of_the_week_long": {
                     "type": "string"
                 },
-                "liturgicalYear": {
+                "liturgical_year": {
                     "type": "string"
                 },
-                "liturgicalSeason": {
+                "liturgical_season": {
                     "type": "string",
                     "enum": [
                         "ADVENT",
@@ -479,19 +479,19 @@
                         "ORDINARY_TIME"
                     ]
                 },
-                "liturgicalSeasonLcl": {
+                "liturgical_season_lcl": {
                     "type": "string"
                 },
-                "hasVigilMass": {
+                "has_vigil_mass": {
                     "type": "boolean"
                 },
-                "hasVesperI": {
+                "has_vesper_i": {
                     "type": "boolean"
                 },
-                "hasVesperII": {
+                "has_vesper_ii": {
                     "type": "boolean"
                 },
-                "psalterWeek": {
+                "psalter_week": {
                     "type": "integer"
                 }
             },
@@ -500,22 +500,22 @@
                 "name",
                 "date",
                 "color",
-                "colorLcl",
+                "color_lcl",
                 "type",
                 "grade",
                 "display_grade",
                 "common",
-                "commonLcl",
-                "dayOfTheWeek_ISO8601",
+                "common_lcl",
+                "day_of_the_week_iso8601",
                 "month",
                 "day",
                 "year",
-                "monthShort",
-                "monthLong",
-                "dayOfTheWeekShort",
-                "dayOfTheWeekLong",
-                "liturgicalSeason",
-                "liturgicalSeasonLcl"
+                "month_short",
+                "month_long",
+                "day_of_the_week_short",
+                "day_of_the_week_long",
+                "liturgical_season",
+                "liturgical_season_lcl"
             ],
             "additionalProperties": false
         }

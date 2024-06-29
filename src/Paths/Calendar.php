@@ -2447,7 +2447,7 @@ class Calendar
                     : sprintf(_("of the %s Week of Easter"), $ordinal);
                 $name = $dayOfTheWeek . " " . $t;
                 $festivity = new Festivity($name, $weekdayEaster, LitColor::WHITE, LitFeastType::MOBILE);
-                $festivity->psalterWeek = $this->Cal::psalterWeek($currentEasterWeek);
+                $festivity->psalter_week = $this->Cal::psalterWeek($currentEasterWeek);
                 $this->Cal->addFestivity("EasterWeekday" . $weekdayEasterCnt, $festivity);
             }
             $weekdayEasterCnt++;
@@ -2492,7 +2492,7 @@ class Calendar
                     : sprintf(_("of the %s Week of Ordinary Time"), $ordinal);
                 $name = $dayOfTheWeek . " " . $nthStr;
                 $festivity = new Festivity($name, $firstOrdinary, LitColor::GREEN, LitFeastType::MOBILE);
-                $festivity->psalterWeek = $this->Cal::psalterWeek($currentOrdWeek);
+                $festivity->psalter_week = $this->Cal::psalterWeek($currentOrdWeek);
                 $this->Cal->addFestivity("FirstOrdWeekday" . $ordWeekday, $festivity);
             }
             $ordWeekday++;
@@ -2533,7 +2533,7 @@ class Calendar
                     : sprintf(_("of the %s Week of Ordinary Time"), $ordinal);
                 $name = $dayOfTheWeek . " " . $nthStr;
                 $festivity = new Festivity($name, $lastOrdinary, LitColor::GREEN, LitFeastType::MOBILE);
-                $festivity->psalterWeek = $this->Cal::psalterWeek($currentOrdWeek);
+                $festivity->psalter_week = $this->Cal::psalterWeek($currentOrdWeek);
                 $this->Cal->addFestivity("LastOrdWeekday" . $ordWeekday, $festivity);
             }
             $ordWeekday++;
@@ -2569,7 +2569,7 @@ class Calendar
         if (file_exists($nationalDataFile)) {
             $this->NationalData = json_decode(file_get_contents($nationalDataFile));
             if (json_last_error() === JSON_ERROR_NONE) {
-                if (property_exists($this->NationalData, "Metadata") && property_exists($this->NationalData->metadata, "wider_region")) {
+                if (property_exists($this->NationalData, "metadata") && property_exists($this->NationalData->metadata, "wider_region")) {
                     $widerRegionDataFile = $this->NationalData->metadata->wider_region->jsonfile;
                     $widerRegionI18nFile = $this->NationalData->metadata->wider_region->i18nfile;
                     if (file_exists($widerRegionI18nFile)) {
@@ -2577,9 +2577,9 @@ class Calendar
                         if (json_last_error() === JSON_ERROR_NONE && file_exists($widerRegionDataFile)) {
                             $this->WiderRegionData = json_decode(file_get_contents($widerRegionDataFile));
                             if (json_last_error() === JSON_ERROR_NONE && property_exists($this->WiderRegionData, "litcal")) {
-                                foreach ($this->WiderRegionData->LitCal as $idx => $value) {
-                                    $tag = $value->Festivity->tag;
-                                    $this->WiderRegionData->LitCal[$idx]->Festivity->name = $widerRegionI18nData->{ $tag };
+                                foreach ($this->WiderRegionData->litcal as $idx => $value) {
+                                    $tag = $value->festivity->tag;
+                                    $this->WiderRegionData->litcal[$idx]->festivity->name = $widerRegionI18nData->{ $tag };
                                 }
                             } else {
                                 $this->Messages[] = sprintf(_("Error retrieving and decoding Wider Region data from file %s."), $widerRegionDataFile) . ": " . json_last_error_msg();
@@ -2894,7 +2894,7 @@ class Calendar
             $this->handleNationalCalendarRows($this->NationalData->litcal);
         }
 
-        if ($this->NationalData !== null && property_exists($this->NationalData, "Metadata") && property_exists($this->NationalData->metadata, "missals")) {
+        if ($this->NationalData !== null && property_exists($this->NationalData, "metadata") && property_exists($this->NationalData->metadata, "missals")) {
             if ($this->NationalData->metadata->Region === 'UNITED STATES') {
                 $this->NationalData->metadata->Region = 'USA';
             }
@@ -2980,8 +2980,8 @@ class Calendar
                 }
             }
         } else {
-            if ($this->NationalData !== null && property_exists($this->NationalData, 'Metadata') && property_exists($this->NationalData->metadata, 'Region')) {
-                $this->Messages[] = "Did not find any Missals for region " . $this->NationalData->metadata->Region;
+            if ($this->NationalData !== null && property_exists($this->NationalData, 'metadata') && property_exists($this->NationalData->metadata, 'Region')) {
+                $this->Messages[] = "Did not find any Missals for region " . $this->NationalData->metadata->region;
             }
         }
     }
@@ -3327,12 +3327,12 @@ class Calendar
                 } else {
                     $currentFeastDate = DateTime::createFromFormat(
                         '!j-n-Y',
-                        $obj->Festivity->day . '-' . $obj->Festivity->month . '-' . $this->CalendarParams->Year,
+                        $obj->festivity->day . '-' . $obj->festivity->month . '-' . $this->CalendarParams->Year,
                         new \DateTimeZone('UTC')
                     );
                 }
                 if ($currentFeastDate !== false) {
-                    if ($obj->Festivity->grade > LitGrade::FEAST) {
+                    if ($obj->festivity->grade > LitGrade::FEAST) {
                         if ($this->Cal->inSolemnities($currentFeastDate) && $key != $this->Cal->solemnityKeyFromDate($currentFeastDate)) {
                             //there seems to be a coincidence with a different Solemnity on the same day!
                             //should we attempt to move to the next open slot?
@@ -3341,7 +3341,7 @@ class Calendar
                                 .  sprintf(
                                     /**translators: 1: Festivity name, 2: Name of the diocese, 3: Festivity date, 4: Coinciding festivity name, 5: Requested calendar year */
                                     _('The Solemnity \'%1$s\', proper to the calendar of the %2$s and usually celebrated on %3$s, coincides with the Sunday or Solemnity \'%4$s\' in the year %5$d! Does something need to be done about this?'),
-                                    '<i>' . $obj->Festivity->name . '</i>',
+                                    '<i>' . $obj->festivity->name . '</i>',
                                     $this->GeneralIndex->{$this->CalendarParams->DiocesanCalendar}->diocese,
                                     '<b>' . $this->dayAndMonth->format($currentFeastDate->format('U')) . '</b>',
                                     '<i>' . $this->Cal->solemnityFromDate($currentFeastDate)->name . '</i>',
@@ -3351,32 +3351,32 @@ class Calendar
                         $this->Cal->addFestivity(
                             $this->CalendarParams->DiocesanCalendar . "_" . $key,
                             new Festivity(
-                                "[ " . $this->GeneralIndex->{$this->CalendarParams->DiocesanCalendar}->diocese . " ] " . $obj->Festivity->name,
+                                "[ " . $this->GeneralIndex->{$this->CalendarParams->DiocesanCalendar}->diocese . " ] " . $obj->festivity->name,
                                 $currentFeastDate,
-                                $obj->Festivity->color,
+                                $obj->festivity->color,
                                 LitFeastType::FIXED,
-                                $obj->Festivity->grade,
-                                $obj->Festivity->common
+                                $obj->festivity->grade,
+                                $obj->festivity->common
                             )
                         );
-                    } elseif ($obj->Festivity->grade <= LitGrade::FEAST && !$this->Cal->inSolemnities($currentFeastDate)) {
+                    } elseif ($obj->festivity->grade <= LitGrade::FEAST && !$this->Cal->inSolemnities($currentFeastDate)) {
                         $this->Cal->addFestivity(
                             $this->CalendarParams->DiocesanCalendar . "_" . $key,
                             new Festivity(
-                                "[ " . $this->GeneralIndex->{$this->CalendarParams->DiocesanCalendar}->diocese . " ] " . $obj->Festivity->name,
+                                "[ " . $this->GeneralIndex->{$this->CalendarParams->DiocesanCalendar}->diocese . " ] " . $obj->festivity->name,
                                 $currentFeastDate,
-                                $obj->Festivity->color,
+                                $obj->festivity->color,
                                 LitFeastType::FIXED,
-                                $obj->Festivity->grade,
-                                $obj->Festivity->common
+                                $obj->festivity->grade,
+                                $obj->festivity->common
                             )
                         );
                     } else {
                         $this->Messages[] = $this->CalendarParams->DiocesanCalendar . ": " . sprintf(
                             /**translators: 1: Festivity grade, 2: Festivity name, 3: Name of the diocese, 4: Festivity date, 5: Coinciding festivity name, 6: Requested calendar year */
                             _('The %1$s \'%2$s\', proper to the calendar of the %3$s and usually celebrated on %4$s, is suppressed by the Sunday or Solemnity %5$s in the year %6$d'),
-                            $this->LitGrade->i18n($obj->Festivity->grade, false),
-                            '<i>' . $obj->Festivity->name . '</i>',
+                            $this->LitGrade->i18n($obj->festivity->grade, false),
+                            '<i>' . $obj->festivity->name . '</i>',
                             $this->GeneralIndex->{$this->CalendarParams->DiocesanCalendar}->diocese,
                             '<b>' . $this->dayAndMonth->format($currentFeastDate->format('U')) . '</b>',
                             '<i>' . $this->Cal->solemnityFromDate($currentFeastDate)->name . '</i>',
