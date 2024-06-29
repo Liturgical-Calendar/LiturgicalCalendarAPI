@@ -397,27 +397,27 @@ class Events
             die();
         }
         foreach ($DATA as $idx => $festivity) {
-            $key = $festivity[ "Festivity" ][ "TAG" ];
+            $key = $festivity[ "festivity" ][ "TAG" ];
             if (false === array_key_exists($key, self::$FestivityCollection)) {
-                self::$FestivityCollection[ $key ] = $festivity[ "Festivity" ];
+                self::$FestivityCollection[ $key ] = $festivity[ "festivity" ];
                 self::$FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
-                if (array_key_exists("decreeLangs", $festivity[ "Metadata" ])) {
-                    $decreeURL = sprintf($festivity[ "Metadata" ][ "decreeURL" ], 'LA');
-                    if (array_key_exists(strtoupper($this->EventsParams->Locale), $festivity[ "Metadata" ][ "decreeLangs" ])) {
-                        $decreeLang = $festivity[ "Metadata" ][ "decreeLangs" ][ strtoupper($this->EventsParams->Locale) ];
-                        $decreeURL = sprintf($festivity[ "Metadata" ][ "decreeURL" ], $decreeLang);
+                if (array_key_exists("languages", $festivity[ "metadata" ])) {
+                    $decreeURL = sprintf($festivity[ "metadata" ][ "decree_url" ], 'LA');
+                    if (array_key_exists(strtoupper($this->EventsParams->Locale), $festivity[ "metadata" ][ "languages" ])) {
+                        $decreeLang = $festivity[ "metadata" ][ "languages" ][ strtoupper($this->EventsParams->Locale) ];
+                        $decreeURL = sprintf($festivity[ "metadata" ][ "decree_url" ], $decreeLang);
                     }
                 } else {
-                    $decreeURL = $festivity[ "Metadata" ][ "decreeURL" ];
+                    $decreeURL = $festivity[ "metadata" ][ "decree_url" ];
                 }
                 self::$FestivityCollection[ $key ][ "DECREE" ] = $decreeURL;
-            } elseif ($festivity[ "Metadata" ][ "action" ] === 'setProperty') {
-                if ($festivity[ "Metadata" ][ "property" ] === 'name') {
+            } elseif ($festivity[ "metadata" ][ "action" ] === 'setProperty') {
+                if ($festivity[ "metadata" ][ "property" ] === 'name') {
                     self::$FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
-                } elseif ($festivity[ "Metadata" ][ "property" ] === 'grade') {
-                    self::$FestivityCollection[ $key ][ "GRADE" ] = $festivity[ "Festivity" ][ "GRADE" ];
+                } elseif ($festivity[ "metadata" ][ "property" ] === 'grade') {
+                    self::$FestivityCollection[ $key ][ "GRADE" ] = $festivity[ "festivity" ][ "GRADE" ];
                 }
-            } elseif ($festivity[ "Metadata" ][ "action" ] === 'makeDoctor') {
+            } elseif ($festivity[ "metadata" ][ "action" ] === 'makeDoctor') {
                 self::$FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
             }
             self::$FestivityCollection[ $key ][ "GRADE_LCL" ] = self::$LitGrade->i18n(self::$FestivityCollection[ $key ][ "GRADE" ], false);
@@ -514,11 +514,11 @@ class Events
     private function produceResponse(): void
     {
         $responseObj = [
-            "LitCalAllFestivities" => self::$FestivityCollection,
-            "Settings" => [
-                "Locale" => $this->EventsParams->Locale,
-                "NationalCalendar" => $this->EventsParams->NationalCalendar,
-                "DiocesanCalendar" => $this->EventsParams->DiocesanCalendar
+            "litcal_events" => self::$FestivityCollection,
+            "settings" => [
+                "locale" => $this->EventsParams->Locale,
+                "nationalcalendar" => $this->EventsParams->NationalCalendar,
+                "diocesancalendar" => $this->EventsParams->DiocesanCalendar
             ]
         ];
         $response = json_encode($responseObj);
