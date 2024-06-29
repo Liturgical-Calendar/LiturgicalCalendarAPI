@@ -90,11 +90,11 @@ class FestivityCollection
         //Sundays of Advent, Lent, Easter
         if (preg_match('/(?:Advent|Lent|Easter)([1-7])/', $key, $matches) === 1) {
             $this->SundaysAdventLentEaster[] = $festivity->date;
-            $this->festivities[ $key ]->psalterWeek = self::psalterWeek(intval($matches[1]));
+            $this->festivities[ $key ]->psalter_week = self::psalterWeek(intval($matches[1]));
         }
         //Ordinary Sunday Psalter Week
         if (preg_match('/OrdSunday([1-9][0-9]*)/', $key, $matches) === 1) {
-            $this->festivities[ $key ]->psalterWeek = self::psalterWeek(intval($matches[1]));
+            $this->festivities[ $key ]->psalter_week = self::psalterWeek(intval($matches[1]));
         }
     }
 
