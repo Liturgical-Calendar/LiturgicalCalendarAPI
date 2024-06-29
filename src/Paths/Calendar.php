@@ -3310,16 +3310,16 @@ class Calendar
             //creation will be restricted only if explicitly defined by the sinceYear property
             if (
                 (
-                    $this->CalendarParams->Year >= $obj->metadata->sinceYear
-                    || $obj->metadata->sinceYear === null
-                    || $obj->metadata->sinceYear === 0
+                    $this->CalendarParams->Year >= $obj->metadata->since_year
+                    || $obj->metadata->since_year === null
+                    || $obj->metadata->since_year === 0
                 )
                 &&
                 (
-                    false === property_exists($obj->metadata, 'untilYear')
-                    || $obj->metadata->untilYear === null
-                    || $this->CalendarParams->Year <= $obj->metadata->untilYear
-                    || $obj->metadata->untilYear === 0
+                    false === property_exists($obj->metadata, 'until_year')
+                    || $obj->metadata->until_year === null
+                    || $this->CalendarParams->Year <= $obj->metadata->until_year
+                    || $obj->metadata->until_year === 0
                 )
             ) {
                 if (property_exists($obj->metadata, 'strtotime')) {
