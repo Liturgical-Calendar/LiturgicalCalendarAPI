@@ -105,7 +105,7 @@ class Health implements MessageComponentInterface
     }
 
     public const DATA_PATH_TO_SCHEMA = [
-        API_BASE_PATH . '/calendars'                                => LitSchema::METADATA,
+        API_BASE_PATH . '/calendars/'                                => LitSchema::METADATA,
         "data/propriumdetempore.json"                               => LitSchema::PROPRIUMDETEMPORE,
         "data/propriumdesanctis_1970/propriumdesanctis_1970.json"   => LitSchema::PROPRIUMDESANCTIS,
         "data/propriumdesanctis_2002/propriumdesanctis_2002.json"   => LitSchema::PROPRIUMDESANCTIS,
