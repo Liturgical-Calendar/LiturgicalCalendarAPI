@@ -2083,12 +2083,12 @@ class Calendar
         $DoctorsDecrees = array_filter(
             $this->tempCal[ "MEMORIALS_FROM_DECREES" ],
             function ($row) {
-                return $row->Metadata->action === "makeDoctor";
+                return $row->metadata->action === "makeDoctor";
             }
         );
         foreach ($DoctorsDecrees as $row) {
-            if ($this->CalendarParams->Year >= $row->Metadata->sinceYear) {
-                $festivity = $this->Cal->getFestivity($row->Festivity->TAG);
+            if ($this->CalendarParams->Year >= $row->metadata->since_year) {
+                $festivity = $this->Cal->getFestivity($row->festivity->TAG);
                 if ($festivity !== null) {
                     $decree = $this->elaborateDecreeSource($row);
                     /**translators:
@@ -2101,12 +2101,12 @@ class Calendar
                     $this->Messages[] = sprintf(
                         $message,
                         '<i>' . $festivity->name . '</i>',
-                        $row->Metadata->sinceYear,
+                        $row->metadata->since_year,
                         $this->CalendarParams->Year,
                         $decree
                     );
                     $etDoctor = $this->CalendarParams->Locale === LitLocale::LATIN ? " et Ecclesiæ doctoris" : " " . _("and Doctor of the Church");
-                    $this->Cal->setProperty($row->Festivity->TAG, "name", $festivity->name . $etDoctor);
+                    $this->Cal->setProperty($row->festivity->TAG, "name", $festivity->name . $etDoctor);
                 }
             }
         }
@@ -2130,11 +2130,11 @@ class Calendar
             $MemorialsFromDecrees = array_filter(
                 $this->tempCal[ "MEMORIALS_FROM_DECREES" ],
                 function ($row) use ($grade) {
-                    return $row->decree_metadata->action !== "makeDoctor" && $row->festivity->GRADE === $grade;
+                    return $row->metadata->action !== "makeDoctor" && $row->festivity->GRADE === $grade;
                 }
             );
             foreach ($MemorialsFromDecrees as $row) {
-                if ($this->CalendarParams->Year >= $row->decree_metadata->since_year) {
+                if ($this->CalendarParams->Year >= $row->metadata->since_year) {
                     // TODO: until we update all JSON resources with a snake case schema, we'll just convert those that are using snake case schema to our old schema
                     if (property_exists($row, "festivity")) {
                         $row->Festivity = $row->festivity;
@@ -3719,7 +3719,6 @@ class Calendar
             $systemLocale = $this->prepareL10N();
             Festivity::setLocale($this->CalendarParams->Locale, $systemLocale);
             $this->calculateUniversalCalendar();
-
             if ($this->CalendarParams->NationalCalendar !== null && $this->NationalData !== null) {
                 $this->applyNationalCalendar();
             }
