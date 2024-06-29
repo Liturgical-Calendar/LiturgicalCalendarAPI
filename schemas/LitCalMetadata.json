@@ -3,19 +3,19 @@
     "title": "LitCalMetadata",
     "type": "object",
     "properties": {
-        "LitCalMetadata": {
+        "litcal_metadata": {
             "$ref": "#/definitions/LitCalMetadata"
         }
     },
     "required": [
-        "LitCalMetadata"
+        "litcal_metadata"
     ],
     "additionalProperties": false,
     "definitions": {
         "LitCalMetadata": {
             "type": "object",
             "properties": {
-                "NationalCalendars": {
+                "national_calendars": {
                     "type": "object",
                     "propertyNames": {
                         "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
@@ -29,7 +29,7 @@
                         }
                     }
                 },
-                "NationalCalendarsMetadata": {
+                "national_calendars_metadata": {
                     "type": "object",
                     "additionalProperties": false,
                     "propertyNames": {
@@ -45,7 +45,7 @@
                                         "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Missal"
                                     }
                                 },
-                                "widerRegions": {
+                                "wider_regions": {
                                     "type": "array",
                                     "items": {
                                         "$ref": "#/definitions/WiderRegionDef"
@@ -60,16 +60,16 @@
                                 "settings": {
                                     "type": "object",
                                     "properties": {
-                                        "Epiphany": {
+                                        "epiphany": {
                                             "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
                                         },
-                                        "Ascension": {
+                                        "ascension": {
                                             "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Ascension"
                                         },
-                                        "CorpusChristi": {
+                                        "corpuschristi": {
                                             "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
                                         },
-                                        "Locale": {
+                                        "locale": {
                                             "type": "string"
                                         }
                                     }
@@ -78,7 +78,7 @@
                         }
                     }
                 },
-                "DiocesanCalendars": {
+                "diocesan_calendars": {
                     "type": "object",
                     "patternProperties": {
                         "": {
@@ -101,7 +101,7 @@
                         }
                     }
                 },
-                "DiocesanGroups": {
+                "diocesan_groups": {
                     "type": "object",
                     "patternProperties": {
                         "": {
@@ -112,13 +112,13 @@
                         }
                     }
                 },
-                "WiderRegions": {
+                "wider_regions": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/WiderRegionDef"
                     }
                 },
-                "RomanMissals": {
+                "roman_missals": {
                     "type": "object",
                     "propertyNames": {
                         "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/MissalDef"
@@ -133,28 +133,28 @@
                                 "name": {
                                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/MissalName"
                                 },
-                                "sanctoraleFileName": {
+                                "sanctorale_filename": {
                                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/MissalFileName"
                                 },
-                                "yearLimits": {
+                                "year_limits": {
                                     "type": "object",
                                     "properties": {
-                                        "sinceYear": {
+                                        "since_year": {
                                             "type": "integer"
                                         },
-                                        "untilYear": {
+                                        "until_year": {
                                             "type": "integer"
                                         }
                                     },
-                                    "required": [ "sinceYear" ],
+                                    "required": [ "since_year" ],
                                     "additionalProperties": false
                                 }
                             },
                             "required": [
                                 "value",
                                 "name",
-                                "sanctoraleFileName",
-                                "yearLimits"
+                                "sanctorale_filename",
+                                "year_limits"
                             ],
                             "additionalProperties": false
                         }
@@ -162,12 +162,12 @@
                 }
             },
             "required": [
-                "NationalCalendars",
-                "NationalCalendarsMetadata",
-                "DiocesanCalendars",
-                "DiocesanGroups",
-                "WiderRegions",
-                "RomanMissals"
+                "national_calendars",
+                "national_calendars_metadata",
+                "diocesan_calendars",
+                "diocesan_groups",
+                "wider_regions",
+                "roman_missals"
             ],
             "additionalProperties": false
         },

@@ -49,7 +49,7 @@ class Metadata
                         Metadata::$nationalCalendars[Metadata::$diocesanCalendars[$key]["nation"]] = [];
                         Metadata::$nationalCalendarsMetadata[Metadata::$diocesanCalendars[$key]["nation"]] = [
                             "missals"       => [],
-                            "widerRegions"  => [],
+                            "wider_regions" => [],
                             "dioceses"      => [],
                             "settings"      => []
                         ];
@@ -64,9 +64,9 @@ class Metadata
                     }
                     if (file_exists("nations/$nation/$nation.json")) {
                         $nationData = json_decode(file_get_contents("nations/$nation/$nation.json"));
-                        Metadata::$nationalCalendarsMetadata[$nation]["missals"] = $nationData->Metadata->Missals;
-                        Metadata::$nationalCalendarsMetadata[$nation]["widerRegions"][] = $nationData->Metadata->WiderRegion->name;
-                        Metadata::$nationalCalendarsMetadata[$nation]["settings"] = $nationData->Settings;
+                        Metadata::$nationalCalendarsMetadata[$nation]["missals"] = $nationData->metadata->missals;
+                        Metadata::$nationalCalendarsMetadata[$nation]["wider_regions"][] = $nationData->metadata->wider_region->name;
+                        Metadata::$nationalCalendarsMetadata[$nation]["settings"] = $nationData->settings;
                     }
                 }
                 $filterDirResults = ['..', '.', 'index.json'];
@@ -89,13 +89,13 @@ class Metadata
     public static function response()
     {
         $response = json_encode([
-            "LitCalMetadata" => [
-                "NationalCalendars"         => Metadata::$nationalCalendars,
-                "NationalCalendarsMetadata" => Metadata::$nationalCalendarsMetadata,
-                "DiocesanCalendars"         => Metadata::$diocesanCalendars,
-                "DiocesanGroups"            => Metadata::$diocesanGroups,
-                "WiderRegions"              => Metadata::$widerRegionsNames,
-                "RomanMissals"              => RomanMissal::produceMetadata()
+            "litcal_metadata" => [
+                "national_calendars"          => Metadata::$nationalCalendars,
+                "national_calendars_metadata" => Metadata::$nationalCalendarsMetadata,
+                "diocesan_calendars"          => Metadata::$diocesanCalendars,
+                "diocesan_groups"             => Metadata::$diocesanGroups,
+                "wider_regions"               => Metadata::$widerRegionsNames,
+                "roman_missals"               => RomanMissal::produceMetadata()
             ]
         ], JSON_PRETTY_PRINT);
         $responseHash = md5($response);
