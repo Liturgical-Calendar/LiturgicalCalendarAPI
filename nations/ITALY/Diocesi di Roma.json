@@ -1,7 +1,7 @@
 {
-    "LitCal": {
+    "litcal": {
         "BeatoGregorioXpapa": {
-            "Festivity": {
+            "festivity": {
                 "name": "Beato Gregorio X, papa",
                 "color": [
                     "white"
@@ -13,13 +13,13 @@
                 "day": 9,
                 "month": 1
             },
-            "Metadata": {
-                "formRowNum": 0,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 0,
+                "since_year": 1973
             }
         },
         "SanVincenzoPallottisacerdote": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Vincenzo Pallotti, sacerdote",
                 "color": [
                     "white"
@@ -31,13 +31,13 @@
                 "day": 22,
                 "month": 1
             },
-            "Metadata": {
-                "formRowNum": 1,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 1,
+                "since_year": 1973
             }
         },
         "BeataLudovicaAlbertoni": {
-            "Festivity": {
+            "festivity": {
                 "name": "Beata Ludovica Albertoni",
                 "color": [
                     "white"
@@ -49,13 +49,13 @@
                 "day": 1,
                 "month": 2
             },
-            "Metadata": {
-                "formRowNum": 1,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 1,
+                "since_year": 1973
             }
         },
         "SantoIlaropapa": {
-            "Festivity": {
+            "festivity": {
                 "name": "Santo Ilaro, papa",
                 "color": [
                     "white"
@@ -67,13 +67,13 @@
                 "day": 28,
                 "month": 2
             },
-            "Metadata": {
-                "formRowNum": 2,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 2,
+                "since_year": 1973
             }
         },
         "SanFeliceIIIpapa": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Felice III, papa",
                 "color": [
                     "white"
@@ -85,13 +85,13 @@
                 "day": 1,
                 "month": 3
             },
-            "Metadata": {
-                "formRowNum": 3,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 3,
+                "since_year": 1973
             }
         },
         "SanMartinoIpapaemartire": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Martino I, papa e martire",
                 "color": [
                     "red",
@@ -105,13 +105,13 @@
                 "day": 13,
                 "month": 4
             },
-            "Metadata": {
-                "formRowNum": 2,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 2,
+                "since_year": 1973
             }
         },
         "SanBenedettoGiuseppeLabre": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Benedetto Giuseppe Labre",
                 "color": [
                     "white"
@@ -123,13 +123,13 @@
                 "day": 16,
                 "month": 4
             },
-            "Metadata": {
-                "formRowNum": 3,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 3,
+                "since_year": 1973
             }
         },
         "SanLeoneIXpapa": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Leone IX, papa",
                 "color": [
                     "white"
@@ -141,13 +141,13 @@
                 "day": 19,
                 "month": 4
             },
-            "Metadata": {
-                "formRowNum": 4,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 4,
+                "since_year": 1973
             }
         },
         "SanPioVpapa": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Pio V, papa",
                 "color": [
                     "white"
@@ -159,13 +159,13 @@
                 "day": 30,
                 "month": 4
             },
-            "Metadata": {
-                "formRowNum": 5,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 5,
+                "since_year": 1973
             }
         },
         "SanFelicedaCantalicereligioso": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Felice da Cantalice, religioso",
                 "color": [
                     "white"
@@ -177,13 +177,13 @@
                 "day": 18,
                 "month": 5
             },
-            "Metadata": {
-                "formRowNum": 4,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 4,
+                "since_year": 1973
             }
         },
         "SanGiovanniBattistadeRossisacerdote": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Giovanni Battista de Rossi, sacerdote",
                 "color": [
                     "white"
@@ -195,13 +195,13 @@
                 "day": 23,
                 "month": 5
             },
-            "Metadata": {
-                "formRowNum": 6,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 6,
+                "since_year": 1973
             }
         },
         "BeataMariaVergineAuxiliumChristianorum": {
-            "Festivity": {
+            "festivity": {
                 "name": "Beata Maria Vergine «Auxilium Christianorum»",
                 "color": [
                     "white"
@@ -213,13 +213,13 @@
                 "day": 24,
                 "month": 5
             },
-            "Metadata": {
-                "formRowNum": 5,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 5,
+                "since_year": 1973
             }
         },
         "SanGregorioVIIpapa": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Gregorio VII, papa",
                 "color": [
                     "white"
@@ -231,13 +231,13 @@
                 "day": 25,
                 "month": 5
             },
-            "Metadata": {
-                "formRowNum": 7,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 7,
+                "since_year": 1973
             }
         },
         "SantiMarcellinoePietromartiri": {
-            "Festivity": {
+            "festivity": {
                 "name": "Santi Marcellino e Pietro, martiri",
                 "color": [
                     "red"
@@ -249,13 +249,13 @@
                 "day": 2,
                 "month": 6
             },
-            "Metadata": {
-                "formRowNum": 8,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 8,
+                "since_year": 1973
             }
         },
         "BeataAnnaMariaTaigi": {
-            "Festivity": {
+            "festivity": {
                 "name": "Beata Anna Maria Taigi",
                 "color": [
                     "white"
@@ -267,13 +267,13 @@
                 "day": 9,
                 "month": 6
             },
-            "Metadata": {
-                "formRowNum": 9,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 9,
+                "since_year": 1973
             }
         },
         "SantiGiovanniePaolomartiri": {
-            "Festivity": {
+            "festivity": {
                 "name": "Santi Giovanni e Paolo, martiri",
                 "color": [
                     "red"
@@ -285,13 +285,13 @@
                 "day": 26,
                 "month": 6
             },
-            "Metadata": {
-                "formRowNum": 6,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 6,
+                "since_year": 1973
             }
         },
         "SantiPietroePaoloApostoliPatroniprincipalidiRoma": {
-            "Festivity": {
+            "festivity": {
                 "name": "Santi Pietro e Paolo, Apostoli, Patroni principali di Roma",
                 "color": [
                     "red"
@@ -303,13 +303,13 @@
                 "day": 29,
                 "month": 6
             },
-            "Metadata": {
-                "formRowNum": 0,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 0,
+                "since_year": 1973
             }
         },
         "SantiPrimiMartiridellaChiesaRomana": {
-            "Festivity": {
+            "festivity": {
                 "name": "Santi Primi Martiri della Chiesa Romana",
                 "color": [
                     "red"
@@ -321,13 +321,13 @@
                 "day": 30,
                 "month": 6
             },
-            "Metadata": {
-                "formRowNum": 10,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 10,
+                "since_year": 1973
             }
         },
         "SantaBrigidareligiosa": {
-            "Festivity": {
+            "festivity": {
                 "name": "Santa Brigida, religiosa",
                 "color": [
                     "white"
@@ -340,13 +340,13 @@
                 "day": 23,
                 "month": 7
             },
-            "Metadata": {
-                "formRowNum": 11,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 11,
+                "since_year": 1973
             }
         },
         "BeatoInnocenzoXIpapa": {
-            "Festivity": {
+            "festivity": {
                 "name": "Beato Innocenzo XI, papa",
                 "color": [
                     "white"
@@ -358,13 +358,13 @@
                 "day": 12,
                 "month": 8
             },
-            "Metadata": {
-                "formRowNum": 8,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 8,
+                "since_year": 1973
             }
         },
         "SanSistoIIIpapa": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Sisto III, papa",
                 "color": [
                     "white"
@@ -376,13 +376,13 @@
                 "day": 19,
                 "month": 8
             },
-            "Metadata": {
-                "formRowNum": 9,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 9,
+                "since_year": 1973
             }
         },
         "SanGasparedelBufalosacerdote": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Gaspare del Bufalo, sacerdote",
                 "color": [
                     "white"
@@ -394,13 +394,13 @@
                 "day": 21,
                 "month": 10
             },
-            "Metadata": {
-                "formRowNum": 13,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 13,
+                "since_year": 1973
             }
         },
         "SanNicolaIpapa": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Nicola I, papa",
                 "color": [
                     "white"
@@ -412,13 +412,13 @@
                 "day": 13,
                 "month": 11
             },
-            "Metadata": {
-                "formRowNum": 14,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 14,
+                "since_year": 1973
             }
         },
         "SanGelasioIpapa": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Gelasio I, papa",
                 "color": [
                     "white"
@@ -430,13 +430,13 @@
                 "day": 20,
                 "month": 11
             },
-            "Metadata": {
-                "formRowNum": 10,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 10,
+                "since_year": 1973
             }
         },
         "SanClementeIpapaemartire": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Clemente I, papa e martire",
                 "color": [
                     "red",
@@ -450,13 +450,13 @@
                 "day": 23,
                 "month": 11
             },
-            "Metadata": {
-                "formRowNum": 15,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 15,
+                "since_year": 1973
             }
         },
         "SanSiriciopapa": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Siricio, papa",
                 "color": [
                     "white"
@@ -468,13 +468,13 @@
                 "day": 26,
                 "month": 11
             },
-            "Metadata": {
-                "formRowNum": 11,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 11,
+                "since_year": 1973
             }
         },
         "SanLeonardodaPortoMauriziosacerdote": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Leonardo da Porto Maurizio, sacerdote",
                 "color": [
                     "white"
@@ -486,13 +486,13 @@
                 "day": 26,
                 "month": 11
             },
-            "Metadata": {
-                "formRowNum": 12,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 12,
+                "since_year": 1973
             }
         },
         "SanDamasoIpapa": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Damaso I, papa",
                 "color": [
                     "white"
@@ -504,13 +504,13 @@
                 "day": 11,
                 "month": 12
             },
-            "Metadata": {
-                "formRowNum": 16,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 16,
+                "since_year": 1973
             }
         },
         "DedicazionedellaBasilicaPapaledelSSSalvatoreCattedralediRoma": {
-            "Festivity": {
+            "festivity": {
                 "name": "Dedicazione della Basilica Papale del SS. Salvatore, Cattedrale di Roma",
                 "color": [
                     "white"
@@ -522,13 +522,13 @@
                 "day": 9,
                 "month": 11
             },
-            "Metadata": {
-                "formRowNum": 1,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 1,
+                "since_year": 1973
             }
         },
         "SanGiovanniPaoloIIpapa": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Giovanni Paolo II, papa",
                 "color": [
                     "white"
@@ -540,13 +540,13 @@
                 "day": 22,
                 "month": 10
             },
-            "Metadata": {
-                "formRowNum": 17,
-                "sinceYear": 2014
+            "metadata": {
+                "form_rownum": 17,
+                "since_year": 2014
             }
         },
         "BeatoUrbanoIIpapa": {
-            "Festivity": {
+            "festivity": {
                 "name": "Beato Urbano II, papa",
                 "color": [
                     "white"
@@ -558,13 +558,13 @@
                 "day": 28,
                 "month": 7
             },
-            "Metadata": {
-                "formRowNum": 7,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 7,
+                "since_year": 1973
             }
         },
         "SantAgatonepapa": {
-            "Festivity": {
+            "festivity": {
                 "name": "Sant'Agatone, papa",
                 "color": [
                     "white"
@@ -576,13 +576,13 @@
                 "day": 10,
                 "month": 1
             },
-            "Metadata": {
-                "formRowNum": 0,
-                "sinceYear": 1973
+            "metadata": {
+                "form_rownum": 0,
+                "since_year": 1973
             }
         },
         "SanCallistoIpapaemartire": {
-            "Festivity": {
+            "festivity": {
                 "name": "San Callisto I, papa e martire",
                 "color": [
                     "red",
@@ -596,9 +596,9 @@
                 "day": 14,
                 "month": 10
             },
-            "Metadata": {
-                "formRowNum": 12,
-                "sinceYear": 1970
+            "metadata": {
+                "form_rownum": 12,
+                "since_year": 1970
             }
         }
     }

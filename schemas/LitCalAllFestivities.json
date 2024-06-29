@@ -3,25 +3,25 @@
     "title": "LitCalAllFestivities",
     "type": "object",
     "properties": {
-        "LitCalAllFestivities": {
+        "litcal_events": {
             "$ref": "#/definitions/LitCalAllFestivities"
         },
-        "Settings": {
+        "settings": {
             "type": "object",
             "oneOf": [
               {
                 "properties": {
-                  "Locale": {
+                  "locale": {
                     "type": "string",
                     "pattern": "^[a-z][a-z]$",
                     "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
                   },
-                  "NationalCalendar": {
+                  "nationalcalendar": {
                     "type": "string",
                     "pattern": "^[A-Z]{3,45}$",
                     "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
                   },
-                  "DiocesanCalendar": {
+                  "diocesancalendar": {
                     "type": "string",
                     "pattern": "^[A-Z]{3,45}$",
                     "description": "indicates the Diocesan Calendar used to produce the data in LitCalAllFestivities"
@@ -31,17 +31,17 @@
               },
               {
                 "properties": {
-                  "Locale": {
+                  "locale": {
                     "type": "string",
                     "pattern": "^[a-z][a-z]$",
                     "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
                   },
-                  "NationalCalendar": {
+                  "nationalcalendar": {
                     "type": "string",
                     "pattern": "^[A-Z]{3,45}$",
                     "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
                   },
-                  "DiocesanCalendar": {
+                  "diocesancalendar": {
                     "type": "null"
                   }
                 },
@@ -49,15 +49,15 @@
               },
               {
                 "properties": {
-                  "Locale": {
+                  "locale": {
                     "type": "string",
                     "pattern": "^[a-z][a-z]$",
                     "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
                   },
-                  "NationalCalendar": {
+                  "nationalcalendar": {
                     "type": "null"
                   },
-                  "DiocesanCalendar": {
+                  "diocesancalendar": {
                     "type": "null"
                   }
                 },

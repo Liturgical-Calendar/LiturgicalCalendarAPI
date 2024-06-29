@@ -1,7 +1,7 @@
 {
-    "LitCal": [
+    "litcal": [
         {
-            "Festivity": {
+            "festivity": {
                 "tag": "LadyGuadalupe",
                 "name": "[ USA ] Our Lady of Guadalupe",
                 "color": [
@@ -11,22 +11,22 @@
                 "day": 12,
                 "month": 12
             },
-            "Metadata": {
+            "metadata": {
                 "action": "makePatron",
-                "sinceYear": 1999,
-                "decreeURL": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/homilies\/1999\/documents\/hf_jp-ii_hom_19990123_mexico-guadalupe.html",
-                "decreeLangs": {
-                    "DE": "de",
-                    "ES": "es",
-                    "EN": "en",
-                    "FR": "fr",
-                    "IT": "it",
-                    "PT": "pt"
+                "since_year": 1999,
+                "url": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/homilies\/1999\/documents\/hf_jp-ii_hom_19990123_mexico-guadalupe.html",
+                "url_lang_map": {
+                    "de": "de",
+                    "es": "es",
+                    "en": "en",
+                    "fr": "fr",
+                    "it": "it",
+                    "pt": "pt"
                 }
             }
         }
     ],
-    "NationalCalendars": {
+    "nationalcalendars": {
         "Canada": "CA",
         "United States": "US",
         "Brazil": "BR",
@@ -50,9 +50,9 @@
         "Peru": "PE",
         "Puerto Rico": "PR"
     },
-    "Metadata": {
-        "IsMultilingual": true,
-        "Languages": [
+    "metadata": {
+        "multilingual": true,
+        "languages": [
             "en_CA",
             "en_US",
             "fr_CA",
@@ -78,6 +78,6 @@
             "es_PE",
             "es_PR"
         ],
-        "WiderRegion": "Americas"
+        "wider_region": "Americas"
     }
 }

@@ -1,7 +1,7 @@
 {
-    "LitCal": [
+    "litcal": [
         {
-            "Festivity": {
+            "festivity": {
                 "tag": "StCatherineSiena",
                 "name": "Santa Caterina da Siena, vergine e dottore della Chiesa, patrona d'Italia",
                 "color": [
@@ -11,15 +11,15 @@
                 "day": 29,
                 "month": 4
             },
-            "Metadata": {
+            "metadata": {
                 "action": "makePatron",
-                "sinceYear": 1939,
+                "since_year": 1939,
                 "untilYear": 1999,
-                "decreeURL": "https:\/\/www.vatican.va\/content\/pius-xii\/it\/briefs\/documents\/hf_p-xii_brief_19390618_patroni-italia.html"
+                "url": "https:\/\/www.vatican.va\/content\/pius-xii\/it\/briefs\/documents\/hf_p-xii_brief_19390618_patroni-italia.html"
             }
         },
         {
-            "Festivity": {
+            "festivity": {
                 "tag": "StFrancisAssisi",
                 "name": "San Francesco d'Assisi, patrono d'Italia",
                 "color": [
@@ -29,27 +29,27 @@
                 "day": 29,
                 "month": 4
             },
-            "Metadata": {
+            "metadata": {
                 "action": "makePatron",
-                "sinceYear": 1939,
-                "decreeURL": "https:\/\/www.vatican.va\/content\/pius-xii\/it\/briefs\/documents\/hf_p-xii_brief_19390618_patroni-italia.html"
+                "since_year": 1939,
+                "url": "https:\/\/www.vatican.va\/content\/pius-xii\/it\/briefs\/documents\/hf_p-xii_brief_19390618_patroni-italia.html"
             }
         }
     ],
-    "Settings": {
-        "Epiphany": "JAN6",
-        "Ascension": "SUNDAY",
-        "CorpusChristi": "SUNDAY",
-        "Locale": "IT"
+    "settings": {
+        "epiphany": "JAN6",
+        "ascension": "SUNDAY",
+        "corpuschristi": "SUNDAY",
+        "locale": "IT"
     },
-    "Metadata": {
-        "Region": "ITALY",
-        "WiderRegion": {
+    "metadata": {
+        "region": "ITALY",
+        "wider_region": {
             "name": "Europe",
             "jsonFile": "nations\/Europe.json",
             "i18nFile": "nations\/EUROPE\/it_IT.json"
         },
-        "Missals": [
+        "missals": [
             "ITALY_1983",
             "ITALY_2020"
         ]

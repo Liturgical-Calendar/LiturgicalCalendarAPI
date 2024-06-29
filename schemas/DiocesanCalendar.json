@@ -6,15 +6,15 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "LitCal": {
+                "litcal": {
                     "$ref": "#/definitions/LitCal"
                 },
-                "Overrides": {
+                "overrides": {
                     "$ref": "#/definitions/Overrides"
                 }
             },
             "required": [
-                "LitCal"
+                "litcal"
             ],
             "title": "DiocesanCalendar"
         },
@@ -25,7 +25,7 @@
                 "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$": {
                     "type": "object",
                     "properties": {
-                        "Festivity": {
+                        "festivity": {
                             "type": "object",
                             "additionalProperties": false,
                             "properties": {
@@ -58,23 +58,23 @@
                                 "common"
                             ]
                         },
-                        "Metadata": {
+                        "metadata": {
                             "type": "object",
                             "additionalProperties": false,
                             "properties": {
-                                "formRowNum": {
+                                "form_rownum": {
                                     "type": "integer"
                                 },
-                                "sinceYear": {
+                                "since_year": {
                                     "type": "integer"
                                 },
-                                "untilYear": {
+                                "until_year": {
                                     "type": "integer"
                                 },
-                                "decreeURL": {
+                                "url": {
                                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DecreeURL"
                                 },
-                                "decreeLangs": {
+                                "languages": {
                                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DecreeLangs"
                                 },
                                 "strtotime": {
@@ -99,13 +99,13 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "Epiphany": {
+                "epiphany": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
                 },
-                "Ascension": {
+                "ascension": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Ascension"
                 },
-                "CorpusChristi": {
+                "corpusChristi": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
                 }
             },

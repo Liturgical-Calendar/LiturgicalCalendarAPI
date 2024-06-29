@@ -1,7 +1,7 @@
 {
-    "LitCal": [
+    "litcal": [
         {
-            "Festivity": {
+            "festivity": {
                 "tag": "StBenedict",
                 "name": "San Benedetto, abate, patrono d'Europa",
                 "color": [
@@ -11,19 +11,19 @@
                 "day": 11,
                 "month": 7
             },
-            "Metadata": {
+            "metadata": {
                 "action": "makePatron",
-                "sinceYear": 1964,
-                "decreeURL": "https:\/\/www.vatican.va\/content\/paul-vi\/%s\/apost_letters\/documents\/hf_p-vi_apl_19641024_pacis-nuntius.html",
-                "decreeLangs": {
-                    "IT": "it",
-                    "ES": "es",
-                    "LA": "la"
+                "since_year": 1964,
+                "url": "https:\/\/www.vatican.va\/content\/paul-vi\/%s\/apost_letters\/documents\/hf_p-vi_apl_19641024_pacis-nuntius.html",
+                "url_lang_map": {
+                    "it": "it",
+                    "es": "es",
+                    "la": "la"
                 }
             }
         },
         {
-            "Festivity": {
+            "festivity": {
                 "tag": "StsCyrilMethodius",
                 "name": "Santi Cirillo, monaco, e Metodio, vescovo, patroni d'Europa",
                 "color": [
@@ -33,20 +33,20 @@
                 "day": 14,
                 "month": 2
             },
-            "Metadata": {
+            "metadata": {
                 "action": "makePatron",
-                "sinceYear": 1980,
-                "decreeURL": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/apost_letters\/1980\/documents\/hf_jp-ii_apl_31121980_egregiae-virtutis.html",
-                "decreeLangs": {
-                    "ES": "es",
-                    "IT": "it",
-                    "LA": "la",
-                    "PT": "pt"
+                "since_year": 1980,
+                "url": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/apost_letters\/1980\/documents\/hf_jp-ii_apl_31121980_egregiae-virtutis.html",
+                "url_lang_map": {
+                    "es": "es",
+                    "it": "it",
+                    "la": "la",
+                    "pt": "pt"
                 }
             }
         },
         {
-            "Festivity": {
+            "festivity": {
                 "tag": "StBridget",
                 "name": "Santa Brigida, religiosa, patrona d'Europa",
                 "color": [
@@ -56,23 +56,23 @@
                 "day": 23,
                 "month": 7
             },
-            "Metadata": {
+            "metadata": {
                 "action": "makePatron",
-                "sinceYear": 1999,
-                "decreeURL": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/motu_proprio\/documents\/hf_jp-ii_motu-proprio_01101999_co-patronesses-europe.html",
-                "decreeLangs": {
-                    "DE": "de",
-                    "EN": "en",
-                    "ES": "es",
-                    "FR": "fr",
-                    "IT": "it",
-                    "LA": "la",
-                    "PT": "pt"
+                "since_year": 1999,
+                "url": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/motu_proprio\/documents\/hf_jp-ii_motu-proprio_01101999_co-patronesses-europe.html",
+                "url_lang_map": {
+                    "de": "de",
+                    "en": "en",
+                    "es": "es",
+                    "fr": "fr",
+                    "it": "it",
+                    "la": "la",
+                    "pt": "pt"
                 }
             }
         },
         {
-            "Festivity": {
+            "festivity": {
                 "tag": "StCatherineSiena",
                 "name": "Santa Caterina da Siena, vergine e dottore della Chiesa, patrona d'Italia e d'Europa",
                 "color": [
@@ -82,23 +82,23 @@
                 "day": 29,
                 "month": 4
             },
-            "Metadata": {
+            "metadata": {
                 "action": "makePatron",
-                "sinceYear": 1999,
-                "decreeURL": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/motu_proprio\/documents\/hf_jp-ii_motu-proprio_01101999_co-patronesses-europe.html",
-                "decreeLangs": {
-                    "DE": "de",
-                    "EN": "en",
-                    "ES": "es",
-                    "FR": "fr",
-                    "IT": "it",
-                    "LA": "la",
-                    "PT": "pt"
+                "since_year": 1999,
+                "url": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/motu_proprio\/documents\/hf_jp-ii_motu-proprio_01101999_co-patronesses-europe.html",
+                "url_lang_map": {
+                    "de": "de",
+                    "en": "en",
+                    "es": "es",
+                    "fr": "fr",
+                    "it": "it",
+                    "la": "la",
+                    "pt": "pt"
                 }
             }
         },
         {
-            "Festivity": {
+            "festivity": {
                 "tag": "StEdithStein",
                 "name": "Santa Teresa Benedetta della Croce, vergine e martire, patrona d'Europa",
                 "color": [
@@ -120,24 +120,24 @@
                     "GOSPEL": ""
                 }
             },
-            "Metadata": {
+            "metadata": {
                 "action": "createNew",
-                "sinceYear": 1999,
+                "since_year": 1999,
                 "untilYear": 2002,
-                "decreeURL": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/motu_proprio\/documents\/hf_jp-ii_motu-proprio_01101999_co-patronesses-europe.html",
-                "decreeLangs": {
-                    "DE": "de",
-                    "EN": "en",
-                    "ES": "es",
-                    "FR": "fr",
-                    "IT": "it",
-                    "LA": "la",
-                    "PT": "pt"
+                "url": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/motu_proprio\/documents\/hf_jp-ii_motu-proprio_01101999_co-patronesses-europe.html",
+                "url_lang_map": {
+                    "de": "de",
+                    "en": "en",
+                    "es": "es",
+                    "fr": "fr",
+                    "it": "it",
+                    "la": "la",
+                    "pt": "pt"
                 }
             }
         },
         {
-            "Festivity": {
+            "festivity": {
                 "tag": "StEdithStein",
                 "name": "Santa Teresa Benedetta della Croce, vergine e martire, patrona d'Europa",
                 "color": [
@@ -148,18 +148,18 @@
                 "day": 9,
                 "month": 8
             },
-            "Metadata": {
+            "metadata": {
                 "action": "makePatron",
-                "sinceYear": 2002,
-                "decreeURL": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/motu_proprio\/documents\/hf_jp-ii_motu-proprio_01101999_co-patronesses-europe.html",
-                "decreeLangs": {
-                    "DE": "de",
-                    "EN": "en",
-                    "ES": "es",
-                    "FR": "fr",
-                    "IT": "it",
-                    "LA": "la",
-                    "PT": "pt"
+                "since_year": 2002,
+                "url": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/motu_proprio\/documents\/hf_jp-ii_motu-proprio_01101999_co-patronesses-europe.html",
+                "url_lang_map": {
+                    "de": "de",
+                    "en": "en",
+                    "es": "es",
+                    "fr": "fr",
+                    "it": "it",
+                    "la": "la",
+                    "pt": "pt"
                 }
             }
         }
@@ -195,9 +195,9 @@
         "Liechtenstein": "LI",
         "Hungary": "HU"
     },
-    "Metadata": {
-        "IsMultilingual": true,
-        "Languages": [
+    "metadata": {
+        "multilingual": true,
+        "languages": [
             "bg_BG",
             "cs_CZ",
             "hr_HR",
@@ -232,6 +232,6 @@
             "tr_CY",
             "hu_HU"
         ],
-        "WiderRegion": "Europe"
+        "wider_region": "Europe"
     }
 }

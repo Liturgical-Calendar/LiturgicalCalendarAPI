@@ -1,7 +1,7 @@
 {
-    "LitCal": {
+    "litcal": {
         "VerjaardagvandeWijdingvandekathedraal": {
-            "Festivity": {
+            "festivity": {
                 "name": "Verjaardag van de Wijding van de kathedraal",
                 "color": [
                     "white"
@@ -13,13 +13,13 @@
                 "day": 25,
                 "month": 8
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 1
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 1
             }
         },
         "HJohannesapostelenevangelistpatroonvanhetbisdom": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Johannes, apostel en evangelist, patroon van het bisdom",
                 "color": [
                     "white"
@@ -31,13 +31,13 @@
                 "day": 27,
                 "month": 12
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 0
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 0
             }
         },
         "ZPetrusDonderspriester": {
-            "Festivity": {
+            "festivity": {
                 "name": "Z. Petrus Donders, priester",
                 "color": [
                     "white"
@@ -50,13 +50,13 @@
                 "day": 14,
                 "month": 1
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 0
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 0
             }
         },
         "HOdulfuspriester": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Odulfus, priester",
                 "color": [
                     "white"
@@ -68,13 +68,13 @@
                 "day": 12,
                 "month": 6
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 1
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 1
             }
         },
         "HServatiusbisschop": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Servatius, bisschop",
                 "color": [
                     "white"
@@ -86,13 +86,13 @@
                 "day": 13,
                 "month": 5
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 0
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 0
             }
         },
         "HLambertusbisschopenmartelaar": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Lambertus, bisschop en martelaar",
                 "color": [
                     "white"
@@ -104,13 +104,13 @@
                 "day": 17,
                 "month": 9
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 1
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 1
             }
         },
         "HHubertusbisschop": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Hubertus, bisschop",
                 "color": [
                     "white"
@@ -122,13 +122,13 @@
                 "day": 3,
                 "month": 11
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 2
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 2
             }
         },
         "HeiligeMaagdMariaZoeteMoedervanDenBosch": {
-            "Festivity": {
+            "festivity": {
                 "name": "Heilige Maagd Maria, Zoete Moeder van Den Bosch",
                 "color": [
                     "white"
@@ -140,13 +140,13 @@
                 "day": 7,
                 "month": 7
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 2
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 2
             }
         },
         "ZEustachiusvanLieshoutpriester": {
-            "Festivity": {
+            "festivity": {
                 "name": "Z. Eustachius van Lieshout, priester",
                 "color": [
                     "white"
@@ -158,13 +158,13 @@
                 "day": 30,
                 "month": 8
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 3
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 3
             }
         },
         "HOdamaagd": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Oda, maagd",
                 "color": [
                     "white"
@@ -176,9 +176,9 @@
                 "day": 27,
                 "month": 11
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 4
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 4
             }
         }
     }

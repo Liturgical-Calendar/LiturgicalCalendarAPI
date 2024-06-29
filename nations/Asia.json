@@ -1,7 +1,7 @@
 {
-    "LitCal": [
+    "litcal": [
         {
-            "Festivity": {
+            "festivity": {
                 "tag": "StFrancisXavier",
                 "name": "San Francesco Saverio, sacerdote",
                 "color": [
@@ -11,18 +11,18 @@
                 "day": 3,
                 "month": 12
             },
-            "Metadata": {
+            "metadata": {
                 "action": "makePatron",
-                "sinceYear": 1970,
-                "decreeURL": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/apost_exhortations\/documents\/hf_jp-ii_exh_06111999_ecclesia-in-asia.html",
-                "decreeLangs": {
-                    "DE": "de",
-                    "EN": "en",
-                    "ES": "es",
-                    "FR": "fr",
-                    "IT": "it",
-                    "PT": "pt",
-                    "ZH": "zh"
+                "since_year": 1970,
+                "url": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/apost_exhortations\/documents\/hf_jp-ii_exh_06111999_ecclesia-in-asia.html",
+                "url_lang_map": {
+                    "de": "de",
+                    "en": "en",
+                    "es": "es",
+                    "fr": "fr",
+                    "it": "it",
+                    "pt": "pt",
+                    "zh": "zh"
                 }
             }
         }
@@ -31,12 +31,12 @@
         "China": "CN",
         "Japan": "JP"
     },
-    "Metadata": {
-        "IsMultilingual": true,
-        "Languages": [
+    "metadata": {
+        "multilingual": true,
+        "languages": [
             "zh_Hans_CN",
             "ja_JP"
         ],
-        "WiderRegion": "Asia"
+        "wider_region": "Asia"
     }
 }

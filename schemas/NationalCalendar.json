@@ -1,45 +1,42 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$ref": "#/definitions/NationalCalendar",
-    "definitions": {
-        "NationalCalendar": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "LitCal": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/LitCal"
-                    }
-                },
-                "Settings": {
-                    "$ref": "#/definitions/Settings"
-                },
-                "Metadata": {
-                    "$ref": "#/definitions/NationalCalendarMetadata"
-                }
-            },
-            "required": [
-                "LitCal",
-                "Metadata",
-                "Settings"
-            ],
-            "title": "NationalCalendar"
+    "title": "NationalCalendar",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "litcal": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/LitCal"
+            }
         },
+        "settings": {
+            "$ref": "#/definitions/Settings"
+        },
+        "metadata": {
+            "$ref": "#/definitions/NationalCalendarMetadata"
+        }
+    },
+    "required": [
+        "litcal",
+        "metadata",
+        "settings"
+    ],
+    "definitions": {
         "LitCal": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "Festivity": {
+                "festivity": {
                     "$ref": "#/definitions/Festivity"
                 },
-                "Metadata": {
+                "metadata": {
                     "$ref": "#/definitions/LitCalMetadata"
                 }
             },
             "required": [
-                "Festivity",
-                "Metadata"
+                "festivity",
+                "metadata"
             ],
             "title": "LitCal"
         },
@@ -105,10 +102,10 @@
                 "action": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/NationalCalendarAction"
                 },
-                "sinceYear": {
+                "since_year": {
                     "type": "integer"
                 },
-                "untilYear": {
+                "until_year": {
                     "type": "integer"
                 },
                 "missal": {
@@ -124,7 +121,7 @@
                         "grade"
                     ]
                 },
-                "decreeURL": {
+                "url": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DecreeURL"
                 },
                 "decreeLangs": {
@@ -133,7 +130,7 @@
             },
             "required": [
                 "action",
-                "sinceYear"
+                "since_year"
             ],
             "title": "LitCalMetadata"
         },
@@ -141,20 +138,20 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "Region": {
+                "region": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
                 },
-                "WiderRegion": {
+                "wider_region": {
                     "$ref": "#/definitions/WiderRegion"
                 },
-                "Missals": {
+                "missals": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Missals"
                 }
             },
             "required": [
-                "Missals",
-                "Region",
-                "WiderRegion"
+                "missals",
+                "region",
+                "wider_region"
             ],
             "title": "NationalCalendarMetadata"
         },
@@ -165,16 +162,16 @@
                 "name": {
                     "type": "string"
                 },
-                "jsonFile": {
+                "jsonfile": {
                     "type": "string"
                 },
-                "i18nFile": {
+                "i18nfile": {
                     "type": "string"
                 }
             },
             "required": [
-                "i18nFile",
-                "jsonFile",
+                "i18nfile",
+                "jsonfile",
                 "name"
             ],
             "title": "WiderRegion"
@@ -183,27 +180,27 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "Epiphany": {
+                "epiphany": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
                 },
-                "Ascension": {
+                "ascension": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Ascension"
                 },
-                "CorpusChristi": {
+                "corpuschristi": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
                 },
-                "EternalHighPriest": {
+                "eternalhighpriest": {
                     "type": "boolean"
                 },
-                "Locale": {
+                "locale": {
                     "type": "string"
                 }
             },
             "required": [
-                "Ascension",
-                "CorpusChristi",
-                "Epiphany",
-                "Locale"
+                "ascension",
+                "corpuschristi",
+                "epiphany",
+                "locale"
             ],
             "title": "Settings"
         }

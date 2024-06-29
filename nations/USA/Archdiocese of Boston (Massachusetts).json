@@ -1,7 +1,7 @@
 {
-    "LitCal": {
+    "litcal": {
         "DedicationoftheCathedraloftheHolyCross": {
-            "Festivity": {
+            "festivity": {
                 "name": "Dedication of the Cathedral of the Holy Cross",
                 "color": ["white"],
                 "grade": 4,
@@ -9,15 +9,15 @@
                 "day": 8,
                 "month": 12
             },
-            "Metadata": {
-                "formRowNum": 1,
-                "sinceYear": 1970
+            "metadata": {
+                "form_rownum": 1,
+                "since_year": 1970
             }
         }
     },
-    "Overrides": {
-        "Epiphany": "JAN6",
-        "Ascension": "THURSDAY",
-        "CorpusChristi": "THURSDAY"
+    "overrides": {
+        "epiphany": "JAN6",
+        "ascension": "THURSDAY",
+        "corpuschristi": "THURSDAY"
     }
 }

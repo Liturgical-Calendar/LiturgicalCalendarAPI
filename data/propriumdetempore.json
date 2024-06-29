@@ -66,7 +66,7 @@
             "GOSPEL": ""
         }
     },
-    "Epiphany": {
+    "epiphany": {
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -75,7 +75,7 @@
             "GOSPEL": ""
         }
     },
-    "Ascension": {
+    "ascension": {
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",
@@ -256,7 +256,7 @@
             "GOSPEL": ""
         }
     },
-    "CorpusChristi": {
+    "corpuschristi": {
         "READINGS": {
             "FIRST_READING": "",
             "RESPONSORIAL_PSALM": "",

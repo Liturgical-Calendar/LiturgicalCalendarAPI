@@ -1,14 +1,12 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$ref": "#/definitions/LitCalTest",
+    "title": "LitCalTest",
+    "oneOf": [
+        { "$ref": "#/definitions/ExactCorrespondenceType" },
+        { "$ref": "#/definitions/ExactCorrespondenceSinceType" },
+        { "$ref": "#/definitions/ExactCorrespondenceUntilType" }
+    ],
     "definitions": {
-        "LitCalTest": {
-            "oneOf": [
-                { "$ref": "#/definitions/ExactCorrespondenceType" },
-                { "$ref": "#/definitions/ExactCorrespondenceSinceType" },
-                { "$ref": "#/definitions/ExactCorrespondenceUntilType" }
-            ]
-        },
         "AppliesToOrExcludes": {
             "type": "object",
             "minProperties": 1,

@@ -3,7 +3,7 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-        "LitCalSchemas": {
+        "litcal_schemas": {
             "type": "object",
             "additionalProperties": false,
             "properties": {

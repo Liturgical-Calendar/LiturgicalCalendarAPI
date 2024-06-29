@@ -373,36 +373,36 @@ class Calendar
                 $this->CalendarParams->CorpusChristi   = CorpusChristi::THURSDAY;
                 $this->CalendarParams->Locale          = LitLocale::LATIN;
             } else {
-                if (property_exists($this->NationalData, 'Settings')) {
+                if (property_exists($this->NationalData, 'settings')) {
                     if (
-                        property_exists($this->NationalData->Settings, 'Epiphany')
-                        && Epiphany::isValid($this->NationalData->Settings->Epiphany)
+                        property_exists($this->NationalData->settings, 'epiphany')
+                        && Epiphany::isValid($this->NationalData->settings->epiphany)
                     ) {
-                        $this->CalendarParams->Epiphany        = $this->NationalData->Settings->Epiphany;
+                        $this->CalendarParams->Epiphany        = $this->NationalData->settings->epiphany;
                     }
                     if (
-                        property_exists($this->NationalData->Settings, 'Ascension')
-                        && Ascension::isValid($this->NationalData->Settings->Ascension)
+                        property_exists($this->NationalData->settings, 'ascension')
+                        && Ascension::isValid($this->NationalData->settings->ascension)
                     ) {
-                        $this->CalendarParams->Ascension       = $this->NationalData->Settings->Ascension;
+                        $this->CalendarParams->Ascension       = $this->NationalData->settings->ascension;
                     }
                     if (
-                        property_exists($this->NationalData->Settings, 'CorpusChristi')
-                        && CorpusChristi::isValid($this->NationalData->Settings->CorpusChristi)
+                        property_exists($this->NationalData->settings, 'corpuschristi')
+                        && CorpusChristi::isValid($this->NationalData->settings->corpuschristi)
                     ) {
-                        $this->CalendarParams->CorpusChristi   = $this->NationalData->Settings->CorpusChristi;
+                        $this->CalendarParams->CorpusChristi   = $this->NationalData->settings->corpuschristi;
                     }
                     if (
-                        property_exists($this->NationalData->Settings, 'EternalHighPriest')
-                        && is_bool($this->NationalData->Settings->EternalHighPriest)
+                        property_exists($this->NationalData->settings, 'eternalhighpriest')
+                        && is_bool($this->NationalData->settings->eternalhighpriest)
                     ) {
-                        $this->CalendarParams->EternalHighPriest = $this->NationalData->Settings->EternalHighPriest;
+                        $this->CalendarParams->EternalHighPriest = $this->NationalData->settings->eternalhighpriest;
                     }
                     if (
-                        property_exists($this->NationalData->Settings, 'Locale')
-                        && LitLocale::isValid($this->NationalData->Settings->Locale)
+                        property_exists($this->NationalData->settings, 'locale')
+                        && LitLocale::isValid($this->NationalData->settings->locale)
                     ) {
-                        $this->CalendarParams->Locale          = $this->NationalData->Settings->Locale;
+                        $this->CalendarParams->Locale          = $this->NationalData->settings->locale;
                     }
                 }
             }
@@ -412,20 +412,20 @@ class Calendar
     private function updateSettingsBasedOnDiocesanCalendar(): void
     {
         if ($this->CalendarParams->DiocesanCalendar !== null && $this->DiocesanData !== null) {
-            if (property_exists($this->DiocesanData, "Overrides")) {
-                foreach ($this->DiocesanData->Overrides as $key => $value) {
+            if (property_exists($this->DiocesanData, "overrides")) {
+                foreach ($this->DiocesanData->overrides as $key => $value) {
                     switch ($key) {
-                        case "Epiphany":
+                        case "epiphany":
                             if (Epiphany::isValid($value)) {
                                 $this->CalendarParams->Epiphany        = $value;
                             }
                             break;
-                        case "Ascension":
+                        case "ascension":
                             if (Ascension::isValid($value)) {
                                 $this->CalendarParams->Ascension       = $value;
                             }
                             break;
-                        case "CorpusChristi":
+                        case "corpuschristi":
                             if (CorpusChristi::isValid($value)) {
                                 $this->CalendarParams->CorpusChristi   = $value;
                             }
@@ -1282,7 +1282,7 @@ class Calendar
         }
 
         //let's add a displayGrade property for AllSouls so applications don't have to worry about fixing it
-        $this->Cal->setProperty("AllSouls", "displayGrade", $this->LitGrade->i18n(LitGrade::COMMEMORATION, false));
+        $this->Cal->setProperty("AllSouls", 'display_grade', $this->LitGrade->i18n(LitGrade::COMMEMORATION, false));
 
         $this->Cal->addSolemnitiesLordBVM([
             "Easter",
@@ -1803,12 +1803,13 @@ class Calendar
 
     private function handleCoincidenceDecree(object $row): void
     {
-        $lang = ( property_exists($row->Metadata, 'decreeLangs') && property_exists($row->Metadata->decreeLangs, $this->CalendarParams->Locale) ) ?
-            $row->Metadata->decreeLangs->{$this->CalendarParams->Locale} :
-            "en";
-        $url = str_contains($row->Metadata->decreeURL, '%s') ? sprintf($row->Metadata->decreeURL, $lang) : $row->Metadata->decreeURL;
+        $url = $row->metadata->url;
+        if (property_exists($row->metadata, 'url_lang_map') && str_contains($url, '%s')) {
+            $lang = $this->getBestLangFromMap($row->metadata->url_lang_map);
+            $url = sprintf($url, $lang);
+        }
         $decree = '<a href="' . $url . '">' . _("Decree of the Congregation for Divine Worship") . '</a>';
-        $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast($row->Festivity->DATE, $this->CalendarParams);
+        $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast($row->festivity->DATE, $this->CalendarParams);
         $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
         $this->Messages[] = sprintf(
             /**translators:
@@ -1822,13 +1823,13 @@ class Calendar
              * 8. Requested calendar year
              */
             _('The %1$s \'%2$s\', added on %3$s since the year %4$d (%5$s), is however superseded by a %6$s \'%7$s\' in the year %8$d.'),
-            $this->LitGrade->i18n($row->Festivity->GRADE),
-            $row->Festivity->NAME,
-            $locale === LitLocale::LATIN ? ( $row->Festivity->DATE->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->Festivity->DATE->format('n') ] ) :
-                ( $locale === 'EN' ? $row->Festivity->DATE->format('F jS') :
-                    $this->dayAndMonth->format($row->Festivity->DATE->format('U'))
+            $this->LitGrade->i18n($row->festivity->GRADE),
+            $row->festivity->NAME,
+            $locale === LitLocale::LATIN ? ( $row->festivity->DATE->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->festivity->DATE->format('n') ] ) :
+                ( $locale === 'EN' ? $row->festivity->DATE->format('F jS') :
+                    $this->dayAndMonth->format($row->festivity->DATE->format('U'))
                 ),
-            $row->Metadata->sinceYear,
+            $row->metadata->since_year,
             $decree,
             $coincidingFestivity->grade,
             $coincidingFestivity->event->name,
@@ -1882,26 +1883,26 @@ class Calendar
             //we won't have a date defined for mobile festivites, we'll have to calculate them here case by case
             //otherwise we'll have to create a language that we can interpret in an automated fashion...
             //for example we can use strtotime
-            if (property_exists($row->Metadata, 'strtotime')) {
-                switch (gettype($row->Metadata->strtotime)) {
+            if (property_exists($row->metadata, 'strtotime')) {
+                switch (gettype($row->metadata->strtotime)) {
                     case 'object':
                         if (
-                            property_exists($row->Metadata->strtotime, 'dayOfTheWeek')
-                            && property_exists($row->Metadata->strtotime, 'relativeTime')
-                            && property_exists($row->Metadata->strtotime, 'festivityKey')
+                            property_exists($row->metadata->strtotime, 'day_of_the_week')
+                            && property_exists($row->metadata->strtotime, 'relative_time')
+                            && property_exists($row->metadata->strtotime, 'festivity_key')
                         ) {
-                            $festivity = $this->Cal->getFestivity($row->Metadata->strtotime->festivityKey);
+                            $festivity = $this->Cal->getFestivity($row->metadata->strtotime->festivity_key);
                             if ($festivity !== null) {
                                 $relString = '';
-                                $row->Festivity->DATE = clone( $festivity->date );
-                                switch ($row->Metadata->strtotime->relativeTime) {
+                                $row->festivity->DATE = clone( $festivity->date );
+                                switch ($row->metadata->strtotime->relative_time) {
                                     case 'before':
-                                        $row->Festivity->DATE->modify("previous {$row->Metadata->strtotime->dayOfTheWeek}");
+                                        $row->festivity->DATE->modify("previous {$row->metadata->strtotime->day_of_the_week}");
                                          /**translators: e.g. 'Monday before Palm Sunday' */
                                         $relString = _('before');
                                         break;
                                     case 'after':
-                                        $row->Festivity->DATE->modify("next {$row->Metadata->strtotime->dayOfTheWeek}");
+                                        $row->festivity->DATE->modify("next {$row->metadata->strtotime->day_of_the_week}");
                                         /**translators: e.g. 'Monday after Pentecost' */
                                         $relString = _('after');
                                         break;
@@ -1909,16 +1910,16 @@ class Calendar
                                         $this->Messages[] = sprintf(
                                             /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
                                             _('Cannot create mobile festivity \'%1$s\': can only be relative to festivity with key \'%2$s\' using keywords %3$s'),
-                                            $row->Festivity->name,
-                                            $row->Metadata->strtotime->festivityKey,
+                                            $row->festivity->name,
+                                            $row->metadata->strtotime->festivity_key,
                                             implode(', ', ['\'before\'', '\'after\''])
                                         );
                                         break;
                                 }
                                 $dayOfTheWeek = $this->CalendarParams->Locale === LitLocale::LATIN
-                                    ? LitMessages::LATIN_DAYOFTHEWEEK[ $row->Festivity->DATE->format('w') ]
-                                    : ucfirst($this->dayOfTheWeek->format($row->Festivity->DATE->format('U')));
-                                $row->Metadata->addedWhen = $dayOfTheWeek . ' ' . $relString . ' ' . $festivity->name;
+                                    ? LitMessages::LATIN_DAYOFTHEWEEK[ $row->festivity->DATE->format('w') ]
+                                    : ucfirst($this->dayOfTheWeek->format($row->festivity->DATE->format('U')));
+                                $row->metadata->added_when = $dayOfTheWeek . ' ' . $relString . ' ' . $festivity->name;
                                 if (true === $this->checkCoincidencesNewMobileFestivity($row)) {
                                     $this->createMobileFestivity($row);
                                 }
@@ -1926,25 +1927,25 @@ class Calendar
                                 $this->Messages[] = sprintf(
                                     /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
                                     _('Cannot create mobile festivity \'%1$s\' relative to festivity with key \'%2$s\''),
-                                    $row->Festivity->name,
-                                    $row->Metadata->strtotime->festivityKey
+                                    $row->festivity->name,
+                                    $row->metadata->strtotime->festivity_key
                                 );
                             }
                         } else {
                             $this->Messages[] = sprintf(
                                 /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created 2. list of properties */
                                 _('Cannot create mobile festivity \'%1$s\': when the \'strtotime\' property is an object, it must have properties %2$s'),
-                                $row->Festivity->name,
+                                $row->festivity->name,
                                 implode(', ', ['\'day_of_the_week\'', '\'relative_time\'', '\'festivity_key\''])
                             );
                         }
                         break;
                     case 'string':
-                        if ($row->Metadata->strtotime !== '') {
-                            $festivityDateTS = strtotime($row->Metadata->strtotime . ' ' . $this->CalendarParams->Year . ' UTC');
-                            $row->Festivity->DATE = new DateTime("@$festivityDateTS");
-                            $row->Festivity->DATE->setTimeZone(new \DateTimeZone('UTC'));
-                            $row->Metadata->addedWhen = $row->Metadata->strtotime;
+                        if ($row->metadata->strtotime !== '') {
+                            $festivityDateTS = strtotime($row->metadata->strtotime . ' ' . $this->CalendarParams->Year . ' UTC');
+                            $row->festivity->DATE = new DateTime("@$festivityDateTS");
+                            $row->festivity->DATE->setTimeZone(new \DateTimeZone('UTC'));
+                            $row->metadata->added_when = $row->metadata->strtotime;
                             if (true === $this->checkCoincidencesNewMobileFestivity($row)) {
                                 $this->createMobileFestivity($row);
                             }
@@ -1954,36 +1955,36 @@ class Calendar
                         $this->Messages[] = sprintf(
                             /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created */
                             _('Cannot create mobile festivity \'%1$s\': \'strtotime\' property must be either an object or a string! Currently it has type \'%2$s\''),
-                            $row->Festivity->name,
-                            gettype($row->Metadata->strtotime)
+                            $row->festivity->name,
+                            gettype($row->metadata->strtotime)
                         );
                 }
             } else {
                 $this->Messages[] = sprintf(
                     /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created */
                     _('Cannot create mobile festivity \'%1$s\' without a \'strtotime\' property!'),
-                    $row->Festivity->name
+                    $row->festivity->name
                 );
             }
         } else {
-            $row->Festivity->DATE = DateTime::createFromFormat(
+            $row->festivity->DATE = DateTime::createFromFormat(
                 '!j-n-Y',
-                "{$row->Festivity->DAY}-{$row->Festivity->MONTH}-{$this->CalendarParams->Year}",
+                "{$row->festivity->DAY}-{$row->festivity->MONTH}-{$this->CalendarParams->Year}",
                 new \DateTimeZone('UTC')
             );
             $decree = $this->elaborateDecreeSource($row);
             $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
-            if ($row->Festivity->GRADE === LitGrade::MEMORIAL_OPT) {
-                if ($this->Cal->notInSolemnitiesFeastsOrMemorials($row->Festivity->DATE)) {
+            if ($row->festivity->GRADE === LitGrade::MEMORIAL_OPT) {
+                if ($this->Cal->notInSolemnitiesFeastsOrMemorials($row->festivity->DATE)) {
                     $festivity = new Festivity(
-                        $row->Festivity->NAME,
-                        $row->Festivity->DATE,
-                        $row->Festivity->COLOR,
+                        $row->festivity->NAME,
+                        $row->festivity->DATE,
+                        $row->festivity->COLOR,
                         LitFeastType::FIXED,
-                        $row->Festivity->GRADE,
-                        $row->Festivity->COMMON
+                        $row->festivity->GRADE,
+                        $row->festivity->COMMON
                     );
-                    $this->Cal->addFestivity($row->Festivity->TAG, $festivity);
+                    $this->Cal->addFestivity($row->festivity->TAG, $festivity);
                     $this->Messages[] = sprintf(
                         /**translators:
                          * 1. Grade or rank of the festivity
@@ -1994,14 +1995,14 @@ class Calendar
                          * 6. Requested calendar year
                          */
                         _('The %1$s \'%2$s\' has been added on %3$s since the year %4$d (%5$s), applicable to the year %6$d.'),
-                        $this->LitGrade->i18n($row->Festivity->GRADE, false),
-                        $row->Festivity->NAME,
+                        $this->LitGrade->i18n($row->festivity->GRADE, false),
+                        $row->festivity->NAME,
                         $locale === LitLocale::LATIN
-                            ? ( $row->Festivity->DATE->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->Festivity->DATE->format('n') ] )
-                            : ( $locale === 'EN' ? $row->Festivity->DATE->format('F jS') :
-                                $this->dayAndMonth->format($row->Festivity->DATE->format('U'))
+                            ? ( $row->festivity->DATE->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->festivity->DATE->format('n') ] )
+                            : ( $locale === 'EN' ? $row->festivity->DATE->format('F jS') :
+                                $this->dayAndMonth->format($row->festivity->DATE->format('U'))
                             ),
-                        $row->Metadata->sinceYear,
+                        $row->metadata->since_year,
                         $decree,
                         $this->CalendarParams->Year
                     );
@@ -2014,13 +2015,13 @@ class Calendar
 
     private function setPropertyBasedOnDecree(object $row): void
     {
-        $festivity = $this->Cal->getFestivity($row->Festivity->TAG);
+        $festivity = $this->Cal->getFestivity($row->festivity->TAG);
         if ($festivity !== null) {
             $decree = $this->elaborateDecreeSource($row);
-            switch ($row->Metadata->property) {
+            switch ($row->metadata->property) {
                 case "name":
                     //example: StMartha becomes Martha, Mary and Lazarus in 2021
-                    $this->Cal->setProperty($row->Festivity->TAG, "name", $row->Festivity->NAME);
+                    $this->Cal->setProperty($row->festivity->TAG, "name", $row->festivity->NAME);
                     /**translators:
                      * 1. Grade or rank of the festivity
                      * 2. Name of the festivity
@@ -2034,14 +2035,14 @@ class Calendar
                         $message,
                         $this->LitGrade->i18n($festivity->grade, false),
                         '<i>' . $festivity->name . '</i>',
-                        '<i>' . $row->Festivity->NAME . '</i>',
-                        $row->Metadata->sinceYear,
+                        '<i>' . $row->festivity->NAME . '</i>',
+                        $row->metadata->since_year,
                         $this->CalendarParams->Year,
                         $decree
                     );
                     break;
                 case "grade":
-                    if ($row->Festivity->GRADE > $festivity->grade) {
+                    if ($row->festivity->GRADE > $festivity->grade) {
                         //example: StMaryMagdalene raised to Feast in 2016
                         /**translators:
                          * 1. Grade or rank of the festivity
@@ -2067,12 +2068,12 @@ class Calendar
                         $message,
                         $this->LitGrade->i18n($festivity->grade, false),
                         $festivity->name,
-                        $this->LitGrade->i18n($row->Festivity->GRADE, false),
-                        $row->Metadata->sinceYear,
+                        $this->LitGrade->i18n($row->festivity->GRADE, false),
+                        $row->metadata->since_year,
                         $this->CalendarParams->Year,
                         $decree
                     );
-                    $this->Cal->setProperty($row->Festivity->TAG, "grade", $row->Festivity->GRADE);
+                    $this->Cal->setProperty($row->festivity->TAG, "grade", $row->festivity->GRADE);
                     break;
             }
         }
@@ -2112,12 +2113,27 @@ class Calendar
         }
     }
 
+    private function getBestLangFromMap(object $map): string
+    {
+        if (property_exists($map, LitLocale::$PRIMARY_LANGUAGE)) {
+            return $map->{LitLocale::$PRIMARY_LANGUAGE};
+        } elseif (property_exists($map, 'la')) {
+            return $map->la;
+        } elseif (property_exists($map, 'en')) {
+            return $map->en;
+        } else {
+            $objIterator = new \ArrayIterator($map);
+            return $objIterator->key();
+        }
+    }
+
     private function elaborateDecreeSource(object $row): string
     {
-        $lang = ( property_exists($row->metadata, 'url_lang_map') && property_exists($row->metadata->url_lang_map, LitLocale::$PRIMARY_LANGUAGE) ) ?
-            $row->metadata->url_lang_map->{LitLocale::$PRIMARY_LANGUAGE} :
-            "en";
-        $url = str_contains($row->metadata->url, '%s') ? sprintf($row->metadata->url, $lang) : $row->metadata->url;
+        $url = $row->metadata->url;
+        if (property_exists($row->metadata, 'url_lang_map') && str_contains($url, '%s')) {
+            $lang = $this->getBestLangFromMap($row->metadata->url_lang_map);
+            $url = sprintf($url, $lang);
+        }
         return '<a href="' . $url . '">' . _("Decree of the Congregation for Divine Worship") . '</a>';
     }
 
@@ -2135,30 +2151,6 @@ class Calendar
             );
             foreach ($MemorialsFromDecrees as $row) {
                 if ($this->CalendarParams->Year >= $row->metadata->since_year) {
-                    // TODO: until we update all JSON resources with a snake case schema, we'll just convert those that are using snake case schema to our old schema
-                    if (property_exists($row, "festivity")) {
-                        $row->Festivity = $row->festivity;
-                    }
-                    if (property_exists($row, "metadata")) {
-                        $row->Metadata = $row->metadata;
-                        if (property_exists($row->metadata, 'strototime') && gettype($row->metadata->strtotime === 'object')) {
-                            foreach ($row->metadata->strtotime as $key => $value) {
-                                switch ($key) {
-                                    case 'day_of_the_week':
-                                        $row->Metadata->strtotime->dayOfTheWeek = $value;
-                                        break;
-                                    case 'relative_time':
-                                        $row->Metadata->strtotime->relativeTime = $value;
-                                        break;
-                                    case 'festivity_key':
-                                        $row->Metadata->strtotime->festivityKey = $value;
-                                        break;
-                                }
-                            }
-                        }
-                    }
-                    // END TODO
-
                     switch ($row->metadata->action) {
                         case "createNew":
                             //example: MaryMotherChurch in 2018
@@ -2184,18 +2176,19 @@ class Calendar
     private function createMobileFestivity(object $row): void
     {
         $festivity = new Festivity(
-            $row->Festivity->NAME,
-            $row->Festivity->DATE,
-            $row->Festivity->COLOR,
+            $row->festivity->NAME,
+            $row->festivity->DATE,
+            $row->festivity->COLOR,
             LitFeastType::MOBILE,
-            $row->Festivity->GRADE,
-            $row->Festivity->COMMON
+            $row->festivity->GRADE,
+            $row->festivity->COMMON
         );
-        $this->Cal->addFestivity($row->Festivity->TAG, $festivity);
-        $lang = ( property_exists($row->Metadata, 'decreeLangs') && property_exists($row->Metadata->decreeLangs, $this->CalendarParams->Locale) ) ?
-            $row->Metadata->decreeLangs->{$this->CalendarParams->Locale} :
-            "en";
-        $url = str_contains($row->Metadata->decreeURL, '%s') ? sprintf($row->Metadata->decreeURL, $lang) : $row->Metadata->decreeURL;
+        $this->Cal->addFestivity($row->festivity->TAG, $festivity);
+        $url = $row->metadata->url;
+        if (property_exists($row->metadata, 'url_lang_map') && str_contains($url, '%s')) {
+            $lang = $this->getBestLangFromMap($row->metadata->url_lang_map);
+            $url = sprintf($url, $lang);
+        }
         $decree = '<a href="' . $url . '">' . _("Decree of the Congregation for Divine Worship") . '</a>';
 
         $this->Messages[] = sprintf(
@@ -2208,10 +2201,10 @@ class Calendar
              * 6. Requested calendar year
              */
             _('The %1$s \'%2$s\' has been added on %3$s since the year %4$d (%5$s), applicable to the year %6$d.'),
-            $this->LitGrade->i18n($row->Festivity->GRADE, false),
-            $row->Festivity->NAME,
-            $row->Metadata->addedWhen,
-            $row->Metadata->sinceYear,
+            $this->LitGrade->i18n($row->festivity->GRADE, false),
+            $row->festivity->NAME,
+            $row->metadata->added_when,
+            $row->metadata->since_year,
             $decree,
             $this->CalendarParams->Year
         );
@@ -2219,19 +2212,20 @@ class Calendar
 
     private function checkCoincidencesNewMobileFestivity(object $row): bool
     {
-        if ($row->Festivity->GRADE === LitGrade::MEMORIAL) {
-            $lang = ( property_exists($row->Metadata, 'decreeLangs') && property_exists($row->Metadata->decreeLangs, $this->CalendarParams->Locale) ) ?
-                $row->Metadata->decreeLangs->{$this->CalendarParams->Locale} :
-                "en";
-            $url = str_contains($row->Metadata->decreeURL, '%s') ? sprintf($row->Metadata->decreeURL, $lang) : $row->Metadata->decreeURL;
+        if ($row->festivity->GRADE === LitGrade::MEMORIAL) {
+            $url = $row->metadata->url;
+            if (property_exists($row->metadata, 'url_lang_map') && str_contains($url, '%s')) {
+                $lang = $this->getBestLangFromMap($row->metadata->url_lang_map);
+                $url = sprintf($url, $lang);
+            }
             $decree = '<a href="' . $url . '">' . _("Decree of the Congregation for Divine Worship") . '</a>';
 
             //A Memorial is superseded by Solemnities and Feasts, but not by Memorials of Saints
-            if ($this->Cal->inSolemnities($row->Festivity->DATE) || $this->Cal->inFeasts($row->Festivity->DATE)) {
-                if ($this->Cal->inSolemnities($row->Festivity->DATE)) {
-                    $coincidingFestivity = $this->Cal->solemnityFromDate($row->Festivity->DATE);
+            if ($this->Cal->inSolemnities($row->festivity->DATE) || $this->Cal->inFeasts($row->festivity->DATE)) {
+                if ($this->Cal->inSolemnities($row->festivity->DATE)) {
+                    $coincidingFestivity = $this->Cal->solemnityFromDate($row->festivity->DATE);
                 } else {
-                    $coincidingFestivity = $this->Cal->feastOrMemorialFromDate($row->Festivity->DATE);
+                    $coincidingFestivity = $this->Cal->feastOrMemorialFromDate($row->festivity->DATE);
                 }
 
                 $this->Messages[] = sprintf(
@@ -2246,10 +2240,10 @@ class Calendar
                      * 8. Requested calendar year
                      */
                     _('The %1$s \'%2$s\', added on %3$s since the year %4$d (%5$s), is however superseded by the %6$s \'%7$s\' in the year %8$d.'),
-                    $this->LitGrade->i18n($row->Festivity->GRADE, false),
-                    '<i>' . $row->Festivity->NAME . '</i>',
-                    $row->Metadata->addedWhen,
-                    $row->Metadata->sinceYear,
+                    $this->LitGrade->i18n($row->festivity->GRADE, false),
+                    '<i>' . $row->festivity->NAME . '</i>',
+                    $row->metadata->added_when,
+                    $row->metadata->since_year,
                     $decree,
                     $coincidingFestivity->grade,
                     '<i>' . $coincidingFestivity->name . '</i>',
@@ -2257,8 +2251,8 @@ class Calendar
                 );
                 return false;
             } else {
-                if ($this->Cal->inCalendar($row->Festivity->DATE)) {
-                    $coincidingFestivities = $this->Cal->getCalEventsFromDate($row->Festivity->DATE);
+                if ($this->Cal->inCalendar($row->festivity->DATE)) {
+                    $coincidingFestivities = $this->Cal->getCalEventsFromDate($row->festivity->DATE);
                     if (count($coincidingFestivities) > 0) {
                         foreach ($coincidingFestivities as $coincidingFestivityKey => $coincidingFestivity) {
                             $this->Messages[] = sprintf(
@@ -2275,10 +2269,10 @@ class Calendar
                                 _('In the year %1$d, the %2$s \'%3$s\' has been suppressed by the %4$s \'%5$s\', added on %6$s since the year %7$d (%8$s).'),
                                 $this->LitGrade->i18n($coincidingFestivity->grade, false),
                                 '<i>' . $coincidingFestivity->name . '</i>',
-                                $this->LitGrade->i18n($row->Festivity->GRADE, false),
-                                '<i>' . $row->Festivity->NAME . '</i>',
-                                $row->Metadata->addedWhen,
-                                $row->Metadata->sinceYear,
+                                $this->LitGrade->i18n($row->festivity->GRADE, false),
+                                '<i>' . $row->festivity->NAME . '</i>',
+                                $row->metadata->added_when,
+                                $row->metadata->since_year,
                                 $decree
                             );
                             $this->Cal->removeFestivity($coincidingFestivityKey);
@@ -2575,14 +2569,14 @@ class Calendar
         if (file_exists($nationalDataFile)) {
             $this->NationalData = json_decode(file_get_contents($nationalDataFile));
             if (json_last_error() === JSON_ERROR_NONE) {
-                if (property_exists($this->NationalData, "Metadata") && property_exists($this->NationalData->Metadata, "WiderRegion")) {
-                    $widerRegionDataFile = $this->NationalData->Metadata->WiderRegion->jsonFile;
-                    $widerRegionI18nFile = $this->NationalData->Metadata->WiderRegion->i18nFile;
+                if (property_exists($this->NationalData, "Metadata") && property_exists($this->NationalData->metadata, "wider_region")) {
+                    $widerRegionDataFile = $this->NationalData->metadata->wider_region->jsonfile;
+                    $widerRegionI18nFile = $this->NationalData->metadata->wider_region->i18nfile;
                     if (file_exists($widerRegionI18nFile)) {
                         $widerRegionI18nData = json_decode(file_get_contents($widerRegionI18nFile));
                         if (json_last_error() === JSON_ERROR_NONE && file_exists($widerRegionDataFile)) {
                             $this->WiderRegionData = json_decode(file_get_contents($widerRegionDataFile));
-                            if (json_last_error() === JSON_ERROR_NONE && property_exists($this->WiderRegionData, "LitCal")) {
+                            if (json_last_error() === JSON_ERROR_NONE && property_exists($this->WiderRegionData, "litcal")) {
                                 foreach ($this->WiderRegionData->LitCal as $idx => $value) {
                                     $tag = $value->Festivity->tag;
                                     $this->WiderRegionData->LitCal[$idx]->Festivity->name = $widerRegionI18nData->{ $tag };
@@ -2605,20 +2599,20 @@ class Calendar
 
     private function handleMissingFestivity(object $row): void
     {
-        $currentFeastDate = DateTime::createFromFormat('!j-n-Y', "{$row->Festivity->day}-{$row->Festivity->month}-" . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
+        $currentFeastDate = DateTime::createFromFormat('!j-n-Y', "{$row->festivity->day}-{$row->festivity->month}-" . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
         //let's also get the name back from the database, so we can give some feedback and maybe even recreate the festivity
         if ($this->Cal->inSolemnitiesFeastsOrMemorials($currentFeastDate) || self::dateIsSunday($currentFeastDate)) {
             $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast($currentFeastDate, $this->CalendarParams);
             if ($this->Cal->inFeastsOrMemorials($currentFeastDate)) {
                 //we should probably be able to create it anyways in this case?
                 $this->Cal->addFestivity(
-                    $row->Festivity->tag,
+                    $row->festivity->tag,
                     new Festivity(
-                        $row->Festivity->name,
+                        $row->festivity->name,
                         $currentFeastDate,
-                        $row->Festivity->color,
+                        $row->festivity->color,
                         LitFeastType::FIXED,
-                        $row->Festivity->grade,
+                        $row->festivity->grade,
                         LitCommon::PROPRIO
                     )
                 );
@@ -2633,8 +2627,8 @@ class Calendar
                  * 6. Requested calendar year
                  */
                 _('The %1$s \'%2$s\', usually celebrated on %3$s, is suppressed by the %4$s \'%5$s\' in the year %6$d.'),
-                $this->LitGrade->i18n($row->Festivity->grade, false),
-                $row->Festivity->name,
+                $this->LitGrade->i18n($row->festivity->grade, false),
+                $row->festivity->name,
                 $this->dayAndMonth->format($currentFeastDate->format('U')),
                 $coincidingFestivity->grade,
                 $coincidingFestivity->event->name,
@@ -2645,14 +2639,14 @@ class Calendar
 
     private function festivityCanBeCreated(object $row): bool
     {
-        switch ($row->Festivity->grade) {
+        switch ($row->festivity->grade) {
             case LitGrade::MEMORIAL_OPT:
-                return $this->Cal->notInSolemnitiesFeastsOrMemorials($row->Festivity->DATE);
+                return $this->Cal->notInSolemnitiesFeastsOrMemorials($row->festivity->DATE);
             case LitGrade::MEMORIAL:
-                return $this->Cal->notInSolemnitiesOrFeasts($row->Festivity->DATE);
+                return $this->Cal->notInSolemnitiesOrFeasts($row->festivity->DATE);
                 //however we still have to handle possible coincidences with another memorial
             case LitGrade::FEAST:
-                return $this->Cal->notInSolemnities($row->Festivity->DATE);
+                return $this->Cal->notInSolemnities($row->festivity->DATE);
                 //however we still have to handle possible coincidences with another feast
             case LitGrade::SOLEMNITY:
                 return true;
@@ -2663,16 +2657,16 @@ class Calendar
 
     private function festivityDoesNotCoincide(object $row): bool
     {
-        switch ($row->Festivity->grade) {
+        switch ($row->festivity->grade) {
             case LitGrade::MEMORIAL_OPT:
                 return true;
                 //optional memorials never have problems as regards coincidence with another optional memorial
             case LitGrade::MEMORIAL:
-                return $this->Cal->notInMemorials($row->Festivity->DATE);
+                return $this->Cal->notInMemorials($row->festivity->DATE);
             case LitGrade::FEAST:
-                return $this->Cal->notInFeasts($row->Festivity->DATE);
+                return $this->Cal->notInFeasts($row->festivity->DATE);
             case LitGrade::SOLEMNITY:
-                return $this->Cal->notInSolemnities($row->Festivity->DATE);
+                return $this->Cal->notInSolemnities($row->festivity->DATE);
         }
         //functions should generally have a default return value
         //however, it would make no sense to give a default return value here
@@ -2681,10 +2675,10 @@ class Calendar
 
     private function handleFestivityCreationWithCoincidence(object $row): void
     {
-        switch ($row->Festivity->grade) {
+        switch ($row->festivity->grade) {
             case LitGrade::MEMORIAL:
                 //both memorials become optional memorials
-                $coincidingFestivities = $this->Cal->getCalEventsFromDate($row->Festivity->DATE);
+                $coincidingFestivities = $this->Cal->getCalEventsFromDate($row->festivity->DATE);
                 $coincidingMemorials = array_filter($coincidingFestivities, function ($el) {
                     return $el->grade === LitGrade::MEMORIAL;
                 });
@@ -2694,14 +2688,14 @@ class Calendar
                     $coincidingMemorialName = $value->name;
                 }
                 $festivity = new Festivity(
-                    $row->Festivity->name,
-                    $row->Festivity->DATE,
-                    $row->Festivity->color,
+                    $row->festivity->name,
+                    $row->festivity->DATE,
+                    $row->festivity->color,
                     LitFeastType::FIXED,
                     LitGrade::MEMORIAL_OPT,
-                    $row->Festivity->common
+                    $row->festivity->common
                 );
-                $this->Cal->addFestivity($row->Festivity->tag, $festivity);
+                $this->Cal->addFestivity($row->festivity->tag, $festivity);
                 $this->Messages[] = sprintf(
                     /**translators:
                      * 1. Name of the first coinciding Memorial
@@ -2710,7 +2704,7 @@ class Calendar
                      * 4. Source of the information
                      */
                     _('The Memorial \'%1$s\' coincides with another Memorial \'%2$s\' in the year %3$d. They are both reduced in rank to optional memorials.'),
-                    $row->Festivity->name,
+                    $row->festivity->name,
                     $coincidingMemorialName,
                     $this->CalendarParams->Year
                 );
@@ -2718,7 +2712,7 @@ class Calendar
             case LitGrade::FEAST:
                 //there seems to be a coincidence with a different Feast on the same day!
                 //what should we do about this? perhaps move one of them?
-                $coincidingFestivities = $this->Cal->getCalEventsFromDate($row->Festivity->DATE);
+                $coincidingFestivities = $this->Cal->getCalEventsFromDate($row->festivity->DATE);
                 $coincidingFeasts = array_filter($coincidingFestivities, function ($el) {
                     return $el->grade === LitGrade::FEAST;
                 });
@@ -2732,8 +2726,8 @@ class Calendar
                     . sprintf(
                         /**translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year */
                         _('The Feast \'%1$s\', usually celebrated on %2$s, coincides with another Feast \'%3$s\' in the year %4$d! Does something need to be done about this?'),
-                        '<b>' . $row->Festivity->name . '</b>',
-                        '<b>' . $this->dayAndMonth->format($row->Festivity->DATE->format('U')) . '</b>',
+                        '<b>' . $row->festivity->name . '</b>',
+                        '<b>' . $this->dayAndMonth->format($row->festivity->DATE->format('U')) . '</b>',
                         '<b>' . $coincidingFeastName . '</b>',
                         $this->CalendarParams->Year
                     );
@@ -2746,9 +2740,9 @@ class Calendar
                     . sprintf(
                         /**translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year */
                         _('The Solemnity \'%1$s\', usually celebrated on %2$s, coincides with the Sunday or Solemnity \'%3$s\' in the year %4$d! Does something need to be done about this?'),
-                        '<i>' . $row->Festivity->name . '</i>',
-                        '<b>' . $this->dayAndMonth->format($row->Festivity->DATE->format('U')) . '</b>',
-                        '<i>' . $this->Cal->solemnityFromDate($row->Festivity->DATE)->name . '</i>',
+                        '<i>' . $row->festivity->name . '</i>',
+                        '<b>' . $this->dayAndMonth->format($row->festivity->DATE->format('U')) . '</b>',
+                        '<i>' . $this->Cal->solemnityFromDate($row->festivity->DATE)->name . '</i>',
                         $this->CalendarParams->Year
                     );
                 break;
@@ -2758,23 +2752,23 @@ class Calendar
     private function createNewRegionalOrNationalFestivity(object $row): void
     {
         if (
-            property_exists($row->Festivity, 'strtotime')
-            && $row->Festivity->strtotime !== ''
+            property_exists($row->festivity, 'strtotime')
+            && $row->festivity->strtotime !== ''
         ) {
-            $festivityDateTS = strtotime($row->Festivity->strtotime . ' ' . $this->CalendarParams->Year . ' UTC');
-            $row->Festivity->DATE = new DateTime("@$festivityDateTS");
-            $row->Festivity->DATE->setTimeZone(new \DateTimeZone('UTC'));
+            $festivityDateTS = strtotime($row->festivity->strtotime . ' ' . $this->CalendarParams->Year . ' UTC');
+            $row->festivity->DATE = new DateTime("@$festivityDateTS");
+            $row->festivity->DATE->setTimeZone(new \DateTimeZone('UTC'));
         } elseif (
-            property_exists($row->Festivity, 'month')
-            && $row->Festivity->month >= 1
-            && $row->Festivity->month <= 12
-            && property_exists($row->Festivity, 'day')
-            && $row->Festivity->day >= 1
-            && $row->Festivity->day <= cal_days_in_month(CAL_GREGORIAN, $row->Festivity->month, $this->CalendarParams->Year)
+            property_exists($row->festivity, 'month')
+            && $row->festivity->month >= 1
+            && $row->festivity->month <= 12
+            && property_exists($row->festivity, 'day')
+            && $row->festivity->day >= 1
+            && $row->festivity->day <= cal_days_in_month(CAL_GREGORIAN, $row->festivity->month, $this->CalendarParams->Year)
         ) {
-            $row->Festivity->DATE = DateTime::createFromFormat(
+            $row->festivity->DATE = DateTime::createFromFormat(
                 '!j-n-Y',
-                "{$row->Festivity->day}-{$row->Festivity->month}-{$this->CalendarParams->Year}",
+                "{$row->festivity->day}-{$row->festivity->month}-{$this->CalendarParams->Year}",
                 new \DateTimeZone('UTC')
             );
         } else {
@@ -2787,37 +2781,37 @@ class Calendar
         }
         if ($this->festivityCanBeCreated($row)) {
             if ($this->festivityDoesNotCoincide($row)) {
-                if (!property_exists($row->Festivity, 'type') || !LitFeastType::isValid($row->Festivity->type)) {
-                    $row->Festivity->type = property_exists($row->Festivity, 'strtotime') ? LitFeastType::MOBILE : LitFeastType::FIXED;
+                if (!property_exists($row->festivity, 'type') || !LitFeastType::isValid($row->festivity->type)) {
+                    $row->festivity->type = property_exists($row->festivity, 'strtotime') ? LitFeastType::MOBILE : LitFeastType::FIXED;
                 }
                 $festivity = new Festivity(
-                    $row->Festivity->name,
-                    $row->Festivity->DATE,
-                    $row->Festivity->color,
-                    $row->Festivity->type,
-                    $row->Festivity->grade,
-                    $row->Festivity->common
+                    $row->festivity->name,
+                    $row->festivity->DATE,
+                    $row->festivity->color,
+                    $row->festivity->type,
+                    $row->festivity->grade,
+                    $row->festivity->common
                 );
-                $this->Cal->addFestivity($row->Festivity->tag, $festivity);
+                $this->Cal->addFestivity($row->festivity->tag, $festivity);
             } else {
                 $this->handleFestivityCreationWithCoincidence($row);
             }
             $infoSource = 'unknown';
-            if (property_exists($row->Metadata, 'decreeURL')) {
+            if (property_exists($row->metadata, 'url')) {
                 $infoSource = $this->elaborateDecreeSource($row);
-            } elseif (property_exists($row->Metadata, 'missal')) {
-                $infoSource = RomanMissal::getName($row->Metadata->missal);
+            } elseif (property_exists($row->metadata, 'missal')) {
+                $infoSource = RomanMissal::getName($row->metadata->missal);
             }
 
             $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
             $formattedDateStr = $this->CalendarParams->Locale === LitLocale::LATIN
-                ? ( $row->Festivity->DATE->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->Festivity->DATE->format('n') ] )
+                ? ( $row->festivity->DATE->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->festivity->DATE->format('n') ] )
                 : ( $locale === 'EN'
-                    ? $row->Festivity->DATE->format('F jS')
-                    : $this->dayAndMonth->format($row->Festivity->DATE->format('U'))
+                    ? $row->festivity->DATE->format('F jS')
+                    : $this->dayAndMonth->format($row->festivity->DATE->format('U'))
                 );
-            $dateStr = property_exists($row->Festivity, 'strtotime') && $row->Festivity->strtotime !== ''
-                ? '<i>' . $row->Festivity->strtotime . '</i>'
+            $dateStr = property_exists($row->festivity, 'strtotime') && $row->festivity->strtotime !== ''
+                ? '<i>' . $row->festivity->strtotime . '</i>'
                 : $formattedDateStr;
             $this->Messages[] = sprintf(
                 /**translators:
@@ -2829,10 +2823,10 @@ class Calendar
                  * 6. Requested calendar year
                  */
                 _('The %1$s \'%2$s\' has been added on %3$s since the year %4$d (%5$s), applicable to the year %6$d.'),
-                $this->LitGrade->i18n($row->Festivity->grade, false),
-                $row->Festivity->name,
+                $this->LitGrade->i18n($row->festivity->grade, false),
+                $row->festivity->name,
                 $dateStr,
-                $row->Metadata->sinceYear,
+                $row->metadata->since_year,
                 $infoSource,
                 $this->CalendarParams->Year
             );
@@ -2844,20 +2838,20 @@ class Calendar
     private function handleNationalCalendarRows(array $rows): void
     {
         foreach ($rows as $row) {
-            if ($this->CalendarParams->Year >= $row->Metadata->sinceYear) {
-                if (property_exists($row->Metadata, "untilYear") && $this->CalendarParams->Year >= $row->Metadata->untilYear) {
+            if ($this->CalendarParams->Year >= $row->metadata->since_year) {
+                if (property_exists($row->metadata, "untilYear") && $this->CalendarParams->Year >= $row->metadata->until_year) {
                     continue;
                 } else {
                     //if either the property doesn't exist (so no limit is set)
                     //or there is a limit but we are within those limits
-                    switch ($row->Metadata->action) {
+                    switch ($row->metadata->action) {
                         case "makePatron":
-                            $festivity = $this->Cal->getFestivity($row->Festivity->tag);
+                            $festivity = $this->Cal->getFestivity($row->festivity->tag);
                             if ($festivity !== null) {
-                                if ($festivity->grade !== $row->Festivity->grade) {
-                                    $this->Cal->setProperty($row->Festivity->tag, "grade", $row->Festivity->grade);
+                                if ($festivity->grade !== $row->festivity->grade) {
+                                    $this->Cal->setProperty($row->festivity->tag, "grade", $row->festivity->grade);
                                 }
-                                $this->Cal->setProperty($row->Festivity->tag, "name", $row->Festivity->name);
+                                $this->Cal->setProperty($row->festivity->tag, "name", $row->festivity->name);
                             } else {
                                 $this->handleMissingFestivity($row);
                             }
@@ -2866,22 +2860,22 @@ class Calendar
                             $this->createNewRegionalOrNationalFestivity($row);
                             break;
                         case "setProperty":
-                            switch ($row->Metadata->property) {
+                            switch ($row->metadata->property) {
                                 case "name":
-                                    $this->Cal->setProperty($row->Festivity->tag, "name", $row->Festivity->name);
+                                    $this->Cal->setProperty($row->festivity->tag, "name", $row->festivity->name);
                                     break;
                                 case "grade":
-                                    $this->Cal->setProperty($row->Festivity->tag, "grade", $row->Festivity->grade);
+                                    $this->Cal->setProperty($row->festivity->tag, "grade", $row->festivity->grade);
                                     break;
                             }
                             break;
                         case "moveFestivity":
                             $festivityNewDate = DateTime::createFromFormat(
                                 '!j-n-Y',
-                                $row->Festivity->day . '-' . $row->Festivity->month . '-' . $this->CalendarParams->Year,
+                                $row->festivity->day . '-' . $row->festivity->month . '-' . $this->CalendarParams->Year,
                                 new \DateTimeZone('UTC')
                             );
-                            $this->moveFestivityDate($row->Festivity->tag, $festivityNewDate, $row->Metadata->reason, $row->Metadata->missal);
+                            $this->moveFestivityDate($row->festivity->tag, $festivityNewDate, $row->metadata->reason, $row->metadata->missal);
                             break;
                     }
                 }
@@ -2892,20 +2886,20 @@ class Calendar
     private function applyNationalCalendar(): void
     {
         //first thing is apply any wider region festivities, such as Patron Saints of the Wider Region (example: Europe)
-        if ($this->WiderRegionData !== null && property_exists($this->WiderRegionData, "LitCal")) {
-            $this->handleNationalCalendarRows($this->WiderRegionData->LitCal);
+        if ($this->WiderRegionData !== null && property_exists($this->WiderRegionData, "litcal")) {
+            $this->handleNationalCalendarRows($this->WiderRegionData->litcal);
         }
 
-        if ($this->NationalData !== null && property_exists($this->NationalData, "LitCal")) {
-            $this->handleNationalCalendarRows($this->NationalData->LitCal);
+        if ($this->NationalData !== null && property_exists($this->NationalData, "litcal")) {
+            $this->handleNationalCalendarRows($this->NationalData->litcal);
         }
 
-        if ($this->NationalData !== null && property_exists($this->NationalData, "Metadata") && property_exists($this->NationalData->Metadata, "Missals")) {
-            if ($this->NationalData->Metadata->Region === 'UNITED STATES') {
-                $this->NationalData->Metadata->Region = 'USA';
+        if ($this->NationalData !== null && property_exists($this->NationalData, "Metadata") && property_exists($this->NationalData->metadata, "missals")) {
+            if ($this->NationalData->metadata->Region === 'UNITED STATES') {
+                $this->NationalData->metadata->Region = 'USA';
             }
-            $this->Messages[] = "Found Missals for region " . $this->NationalData->Metadata->Region . ": " . implode(', ', $this->NationalData->Metadata->Missals);
-            foreach ($this->NationalData->Metadata->Missals as $missal) {
+            $this->Messages[] = "Found Missals for region " . $this->NationalData->metadata->Region . ": " . implode(', ', $this->NationalData->metadata->missals);
+            foreach ($this->NationalData->metadata->missals as $missal) {
                 $yearLimits = RomanMissal::getYearLimits($missal);
                 if ($this->CalendarParams->Year >= $yearLimits->sinceYear) {
                     if (property_exists($yearLimits, "untilYear") && $this->CalendarParams->Year >= $yearLimits->untilYear) {
@@ -2926,7 +2920,7 @@ class Calendar
                                 );
                                 if (!$this->Cal->inSolemnitiesOrFeasts($currentFeastDate)) {
                                     $festivity = new Festivity(
-                                        "[ {$this->NationalData->Metadata->Region} ] " . $row->NAME,
+                                        "[ {$this->NationalData->metadata->Region} ] " . $row->NAME,
                                         $currentFeastDate,
                                         $row->COLOR,
                                         LitFeastType::FIXED,
@@ -2963,7 +2957,7 @@ class Calendar
                                              * 6. Superseding festivity name
                                              * 7. Requested calendar year
                                              */
-                                            $this->NationalData->Metadata->Region . ": " . _('The %1$s \'%2$s\' (%3$s), added to the national calendar in the %4$s, is superseded by the %5$s \'%6$s\' in the year %7$d'),
+                                            $this->NationalData->metadata->Region . ": " . _('The %1$s \'%2$s\' (%3$s), added to the national calendar in the %4$s, is superseded by the %5$s \'%6$s\' in the year %7$d'),
                                             $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : $this->LitGrade->i18n($row->GRADE, false),
                                             '<i>' . $row->NAME . '</i>',
                                             $this->dayAndMonth->format($currentFeastDate->format('U')),
@@ -2986,8 +2980,8 @@ class Calendar
                 }
             }
         } else {
-            if ($this->NationalData !== null && property_exists($this->NationalData, 'Metadata') && property_exists($this->NationalData->Metadata, 'Region')) {
-                $this->Messages[] = "Did not find any Missals for region " . $this->NationalData->Metadata->Region;
+            if ($this->NationalData !== null && property_exists($this->NationalData, 'Metadata') && property_exists($this->NationalData->metadata, 'Region')) {
+                $this->Messages[] = "Did not find any Missals for region " . $this->NationalData->metadata->Region;
             }
         }
     }
@@ -3180,26 +3174,26 @@ class Calendar
 
     private function interpretStrtotime(object $row): DateTime|false
     {
-        switch (gettype($row->Metadata->strtotime)) {
+        switch (gettype($row->metadata->strtotime)) {
             case 'object':
                 if (
-                    property_exists($row->Metadata->strtotime, 'dayOfTheWeek')
-                    && property_exists($row->Metadata->strtotime, 'relativeTime')
-                    && property_exists($row->Metadata->strtotime, 'festivityKey')
+                    property_exists($row->metadata->strtotime, 'day_of_the_week')
+                    && property_exists($row->metadata->strtotime, 'relative_time')
+                    && property_exists($row->metadata->strtotime, 'festivity_key')
                 ) {
-                    $festivity = $this->Cal->getFestivity($row->Metadata->strtotime->festivityKey);
+                    $festivity = $this->Cal->getFestivity($row->metadata->strtotime->festivity_key);
                     if ($festivity !== null) {
                         //$relString = '';
                         $DATE = clone( $festivity->date );
-                        switch ($row->Metadata->strtotime->relativeTime) {
+                        switch ($row->metadata->strtotime->relative_time) {
                             case 'before':
-                                $DATE->modify("previous {$row->Metadata->strtotime->dayOfTheWeek}");
+                                $DATE->modify("previous {$row->metadata->strtotime->day_of_the_week}");
                                     /**translators: e.g. 'Monday before Palm Sunday' */
                                 //$relString = _( 'before' );
                                 return $DATE;
                                 //break; //unnecessary seeing we are returning immediately
                             case 'after':
-                                $DATE->modify("next {$row->Metadata->strtotime->dayOfTheWeek}");
+                                $DATE->modify("next {$row->metadata->strtotime->day_of_the_week}");
                                 /**translators: e.g. 'Monday after Pentecost' */
                                 //$relString = _( 'after' );
                                 return $DATE;
@@ -3208,8 +3202,8 @@ class Calendar
                                 $this->Messages[] = sprintf(
                                     /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
                                     _('Cannot create mobile festivity \'%1$s\': can only be relative to festivity with key \'%2$s\' using keywords %3$s'),
-                                    $row->Festivity->name,
-                                    $row->Metadata->strtotime->festivityKey,
+                                    $row->festivity->name,
+                                    $row->metadata->strtotime->festivity_key,
                                     implode(', ', ['\'before\'', '\'after\''])
                                 );
                                 return false;
@@ -3218,8 +3212,8 @@ class Calendar
                         /*
                         $dayOfTheWeek = $this->CalendarParams->Locale === LitLocale::LATIN
                             ? LitMessages::LATIN_DAYOFTHEWEEK[ $DATE->format( 'w' ) ]
-                            : ucfirst( $this->dayOfTheWeek->format( $row->Festivity->DATE->format( 'U' ) ) );
-                        $row->Metadata->addedWhen = $dayOfTheWeek . ' ' . $relString . ' ' . $festivity->name;
+                            : ucfirst( $this->dayOfTheWeek->format( $row->festivity->DATE->format( 'U' ) ) );
+                        $row->metadata->added_when = $day_of_the_week . ' ' . $relString . ' ' . $festivity->name;
                         if( true === $this->checkCoincidencesNewMobileFestivity( $row ) ) {
                             $this->createMobileFestivity( $row );
                         }
@@ -3228,8 +3222,8 @@ class Calendar
                         $this->Messages[] = sprintf(
                             /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
                             _('Cannot create mobile festivity \'%1$s\' relative to festivity with key \'%2$s\''),
-                            $row->Festivity->name,
-                            $row->Metadata->strtotime->festivityKey
+                            $row->festivity->name,
+                            $row->metadata->strtotime->festivity_key
                         );
                         return false;
                     }
@@ -3237,16 +3231,16 @@ class Calendar
                     $this->Messages[] = sprintf(
                         /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created 2. list of properties */
                         _('Cannot create mobile festivity \'%1$s\': when the \'strtotime\' property is an object, it must have properties %2$s'),
-                        $row->Festivity->name,
-                        implode(', ', ['\'dayOfTheWeek\'', '\'relativeTime\'', '\'festivityKey\''])
+                        $row->festivity->name,
+                        implode(', ', ['\'day_of_the_week\'', '\'relative_time\'', '\'festivity_key\''])
                     );
                     return false;
                 }
                 break;
             case 'string':
-                if ($row->Metadata->strtotime !== '') {
-                    if (preg_match('/(before|after)/', $row->Metadata->strtotime) !== false && preg_match('/(before|after)/', $row->Metadata->strtotime) !== 0) {
-                        $match = preg_split('/(before|after)/', $row->Metadata->strtotime, -1, PREG_SPLIT_DELIM_CAPTURE);
+                if ($row->metadata->strtotime !== '') {
+                    if (preg_match('/(before|after)/', $row->metadata->strtotime) !== false && preg_match('/(before|after)/', $row->metadata->strtotime) !== 0) {
+                        $match = preg_split('/(before|after)/', $row->metadata->strtotime, -1, PREG_SPLIT_DELIM_CAPTURE);
                         if ($match !== false && count($match) === 3) {
                             $festivityDateTS = strtotime($match[2] . ' ' . $this->CalendarParams->Year . ' UTC');
                             if ($festivityDateTS !== false) {
@@ -3262,7 +3256,7 @@ class Calendar
                                 $this->Messages[] = sprintf(
                                     /**translators: Do not translate 'strtotime'! */
                                     'Could not interpret the \'strtotime\' property with value %1$s into a timestamp',
-                                    $row->Metadata->strtotime
+                                    $row->metadata->strtotime
                                 );
                                 return false;
                             }
@@ -3270,17 +3264,17 @@ class Calendar
                             $this->Messages[] = sprintf(
                                 /**translators: Do not translate 'strtotime'! */
                                 'Could not interpret the \'strtotime\' property with value %1$s into a timestamp. Splitting failed: %2$s',
-                                $row->Metadata->strtotime,
+                                $row->metadata->strtotime,
                                 json_encode($match)
                             );
                             return false;
                         }
                     } else {
-                        $festivityDateTS = strtotime($row->Metadata->strtotime . ' ' . $this->CalendarParams->Year . ' UTC');
+                        $festivityDateTS = strtotime($row->metadata->strtotime . ' ' . $this->CalendarParams->Year . ' UTC');
                         if ($festivityDateTS !== false) {
                             $DATE = new DateTime("@$festivityDateTS");
                             $DATE->setTimeZone(new \DateTimeZone('UTC'));
-                            //$row->Metadata->addedWhen = $row->Metadata->strtotime;
+                            //$row->metadata->added_when = $row->metadata->strtotime;
                             /*if( true === $this->checkCoincidencesNewMobileFestivity( $row ) ) {
                                 $this->createMobileFestivity( $row );
                             }*/
@@ -3289,7 +3283,7 @@ class Calendar
                             $this->Messages[] = sprintf(
                                 /**translators: Do not translate 'strtotime'! */
                                 'Could not interpret the \'strtotime\' property with value %1$s into a timestamp',
-                                $row->Metadata->strtotime
+                                $row->metadata->strtotime
                             );
                             return false;
                         }
@@ -3302,8 +3296,8 @@ class Calendar
                 $this->Messages[] = sprintf(
                     /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created */
                     _('Cannot create mobile festivity \'%1$s\': \'strtotime\' property must be either an object or a string! Currently it has type \'%2$s\''),
-                    $row->Festivity->name,
-                    gettype($row->Metadata->strtotime)
+                    $row->festivity->name,
+                    gettype($row->metadata->strtotime)
                 );
                 return false;
         }
@@ -3311,24 +3305,24 @@ class Calendar
 
     private function applyDiocesanCalendar()
     {
-        foreach ($this->DiocesanData->LitCal as $key => $obj) {
+        foreach ($this->DiocesanData->litcal as $key => $obj) {
             //if sinceYear is undefined or null or empty, let's go ahead and create the event in any case
             //creation will be restricted only if explicitly defined by the sinceYear property
             if (
                 (
-                    $this->CalendarParams->Year >= $obj->Metadata->sinceYear
-                    || $obj->Metadata->sinceYear === null
-                    || $obj->Metadata->sinceYear === 0
+                    $this->CalendarParams->Year >= $obj->metadata->sinceYear
+                    || $obj->metadata->sinceYear === null
+                    || $obj->metadata->sinceYear === 0
                 )
                 &&
                 (
-                    false === property_exists($obj->Metadata, 'untilYear')
-                    || $obj->Metadata->untilYear === null
-                    || $this->CalendarParams->Year <= $obj->Metadata->untilYear
-                    || $obj->Metadata->untilYear === 0
+                    false === property_exists($obj->metadata, 'untilYear')
+                    || $obj->metadata->untilYear === null
+                    || $this->CalendarParams->Year <= $obj->metadata->untilYear
+                    || $obj->metadata->untilYear === 0
                 )
             ) {
-                if (property_exists($obj->Metadata, 'strtotime')) {
+                if (property_exists($obj->metadata, 'strtotime')) {
                     $currentFeastDate = $this->interpretStrtotime($obj, $key);
                 } else {
                     $currentFeastDate = DateTime::createFromFormat(
@@ -3439,7 +3433,7 @@ class Calendar
         $ical .= "X-WR-CALNAME:Roman Catholic Universal Liturgical Calendar " . strtoupper(substr($this->CalendarParams->Locale, 0, 2)) . "\r\n";
         $ical .= "X-WR-TIMEZONE:Europe/Vatican\r\n"; //perhaps allow this to be set through a GET or POST?
         $ical .= "X-PUBLISHED-TTL:PT1D\r\n";
-        foreach ($SerializeableLitCal->LitCal as $FestivityKey => $CalEvent) {
+        foreach ($SerializeableLitCal->litcal as $FestivityKey => $CalEvent) {
             $displayGrade = "";
             $displayGradeHTML = "";
             if ($FestivityKey === 'AllSouls') {
@@ -3449,17 +3443,17 @@ class Calendar
                 $displayGrade = $this->LitGrade->i18n(LitGrade::FEAST, false);
                 $displayGradeHTML = $this->LitGrade->i18n(LitGrade::FEAST, true);
             } elseif ((int)$CalEvent->date->format('N') !== 7) {
-                if (property_exists($CalEvent, 'displayGrade') && $CalEvent->displayGrade !== "") {
-                    $displayGrade = $CalEvent->displayGrade;
-                    $displayGradeHTML = '<B>' . $CalEvent->displayGrade . '</B>';
+                if (property_exists($CalEvent, 'display_grade') && $CalEvent->display_grade !== "") {
+                    $displayGrade = $CalEvent->display_grade;
+                    $displayGradeHTML = '<B>' . $CalEvent->display_grade . '</B>';
                 } else {
                     $displayGrade = $this->LitGrade->i18n($CalEvent->grade, false);
                     $displayGradeHTML = $this->LitGrade->i18n($CalEvent->grade, true);
                 }
             } elseif ((int)$CalEvent->grade > LitGrade::MEMORIAL) {
-                if (property_exists($CalEvent, 'displayGrade') && $CalEvent->displayGrade !== "") {
-                    $displayGrade = $CalEvent->displayGrade;
-                    $displayGradeHTML = '<B>' . $CalEvent->displayGrade . '</B>';
+                if (property_exists($CalEvent, 'display_grade') && $CalEvent->display_grade !== "") {
+                    $displayGrade = $CalEvent->display_grade;
+                    $displayGradeHTML = '<B>' . $CalEvent->display_grade . '</B>';
                 } else {
                     $displayGrade = $this->LitGrade->i18n($CalEvent->grade, false);
                     $displayGradeHTML = $this->LitGrade->i18n($CalEvent->grade, true);
@@ -3472,10 +3466,10 @@ class Calendar
                 || (is_array($CalEvent->color) && count($CalEvent->color) > 0 )
                 ? '\n' . LitMessages::parseColorString($CalEvent->color, $this->CalendarParams->Locale, false)
                 : "";
-            $description .= property_exists($CalEvent, 'liturgicalyear')
-                && $CalEvent->liturgicalYear !== null
-                && $CalEvent->liturgicalYear != ""
-                ? '\n' . $CalEvent->liturgicalYear
+            $description .= property_exists($CalEvent, 'liturgical_year')
+                && $CalEvent->liturgical_year !== null
+                && $CalEvent->liturgical_year != ""
+                ? '\n' . $CalEvent->liturgical_year
                 : "";
             $htmlDescription = "<P DIR=LTR>" . $this->LitCommon->c($CalEvent->common);
             $htmlDescription .=  '<BR>' . $displayGradeHTML;
@@ -3483,10 +3477,10 @@ class Calendar
                 || (is_array($CalEvent->color) && count($CalEvent->color) > 0 )
                 ? "<BR>" . LitMessages::parseColorString($CalEvent->color, $this->CalendarParams->Locale, true)
                 : "";
-            $htmlDescription .= property_exists($CalEvent, 'liturgicalYear')
-                && $CalEvent->liturgicalYear !== null
-                && $CalEvent->liturgicalYear != ""
-                ? '<BR>' . $CalEvent->liturgicalYear . "</P>"
+            $htmlDescription .= property_exists($CalEvent, 'liturgical_year')
+                && $CalEvent->liturgical_year !== null
+                && $CalEvent->liturgical_year != ""
+                ? '<BR>' . $CalEvent->liturgical_year . "</P>"
                 : "</P>";
             $ical .= "BEGIN:VEVENT\r\n";
             $ical .= "CLASS:PUBLIC\r\n";
@@ -3522,34 +3516,34 @@ class Calendar
     private function generateResponse()
     {
         $SerializeableLitCal                          = new \stdClass();
-        $SerializeableLitCal->Settings                = new \stdClass();
-        $SerializeableLitCal->Metadata                = new \stdClass();
+        $SerializeableLitCal->settings                = new \stdClass();
+        $SerializeableLitCal->metadata                = new \stdClass();
 
-        $SerializeableLitCal->LitCal                  = $this->Cal->getFestivities();
-        $SerializeableLitCal->Messages                = $this->Messages;
-        $SerializeableLitCal->Settings->Year          = $this->CalendarParams->Year;
-        $SerializeableLitCal->Settings->Epiphany      = $this->CalendarParams->Epiphany;
-        $SerializeableLitCal->Settings->Ascension     = $this->CalendarParams->Ascension;
-        $SerializeableLitCal->Settings->CorpusChristi = $this->CalendarParams->CorpusChristi;
-        $SerializeableLitCal->Settings->Locale        = $this->CalendarParams->Locale;
-        $SerializeableLitCal->Settings->ReturnType    = $this->CalendarParams->ReturnType;
-        $SerializeableLitCal->Settings->CalendarType  = $this->CalendarParams->CalendarType;
-        $SerializeableLitCal->Settings->EternalHighPriest = $this->CalendarParams->EternalHighPriest;
+        $SerializeableLitCal->litcal                  = $this->Cal->getFestivities();
+        $SerializeableLitCal->messages                = $this->Messages;
+        $SerializeableLitCal->settings->year          = $this->CalendarParams->Year;
+        $SerializeableLitCal->settings->epiphany      = $this->CalendarParams->Epiphany;
+        $SerializeableLitCal->settings->ascension     = $this->CalendarParams->Ascension;
+        $SerializeableLitCal->settings->corpuschristi = $this->CalendarParams->CorpusChristi;
+        $SerializeableLitCal->settings->locale        = $this->CalendarParams->Locale;
+        $SerializeableLitCal->settings->returntype    = $this->CalendarParams->ReturnType;
+        $SerializeableLitCal->settings->calendartype  = $this->CalendarParams->CalendarType;
+        $SerializeableLitCal->settings->eternalhighpriest = $this->CalendarParams->EternalHighPriest;
         if ($this->CalendarParams->NationalCalendar !== null) {
-            $SerializeableLitCal->Settings->NationalCalendar = $this->CalendarParams->NationalCalendar;
+            $SerializeableLitCal->settings->nationalcalendar = $this->CalendarParams->NationalCalendar;
         }
         if ($this->CalendarParams->DiocesanCalendar !== null) {
-            $SerializeableLitCal->Settings->DiocesanCalendar = $this->CalendarParams->DiocesanCalendar;
+            $SerializeableLitCal->settings->diocesancalendar = $this->CalendarParams->DiocesanCalendar;
         }
 
-        $SerializeableLitCal->Metadata->Version             = self::API_VERSION;
-        $SerializeableLitCal->Metadata->Timestamp           = time();
-        $SerializeableLitCal->Metadata->DateTime            = date(DATE_ATOM);
+        $SerializeableLitCal->metadata->version             = self::API_VERSION;
+        $SerializeableLitCal->metadata->timestamp           = time();
+        $SerializeableLitCal->metadata->datetime            = date(DATE_ATOM);
 
-        //$SerializeableLitCal->Metadata->RequestHeaders      = self::$APICore->getJsonEncodedRequestHeaders();
-        $SerializeableLitCal->Metadata->RequestHeaders      = self::$APICore->getRequestHeaders();
-        $SerializeableLitCal->Metadata->Solemnities         = $this->Cal->getSolemnities();
-        $SerializeableLitCal->Metadata->FeastsMemorials     = $this->Cal->getFeastsAndMemorials();
+        //$SerializeableLitCal->metadata->request_headers     = self::$APICore->getJsonEncodedRequestHeaders();
+        $SerializeableLitCal->metadata->request_headers      = self::$APICore->getRequestHeaders();
+        $SerializeableLitCal->metadata->solemnities         = $this->Cal->getSolemnities();
+        $SerializeableLitCal->metadata->feasts_memorials     = $this->Cal->getFeastsAndMemorials();
 
         //make sure we have an engineCache folder for the current Version
         if (realpath("engineCache/v" . str_replace(".", "_", self::API_VERSION)) === false) {

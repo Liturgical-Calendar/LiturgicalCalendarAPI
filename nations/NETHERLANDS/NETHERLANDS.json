@@ -1,21 +1,21 @@
 {
-    "LitCal": [
+    "litcal": [
         {
-            "Festivity": {
+            "festivity": {
                 "tag": "StPeterCanisius",
                 "name": "Saint Peter Canisius, Priest and Doctor of the Church",
                 "grade": 3,
                 "day": 21,
                 "month": 12
             },
-            "Metadata": {
+            "metadata": {
                 "action": "setProperty",
                 "property": "grade",
-                "sinceYear": 1979
+                "since_year": 1979
             }
         },
         {
-            "Festivity": {
+            "festivity": {
                 "tag": "HLidwina",
                 "name": "H. Lidwina, maagd",
                 "color": [
@@ -34,13 +34,13 @@
                     "GOSPEL": ""
                 }
             },
-            "Metadata": {
+            "metadata": {
                 "action": "createNew",
-                "sinceYear": 1979
+                "since_year": 1979
             }
         },
         {
-            "Festivity": {
+            "festivity": {
                 "tag": "MartelarenGorcum",
                 "name": "HH. Martelaren van Gorcum",
                 "color": [
@@ -59,13 +59,13 @@
                     "GOSPEL": ""
                 }
             },
-            "Metadata": {
+            "metadata": {
                 "action": "createNew",
-                "sinceYear": 1979
+                "since_year": 1979
             }
         },
         {
-            "Festivity": {
+            "festivity": {
                 "tag": "Brandsma",
                 "name": "Z. Titus Brandsma, priester en martelaar",
                 "color": [
@@ -78,13 +78,13 @@
                     "Martyrs"
                 ]
             },
-            "Metadata": {
+            "metadata": {
                 "action": "createNew",
-                "sinceYear": 1979
+                "since_year": 1979
             }
         },
         {
-            "Festivity": {
+            "festivity": {
                 "tag": "VerjaardagWijdingKerken",
                 "name": "Verjaardag van de Wijding van alle kerken waarvan de wijdingsdatum niet bekend is",
                 "color": [
@@ -103,13 +103,13 @@
                     "GOSPEL": ""
                 }
             },
-            "Metadata": {
+            "metadata": {
                 "action": "createNew",
-                "sinceYear": 1979
+                "since_year": 1979
             }
         },
         {
-            "Festivity": {
+            "festivity": {
                 "tag": "Verkondigers",
                 "name": "Alle HH. Verkondigers van het geloof in onze streken",
                 "color": [
@@ -128,13 +128,13 @@
                     "GOSPEL": ""
                 }
             },
-            "Metadata": {
+            "metadata": {
                 "action": "createNew",
-                "sinceYear": 1979
+                "since_year": 1979
             }
         },
         {
-            "Festivity": {
+            "festivity": {
                 "tag": "Willibrord",
                 "name": "H. Willibrord, bisschop, verkondiger van ons geloof, patroon van de Nederlandse kerkprovincie",
                 "color": [
@@ -153,27 +153,27 @@
                     "GOSPEL": ""
                 }
             },
-            "Metadata": {
+            "metadata": {
                 "action": "createNew",
-                "sinceYear": 1979
+                "since_year": 1979
             }
         }
     ],
-    "Settings": {
-        "Epiphany": "SUNDAY_JAN2_JAN8",
-        "Ascension": "THURSDAY",
-        "CorpusChristi": "SUNDAY",
-        "Locale": "nl_NL",
-        "EternalHighPriest": true
+    "settings": {
+        "epiphany": "SUNDAY_JAN2_JAN8",
+        "ascension": "THURSDAY",
+        "corpuschristi": "SUNDAY",
+        "locale": "nl_NL",
+        "eternalhighpriest": true
     },
-    "Metadata": {
-        "Region": "NETHERLANDS",
-        "WiderRegion": {
+    "metadata": {
+        "region": "NETHERLANDS",
+        "wider_region": {
             "name": "Europe",
             "jsonFile": "nations\/Europe.json",
             "i18nFile": "nations\/EUROPE\/nl_NL.json"
         },
-        "Missals": [
+        "missals": [
             "NETHERLANDS_1978"
         ]
     }

@@ -54,7 +54,7 @@
                 "metadata"
             ]
         },
-        "Festivity": {
+        "festivity": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -91,7 +91,7 @@
             ],
             "title": "Festivity"
         },
-        "Metadata": {
+        "metadata": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -146,7 +146,7 @@
                                         "after"
                                     ]
                                 },
-                                "festivity_tey": {
+                                "festivity_key": {
                                     "type": "string",
                                     "description": "Must be a valid key for a festivity in the Universal Calendar"
                                 }

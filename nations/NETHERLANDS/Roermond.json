@@ -1,7 +1,7 @@
 {
-    "LitCal": {
+    "litcal": {
         "OnbevlekteOntvangenisvandeHeiligeMaagdMariaPatroonsfeestvanhetbisdom": {
-            "Festivity": {
+            "festivity": {
                 "name": "Onbevlekte Ontvangenis van de Heilige Maagd Maria, Patroonsfeest van het bisdom",
                 "color": [
                     "white"
@@ -13,13 +13,13 @@
                 "day": 8,
                 "month": 12
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 0
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 0
             }
         },
         "ZArnoldJanssenpriester": {
-            "Festivity": {
+            "festivity": {
                 "name": "Z. Arnold Janssen, priester",
                 "color": [
                     "white"
@@ -31,14 +31,14 @@
                 "day": 15,
                 "month": 1
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 0,
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 0,
                 "untilYear": 2003
             }
         },
         "HGregoriusdeGrotepausenkerkleraar": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Gregorius de Grote, paus en kerkleraar",
                 "color": [
                     "white"
@@ -51,13 +51,13 @@
                 "day": 4,
                 "month": 9
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 1
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 1
             }
         },
         "HGerlachkluizenaar": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Gerlach, kluizenaar",
                 "color": [
                     "white"
@@ -69,13 +69,13 @@
                 "day": 5,
                 "month": 1
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 0
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 0
             }
         },
         "HHWiroPlechelmusenOtger": {
-            "Festivity": {
+            "festivity": {
                 "name": "HH. Wiro, Plechelmus en Otger",
                 "color": [
                     "white"
@@ -87,13 +87,13 @@
                 "day": 8,
                 "month": 5
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 1
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 1
             }
         },
         "AlleheiligeBisschoppenvanMaastricht": {
-            "Festivity": {
+            "festivity": {
                 "name": "Alle heilige Bisschoppen van Maastricht",
                 "color": [
                     "white"
@@ -105,13 +105,13 @@
                 "day": 14,
                 "month": 5
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 2
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 2
             }
         },
         "HLambertusbisschopenmartelaar": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Lambertus, bisschop en martelaar",
                 "color": [
                     "white"
@@ -123,13 +123,13 @@
                 "day": 17,
                 "month": 9
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 3
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 3
             }
         },
         "HHubertusbisschop": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Hubertus, bisschop",
                 "color": [
                     "white"
@@ -141,13 +141,13 @@
                 "day": 3,
                 "month": 11
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 4
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 4
             }
         },
         "HKarelvanSintAndriesKarelHoubenpriester": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Karel van Sint Andries (Karel Houben), priester",
                 "color": [
                     "white"
@@ -159,13 +159,13 @@
                 "day": 5,
                 "month": 1
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 5
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 5
             }
         },
         "ZClaravanhetArmeKindJezuzClaraFeymaagd": {
-            "Festivity": {
+            "festivity": {
                 "name": "Z. Clara van het Arme Kind Jezuz (Clara Fey), maagd",
                 "color": [
                     "white"
@@ -177,13 +177,13 @@
                 "day": 8,
                 "month": 5
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 6
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 6
             }
         },
         "ZJosefaStenmannsmaagd": {
-            "Festivity": {
+            "festivity": {
                 "name": "Z. Josefa Stenmanns, maagd",
                 "color": [
                     "white"
@@ -195,13 +195,13 @@
                 "day": 20,
                 "month": 5
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 7
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 7
             }
         },
         "ZMariaTeresavandeHJozefAnnaMariaTauschermaagd": {
-            "Festivity": {
+            "festivity": {
                 "name": "Z. Maria Teresa van de H. Jozef (Anna Maria Tauscher), maagd",
                 "color": [
                     "white"
@@ -213,13 +213,13 @@
                 "day": 30,
                 "month": 10
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 8
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 8
             }
         },
         "ZMariaHelenaStollenwerkmaagd": {
-            "Festivity": {
+            "festivity": {
                 "name": "Z. Maria Helena Stollenwerk, maagd",
                 "color": [
                     "white"
@@ -231,13 +231,13 @@
                 "day": 28,
                 "month": 11
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 9
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 9
             }
         },
         "HServatiusbiscchop": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Servatius, biscchop",
                 "color": [
                     "white"
@@ -249,13 +249,13 @@
                 "day": 13,
                 "month": 5
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 0
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 0
             }
         },
         "VerjaardagvandeWijdingvandekathedraal": {
-            "Festivity": {
+            "festivity": {
                 "name": "Verjaardag van de Wijding van de kathedraal",
                 "color": [
                     "white"
@@ -267,13 +267,13 @@
                 "day": 3,
                 "month": 9
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 1
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 1
             }
         },
         "HeiligeMaagdMariaSterrederZee": {
-            "Festivity": {
+            "festivity": {
                 "name": "Heilige Maagd Maria, Sterre der Zee",
                 "color": [
                     "white"
@@ -285,13 +285,13 @@
                 "day": 10,
                 "month": 10
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 2
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 2
             }
         },
         "HArnoldJanssenpriester": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Arnold Janssen, priester",
                 "color": [
                     "white"
@@ -303,9 +303,9 @@
                 "day": 15,
                 "month": 1
             },
-            "Metadata": {
-                "sinceYear": 2004,
-                "formRowNum": 3
+            "metadata": {
+                "since_year": 2004,
+                "form_rownum": 3
             }
         }
     }
