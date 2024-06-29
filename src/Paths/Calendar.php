@@ -1345,7 +1345,7 @@ class Calendar
             $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row->DAY . '-' . $row->MONTH . '-' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
             $festivity = new Festivity($row->NAME, $currentFeastDate, $row->COLOR, LitFeastType::FIXED, $row->GRADE, $row->COMMON);
             if ($row->TAG === 'DedicationLateran') {
-                $festivity->displayGrade = $this->LitGrade->i18n(LitGrade::FEAST, false);
+                $festivity->display_grade = $this->LitGrade->i18n(LitGrade::FEAST, false);
             }
             $this->Cal->addFestivity($row->TAG, $festivity);
         }
