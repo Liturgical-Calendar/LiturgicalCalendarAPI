@@ -336,17 +336,17 @@ class FestivityCollection
         foreach ($this->festivities as $key => $festivity) {
             // DEFINE LITURGICAL SEASONS
             if ($festivity->date >= $this->festivities[ "Advent1" ]->date && $festivity->date < $this->festivities[ "Christmas" ]->date) {
-                $this->festivities[ $key ]->liturgicalSeason = LitSeason::ADVENT;
+                $this->festivities[ $key ]->liturgical_season = LitSeason::ADVENT;
             } elseif ($festivity->date >= $this->festivities[ "Christmas" ]->date || $festivity->date <= $this->festivities[ "BaptismLord" ]->date) {
-                $this->festivities[ $key ]->liturgicalSeason = LitSeason::CHRISTMAS;
+                $this->festivities[ $key ]->liturgical_season = LitSeason::CHRISTMAS;
             } elseif ($festivity->date >= $this->festivities[ "AshWednesday" ]->date && $festivity->date <= $this->festivities[ "HolyThurs" ]->date) {
-                $this->festivities[ $key ]->liturgicalSeason = LitSeason::LENT;
+                $this->festivities[ $key ]->liturgical_season = LitSeason::LENT;
             } elseif ($festivity->date > $this->festivities[ "HolyThurs" ]->date && $festivity->date < $this->festivities[ "Easter" ]->date) {
-                $this->festivities[ $key ]->liturgicalSeason = LitSeason::EASTER_TRIDUUM;
+                $this->festivities[ $key ]->liturgical_season = LitSeason::EASTER_TRIDUUM;
             } elseif ($festivity->date >= $this->festivities[ "Easter" ]->date && $festivity->date <= $this->festivities[ "Pentecost" ]->date) {
-                $this->festivities[ $key ]->liturgicalSeason = LitSeason::EASTER;
+                $this->festivities[ $key ]->liturgical_season = LitSeason::EASTER;
             } else {
-                $this->festivities[ $key ]->liturgicalSeason = LitSeason::ORDINARY_TIME;
+                $this->festivities[ $key ]->liturgical_season = LitSeason::ORDINARY_TIME;
             }
 
             // DEFINE YEAR CYCLES (except for Holy Week and Easter Octave)
