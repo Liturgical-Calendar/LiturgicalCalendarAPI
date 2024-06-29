@@ -12,7 +12,7 @@ use Johnrdorazio\LitCal\Enum\LitSeason;
 
 class Festivity implements \JsonSerializable
 {
-    public static $eventIdx = 0;
+    public static $eventidx = 0;
 
     public int $idx;
 
@@ -22,7 +22,7 @@ class Festivity implements \JsonSerializable
     public array $color = [];
     public string $type;
     public int $grade;
-    public string $displayGrade;
+    public string $display_grade;
     public array $common;  //"Proper" or specified common(s) of saints...
 
     /** The following properties are set externally, but may be optional and therefore may remain null */
@@ -57,7 +57,7 @@ class Festivity implements \JsonSerializable
         string|array $common = [ '???' ],
         string $displayGrade = ''
     ) {
-        $this->idx          = self::$eventIdx++;
+        $this->idx          = self::$eventidx++;
         $this->name         = $name;
         $this->date         = $date; //DateTime object
         if (is_array($color)) {
@@ -73,7 +73,7 @@ class Festivity implements \JsonSerializable
         $_type              = strtolower($type);
         $this->type         = LitFeastType::isValid($_type) ? $_type : '???';
         $this->grade        = $grade >= LitGrade::WEEKDAY && $grade <= LitGrade::HIGHER_SOLEMNITY ? $grade : -1;
-        $this->displayGrade = $displayGrade;
+        $this->display_grade = $displayGrade;
         $this->gradeLcl     = self::$LitGrade->i18n($this->grade, false);
         //Festivity::debugWrite( "*** Festivity.php *** common vartype = " . gettype( $common ) );
         if (is_string($common)) {
@@ -117,7 +117,7 @@ class Festivity implements \JsonSerializable
     public function jsonSerialize(): mixed
     {
         $returnArr = [
-            'eventIdx'      => $this->idx,
+            'eventidx'      => $this->idx,
             'name'          => $this->name,
             //serialize the DateTime object as a PHP timestamp (seconds since the Unix Epoch)
             'date'          => (int) $this->date->format('U'),
@@ -126,7 +126,7 @@ class Festivity implements \JsonSerializable
             'type'          => $this->type,
             'grade'         => $this->grade,
             'gradeLcl'      => $this->gradeLcl,
-            'displayGrade'  => $this->displayGrade,
+            'display_grade'  => $this->display_grade,
             'common'        => $this->common,
             'commonLcl'     => $this->commonLcl,
             'dayOfTheWeek_ISO8601'  => (int) $this->date->format('N'), //1 for Monday, 7 for Sunday

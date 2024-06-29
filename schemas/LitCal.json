@@ -196,7 +196,7 @@
             },
             "litcal": {
                 "Advent1_vigil": {
-                    "eventIdx": 1076,
+                    "eventidx": 1076,
                     "name": "Dominica Prima Adventus Missa in Vigilia",
                     "date": 1701475200,
                     "color": [
@@ -208,7 +208,7 @@
                     "type": "mobile",
                     "grade": 7,
                     "gradeLcl": "celebratio altioris ordinis quam sollemnitatis",
-                    "displayGrade": "",
+                    "display_grade": "",
                     "common": [],
                     "commonLcl": "",
                     "dayOfTheWeek_ISO8601": 6,
@@ -224,7 +224,7 @@
                     "isVigilFor": "Advent1"
                 },
                 "Advent1": {
-                    "eventIdx": 583,
+                    "eventidx": 583,
                     "name": "Dominica Prima Adventus",
                     "date": 1701561600,
                     "color": [
@@ -236,7 +236,7 @@
                     "type": "mobile",
                     "grade": 7,
                     "gradeLcl": "celebratio altioris ordinis quam sollemnitatis",
-                    "displayGrade": "",
+                    "display_grade": "",
                     "common": [],
                     "commonLcl": "",
                     "dayOfTheWeek_ISO8601": 7,
@@ -289,7 +289,7 @@
         "FestivityVigil": {
             "type": "object",
             "properties": {
-                "eventIdx": {
+                "eventidx": {
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 2000
@@ -318,7 +318,7 @@
                 "gradeLcl": {
                     "type": "string"
                 },
-                "displayGrade": {
+                "display_grade": {
                     "type": "string"
                 },
                 "common": {
@@ -370,14 +370,14 @@
                 }
             },
             "required": [
-                "eventIdx",
+                "eventidx",
                 "name",
                 "date",
                 "color",
                 "colorLcl",
                 "type",
                 "grade",
-                "displayGrade",
+                "display_grade",
                 "common",
                 "commonLcl",
                 "dayOfTheWeek_ISO8601",
@@ -395,7 +395,7 @@
         },
         "FestivityWithSeason": {
             "properties": {
-                "eventIdx": {
+                "eventidx": {
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 2000
@@ -424,7 +424,7 @@
                 "gradeLcl": {
                     "type": "string"
                 },
-                "displayGrade": {
+                "display_grade": {
                     "type": "string"
                 },
                 "common": {
@@ -496,14 +496,14 @@
                 }
             },
             "required": [
-                "eventIdx",
+                "eventidx",
                 "name",
                 "date",
                 "color",
                 "colorLcl",
                 "type",
                 "grade",
-                "displayGrade",
+                "display_grade",
                 "common",
                 "commonLcl",
                 "dayOfTheWeek_ISO8601",
