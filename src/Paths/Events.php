@@ -402,13 +402,13 @@ class Events
                 self::$FestivityCollection[ $key ] = $festivity[ "festivity" ];
                 self::$FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
                 if (array_key_exists("languages", $festivity[ "metadata" ])) {
-                    $decreeURL = sprintf($festivity[ "metadata" ][ "decree_url" ], 'LA');
+                    $decreeURL = sprintf($festivity[ "metadata" ][ "url" ], 'LA');
                     if (array_key_exists(strtoupper($this->EventsParams->Locale), $festivity[ "metadata" ][ "languages" ])) {
                         $decreeLang = $festivity[ "metadata" ][ "languages" ][ strtoupper($this->EventsParams->Locale) ];
-                        $decreeURL = sprintf($festivity[ "metadata" ][ "decree_url" ], $decreeLang);
+                        $decreeURL = sprintf($festivity[ "metadata" ][ "url" ], $decreeLang);
                     }
                 } else {
-                    $decreeURL = $festivity[ "metadata" ][ "decree_url" ];
+                    $decreeURL = $festivity[ "metadata" ][ "url" ];
                 }
                 self::$FestivityCollection[ $key ][ "DECREE" ] = $decreeURL;
             } elseif ($festivity[ "metadata" ][ "action" ] === 'setProperty') {
