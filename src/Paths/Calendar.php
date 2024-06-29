@@ -633,7 +633,7 @@ class Calendar
                 die(json_encode($response));
             } else {
                 $this->tempCal[ "MEMORIALS_FROM_DECREES" ] = [];
-                foreach ($memorialsFromDecrees->litcal_decrees as $row) {
+                foreach ($memorialsFromDecrees as $row) {
                     if (
                         (
                             $row->metadata->action === "createNew"
