@@ -56,6 +56,9 @@ class Router
 
     public static function route(): void
     {
+        if (false === defined('API_BASE_PATH')) {
+            define('API_BASE_PATH', "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}");
+        }
         $requestPathParts = self::buildRequestPathParts();
         $route = array_shift($requestPathParts);
         switch ($route) {
