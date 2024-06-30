@@ -110,7 +110,7 @@ class Health implements MessageComponentInterface
         "data/propriumdesanctis_1970/propriumdesanctis_1970.json"   => LitSchema::PROPRIUMDESANCTIS,
         "data/propriumdesanctis_2002/propriumdesanctis_2002.json"   => LitSchema::PROPRIUMDESANCTIS,
         "data/propriumdesanctis_2008/propriumdesanctis_2008.json"   => LitSchema::PROPRIUMDESANCTIS,
-        "data/memorialsFromDecrees/memorialsFromDecrees.json"       => LitSchema::DECREEMEMORIALS,
+        API_BASE_PATH . '/decrees/'                                 => LitSchema::DECREEMEMORIALS,
         "nations/index.json"                                        => LitSchema::INDEX
     ];
 
