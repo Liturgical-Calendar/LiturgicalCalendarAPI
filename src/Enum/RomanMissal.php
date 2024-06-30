@@ -64,17 +64,17 @@ class RomanMissal
     ];
 
     public static array $yearLimits = [
-        self::EDITIO_TYPICA_1970                    => [ "sinceYear" => 1970 ],
-        self::REIMPRESSIO_EMENDATA_1971             => [ "sinceYear" => 1971 ],
-        self::EDITIO_TYPICA_SECUNDA_1975            => [ "sinceYear" => 1975 ],
-        self::EDITIO_TYPICA_TERTIA_2002             => [ "sinceYear" => 2002 ],
-        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008    => [ "sinceYear" => 2008 ],
-        self::USA_EDITION_2011                      => [ "sinceYear" => 2011 ],
+        self::EDITIO_TYPICA_1970                    => [ "since_year" => 1970 ],
+        self::REIMPRESSIO_EMENDATA_1971             => [ "since_year" => 1971 ],
+        self::EDITIO_TYPICA_SECUNDA_1975            => [ "since_year" => 1975 ],
+        self::EDITIO_TYPICA_TERTIA_2002             => [ "since_year" => 2002 ],
+        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008    => [ "since_year" => 2008 ],
+        self::USA_EDITION_2011                      => [ "since_year" => 2011 ],
         //the festivities applied in the '83 edition were incorporated into the Latin 2002 edition,
         //therefore we no longer need to apply them after the year 2002 since the Latin edition takes precedence
-        self::ITALY_EDITION_1983                    => [ "sinceYear" => 1983, "untilYear" => 2002 ],
-        self::ITALY_EDITION_2020                    => [ "sinceYear" => 2020 ],
-        self::NETHERLANDS_EDITION_1978              => [ "sinceYear" => 1979 ]
+        self::ITALY_EDITION_1983                    => [ "since_year" => 1983, "until_year" => 2002 ],
+        self::ITALY_EDITION_2020                    => [ "since_year" => 2020 ],
+        self::NETHERLANDS_EDITION_1978              => [ "since_year" => 1979 ]
     ];
 
 
@@ -113,7 +113,7 @@ class RomanMissal
         $reflectionClass = new \ReflectionClass(static::class);
         $metadata = $reflectionClass->getConstants();
         array_walk($metadata, function (string &$v) {
-            $v = [ "value" => $v, "name" => self::getName($v), "sanctoraleFileName" => self::getSanctoraleFileName($v), "yearLimits" => self::$yearLimits[ $v ] ];
+            $v = [ "value" => $v, "name" => self::getName($v), "sanctorale_filename" => self::getSanctoraleFileName($v), "year_limits" => self::$yearLimits[ $v ] ];
         });
         return $metadata;
     }

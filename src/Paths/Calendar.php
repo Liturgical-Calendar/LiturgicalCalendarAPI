@@ -2895,14 +2895,14 @@ class Calendar
         }
 
         if ($this->NationalData !== null && property_exists($this->NationalData, "metadata") && property_exists($this->NationalData->metadata, "missals")) {
-            if ($this->NationalData->metadata->Region === 'UNITED STATES') {
-                $this->NationalData->metadata->Region = 'USA';
+            if ($this->NationalData->metadata->region === 'UNITED STATES') {
+                $this->NationalData->metadata->region = 'USA';
             }
-            $this->Messages[] = "Found Missals for region " . $this->NationalData->metadata->Region . ": " . implode(', ', $this->NationalData->metadata->missals);
+            $this->Messages[] = "Found Missals for region " . $this->NationalData->metadata->region . ": " . implode(', ', $this->NationalData->metadata->missals);
             foreach ($this->NationalData->metadata->missals as $missal) {
                 $yearLimits = RomanMissal::getYearLimits($missal);
-                if ($this->CalendarParams->Year >= $yearLimits->sinceYear) {
-                    if (property_exists($yearLimits, "untilYear") && $this->CalendarParams->Year >= $yearLimits->untilYear) {
+                if ($this->CalendarParams->Year >= $yearLimits->since_year) {
+                    if (property_exists($yearLimits, "until_year") && $this->CalendarParams->Year >= $yearLimits->until_year) {
                         continue;
                     } else {
                         if (RomanMissal::getSanctoraleFileName($missal) !== false) {
@@ -2920,7 +2920,7 @@ class Calendar
                                 );
                                 if (!$this->Cal->inSolemnitiesOrFeasts($currentFeastDate)) {
                                     $festivity = new Festivity(
-                                        "[ {$this->NationalData->metadata->Region} ] " . $row->NAME,
+                                        "[ {$this->NationalData->metadata->region} ] " . $row->NAME,
                                         $currentFeastDate,
                                         $row->COLOR,
                                         LitFeastType::FIXED,
@@ -2957,7 +2957,7 @@ class Calendar
                                              * 6. Superseding festivity name
                                              * 7. Requested calendar year
                                              */
-                                            $this->NationalData->metadata->Region . ": " . _('The %1$s \'%2$s\' (%3$s), added to the national calendar in the %4$s, is superseded by the %5$s \'%6$s\' in the year %7$d'),
+                                            $this->NationalData->metadata->region . ": " . _('The %1$s \'%2$s\' (%3$s), added to the national calendar in the %4$s, is superseded by the %5$s \'%6$s\' in the year %7$d'),
                                             $row->DISPLAYGRADE !== "" ? $row->DISPLAYGRADE : $this->LitGrade->i18n($row->GRADE, false),
                                             '<i>' . $row->NAME . '</i>',
                                             $this->dayAndMonth->format($currentFeastDate->format('U')),
@@ -2980,7 +2980,7 @@ class Calendar
                 }
             }
         } else {
-            if ($this->NationalData !== null && property_exists($this->NationalData, 'metadata') && property_exists($this->NationalData->metadata, 'Region')) {
+            if ($this->NationalData !== null && property_exists($this->NationalData, 'metadata') && property_exists($this->NationalData->metadata, 'region')) {
                 $this->Messages[] = "Did not find any Missals for region " . $this->NationalData->metadata->region;
             }
         }
