@@ -13,7 +13,7 @@
         }
     },
     "required": [
-        "litcal_decrres"
+        "litcal_decrees"
     ],
     "definitions": {
         "LitCalDecree": {
@@ -54,7 +54,7 @@
                 "metadata"
             ]
         },
-        "festivity": {
+        "Festivity": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -91,7 +91,7 @@
             ],
             "title": "Festivity"
         },
-        "metadata": {
+        "Metadata": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
