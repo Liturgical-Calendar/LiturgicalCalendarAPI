@@ -31,11 +31,12 @@ class LitFunc
                 //self::debugWrite( "value of key <$key> is an array" );
                 if (self::isNotLitCalEventKey($key)) {
                   //self::debugWrite( "key <$key> is not a LitCalEvent" );
+                    $key = str_replace('_', '', ucwords($key, '_'));
                     $new_object = $xml->addChild($key);
                 } else {
                   //self::debugWrite( "key <$key> is a LitCalEvent" );
                     $new_object = $xml->addChild("LitCalEvent");
-                    $new_object->addAttribute("eventkey", $key);
+                    $new_object->addAttribute("eventKey", $key);
                 }
                 //self::debugWrite( "proceeding to convert array value of <$key> to xml sequence..." );
                 self::convertArray2XML($value, $new_object);
@@ -45,17 +46,19 @@ class LitFunc
                     //self::debugWrite( "key <$key> is numerical, have to deal with this..." );
                     if (self::$LAST_ARRAY_KEY === 'messages') {
                       //self::debugWrite( "key <$key> seems to belong to the Messages array: will create a corresponding <message> element with attribute 'idx'" );
-                        $el = $xml->addChild('message', htmlspecialchars($value));
+                        $el = $xml->addChild('Message', htmlspecialchars($value));
                         $el->addAttribute("idx", $key);
                     } else {
                       //self::debugWrite( "key <$key> does not seem to belong to the Messages array: will create a corresponding <option> element with attribute 'idx'" );
-                        $el = $xml->addChild('option', $value);
+                        $el = $xml->addChild('Option', $value);
                         $el->addAttribute("idx", $key);
                     }
                 } elseif (is_bool($value)) {
                     $boolVal = $value ? 1 : 0;
+                    $key = str_replace('_', '', ucwords($key, '_'));
                     $xml->addChild($key, $boolVal);
                 } else {
+                    $key = str_replace('_', '', ucwords($key, '_'));
                     $xml->addChild($key, htmlspecialchars($value));
                 }
             }
