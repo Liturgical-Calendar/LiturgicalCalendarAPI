@@ -58,12 +58,12 @@ class CalendarParams
         // set a default value for the Year parameter, defaulting to current year
         $this->Year = (int)date("Y");
 
-        $calendarsRoute = (defined('API_BASE_PATH') ? API_BASE_PATH : 'https://litcal.johnromanodorazio.com/api/dev') . Route::CALENDARS->value;
+        $calendarsRoute = (defined('API_BASE_PATH') ? API_BASE_PATH : "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}/api/dev") . Route::CALENDARS->value;
         $metadataRaw = file_get_contents($calendarsRoute);
         if ($metadataRaw) {
             $metadata = json_decode($metadataRaw);
             if (JSON_ERROR_NONE === json_last_error() && property_exists($metadata, 'LitCalMetadata')) {
-                $this->calendars = $metadata->LitCalMetadata;
+                $this->calendars = $metadata->litcal_metadata;
             }
         }
 
