@@ -2839,7 +2839,7 @@ class Calendar
     {
         foreach ($rows as $row) {
             if ($this->CalendarParams->Year >= $row->metadata->since_year) {
-                if (property_exists($row->metadata, "untilYear") && $this->CalendarParams->Year >= $row->metadata->until_year) {
+                if (property_exists($row->metadata, "until_year") && $this->CalendarParams->Year >= $row->metadata->until_year) {
                     continue;
                 } else {
                     //if either the property doesn't exist (so no limit is set)
