@@ -1,23 +1,21 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "DiocesanCalendar",
     "$ref": "#/definitions/DiocesanCalendar",
-    "definitions": {
-        "DiocesanCalendar": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "litcal": {
-                    "$ref": "#/definitions/LitCal"
-                },
-                "overrides": {
-                    "$ref": "#/definitions/Overrides"
-                }
-            },
-            "required": [
-                "litcal"
-            ],
-            "title": "DiocesanCalendar"
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "litcal": {
+            "$ref": "#/definitions/LitCal"
         },
+        "overrides": {
+            "$ref": "#/definitions/Overrides"
+        }
+    },
+    "required": [
+        "litcal"
+    ],
+    "definitions": {
         "LitCal": {
             "type": "object",
             "additionalProperties": false,
@@ -82,14 +80,14 @@
                                 }
                             },
                             "required": [
-                                "formRowNum",
-                                "sinceYear"
+                                "form_rownum",
+                                "since_year"
                             ]
                         }
                     },
                     "required": [
-                        "Festivity",
-                        "Metadata"
+                        "festivity",
+                        "metadata"
                     ]
                 }
             },
@@ -105,7 +103,7 @@
                 "ascension": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Ascension"
                 },
-                "corpusChristi": {
+                "corpuschristi": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
                 }
             },
