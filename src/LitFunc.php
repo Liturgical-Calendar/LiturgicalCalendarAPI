@@ -16,6 +16,14 @@ class LitFunc
 {
     private const NON_EVENT_KEYS = [ 'litcal', 'settings', 'messages', 'metadata', 'solemnities', 'feasts_memorials', 'request_headers', 'color', 'color_lcl', 'common' ];
     private static string $LAST_ARRAY_KEY = '';
+    private const TRANSFORMS = [
+      "corpuschristi"     => "CorpusChristi",
+      "eternalhighpriest" => "EternalHighPriest",
+      "litcal"            => "LitCal",
+      "returntype"        => "ReturnType",
+      "calendartype"      => "CalendarType",
+      "eventidx"          => "EventIdx"
+    ];
     public static string $HASH_REQUEST    = '';
 
     public static function isNotLitCalEventKey(string $key): bool
@@ -30,11 +38,15 @@ class LitFunc
                 self::$LAST_ARRAY_KEY = $key;
                 //self::debugWrite( "value of key <$key> is an array" );
                 if (self::isNotLitCalEventKey($key)) {
-                  //self::debugWrite( "key <$key> is not a LitCalEvent" );
-                    $key = str_replace('_', '', ucwords($key, '_'));
+                    //self::debugWrite( "key <$key> is not a LitCalEvent" );
+                    if (in_array($key, self::TRANSFORMS)) {
+                        $key = self::TRANSFORMS[$key];
+                    } else {
+                        $key = str_replace('_', '', ucwords($key, '_'));
+                    }
                     $new_object = $xml->addChild($key);
                 } else {
-                  //self::debugWrite( "key <$key> is a LitCalEvent" );
+                    //self::debugWrite( "key <$key> is a LitCalEvent" );
                     $new_object = $xml->addChild("LitCalEvent");
                     $new_object->addAttribute("eventKey", $key);
                 }
@@ -55,10 +67,18 @@ class LitFunc
                     }
                 } elseif (is_bool($value)) {
                     $boolVal = $value ? 1 : 0;
-                    $key = str_replace('_', '', ucwords($key, '_'));
+                    if (in_array($key, self::TRANSFORMS)) {
+                        $key = self::TRANSFORMS[$key];
+                    } else {
+                        $key = str_replace('_', '', ucwords($key, '_'));
+                    }
                     $xml->addChild($key, $boolVal);
                 } else {
-                    $key = str_replace('_', '', ucwords($key, '_'));
+                    if (in_array($key, self::TRANSFORMS)) {
+                        $key = self::TRANSFORMS[$key];
+                    } else {
+                        $key = str_replace('_', '', ucwords($key, '_'));
+                    }
                     $xml->addChild($key, htmlspecialchars($value));
                 }
             }
