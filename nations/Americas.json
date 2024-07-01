@@ -26,7 +26,7 @@
             }
         }
     ],
-    "nationalcalendars": {
+    "national_calendars": {
         "Canada": "CA",
         "United States": "US",
         "Brazil": "BR",
