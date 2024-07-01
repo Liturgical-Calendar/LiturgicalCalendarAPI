@@ -427,10 +427,10 @@ class Health implements MessageComponentInterface
         } else {
             switch ($category) {
                 case 'nationalcalendar':
-                    $req = "/nation/$Calendar/$Year&calendartype=CIVIL";
+                    $req = "/nation/$Calendar/$Year?calendartype=CIVIL";
                     break;
                 case 'diocesancalendar':
-                    $req = "/diocese/$Calendar/$Year&calendartype=CIVIL";
+                    $req = "/diocese/$Calendar/$Year?calendartype=CIVIL";
                     break;
                 default:
                     //we shouldn't ever get any other categories
