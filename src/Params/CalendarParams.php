@@ -144,19 +144,19 @@ class CalendarParams
                         }
                         break;
                     case "NATIONALCALENDAR":
-                        if (property_exists($this->calendars->NationalCalendars, $value)) {
+                        if (property_exists($this->calendars->national_calendars, $value)) {
                             $this->NationalCalendar = $value;
                         } else {
-                            $validVals = array_keys(get_object_vars($this->calendars->NationalCalendars));
+                            $validVals = array_keys(get_object_vars($this->calendars->national_calendars));
                             $description = "Invalid value `{$value}` for parameter `NATIONALCALENDAR`, valid values are: " . implode(', ', $validVals);
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
                     case "DIOCESANCALENDAR":
-                        if (property_exists($this->calendars->DiocesanCalendars, $value)) {
+                        if (property_exists($this->calendars->diocesan_calendars, $value)) {
                             $this->DiocesanCalendar = $value;
                         } else {
-                            $validVals = array_keys(get_object_vars($this->calendars->DiocesanCalendars));
+                            $validVals = array_keys(get_object_vars($this->calendars->diocesan_calendars));
                             $description = "Invalid value `{$value}` for parameter `DIOCESANCALENDAR`, valid values are: " . implode(', ', $validVals);
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
