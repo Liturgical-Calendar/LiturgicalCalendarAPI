@@ -11,19 +11,19 @@
             "type": "object",
             "minProperties": 1,
             "properties": {
-                "nationalcalendar": {
+                "national_calendar": {
                     "type": "string"
                 },
-                "diocesancalendar": {
+                "diocesan_calendar": {
                     "type": "string"
                 },
-                "nationalcalendars": {
+                "national_calendars": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
                 },
-                "diocesancalendars": {
+                "diocesan_calendars": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -31,10 +31,10 @@
                 }
             },
             "anyOf": [
-                { "required": ["nationalcalendar"] },
-                { "required": ["nationalcalendars"] },
-                { "required": ["diocesancalendar"] },
-                { "required": ["diocesancalendars"] }
+                { "required": ["national_calendar"] },
+                { "required": ["national_calendars"] },
+                { "required": ["diocesan_calendar"] },
+                { "required": ["diocesan_calendars"] }
             ],
             "additionalProperties": false
         },
