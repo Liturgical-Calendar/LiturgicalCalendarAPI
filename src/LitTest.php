@@ -36,8 +36,8 @@ class LitTest
                             $schema = Schema::import($jsonSchema);
                             $schema->in($this->testInstructions);
                             self::$testCache->{$Test} = new \stdClass();
-                            self::$testCache->{$Test}->testInstructions     = $this->testInstructions;
-                            self::$testCache->{$this->Test}->yearsSupported = $this->detectYearsSupported();
+                            self::$testCache->{$Test}->testInstructions = $this->testInstructions;
+                            self::$testCache->{$Test}->yearsSupported = $this->detectYearsSupported();
                             $this->readyState = true;
                         } catch (InvalidValue | \Exception $e) {
                             $this->setError("Cannot proceed with {$Test}, the Test instructions were incorrectly validated against schema " . $schemaFile . ": " . $e->getMessage());
@@ -65,9 +65,8 @@ class LitTest
 
     public function runTest(): void
     {
-
         if ($this->readyState) {
-            $assertion = $this->retrieveAssertionForYear($this->dataToTest->Settings->Year);
+            $assertion = $this->retrieveAssertionForYear($this->dataToTest->settings->year);
             if (is_null($assertion)) {
                 $this->setError("Out of bounds error: {$this->Test} only supports calendar years [ " . implode(', ', self::$testCache->{$this->Test}->yearsSupported) . " ]");
                 return;
@@ -75,16 +74,16 @@ class LitTest
 
             $calendarType = $this->getCalendarTypeStr();
             $calendarName = $this->getCalendarName();
-            $messageIfError = "{$this->Test} Assertion '{$assertion->assertion}' failed for Year " . $this->dataToTest->Settings->Year . " in {$calendarType}{$calendarName}.";
+            $messageIfError = "{$this->Test} Assertion '{$assertion->assertion}' failed for Year " . $this->dataToTest->settings->year . " in {$calendarType}{$calendarName}.";
             $eventKey = self::$testCache->{$this->Test}->testInstructions->eventkey;
 
             switch ($assertion->assert) {
                 case 'eventNotExists':
-                    $errorMessage = is_null($assertion->expectedValue)
+                    $errorMessage = is_null($assertion->expected_value)
                         ? " The event {$eventKey} should not exist, instead the event has a timestamp of {$this->dataToTest->LitCal->{$eventKey}->date}"
                         : " What is going on here? We expected the event not to exist, and in fact it doesn't. We should never get here!";
 
-                    if (false === property_exists($this->dataToTest->LitCal, $eventKey)) {
+                    if (false === property_exists($this->dataToTest->litcal, $eventKey)) {
                         $this->setSuccess();
                     } else {
                         $this->setError($messageIfError . $errorMessage);
@@ -92,11 +91,11 @@ class LitTest
                     break;
                 case 'eventExists AND hasExpectedTimestamp':
                     $firstErrorMessage = " The event {$eventKey} should exist, instead it was not found";
-                    if (property_exists($this->dataToTest->LitCal, $eventKey)) {
-                        $actualValue = $this->dataToTest->LitCal->{$eventKey}->date;
-                        $secondErrorMessage = " The event {$eventKey} was expected to have timestamp {$assertion->expectedValue}, instead it had timestamp {$actualValue}";
-                        if ($actualValue === $assertion->expectedValue) {
-                            $this->setSuccess("expectedValue = {$assertion->expectedValue}, actualValue = {$actualValue}");
+                    if (property_exists($this->dataToTest->litcal, $eventKey)) {
+                        $actualValue = $this->dataToTest->litcal->{$eventKey}->date;
+                        $secondErrorMessage = " The event {$eventKey} was expected to have timestamp {$assertion->expected_value}, instead it had timestamp {$actualValue}";
+                        if ($actualValue === $assertion->expected_value) {
+                            $this->setSuccess("expected_value = {$assertion->expected_value}, actualValue = {$actualValue}");
                         } else {
                             $this->setError($messageIfError . $secondErrorMessage);
                         }
@@ -113,15 +112,15 @@ class LitTest
 
     private function getCalendarTypeStr(): string
     {
-        return property_exists($this->dataToTest->Settings, 'NationalCalendar') ? 'the national calendar of ' : (
-            property_exists($this->dataToTest->Settings, 'DiocesanCalendar') ? 'the diocesan calendar of ' : ''
+        return property_exists($this->dataToTest->settings, 'nationalcalendar') ? 'the national calendar of ' : (
+            property_exists($this->dataToTest->settings, 'diocesancalendar') ? 'the diocesan calendar of ' : ''
         );
     }
 
     private function getCalendarName(): string
     {
-        return property_exists($this->dataToTest->Settings, 'DiocesanCalendar') ? $this->dataToTest->Settings->DiocesanCalendar : (
-            property_exists($this->dataToTest->Settings, 'NationalCalendar') ? $this->dataToTest->Settings->NationalCalendar : 'the Universal Roman Calendar'
+        return property_exists($this->dataToTest->settings, 'diocesancalendar') ? $this->dataToTest->settings->diocesancalendar : (
+            property_exists($this->dataToTest->settings, 'nationalcalendar') ? $this->dataToTest->settings->nationalcalendar : 'the Universal Roman Calendar'
         );
     }
 
@@ -129,13 +128,13 @@ class LitTest
     {
         $this->Message = new \stdClass();
         $this->Message->type = $type;
-        $this->Message->classes = ".$this->Test.year-{$this->dataToTest->Settings->Year}.test-valid";
+        $this->Message->classes = ".$this->Test.year-{$this->dataToTest->settings->year}.test-valid";
         $this->Message->test = $this->Test;
         if ($type === 'success') {
             if (is_null($text)) {
-                $this->Message->text = "$this->Test passed for the Calendar {$this->getCalendarName()} for the year {$this->dataToTest->Settings->Year}";
+                $this->Message->text = "$this->Test passed for the Calendar {$this->getCalendarName()} for the year {$this->dataToTest->settings->year}";
             } else {
-                $this->Message->text = "$this->Test passed for the Calendar {$this->getCalendarName()} for the year {$this->dataToTest->Settings->Year}: " . $text;
+                $this->Message->text = "$this->Test passed for the Calendar {$this->getCalendarName()} for the year {$this->dataToTest->settings->year}: " . $text;
             }
         } else {
             $this->Message->text = $text;
