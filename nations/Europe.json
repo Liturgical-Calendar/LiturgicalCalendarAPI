@@ -164,7 +164,7 @@
             }
         }
     ],
-    "NationalCalendars": {
+    "national_calendars": {
         "Bulgaria": "BG",
         "Czechia": "CZ",
         "Croatia": "HR",

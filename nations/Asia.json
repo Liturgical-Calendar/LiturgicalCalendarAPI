@@ -27,7 +27,7 @@
             }
         }
     ],
-    "NationalCalendars": {
+    "national_calendars": {
         "China": "CN",
         "Japan": "JP"
     },
