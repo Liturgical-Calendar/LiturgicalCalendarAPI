@@ -411,12 +411,35 @@ class Health implements MessageComponentInterface
 
     private function executeUnitTest(string $Test, string $Calendar, int $Year, string $category, ConnectionInterface $to): void
     {
+        //get the index of the responsetype from the ReturnType class
+        $responseTypeIdx = array_search("JSON", ReturnType::$values);
+        //get the corresponding accept mime type
+        $acceptMimeType = AcceptHeader::$values[$responseTypeIdx];
+        $opts = [
+            "http" => [
+                "method" => "GET",
+                "header" => "Accept: $acceptMimeType\r\n"
+            ]
+        ];
+        $context = stream_context_create($opts);
         if ($Calendar === 'VATICAN') {
-            $req = "?nationalcalendar=VATICAN&year=$Year&calendartype=CIVIL";
+            $req = "/$Year?calendartype=CIVIL";
         } else {
-            $req = "?$category=$Calendar&year=$Year&calendartype=CIVIL";
+            switch ($category) {
+                case 'nationalcalendar':
+                    $req = "/nation/$Calendar/$Year&calendartype=CIVIL";
+                    break;
+                case 'diocesancalendar':
+                    $req = "/diocese/$Calendar/$Year&calendartype=CIVIL";
+                    break;
+                default:
+                    //we shouldn't ever get any other categories
+            }
         }
-        $jsonData = json_decode(file_get_contents(API_BASE_PATH . $req));
+        $data = file_get_contents(self::REQPATH . $req, false, $context);
+        // We don't really need to check whether file_get_contents succeeded
+        //  because this check already takes place in the validateCalendar test phase
+        $jsonData = json_decode($data);
         if (json_last_error() === JSON_ERROR_NONE) {
             $UnitTest = new LitTest($Test, $jsonData);
             if ($UnitTest->isReady()) {
