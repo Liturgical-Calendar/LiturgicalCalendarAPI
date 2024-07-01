@@ -93,8 +93,8 @@ class LitFunc
         }
     }
 
-  // https://en.wikipedia.org/wiki/Computus#Anonymous_Gregorian_algorithm
-  // aka Meeus/Jones/Butcher algorithm
+    // https://en.wikipedia.org/wiki/Computus#Anonymous_Gregorian_algorithm
+    // aka Meeus/Jones/Butcher algorithm
     public static function calcGregEaster($Y): DateTime
     {
         $a = $Y % 19;
@@ -118,10 +118,10 @@ class LitFunc
     }
 
 
-  //https://en.wikipedia.org/wiki/Computus#Meeus.27_Julian_algorithm
-  //Meeus' Julian algorithm
-  //Also many javascript examples can be found here:
-  //https://web.archive.org/web/20150227133210/http://www.merlyn.demon.co.uk/estralgs.txt
+    //https://en.wikipedia.org/wiki/Computus#Meeus.27_Julian_algorithm
+    //Meeus' Julian algorithm
+    //Also many javascript examples can be found here:
+    //https://web.archive.org/web/20150227133210/http://www.merlyn.demon.co.uk/estralgs.txt
     public static function calcJulianEaster(int $Y, bool $gregCal = false): DateTime
     {
         $a = $Y % 4;
@@ -173,10 +173,10 @@ class LitFunc
         }
         return $dateObj;
     }
-  /**
-  private static function debugWrite( string $string ) {
-    $debugFile = "LitFuncDebug_" . LitFunc::$HASH_REQUEST . ".log";
-    file_put_contents( $debugFile, date('c') . "\t" . $string . PHP_EOL, FILE_APPEND );
-  }
-  */
+    /**
+    private static function debugWrite( string $string ) {
+      $debugFile = "LitFuncDebug_" . LitFunc::$HASH_REQUEST . ".log";
+      file_put_contents( $debugFile, date('c') . "\t" . $string . PHP_EOL, FILE_APPEND );
+    }
+    */
 }
