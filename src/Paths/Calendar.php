@@ -2570,8 +2570,8 @@ class Calendar
             $this->NationalData = json_decode(file_get_contents($nationalDataFile));
             if (json_last_error() === JSON_ERROR_NONE) {
                 if (property_exists($this->NationalData, "metadata") && property_exists($this->NationalData->metadata, "wider_region")) {
-                    $widerRegionDataFile = $this->NationalData->metadata->wider_region->jsonfile;
-                    $widerRegionI18nFile = $this->NationalData->metadata->wider_region->i18nfile;
+                    $widerRegionDataFile = $this->NationalData->metadata->wider_region->json_file;
+                    $widerRegionI18nFile = $this->NationalData->metadata->wider_region->i18n_file;
                     if (file_exists($widerRegionI18nFile)) {
                         $widerRegionI18nData = json_decode(file_get_contents($widerRegionI18nFile));
                         if (json_last_error() === JSON_ERROR_NONE && file_exists($widerRegionDataFile)) {

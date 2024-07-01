@@ -162,16 +162,16 @@
                 "name": {
                     "type": "string"
                 },
-                "jsonfile": {
+                "json_file": {
                     "type": "string"
                 },
-                "i18nfile": {
+                "i18n_file": {
                     "type": "string"
                 }
             },
             "required": [
-                "i18nfile",
-                "jsonfile",
+                "i18n_file",
+                "json_file",
                 "name"
             ],
             "title": "WiderRegion"

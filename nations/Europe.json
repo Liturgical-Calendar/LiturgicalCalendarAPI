@@ -123,7 +123,7 @@
             "metadata": {
                 "action": "createNew",
                 "since_year": 1999,
-                "untilYear": 2002,
+                "until_year": 2002,
                 "url": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/motu_proprio\/documents\/hf_jp-ii_motu-proprio_01101999_co-patronesses-europe.html",
                 "url_lang_map": {
                     "de": "de",

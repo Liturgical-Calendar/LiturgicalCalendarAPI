@@ -14,7 +14,7 @@
             "metadata": {
                 "action": "makePatron",
                 "since_year": 1939,
-                "untilYear": 1999,
+                "until_year": 1999,
                 "url": "https:\/\/www.vatican.va\/content\/pius-xii\/it\/briefs\/documents\/hf_p-xii_brief_19390618_patroni-italia.html"
             }
         },
@@ -46,8 +46,8 @@
         "region": "ITALY",
         "wider_region": {
             "name": "Europe",
-            "jsonFile": "nations\/Europe.json",
-            "i18nFile": "nations\/EUROPE\/it_IT.json"
+            "json_file": "nations\/Europe.json",
+            "i18n_file": "nations\/EUROPE\/it_IT.json"
         },
         "missals": [
             "ITALY_1983",
