@@ -62,9 +62,13 @@ class CalendarParams
         $metadataRaw = file_get_contents($calendarsRoute);
         if ($metadataRaw) {
             $metadata = json_decode($metadataRaw);
-            if (JSON_ERROR_NONE === json_last_error() && property_exists($metadata, 'LitCalMetadata')) {
+            if (JSON_ERROR_NONE === json_last_error() && property_exists($metadata, 'litcal_metadata')) {
                 $this->calendars = $metadata->litcal_metadata;
+            } else {
+                Calendar::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The API was unable to initialize calendars metadata: " . json_last_error_msg());
             }
+        } else {
+            Calendar::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The API was unable to load calendars metadata");
         }
 
         // set a default value for language starting from Accept-Language header
