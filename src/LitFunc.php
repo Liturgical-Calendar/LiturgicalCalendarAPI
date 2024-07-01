@@ -14,7 +14,7 @@ use Johnrdorazio\LitCal\DateTime;
  */
 class LitFunc
 {
-    private const NON_EVENT_KEYS = [ 'LitCal', 'Settings', 'Messages', 'Metadata', 'Solemnities', 'FeastsMemorials', 'RequestHeaders', 'color', 'colorLcl', 'common' ];
+    private const NON_EVENT_KEYS = [ 'litcal', 'settings', 'messages', 'metadata', 'solemnities', 'feasts_memorials', 'request_headers', 'color', 'color_lcl', 'common' ];
     private static string $LAST_ARRAY_KEY = '';
     public static string $HASH_REQUEST    = '';
 
@@ -43,7 +43,7 @@ class LitFunc
               // XML elements cannot have numerical names, they must have text
                 if (is_numeric($key)) {
                     //self::debugWrite( "key <$key> is numerical, have to deal with this..." );
-                    if (self::$LAST_ARRAY_KEY === 'Messages') {
+                    if (self::$LAST_ARRAY_KEY === 'messages') {
                       //self::debugWrite( "key <$key> seems to belong to the Messages array: will create a corresponding <message> element with attribute 'idx'" );
                         $el = $xml->addChild('message', htmlspecialchars($value));
                         $el->addAttribute("idx", $key);
