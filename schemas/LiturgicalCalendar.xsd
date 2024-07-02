@@ -106,7 +106,7 @@
                             </xs:simpleType>
                           </xs:element>
                         </xs:sequence>
-                        <xs:attribute name="EventKey" type="xs:string" use="required" />
+                        <xs:attribute name="eventKey" type="xs:string" use="required" />
                       </xs:complexType>
                     </xs:element>
                   </xs:sequence>
@@ -136,7 +136,7 @@
                             </xs:simpleType>
                           </xs:element>
                         </xs:sequence>
-                        <xs:attribute name="EventKey" type="xs:string" use="required" />
+                        <xs:attribute name="eventKey" type="xs:string" use="required" />
                       </xs:complexType>
                     </xs:element>
                   </xs:sequence>
@@ -279,7 +279,7 @@
                     <xs:element name="LiturgicalSeason" minOccurs="0" type="xs:string" />
                     <xs:element name="LiturgicalSeasonLcl" minOccurs="0" type="xs:string" />
                   </xs:sequence>
-                  <xs:attribute name="Eventkey" type="xs:ID" use="required" />
+                  <xs:attribute name="eventKey" type="xs:ID" use="required" />
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
