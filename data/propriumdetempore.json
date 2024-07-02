@@ -278,7 +278,7 @@
         "type": "mobile",
         "color": [ "red" ],
         "readings": {
-            "PALM_GOSPEL": "",
+            "palm_gospel": "",
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
