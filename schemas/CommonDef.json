@@ -693,7 +693,7 @@
                 "vai",  "vi",  "vun",   "wae",  "wo",   "xh",   "xog",   "yav", "yi",   "yo",
                 "yue",  "zgh", "zh",    "zu",   "LA",   "la"
             ]
-},
+        },
         "AcceptLanguage": {
             "type": "string",
             "anyOf": [
