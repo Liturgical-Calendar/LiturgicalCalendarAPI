@@ -58,7 +58,7 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "TAG": {
+                "event_key": {
                     "type": "string"
                 },
                 "GRADE": {
@@ -87,7 +87,7 @@
                 }
             },
             "required": [
-                "TAG"
+                "event_key"
             ],
             "title": "Festivity"
         },

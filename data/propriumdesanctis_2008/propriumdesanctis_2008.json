@@ -2,7 +2,7 @@
     {
         "MONTH": 9,
         "DAY": 23,
-        "TAG": "StPioPietrelcina",
+        "event_key": "StPioPietrelcina",
         "GRADE": 3,
         "COMMON": [
             "Pastors:For One Pastor",
@@ -13,17 +13,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 12,
         "DAY": 12,
-        "TAG": "LadyGuadalupe",
+        "event_key": "LadyGuadalupe",
         "GRADE": 2,
         "COMMON": [
             "Blessed Virgin Mary"
@@ -33,17 +33,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 12,
         "DAY": 9,
-        "TAG": "JuanDiego",
+        "event_key": "JuanDiego",
         "GRADE": 2,
         "COMMON": [
             "Holy Men and Women:For One Saint"
@@ -53,11 +53,11 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     }
 ]

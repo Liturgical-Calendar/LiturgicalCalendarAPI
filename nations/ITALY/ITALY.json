@@ -2,7 +2,7 @@
     "litcal": [
         {
             "festivity": {
-                "tag": "StCatherineSiena",
+                "event_key": "StCatherineSiena",
                 "name": "Santa Caterina da Siena, vergine e dottore della Chiesa, patrona d'Italia",
                 "color": [
                     "white"
@@ -20,7 +20,7 @@
         },
         {
             "festivity": {
-                "tag": "StFrancisAssisi",
+                "event_key": "StFrancisAssisi",
                 "name": "San Francesco d'Assisi, patrono d'Italia",
                 "color": [
                     "white"

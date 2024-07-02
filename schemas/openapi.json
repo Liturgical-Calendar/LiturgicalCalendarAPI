@@ -789,7 +789,7 @@
                     "StsBasilGreg": {
                       "MONTH": 1,
                       "DAY": 2,
-                      "TAG": "StsBasilGreg",
+                      "event_key": "StsBasilGreg",
                       "GRADE": 3,
                       "COMMON": [
                         "Proper"
@@ -799,11 +799,11 @@
                         "white"
                       ],
                       "READINGS": {
-                        "FIRST_READING": "Ef 4, 1-7.11-13",
-                        "RESPONSORIAL_PSALM": "Salmo 23",
-                        "SECOND_READING": "",
-                        "ALLELUIA_VERSE": "Mt 23, 9b.10b",
-                        "GOSPEL": "Mt 23, 8-12"
+                        "first_reading": "Ef 4, 1-7.11-13",
+                        "responsorial_psalm": "Salmo 23",
+                        "second_reading": "",
+                        "alleluia_verse": "Mt 23, 9b.10b",
+                        "gospel": "Mt 23, 8-12"
                       },
                       "NAME": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
                       "MISSAL": "VATICAN_1970"
@@ -811,7 +811,7 @@
                     "StRayPenyafort": {
                       "MONTH": 1,
                       "DAY": 7,
-                      "TAG": "StRayPenyafort",
+                      "event_key": "StRayPenyafort",
                       "GRADE": 2,
                       "COMMON": [
                         "Pastors:For One Pastor"
@@ -821,11 +821,11 @@
                         "white"
                       ],
                       "READINGS": {
-                        "FIRST_READING": "2 Cor 5, 14-20",
-                        "RESPONSORIAL_PSALM": "Salmo 103",
-                        "SECOND_READING": "",
-                        "ALLELUIA_VERSE": "Mt 24, 42a.44",
-                        "GOSPEL": "Lc 12, 35-40"
+                        "first_reading": "2 Cor 5, 14-20",
+                        "responsorial_psalm": "Salmo 103",
+                        "second_reading": "",
+                        "alleluia_verse": "Mt 24, 42a.44",
+                        "gospel": "Lc 12, 35-40"
                       },
                       "NAME": "Sancti Raimundi de Penyafort, presbyteri",
                       "MISSAL": "VATICAN_1970"
@@ -884,7 +884,7 @@
                     "StsBasilGreg": {
                       "MONTH": 1,
                       "DAY": 2,
-                      "TAG": "StsBasilGreg",
+                      "event_key": "StsBasilGreg",
                       "GRADE": 3,
                       "COMMON": [
                         "Proper"
@@ -894,11 +894,11 @@
                         "white"
                       ],
                       "READINGS": {
-                        "FIRST_READING": "Ef 4, 1-7.11-13",
-                        "RESPONSORIAL_PSALM": "Salmo 23",
-                        "SECOND_READING": "",
-                        "ALLELUIA_VERSE": "Mt 23, 9b.10b",
-                        "GOSPEL": "Mt 23, 8-12"
+                        "first_reading": "Ef 4, 1-7.11-13",
+                        "responsorial_psalm": "Salmo 23",
+                        "second_reading": "",
+                        "alleluia_verse": "Mt 23, 9b.10b",
+                        "gospel": "Mt 23, 8-12"
                       },
                       "NAME": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
                       "MISSAL": "VATICAN_1970"
@@ -906,7 +906,7 @@
                     "StRayPenyafort": {
                       "MONTH": 1,
                       "DAY": 7,
-                      "TAG": "StRayPenyafort",
+                      "event_key": "StRayPenyafort",
                       "GRADE": 2,
                       "COMMON": [
                         "Pastors:For One Pastor"
@@ -916,11 +916,11 @@
                         "white"
                       ],
                       "READINGS": {
-                        "FIRST_READING": "2 Cor 5, 14-20",
-                        "RESPONSORIAL_PSALM": "Salmo 103",
-                        "SECOND_READING": "",
-                        "ALLELUIA_VERSE": "Mt 24, 42a.44",
-                        "GOSPEL": "Lc 12, 35-40"
+                        "first_reading": "2 Cor 5, 14-20",
+                        "responsorial_psalm": "Salmo 103",
+                        "second_reading": "",
+                        "alleluia_verse": "Mt 24, 42a.44",
+                        "gospel": "Lc 12, 35-40"
                       },
                       "NAME": "Sancti Raimundi de Penyafort, presbyteri",
                       "MISSAL": "VATICAN_1970"
@@ -2635,7 +2635,7 @@
                     "minimum": 1,
                     "maximum": 31
                   },
-                  "TAG": {
+                  "event_key": {
                     "type": "string",
                     "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$",
                     "description": "corresponds to the `eventkey` property of liturgical events in the output of the LitCal API and similar endpoints"
@@ -2672,58 +2672,58 @@
                   "READINGS": {
                     "type": "object",
                     "properties": {
-                      "FIRST_READING": {
+                      "first_reading": {
                         "type": "string"
                       },
-                      "RESPONSORIAL_PSALM": {
+                      "responsorial_psalm": {
                         "type": "string"
                       },
-                      "SECOND_READING": {
+                      "second_reading": {
                         "type": "string"
                       },
-                      "RESPONSORIAL_PSALM_2": {
+                      "responsorial_psalm_2": {
                         "type": "string"
                       },
-                      "THIRD_READING": {
+                      "third_reading": {
                         "type": "string"
                       },
-                      "RESPONSORIAL_PSALM_3": {
+                      "responsorial_psalm_3": {
                         "type": "string"
                       },
-                      "FOURTH_READING": {
+                      "fourth_reading": {
                         "type": "string"
                       },
-                      "RESPONSORIAL_PSALM_4": {
+                      "responsorial_psalm_4": {
                         "type": "string"
                       },
-                      "FIFTH_READING": {
+                      "fifth_reading": {
                         "type": "string"
                       },
-                      "RESPONSORIAL_PSALM_5": {
+                      "responsorial_psalm_5": {
                         "type": "string"
                       },
-                      "SIXTH_READING": {
+                      "sixth_reading": {
                         "type": "string"
                       },
-                      "RESPONSORIAL_PSALM_6": {
+                      "responsorial_psalm_6": {
                         "type": "string"
                       },
-                      "SEVENTH_READING": {
+                      "seventh_reading": {
                         "type": "string"
                       },
-                      "RESPONSORIAL_PSALM_7": {
+                      "responsorial_psalm_7": {
                         "type": "string"
                       },
-                      "EPISTLE": {
+                      "epistle": {
                         "type": "string"
                       },
-                      "RESPONSORIAL_PSALM_EPISTLE": {
+                      "responsorial_psalm_epistle": {
                         "type": "string"
                       },
-                      "ALLELUIA_VERSE": {
+                      "alleluia_verse": {
                         "type": "string"
                       },
-                      "GOSPEL": {
+                      "gospel": {
                         "type": "string"
                       }
                     },
@@ -2758,7 +2758,7 @@
                 "required": [
                   "MONTH",
                   "DAY",
-                  "TAG",
+                  "event_key",
                   "GRADE",
                   "COMMON",
                   "CALENDAR",

@@ -2,7 +2,7 @@
     {
         "MONTH": 1,
         "DAY": 3,
-        "TAG": "NameJesus",
+        "event_key": "NameJesus",
         "GRADE": 2,
         "COMMON": [
             "Proper"
@@ -12,17 +12,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 2,
         "DAY": 8,
-        "TAG": "StJosephineBakhita",
+        "event_key": "StJosephineBakhita",
         "GRADE": 2,
         "COMMON": [
             "Virgins:For One Virgin"
@@ -32,17 +32,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 4,
         "DAY": 23,
-        "TAG": "StAdalbert",
+        "event_key": "StAdalbert",
         "GRADE": 2,
         "COMMON": [
             "Martyrs:For One Martyr",
@@ -54,17 +54,17 @@
             "red"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 4,
         "DAY": 28,
-        "TAG": "StLouisGrignionMontfort",
+        "event_key": "StLouisGrignionMontfort",
         "GRADE": 2,
         "COMMON": [
             "Pastors:For One Pastor"
@@ -74,17 +74,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 5,
         "DAY": 13,
-        "TAG": "LadyFatima",
+        "event_key": "LadyFatima",
         "GRADE": 2,
         "COMMON": [
             "Blessed Virgin Mary"
@@ -94,17 +94,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 5,
         "DAY": 21,
-        "TAG": "StChristopherMagallanes",
+        "event_key": "StChristopherMagallanes",
         "GRADE": 2,
         "COMMON": [
             "Martyrs:For Several Martyrs"
@@ -114,17 +114,17 @@
             "red"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 5,
         "DAY": 22,
-        "TAG": "StRitaCascia",
+        "event_key": "StRitaCascia",
         "GRADE": 2,
         "COMMON": [
             "Holy Men and Women:For Religious"
@@ -134,17 +134,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 7,
         "DAY": 9,
-        "TAG": "StAugustineZhaoRong",
+        "event_key": "StAugustineZhaoRong",
         "GRADE": 2,
         "COMMON": [
             "Martyrs:For Several Martyrs"
@@ -154,17 +154,17 @@
             "red"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 7,
         "DAY": 20,
-        "TAG": "StApollinaris",
+        "event_key": "StApollinaris",
         "GRADE": 2,
         "COMMON": [
             "Martyrs:For One Martyr",
@@ -176,17 +176,17 @@
             "red"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 7,
         "DAY": 24,
-        "TAG": "StSharbelMakhluf",
+        "event_key": "StSharbelMakhluf",
         "GRADE": 2,
         "COMMON": [
             "Pastors:For One Pastor",
@@ -197,17 +197,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 8,
         "DAY": 2,
-        "TAG": "StPeterJulianEymard",
+        "event_key": "StPeterJulianEymard",
         "GRADE": 2,
         "COMMON": [
             "Pastors:For One Pastor",
@@ -218,17 +218,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 8,
         "DAY": 9,
-        "TAG": "StEdithStein",
+        "event_key": "StEdithStein",
         "GRADE": 2,
         "COMMON": [
             "Martyrs:For a Virgin Martyr",
@@ -240,17 +240,17 @@
             "red"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 8,
         "DAY": 14,
-        "TAG": "StMaximilianKolbe",
+        "event_key": "StMaximilianKolbe",
         "GRADE": 3,
         "COMMON": [
             "Proper"
@@ -261,17 +261,17 @@
             "red"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 9,
         "DAY": 9,
-        "TAG": "StPeterClaver",
+        "event_key": "StPeterClaver",
         "GRADE": 2,
         "COMMON": [
             "Pastors:For One Pastor",
@@ -282,17 +282,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 9,
         "DAY": 12,
-        "TAG": "HolyNameMary",
+        "event_key": "HolyNameMary",
         "GRADE": 2,
         "COMMON": [
             "Proper"
@@ -302,17 +302,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 9,
         "DAY": 20,
-        "TAG": "StAndrewKimTaegon",
+        "event_key": "StAndrewKimTaegon",
         "GRADE": 3,
         "COMMON": [
             "Proper"
@@ -322,17 +322,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 9,
         "DAY": 28,
-        "TAG": "StsLawrenceRuiz",
+        "event_key": "StsLawrenceRuiz",
         "GRADE": 2,
         "COMMON": [
             "Martyrs:For Several Martyrs"
@@ -342,17 +342,17 @@
             "red"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 11,
         "DAY": 24,
-        "TAG": "StAndrewDungLac",
+        "event_key": "StAndrewDungLac",
         "GRADE": 3,
         "COMMON": [
             "Proper"
@@ -362,17 +362,17 @@
             "red"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 11,
         "DAY": 25,
-        "TAG": "StCatherineAlexandria",
+        "event_key": "StCatherineAlexandria",
         "GRADE": 2,
         "COMMON": [
             "Martyrs:For a Virgin Martyr",
@@ -384,11 +384,11 @@
             "red"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     }
 ]

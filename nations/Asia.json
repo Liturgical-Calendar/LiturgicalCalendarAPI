@@ -2,7 +2,7 @@
     "litcal": [
         {
             "festivity": {
-                "tag": "StFrancisXavier",
+                "event_key": "StFrancisXavier",
                 "name": "San Francesco Saverio, sacerdote",
                 "color": [
                     "white"

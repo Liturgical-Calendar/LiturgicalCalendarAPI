@@ -44,7 +44,7 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "tag": {
+                "event_key": {
                     "type": "string"
                 },
                 "name": {
@@ -79,14 +79,14 @@
                         "day",
                         "month",
                         "name",
-                        "tag"
+                        "event_key"
                     ]
                 },
                 {
                     "required": [
                         "strtotime",
                         "name",
-                        "tag",
+                        "event_key",
                         "common",
                         "color",
                         "grade"

@@ -26,91 +26,6 @@ class Events
     private static array $requestPathParts           = [];
     private EventsParams $EventsParams;
 
-    // The liturgical rank of Proprium de Tempore events is defined in LitCalAPI rather than in resource files
-    // So we can't gather this information just from the resource files
-    // Which means we need to define them here manually
-    private const PROPRIUM_DE_TEMPORE_RANKS = [
-        "HolyThurs"         => LitGrade::HIGHER_SOLEMNITY,
-        "GoodFri"           => LitGrade::HIGHER_SOLEMNITY,
-        "EasterVigil"       => LitGrade::HIGHER_SOLEMNITY,
-        "Easter"            => LitGrade::HIGHER_SOLEMNITY,
-        "Christmas"         => LitGrade::HIGHER_SOLEMNITY,
-        "Christmas2"        => LitGrade::FEAST_LORD,
-        "MotherGod"         => LitGrade::SOLEMNITY,
-        "Epiphany"          => LitGrade::HIGHER_SOLEMNITY,
-        "Easter2"           => LitGrade::HIGHER_SOLEMNITY,
-        "Easter3"           => LitGrade::HIGHER_SOLEMNITY,
-        "Easter4"           => LitGrade::HIGHER_SOLEMNITY,
-        "Easter5"           => LitGrade::HIGHER_SOLEMNITY,
-        "Easter6"           => LitGrade::HIGHER_SOLEMNITY,
-        "Easter7"           => LitGrade::HIGHER_SOLEMNITY,
-        "Ascension"         => LitGrade::HIGHER_SOLEMNITY,
-        "Pentecost"         => LitGrade::HIGHER_SOLEMNITY,
-        "Advent1"           => LitGrade::HIGHER_SOLEMNITY,
-        "Advent2"           => LitGrade::HIGHER_SOLEMNITY,
-        "Advent3"           => LitGrade::HIGHER_SOLEMNITY,
-        "Advent4"           => LitGrade::HIGHER_SOLEMNITY,
-        "Lent1"             => LitGrade::HIGHER_SOLEMNITY,
-        "Lent2"             => LitGrade::HIGHER_SOLEMNITY,
-        "Lent3"             => LitGrade::HIGHER_SOLEMNITY,
-        "Lent4"             => LitGrade::HIGHER_SOLEMNITY,
-        "Lent5"             => LitGrade::HIGHER_SOLEMNITY,
-        "PalmSun"           => LitGrade::HIGHER_SOLEMNITY,
-        "Trinity"           => LitGrade::HIGHER_SOLEMNITY,
-        "CorpusChristi"     => LitGrade::HIGHER_SOLEMNITY,
-        "AshWednesday"      => LitGrade::HIGHER_SOLEMNITY,
-        "MonHolyWeek"       => LitGrade::HIGHER_SOLEMNITY,
-        "TueHolyWeek"       => LitGrade::HIGHER_SOLEMNITY,
-        "WedHolyWeek"       => LitGrade::HIGHER_SOLEMNITY,
-        "MonOctaveEaster"   => LitGrade::HIGHER_SOLEMNITY,
-        "TueOctaveEaster"   => LitGrade::HIGHER_SOLEMNITY,
-        "WedOctaveEaster"   => LitGrade::HIGHER_SOLEMNITY,
-        "ThuOctaveEaster"   => LitGrade::HIGHER_SOLEMNITY,
-        "FriOctaveEaster"   => LitGrade::HIGHER_SOLEMNITY,
-        "SatOctaveEaster"   => LitGrade::HIGHER_SOLEMNITY,
-        "SacredHeart"       => LitGrade::SOLEMNITY,
-        "ChristKing"        => LitGrade::SOLEMNITY,
-        "BaptismLord"       => LitGrade::FEAST_LORD,
-        "HolyFamily"        => LitGrade::FEAST_LORD,
-        "OrdSunday2"        => LitGrade::FEAST_LORD,
-        "OrdSunday3"        => LitGrade::FEAST_LORD,
-        "OrdSunday4"        => LitGrade::FEAST_LORD,
-        "OrdSunday5"        => LitGrade::FEAST_LORD,
-        "OrdSunday6"        => LitGrade::FEAST_LORD,
-        "OrdSunday7"        => LitGrade::FEAST_LORD,
-        "OrdSunday8"        => LitGrade::FEAST_LORD,
-        "OrdSunday9"        => LitGrade::FEAST_LORD,
-        "OrdSunday10"       => LitGrade::FEAST_LORD,
-        "OrdSunday11"       => LitGrade::FEAST_LORD,
-        "OrdSunday12"       => LitGrade::FEAST_LORD,
-        "OrdSunday13"       => LitGrade::FEAST_LORD,
-        "OrdSunday14"       => LitGrade::FEAST_LORD,
-        "OrdSunday15"       => LitGrade::FEAST_LORD,
-        "OrdSunday16"       => LitGrade::FEAST_LORD,
-        "OrdSunday17"       => LitGrade::FEAST_LORD,
-        "OrdSunday18"       => LitGrade::FEAST_LORD,
-        "OrdSunday19"       => LitGrade::FEAST_LORD,
-        "OrdSunday20"       => LitGrade::FEAST_LORD,
-        "OrdSunday21"       => LitGrade::FEAST_LORD,
-        "OrdSunday22"       => LitGrade::FEAST_LORD,
-        "OrdSunday23"       => LitGrade::FEAST_LORD,
-        "OrdSunday24"       => LitGrade::FEAST_LORD,
-        "OrdSunday25"       => LitGrade::FEAST_LORD,
-        "OrdSunday26"       => LitGrade::FEAST_LORD,
-        "OrdSunday27"       => LitGrade::FEAST_LORD,
-        "OrdSunday28"       => LitGrade::FEAST_LORD,
-        "OrdSunday29"       => LitGrade::FEAST_LORD,
-        "OrdSunday30"       => LitGrade::FEAST_LORD,
-        "OrdSunday31"       => LitGrade::FEAST_LORD,
-        "OrdSunday32"       => LitGrade::FEAST_LORD,
-        "OrdSunday33"       => LitGrade::FEAST_LORD,
-        "OrdSunday34"       => LitGrade::FEAST_LORD,
-        "ImmaculateHeart"   => LitGrade::MEMORIAL
-    ];
-    private const PROPRIUM_DE_TEMPORE_RED = [ "SacredHeart", "Pentecost", "GoodFri", "PalmSun", "SacredHeart" ];
-    private const PROPROIUM_DE_TEMPORE_PURPLE = [ "Advent1", "Advent2", "Advent4", "AshWednesday", "Lent1", "Lent2", "Lent3", "Lent5" ];
-    private const PROPRIUM_DE_TEMPORE_PINK = [ "Advent3", "Lent4" ];
-
     public function __construct(array $requestPathParts = [])
     {
         self::$APICore = new APICore();
@@ -255,10 +170,10 @@ class Events
                             $widerRegionI18nData = json_decode(file_get_contents($widerRegionI18nFile));
                             if (json_last_error() === JSON_ERROR_NONE && file_exists($widerRegionDataFile)) {
                                 self::$WiderRegionData = json_decode(file_get_contents($widerRegionDataFile));
-                                if (json_last_error() === JSON_ERROR_NONE && property_exists(self::$WiderRegionData, "LitCal")) {
-                                    foreach (self::$WiderRegionData->LitCal as $idx => $value) {
-                                        $tag = $value->Festivity->tag;
-                                        self::$WiderRegionData->LitCal[$idx]->Festivity->name = $widerRegionI18nData->{ $tag };
+                                if (json_last_error() === JSON_ERROR_NONE && property_exists(self::$WiderRegionData, "litcal")) {
+                                    foreach (self::$WiderRegionData->litcal as $idx => $value) {
+                                        $event_key = $value->Festivity->event_key;
+                                        self::$WiderRegionData->litcal[$idx]->festivity->name = $widerRegionI18nData->{ $event_key };
                                     }
                                 }
                             }
@@ -305,11 +220,11 @@ class Events
                     die();
                 }
                 foreach ($DATA as $idx => $festivity) {
-                    $key = $festivity[ "TAG" ];
+                    $key = $festivity[ "event_key" ];
                     self::$FestivityCollection[ $key ] = $festivity;
                     self::$FestivityCollection[ $key ][ "MISSAL" ] = $LatinMissal;
-                    self::$FestivityCollection[ $key ][ "GRADE_LCL" ] = self::$LitGrade->i18n($festivity["GRADE"], false);
-                    self::$FestivityCollection[ $key ][ "COMMON_LCL" ] = self::$LitCommon->c($festivity["COMMON"]);
+                    self::$FestivityCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($festivity["grade"], false);
+                    self::$FestivityCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c($festivity["common"]);
                 }
                 // There may or may not be a related translation file; if there is, we get the translated name from here
                 $I18nPath = RomanMissal::getSanctoraleI18nFilePath($LatinMissal);
@@ -324,8 +239,8 @@ class Events
                         die();
                     }
                     foreach ($DATA as $idx => $festivity) {
-                        $key = $festivity[ "TAG" ];
-                        self::$FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
+                        $key = $festivity[ "event_key" ];
+                        self::$FestivityCollection[ $key ][ "name" ] = $NAME[ $key ];
                     }
                 }
             }
@@ -354,25 +269,15 @@ class Events
             die();
         }
 
-        foreach ($DATA as $key => $readings) {
+        foreach ($DATA as $row) {
+            $key = $row['event_key'];
             if (false === array_key_exists($key, self::$FestivityCollection)) {
-                self::$FestivityCollection[ $key ] = $readings;
-                self::$FestivityCollection[ $key ][ "TAG" ] = $key;
-                self::$FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
-                self::$FestivityCollection[ $key ][ "GRADE" ] = self::PROPRIUM_DE_TEMPORE_RANKS[ $key ];
-                self::$FestivityCollection[ $key ][ "GRADE_LCL" ] = self::$LitGrade->i18n(self::PROPRIUM_DE_TEMPORE_RANKS[ $key ], false);
-                self::$FestivityCollection[ $key ][ "COMMON" ] = [];
-                self::$FestivityCollection[ $key ][ "COMMON_LCL" ] = "";
-                self::$FestivityCollection[ $key ][ "CALENDAR" ] = "GENERAL ROMAN";
-                if (in_array($key, self::PROPRIUM_DE_TEMPORE_RED)) {
-                    self::$FestivityCollection[ $key ][ "COLOR" ] = [ "red" ];
-                } elseif (in_array($key, self::PROPROIUM_DE_TEMPORE_PURPLE)) {
-                    self::$FestivityCollection[ $key ][ "COLOR" ] = [ "purple" ];
-                } elseif (in_array($key, self::PROPRIUM_DE_TEMPORE_PINK)) {
-                    self::$FestivityCollection[ $key ][ "COLOR" ] = [ "pink" ];
-                } else {
-                    self::$FestivityCollection[ $key ][ "COLOR" ] = [ "white" ];
-                }
+                self::$FestivityCollection[ $key ] = $row;
+                self::$FestivityCollection[ $key ][ "name" ] = $NAME[ $key ];
+                self::$FestivityCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($row['grade'], false);
+                self::$FestivityCollection[ $key ][ "common" ] = [];
+                self::$FestivityCollection[ $key ][ "common_lcl" ] = "";
+                self::$FestivityCollection[ $key ][ "calendar" ] = "GENERAL ROMAN";
             }
         }
     }
@@ -397,10 +302,10 @@ class Events
             die();
         }
         foreach ($DATA as $idx => $festivity) {
-            $key = $festivity[ "festivity" ][ "TAG" ];
+            $key = $festivity[ "festivity" ][ "event_key" ];
             if (false === array_key_exists($key, self::$FestivityCollection)) {
                 self::$FestivityCollection[ $key ] = $festivity[ "festivity" ];
-                self::$FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
+                self::$FestivityCollection[ $key ][ "name" ] = $NAME[ $key ];
                 if (array_key_exists("languages", $festivity[ "metadata" ])) {
                     $decreeURL = sprintf($festivity[ "metadata" ][ "url" ], 'LA');
                     if (array_key_exists(strtoupper($this->EventsParams->Locale), $festivity[ "metadata" ][ "languages" ])) {
@@ -413,16 +318,16 @@ class Events
                 self::$FestivityCollection[ $key ][ "DECREE" ] = $decreeURL;
             } elseif ($festivity[ "metadata" ][ "action" ] === 'setProperty') {
                 if ($festivity[ "metadata" ][ "property" ] === 'name') {
-                    self::$FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
+                    self::$FestivityCollection[ $key ][ "name" ] = $NAME[ $key ];
                 } elseif ($festivity[ "metadata" ][ "property" ] === 'grade') {
-                    self::$FestivityCollection[ $key ][ "GRADE" ] = $festivity[ "festivity" ][ "GRADE" ];
+                    self::$FestivityCollection[ $key ][ "grade" ] = $festivity[ "festivity" ][ "grade" ];
                 }
             } elseif ($festivity[ "metadata" ][ "action" ] === 'makeDoctor') {
-                self::$FestivityCollection[ $key ][ "NAME" ] = $NAME[ $key ];
+                self::$FestivityCollection[ $key ][ "name" ] = $NAME[ $key ];
             }
-            self::$FestivityCollection[ $key ][ "GRADE_LCL" ] = self::$LitGrade->i18n(self::$FestivityCollection[ $key ][ "GRADE" ], false);
-            if (array_key_exists('COMMON', self::$FestivityCollection[ $key ])) {
-                self::$FestivityCollection[ $key ][ "COMMON_LCL" ] = self::$LitCommon->c(self::$FestivityCollection[ $key ][ "COMMON" ]);
+            self::$FestivityCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n(self::$FestivityCollection[ $key ][ "grade" ], false);
+            if (array_key_exists('common', self::$FestivityCollection[ $key ])) {
+                self::$FestivityCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c(self::$FestivityCollection[ $key ][ "common" ]);
             }
         }
     }
@@ -430,27 +335,27 @@ class Events
     private function processNationalCalendarData(): void
     {
         if ($this->EventsParams->NationalCalendar !== null && self::$NationalData !== null) {
-            if (self::$WiderRegionData !== null && property_exists(self::$WiderRegionData, "LitCal")) {
-                foreach (self::$WiderRegionData->LitCal as $row) {
+            if (self::$WiderRegionData !== null && property_exists(self::$WiderRegionData, "litcal")) {
+                foreach (self::$WiderRegionData->litcal as $row) {
                     if ($row->Metadata->action === 'createNew') {
-                        $key = $row->Festivity->tag;
+                        $key = $row->Festivity->event_key;
                         self::$FestivityCollection[ $key ] = [];
                         foreach ($row->Festivity as $prop => $value) {
                             $prop = strtoupper($prop);
                             self::$FestivityCollection[ $key ][ $prop ] = $value;
                         }
-                        self::$FestivityCollection[ $key ][ "GRADE_LCL" ] = self::$LitGrade->i18n($row->Festivity->grade, false);
-                        self::$FestivityCollection[ $key ][ "COMMON_LCL" ] = self::$LitCommon->c($row->Festivity->common);
+                        self::$FestivityCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($row->Festivity->grade, false);
+                        self::$FestivityCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c($row->Festivity->common);
                     }
                 }
             }
-            foreach (self::$NationalData->LitCal as $row) {
+            foreach (self::$NationalData->litcal as $row) {
                 if ($row->Metadata->action === 'createNew') {
-                    $key = $row->Festivity->tag;
+                    $key = $row->Festivity->event_key;
                     $temp = (array) $row->Festivity;
                     self::$FestivityCollection[ $key ] = array_change_key_case($temp, CASE_UPPER);
-                    self::$FestivityCollection[ $key ][ "GRADE_LCL" ] = self::$LitGrade->i18n($row->Festivity->grade, false);
-                    self::$FestivityCollection[ $key ][ "COMMON_LCL" ] = self::$LitCommon->c($row->Festivity->common);
+                    self::$FestivityCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($row->Festivity->grade, false);
+                    self::$FestivityCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c($row->Festivity->common);
                 }
             }
             if (property_exists(self::$NationalData, "Metadata") && property_exists(self::$NationalData->Metadata, "Missals")) {
@@ -466,11 +371,11 @@ class Events
                         }
                         $PropriumDeSanctis = json_decode(file_get_contents($DataFile));
                         foreach ($PropriumDeSanctis as $idx => $festivity) {
-                            $key = $festivity->TAG;
+                            $key = $festivity->event_key;
                             self::$FestivityCollection[ $key ] = (array) $festivity;
-                            self::$FestivityCollection[ $key ][ "GRADE_LCL" ] = self::$LitGrade->i18n($festivity->GRADE, false);
-                            self::$FestivityCollection[ $key ][ "COMMON_LCL" ] = self::$LitCommon->c($festivity->COMMON);
-                            self::$FestivityCollection[ $key ][ "MISSAL" ] = $missal;
+                            self::$FestivityCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($festivity->grade, false);
+                            self::$FestivityCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c($festivity->common);
+                            self::$FestivityCollection[ $key ][ "missal" ] = $missal;
                         }
                     }
                 }
@@ -481,12 +386,12 @@ class Events
     private function processDiocesanCalendarData(): void
     {
         if ($this->EventsParams->DiocesanCalendar !== null && self::$DiocesanData !== null) {
-            foreach (self::$DiocesanData->LitCal as $key => $festivity) {
+            foreach (self::$DiocesanData->litcal as $key => $festivity) {
                 $temp = (array) $festivity->Festivity;
                 self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ] = array_change_key_case($temp, CASE_UPPER);
-                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ][ "TAG" ] = $this->EventsParams->DiocesanCalendar . '_' . $key;
-                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ][ "GRADE_LCL" ] = self::$LitGrade->i18n($festivity->Festivity->grade, false);
-                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ][ "COMMON_LCL" ] = self::$LitCommon->c($festivity->Festivity->common);
+                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ][ "event_key" ] = $this->EventsParams->DiocesanCalendar . '_' . $key;
+                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ][ "grade_lcl" ] = self::$LitGrade->i18n($festivity->Festivity->grade, false);
+                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ][ "common_lcl" ] = self::$LitCommon->c($festivity->Festivity->common);
             }
         }
     }
@@ -517,8 +422,8 @@ class Events
             "litcal_events" => self::$FestivityCollection,
             "settings" => [
                 "locale" => $this->EventsParams->Locale,
-                "nationalcalendar" => $this->EventsParams->NationalCalendar,
-                "diocesancalendar" => $this->EventsParams->DiocesanCalendar
+                "national_calendar" => $this->EventsParams->NationalCalendar,
+                "diocesan_calendar" => $this->EventsParams->DiocesanCalendar
             ]
         ];
         $response = json_encode($responseObj);

@@ -100,7 +100,7 @@ class RegionalData
                         if (file_exists("nations/{$uKey}/{$this->params->locale}.json")) {
                             $localeData = json_decode(file_get_contents("nations/{$uKey}/{$this->params->locale}.json"));
                             foreach ($response->LitCal as $idx => $el) {
-                                $response->LitCal[$idx]->Festivity->name = $localeData->{$response->LitCal[$idx]->Festivity->tag};
+                                $response->LitCal[$idx]->Festivity->name = $localeData->{$response->LitCal[$idx]->Festivity->event_key};
                             }
                         }
                     }
@@ -170,7 +170,7 @@ class RegionalData
                     }
                     $translationJSON = new \stdClass();
                     foreach ($this->params->payload->LitCal as $CalEvent) {
-                        $translationJSON->{ $CalEvent->Festivity->tag } = '';
+                        $translationJSON->{ $CalEvent->Festivity->event_key } = '';
                     }
                     if (count($this->params->payload->Metadata->Languages) > 0) {
                         foreach ($this->params->payload->Metadata->Languages as $iso) {

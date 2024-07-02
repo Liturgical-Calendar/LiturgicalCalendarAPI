@@ -2,7 +2,7 @@
     "litcal": [
         {
             "festivity": {
-                "tag": "ImmaculateConception",
+                "event_key": "ImmaculateConception",
                 "name": "The Immaculate Conception of the Blessed Virgin Mary, Patronal feastday of the United States of America",
                 "color": [
                     "white"
@@ -18,7 +18,7 @@
         },
         {
             "festivity": {
-                "tag": "StVincentDeacon",
+                "event_key": "StVincentDeacon",
                 "name": "Saint Vincent, Deacon and Martyr",
                 "day": 23,
                 "month": 1
@@ -32,7 +32,7 @@
         },
         {
             "festivity": {
-                "tag": "StVincentDeacon",
+                "event_key": "StVincentDeacon",
                 "name": "[ USA ] Saint Vincent, Deacon and Martyr",
                 "day": 22,
                 "month": 1
@@ -45,7 +45,7 @@
         },
         {
             "festivity": {
-                "tag": "StPaulCross",
+                "event_key": "StPaulCross",
                 "name": "Saint Paul of the Cross, Priest",
                 "day": 20,
                 "month": 10
@@ -59,7 +59,7 @@
         },
         {
             "festivity": {
-                "tag": "StPaulCross",
+                "event_key": "StPaulCross",
                 "name": "[ USA ] Saint Paul of the Cross, Priest",
                 "day": 19,
                 "month": 10
@@ -72,7 +72,7 @@
         },
         {
             "festivity": {
-                "tag": "StsJeanBrebeuf",
+                "event_key": "StsJeanBrebeuf",
                 "name": "Saints John de Brébeuf and Isaac Jogues, Priests, and Companions, Martyrs",
                 "grade": 3,
                 "day": 19,
@@ -86,7 +86,7 @@
         },
         {
             "festivity": {
-                "tag": "StsJeanBrebeuf",
+                "event_key": "StsJeanBrebeuf",
                 "name": "[ USA ] Saints John de Brébeuf and Isaac Jogues, Priests, and Companions, Martyrs",
                 "day": 19,
                 "month": 10
@@ -99,7 +99,7 @@
         },
         {
             "festivity": {
-                "tag": "ThanksgivingDay",
+                "event_key": "ThanksgivingDay",
                 "name": "[ USA ] Thanksgiving",
                 "color": [
                     "white"
@@ -115,7 +115,7 @@
         },
         {
             "festivity": {
-                "tag": "StCamillusDeLellis",
+                "event_key": "StCamillusDeLellis",
                 "name": "Saint Camillus de Lellis, Priest",
                 "day": 18,
                 "month": 7
@@ -129,7 +129,7 @@
         },
         {
             "festivity": {
-                "tag": "StCamillusDeLellis",
+                "event_key": "StCamillusDeLellis",
                 "name": "[ USA ] Saint Camillus de Lellis, Priest",
                 "day": 14,
                 "month": 7
@@ -142,7 +142,7 @@
         },
         {
             "festivity": {
-                "tag": "StElizabethPortugal",
+                "event_key": "StElizabethPortugal",
                 "name": "Saint Elizabeth of Portugal",
                 "day": 5,
                 "month": 7
@@ -156,7 +156,7 @@
         },
         {
             "festivity": {
-                "tag": "StElizabethPortugal",
+                "event_key": "StElizabethPortugal",
                 "name": "[ USA ] Saint Elizabeth of Portugal",
                 "day": 4,
                 "month": 7

@@ -2,7 +2,7 @@
     "litcal": [
         {
             "festivity": {
-                "tag": "StPeterCanisius",
+                "event_key": "StPeterCanisius",
                 "name": "Saint Peter Canisius, Priest and Doctor of the Church",
                 "grade": 3,
                 "day": 21,
@@ -16,7 +16,7 @@
         },
         {
             "festivity": {
-                "tag": "HLidwina",
+                "event_key": "HLidwina",
                 "name": "H. Lidwina, maagd",
                 "color": [
                     "white"
@@ -28,10 +28,10 @@
                     "Proper"
                 ],
                 "readings": {
-                    "FIRST_READING": "",
-                    "RESPONSORIAL_PSALM": "",
-                    "ALLELUIA_VERSE": "",
-                    "GOSPEL": ""
+                    "first_reading": "",
+                    "responsorial_psalm": "",
+                    "alleluia_verse": "",
+                    "gospel": ""
                 }
             },
             "metadata": {
@@ -41,7 +41,7 @@
         },
         {
             "festivity": {
-                "tag": "MartelarenGorcum",
+                "event_key": "MartelarenGorcum",
                 "name": "HH. Martelaren van Gorcum",
                 "color": [
                     "red"
@@ -53,10 +53,10 @@
                     "Proper"
                 ],
                 "readings": {
-                    "FIRST_READING": "",
-                    "RESPONSORIAL_PSALM": "",
-                    "ALLELUIA_VERSE": "",
-                    "GOSPEL": ""
+                    "first_reading": "",
+                    "responsorial_psalm": "",
+                    "alleluia_verse": "",
+                    "gospel": ""
                 }
             },
             "metadata": {
@@ -66,7 +66,7 @@
         },
         {
             "festivity": {
-                "tag": "Brandsma",
+                "event_key": "Brandsma",
                 "name": "Z. Titus Brandsma, priester en martelaar",
                 "color": [
                     "red"
@@ -85,7 +85,7 @@
         },
         {
             "festivity": {
-                "tag": "VerjaardagWijdingKerken",
+                "event_key": "VerjaardagWijdingKerken",
                 "name": "Verjaardag van de Wijding van alle kerken waarvan de wijdingsdatum niet bekend is",
                 "color": [
                     "white"
@@ -97,10 +97,10 @@
                     "Proper"
                 ],
                 "readings": {
-                    "FIRST_READING": "",
-                    "RESPONSORIAL_PSALM": "",
-                    "ALLELUIA_VERSE": "",
-                    "GOSPEL": ""
+                    "first_reading": "",
+                    "responsorial_psalm": "",
+                    "alleluia_verse": "",
+                    "gospel": ""
                 }
             },
             "metadata": {
@@ -110,7 +110,7 @@
         },
         {
             "festivity": {
-                "tag": "Verkondigers",
+                "event_key": "Verkondigers",
                 "name": "Alle HH. Verkondigers van het geloof in onze streken",
                 "color": [
                     "white"
@@ -122,10 +122,10 @@
                     "Proper"
                 ],
                 "readings": {
-                    "FIRST_READING": "",
-                    "RESPONSORIAL_PSALM": "",
-                    "ALLELUIA_VERSE": "",
-                    "GOSPEL": ""
+                    "first_reading": "",
+                    "responsorial_psalm": "",
+                    "alleluia_verse": "",
+                    "gospel": ""
                 }
             },
             "metadata": {
@@ -135,7 +135,7 @@
         },
         {
             "festivity": {
-                "tag": "Willibrord",
+                "event_key": "Willibrord",
                 "name": "H. Willibrord, bisschop, verkondiger van ons geloof, patroon van de Nederlandse kerkprovincie",
                 "color": [
                     "white"
@@ -147,10 +147,10 @@
                     "Proper"
                 ],
                 "readings": {
-                    "FIRST_READING": "",
-                    "RESPONSORIAL_PSALM": "",
-                    "ALLELUIA_VERSE": "",
-                    "GOSPEL": ""
+                    "first_reading": "",
+                    "responsorial_psalm": "",
+                    "alleluia_verse": "",
+                    "gospel": ""
                 }
             },
             "metadata": {

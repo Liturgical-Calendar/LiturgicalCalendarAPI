@@ -2,7 +2,7 @@
     {
         "MONTH": 1,
         "DAY": 4,
-        "TAG": "StElizabethSeton",
+        "event_key": "StElizabethSeton",
         "NAME": "Saint Elizabeth Ann Seton, Religious",
         "GRADE": 3,
         "DISPLAYGRADE": "",
@@ -14,17 +14,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 1,
         "DAY": 5,
-        "TAG": "StJohnNeumann",
+        "event_key": "StJohnNeumann",
         "NAME": "Saint John Neumann, Bishop",
         "GRADE": 3,
         "DISPLAYGRADE": "",
@@ -36,17 +36,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 1,
         "DAY": 6,
-        "TAG": "StAndreBessette",
+        "event_key": "StAndreBessette",
         "NAME": "Saint André Bessette, Religious",
         "GRADE": 2,
         "DISPLAYGRADE": "",
@@ -58,17 +58,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 1,
         "DAY": 22,
-        "TAG": "PrayerUnborn",
+        "event_key": "PrayerUnborn",
         "NAME": "Day of Prayer for the Legal Protection of Unborn Children",
         "GRADE": 3,
         "DISPLAYGRADE": "National Day of Prayer",
@@ -82,17 +82,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 3,
         "DAY": 3,
-        "TAG": "StKatharineDrexel",
+        "event_key": "StKatharineDrexel",
         "NAME": "Saint Katharine Drexel, Virgin",
         "GRADE": 2,
         "DISPLAYGRADE": "",
@@ -104,17 +104,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 5,
         "DAY": 10,
-        "TAG": "StDamienVeuster",
+        "event_key": "StDamienVeuster",
         "NAME": "Saint Damien de Veuster, Priest",
         "GRADE": 2,
         "DISPLAYGRADE": "",
@@ -126,17 +126,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 5,
         "DAY": 15,
-        "TAG": "StIsidore",
+        "event_key": "StIsidore",
         "NAME": "Saint Isidore",
         "GRADE": 2,
         "DISPLAYGRADE": "",
@@ -148,17 +148,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 7,
         "DAY": 1,
-        "TAG": "JuniperoSerra",
+        "event_key": "JuniperoSerra",
         "NAME": "Blessed Junípero Serra, Priest",
         "GRADE": 2,
         "DISPLAYGRADE": "",
@@ -171,17 +171,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 7,
         "DAY": 4,
-        "TAG": "IndependenceDay",
+        "event_key": "IndependenceDay",
         "NAME": "Independence Day",
         "GRADE": 3,
         "DISPLAYGRADE": "National Holiday",
@@ -193,17 +193,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 7,
         "DAY": 14,
-        "TAG": "KateriTekakwitha",
+        "event_key": "KateriTekakwitha",
         "NAME": "Blessed Kateri Tekakwitha, Virgin",
         "GRADE": 3,
         "DISPLAYGRADE": "",
@@ -215,17 +215,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 9,
         "DAY": 9,
-        "TAG": "StPeterClaver",
+        "event_key": "StPeterClaver",
         "NAME": "Saint Peter Claver, Priest",
         "GRADE": 3,
         "DISPLAYGRADE": "",
@@ -238,17 +238,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 10,
         "DAY": 6,
-        "TAG": "MarieDurocher",
+        "event_key": "MarieDurocher",
         "NAME": "Blessed Marie Rose Durocher, Virgin",
         "GRADE": 2,
         "DISPLAYGRADE": "",
@@ -260,17 +260,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 11,
         "DAY": 13,
-        "TAG": "StFrancesXCabrini",
+        "event_key": "StFrancesXCabrini",
         "NAME": "Saint Frances Xavier Cabrini, Virgin",
         "GRADE": 3,
         "DISPLAYGRADE": "",
@@ -283,17 +283,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 11,
         "DAY": 18,
-        "TAG": "StRoseDuchesne",
+        "event_key": "StRoseDuchesne",
         "NAME": "Saint Rose Philippine Duchesne, Virgin",
         "GRADE": 2,
         "DISPLAYGRADE": "",
@@ -305,17 +305,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 11,
         "DAY": 23,
-        "TAG": "MiguelPro",
+        "event_key": "MiguelPro",
         "NAME": "Blessed Miguel Agustín Pro, Priest and Martyr",
         "GRADE": 2,
         "DISPLAYGRADE": "",
@@ -329,11 +329,11 @@
             "red"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     }
 ]

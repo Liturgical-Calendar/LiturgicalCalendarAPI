@@ -2,7 +2,7 @@
     "litcal": [
         {
             "festivity": {
-                "tag": "StBenedict",
+                "event_key": "StBenedict",
                 "name": "San Benedetto, abate, patrono d'Europa",
                 "color": [
                     "white"
@@ -24,7 +24,7 @@
         },
         {
             "festivity": {
-                "tag": "StsCyrilMethodius",
+                "event_key": "StsCyrilMethodius",
                 "name": "Santi Cirillo, monaco, e Metodio, vescovo, patroni d'Europa",
                 "color": [
                     "white"
@@ -47,7 +47,7 @@
         },
         {
             "festivity": {
-                "tag": "StBridget",
+                "event_key": "StBridget",
                 "name": "Santa Brigida, religiosa, patrona d'Europa",
                 "color": [
                     "white"
@@ -73,7 +73,7 @@
         },
         {
             "festivity": {
-                "tag": "StCatherineSiena",
+                "event_key": "StCatherineSiena",
                 "name": "Santa Caterina da Siena, vergine e dottore della Chiesa, patrona d'Italia e d'Europa",
                 "color": [
                     "white"
@@ -99,7 +99,7 @@
         },
         {
             "festivity": {
-                "tag": "StEdithStein",
+                "event_key": "StEdithStein",
                 "name": "Santa Teresa Benedetta della Croce, vergine e martire, patrona d'Europa",
                 "color": [
                     "white",
@@ -113,11 +113,11 @@
                     "Virgins:For One Virgin"
                 ],
                 "readings": {
-                    "FIRST_READING": "",
-                    "RESPONSORIAL_PSALM": "",
-                    "SECOND_READING": "",
-                    "ALLELUIA_VERSE": "",
-                    "GOSPEL": ""
+                    "first_reading": "",
+                    "responsorial_psalm": "",
+                    "second_reading": "",
+                    "alleluia_verse": "",
+                    "gospel": ""
                 }
             },
             "metadata": {
@@ -138,7 +138,7 @@
         },
         {
             "festivity": {
-                "tag": "StEdithStein",
+                "event_key": "StEdithStein",
                 "name": "Santa Teresa Benedetta della Croce, vergine e martire, patrona d'Europa",
                 "color": [
                     "white",

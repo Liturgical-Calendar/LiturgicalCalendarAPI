@@ -16,12 +16,12 @@
                     "pattern": "^[a-z][a-z]$",
                     "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
                   },
-                  "nationalcalendar": {
+                  "national_calendar": {
                     "type": "string",
                     "pattern": "^[A-Z]{3,45}$",
                     "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
                   },
-                  "diocesancalendar": {
+                  "diocesan_calendar": {
                     "type": "string",
                     "pattern": "^[A-Z]{3,45}$",
                     "description": "indicates the Diocesan Calendar used to produce the data in LitCalAllFestivities"
@@ -36,12 +36,12 @@
                     "pattern": "^[a-z][a-z]$",
                     "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
                   },
-                  "nationalcalendar": {
+                  "national_calendar": {
                     "type": "string",
                     "pattern": "^[A-Z]{3,45}$",
                     "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
                   },
-                  "diocesancalendar": {
+                  "diocesan_calendar": {
                     "type": "null"
                   }
                 },
@@ -54,10 +54,10 @@
                     "pattern": "^[a-z][a-z]$",
                     "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
                   },
-                  "nationalcalendar": {
+                  "national_calendar": {
                     "type": "null"
                   },
-                  "diocesancalendar": {
+                  "diocesan_calendar": {
                     "type": "null"
                   }
                 },
@@ -78,39 +78,31 @@
               "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$": {
                 "type": "object",
                 "properties": {
-                  "MONTH": {
+                  "month": {
                     "type": "integer",
                     "format": "int32",
                     "minimum": 1,
                     "maximum": 12
                   },
-                  "DAY": {
+                  "day": {
                     "type": "integer",
                     "format": "int32",
                     "minimum": 1,
                     "maximum": 31
                   },
-                  "TAG": {
-                    "type": "string",
-                    "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$",
-                    "description": "corresponds to the `eventkey` property of liturgical events in the output of the LitCal API and similar endpoints"
+                  "event_key": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/EventKey"
                   },
-                  "GRADE": {
-                    "type": "integer",
-                    "format": "int32",
-                    "minimum": 1,
-                    "maximum": 7
+                  "grade": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/LitGrade"
                   },
-                  "DISPLAYGRADE": {
+                  "display_grade": {
                     "type": "string"
                   },
-                  "COMMON": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
+                  "common": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
                   },
-                  "CALENDAR": {
+                  "calendar": {
                     "type": "string",
                     "enum": [
                         "GENERAL ROMAN",
@@ -118,83 +110,78 @@
                         "USA"
                     ]
                   },
-                  "COLOR": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "enum": [ "white", "red", "green", "pink", "purple" ]
-                    }
+                  "color": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                   },
-                  "READINGS": {
+                  "readings": {
                     "anyOf": [
                         {
-                            "$ref": "#/definitions/READINGS"
+                            "$ref": "#/definitions/Readings"
                         },
                         {
                             "type": "object",
                             "properties": {
                                 "VIGIL": {
-                                    "$ref": "#/definitions/READINGS"
+                                    "$ref": "#/definitions/Readings"
                                 },
                                 "DAY": {
-                                    "$ref": "#/definitions/READINGS"
+                                    "$ref": "#/definitions/Readings"
                                 }
                             },
                             "additionalProperties": false
                         }
                     ]
                   },
-                  "NAME": {
+                  "name": {
                     "type": "string",
                     "description": "The actual name of the liturgical event as defined in the latest edition of the source Roman Missal indicated in the key `MISSAL` (i.e. if the Missal is the Latin edition of the Roman Missal, the name should be from the latest edition of the Latin Roman Missal)"
                   },
-                  "TYPE": {
-                    "type": "string",
-                    "enum": [ "mobile", "fixed" ]
+                  "type": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitFeastType"
                   },
-                  "MISSAL": {
+                  "missal": {
                     "type": "string",
                     "enum": [ "VATICAN_1970", "VATICAN_2002", "VATICAN_2008", "USA_2011", "ITALY_1983" ],
                     "description": "When a liturgical event is defined in a Roman Missal, this property will be present with an indication of the Roman Missal in question"
                   },
-                  "DECREE": {
+                  "decree": {
                     "type": "string",
                     "description": "When a liturgical event is defined ex-novo by a decree of the Congregation of Divine Worship rather than by a Roman Missal, this property will be present with a reference to the decree"
                   },
-                  "STRTOTIME": {
+                  "strtotime": {
                     "type": "string"
                   },
-                  "GRADE_LCL": {
+                  "grade_lcl": {
                     "type": "string"
                   }
                 },
                 "additionalProperties": false,
-                "required": [ "TAG", "GRADE", "COMMON", "COLOR", "NAME", "GRADE_LCL" ]
+                "required": [ "event_key", "grade", "common", "color", "name", "grade_lcl" ]
               }
             }
         },
-        "READINGS": {
+        "Readings": {
             "type": "object",
             "properties": {
-                "FIRST_READING": { "type": "string" },
-                "RESPONSORIAL_PSALM": { "type": "string" },
-                "SECOND_READING": { "type": "string" },
-                "RESPONSORIAL_PSALM_2": { "type": "string" },
-                "THIRD_READING": { "type": "string" },
-                "RESPONSORIAL_PSALM_3": { "type": "string" },
-                "FOURTH_READING": { "type": "string" },
-                "RESPONSORIAL_PSALM_4": { "type": "string" },
-                "FIFTH_READING": { "type": "string" },
-                "RESPONSORIAL_PSALM_5": { "type": "string" },
-                "SIXTH_READING": { "type": "string" },
-                "RESPONSORIAL_PSALM_6": { "type": "string" },
-                "SEVENTH_READING": { "type": "string" },
-                "RESPONSORIAL_PSALM_7": { "type": "string" },
-                "EPISTLE": { "type": "string" },
-                "RESPONSORIAL_PSALM_EPISTLE": { "type": "string" },
-                "ALLELUIA_VERSE": { "type": "string" },
-                "GOSPEL": { "type": "string" },
-                "PALM_GOSPEL": { "type": "string" }
+                "first_reading": { "type": "string" },
+                "responsorial_psalm": { "type": "string" },
+                "second_reading": { "type": "string" },
+                "responsorial_psalm_2": { "type": "string" },
+                "third_reading": { "type": "string" },
+                "responsorial_psalm_3": { "type": "string" },
+                "fourth_reading": { "type": "string" },
+                "responsorial_psalm_4": { "type": "string" },
+                "fifth_reading": { "type": "string" },
+                "responsorial_psalm_5": { "type": "string" },
+                "sixth_reading": { "type": "string" },
+                "responsorial_psalm_6": { "type": "string" },
+                "seventh_reading": { "type": "string" },
+                "responsorial_psalm_7": { "type": "string" },
+                "epistle": { "type": "string" },
+                "responsorial_psalm_epistle": { "type": "string" },
+                "alleluia_verse": { "type": "string" },
+                "gospel": { "type": "string" },
+                "palm_gospel": { "type": "string" }
             },
             "additionalProperties": false
         }

@@ -88,7 +88,7 @@ class CalendarParams
         foreach ($DATA as $key => $value) {
             $key = strtoupper($key);
             if (in_array($key, self::ALLOWED_PARAMS)) {
-                if ($key !== 'YEAR' && $key !== 'ETERNALHIGHPRIEST') {
+                if ($key !== 'YEAR' && $key !== 'ETERNAL_HIGH_PRIEST') {
                     // all other parameters expect a string value
                     if (gettype($value) !== 'string') {
                         $description = "Expected value of type String for parameter `{$key}`, instead found type " . gettype($value);
@@ -116,7 +116,7 @@ class CalendarParams
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "CORPUSCHRISTI":
+                    case "CORPUS_CHRISTI":
                         if (CorpusChristi::isValid(strtoupper($value))) {
                             $this->CorpusChristi = strtoupper($value);
                         } else {
@@ -135,7 +135,7 @@ class CalendarParams
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "RETURNTYPE":
+                    case "RETURN_TYPE":
                         if (ReturnType::isValid(strtoupper($value))) {
                             $this->ReturnType = strtoupper($value);
                         } else {
@@ -143,7 +143,7 @@ class CalendarParams
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "NATIONALCALENDAR":
+                    case "NATIONAL_CALENDAR":
                         if (property_exists($this->calendars->national_calendars, $value)) {
                             $this->NationalCalendar = $value;
                         } else {
@@ -152,7 +152,7 @@ class CalendarParams
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "DIOCESANCALENDAR":
+                    case "DIOCESAN_CALENDAR":
                         if (property_exists($this->calendars->diocesan_calendars, $value)) {
                             $this->DiocesanCalendar = $value;
                         } else {
@@ -161,7 +161,7 @@ class CalendarParams
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "CALENDARTYPE":
+                    case "CALENDAR_TYPE":
                         if (CalendarType::isValid(strtoupper($value))) {
                             $this->CalendarType = strtoupper($value);
                         } else {
@@ -169,7 +169,7 @@ class CalendarParams
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "ETERNALHIGHPRIEST":
+                    case "ETERNAL_HIGH_PRIEST":
                         if (gettype($value) !== 'boolean') {
                             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                             if (null === $value) {

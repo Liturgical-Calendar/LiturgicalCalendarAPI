@@ -45,7 +45,7 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "tag": {
+                "event_key": {
                     "type": "string"
                 },
                 "name": {
@@ -75,7 +75,7 @@
                 "day",
                 "grade",
                 "month",
-                "tag"
+                "event_key"
             ],
             "title": "Festivity"
         },

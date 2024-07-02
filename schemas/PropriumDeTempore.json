@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "PropriumDeTempore",
-    "type": "object",
-    "additionalProperties": {
+    "type": "array",
+    "items": {
         "$ref": "#/definitions/LitEvent"
     },
     "definitions": {
@@ -10,12 +10,25 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "READINGS": {
+                "event_key": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/EventKey"
+                },
+                "grade": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
+                },
+                "type": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schema/CommonDef.json#/definitions/LitFeastType"
+                },
+                "color": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitColor"
+                },
+                "readings": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Readings"
                 }
             },
             "required": [
-                "READINGS"
+                "event_key",
+                "readings"
             ]
         }
     }

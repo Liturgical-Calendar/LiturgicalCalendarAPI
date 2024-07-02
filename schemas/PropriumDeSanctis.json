@@ -15,7 +15,7 @@
                 "DAY": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Day"
                 },
-                "TAG": {
+                "event_key": {
                     "type": "string"
                 },
                 "NAME": {
@@ -55,7 +55,7 @@
                 "GRADE",
                 "MONTH",
                 "READINGS",
-                "TAG"
+                "event_key"
             ],
             "title": "PropriumDeSanctis"
         },

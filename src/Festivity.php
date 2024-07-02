@@ -117,7 +117,7 @@ class Festivity implements \JsonSerializable
     public function jsonSerialize(): mixed
     {
         $returnArr = [
-            'eventidx'                => $this->idx,
+            'event_idx'                => $this->idx,
             'name'                    => $this->name,
             //serialize the DateTime   object as a PHP timestamp (seconds since the Unix Epoch)
             'date'                    => (int) $this->date->format('U'),

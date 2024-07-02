@@ -1,6 +1,11 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "definitions": {
+        "EventKey": {
+            "type": "string",
+            "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$",
+            "description": "corresponds to the `event_key` property of liturgical events in the output of the LitCal API and similar endpoints"
+        },
         "LitColor": {
             "type": "array",
             "uniqueItems": true,
@@ -75,69 +80,69 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "PALM_GOSPEL": {
+                "palm_gospel": {
                     "type": "string"
                 },
-                "FIRST_READING": {
+                "first_reading": {
                     "type": "string"
                 },
-                "RESPONSORIAL_PSALM": {
+                "responsorial_psalm": {
                     "type": "string"
                 },
-                "SECOND_READING": {
+                "second_reading": {
                     "type": "string"
                 },
-                "RESPONSORIAL_PSALM_2": {
+                "responsorial_psalm_2": {
                     "type": "string"
                 },
-                "THIRD_READING": {
+                "third_reading": {
                     "type": "string"
                 },
-                "RESPONSORIAL_PSALM_3": {
+                "responsorial_psalm_3": {
                     "type": "string"
                 },
-                "FOURTH_READING": {
+                "fourth_reading": {
                     "type": "string"
                 },
-                "RESPONSORIAL_PSALM_4": {
+                "responsorial_psalm_4": {
                     "type": "string"
                 },
-                "FIFTH_READING": {
+                "fifth_reading": {
                     "type": "string"
                 },
-                "RESPONSORIAL_PSALM_5": {
+                "responsorial_psalm_5": {
                     "type": "string"
                 },
-                "SIXTH_READING": {
+                "sixth_reading": {
                     "type": "string"
                 },
-                "RESPONSORIAL_PSALM_6": {
+                "responsorial_psalm_6": {
                     "type": "string"
                 },
-                "SEVENTH_READING": {
+                "seventh_reading": {
                     "type": "string"
                 },
-                "RESPONSORIAL_PSALM_7": {
+                "responsorial_psalm_7": {
                     "type": "string"
                 },
-                "EPISTLE": {
+                "epistle": {
                     "type": "string"
                 },
-                "RESPONSORIAL_PSALM_EPISTLE": {
+                "responsorial_psalm_epistle": {
                     "type": "string"
                 },
-                "ALLELUIA_VERSE": {
+                "alleluia_verse": {
                     "type": "string"
                 },
-                "GOSPEL": {
+                "gospel": {
                     "type": "string"
                 }
             },
             "required": [
-                "FIRST_READING",
-                "RESPONSORIAL_PSALM",
-                "ALLELUIA_VERSE",
-                "GOSPEL"
+                "first_reading",
+                "responsorial_psalm",
+                "alleluia_verse",
+                "gospel"
             ],
             "title": "Readings"
         },

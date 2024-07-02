@@ -2,7 +2,7 @@
     {
         "MONTH": 4,
         "DAY": 23,
-        "TAG": "StAdalbert",
+        "event_key": "StAdalbert",
         "NAME": "Sant'Adalberto, vescovo e martire",
         "GRADE": 2,
         "DISPLAYGRADE": "",
@@ -16,17 +16,17 @@
             "red"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 4,
         "DAY": 28,
-        "TAG": "StLouisGrignonMontfort",
+        "event_key": "StLouisGrignonMontfort",
         "NAME": "San Luigi Grignon de Montfort",
         "GRADE": 2,
         "DISPLAYGRADE": "",
@@ -38,17 +38,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 8,
         "DAY": 2,
-        "TAG": "StPeterJulianEymard",
+        "event_key": "StPeterJulianEymard",
         "NAME": "San Pietro Giuliani, sacerdote",
         "GRADE": 2,
         "DISPLAYGRADE": "",
@@ -61,17 +61,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 8,
         "DAY": 14,
-        "TAG": "StMaximilianKolbe",
+        "event_key": "StMaximilianKolbe",
         "NAME": "San Massimiliano Kolbe, sacerdote e martire",
         "GRADE": 3,
         "DISPLAYGRADE": "",
@@ -84,17 +84,17 @@
             "red"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 9,
         "DAY": 9,
-        "TAG": "StPeterClaver",
+        "event_key": "StPeterClaver",
         "NAME": "San Pietro Claver, sacerdote",
         "GRADE": 2,
         "DISPLAYGRADE": "",
@@ -107,17 +107,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 9,
         "DAY": 20,
-        "TAG": "StAndrewKimTaegon",
+        "event_key": "StAndrewKimTaegon",
         "NAME": "Santi Andrea Kim Taegon, sacerdote, Paolo Chong Hasang e compagni martiri",
         "GRADE": 3,
         "DISPLAYGRADE": "",
@@ -129,17 +129,17 @@
             "white"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 9,
         "DAY": 28,
-        "TAG": "StsLawrenceRuiz",
+        "event_key": "StsLawrenceRuiz",
         "NAME": "Santi Lorenzo Ruiz e compagni martiri",
         "GRADE": 2,
         "DISPLAYGRADE": "",
@@ -151,17 +151,17 @@
             "red"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
         "MONTH": 11,
         "DAY": 24,
-        "TAG": "StAndrewDungLac",
+        "event_key": "StAndrewDungLac",
         "NAME": "Sant'Andrea Dung-Lac e compagni martiri",
         "GRADE": 3,
         "DISPLAYGRADE": "",
@@ -173,11 +173,11 @@
             "red"
         ],
         "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     }
 ]

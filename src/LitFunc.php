@@ -18,16 +18,8 @@ class LitFunc
     private const NON_EVENT_KEYS = [ 'litcal', 'settings', 'messages', 'metadata', 'solemnities', 'feasts_memorials', 'request_headers', 'color', 'color_lcl', 'common' ];
     private static string $LAST_ARRAY_KEY = '';
     private const TRANSFORM_KEYS = [
-      "corpuschristi"     => "CorpusChristi",
-      "eternalhighpriest" => "EternalHighPriest",
       "litcal"            => "LitCal",
-      "returntype"        => "ReturnType",
-      "calendartype"      => "CalendarType",
-      "eventidx"          => "EventIdx",
-      "nationalcalendar"  => "NationalCalendar",
-      "diocesancalendar"  => "DiocesanCalendar",
-      "has_vesper_ii"     => "HasVesperII",
-      "datetime"          => "DateTime"
+      "has_vesper_ii"     => "HasVesperII"
     ];
     public static string $HASH_REQUEST    = '';
 
