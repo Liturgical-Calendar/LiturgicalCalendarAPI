@@ -157,7 +157,7 @@
                     <xs:element name="Color">
                       <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="option" minOccurs="0" maxOccurs="3">
+                          <xs:element name="Option" minOccurs="0" maxOccurs="3">
                             <xs:complexType mixed="true">
                               <xs:simpleContent>
                                 <xs:extension base="cl:ColorEnumType">
