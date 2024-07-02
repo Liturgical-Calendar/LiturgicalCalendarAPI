@@ -1879,7 +1879,7 @@ class Calendar
 
     private function createFestivityFromDecree(object $row): void
     {
-        if ($row->festivity->TYPE === "mobile") {
+        if ($row->festivity->type === "mobile") {
             //we won't have a date defined for mobile festivites, we'll have to calculate them here case by case
             //otherwise we'll have to create a language that we can interpret in an automated fashion...
             //for example we can use strtotime
