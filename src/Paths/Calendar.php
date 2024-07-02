@@ -1635,8 +1635,8 @@ class Calendar
                 ( $locale === 'EN' ? $row->date->format('F jS') :
                     $this->dayAndMonth->format($row->date->format('U'))
                 ),
-            $row->yearSince,
-            $row->DECREE,
+            $row->year_since,
+            $row->decree,
             $this->CalendarParams->Year
         );
     }
@@ -1662,23 +1662,23 @@ class Calendar
                 $this->reduceMemorialsInAdventLentToCommemoration($row->date, $row);
 
                 if ($missal === RomanMissal::EDITIO_TYPICA_TERTIA_2002) {
-                    $row->yearSince = 2002;
-                    $row->DECREE = '<a href="https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2002/03/22/0150/00449.html">'
+                    $row->year_since = 2002;
+                    $row->decree = '<a href="https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2002/03/22/0150/00449.html">'
                         . _('Vatican Press conference: Presentation of the Editio Typica Tertia of the Roman Missal')
                         . '</a>';
                     $this->addMissalMemorialMessage($row);
                 } elseif ($missal === RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008) {
-                    $row->yearSince = 2008;
+                    $row->year_since = 2008;
                     switch ($row->event_key) {
                         case "StPioPietrelcina":
-                            $row->DECREE = RomanMissal::getName($missal);
+                            $row->decree = RomanMissal::getName($missal);
                             break;
                         /**both of the following tags refer to the same decree, no need for a break between them */
                         case "LadyGuadalupe":
                         case "JuanDiego":
                             $langs = ["LA" => "lt", "ES" => "es"];
                             $lang = in_array($this->CalendarParams->Locale, array_keys($langs)) ? $langs[$this->CalendarParams->Locale] : "lt";
-                            $row->DECREE = "<a href=\"http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\">"
+                            $row->decree = "<a href=\"http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\">"
                                 . _('Decree of the Congregation for Divine Worship')
                                 . '</a>';
                             break;
@@ -2328,8 +2328,8 @@ class Calendar
     private function handleSaintJaneFrancesDeChantal()
     {
         $StJaneFrancesNewDate = DateTime::createFromFormat('!j-n-Y', '12-8-' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
-        $langs = ["LA" => "lt", "ES" => "es"];
-        $lang = in_array($this->CalendarParams->Locale, array_keys($langs)) ? $langs[$this->CalendarParams->Locale] : "lt";
+        $langs = ["la" => "lt", "es" => "es"];
+        $lang = in_array(LitLocale::$PRIMARY_LANGUAGE, array_keys($langs)) ? $langs[LitLocale::$PRIMARY_LANGUAGE] : "lt";
         if (self::dateIsNotSunday($StJaneFrancesNewDate) && $this->Cal->notInSolemnitiesFeastsOrMemorials($StJaneFrancesNewDate)) {
             $festivity = $this->Cal->getFestivity("StJaneFrancesDeChantal");
             if ($festivity !== null) {

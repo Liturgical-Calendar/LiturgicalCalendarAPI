@@ -615,7 +615,7 @@ class FestivityCollection
         return $weekOfOrdinaryTimeOrSeason % 4 === 0 ? 4 : $weekOfOrdinaryTimeOrSeason % 4;
     }
 
-    public function purgeDataBeforeAdvent(int|null $buffer = null): void
+    public function purgeDataBeforeAdvent(): void
     {
         foreach ($this->festivities as $key => $festivity) {
             if ($festivity->date < $this->festivities[ "Advent1" ]->date) {
@@ -639,7 +639,7 @@ class FestivityCollection
         }
     }
 
-    public function purgeDataAdventChristmas(int|null $buffer = null)
+    public function purgeDataAdventChristmas()
     {
         // the buffer should allow for
         foreach ($this->festivities as $key => $festivity) {
