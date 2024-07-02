@@ -36,16 +36,12 @@ class LitFunc
 
     private static function isTransformKey(string $key): bool
     {
-        return in_array($key, self::TRANSFORM_KEYS);
+        return array_key_exists($key, self::TRANSFORM_KEYS);
     }
 
     public static function convertArray2XML(array $data, ?\SimpleXMLElement &$xml): void
     {
-        $xml->addChild("Keys");
         foreach ($data as $key => $value) {
-            if (false === isset($xml->Keys->{$key})) {
-                $xml->Keys->addChild($key);
-            }
             if (is_array($value)) {
                 self::$LAST_ARRAY_KEY = $key;
                 //self::debugWrite( "value of key <$key> is an array" );
