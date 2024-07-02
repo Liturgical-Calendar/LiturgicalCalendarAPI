@@ -121,8 +121,8 @@ class RegionalData
      */
     private function handlePutPatchDeleteRequests(string $requestMethod)
     {
-        self::$APICore->enforceAjaxRequest();
-        self::$APICore->enforceReferer();
+        //self::$APICore->enforceAjaxRequest();
+        //self::$APICore->enforceReferer();
         if (RequestMethod::PUT === $requestMethod) {
             $this->writeRegionalCalendar();
         } elseif (RequestMethod::DELETE === $requestMethod) {

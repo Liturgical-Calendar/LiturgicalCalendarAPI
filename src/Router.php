@@ -103,14 +103,14 @@ class Router
             case 'data':
                 $RegionalData = new RegionalData();
                 RegionalData::$APICore->setAllowedOrigins(self::$allowedOrigins);
-                RegionalData::$APICore->setAllowedReferers(
+                /*RegionalData::$APICore->setAllowedReferers(
                     array_map(
                         function ($el) {
                             return $el . "/";
                         },
                         self::$allowedOrigins
                     )
-                );
+                );*/
                 RegionalData::$APICore->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST,
