@@ -27,9 +27,9 @@ class RegionalDataParams
         $metadataRaw = file_get_contents($calendarsRoute);
         if ($metadataRaw) {
             $metadata = json_decode($metadataRaw);
-            if (JSON_ERROR_NONE === json_last_error() && property_exists($metadata, 'LitCalMetadata')) {
-                $this->calendars = $metadata->LitCalMetadata;
-                unset($this->calendars->NationalCalendars->VATICAN);
+            if (JSON_ERROR_NONE === json_last_error() && property_exists($metadata, 'litcal_metadata')) {
+                $this->calendars = $metadata->litcal_metadata;
+                unset($this->calendars->national_calendars->VATICAN);
             }
         }
     }
@@ -52,10 +52,10 @@ class RegionalDataParams
             switch ($data->category) {
                 case 'NATIONALCALENDAR':
                     if (
-                        false === property_exists($this->calendars->NationalCalendars, $data->key)
+                        false === property_exists($this->calendars->national_calendars, $data->key)
                         && RegionalData::$APICore->getRequestMethod() !== RequestMethod::PUT
                     ) {
-                        $nationalCalendarsArr = array_keys(get_object_vars($this->calendars->NationalCalendars));
+                        $nationalCalendarsArr = array_keys(get_object_vars($this->calendars->national_calendars));
                         $validVals = implode(', ', $nationalCalendarsArr);
                         RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`, valid values are: {$validVals}");
                     } else {
@@ -63,7 +63,7 @@ class RegionalDataParams
                     }
                     // Check the request method: cannot DELETE National calendar data if it is still in use by a Diocesan calendar
                     if (RegionalData::$APICore->getRequestMethod() === RequestMethod::DELETE) {
-                        foreach ($this->calendars->DiocesanCalendars as $key => $value) {
+                        foreach ($this->calendars->diocesan_calendars as $key => $value) {
                             if ($value->nation === $data->key) {
                                 RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Cannot DELETE National Calendar data while there are Diocesan calendars that depend on it. Currently, {$data->key} is in use by Diocesan calendar {$key}");
                             }
@@ -72,10 +72,10 @@ class RegionalDataParams
                     break;
                 case 'DIOCESANCALENDAR':
                     if (
-                        false === property_exists($this->calendars->DiocesanCalendars, $data->key)
+                        false === property_exists($this->calendars->diocesan_calendars, $data->key)
                         && RegionalData::$APICore->getRequestMethod() !== RequestMethod::PUT
                     ) {
-                        $validVals = implode(', ', array_keys(get_object_vars($this->calendars->DiocesanCalendars)));
+                        $validVals = implode(', ', array_keys(get_object_vars($this->calendars->diocesan_calendars)));
                         RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`, valid values are: {$validVals}");
                     } else {
                         $this->key = $data->key;
@@ -83,10 +83,10 @@ class RegionalDataParams
                     break;
                 case 'WIDERREGIONCALENDAR':
                     if (
-                        false === in_array($data->key, $this->calendars->WiderRegions)
+                        false === in_array($data->key, $this->calendars->wider_regions)
                         && RegionalData::$APICore->getRequestMethod() !== RequestMethod::PUT
                     ) {
-                        $validVals = implode(', ', $this->calendars->WiderRegions);
+                        $validVals = implode(', ', $this->calendars->wider_regions);
                         RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`, valid values are: {$validVals}");
                     } else {
                         $this->key = $data->key;
@@ -111,7 +111,7 @@ class RegionalDataParams
                     }
                     // Check the request method: cannot DELETE Wider Region calendar data if there are national calendars that depend on it
                     if (RegionalData::$APICore->getRequestMethod() === RequestMethod::DELETE) {
-                        foreach ($this->calendars->NationalCalendarsMetadata as $key => $value) {
+                        foreach ($this->calendars->national_calendars_metadata as $key => $value) {
                             if (in_array($data->key, $value->widerRegions)) {
                                 RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Cannot DELETE Wider Region calendar data while there are National calendars that depend on it. Currently {$data->key} is in use by {$key}");
                             }
@@ -129,9 +129,9 @@ class RegionalDataParams
             switch ($this->category) {
                 case 'NATIONALCALENDAR':
                     if (
-                        false === property_exists($data->payload, 'LitCal')
-                        || false === property_exists($data->payload, 'Metadata')
-                        || false === property_exists($data->payload, 'Settings')
+                        false === property_exists($data->payload, 'litcal')
+                        || false === property_exists($data->payload, 'metadata')
+                        || false === property_exists($data->payload, 'settings')
                     ) {
                         $message = "Cannot create or update National calendar data when the payload does not have required properties `LitCal`, `Metadata` or `Settings`. Payload was:\n" . json_encode($data->payload, JSON_PRETTY_PRINT);
                         RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
@@ -139,30 +139,30 @@ class RegionalDataParams
                     break;
                 case 'DIOCESANCALENDAR':
                     if (
-                        false === property_exists($data->payload, 'CalData')
-                        || false === property_exists($data->payload, 'Diocese')
-                        || false === property_exists($data->payload, 'Nation')
+                        false === property_exists($data->payload, 'caldata')
+                        || false === property_exists($data->payload, 'diocese')
+                        || false === property_exists($data->payload, 'nation')
                     ) {
-                        $message = "Cannot create or update Diocesan calendar data when the payload does not have required properties `CalData`, `Diocese` or `Nation`. Payload was:\n" . json_encode($data->payload, JSON_PRETTY_PRINT);
+                        $message = "Cannot create or update Diocesan calendar data when the payload does not have required properties `caldata`, `diocese` or `nation`. Payload was:\n" . json_encode($data->payload, JSON_PRETTY_PRINT);
                         RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                     }
                     break;
                 case 'WIDERREGIONCALENDAR':
                     if (
-                        false === property_exists($data->payload, 'LitCal')
-                        || false === property_exists($data->payload, 'Metadata')
-                        || false === property_exists($data->payload, 'NationalCalendars')
-                        || false === property_exists($data->payload->Metadata, 'WiderRegion')
-                        || false === property_exists($data->payload->Metadata, 'IsMultilingual')
+                        false === property_exists($data->payload, 'litcal')
+                        || false === property_exists($data->payload, 'metadata')
+                        || false === property_exists($data->payload, 'national_calendars')
+                        || false === property_exists($data->payload->metadata, 'wider_region')
+                        || false === property_exists($data->payload->metadata, 'multilingual')
                     ) {
-                        $message = "Cannot create or update Wider Region calendar data when the payload does not have required properties `LitCal`, `NationalCalendars`, `Metadata`, `Metadata->WiderRegion`, `Metadata->IsMultilingual`. Payload was:\n" . json_encode($data->payload, JSON_PRETTY_PRINT);
+                        $message = "Cannot create or update Wider Region calendar data when the payload does not have required properties `litcal`, `national_calendars`, `metadata`, `metadata->wider_region`, `metadata->multilingual`. Payload was:\n" . json_encode($data->payload, JSON_PRETTY_PRINT);
                         RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                     }
                     if (
-                        true === $data->payload->Metadata->IsMultilingual
-                        && false === property_exists($data->payload->Metadata, 'Languages')
+                        true === $data->payload->metadata->multilingual
+                        && false === property_exists($data->payload->metadata, 'languages')
                     ) {
-                        $message = "Cannot create or update Wider Region calendar data when the payload has value `true` for `Metadata->IsMultilingual` but does not have required array `Metadata->Languages`. Payload was:\n" . json_encode($data->payload, JSON_PRETTY_PRINT);
+                        $message = "Cannot create or update Wider Region calendar data when the payload has value `true` for `metadata->multilingual` but does not have required array `metadata->languages`. Payload was:\n" . json_encode($data->payload, JSON_PRETTY_PRINT);
                         RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                     }
                     break;
