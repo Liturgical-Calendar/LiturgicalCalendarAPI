@@ -1,17 +1,17 @@
 [
     {
-        "MONTH": 1,
-        "DAY": 3,
+        "month": 1,
+        "day": 3,
         "event_key": "NameJesus",
-        "GRADE": 2,
-        "COMMON": [
+        "grade": 2,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -20,18 +20,18 @@
         }
     },
     {
-        "MONTH": 2,
-        "DAY": 8,
+        "month": 2,
+        "day": 8,
         "event_key": "StJosephineBakhita",
-        "GRADE": 2,
-        "COMMON": [
+        "grade": 2,
+        "common": [
             "Virgins:For One Virgin"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -40,20 +40,20 @@
         }
     },
     {
-        "MONTH": 4,
-        "DAY": 23,
+        "month": 4,
+        "day": 23,
         "event_key": "StAdalbert",
-        "GRADE": 2,
-        "COMMON": [
+        "grade": 2,
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For a Bishop"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -62,18 +62,18 @@
         }
     },
     {
-        "MONTH": 4,
-        "DAY": 28,
+        "month": 4,
+        "day": 28,
         "event_key": "StLouisGrignionMontfort",
-        "GRADE": 2,
-        "COMMON": [
+        "grade": 2,
+        "common": [
             "Pastors:For One Pastor"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -82,18 +82,18 @@
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 13,
+        "month": 5,
+        "day": 13,
         "event_key": "LadyFatima",
-        "GRADE": 2,
-        "COMMON": [
+        "grade": 2,
+        "common": [
             "Blessed Virgin Mary"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -102,18 +102,18 @@
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 21,
+        "month": 5,
+        "day": 21,
         "event_key": "StChristopherMagallanes",
-        "GRADE": 2,
-        "COMMON": [
+        "grade": 2,
+        "common": [
             "Martyrs:For Several Martyrs"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -122,18 +122,18 @@
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 22,
+        "month": 5,
+        "day": 22,
         "event_key": "StRitaCascia",
-        "GRADE": 2,
-        "COMMON": [
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -142,18 +142,18 @@
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 9,
+        "month": 7,
+        "day": 9,
         "event_key": "StAugustineZhaoRong",
-        "GRADE": 2,
-        "COMMON": [
+        "grade": 2,
+        "common": [
             "Martyrs:For Several Martyrs"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -162,20 +162,20 @@
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 20,
+        "month": 7,
+        "day": 20,
         "event_key": "StApollinaris",
-        "GRADE": 2,
-        "COMMON": [
+        "grade": 2,
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For a Bishop"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -184,19 +184,19 @@
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 24,
+        "month": 7,
+        "day": 24,
         "event_key": "StSharbelMakhluf",
-        "GRADE": 2,
-        "COMMON": [
+        "grade": 2,
+        "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For a Monk"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -205,19 +205,19 @@
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 2,
+        "month": 8,
+        "day": 2,
         "event_key": "StPeterJulianEymard",
-        "GRADE": 2,
-        "COMMON": [
+        "grade": 2,
+        "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -226,20 +226,20 @@
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 9,
+        "month": 8,
+        "day": 9,
         "event_key": "StEdithStein",
-        "GRADE": 2,
-        "COMMON": [
+        "grade": 2,
+        "common": [
             "Martyrs:For a Virgin Martyr",
             "Virgins:For One Virgin"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -248,19 +248,19 @@
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 14,
+        "month": 8,
+        "day": 14,
         "event_key": "StMaximilianKolbe",
-        "GRADE": 3,
-        "COMMON": [
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -269,19 +269,19 @@
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 9,
+        "month": 9,
+        "day": 9,
         "event_key": "StPeterClaver",
-        "GRADE": 2,
-        "COMMON": [
+        "grade": 2,
+        "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -290,18 +290,18 @@
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 12,
+        "month": 9,
+        "day": 12,
         "event_key": "HolyNameMary",
-        "GRADE": 2,
-        "COMMON": [
+        "grade": 2,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -310,18 +310,18 @@
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 20,
+        "month": 9,
+        "day": 20,
         "event_key": "StAndrewKimTaegon",
-        "GRADE": 3,
-        "COMMON": [
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -330,18 +330,18 @@
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 28,
+        "month": 9,
+        "day": 28,
         "event_key": "StsLawrenceRuiz",
-        "GRADE": 2,
-        "COMMON": [
+        "grade": 2,
+        "common": [
             "Martyrs:For Several Martyrs"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -350,18 +350,18 @@
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 24,
+        "month": 11,
+        "day": 24,
         "event_key": "StAndrewDungLac",
-        "GRADE": 3,
-        "COMMON": [
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -370,20 +370,20 @@
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 25,
+        "month": 11,
+        "day": 25,
         "event_key": "StCatherineAlexandria",
-        "GRADE": 2,
-        "COMMON": [
+        "grade": 2,
+        "common": [
             "Martyrs:For a Virgin Martyr",
             "Virgins:For One Virgin"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",

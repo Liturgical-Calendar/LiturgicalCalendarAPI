@@ -1,21 +1,21 @@
 [
     {
-        "MONTH": 4,
-        "DAY": 23,
+        "month": 4,
+        "day": 23,
         "event_key": "StAdalbert",
         "NAME": "Sant'Adalberto, vescovo e martire",
-        "GRADE": 2,
+        "grade": 2,
         "DISPLAYGRADE": "",
-        "COMMON": [
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For a Bishop"
         ],
-        "CALENDAR": "ITALY",
-        "COLOR": [
+        "calendar": "ITALY",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -24,20 +24,20 @@
         }
     },
     {
-        "MONTH": 4,
-        "DAY": 28,
+        "month": 4,
+        "day": 28,
         "event_key": "StLouisGrignonMontfort",
         "NAME": "San Luigi Grignon de Montfort",
-        "GRADE": 2,
+        "grade": 2,
         "DISPLAYGRADE": "",
-        "COMMON": [
+        "common": [
             "Pastors:For One Pastor"
         ],
-        "CALENDAR": "ITALY",
-        "COLOR": [
+        "calendar": "ITALY",
+        "color": [
             "white"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -46,21 +46,21 @@
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 2,
+        "month": 8,
+        "day": 2,
         "event_key": "StPeterJulianEymard",
         "NAME": "San Pietro Giuliani, sacerdote",
-        "GRADE": 2,
+        "grade": 2,
         "DISPLAYGRADE": "",
-        "COMMON": [
+        "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "ITALY",
-        "COLOR": [
+        "calendar": "ITALY",
+        "color": [
             "white"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -69,21 +69,21 @@
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 14,
+        "month": 8,
+        "day": 14,
         "event_key": "StMaximilianKolbe",
         "NAME": "San Massimiliano Kolbe, sacerdote e martire",
-        "GRADE": 3,
+        "grade": 3,
         "DISPLAYGRADE": "",
-        "COMMON": [
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "ITALY",
-        "COLOR": [
+        "calendar": "ITALY",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -92,21 +92,21 @@
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 9,
+        "month": 9,
+        "day": 9,
         "event_key": "StPeterClaver",
         "NAME": "San Pietro Claver, sacerdote",
-        "GRADE": 2,
+        "grade": 2,
         "DISPLAYGRADE": "",
-        "COMMON": [
+        "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
         ],
-        "CALENDAR": "ITALY",
-        "COLOR": [
+        "calendar": "ITALY",
+        "color": [
             "white"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -115,20 +115,20 @@
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 20,
+        "month": 9,
+        "day": 20,
         "event_key": "StAndrewKimTaegon",
         "NAME": "Santi Andrea Kim Taegon, sacerdote, Paolo Chong Hasang e compagni martiri",
-        "GRADE": 3,
+        "grade": 3,
         "DISPLAYGRADE": "",
-        "COMMON": [
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "ITALY",
-        "COLOR": [
+        "calendar": "ITALY",
+        "color": [
             "white"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -137,20 +137,20 @@
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 28,
+        "month": 9,
+        "day": 28,
         "event_key": "StsLawrenceRuiz",
         "NAME": "Santi Lorenzo Ruiz e compagni martiri",
-        "GRADE": 2,
+        "grade": 2,
         "DISPLAYGRADE": "",
-        "COMMON": [
+        "common": [
             "Martyrs:For Several Martyrs"
         ],
-        "CALENDAR": "ITALY",
-        "COLOR": [
+        "calendar": "ITALY",
+        "color": [
             "red"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
@@ -159,20 +159,20 @@
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 24,
+        "month": 11,
+        "day": 24,
         "event_key": "StAndrewDungLac",
         "NAME": "Sant'Andrea Dung-Lac e compagni martiri",
-        "GRADE": 3,
+        "grade": 3,
         "DISPLAYGRADE": "",
-        "COMMON": [
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "ITALY",
-        "COLOR": [
+        "calendar": "ITALY",
+        "color": [
             "red"
         ],
-        "READINGS": {
+        "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
