@@ -17,7 +17,7 @@
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/LitGrade"
                 },
                 "type": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/v9/schema/CommonDef.json#/definitions/LitFeastType"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/LitFeastType"
                 },
                 "color": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/LitColor"
