@@ -61,28 +61,28 @@
                 "event_key": {
                     "type": "string"
                 },
-                "GRADE": {
+                "grade": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/LitGrade"
                 },
-                "COMMON": {
+                "common": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/LitCommon"
                 },
-                "CALENDAR": {
+                "calendar": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Calendar"
                 },
-                "COLOR": {
+                "color": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/LitColor"
                 },
-                "TYPE": {
+                "type": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/LitFeastType"
                 },
-                "READINGS": {
+                "readings": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Readings"
                 },
-                "MONTH": {
+                "month": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Month"
                 },
-                "DAY": {
+                "day": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Day"
                 }
             },
