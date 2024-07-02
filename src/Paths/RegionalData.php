@@ -94,13 +94,13 @@ class RegionalData
                 if ($this->params->category === "WIDERREGIONCALENDAR") {
                     $isMultilingual = is_dir("nations/{$uKey}");
                     if ($isMultilingual) {
-                        if (false === in_array($this->params->locale, $response->Metadata->Languages)) {
-                            self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value `{$this->params->locale}` for param `locale`. Valid values for current requested Wider region calendar data `{$this->params->key}` are: " . implode(', ', $response->Metadata->Languages));
+                        if (false === in_array($this->params->locale, $response->metadata->languages)) {
+                            self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value `{$this->params->locale}` for param `locale`. Valid values for current requested Wider region calendar data `{$this->params->key}` are: " . implode(', ', $response->metadata->languages));
                         }
                         if (file_exists("nations/{$uKey}/{$this->params->locale}.json")) {
                             $localeData = json_decode(file_get_contents("nations/{$uKey}/{$this->params->locale}.json"));
-                            foreach ($response->LitCal as $idx => $el) {
-                                $response->LitCal[$idx]->Festivity->name = $localeData->{$response->LitCal[$idx]->Festivity->event_key};
+                            foreach ($response->litcal as $idx => $el) {
+                                $response->litcal[$idx]->festivity->name = $localeData->{$response->litcal[$idx]->festivity->event_key};
                             }
                         }
                     }
@@ -141,7 +141,7 @@ class RegionalData
         $response = new \stdClass();
         switch ($this->params->category) {
             case 'NATIONALCALENDAR':
-                $region = $this->params->payload->Metadata->Region;
+                $region = $this->params->payload->metadata->region;
                 if ($region === 'UNITED STATES') {
                     $region = 'USA';
                 }
@@ -154,26 +154,26 @@ class RegionalData
                 if ($test === true) {
                     $data = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
                     file_put_contents($path . "/{$region}.json", $data . PHP_EOL);
-                    $response->success = "Calendar data created or updated for Nation \"{$this->params->payload->Metadata->Region}\"";
+                    $response->success = "Calendar data created or updated for Nation \"{$this->params->payload->metadata->region}\"";
                     self::produceResponse(json_encode($response));
                 } else {
                     self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
                 }
                 break;
             case 'WIDERREGIONCALENDAR':
-                $this->params->payload->Metadata->WiderRegion = ucfirst(strtolower($this->params->payload->Metadata->WiderRegion));
-                $widerRegion = strtoupper($this->params->payload->Metadata->WiderRegion);
-                if ($this->params->payload->Metadata->IsMultilingual === true) {
+                $this->params->payload->metadata->wider_region = ucfirst(strtolower($this->params->payload->metadata->wider_region));
+                $widerRegion = strtoupper($this->params->payload->metadata->wider_region);
+                if ($this->params->payload->metadata->multilingual === true) {
                     $path = "nations/{$widerRegion}";
                     if (!file_exists($path)) {
                         mkdir($path, 0755, true);
                     }
                     $translationJSON = new \stdClass();
-                    foreach ($this->params->payload->LitCal as $CalEvent) {
-                        $translationJSON->{ $CalEvent->Festivity->event_key } = '';
+                    foreach ($this->params->payload->litcal as $CalEvent) {
+                        $translationJSON->{ $CalEvent->festivity->event_key } = '';
                     }
-                    if (count($this->params->payload->Metadata->Languages) > 0) {
-                        foreach ($this->params->payload->Metadata->Languages as $iso) {
+                    if (count($this->params->payload->netadata->languages) > 0) {
+                        foreach ($this->params->payload->metadata->languages as $iso) {
                             if (!file_exists("nations/{$widerRegion}/{$iso}.json")) {
                                 file_put_contents(
                                     "nations/{$widerRegion}/{$iso}.json",
@@ -187,8 +187,8 @@ class RegionalData
                 $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::WIDERREGION);
                 if ($test === true) {
                     $data = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                    file_put_contents("nations/{$this->params->payload->Metadata->WiderRegion}.json", $data . PHP_EOL);
-                    $response->success = "Calendar data created or updated for Wider Region \"{$this->params->payload->Metadata->WiderRegion}\"";
+                    file_put_contents("nations/{$this->params->payload->metadata->wider_region}.json", $data . PHP_EOL);
+                    $response->success = "Calendar data created or updated for Wider Region \"{$this->params->payload->metadata->wider_region}\"";
                     self::produceResponse(json_encode($response));
                 } else {
                     self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
@@ -196,26 +196,26 @@ class RegionalData
                 break;
             case 'DIOCESANCALENDAR':
                 $updateData = new \stdClass();
-                $nationType = gettype($this->params->payload->Nation);
-                $dioceseType = gettype($this->params->payload->Diocese);
+                $nationType = gettype($this->params->payload->nation);
+                $dioceseType = gettype($this->params->payload->diocese);
                 if ($nationType !== 'string' || $dioceseType !== 'string') {
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Params `Nation` and `Diocese` in payload are expected to be of type string, instead `Nation` was of type `{$nationType}` and `Diocese` was of type `{$dioceseType}`");
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Params `nation` and `diocese` in payload are expected to be of type string, instead `nation` was of type `{$nationType}` and `diocese` was of type `{$dioceseType}`");
                 }
-                $updateData->Nation = strip_tags($this->params->payload->Nation);
-                $updateData->Diocese = strip_tags($this->params->payload->Diocese);
-                $CalData = $this->params->payload->CalData;
+                $updateData->nation = strip_tags($this->params->payload->nation);
+                $updateData->diocese = strip_tags($this->params->payload->diocese);
+                $CalData = $this->params->payload->caldata;
                 if (false === $CalData instanceof \stdClass) {
                     $calType = gettype($CalData);
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "`CalData` param in payload expected to be serialized object, instead it was of type `{$calType}` after unserialization");
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "`caldata` param in payload expected to be serialized object, instead it was of type `{$calType}` after unserialization");
                 }
                 if (property_exists($this->params->payload, 'group')) {
                     $groupType = gettype($this->params->payload->group);
                     if ($groupType !== 'string') {
                         self::produceErrorResponse(StatusCode::BAD_REQUEST, "Param `group` in payload is expected to be of type `string`, instead it was of type `{$groupType}`");
                     }
-                    $updateData->Group = strip_tags($this->params->payload->group);
+                    $updateData->group = strip_tags($this->params->payload->group);
                 }
-                $updateData->path = "nations/{$updateData->Nation}";
+                $updateData->path = "nations/{$updateData->nation}";
                 if (!file_exists($updateData->path)) {
                     mkdir($updateData->path, 0755, true);
                 }
@@ -224,11 +224,11 @@ class RegionalData
                 if ($test === true) {
                     $calendarData = json_encode($CalData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
                     file_put_contents(
-                        $updateData->path . "/{$updateData->Diocese}.json",
+                        $updateData->path . "/{$updateData->diocese}.json",
                         $calendarData . PHP_EOL
                     );
                     $this->createOrUpdateIndex($updateData);
-                    $response->success = "Calendar data created or updated for Diocese \"{$updateData->Diocese}\" (Nation: \"$updateData->Nation\")";
+                    $response->success = "Calendar data created or updated for Diocese \"{$updateData->diocese}\" (Nation: \"$updateData->nation\")";
                     self::produceResponse(json_encode($response));
                 } else {
                     self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
@@ -292,7 +292,7 @@ class RegionalData
         if (null === $this->generalIndex) {
             $this->generalIndex = new \stdClass();
         }
-        $key = strtoupper(preg_replace("/[^a-zA-Z]/", "", $data->Diocese));
+        $key = strtoupper(preg_replace("/[^a-zA-Z]/", "", $data->diocese));
 
         if ($delete) {
             if (property_exists($this->generalIndex, $key)) {
@@ -302,11 +302,11 @@ class RegionalData
             if (!property_exists($this->generalIndex, $key)) {
                 $this->generalIndex->$key = new \stdClass();
             }
-            $this->generalIndex->$key->path = $data->path . "/{$data->Diocese}.json";
-            $this->generalIndex->$key->nation = $data->Nation;
-            $this->generalIndex->$key->diocese = $data->Diocese;
-            if (property_exists($data, 'Group')) {
-                $this->generalIndex->$key->group = $data->Group;
+            $this->generalIndex->$key->path = $data->path . "/{$data->diocese}.json";
+            $this->generalIndex->$key->nation = $data->nation;
+            $this->generalIndex->$key->diocese = $data->diocese;
+            if (property_exists($data, 'group')) {
+                $this->generalIndex->$key->group = $data->group;
             }
         }
 
