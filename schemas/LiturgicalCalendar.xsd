@@ -75,25 +75,10 @@
               <xs:element name="RequestHeaders">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="Cookie" minOccurs="0" type="xs:string" />
-                    <xs:element name="Priority" minOccurs="0" type="xs:string" />
                     <xs:element name="Accept-Language" minOccurs="0" type="xs:string" />
-                    <xs:element name="Accept-Encoding" minOccurs="0" type="xs:string" />
-                    <xs:element name="Sec-Fetch-Dest" minOccurs="0" type="xs:string" />
-                    <xs:element name="Sec-Fetch-User" minOccurs="0" type="xs:string" />
-                    <xs:element name="Sec-Fetch-Mode" minOccurs="0" type="xs:string" />
-                    <xs:element name="Sec-Fetch-Site" minOccurs="0" type="xs:string" />
                     <xs:element name="Accept" minOccurs="0" type="xs:string" />
-                    <xs:element name="User-Agent" minOccurs="0" type="xs:string" />
-                    <xs:element name="Upgrade-Insecure-Requests" minOccurs="0" type="xs:string" />
-                    <xs:element name="Sec-Ch-Ua-Platform" minOccurs="0" type="xs:string" />
-                    <xs:element name="Sec-Ch-Ua-Mobile" minOccurs="0" type="xs:string" />
-                    <xs:element name="Sec-Ch-Ua" minOccurs="0" type="xs:string" />
-                    <xs:element name="Cache-Control" minOccurs="0" type="xs:string" />
-                    <xs:element name="Pragma" minOccurs="0" type="xs:string" />
-                    <xs:element name="Connection" minOccurs="0" type="xs:string" />
-                    <xs:element name="X-Accel-Internal" minOccurs="0" type="xs:string" />
-                    <xs:element name="Host" minOccurs="0" type="xs:string" />
+                    <xs:element name="Origin" minOccurs="0" type="xs:string" />
+                    <xs:element name="X-Requested-With" minOccurs="0" type="xs:string" />
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
@@ -103,8 +88,8 @@
                     <xs:element name="LitCalEvent" maxOccurs="unbounded">
                       <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="date" type="xs:dateTime" />
-                          <xs:element name="timezone_type">
+                          <xs:element name="Date" type="xs:dateTime" />
+                          <xs:element name="TimezoneType">
                             <xs:simpleType>
                               <xs:restriction base="xs:byte">
                                 <!-- <xs:enumeration value="1" /> -->
@@ -113,7 +98,7 @@
                               </xs:restriction>
                             </xs:simpleType>
                           </xs:element>
-                          <xs:element name="timezone">
+                          <xs:element name="Timezone">
                             <xs:simpleType>
                               <xs:restriction base="xs:string">
                                 <xs:enumeration value="UTC" />
@@ -121,7 +106,7 @@
                             </xs:simpleType>
                           </xs:element>
                         </xs:sequence>
-                        <xs:attribute name="eventkey" type="xs:string" use="required" />
+                        <xs:attribute name="EventKey" type="xs:string" use="required" />
                       </xs:complexType>
                     </xs:element>
                   </xs:sequence>
@@ -133,8 +118,8 @@
                     <xs:element name="LitCalEvent" maxOccurs="unbounded">
                       <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="date" type="xs:dateTime" />
-                          <xs:element name="timezone_type">
+                          <xs:element name="Date" type="xs:dateTime" />
+                          <xs:element name="TimezoneType">
                             <xs:simpleType>
                               <xs:restriction base="xs:byte">
                                 <!-- <xs:enumeration value="1" /> -->
@@ -143,7 +128,7 @@
                               </xs:restriction>
                             </xs:simpleType>
                           </xs:element>
-                          <xs:element name="timezone">
+                          <xs:element name="Timezone">
                             <xs:simpleType>
                               <xs:restriction base="xs:string">
                                 <xs:enumeration value="UTC" />
@@ -151,7 +136,7 @@
                             </xs:simpleType>
                           </xs:element>
                         </xs:sequence>
-                        <xs:attribute name="eventkey" type="xs:string" use="required" />
+                        <xs:attribute name="EventKey" type="xs:string" use="required" />
                       </xs:complexType>
                     </xs:element>
                   </xs:sequence>
@@ -166,16 +151,16 @@
               <xs:element name="LitCalEvent" maxOccurs="unbounded">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="eventIdx" type="xs:string" />
-                    <xs:element name="name" type="xs:string" />
-                    <xs:element name="date" type="xs:long" />
-                    <xs:element name="color">
+                    <xs:element name="EventIdx" type="xs:string" />
+                    <xs:element name="Name" type="xs:string" />
+                    <xs:element name="Date" type="xs:long" />
+                    <xs:element name="Color">
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element name="option" minOccurs="0" maxOccurs="3">
                             <xs:complexType mixed="true">
                               <xs:simpleContent>
-                                <xs:extension base="cl:colorEnumType">
+                                <xs:extension base="cl:ColorEnumType">
                                   <xs:attribute type="xs:byte" name="idx" use="required" />
                                 </xs:extension>
                               </xs:simpleContent>
@@ -184,10 +169,10 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
-                    <xs:element name="colorLcl">
+                    <xs:element name="ColorLcl">
                       <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="option" minOccurs="0" maxOccurs="3">
+                          <xs:element name="Option" minOccurs="0" maxOccurs="3">
                             <xs:complexType>
                               <xs:simpleContent>
                                 <xs:extension base="xs:string">
@@ -199,7 +184,7 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
-                    <xs:element name="type">
+                    <xs:element name="Type">
                       <xs:simpleType>
                         <xs:restriction base="xs:string">
                           <xs:enumeration value="mobile" />
@@ -207,7 +192,7 @@
                         </xs:restriction>
                       </xs:simpleType>
                     </xs:element>
-                    <xs:element name="grade">
+                    <xs:element name="Grade">
                       <xs:simpleType>
                         <xs:restriction base="xs:byte">
                           <xs:enumeration value="0" />
@@ -221,12 +206,12 @@
                         </xs:restriction>
                       </xs:simpleType>
                     </xs:element>
-                    <xs:element name="gradeLcl" type="xs:string" />
-                    <xs:element name="displayGrade" type="xs:string" />
-                    <xs:element name="common">
+                    <xs:element name="GradeLcl" type="xs:string" />
+                    <xs:element name="DisplayGrade" type="xs:string" />
+                    <xs:element name="Common">
                       <xs:complexType mixed="true">
                         <xs:sequence>
-                          <xs:element name="option" maxOccurs="unbounded" minOccurs="0">
+                          <xs:element name="Option" maxOccurs="unbounded" minOccurs="0">
                             <xs:complexType>
                               <xs:simpleContent>
                                 <xs:extension base="xs:string">
@@ -238,8 +223,8 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
-                    <xs:element name="commonLcl" type="xs:string" />
-                    <xs:element name="dayOfTheWeek_ISO8601">
+                    <xs:element name="CommonLcl" type="xs:string" />
+                    <xs:element name="DayOfTheWeekIso8601">
                       <xs:simpleType>
                         <xs:restriction base="xs:positiveInteger">
                           <xs:minInclusive value="1" />
@@ -247,7 +232,7 @@
                         </xs:restriction>
                       </xs:simpleType>
                     </xs:element>
-                    <xs:element name="month">
+                    <xs:element name="Month">
                       <xs:simpleType>
                         <xs:restriction base="xs:positiveInteger">
                           <xs:minInclusive value="1" />
@@ -255,7 +240,7 @@
                         </xs:restriction>
                       </xs:simpleType>
                     </xs:element>
-                    <xs:element name="day">
+                    <xs:element name="Day">
                       <xs:simpleType>
                         <xs:restriction base="xs:positiveInteger">
                           <xs:minInclusive value="1" />
@@ -263,7 +248,7 @@
                         </xs:restriction>
                       </xs:simpleType>
                     </xs:element>
-                    <xs:element name="year">
+                    <xs:element name="Year">
                       <xs:simpleType>
                         <xs:restriction base="xs:positiveInteger">
                           <xs:minInclusive value="1969" />
@@ -271,17 +256,17 @@
                         </xs:restriction>
                       </xs:simpleType>
                     </xs:element>
-                    <xs:element name="monthShort" type="xs:string" />
-                    <xs:element name="monthLong" type="xs:string" />
-                    <xs:element name="dayOfTheWeekShort" type="xs:string" />
-                    <xs:element name="dayOfTheWeekLong" type="xs:string" />
-                    <xs:element name="liturgicalYear" minOccurs="0" type="xs:string" />
-                    <xs:element name="isVigilMass" minOccurs="0" type="xs:boolean" />
-                    <xs:element name="isVigilFor" minOccurs="0" type="xs:string" />
-                    <xs:element name="hasVigilMass" minOccurs="0" type="xs:boolean" />
-                    <xs:element name="hasVesperI" minOccurs="0" type="xs:boolean" />
-                    <xs:element name="hasVesperII" minOccurs="0" type="xs:boolean" />
-                    <xs:element name="psalterWeek" minOccurs="0">
+                    <xs:element name="MonthShort" type="xs:string" />
+                    <xs:element name="MonthLong" type="xs:string" />
+                    <xs:element name="DayOfTheWeekShort" type="xs:string" />
+                    <xs:element name="DayOfTheWeekLong" type="xs:string" />
+                    <xs:element name="LiturgicalYear" minOccurs="0" type="xs:string" />
+                    <xs:element name="IsVigilMass" minOccurs="0" type="xs:boolean" />
+                    <xs:element name="IsVigilFor" minOccurs="0" type="xs:string" />
+                    <xs:element name="HasVigilMass" minOccurs="0" type="xs:boolean" />
+                    <xs:element name="HasVesperI" minOccurs="0" type="xs:boolean" />
+                    <xs:element name="HasVesperII" minOccurs="0" type="xs:boolean" />
+                    <xs:element name="PsalterWeek" minOccurs="0">
                       <xs:simpleType>
                         <xs:restriction base="xs:byte">
                           <xs:enumeration value="1" />
@@ -291,10 +276,10 @@
                         </xs:restriction>
                       </xs:simpleType>
                     </xs:element>
-                    <xs:element name="liturgicalSeason" minOccurs="0" type="xs:string" />
-                    <xs:element name="liturgicalSeasonLcl" minOccurs="0" type="xs:string" />
+                    <xs:element name="LiturgicalSeason" minOccurs="0" type="xs:string" />
+                    <xs:element name="LiturgicalSeasonLcl" minOccurs="0" type="xs:string" />
                   </xs:sequence>
-                  <xs:attribute name="eventkey" type="xs:ID" use="required" />
+                  <xs:attribute name="Eventkey" type="xs:ID" use="required" />
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
@@ -303,7 +288,7 @@
         <xs:element name="Messages">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="message" maxOccurs="unbounded" minOccurs="0">
+              <xs:element name="Message" maxOccurs="unbounded" minOccurs="0">
                 <xs:complexType>
                   <xs:simpleContent>
                     <xs:extension base="xs:string">
@@ -318,7 +303,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:simpleType name="colorEnumType">
+  <xs:simpleType name="ColorEnumType">
     <xs:restriction base="xs:string">
       <xs:enumeration value="green" />
       <xs:enumeration value="red" />

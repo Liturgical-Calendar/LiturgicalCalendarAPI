@@ -25,7 +25,8 @@ class LitFunc
       "calendartype"      => "CalendarType",
       "eventidx"          => "EventIdx",
       "nationalcalendar"  => "NationalCalendar",
-      "diocesancalendar"  => "DiocesanCalendar"
+      "diocesancalendar"  => "DiocesanCalendar",
+      "has_vesper_ii"     => "HasVesperII"
     ];
     public static string $HASH_REQUEST    = '';
 
