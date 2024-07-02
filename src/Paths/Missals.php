@@ -205,7 +205,7 @@ class Missals
                 if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
                     $missal                 = new \stdClass();
                     $missal->missal_id      = "EDITIO_TYPICA_{$matches[1]}";
-                    $missal->region         = "EDITIO_TYPICA";
+                    $missal->region         = "VATICAN";
                     $missal->year_published = $matches[1];
                     $missal->data_path      = "data/$directory/$directory.json";
                     $it = new \DirectoryIterator("glob://data/$directory/i18n/*.json");
