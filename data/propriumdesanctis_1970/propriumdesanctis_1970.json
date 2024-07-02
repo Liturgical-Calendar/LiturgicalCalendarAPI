@@ -1556,7 +1556,7 @@
             "white"
         ],
         "readings": {
-            "VIGIL": {
+            "vigil": {
                 "first_reading": "Ger 1, 4-10",
                 "responsorial_psalm": "Salmo 71",
                 "second_reading": "1Pt 1, 8-12",

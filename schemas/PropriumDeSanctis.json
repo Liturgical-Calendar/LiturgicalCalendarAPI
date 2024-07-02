@@ -9,34 +9,34 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "MONTH": {
+                "month": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Month"
                 },
-                "DAY": {
+                "day": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Day"
                 },
                 "event_key": {
                     "type": "string"
                 },
-                "NAME": {
+                "name": {
                     "type": "string"
                 },
-                "GRADE": {
+                "grade": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/LitGrade"
                 },
-                "DISPLAYGRADE": {
+                "display_grade": {
                     "type": "string"
                 },
-                "COMMON": {
+                "common": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/LitCommon"
                 },
-                "CALENDAR": {
+                "calendar": {
                     "$ref": "#/definitions/Calendar"
                 },
-                "COLOR": {
+                "color": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/LitColor"
                 },
-                "READINGS": {
+                "readings": {
                     "oneOf": [
                         {
                             "$ref": "#/definitions/LiturgicalEventWithVigilMass"
@@ -48,13 +48,13 @@
                 }
             },
             "required": [
-                "CALENDAR",
-                "COLOR",
-                "COMMON",
-                "DAY",
-                "GRADE",
-                "MONTH",
-                "READINGS",
+                "calendar",
+                "color",
+                "common",
+                "day",
+                "grade",
+                "month",
+                "readings",
                 "event_key"
             ],
             "title": "PropriumDeSanctis"
@@ -63,16 +63,16 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "VIGIL": {
+                "vigil": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Readings"
                 },
-                "DAY": {
+                "day": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Readings"
                 }
             },
             "required": [
-                "VIGIL",
-                "DAY"
+                "vigil",
+                "day"
             ],
             "title": "LiturgicalEventWithMass"
         },

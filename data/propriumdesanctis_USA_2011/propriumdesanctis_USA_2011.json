@@ -5,7 +5,7 @@
         "event_key": "StElizabethSeton",
         "NAME": "Saint Elizabeth Ann Seton, Religious",
         "grade": 3,
-        "DISPLAYGRADE": "",
+        "display_grade": "",
         "common": [
             "Proper"
         ],
@@ -27,7 +27,7 @@
         "event_key": "StJohnNeumann",
         "NAME": "Saint John Neumann, Bishop",
         "grade": 3,
-        "DISPLAYGRADE": "",
+        "display_grade": "",
         "common": [
             "Proper"
         ],
@@ -49,7 +49,7 @@
         "event_key": "StAndreBessette",
         "NAME": "Saint André Bessette, Religious",
         "grade": 2,
-        "DISPLAYGRADE": "",
+        "display_grade": "",
         "common": [
             "Holy Men and Women:For Religious"
         ],
@@ -71,7 +71,7 @@
         "event_key": "PrayerUnborn",
         "NAME": "Day of Prayer for the Legal Protection of Unborn Children",
         "grade": 3,
-        "DISPLAYGRADE": "National Day of Prayer",
+        "display_grade": "National Day of Prayer",
         "common": [
             "Masses and Prayers for Various Needs and Occasions:For Giving Thanks to God for the Gift of Human Life",
             "Preservation of Peace and Justice"
@@ -95,7 +95,7 @@
         "event_key": "StKatharineDrexel",
         "NAME": "Saint Katharine Drexel, Virgin",
         "grade": 2,
-        "DISPLAYGRADE": "",
+        "display_grade": "",
         "common": [
             "Virgins:For One Virgin"
         ],
@@ -117,7 +117,7 @@
         "event_key": "StDamienVeuster",
         "NAME": "Saint Damien de Veuster, Priest",
         "grade": 2,
-        "DISPLAYGRADE": "",
+        "display_grade": "",
         "common": [
             "Pastors:For Missionaries"
         ],
@@ -139,7 +139,7 @@
         "event_key": "StIsidore",
         "NAME": "Saint Isidore",
         "grade": 2,
-        "DISPLAYGRADE": "",
+        "display_grade": "",
         "common": [
             "Holy Men and Women:For One Saint"
         ],
@@ -161,7 +161,7 @@
         "event_key": "JuniperoSerra",
         "NAME": "Blessed Junípero Serra, Priest",
         "grade": 2,
-        "DISPLAYGRADE": "",
+        "display_grade": "",
         "common": [
             "Pastors:For One Pastor",
             "Pastors:For Missionaries"
@@ -184,7 +184,7 @@
         "event_key": "IndependenceDay",
         "NAME": "Independence Day",
         "grade": 3,
-        "DISPLAYGRADE": "National Holiday",
+        "display_grade": "National Holiday",
         "common": [
             "Proper"
         ],
@@ -206,7 +206,7 @@
         "event_key": "KateriTekakwitha",
         "NAME": "Blessed Kateri Tekakwitha, Virgin",
         "grade": 3,
-        "DISPLAYGRADE": "",
+        "display_grade": "",
         "common": [
             "Virgins:For One Virgin"
         ],
@@ -228,7 +228,7 @@
         "event_key": "StPeterClaver",
         "NAME": "Saint Peter Claver, Priest",
         "grade": 3,
-        "DISPLAYGRADE": "",
+        "display_grade": "",
         "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
@@ -251,7 +251,7 @@
         "event_key": "MarieDurocher",
         "NAME": "Blessed Marie Rose Durocher, Virgin",
         "grade": 2,
-        "DISPLAYGRADE": "",
+        "display_grade": "",
         "common": [
             "Virgins:For One Virgin"
         ],
@@ -273,7 +273,7 @@
         "event_key": "StFrancesXCabrini",
         "NAME": "Saint Frances Xavier Cabrini, Virgin",
         "grade": 3,
-        "DISPLAYGRADE": "",
+        "display_grade": "",
         "common": [
             "Virgins:For One Virgin",
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
@@ -296,7 +296,7 @@
         "event_key": "StRoseDuchesne",
         "NAME": "Saint Rose Philippine Duchesne, Virgin",
         "grade": 2,
-        "DISPLAYGRADE": "",
+        "display_grade": "",
         "common": [
             "Virgins:For One Virgin"
         ],
@@ -318,7 +318,7 @@
         "event_key": "MiguelPro",
         "NAME": "Blessed Miguel Agustín Pro, Priest and Martyr",
         "grade": 2,
-        "DISPLAYGRADE": "",
+        "display_grade": "",
         "common": [
             "Martyrs:For One Martyr",
             "Pastors:For One Pastor"
