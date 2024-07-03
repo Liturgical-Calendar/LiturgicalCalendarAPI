@@ -124,9 +124,6 @@
                 "url": {
                     "type": "string",
                     "format": "uri"
-                },
-                "decreeLangs": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/DecreeLangs"
                 }
             },
             "required": [

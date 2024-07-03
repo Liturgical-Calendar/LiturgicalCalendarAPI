@@ -68,15 +68,12 @@
                                 "until_year": {
                                     "type": "integer"
                                 },
+                                "strtotime": {
+                                    "type": "string"
+                                },
                                 "url": {
                                     "type": "string",
                                     "format": "uri"
-                                },
-                                "languages": {
-                                    "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/DecreeLangs"
-                                },
-                                "strtotime": {
-                                    "type": "string"
                                 }
                             },
                             "required": [

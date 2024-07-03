@@ -91,7 +91,7 @@
                 },
                 "url": {
                     "type": "string",
-                    "pattern": "^https?:\\/\\/(www\\.)?[a-zA-Z]{1,50}\\.[a-zA-Z]{1,6}([-a-zA-Z0-9()@:%._+~\\/]*)\\.(html|pdf)$"
+                    "format": "uri"
                 },
                 "url_lang_map": {
                     "type": "object",
