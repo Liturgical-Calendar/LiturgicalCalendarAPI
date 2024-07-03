@@ -3,7 +3,7 @@
         "month": 1,
         "day": 4,
         "event_key": "StElizabethSeton",
-        "NAME": "Saint Elizabeth Ann Seton, Religious",
+        "name": "Saint Elizabeth Ann Seton, Religious",
         "grade": 3,
         "display_grade": "",
         "common": [
@@ -25,7 +25,7 @@
         "month": 1,
         "day": 5,
         "event_key": "StJohnNeumann",
-        "NAME": "Saint John Neumann, Bishop",
+        "name": "Saint John Neumann, Bishop",
         "grade": 3,
         "display_grade": "",
         "common": [
@@ -47,7 +47,7 @@
         "month": 1,
         "day": 6,
         "event_key": "StAndreBessette",
-        "NAME": "Saint André Bessette, Religious",
+        "name": "Saint André Bessette, Religious",
         "grade": 2,
         "display_grade": "",
         "common": [
@@ -69,7 +69,7 @@
         "month": 1,
         "day": 22,
         "event_key": "PrayerUnborn",
-        "NAME": "Day of Prayer for the Legal Protection of Unborn Children",
+        "name": "Day of Prayer for the Legal Protection of Unborn Children",
         "grade": 3,
         "display_grade": "National Day of Prayer",
         "common": [
@@ -93,7 +93,7 @@
         "month": 3,
         "day": 3,
         "event_key": "StKatharineDrexel",
-        "NAME": "Saint Katharine Drexel, Virgin",
+        "name": "Saint Katharine Drexel, Virgin",
         "grade": 2,
         "display_grade": "",
         "common": [
@@ -115,7 +115,7 @@
         "month": 5,
         "day": 10,
         "event_key": "StDamienVeuster",
-        "NAME": "Saint Damien de Veuster, Priest",
+        "name": "Saint Damien de Veuster, Priest",
         "grade": 2,
         "display_grade": "",
         "common": [
@@ -137,7 +137,7 @@
         "month": 5,
         "day": 15,
         "event_key": "StIsidore",
-        "NAME": "Saint Isidore",
+        "name": "Saint Isidore",
         "grade": 2,
         "display_grade": "",
         "common": [
@@ -159,7 +159,7 @@
         "month": 7,
         "day": 1,
         "event_key": "JuniperoSerra",
-        "NAME": "Blessed Junípero Serra, Priest",
+        "name": "Blessed Junípero Serra, Priest",
         "grade": 2,
         "display_grade": "",
         "common": [
@@ -182,7 +182,7 @@
         "month": 7,
         "day": 4,
         "event_key": "IndependenceDay",
-        "NAME": "Independence Day",
+        "name": "Independence Day",
         "grade": 3,
         "display_grade": "National Holiday",
         "common": [
@@ -204,7 +204,7 @@
         "month": 7,
         "day": 14,
         "event_key": "KateriTekakwitha",
-        "NAME": "Blessed Kateri Tekakwitha, Virgin",
+        "name": "Blessed Kateri Tekakwitha, Virgin",
         "grade": 3,
         "display_grade": "",
         "common": [
@@ -226,7 +226,7 @@
         "month": 9,
         "day": 9,
         "event_key": "StPeterClaver",
-        "NAME": "Saint Peter Claver, Priest",
+        "name": "Saint Peter Claver, Priest",
         "grade": 3,
         "display_grade": "",
         "common": [
@@ -249,7 +249,7 @@
         "month": 10,
         "day": 6,
         "event_key": "MarieDurocher",
-        "NAME": "Blessed Marie Rose Durocher, Virgin",
+        "name": "Blessed Marie Rose Durocher, Virgin",
         "grade": 2,
         "display_grade": "",
         "common": [
@@ -271,7 +271,7 @@
         "month": 11,
         "day": 13,
         "event_key": "StFrancesXCabrini",
-        "NAME": "Saint Frances Xavier Cabrini, Virgin",
+        "name": "Saint Frances Xavier Cabrini, Virgin",
         "grade": 3,
         "display_grade": "",
         "common": [
@@ -294,7 +294,7 @@
         "month": 11,
         "day": 18,
         "event_key": "StRoseDuchesne",
-        "NAME": "Saint Rose Philippine Duchesne, Virgin",
+        "name": "Saint Rose Philippine Duchesne, Virgin",
         "grade": 2,
         "display_grade": "",
         "common": [
@@ -316,7 +316,7 @@
         "month": 11,
         "day": 23,
         "event_key": "MiguelPro",
-        "NAME": "Blessed Miguel Agustín Pro, Priest and Martyr",
+        "name": "Blessed Miguel Agustín Pro, Priest and Martyr",
         "grade": 2,
         "display_grade": "",
         "common": [
