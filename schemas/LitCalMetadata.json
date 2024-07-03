@@ -172,25 +172,50 @@
             "additionalProperties": false
         },
         "WiderRegionDef": {
-            "type": "string",
-            "enum": [
-                "Africa",
-                "Alsace",
-                "Americas",
-                "Anatolia",
-                "Antarctica",
-                "Asia",
-                "Australasia",
-                "Central Africa",
-                "Central America",
-                "Europe",
-                "Indies",
-                "North Africa",
-                "Oceania",
-                "Scandinavia",
-                "South America",
-                "West Indies"
-            ]
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "enum": [
+                        "Africa",
+                        "Alsace",
+                        "Americas",
+                        "Anatolia",
+                        "Antarctica",
+                        "Asia",
+                        "Australasia",
+                        "Central Africa",
+                        "Central America",
+                        "Europe",
+                        "Indies",
+                        "North Africa",
+                        "Oceania",
+                        "Scandinavia",
+                        "South America",
+                        "West Indies"
+                    ]
+                },
+                "languages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Locale"
+                    }
+                },
+                "data_path": {
+                    "type": "string",
+                    "pattern": "^nations/[ACEINOSW][flmnsueoc][rseatindo][a-zA-Z\\s]+.json$"
+                },
+                "i18n_path": {
+                    "type": "string",
+                    "pattern": "^nations/[ACEINOSW][FLMNSUEOC][RSEATINDO][A-Z\\s]+$"
+                },
+                "api_path": {
+                    "type": "string",
+                    "pattern": "^https:\\\/\\\/litcal\\.johnromanodorazio\\.com\\\/api\\\/v9\\\/data\\\/widerregion\\\/[ACEINOSW][flmnsueoc][rseatindo][a-zA-Z\\s]+\\?locale=\\{language\\}$"
+                }
+            },
+            "required": ["name", "languages", "data_path", "i18n_path", "api_path"]
         }
     }
 }
