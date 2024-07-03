@@ -75,12 +75,12 @@ class LitTest
             $calendarType = $this->getCalendarTypeStr();
             $calendarName = $this->getCalendarName();
             $messageIfError = "{$this->Test} Assertion '{$assertion->assertion}' failed for Year " . $this->dataToTest->settings->year . " in {$calendarType}{$calendarName}.";
-            $eventKey = self::$testCache->{$this->Test}->testInstructions->eventkey;
+            $eventKey = self::$testCache->{$this->Test}->testInstructions->event_key;
 
             switch ($assertion->assert) {
                 case 'eventNotExists':
                     $errorMessage = is_null($assertion->expected_value)
-                        ? " The event {$eventKey} should not exist, instead the event has a timestamp of {$this->dataToTest->LitCal->{$eventKey}->date}"
+                        ? " The event {$eventKey} should not exist, instead the event has a timestamp of {$this->dataToTest->litcal->{$eventKey}->date}"
                         : " What is going on here? We expected the event not to exist, and in fact it doesn't. We should never get here!";
 
                     if (false === property_exists($this->dataToTest->litcal, $eventKey)) {
@@ -112,15 +112,15 @@ class LitTest
 
     private function getCalendarTypeStr(): string
     {
-        return property_exists($this->dataToTest->settings, 'nationalcalendar') ? 'the national calendar of ' : (
-            property_exists($this->dataToTest->settings, 'diocesancalendar') ? 'the diocesan calendar of ' : ''
+        return property_exists($this->dataToTest->settings, 'national_calendar') ? 'the national calendar of ' : (
+            property_exists($this->dataToTest->settings, 'diocesan_calendar') ? 'the diocesan calendar of ' : ''
         );
     }
 
     private function getCalendarName(): string
     {
-        return property_exists($this->dataToTest->settings, 'diocesancalendar') ? $this->dataToTest->settings->diocesancalendar : (
-            property_exists($this->dataToTest->settings, 'nationalcalendar') ? $this->dataToTest->settings->nationalcalendar : 'the Universal Roman Calendar'
+        return property_exists($this->dataToTest->settings, 'diocesan_calendar') ? $this->dataToTest->settings->diocesan_calendar : (
+            property_exists($this->dataToTest->settings, 'natinal_calendar') ? $this->dataToTest->settings->natinal_calendar : 'the Universal Roman Calendar'
         );
     }
 
