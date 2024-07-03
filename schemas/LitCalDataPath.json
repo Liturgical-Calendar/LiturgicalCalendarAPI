@@ -2,8 +2,8 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "LitCalDataPath",
     "oneOf": [
-        { "$ref": "https://lical.johnromanodorazio.com/api/v9/schemas/DiocesanCalendar.json" },
-        { "$ref": "https://lical.johnromanodorazio.com/api/v9/schemas/NationalCalendar.json" },
-        { "$ref": "https://lical.johnromanodorazio.com/api/v9/schemas/WiderRegionCalendar.json" }
+        { "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/DiocesanCalendar.json" },
+        { "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/NationalCalendar.json" },
+        { "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/WiderRegionCalendar.json" }
     ]
 }
