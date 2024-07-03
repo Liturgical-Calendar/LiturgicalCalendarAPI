@@ -84,9 +84,9 @@ class Metadata
                     return [
                         "name" => pathinfo('nations/' . $el, PATHINFO_FILENAME),
                         "languages" => $widerRegionLanguages,
-                        "data_path" => 'nations/' . $el . '.json',
-                        "i18n_path" => 'nations/' . $dirName,
-                        "api_path" => API_BASE_PATH . '/data/widerregion/' . $el . '?locale={locale}'
+                        "data_path" => "nations/$el",
+                        "i18n_path" => "nations/$dirName",
+                        "api_path" => API_BASE_PATH . '/data/widerregion/' . pathinfo('nations/' . $el, PATHINFO_FILENAME) . '?locale={locale}'
                     ];
                 }, $widerRegionsFiles);
                 return 200;
