@@ -78,8 +78,9 @@ class Metadata
                     $dirName = strtoupper(pathinfo('nations/' . $el, PATHINFO_FILENAME));
                     $langsInFolder = array_diff(scandir("nations/$dirName"), ['..','.']);
                     $widerRegionLanguages = array_values(array_filter($langsInFolder, function ($elem) use ($dirName) {
-                        return pathinfo("nations/$dirName/" . $elem, PATHINFO_EXTENSION) === 'json';
+                        return pathinfo("nations/$dirName/$elem", PATHINFO_EXTENSION) === 'json';
                     }));
+                    $widerRegionLanguages = array_map(fn ($el) => pathinfo("nations/$dirName/$el", PATHINFO_FILENAME), $widerRegionLanguages);
                     return [
                         "name" => pathinfo('nations/' . $el, PATHINFO_FILENAME),
                         "languages" => $widerRegionLanguages,
