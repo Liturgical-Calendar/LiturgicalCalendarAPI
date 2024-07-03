@@ -222,7 +222,7 @@ class Events
                 foreach ($DATA as $idx => $festivity) {
                     $key = $festivity[ "event_key" ];
                     self::$FestivityCollection[ $key ] = $festivity;
-                    self::$FestivityCollection[ $key ][ "MISSAL" ] = $LatinMissal;
+                    self::$FestivityCollection[ $key ][ "missal" ] = $LatinMissal;
                     self::$FestivityCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($festivity["grade"], false);
                     self::$FestivityCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c($festivity["common"]);
                 }
