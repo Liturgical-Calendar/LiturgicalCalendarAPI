@@ -112,7 +112,7 @@ class Missals
                                     foreach ($missalRows as $idx => $row) {
                                         $key = $row->event_key;
                                         if (property_exists($i18nObj, $key)) {
-                                            $missalRows[$idx]->NAME = $i18nObj->{$key};
+                                            $missalRows[$idx]->name = $i18nObj->{$key};
                                         }
                                     }
                                     self::produceResponse(json_encode($missalRows));
