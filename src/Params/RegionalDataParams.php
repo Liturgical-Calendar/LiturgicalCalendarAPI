@@ -10,8 +10,9 @@ use Johnrdorazio\LitCal\Enum\RequestMethod;
 
 class RegionalDataParams
 {
-    private ?object $calendars = null;
-    public const array EXPECTED_CATEGORIES = [
+    private ?object $calendars              = null;
+    private static array $widerRegionNames         = [];
+    public const array EXPECTED_CATEGORIES  = [
         "nation"      => "NATIONALCALENDAR",
         "diocese"     => "DIOCESANCALENDAR",
         "widerregion" => "WIDERREGIONCALENDAR"
@@ -30,6 +31,9 @@ class RegionalDataParams
             if (JSON_ERROR_NONE === json_last_error() && property_exists($metadata, 'litcal_metadata')) {
                 $this->calendars = $metadata->litcal_metadata;
                 unset($this->calendars->national_calendars->VATICAN);
+                foreach ($this->calendars->wider_regions as $widerRegion) {
+                    self::$widerRegionNames[] = $widerRegion->name;
+                }
             }
         }
     }
@@ -83,10 +87,10 @@ class RegionalDataParams
                     break;
                 case 'WIDERREGIONCALENDAR':
                     if (
-                        false === in_array($data->key, $this->calendars->wider_regions)
+                        false === in_array($data->key, self::$widerRegionNames)
                         && RegionalData::$APICore->getRequestMethod() !== RequestMethod::PUT
                     ) {
-                        $validVals = implode(', ', $this->calendars->wider_regions);
+                        $validVals = implode(', ', self::$widerRegionNames);
                         RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`, valid values are: {$validVals}");
                     } else {
                         $this->key = $data->key;
@@ -112,7 +116,7 @@ class RegionalDataParams
                     // Check the request method: cannot DELETE Wider Region calendar data if there are national calendars that depend on it
                     if (RegionalData::$APICore->getRequestMethod() === RequestMethod::DELETE) {
                         foreach ($this->calendars->national_calendars_metadata as $key => $value) {
-                            if (in_array($data->key, $value->widerRegions)) {
+                            if (in_array($data->key, $value->wider_regions)) {
                                 RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Cannot DELETE Wider Region calendar data while there are National calendars that depend on it. Currently {$data->key} is in use by {$key}");
                             }
                         }
