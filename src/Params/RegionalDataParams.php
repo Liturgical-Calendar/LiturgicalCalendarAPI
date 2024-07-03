@@ -91,13 +91,21 @@ class RegionalDataParams
                         && RegionalData::$APICore->getRequestMethod() !== RequestMethod::PUT
                     ) {
                         $validVals = implode(', ', self::$widerRegionNames);
-                        RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`, valid values are: {$validVals}");
+                        $message = "Invalid value {$data->key} for param `key`, valid values are: {$validVals}";
+                        RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                     } else {
                         $this->key = $data->key;
                     }
                     // A locale parameter is required for WiderRegion data, whether supplied by the Accept-Language header or by a `locale` parameter
-                    $currentWiderRegion = array_filter($this->calendars->wider_regions, fn ($el) => $el->name === $data->key)[0];
-                    $validLangs = $currentWiderRegion->languages;
+                    $currentWiderRegionArr = array_filter($this->calendars->wider_regions, fn ($el) => $el->name === $data->key);
+                    if (count($currentWiderRegionArr)) {
+                        $currentWiderRegion = $currentWiderRegionArr[0];
+                        $validLangs = $currentWiderRegion->languages;
+                    } else {
+                        $message = "I thought I told you that {$data->key} was an invalid wider region value for param `key`, I could not find such a key in a `name` prop in the array: "
+                            . json_encode($this->calendars->wider_regions, JSON_PRETTY_PRINT);
+                        RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+                    }
                     if (property_exists($data, 'locale')) {
                         $data->locale = \Locale::canonicalize($data->locale);
                         if (in_array($data->locale, $validLangs)) {
