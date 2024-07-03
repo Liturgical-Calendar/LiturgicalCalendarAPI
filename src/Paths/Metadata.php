@@ -86,7 +86,7 @@ class Metadata
                         "languages" => $widerRegionLanguages,
                         "data_path" => "nations/$el",
                         "i18n_path" => "nations/$dirName",
-                        "api_path" => API_BASE_PATH . '/data/widerregion/' . pathinfo('nations/' . $el, PATHINFO_FILENAME) . '?locale={locale}'
+                        "api_path" => API_BASE_PATH . '/data/widerregion/' . pathinfo('nations/' . $el, PATHINFO_FILENAME) . '?locale={language}'
                     ];
                 }, $widerRegionsFiles);
                 return 200;
