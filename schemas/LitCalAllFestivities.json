@@ -96,19 +96,20 @@
                   "grade": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/LitGrade"
                   },
+                  "grade_lcl": {
+                    "type": "string"
+                  },
                   "display_grade": {
                     "type": "string"
                   },
                   "common": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/LitCommon"
                   },
+                  "common_lcl": {
+                    "type": "string"
+                  },
                   "calendar": {
-                    "type": "string",
-                    "enum": [
-                        "GENERAL ROMAN",
-                        "ITALY",
-                        "USA"
-                    ]
+                    "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Calendar"
                   },
                   "color": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/LitColor"
@@ -116,16 +117,16 @@
                   "readings": {
                     "anyOf": [
                         {
-                            "$ref": "#/definitions/Readings"
+                            "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Readings"
                         },
                         {
                             "type": "object",
                             "properties": {
-                                "VIGIL": {
-                                    "$ref": "#/definitions/Readings"
+                                "vigil": {
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Readings"
                                 },
-                                "DAY": {
-                                    "$ref": "#/definitions/Readings"
+                                "day": {
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Readings"
                                 }
                             },
                             "additionalProperties": false
@@ -150,40 +151,12 @@
                   },
                   "strtotime": {
                     "type": "string"
-                  },
-                  "grade_lcl": {
-                    "type": "string"
                   }
                 },
                 "additionalProperties": false,
-                "required": [ "event_key", "grade", "common", "color", "name", "grade_lcl" ]
+                "required": [ "event_key", "grade", "common", "common_lcl", "color", "name", "grade_lcl" ]
               }
             }
-        },
-        "Readings": {
-            "type": "object",
-            "properties": {
-                "first_reading": { "type": "string" },
-                "responsorial_psalm": { "type": "string" },
-                "second_reading": { "type": "string" },
-                "responsorial_psalm_2": { "type": "string" },
-                "third_reading": { "type": "string" },
-                "responsorial_psalm_3": { "type": "string" },
-                "fourth_reading": { "type": "string" },
-                "responsorial_psalm_4": { "type": "string" },
-                "fifth_reading": { "type": "string" },
-                "responsorial_psalm_5": { "type": "string" },
-                "sixth_reading": { "type": "string" },
-                "responsorial_psalm_6": { "type": "string" },
-                "seventh_reading": { "type": "string" },
-                "responsorial_psalm_7": { "type": "string" },
-                "epistle": { "type": "string" },
-                "responsorial_psalm_epistle": { "type": "string" },
-                "alleluia_verse": { "type": "string" },
-                "gospel": { "type": "string" },
-                "palm_gospel": { "type": "string" }
-            },
-            "additionalProperties": false
         }
     }
 }
