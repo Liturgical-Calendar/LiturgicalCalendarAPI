@@ -97,7 +97,7 @@ class RegionalDataParams
                         $this->key = $data->key;
                     }
                     // A locale parameter is required for WiderRegion data, whether supplied by the Accept-Language header or by a `locale` parameter
-                    $currentWiderRegionArr = array_filter($this->calendars->wider_regions, fn ($el) => $el->name === $data->key);
+                    $currentWiderRegionArr = array_values(array_filter($this->calendars->wider_regions, fn ($el) => $el->name === $data->key));
                     if (count($currentWiderRegionArr)) {
                         $currentWiderRegion = $currentWiderRegionArr[0];
                         $validLangs = $currentWiderRegion->languages;
