@@ -48,7 +48,7 @@
                                 "wider_regions": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/definitions/WiderRegionDef"
+                                        "$ref": "#/definitions/WiderRegionNames"
                                     }
                                 },
                                 "dioceses": {
@@ -176,25 +176,7 @@
             "additionalProperties": false,
             "properties": {
                 "name": {
-                    "type": "string",
-                    "enum": [
-                        "Africa",
-                        "Alsace",
-                        "Americas",
-                        "Anatolia",
-                        "Antarctica",
-                        "Asia",
-                        "Australasia",
-                        "Central Africa",
-                        "Central America",
-                        "Europe",
-                        "Indies",
-                        "North Africa",
-                        "Oceania",
-                        "Scandinavia",
-                        "South America",
-                        "West Indies"
-                    ]
+                    "$ref": "#/definitions/WiderRegionNames"
                 },
                 "languages": {
                     "type": "array",
@@ -216,6 +198,27 @@
                 }
             },
             "required": ["name", "languages", "data_path", "i18n_path", "api_path"]
+        },
+        "WiderRegionNames": {
+            "type": "string",
+            "enum": [
+                "Africa",
+                "Alsace",
+                "Americas",
+                "Anatolia",
+                "Antarctica",
+                "Asia",
+                "Australasia",
+                "Central Africa",
+                "Central America",
+                "Europe",
+                "Indies",
+                "North Africa",
+                "Oceania",
+                "Scandinavia",
+                "South America",
+                "West Indies"
+            ]
         }
     }
 }
