@@ -1,6 +1,6 @@
 {
     "name": "StJaneFrancesDeChantalTest",
-    "eventkey": "StJaneFrancesDeChantal",
+    "event_key": "StJaneFrancesDeChantal",
     "description": "Saint Jane Frances de Chantal was moved from December 12 to August 12 in the 2002 Latin Edition of the Roman Missal, to allow bishops conferences to insert Our Lady of Guadalupe as an optional memorial on December 12. DOES ST JANE FRANCES DE CHANTAL FALL ON THE RIGHT DAY BOTH BEFORE AND AFTER 2002, OR IT CORRECTLY OVERRIDEN BY GREATER FESTIVITIES?",
     "test_type": "variableCorrespondence",
     "assertions": [

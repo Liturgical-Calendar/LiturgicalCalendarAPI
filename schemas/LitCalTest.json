@@ -45,7 +45,7 @@
                     "type": "string",
                     "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
                 },
-                "eventkey": {
+                "event_key": {
                     "type": "string",
                     "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
                 },
@@ -69,7 +69,7 @@
                     "$ref": "#/definitions/Assertions"
                 }
             },
-            "required": [ "name", "eventkey", "description", "test_type", "assertions" ],
+            "required": [ "name", "event_key", "description", "test_type", "assertions" ],
             "additionalProperties": false
         },
         "ExactCorrespondenceSinceType": {
@@ -79,7 +79,7 @@
                     "type": "string",
                     "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
                 },
-                "eventkey": {
+                "event_key": {
                     "type": "string",
                     "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
                 },
@@ -103,7 +103,7 @@
                     "$ref": "#/definitions/Assertions"
                 }
             },
-            "required": [ "name", "eventkey", "description", "test_type", "assertions", "year_since" ],
+            "required": [ "name", "event_key", "description", "test_type", "assertions", "year_since" ],
             "additionalProperties": false
         },
         "ExactCorrespondenceUntilType": {
@@ -113,7 +113,7 @@
                     "type": "string",
                     "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
                 },
-                "eventkey": {
+                "event_key": {
                     "type": "string",
                     "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
                 },
@@ -137,7 +137,7 @@
                     "$ref": "#/definitions/Assertions"
                 }
             },
-            "required": [ "name", "eventkey", "description", "test_type", "assertions", "year_until" ],
+            "required": [ "name", "event_key", "description", "test_type", "assertions", "year_until" ],
             "additionalProperties": false
         },
         "Assertions": {

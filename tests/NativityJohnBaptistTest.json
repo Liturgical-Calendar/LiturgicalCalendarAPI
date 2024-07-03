@@ -1,6 +1,6 @@
 {
     "name": "NativityJohnBaptistTest",
-    "eventkey": "NativityJohnBaptist",
+    "event_key": "NativityJohnBaptist",
     "description": "When the Nativity of John the Baptist coincides with the Solemnity of the Sacred Heart, is it correctly moved to June 23?",
     "test_type": "exactCorrespondence",
     "assertions": [
