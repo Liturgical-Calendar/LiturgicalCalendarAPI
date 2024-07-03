@@ -96,19 +96,25 @@ class RegionalDataParams
                         $this->key = $data->key;
                     }
                     // A locale parameter is required for WiderRegion data, whether supplied by the Accept-Language header or by a `locale` parameter
+                    $currentWiderRegion = array_filter($this->calendars->wider_regions, fn ($el) => $el->name === $data->key);
+                    $validLangs = $currentWiderRegion->languages;
                     if (property_exists($data, 'locale')) {
                         $data->locale = \Locale::canonicalize($data->locale);
-                        if (LitLocale::isValid($data->locale)) {
+                        if (in_array($data->locale, $validLangs)) {
                             $this->locale = $data->locale;
                         } else {
-                            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->locale} for param `locale`");
+                            $message = "Invalid value {$data->locale} for param `locale`, valid values for wider region {$currentWiderRegion->name} are: "
+                                        . implode(', ', $validLangs);
+                            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                         }
                     } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
                         $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-                        if (LitLocale::isValid($value)) {
+                        if (in_array($value, $validLangs)) {
                             $this->locale = $value;
                         } else {
-                            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$value} for Accept-Language header");
+                            $message = "Invalid value {$value} for Accept-Language header, valid values for wider region {$currentWiderRegion->name} are: "
+                                        . implode(', ', $validLangs);
+                            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                         }
                     } else {
                         RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "`locale` param or `Accept-Language` header required for Wider Region calendar data");
