@@ -15,17 +15,27 @@ class LitSchema
     public const I18N              = self::SCHEMA_BASE_PATH . "/LitCalTranslation.json";
     public const METADATA          = self::SCHEMA_BASE_PATH . "/LitCalMetadata.json";
     public const LITCAL            = self::SCHEMA_BASE_PATH . "/LitCal.json";
+    public const EVENTS            = self::SCHEMA_BASE_PATH . "/LitCalAllFestivities.json";
+    public const TESTS             = self::SCHEMA_BASE_PATH . "/LitCalTests.json";
+    public const MISSALS           = self::SCHEMA_BASE_PATH . "/LitCalMissals.json";
+    public const EASTER            = self::SCHEMA_BASE_PATH . "/LitCalEasterPath.json";
+    public const DATA              = self::SCHEMA_BASE_PATH . "/LitCalDataPath.json";
 
+    private const ERRMSG           = "Schema validation error: ";
     public const ERROR_MESSAGES = [
-        LitSchema::INDEX             => "Schema validation error: Index not updated",
-        LitSchema::DIOCESAN          => "Schema validation error: Diocesan Calendar not created / updated",
-        LitSchema::NATIONAL          => "Schema validation error: National Calendar not created / updated",
-        LitSchema::PROPRIUMDESANCTIS => "Schema validation error: Proprium de Sanctis data not created / updated",
-        LitSchema::PROPRIUMDETEMPORE => "Schema validation error: Proprium de Tempore data not created / updated",
-        LitSchema::WIDERREGION       => "Schema validation error: Wider Region data not created / updated",
-        LitSchema::DECREEMEMORIALS   => "Schema validation error: Memorials from Decrees data not created / updated",
-        LitSchema::I18N              => "Schema validation error: Translation data not created / updated",
-        LitSchema::METADATA          => "Schema validation error: LitCalMetadata not valid",
-        LitSchema::LITCAL            => "Schema validation error: LitCal not valid"
+        LitSchema::INDEX             => self::ERRMSG . "Index not updated",
+        LitSchema::DIOCESAN          => self::ERRMSG . "Diocesan Calendar not created / updated",
+        LitSchema::NATIONAL          => self::ERRMSG . "National Calendar not created / updated",
+        LitSchema::PROPRIUMDESANCTIS => self::ERRMSG . "Proprium de Sanctis data not created / updated",
+        LitSchema::PROPRIUMDETEMPORE => self::ERRMSG . "Proprium de Tempore data not created / updated",
+        LitSchema::WIDERREGION       => self::ERRMSG . "Wider Region data not created / updated",
+        LitSchema::DECREEMEMORIALS   => self::ERRMSG . "Memorials from Decrees data not created / updated",
+        LitSchema::I18N              => self::ERRMSG . "Translation data not created / updated",
+        LitSchema::METADATA          => self::ERRMSG . "LitCalMetadata not valid",
+        LitSchema::LITCAL            => self::ERRMSG . "LitCal not valid",
+        LitSchema::EVENTS            => self::ERRMSG . "Events path data not valid",
+        LitSchema::TESTS             => self::ERRMSG . "Tests path data not valid",
+        LitSchema::EASTER            => self::ERRMSG . "Easter path data not valid",
+        LitSchema::DATA              => self::ERRMSG . "Data path data not valid"
     ];
 }

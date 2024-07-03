@@ -105,13 +105,21 @@ class Health implements MessageComponentInterface
     }
 
     public const DATA_PATH_TO_SCHEMA = [
-        API_BASE_PATH . '/calendars/'                               => LitSchema::METADATA,
-        "data/propriumdetempore.json"                               => LitSchema::PROPRIUMDETEMPORE,
-        "data/propriumdesanctis_1970/propriumdesanctis_1970.json"   => LitSchema::PROPRIUMDESANCTIS,
-        "data/propriumdesanctis_2002/propriumdesanctis_2002.json"   => LitSchema::PROPRIUMDESANCTIS,
-        "data/propriumdesanctis_2008/propriumdesanctis_2008.json"   => LitSchema::PROPRIUMDESANCTIS,
-        API_BASE_PATH . '/decrees/'                                 => LitSchema::DECREEMEMORIALS,
-        "nations/index.json"                                        => LitSchema::INDEX
+        "data/propriumdetempore.json"                                => LitSchema::PROPRIUMDETEMPORE,
+        "data/propriumdesanctis_1970/propriumdesanctis_1970.json"    => LitSchema::PROPRIUMDESANCTIS,
+        "data/propriumdesanctis_2002/propriumdesanctis_2002.json"    => LitSchema::PROPRIUMDESANCTIS,
+        "data/propriumdesanctis_2008/propriumdesanctis_2008.json"    => LitSchema::PROPRIUMDESANCTIS,
+        "data/propriumdesanctis_ITALY_1983/propriumdesanctis_ITALY_1983.json"
+                                                                     => LitSchema::PROPRIUMDESANCTIS,
+        "data/propriumdesanctis_USA_2011/propriumdesanctis_USA_2011" => LitSchema::PROPRIUMDESANCTIS,
+        "nations/index.json"                                         => LitSchema::INDEX,
+        API_BASE_PATH . '/calendars/'                                => LitSchema::METADATA,
+        API_BASE_PATH . '/decrees/'                                  => LitSchema::DECREEMEMORIALS,
+        API_BASE_PATH . '/events/'                                   => LitSchema::EVENTS,
+        API_BASE_PATH . '/tests/'                                    => LitSchema::TESTS,
+        API_BASE_PATH . '/easter/'                                   => LitSchema::EASTER,
+        API_BASE_PATH . '/missals/'                                  => LitSchema::MISSALS,
+        API_BASE_PATH . '/data/'                                     => LitSchema::DATA
     ];
 
     public function __construct()
@@ -137,6 +145,19 @@ class Health implements MessageComponentInterface
                 break;
             case 'propriumdesanctis':
                 $schema = LitSchema::PROPRIUMDESANCTIS;
+                break;
+            case 'resourceDataCheck':
+                if (
+                    preg_match("/\/missals\/[_A-Z0-9]+$/", $dataPath)
+                ) {
+                    $schema = LitSchema::PROPRIUMDESANCTIS;
+                } elseif (
+                    preg_match("/\/data\/(nation|diocese|widerregion)/", $dataPath)
+                ) {
+                    $schema = LitSchema::DATA;
+                } else {
+                    $schema = Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
+                }
                 break;
         }
         $data = file_get_contents($dataPath);
