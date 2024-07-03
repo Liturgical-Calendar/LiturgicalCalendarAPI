@@ -315,7 +315,7 @@ class Events
                 } else {
                     $decreeURL = $festivity[ "metadata" ][ "url" ];
                 }
-                self::$FestivityCollection[ $key ][ "DECREE" ] = $decreeURL;
+                self::$FestivityCollection[ $key ][ "decree" ] = $decreeURL;
             } elseif ($festivity[ "metadata" ][ "action" ] === 'setProperty') {
                 if ($festivity[ "metadata" ][ "property" ] === 'name') {
                     self::$FestivityCollection[ $key ][ "name" ] = $NAME[ $key ];
