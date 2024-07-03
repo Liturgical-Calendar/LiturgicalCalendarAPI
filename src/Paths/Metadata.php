@@ -12,7 +12,7 @@ class Metadata
     private static array $diocesanCalendars         = [];
     private static array $diocesanGroups            = [];
     private static array $nationalCalendarsMetadata = [];
-    private static array $widerRegionsNames         = [];
+    private static array $widerRegions              = [];
 
     private static function retrieveCalendars()
     {
@@ -74,8 +74,19 @@ class Metadata
                 $widerRegionsFiles = array_values(array_filter($dirResults, function ($el) {
                     return !is_dir('nations/' . $el) && pathinfo('nations/' . $el, PATHINFO_EXTENSION) === 'json';
                 }));
-                Metadata::$widerRegionsNames = array_map(function ($el) {
-                    return pathinfo('nations/' . $el, PATHINFO_FILENAME);
+                Metadata::$widerRegions = array_map(function ($el) {
+                    $dirName = strtoupper($el);
+                    $langsInFolder = array_diff(scandir("nations/$dirName"), ['..','.']);
+                    $widerRegionLanguages = array_values(array_filter($langsInFolder, function ($elem) use ($dirName) {
+                        return pathinfo("nations/$dirName" . $elem, PATHINFO_EXTENSION) === 'json';
+                    }));
+                    return [
+                        "name" => pathinfo('nations/' . $el, PATHINFO_FILENAME),
+                        "languages" => $widerRegionLanguages,
+                        "data_path" => 'nations/' . $el . '.json',
+                        "i18n_path" => 'nations/' . $dirName,
+                        "api_path" => API_BASE_PATH . '/data/widerregion/' . $el . '?locale={locale}'
+                    ];
                 }, $widerRegionsFiles);
                 return 200;
             } else {
@@ -94,7 +105,7 @@ class Metadata
                 "national_calendars_metadata" => Metadata::$nationalCalendarsMetadata,
                 "diocesan_calendars"          => Metadata::$diocesanCalendars,
                 "diocesan_groups"             => Metadata::$diocesanGroups,
-                "wider_regions"               => Metadata::$widerRegionsNames,
+                "wider_regions"               => Metadata::$widerRegions,
                 "roman_missals"               => RomanMissal::produceMetadata()
             ]
         ], JSON_PRETTY_PRINT);
