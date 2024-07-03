@@ -67,8 +67,8 @@
         }
     },
     "required": [
-        "LitCalAllFestivities",
-        "Settings"
+        "litcal_events",
+        "settings"
     ],
     "additionalProperties": false,
     "definitions": {
