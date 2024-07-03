@@ -1,7 +1,0 @@
-{
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "array",
-    "items": {
-        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/LitCalTest.json"
-    }
-}

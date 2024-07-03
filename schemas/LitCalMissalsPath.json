@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "LitCalMissals",
+    "title": "LitCalMissalsPath",
     "description": "A collection of the Missals from which sanctorale data is used to define one or another Liturgical Calendar",
     "type": "object",
     "additionalProperties": false,
