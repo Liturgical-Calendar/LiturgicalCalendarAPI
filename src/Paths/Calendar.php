@@ -1758,7 +1758,7 @@ class Calendar
         switch ($missal) {
             case RomanMissal::EDITIO_TYPICA_1970:
                 $YEAR = 1970;
-                $lang = in_array($this->CalendarParams->Locale, ["DE","EN","IT","LA","PT"]) ? strtolower($this->CalendarParams->Locale) : "en";
+                $lang = in_array(LitLocale::$PRIMARY_LANGUAGE, ["de","en","it","la","pt"]) ? LitLocale::$PRIMARY_LANGUAGE : "en";
                 $DECREE = "<a href=\"https://www.vatican.va/content/paul-vi/$lang/apost_constitutions/documents/hf_p-vi_apc_19690403_missale-romanum.html\">"
                     . _('Apostolic Constitution Missale Romanum')
                     . "</a>";
@@ -2408,8 +2408,8 @@ class Calendar
                 LitCommon::PROPRIO
             );
             $this->Cal->addFestivity("ConversionStPaul", $festivity);
-            $langs = ["FR" => "fr", "EN" => "en", "IT" => "it", "LA" => "lt", "PT" => "pt", "ES" => "sp", "DE" => "ge"];
-            $lang = in_array($this->CalendarParams->Locale, array_keys($langs)) ? $langs[$this->CalendarParams->Locale] : "en";
+            $langs = ["fr" => "fr", "en" => "en", "it" => "it", "la" => "lt", "pt" => "pt", "es" => "sp", "de" => "ge"];
+            $lang = in_array(LitLocale::$PRIMARY_LANGUAGE, array_keys($langs)) ? $langs[LitLocale::$PRIMARY_LANGUAGE] : "en";
             $this->Messages[] = sprintf(
                 /**translators: 1: Festivity name, 2: Source of the information  */
                 _('The Feast \'%1$s\' would have been suppressed this year ( 2009 ) since it falls on a Sunday, however being the Year of the Apostle Paul, as per the %2$s it has been reinstated so that local churches can optionally celebrate the memorial.'),
