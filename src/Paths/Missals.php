@@ -41,7 +41,7 @@ class Missals
             if (self::$APICore->getRequestMethod() === RequestMethod::POST) {
                 if ($payload !== null && property_exists($payload, 'locale')) {
                     $data["LOCALE"] = $payload->locale;
-                } else {
+                } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
                     $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
                     if ($locale && LitLocale::isValid($locale)) {
                         $data["LOCALE"] = $locale;
@@ -61,7 +61,7 @@ class Missals
         } elseif (self::$APICore->getRequestMethod() === RequestMethod::GET) {
             if (isset($_GET['locale'])) {
                 $data["LOCALE"] = $_GET['locale'];
-            } else {
+            } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
                 $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
                 if ($locale && LitLocale::isValid($locale)) {
                     $data["LOCALE"] = $locale;
