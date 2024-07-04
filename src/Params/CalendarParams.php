@@ -27,16 +27,22 @@ class CalendarParams
     public ?string $DiocesanCalendar     = null;
 
     public const ALLOWED_PARAMS  = [
-        "YEAR",
-        "CALENDARTYPE",
-        "EPIPHANY",
-        "ASCENSION",
-        "CORPUSCHRISTI",
-        "ETERNALHIGHPRIEST",
-        "LOCALE",
-        "RETURNTYPE",
-        "NATIONALCALENDAR",
-        "DIOCESANCALENDAR"
+        "year",
+        "calendartype",
+        "calendar_type",
+        "epiphany",
+        "ascension",
+        "corpuschristi",
+        "corpus_christi",
+        "eternalhighpriest",
+        "eternal_high_priest",
+        "locale",
+        "returntype",
+        "return_type",
+        "nationalcalendar",
+        "national_calendar",
+        "diocesancalendar",
+        "diocesan_calendar"
     ];
 
     // If we can get more data from 1582 (year of the Gregorian reform) to 1969
@@ -86,9 +92,9 @@ class CalendarParams
     public function setData(array $DATA = [])
     {
         foreach ($DATA as $key => $value) {
-            $key = strtoupper($key);
+            $key = strtolower($key);
             if (in_array($key, self::ALLOWED_PARAMS)) {
-                if ($key !== 'YEAR' && $key !== 'ETERNAL_HIGH_PRIEST') {
+                if ($key !== 'year' && $key !== 'eternal_high_priest' && $key !== 'eternalhighpriest') {
                     // all other parameters expect a string value
                     if (gettype($value) !== 'string') {
                         $description = "Expected value of type String for parameter `{$key}`, instead found type " . gettype($value);
@@ -97,83 +103,89 @@ class CalendarParams
                     $value = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
                 }
                 switch ($key) {
-                    case "YEAR":
+                    case "year":
                         $this->enforceYearValidity($value);
                         break;
-                    case "EPIPHANY":
+                    case "epiphany":
                         if (Epiphany::isValid(strtoupper($value))) {
                             $this->Epiphany = strtoupper($value);
                         } else {
-                            $description = "Invalid value `{$value}` for parameter `EPIPHANY`, valid values are: " . implode(', ', Epiphany::$values);
+                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: " . implode(', ', Epiphany::$values);
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "ASCENSION":
+                    case "ascension":
                         if (Ascension::isValid(strtoupper($value))) {
                             $this->Ascension = strtoupper($value);
                         } else {
-                            $description = "Invalid value `{$value}` for parameter `ASCENSION`, valid values are: " . implode(', ', Ascension::$values);
+                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: " . implode(', ', Ascension::$values);
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "CORPUS_CHRISTI":
+                    case "corpus_christi":
+                    case "corpuschristi":
                         if (CorpusChristi::isValid(strtoupper($value))) {
                             $this->CorpusChristi = strtoupper($value);
                         } else {
-                            $description = "Invalid value `{$value}` for parameter `CORPUSCHRISTI`, valid values are: " . implode(', ', CorpusChristi::$values);
+                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: " . implode(', ', CorpusChristi::$values);
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "LOCALE":
+                    case "locale":
                         if ($value !== 'LA' && $value !== 'la') {
                             $value = \Locale::canonicalize($value);
                         }
                         if (LitLocale::isValid($value)) {
                             $this->Locale = $value;
                         } else {
-                            $description = "Invalid value `{$value}` for parameter `LOCALE`, valid values are: LA, " . implode(', ', LitLocale::$AllAvailableLocales);
+                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: LA, " . implode(', ', LitLocale::$AllAvailableLocales);
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "RETURN_TYPE":
+                    case "return_type":
+                    case "returntype":
                         if (ReturnType::isValid(strtoupper($value))) {
                             $this->ReturnType = strtoupper($value);
                         } else {
-                            $description = "Invalid value `{$value}` for parameter `RETURNTYPE`, valid values are: " . implode(', ', ReturnType::$values);
+                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: " . implode(', ', ReturnType::$values);
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "NATIONAL_CALENDAR":
+                    case "national_calendar":
+                    case "nationalcalendar":
                         if (property_exists($this->calendars->national_calendars, $value)) {
                             $this->NationalCalendar = $value;
                         } else {
                             $validVals = array_keys(get_object_vars($this->calendars->national_calendars));
-                            $description = "Invalid value `{$value}` for parameter `NATIONALCALENDAR`, valid values are: " . implode(', ', $validVals);
+                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: " . implode(', ', $validVals);
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "DIOCESAN_CALENDAR":
+                    case "diocesan_calendar":
+                    case "diocesancalendar":
                         if (property_exists($this->calendars->diocesan_calendars, $value)) {
                             $this->DiocesanCalendar = $value;
                         } else {
                             $validVals = array_keys(get_object_vars($this->calendars->diocesan_calendars));
-                            $description = "Invalid value `{$value}` for parameter `DIOCESANCALENDAR`, valid values are: " . implode(', ', $validVals);
+                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: " . implode(', ', $validVals);
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "CALENDAR_TYPE":
+                    case "calendar_type":
+                    case "calendartype":
                         if (CalendarType::isValid(strtoupper($value))) {
                             $this->CalendarType = strtoupper($value);
                         } else {
-                            $description = "Invalid value `{$value}` for parameter `CALENDARTYPE`, valid values are: " . implode(', ', CalendarType::$values);
+                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: " . implode(', ', CalendarType::$values);
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "ETERNAL_HIGH_PRIEST":
+                    case "eternal_high_priest":
+                    case "eternalhighpriest":
                         if (gettype($value) !== 'boolean') {
                             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                             if (null === $value) {
-                                $description = "Invalid value for parameter `ETERNALHIGHPRIEST`, valid values are `true` and `false`";
+                                $description = "Invalid value for parameter `$key`, valid values are boolean `true` and `false`";
                                 Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                             }
                         }
