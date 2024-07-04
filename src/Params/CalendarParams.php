@@ -29,20 +29,14 @@ class CalendarParams
     public const ALLOWED_PARAMS  = [
         "year",
         "calendartype",
-        "calendar_type",
         "epiphany",
         "ascension",
         "corpuschristi",
-        "corpus_christi",
         "eternalhighpriest",
-        "eternal_high_priest",
         "locale",
         "returntype",
-        "return_type",
         "nationalcalendar",
-        "national_calendar",
-        "diocesancalendar",
-        "diocesan_calendar"
+        "diocesancalendar"
     ];
 
     // If we can get more data from 1582 (year of the Gregorian reform) to 1969
@@ -92,9 +86,10 @@ class CalendarParams
     public function setData(array $DATA = [])
     {
         foreach ($DATA as $key => $value) {
+            $key = str_replace('_', '', $key);
             $key = strtolower($key);
             if (in_array($key, self::ALLOWED_PARAMS)) {
-                if ($key !== 'year' && $key !== 'eternal_high_priest' && $key !== 'eternalhighpriest') {
+                if ($key !== 'year' && $key !== 'eternalhighpriest') {
                     // all other parameters expect a string value
                     if (gettype($value) !== 'string') {
                         $description = "Expected value of type String for parameter `{$key}`, instead found type " . gettype($value);
@@ -122,7 +117,6 @@ class CalendarParams
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "corpus_christi":
                     case "corpuschristi":
                         if (CorpusChristi::isValid(strtoupper($value))) {
                             $this->CorpusChristi = strtoupper($value);
@@ -142,7 +136,6 @@ class CalendarParams
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "return_type":
                     case "returntype":
                         if (ReturnType::isValid(strtoupper($value))) {
                             $this->ReturnType = strtoupper($value);
@@ -151,7 +144,6 @@ class CalendarParams
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "national_calendar":
                     case "nationalcalendar":
                         if (property_exists($this->calendars->national_calendars, $value)) {
                             $this->NationalCalendar = $value;
@@ -161,7 +153,6 @@ class CalendarParams
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "diocesan_calendar":
                     case "diocesancalendar":
                         if (property_exists($this->calendars->diocesan_calendars, $value)) {
                             $this->DiocesanCalendar = $value;
@@ -171,7 +162,6 @@ class CalendarParams
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "calendar_type":
                     case "calendartype":
                         if (CalendarType::isValid(strtoupper($value))) {
                             $this->CalendarType = strtoupper($value);
@@ -180,7 +170,6 @@ class CalendarParams
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
-                    case "eternal_high_priest":
                     case "eternalhighpriest":
                         if (gettype($value) !== 'boolean') {
                             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
