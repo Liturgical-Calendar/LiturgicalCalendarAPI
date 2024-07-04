@@ -111,7 +111,7 @@
                 "solemnities_keys": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/EventKey"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/EventKey"
                     }
                 },
                 "feasts": {
@@ -120,7 +120,7 @@
                 "feasts_keys": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/EventKey"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/EventKey"
                     }
                 },
                 "memorials": {
@@ -129,7 +129,7 @@
                 "memorials_keys": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/EventKey"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/EventKey"
                     }
                 }
             },
