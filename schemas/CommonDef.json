@@ -227,11 +227,11 @@
         "Missal": {
             "type": "string",
             "enum": [
-                "VATICAN_1970",
-                "VATICAN_1971",
-                "VATICAN_1975",
-                "VATICAN_2002",
-                "VATICAN_2008",
+                "EDITIO_TYPICA_1970",
+                "EDITIO_TYPICA_1971",
+                "EDITIO_TYPICA_1975",
+                "EDITIO_TYPICA_2002",
+                "EDITIO_TYPICA_2008",
                 "USA_2011",
                 "ITALY_1983",
                 "ITALY_2020",

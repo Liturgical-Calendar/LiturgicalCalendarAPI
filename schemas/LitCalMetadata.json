@@ -127,14 +127,20 @@
                         "": {
                             "type": "object",
                             "properties": {
-                                "value": {
-                                    "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Missal"
+                                "missal_id": {
+                                    "type": "string",
+                                    "pattern": "^(EDITIO_TYPICA|ITALY|USA|NETHERLANDS)_(19[7-9]|[2-9][0-9][0-9])[0-9]$"
                                 },
                                 "name": {
                                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/MissalName"
                                 },
-                                "sanctorale_filename": {
-                                    "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/MissalFileName"
+                                "data_path": {
+                                    "type": "string",
+                                    "pattern": "^data\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\.json$"
+                                },
+                                "i18n_path": {
+                                    "type": "string",
+                                    "pattern": "^data\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\\/i18n\\\/$"
                                 },
                                 "year_limits": {
                                     "type": "object",
@@ -148,13 +154,20 @@
                                     },
                                     "required": [ "since_year" ],
                                     "additionalProperties": false
+                                },
+                                "year_published": {
+                                    "type": "integer",
+                                    "minimum": 1970,
+                                    "maximum": 9999
                                 }
                             },
                             "required": [
-                                "value",
+                                "missal_id",
                                 "name",
-                                "sanctorale_filename",
-                                "year_limits"
+                                "data_path",
+                                "i18n_path",
+                                "year_limits",
+                                "year_published"
                             ],
                             "additionalProperties": false
                         }
