@@ -4,11 +4,11 @@ namespace Johnrdorazio\LitCal\Enum;
 
 class RomanMissal
 {
-    public const EDITIO_TYPICA_1970                    = "VATICAN_1970";
-    public const REIMPRESSIO_EMENDATA_1971             = "VATICAN_1971";
-    public const EDITIO_TYPICA_SECUNDA_1975            = "VATICAN_1975";
-    public const EDITIO_TYPICA_TERTIA_2002             = "VATICAN_2002";
-    public const EDITIO_TYPICA_TERTIA_EMENDATA_2008    = "VATICAN_2008";
+    public const EDITIO_TYPICA_1970                    = "EDITIO_TYPICA_1970";
+    public const REIMPRESSIO_EMENDATA_1971             = "EDITIO_TYPICA_1971";
+    public const EDITIO_TYPICA_SECUNDA_1975            = "EDITIO_TYPICA_1975";
+    public const EDITIO_TYPICA_TERTIA_2002             = "EDITIO_TYPICA_2002";
+    public const EDITIO_TYPICA_TERTIA_EMENDATA_2008    = "EDITIO_TYPICA_2008";
 
     public const USA_EDITION_2011                      = "USA_2011";
     public const ITALY_EDITION_1983                    = "ITALY_1983";
@@ -16,11 +16,11 @@ class RomanMissal
     public const NETHERLANDS_EDITION_1978              = "NETHERLANDS_1978";
 
     public static array $values = [
-        "VATICAN_1970",
-        "VATICAN_1971",
-        "VATICAN_1975",
-        "VATICAN_2002",
-        "VATICAN_2008",
+        "EDITIO_TYPICA_1970",
+        "EDITIO_TYPICA_1971",
+        "EDITIO_TYPICA_1975",
+        "EDITIO_TYPICA_2002",
+        "EDITIO_TYPICA_2008",
         "USA_2011",
         "ITALY_1983",
         "ITALY_2020",
@@ -113,7 +113,14 @@ class RomanMissal
         $reflectionClass = new \ReflectionClass(static::class);
         $metadata = $reflectionClass->getConstants();
         array_walk($metadata, function (string &$v) {
-            $v = [ "value" => $v, "name" => self::getName($v), "sanctorale_filename" => self::getSanctoraleFileName($v), "year_limits" => self::$yearLimits[ $v ] ];
+            $v = [
+                "missal_id" => $v,
+                "name" => self::getName($v),
+                "data_path" => self::getSanctoraleFileName($v),
+                "i18n_path" => self::getSanctoraleI18nFilePath($v),
+                "year_limits" => self::$yearLimits[ $v ],
+                "year_published" => self::$yearLimits[ $v ][ "since_year" ]
+            ];
         });
         return $metadata;
     }
