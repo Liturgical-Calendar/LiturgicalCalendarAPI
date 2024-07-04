@@ -71,11 +71,11 @@
                 }
             },
             "required": [
+                "event_key",
                 "color",
-                "day",
                 "grade",
-                "month",
-                "event_key"
+                "day",
+                "month"
             ],
             "title": "Festivity"
         },

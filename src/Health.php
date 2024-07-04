@@ -152,9 +152,20 @@ class Health implements MessageComponentInterface
                 ) {
                     $schema = LitSchema::PROPRIUMDESANCTIS;
                 } elseif (
-                    preg_match("/\/data\/(nation|diocese|widerregion)/", $dataPath)
+                    preg_match("/\/data\/(nation|diocese|widerregion)/", $dataPath, $matches)
                 ) {
                     $schema = LitSchema::DATA;
+                    switch ($matches[1]) {
+                        case 'nation':
+                            $schema = LitSchema::NATIONAL;
+                            break;
+                        case 'diocese':
+                            $schema = LitSchema::DIOCESAN;
+                            break;
+                        case 'widerregion':
+                            $schema = LitSchema::WIDERREGION;
+                            break;
+                    }
                 } else {
                     $schema = Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
                 }
