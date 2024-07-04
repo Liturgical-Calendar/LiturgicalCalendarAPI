@@ -57,6 +57,13 @@ class Calendar
     private int $startTime;
     private int $endTime;
 
+    private const EASTER_TRIDUUM_EVENT_KEYS = [
+        "HolyThurs",
+        "GoodFri",
+        "EasterVigil",
+        "Easter"
+    ];
+
     /**
      * The following schemas for ordinal spellouts have been taken from
      * https://www.saxonica.com/html/documentation11/extensibility/localizing/ICU-numbering-dates/ICU-numbering.html
@@ -517,12 +524,37 @@ class Calendar
         // with the Prima Editio Typica of the Roman Missal and the General Norms
         // promulgated with the Motu Proprio "Mysterii Paschali" in 1969
         if ($this->CalendarParams->Year < 1970) {
-            $this->Messages[] = sprintf(
+            $message = sprintf(
                 _("Only years from 1970 and after are supported. You tried requesting the year %d."),
                 $this->CalendarParams->Year
             );
-            $this->generateResponse();
+            self::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
         }
+    }
+
+    private function loadPropriumDeTemporeI18nData(): ?array
+    {
+        $locale = LitLocale::$PRIMARY_LANGUAGE;
+        $propriumDeTemporeI18nFile = "data/propriumdetempore/{$locale}.json";
+        if (file_exists($propriumDeTemporeI18nFile)) {
+            $rawData = file_get_contents($propriumDeTemporeI18nFile);
+            $PropriumDeTemporeI18n = json_decode($rawData, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $PropriumDeTemporeI18n;
+            } else {
+                $message = sprintf(
+                    /**translators: Temporale refers to the Proprium de Tempore */
+                    _("There was an error trying to decode localized JSON data for the Temporale: %s"),
+                    json_last_error_msg()
+                );
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
+            }
+        } else {
+            /**translators: Temporale refers to the Proprium de Tempore */
+            $message = _("There was an error trying to retrieve localized data for the Temporale.");
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
+        }
+        return null;
     }
 
     /**
@@ -530,21 +562,34 @@ class Calendar
      */
     private function loadPropriumDeTemporeData(): void
     {
-        $locale = LitLocale::$PRIMARY_LANGUAGE;
-        $propriumdetemporeFile = "data/propriumdetempore/{$locale}.json";
-        if (file_exists($propriumdetemporeFile)) {
-            $PropriumDeTempore = json_decode(file_get_contents($propriumdetemporeFile), true);
+        $propriumDeTemporeFile = "data/propriumdetempore.json";
+        if (file_exists($propriumDeTemporeFile)) {
+            $rawData = file_get_contents($propriumDeTemporeFile);
+            $PropriumDeTempore = json_decode($rawData, true);
             if (json_last_error() === JSON_ERROR_NONE) {
-                foreach ($PropriumDeTempore as $key => $event) {
-                    $this->PropriumDeTempore[ $key ] = [ "name" => $event ];
+                $PropriumDeTemporeI18n = $this->loadPropriumDeTemporeI18nData();
+                if (null !== $PropriumDeTemporeI18n) {
+                    foreach ($PropriumDeTempore as $event) {
+                        $key = $event["event_key"];
+                        unset($event["event_key"]);
+                        $this->PropriumDeTempore[ $key ] = [
+                            "name" => $PropriumDeTemporeI18n[ $key ],
+                            ...$event
+                        ];
+                    }
                 }
             } else {
-                $response = new \stdClass();
-                $response->ERROR = "There was an error trying to retrieve"
-                    . " and decode JSON data for the Proprium de Tempore. "
-                    . json_last_error_msg();
-                die(json_encode($response));
+                $message = sprintf(
+                    /**translators: Temporale refers to the Proprium de Tempore */
+                    _("There was an error trying to decode JSON data for the Temporale: %s"),
+                    json_last_error_msg()
+                );
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
             }
+        } else {
+            /**translators: Temporale refers to the Proprium de Tempore */
+            $message = _("There was an error trying to retrieve data for the Temporale.");
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
         }
     }
 
@@ -557,33 +602,42 @@ class Calendar
             $locale = LitLocale::$PRIMARY_LANGUAGE;
             $propriumdesanctisI18nFile = $propriumdesanctisI18nPath . $locale . ".json";
             if (file_exists($propriumdesanctisI18nFile)) {
-                $NAME = json_decode(file_get_contents($propriumdesanctisI18nFile), true);
+                $rawData = file_get_contents($propriumdesanctisI18nFile);
+                $NAME = json_decode($rawData, true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
-                    $response = new \stdClass();
-                    $response->ERROR = "There was an error trying to retrieve"
-                        . " and decode JSON i18n data for the Proprium de Sanctis for the Missal "
-                        . RomanMissal::getName($missal)
-                        . ": "
-                        . json_last_error_msg();
-                    die(json_encode($response));
+                    $message = sprintf(
+                        /**translators:
+                         *  do not translate 'JSON';
+                         * 'Sanctorale' refers to the Proprium de Sanctis;
+                         * 1: name of the Roman Missal
+                         * 2: error message
+                         */
+                        _('There was an error trying to decode JSON localization data for the Sanctorale for the Missal %1$s: %2$s'),
+                        RomanMissal::getName($missal),
+                        json_last_error_msg()
+                    );
+                    self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
                 }
             } else {
-                $this->Messages[] = sprintf(
-                    /**translators: name of the Roman Missal */
-                    _('Data for the sanctorale from %s could not be found.'),
+                $message = sprintf(
+                    /**translators: Sanctorale refers to the Proprium de Sanctis; %s = name of the Roman Missal */
+                    _('Data for the Sanctorale from %s could not be found.'),
                     RomanMissal::getName($missal)
                 );
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
             }
         } else {
-            $this->Messages[] = sprintf(
+            $message = sprintf(
                 /**translators: name of the Roman Missal */
                 _('Translation data for the sanctorale from %s could not be found.'),
                 RomanMissal::getName($missal)
             );
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
         }
 
         if (file_exists($propriumdesanctisFile)) {
-            $PropriumDeSanctis = json_decode(file_get_contents($propriumdesanctisFile));
+            $rawData = file_get_contents($propriumdesanctisFile);
+            $PropriumDeSanctis = json_decode($rawData);
             if (json_last_error() === JSON_ERROR_NONE) {
                 $this->tempCal[ $missal ] = [];
                 foreach ($PropriumDeSanctis as $row) {
@@ -593,14 +647,21 @@ class Calendar
                     $this->tempCal[ $missal ][ $row->event_key ] = $row;
                 }
             } else {
-                $response = new \stdClass();
-                $response->ERROR = "There was an error trying to retrieve"
-                    . " and decode JSON data for the Proprium de Sanctis for the Missal "
-                    . RomanMissal::getName($missal)
-                    . ": "
-                    . json_last_error_msg();
-                die(json_encode($response));
+                $message = sprintf(
+                    /**translators: Sanctorale refers to the Proprium de Sanctis;
+                     * 1: name of the Roman Missal
+                     * 2: error message
+                     */
+                    _('There was an error trying to decode JSON data for the Sanctorale for the Missal %1$s: %2$s.'),
+                    RomanMissal::getName($missal),
+                    json_last_error_msg()
+                );
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
             }
+        } else {
+            /**translators: Sanctorale refers to Proprium de Sanctis */
+            $message = _('Could not find the Sanctorale data');
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
         }
     }
 
@@ -613,24 +674,29 @@ class Calendar
         $NAME = null;
 
         if (file_exists($memorialsFromDecreesI18nFile)) {
-            $NAME = json_decode(file_get_contents($memorialsFromDecreesI18nFile), true);
+            $rawData = file_get_contents($memorialsFromDecreesI18nFile);
+            $NAME = json_decode($rawData, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
-                $response = new \stdClass();
-                $response->ERROR = "There was an error trying to retrieve"
-                    . " and decode JSON i18n data for Memorials based on Decrees: "
-                    . json_last_error_msg();
-                die(json_encode($response));
+                $message = sprintf(
+                    _('There was an error trying to decode translation data for Memorials based on Decrees of the Congregation for Divine Worship: %s'),
+                    json_last_error_msg()
+                );
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
             }
+        } else {
+            $message = _('Could not find translation data for Memorials based on Decrees of the Congregation for Divine Worship');
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
         }
 
         if (file_exists($memorialsFromDecreesFile)) {
-            $memorialsFromDecrees = json_decode(file_get_contents($memorialsFromDecreesFile));
+            $rawData = file_get_contents($memorialsFromDecreesFile);
+            $memorialsFromDecrees = json_decode($rawData);
             if (json_last_error() !== JSON_ERROR_NONE) {
-                $response = new \stdClass();
-                $response->ERROR = "There was an error trying to retrieve"
-                    . " and decode JSON data for Memorials based on Decrees: "
-                    . json_last_error_msg();
-                die(json_encode($response));
+                $message = sprintf(
+                    _('There was an error trying to decode JSON data for Memorials based on Decrees of the Congregation for Divine Worship: %s'),
+                    json_last_error_msg()
+                );
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
             } else {
                 $this->tempCal[ "MEMORIALS_FROM_DECREES" ] = [];
                 foreach ($memorialsFromDecrees as $row) {
@@ -649,41 +715,36 @@ class Calendar
         }
     }
 
+    private function createPropriumDeTemporeFestivityByKey(?string $key = null): void
+    {
+        if ($key) {
+            $event = new Festivity(
+                $this->PropriumDeTempore[ $key ][ "name" ],
+                $this->PropriumDeTempore[ $key ][ "date" ],
+                $this->PropriumDeTempore[ $key ][ "color" ],
+                $this->PropriumDeTempore[ $key ][ "type" ],
+                $this->PropriumDeTempore[ $key ][ "grade" ]
+            );
+            $this->Cal->addFestivity($key, $event);
+        } else {
+            //return error
+        }
+    }
+
+    private function calculatePropriumDeTemporeDates(): void
+    {
+        $this->PropriumDeTempore[ "HolyThurs" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P3D'));
+        $this->PropriumDeTempore[ "GoodFri" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P2D'));
+        $this->PropriumDeTempore[ "EasterVigil" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P1D'));
+        $this->PropriumDeTempore[ "Easter" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year);
+    }
+
     private function calculateEasterTriduum(): void
     {
-        $HolyThurs   = new Festivity(
-            $this->PropriumDeTempore[ "HolyThurs" ][ "name" ],
-            LitFunc::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P3D')),
-            LitColor::WHITE,
-            LitFeastType::MOBILE,
-            LitGrade::HIGHER_SOLEMNITY
-        );
-        $GoodFri     = new Festivity(
-            $this->PropriumDeTempore[ "GoodFri" ][ "name" ],
-            LitFunc::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P2D')),
-            LitColor::RED,
-            LitFeastType::MOBILE,
-            LitGrade::HIGHER_SOLEMNITY
-        );
-        $EasterVigil = new Festivity(
-            $this->PropriumDeTempore[ "EasterVigil" ][ "name" ],
-            LitFunc::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P1D')),
-            LitColor::WHITE,
-            LitFeastType::MOBILE,
-            LitGrade::HIGHER_SOLEMNITY
-        );
-        $Easter     = new Festivity(
-            $this->PropriumDeTempore[ "Easter" ][ "name" ],
-            LitFunc::calcGregEaster($this->CalendarParams->Year),
-            LitColor::WHITE,
-            LitFeastType::MOBILE,
-            LitGrade::HIGHER_SOLEMNITY
-        );
-
-        $this->Cal->addFestivity("HolyThurs", $HolyThurs);
-        $this->Cal->addFestivity("GoodFri", $GoodFri);
-        $this->Cal->addFestivity("EasterVigil", $EasterVigil);
-        $this->Cal->addFestivity("Easter", $Easter);
+        $this->createPropriumDeTemporeFestivityByKey("HolyThurs");
+        $this->createPropriumDeTemporeFestivityByKey("GoodFri");
+        $this->createPropriumDeTemporeFestivityByKey("EasterVigil");
+        $this->createPropriumDeTemporeFestivityByKey("Easter");
     }
 
     /**
@@ -2143,7 +2204,8 @@ class Calendar
     private function applyDecrees(int|string $grade = LitGrade::MEMORIAL): void
     {
         if (!isset($this->tempCal[ "MEMORIALS_FROM_DECREES" ]) || !is_array($this->tempCal[ "MEMORIALS_FROM_DECREES" ])) {
-            die('{"ERROR": "We seem to be missing data for Memorials based on Decrees: array data was not found!"}');
+            $message = "We seem to be missing data for Memorials based on Decrees: array data was not found!";
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
         }
         if (gettype($grade) === "integer") {
             $MemorialsFromDecrees = array_filter(
@@ -3070,8 +3132,8 @@ class Calendar
 
     private function calculateUniversalCalendar(): void
     {
-
         $this->loadPropriumDeTemporeData();
+        $this->calculatePropriumDeTemporeDates();
         /**
          *  CALCULATE LITURGICAL EVENTS BASED ON THE ORDER OF PRECEDENCE OF LITURGICAL DAYS ( LY 59 )
          *  General Norms for the Liturgical Year and the Calendar ( issued on Feb. 14 1969 )
@@ -3596,7 +3658,11 @@ class Calendar
                 if ($infoObj->status === "success") {
                     $response = $this->produceIcal($SerializeableLitCal, $infoObj->obj);
                 } else {
-                    die('Error receiving or parsing info from github about latest release: ' . $infoObj->message);
+                    $message = sprintf(
+                        _('Error receiving or parsing info from github about latest release: %s.'),
+                        $infoObj->message
+                    );
+                    self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
                 }
                 break;
             default:
