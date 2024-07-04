@@ -135,12 +135,28 @@
                                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/MissalName"
                                 },
                                 "data_path": {
-                                    "type": "string",
-                                    "pattern": "^data\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\.json$"
+                                    "oneOf": [
+                                        {
+                                            "type": "string",
+                                            "pattern": "^data\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\.json$"
+                                        },
+                                        {
+                                            "type": "boolean",
+                                            "enum": [false]
+                                        }
+                                    ]
                                 },
                                 "i18n_path": {
-                                    "type": "string",
-                                    "pattern": "^data\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\\/i18n\\\/$"
+                                    "oneOf": [
+                                        {
+                                            "type": "string",
+                                            "pattern": "^data\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\\/i18n\\\/$"
+                                        },
+                                        {
+                                            "type": "boolean",
+                                            "enum": [false]
+                                        }
+                                    ]
                                 },
                                 "year_limits": {
                                     "type": "object",
