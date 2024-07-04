@@ -552,7 +552,7 @@ class FestivityCollection
         foreach ($this->solemnities as $key => $solemnity) {
             $solemnitiesCollection[] = [
                 "event_key" => $key,
-                ...json_decode(json_encode($solemnity))
+                ...json_decode(json_encode($solemnity), true)
             ];
         }
         return $solemnitiesCollection;
@@ -574,7 +574,7 @@ class FestivityCollection
         foreach ($this->feasts as $key => $feast) {
             $feastsCollection[] = [
                 "event_key" => $key,
-                ...json_decode(json_encode($feast))
+                ...json_decode(json_encode($feast), true)
             ];
         }
         return $feastsCollection;
@@ -596,7 +596,7 @@ class FestivityCollection
         foreach ($this->memorials as $key => $memorial) {
             $memorialsCollection[] = [
                 "event_key" => $key,
-                ...json_decode(json_encode($memorial))
+                ...json_decode(json_encode($memorial), true)
             ];
         }
         return $memorialsCollection;
