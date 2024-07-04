@@ -108,15 +108,40 @@
                 "solemnities": {
                     "$ref": "#/definitions/DateTimeObjectCollection"
                 },
-                "feasts_memorials": {
+                "solemnities_keys": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/EventKey"
+                    }
+                },
+                "feasts": {
                     "$ref": "#/definitions/DateTimeObjectCollection"
+                },
+                "feasts_keys": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/EventKey"
+                    }
+                },
+                "memorials": {
+                    "$ref": "#/definitions/DateTimeObjectCollection"
+                },
+                "memorials_keys": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/EventKey"
+                    }
                 }
             },
             "required": [
                 "version",
                 "request_headers",
                 "solemnities",
-                "feasts_memorials"
+                "solemnities_keys",
+                "feasts",
+                "feasts_keys",
+                "memorials",
+                "memorials_keys"
             ]
         },
         "litcal": {
@@ -169,30 +194,60 @@
                     "Accept": "application/json",
                     "Host": "litcal.johnromanodorazio.com"
                 },
-                "solemnities": {
-                    "Christmas": {
+                "solemnities": [
+                    {
+                        "event_key": "Christmas",
                         "date": "2023-12-25T00:00:00+00:00",
                         "timezone_type": 3,
                         "timezone": "UTC"
                     },
-                    "Advent1": {
+                    {
+                        "event_key": "Advent1",
                         "date": "2023-12-03T00:00:00+00:00",
                         "timezone_type": 3,
                         "timezone": "UTC"
                     }
-                },
-                "feasts_memorials": {
-                    "StStephenProtomartyr": {
-                        "date": "2023-12-26T00:00:00+00:00",
+                ],
+                "solemnities_keys": [
+                    "Christmas",
+                    "Advent1"
+                ],
+                "feasts": [
+                    {
+                        "event_key": "ConversionStPaul",
+                        "date": "2023-01-25T00:00:00+00:00",
                         "timezone_type": 3,
                         "timezone": "UTC"
                     },
-                    "StJohnEvangelist": {
-                        "date": "2023-12-27T00:00:00+00:00",
+                    {
+                        "event_key": "StMarkEvangelist",
+                        "date": "2023-04-25T00:00:00+00:00",
                         "timezone_type": 3,
                         "timezone": "UTC"
                     }
-                }
+                ],
+                "feasts_keys": [
+                    "ConversionStPaul",
+                    "StMarkEvangelist"
+                ],
+                "memorials": [
+                    {
+                        "event_key": "ImmaculateHeart",
+                        "date": "2023-06-17T00:00:00+00:00",
+                        "timezone_type": 3,
+                        "timezone": "UTC"
+                    },
+                    {
+                        "event_key": "StsBasilGreg",
+                        "date": "2023-01-02T00:00:00+00:00",
+                        "timezone_type": 3,
+                        "timezone": "UTC"
+                    }
+                ],
+                "memorials_keys": [
+                    "ImmaculateHeart",
+                    "StsBasilGreg"
+                ]
             },
             "litcal": {
                 "Advent1_vigil": {
@@ -264,24 +319,25 @@
     ],
     "definitions": {
         "DateTimeObjectCollection": {
-            "type": "object",
-            "patternProperties": {
-                "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+(?:0|_vigil)?$": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                        "date": {
-                            "type": "string",
-                            "format": "date-time"
-                        },
-                        "timezone_type": {
-                            "type": "integer",
-                            "const": 3
-                        },
-                        "timezone": {
-                            "type": "string",
-                            "const": "UTC"
-                        }
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "event_key": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/EventKey"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "timezone_type": {
+                        "type": "integer",
+                        "const": 3
+                    },
+                    "timezone": {
+                        "type": "string",
+                        "const": "UTC"
                     }
                 }
             }
