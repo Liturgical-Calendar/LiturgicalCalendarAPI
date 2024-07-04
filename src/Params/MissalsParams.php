@@ -9,7 +9,7 @@ use Johnrdorazio\LitCal\Paths\Missals;
 class MissalsParams
 {
     public ?string $Region              = null;
-    public ?string $Year                = null;
+    public ?int $Year                   = null;
     public ?string $Locale              = null;
     public ?string $baseLocale          = null;
     private array $availableLangs       = [];
@@ -57,6 +57,9 @@ class MissalsParams
                         }
                         break;
                     case 'YEAR':
+                        if (gettype($value) === 'string') {
+                            $value = intval($value);
+                        }
                         if (in_array($value, self::$MissalYears)) {
                             $this->Year = $value;
                         } else {

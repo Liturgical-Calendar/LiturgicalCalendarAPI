@@ -206,7 +206,7 @@ class Missals
                     $missal                 = new \stdClass();
                     $missal->missal_id      = "EDITIO_TYPICA_{$matches[1]}";
                     $missal->region         = "VATICAN";
-                    $missal->year_published = $matches[1];
+                    $missal->year_published = intval($matches[1]);
                     $missal->data_path      = "data/$directory/$directory.json";
                     $it = new \DirectoryIterator("glob://data/$directory/i18n/*.json");
                     $languages = [];
@@ -220,7 +220,7 @@ class Missals
                     $missal                 = new \stdClass();
                     $missal->missal_id      = "{$matches[1]}_{$matches[2]}";
                     $missal->region         = $matches[1];
-                    $missal->year_published = $matches[2];
+                    $missal->year_published = intval($matches[2]);
                     $missal->data_path      = "data/$directory/$directory.json";
                     $missal->api_path       = API_BASE_PATH . "/missals/{$matches[1]}_{$matches[2]}";
                 }
