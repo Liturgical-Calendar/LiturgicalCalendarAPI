@@ -201,7 +201,7 @@ class Health implements MessageComponentInterface
             } else {
                 $message = new \stdClass();
                 $message->type = "error";
-                $message->text = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg();
+                $message->text = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . " :: Raw data = <<<JSON\n$data\n>>>";
                 $message->classes = ".$validation->validate.json-valid";
                 $this->sendMessage($to, $message);
             }
