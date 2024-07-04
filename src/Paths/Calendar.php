@@ -1166,6 +1166,7 @@ class Calendar
              * >>
              *
              * http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/1990/284-285.html
+             * https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-284-285-1990.pdf
              */
 
             if ($this->Cal->inSolemnities($currentFeastDate)) {
@@ -1174,6 +1175,7 @@ class Calendar
                     //and the Annunciation will be transferred to the Monday following the Second Sunday of Easter
                     //Notitiæ vol. 42 [ 2006 ] num. 3/4, 475-476, p. 96
                     //http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html
+                    //https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-42-(2006)/Notitiae-475-476-2006.pdf
                     $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
                 if (
                     $row->event_key === "StJoseph"
@@ -1192,7 +1194,7 @@ class Calendar
                             ( $locale === 'EN' ? $tempFestivity->date->format('F jS') :
                                 $this->dayAndMonth->format($tempFestivity->date->format('U'))
                             ),
-                        '<a href="http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html">'
+                        '<a href="https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-42-(2006)/Notitiae-475-476-2006.pdf">'
                             . _('Decree of the Congregation for Divine Worship')
                         . '</a>'
                     );
@@ -1212,14 +1214,14 @@ class Calendar
                                 ? $tempFestivity->date->format('F jS')
                                 : $this->dayAndMonth->format($tempFestivity->date->format('U'))
                             ),
-                        '<a href="http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html">'
+                        '<a href="https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-42-(2006)/Notitiae-475-476-2006.pdf">'
                             . _('Decree of the Congregation for Divine Worship')
                         . '</a>'
                     );
 
                     //In some German churches it was the custom to keep the office of the Annunciation on the Saturday before Palm Sunday
                     // if the 25th of March fell in Holy Week.
-                    // source: http://www.newadvent.org/cathen/01542a.htm
+                    // source: https://www.newadvent.org/cathen/01542a.htm
                     /*
                             else if( $tempFestivity->date == $this->Cal->getFestivity( "PalmSun" )->date ){
                             $tempFestivity->date->add( new \DateInterval( 'P15D' ) );
@@ -1240,7 +1242,7 @@ class Calendar
                             ( $locale === 'EN' ? $tempFestivity->date->format('F jS') :
                                 $this->dayAndMonth->format($tempFestivity->date->format('U'))
                             ),
-                        '<a href="http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/1990/284-285.html">' . _('Decree of the Congregation for Divine Worship') . '</a>'
+                        '<a href="https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-284-285-1990.pdf">' . _('Decree of the Congregation for Divine Worship') . '</a>'
                     );
                 } else {
                     //In all other cases, let's make a note of what's happening and ask the Congegation for Divine Worship
@@ -1258,6 +1260,7 @@ class Calendar
                 // ( except in cases where John the Baptist is patron of a nation, diocese, city or religious community,
                 // then the Sacred Heart can be anticipated by one day to June 23 )
                 // http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html
+                // https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf
                 // This will happen again in 2033 and 2044
                 if ($row->event_key === "NativityJohnBaptist" && $this->Cal->solemnityKeyFromDate($currentFeastDate) === "SacredHeart") {
                     $NativityJohnBaptistNewDate = clone( $this->Cal->getFestivity("SacredHeart")->date );
@@ -1271,7 +1274,7 @@ class Calendar
                             $tempFestivity->name,
                             $SacredHeart->name,
                             $this->CalendarParams->Year,
-                            '<a href="http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html">'
+                            '<a href="https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf">'
                                 . _('Decree of the Congregation for Divine Worship')
                             . '</a>'
                         );
@@ -1375,7 +1378,7 @@ class Calendar
         // In 2012, Pope Benedict XVI gave faculty to the Episcopal Conferences
         //  to insert the Feast of Our Lord Jesus Christ, the Eternal High Priest
         //  in their own liturgical calendars on the Thursday after Pentecost,
-        //  see http://notitiae.ipsissima-verba.org/pdf/notitiae-2012-335-368.pdf
+        //  see https://notitiae.ipsissima-verba.org/pdf/notitiae-2012-335-368.pdf
         if ($this->CalendarParams->Year >= 2012 && true === $this->CalendarParams->EternalHighPriest) {
             $EternalHighPriestDate = clone( $this->Cal->getFestivity("Pentecost")->date );
             $EternalHighPriestDate->modify('next Thursday');
@@ -1392,7 +1395,7 @@ class Calendar
                    ' on the Thursday after Pentecost: applicable to the calendar \'%1$s\' in the year \'%2$d\' (%3$s).'),
                 $this->CalendarParams->NationalCalendar,
                 $this->CalendarParams->Year,
-                '<a href="http://notitiae.ipsissima-verba.org/pdf/notitiae-2012-335-368.pdf" target="_blank">notitiae-2012-335-368.pdf</a>'
+                '<a href="https://notitiae.ipsissima-verba.org/pdf/notitiae-2012-335-368.pdf" target="_blank">notitiae-2012-335-368.pdf</a>'
             );
         }
     }
@@ -1490,7 +1493,7 @@ class Calendar
 
         // With the decree Apostolorum Apostola ( June 3rd 2016 ), the Congregation for Divine Worship
         // with the approval of Pope Francis elevated the memorial of Saint Mary Magdalen to a Feast
-        // source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf
+        // source: https://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf
         // This is taken care of ahead when the "memorials from decrees" are applied
         // see :MEMORIALS_FROM_DECREES
     }
@@ -1676,9 +1679,9 @@ class Calendar
                         /**both of the following tags refer to the same decree, no need for a break between them */
                         case "LadyGuadalupe":
                         case "JuanDiego":
-                            $langs = ["LA" => "lt", "ES" => "es"];
-                            $lang = in_array($this->CalendarParams->Locale, array_keys($langs)) ? $langs[$this->CalendarParams->Locale] : "lt";
-                            $row->decree = "<a href=\"http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\">"
+                            $langs = ["la" => "lt", "es" => "es"];
+                            $lang = in_array(LitLocale::$PRIMARY_LANGUAGE, array_keys($langs)) ? $langs[LitLocale::$PRIMARY_LANGUAGE] : "lt";
+                            $row->decree = "<a href=\"https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\">"
                                 . _('Decree of the Congregation for Divine Worship')
                                 . '</a>';
                             break;
@@ -1842,7 +1845,7 @@ class Calendar
         $coincidence = false;
         //IMMACULATEHEART: in years when the memorial of the Immaculate Heart of Mary coincides with another obligatory memorial,
         //as happened in 2014 [ 28 June, Saint Irenaeus ] and 2015 [ 13 June, Saint Anthony of Padua ], both must be considered optional for that year
-        //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
+        //source: https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
         $ImmaculateHeart = $this->Cal->getFestivity("ImmaculateHeart");
         if ($ImmaculateHeart !== null) {
             if ((int)$row->grade === LitGrade::MEMORIAL) {
@@ -1866,7 +1869,7 @@ class Calendar
                         $ImmaculateHeart->name,
                         $festivity->name,
                         $this->CalendarParams->Year,
-                        '<a href="http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html">'
+                        '<a href="https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html">'
                             . _('Decree of the Congregation for Divine Worship')
                             . '</a>'
                     );
@@ -2307,7 +2310,7 @@ class Calendar
             );
 
             //In years when this memorial coincides with another obligatory memorial, as happened in 2014 [ 28 June, Saint Irenaeus ] and 2015 [ 13 June, Saint Anthony of Padua ], both must be considered optional for that year
-            //source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
+            //source: https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
             //This is taken care of in the next code cycle, see tag IMMACULATEHEART: in the code comments ahead
         } else {
             $row = (object)$this->PropriumDeTempore[ "ImmaculateHeart" ];
@@ -2323,7 +2326,7 @@ class Calendar
      * probably to allow local bishop's conferences to insert Our Lady of Guadalupe as an optional memorial on December 12
      * seeing that with the decree of March 25th 1999 of the Congregation of Divine Worship
      * Our Lady of Guadalupe was granted as a Feast day for all dioceses and territories of the Americas
-     * source: http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_lt.html
+     * source: https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_lt.html
      */
     private function handleSaintJaneFrancesDeChantal()
     {
@@ -2338,7 +2341,7 @@ class Calendar
                     /**translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year  */
                     _('The optional memorial \'%1$s\' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d.'),
                     $festivity->name,
-                    "<a href=\"http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\">"
+                    "<a href=\"https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\">"
                         . _('Decree of the Congregation for Divine Worship')
                         . '</a>',
                     $this->CalendarParams->Year
@@ -2353,7 +2356,7 @@ class Calendar
                     /**translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year  */
                     _('The optional memorial \'%1$s\', which would have been superseded this year by a Sunday or Solemnity were it on Dec. 12, has however been transferred to Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d.'),
                     $festivity->name,
-                    "<a href=\"http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\">"
+                    "<a href=\"https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\">"
                         . _('Decree of the Congregation for Divine Worship')
                         . '</a>',
                     $this->CalendarParams->Year
@@ -2370,7 +2373,7 @@ class Calendar
             $this->Messages[] = sprintf(
                 _('The optional memorial \'%1$s\' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d. However, it is superseded by a Sunday, a Solemnity, or a Feast \'%4$s\' in the year %3$d.'),
                 $row->name,
-                "<a href=\"http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\">"
+                "<a href=\"https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\">"
                     . _('Decree of the Congregation for Divine Worship')
                     . '</a>',
                 $this->CalendarParams->Year,
@@ -2385,7 +2388,7 @@ class Calendar
      * However, considering that it is the Year of Saint Paul,
      * with decree of Jan 25 2008 the Congregation for Divine Worship gave faculty to the single churches
      * to celebrate the Conversion of St. Paul anyways. So let's re-insert it as an optional memorial?
-     * http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_la.html
+     * https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_la.html
      */
     private function applyOptionalMemorialDecree2009(): void
     {
@@ -2411,7 +2414,7 @@ class Calendar
                 /**translators: 1: Festivity name, 2: Source of the information  */
                 _('The Feast \'%1$s\' would have been suppressed this year ( 2009 ) since it falls on a Sunday, however being the Year of the Apostle Paul, as per the %2$s it has been reinstated so that local churches can optionally celebrate the memorial.'),
                 '<i>' . $row->name . '</i>',
-                "<a href=\"http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_$lang.html\">"
+                "<a href=\"https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_$lang.html\">"
                     . _('Decree of the Congregation for Divine Worship')
                     . '</a>'
             );
