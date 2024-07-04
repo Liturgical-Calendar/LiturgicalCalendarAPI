@@ -546,14 +546,65 @@ class FestivityCollection
         return $this->solemnities;
     }
 
+    public function getSolemnitiesCollection(): array
+    {
+        $solemnitiesCollection = [];
+        foreach ($this->solemnities as $key => $solemnity) {
+            $solemnitiesCollection[] = [
+                "event_key" => $key,
+                ...$solemnity
+            ];
+        }
+        return $solemnitiesCollection;
+    }
+
+    public function getSolemnitiesKeys(): array
+    {
+        return array_keys($this->solemnities);
+    }
+
     public function getFeasts(): array
     {
         return $this->feasts;
     }
 
+    public function getFeastsCollection(): array
+    {
+        $feastsCollection = [];
+        foreach ($this->feasts as $key => $feast) {
+            $feastsCollection[] = [
+                "event_key" => $key,
+                ...$feast
+            ];
+        }
+        return $feastsCollection;
+    }
+
+    public function getFeastsKeys(): array
+    {
+        return array_keys($this->feasts);
+    }
+
     public function getMemorials(): array
     {
         return $this->memorials;
+    }
+
+    public function getMemorialsCollection(): array
+    {
+        $memorialsCollection = [];
+        foreach ($this->memorials as $key => $memorial) {
+            $memorialsCollection[] = [
+                "event_key" => $key,
+                ...$memorial
+            ];
+        }
+        return $memorialsCollection;
+    }
+
+    public function getMemorialsKeys(): array
+    {
+        return array_keys($this->memorials);
     }
 
     public function getWeekdaysAdventChristmasLent(): array

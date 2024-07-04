@@ -3518,19 +3518,17 @@ class Calendar
 
     private function generateResponse()
     {
-        $SerializeableLitCal                          = new \stdClass();
-        $SerializeableLitCal->settings                = new \stdClass();
-        $SerializeableLitCal->metadata                = new \stdClass();
+        $SerializeableLitCal                                = new \stdClass();
+        $SerializeableLitCal->litcal                        = $this->Cal->getFestivities();
 
-        $SerializeableLitCal->litcal                  = $this->Cal->getFestivities();
-        $SerializeableLitCal->messages                = $this->Messages;
-        $SerializeableLitCal->settings->year          = $this->CalendarParams->Year;
-        $SerializeableLitCal->settings->epiphany      = $this->CalendarParams->Epiphany;
-        $SerializeableLitCal->settings->ascension     = $this->CalendarParams->Ascension;
-        $SerializeableLitCal->settings->corpus_christi = $this->CalendarParams->CorpusChristi;
-        $SerializeableLitCal->settings->locale        = $this->CalendarParams->Locale;
-        $SerializeableLitCal->settings->return_type    = $this->CalendarParams->ReturnType;
-        $SerializeableLitCal->settings->calendar_type  = $this->CalendarParams->CalendarType;
+        $SerializeableLitCal->settings                      = new \stdClass();
+        $SerializeableLitCal->settings->year                = $this->CalendarParams->Year;
+        $SerializeableLitCal->settings->epiphany            = $this->CalendarParams->Epiphany;
+        $SerializeableLitCal->settings->ascension           = $this->CalendarParams->Ascension;
+        $SerializeableLitCal->settings->corpus_christi      = $this->CalendarParams->CorpusChristi;
+        $SerializeableLitCal->settings->locale              = $this->CalendarParams->Locale;
+        $SerializeableLitCal->settings->return_type         = $this->CalendarParams->ReturnType;
+        $SerializeableLitCal->settings->calendar_type       = $this->CalendarParams->CalendarType;
         $SerializeableLitCal->settings->eternal_high_priest = $this->CalendarParams->EternalHighPriest;
         if ($this->CalendarParams->NationalCalendar !== null) {
             $SerializeableLitCal->settings->national_calendar = $this->CalendarParams->NationalCalendar;
@@ -3539,14 +3537,18 @@ class Calendar
             $SerializeableLitCal->settings->diocesan_calendar = $this->CalendarParams->DiocesanCalendar;
         }
 
+        $SerializeableLitCal->metadata                      = new \stdClass();
         $SerializeableLitCal->metadata->version             = self::API_VERSION;
         $SerializeableLitCal->metadata->timestamp           = time();
-        $SerializeableLitCal->metadata->date_time            = date(DATE_ATOM);
-
-        //$SerializeableLitCal->metadata->request_headers     = self::$APICore->getJsonEncodedRequestHeaders();
-        $SerializeableLitCal->metadata->request_headers      = self::$APICore->getRequestHeaders();
-        $SerializeableLitCal->metadata->solemnities         = $this->Cal->getSolemnities();
-        $SerializeableLitCal->metadata->feasts_memorials     = $this->Cal->getFeastsAndMemorials();
+        $SerializeableLitCal->metadata->date_time           = date(DATE_ATOM);
+        $SerializeableLitCal->metadata->request_headers     = self::$APICore->getRequestHeaders();
+        $SerializeableLitCal->metadata->solemnities         = $this->Cal->getSolemnitiesCollection();
+        $SerializeableLitCal->metadata->solemnities_keys    = $this->Cal->getSolemnitiesKeys();
+        $SerializeableLitCal->metadata->feasts              = $this->Cal->getFeastsCollection();
+        $SerializeableLitCal->metadata->feasts_keys         = $this->Cal->getFeastsKeys();
+        $SerializeableLitCal->metadata->memorials           = $this->Cal->getMemorialsCollection();
+        $SerializeableLitCal->metadata->memorials_keys      = $this->Cal->getMemorialsKeys();
+        $SerializeableLitCal->messages                      = $this->Messages;
 
         //make sure we have an engineCache folder for the current Version
         if (realpath("engineCache/v" . str_replace(".", "_", self::API_VERSION)) === false) {
