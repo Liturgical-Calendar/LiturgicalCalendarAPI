@@ -26,7 +26,7 @@
                 "region": {
                     "type": "string",
                     "enum": [
-                        "EDITIO_TYPICA",
+                        "VATICAN",
                         "ITALY",
                         "USA",
                         "NETHERLANDS"
