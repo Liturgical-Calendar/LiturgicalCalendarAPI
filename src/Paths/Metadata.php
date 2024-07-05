@@ -116,10 +116,17 @@ class Metadata
                 ...$calendar
             ];
         }
+        $nationalCalendars = [];
+        foreach (Metadata::$nationalCalendars as $key => $calendar) {
+            $nationalCalendars[] = [
+                "calendar_id" => $key,
+                ...Metadata::$nationalCalendarsMetadata[$key]
+            ];
+        }
         $response = json_encode([
             "litcal_metadata" => [
-                "national_calendars"          => Metadata::$nationalCalendars,
-                "national_calendars_metadata" => Metadata::$nationalCalendarsMetadata,
+                "national_calendars"          => $nationalCalendars,
+                "national_calendars_keys"     => array_keys(Metadata::$nationalCalendars),
                 "diocesan_calendars"          => $diocesanCalendars,
                 "diocesan_calendars_keys"     => array_keys(Metadata::$diocesanCalendars),
                 "diocesan_groups"             => $diocesanGroups,
