@@ -114,12 +114,13 @@ class Health implements MessageComponentInterface
         "data/propriumdesanctis_USA_2011/propriumdesanctis_USA_2011" => LitSchema::PROPRIUMDESANCTIS,
         "nations/index.json"                                         => LitSchema::INDEX,
         API_BASE_PATH . '/calendars/'                                => LitSchema::METADATA,
-        API_BASE_PATH . '/decrees/'                                  => LitSchema::DECREEMEMORIALS,
+        API_BASE_PATH . '/decrees/'                                  => LitSchema::DECREES,
         API_BASE_PATH . '/events/'                                   => LitSchema::EVENTS,
         API_BASE_PATH . '/tests/'                                    => LitSchema::TESTS,
         API_BASE_PATH . '/easter/'                                   => LitSchema::EASTER,
         API_BASE_PATH . '/missals/'                                  => LitSchema::MISSALS,
-        API_BASE_PATH . '/data/'                                     => LitSchema::DATA
+        API_BASE_PATH . '/data/'                                     => LitSchema::DATA,
+        API_BASE_PATH . '/schemas/'                                  => LitSchema::SCHEMAS
     ];
 
     public function __construct()

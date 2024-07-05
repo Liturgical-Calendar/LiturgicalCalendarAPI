@@ -12,7 +12,9 @@
  * @link      https://litcal.johnromanodorazio.com
  */
 
-namespace Johnrdorazio\LitCal;
+namespace Johnrdorazio\LitCal\Paths;
+
+use Johnrdorazio\LitCal\Router;
 
 class Schemas
 {
@@ -50,13 +52,11 @@ class Schemas
         switch ($pathParamCount) {
             case 0:
                 $schemaIndex = new \stdClass();
-                $schemaIndex->LitCalSchemas = new \stdClass();
-                $schemaIndex->LitCalSchemas->items = [];
+                $schemaIndex->litcal_schemas = [];
                 $it = new \DirectoryIterator("glob://schemas/*.json");
                 foreach ($it as $f) {
-                    $schemaIndex->LitCalSchemas->items[] = API_BASE_PATH . '/schemas/' . $f->getFilename();
+                    $schemaIndex->litcal_schemas[] = API_BASE_PATH . '/schemas/' . $f->getFilename();
                 }
-                $schemaIndex->{'$schema'} = API_BASE_PATH . '/schemas/LitCalSchemas.json';
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode($schemaIndex);
                 die();

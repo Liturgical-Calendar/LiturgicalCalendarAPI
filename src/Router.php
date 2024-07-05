@@ -15,6 +15,7 @@ use Johnrdorazio\LitCal\Paths\Tests;
 use Johnrdorazio\LitCal\Paths\RegionalData;
 use Johnrdorazio\LitCal\Paths\Missals;
 use Johnrdorazio\LitCal\Paths\Decrees;
+use Johnrdorazio\LitCal\Paths\Schemas;
 
 class Router
 {
