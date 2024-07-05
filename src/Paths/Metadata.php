@@ -6,7 +6,7 @@ use Johnrdorazio\LitCal\Enum\RomanMissal;
 
 class Metadata
 {
-    private static array $baseNationalCalendars     = [ "VATICAN" ];
+    private static array $baseNationalCalendars     = [];
     private static array $nationalCalendars         = [];
     private static array $diocesanCalendars         = [];
     private static array $diocesanGroups            = [];
@@ -117,6 +117,9 @@ class Metadata
             ];
         }
         $nationalCalendars = [];
+        $nationalCalendars[] = [
+            "calendar_id" => "VATICAN"
+        ];
         foreach (Metadata::$nationalCalendars as $key => $calendar) {
             $nationalCalendars[] = [
                 "calendar_id" => $key,
@@ -126,7 +129,7 @@ class Metadata
         $response = json_encode([
             "litcal_metadata" => [
                 "national_calendars"          => $nationalCalendars,
-                "national_calendars_keys"     => array_keys(Metadata::$nationalCalendars),
+                "national_calendars_keys"     => array_push(array_keys(Metadata::$nationalCalendars), "VATICAN"),
                 "diocesan_calendars"          => $diocesanCalendars,
                 "diocesan_calendars_keys"     => array_keys(Metadata::$diocesanCalendars),
                 "diocesan_groups"             => $diocesanGroups,
