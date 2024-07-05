@@ -86,6 +86,7 @@
                         "properties": {
                             "calendar_id": {
                                 "type": "string",
+                                "pattern": "^[A-Z]+$",
                                 "description": "uppercase normalized string from the name of the diocese, without any spaces or special characters"
                             },
                             "nation": {
@@ -103,6 +104,14 @@
                             "nation",
                             "diocese"
                         ]
+                    }
+                },
+                "diocesan_calendars_keys": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "pattern": "^[A-Z]+$",
+                        "description": "uppercase normalized string from the name of the diocese, without any spaces or special characters"
                     }
                 },
                 "diocesan_groups": {
@@ -213,6 +222,7 @@
                 "national_calendars",
                 "national_calendars_metadata",
                 "diocesan_calendars",
+                "diocesan_calendars_keys",
                 "diocesan_groups",
                 "wider_regions",
                 "wider_regions_keys",
