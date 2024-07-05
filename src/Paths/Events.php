@@ -36,7 +36,7 @@ class Events
     private static function retrieveLatinMissals(): void
     {
         self::$LatinMissals = array_filter(RomanMissal::$values, function ($item) {
-            return str_starts_with($item, "VATICAN_");
+            return str_starts_with($item, "EDITIO_TYPICA_");
         });
     }
 
