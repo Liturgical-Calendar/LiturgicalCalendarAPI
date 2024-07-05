@@ -7,144 +7,6 @@
   <xs:element name="LiturgicalCalendar">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="Settings">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="Year">
-                <xs:simpleType>
-                  <xs:restriction base="xs:positiveInteger">
-                    <xs:minInclusive value="1970" />
-                    <xs:maxInclusive value="9999" />
-                  </xs:restriction>
-                </xs:simpleType>
-              </xs:element>
-              <xs:element name="Epiphany">
-                <xs:simpleType>
-                  <xs:restriction base="xs:string">
-                    <xs:enumeration value="SUNDAY_JAN2_JAN8" />
-                    <xs:enumeration value="JAN6" />
-                  </xs:restriction>
-                </xs:simpleType>
-              </xs:element>
-              <xs:element name="Ascension">
-                <xs:simpleType>
-                  <xs:restriction base="xs:string">
-                    <xs:enumeration value="THURSDAY" />
-                    <xs:enumeration value="SUNDAY" />
-                  </xs:restriction>
-                </xs:simpleType>
-              </xs:element>
-              <xs:element name="CorpusChristi">
-                <xs:simpleType>
-                  <xs:restriction base="xs:string">
-                    <xs:enumeration value="THURSDAY" />
-                    <xs:enumeration value="SUNDAY" />
-                  </xs:restriction>
-                </xs:simpleType>
-              </xs:element>
-              <xs:element name="Locale" type="xs:string" />
-              <xs:element name="ReturnType">
-                <xs:simpleType>
-                  <xs:restriction base="xs:string">
-                    <!-- <xs:enumeration value="JSON" /> -->
-                    <!-- <xs:enumeration value="ICS" /> -->
-                    <xs:enumeration value="XML" />
-                  </xs:restriction>
-                </xs:simpleType>
-              </xs:element>
-              <xs:element name="CalendarType">
-                <xs:simpleType>
-                  <xs:restriction base="xs:string">
-                    <xs:enumeration value="CIVIL" />
-                    <xs:enumeration value="LITURGICAL" />
-                  </xs:restriction>
-                </xs:simpleType>
-              </xs:element>
-              <xs:element name="EternalHighPriest" type="xs:boolean" />
-              <xs:element name="NationalCalendar" minOccurs="0" type="xs:string" />
-              <xs:element name="DiocesanCalendar" minOccurs="0" type="xs:string" />
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="Metadata">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="Version" type="xs:float" />
-              <xs:element name="Timestamp" type="xs:long" />
-              <xs:element name="DateTime" type="xs:dateTime" />
-              <xs:element name="RequestHeaders">
-                <xs:complexType>
-                  <xs:sequence>
-                    <xs:element name="Accept-Language" minOccurs="0" type="xs:string" />
-                    <xs:element name="Accept" minOccurs="0" type="xs:string" />
-                    <xs:element name="Origin" minOccurs="0" type="xs:string" />
-                    <xs:element name="X-Requested-With" minOccurs="0" type="xs:string" />
-                  </xs:sequence>
-                </xs:complexType>
-              </xs:element>
-              <xs:element name="Solemnities">
-                <xs:complexType>
-                  <xs:sequence>
-                    <xs:element name="LitCalEvent" maxOccurs="unbounded">
-                      <xs:complexType>
-                        <xs:sequence>
-                          <xs:element name="Date" type="xs:dateTime" />
-                          <xs:element name="TimezoneType">
-                            <xs:simpleType>
-                              <xs:restriction base="xs:byte">
-                                <!-- <xs:enumeration value="1" /> -->
-                                <!-- <xs:enumeration value="2" /> -->
-                                <xs:enumeration value="3" />
-                              </xs:restriction>
-                            </xs:simpleType>
-                          </xs:element>
-                          <xs:element name="Timezone">
-                            <xs:simpleType>
-                              <xs:restriction base="xs:string">
-                                <xs:enumeration value="UTC" />
-                              </xs:restriction>
-                            </xs:simpleType>
-                          </xs:element>
-                        </xs:sequence>
-                        <xs:attribute name="eventKey" type="xs:string" use="required" />
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:sequence>
-                </xs:complexType>
-              </xs:element>
-              <xs:element name="FeastsMemorials">
-                <xs:complexType>
-                  <xs:sequence>
-                    <xs:element name="LitCalEvent" maxOccurs="unbounded">
-                      <xs:complexType>
-                        <xs:sequence>
-                          <xs:element name="Date" type="xs:dateTime" />
-                          <xs:element name="TimezoneType">
-                            <xs:simpleType>
-                              <xs:restriction base="xs:byte">
-                                <!-- <xs:enumeration value="1" /> -->
-                                <!-- <xs:enumeration value="2" /> -->
-                                <xs:enumeration value="3" />
-                              </xs:restriction>
-                            </xs:simpleType>
-                          </xs:element>
-                          <xs:element name="Timezone">
-                            <xs:simpleType>
-                              <xs:restriction base="xs:string">
-                                <xs:enumeration value="UTC" />
-                              </xs:restriction>
-                            </xs:simpleType>
-                          </xs:element>
-                        </xs:sequence>
-                        <xs:attribute name="eventKey" type="xs:string" use="required" />
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:sequence>
-                </xs:complexType>
-              </xs:element>
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
         <xs:element name="LitCal">
           <xs:complexType>
             <xs:sequence>
@@ -280,6 +142,144 @@
                     <xs:element name="LiturgicalSeasonLcl" minOccurs="0" type="xs:string" />
                   </xs:sequence>
                   <xs:attribute name="eventKey" type="xs:ID" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Settings">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Year">
+                <xs:simpleType>
+                  <xs:restriction base="xs:positiveInteger">
+                    <xs:minInclusive value="1970" />
+                    <xs:maxInclusive value="9999" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Epiphany">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="SUNDAY_JAN2_JAN8" />
+                    <xs:enumeration value="JAN6" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Ascension">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="THURSDAY" />
+                    <xs:enumeration value="SUNDAY" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="CorpusChristi">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="THURSDAY" />
+                    <xs:enumeration value="SUNDAY" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Locale" type="xs:string" />
+              <xs:element name="ReturnType">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <!-- <xs:enumeration value="JSON" /> -->
+                    <!-- <xs:enumeration value="ICS" /> -->
+                    <xs:enumeration value="XML" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="CalendarType">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="CIVIL" />
+                    <xs:enumeration value="LITURGICAL" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="EternalHighPriest" type="xs:boolean" />
+              <xs:element name="NationalCalendar" minOccurs="0" type="xs:string" />
+              <xs:element name="DiocesanCalendar" minOccurs="0" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Metadata">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Version" type="xs:float" />
+              <xs:element name="Timestamp" type="xs:long" />
+              <xs:element name="DateTime" type="xs:dateTime" />
+              <xs:element name="RequestHeaders">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Accept-Language" minOccurs="0" type="xs:string" />
+                    <xs:element name="Accept" minOccurs="0" type="xs:string" />
+                    <xs:element name="Origin" minOccurs="0" type="xs:string" />
+                    <xs:element name="X-Requested-With" minOccurs="0" type="xs:string" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Solemnities">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="LitCalEvent" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Date" type="xs:dateTime" />
+                          <xs:element name="TimezoneType">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:byte">
+                                <!-- <xs:enumeration value="1" /> -->
+                                <!-- <xs:enumeration value="2" /> -->
+                                <xs:enumeration value="3" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                          <xs:element name="Timezone">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:enumeration value="UTC" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="eventKey" type="xs:string" use="required" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="FeastsMemorials">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="LitCalEvent" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Date" type="xs:dateTime" />
+                          <xs:element name="TimezoneType">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:byte">
+                                <!-- <xs:enumeration value="1" /> -->
+                                <!-- <xs:enumeration value="2" /> -->
+                                <xs:enumeration value="3" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                          <xs:element name="Timezone">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:enumeration value="UTC" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="eventKey" type="xs:string" use="required" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
