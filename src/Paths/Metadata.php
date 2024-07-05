@@ -126,10 +126,14 @@ class Metadata
                 ...Metadata::$nationalCalendarsMetadata[$key]
             ];
         }
+        $nationalCalendarsKeys = [
+            "VATICAN",
+            ...array_keys(Metadata::$nationalCalendars)
+        ];
         $response = json_encode([
             "litcal_metadata" => [
                 "national_calendars"          => $nationalCalendars,
-                "national_calendars_keys"     => array_push(array_keys(Metadata::$nationalCalendars), "VATICAN"),
+                "national_calendars_keys"     => $nationalCalendarsKeys,
                 "diocesan_calendars"          => $diocesanCalendars,
                 "diocesan_calendars_keys"     => array_keys(Metadata::$diocesanCalendars),
                 "diocesan_groups"             => $diocesanGroups,
