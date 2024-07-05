@@ -196,7 +196,7 @@
             },
             "required": [
                 "ascension",
-                "corpuschristi",
+                "corpus_christi",
                 "epiphany",
                 "locale"
             ],
