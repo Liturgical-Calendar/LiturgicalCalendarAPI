@@ -348,7 +348,7 @@
               <xs:element name="MemorialsKeys">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="Key" maxOccurs="unbounded" minOccurs="50">
+                    <xs:element name="Key" maxOccurs="unbounded" minOccurs="40">
                       <xs:complexType>
                         <xs:simpleContent>
                           <xs:extension base="xs:string">
