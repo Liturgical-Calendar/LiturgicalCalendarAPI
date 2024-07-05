@@ -15,7 +15,22 @@ use Johnrdorazio\LitCal\DateTime;
 class LitFunc
 {
     // NON_EVENT_KEYS are keys whose value is an array, but are not a LitCalEvent
-    private const NON_EVENT_KEYS = [ 'litcal', 'settings', 'messages', 'metadata', 'solemnities', 'feasts_memorials', 'request_headers', 'color', 'color_lcl', 'common' ];
+    private const NON_EVENT_KEYS = [
+        'litcal',
+        'settings',
+        'messages',
+        'metadata',
+        'solemnities',
+        'solemnities_keys',
+        'feasts',
+        'feasts_keys',
+        'memorials',
+        'memorials_keys',
+        'request_headers',
+        'color',
+        'color_lcl',
+        'common'
+    ];
     private static string $LAST_ARRAY_KEY = '';
     private const TRANSFORM_KEYS = [
       "litcal"            => "LitCal",
