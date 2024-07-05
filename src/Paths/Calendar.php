@@ -597,7 +597,21 @@ class Calendar
     {
         $propriumdesanctisFile = RomanMissal::getSanctoraleFileName($missal);
         $propriumdesanctisI18nPath = RomanMissal::getSanctoraleI18nFilePath($missal);
-
+        // only produce an error if a translation file is expected but not found
+        if (
+            str_starts_with($missal, 'EDITIO_TYPICA_')
+            && (
+                false === $propriumdesanctisI18nPath
+                || false === file_exists($propriumdesanctisI18nPath)
+            )
+        ) {
+            $message = sprintf(
+                /**translators: name of the Roman Missal */
+                _('Translation data for the sanctorale from %s could not be found.'),
+                RomanMissal::getName($missal)
+            );
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
+        }
         if ($propriumdesanctisI18nPath !== false) {
             $locale = LitLocale::$PRIMARY_LANGUAGE;
             $propriumdesanctisI18nFile = $propriumdesanctisI18nPath . $locale . ".json";
@@ -626,13 +640,6 @@ class Calendar
                 );
                 self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
             }
-        } else {
-            $message = sprintf(
-                /**translators: name of the Roman Missal */
-                _('Translation data for the sanctorale from %s could not be found.'),
-                RomanMissal::getName($missal)
-            );
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
         }
 
         if (file_exists($propriumdesanctisFile)) {
