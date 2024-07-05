@@ -81,6 +81,9 @@ class LitFunc
                       //self::debugWrite( "key <$key> seems to belong to the Messages array: will create a corresponding <message> element with attribute 'idx'" );
                         $el = $xml->addChild('Message', htmlspecialchars($value));
                         $el->addAttribute("idx", $key);
+                    } elseif (in_array(self::$LAST_ARRAY_KEY, ['solemnities_keys','feasts_keys','memorials_keys'])) {
+                        $el = $xml->addChild('Key', $value);
+                        $el->addAttribute("idx", $key);
                     } else {
                       //self::debugWrite( "key <$key> does not seem to belong to the Messages array: will create a corresponding <option> element with attribute 'idx'" );
                         $el = $xml->addChild('Option', $value);
