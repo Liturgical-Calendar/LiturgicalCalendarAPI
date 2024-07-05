@@ -141,9 +141,7 @@
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/LitFeastType"
                   },
                   "missal": {
-                    "type": "string",
-                    "enum": [ "VATICAN_1970", "VATICAN_2002", "VATICAN_2008", "USA_2011", "ITALY_1983" ],
-                    "description": "When a liturgical event is defined in a Roman Missal, this property will be present with an indication of the Roman Missal in question"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Missal"
                   },
                   "decree": {
                     "type": "string",
