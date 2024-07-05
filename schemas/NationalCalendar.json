@@ -184,10 +184,10 @@
                 "ascension": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Ascension"
                 },
-                "corpuschristi": {
+                "corpus_christi": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/CorpusChristi"
                 },
-                "eternalhighpriest": {
+                "eternal_high_priest": {
                     "type": "boolean"
                 },
                 "locale": {

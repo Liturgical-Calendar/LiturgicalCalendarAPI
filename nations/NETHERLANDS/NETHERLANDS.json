@@ -162,9 +162,9 @@
     "settings": {
         "epiphany": "SUNDAY_JAN2_JAN8",
         "ascension": "THURSDAY",
-        "corpuschristi": "SUNDAY",
+        "corpus_christi": "SUNDAY",
         "locale": "nl_NL",
-        "eternalhighpriest": true
+        "eternal_high_priest": true
     },
     "metadata": {
         "region": "NETHERLANDS",

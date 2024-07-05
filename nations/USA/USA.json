@@ -171,8 +171,8 @@
     "settings": {
         "epiphany": "SUNDAY_JAN2_JAN8",
         "ascension": "SUNDAY",
-        "corpuschristi": "SUNDAY",
-        "locale": "EN"
+        "corpus_christi": "SUNDAY",
+        "locale": "en_US"
     },
     "metadata": {
         "region": "UNITED STATES",

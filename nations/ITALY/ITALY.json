@@ -39,8 +39,8 @@
     "settings": {
         "epiphany": "JAN6",
         "ascension": "SUNDAY",
-        "corpuschristi": "SUNDAY",
-        "locale": "IT"
+        "corpus_christi": "SUNDAY",
+        "locale": "it_IT"
     },
     "metadata": {
         "region": "ITALY",
