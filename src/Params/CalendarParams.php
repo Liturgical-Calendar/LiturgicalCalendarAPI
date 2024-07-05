@@ -154,11 +154,11 @@ class CalendarParams
                         }
                         break;
                     case "diocesancalendar":
-                        if (property_exists($this->calendars->diocesan_calendars, $value)) {
+                        if (in_array($value, $this->calendars->diocesan_calendars_keys)) {
                             $this->DiocesanCalendar = $value;
                         } else {
-                            $validVals = array_keys(get_object_vars($this->calendars->diocesan_calendars));
-                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: " . implode(', ', $validVals);
+                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: "
+                                . implode(', ', $this->calendars->diocesan_calendars_keys);
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;

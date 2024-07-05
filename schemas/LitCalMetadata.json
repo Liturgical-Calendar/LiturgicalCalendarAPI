@@ -79,43 +79,62 @@
                     }
                 },
                 "diocesan_calendars": {
-                    "type": "object",
-                    "patternProperties": {
-                        "": {
-                            "type": "object",
-                            "properties": {
-                                "nation": {
-                                    "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Region"
-                                },
-                                "diocese": {
-                                    "type": "string"
-                                },
-                                "group": {
-                                    "type": "string"
-                                }
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                            "calendar_id": {
+                                "type": "string",
+                                "description": "uppercase normalized string from the name of the diocese, without any spaces or special characters"
                             },
-                            "required": [
-                                "nation",
-                                "diocese"
-                            ]
-                        }
+                            "nation": {
+                                "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Region"
+                            },
+                            "diocese": {
+                                "type": "string"
+                            },
+                            "group": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "calendar_id",
+                            "nation",
+                            "diocese"
+                        ]
                     }
                 },
                 "diocesan_groups": {
-                    "type": "object",
-                    "patternProperties": {
-                        "": {
-                            "type": "array",
-                            "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                            "group_name": {
                                 "type": "string"
+                            },
+                            "dioceses": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "pattern": "^[A-Z]+$"
+                                }
                             }
-                        }
+                        },
+                        "required": ["group_name", "dioceses"]
                     }
                 },
                 "wider_regions": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/WiderRegionDef"
+                    }
+                },
+                "wider_regions_keys": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/WiderRegionNames"
                     }
                 },
                 "roman_missals": {
@@ -196,6 +215,7 @@
                 "diocesan_calendars",
                 "diocesan_groups",
                 "wider_regions",
+                "wider_regions_keys",
                 "roman_missals"
             ],
             "additionalProperties": false

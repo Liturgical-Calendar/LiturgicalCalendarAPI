@@ -67,20 +67,27 @@ class RegionalDataParams
                     }
                     // Check the request method: cannot DELETE National calendar data if it is still in use by a Diocesan calendar
                     if (RegionalData::$APICore->getRequestMethod() === RequestMethod::DELETE) {
-                        foreach ($this->calendars->diocesan_calendars as $key => $value) {
-                            if ($value->nation === $data->key) {
-                                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Cannot DELETE National Calendar data while there are Diocesan calendars that depend on it. Currently, {$data->key} is in use by Diocesan calendar {$key}");
+                        foreach ($this->calendars->diocesan_calendars as $diocesanCalendar) {
+                            if ($diocesanCalendar->nation === $data->key) {
+                                RegionalData::produceErrorResponse(
+                                    StatusCode::BAD_REQUEST,
+                                    "Cannot DELETE National Calendar data while there are Diocesan calendars that depend on it."
+                                    . " Currently, {$data->key} is in use by Diocesan calendar {$diocesanCalendar->calendar_id}."
+                                );
                             }
                         }
                     }
                     break;
                 case 'DIOCESANCALENDAR':
                     if (
-                        false === property_exists($this->calendars->diocesan_calendars, $data->key)
+                        false === in_array($data->key, $this->calendars->diocesan_calendars_keys)
                         && RegionalData::$APICore->getRequestMethod() !== RequestMethod::PUT
                     ) {
-                        $validVals = implode(', ', array_keys(get_object_vars($this->calendars->diocesan_calendars)));
-                        RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value {$data->key} for param `key`, valid values are: {$validVals}");
+                        $validVals = implode(', ', $this->calendars->diocesan_calendars_keys);
+                        RegionalData::produceErrorResponse(
+                            StatusCode::BAD_REQUEST,
+                            "Invalid value {$data->key} for param `key`, valid values are: {$validVals}"
+                        );
                     } else {
                         $this->key = $data->key;
                     }
