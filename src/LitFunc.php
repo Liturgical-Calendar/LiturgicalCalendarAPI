@@ -65,7 +65,11 @@ class LitFunc
                 } else {
                     //self::debugWrite( "key <$key> is a LitCalEvent" );
                     $new_object = $xml->addChild("LitCalEvent");
-                    $new_object->addAttribute("eventKey", $key);
+                    if (in_array(self::$LAST_ARRAY_KEY, ['solemnities','feasts','memorials'])) {
+                        $new_object->addAttribute("idx", $key);
+                    } else {
+                        $new_object->addAttribute("eventKey", $key);
+                    }
                 }
                 //self::debugWrite( "proceeding to convert array value of <$key> to xml sequence..." );
                 self::convertArray2XML($value, $new_object);
