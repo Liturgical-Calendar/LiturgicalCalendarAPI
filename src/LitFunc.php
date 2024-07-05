@@ -65,7 +65,7 @@ class LitFunc
                 } else {
                     //self::debugWrite( "key <$key> is a LitCalEvent" );
                     $new_object = $xml->addChild("LitCalEvent");
-                    if (in_array(self::$LAST_ARRAY_KEY, ['solemnities','feasts','memorials'])) {
+                    if (is_numeric($key)) {
                         $new_object->addAttribute("idx", $key);
                     } else {
                         $new_object->addAttribute("eventKey", $key);
