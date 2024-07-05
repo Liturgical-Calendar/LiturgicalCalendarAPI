@@ -118,7 +118,14 @@ class Metadata
         }
         $nationalCalendars = [];
         $nationalCalendars[] = [
-            "calendar_id" => "VATICAN"
+            "calendar_id" => "VATICAN",
+            "missals" => [
+                "EDITIO_TYPICA_1970",
+                "EDITIO_TYPICA_1971",
+                "EDITIO_TYPICA_1975",
+                "EDITIO_TYPICA_2002",
+                "EDITIO_TYPICA_2008"
+            ]
         ];
         foreach (Metadata::$nationalCalendars as $key => $calendar) {
             $nationalCalendars[] = [

@@ -145,11 +145,11 @@ class CalendarParams
                         }
                         break;
                     case "nationalcalendar":
-                        if (property_exists($this->calendars->national_calendars, $value)) {
+                        if (in_array($value, $this->calendars->national_calendars_keys)) {
                             $this->NationalCalendar = $value;
                         } else {
-                            $validVals = array_keys(get_object_vars($this->calendars->national_calendars));
-                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: " . implode(', ', $validVals);
+                            $validVals = implode(', ', $this->calendars->national_calendars);
+                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: $validVals.";
                             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                         }
                         break;
