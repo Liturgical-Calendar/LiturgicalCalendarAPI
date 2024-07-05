@@ -100,12 +100,19 @@ class Metadata
 
     public static function response()
     {
+        $diocesanGroups = [];
+        foreach (Metadata::$diocesanGroups as $key => $group) {
+            $diocesanGroups[] = [
+                "group_name" => $key,
+                "dioceses" => $group
+            ];
+        }
         $response = json_encode([
             "litcal_metadata" => [
                 "national_calendars"          => Metadata::$nationalCalendars,
                 "national_calendars_metadata" => Metadata::$nationalCalendarsMetadata,
                 "diocesan_calendars"          => Metadata::$diocesanCalendars,
-                "diocesan_groups"             => Metadata::$diocesanGroups,
+                "diocesan_groups"             => $diocesanGroups,
                 "wider_regions"               => Metadata::$widerRegions,
                 "roman_missals"               => RomanMissal::produceMetadata()
             ]
