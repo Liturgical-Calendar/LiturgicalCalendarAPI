@@ -2,13 +2,14 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Bonaventura Galang <bonaventuragal@gmail.com>, 2024.
+# User_425 <user425.itsme@gmail.com>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-06-09 09:19+0000\n"
-"PO-Revision-Date: 2024-07-11 12:40+0000\n"
-"Last-Translator: Bonaventura Galang <bonaventuragal@gmail.com>\n"
+"PO-Revision-Date: 2024-08-20 15:40+0000\n"
+"Last-Translator: User_425 <user425.itsme@gmail.com>\n"
 "Language-Team: Indonesian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/id/>\n"
 "Language: id\n"
@@ -24,6 +25,8 @@ msgid ""
 "Only years from 1970 and after are supported. You tried requesting the year "
 "%d."
 msgstr ""
+"Hanya mendukung dari tahun 1970 dan seterusnya. Kamu mencoba meminta tahun "
+"%d."
 
 #. translators: name of the Roman Missal
 #: src/API.php:494
