@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # Ubuntu <priest@johnromanodorazio.com>, 2021.
 # John R. D'Orazio <priest@johnromanodorazio.com>, 2022, 2023.
+# OpenAI <noreply-mt-openai@weblate.org>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-06-09 09:19+0000\n"
-"PO-Revision-Date: 2023-01-02 14:09+0000\n"
-"Last-Translator: John R. D'Orazio <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2024-08-30 11:45+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: German <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/de/>\n"
 "Language: de\n"
@@ -17,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.12.1\n"
+"X-Generator: Weblate 5.6.1\n"
 
 #: src/API.php:442
 #, php-format
@@ -25,18 +26,21 @@ msgid ""
 "Only years from 1970 and after are supported. You tried requesting the year "
 "%d."
 msgstr ""
+"Nur Jahre ab 1970 werden unterstützt. Du hast versucht, das Jahr %d "
+"anzufordern."
 
 #. translators: name of the Roman Missal
 #: src/API.php:494
 #, php-format
 msgid "Data for the sanctorale from %s could not be found."
-msgstr ""
+msgstr "Daten für das Sanctorale von %s konnten nicht gefunden werden."
 
 #. translators: name of the Roman Missal
 #: src/API.php:501
 #, php-format
 msgid "Translation data for the sanctorale from %s could not be found."
 msgstr ""
+"Übersetzungsdaten für das Sanctorale von %s konnten nicht gefunden werden."
 
 #. translators: days before Epiphany when Epiphany falls on Jan 6 (not useful in Italian!)
 #. translators: days after Epiphany when Epiphany falls on Jan 6 (not useful in Italian!)
@@ -45,14 +49,14 @@ msgstr ""
 #: src/API.php:666 src/API.php:718 src/API.php:805 src/API.php:845
 #, php-format
 msgid "%s - Christmas Weekday"
-msgstr ""
+msgstr "%s - Wochentag in der Weihnachtszeit"
 
 #. translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
 #: src/API.php:962 src/LitMessages.php:149 src/LitMessages.php:154
 #: src/Enum/LitCommon.php:385
 msgid "or"
-msgstr ""
+msgstr "oder"
 
 #. translators: as instituted on the day of the canonization of St Faustina Kowalska by Pope John Paul II in the year 2000
 #: src/API.php:966
@@ -67,25 +71,27 @@ msgid ""
 "The Solemnity '%1$s' falls on %2$s in the year %3$d, the celebration has "
 "been transferred to %4$s (%5$s) as per the %6$s."
 msgstr ""
+"Das Hochfest '%1$s' fällt im Jahr %3$d auf den %2$s, die Feier wurde auf den "
+"%4$s (%5$s) gemäß dem %6$s verschoben."
 
 #: src/API.php:1084
 msgid "the Saturday preceding Palm Sunday"
-msgstr ""
+msgstr "der Samstag vor dem Palmsonntag"
 
 #: src/API.php:1090 src/API.php:1110 src/API.php:1137 src/API.php:1168
 #: src/API.php:1558 src/API.php:1686 src/API.php:1745 src/API.php:1997
 #: src/API.php:2051 src/API.php:2079 src/API.php:2200 src/API.php:2215
 #: src/API.php:2232 src/API.php:2273 src/FestivityCollection.php:435
 msgid "Decree of the Congregation for Divine Worship"
-msgstr ""
+msgstr "Dekret der Kongregation für den Gottesdienst"
 
 #: src/API.php:1102
 msgid "the Monday following the Second Sunday of Easter"
-msgstr ""
+msgstr "der Montag nach dem zweiten Sonntag der Osterzeit"
 
 #: src/API.php:1132
 msgid "the following Monday"
-msgstr ""
+msgstr "der folgende Montag"
 
 #. translators: 1: Festivity name, 2: Coinciding Festivity name, 3: Requested calendar year
 #: src/API.php:1143
@@ -94,6 +100,9 @@ msgid ""
 "The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year %3$d. "
 "We should ask the Congregation for Divine Worship what to do about this!"
 msgstr ""
+"Die Feierlichkeit '%1$s' fällt im Jahr %3$d mit der Feierlichkeit '%2$s' "
+"zusammen. Wir sollten die Kongregation für den Gottesdienst fragen, was wir "
+"tun sollen!"
 
 #. translators: 1: Festivity name, 2: Coinciding Festivity name, 3: Requested calendar year, 4: Decree of the Congregation for Divine Worship
 #: src/API.php:1163
@@ -102,6 +111,8 @@ msgid ""
 "Seeing that the Solemnity '%1$s' coincides with the Solemnity '%2$s' in the "
 "year %3$d, it has been anticipated by one day as per %4$s."
 msgstr ""
+"Da die Feierlichkeit '%1$s' im Jahr %3$d mit der Feierlichkeit '%2$s' "
+"zusammenfällt, wurde sie gemäß %4$s um einen Tag vorverlegt."
 
 #. translators: 1: Festivity name (Christmas), 2: Requested calendar year, 3: Festivity name (Holy Family), 4: New date for Holy Family
 #: src/API.php:1252
@@ -110,11 +121,13 @@ msgid ""
 "'%1$s' falls on a Sunday in the year %2$d, therefore the Feast '%3$s' is "
 "celebrated on %4$s rather than on the Sunday after Christmas."
 msgstr ""
+"'%1$s' fällt im Jahr %2$d auf einen Sonntag, daher wird das Fest '%3$s' am "
+"%4$s und nicht am Sonntag nach Weihnachten gefeiert."
 
 #. translators: You can ignore this translation if the Feast has not been inserted by the Episcopal Conference
 #: src/API.php:1277
 msgid "Our Lord Jesus Christ, The Eternal High Priest"
-msgstr ""
+msgstr "Unser Herr Jesus Christus, der ewige Hohepriester"
 
 #. translators: 1: National Calendar, 2: Requested calendar year, 3: source of the rule
 #: src/API.php:1282
@@ -125,34 +138,38 @@ msgid ""
 "own liturgical calendars on the Thursday after Pentecost: applicable to the "
 "calendar '%1$s' in the year '%2$d' (%3$s)."
 msgstr ""
+"Im Jahr 2012 erteilte Papst Benedikt XVI. den Bischofskonferenzen die "
+"Erlaubnis, das Fest Unseres Herrn Jesus Christus, des Ewigen Hohenpriesters, "
+"in ihre eigenen liturgischen Kalender am Donnerstag nach Pfingsten "
+"aufzunehmen: anwendbar für den Kalender '%1$s' im Jahr '%2$d' (%3$s)."
 
 #. translators: 1: Festivity name, 2: Superseding Festivity grade, 3: Superseding Festivity name, 4: Requested calendar year
 #: src/API.php:1313 src/API.php:1338
 #, php-format
 msgid "'%1$s' is superseded by the %2$s '%3$s' in the year %4$d."
-msgstr ""
+msgstr "'%1$s' wird im Jahr %4$d durch den %2$s '%3$s' ersetzt."
 
 #. translators: %s is an ordinal number (first, second...)
 #: src/API.php:1411
 #, php-format
 msgid "of the %s Week of Advent"
-msgstr ""
+msgstr "der %s Woche des Advents"
 
 #. translators: %s is an ordinal number (first, second...)
 #: src/API.php:1442
 #, php-format
 msgid "%s Day of the Octave of Christmas"
-msgstr ""
+msgstr "%s Tag der Oktav von Weihnachten"
 
 #. translators: %s is an ordinal number (first, second...)
 #: src/API.php:1475
 #, php-format
 msgid "of the %s Week of Lent"
-msgstr ""
+msgstr "der %s Woche der Fastenzeit"
 
 #: src/API.php:1484
 msgid "after Ash Wednesday"
-msgstr ""
+msgstr "nach Aschermittwoch"
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -184,12 +201,16 @@ msgid ""
 "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
 "applicable to the year %6$d."
 msgstr ""
+"Der %1$s '%2$s' wurde seit dem Jahr %4$d (%5$s) am %3$s hinzugefügt, "
+"anwendbar für das Jahr %6$d."
 
 #: src/API.php:1543 src/API.php:1642
 msgid ""
 "Vatican Press conference: Presentation of the Editio Typica Tertia of the "
 "Roman Missal"
 msgstr ""
+"Vatikanische Pressekonferenz: Vorstellung der Editio Typica Tertia des "
+"Römischen Messbuchs"
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -203,6 +224,9 @@ msgid ""
 "Octave of Christmas, or on the weekdays of the Lenten season in the year "
 "%3$d, rank reduced to Commemoration."
 msgstr ""
+"Der %1$s '%2$s' fällt entweder zwischen dem 17. Dez. und dem 24. Dez., oder "
+"während der Weihnachtsoktav, oder an den Wochentagen der Fastenzeit im Jahr "
+"%3$d, Rang herabgestuft zu Gedenken."
 
 #. translators:
 #.  1. Grade or rank of the festivity that has been superseded
@@ -214,11 +238,11 @@ msgstr ""
 #: src/API.php:1614
 #, php-format
 msgid "The %1$s '%2$s' is superseded by the %3$s '%4$s' in the year %5$d."
-msgstr ""
+msgstr "Der %1$s '%2$s' wird im Jahr %5$d durch den %3$s '%4$s' verdrängt."
 
 #: src/API.php:1636
 msgid "Apostolic Constitution Missale Romanum"
-msgstr ""
+msgstr "Apostolische Konstitution Missale Romanum"
 
 #: src/API.php:1662
 #, php-format
@@ -227,6 +251,9 @@ msgid ""
 "(%5$s) and usually celebrated on %6$s, is suppressed by the %7$s '%8$s' in "
 "the year %9$d."
 msgstr ""
+"Das %1$s '%2$s', das seit dem Jahr %4$d (%5$s) im %3$s des Römischen "
+"Messbuchs hinzugefügt wurde und normalerweise am %6$s gefeiert wird, wird im "
+"Jahr %9$d durch das %7$s '%8$s' unterdrückt."
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -244,6 +271,8 @@ msgid ""
 "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
 "superseded by a %6$s '%7$s' in the year %8$d."
 msgstr ""
+"Der %1$s '%2$s', hinzugefügt am %3$s seit dem Jahr %4$d (%5$s), wird jedoch "
+"im Jahr %8$d von einem %6$s '%7$s' verdrängt."
 
 #. translators:
 #.  1. Name of the first coinciding Memorial
@@ -257,16 +286,18 @@ msgid ""
 "The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
 "They are both reduced in rank to optional memorials (%4$s)."
 msgstr ""
+"Das Gedenktag '%1$s' fällt im Jahr %3$d mit einem anderen Gedenktag '%2$s' "
+"zusammen. Beide werden zu fakultativen Gedenktagen herabgestuft (%4$s)."
 
 #. translators: e.g. 'Monday before Palm Sunday'
 #: src/API.php:1777
 msgid "before"
-msgstr ""
+msgstr "vor"
 
 #. translators: e.g. 'Monday after Pentecost'
 #: src/API.php:1782
 msgid "after"
-msgstr ""
+msgstr "nach"
 
 #. translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to
 #: src/API.php:1787 src/API.php:3035
@@ -275,6 +306,9 @@ msgid ""
 "Cannot create mobile festivity '%1$s': can only be relative to festivity "
 "with key '%2$s' using keywords %3$s"
 msgstr ""
+"Kann mobile Festlichkeit '%1$s' nicht erstellen: kann nur relativ zur "
+"Festlichkeit mit Schlüssel '%2$s' unter Verwendung der Schlüsselwörter %3$s "
+"sein"
 
 #. translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to
 #: src/API.php:1804 src/API.php:3055
@@ -282,6 +316,8 @@ msgstr ""
 msgid ""
 "Cannot create mobile festivity '%1$s' relative to festivity with key '%2$s'"
 msgstr ""
+"Kann mobile Festivität '%1$s' nicht erstellen, die sich auf Festivität mit "
+"Schlüssel '%2$s' bezieht."
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created 2. list of properties
 #: src/API.php:1812 src/API.php:3064
@@ -290,6 +326,8 @@ msgid ""
 "Cannot create mobile festivity '%1$s': when the 'strtotime' property is an "
 "object, it must have properties %2$s"
 msgstr ""
+"Kann mobile Festlichkeit '%1$s' nicht erstellen: wenn die 'strtotime'-"
+"Eigenschaft ein Objekt ist, muss sie Eigenschaften %2$s haben"
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created
 #: src/API.php:1832 src/API.php:3129
@@ -298,12 +336,15 @@ msgid ""
 "Cannot create mobile festivity '%1$s': 'strtotime' property must be either "
 "an object or a string! Currently it has type '%2$s'"
 msgstr ""
+"Kann mobile Festlichkeit '%1$s' nicht erstellen: 'strtotime'-Eigenschaft "
+"muss entweder ein Objekt oder ein String sein! Derzeit hat es den Typ '%2$s'"
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created
 #: src/API.php:1840
 #, php-format
 msgid "Cannot create mobile festivity '%1$s' without a 'strtotime' property!"
 msgstr ""
+"Kann mobile Festlichkeit '%1$s' ohne 'strtotime'-Eigenschaft nicht erstellen!"
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -319,6 +360,8 @@ msgid ""
 "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
 "applicable to the year %5$d (%6$s)."
 msgstr ""
+"Der Name des %1$s '%2$s' wurde seit dem Jahr %4$d in %3$s geändert, "
+"anwendbar für das Jahr %5$d (%6$s)."
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -334,6 +377,8 @@ msgid ""
 "The %1$s '%2$s' has been raised to the rank of %3$s since the year %4$d, "
 "applicable to the year %5$d (%6$s)."
 msgstr ""
+"Das %1$s '%2$s' wurde seit dem Jahr %4$d in den Rang von %3$s erhoben, "
+"anwendbar für das Jahr %5$d (%6$s)."
 
 #. translators:
 #.  1. Grade or rank of the festivity
@@ -349,6 +394,8 @@ msgid ""
 "The %1$s '%2$s' has been lowered to the rank of %3$s since the year %4$d, "
 "applicable to the year %5$d (%6$s)."
 msgstr ""
+"Der %1$s '%2$s' wurde seit dem Jahr %4$d auf den Rang von %3$s herabgestuft, "
+"anwendbar auf das Jahr %5$d (%6$s)."
 
 #. translators:
 #.  1. Name of the festivity
@@ -362,10 +409,12 @@ msgid ""
 "'%1$s' has been declared a Doctor of the Church since the year %2$d, "
 "applicable to the year %3$d (%4$s)."
 msgstr ""
+"'%1$s' wurde seit dem Jahr %2$d zum Kirchenlehrer erklärt, gültig für das "
+"Jahr %3$d (%4$s)."
 
 #: src/API.php:1984
 msgid "and Doctor of the Church"
-msgstr ""
+msgstr "und Kirchenlehrer"
 
 #. translators:
 #.  1. Grade or rank of the festivity being created
@@ -383,6 +432,8 @@ msgid ""
 "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
 "superseded by the %6$s '%7$s' in the year %8$d."
 msgstr ""
+"Das %1$s '%2$s', das seit dem Jahr %4$d (%5$s) am %3$s hinzugefügt wurde, "
+"wird jedoch im Jahr %8$d durch das %6$s '%7$s' verdrängt."
 
 #. translators:
 #.  1. Requested calendar year
@@ -400,6 +451,8 @@ msgid ""
 "In the year %1$d, the %2$s '%3$s' has been suppressed by the %4$s '%5$s', "
 "added on %6$s since the year %7$d (%8$s)."
 msgstr ""
+"Im Jahr %1$d wurde der %2$s '%3$s' durch den %4$s '%5$s' unterdrückt, der "
+"seit dem Jahr %7$d (%8$s) am %6$s hinzugefügt wurde."
 
 #. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
 #: src/API.php:2197
@@ -408,6 +461,8 @@ msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
 "since the year 2002 (%2$s), applicable to the year %3$d."
 msgstr ""
+"Das fakultative Gedenkfest '%1$s' wurde seit dem Jahr 2002 (%2$s) vom 12. "
+"Dezember auf den 12. August verlegt, anwendbar für das Jahr %3$d."
 
 #. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
 #: src/API.php:2212
@@ -417,6 +472,10 @@ msgid ""
 "a Sunday or Solemnity were it on Dec. 12, has however been transferred to "
 "Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d."
 msgstr ""
+"Das fakultative Gedenkfest '%1$s', das in diesem Jahr durch einen Sonntag "
+"oder eine Feierlichkeit am 12. Dezember verdrängt worden wäre, wurde jedoch "
+"seit dem Jahr 2002 (%2$s) auf den 12. August verlegt, anwendbar für das Jahr "
+"%3$d."
 
 #: src/API.php:2229
 #, php-format
@@ -425,6 +484,9 @@ msgid ""
 "since the year 2002 (%2$s), applicable to the year %3$d. However, it is "
 "superseded by a Sunday, a Solemnity, or a Feast '%4$s' in the year %3$d."
 msgstr ""
+"Das optionale Gedenken '%1$s' wurde seit dem Jahr 2002 (%2$s) vom 12. Dez. "
+"auf den 12. Aug. verschoben, anwendbar auf das Jahr %3$d. Es wird jedoch im "
+"Jahr %3$d von einem Sonntag, einer Hochfest oder einem Fest '%4$s' verdrängt."
 
 #. translators: 1: Festivity name, 2: Source of the information
 #: src/API.php:2270
@@ -435,30 +497,37 @@ msgid ""
 "%2$s it has been reinstated so that local churches can optionally celebrate "
 "the memorial."
 msgstr ""
+"Das Fest '%1$s' wäre in diesem Jahr (2009) unterdrückt worden, da es auf "
+"einen Sonntag fällt. Da es jedoch das Jahr des Apostels Paulus ist, wurde es "
+"gemäß %2$s wiederhergestellt, sodass die örtlichen Kirchen das Gedenken "
+"optional feiern können."
 
 #: src/API.php:2305
 #, php-format
 msgid "of the %s Week of Easter"
-msgstr ""
+msgstr "der %s Woche der Osterzeit"
 
 #: src/API.php:2346 src/API.php:2387
 #, php-format
 msgid "of the %s Week of Ordinary Time"
-msgstr ""
+msgstr "der %s Woche der gewöhnlichen Zeit"
 
 #: src/API.php:2413
 msgid "Saturday Memorial of the Blessed Virgin Mary"
-msgstr ""
+msgstr "Samstagsgedenken der seligen Jungfrau Maria"
 
 #: src/API.php:2439 src/API.php:2442
 #, php-format
 msgid "Error retrieving and decoding Wider Region data from file %s."
 msgstr ""
+"Fehler beim Abrufen und Dekodieren der Daten der weiteren Region aus der "
+"Datei %s."
 
 #: src/API.php:2449
 #, php-format
 msgid "Error retrieving and decoding National data from file %s."
 msgstr ""
+"Fehler beim Abrufen und Dekodieren der nationalen Daten aus der Datei %s."
 
 #. translators:
 #.  1. Grade of the festivity
@@ -474,6 +543,8 @@ msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
 "'%5$s' in the year %6$d."
 msgstr ""
+"Der %1$s '%2$s', normalerweise gefeiert am %3$s, wird im Jahr %6$d durch den "
+"%4$s '%5$s' unterdrückt."
 
 #. translators:
 #.  1. Name of the first coinciding Memorial
@@ -487,6 +558,8 @@ msgid ""
 "The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
 "They are both reduced in rank to optional memorials."
 msgstr ""
+"Das Gedenken '%1$s' fällt im Jahr %3$d mit einem anderen Gedenken '%2$s' "
+"zusammen. Beide werden zu fakultativen Gedenktagen herabgestuft."
 
 #. translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year
 #: src/API.php:2575
@@ -495,6 +568,8 @@ msgid ""
 "The Feast '%1$s', usually celebrated on %2$s, coincides with another Feast "
 "'%3$s' in the year %4$d! Does something need to be done about this?"
 msgstr ""
+"Das Fest '%1$s', normalerweise gefeiert am %2$s, fällt im Jahr %4$d mit "
+"einem anderen Fest '%3$s' zusammen! Muss etwas dagegen unternommen werden?"
 
 #. translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year
 #: src/API.php:2589
@@ -504,18 +579,23 @@ msgid ""
 "or Solemnity '%3$s' in the year %4$d! Does something need to be done about "
 "this?"
 msgstr ""
+"Das Hochfest '%1$s', das normalerweise am %2$s gefeiert wird, fällt im Jahr "
+"%4$d mit dem Sonntag oder Hochfest '%3$s' zusammen! Muss etwas dagegen "
+"unternommen werden?"
 
 #: src/API.php:2622
 msgid ""
 "We should be creating a new festivity, however we do not seem to have the "
 "correct date information in order to proceed"
 msgstr ""
+"Wir sollten ein neues Fest schaffen, aber wir scheinen nicht die richtigen "
+"Datumsinformationen zu haben, um fortzufahren."
 
 #. translators: Name of the Roman Missal
 #: src/API.php:2754
 #, php-format
 msgid "Found a sanctorale data file for %s"
-msgstr ""
+msgstr "Sanctorale-Datendatei für %s gefunden"
 
 #. translators:
 #.  1. Festivity grade
@@ -532,12 +612,14 @@ msgid ""
 "The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
 "superseded by the %5$s '%6$s' in the year %7$d"
 msgstr ""
+"Der %1$s '%2$s' (%3$s), der in den %4$s in den nationalen Kalender "
+"aufgenommen wurde, wird im Jahr %7$d durch den %5$s '%6$s' ersetzt."
 
 #. translators: Name of the Roman Missal
 #: src/API.php:2810
 #, php-format
 msgid "Could not find a sanctorale data file for %s"
-msgstr ""
+msgstr "Konnte keine Sanctorale-Datendatei für %s finden"
 
 #. translators: 1. Festivity grade, 2. Festivity name, 3. New festivity name, 4: Requested calendar year, 5. Old date, 6. New date
 #: src/API.php:2855
@@ -546,6 +628,8 @@ msgid ""
 "The %1$s '%2$s' is transferred from %5$s to %6$s as per the %7$s, to make "
 "room for '%3$s': applicable to the year %4$d."
 msgstr ""
+"Das %1$s '%2$s' wird gemäß dem %7$s vom %5$s auf den %6$s verlegt, um Platz "
+"für '%3$s' zu schaffen: anwendbar für das Jahr %4$d."
 
 #. translators: 1. Festivity grade, 2. Festivity name, 3. Old date, 4. New date, 5. Source of the information, 6. New festivity name, 7. Superseding festivity grade, 8. Superseding festivity name, 9: Requested calendar year
 #: src/API.php:2873
@@ -555,6 +639,9 @@ msgid ""
 "%5$s, to make room for '%6$s', however it is suppressed by the %7$s '%8$s' "
 "in the year %9$d."
 msgstr ""
+"Der %1$s '%2$s' wäre vom %3$s auf den %4$s gemäß dem %5$s verschoben worden, "
+"um Platz für '%6$s' zu machen, wird jedoch im Jahr %9$d durch den %7$s '%8$"
+"s' unterdrückt."
 
 #. translators: 1: Festivity name, 2: Name of the diocese, 3: Festivity date, 4: Coinciding festivity name, 5: Requested calendar year
 #: src/API.php:3174
@@ -564,6 +651,9 @@ msgid ""
 "celebrated on %3$s, coincides with the Sunday or Solemnity '%4$s' in the "
 "year %5$d! Does something need to be done about this?"
 msgstr ""
+"Die Feierlichkeit '%1$s', die im Kalender der %2$s steht und normalerweise "
+"am %3$s gefeiert wird, fällt im Jahr %5$d mit dem Sonntag oder der "
+"Feierlichkeit '%4$s' zusammen! Muss hier etwas unternommen werden?"
 
 #. translators: 1: Festivity grade, 2: Festivity name, 3: Name of the diocese, 4: Festivity date, 5: Coinciding festivity name, 6: Requested calendar year
 #: src/API.php:3208
@@ -572,15 +662,18 @@ msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
 "on %4$s, is suppressed by the Sunday or Solemnity %5$s in the year %6$d"
 msgstr ""
+"Der %1$s '%2$s', der normalerweise am %4$s im Kalender der %3$s gefeiert "
+"wird, wird im Jahr %6$d durch den Sonntag oder die Feierlichkeit %5$s "
+"unterdrückt."
 
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
 #: src/FestivityCollection.php:47
 msgid "YEAR"
-msgstr ""
+msgstr "JAHR"
 
 #: src/FestivityCollection.php:48
 msgid "Vigil Mass"
-msgstr ""
+msgstr "Vigilmesse"
 
 #: src/FestivityCollection.php:429
 #, php-format
@@ -589,6 +682,9 @@ msgid ""
 "year %5$d. As per %6$s, the first has precedence, therefore the Vigil Mass "
 "is confirmed as are I Vespers."
 msgstr ""
+"Die Vigilmesse für den %1$s '%2$s' fällt im Jahr %5$d mit dem %3$s '%4$s' "
+"zusammen. Gemäß %6$s hat der erste Vorrang, daher wird die Vigilmesse sowie "
+"die I. Vesper bestätigt."
 
 #: src/FestivityCollection.php:443
 #, php-format
@@ -598,6 +694,10 @@ msgid ""
 "and a vigil Mass, whereas the last Solemnity will not have either Vespers II "
 "or an evening Mass."
 msgstr ""
+"Die Vigilmesse für das %1$s '%2$s' fällt im Jahr %5$d mit dem %3$s '%4$s' "
+"zusammen. Da die erste Feierlichkeit Vorrang hat, wird sie Vesper I und eine "
+"Vigilmesse haben, während die letzte Feierlichkeit weder Vesper II noch eine "
+"Abendmesse haben wird."
 
 #: src/FestivityCollection.php:453
 #, php-format
@@ -607,6 +707,10 @@ msgid ""
 "Vespers II and an evening Mass, while the first Solemnity will not have a "
 "Vigil Mass or Vespers I."
 msgstr ""
+"Die Vigilmesse für das %1$s '%2$s' fällt im Jahr %5$d mit dem %3$s '%4$s' "
+"zusammen. Diese letzte Feierlichkeit hat Vorrang, daher wird sie Vesper II "
+"und eine Abendmesse beibehalten, während die erste Feierlichkeit keine "
+"Vigilmesse oder Vesper I haben wird."
 
 #: src/FestivityCollection.php:512
 #, php-format
@@ -615,238 +719,241 @@ msgid ""
 "year %5$d. We should ask the Congregation for Divine Worship what to do "
 "about this!"
 msgstr ""
+"Die Vigilmesse für den %1$s '%2$s' fällt im Jahr %5$d mit dem %3$s '%4$s' "
+"zusammen. Wir sollten die Kongregation für den Gottesdienst fragen, was zu "
+"tun ist!"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:34
 msgid "green"
-msgstr ""
+msgstr "grün"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:39
 msgid "purple"
-msgstr ""
+msgstr "violett"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:44
 msgid "white"
-msgstr ""
+msgstr "weiß"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:49
 msgid "red"
-msgstr ""
+msgstr "rot"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:54
 msgid "pink"
-msgstr ""
+msgstr "rosa"
 
 #: src/Enum/LitCommon.php:61
 msgid "Proper"
-msgstr ""
+msgstr "Eigen"
 
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:63
 msgid "Dedication of a Church"
-msgstr ""
+msgstr "Kirchweihe"
 
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:65
 msgid "Blessed Virgin Mary"
-msgstr ""
+msgstr "Selige Jungfrau Maria"
 
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:67
 msgid "Martyrs"
-msgstr ""
+msgstr "Märtyrer"
 
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:69
 msgid "Pastors"
-msgstr ""
+msgstr "Pastoren"
 
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:71
 msgid "Doctors"
-msgstr ""
+msgstr "Ärzte"
 
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:73
 msgid "Virgins"
-msgstr ""
+msgstr "Jungfrauen"
 
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:75
 msgid "Holy Men and Women"
-msgstr ""
+msgstr "Heilige Männer und Frauen"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:78
 msgid "For One Martyr"
-msgstr ""
+msgstr "Für einen Märtyrer"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:80
 msgid "For Several Martyrs"
-msgstr ""
+msgstr "Für mehrere Märtyrer"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:82
 msgid "For Missionary Martyrs"
-msgstr ""
+msgstr "Für missionarische Märtyrer"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:84
 msgid "For One Missionary Martyr"
-msgstr ""
+msgstr "Für einen missionarischen Märtyrer"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:86
 msgid "For Several Missionary Martyrs"
-msgstr ""
+msgstr "Für mehrere missionarische Märtyrer"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:88
 msgid "For a Virgin Martyr"
-msgstr ""
+msgstr "Für eine jungfräuliche Märtyrerin"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:90
 msgid "For a Holy Woman Martyr"
-msgstr ""
+msgstr "Für eine heilige Märtyrerin"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:92
 msgid "For a Pope"
-msgstr ""
+msgstr "Für einen Papst"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:94
 msgid "For a Bishop"
-msgstr ""
+msgstr "Für einen Bischof"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:96
 msgid "For One Pastor"
-msgstr ""
+msgstr "Für einen Pfarrer"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:98
 msgid "For Several Pastors"
-msgstr ""
+msgstr "Für mehrere Hirten"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:100
 msgid "For Founders of a Church"
-msgstr ""
+msgstr "Für Gründer einer Kirche"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:102
 msgid "For One Founder"
-msgstr ""
+msgstr "Für einen Gründer"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:104
 msgid "For Several Founders"
-msgstr ""
+msgstr "Für mehrere Gründer"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:106
 msgid "For Missionaries"
-msgstr ""
+msgstr "Für Missionare"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:108
 msgid "For One Virgin"
-msgstr ""
+msgstr "Für eine Jungfrau"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:110
 msgid "For Several Virgins"
-msgstr ""
+msgstr "Für mehrere Jungfrauen"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:112
 msgid "For Several Saints"
-msgstr ""
+msgstr "Für mehrere Heilige"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:114
 msgid "For One Saint"
-msgstr ""
+msgstr "Für einen Heiligen"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:116
 msgid "For an Abbot"
-msgstr ""
+msgstr "Für einen Abt"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:118
 msgid "For a Monk"
-msgstr ""
+msgstr "Für einen Mönch"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:120
 msgid "For a Nun"
-msgstr ""
+msgstr "Für eine Nonne"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:122
 msgid "For Religious"
-msgstr ""
+msgstr "Für Ordensleute"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:124
 msgid "For Those Who Practiced Works of Mercy"
-msgstr ""
+msgstr "Für diejenigen, die Werke der Barmherzigkeit praktizierten"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:126
 msgid "For Educators"
-msgstr ""
+msgstr "Für Erzieher"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:128
 msgid "For Holy Women"
-msgstr ""
+msgstr "Für heilige Frauen"
 
 #. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: src/Enum/LitCommon.php:176 src/Enum/LitCommon.php:188
 msgctxt "(SING_FEMM)"
 msgid "of the"
-msgstr ""
+msgstr "des"
 
 #. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: src/Enum/LitCommon.php:179
 msgctxt "(PLUR_FEMM)"
 msgid "of"
-msgstr ""
+msgstr "von"
 
 #. translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: src/Enum/LitCommon.php:185
 msgctxt "(PLUR_MASC)"
 msgid "of"
-msgstr ""
+msgstr "von"
 
 #. translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: src/Enum/LitCommon.php:191
 msgctxt "(SING_MASC)"
 msgid "of the"
-msgstr ""
+msgstr "der"
 
 #: src/Enum/LitCommon.php:368
 msgid "From the Common"
-msgstr ""
+msgstr "Aus dem Gemeinsamen"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:95 src/Enum/LitGrade.php:149
 msgid "weekday"
-msgstr ""
+msgstr "Wochentag"
 
 #. translators: liturgical rank. Keep Capitalized
 #: src/Enum/LitGrade.php:102
 msgid "Commemoration"
-msgstr ""
+msgstr "Gedenktag"
 
 #. translators: liturgical rank. Keep Capitalized
 #: src/Enum/LitGrade.php:109
@@ -876,34 +983,34 @@ msgstr "HOCHFEST"
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:144
 msgid "celebration with precedence over solemnities"
-msgstr ""
+msgstr "Feier mit Vorrang vor Hochfesten"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:25
 msgid "Advent"
-msgstr ""
+msgstr "Advent"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:28
 msgid "Christmas"
-msgstr ""
+msgstr "Weihnachten"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:31
 msgid "Lent"
-msgstr ""
+msgstr "Fastenzeit"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:34
 msgid "Easter Triduum"
-msgstr ""
+msgstr "Österliches Triduum"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:37
 msgid "Easter"
-msgstr ""
+msgstr "Ostern"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:40
 msgid "Ordinary Time"
-msgstr ""
+msgstr "Gewöhnliche Zeit"
