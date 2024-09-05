@@ -22,12 +22,12 @@
                         "additionalProperties": false,
                         "properties": {
                             "calendar_id": {
-                                "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Region"
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
                             },
                             "missals": {
                                 "type": "array",
                                 "items": {
-                                    "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Missal"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Missal"
                                 }
                             },
                             "wider_regions": {
@@ -48,13 +48,13 @@
                                 "additionalProperties": false,
                                 "properties": {
                                     "epiphany": {
-                                        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Epiphany"
+                                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
                                     },
                                     "ascension": {
-                                        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Ascension"
+                                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Ascension"
                                     },
                                     "corpus_christi": {
-                                        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/CorpusChristi"
+                                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
                                     },
                                     "locale": {
                                         "type": "string"
@@ -71,7 +71,7 @@
                 "national_calendars_keys": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Region"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
                     }
                 },
                 "diocesan_calendars": {
@@ -86,7 +86,7 @@
                                 "description": "uppercase normalized string from the name of the diocese, without any spaces or special characters"
                             },
                             "nation": {
-                                "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Region"
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
                             },
                             "diocese": {
                                 "type": "string"
@@ -145,7 +145,7 @@
                 "roman_missals": {
                     "type": "object",
                     "propertyNames": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/MissalDef"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/MissalDef"
                     },
                     "patternProperties": {
                         "": {
@@ -156,7 +156,7 @@
                                     "pattern": "^(EDITIO_TYPICA|ITALY|USA|NETHERLANDS)_(19[7-9]|[2-9][0-9][0-9])[0-9]$"
                                 },
                                 "name": {
-                                    "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/MissalName"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/MissalName"
                                 },
                                 "data_path": {
                                     "oneOf": [
@@ -236,7 +236,7 @@
                 "languages": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/v9/schemas/CommonDef.json#/definitions/Locale"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
                     }
                 },
                 "data_path": {
