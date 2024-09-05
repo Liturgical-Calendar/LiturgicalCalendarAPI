@@ -161,7 +161,7 @@ class Events
                 self::$NationalData = json_decode(file_get_contents($nationalDataFile));
                 if (json_last_error() === JSON_ERROR_NONE) {
                     if (property_exists(self::$NationalData, "settings") && property_exists(self::$NationalData->settings, "locale")) {
-                        $this->EventsParams->Locale = self::$NationalData->Settings->Locale;
+                        $this->EventsParams->Locale = self::$NationalData->settings->locale;
                     }
                     if (property_exists(self::$NationalData, "metadata") && property_exists(self::$NationalData->metadata, "wider_region")) {
                         $widerRegionDataFile = self::$NationalData->metadata->wider_region->jsonFile;
