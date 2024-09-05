@@ -341,7 +341,6 @@ class Events
                         $key = $row->festivity->event_key;
                         self::$FestivityCollection[ $key ] = [];
                         foreach ($row->festivity as $prop => $value) {
-                            $prop = strtoupper($prop);
                             self::$FestivityCollection[ $key ][ $prop ] = $value;
                         }
                         self::$FestivityCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($row->festivity->grade, false);
