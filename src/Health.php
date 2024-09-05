@@ -17,6 +17,11 @@ class Health implements MessageComponentInterface
 {
     protected $clients;
     private const REQPATH = API_BASE_PATH . Route::CALENDAR->value;
+    private const ACTION_PROPERTIES = [
+        "executeValidation" => ["validate", "sourceFile", "category"],
+        "validateCalendar" => ["calendar", "year", "category", "responsetype"],
+        "executeUnitTest" => ["calendar", "year", "category", "test"]
+    ];
     public function onOpen(ConnectionInterface $conn)
     {
         // Store the new connection to send messages to later
@@ -25,54 +30,53 @@ class Health implements MessageComponentInterface
         echo "New connection! ({$conn->resourceId})\n";
     }
 
+    private static function validateMessageProperties(object $message): bool
+    {
+        $valid = true;
+        foreach (self::ACTION_PROPERTIES[$message->action] as $prop) {
+            if (false === property_exists($message, $prop)) {
+                return false;
+            }
+        }
+        return $valid;
+    }
+
     public function onMessage(ConnectionInterface $from, $msg)
     {
         echo sprintf('Receiving message "%s" from connection %d', $msg, $from->resourceId);
         $messageReceived = json_decode($msg);
-        if (json_last_error() === JSON_ERROR_NONE) {
-            if (property_exists($messageReceived, 'action')) {
-                switch ($messageReceived->action) {
-                    case 'executeValidation':
-                        if (
-                            property_exists($messageReceived, 'validate') &&
-                            property_exists($messageReceived, 'sourceFile') &&
-                            property_exists($messageReceived, 'category')
-                        ) {
-                            $this->executeValidation($messageReceived, $from);
-                        }
-                        break;
-                    case 'validateCalendar':
-                        if (
-                            property_exists($messageReceived, 'calendar') &&
-                            property_exists($messageReceived, 'year') &&
-                            property_exists($messageReceived, 'category') &&
-                            property_exists($messageReceived, 'responsetype')
-                        ) {
-                            $this->validateCalendar(
-                                $messageReceived->calendar,
-                                $messageReceived->year,
-                                $messageReceived->category,
-                                $messageReceived->responsetype,
-                                $from
-                            );
-                        }
-                        break;
-                    case 'executeUnitTest':
-                        if (
-                            property_exists($messageReceived, 'calendar') &&
-                            property_exists($messageReceived, 'year') &&
-                            property_exists($messageReceived, 'category') &&
-                            property_exists($messageReceived, 'test')
-                        ) {
-                            $this->executeUnitTest($messageReceived->test, $messageReceived->calendar, $messageReceived->year, $messageReceived->category, $from);
-                        }
-                        break;
-                    default:
-                        $message = new \stdClass();
-                        $message->type = "echobot";
-                        $message->text = $msg;
-                        $this->sendMessage($from, $message);
-                }
+        if (
+            json_last_error() === JSON_ERROR_NONE
+            && property_exists($messageReceived, 'action')
+            && self::validateMessageProperties($messageReceived)
+        ) {
+            switch ($messageReceived->action) {
+                case 'executeValidation':
+                    $this->executeValidation($messageReceived, $from);
+                    break;
+                case 'validateCalendar':
+                    $this->validateCalendar(
+                        $messageReceived->calendar,
+                        $messageReceived->year,
+                        $messageReceived->category,
+                        $messageReceived->responsetype,
+                        $from
+                    );
+                    break;
+                case 'executeUnitTest':
+                    $this->executeUnitTest(
+                        $messageReceived->test,
+                        $messageReceived->calendar,
+                        $messageReceived->year,
+                        $messageReceived->category,
+                        $from
+                    );
+                    break;
+                default:
+                    $message = new \stdClass();
+                    $message->type = "echobot";
+                    $message->text = $msg;
+                    $this->sendMessage($from, $message);
             }
         }
     }
