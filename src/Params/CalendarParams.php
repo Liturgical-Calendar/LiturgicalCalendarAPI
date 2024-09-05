@@ -83,6 +83,15 @@ class CalendarParams
         $this->setData($DATA);
     }
 
+    private static function validateStringValue(string $key, mixed $value): string
+    {
+        if (gettype($value) !== 'string') {
+            $description = "Expected value of type String for parameter `{$key}`, instead found type " . gettype($value);
+            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+        }
+        return filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
+    }
+
     public function setData(array $DATA = [])
     {
         foreach ($DATA as $key => $value) {
@@ -91,101 +100,45 @@ class CalendarParams
             if (in_array($key, self::ALLOWED_PARAMS)) {
                 if ($key !== 'year' && $key !== 'eternalhighpriest') {
                     // all other parameters expect a string value
-                    if (gettype($value) !== 'string') {
-                        $description = "Expected value of type String for parameter `{$key}`, instead found type " . gettype($value);
-                        Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-                    }
-                    $value = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
+                    $value = CalendarParams::validateStringValue($key, $value);
                 }
                 switch ($key) {
                     case "year":
-                        $this->enforceYearValidity($value);
+                        $this->validateYearParam($value);
                         break;
                     case "epiphany":
-                        if (Epiphany::isValid(strtoupper($value))) {
-                            $this->Epiphany = strtoupper($value);
-                        } else {
-                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: " . implode(', ', Epiphany::$values);
-                            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-                        }
+                        $this->validateEpiphanyParam($value);
                         break;
                     case "ascension":
-                        if (Ascension::isValid(strtoupper($value))) {
-                            $this->Ascension = strtoupper($value);
-                        } else {
-                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: " . implode(', ', Ascension::$values);
-                            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-                        }
+                        $this->validateAscensionParam($value);
                         break;
                     case "corpuschristi":
-                        if (CorpusChristi::isValid(strtoupper($value))) {
-                            $this->CorpusChristi = strtoupper($value);
-                        } else {
-                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: " . implode(', ', CorpusChristi::$values);
-                            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-                        }
+                        $this->validateCorpusChristiParam($value);
                         break;
                     case "locale":
-                        if ($value !== 'LA' && $value !== 'la') {
-                            $value = \Locale::canonicalize($value);
-                        }
-                        if (LitLocale::isValid($value)) {
-                            $this->Locale = $value;
-                        } else {
-                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: LA, " . implode(', ', LitLocale::$AllAvailableLocales);
-                            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-                        }
+                        $this->validateLocaleParam($value);
                         break;
                     case "returntype":
-                        if (ReturnType::isValid(strtoupper($value))) {
-                            $this->ReturnType = strtoupper($value);
-                        } else {
-                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: " . implode(', ', ReturnType::$values);
-                            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-                        }
+                        $this->validateReturnTypeParam($value);
                         break;
                     case "nationalcalendar":
-                        if (in_array($value, $this->calendars->national_calendars_keys)) {
-                            $this->NationalCalendar = $value;
-                        } else {
-                            $validVals = implode(', ', $this->calendars->national_calendars);
-                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: $validVals.";
-                            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-                        }
+                        $this->validateNationalCalendarParam($value);
                         break;
                     case "diocesancalendar":
-                        if (in_array($value, $this->calendars->diocesan_calendars_keys)) {
-                            $this->DiocesanCalendar = $value;
-                        } else {
-                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: "
-                                . implode(', ', $this->calendars->diocesan_calendars_keys);
-                            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-                        }
+                        $this->validateDiocesanCalendarParam($value);
                         break;
                     case "calendartype":
-                        if (CalendarType::isValid(strtoupper($value))) {
-                            $this->CalendarType = strtoupper($value);
-                        } else {
-                            $description = "Invalid value `{$value}` for parameter `$key`, valid values are: " . implode(', ', CalendarType::$values);
-                            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-                        }
+                        $this->validateCalendarTypeParam($value);
                         break;
                     case "eternalhighpriest":
-                        if (gettype($value) !== 'boolean') {
-                            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-                            if (null === $value) {
-                                $description = "Invalid value for parameter `$key`, valid values are boolean `true` and `false`";
-                                Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-                            }
-                        }
-                        $this->EternalHighPriest = $value;
+                        $this->validateEternalHighPriestParam($value);
                         break;
                 }
             }
         }
     }
 
-    private function enforceYearValidity(int|string $value)
+    private function validateYearParam(int|string $value)
     {
         if (gettype($value) === 'string') {
             if (is_numeric($value) && ctype_digit($value) && strlen($value) === 4) {
@@ -197,12 +150,109 @@ class CalendarParams
         } elseif (gettype($value) === 'integer') {
             $this->Year = $value;
         } else {
-            $description = 'Year parameter must be of type Integer or numeric String, instead it was of type ' . gettype($value);
+            $description = 'Parameter `year` must be of type Integer or numeric String, instead it was of type ' . gettype($value);
             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
         }
         if ($this->Year < self::YEAR_LOWER_LIMIT || $this->Year > self::YEAR_UPPER_LIMIT) {
-            $description = 'Year parameter out of bounds, must have a value betwen ' . self::YEAR_LOWER_LIMIT . ' and ' . self::YEAR_UPPER_LIMIT;
+            $description = 'Parameter `year` out of bounds, must have a value betwen ' . self::YEAR_LOWER_LIMIT . ' and ' . self::YEAR_UPPER_LIMIT;
             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
         }
+    }
+
+    private function validateEpiphanyParam(string $value)
+    {
+        if (Epiphany::isValid(strtoupper($value))) {
+            $this->Epiphany = strtoupper($value);
+        } else {
+            $description = "Invalid value `{$value}` for parameter `epiphany`, valid values are: " . implode(', ', Epiphany::$values);
+            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+        }
+    }
+
+    private function validateAscensionParam(string $value)
+    {
+        if (Ascension::isValid(strtoupper($value))) {
+            $this->Ascension = strtoupper($value);
+        } else {
+            $description = "Invalid value `{$value}` for parameter `ascension`, valid values are: " . implode(', ', Ascension::$values);
+            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+        }
+    }
+
+    private function validateCorpusChristiParam(string $value)
+    {
+        if (CorpusChristi::isValid(strtoupper($value))) {
+            $this->CorpusChristi = strtoupper($value);
+        } else {
+            $description = "Invalid value `{$value}` for parameter `corpus_christi`, valid values are: " . implode(', ', CorpusChristi::$values);
+            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+        }
+    }
+
+    private function validateLocaleParam(string $value)
+    {
+        if ($value !== 'LA' && $value !== 'la') {
+            $value = \Locale::canonicalize($value);
+        }
+        if (LitLocale::isValid($value)) {
+            $this->Locale = $value;
+        } else {
+            $description = "Invalid value `{$value}` for parameter `locale`, valid values are: LA, " . implode(', ', LitLocale::$AllAvailableLocales);
+            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+        }
+    }
+
+    private function validateReturnTypeParam(string $value)
+    {
+        if (ReturnType::isValid(strtoupper($value))) {
+            $this->ReturnType = strtoupper($value);
+        } else {
+            $description = "Invalid value `{$value}` for parameter `return_type`, valid values are: " . implode(', ', ReturnType::$values);
+            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+        }
+    }
+
+    private function validateNationalCalendarParam(string $value)
+    {
+        if (in_array($value, $this->calendars->national_calendars_keys)) {
+            $this->NationalCalendar = $value;
+        } else {
+            $validVals = implode(', ', $this->calendars->national_calendars);
+            $description = "Invalid National calendar `{$value}`, valid national calendars are: $validVals.";
+            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+        }
+    }
+
+    private function validateDiocesanCalendarParam(string $value)
+    {
+        if (in_array($value, $this->calendars->diocesan_calendars_keys)) {
+            $this->DiocesanCalendar = $value;
+        } else {
+            $description = "Invalid Diocesan calendar `{$value}`, valid diocesan calendars are: "
+                . implode(', ', $this->calendars->diocesan_calendars_keys);
+            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+        }
+    }
+
+    private function validateCalendarTypeParam(string $value)
+    {
+        if (CalendarType::isValid(strtoupper($value))) {
+            $this->CalendarType = strtoupper($value);
+        } else {
+            $description = "Invalid value `{$value}` for parameter `calendar_type`, valid values are: " . implode(', ', CalendarType::$values);
+            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+        }
+    }
+
+    private function validateEternalHighPriestParam(mixed $value)
+    {
+        if (gettype($value) !== 'boolean') {
+            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if (null === $value) {
+                $description = "Invalid value for parameter `eternal_high_priest`, valid values are boolean `true` and `false`";
+                Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+            }
+        }
+        $this->EternalHighPriest = $value;
     }
 }
