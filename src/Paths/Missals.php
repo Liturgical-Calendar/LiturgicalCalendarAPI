@@ -17,64 +17,84 @@ class Missals
     public static object $missalsIndex;
     private static array $requestPathParts = [];
 
+    private static function initPayloadFromRequestBody(): ?object
+    {
+        $payload = null;
+        switch (self::$APICore->getRequestContentType()) {
+            case RequestContentType::JSON:
+                $payload = self::$APICore->retrieveRequestParamsFromJsonBody();
+                break;
+            case RequestContentType::YAML:
+                $payload = self::$APICore->retrieveRequestParamsFromYamlBody();
+                break;
+            case RequestContentType::FORMDATA:
+                $payload = (object)$_POST;
+                break;
+            default:
+                if (in_array(self::$APICore->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
+                    // the payload MUST be in the body of the request, either JSON encoded or YAML encoded
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Expected payload in body of request, either JSON encoded or YAML encoded");
+                }
+        }
+        return $payload;
+    }
+
+    private static function handlePostPayload(?object $payload): array
+    {
+        $data = [];
+        if ($payload !== null && property_exists($payload, 'locale')) {
+            $data["LOCALE"] = $payload->locale;
+        } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+            if ($locale && LitLocale::isValid($locale)) {
+                $data["LOCALE"] = $locale;
+            } else {
+                $data["LOCALE"] = LitLocale::LATIN;
+            }
+        }
+        if (property_exists($payload, 'region')) {
+            $data["REGION"] = $payload->region;
+        }
+        if (property_exists($payload, 'year')) {
+            $data["YEAR"] = $payload->year;
+        }
+        return $data;
+    }
+
+    private static function handleGetPayload(): array
+    {
+        $data = [];
+        if (isset($_GET['locale'])) {
+            $data["LOCALE"] = $_GET['locale'];
+        } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+            if ($locale && LitLocale::isValid($locale)) {
+                $data["LOCALE"] = $locale;
+            } else {
+                $data["LOCALE"] = LitLocale::LATIN;
+            }
+        }
+        if (isset($_GET['region'])) {
+            $data["REGION"] = $_GET["region"];
+        }
+        if (isset($_GET['year'])) {
+            $data["YEAR"] = $_GET['year'];
+        }
+        return $data;
+    }
+
     private static function initRequestParams(): array
     {
         $data = [];
         if (in_array(self::$APICore->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH])) {
-            $payload = null;
-            switch (self::$APICore->getRequestContentType()) {
-                case RequestContentType::JSON:
-                    $payload = self::$APICore->retrieveRequestParamsFromJsonBody();
-                    break;
-                case RequestContentType::YAML:
-                    $payload = self::$APICore->retrieveRequestParamsFromYamlBody();
-                    break;
-                case RequestContentType::FORMDATA:
-                    $payload = (object)$_POST;
-                    break;
-                default:
-                    if (in_array(self::$APICore->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
-                        // the payload MUST be in the body of the request, either JSON encoded or YAML encoded
-                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Expected payload in body of request, either JSON encoded or YAML encoded");
-                    }
-            }
+            $payload = self::initPayloadFromRequestBody();
             if (self::$APICore->getRequestMethod() === RequestMethod::POST) {
-                if ($payload !== null && property_exists($payload, 'locale')) {
-                    $data["LOCALE"] = $payload->locale;
-                } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-                    $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-                    if ($locale && LitLocale::isValid($locale)) {
-                        $data["LOCALE"] = $locale;
-                    } else {
-                        $data["LOCALE"] = LitLocale::LATIN;
-                    }
-                }
-                if (property_exists($payload, 'region')) {
-                    $data["REGION"] = $payload->region;
-                }
-                if (property_exists($payload, 'year')) {
-                    $data["YEAR"] = $payload->year;
-                }
+                $data = self::handlePostPayload($payload);
             } else {
                 $data["PAYLOAD"] = $payload;
             }
         } elseif (self::$APICore->getRequestMethod() === RequestMethod::GET) {
-            if (isset($_GET['locale'])) {
-                $data["LOCALE"] = $_GET['locale'];
-            } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-                $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-                if ($locale && LitLocale::isValid($locale)) {
-                    $data["LOCALE"] = $locale;
-                } else {
-                    $data["LOCALE"] = LitLocale::LATIN;
-                }
-            }
-            if (isset($_GET['region'])) {
-                $data["REGION"] = $_GET["region"];
-            }
-            if (isset($_GET['year'])) {
-                $data["YEAR"] = $_GET['year'];
-            }
+            $data = self::handleGetPayload();
         }
         return $data;
     }
