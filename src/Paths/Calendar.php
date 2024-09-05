@@ -245,7 +245,7 @@ class Calendar
         die();
     }
 
-    private function initParamsFromRequestBody()
+    private function initParamsFromRequestBodyOrUrl()
     {
         if (self::$APICore->getRequestContentType() === RequestContentType::JSON) {
             $data = self::$APICore->retrieveRequestParamsFromJsonBody(true);
@@ -277,7 +277,7 @@ class Calendar
     private function initParameterData(array $requestPathParts = [])
     {
         // first we try initialize settings from the request body or from the url parameters
-        $this->initParamsFromRequestBody();
+        $this->initParamsFromRequestBodyOrUrl();
 
         // then we check if there are parameters that can be set from the path,
         // which will have precedence over body or url params
@@ -1947,139 +1947,150 @@ class Calendar
         return $coincidence;
     }
 
-    private function createFestivityFromDecree(object $row): void
+    private function handleFestivityDecreeTypeMobile(object $row): void
     {
-        if ($row->festivity->type === "mobile") {
-            //we won't have a date defined for mobile festivites, we'll have to calculate them here case by case
-            //otherwise we'll have to create a language that we can interpret in an automated fashion...
-            //for example we can use strtotime
-            if (property_exists($row->metadata, 'strtotime')) {
-                switch (gettype($row->metadata->strtotime)) {
-                    case 'object':
-                        if (
-                            property_exists($row->metadata->strtotime, 'day_of_the_week')
-                            && property_exists($row->metadata->strtotime, 'relative_time')
-                            && property_exists($row->metadata->strtotime, 'festivity_key')
-                        ) {
-                            $festivity = $this->Cal->getFestivity($row->metadata->strtotime->festivity_key);
-                            if ($festivity !== null) {
-                                $relString = '';
-                                $row->festivity->date = clone( $festivity->date );
-                                switch ($row->metadata->strtotime->relative_time) {
-                                    case 'before':
-                                        $row->festivity->date->modify("previous {$row->metadata->strtotime->day_of_the_week}");
-                                         /**translators: e.g. 'Monday before Palm Sunday' */
-                                        $relString = _('before');
-                                        break;
-                                    case 'after':
-                                        $row->festivity->date->modify("next {$row->metadata->strtotime->day_of_the_week}");
-                                        /**translators: e.g. 'Monday after Pentecost' */
-                                        $relString = _('after');
-                                        break;
-                                    default:
-                                        $this->Messages[] = sprintf(
-                                            /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
-                                            _('Cannot create mobile festivity \'%1$s\': can only be relative to festivity with key \'%2$s\' using keywords %3$s'),
-                                            $row->festivity->name,
-                                            $row->metadata->strtotime->festivity_key,
-                                            implode(', ', ['\'before\'', '\'after\''])
-                                        );
-                                        break;
-                                }
-                                $dayOfTheWeek = $this->CalendarParams->Locale === LitLocale::LATIN
-                                    ? LitMessages::LATIN_DAYOFTHEWEEK[ $row->festivity->date->format('w') ]
-                                    : ucfirst($this->dayOfTheWeek->format($row->festivity->date->format('U')));
-                                $row->metadata->added_when = $dayOfTheWeek . ' ' . $relString . ' ' . $festivity->name;
-                                if (true === $this->checkCoincidencesNewMobileFestivity($row)) {
-                                    $this->createMobileFestivity($row);
-                                }
-                            } else {
-                                $this->Messages[] = sprintf(
-                                    /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
-                                    _('Cannot create mobile festivity \'%1$s\' relative to festivity with key \'%2$s\''),
-                                    $row->festivity->name,
-                                    $row->metadata->strtotime->festivity_key
-                                );
+        //we won't have a date defined for mobile festivites, we'll have to calculate them here case by case
+        //otherwise we'll have to create a language that we can interpret in an automated fashion...
+        //for example we can use strtotime
+        if (property_exists($row->metadata, 'strtotime')) {
+            switch (gettype($row->metadata->strtotime)) {
+                case 'object':
+                    if (
+                        property_exists($row->metadata->strtotime, 'day_of_the_week')
+                        && property_exists($row->metadata->strtotime, 'relative_time')
+                        && property_exists($row->metadata->strtotime, 'festivity_key')
+                    ) {
+                        $festivity = $this->Cal->getFestivity($row->metadata->strtotime->festivity_key);
+                        if ($festivity !== null) {
+                            $relString = '';
+                            $row->festivity->date = clone( $festivity->date );
+                            switch ($row->metadata->strtotime->relative_time) {
+                                case 'before':
+                                    $row->festivity->date->modify("previous {$row->metadata->strtotime->day_of_the_week}");
+                                        /**translators: e.g. 'Monday before Palm Sunday' */
+                                    $relString = _('before');
+                                    break;
+                                case 'after':
+                                    $row->festivity->date->modify("next {$row->metadata->strtotime->day_of_the_week}");
+                                    /**translators: e.g. 'Monday after Pentecost' */
+                                    $relString = _('after');
+                                    break;
+                                default:
+                                    $this->Messages[] = sprintf(
+                                        /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
+                                        _('Cannot create mobile festivity \'%1$s\': can only be relative to festivity with key \'%2$s\' using keywords %3$s'),
+                                        $row->festivity->name,
+                                        $row->metadata->strtotime->festivity_key,
+                                        implode(', ', ['\'before\'', '\'after\''])
+                                    );
+                                    break;
                             }
-                        } else {
-                            $this->Messages[] = sprintf(
-                                /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created 2. list of properties */
-                                _('Cannot create mobile festivity \'%1$s\': when the \'strtotime\' property is an object, it must have properties %2$s'),
-                                $row->festivity->name,
-                                implode(', ', ['\'day_of_the_week\'', '\'relative_time\'', '\'festivity_key\''])
-                            );
-                        }
-                        break;
-                    case 'string':
-                        if ($row->metadata->strtotime !== '') {
-                            $festivityDateTS = strtotime($row->metadata->strtotime . ' ' . $this->CalendarParams->Year . ' UTC');
-                            $row->festivity->date = new DateTime("@$festivityDateTS");
-                            $row->festivity->date->setTimeZone(new \DateTimeZone('UTC'));
-                            $row->metadata->added_when = $row->metadata->strtotime;
+                            $dayOfTheWeek = $this->CalendarParams->Locale === LitLocale::LATIN
+                                ? LitMessages::LATIN_DAYOFTHEWEEK[ $row->festivity->date->format('w') ]
+                                : ucfirst($this->dayOfTheWeek->format($row->festivity->date->format('U')));
+                            $row->metadata->added_when = $dayOfTheWeek . ' ' . $relString . ' ' . $festivity->name;
                             if (true === $this->checkCoincidencesNewMobileFestivity($row)) {
                                 $this->createMobileFestivity($row);
                             }
+                        } else {
+                            $this->Messages[] = sprintf(
+                                /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
+                                _('Cannot create mobile festivity \'%1$s\' relative to festivity with key \'%2$s\''),
+                                $row->festivity->name,
+                                $row->metadata->strtotime->festivity_key
+                            );
                         }
-                        break;
-                    default:
+                    } else {
                         $this->Messages[] = sprintf(
-                            /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created */
-                            _('Cannot create mobile festivity \'%1$s\': \'strtotime\' property must be either an object or a string! Currently it has type \'%2$s\''),
+                            /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created 2. list of properties */
+                            _('Cannot create mobile festivity \'%1$s\': when the \'strtotime\' property is an object, it must have properties %2$s'),
                             $row->festivity->name,
-                            gettype($row->metadata->strtotime)
+                            implode(', ', ['\'day_of_the_week\'', '\'relative_time\'', '\'festivity_key\''])
                         );
-                }
-            } else {
-                $this->Messages[] = sprintf(
-                    /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created */
-                    _('Cannot create mobile festivity \'%1$s\' without a \'strtotime\' property!'),
-                    $row->festivity->name
-                );
+                    }
+                    break;
+                case 'string':
+                    if ($row->metadata->strtotime !== '') {
+                        $festivityDateTS = strtotime($row->metadata->strtotime . ' ' . $this->CalendarParams->Year . ' UTC');
+                        $row->festivity->date = new DateTime("@$festivityDateTS");
+                        $row->festivity->date->setTimeZone(new \DateTimeZone('UTC'));
+                        $row->metadata->added_when = $row->metadata->strtotime;
+                        if (true === $this->checkCoincidencesNewMobileFestivity($row)) {
+                            $this->createMobileFestivity($row);
+                        }
+                    }
+                    break;
+                default:
+                    $this->Messages[] = sprintf(
+                        /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created */
+                        _('Cannot create mobile festivity \'%1$s\': \'strtotime\' property must be either an object or a string! Currently it has type \'%2$s\''),
+                        $row->festivity->name,
+                        gettype($row->metadata->strtotime)
+                    );
             }
         } else {
-            $row->festivity->date = DateTime::createFromFormat(
-                '!j-n-Y',
-                "{$row->festivity->day}-{$row->festivity->month}-{$this->CalendarParams->Year}",
-                new \DateTimeZone('UTC')
+            $this->Messages[] = sprintf(
+                /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created */
+                _('Cannot create mobile festivity \'%1$s\' without a \'strtotime\' property!'),
+                $row->festivity->name
             );
-            $decree = $this->elaborateDecreeSource($row);
-            $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
-            if ($row->festivity->grade === LitGrade::MEMORIAL_OPT) {
-                if ($this->Cal->notInSolemnitiesFeastsOrMemorials($row->festivity->date)) {
-                    $festivity = new Festivity(
-                        $row->festivity->name,
-                        $row->festivity->date,
-                        $row->festivity->color,
-                        LitFeastType::FIXED,
-                        $row->festivity->grade,
-                        $row->festivity->common
-                    );
-                    $this->Cal->addFestivity($row->festivity->event_key, $festivity);
-                    $this->Messages[] = sprintf(
-                        /**translators:
-                         * 1. Grade or rank of the festivity
-                         * 2. Name of the festivity
-                         * 3. Day of the festivity
-                         * 4. Year from which the festivity has been added
-                         * 5. Source of the information
-                         * 6. Requested calendar year
-                         */
-                        _('The %1$s \'%2$s\' has been added on %3$s since the year %4$d (%5$s), applicable to the year %6$d.'),
-                        $this->LitGrade->i18n($row->festivity->grade, false),
-                        $row->festivity->name,
-                        $locale === LitLocale::LATIN
-                            ? ( $row->festivity->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->festivity->date->format('n') ] )
-                            : ( $locale === 'EN' ? $row->festivity->date->format('F jS') :
-                                $this->dayAndMonth->format($row->festivity->date->format('U'))
-                            ),
-                        $row->metadata->since_year,
-                        $decree,
-                        $this->CalendarParams->Year
-                    );
-                } else {
-                    $this->handleCoincidenceDecree($row);
-                }
+        }
+    }
+
+    private function handleFestivityDecreeTypeFixed(object $row): void
+    {
+        $row->festivity->date = DateTime::createFromFormat(
+            '!j-n-Y',
+            "{$row->festivity->day}-{$row->festivity->month}-{$this->CalendarParams->Year}",
+            new \DateTimeZone('UTC')
+        );
+        $decree = $this->elaborateDecreeSource($row);
+        $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
+        if ($row->festivity->grade === LitGrade::MEMORIAL_OPT) {
+            if ($this->Cal->notInSolemnitiesFeastsOrMemorials($row->festivity->date)) {
+                $festivity = new Festivity(
+                    $row->festivity->name,
+                    $row->festivity->date,
+                    $row->festivity->color,
+                    LitFeastType::FIXED,
+                    $row->festivity->grade,
+                    $row->festivity->common
+                );
+                $this->Cal->addFestivity($row->festivity->event_key, $festivity);
+                $this->Messages[] = sprintf(
+                    /**translators:
+                     * 1. Grade or rank of the festivity
+                     * 2. Name of the festivity
+                     * 3. Day of the festivity
+                     * 4. Year from which the festivity has been added
+                     * 5. Source of the information
+                     * 6. Requested calendar year
+                     */
+                    _('The %1$s \'%2$s\' has been added on %3$s since the year %4$d (%5$s), applicable to the year %6$d.'),
+                    $this->LitGrade->i18n($row->festivity->grade, false),
+                    $row->festivity->name,
+                    $locale === LitLocale::LATIN
+                        ? ( $row->festivity->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->festivity->date->format('n') ] )
+                        : ( $locale === 'EN' ? $row->festivity->date->format('F jS') :
+                            $this->dayAndMonth->format($row->festivity->date->format('U'))
+                        ),
+                    $row->metadata->since_year,
+                    $decree,
+                    $this->CalendarParams->Year
+                );
+            } else {
+                $this->handleCoincidenceDecree($row);
             }
+        }
+    }
+
+    private function createFestivityFromDecree(object $row): void
+    {
+        $festivityType = $row->festivity->type;
+        if ("mobile" === $festivityType) {
+            $this->handleFestivityDecreeTypeMobile($row);
+        } else {
+            $this->handleFestivityDecreeTypeFixed($row);
         }
     }
 
