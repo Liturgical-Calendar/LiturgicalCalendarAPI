@@ -274,13 +274,8 @@ class Calendar
         }
     }
 
-    private function initParameterData(array $requestPathParts = [])
+    private function initParamsFromRequestPath(array $requestPathParts)
     {
-        // first we try initialize settings from the request body or from the url parameters
-        $this->initParamsFromRequestBodyOrUrl();
-
-        // then we check if there are parameters that can be set from the path,
-        // which will have precedence over body or url params
         $numPathParts = count($requestPathParts);
         if ($numPathParts > 0) {
             $DATA = [];
@@ -337,22 +332,22 @@ class Calendar
                 $this->CalendarParams->setData($DATA);
             }
         }
+    }
+
+    private function initReturnType()
+    {
         if ($this->CalendarParams->ReturnType !== null) {
-            if (in_array($this->CalendarParams->ReturnType, $this->AllowedReturnTypes)) {
-                self::$APICore->setResponseContentType(
-                    self::$APICore->getAllowedAcceptHeaders()[ array_search($this->CalendarParams->ReturnType, $this->AllowedReturnTypes) ]
-                );
-            } else {
+            if (false === in_array($this->CalendarParams->ReturnType, $this->AllowedReturnTypes)) {
                 $description = "You are requesting a content type which this API cannot produce. Allowed content types are "
                     . implode(' and ', $this->AllowedReturnTypes)
                     . ', but you have issued a parameter requesting a Content Type of '
                     . strtoupper($this->CalendarParams->ReturnType);
                 self::produceErrorResponse(StatusCode::NOT_ACCEPTABLE, $description);
             }
+            self::$APICore->setResponseContentType(
+                self::$APICore->getAllowedAcceptHeaders()[ array_search($this->CalendarParams->ReturnType, $this->AllowedReturnTypes) ]
+            );
         } else {
-            // if the return type was not explicitly set through a parameter,
-            //   check if we have an accept header
-            //   and if not, use default value
             if (self::$APICore->hasAcceptHeader()) {
                 if (self::$APICore->isAllowedAcceptHeader()) {
                     $this->CalendarParams->ReturnType = $this->AllowedReturnTypes[ self::$APICore->getIdxAcceptHeaderInAllowed() ];
@@ -377,6 +372,13 @@ class Calendar
                 self::$APICore->setResponseContentType(self::$APICore->getAllowedAcceptHeaders()[ 0 ]);
             }
         }
+    }
+
+    private function initParameterData(array $requestPathParts = [])
+    {
+        $this->initParamsFromRequestBodyOrUrl();
+        $this->initParamsFromRequestPath($requestPathParts);
+        $this->initReturnType();
     }
 
     private function updateSettingsBasedOnNationalCalendar(): void
