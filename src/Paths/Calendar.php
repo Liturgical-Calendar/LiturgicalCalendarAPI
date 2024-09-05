@@ -3234,125 +3234,116 @@ class Calendar
         // see :SATURDAY_MEMORIAL_BVM
     }
 
-    private function interpretStrtotime(object $row): DateTime|false
+    private function validateStrToTime(object|string $strtotime): bool
+    {
+        if (is_string($strtotime)) {
+            return $strtotime !== '';
+        } elseif (is_object($strtotime)) {
+            return (
+                property_exists($strtotime, 'day_of_the_week')
+                && property_exists($strtotime, 'relative_time')
+                && property_exists($strtotime, 'festivity_key')
+            );
+        }
+        return false;
+    }
+
+    private function interpretStrtotime(object $row): ?DateTime
     {
         switch (gettype($row->metadata->strtotime)) {
             case 'object':
-                if (
-                    property_exists($row->metadata->strtotime, 'day_of_the_week')
-                    && property_exists($row->metadata->strtotime, 'relative_time')
-                    && property_exists($row->metadata->strtotime, 'festivity_key')
-                ) {
-                    $festivity = $this->Cal->getFestivity($row->metadata->strtotime->festivity_key);
-                    if ($festivity !== null) {
-                        //$relString = '';
-                        $DATE = clone( $festivity->date );
-                        switch ($row->metadata->strtotime->relative_time) {
-                            case 'before':
-                                $DATE->modify("previous {$row->metadata->strtotime->day_of_the_week}");
-                                    /**translators: e.g. 'Monday before Palm Sunday' */
-                                //$relString = _( 'before' );
-                                return $DATE;
-                                //break; //unnecessary seeing we are returning immediately
-                            case 'after':
-                                $DATE->modify("next {$row->metadata->strtotime->day_of_the_week}");
-                                /**translators: e.g. 'Monday after Pentecost' */
-                                //$relString = _( 'after' );
-                                return $DATE;
-                                //break; //unnecessary seeing we are returning immediately
-                            default:
-                                $this->Messages[] = sprintf(
-                                    /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
-                                    _('Cannot create mobile festivity \'%1$s\': can only be relative to festivity with key \'%2$s\' using keywords %3$s'),
-                                    $row->festivity->name,
-                                    $row->metadata->strtotime->festivity_key,
-                                    implode(', ', ['\'before\'', '\'after\''])
-                                );
-                                return false;
-                                //break; //unnecessary seeing we are returning immediately
-                        }
-                        /*
-                        $dayOfTheWeek = $this->CalendarParams->Locale === LitLocale::LATIN
-                            ? LitMessages::LATIN_DAYOFTHEWEEK[ $DATE->format( 'w' ) ]
-                            : ucfirst( $this->dayOfTheWeek->format( $row->festivity->date->format( 'U' ) ) );
-                        $row->metadata->added_when = $day_of_the_week . ' ' . $relString . ' ' . $festivity->name;
-                        if( true === $this->checkCoincidencesNewMobileFestivity( $row ) ) {
-                            $this->createMobileFestivity( $row );
-                        }
-                        */
-                    } else {
-                        $this->Messages[] = sprintf(
-                            /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
-                            _('Cannot create mobile festivity \'%1$s\' relative to festivity with key \'%2$s\''),
-                            $row->festivity->name,
-                            $row->metadata->strtotime->festivity_key
-                        );
-                        return false;
-                    }
-                } else {
+                if (false === $this->validateStrToTime($row->metadata->strtotime)) {
                     $this->Messages[] = sprintf(
                         /**translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created 2. list of properties */
                         _('Cannot create mobile festivity \'%1$s\': when the \'strtotime\' property is an object, it must have properties %2$s'),
                         $row->festivity->name,
                         implode(', ', ['\'day_of_the_week\'', '\'relative_time\'', '\'festivity_key\''])
                     );
-                    return false;
+                    return null;
                 }
+
+                $festivity = $this->Cal->getFestivity($row->metadata->strtotime->festivity_key);
+                if (null === $festivity) {
+                    $this->Messages[] = sprintf(
+                        /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
+                        _('Cannot create mobile festivity \'%1$s\' relative to festivity with key \'%2$s\''),
+                        $row->festivity->name,
+                        $row->metadata->strtotime->festivity_key
+                    );
+                    return null;
+                }
+
+                $DATE = clone( $festivity->date );
+                switch ($row->metadata->strtotime->relative_time) {
+                    case 'before':
+                        $DATE->modify("previous {$row->metadata->strtotime->day_of_the_week}");
+                        return $DATE;
+                    case 'after':
+                        $DATE->modify("next {$row->metadata->strtotime->day_of_the_week}");
+                        return $DATE;
+                    default:
+                        $this->Messages[] = sprintf(
+                            /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
+                            _('Cannot create mobile festivity \'%1$s\': can only be relative to festivity with key \'%2$s\' using keywords %3$s'),
+                            $row->festivity->name,
+                            $row->metadata->strtotime->festivity_key,
+                            implode(', ', ['\'before\'', '\'after\''])
+                        );
+                        return false;
+                }
+
                 break;
             case 'string':
-                if ($row->metadata->strtotime !== '') {
-                    if (preg_match('/(before|after)/', $row->metadata->strtotime) !== false && preg_match('/(before|after)/', $row->metadata->strtotime) !== 0) {
-                        $match = preg_split('/(before|after)/', $row->metadata->strtotime, -1, PREG_SPLIT_DELIM_CAPTURE);
-                        if ($match !== false && count($match) === 3) {
-                            $festivityDateTS = strtotime($match[2] . ' ' . $this->CalendarParams->Year . ' UTC');
-                            if ($festivityDateTS !== false) {
-                                $DATE = new DateTime("@$festivityDateTS");
-                                $DATE->setTimeZone(new \DateTimeZone('UTC'));
-                                if ($match[1] === 'before') {
-                                    $DATE->modify("previous {$match[0]}");
-                                } elseif ($match[1] === 'after') {
-                                    $DATE->modify("next {$match[0]}");
-                                }
-                                return $DATE;
-                            } else {
-                                $this->Messages[] = sprintf(
-                                    /**translators: Do not translate 'strtotime'! */
-                                    'Could not interpret the \'strtotime\' property with value %1$s into a timestamp',
-                                    $row->metadata->strtotime
-                                );
-                                return false;
-                            }
-                        } else {
-                            $this->Messages[] = sprintf(
-                                /**translators: Do not translate 'strtotime'! */
-                                'Could not interpret the \'strtotime\' property with value %1$s into a timestamp. Splitting failed: %2$s',
-                                $row->metadata->strtotime,
-                                json_encode($match)
-                            );
-                            return false;
-                        }
-                    } else {
-                        $festivityDateTS = strtotime($row->metadata->strtotime . ' ' . $this->CalendarParams->Year . ' UTC');
-                        if ($festivityDateTS !== false) {
-                            $DATE = new DateTime("@$festivityDateTS");
-                            $DATE->setTimeZone(new \DateTimeZone('UTC'));
-                            //$row->metadata->added_when = $row->metadata->strtotime;
-                            /*if( true === $this->checkCoincidencesNewMobileFestivity( $row ) ) {
-                                $this->createMobileFestivity( $row );
-                            }*/
-                            return $DATE;
-                        } else {
-                            $this->Messages[] = sprintf(
-                                /**translators: Do not translate 'strtotime'! */
-                                'Could not interpret the \'strtotime\' property with value %1$s into a timestamp',
-                                $row->metadata->strtotime
-                            );
-                            return false;
-                        }
-                    }
-                } else {
-                    return false;
+                if (false === $this->validateStrToTime($row->metadata->strtotime)) {
+                    return null;
                 }
+
+                if (preg_match('/(before|after)/', $row->metadata->strtotime)) {
+                    $match = preg_split('/(before|after)/', $row->metadata->strtotime, -1, PREG_SPLIT_DELIM_CAPTURE);
+                    if (false === $match || count($match) !== 3) {
+                        $this->Messages[] = sprintf(
+                            /**translators: Do not translate 'strtotime'! */
+                            'Could not interpret the \'strtotime\' property with value %1$s into a timestamp. Splitting failed: %2$s',
+                            $row->metadata->strtotime,
+                            json_encode($match)
+                        );
+                        return null;
+                    }
+
+                    $festivityDateTS = strtotime($match[2] . ' ' . $this->CalendarParams->Year . ' UTC');
+                    if (false === $festivityDateTS) {
+                        $this->Messages[] = sprintf(
+                            /**translators: Do not translate 'strtotime'! */
+                            'Could not interpret the \'strtotime\' property with value %1$s into a timestamp',
+                            $row->metadata->strtotime
+                        );
+                        return null;
+                    }
+
+                    $DATE = new DateTime("@$festivityDateTS");
+                    $DATE->setTimeZone(new \DateTimeZone('UTC'));
+                    if ($match[1] === 'before') {
+                        $DATE->modify("previous {$match[0]}");
+                    } elseif ($match[1] === 'after') {
+                        $DATE->modify("next {$match[0]}");
+                    }
+                    return $DATE;
+                } else {
+                    $festivityDateTS = strtotime($row->metadata->strtotime . ' ' . $this->CalendarParams->Year . ' UTC');
+                    if (false === $festivityDateTS) {
+                        $this->Messages[] = sprintf(
+                            /**translators: Do not translate 'strtotime'! */
+                            'Could not interpret the \'strtotime\' property with value %1$s into a timestamp',
+                            $row->metadata->strtotime
+                        );
+                        return null;
+                    }
+
+                    $DATE = new DateTime("@$festivityDateTS");
+                    $DATE->setTimeZone(new \DateTimeZone('UTC'));
+                    return $DATE;
+                }
+
                 break;
             default:
                 $this->Messages[] = sprintf(
