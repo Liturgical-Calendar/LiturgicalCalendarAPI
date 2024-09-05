@@ -245,7 +245,7 @@ class Calendar
         die();
     }
 
-    private function initParameterData(array $requestPathParts = [])
+    private function initParamsFromRequestBody()
     {
         if (self::$APICore->getRequestContentType() === RequestContentType::JSON) {
             $data = self::$APICore->retrieveRequestParamsFromJsonBody(true);
@@ -272,7 +272,15 @@ class Calendar
                     self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, $description);
             }
         }
-        // path will have precedence over params
+    }
+
+    private function initParameterData(array $requestPathParts = [])
+    {
+        // first we try initialize settings from the request body or from the url parameters
+        $this->initParamsFromRequestBody();
+
+        // then we check if there are parameters that can be set from the path,
+        // which will have precedence over body or url params
         $numPathParts = count($requestPathParts);
         if ($numPathParts > 0) {
             $DATA = [];
