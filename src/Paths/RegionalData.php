@@ -130,6 +130,108 @@ class RegionalData
         }
     }
 
+    private function handleNationalCalendarWrite()
+    {
+        $response = new \stdClass();
+        $region = $this->params->payload->metadata->region;
+        if ($region === 'UNITED STATES') {
+            $region = 'USA';
+        }
+        $path = "nations/{$region}";
+        if (!file_exists($path)) {
+            mkdir($path, 0755, true);
+        }
+
+        $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::NATIONAL);
+        if ($test === true) {
+            $data = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            file_put_contents($path . "/{$region}.json", $data . PHP_EOL);
+            $response->success = "Calendar data created or updated for Nation \"{$this->params->payload->metadata->region}\"";
+            self::produceResponse(json_encode($response));
+        } else {
+            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+        }
+    }
+
+    private function handleWiderRegionCalendarWrite()
+    {
+        $response = new \stdClass();
+        $this->params->payload->metadata->wider_region = ucfirst(strtolower($this->params->payload->metadata->wider_region));
+        $widerRegion = strtoupper($this->params->payload->metadata->wider_region);
+        if ($this->params->payload->metadata->multilingual === true) {
+            $path = "nations/{$widerRegion}";
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+            $translationJSON = new \stdClass();
+            foreach ($this->params->payload->litcal as $CalEvent) {
+                $translationJSON->{ $CalEvent->festivity->event_key } = '';
+            }
+            if (count($this->params->payload->netadata->languages) > 0) {
+                foreach ($this->params->payload->metadata->languages as $iso) {
+                    if (!file_exists("nations/{$widerRegion}/{$iso}.json")) {
+                        file_put_contents(
+                            "nations/{$widerRegion}/{$iso}.json",
+                            json_encode($translationJSON, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+                        );
+                    }
+                }
+            }
+        }
+
+        $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::WIDERREGION);
+        if ($test === true) {
+            $data = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            file_put_contents("nations/{$this->params->payload->metadata->wider_region}.json", $data . PHP_EOL);
+            $response->success = "Calendar data created or updated for Wider Region \"{$this->params->payload->metadata->wider_region}\"";
+            self::produceResponse(json_encode($response));
+        } else {
+            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+        }
+    }
+
+    private function handleDiocesanCalendarWrite()
+    {
+        $response = new \stdClass();
+        $updateData = new \stdClass();
+        $nationType = gettype($this->params->payload->nation);
+        $dioceseType = gettype($this->params->payload->diocese);
+        if ($nationType !== 'string' || $dioceseType !== 'string') {
+            self::produceErrorResponse(StatusCode::BAD_REQUEST, "Params `nation` and `diocese` in payload are expected to be of type string, instead `nation` was of type `{$nationType}` and `diocese` was of type `{$dioceseType}`");
+        }
+        $updateData->nation = strip_tags($this->params->payload->nation);
+        $updateData->diocese = strip_tags($this->params->payload->diocese);
+        $CalData = $this->params->payload->caldata;
+        if (false === $CalData instanceof \stdClass) {
+            $calType = gettype($CalData);
+            self::produceErrorResponse(StatusCode::BAD_REQUEST, "`caldata` param in payload expected to be serialized object, instead it was of type `{$calType}` after unserialization");
+        }
+        if (property_exists($this->params->payload, 'group')) {
+            $groupType = gettype($this->params->payload->group);
+            if ($groupType !== 'string') {
+                self::produceErrorResponse(StatusCode::BAD_REQUEST, "Param `group` in payload is expected to be of type `string`, instead it was of type `{$groupType}`");
+            }
+            $updateData->group = strip_tags($this->params->payload->group);
+        }
+        $updateData->path = "nations/{$updateData->nation}";
+        if (!file_exists($updateData->path)) {
+            mkdir($updateData->path, 0755, true);
+        }
+
+        $test = $this->validateDataAgainstSchema($CalData, LitSchema::DIOCESAN);
+        if ($test === true) {
+            $calendarData = json_encode($CalData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            file_put_contents(
+                $updateData->path . "/{$updateData->diocese}.json",
+                $calendarData . PHP_EOL
+            );
+            $this->createOrUpdateIndex($updateData);
+            $response->success = "Calendar data created or updated for Diocese \"{$updateData->diocese}\" (Nation: \"$updateData->nation\")";
+            self::produceResponse(json_encode($response));
+        } else {
+            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+        }
+    }
 
     /**
      * Function writeRegionalCalendar
@@ -138,101 +240,15 @@ class RegionalData
      */
     private function writeRegionalCalendar()
     {
-        $response = new \stdClass();
         switch ($this->params->category) {
             case 'NATIONALCALENDAR':
-                $region = $this->params->payload->metadata->region;
-                if ($region === 'UNITED STATES') {
-                    $region = 'USA';
-                }
-                $path = "nations/{$region}";
-                if (!file_exists($path)) {
-                    mkdir($path, 0755, true);
-                }
-
-                $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::NATIONAL);
-                if ($test === true) {
-                    $data = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                    file_put_contents($path . "/{$region}.json", $data . PHP_EOL);
-                    $response->success = "Calendar data created or updated for Nation \"{$this->params->payload->metadata->region}\"";
-                    self::produceResponse(json_encode($response));
-                } else {
-                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
-                }
+                $this->handleNationalCalendarWrite();
                 break;
             case 'WIDERREGIONCALENDAR':
-                $this->params->payload->metadata->wider_region = ucfirst(strtolower($this->params->payload->metadata->wider_region));
-                $widerRegion = strtoupper($this->params->payload->metadata->wider_region);
-                if ($this->params->payload->metadata->multilingual === true) {
-                    $path = "nations/{$widerRegion}";
-                    if (!file_exists($path)) {
-                        mkdir($path, 0755, true);
-                    }
-                    $translationJSON = new \stdClass();
-                    foreach ($this->params->payload->litcal as $CalEvent) {
-                        $translationJSON->{ $CalEvent->festivity->event_key } = '';
-                    }
-                    if (count($this->params->payload->netadata->languages) > 0) {
-                        foreach ($this->params->payload->metadata->languages as $iso) {
-                            if (!file_exists("nations/{$widerRegion}/{$iso}.json")) {
-                                file_put_contents(
-                                    "nations/{$widerRegion}/{$iso}.json",
-                                    json_encode($translationJSON, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
-                                );
-                            }
-                        }
-                    }
-                }
-
-                $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::WIDERREGION);
-                if ($test === true) {
-                    $data = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                    file_put_contents("nations/{$this->params->payload->metadata->wider_region}.json", $data . PHP_EOL);
-                    $response->success = "Calendar data created or updated for Wider Region \"{$this->params->payload->metadata->wider_region}\"";
-                    self::produceResponse(json_encode($response));
-                } else {
-                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
-                }
+                $this->handleWiderRegionCalendarWrite();
                 break;
             case 'DIOCESANCALENDAR':
-                $updateData = new \stdClass();
-                $nationType = gettype($this->params->payload->nation);
-                $dioceseType = gettype($this->params->payload->diocese);
-                if ($nationType !== 'string' || $dioceseType !== 'string') {
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Params `nation` and `diocese` in payload are expected to be of type string, instead `nation` was of type `{$nationType}` and `diocese` was of type `{$dioceseType}`");
-                }
-                $updateData->nation = strip_tags($this->params->payload->nation);
-                $updateData->diocese = strip_tags($this->params->payload->diocese);
-                $CalData = $this->params->payload->caldata;
-                if (false === $CalData instanceof \stdClass) {
-                    $calType = gettype($CalData);
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "`caldata` param in payload expected to be serialized object, instead it was of type `{$calType}` after unserialization");
-                }
-                if (property_exists($this->params->payload, 'group')) {
-                    $groupType = gettype($this->params->payload->group);
-                    if ($groupType !== 'string') {
-                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Param `group` in payload is expected to be of type `string`, instead it was of type `{$groupType}`");
-                    }
-                    $updateData->group = strip_tags($this->params->payload->group);
-                }
-                $updateData->path = "nations/{$updateData->nation}";
-                if (!file_exists($updateData->path)) {
-                    mkdir($updateData->path, 0755, true);
-                }
-
-                $test = $this->validateDataAgainstSchema($CalData, LitSchema::DIOCESAN);
-                if ($test === true) {
-                    $calendarData = json_encode($CalData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                    file_put_contents(
-                        $updateData->path . "/{$updateData->diocese}.json",
-                        $calendarData . PHP_EOL
-                    );
-                    $this->createOrUpdateIndex($updateData);
-                    $response->success = "Calendar data created or updated for Diocese \"{$updateData->diocese}\" (Nation: \"$updateData->nation\")";
-                    self::produceResponse(json_encode($response));
-                } else {
-                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
-                }
+                $this->handleDiocesanCalendarWrite();
         }
     }
 
