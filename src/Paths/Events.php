@@ -54,70 +54,86 @@ class Events
         }
     }
 
-    private function handleRequestParams(): void
+    private function validateRequestPathParams(): void
     {
-        if (count(self::$requestPathParts)) {
-            if (false === in_array(self::$requestPathParts[0], ['nation','diocese'])) {
-                echo self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "unknown resource path: " . self::$requestPathParts[0]);
-                die();
-            }
-            if (count(self::$requestPathParts) === 2) {
-                if (self::$requestPathParts[0] === "nation") {
-                    $data = [ "NATIONALCALENDAR" => self::$requestPathParts[1] ];
-                    if (false === $this->EventsParams->setData($data)) {
-                        echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
-                        die();
-                    }
-                } elseif (self::$requestPathParts[0] === "diocese") {
-                    $data = [ "DIOCESANCALENDAR" => self::$requestPathParts[1] ];
-                    if (false === $this->EventsParams->setData($data)) {
-                        echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
-                        die();
-                    }
-                } else {
-                    echo self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "unknown resource path: " . self::$requestPathParts[0]);
+        $data = null;
+        if (false === in_array(self::$requestPathParts[0], ['nation','diocese'])) {
+            echo self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "unknown resource path: " . self::$requestPathParts[0]);
+            die();
+        }
+        if (count(self::$requestPathParts) === 2) {
+            if (self::$requestPathParts[0] === "nation") {
+                $data = [ "NATIONALCALENDAR" => self::$requestPathParts[1] ];
+                if (false === $this->EventsParams->setData($data)) {
+                    echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
+                    die();
+                }
+            } elseif (self::$requestPathParts[0] === "diocese") {
+                $data = [ "DIOCESANCALENDAR" => self::$requestPathParts[1] ];
+                if (false === $this->EventsParams->setData($data)) {
+                    echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
                     die();
                 }
             } else {
-                $description = "wrong number of path parameters, needed two but got " . count(self::$requestPathParts) . ": [" . implode(',', self::$requestPathParts) . "]";
-                echo self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $description);
+                echo self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "unknown resource path: " . self::$requestPathParts[0]);
                 die();
             }
+        } else {
+            $description = "wrong number of path parameters, needed two but got " . count(self::$requestPathParts) . ": [" . implode(',', self::$requestPathParts) . "]";
+            echo self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $description);
+            die();
+        }
+    }
+
+    private function validatePostParams(): void
+    {
+        if (self::$APICore->getRequestContentType() === RequestContentType::JSON) {
+            $json = file_get_contents('php://input');
+            if (false !== $json && "" !== $json) {
+                $data = json_decode($json, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    $description = "Malformed JSON data received in the request: <$json>, " . json_last_error_msg();
+                    echo self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+                    die();
+                } else {
+                    if (false === $this->EventsParams->setData($data)) {
+                        echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
+                        die();
+                    }
+                }
+            }
+        } elseif (self::$APICore->getRequestContentType() === RequestContentType::FORMDATA) {
+            if (count($_POST)) {
+                if (false === $this->EventsParams->setData($_POST)) {
+                    echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
+                    die();
+                }
+            }
+        }
+    }
+
+    private function validateGetParams(): void
+    {
+        if (count($_GET)) {
+            if (false === $this->EventsParams->setData($_GET)) {
+                echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
+                die();
+            }
+        }
+    }
+
+    private function handleRequestParams(): void
+    {
+        if (count(self::$requestPathParts)) {
+            $this->validateRequestPathParams();
         }
 
         switch (self::$APICore->getRequestMethod()) {
             case RequestMethod::POST:
-                if (self::$APICore->getRequestContentType() === RequestContentType::JSON) {
-                    $json = file_get_contents('php://input');
-                    if (false !== $json && "" !== $json) {
-                        $data = json_decode($json, true);
-                        if (json_last_error() !== JSON_ERROR_NONE) {
-                            $description = "Malformed JSON data received in the request: <$json>, " . json_last_error_msg();
-                            echo self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-                            die();
-                        } else {
-                            if (false === $this->EventsParams->setData($data)) {
-                                echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
-                                die();
-                            }
-                        }
-                    }
-                } elseif (self::$APICore->getRequestContentType() === RequestContentType::FORMDATA) {
-                    if (count($_POST)) {
-                        if (false === $this->EventsParams->setData($_POST)) {
-                            echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
-                            die();
-                        }
-                    }
-                }
+                $this->validatePostParams();
                 break;
             case RequestMethod::GET:
-                if (count($_GET)) {
-                    if (false === $this->EventsParams->setData($_GET)) {
-                        echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
-                        die();
-                    }
-                }
+                $this->validateGetParams();
                 break;
             case RequestMethod::OPTIONS:
                 //continue
