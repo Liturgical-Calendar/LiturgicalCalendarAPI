@@ -33,7 +33,7 @@ class Health implements MessageComponentInterface
     private static function validateMessageProperties(object $message): bool
     {
         $valid = true;
-        foreach (self::ACTION_PROPERTIES[$message->action] as $prop) {
+        foreach (Health::ACTION_PROPERTIES[$message->action] as $prop) {
             if (false === property_exists($message, $prop)) {
                 return false;
             }
@@ -132,30 +132,24 @@ class Health implements MessageComponentInterface
         $this->clients = new \SplObjectStorage();
     }
 
-    private function executeValidation(object $validation, ConnectionInterface $to)
+    private static function retrieveSchemaForCategory(string $category, ?string $dataPath = null): ?string
     {
-        $dataPath = $validation->sourceFile;
-        switch ($validation->category) {
+        switch ($category) {
             case 'universalcalendar':
-                $schema = Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
-                break;
+                return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
             case 'nationalcalendar':
-                $schema = LitSchema::NATIONAL;
-                break;
+                return LitSchema::NATIONAL;
             case 'diocesancalendar':
-                $schema = LitSchema::DIOCESAN;
-                break;
+                return LitSchema::DIOCESAN;
             case 'widerregioncalendar':
-                $schema = LitSchema::WIDERREGION;
-                break;
+                return LitSchema::WIDERREGION;
             case 'propriumdesanctis':
-                $schema = LitSchema::PROPRIUMDESANCTIS;
-                break;
+                return LitSchema::PROPRIUMDESANCTIS;
             case 'resourceDataCheck':
                 if (
                     preg_match("/\/missals\/[_A-Z0-9]+$/", $dataPath)
                 ) {
-                    $schema = LitSchema::PROPRIUMDESANCTIS;
+                    return LitSchema::PROPRIUMDESANCTIS;
                 } elseif (
                     preg_match("/\/data\/(nation|diocese|widerregion)/", $dataPath, $matches)
                 ) {
@@ -171,11 +165,17 @@ class Health implements MessageComponentInterface
                             $schema = LitSchema::WIDERREGION;
                             break;
                     }
-                } else {
-                    $schema = Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
+                    return $schema;
                 }
-                break;
+                return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
         }
+        return null;
+    }
+
+    private function executeValidation(object $validation, ConnectionInterface $to)
+    {
+        $dataPath = $validation->sourceFile;
+        $schema = Health::retrieveSchemaForCategory($validation->category, $dataPath);
         $data = file_get_contents($dataPath);
         if ($data !== false) {
             $message = new \stdClass();
