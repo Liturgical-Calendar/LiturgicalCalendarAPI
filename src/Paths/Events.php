@@ -164,8 +164,8 @@ class Events
                         $this->EventsParams->Locale = self::$NationalData->settings->locale;
                     }
                     if (property_exists(self::$NationalData, "metadata") && property_exists(self::$NationalData->metadata, "wider_region")) {
-                        $widerRegionDataFile = self::$NationalData->metadata->wider_region->jsonFile;
-                        $widerRegionI18nFile = self::$NationalData->metadata->wider_region->i18nFile;
+                        $widerRegionDataFile = self::$NationalData->metadata->wider_region->json_file;
+                        $widerRegionI18nFile = self::$NationalData->metadata->wider_region->i18n_file;
                         if (file_exists($widerRegionI18nFile)) {
                             $widerRegionI18nData = json_decode(file_get_contents($widerRegionI18nFile));
                             if (json_last_error() === JSON_ERROR_NONE && file_exists($widerRegionDataFile)) {
