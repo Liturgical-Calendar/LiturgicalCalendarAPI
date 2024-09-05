@@ -145,7 +145,7 @@ class Events
                     die();
                 }
             } else {
-                $description = "uknown diocese `{$this->EventsParams->DiocesanCalendar}`, supported values are: ["
+                $description = "unknown diocese `{$this->EventsParams->DiocesanCalendar}`, supported values are: ["
                     . implode(',', array_keys(get_object_vars(self::$GeneralIndex))) . "]";
                 echo self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                 die();
@@ -160,19 +160,19 @@ class Events
             if (file_exists($nationalDataFile)) {
                 self::$NationalData = json_decode(file_get_contents($nationalDataFile));
                 if (json_last_error() === JSON_ERROR_NONE) {
-                    if (property_exists(self::$NationalData, "Settings") && property_exists(self::$NationalData->Settings, "Locale")) {
+                    if (property_exists(self::$NationalData, "settings") && property_exists(self::$NationalData->settings, "locale")) {
                         $this->EventsParams->Locale = self::$NationalData->Settings->Locale;
                     }
-                    if (property_exists(self::$NationalData, "Metadata") && property_exists(self::$NationalData->Metadata, "WiderRegion")) {
-                        $widerRegionDataFile = self::$NationalData->Metadata->WiderRegion->jsonFile;
-                        $widerRegionI18nFile = self::$NationalData->Metadata->WiderRegion->i18nFile;
+                    if (property_exists(self::$NationalData, "metadata") && property_exists(self::$NationalData->metadata, "wider_region")) {
+                        $widerRegionDataFile = self::$NationalData->metadata->wider_region->jsonFile;
+                        $widerRegionI18nFile = self::$NationalData->metadata->wider_region->i18nFile;
                         if (file_exists($widerRegionI18nFile)) {
                             $widerRegionI18nData = json_decode(file_get_contents($widerRegionI18nFile));
                             if (json_last_error() === JSON_ERROR_NONE && file_exists($widerRegionDataFile)) {
                                 self::$WiderRegionData = json_decode(file_get_contents($widerRegionDataFile));
                                 if (json_last_error() === JSON_ERROR_NONE && property_exists(self::$WiderRegionData, "litcal")) {
                                     foreach (self::$WiderRegionData->litcal as $idx => $value) {
-                                        $event_key = $value->Festivity->event_key;
+                                        $event_key = $value->festivity->event_key;
                                         self::$WiderRegionData->litcal[$idx]->festivity->name = $widerRegionI18nData->{ $event_key };
                                     }
                                 }
@@ -337,32 +337,31 @@ class Events
         if ($this->EventsParams->NationalCalendar !== null && self::$NationalData !== null) {
             if (self::$WiderRegionData !== null && property_exists(self::$WiderRegionData, "litcal")) {
                 foreach (self::$WiderRegionData->litcal as $row) {
-                    if ($row->Metadata->action === 'createNew') {
-                        $key = $row->Festivity->event_key;
+                    if ($row->metadata->action === 'createNew') {
+                        $key = $row->festivity->event_key;
                         self::$FestivityCollection[ $key ] = [];
-                        foreach ($row->Festivity as $prop => $value) {
+                        foreach ($row->festivity as $prop => $value) {
                             $prop = strtoupper($prop);
                             self::$FestivityCollection[ $key ][ $prop ] = $value;
                         }
-                        self::$FestivityCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($row->Festivity->grade, false);
-                        self::$FestivityCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c($row->Festivity->common);
+                        self::$FestivityCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($row->festivity->grade, false);
+                        self::$FestivityCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c($row->festivity->common);
                     }
                 }
             }
             foreach (self::$NationalData->litcal as $row) {
-                if ($row->Metadata->action === 'createNew') {
-                    $key = $row->Festivity->event_key;
-                    $temp = (array) $row->Festivity;
-                    self::$FestivityCollection[ $key ] = array_change_key_case($temp, CASE_UPPER);
-                    self::$FestivityCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($row->Festivity->grade, false);
-                    self::$FestivityCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c($row->Festivity->common);
+                if ($row->metadata->action === 'createNew') {
+                    $key = $row->festivity->event_key;
+                    self::$FestivityCollection[ $key ] = (array) $row->festivity;
+                    self::$FestivityCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($row->festivity->grade, false);
+                    self::$FestivityCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c($row->festivity->common);
                 }
             }
-            if (property_exists(self::$NationalData, "Metadata") && property_exists(self::$NationalData->Metadata, "Missals")) {
-                if (self::$NationalData->Metadata->Region === 'UNITED STATES') {
-                    self::$NationalData->Metadata->Region = 'USA';
+            if (property_exists(self::$NationalData, "metadata") && property_exists(self::$NationalData->metadata, "missals")) {
+                if (self::$NationalData->metadata->region === 'UNITED STATES') {
+                    self::$NationalData->metadata->region = 'USA';
                 }
-                foreach (self::$NationalData->Metadata->Missals as $missal) {
+                foreach (self::$NationalData->metadata->missals as $missal) {
                     $DataFile = RomanMissal::getSanctoraleFileName($missal);
                     if ($DataFile !== false) {
                         if (!file_exists($DataFile)) {
@@ -386,12 +385,11 @@ class Events
     private function processDiocesanCalendarData(): void
     {
         if ($this->EventsParams->DiocesanCalendar !== null && self::$DiocesanData !== null) {
-            foreach (self::$DiocesanData->litcal as $key => $festivity) {
-                $temp = (array) $festivity->Festivity;
-                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ] = array_change_key_case($temp, CASE_UPPER);
+            foreach (self::$DiocesanData->litcal as $key => $row) {
+                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ] = (array) $row->festivity;
                 self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ][ "event_key" ] = $this->EventsParams->DiocesanCalendar . '_' . $key;
-                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ][ "grade_lcl" ] = self::$LitGrade->i18n($festivity->Festivity->grade, false);
-                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ][ "common_lcl" ] = self::$LitCommon->c($festivity->Festivity->common);
+                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ][ "grade_lcl" ] = self::$LitGrade->i18n($row->festivity->grade, false);
+                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ][ "common_lcl" ] = self::$LitCommon->c($row->festivity->common);
             }
         }
     }
