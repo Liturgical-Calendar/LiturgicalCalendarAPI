@@ -1,22 +1,22 @@
 {
-    "LitCal": [
+    "litcal": [
         {
-            "Festivity": {
-                "tag": "StPeterCanisius",
+            "festivity": {
+                "event_key": "StPeterCanisius",
                 "name": "Saint Peter Canisius, Priest and Doctor of the Church",
                 "grade": 3,
                 "day": 21,
                 "month": 12
             },
-            "Metadata": {
+            "metadata": {
                 "action": "setProperty",
                 "property": "grade",
-                "sinceYear": 1979
+                "since_year": 1979
             }
         },
         {
-            "Festivity": {
-                "tag": "HLidwina",
+            "festivity": {
+                "event_key": "HLidwina",
                 "name": "H. Lidwina, maagd",
                 "color": [
                     "white"
@@ -28,20 +28,20 @@
                     "Proper"
                 ],
                 "readings": {
-                    "FIRST_READING": "",
-                    "RESPONSORIAL_PSALM": "",
-                    "ALLELUIA_VERSE": "",
-                    "GOSPEL": ""
+                    "first_reading": "",
+                    "responsorial_psalm": "",
+                    "alleluia_verse": "",
+                    "gospel": ""
                 }
             },
-            "Metadata": {
+            "metadata": {
                 "action": "createNew",
-                "sinceYear": 1979
+                "since_year": 1979
             }
         },
         {
-            "Festivity": {
-                "tag": "MartelarenGorcum",
+            "festivity": {
+                "event_key": "MartelarenGorcum",
                 "name": "HH. Martelaren van Gorcum",
                 "color": [
                     "red"
@@ -53,20 +53,20 @@
                     "Proper"
                 ],
                 "readings": {
-                    "FIRST_READING": "",
-                    "RESPONSORIAL_PSALM": "",
-                    "ALLELUIA_VERSE": "",
-                    "GOSPEL": ""
+                    "first_reading": "",
+                    "responsorial_psalm": "",
+                    "alleluia_verse": "",
+                    "gospel": ""
                 }
             },
-            "Metadata": {
+            "metadata": {
                 "action": "createNew",
-                "sinceYear": 1979
+                "since_year": 1979
             }
         },
         {
-            "Festivity": {
-                "tag": "Brandsma",
+            "festivity": {
+                "event_key": "Brandsma",
                 "name": "Z. Titus Brandsma, priester en martelaar",
                 "color": [
                     "red"
@@ -78,14 +78,14 @@
                     "Martyrs"
                 ]
             },
-            "Metadata": {
+            "metadata": {
                 "action": "createNew",
-                "sinceYear": 1979
+                "since_year": 1979
             }
         },
         {
-            "Festivity": {
-                "tag": "VerjaardagWijdingKerken",
+            "festivity": {
+                "event_key": "VerjaardagWijdingKerken",
                 "name": "Verjaardag van de Wijding van alle kerken waarvan de wijdingsdatum niet bekend is",
                 "color": [
                     "white"
@@ -97,20 +97,20 @@
                     "Proper"
                 ],
                 "readings": {
-                    "FIRST_READING": "",
-                    "RESPONSORIAL_PSALM": "",
-                    "ALLELUIA_VERSE": "",
-                    "GOSPEL": ""
+                    "first_reading": "",
+                    "responsorial_psalm": "",
+                    "alleluia_verse": "",
+                    "gospel": ""
                 }
             },
-            "Metadata": {
+            "metadata": {
                 "action": "createNew",
-                "sinceYear": 1979
+                "since_year": 1979
             }
         },
         {
-            "Festivity": {
-                "tag": "Verkondigers",
+            "festivity": {
+                "event_key": "Verkondigers",
                 "name": "Alle HH. Verkondigers van het geloof in onze streken",
                 "color": [
                     "white"
@@ -122,20 +122,20 @@
                     "Proper"
                 ],
                 "readings": {
-                    "FIRST_READING": "",
-                    "RESPONSORIAL_PSALM": "",
-                    "ALLELUIA_VERSE": "",
-                    "GOSPEL": ""
+                    "first_reading": "",
+                    "responsorial_psalm": "",
+                    "alleluia_verse": "",
+                    "gospel": ""
                 }
             },
-            "Metadata": {
+            "metadata": {
                 "action": "createNew",
-                "sinceYear": 1979
+                "since_year": 1979
             }
         },
         {
-            "Festivity": {
-                "tag": "Willibrord",
+            "festivity": {
+                "event_key": "Willibrord",
                 "name": "H. Willibrord, bisschop, verkondiger van ons geloof, patroon van de Nederlandse kerkprovincie",
                 "color": [
                     "white"
@@ -147,33 +147,33 @@
                     "Proper"
                 ],
                 "readings": {
-                    "FIRST_READING": "",
-                    "RESPONSORIAL_PSALM": "",
-                    "ALLELUIA_VERSE": "",
-                    "GOSPEL": ""
+                    "first_reading": "",
+                    "responsorial_psalm": "",
+                    "alleluia_verse": "",
+                    "gospel": ""
                 }
             },
-            "Metadata": {
+            "metadata": {
                 "action": "createNew",
-                "sinceYear": 1979
+                "since_year": 1979
             }
         }
     ],
-    "Settings": {
-        "Epiphany": "SUNDAY_JAN2_JAN8",
-        "Ascension": "THURSDAY",
-        "CorpusChristi": "SUNDAY",
-        "Locale": "nl_NL",
-        "EternalHighPriest": true
+    "settings": {
+        "epiphany": "SUNDAY_JAN2_JAN8",
+        "ascension": "THURSDAY",
+        "corpus_christi": "SUNDAY",
+        "locale": "nl_NL",
+        "eternal_high_priest": true
     },
-    "Metadata": {
-        "Region": "NETHERLANDS",
-        "WiderRegion": {
+    "metadata": {
+        "region": "NETHERLANDS",
+        "wider_region": {
             "name": "Europe",
-            "jsonFile": "nations\/Europe.json",
-            "i18nFile": "nations\/EUROPE\/nl_NL.json"
+            "json_file": "nations\/Europe.json",
+            "i18n_file": "nations\/EUROPE\/nl_NL.json"
         },
-        "Missals": [
+        "missals": [
             "NETHERLANDS_1978"
         ]
     }

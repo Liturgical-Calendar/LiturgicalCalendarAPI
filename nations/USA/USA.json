@@ -1,8 +1,8 @@
 {
-    "LitCal": [
+    "litcal": [
         {
-            "Festivity": {
-                "tag": "ImmaculateConception",
+            "festivity": {
+                "event_key": "ImmaculateConception",
                 "name": "The Immaculate Conception of the Blessed Virgin Mary, Patronal feastday of the United States of America",
                 "color": [
                     "white"
@@ -11,95 +11,95 @@
                 "day": 8,
                 "month": 12
             },
-            "Metadata": {
+            "metadata": {
                 "action": "makePatron",
-                "sinceYear": 1970
+                "since_year": 1970
             }
         },
         {
-            "Festivity": {
-                "tag": "StVincentDeacon",
+            "festivity": {
+                "event_key": "StVincentDeacon",
                 "name": "Saint Vincent, Deacon and Martyr",
                 "day": 23,
                 "month": 1
             },
-            "Metadata": {
+            "metadata": {
                 "action": "moveFestivity",
                 "missal": "USA_2011",
                 "reason": "National Day of Prayer for the Unborn",
-                "sinceYear": 1970
+                "since_year": 1970
             }
         },
         {
-            "Festivity": {
-                "tag": "StVincentDeacon",
+            "festivity": {
+                "event_key": "StVincentDeacon",
                 "name": "[ USA ] Saint Vincent, Deacon and Martyr",
                 "day": 22,
                 "month": 1
             },
-            "Metadata": {
+            "metadata": {
                 "action": "setProperty",
                 "property": "name",
-                "sinceYear": 1970
+                "since_year": 1970
             }
         },
         {
-            "Festivity": {
-                "tag": "StPaulCross",
+            "festivity": {
+                "event_key": "StPaulCross",
                 "name": "Saint Paul of the Cross, Priest",
                 "day": 20,
                 "month": 10
             },
-            "Metadata": {
+            "metadata": {
                 "action": "moveFestivity",
                 "missal": "USA_2011",
                 "reason": "Saint John Brebeuf (elevated to memorial)",
-                "sinceYear": 1970
+                "since_year": 1970
             }
         },
         {
-            "Festivity": {
-                "tag": "StPaulCross",
+            "festivity": {
+                "event_key": "StPaulCross",
                 "name": "[ USA ] Saint Paul of the Cross, Priest",
                 "day": 19,
                 "month": 10
             },
-            "Metadata": {
+            "metadata": {
                 "action": "setProperty",
                 "property": "name",
-                "sinceYear": 1970
+                "since_year": 1970
             }
         },
         {
-            "Festivity": {
-                "tag": "StsJeanBrebeuf",
+            "festivity": {
+                "event_key": "StsJeanBrebeuf",
                 "name": "Saints John de Brébeuf and Isaac Jogues, Priests, and Companions, Martyrs",
                 "grade": 3,
                 "day": 19,
                 "month": 10
             },
-            "Metadata": {
+            "metadata": {
                 "action": "setProperty",
                 "property": "grade",
-                "sinceYear": 1970
+                "since_year": 1970
             }
         },
         {
-            "Festivity": {
-                "tag": "StsJeanBrebeuf",
+            "festivity": {
+                "event_key": "StsJeanBrebeuf",
                 "name": "[ USA ] Saints John de Brébeuf and Isaac Jogues, Priests, and Companions, Martyrs",
                 "day": 19,
                 "month": 10
             },
-            "Metadata": {
+            "metadata": {
                 "action": "setProperty",
                 "property": "name",
-                "sinceYear": 1970
+                "since_year": 1970
             }
         },
         {
-            "Festivity": {
-                "tag": "ThanksgivingDay",
+            "festivity": {
+                "event_key": "ThanksgivingDay",
                 "name": "[ USA ] Thanksgiving",
                 "color": [
                     "white"
@@ -108,80 +108,80 @@
                 "strtotime": "fourth thursday of november",
                 "common": []
             },
-            "Metadata": {
+            "metadata": {
                 "action": "createNew",
-                "sinceYear": 1970
+                "since_year": 1970
             }
         },
         {
-            "Festivity": {
-                "tag": "StCamillusDeLellis",
+            "festivity": {
+                "event_key": "StCamillusDeLellis",
                 "name": "Saint Camillus de Lellis, Priest",
                 "day": 18,
                 "month": 7
             },
-            "Metadata": {
+            "metadata": {
                 "action": "moveFestivity",
                 "missal": "USA_2011",
                 "reason": "Blessed Kateri Tekakwitha",
-                "sinceYear": 1970
+                "since_year": 1970
             }
         },
         {
-            "Festivity": {
-                "tag": "StCamillusDeLellis",
+            "festivity": {
+                "event_key": "StCamillusDeLellis",
                 "name": "[ USA ] Saint Camillus de Lellis, Priest",
                 "day": 14,
                 "month": 7
             },
-            "Metadata": {
+            "metadata": {
                 "action": "setProperty",
                 "property": "name",
-                "sinceYear": 1970
+                "since_year": 1970
             }
         },
         {
-            "Festivity": {
-                "tag": "StElizabethPortugal",
+            "festivity": {
+                "event_key": "StElizabethPortugal",
                 "name": "Saint Elizabeth of Portugal",
                 "day": 5,
                 "month": 7
             },
-            "Metadata": {
+            "metadata": {
                 "action": "moveFestivity",
                 "missal": "USA_2011",
                 "reason": "Independence Day",
-                "sinceYear": 1970
+                "since_year": 1970
             }
         },
         {
-            "Festivity": {
-                "tag": "StElizabethPortugal",
+            "festivity": {
+                "event_key": "StElizabethPortugal",
                 "name": "[ USA ] Saint Elizabeth of Portugal",
                 "day": 4,
                 "month": 7
             },
-            "Metadata": {
+            "metadata": {
                 "action": "setProperty",
                 "property": "name",
-                "sinceYear": 1970
+                "since_year": 1970
             }
         }
     ],
-    "Settings": {
-        "Epiphany": "SUNDAY_JAN2_JAN8",
-        "Ascension": "SUNDAY",
-        "CorpusChristi": "SUNDAY",
-        "Locale": "EN"
+    "settings": {
+        "epiphany": "SUNDAY_JAN2_JAN8",
+        "ascension": "SUNDAY",
+        "corpus_christi": "SUNDAY",
+        "locale": "en_US"
     },
-    "Metadata": {
-        "Region": "UNITED STATES",
-        "WiderRegion": {
+    "metadata": {
+        "region": "UNITED STATES",
+        "wider_region": {
             "name": "Americas",
-            "jsonFile": "nations\/Americas.json",
-            "i18nFile": "nations\/AMERICAS\/en_US.json"
+            "json_file": "nations\/Americas.json",
+            "i18n_file": "nations\/AMERICAS\/en_US.json"
         },
-        "Missals": [
+        "missals": [
             "USA_2011"
         ]
     }

@@ -1,7 +1,7 @@
 {
-    "LitCal": {
+    "litcal": {
         "MariaTenhemelopnemingPatroonsfeestvanhetbisdom": {
-            "Festivity": {
+            "festivity": {
                 "name": "Maria Tenhemelopneming, Patroonsfeest van het bisdom",
                 "color": [
                     "white"
@@ -13,13 +13,13 @@
                 "day": 15,
                 "month": 8
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 0
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 0
             }
         },
         "VerjaardagvandeWijdingvandebisschopskerk": {
-            "Festivity": {
+            "festivity": {
                 "name": "Verjaardag van de Wijding van de bisschopskerk",
                 "color": [
                     "white"
@@ -31,14 +31,14 @@
                 "day": 20,
                 "month": 12
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 1,
-                "untilYear": 2019
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 1,
+                "until_year": 2019
             }
         },
         "VerjaardagvandeWijdingvandebisschopskerk_2": {
-            "Festivity": {
+            "festivity": {
                 "name": "Verjaardag van de Wijding van de bisschopskerk",
                 "color": [
                     "white"
@@ -50,13 +50,13 @@
                 "day": 12,
                 "month": 12
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 2
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 2
             }
         },
         "HHMariaAdolfinaengezellinnenmaagdenenmartelaressen": {
-            "Festivity": {
+            "festivity": {
                 "name": "HH. Maria Adolfina en.gezellinnen, maagden en martelaressen",
                 "color": [
                     "red"
@@ -68,13 +68,13 @@
                 "day": 8,
                 "month": 7
             },
-            "Metadata": {
-                "sinceYear": 2001,
-                "formRowNum": 3
+            "metadata": {
+                "since_year": 2001,
+                "form_rownum": 3
             }
         },
         "ZZMariaAdolfinaengezellinnenmaagdenenmartelaressen": {
-            "Festivity": {
+            "festivity": {
                 "name": "ZZ. Maria Adolfina en gezellinnen, maagden en martelaressen",
                 "color": [
                     "red"
@@ -86,14 +86,14 @@
                 "day": 8,
                 "month": 7
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 0,
-                "untilYear": 2000
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 0,
+                "until_year": 2000
             }
         },
         "ZPetrusDonderspriester": {
-            "Festivity": {
+            "festivity": {
                 "name": "Z. Petrus Donders, priester",
                 "color": [
                     "white"
@@ -106,13 +106,13 @@
                 "day": 14,
                 "month": 1
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 0
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 0
             }
         },
         "HAmandusbisschop": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Amandus, bisschop",
                 "color": [
                     "white"
@@ -124,13 +124,13 @@
                 "day": 6,
                 "month": 2
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 1
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 1
             }
         },
         "HGertrudismaagd": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Gertrudis, maagd",
                 "color": [
                     "white"
@@ -143,13 +143,13 @@
                 "day": 17,
                 "month": 3
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 2
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 2
             }
         },
         "HLambertusbisschopenmartelaar": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Lambertus, bisschop en martelaar",
                 "color": [
                     "red"
@@ -161,13 +161,13 @@
                 "day": 17,
                 "month": 9
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 3
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 3
             }
         },
         "HHubertusbisschop": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Hubertus, bisschop",
                 "color": [
                     "white"
@@ -179,13 +179,13 @@
                 "day": 3,
                 "month": 11
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 4
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 4
             }
         },
         "HEligiusbisschop": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Eligius, bisschop",
                 "color": [
                     "white"
@@ -197,9 +197,9 @@
                 "day": 1,
                 "month": 12
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 5
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 5
             }
         }
     }

@@ -12,9 +12,11 @@
  * @link      https://litcal.johnromanodorazio.com
  */
 
-namespace Johnrdorazio\LitCal;
+namespace Johnrdorazio\LitCal\Paths;
 
-class Schema
+use Johnrdorazio\LitCal\Router;
+
+class Schemas
 {
     private static function enforceOrigin(): void
     {
@@ -42,21 +44,33 @@ class Schema
         }
     }
 
-    public static function retrieve(): void
+    public static function retrieve(array $requestPathParts = []): void
     {
         self::enforceOrigin();
         self::enforceRequestMethod();
-        if (isset($_GET['schema'])) {
-            if (file_exists('schemas/' . $_GET['schema'])) {
+        $pathParamCount = count($requestPathParts);
+        switch ($pathParamCount) {
+            case 0:
+                $schemaIndex = new \stdClass();
+                $schemaIndex->litcal_schemas = [];
+                $it = new \DirectoryIterator("glob://schemas/*.json");
+                foreach ($it as $f) {
+                    $schemaIndex->litcal_schemas[] = API_BASE_PATH . '/schemas/' . $f->getFilename();
+                }
                 header('Content-Type: application/json; charset=utf-8');
-                echo file_get_contents('schemas/' . $_GET['schema']);
-            } else {
-                header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
-                die('File not found');
-            }
-        } else {
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
-            die('Schema parameter is required');
+                echo json_encode($schemaIndex);
+                die();
+                break;
+            case 1:
+                if (file_exists('schemas/' . $requestPathParts[0])) {
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo file_get_contents('schemas/' . $requestPathParts[0]);
+                    die();
+                } else {
+                    header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
+                    die("Schema file '{$requestPathParts[0]}' not found");
+                }
+                break;
         }
     }
 }

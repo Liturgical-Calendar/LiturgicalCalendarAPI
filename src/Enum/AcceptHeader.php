@@ -6,8 +6,8 @@ class AcceptHeader
 {
     public const ATTACHMENT = "application/octet-stream";
     public const JSON      = "application/json";
+    public const YAML      = "application/yaml";
     public const XML       = "application/xml";
-    public const YML       = "application/yaml";
     public const PDF       = "application/pdf";
     public const HTML      = "text/html";
     public const ICS       = "text/calendar";
@@ -33,8 +33,8 @@ class AcceptHeader
     public static array $values = [
         "application/octet-stream",
         "application/json",
-        "application/xml",
         "application/yaml",
+        "application/xml",
         "application/pdf",
         "text/html",
         "text/calendar",

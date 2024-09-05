@@ -1,63 +1,63 @@
 [
     {
-        "MONTH": 9,
-        "DAY": 23,
-        "TAG": "StPioPietrelcina",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 9,
+        "day": 23,
+        "event_key": "StPioPietrelcina",
+        "grade": 3,
+        "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 12,
-        "TAG": "LadyGuadalupe",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 12,
+        "day": 12,
+        "event_key": "LadyGuadalupe",
+        "grade": 2,
+        "common": [
             "Blessed Virgin Mary"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 9,
-        "TAG": "JuanDiego",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 12,
+        "day": 9,
+        "event_key": "JuanDiego",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For One Saint"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     }
 ]

@@ -17,9 +17,8 @@ class APICore
     private ?string $JsonEncodedRequestHeaders  = null;
     private ?string $RequestContentType         = null;
     private ?string $ResponseContentType        = null;
-
     private static array $onlyUsefulHeaders = [
-        "Accept", "Accept-Language", "X-Requested-With", "Host", "Origin"
+        "Accept", "Accept-Language", "X-Requested-With", "Origin"
     ];
 
     public function __construct()
@@ -48,7 +47,7 @@ class APICore
         } elseif ($this->isAllowedOrigin()) {
             header('Access-Control-Allow-Origin: ' . $this->RequestHeaders[ "Origin" ]);
         } else {
-            header("Access-Control-Allow-Origin: {$_SERVER['HTTP_HOST']}");
+            header("Access-Control-Allow-Origin: {$_SERVER['SERVER_NAME']}");
         }
         header('Access-Control-Allow-Credentials: true');
         header('Access-Control-Max-Age: 86400');    // cache for 1 day
@@ -99,7 +98,6 @@ class APICore
 
     public function validateAcceptHeader(bool $beLaxAboutIt)
     {
-
         if ($this->hasAcceptHeader()) {
             if ($this->isAllowedAcceptHeader()) {
                 $this->ResponseContentType = explode(',', $this->RequestHeaders[ "Accept" ])[0];
@@ -145,6 +143,11 @@ class APICore
     public function setAllowedRequestContentTypes(array $requestContentTypes): void
     {
         $this->AllowedRequestContentTypes = array_values(array_intersect(RequestContentType::$values, $requestContentTypes));
+    }
+
+    public function getResponseContentType(): ?string
+    {
+        return $this->ResponseContentType;
     }
 
     public function setResponseContentType(string $responseContentType): void
@@ -255,19 +258,55 @@ class APICore
         }
     }
 
-    public function retrieveRequestParamsFromJsonBody(): object
+    public function retrieveRequestParamsFromJsonBody(bool $assoc = false): object|array
     {
-
-        $json = file_get_contents('php://input');
-        $data = json_decode($json);
-        if ("" === $json) {
+        $rawData = file_get_contents('php://input');
+        if ("" === $rawData) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
-            die('{"error":"No JSON data received in the request"');
-        } elseif (json_last_error() !== JSON_ERROR_NONE) {
+            die('{"error":"No JSON data received in the request"}');
+        }
+        $data = json_decode($rawData, $assoc);
+        if (json_last_error() !== JSON_ERROR_NONE) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
-            die('{"error":"Malformed JSON data received in the request: <' . $json . '>, ' . json_last_error_msg() . '"}');
+            die('{"error":"Malformed JSON data received in the request: <' . $rawData . '>, ' . json_last_error_msg() . '"}');
         }
         return $data;
+    }
+
+    private static function warningHandler($errno, $errstr)
+    {
+        throw new \Exception($errstr, $errno);
+    }
+
+    public function retrieveRequestParamsFromYamlBody(bool $assoc = false): object|array
+    {
+        $rawData = file_get_contents('php://input');
+        if ("" === $rawData) {
+            header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
+            die('{"error":"No YAML data received in the request"}');
+        }
+
+        set_error_handler(array('self', 'warningHandler'), E_WARNING);
+        try {
+            $data = yaml_parse($rawData);
+            if (false === $data) {
+                header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
+                $response = new \stdClass();
+                $response->error = "Malformed YAML data received in the request";
+                die(json_encode($response));
+            } else {
+                return $assoc ? $data : json_decode(json_encode($data));
+            }
+        } catch (\Exception $e) {
+            header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
+            $response = new \stdClass();
+            $response->status = "error";
+            $response->message = "Malformed YAML data received in the request";
+            $response->error = $e->getMessage();
+            $response->line = $e->getLine();
+            $response->code = $e->getCode();
+            die(json_encode($response));
+        }
     }
 
     public function init()

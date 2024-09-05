@@ -1,6 +1,11 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "definitions": {
+        "EventKey": {
+            "type": "string",
+            "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$",
+            "description": "corresponds to the `event_key` property of liturgical events in the output of the LitCal API and similar endpoints"
+        },
         "LitColor": {
             "type": "array",
             "uniqueItems": true,
@@ -75,69 +80,69 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "PALM_GOSPEL": {
+                "palm_gospel": {
                     "type": "string"
                 },
-                "FIRST_READING": {
+                "first_reading": {
                     "type": "string"
                 },
-                "RESPONSORIAL_PSALM": {
+                "responsorial_psalm": {
                     "type": "string"
                 },
-                "SECOND_READING": {
+                "second_reading": {
                     "type": "string"
                 },
-                "RESPONSORIAL_PSALM_2": {
+                "responsorial_psalm_2": {
                     "type": "string"
                 },
-                "THIRD_READING": {
+                "third_reading": {
                     "type": "string"
                 },
-                "RESPONSORIAL_PSALM_3": {
+                "responsorial_psalm_3": {
                     "type": "string"
                 },
-                "FOURTH_READING": {
+                "fourth_reading": {
                     "type": "string"
                 },
-                "RESPONSORIAL_PSALM_4": {
+                "responsorial_psalm_4": {
                     "type": "string"
                 },
-                "FIFTH_READING": {
+                "fifth_reading": {
                     "type": "string"
                 },
-                "RESPONSORIAL_PSALM_5": {
+                "responsorial_psalm_5": {
                     "type": "string"
                 },
-                "SIXTH_READING": {
+                "sixth_reading": {
                     "type": "string"
                 },
-                "RESPONSORIAL_PSALM_6": {
+                "responsorial_psalm_6": {
                     "type": "string"
                 },
-                "SEVENTH_READING": {
+                "seventh_reading": {
                     "type": "string"
                 },
-                "RESPONSORIAL_PSALM_7": {
+                "responsorial_psalm_7": {
                     "type": "string"
                 },
-                "EPISTLE": {
+                "epistle": {
                     "type": "string"
                 },
-                "RESPONSORIAL_PSALM_EPISTLE": {
+                "responsorial_psalm_epistle": {
                     "type": "string"
                 },
-                "ALLELUIA_VERSE": {
+                "alleluia_verse": {
                     "type": "string"
                 },
-                "GOSPEL": {
+                "gospel": {
                     "type": "string"
                 }
             },
             "required": [
-                "FIRST_READING",
-                "RESPONSORIAL_PSALM",
-                "ALLELUIA_VERSE",
-                "GOSPEL"
+                "first_reading",
+                "responsorial_psalm",
+                "alleluia_verse",
+                "gospel"
             ],
             "title": "Readings"
         },
@@ -186,73 +191,6 @@
             ],
             "title": "CorpusChristi"
         },
-        "DecreeLangs": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "DE": {
-                    "type": "string",
-                    "description": "German",
-                    "enum": [
-                        "de",
-                        "ge"
-                    ]
-                },
-                "EN": {
-                    "type": "string",
-                    "description": "English",
-                    "enum": [
-                        "en"
-                    ]
-                },
-                "ES": {
-                    "type": "string",
-                    "description": "Spanish",
-                    "enum": [
-                        "es",
-                        "sp"
-                    ]
-                },
-                "FR": {
-                    "type": "string",
-                    "description": "French",
-                    "enum": [
-                        "fr"
-                    ]
-                },
-                "IT": {
-                    "type": "string",
-                    "description": "Italian",
-                    "enum": [
-                        "it"
-                    ]
-                },
-                "LA": {
-                    "type": "string",
-                    "description": "Latin",
-                    "enum": [
-                        "la"
-                    ]
-                },
-                "PL": {
-                    "type": "string",
-                    "description": "Polish",
-                    "enum": [
-                        "pl"
-                    ]
-                },
-                "PT": {
-                    "type": "string",
-                    "description": "Portuguese",
-                    "enum": [
-                        "po",
-                        "pt"
-                    ]
-                }
-            },
-            "description": "mapping between two-letter ISO code for a language, and the actual two-letter representation used in the Decree URL",
-            "title": "DecreeLangs"
-        },
         "Calendar": {
             "type": "string",
             "enum": [
@@ -263,11 +201,6 @@
                 "NETHERLANDS"
             ],
             "title": "Calendar"
-        },
-        "DecreeURL": {
-            "type": "string",
-            "pattern": "^https?:\\\/\\\/(www\\.)?[a-zA-Z]{1,50}\\.[a-zA-Z]{1,6}([-a-zA-Z0-9()@:%._+~\\\/]*)\\.(html|pdf)$",
-            "title": "DecreeURL"
         },
         "Missals": {
             "type": "array",
@@ -294,11 +227,11 @@
         "Missal": {
             "type": "string",
             "enum": [
-                "VATICAN_1970",
-                "VATICAN_1971",
-                "VATICAN_1975",
-                "VATICAN_2002",
-                "VATICAN_2008",
+                "EDITIO_TYPICA_1970",
+                "EDITIO_TYPICA_1971",
+                "EDITIO_TYPICA_1975",
+                "EDITIO_TYPICA_2002",
+                "EDITIO_TYPICA_2008",
                 "USA_2011",
                 "ITALY_1983",
                 "ITALY_2020",
@@ -587,15 +520,6 @@
                 "ZIMBABWE"
             ]
         },
-        "MemorialFromDecreesAction": {
-            "type": "string",
-            "enum": [
-                "createNew",
-                "setProperty",
-                "makeDoctor"
-            ],
-            "title": "MemorialFromDecreesAction"
-        },
         "WiderRegionCalendarAction": {
             "type": "string",
             "enum": [
@@ -769,7 +693,7 @@
                 "vai",  "vi",  "vun",   "wae",  "wo",   "xh",   "xog",   "yav", "yi",   "yo",
                 "yue",  "zgh", "zh",    "zu",   "LA",   "la"
             ]
-},
+        },
         "AcceptLanguage": {
             "type": "string",
             "anyOf": [
@@ -783,4 +707,3 @@
         }
     }
 }
-

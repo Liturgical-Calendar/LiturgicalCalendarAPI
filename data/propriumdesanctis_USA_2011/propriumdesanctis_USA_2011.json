@@ -1,339 +1,339 @@
 [
     {
-        "MONTH": 1,
-        "DAY": 4,
-        "TAG": "StElizabethSeton",
-        "NAME": "Saint Elizabeth Ann Seton, Religious",
-        "GRADE": 3,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 1,
+        "day": 4,
+        "event_key": "StElizabethSeton",
+        "name": "Saint Elizabeth Ann Seton, Religious",
+        "grade": 3,
+        "display_grade": "",
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "USA",
-        "COLOR": [
+        "calendar": "USA",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 1,
-        "DAY": 5,
-        "TAG": "StJohnNeumann",
-        "NAME": "Saint John Neumann, Bishop",
-        "GRADE": 3,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 1,
+        "day": 5,
+        "event_key": "StJohnNeumann",
+        "name": "Saint John Neumann, Bishop",
+        "grade": 3,
+        "display_grade": "",
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "USA",
-        "COLOR": [
+        "calendar": "USA",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 1,
-        "DAY": 6,
-        "TAG": "StAndreBessette",
-        "NAME": "Saint André Bessette, Religious",
-        "GRADE": 2,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 1,
+        "day": 6,
+        "event_key": "StAndreBessette",
+        "name": "Saint André Bessette, Religious",
+        "grade": 2,
+        "display_grade": "",
+        "common": [
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "USA",
-        "COLOR": [
+        "calendar": "USA",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 1,
-        "DAY": 22,
-        "TAG": "PrayerUnborn",
-        "NAME": "Day of Prayer for the Legal Protection of Unborn Children",
-        "GRADE": 3,
-        "DISPLAYGRADE": "National Day of Prayer",
-        "COMMON": [
+        "month": 1,
+        "day": 22,
+        "event_key": "PrayerUnborn",
+        "name": "Day of Prayer for the Legal Protection of Unborn Children",
+        "grade": 3,
+        "display_grade": "National Day of Prayer",
+        "common": [
             "Masses and Prayers for Various Needs and Occasions:For Giving Thanks to God for the Gift of Human Life",
             "Preservation of Peace and Justice"
         ],
-        "CALENDAR": "USA",
-        "COLOR": [
+        "calendar": "USA",
+        "color": [
             "purple",
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 3,
-        "DAY": 3,
-        "TAG": "StKatharineDrexel",
-        "NAME": "Saint Katharine Drexel, Virgin",
-        "GRADE": 2,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 3,
+        "day": 3,
+        "event_key": "StKatharineDrexel",
+        "name": "Saint Katharine Drexel, Virgin",
+        "grade": 2,
+        "display_grade": "",
+        "common": [
             "Virgins:For One Virgin"
         ],
-        "CALENDAR": "USA",
-        "COLOR": [
+        "calendar": "USA",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 10,
-        "TAG": "StDamienVeuster",
-        "NAME": "Saint Damien de Veuster, Priest",
-        "GRADE": 2,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 5,
+        "day": 10,
+        "event_key": "StDamienVeuster",
+        "name": "Saint Damien de Veuster, Priest",
+        "grade": 2,
+        "display_grade": "",
+        "common": [
             "Pastors:For Missionaries"
         ],
-        "CALENDAR": "USA",
-        "COLOR": [
+        "calendar": "USA",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 15,
-        "TAG": "StIsidore",
-        "NAME": "Saint Isidore",
-        "GRADE": 2,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 5,
+        "day": 15,
+        "event_key": "StIsidore",
+        "name": "Saint Isidore",
+        "grade": 2,
+        "display_grade": "",
+        "common": [
             "Holy Men and Women:For One Saint"
         ],
-        "CALENDAR": "USA",
-        "COLOR": [
+        "calendar": "USA",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 1,
-        "TAG": "JuniperoSerra",
-        "NAME": "Blessed Junípero Serra, Priest",
-        "GRADE": 2,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 7,
+        "day": 1,
+        "event_key": "JuniperoSerra",
+        "name": "Blessed Junípero Serra, Priest",
+        "grade": 2,
+        "display_grade": "",
+        "common": [
             "Pastors:For One Pastor",
             "Pastors:For Missionaries"
         ],
-        "CALENDAR": "USA",
-        "COLOR": [
+        "calendar": "USA",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 4,
-        "TAG": "IndependenceDay",
-        "NAME": "Independence Day",
-        "GRADE": 3,
-        "DISPLAYGRADE": "National Holiday",
-        "COMMON": [
+        "month": 7,
+        "day": 4,
+        "event_key": "IndependenceDay",
+        "name": "Independence Day",
+        "grade": 3,
+        "display_grade": "National Holiday",
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "USA",
-        "COLOR": [
+        "calendar": "USA",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 14,
-        "TAG": "KateriTekakwitha",
-        "NAME": "Blessed Kateri Tekakwitha, Virgin",
-        "GRADE": 3,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 7,
+        "day": 14,
+        "event_key": "KateriTekakwitha",
+        "name": "Blessed Kateri Tekakwitha, Virgin",
+        "grade": 3,
+        "display_grade": "",
+        "common": [
             "Virgins:For One Virgin"
         ],
-        "CALENDAR": "USA",
-        "COLOR": [
+        "calendar": "USA",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 9,
-        "TAG": "StPeterClaver",
-        "NAME": "Saint Peter Claver, Priest",
-        "GRADE": 3,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 9,
+        "day": 9,
+        "event_key": "StPeterClaver",
+        "name": "Saint Peter Claver, Priest",
+        "grade": 3,
+        "display_grade": "",
+        "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
         ],
-        "CALENDAR": "USA",
-        "COLOR": [
+        "calendar": "USA",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 6,
-        "TAG": "MarieDurocher",
-        "NAME": "Blessed Marie Rose Durocher, Virgin",
-        "GRADE": 2,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 10,
+        "day": 6,
+        "event_key": "MarieDurocher",
+        "name": "Blessed Marie Rose Durocher, Virgin",
+        "grade": 2,
+        "display_grade": "",
+        "common": [
             "Virgins:For One Virgin"
         ],
-        "CALENDAR": "USA",
-        "COLOR": [
+        "calendar": "USA",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 13,
-        "TAG": "StFrancesXCabrini",
-        "NAME": "Saint Frances Xavier Cabrini, Virgin",
-        "GRADE": 3,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 11,
+        "day": 13,
+        "event_key": "StFrancesXCabrini",
+        "name": "Saint Frances Xavier Cabrini, Virgin",
+        "grade": 3,
+        "display_grade": "",
+        "common": [
             "Virgins:For One Virgin",
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
         ],
-        "CALENDAR": "USA",
-        "COLOR": [
+        "calendar": "USA",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 18,
-        "TAG": "StRoseDuchesne",
-        "NAME": "Saint Rose Philippine Duchesne, Virgin",
-        "GRADE": 2,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 11,
+        "day": 18,
+        "event_key": "StRoseDuchesne",
+        "name": "Saint Rose Philippine Duchesne, Virgin",
+        "grade": 2,
+        "display_grade": "",
+        "common": [
             "Virgins:For One Virgin"
         ],
-        "CALENDAR": "USA",
-        "COLOR": [
+        "calendar": "USA",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 23,
-        "TAG": "MiguelPro",
-        "NAME": "Blessed Miguel Agustín Pro, Priest and Martyr",
-        "GRADE": 2,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 11,
+        "day": 23,
+        "event_key": "MiguelPro",
+        "name": "Blessed Miguel Agustín Pro, Priest and Martyr",
+        "grade": 2,
+        "display_grade": "",
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For One Pastor"
         ],
-        "CALENDAR": "USA",
-        "COLOR": [
+        "calendar": "USA",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     }
 ]

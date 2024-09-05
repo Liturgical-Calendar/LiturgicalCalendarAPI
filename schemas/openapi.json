@@ -30,7 +30,7 @@
     },
     {
       "name": "Unit Test Index endpoint",
-      "description": "Retrieve or create unit tests"
+      "description": "Retrieve / create / update / delete unit tests"
     },
     {
       "name": "All possible liturgical events endpoint",
@@ -38,7 +38,7 @@
     },
     {
       "name": "RegionalData",
-      "description": "Retrieve / create / update National, Diocesan or Wider Region calendars "
+      "description": "Retrieve / create / update / delete National, Diocesan or Wider Region calendars "
     },
     {
       "name": "Easter",
@@ -46,16 +46,23 @@
     }
   ],
   "paths": {
-    "/": {
+    "/calendar": {
       "get": {
         "tags": [
           "Main API endpoint"
         ],
         "security": [{}],
         "summary": "Retrieve liturgical events for each day of a given year",
-        "operationId": "retrieveEventsGET",
+        "operationId": "retrieveCalendarGET",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
         "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
+            }
+          },
           {
             "in": "query",
             "name": "parameters",
@@ -137,12 +144,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCal.json#/definitions/LitCal"
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCal.json"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCal.json#/definitions/LitCal"
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCal.json"
                 }
               },
               "text/calendar": {
@@ -184,14 +191,23 @@
         ],
         "security": [{}],
         "summary": "retrieves liturgical events for each day of the year",
-        "operationId": "retrieveEventsPOST",
+        "operationId": "retrieveCalendarPOST",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
+            }
+          }
+        ],
         "requestBody": {
           "required": false,
           "content": {
             "application/x-www-form-urlencoded": {
               "schema": {
-                "$ref": "#/components/schemas/RequestBody"
+                "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
               },
               "examples": {
                 "GeneralRomanCalendar":
@@ -214,7 +230,7 @@
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RequestBody"
+                "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
               },
               "examples": {
                 "GeneralRomanCalendar":
@@ -277,12 +293,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCal.json#/definitions/LitCal"
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCal.json"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCal.json#/definitions/LitCal"
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCal.json"
                 }
               },
               "text/calendar": {
@@ -319,7 +335,7 @@
         }
       }
     },
-    "/metadata": {
+    "/calendars": {
       "get": {
         "tags": [
           "Metadata API endpoint"
@@ -379,7 +395,7 @@
         }
       }
     },
-    "/testsindex": {
+    "/tests": {
       "get": {
         "tags": [
           "Unit Test Index endpoint"
@@ -734,51 +750,29 @@
         }
       }
     },
-    "/allevents": {
+    "/events": {
       "get": {
         "tags": [
           "All possible liturgical events endpoint"
         ],
         "security": [{}],
         "summary": "retrieves all possible liturgical events that may or may not appear in the Liturgical Calendar for any given year, based on the calculations done by the LitCal API; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
-        "operationId": "retrieveAllEventsGET",
+        "operationId": "retrieveEventsGET",
         "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
+            }
+          },
           {
             "in": "query",
             "name": "settings",
             "style": "form",
             "explode": true,
             "schema": {
-              "type": "object",
-              "oneOf": [
-                {
-                  "properties": {
-                    "locale": {
-                      "type": "string",
-                      "description": "request the localization of the returned events in a specific language; will not be considered if a National calendar or diocesan calendar is requested",
-                      "default": "la"
-                    },
-                    "nationalcalendar": {
-                      "type": "string",
-                      "description": "requests liturgical calendar data for a particular geographic area, on a national level or according to specifications defined be one or more Episcopal Conferences or on a Roman Missal published for a certain language or geographic area."
-                    }
-                  }
-                },
-                {
-                  "properties": {
-                    "locale": {
-                      "type": "string",
-                      "description": "request the localization of the returned events in a specific language; will not be considered if a National calendar or diocesan calendar is requested",
-                      "default": "la"
-                    },
-                    "diocesancalendar": {
-                      "type": "string",
-                      "description": "requests liturgical calendar data for a particular diocese"
-                    }
-                  }
-                }
-              ],
-              "additionalProperties": false
+              "$ref": "#/components/schemas/EventsRequestBody"
             }
           }
         ],
@@ -795,7 +789,7 @@
                     "StsBasilGreg": {
                       "MONTH": 1,
                       "DAY": 2,
-                      "TAG": "StsBasilGreg",
+                      "event_key": "StsBasilGreg",
                       "GRADE": 3,
                       "COMMON": [
                         "Proper"
@@ -805,11 +799,11 @@
                         "white"
                       ],
                       "READINGS": {
-                        "FIRST_READING": "Ef 4, 1-7.11-13",
-                        "RESPONSORIAL_PSALM": "Salmo 23",
-                        "SECOND_READING": "",
-                        "ALLELUIA_VERSE": "Mt 23, 9b.10b",
-                        "GOSPEL": "Mt 23, 8-12"
+                        "first_reading": "Ef 4, 1-7.11-13",
+                        "responsorial_psalm": "Salmo 23",
+                        "second_reading": "",
+                        "alleluia_verse": "Mt 23, 9b.10b",
+                        "gospel": "Mt 23, 8-12"
                       },
                       "NAME": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
                       "MISSAL": "VATICAN_1970"
@@ -817,7 +811,7 @@
                     "StRayPenyafort": {
                       "MONTH": 1,
                       "DAY": 7,
-                      "TAG": "StRayPenyafort",
+                      "event_key": "StRayPenyafort",
                       "GRADE": 2,
                       "COMMON": [
                         "Pastors:For One Pastor"
@@ -827,11 +821,106 @@
                         "white"
                       ],
                       "READINGS": {
-                        "FIRST_READING": "2 Cor 5, 14-20",
-                        "RESPONSORIAL_PSALM": "Salmo 103",
-                        "SECOND_READING": "",
-                        "ALLELUIA_VERSE": "Mt 24, 42a.44",
-                        "GOSPEL": "Lc 12, 35-40"
+                        "first_reading": "2 Cor 5, 14-20",
+                        "responsorial_psalm": "Salmo 103",
+                        "second_reading": "",
+                        "alleluia_verse": "Mt 24, 42a.44",
+                        "gospel": "Lc 12, 35-40"
+                      },
+                      "NAME": "Sancti Raimundi de Penyafort, presbyteri",
+                      "MISSAL": "VATICAN_1970"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "304 Not Modified"
+          },
+          "404": {
+            "description": "404 Not Found: resource file not found"
+          },
+          "503": {
+            "description": "503 Service Unavailable: could not decode resource files"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "All possible liturgical events endpoint"
+        ],
+        "security": [{}],
+        "summary": "retrieves all possible liturgical events that may or may not appear in the Liturgical Calendar for any given year, based on the calculations done by the LitCal API; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
+        "operationId": "retrieveEventsPOST",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/EventsRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: A collection of all possible liturgical events that can be found in a liturgical calendar produced by the LitCal API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
+                },
+                "example": {
+                  "LitCalAllFestivities": {
+                    "StsBasilGreg": {
+                      "MONTH": 1,
+                      "DAY": 2,
+                      "event_key": "StsBasilGreg",
+                      "GRADE": 3,
+                      "COMMON": [
+                        "Proper"
+                      ],
+                      "CALENDAR": "GENERAL ROMAN",
+                      "COLOR": [
+                        "white"
+                      ],
+                      "READINGS": {
+                        "first_reading": "Ef 4, 1-7.11-13",
+                        "responsorial_psalm": "Salmo 23",
+                        "second_reading": "",
+                        "alleluia_verse": "Mt 23, 9b.10b",
+                        "gospel": "Mt 23, 8-12"
+                      },
+                      "NAME": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
+                      "MISSAL": "VATICAN_1970"
+                    },
+                    "StRayPenyafort": {
+                      "MONTH": 1,
+                      "DAY": 7,
+                      "event_key": "StRayPenyafort",
+                      "GRADE": 2,
+                      "COMMON": [
+                        "Pastors:For One Pastor"
+                      ],
+                      "CALENDAR": "GENERAL ROMAN",
+                      "COLOR": [
+                        "white"
+                      ],
+                      "READINGS": {
+                        "first_reading": "2 Cor 5, 14-20",
+                        "responsorial_psalm": "Salmo 103",
+                        "second_reading": "",
+                        "alleluia_verse": "Mt 24, 42a.44",
+                        "gospel": "Lc 12, 35-40"
                       },
                       "NAME": "Sancti Raimundi de Penyafort, presbyteri",
                       "MISSAL": "VATICAN_1970"
@@ -853,7 +942,7 @@
         }
       }
     },
-    "/regionaldata": {
+    "/data": {
       "get": {
         "tags": [
           "RegionalData"
@@ -2124,7 +2213,7 @@
           }
         }
       },
-      "RequestBody": {
+      "RetrieveCalendarRequestBody": {
         "anyOf": [
           {
             "$ref": "#/components/schemas/NationalCalendarRequestBody"
@@ -2249,7 +2338,7 @@
         "additionalProperties": false,
         "properties": {
           "locale": {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Locale"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
           },
           "epiphany": {
             "type": "string",
@@ -2299,6 +2388,39 @@
             ]
           }
         }
+      },
+      "EventsRequestBody": {
+        "type": "object",
+        "title": "",
+        "description": "",
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "nationalcalendar": {
+                "type": "string",
+                "description": "requests liturgical calendar data for a particular geographic area, on a national level or according to specifications defined be one or more Episcopal Conferences or on a Roman Missal published for a certain language or geographic area."
+              }
+            }
+          },
+          {
+            "properties": {
+              "diocesancalendar": {
+                "type": "string",
+                "description": "requests liturgical calendar data for a particular diocese"
+              }
+            }
+          },
+          {
+            "properties": {
+              "locale": {
+                "type": "string",
+                "description": "request the localization of the General Roman Calendar; however it is preferable to set the Accept-Language header",
+                "default": "la"
+              }
+            }
+          }
+        ]
       },
       "UnitTestArray": {
         "type": "array",
@@ -2358,10 +2480,10 @@
             }
           },
           "appliesTo": {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
           },
           "excludes": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
           }
         },
         "required": [
@@ -2417,10 +2539,10 @@
             }
           },
           "appliesTo": {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
           },
           "excludes": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
           }
         },
         "required": [
@@ -2477,10 +2599,10 @@
             }
           },
           "appliesTo": {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
           },
           "excludes": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=LitCalTest.json#/definitions/AppliesToOrExcludes"
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
           }
         },
         "required": [
@@ -2513,7 +2635,7 @@
                     "minimum": 1,
                     "maximum": 31
                   },
-                  "TAG": {
+                  "event_key": {
                     "type": "string",
                     "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$",
                     "description": "corresponds to the `eventkey` property of liturgical events in the output of the LitCal API and similar endpoints"
@@ -2550,58 +2672,58 @@
                   "READINGS": {
                     "type": "object",
                     "properties": {
-                      "FIRST_READING": {
+                      "first_reading": {
                         "type": "string"
                       },
-                      "RESPONSORIAL_PSALM": {
+                      "responsorial_psalm": {
                         "type": "string"
                       },
-                      "SECOND_READING": {
+                      "second_reading": {
                         "type": "string"
                       },
-                      "RESPONSORIAL_PSALM_2": {
+                      "responsorial_psalm_2": {
                         "type": "string"
                       },
-                      "THIRD_READING": {
+                      "third_reading": {
                         "type": "string"
                       },
-                      "RESPONSORIAL_PSALM_3": {
+                      "responsorial_psalm_3": {
                         "type": "string"
                       },
-                      "FOURTH_READING": {
+                      "fourth_reading": {
                         "type": "string"
                       },
-                      "RESPONSORIAL_PSALM_4": {
+                      "responsorial_psalm_4": {
                         "type": "string"
                       },
-                      "FIFTH_READING": {
+                      "fifth_reading": {
                         "type": "string"
                       },
-                      "RESPONSORIAL_PSALM_5": {
+                      "responsorial_psalm_5": {
                         "type": "string"
                       },
-                      "SIXTH_READING": {
+                      "sixth_reading": {
                         "type": "string"
                       },
-                      "RESPONSORIAL_PSALM_6": {
+                      "responsorial_psalm_6": {
                         "type": "string"
                       },
-                      "SEVENTH_READING": {
+                      "seventh_reading": {
                         "type": "string"
                       },
-                      "RESPONSORIAL_PSALM_7": {
+                      "responsorial_psalm_7": {
                         "type": "string"
                       },
-                      "EPISTLE": {
+                      "epistle": {
                         "type": "string"
                       },
-                      "RESPONSORIAL_PSALM_EPISTLE": {
+                      "responsorial_psalm_epistle": {
                         "type": "string"
                       },
-                      "ALLELUIA_VERSE": {
+                      "alleluia_verse": {
                         "type": "string"
                       },
-                      "GOSPEL": {
+                      "gospel": {
                         "type": "string"
                       }
                     },
@@ -2636,7 +2758,7 @@
                 "required": [
                   "MONTH",
                   "DAY",
-                  "TAG",
+                  "event_key",
                   "GRADE",
                   "COMMON",
                   "CALENDAR",
@@ -2778,13 +2900,13 @@
       "NationalDiocesanWiderRegionCalendar": {
         "oneOf": [
           {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=NationalCalendar.json#/definitions/NationalCalendar"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/NationalCalendar.json"
           },
           {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=DiocesanCalendar.json#/definitions/DiocesanCalendar"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/DiocesanCalendar.json"
           },
           {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=WiderRegionCalendar.json#/definitions/WiderRegionCalendar"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/WiderRegionCalendar.json"
           }
         ]
       }

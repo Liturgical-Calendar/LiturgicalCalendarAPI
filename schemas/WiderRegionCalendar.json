@@ -1,45 +1,43 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$ref": "#/definitions/WiderRegionCalendar",
-    "definitions": {
-        "WiderRegionCalendar": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "LitCal": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/LitCal"
-                    }
-                },
-                "NationalCalendars": {
-                    "$ref": "#/definitions/NationalCalendars"
-                },
-                "Metadata": {
-                    "$ref": "#/definitions/CalendarMetadata"
-                }
+    "title": "WiderRegionCalendar",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "litcal": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/LitCal"
             },
-            "required": [
-                "LitCal",
-                "NationalCalendars",
-                "Metadata"
-            ],
-            "title": "WiderRegionCalendar"
+            "minItems": 1
         },
+        "national_calendars": {
+            "$ref": "#/definitions/NationalCalendars"
+        },
+        "metadata": {
+            "$ref": "#/definitions/CalendarMetadata"
+        }
+    },
+    "required": [
+        "litcal",
+        "national_calendars",
+        "metadata"
+    ],
+    "definitions": {
         "LitCal": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "Festivity": {
+                "festivity": {
                     "$ref": "#/definitions/Festivity"
                 },
-                "Metadata": {
+                "metadata": {
                     "$ref": "#/definitions/Metadata"
                 }
             },
             "required": [
-                "Festivity",
-                "Metadata"
+                "festivity",
+                "metadata"
             ],
             "title": "LitCal"
         },
@@ -47,37 +45,37 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "tag": {
+                "event_key": {
                     "type": "string"
                 },
                 "name": {
                     "type": "string"
                 },
                 "color": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitColor"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                 },
                 "grade": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitGrade"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                 },
                 "day": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Day"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Day"
                 },
                 "month": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Month"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Month"
                 },
                 "common": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitCommon"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
                 },
                 "readings": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Readings"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Readings"
                 }
             },
             "required": [
+                "event_key",
                 "color",
-                "day",
                 "grade",
-                "month",
-                "tag"
+                "day",
+                "month"
             ],
             "title": "Festivity"
         },
@@ -86,26 +84,96 @@
             "additionalProperties": false,
             "properties": {
                 "action": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/WiderRegionCalendarAction"
+                    "$ref": "#/definitions/WiderRegionCalendarAction"
                 },
-                "sinceYear": {
+                "since_year": {
                     "type": "integer"
                 },
-                "decreeURL": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/DecreeURL"
+                "url": {
+                    "type": "string",
+                    "format": "uri"
                 },
-                "decreeLangs": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/DecreeLangs"
+                "url_lang_map": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "de": {
+                            "type": "string",
+                            "description": "German",
+                            "enum": [
+                                "de",
+                                "ge"
+                            ]
+                        },
+                        "en": {
+                            "type": "string",
+                            "description": "English",
+                            "enum": [
+                                "en"
+                            ]
+                        },
+                        "es": {
+                            "type": "string",
+                            "description": "Spanish",
+                            "enum": [
+                                "es",
+                                "sp"
+                            ]
+                        },
+                        "fr": {
+                            "type": "string",
+                            "description": "French",
+                            "enum": [
+                                "fr"
+                            ]
+                        },
+                        "it": {
+                            "type": "string",
+                            "description": "Italian",
+                            "enum": [
+                                "it"
+                            ]
+                        },
+                        "la": {
+                            "type": "string",
+                            "description": "Latin",
+                            "enum": [
+                                "la"
+                            ]
+                        },
+                        "pl": {
+                            "type": "string",
+                            "description": "Polish",
+                            "enum": [
+                                "pl"
+                            ]
+                        },
+                        "pt": {
+                            "type": "string",
+                            "description": "Portuguese",
+                            "enum": [
+                                "po",
+                                "pt"
+                            ]
+                        },
+                        "zh": {
+                            "type": "string",
+                            "description": "Chinese",
+                            "enum": [
+                                "zh"
+                            ]
+                        }
+                    }
                 },
-                "untilYear": {
+                "until_year": {
                     "type": "integer"
                 }
             },
             "required": [
                 "action",
-                "decreeLangs",
-                "decreeURL",
-                "sinceYear"
+                "url_lang_map",
+                "url",
+                "since_year"
             ],
             "title": "Metadata"
         },
@@ -371,31 +439,48 @@
                     "pattern": "[A-Z1-9]{2,3}"
                 }
             },
+            "minProperties": 1,
             "title": "NationalCalendars"
         },
         "CalendarMetadata": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "IsMultilingual": {
+                "multilingual": {
                     "type": "boolean"
                 },
-                "Languages": {
+                "languages": {
                     "type": "array",
                     "items": {
                         "type": "string",
                         "pattern": "[a-z]{2}_[A-Z1-9]{2,3}"
-                    }
+                    },
+                    "minItems": 1
                 },
-                "WiderRegion": {
-                    "type": "string"
+                "wider_region": {
+                    "type": "string",
+                    "enum": [
+                        "Africa",
+                        "Americas",
+                        "Asia",
+                        "Europe",
+                        "Oceania"
+                    ]
                 }
             },
             "required": [
-                "IsMultilingual",
-                "WiderRegion"
+                "multilingual",
+                "wider_region"
             ],
             "title": "CalendarMetadata"
+        },
+        "WiderRegionCalendarAction": {
+            "type": "string",
+            "enum": [
+                "createNew",
+                "makePatron"
+            ],
+            "title": "WiderRegionCalendarAction"
         }
     }
 }

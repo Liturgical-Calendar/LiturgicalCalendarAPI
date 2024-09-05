@@ -1,7 +1,7 @@
 {
-    "LitCal": {
+    "litcal": {
         "HWillibrordbisschopverkondigervanonsgeloofpatroonvanhetbisdom": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Willibrord, bisschop, verkondiger van ons geloof, patroon van het bisdom",
                 "color": [
                     "white"
@@ -13,13 +13,13 @@
                 "day": 7,
                 "month": 11
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 0
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 0
             }
         },
         "VerjaardagvandeWijdingvandekathedraal": {
-            "Festivity": {
+            "festivity": {
                 "name": "Verjaardag van de Wijding van de kathedraal",
                 "color": [
                     "white"
@@ -31,13 +31,13 @@
                 "day": 2,
                 "month": 5
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 1
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 1
             }
         },
         "HAthanasiusbisschopenkerkleraar": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Athanasius, bisschop en kerkleraar",
                 "color": [
                     "white"
@@ -50,13 +50,13 @@
                 "day": 4,
                 "month": 5
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 0
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 0
             }
         },
         "HHBonifatiusbisschopengezellenmartelarenbijpatronenvanhetbisdom": {
-            "Festivity": {
+            "festivity": {
                 "name": "HH. Bonifatius, bisschop, en gezellen, martelaren, bijpatronen van het bisdom",
                 "color": [
                     "red",
@@ -70,13 +70,13 @@
                 "day": 5,
                 "month": 6
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 1
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 1
             }
         },
         "HAdalbertdiaken": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Adalbert diaken",
                 "color": [
                     "white"
@@ -88,13 +88,13 @@
                 "day": 25,
                 "month": 6
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 2
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 2
             }
         },
         "OnzeLieveVrouwterNood": {
-            "Festivity": {
+            "festivity": {
                 "name": "Onze Lieve Vrouw ter Nood",
                 "color": [
                     "white"
@@ -106,14 +106,14 @@
                 "day": 1,
                 "month": 1
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 3,
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 3,
                 "strtotime": "last saturday of May"
             }
         },
         "MirakelvanhetHSacramentteAmsterdam": {
-            "Festivity": {
+            "festivity": {
                 "name": "Mirakel van het H. Sacrament te Amsterdam",
                 "color": [
                     "white"
@@ -125,14 +125,14 @@
                 "day": 1,
                 "month": 1
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 0,
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 0,
                 "strtotime": "wednesday after March 12"
             }
         },
         "HBavo": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Bavo",
                 "color": [
                     "white"
@@ -144,13 +144,13 @@
                 "day": 1,
                 "month": 10
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 1
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 1
             }
         },
         "HTeresiavanhetKindJezusmaagd": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Teresia van het Kind Jezus, maagd",
                 "color": [
                     "white"
@@ -162,13 +162,13 @@
                 "day": 1,
                 "month": 10
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 2
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 2
             }
         },
         "HJozefmariaEscrivpriester": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Jozefmaria Escrivá, priester",
                 "color": [
                     "white"
@@ -180,9 +180,9 @@
                 "day": 26,
                 "month": 6
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 3
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 3
             }
         }
     }

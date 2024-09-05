@@ -14,13 +14,38 @@ use Johnrdorazio\LitCal\DateTime;
  */
 class LitFunc
 {
-    private const NON_EVENT_KEYS = [ 'LitCal', 'Settings', 'Messages', 'Metadata', 'Solemnities', 'FeastsMemorials', 'RequestHeaders', 'color', 'colorLcl', 'common' ];
+    // NON_EVENT_KEYS are keys whose value is an array, but are not a LitCalEvent
+    private const NON_EVENT_KEYS = [
+        'litcal',
+        'settings',
+        'messages',
+        'metadata',
+        'solemnities',
+        'solemnities_keys',
+        'feasts',
+        'feasts_keys',
+        'memorials',
+        'memorials_keys',
+        'request_headers',
+        'color',
+        'color_lcl',
+        'common'
+    ];
     private static string $LAST_ARRAY_KEY = '';
+    private const TRANSFORM_KEYS = [
+      "litcal"            => "LitCal",
+      "has_vesper_ii"     => "HasVesperII"
+    ];
     public static string $HASH_REQUEST    = '';
 
-    public static function isNotLitCalEventKey(string $key): bool
+    private static function isNotLitCalEventKey(string $key): bool
     {
         return in_array($key, self::NON_EVENT_KEYS);
+    }
+
+    private static function isTransformKey(string $key): bool
+    {
+        return array_key_exists($key, self::TRANSFORM_KEYS);
     }
 
     public static function convertArray2XML(array $data, ?\SimpleXMLElement &$xml): void
@@ -30,12 +55,21 @@ class LitFunc
                 self::$LAST_ARRAY_KEY = $key;
                 //self::debugWrite( "value of key <$key> is an array" );
                 if (self::isNotLitCalEventKey($key)) {
-                  //self::debugWrite( "key <$key> is not a LitCalEvent" );
+                    //self::debugWrite( "key <$key> is not a LitCalEvent" );
+                    if (self::isTransformKey($key)) {
+                        $key = self::TRANSFORM_KEYS[$key];
+                    } else {
+                        $key = str_replace('_', '', ucwords($key, '_'));
+                    }
                     $new_object = $xml->addChild($key);
                 } else {
-                  //self::debugWrite( "key <$key> is a LitCalEvent" );
+                    //self::debugWrite( "key <$key> is a LitCalEvent" );
                     $new_object = $xml->addChild("LitCalEvent");
-                    $new_object->addAttribute("eventkey", $key);
+                    if (is_numeric($key)) {
+                        $new_object->addAttribute("idx", $key);
+                    } else {
+                        $new_object->addAttribute("eventKey", $key);
+                    }
                 }
                 //self::debugWrite( "proceeding to convert array value of <$key> to xml sequence..." );
                 self::convertArray2XML($value, $new_object);
@@ -43,27 +77,40 @@ class LitFunc
               // XML elements cannot have numerical names, they must have text
                 if (is_numeric($key)) {
                     //self::debugWrite( "key <$key> is numerical, have to deal with this..." );
-                    if (self::$LAST_ARRAY_KEY === 'Messages') {
+                    if (self::$LAST_ARRAY_KEY === 'messages') {
                       //self::debugWrite( "key <$key> seems to belong to the Messages array: will create a corresponding <message> element with attribute 'idx'" );
-                        $el = $xml->addChild('message', htmlspecialchars($value));
+                        $el = $xml->addChild('Message', htmlspecialchars($value));
+                        $el->addAttribute("idx", $key);
+                    } elseif (in_array(self::$LAST_ARRAY_KEY, ['solemnities_keys','feasts_keys','memorials_keys'])) {
+                        $el = $xml->addChild('Key', $value);
                         $el->addAttribute("idx", $key);
                     } else {
                       //self::debugWrite( "key <$key> does not seem to belong to the Messages array: will create a corresponding <option> element with attribute 'idx'" );
-                        $el = $xml->addChild('option', $value);
+                        $el = $xml->addChild('Option', $value);
                         $el->addAttribute("idx", $key);
                     }
                 } elseif (is_bool($value)) {
                     $boolVal = $value ? 1 : 0;
+                    if (self::isTransformKey($key)) {
+                        $key = self::TRANSFORM_KEYS[$key];
+                    } else {
+                        $key = str_replace('_', '', ucwords($key, '_'));
+                    }
                     $xml->addChild($key, $boolVal);
                 } else {
+                    if (self::isTransformKey($key)) {
+                        $key = self::TRANSFORM_KEYS[$key];
+                    } else {
+                        $key = str_replace('_', '', ucwords($key, '_'));
+                    }
                     $xml->addChild($key, htmlspecialchars($value));
                 }
             }
         }
     }
 
-  // https://en.wikipedia.org/wiki/Computus#Anonymous_Gregorian_algorithm
-  // aka Meeus/Jones/Butcher algorithm
+    // https://en.wikipedia.org/wiki/Computus#Anonymous_Gregorian_algorithm
+    // aka Meeus/Jones/Butcher algorithm
     public static function calcGregEaster($Y): DateTime
     {
         $a = $Y % 19;
@@ -87,10 +134,10 @@ class LitFunc
     }
 
 
-  //https://en.wikipedia.org/wiki/Computus#Meeus.27_Julian_algorithm
-  //Meeus' Julian algorithm
-  //Also many javascript examples can be found here:
-  //https://web.archive.org/web/20150227133210/http://www.merlyn.demon.co.uk/estralgs.txt
+    //https://en.wikipedia.org/wiki/Computus#Meeus.27_Julian_algorithm
+    //Meeus' Julian algorithm
+    //Also many javascript examples can be found here:
+    //https://web.archive.org/web/20150227133210/http://www.merlyn.demon.co.uk/estralgs.txt
     public static function calcJulianEaster(int $Y, bool $gregCal = false): DateTime
     {
         $a = $Y % 4;
@@ -142,10 +189,10 @@ class LitFunc
         }
         return $dateObj;
     }
-  /**
-  private static function debugWrite( string $string ) {
-    $debugFile = "LitFuncDebug_" . LitFunc::$HASH_REQUEST . ".log";
-    file_put_contents( $debugFile, date('c') . "\t" . $string . PHP_EOL, FILE_APPEND );
-  }
-  */
+    /**
+    private static function debugWrite( string $string ) {
+      $debugFile = "LitFuncDebug_" . LitFunc::$HASH_REQUEST . ".log";
+      file_put_contents( $debugFile, date('c') . "\t" . $string . PHP_EOL, FILE_APPEND );
+    }
+    */
 }

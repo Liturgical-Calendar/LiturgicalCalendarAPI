@@ -1,289 +1,343 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$ref": "#/definitions/LitCal",
-    "definitions": {
-        "LitCal": {
+    "title": "LitCal",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "settings": {
             "type": "object",
+            "description": "echoes back the settings that were requested for the generation of this specific liturgical calendar, as feedback to be sure that the requested settings were correctly applied",
             "additionalProperties": false,
             "properties": {
-                "Settings": {
-                    "type": "object",
-                    "description": "echoes back the settings that were requested for the generation of this specific liturgical calendar, as feedback to be sure that the requested settings were correctly applied",
-                    "additionalProperties": false,
-                    "properties": {
-                        "Year": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Year"
-                        },
-                        "CalendarType": {
-                            "type": "string",
-                            "enum": [
-                                "CIVIL",
-                                "LITURGICAL"
-                            ]
-                        },
-                        "Epiphany": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Epiphany"
-                        },
-                        "Ascension": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Ascension"
-                        },
-                        "CorpusChristi": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/CorpusChristi"
-                        },
-                        "Locale": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Locale"
-                        },
-                        "ReturnType": {
-                            "type": "string",
-                            "enum": [
-                                "ICS",
-                                "JSON",
-                                "XML",
-                                "YML"
-                            ]
-                        },
-                        "EternalHighPriest": {
-                            "type": "boolean"
-                        },
-                        "NationalCalendar": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Region"
-                        },
-                        "DiocesanCalendar": {
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        "Year",
-                        "Epiphany",
-                        "Ascension",
-                        "CorpusChristi",
-                        "Locale",
-                        "ReturnType",
-                        "CalendarType",
-                        "EternalHighPriest"
+                "year": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
+                },
+                "calendar_type": {
+                    "type": "string",
+                    "enum": [
+                        "CIVIL",
+                        "LITURGICAL"
                     ]
                 },
-                "Metadata": {
-                    "type": "object",
-                    "description": "contains information about the current API version, how and when the current response was produced, and keys of liturgical events that can have precedence over others, useful for further calculations of a local calendar",
-                    "additionalProperties": false,
-                    "properties": {
-                        "Version": {
-                            "type": "string",
-                            "minLength": 3,
-                            "maxLength": 5,
-                            "pattern": "^(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)$"
-                        },
-                        "Timestamp": {
-                            "type": "integer",
-                            "description": "Certainly cannot be any earlier than the start of the project itself July 26, 2017; we'll set the max to Dec 12th, 9999",
-                            "minimum": 1501108382,
-                            "maximum": 253402214400
-                        },
-                        "DateTime": {
-                            "type": "string",
-                            "format": "date-time"
-                        },
-                        "RequestHeaders": {
-                            "type": "object",
-                            "properties": {
-                                "Accept": {
-                                    "type": "string",
-                                    "description": "If present, must contain at least one of the following",
-                                    "pattern": "(?:text/html|application/xml|application/json|text/calendar|application/yaml)"
-                                },
-                                "Accept-Language": {
-                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/AcceptLanguage"
-                                },
-                                "Host": {
-                                    "type": "string",
-                                    "const": "litcal.johnromanodorazio.com"
-                                },
-                                "X-Requested-With": {
-                                    "type": "string",
-                                    "description": "Will only appear for AJAX requests, and will only ever have a value of XMLHttpRequest",
-                                    "const": "XMLHttpRequest"
-                                }
-                            },
-                            "additionalProperties": false
-                        },
-                        "Solemnities": {
-                            "$ref": "#/definitions/DateTimeObjectCollection"
-                        },
-                        "FeastsMemorials": {
-                            "$ref": "#/definitions/DateTimeObjectCollection"
-                        }
-                    },
-                    "required": [
-                        "Version",
-                        "RequestHeaders",
-                        "Solemnities",
-                        "FeastsMemorials"
+                "epiphany": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
+                },
+                "ascension": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Ascension"
+                },
+                "corpus_christi": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
+                },
+                "locale": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
+                },
+                "return_type": {
+                    "type": "string",
+                    "enum": [
+                        "ICS",
+                        "JSON",
+                        "XML",
+                        "YML"
                     ]
                 },
-                "LitCal": {
+                "eternal_high_priest": {
+                    "type": "boolean"
+                },
+                "national_calendar": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
+                },
+                "diocesan_calendar": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "year",
+                "epiphany",
+                "ascension",
+                "corpus_christi",
+                "locale",
+                "return_type",
+                "calendar_type",
+                "eternal_high_priest"
+            ]
+        },
+        "metadata": {
+            "type": "object",
+            "description": "contains information about the current API version, how and when the current response was produced, and keys of liturgical events that can have precedence over others, useful for further calculations of a local calendar",
+            "additionalProperties": false,
+            "properties": {
+                "version": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 5,
+                    "pattern": "^(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)$"
+                },
+                "timestamp": {
+                    "type": "integer",
+                    "description": "Certainly cannot be any earlier than the start of the project itself July 26, 2017; we'll set the max to Dec 12th, 9999",
+                    "minimum": 1501108382,
+                    "maximum": 253402214400
+                },
+                "date_time": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "request_headers": {
                     "type": "object",
-                    "description": "the liturgical events that make up the requested Liturgical Calendar for the given year",
-                    "patternProperties": {
-                        "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}_vigil$": {
-                            "$ref": "#/definitions/FestivityVigil"
+                    "properties": {
+                        "Accept": {
+                            "type": "string",
+                            "description": "If present, must contain at least one of the following",
+                            "pattern": "(?:text/html|application/xml|application/json|text/calendar|application/yaml)"
                         },
-                        "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}$": {
-                            "$ref": "#/definitions/FestivityWithSeason"
+                        "Accept-Language": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/AcceptLanguage"
+                        },
+                        "Host": {
+                            "type": "string",
+                            "const": "litcal.johnromanodorazio.com"
+                        },
+                        "X-Requested-With": {
+                            "type": "string",
+                            "description": "Will only appear for AJAX requests, and will only ever have a value of XMLHttpRequest",
+                            "const": "XMLHttpRequest"
                         }
                     },
                     "additionalProperties": false
                 },
-                "Messages": {
+                "solemnities": {
+                    "$ref": "#/definitions/DateTimeObjectCollection"
+                },
+                "solemnities_keys": {
                     "type": "array",
-                    "description": "an array containing all of the significant operations done in the calculation of the requested Liturgical Calendar, with links to the Decrees of the Congregation for Divine Worship where applicable. Useful for understanding how or why the calculations were done, and what changes have been applied in the generation of the Calendar for the specific year requested.",
                     "items": {
-                        "type": "string"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/EventKey"
+                    }
+                },
+                "feasts": {
+                    "$ref": "#/definitions/DateTimeObjectCollection"
+                },
+                "feasts_keys": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/EventKey"
+                    }
+                },
+                "memorials": {
+                    "$ref": "#/definitions/DateTimeObjectCollection"
+                },
+                "memorials_keys": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/EventKey"
                     }
                 }
             },
             "required": [
-                "Settings",
-                "Metadata",
-                "LitCal",
-                "Messages"
-            ],
-            "examples": [
-                {
-                    "Settings": {
-                        "Year": 1970,
-                        "Epiphany": "JAN6",
-                        "Ascension": "SUNDAY",
-                        "CorpusChristi": "SUNDAY",
-                        "CalendarType": "CIVIL",
-                        "Locale": "string",
-                        "ReturnType": "JSON",
-                        "NationalCalendar": "string",
-                        "DiocesanCalendar": "string",
-                        "EternalHighPriest": true
-                    },
-                    "Metadata": {
-                        "Version": "string",
-                        "Timestamp": 1501027200,
-                        "DateTime": "2024-05-02T03:32:58.936Z",
-                        "RequestHeaders": {
-                            "Accept-Language": "it-IT,it;",
-                            "Accept": "application/json",
-                            "Host": "litcal.johnromanodorazio.com"
-                        },
-                        "Solemnities": {
-                            "Christmas": {
-                                "date": "2023-12-25T00:00:00+00:00",
-                                "timezone_type": 3,
-                                "timezone": "UTC"
-                            },
-                            "Advent1": {
-                                "date": "2023-12-03T00:00:00+00:00",
-                                "timezone_type": 3,
-                                "timezone": "UTC"
-                            }
-                        },
-                        "FeastsMemorials": {
-                            "StStephenProtomartyr": {
-                                "date": "2023-12-26T00:00:00+00:00",
-                                "timezone_type": 3,
-                                "timezone": "UTC"
-                            },
-                            "StJohnEvangelist": {
-                                "date": "2023-12-27T00:00:00+00:00",
-                                "timezone_type": 3,
-                                "timezone": "UTC"
-                            }
-                        }
-                    },
-                    "LitCal": {
-                        "Advent1_vigil": {
-                            "eventIdx": 1076,
-                            "name": "Dominica Prima Adventus Missa in Vigilia",
-                            "date": 1701475200,
-                            "color": [
-                                "purple"
-                            ],
-                            "colorLcl": [
-                                "purpura"
-                            ],
-                            "type": "mobile",
-                            "grade": 7,
-                            "gradeLcl": "celebratio altioris ordinis quam sollemnitatis",
-                            "displayGrade": "",
-                            "common": [],
-                            "commonLcl": "",
-                            "dayOfTheWeek_ISO8601": 6,
-                            "month": 12,
-                            "day": 2,
-                            "year": 2023,
-                            "monthShort": "Dec",
-                            "monthLong": "December",
-                            "dayOfTheWeekShort": "Sat",
-                            "dayOfTheWeekLong": "Saturday",
-                            "liturgicalYear": "ANNUM B",
-                            "isVigilMass": true,
-                            "isVigilFor": "Advent1"
-                        },
-                        "Advent1": {
-                            "eventIdx": 583,
-                            "name": "Dominica Prima Adventus",
-                            "date": 1701561600,
-                            "color": [
-                                "purple"
-                            ],
-                            "colorLcl": [
-                                "purpura"
-                            ],
-                            "type": "mobile",
-                            "grade": 7,
-                            "gradeLcl": "celebratio altioris ordinis quam sollemnitatis",
-                            "displayGrade": "",
-                            "common": [],
-                            "commonLcl": "",
-                            "dayOfTheWeek_ISO8601": 7,
-                            "month": 12,
-                            "day": 3,
-                            "year": 2023,
-                            "monthShort": "Dec",
-                            "monthLong": "December",
-                            "dayOfTheWeekShort": "Sun",
-                            "dayOfTheWeekLong": "Sunday",
-                            "liturgicalYear": "ANNUM B",
-                            "hasVigilMass": true,
-                            "hasVesperI": true,
-                            "hasVesperII": true,
-                            "psalterWeek": 1,
-                            "liturgicalSeason": "ADVENT",
-                            "liturgicalSeasonLcl": "Tempus Adventus"
-                        }
-                    },
-                    "Messages": [
-                        "The Solemnity 'Sancti Ioseph Sponsi Beatæ Mariæ Virginis' falls on Dominica IV in Quadragesima in the year 2023, the celebration has been transferred to the following Monday (20 Martius) as per the <a href=\"http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/1990/284-285.html\">Decree of the Congregation for Divine Worship</a>.",
-                        "'Dominica XVIII «Per Annum»' is superseded by the FESTUM DOMINI 'In Transfiguratione Domini' in the year 2023."
-                    ]
-                }
+                "version",
+                "request_headers",
+                "solemnities",
+                "solemnities_keys",
+                "feasts",
+                "feasts_keys",
+                "memorials",
+                "memorials_keys"
             ]
         },
-        "DateTimeObjectCollection": {
+        "litcal": {
             "type": "object",
+            "description": "the liturgical events that make up the requested Liturgical Calendar for the given year",
             "patternProperties": {
-                "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+(?:0|_vigil)?$": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                        "date": {
-                            "type": "string",
-                            "format": "date-time"
-                        },
-                        "timezone_type": {
-                            "type": "integer",
-                            "const": 3
-                        },
-                        "timezone": {
-                            "type": "string",
-                            "const": "UTC"
-                        }
+                "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}_vigil$": {
+                    "$ref": "#/definitions/FestivityVigil"
+                },
+                "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}$": {
+                    "$ref": "#/definitions/FestivityWithSeason"
+                }
+            },
+            "additionalProperties": false
+        },
+        "messages": {
+            "type": "array",
+            "description": "an array containing all of the significant operations done in the calculation of the requested Liturgical Calendar, with links to the Decrees of the Congregation for Divine Worship where applicable. Useful for understanding how or why the calculations were done, and what changes have been applied in the generation of the Calendar for the specific year requested.",
+            "items": {
+                "type": "string"
+            }
+        }
+    },
+    "required": [
+        "settings",
+        "metadata",
+        "litcal",
+        "messages"
+    ],
+    "examples": [
+        {
+            "settings": {
+                "year": 1970,
+                "epiphany": "JAN6",
+                "ascension": "SUNDAY",
+                "corpus_christi": "SUNDAY",
+                "calendar_type": "CIVIL",
+                "locale": "string",
+                "return_type": "JSON",
+                "national_calendar": "string",
+                "diocesan_calendar": "string",
+                "eternal_high_priest": true
+            },
+            "metadata": {
+                "version": "string",
+                "timestamp": 1501027200,
+                "date_time": "2024-05-02T03:32:58.936Z",
+                "request_headers": {
+                    "Accept-Language": "it-IT,it;",
+                    "Accept": "application/json",
+                    "Host": "litcal.johnromanodorazio.com"
+                },
+                "solemnities": [
+                    {
+                        "event_key": "Christmas",
+                        "date": "2023-12-25T00:00:00+00:00",
+                        "timezone_type": 3,
+                        "timezone": "UTC"
+                    },
+                    {
+                        "event_key": "Advent1",
+                        "date": "2023-12-03T00:00:00+00:00",
+                        "timezone_type": 3,
+                        "timezone": "UTC"
+                    }
+                ],
+                "solemnities_keys": [
+                    "Christmas",
+                    "Advent1"
+                ],
+                "feasts": [
+                    {
+                        "event_key": "ConversionStPaul",
+                        "date": "2023-01-25T00:00:00+00:00",
+                        "timezone_type": 3,
+                        "timezone": "UTC"
+                    },
+                    {
+                        "event_key": "StMarkEvangelist",
+                        "date": "2023-04-25T00:00:00+00:00",
+                        "timezone_type": 3,
+                        "timezone": "UTC"
+                    }
+                ],
+                "feasts_keys": [
+                    "ConversionStPaul",
+                    "StMarkEvangelist"
+                ],
+                "memorials": [
+                    {
+                        "event_key": "ImmaculateHeart",
+                        "date": "2023-06-17T00:00:00+00:00",
+                        "timezone_type": 3,
+                        "timezone": "UTC"
+                    },
+                    {
+                        "event_key": "StsBasilGreg",
+                        "date": "2023-01-02T00:00:00+00:00",
+                        "timezone_type": 3,
+                        "timezone": "UTC"
+                    }
+                ],
+                "memorials_keys": [
+                    "ImmaculateHeart",
+                    "StsBasilGreg"
+                ]
+            },
+            "litcal": {
+                "Advent1_vigil": {
+                    "event_idx": 1076,
+                    "name": "Dominica Prima Adventus Missa in Vigilia",
+                    "date": 1701475200,
+                    "color": [
+                        "purple"
+                    ],
+                    "color_lcl": [
+                        "purpura"
+                    ],
+                    "type": "mobile",
+                    "grade": 7,
+                    "grade_lcl": "celebratio altioris ordinis quam sollemnitatis",
+                    "display_grade": "",
+                    "common": [],
+                    "common_lcl": "",
+                    "day_of_the_week_iso8601": 6,
+                    "month": 12,
+                    "day": 2,
+                    "year": 2023,
+                    "month_short": "Dec",
+                    "month_long": "December",
+                    "day_of_the_week_short": "Sat",
+                    "day_of_the_week_long": "Saturday",
+                    "liturgical_year": "ANNUM B",
+                    "is_vigil_mass": true,
+                    "is_vigil_for": "Advent1"
+                },
+                "Advent1": {
+                    "event_idx": 583,
+                    "name": "Dominica Prima Adventus",
+                    "date": 1701561600,
+                    "color": [
+                        "purple"
+                    ],
+                    "color_lcl": [
+                        "purpura"
+                    ],
+                    "type": "mobile",
+                    "grade": 7,
+                    "grade_lcl": "celebratio altioris ordinis quam sollemnitatis",
+                    "display_grade": "",
+                    "common": [],
+                    "common_lcl": "",
+                    "day_of_the_week_iso8601": 7,
+                    "month": 12,
+                    "day": 3,
+                    "year": 2023,
+                    "month_short": "Dec",
+                    "month_long": "December",
+                    "day_of_the_week_short": "Sun",
+                    "day_of_the_week_long": "Sunday",
+                    "liturgical_year": "ANNUM B",
+                    "has_vigil_mass": true,
+                    "has_vesper_i": true,
+                    "has_vesper_ii": true,
+                    "psalter_week": 1,
+                    "liturgical_season": "ADVENT",
+                    "liturgical_season_lcl": "Tempus Adventus"
+                }
+            },
+            "messages": [
+                "The Solemnity 'Sancti Ioseph Sponsi Beatæ Mariæ Virginis' falls on Dominica IV in Quadragesima in the year 2023, the celebration has been transferred to the following Monday (20 Martius) as per the <a href=\"http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/1990/284-285.html\">Decree of the Congregation for Divine Worship</a>.",
+                "'Dominica XVIII «Per Annum»' is superseded by the FESTUM DOMINI 'In Transfiguratione Domini' in the year 2023."
+            ]
+        }
+    ],
+    "definitions": {
+        "DateTimeObjectCollection": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "event_key": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/EventKey"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "timezone_type": {
+                        "type": "integer",
+                        "const": 3
+                    },
+                    "timezone": {
+                        "type": "string",
+                        "const": "UTC"
                     }
                 }
             }
@@ -291,7 +345,7 @@
         "FestivityVigil": {
             "type": "object",
             "properties": {
-                "eventIdx": {
+                "event_idx": {
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 2000
@@ -300,36 +354,36 @@
                     "type": "string"
                 },
                 "date": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Timestamp"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Timestamp"
                 },
                 "color": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitColor"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                 },
-                "colorLcl": {
+                "color_lcl": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
                 },
                 "type": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitFeastType"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitFeastType"
                 },
                 "grade": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitGrade"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                 },
-                "gradeLcl": {
+                "grade_lcl": {
                     "type": "string"
                 },
-                "displayGrade": {
+                "display_grade": {
                     "type": "string"
                 },
                 "common": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitCommon"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
                 },
-                "commonLcl": {
+                "common_lcl": {
                     "type": "string"
                 },
-                "dayOfTheWeek_ISO8601": {
+                "day_of_the_week_iso8601": {
                     "type": "integer",
                     "minimum": 1,
                     "maximum": 7
@@ -349,55 +403,55 @@
                     "minimum": 1969,
                     "maxItems": 9999
                 },
-                "monthShort": {
+                "month_short": {
                     "type": "string"
                 },
-                "monthLong": {
+                "month_long": {
                     "type": "string"
                 },
-                "dayOfTheWeekShort": {
+                "day_of_the_week_short": {
                     "type": "string"
                 },
-                "dayOfTheWeekLong": {
+                "day_of_the_week_long": {
                     "type": "string"
                 },
-                "liturgicalYear": {
+                "liturgical_year": {
                     "type": "string"
                 },
-                "isVigilMass": {
+                "is_vigil_mass": {
                     "type": "boolean"
                 },
-                "isVigilFor": {
+                "is_vigil_for": {
                     "type": "string"
                 }
             },
             "required": [
-                "eventIdx",
+                "event_idx",
                 "name",
                 "date",
                 "color",
-                "colorLcl",
+                "color_lcl",
                 "type",
                 "grade",
-                "displayGrade",
+                "display_grade",
                 "common",
-                "commonLcl",
-                "dayOfTheWeek_ISO8601",
+                "common_lcl",
+                "day_of_the_week_iso8601",
                 "month",
                 "day",
                 "year",
-                "monthShort",
-                "monthLong",
-                "dayOfTheWeekShort",
-                "dayOfTheWeekLong",
-                "isVigilMass",
-                "isVigilFor"
+                "month_short",
+                "month_long",
+                "day_of_the_week_short",
+                "day_of_the_week_long",
+                "is_vigil_mass",
+                "is_vigil_for"
             ],
             "additionalProperties": false
         },
         "FestivityWithSeason": {
             "properties": {
-                "eventIdx": {
+                "event_idx": {
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 2000
@@ -406,36 +460,36 @@
                     "type": "string"
                 },
                 "date": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Timestamp"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Timestamp"
                 },
                 "color": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitColor"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitColor"
                 },
-                "colorLcl": {
+                "color_lcl": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
                 },
                 "type": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitFeastType"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitFeastType"
                 },
                 "grade": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitGrade"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                 },
-                "gradeLcl": {
+                "grade_lcl": {
                     "type": "string"
                 },
-                "displayGrade": {
+                "display_grade": {
                     "type": "string"
                 },
                 "common": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/LitCommon"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
                 },
-                "commonLcl": {
+                "common_lcl": {
                     "type": "string"
                 },
-                "dayOfTheWeek_ISO8601": {
+                "day_of_the_week_iso8601": {
                     "type": "integer",
                     "minimum": 1,
                     "maximum": 7
@@ -455,22 +509,22 @@
                     "minimum": 1969,
                     "maxItems": 9999
                 },
-                "monthShort": {
+                "month_short": {
                     "type": "string"
                 },
-                "monthLong": {
+                "month_long": {
                     "type": "string"
                 },
-                "dayOfTheWeekShort": {
+                "day_of_the_week_short": {
                     "type": "string"
                 },
-                "dayOfTheWeekLong": {
+                "day_of_the_week_long": {
                     "type": "string"
                 },
-                "liturgicalYear": {
+                "liturgical_year": {
                     "type": "string"
                 },
-                "liturgicalSeason": {
+                "liturgical_season": {
                     "type": "string",
                     "enum": [
                         "ADVENT",
@@ -481,43 +535,43 @@
                         "ORDINARY_TIME"
                     ]
                 },
-                "liturgicalSeasonLcl": {
+                "liturgical_season_lcl": {
                     "type": "string"
                 },
-                "hasVigilMass": {
+                "has_vigil_mass": {
                     "type": "boolean"
                 },
-                "hasVesperI": {
+                "has_vesper_i": {
                     "type": "boolean"
                 },
-                "hasVesperII": {
+                "has_vesper_ii": {
                     "type": "boolean"
                 },
-                "psalterWeek": {
+                "psalter_week": {
                     "type": "integer"
                 }
             },
             "required": [
-                "eventIdx",
+                "event_idx",
                 "name",
                 "date",
                 "color",
-                "colorLcl",
+                "color_lcl",
                 "type",
                 "grade",
-                "displayGrade",
+                "display_grade",
                 "common",
-                "commonLcl",
-                "dayOfTheWeek_ISO8601",
+                "common_lcl",
+                "day_of_the_week_iso8601",
                 "month",
                 "day",
                 "year",
-                "monthShort",
-                "monthLong",
-                "dayOfTheWeekShort",
-                "dayOfTheWeekLong",
-                "liturgicalSeason",
-                "liturgicalSeasonLcl"
+                "month_short",
+                "month_long",
+                "day_of_the_week_short",
+                "day_of_the_week_long",
+                "liturgical_season",
+                "liturgical_season_lcl"
             ],
             "additionalProperties": false
         }

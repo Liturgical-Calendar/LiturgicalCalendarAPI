@@ -6,9 +6,9 @@
     "homepage": "https://litcal.johnromanodorazio.com",
     "require": {
         "php": ">=7.4",
-        "swaggest/json-schema": "^0.12",
-        "cboden/ratchet": "^0.4.4",
-        "sabre/vobject": "~4.1"
+        "swaggest/json-schema": "~0.12",
+        "cboden/ratchet": "~0.4",
+        "sabre/vobject": "^4.5.1"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "*"

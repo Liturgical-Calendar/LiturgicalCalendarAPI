@@ -1,31 +1,29 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$ref": "#/definitions/LitCalTest",
+    "title": "LitCalTest",
+    "oneOf": [
+        { "$ref": "#/definitions/ExactCorrespondenceType" },
+        { "$ref": "#/definitions/ExactCorrespondenceSinceType" },
+        { "$ref": "#/definitions/ExactCorrespondenceUntilType" }
+    ],
     "definitions": {
-        "LitCalTest": {
-            "oneOf": [
-                { "$ref": "#/definitions/ExactCorrespondenceType" },
-                { "$ref": "#/definitions/ExactCorrespondenceSinceType" },
-                { "$ref": "#/definitions/ExactCorrespondenceUntilType" }
-            ]
-        },
         "AppliesToOrExcludes": {
             "type": "object",
             "minProperties": 1,
             "properties": {
-                "nationalcalendar": {
+                "national_calendar": {
                     "type": "string"
                 },
-                "diocesancalendar": {
+                "diocesan_calendar": {
                     "type": "string"
                 },
-                "nationalcalendars": {
+                "national_calendars": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
                 },
-                "diocesancalendars": {
+                "diocesan_calendars": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -33,10 +31,10 @@
                 }
             },
             "anyOf": [
-                { "required": ["nationalcalendar"] },
-                { "required": ["nationalcalendars"] },
-                { "required": ["diocesancalendar"] },
-                { "required": ["diocesancalendars"] }
+                { "required": ["national_calendar"] },
+                { "required": ["national_calendars"] },
+                { "required": ["diocesan_calendar"] },
+                { "required": ["diocesan_calendars"] }
             ],
             "additionalProperties": false
         },
@@ -47,21 +45,21 @@
                     "type": "string",
                     "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
                 },
-                "eventkey": {
+                "event_key": {
                     "type": "string",
                     "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
                 },
                 "description": {
                     "type": "string"
                 },
-                "testType": {
+                "test_type": {
                     "type": "string",
                     "enum": [
                         "exactCorrespondence",
                         "variableCorrespondence"
                     ]
                 },
-                "appliesTo": {
+                "applies_to": {
                     "$ref": "#/definitions/AppliesToOrExcludes"
                 },
                 "excludes": {
@@ -71,7 +69,7 @@
                     "$ref": "#/definitions/Assertions"
                 }
             },
-            "required": [ "name", "eventkey", "description", "testType", "assertions" ],
+            "required": [ "name", "event_key", "description", "test_type", "assertions" ],
             "additionalProperties": false
         },
         "ExactCorrespondenceSinceType": {
@@ -81,21 +79,21 @@
                     "type": "string",
                     "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
                 },
-                "eventkey": {
+                "event_key": {
                     "type": "string",
                     "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
                 },
                 "description": {
                     "type": "string"
                 },
-                "testType": {
+                "test_type": {
                     "type": "string",
                     "const": "exactCorrespondenceSince"
                 },
-                "yearSince": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Year"
+                "year_since": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
                 },
-                "appliesTo": {
+                "applies_to": {
                     "$ref": "#/definitions/AppliesToOrExcludes"
                 },
                 "excludes": {
@@ -105,7 +103,7 @@
                     "$ref": "#/definitions/Assertions"
                 }
             },
-            "required": [ "name", "eventkey", "description", "testType", "assertions", "yearSince" ],
+            "required": [ "name", "event_key", "description", "test_type", "assertions", "year_since" ],
             "additionalProperties": false
         },
         "ExactCorrespondenceUntilType": {
@@ -115,21 +113,21 @@
                     "type": "string",
                     "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
                 },
-                "eventkey": {
+                "event_key": {
                     "type": "string",
                     "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
                 },
                 "description": {
                     "type": "string"
                 },
-                "testType": {
+                "test_type": {
                     "type": "string",
                     "const": "exactCorrespondenceUntil"
                 },
-                "yearUntil": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Year"
+                "year_until": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
                 },
-                "appliesTo": {
+                "applies_to": {
                     "$ref": "#/definitions/AppliesToOrExcludes"
                 },
                 "excludes": {
@@ -139,7 +137,7 @@
                     "$ref": "#/definitions/Assertions"
                 }
             },
-            "required": [ "name", "eventkey", "description", "testType", "assertions", "yearUntil" ],
+            "required": [ "name", "event_key", "description", "test_type", "assertions", "year_until" ],
             "additionalProperties": false
         },
         "Assertions": {
@@ -150,9 +148,9 @@
                         "type": "object",
                         "properties": {
                             "year": {
-                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Year"
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
                             },
-                            "expectedValue": {
+                            "expected_value": {
                                 "type": "null"
                             },
                             "assert": {
@@ -166,17 +164,17 @@
                                 "type": "string"
                             }
                         },
-                        "required": [ "year", "expectedValue", "assert", "assertion" ],
+                        "required": [ "year", "expected_value", "assert", "assertion" ],
                         "additionalProperties": false
                     },
                     {
                         "type": "object",
                         "properties": {
                             "year": {
-                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Year"
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
                             },
-                            "expectedValue": {
-                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/?schema=CommonDef.json#/definitions/Timestamp"
+                            "expected_value": {
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Timestamp"
                             },
                             "assert": {
                                 "type": "string",
@@ -189,7 +187,7 @@
                                 "type": "string"
                             }
                         },
-                        "required": [ "year", "expectedValue", "assert", "assertion" ],
+                        "required": [ "year", "expected_value", "assert", "assertion" ],
                         "additionalProperties": false
                     }
                 ]

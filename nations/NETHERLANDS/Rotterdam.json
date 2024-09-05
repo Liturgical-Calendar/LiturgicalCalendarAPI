@@ -1,7 +1,7 @@
 {
-    "LitCal": {
+    "litcal": {
         "HLaurentiusdiakenenmartelaarpatroonvanhetbisdom": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Laurentius, diaken en martelaar, patroon van het bisdom",
                 "color": [
                     "white",
@@ -14,13 +14,13 @@
                 "day": 10,
                 "month": 8
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 0
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 0
             }
         },
         "VerjaardagvandeWijdingvandekathedraal": {
-            "Festivity": {
+            "festivity": {
                 "name": "Verjaardag van de Wijding van de kathedraal",
                 "color": [
                     "white"
@@ -32,13 +32,13 @@
                 "day": 8,
                 "month": 5
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 1
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 1
             }
         },
         "HSwietbertbisschop": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Swietbert, bisschop",
                 "color": [
                     "white"
@@ -50,13 +50,13 @@
                 "day": 1,
                 "month": 3
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 0
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 0
             }
         },
         "HJeroenpriesterenmartelaar": {
-            "Festivity": {
+            "festivity": {
                 "name": "H. Jeroen, priester en martelaar",
                 "color": [
                     "red",
@@ -70,13 +70,13 @@
                 "day": 17,
                 "month": 8
             },
-            "Metadata": {
-                "sinceYear": 1979,
-                "formRowNum": 1
+            "metadata": {
+                "since_year": 1979,
+                "form_rownum": 1
             }
         },
         "MariaterWegheOnzeLieveVrouwvanHaastrecht": {
-            "Festivity": {
+            "festivity": {
                 "name": "Maria ter Weghe – Onze Lieve Vrouw van Haastrecht",
                 "color": [
                     "white"
@@ -88,9 +88,9 @@
                 "day": 20,
                 "month": 10
             },
-            "Metadata": {
-                "sinceYear": 2020,
-                "formRowNum": 2
+            "metadata": {
+                "since_year": 2020,
+                "form_rownum": 2
             }
         }
     }

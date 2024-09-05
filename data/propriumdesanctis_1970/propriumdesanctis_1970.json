@@ -1,3842 +1,3842 @@
 [
     {
-        "MONTH": 1,
-        "DAY": 2,
-        "TAG": "StsBasilGreg",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 1,
+        "day": 2,
+        "event_key": "StsBasilGreg",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Ef 4, 1-7.11-13",
-            "RESPONSORIAL_PSALM": "Salmo 23",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Mt 23, 9b.10b",
-            "GOSPEL": "Mt 23, 8-12"
+        "readings": {
+            "first_reading": "Ef 4, 1-7.11-13",
+            "responsorial_psalm": "Salmo 23",
+            "second_reading": "",
+            "alleluia_verse": "Mt 23, 9b.10b",
+            "gospel": "Mt 23, 8-12"
         }
     },
     {
-        "MONTH": 1,
-        "DAY": 7,
-        "TAG": "StRayPenyafort",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 1,
+        "day": 7,
+        "event_key": "StRayPenyafort",
+        "grade": 2,
+        "common": [
             "Pastors:For One Pastor"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "2 Cor 5, 14-20",
-            "RESPONSORIAL_PSALM": "Salmo 103",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Mt 24, 42a.44",
-            "GOSPEL": "Lc 12, 35-40"
+        "readings": {
+            "first_reading": "2 Cor 5, 14-20",
+            "responsorial_psalm": "Salmo 103",
+            "second_reading": "",
+            "alleluia_verse": "Mt 24, 42a.44",
+            "gospel": "Lc 12, 35-40"
         }
     },
     {
-        "MONTH": 1,
-        "DAY": 13,
-        "TAG": "StHilaryPoitiers",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 1,
+        "day": 13,
+        "event_key": "StHilaryPoitiers",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop",
             "Doctors"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "1Gv 2, 18-25",
-            "RESPONSORIAL_PSALM": "Salmo 110",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Mt 5, 16",
-            "GOSPEL": "Mt 5, 13-19"
+        "readings": {
+            "first_reading": "1Gv 2, 18-25",
+            "responsorial_psalm": "Salmo 110",
+            "second_reading": "",
+            "alleluia_verse": "Mt 5, 16",
+            "gospel": "Mt 5, 13-19"
         }
     },
     {
-        "MONTH": 1,
-        "DAY": 17,
-        "TAG": "StAnthonyEgypt",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 1,
+        "day": 17,
+        "event_key": "StAnthonyEgypt",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Ef 6, 10-13.18",
-            "RESPONSORIAL_PSALM": "Salmo 16",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Gv 8, 31b-32",
-            "GOSPEL": "Mt 19, 16-26"
+        "readings": {
+            "first_reading": "Ef 6, 10-13.18",
+            "responsorial_psalm": "Salmo 16",
+            "second_reading": "",
+            "alleluia_verse": "Gv 8, 31b-32",
+            "gospel": "Mt 19, 16-26"
         }
     },
     {
-        "MONTH": 1,
-        "DAY": 20,
-        "TAG": "StFabianPope",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 1,
+        "day": 20,
+        "event_key": "StFabianPope",
+        "grade": 2,
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For a Pope"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "1 Pt 5, 1-4",
-            "RESPONSORIAL_PSALM": "Salmo 40",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Gv 10, 14",
-            "GOSPEL": "Gv 21, 15-17"
+        "readings": {
+            "first_reading": "1 Pt 5, 1-4",
+            "responsorial_psalm": "Salmo 40",
+            "second_reading": "",
+            "alleluia_verse": "Gv 10, 14",
+            "gospel": "Gv 21, 15-17"
         }
     },
     {
-        "MONTH": 1,
-        "DAY": 20,
-        "TAG": "StSebastian",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 1,
+        "day": 20,
+        "event_key": "StSebastian",
+        "grade": 2,
+        "common": [
             "Martyrs:For One Martyr"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "1 Pt 3, 14-17",
-            "RESPONSORIAL_PSALM": "Salmo 34",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "2 Cor 1, 3b-4a",
-            "GOSPEL": "Mt 10, 28-33 "
+        "readings": {
+            "first_reading": "1 Pt 3, 14-17",
+            "responsorial_psalm": "Salmo 34",
+            "second_reading": "",
+            "alleluia_verse": "2 Cor 1, 3b-4a",
+            "gospel": "Mt 10, 28-33 "
         }
     },
     {
-        "MONTH": 1,
-        "DAY": 21,
-        "TAG": "StAgnes",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 1,
+        "day": 21,
+        "event_key": "StAgnes",
+        "grade": 3,
+        "common": [
             "Martyrs:For a Virgin Martyr",
             "Virgins:For One Virgin"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "1Cor 1, 26-31",
-            "RESPONSORIAL_PSALM": "Salmo 23",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Gv 15, 9b.5b",
-            "GOSPEL": "Mt 13, 44-46"
+        "readings": {
+            "first_reading": "1Cor 1, 26-31",
+            "responsorial_psalm": "Salmo 23",
+            "second_reading": "",
+            "alleluia_verse": "Gv 15, 9b.5b",
+            "gospel": "Mt 13, 44-46"
         }
     },
     {
-        "MONTH": 1,
-        "DAY": 22,
-        "TAG": "StVincentDeacon",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 1,
+        "day": 22,
+        "event_key": "StVincentDeacon",
+        "grade": 2,
+        "common": [
             "Martyrs:For One Martyr"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "2 Cor 4, 7-15",
-            "RESPONSORIAL_PSALM": "Salmo 34",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Mt 10, 17-22"
+        "readings": {
+            "first_reading": "2 Cor 4, 7-15",
+            "responsorial_psalm": "Salmo 34",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Mt 10, 17-22"
         }
     },
     {
-        "MONTH": 1,
-        "DAY": 24,
-        "TAG": "StFrancisDeSales",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 1,
+        "day": 24,
+        "event_key": "StFrancisDeSales",
+        "grade": 3,
+        "common": [
             "Pastors:For a Bishop",
             "Doctors"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Ef 3, 8-12",
-            "RESPONSORIAL_PSALM": "Salmo 37",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Gv 13, 34",
-            "GOSPEL": "Gv 15, 9-17"
+        "readings": {
+            "first_reading": "Ef 3, 8-12",
+            "responsorial_psalm": "Salmo 37",
+            "second_reading": "",
+            "alleluia_verse": "Gv 13, 34",
+            "gospel": "Gv 15, 9-17"
         }
     },
     {
-        "MONTH": 1,
-        "DAY": 25,
-        "TAG": "ConversionStPaul",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 1,
+        "day": 25,
+        "event_key": "ConversionStPaul",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "At 22, 3-16|At 9, 1-22",
-            "RESPONSORIAL_PSALM": "Salmo 117",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Gv 15, 16",
-            "GOSPEL": "Mc 16, 15-18"
+        "readings": {
+            "first_reading": "At 22, 3-16|At 9, 1-22",
+            "responsorial_psalm": "Salmo 117",
+            "second_reading": "",
+            "alleluia_verse": "Gv 15, 16",
+            "gospel": "Mc 16, 15-18"
         }
     },
     {
-        "MONTH": 1,
-        "DAY": 26,
-        "TAG": "StsTimothyTitus",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 1,
+        "day": 26,
+        "event_key": "StsTimothyTitus",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "2Tim 1, 1-8|Tito 1, 1-5",
-            "RESPONSORIAL_PSALM": "Salmo 96",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Lc 4, 18",
-            "GOSPEL": "Lc 10, 1-9"
+        "readings": {
+            "first_reading": "2Tim 1, 1-8|Tito 1, 1-5",
+            "responsorial_psalm": "Salmo 96",
+            "second_reading": "",
+            "alleluia_verse": "Lc 4, 18",
+            "gospel": "Lc 10, 1-9"
         }
     },
     {
-        "MONTH": 1,
-        "DAY": 27,
-        "TAG": "StAngelaMerici",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 1,
+        "day": 27,
+        "event_key": "StAngelaMerici",
+        "grade": 2,
+        "common": [
             "Virgins:For One Virgin",
             "Holy Men and Women:For Educators"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "1 Pt 4, 7-11",
-            "RESPONSORIAL_PSALM": "Salmo 148",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Mt 23, 11.12b",
-            "GOSPEL": "Mc 9, 33-37"
+        "readings": {
+            "first_reading": "1 Pt 4, 7-11",
+            "responsorial_psalm": "Salmo 148",
+            "second_reading": "",
+            "alleluia_verse": "Mt 23, 11.12b",
+            "gospel": "Mc 9, 33-37"
         }
     },
     {
-        "MONTH": 1,
-        "DAY": 28,
-        "TAG": "StThomasAquinas",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 1,
+        "day": 28,
+        "event_key": "StThomasAquinas",
+        "grade": 3,
+        "common": [
             "Pastors:For One Pastor",
             "Doctors"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Sap 7, 7-10.15-16",
-            "RESPONSORIAL_PSALM": "Salmo 119",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Mt 23, 9b.10b",
-            "GOSPEL": "Mt 23, 8-12"
+        "readings": {
+            "first_reading": "Sap 7, 7-10.15-16",
+            "responsorial_psalm": "Salmo 119",
+            "second_reading": "",
+            "alleluia_verse": "Mt 23, 9b.10b",
+            "gospel": "Mt 23, 8-12"
         }
     },
     {
-        "MONTH": 1,
-        "DAY": 31,
-        "TAG": "StJohnBosco",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 1,
+        "day": 31,
+        "event_key": "StJohnBosco",
+        "grade": 3,
+        "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Educators"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Fil 4, 4-9",
-            "RESPONSORIAL_PSALM": "Salmo 103",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Mt 11, 25",
-            "GOSPEL": "Mt 18, 1-5"
+        "readings": {
+            "first_reading": "Fil 4, 4-9",
+            "responsorial_psalm": "Salmo 103",
+            "second_reading": "",
+            "alleluia_verse": "Mt 11, 25",
+            "gospel": "Mt 18, 1-5"
         }
     },
     {
-        "MONTH": 2,
-        "DAY": 2,
-        "TAG": "Presentation",
-        "GRADE": 5,
-        "COMMON": [
+        "month": 2,
+        "day": 2,
+        "event_key": "Presentation",
+        "grade": 5,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Mal 3, 1-4",
-            "RESPONSORIAL_PSALM": "Sal 24",
-            "SECOND_READING": "Eb 2, 14-18",
-            "ALLELUIA_VERSE": "Lc 2, 30.32",
-            "GOSPEL": "Lc 2, 22-40|Lc 2, 22-32"
+        "readings": {
+            "first_reading": "Mal 3, 1-4",
+            "responsorial_psalm": "Sal 24",
+            "second_reading": "Eb 2, 14-18",
+            "alleluia_verse": "Lc 2, 30.32",
+            "gospel": "Lc 2, 22-40|Lc 2, 22-32"
         }
     },
     {
-        "MONTH": 2,
-        "DAY": 3,
-        "TAG": "StBlase",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 2,
+        "day": 3,
+        "event_key": "StBlase",
+        "grade": 2,
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For a Bishop"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "Rm 5, 1-5",
-            "RESPONSORIAL_PSALM": "Salmo 117",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Mc 16, 15-20"
+        "readings": {
+            "first_reading": "Rm 5, 1-5",
+            "responsorial_psalm": "Salmo 117",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Mc 16, 15-20"
         }
     },
     {
-        "MONTH": 2,
-        "DAY": 3,
-        "TAG": "StAnsgar",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 2,
+        "day": 3,
+        "event_key": "StAnsgar",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop",
             "Pastors:For Missionaries"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Is 52, 7-10",
-            "RESPONSORIAL_PSALM": "Salmo 96",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Mc 1, 14-20"
+        "readings": {
+            "first_reading": "Is 52, 7-10",
+            "responsorial_psalm": "Salmo 96",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Mc 1, 14-20"
         }
     },
     {
-        "MONTH": 2,
-        "DAY": 5,
-        "TAG": "StAgatha",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 2,
+        "day": 5,
+        "event_key": "StAgatha",
+        "grade": 3,
+        "common": [
             "Martyrs:For a Virgin Martyr",
             "Virgins:For One Virgin"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "1Cor 1, 26-31",
-            "RESPONSORIAL_PSALM": "Salmo 31",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "1 Pt 4, 14",
-            "GOSPEL": "Lc 9, 23-26"
+        "readings": {
+            "first_reading": "1Cor 1, 26-31",
+            "responsorial_psalm": "Salmo 31",
+            "second_reading": "",
+            "alleluia_verse": "1 Pt 4, 14",
+            "gospel": "Lc 9, 23-26"
         }
     },
     {
-        "MONTH": 2,
-        "DAY": 6,
-        "TAG": "StsPaulMiki",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 2,
+        "day": 6,
+        "event_key": "StsPaulMiki",
+        "grade": 3,
+        "common": [
             "Martyrs:For Several Martyrs"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "Gal 2, 19-20",
-            "RESPONSORIAL_PSALM": "Salmo 126",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Mt 28, 19a.20b",
-            "GOSPEL": "Mt 28, 16-20"
+        "readings": {
+            "first_reading": "Gal 2, 19-20",
+            "responsorial_psalm": "Salmo 126",
+            "second_reading": "",
+            "alleluia_verse": "Mt 28, 19a.20b",
+            "gospel": "Mt 28, 16-20"
         }
     },
     {
-        "MONTH": 2,
-        "DAY": 8,
-        "TAG": "StJeromeEmiliani",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 2,
+        "day": 8,
+        "event_key": "StJeromeEmiliani",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For Educators"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Tb 12, 6-13",
-            "RESPONSORIAL_PSALM": "Salmo 34",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Mc 10, 17-30"
+        "readings": {
+            "first_reading": "Tb 12, 6-13",
+            "responsorial_psalm": "Salmo 34",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Mc 10, 17-30"
         }
     },
     {
-        "MONTH": 2,
-        "DAY": 10,
-        "TAG": "StScholastica",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 2,
+        "day": 10,
+        "event_key": "StScholastica",
+        "grade": 3,
+        "common": [
             "Virgins:For One Virgin",
             "Holy Men and Women:For a Nun"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Ct 8, 6-7",
-            "RESPONSORIAL_PSALM": "Salmo 148",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Gv 14, 23",
-            "GOSPEL": "Lc 10, 38-42"
+        "readings": {
+            "first_reading": "Ct 8, 6-7",
+            "responsorial_psalm": "Salmo 148",
+            "second_reading": "",
+            "alleluia_verse": "Gv 14, 23",
+            "gospel": "Lc 10, 38-42"
         }
     },
     {
-        "MONTH": 2,
-        "DAY": 11,
-        "TAG": "LadyLourdes",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 2,
+        "day": 11,
+        "event_key": "LadyLourdes",
+        "grade": 2,
+        "common": [
             "Blessed Virgin Mary"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Is 66, 10-14c",
-            "RESPONSORIAL_PSALM": "Gdt Gdt 13, 18-19",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Lc 1, 45",
-            "GOSPEL": "Gv 2, 1-11"
+        "readings": {
+            "first_reading": "Is 66, 10-14c",
+            "responsorial_psalm": "Gdt Gdt 13, 18-19",
+            "second_reading": "",
+            "alleluia_verse": "Lc 1, 45",
+            "gospel": "Gv 2, 1-11"
         }
     },
     {
-        "MONTH": 2,
-        "DAY": 14,
-        "TAG": "StsCyrilMethodius",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 2,
+        "day": 14,
+        "event_key": "StsCyrilMethodius",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "At 13, 46-49|Is 52, 7-10",
-            "RESPONSORIAL_PSALM": "Salmo 117",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Lc 4, 18cd",
-            "GOSPEL": "Lc 10, 1-9"
+        "readings": {
+            "first_reading": "At 13, 46-49|Is 52, 7-10",
+            "responsorial_psalm": "Salmo 117",
+            "second_reading": "",
+            "alleluia_verse": "Lc 4, 18cd",
+            "gospel": "Lc 10, 1-9"
         }
     },
     {
-        "MONTH": 2,
-        "DAY": 17,
-        "TAG": "SevenHolyFounders",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 2,
+        "day": 17,
+        "event_key": "SevenHolyFounders",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Rm 8, 26-30",
-            "RESPONSORIAL_PSALM": "Salmo 34",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Mt 19, 27-29"
+        "readings": {
+            "first_reading": "Rm 8, 26-30",
+            "responsorial_psalm": "Salmo 34",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Mt 19, 27-29"
         }
     },
     {
-        "MONTH": 2,
-        "DAY": 21,
-        "TAG": "StPeterDamian",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 2,
+        "day": 21,
+        "event_key": "StPeterDamian",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop",
             "Doctors"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "2 Tm 4, 1-5",
-            "RESPONSORIAL_PSALM": "Salmo 16",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Gv 15, 1-8"
+        "readings": {
+            "first_reading": "2 Tm 4, 1-5",
+            "responsorial_psalm": "Salmo 16",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Gv 15, 1-8"
         }
     },
     {
-        "MONTH": 2,
-        "DAY": 22,
-        "TAG": "ChairStPeter",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 2,
+        "day": 22,
+        "event_key": "ChairStPeter",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "1Pt 5, 1-4",
-            "RESPONSORIAL_PSALM": "Salmo 23",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Mt 16, 18",
-            "GOSPEL": "Mt 16, 13-19"
+        "readings": {
+            "first_reading": "1Pt 5, 1-4",
+            "responsorial_psalm": "Salmo 23",
+            "second_reading": "",
+            "alleluia_verse": "Mt 16, 18",
+            "gospel": "Mt 16, 13-19"
         }
     },
     {
-        "MONTH": 2,
-        "DAY": 23,
-        "TAG": "StPolycarp",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 2,
+        "day": 23,
+        "event_key": "StPolycarp",
+        "grade": 3,
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For a Bishop"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "Ap 2, 8-11",
-            "RESPONSORIAL_PSALM": "Salmo 31",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Gv 15, 18-21"
+        "readings": {
+            "first_reading": "Ap 2, 8-11",
+            "responsorial_psalm": "Salmo 31",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Gv 15, 18-21"
         }
     },
     {
-        "MONTH": 3,
-        "DAY": 4,
-        "TAG": "StCasimir",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 3,
+        "day": 4,
+        "event_key": "StCasimir",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For One Saint"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Fil 3, 8-14",
-            "RESPONSORIAL_PSALM": "Salmo 15",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Gv 15, 9-17"
+        "readings": {
+            "first_reading": "Fil 3, 8-14",
+            "responsorial_psalm": "Salmo 15",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Gv 15, 9-17"
         }
     },
     {
-        "MONTH": 3,
-        "DAY": 7,
-        "TAG": "StsPerpetuaFelicity",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 3,
+        "day": 7,
+        "event_key": "StsPerpetuaFelicity",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "Rm 8, 31b-39",
-            "RESPONSORIAL_PSALM": "Salmo 124",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Mt 5, 10 ",
-            "GOSPEL": "Mt 10, 34-39"
+        "readings": {
+            "first_reading": "Rm 8, 31b-39",
+            "responsorial_psalm": "Salmo 124",
+            "second_reading": "",
+            "alleluia_verse": "Mt 5, 10 ",
+            "gospel": "Mt 10, 34-39"
         }
     },
     {
-        "MONTH": 3,
-        "DAY": 8,
-        "TAG": "StJohnGod",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 3,
+        "day": 8,
+        "event_key": "StJohnGod",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For Religious",
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "1 Gv 3, 14-18",
-            "RESPONSORIAL_PSALM": "Salmo 112",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Mt 25, 31-40"
+        "readings": {
+            "first_reading": "1 Gv 3, 14-18",
+            "responsorial_psalm": "Salmo 112",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Mt 25, 31-40"
         }
     },
     {
-        "MONTH": 3,
-        "DAY": 9,
-        "TAG": "StFrancesRome",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 3,
+        "day": 9,
+        "event_key": "StFrancesRome",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For Religious",
             "Holy Men and Women:For Holy Women"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Pr 31, 10-13.19-20.30-31",
-            "RESPONSORIAL_PSALM": "Salmo 34",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Mt 22, 34-40"
+        "readings": {
+            "first_reading": "Pr 31, 10-13.19-20.30-31",
+            "responsorial_psalm": "Salmo 34",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Mt 22, 34-40"
         }
     },
     {
-        "MONTH": 3,
-        "DAY": 17,
-        "TAG": "StPatrick",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 3,
+        "day": 17,
+        "event_key": "StPatrick",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop",
             "Pastors:For Missionaries"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "1 Pt 4, 7-11",
-            "RESPONSORIAL_PSALM": "Salmo 96",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Lc 5, 1-11"
+        "readings": {
+            "first_reading": "1 Pt 4, 7-11",
+            "responsorial_psalm": "Salmo 96",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Lc 5, 1-11"
         }
     },
     {
-        "MONTH": 3,
-        "DAY": 18,
-        "TAG": "StCyrilJerusalem",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 3,
+        "day": 18,
+        "event_key": "StCyrilJerusalem",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop",
             "Doctors"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "1 Gv 5, 1-5",
-            "RESPONSORIAL_PSALM": "Salmo 19",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Gv 15, 1-8"
+        "readings": {
+            "first_reading": "1 Gv 5, 1-5",
+            "responsorial_psalm": "Salmo 19",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Gv 15, 1-8"
         }
     },
     {
-        "MONTH": 3,
-        "DAY": 19,
-        "TAG": "StJoseph",
-        "GRADE": 6,
-        "COMMON": [
+        "month": 3,
+        "day": 19,
+        "event_key": "StJoseph",
+        "grade": 6,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "2Sam 7, 4-5a.12-14a.16",
-            "RESPONSORIAL_PSALM": "Salmo 89",
-            "SECOND_READING": "Rm 4, 13.16-18.22",
-            "ALLELUIA_VERSE": "Salmo 84,5",
-            "GOSPEL": "Mt 1, 16.18-21.24a|Lc 2, 41-51a"
+        "readings": {
+            "first_reading": "2Sam 7, 4-5a.12-14a.16",
+            "responsorial_psalm": "Salmo 89",
+            "second_reading": "Rm 4, 13.16-18.22",
+            "alleluia_verse": "Salmo 84,5",
+            "gospel": "Mt 1, 16.18-21.24a|Lc 2, 41-51a"
         }
     },
     {
-        "MONTH": 3,
-        "DAY": 23,
-        "TAG": "StTuribius",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 3,
+        "day": 23,
+        "event_key": "StTuribius",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "2 Tm 1, 13-14; 2, 1-3",
-            "RESPONSORIAL_PSALM": "Salmo 96",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Mt 9, 35-38"
+        "readings": {
+            "first_reading": "2 Tm 1, 13-14; 2, 1-3",
+            "responsorial_psalm": "Salmo 96",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Mt 9, 35-38"
         }
     },
     {
-        "MONTH": 3,
-        "DAY": 25,
-        "TAG": "Annunciation",
-        "GRADE": 6,
-        "COMMON": [
+        "month": 3,
+        "day": 25,
+        "event_key": "Annunciation",
+        "grade": 6,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Is 7, 10-14; 8, 10c",
-            "RESPONSORIAL_PSALM": "Salmo 40",
-            "SECOND_READING": "Eb 10, 4-10",
-            "ALLELUIA_VERSE": "Gv 1, 14ab",
-            "GOSPEL": "Lc 1, 26-38"
+        "readings": {
+            "first_reading": "Is 7, 10-14; 8, 10c",
+            "responsorial_psalm": "Salmo 40",
+            "second_reading": "Eb 10, 4-10",
+            "alleluia_verse": "Gv 1, 14ab",
+            "gospel": "Lc 1, 26-38"
         }
     },
     {
-        "MONTH": 4,
-        "DAY": 2,
-        "TAG": "StFrancisPaola",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 4,
+        "day": 2,
+        "event_key": "StFrancisPaola",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Fil 3, 8-14",
-            "RESPONSORIAL_PSALM": "Salmo 16",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Lc 12, 32-34"
+        "readings": {
+            "first_reading": "Fil 3, 8-14",
+            "responsorial_psalm": "Salmo 16",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Lc 12, 32-34"
         }
     },
     {
-        "MONTH": 4,
-        "DAY": 4,
-        "TAG": "StIsidore",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 4,
+        "day": 4,
+        "event_key": "StIsidore",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop",
             "Doctors"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "2 Cor 4, 1-2.5-7",
-            "RESPONSORIAL_PSALM": "Salmo 37",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Lc 6, 43-45"
+        "readings": {
+            "first_reading": "2 Cor 4, 1-2.5-7",
+            "responsorial_psalm": "Salmo 37",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Lc 6, 43-45"
         }
     },
     {
-        "MONTH": 4,
-        "DAY": 5,
-        "TAG": "StVincentFerrer",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 4,
+        "day": 5,
+        "event_key": "StVincentFerrer",
+        "grade": 2,
+        "common": [
             "Pastors:For Missionaries"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "2 Tm 4, 1-5",
-            "RESPONSORIAL_PSALM": "Salmo 40",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Lc 12, 35-40"
+        "readings": {
+            "first_reading": "2 Tm 4, 1-5",
+            "responsorial_psalm": "Salmo 40",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Lc 12, 35-40"
         }
     },
     {
-        "MONTH": 4,
-        "DAY": 7,
-        "TAG": "StJohnBaptistDeLaSalle",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 4,
+        "day": 7,
+        "event_key": "StJohnBaptistDeLaSalle",
+        "grade": 3,
+        "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Educators"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "1Tim 1, 13-14; 2, 1-3",
-            "RESPONSORIAL_PSALM": "Salmo 1",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Mt 23, 11.12b",
-            "GOSPEL": "Mt 18, 1-5"
+        "readings": {
+            "first_reading": "1Tim 1, 13-14; 2, 1-3",
+            "responsorial_psalm": "Salmo 1",
+            "second_reading": "",
+            "alleluia_verse": "Mt 23, 11.12b",
+            "gospel": "Mt 18, 1-5"
         }
     },
     {
-        "MONTH": 4,
-        "DAY": 11,
-        "TAG": "StStanislaus",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 4,
+        "day": 11,
+        "event_key": "StStanislaus",
+        "grade": 3,
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For a Bishop"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "Ap 12, 10-12a",
-            "RESPONSORIAL_PSALM": "Salmo 34",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "2 Cor 1, 3b-4a ",
-            "GOSPEL": "Gv 17, 11b-19"
+        "readings": {
+            "first_reading": "Ap 12, 10-12a",
+            "responsorial_psalm": "Salmo 34",
+            "second_reading": "",
+            "alleluia_verse": "2 Cor 1, 3b-4a ",
+            "gospel": "Gv 17, 11b-19"
         }
     },
     {
-        "MONTH": 4,
-        "DAY": 13,
-        "TAG": "StMartinPope",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 4,
+        "day": 13,
+        "event_key": "StMartinPope",
+        "grade": 2,
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For a Pope"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "2 Tm 2, 8-13; 3, 10-12",
-            "RESPONSORIAL_PSALM": "Salmo 126",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Gv 15, 18-21 "
+        "readings": {
+            "first_reading": "2 Tm 2, 8-13; 3, 10-12",
+            "responsorial_psalm": "Salmo 126",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Gv 15, 18-21 "
         }
     },
     {
-        "MONTH": 4,
-        "DAY": 21,
-        "TAG": "StAnselm",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 4,
+        "day": 21,
+        "event_key": "StAnselm",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop",
             "Doctors"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Ef 3, 14-19",
-            "RESPONSORIAL_PSALM": "Salmo 34",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Mt 7, 21-29"
+        "readings": {
+            "first_reading": "Ef 3, 14-19",
+            "responsorial_psalm": "Salmo 34",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Mt 7, 21-29"
         }
     },
     {
-        "MONTH": 4,
-        "DAY": 23,
-        "TAG": "StGeorge",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 4,
+        "day": 23,
+        "event_key": "StGeorge",
+        "grade": 2,
+        "common": [
             "Martyrs:For One Martyr"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "Ap 21, 5-7",
-            "RESPONSORIAL_PSALM": "Salmo 126",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Lc 9, 23-26"
+        "readings": {
+            "first_reading": "Ap 21, 5-7",
+            "responsorial_psalm": "Salmo 126",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Lc 9, 23-26"
         }
     },
     {
-        "MONTH": 4,
-        "DAY": 24,
-        "TAG": "StFidelisSigmaringen",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 4,
+        "day": 24,
+        "event_key": "StFidelisSigmaringen",
+        "grade": 2,
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For One Pastor"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "Col 1, 24-29",
-            "RESPONSORIAL_PSALM": "Salmo 34",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Gv 17, 20-26"
+        "readings": {
+            "first_reading": "Col 1, 24-29",
+            "responsorial_psalm": "Salmo 34",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Gv 17, 20-26"
         }
     },
     {
-        "MONTH": 4,
-        "DAY": 25,
-        "TAG": "StMarkEvangelist",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 4,
+        "day": 25,
+        "event_key": "StMarkEvangelist",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "1Pt 5, 5b-14",
-            "RESPONSORIAL_PSALM": "Salmo 89",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "1 Cor 1, 23a.24b",
-            "GOSPEL": "Mc 16, 15-20"
+        "readings": {
+            "first_reading": "1Pt 5, 5b-14",
+            "responsorial_psalm": "Salmo 89",
+            "second_reading": "",
+            "alleluia_verse": "1 Cor 1, 23a.24b",
+            "gospel": "Mc 16, 15-20"
         }
     },
     {
-        "MONTH": 4,
-        "DAY": 28,
-        "TAG": "StPeterChanel",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 4,
+        "day": 28,
+        "event_key": "StPeterChanel",
+        "grade": 2,
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For Missionaries"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "1 Cor 1, 18-25",
-            "RESPONSORIAL_PSALM": "Salmo 117",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Mc 1, 14-20"
+        "readings": {
+            "first_reading": "1 Cor 1, 18-25",
+            "responsorial_psalm": "Salmo 117",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Mc 1, 14-20"
         }
     },
     {
-        "MONTH": 4,
-        "DAY": 29,
-        "TAG": "StCatherineSiena",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 4,
+        "day": 29,
+        "event_key": "StCatherineSiena",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "1Gv 1, 5 – 2, 2",
-            "RESPONSORIAL_PSALM": "Salmo 103",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Mt 11, 25",
-            "GOSPEL": "Mt 11, 25-30"
+        "readings": {
+            "first_reading": "1Gv 1, 5 – 2, 2",
+            "responsorial_psalm": "Salmo 103",
+            "second_reading": "",
+            "alleluia_verse": "Mt 11, 25",
+            "gospel": "Mt 11, 25-30"
         }
     },
     {
-        "MONTH": 4,
-        "DAY": 30,
-        "TAG": "StPiusV",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 4,
+        "day": 30,
+        "event_key": "StPiusV",
+        "grade": 2,
+        "common": [
             "Pastors:For a Pope"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "1 Cor 4, 1-5",
-            "RESPONSORIAL_PSALM": "Salmo 110",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Gv 21, 15-17"
+        "readings": {
+            "first_reading": "1 Cor 4, 1-5",
+            "responsorial_psalm": "Salmo 110",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Gv 21, 15-17"
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 1,
-        "TAG": "StJosephWorker",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 5,
+        "day": 1,
+        "event_key": "StJosephWorker",
+        "grade": 2,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Gen 1, 26 – 2, 3|Col 3, 14-15.17.23-24",
-            "RESPONSORIAL_PSALM": "Salmo 90",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Salmo 68, 20",
-            "GOSPEL": "Mt 13, 54-58"
+        "readings": {
+            "first_reading": "Gen 1, 26 – 2, 3|Col 3, 14-15.17.23-24",
+            "responsorial_psalm": "Salmo 90",
+            "second_reading": "",
+            "alleluia_verse": "Salmo 68, 20",
+            "gospel": "Mt 13, 54-58"
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 2,
-        "TAG": "StAthanasius",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 5,
+        "day": 2,
+        "event_key": "StAthanasius",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "1Gv 5, 1-5",
-            "RESPONSORIAL_PSALM": "Salmo 37",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Mt 5, 10",
-            "GOSPEL": "Mt 10, 22-25a"
+        "readings": {
+            "first_reading": "1Gv 5, 1-5",
+            "responsorial_psalm": "Salmo 37",
+            "second_reading": "",
+            "alleluia_verse": "Mt 5, 10",
+            "gospel": "Mt 10, 22-25a"
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 3,
-        "TAG": "StsPhilipJames",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 5,
+        "day": 3,
+        "event_key": "StsPhilipJames",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "1Cor 15, 1-8a",
-            "RESPONSORIAL_PSALM": "Salmo 19",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Gv 14, 6b.9c",
-            "GOSPEL": "Gv 14, 6-14"
+        "readings": {
+            "first_reading": "1Cor 15, 1-8a",
+            "responsorial_psalm": "Salmo 19",
+            "second_reading": "",
+            "alleluia_verse": "Gv 14, 6b.9c",
+            "gospel": "Gv 14, 6-14"
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 12,
-        "TAG": "StsNereusAchilleus",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 5,
+        "day": 12,
+        "event_key": "StsNereusAchilleus",
+        "grade": 2,
+        "common": [
             "Martyrs:For Several Martyrs"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "Ap 7, 9-17",
-            "RESPONSORIAL_PSALM": "Salmo 124",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Mt 10, 17-22"
+        "readings": {
+            "first_reading": "Ap 7, 9-17",
+            "responsorial_psalm": "Salmo 124",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Mt 10, 17-22"
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 12,
-        "TAG": "StPancras",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 5,
+        "day": 12,
+        "event_key": "StPancras",
+        "grade": 2,
+        "common": [
             "Martyrs:For One Martyr"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "Ap 19, 1.5-9a",
-            "RESPONSORIAL_PSALM": "Salmo 103",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Mt 11, 25-30"
+        "readings": {
+            "first_reading": "Ap 19, 1.5-9a",
+            "responsorial_psalm": "Salmo 103",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Mt 11, 25-30"
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 14,
-        "TAG": "StMatthiasAp",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 5,
+        "day": 14,
+        "event_key": "StMatthiasAp",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "At 1, 15-17.20-26",
-            "RESPONSORIAL_PSALM": "Salmo 113",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Gv 15, 16",
-            "GOSPEL": "Gv 15, 9-17"
+        "readings": {
+            "first_reading": "At 1, 15-17.20-26",
+            "responsorial_psalm": "Salmo 113",
+            "second_reading": "",
+            "alleluia_verse": "Gv 15, 16",
+            "gospel": "Gv 15, 9-17"
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 18,
-        "TAG": "StJohnIPope",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 5,
+        "day": 18,
+        "event_key": "StJohnIPope",
+        "grade": 2,
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For a Pope"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "Ap 3, 14b.20-22",
-            "RESPONSORIAL_PSALM": "Salmo 23",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Lc 22, 24-30"
+        "readings": {
+            "first_reading": "Ap 3, 14b.20-22",
+            "responsorial_psalm": "Salmo 23",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Lc 22, 24-30"
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 20,
-        "TAG": "StBernardineSiena",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 5,
+        "day": 20,
+        "event_key": "StBernardineSiena",
+        "grade": 2,
+        "common": [
             "Pastors:For Missionaries",
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "At 4, 8-12",
-            "RESPONSORIAL_PSALM": "Salmo 40",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Gv 8, 12",
-            "GOSPEL": "Lc 9, 57-62"
+        "readings": {
+            "first_reading": "At 4, 8-12",
+            "responsorial_psalm": "Salmo 40",
+            "second_reading": "",
+            "alleluia_verse": "Gv 8, 12",
+            "gospel": "Lc 9, 57-62"
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 25,
-        "TAG": "StBedeVenerable",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 5,
+        "day": 25,
+        "event_key": "StBedeVenerable",
+        "grade": 2,
+        "common": [
             "Doctors",
             "Holy Men and Women:For a Monk"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "1 Cor 2, 10b-16",
-            "RESPONSORIAL_PSALM": "Salmo 119",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Mt 7, 21-29"
+        "readings": {
+            "first_reading": "1 Cor 2, 10b-16",
+            "responsorial_psalm": "Salmo 119",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Mt 7, 21-29"
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 25,
-        "TAG": "StGregoryVII",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 5,
+        "day": 25,
+        "event_key": "StGregoryVII",
+        "grade": 2,
+        "common": [
             "Pastors:For a Pope"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "At 20, 17-18a.28-32.36",
-            "RESPONSORIAL_PSALM": "Salmo 110",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Mt 16, 13-19"
+        "readings": {
+            "first_reading": "At 20, 17-18a.28-32.36",
+            "responsorial_psalm": "Salmo 110",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Mt 16, 13-19"
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 25,
-        "TAG": "StMaryMagdalenePazzi",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 5,
+        "day": 25,
+        "event_key": "StMaryMagdalenePazzi",
+        "grade": 2,
+        "common": [
             "Virgins:For One Virgin",
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "1 Cor 7, 25-35",
-            "RESPONSORIAL_PSALM": "Salmo 148",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Mc 3, 31-35"
+        "readings": {
+            "first_reading": "1 Cor 7, 25-35",
+            "responsorial_psalm": "Salmo 148",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Mc 3, 31-35"
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 26,
-        "TAG": "StPhilipNeri",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 5,
+        "day": 26,
+        "event_key": "StPhilipNeri",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Fil 4, 4-9",
-            "RESPONSORIAL_PSALM": "Salmo 34",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Gv 15, 9b.5b",
-            "GOSPEL": "Gv 17, 20-26"
+        "readings": {
+            "first_reading": "Fil 4, 4-9",
+            "responsorial_psalm": "Salmo 34",
+            "second_reading": "",
+            "alleluia_verse": "Gv 15, 9b.5b",
+            "gospel": "Gv 17, 20-26"
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 27,
-        "TAG": "StAugustineCanterbury",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 5,
+        "day": 27,
+        "event_key": "StAugustineCanterbury",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop",
             "Pastors:For Missionaries"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "1 Ts 2, 2b-8",
-            "RESPONSORIAL_PSALM": "Salmo 96",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Mt 9, 35-38"
+        "readings": {
+            "first_reading": "1 Ts 2, 2b-8",
+            "responsorial_psalm": "Salmo 96",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Mt 9, 35-38"
         }
     },
     {
-        "MONTH": 5,
-        "DAY": 31,
-        "TAG": "Visitation",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 5,
+        "day": 31,
+        "event_key": "Visitation",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Sof 3, 14-18|Rm 12, 9-16b",
-            "RESPONSORIAL_PSALM": "Is 12, 2-6",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Lc 1, 45",
-            "GOSPEL": "Lc 1, 39-56"
+        "readings": {
+            "first_reading": "Sof 3, 14-18|Rm 12, 9-16b",
+            "responsorial_psalm": "Is 12, 2-6",
+            "second_reading": "",
+            "alleluia_verse": "Lc 1, 45",
+            "gospel": "Lc 1, 39-56"
         }
     },
     {
-        "MONTH": 6,
-        "DAY": 1,
-        "TAG": "StJustinMartyr",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 6,
+        "day": 1,
+        "event_key": "StJustinMartyr",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "1Cor 1, 18-25",
-            "RESPONSORIAL_PSALM": "Salmo 34",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Mt 5, 16 ",
-            "GOSPEL": "Mt 5, 13-19"
+        "readings": {
+            "first_reading": "1Cor 1, 18-25",
+            "responsorial_psalm": "Salmo 34",
+            "second_reading": "",
+            "alleluia_verse": "Mt 5, 16 ",
+            "gospel": "Mt 5, 13-19"
         }
     },
     {
-        "MONTH": 6,
-        "DAY": 2,
-        "TAG": "StsMarcellinusPeter",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 6,
+        "day": 2,
+        "event_key": "StsMarcellinusPeter",
+        "grade": 2,
+        "common": [
             "Martyrs:For Several Martyrs"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "2 Cor 6, 4-10",
-            "RESPONSORIAL_PSALM": "Salmo 124",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Gv 17, 11b-19"
+        "readings": {
+            "first_reading": "2 Cor 6, 4-10",
+            "responsorial_psalm": "Salmo 124",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Gv 17, 11b-19"
         }
     },
     {
-        "MONTH": 6,
-        "DAY": 3,
-        "TAG": "StsCharlesLwanga",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 6,
+        "day": 3,
+        "event_key": "StsCharlesLwanga",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "Macc 7, 1-2.9-14",
-            "RESPONSORIAL_PSALM": "Salmo 124",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Mt 5, 3",
-            "GOSPEL": "Mt 5, 1-12a"
+        "readings": {
+            "first_reading": "Macc 7, 1-2.9-14",
+            "responsorial_psalm": "Salmo 124",
+            "second_reading": "",
+            "alleluia_verse": "Mt 5, 3",
+            "gospel": "Mt 5, 1-12a"
         }
     },
     {
-        "MONTH": 6,
-        "DAY": 5,
-        "TAG": "StBoniface",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 6,
+        "day": 5,
+        "event_key": "StBoniface",
+        "grade": 3,
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For Missionaries"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "At 26, 19-23",
-            "RESPONSORIAL_PSALM": "Salmo 117",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Gv 10, 14",
-            "GOSPEL": "Gv 10, 11-16"
+        "readings": {
+            "first_reading": "At 26, 19-23",
+            "responsorial_psalm": "Salmo 117",
+            "second_reading": "",
+            "alleluia_verse": "Gv 10, 14",
+            "gospel": "Gv 10, 11-16"
         }
     },
     {
-        "MONTH": 6,
-        "DAY": 6,
-        "TAG": "StNorbert",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 6,
+        "day": 6,
+        "event_key": "StNorbert",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop",
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Ez 34, 11-16",
-            "RESPONSORIAL_PSALM": "Salmo 23",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Lc 14, 25-33"
+        "readings": {
+            "first_reading": "Ez 34, 11-16",
+            "responsorial_psalm": "Salmo 23",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Lc 14, 25-33"
         }
     },
     {
-        "MONTH": 6,
-        "DAY": 9,
-        "TAG": "StEphrem",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 6,
+        "day": 9,
+        "event_key": "StEphrem",
+        "grade": 2,
+        "common": [
             "Doctors"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Col 3, 12-17",
-            "RESPONSORIAL_PSALM": "Salmo 37",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Lc 6, 43-45"
+        "readings": {
+            "first_reading": "Col 3, 12-17",
+            "responsorial_psalm": "Salmo 37",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Lc 6, 43-45"
         }
     },
     {
-        "MONTH": 6,
-        "DAY": 11,
-        "TAG": "StBarnabasAp",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 6,
+        "day": 11,
+        "event_key": "StBarnabasAp",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "At 11, 21b-26; 13, 1-3",
-            "RESPONSORIAL_PSALM": "Salmo 98",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Mt 28, 19a.20b",
-            "GOSPEL": "Mt 10, 7-13"
+        "readings": {
+            "first_reading": "At 11, 21b-26; 13, 1-3",
+            "responsorial_psalm": "Salmo 98",
+            "second_reading": "",
+            "alleluia_verse": "Mt 28, 19a.20b",
+            "gospel": "Mt 10, 7-13"
         }
     },
     {
-        "MONTH": 6,
-        "DAY": 13,
-        "TAG": "StAnthonyPadua",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 6,
+        "day": 13,
+        "event_key": "StAnthonyPadua",
+        "grade": 3,
+        "common": [
             "Pastors:For One Pastor",
             "Doctors",
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Is 61, 1-3a",
-            "RESPONSORIAL_PSALM": "Salmo 89",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Lc 4, 18cd",
-            "GOSPEL": "Lc 10, 1-9"
+        "readings": {
+            "first_reading": "Is 61, 1-3a",
+            "responsorial_psalm": "Salmo 89",
+            "second_reading": "",
+            "alleluia_verse": "Lc 4, 18cd",
+            "gospel": "Lc 10, 1-9"
         }
     },
     {
-        "MONTH": 6,
-        "DAY": 19,
-        "TAG": "StRomuald",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 6,
+        "day": 19,
+        "event_key": "StRomuald",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For an Abbot"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "Fil 3, 8-10",
-            "RESPONSORIAL_PSALM": "Salmo 131",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Lc 14, 25-33"
+        "readings": {
+            "first_reading": "Fil 3, 8-10",
+            "responsorial_psalm": "Salmo 131",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Lc 14, 25-33"
         }
     },
     {
-        "MONTH": 6,
-        "DAY": 21,
-        "TAG": "StAloysiusGonzaga",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 6,
+        "day": 21,
+        "event_key": "StAloysiusGonzaga",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "1Gv 5, 1-5",
-            "RESPONSORIAL_PSALM": "Salmo 16",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Gv 13, 34",
-            "GOSPEL": "Mt 22, 34-40"
+        "readings": {
+            "first_reading": "1Gv 5, 1-5",
+            "responsorial_psalm": "Salmo 16",
+            "second_reading": "",
+            "alleluia_verse": "Gv 13, 34",
+            "gospel": "Mt 22, 34-40"
         }
     },
     {
-        "MONTH": 6,
-        "DAY": 22,
-        "TAG": "StPaulinusNola",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 6,
+        "day": 22,
+        "event_key": "StPaulinusNola",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "2Cor 8, 9-15",
-            "RESPONSORIAL_PSALM": "Salmo 40",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "Mt 5,3",
-            "GOSPEL": "Lc 12, 32-34"
+        "readings": {
+            "first_reading": "2Cor 8, 9-15",
+            "responsorial_psalm": "Salmo 40",
+            "second_reading": "",
+            "alleluia_verse": "Mt 5,3",
+            "gospel": "Lc 12, 32-34"
         }
     },
     {
-        "MONTH": 6,
-        "DAY": 22,
-        "TAG": "StsJohnFisherThomasMore",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 6,
+        "day": 22,
+        "event_key": "StsJohnFisherThomasMore",
+        "grade": 2,
+        "common": [
             "Martyrs:For Several Martyrs"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "1 Pt 4, 12-19",
-            "RESPONSORIAL_PSALM": "Salmo 126",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": "Mt 10, 34-39"
+        "readings": {
+            "first_reading": "1 Pt 4, 12-19",
+            "responsorial_psalm": "Salmo 126",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": "Mt 10, 34-39"
         }
     },
     {
-        "MONTH": 6,
-        "DAY": 24,
-        "TAG": "NativityJohnBaptist",
-        "GRADE": 6,
-        "COMMON": [
+        "month": 6,
+        "day": 24,
+        "event_key": "NativityJohnBaptist",
+        "grade": 6,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "VIGIL": {
-                "FIRST_READING": "Ger 1, 4-10",
-                "RESPONSORIAL_PSALM": "Salmo 71",
-                "SECOND_READING": "1Pt 1, 8-12",
-                "ALLELUIA_VERSE": " Gv 1, 7; Lc 1, 17 ",
-                "GOSPEL": "Lc 1, 5-17"
+        "readings": {
+            "vigil": {
+                "first_reading": "Ger 1, 4-10",
+                "responsorial_psalm": "Salmo 71",
+                "second_reading": "1Pt 1, 8-12",
+                "alleluia_verse": " Gv 1, 7; Lc 1, 17 ",
+                "gospel": "Lc 1, 5-17"
             },
-            "DAY": {
-                "FIRST_READING": "Ger 1, 4-10",
-                "RESPONSORIAL_PSALM": "Salmo 71",
-                "SECOND_READING": "1Pt 1, 8-12",
-                "ALLELUIA_VERSE": " Gv 1, 7; Lc 1, 17 ",
-                "GOSPEL": "Lc 1, 5-17"
+            "day": {
+                "first_reading": "Ger 1, 4-10",
+                "responsorial_psalm": "Salmo 71",
+                "second_reading": "1Pt 1, 8-12",
+                "alleluia_verse": " Gv 1, 7; Lc 1, 17 ",
+                "gospel": "Lc 1, 5-17"
             }
         }
     },
     {
-        "MONTH": 6,
-        "DAY": 27,
-        "TAG": "StCyrilAlexandria",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 6,
+        "day": 27,
+        "event_key": "StCyrilAlexandria",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop",
             "Doctors"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 6,
-        "DAY": 28,
-        "TAG": "StIrenaeus",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 6,
+        "day": 28,
+        "event_key": "StIrenaeus",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 6,
-        "DAY": 29,
-        "TAG": "StsPeterPaulAp",
-        "GRADE": 6,
-        "COMMON": [
+        "month": 6,
+        "day": 29,
+        "event_key": "StsPeterPaulAp",
+        "grade": 6,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 6,
-        "DAY": 30,
-        "TAG": "FirstMartyrsRome",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 6,
+        "day": 30,
+        "event_key": "FirstMartyrsRome",
+        "grade": 2,
+        "common": [
             "Martyrs:For Several Martyrs"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 3,
-        "TAG": "StThomasAp",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 7,
+        "day": 3,
+        "event_key": "StThomasAp",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 4,
-        "TAG": "StElizabethPortugal",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 7,
+        "day": 4,
+        "event_key": "StElizabethPortugal",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 5,
-        "TAG": "StAnthonyZaccaria",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 7,
+        "day": 5,
+        "event_key": "StAnthonyZaccaria",
+        "grade": 2,
+        "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Religious",
             "Holy Men and Women:For Educators"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 6,
-        "TAG": "StMariaGoretti",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 7,
+        "day": 6,
+        "event_key": "StMariaGoretti",
+        "grade": 2,
+        "common": [
             "Martyrs:For a Virgin Martyr",
             "Virgins:For One Virgin"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 11,
-        "TAG": "StBenedict",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 7,
+        "day": 11,
+        "event_key": "StBenedict",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 13,
-        "TAG": "StHenry",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 7,
+        "day": 13,
+        "event_key": "StHenry",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For One Saint"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 14,
-        "TAG": "StCamillusDeLellis",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 7,
+        "day": 14,
+        "event_key": "StCamillusDeLellis",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 15,
-        "TAG": "StBonaventure",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 7,
+        "day": 15,
+        "event_key": "StBonaventure",
+        "grade": 3,
+        "common": [
             "Pastors:For a Bishop",
             "Doctors"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 16,
-        "TAG": "LadyMountCarmel",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 7,
+        "day": 16,
+        "event_key": "LadyMountCarmel",
+        "grade": 2,
+        "common": [
             "Blessed Virgin Mary"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 21,
-        "TAG": "StLawrenceBrindisi",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 7,
+        "day": 21,
+        "event_key": "StLawrenceBrindisi",
+        "grade": 2,
+        "common": [
             "Pastors:For One Pastor",
             "Doctors",
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 22,
-        "TAG": "StMaryMagdalene",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 7,
+        "day": 22,
+        "event_key": "StMaryMagdalene",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 23,
-        "TAG": "StBridget",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 7,
+        "day": 23,
+        "event_key": "StBridget",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For Religious",
             "Holy Men and Women:For Holy Women"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 25,
-        "TAG": "StJamesAp",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 7,
+        "day": 25,
+        "event_key": "StJamesAp",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 26,
-        "TAG": "StsJoachimAnne",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 7,
+        "day": 26,
+        "event_key": "StsJoachimAnne",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 29,
-        "TAG": "StMartha",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 7,
+        "day": 29,
+        "event_key": "StMartha",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 30,
-        "TAG": "StPeterChrysologus",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 7,
+        "day": 30,
+        "event_key": "StPeterChrysologus",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop",
             "Doctors"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 7,
-        "DAY": 31,
-        "TAG": "StIgnatiusLoyola",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 7,
+        "day": 31,
+        "event_key": "StIgnatiusLoyola",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 1,
-        "TAG": "StAlphonsusMariaDeLiguori",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 8,
+        "day": 1,
+        "event_key": "StAlphonsusMariaDeLiguori",
+        "grade": 3,
+        "common": [
             "Pastors:For a Bishop",
             "Doctors"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 2,
-        "TAG": "StEusebius",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 8,
+        "day": 2,
+        "event_key": "StEusebius",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 4,
-        "TAG": "StJeanVianney",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 8,
+        "day": 4,
+        "event_key": "StJeanVianney",
+        "grade": 3,
+        "common": [
             "Pastors:For One Pastor"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 5,
-        "TAG": "DedicationStMaryMajor",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 8,
+        "day": 5,
+        "event_key": "DedicationStMaryMajor",
+        "grade": 2,
+        "common": [
             "Blessed Virgin Mary"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 6,
-        "TAG": "Transfiguration",
-        "GRADE": 5,
-        "COMMON": [
+        "month": 8,
+        "day": 6,
+        "event_key": "Transfiguration",
+        "grade": 5,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 7,
-        "TAG": "StSixtusIIPope",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 8,
+        "day": 7,
+        "event_key": "StSixtusIIPope",
+        "grade": 2,
+        "common": [
             "Martyrs:For Several Martyrs"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 7,
-        "TAG": "StCajetan",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 8,
+        "day": 7,
+        "event_key": "StCajetan",
+        "grade": 2,
+        "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 8,
-        "TAG": "StDominic",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 8,
+        "day": 8,
+        "event_key": "StDominic",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 10,
-        "TAG": "StLawrenceDeacon",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 8,
+        "day": 10,
+        "event_key": "StLawrenceDeacon",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 11,
-        "TAG": "StClare",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 8,
+        "day": 11,
+        "event_key": "StClare",
+        "grade": 3,
+        "common": [
             "Virgins:For One Virgin",
             "Holy Men and Women:For a Nun"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 12,
-        "TAG": "StJaneFrancesDeChantal",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 12,
+        "day": 12,
+        "event_key": "StJaneFrancesDeChantal",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 13,
-        "TAG": "StsPontianHippolytus",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 8,
+        "day": 13,
+        "event_key": "StsPontianHippolytus",
+        "grade": 2,
+        "common": [
             "Martyrs:For Several Martyrs",
             "Pastors:For Several Pastors"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 15,
-        "TAG": "Assumption",
-        "GRADE": 6,
-        "COMMON": [
+        "month": 8,
+        "day": 15,
+        "event_key": "Assumption",
+        "grade": 6,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 16,
-        "TAG": "StStephenHungary",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 8,
+        "day": 16,
+        "event_key": "StStephenHungary",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For One Saint"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 19,
-        "TAG": "StJohnEudes",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 8,
+        "day": 19,
+        "event_key": "StJohnEudes",
+        "grade": 2,
+        "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 20,
-        "TAG": "StBernardClairvaux",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 8,
+        "day": 20,
+        "event_key": "StBernardClairvaux",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 21,
-        "TAG": "StPiusX",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 8,
+        "day": 21,
+        "event_key": "StPiusX",
+        "grade": 3,
+        "common": [
             "Pastors:For a Pope"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 22,
-        "TAG": "QueenshipMary",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 8,
+        "day": 22,
+        "event_key": "QueenshipMary",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 23,
-        "TAG": "StRoseLima",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 8,
+        "day": 23,
+        "event_key": "StRoseLima",
+        "grade": 2,
+        "common": [
             "Virgins:For One Virgin"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 24,
-        "TAG": "StBartholomewAp",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 8,
+        "day": 24,
+        "event_key": "StBartholomewAp",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 25,
-        "TAG": "StLouis",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 8,
+        "day": 25,
+        "event_key": "StLouis",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For One Saint"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 25,
-        "TAG": "StJosephCalasanz",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 8,
+        "day": 25,
+        "event_key": "StJosephCalasanz",
+        "grade": 2,
+        "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Educators"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 27,
-        "TAG": "StMonica",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 8,
+        "day": 27,
+        "event_key": "StMonica",
+        "grade": 3,
+        "common": [
             "Holy Men and Women:For Holy Women"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 28,
-        "TAG": "StAugustineHippo",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 8,
+        "day": 28,
+        "event_key": "StAugustineHippo",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 29,
-        "TAG": "BeheadingJohnBaptist",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 8,
+        "day": 29,
+        "event_key": "BeheadingJohnBaptist",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 3,
-        "TAG": "StGregoryGreat",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 9,
+        "day": 3,
+        "event_key": "StGregoryGreat",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 8,
-        "TAG": "NativityVirginMary",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 9,
+        "day": 8,
+        "event_key": "NativityVirginMary",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 13,
-        "TAG": "StJohnChrysostom",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 9,
+        "day": 13,
+        "event_key": "StJohnChrysostom",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 14,
-        "TAG": "ExaltationCross",
-        "GRADE": 5,
-        "COMMON": [
+        "month": 9,
+        "day": 14,
+        "event_key": "ExaltationCross",
+        "grade": 5,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 15,
-        "TAG": "LadySorrows",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 9,
+        "day": 15,
+        "event_key": "LadySorrows",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 16,
-        "TAG": "StsCorneliusCyprian",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 9,
+        "day": 16,
+        "event_key": "StsCorneliusCyprian",
+        "grade": 3,
+        "common": [
             "Martyrs:For Several Martyrs",
             "Pastors:For a Bishop"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 17,
-        "TAG": "StRobertBellarmine",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 9,
+        "day": 17,
+        "event_key": "StRobertBellarmine",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop",
             "Doctors"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 19,
-        "TAG": "StJanuarius",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 9,
+        "day": 19,
+        "event_key": "StJanuarius",
+        "grade": 2,
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For a Bishop"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 21,
-        "TAG": "StMatthewEvangelist",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 9,
+        "day": 21,
+        "event_key": "StMatthewEvangelist",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 26,
-        "TAG": "StsCosmasDamian",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 9,
+        "day": 26,
+        "event_key": "StsCosmasDamian",
+        "grade": 2,
+        "common": [
             "Martyrs:For Several Martyrs"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 27,
-        "TAG": "StVincentDePaul",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 9,
+        "day": 27,
+        "event_key": "StVincentDePaul",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 28,
-        "TAG": "StWenceslaus",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 9,
+        "day": 28,
+        "event_key": "StWenceslaus",
+        "grade": 2,
+        "common": [
             "Martyrs:For One Martyr"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 29,
-        "TAG": "StsArchangels",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 9,
+        "day": 29,
+        "event_key": "StsArchangels",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 30,
-        "TAG": "StJerome",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 9,
+        "day": 30,
+        "event_key": "StJerome",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 1,
-        "TAG": "StThereseChildJesus",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 10,
+        "day": 1,
+        "event_key": "StThereseChildJesus",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 2,
-        "TAG": "GuardianAngels",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 10,
+        "day": 2,
+        "event_key": "GuardianAngels",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 4,
-        "TAG": "StFrancisAssisi",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 10,
+        "day": 4,
+        "event_key": "StFrancisAssisi",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 6,
-        "TAG": "StBruno",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 10,
+        "day": 6,
+        "event_key": "StBruno",
+        "grade": 2,
+        "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For a Monk"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 7,
-        "TAG": "LadyRosary",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 10,
+        "day": 7,
+        "event_key": "LadyRosary",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 9,
-        "TAG": "StDenis",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 10,
+        "day": 9,
+        "event_key": "StDenis",
+        "grade": 2,
+        "common": [
             "Martyrs:For Several Martyrs"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 9,
-        "TAG": "StJohnLeonardi",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 10,
+        "day": 9,
+        "event_key": "StJohnLeonardi",
+        "grade": 2,
+        "common": [
             "Pastors:For Missionaries",
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 14,
-        "TAG": "StCallistusIPope",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 10,
+        "day": 14,
+        "event_key": "StCallistusIPope",
+        "grade": 2,
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For a Pope"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 15,
-        "TAG": "StTeresaJesus",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 10,
+        "day": 15,
+        "event_key": "StTeresaJesus",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 16,
-        "TAG": "StHedwig",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 10,
+        "day": 16,
+        "event_key": "StHedwig",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For Religious",
             "Holy Men and Women:For Holy Women"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 16,
-        "TAG": "StMargaretAlacoque",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 10,
+        "day": 16,
+        "event_key": "StMargaretAlacoque",
+        "grade": 2,
+        "common": [
             "Virgins:For One Virgin"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 17,
-        "TAG": "StIgnatiusAntioch",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 10,
+        "day": 17,
+        "event_key": "StIgnatiusAntioch",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 18,
-        "TAG": "StLukeEvangelist",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 10,
+        "day": 18,
+        "event_key": "StLukeEvangelist",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 19,
-        "TAG": "StsJeanBrebeuf",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 10,
+        "day": 19,
+        "event_key": "StsJeanBrebeuf",
+        "grade": 2,
+        "common": [
             "Martyrs:For Missionary Martyrs"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 19,
-        "TAG": "StPaulCross",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 10,
+        "day": 19,
+        "event_key": "StPaulCross",
+        "grade": 2,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 23,
-        "TAG": "StJohnCapistrano",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 10,
+        "day": 23,
+        "event_key": "StJohnCapistrano",
+        "grade": 2,
+        "common": [
             "Pastors:For Missionaries",
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 24,
-        "TAG": "StAnthonyMaryClaret",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 10,
+        "day": 24,
+        "event_key": "StAnthonyMaryClaret",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop",
             "Pastors:For Missionaries"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 10,
-        "DAY": 28,
-        "TAG": "StSimonStJudeAp",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 10,
+        "day": 28,
+        "event_key": "StSimonStJudeAp",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 1,
-        "TAG": "AllSaints",
-        "GRADE": 6,
-        "COMMON": [
+        "month": 11,
+        "day": 1,
+        "event_key": "AllSaints",
+        "grade": 6,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 2,
-        "TAG": "AllSouls",
-        "GRADE": 6,
-        "COMMON": [
+        "month": 11,
+        "day": 2,
+        "event_key": "AllSouls",
+        "grade": 6,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "purple"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 3,
-        "TAG": "StMartinPorres",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 11,
+        "day": 3,
+        "event_key": "StMartinPorres",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 4,
-        "TAG": "StCharlesBorromeo",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 11,
+        "day": 4,
+        "event_key": "StCharlesBorromeo",
+        "grade": 3,
+        "common": [
             "Pastors:For a Bishop"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 9,
-        "TAG": "DedicationLateran",
-        "GRADE": 5,
-        "COMMON": [
+        "month": 11,
+        "day": 9,
+        "event_key": "DedicationLateran",
+        "grade": 5,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 10,
-        "TAG": "StLeoGreat",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 11,
+        "day": 10,
+        "event_key": "StLeoGreat",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 11,
-        "TAG": "StMartinTours",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 11,
+        "day": 11,
+        "event_key": "StMartinTours",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 12,
-        "TAG": "StJosaphat",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 11,
+        "day": 12,
+        "event_key": "StJosaphat",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 15,
-        "TAG": "StAlbertGreat",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 11,
+        "day": 15,
+        "event_key": "StAlbertGreat",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop",
             "Doctors"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 16,
-        "TAG": "StMargaretScotland",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 11,
+        "day": 16,
+        "event_key": "StMargaretScotland",
+        "grade": 2,
+        "common": [
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 16,
-        "TAG": "StGertrudeGreat",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 11,
+        "day": 16,
+        "event_key": "StGertrudeGreat",
+        "grade": 2,
+        "common": [
             "Virgins:For One Virgin",
             "Holy Men and Women:For a Nun"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 17,
-        "TAG": "StElizabethHungary",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 11,
+        "day": 17,
+        "event_key": "StElizabethHungary",
+        "grade": 3,
+        "common": [
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 18,
-        "TAG": "DedicationStsPeterPaul",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 11,
+        "day": 18,
+        "event_key": "DedicationStsPeterPaul",
+        "grade": 2,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 21,
-        "TAG": "PresentationMary",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 11,
+        "day": 21,
+        "event_key": "PresentationMary",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 22,
-        "TAG": "StCecilia",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 11,
+        "day": 22,
+        "event_key": "StCecilia",
+        "grade": 3,
+        "common": [
             "Martyrs:For a Virgin Martyr",
             "Virgins:For One Virgin"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 23,
-        "TAG": "StClementIPope",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 11,
+        "day": 23,
+        "event_key": "StClementIPope",
+        "grade": 2,
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For a Pope"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 23,
-        "TAG": "StColumban",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 11,
+        "day": 23,
+        "event_key": "StColumban",
+        "grade": 2,
+        "common": [
             "Pastors:For Missionaries",
             "Holy Men and Women:For an Abbot"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 30,
-        "TAG": "StAndrewAp",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 11,
+        "day": 30,
+        "event_key": "StAndrewAp",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 3,
-        "TAG": "StFrancisXavier",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 12,
+        "day": 3,
+        "event_key": "StFrancisXavier",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 4,
-        "TAG": "StJohnDamascene",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 12,
+        "day": 4,
+        "event_key": "StJohnDamascene",
+        "grade": 2,
+        "common": [
             "Pastors:For One Pastor",
             "Doctors"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 6,
-        "TAG": "StNicholas",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 12,
+        "day": 6,
+        "event_key": "StNicholas",
+        "grade": 2,
+        "common": [
             "Pastors:For a Bishop"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 7,
-        "TAG": "StAmbrose",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 12,
+        "day": 7,
+        "event_key": "StAmbrose",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 8,
-        "TAG": "ImmaculateConception",
-        "GRADE": 6,
-        "COMMON": [
+        "month": 12,
+        "day": 8,
+        "event_key": "ImmaculateConception",
+        "grade": 6,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 11,
-        "TAG": "StDamasusIPope",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 12,
+        "day": 11,
+        "event_key": "StDamasusIPope",
+        "grade": 2,
+        "common": [
             "Pastors:For a Pope"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 13,
-        "TAG": "StLucySyracuse",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 12,
+        "day": 13,
+        "event_key": "StLucySyracuse",
+        "grade": 3,
+        "common": [
             "Martyrs:For a Virgin Martyr",
             "Virgins:For One Virgin"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 14,
-        "TAG": "StJohnCross",
-        "GRADE": 3,
-        "COMMON": [
+        "month": 12,
+        "day": 14,
+        "event_key": "StJohnCross",
+        "grade": 3,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 21,
-        "TAG": "StPeterCanisius",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 12,
+        "day": 21,
+        "event_key": "StPeterCanisius",
+        "grade": 2,
+        "common": [
             "Pastors:For One Pastor",
             "Doctors"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 23,
-        "TAG": "StJohnKanty",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 12,
+        "day": 23,
+        "event_key": "StJohnKanty",
+        "grade": 2,
+        "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 26,
-        "TAG": "StStephenProtomartyr",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 12,
+        "day": 26,
+        "event_key": "StStephenProtomartyr",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 27,
-        "TAG": "StJohnEvangelist",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 12,
+        "day": 27,
+        "event_key": "StJohnEvangelist",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 28,
-        "TAG": "HolyInnocents",
-        "GRADE": 4,
-        "COMMON": [
+        "month": 12,
+        "day": 28,
+        "event_key": "HolyInnocents",
+        "grade": 4,
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 29,
-        "TAG": "StThomasBecket",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 12,
+        "day": 29,
+        "event_key": "StThomasBecket",
+        "grade": 2,
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For a Bishop"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 12,
-        "DAY": 31,
-        "TAG": "StSylvesterIPope",
-        "GRADE": 2,
-        "COMMON": [
+        "month": 12,
+        "day": 31,
+        "event_key": "StSylvesterIPope",
+        "grade": 2,
+        "common": [
             "Pastors:For a Pope"
         ],
-        "CALENDAR": "GENERAL ROMAN",
-        "COLOR": [
+        "calendar": "GENERAL ROMAN",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     }
 ]

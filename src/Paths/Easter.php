@@ -1,7 +1,9 @@
 <?php
 
-namespace Johnrdorazio\LitCal;
+namespace Johnrdorazio\LitCal\Paths;
 
+use Johnrdorazio\LitCal\LitFunc;
+use Johnrdorazio\LitCal\LitMessages;
 use Johnrdorazio\LitCal\Enum\LitLocale;
 
 class Easter
@@ -79,15 +81,15 @@ class Easter
 
     private static function calculateEasterDates(): void
     {
-        self::$EasterDates              = new \stdClass();
-        self::$EasterDates->EasterDates = [];
-        $dateLastCoincidence            = null;
-        $gregDateString                 = "";
-        $julianDateString               = "";
-        $westernJulianDateString        = "";
+        self::$EasterDates                  = new \stdClass();
+        self::$EasterDates->litcal_easter   = [];
+        $dateLastCoincidence                = null;
+        $gregDateString                     = "";
+        $julianDateString                   = "";
+        $westernJulianDateString            = "";
 
         for ($i = 1583; $i <= 9999; $i++) {
-            self::$EasterDates->EasterDates[$i - 1583] = new \stdClass();
+            self::$EasterDates->litcal_easter[$i - 1583] = new \stdClass();
             $gregorian_easter                    = LitFunc::calcGregEaster($i);
             $julian_easter                       = LitFunc::calcJulianEaster($i);
             $western_julian_easter               = LitFunc::calcJulianEaster($i, true);
@@ -122,13 +124,13 @@ class Easter
                     $westernJulianDateString    = self::$dayOfTheWeekDayMonthYear->format($western_julian_easter->format('U'));
             }
 
-            self::$EasterDates->EasterDates[$i - 1583]->gregorianEaster          = (int) $gregorian_easter->format('U');
-            self::$EasterDates->EasterDates[$i - 1583]->julianEaster             = (int) $julian_easter->format('U');
-            self::$EasterDates->EasterDates[$i - 1583]->westernJulianEaster      = (int) $western_julian_easter->format('U');
-            self::$EasterDates->EasterDates[$i - 1583]->coinciding               = $same_easter;
-            self::$EasterDates->EasterDates[$i - 1583]->gregorianDateString      = $gregDateString;
-            self::$EasterDates->EasterDates[$i - 1583]->julianDateString         = $julianDateString;
-            self::$EasterDates->EasterDates[$i - 1583]->westernJulianDateString  = $westernJulianDateString;
+            self::$EasterDates->litcal_easter[$i - 1583]->gregorianEaster          = (int) $gregorian_easter->format('U');
+            self::$EasterDates->litcal_easter[$i - 1583]->julianEaster             = (int) $julian_easter->format('U');
+            self::$EasterDates->litcal_easter[$i - 1583]->westernJulianEaster      = (int) $western_julian_easter->format('U');
+            self::$EasterDates->litcal_easter[$i - 1583]->coinciding               = $same_easter;
+            self::$EasterDates->litcal_easter[$i - 1583]->gregorianDateString      = $gregDateString;
+            self::$EasterDates->litcal_easter[$i - 1583]->julianDateString         = $julianDateString;
+            self::$EasterDates->litcal_easter[$i - 1583]->westernJulianDateString  = $westernJulianDateString;
         }
 
         self::$EasterDates->lastCoincidenceString     = $dateLastCoincidence->format('l, F jS, Y');

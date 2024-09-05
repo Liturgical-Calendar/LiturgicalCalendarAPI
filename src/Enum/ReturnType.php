@@ -8,15 +8,15 @@ namespace Johnrdorazio\LitCal\Enum;
  *  as indicated in a parameter in the request
  *  rather than in the Accept header
  * The $values array must follow exactly the $values array
- *  in the ACCEPT_HEADER class, so that conversions can be made
+ *  in the \LitCal\Enum\AcceptHeader class, so that conversions can be made
  */
 
 class ReturnType
 {
     public const ATTACHMENT    = "ATTACHMENT";
     public const JSON          = "JSON";
+    public const YAML          = "YML";
     public const XML           = "XML";
-    public const YML           = "YML";
     public const PDF           = "PDF";
     public const HTML          = "HTML";
     public const ICS           = "ICS";
@@ -42,8 +42,8 @@ class ReturnType
     public static array $values = [
         "ATTACHMENT",
         "JSON",
-        "XML",
         "YML",
+        "XML",
         "PDF",
         "HTML",
         "ICS",

@@ -12,7 +12,7 @@ use Johnrdorazio\LitCal\Enum\LitSeason;
 
 class Festivity implements \JsonSerializable
 {
-    public static $eventIdx = 0;
+    public static $eventidx = 0;
 
     public int $idx;
 
@@ -22,23 +22,23 @@ class Festivity implements \JsonSerializable
     public array $color = [];
     public string $type;
     public int $grade;
-    public string $displayGrade;
+    public string $display_grade;
     public array $common;  //"Proper" or specified common(s) of saints...
 
     /** The following properties are set externally, but may be optional and therefore may remain null */
-    public ?string $liturgicalYear = null;
-    public ?bool $isVigilMass    = null;
-    public ?bool $hasVigilMass   = null;
-    public ?bool $hasVesperI     = null;
-    public ?bool $hasVesperII    = null;
-    public ?int $psalterWeek    = null;
-    public ?string $isVigilFor     = null;
-    public ?string $liturgicalSeason = null;
+    public ?int $psalter_week         = null;
+    public ?bool $is_vigil_mass       = null;
+    public ?bool $has_vigil_mass      = null;
+    public ?bool $has_vesper_i        = null;
+    public ?bool $has_vesper_ii       = null;
+    public ?string $is_vigil_for      = null;
+    public ?string $liturgical_year   = null;
+    public ?string $liturgical_season = null;
 
     /** The following properties are set based on properties passed in the constructor or on properties set externally*/
-    public array $colorLcl;
-    public string $gradeLcl;
-    public string $commonLcl;
+    public array $color_lcl;
+    public string $grade_lcl;
+    public string $common_lcl;
 
     private static string $locale   = LitLocale::LATIN;
     private static LitGrade $LitGrade;
@@ -57,7 +57,7 @@ class Festivity implements \JsonSerializable
         string|array $common = [ '???' ],
         string $displayGrade = ''
     ) {
-        $this->idx          = self::$eventIdx++;
+        $this->idx          = self::$eventidx++;
         $this->name         = $name;
         $this->date         = $date; //DateTime object
         if (is_array($color)) {
@@ -69,12 +69,12 @@ class Festivity implements \JsonSerializable
             //the color string can contain multiple colors separated by a comma, when there are multiple commons to choose from for that festivity
             $this->color        = strpos($_color, ",") && LitColor::areValid(explode(",", $_color)) ? explode(",", $_color) : ( LitColor::isValid($_color) ? [ $_color ] : [ '???' ] );
         }
-        $this->colorLcl     = array_map(fn($item) => LitColor::i18n($item, self::$locale), $this->color);
+        $this->color_lcl    = array_map(fn($item) => LitColor::i18n($item, self::$locale), $this->color);
         $_type              = strtolower($type);
         $this->type         = LitFeastType::isValid($_type) ? $_type : '???';
         $this->grade        = $grade >= LitGrade::WEEKDAY && $grade <= LitGrade::HIGHER_SOLEMNITY ? $grade : -1;
-        $this->displayGrade = $displayGrade;
-        $this->gradeLcl     = self::$LitGrade->i18n($this->grade, false);
+        $this->display_grade = $displayGrade;
+        $this->grade_lcl     = self::$LitGrade->i18n($this->grade, false);
         //Festivity::debugWrite( "*** Festivity.php *** common vartype = " . gettype( $common ) );
         if (is_string($common)) {
             //Festivity::debugWrite( "*** Festivity.php *** common vartype is string, value = $common" );
@@ -88,7 +88,7 @@ class Festivity implements \JsonSerializable
                 $this->common = [];
             }
         }
-        $this->commonLcl = self::$LitCommon->c($this->common);
+        $this->common_lcl = self::$LitCommon->c($this->common);
     }
     /*
     private static function debugWrite( string $string ) {
@@ -117,51 +117,51 @@ class Festivity implements \JsonSerializable
     public function jsonSerialize(): mixed
     {
         $returnArr = [
-            'eventIdx'      => $this->idx,
-            'name'          => $this->name,
-            //serialize the DateTime object as a PHP timestamp (seconds since the Unix Epoch)
-            'date'          => (int) $this->date->format('U'),
-            'color'         => $this->color,
-            'colorLcl'      => $this->colorLcl,
-            'type'          => $this->type,
-            'grade'         => $this->grade,
-            'gradeLcl'      => $this->gradeLcl,
-            'displayGrade'  => $this->displayGrade,
-            'common'        => $this->common,
-            'commonLcl'     => $this->commonLcl,
-            'dayOfTheWeek_ISO8601'  => (int) $this->date->format('N'), //1 for Monday, 7 for Sunday
-            'month'                 => (int) $this->date->format('n'), //1 for January, 12 for December
-            'day'                   => (int) $this->date->format('j'),
-            'year'                  => (int) $this->date->format('Y'),
-            'monthShort'            => self::$monthShort->format($this->date->format('U')),
-            'monthLong'             => self::$monthLong->format($this->date->format('U')),
-            'dayOfTheWeekShort'     => self::$dayOfTheWeekShort->format($this->date->format('U')),
-            'dayOfTheWeekLong'      => self::$dayOfTheWeekLong->format($this->date->format('U'))
+            'event_idx'                => $this->idx,
+            'name'                    => $this->name,
+            //serialize the DateTime   object as a PHP timestamp (seconds since the Unix Epoch)
+            'date'                    => (int) $this->date->format('U'),
+            'color'                   => $this->color,
+            'color_lcl'               => $this->color_lcl,
+            'type'                    => $this->type,
+            'grade'                   => $this->grade,
+            'grade_lcl'               => $this->grade_lcl,
+            'display_grade'           => $this->display_grade,
+            'common'                  => $this->common,
+            'common_lcl'              => $this->common_lcl,
+            'day_of_the_week_iso8601' => (int) $this->date->format('N'), //1 for Monday, 7 for Sunday
+            'month'                   => (int) $this->date->format('n'), //1 for January, 12 for December
+            'day'                     => (int) $this->date->format('j'),
+            'year'                    => (int) $this->date->format('Y'),
+            'month_short'             => self::$monthShort->format($this->date->format('U')),
+            'month_long'              => self::$monthLong->format($this->date->format('U')),
+            'day_of_the_week_short'   => self::$dayOfTheWeekShort->format($this->date->format('U')),
+            'day_of_the_week_long'    => self::$dayOfTheWeekLong->format($this->date->format('U'))
         ];
-        if ($this->liturgicalYear !== null) {
-            $returnArr['liturgicalYear']    = $this->liturgicalYear;
+        if ($this->liturgical_year !== null) {
+            $returnArr['liturgical_year']    = $this->liturgical_year;
         }
-        if ($this->isVigilMass !== null) {
-            $returnArr['isVigilMass']       = $this->isVigilMass;
+        if ($this->is_vigil_mass !== null) {
+            $returnArr['is_vigil_mass']       = $this->is_vigil_mass;
         }
-        if ($this->isVigilFor !== null) {
-            $returnArr['isVigilFor']       = $this->isVigilFor;
+        if ($this->is_vigil_for !== null) {
+            $returnArr['is_vigil_for']       = $this->is_vigil_for;
         }
-        if ($this->hasVigilMass !== null) {
-            $returnArr['hasVigilMass']      = $this->hasVigilMass;
+        if ($this->has_vigil_mass !== null) {
+            $returnArr['has_vigil_mass']      = $this->has_vigil_mass;
         }
-        if ($this->hasVesperI !== null) {
-            $returnArr['hasVesperI']        = $this->hasVesperI;
+        if ($this->has_vesper_i !== null) {
+            $returnArr['has_vesper_i']        = $this->has_vesper_i;
         }
-        if ($this->hasVesperII !== null) {
-            $returnArr['hasVesperII']       = $this->hasVesperII;
+        if ($this->has_vesper_ii !== null) {
+            $returnArr['has_vesper_ii']       = $this->has_vesper_ii;
         }
-        if ($this->psalterWeek !== null) {
-            $returnArr['psalterWeek']       = $this->psalterWeek;
+        if ($this->psalter_week !== null) {
+            $returnArr['psalter_week']       = $this->psalter_week;
         }
-        if ($this->liturgicalSeason !== null) {
-            $returnArr['liturgicalSeason']  = $this->liturgicalSeason;
-            $returnArr['liturgicalSeasonLcl'] = LitSeason::i18n($this->liturgicalSeason, self::$locale);
+        if ($this->liturgical_season !== null) {
+            $returnArr['liturgical_season']  = $this->liturgical_season;
+            $returnArr['liturgical_season_lcl'] = LitSeason::i18n($this->liturgical_season, self::$locale);
         }
         return $returnArr;
     }
@@ -183,27 +183,27 @@ class Festivity implements \JsonSerializable
  * Leaving them commented for the time being since we aren't actually using them
  *
     public static function isAdventSeason( Festivity $festivity ) {
-        return $festivity->liturgicalSeason !== null && $festivity->liturgicalSeason === LitSeason::ADVENT;
+        return $festivity->liturgical_season !== null && $festivity->liturgical_season === LitSeason::ADVENT;
     }
 
     public static function isChristmasSeason( Festivity $festivity ) {
-        return $festivity->liturgicalSeason !== null && $festivity->liturgicalSeason === LitSeason::CHRISTMAS;
+        return $festivity->liturgical_season !== null && $festivity->liturgical_season === LitSeason::CHRISTMAS;
     }
 
     public static function isLentSeason( Festivity $festivity ) {
-        return $festivity->liturgicalSeason !== null && $festivity->liturgicalSeason === LitSeason::LENT;
+        return $festivity->liturgical_season !== null && $festivity->liturgical_season === LitSeason::LENT;
     }
 
     public static function isEasterTriduum( Festivity $festivity ) {
-        return $festivity->liturgicalSeason !== null && $festivity->liturgicalSeason === LitSeason::EASTER_TRIDUUM;
+        return $festivity->liturgical_season !== null && $festivity->liturgical_season === LitSeason::EASTER_TRIDUUM;
     }
 
     public static function isEasterSeason( Festivity $festivity ) {
-        return $festivity->liturgicalSeason !== null && $festivity->liturgicalSeason === LitSeason::EASTER;
+        return $festivity->liturgical_season !== null && $festivity->liturgical_season === LitSeason::EASTER;
     }
 
     public static function isOrdinaryTime( Festivity $festivity ) {
-        return $festivity->liturgicalSeason !== null && $festivity->liturgicalSeason === LitSeason::ORDINARY_TIME;
+        return $festivity->liturgical_season !== null && $festivity->liturgical_season === LitSeason::ORDINARY_TIME;
     }
  */
 }

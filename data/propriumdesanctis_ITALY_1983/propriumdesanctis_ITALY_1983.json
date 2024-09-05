@@ -1,183 +1,183 @@
 [
     {
-        "MONTH": 4,
-        "DAY": 23,
-        "TAG": "StAdalbert",
-        "NAME": "Sant'Adalberto, vescovo e martire",
-        "GRADE": 2,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 4,
+        "day": 23,
+        "event_key": "StAdalbert",
+        "name": "Sant'Adalberto, vescovo e martire",
+        "grade": 2,
+        "display_grade": "",
+        "common": [
             "Martyrs:For One Martyr",
             "Pastors:For a Bishop"
         ],
-        "CALENDAR": "ITALY",
-        "COLOR": [
+        "calendar": "ITALY",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 4,
-        "DAY": 28,
-        "TAG": "StLouisGrignonMontfort",
-        "NAME": "San Luigi Grignon de Montfort",
-        "GRADE": 2,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 4,
+        "day": 28,
+        "event_key": "StLouisGrignonMontfort",
+        "name": "San Luigi Grignon de Montfort",
+        "grade": 2,
+        "display_grade": "",
+        "common": [
             "Pastors:For One Pastor"
         ],
-        "CALENDAR": "ITALY",
-        "COLOR": [
+        "calendar": "ITALY",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 2,
-        "TAG": "StPeterJulianEymard",
-        "NAME": "San Pietro Giuliani, sacerdote",
-        "GRADE": 2,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 8,
+        "day": 2,
+        "event_key": "StPeterJulianEymard",
+        "name": "San Pietro Giuliani, sacerdote",
+        "grade": 2,
+        "display_grade": "",
+        "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Religious"
         ],
-        "CALENDAR": "ITALY",
-        "COLOR": [
+        "calendar": "ITALY",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 8,
-        "DAY": 14,
-        "TAG": "StMaximilianKolbe",
-        "NAME": "San Massimiliano Kolbe, sacerdote e martire",
-        "GRADE": 3,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 8,
+        "day": 14,
+        "event_key": "StMaximilianKolbe",
+        "name": "San Massimiliano Kolbe, sacerdote e martire",
+        "grade": 3,
+        "display_grade": "",
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "ITALY",
-        "COLOR": [
+        "calendar": "ITALY",
+        "color": [
             "white",
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 9,
-        "TAG": "StPeterClaver",
-        "NAME": "San Pietro Claver, sacerdote",
-        "GRADE": 2,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 9,
+        "day": 9,
+        "event_key": "StPeterClaver",
+        "name": "San Pietro Claver, sacerdote",
+        "grade": 2,
+        "display_grade": "",
+        "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
         ],
-        "CALENDAR": "ITALY",
-        "COLOR": [
+        "calendar": "ITALY",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 20,
-        "TAG": "StAndrewKimTaegon",
-        "NAME": "Santi Andrea Kim Taegon, sacerdote, Paolo Chong Hasang e compagni martiri",
-        "GRADE": 3,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 9,
+        "day": 20,
+        "event_key": "StAndrewKimTaegon",
+        "name": "Santi Andrea Kim Taegon, sacerdote, Paolo Chong Hasang e compagni martiri",
+        "grade": 3,
+        "display_grade": "",
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "ITALY",
-        "COLOR": [
+        "calendar": "ITALY",
+        "color": [
             "white"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 9,
-        "DAY": 28,
-        "TAG": "StsLawrenceRuiz",
-        "NAME": "Santi Lorenzo Ruiz e compagni martiri",
-        "GRADE": 2,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 9,
+        "day": 28,
+        "event_key": "StsLawrenceRuiz",
+        "name": "Santi Lorenzo Ruiz e compagni martiri",
+        "grade": 2,
+        "display_grade": "",
+        "common": [
             "Martyrs:For Several Martyrs"
         ],
-        "CALENDAR": "ITALY",
-        "COLOR": [
+        "calendar": "ITALY",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     },
     {
-        "MONTH": 11,
-        "DAY": 24,
-        "TAG": "StAndrewDungLac",
-        "NAME": "Sant'Andrea Dung-Lac e compagni martiri",
-        "GRADE": 3,
-        "DISPLAYGRADE": "",
-        "COMMON": [
+        "month": 11,
+        "day": 24,
+        "event_key": "StAndrewDungLac",
+        "name": "Sant'Andrea Dung-Lac e compagni martiri",
+        "grade": 3,
+        "display_grade": "",
+        "common": [
             "Proper"
         ],
-        "CALENDAR": "ITALY",
-        "COLOR": [
+        "calendar": "ITALY",
+        "color": [
             "red"
         ],
-        "READINGS": {
-            "FIRST_READING": "",
-            "RESPONSORIAL_PSALM": "",
-            "SECOND_READING": "",
-            "ALLELUIA_VERSE": "",
-            "GOSPEL": ""
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
         }
     }
 ]
