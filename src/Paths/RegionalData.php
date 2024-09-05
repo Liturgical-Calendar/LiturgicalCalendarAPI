@@ -370,36 +370,46 @@ class RegionalData
         return $data;
     }
 
+    private static function setDataFromPath(array $requestPathParts): object
+    {
+        $data = new \stdClass();
+        $data->category = RegionalDataParams::EXPECTED_CATEGORIES[$requestPathParts[0]];
+        $data->key = $requestPathParts[1];
+
+        if (in_array(self::$APICore->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH])) {
+            $data = RegionalData::retrievePayloadFromPostPutPatchRequest($data);
+        } elseif (
+            self::$APICore->getRequestMethod() === RequestMethod::GET
+            && isset($_GET['locale'])
+        ) {
+            $data->locale = $_GET['locale'];
+        }
+        return $data;
+    }
+
+    private static function validateRequestPath(array $requestPathParts): void
+    {
+        if (count($requestPathParts) !== 2) {
+            self::produceErrorResponse(
+                StatusCode::BAD_REQUEST,
+                "Expected two and exactly two path params, received " . count($requestPathParts)
+            );
+        }
+
+        if (false === array_key_exists($requestPathParts[0], RegionalDataParams::EXPECTED_CATEGORIES)) {
+            self::produceErrorResponse(
+                StatusCode::BAD_REQUEST,
+                "Unexpected path param {$requestPathParts[0]}, acceptable values are: "
+                    . implode(', ', array_keys(RegionalDataParams::EXPECTED_CATEGORIES))
+            );
+        }
+    }
+
     private function handleRequestParams(array $requestPathParts = []): void
     {
         if (count($requestPathParts)) {
-            if (count($requestPathParts) !== 2) {
-                self::produceErrorResponse(
-                    StatusCode::BAD_REQUEST,
-                    "Expected two and exactly two path params, received " . count($requestPathParts)
-                );
-            }
-
-            if (false === array_key_exists($requestPathParts[0], RegionalDataParams::EXPECTED_CATEGORIES)) {
-                self::produceErrorResponse(
-                    StatusCode::BAD_REQUEST,
-                    "Unexpected path param {$requestPathParts[0]}, acceptable values are: "
-                        . implode(', ', array_keys(RegionalDataParams::EXPECTED_CATEGORIES))
-                );
-            }
-
-            $data = new \stdClass();
-            $data->category = RegionalDataParams::EXPECTED_CATEGORIES[$requestPathParts[0]];
-            $data->key = $requestPathParts[1];
-
-            if (in_array(self::$APICore->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH])) {
-                $data = RegionalData::retrievePayloadFromPostPutPatchRequest($data);
-            } elseif (
-                self::$APICore->getRequestMethod() === RequestMethod::GET
-                && isset($_GET['locale'])
-            ) {
-                $data->locale = $_GET['locale'];
-            }
+            RegionalData::validateRequestPath($requestPathParts);
+            $data = RegionalData::setDataFromPath($requestPathParts);
         } elseif (self::$APICore->getRequestContentType() === RequestContentType::JSON) {
             $data = self::$APICore->retrieveRequestParamsFromJsonBody();
         } elseif (self::$APICore->getRequestContentType() === RequestContentType::YAML) {
