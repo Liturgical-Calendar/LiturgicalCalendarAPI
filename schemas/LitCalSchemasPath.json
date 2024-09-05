@@ -1,0 +1,15 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "LitCalSchemasPath",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "litcal_schemas": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "pattern": "^https?:\\\/\\\/litcal\\.johnromanodorazio\\.com\\\/api\\\/(dev|v[3-9])\\\/schemas\\\/[a-zA-Z]+\\.json"
+            }
+        }
+    }
+}
