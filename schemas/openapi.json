@@ -341,7 +341,7 @@
           "Metadata API endpoint"
         ],
         "security": [{}],
-        "summary": "gives information about current supported national and diocesan calendars and relative locales",
+        "summary": "index of current supported national and diocesan calendars and relative locales, settings, etc.",
         "operationId": "retrieveMetadataGET",
         "responses": {
           "200": {
@@ -2068,7 +2068,7 @@
                       "type": "string"
                     }
                   },
-                  "widerRegions": {
+                  "wider_regions": {
                     "type": "array",
                     "items": {
                       "type": "string"
@@ -2081,43 +2081,7 @@
                     }
                   },
                   "settings": {
-                    "type": "object",
-                    "properties": {
-                      "Epiphany": {
-                        "type": "string",
-                        "enum": [
-                          "JAN6",
-                          "SUNDAY_JAN2_JAN8"
-                        ]
-                      },
-                      "Ascension": {
-                        "type": "string",
-                        "enum": [
-                          "SUNDAY",
-                          "THURSDAY"
-                        ]
-                      },
-                      "CorpusChristi": {
-                        "type": "string",
-                        "enum": [
-                          "SUNDAY",
-                          "THURSDAY"
-                        ]
-                      },
-                      "Locale": {
-                        "type": "string"
-                      },
-                      "EternalHighPriest": {
-                        "type": "boolean"
-                      }
-                    },
-                    "additionalProperties": false,
-                    "required": [
-                      "Epiphany",
-                      "Ascension",
-                      "CorpusChristi",
-                      "Locale"
-                    ]
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CalendarSettings"
                   }
                 },
                 "additionalProperties": false
@@ -2142,8 +2106,12 @@
                   "group": {
                     "type": "string",
                     "description": "Named group of diocesan calendars which can be pooled together"
+                  },
+                  "settings": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CalendarSettings"
                   }
                 },
+                "additionalProperties": false,
                 "required": [
                   "nation",
                   "diocese"
