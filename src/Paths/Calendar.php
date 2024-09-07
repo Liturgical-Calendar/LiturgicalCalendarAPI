@@ -442,7 +442,7 @@ class Calendar
                                 $this->CalendarParams->Ascension       = $value;
                             }
                             break;
-                        case "corpuschristi":
+                        case "corpus_christi":
                             if (CorpusChristi::isValid($value)) {
                                 $this->CalendarParams->CorpusChristi   = $value;
                             }
