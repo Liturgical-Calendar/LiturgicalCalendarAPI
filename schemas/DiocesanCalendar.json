@@ -91,19 +91,7 @@
             "title": "LitCal"
         },
         "Overrides": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "epiphany": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
-                },
-                "ascension": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Ascension"
-                },
-                "corpuschristi": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
-                }
-            },
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CalendarSettings",
             "title": "Overrides"
         }
     }

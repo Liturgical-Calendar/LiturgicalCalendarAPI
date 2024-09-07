@@ -44,25 +44,7 @@
                                 }
                             },
                             "settings": {
-                                "type": "object",
-                                "additionalProperties": false,
-                                "properties": {
-                                    "epiphany": {
-                                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
-                                    },
-                                    "ascension": {
-                                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Ascension"
-                                    },
-                                    "corpus_christi": {
-                                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
-                                    },
-                                    "locale": {
-                                        "type": "string"
-                                    },
-                                    "eternal_high_priest": {
-                                        "type": "boolean"
-                                    }
-                                }
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CalendarSettings"
                             }
                         },
                         "required": ["calendar_id", "missals"]
@@ -93,6 +75,9 @@
                             },
                             "group": {
                                 "type": "string"
+                            },
+                            "settings": {
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CalendarSettings"
                             }
                         },
                         "required": [

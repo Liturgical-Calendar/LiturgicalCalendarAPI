@@ -191,6 +191,30 @@
             ],
             "title": "CorpusChristi"
         },
+        "EternalHighPriest": {
+            "type": "boolean"
+        },
+        "CalendarSettings": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "epiphany": {
+                    "$ref": "#/definitions/Epiphany"
+                },
+                "ascension": {
+                    "$ref": "#/definitions/Ascension"
+                },
+                "corpus_christi": {
+                    "$ref": "#/definitions/CorpusChristi"
+                },
+                "eternal_high_priest": {
+                    "$ref": "#/definitions/EternalHighPriest"
+                },
+                "locale": {
+                    "$ref": "#/definitions/Locale"
+                }
+            }
+        },
         "Calendar": {
             "type": "string",
             "enum": [
