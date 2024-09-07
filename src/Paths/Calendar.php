@@ -13,7 +13,7 @@ use Johnrdorazio\LitCal\Enum\CorpusChristi;
 use Johnrdorazio\LitCal\Enum\Epiphany;
 use Johnrdorazio\LitCal\Enum\AcceptHeader;
 use Johnrdorazio\LitCal\Enum\CacheDuration;
-use Johnrdorazio\LitCal\Enum\CalendarType;
+use Johnrdorazio\LitCal\Enum\YearType;
 use Johnrdorazio\LitCal\Enum\LitColor;
 use Johnrdorazio\LitCal\Enum\LitCommon;
 use Johnrdorazio\LitCal\Enum\LitFeastType;
@@ -267,7 +267,7 @@ class Calendar
      * - diocesan_calendar: a string indicating the diocesan calendar to produce
      * - locale: a string representing the locale of the calendar
      * - return_type: a string indicating the format of the response
-     * - calendar_type: a string indicating whether the calendar should be caculated according to the Civil year or the Liturgical year
+     * - year_type: a string indicating whether the calendar should be caculated according to the Civil year or the Liturgical year
      * - year: an integer indicating the year for which the calendar should be calculated
      *
      * @return void
@@ -4220,7 +4220,7 @@ class Calendar
         $SerializeableLitCal->settings->corpus_christi      = $this->CalendarParams->CorpusChristi;
         $SerializeableLitCal->settings->locale              = $this->CalendarParams->Locale;
         $SerializeableLitCal->settings->return_type         = $this->CalendarParams->ReturnType;
-        $SerializeableLitCal->settings->calendar_type       = $this->CalendarParams->CalendarType;
+        $SerializeableLitCal->settings->year_type       = $this->CalendarParams->YearType;
         $SerializeableLitCal->settings->eternal_high_priest = $this->CalendarParams->EternalHighPriest;
         if ($this->CalendarParams->NationalCalendar !== null) {
             $SerializeableLitCal->settings->national_calendar = $this->CalendarParams->NationalCalendar;
@@ -4455,7 +4455,7 @@ class Calendar
 
             $this->Cal->setCyclesVigilsSeasons();
 
-            if ($this->CalendarParams->CalendarType === CalendarType::LITURGICAL) {
+            if ($this->CalendarParams->YearType === YearType::LITURGICAL) {
                 // Save the state of the current Calendar calculation
                 $this->Cal->sortFestivities();
                 $CalBackup = clone( $this->Cal );

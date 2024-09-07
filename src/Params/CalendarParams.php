@@ -2,7 +2,7 @@
 
 namespace Johnrdorazio\LitCal\Params;
 
-use Johnrdorazio\LitCal\Enum\CalendarType;
+use Johnrdorazio\LitCal\Enum\YearType;
 use Johnrdorazio\LitCal\Enum\Epiphany;
 use Johnrdorazio\LitCal\Enum\Ascension;
 use Johnrdorazio\LitCal\Enum\CorpusChristi;
@@ -16,7 +16,7 @@ class CalendarParams
 {
     private ?object $calendars;
     public int $Year;
-    public string $CalendarType          = CalendarType::LITURGICAL;
+    public string $YearType              = YearType::LITURGICAL;
     public string $Epiphany              = Epiphany::JAN6;
     public string $Ascension             = Ascension::THURSDAY;
     public string $CorpusChristi         = CorpusChristi::THURSDAY;
@@ -128,7 +128,7 @@ class CalendarParams
                         $this->validateDiocesanCalendarParam($value);
                         break;
                     case "calendartype":
-                        $this->validateCalendarTypeParam($value);
+                        $this->validateYearTypeParam($value);
                         break;
                     case "eternalhighpriest":
                         $this->validateEternalHighPriestParam($value);
@@ -234,12 +234,12 @@ class CalendarParams
         }
     }
 
-    private function validateCalendarTypeParam(string $value)
+    private function validateYearTypeParam(string $value)
     {
-        if (CalendarType::isValid(strtoupper($value))) {
-            $this->CalendarType = strtoupper($value);
+        if (YearType::isValid(strtoupper($value))) {
+            $this->YearType = strtoupper($value);
         } else {
-            $description = "Invalid value `{$value}` for parameter `calendar_type`, valid values are: " . implode(', ', CalendarType::$values);
+            $description = "Invalid value `{$value}` for parameter `year_type`, valid values are: " . implode(', ', YearType::$values);
             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
         }
     }

@@ -2,7 +2,7 @@
 
 namespace Johnrdorazio\LitCal\Enum;
 
-class CalendarType
+class YearType
 {
     public const CIVIL        = "CIVIL";
     public const LITURGICAL   = "LITURGICAL";

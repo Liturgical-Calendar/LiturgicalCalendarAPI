@@ -72,7 +72,7 @@ class LitTest
                 return;
             }
 
-            $calendarType = $this->getCalendarTypeStr();
+            $calendarType = $this->getYearTypeStr();
             $calendarName = $this->getCalendarName();
             $messageIfError = "{$this->Test} Assertion '{$assertion->assertion}' failed for Year " . $this->dataToTest->settings->year . " in {$calendarType}{$calendarName}.";
             $eventKey = self::$testCache->{$this->Test}->testInstructions->event_key;
@@ -110,7 +110,7 @@ class LitTest
         }
     }
 
-    private function getCalendarTypeStr(): string
+    private function getYearTypeStr(): string
     {
         return property_exists($this->dataToTest->settings, 'national_calendar') ? 'the national calendar of ' : (
             property_exists($this->dataToTest->settings, 'diocesan_calendar') ? 'the diocesan calendar of ' : ''

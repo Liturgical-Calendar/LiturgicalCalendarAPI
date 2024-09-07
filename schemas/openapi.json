@@ -1837,7 +1837,7 @@
                   "THURSDAY"
                 ]
               },
-              "CalendarType": {
+              "YearType": {
                 "type": "string",
                 "enum": [
                   "CIVIL",

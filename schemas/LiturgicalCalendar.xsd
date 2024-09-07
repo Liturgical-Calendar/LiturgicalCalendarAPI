@@ -192,7 +192,7 @@
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
-              <xs:element name="CalendarType">
+              <xs:element name="YearType">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:enumeration value="CIVIL" />

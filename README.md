@@ -84,7 +84,7 @@ _(See [usage.php#calSubscription](https://litcal.johnromanodorazio.com/usage.php
 * [avoid defining year cycle for holy week and octave easter](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/2adcd8f9bfab7532a0aa5fa1c8a8cbcec210670d)
 * [make sure sat mem BVM only Ordinary Time](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/925241da0bde2b6f532f217412f22867ca70bd41)
 * [add isVigilFor key to vigil Masses](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/f1ab902606736ae596480ace6a33479940ad5be9)
-* [implement CalendarType with types LITURGICAL and CIVIL](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/1e3ed76cd273939039baf07d74e27334112d8253)
+* [implement YearType with types LITURGICAL and CIVIL](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/1e3ed76cd273939039baf07d74e27334112d8253)
 * output Liturgical Calendar as default (from first Sunday of Advent until Saturday of the 34th Week of Ordinary Time)
 * track timing of calculations or read operations for pre-calculated / cached calendars, and add headers to Response: [add X-LitCal-ExecutionTime header](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/0965b8c462447954c1c87f7ee174965c66f34420), [add X-LitCal-Startime and -Endtime headers](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/870dd95d4978cb676db7f37972e8f43754d888cd), [add X-LitCal-Generated header](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/482e641395ef355ae536ab10ebbe6834877bc8ec)
 * fix rank Dedication Lateran Basilica

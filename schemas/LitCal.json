@@ -12,7 +12,7 @@
                 "year": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
                 },
-                "calendar_type": {
+                "year_type": {
                     "type": "string",
                     "enum": [
                         "CIVIL",
@@ -57,7 +57,7 @@
                 "corpus_christi",
                 "locale",
                 "return_type",
-                "calendar_type",
+                "year_type",
                 "eternal_high_priest"
             ]
         },
@@ -178,7 +178,7 @@
                 "epiphany": "JAN6",
                 "ascension": "SUNDAY",
                 "corpus_christi": "SUNDAY",
-                "calendar_type": "CIVIL",
+                "year_type": "CIVIL",
                 "locale": "string",
                 "return_type": "JSON",
                 "national_calendar": "string",
