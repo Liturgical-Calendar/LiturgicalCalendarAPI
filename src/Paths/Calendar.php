@@ -81,7 +81,6 @@ class Calendar
      *   also should not be necessary, since we refer to single weeks or days
      *   so again in these cases we can stick with the singular masculine / feminine forms
      */
-
     private static $genericSpelloutOrdinal          = [
         'af', //Afrikaans
         'am', //Amharic
@@ -217,6 +216,14 @@ class Calendar
         file_put_contents("debug.log", $string . PHP_EOL, FILE_APPEND);
     }
 
+
+    /**
+     * Produce an error response with HTTP status code related to the error that was encountered.
+     *
+     * @param int $statusCode the HTTP status code to return
+     * @param string $description a short description of the error
+     * @return void
+     */
     public static function produceErrorResponse(int $statusCode, string $description): void
     {
         if (self::$APICore->getResponseContentType() === null) {
@@ -245,6 +252,26 @@ class Calendar
         die();
     }
 
+    /**
+     * Initialize the CalendarParams object from the body of the request or from the URL query parameters.
+     *
+     * If the request method is not POST, GET or OPTIONS, the function will produce an error response with HTTP status code 405.
+     *
+     * The request body is expected to be a JSON or YAML encoded object.
+     * The object may contain the following properties:
+     * - epiphany: a string indicating whether Epiphany should be calculated on Jan 6th or on the Sunday between Jan 2nd and Jan 8th
+     * - ascension: a string indicating whether Ascension should be calculated on a Thursday or on a Sunday
+     * - corpus_christi: a string indicating whether Corpus Christi should be calculated on a Thursday or on a Sunday
+     * - eternal_high_priest: a string indicating whether the celebration of Jesus Christ Eternal High Priest is applicable to the current requested calendar
+     * - national_calendar: a string indicating the national calendar to produce
+     * - diocesan_calendar: a string indicating the diocesan calendar to produce
+     * - locale: a string representing the locale of the calendar
+     * - return_type: a string indicating the format of the response
+     * - calendar_type: a string indicating whether the calendar should be caculated according to the Civil year or the Liturgical year
+     * - year: an integer indicating the year for which the calendar should be calculated
+     *
+     * @return void
+     */
     private function initParamsFromRequestBodyOrUrl()
     {
         if (self::$APICore->getRequestContentType() === RequestContentType::JSON) {
@@ -274,6 +301,17 @@ class Calendar
         }
     }
 
+    /**
+     * Initialize the CalendarParams object from the path parameters of the request.
+     * Expected path parameters are:
+     * 1) nation or diocese or year: a string indicating whether a national or diocesan calendar is requested, or an integer indicating the year for which the General Roman calendar should be calculated
+     * 2) (when 1 is a string) a string indicating the national or diocesan calendar to produce
+     * 3) (when 1 is a string) an integer indicating the year for which the national or diocesan calendar should be calculated
+     *
+     * @param array $requestPathParts an array of path parameters
+     *
+     * @return void
+     */
     private function initParamsFromRequestPath(array $requestPathParts)
     {
         $numPathParts = count($requestPathParts);
@@ -334,6 +372,19 @@ class Calendar
         }
     }
 
+    /**
+     * Sets the Response Content Type header based on whether the request provided a *return_type* parameter
+     * and whether the value of that parameter is in the list of content types that the API can produce.
+     * If the request did not provide a *return_type* parameter, it will check for the presence of an *Accept* header,
+     * and if it is present and in the list of content types that the API can produce, it will use that.
+     * If the request did not provide a *return_type* parameter and there is no *Accept* header,
+     * or if the *Accept* header is not in the list of content types that the API can produce, it will use the first
+     * value in the list of content types that the API can produce.
+     * If the request did provide a *return_type* parameter, and the value of that parameter is not in the list of content types
+     * that the API can produce, it will return a *406 Not Acceptable* error.
+     * If the request did provide a *return_type* parameter, and the value of that parameter is in the list of content types
+     * that the API can produce, it will use that.
+     */
     private function initReturnType()
     {
         if ($this->CalendarParams->ReturnType !== null) {
@@ -374,6 +425,14 @@ class Calendar
         }
     }
 
+    /**
+     * Initialize the CalendarParams object from the request body and URL query parameters
+     * and the request path, and set the return type of the response.
+     *
+     * @param array $requestPathParts the parts of the request path
+     *
+     * @return void
+     */
     private function initParameterData(array $requestPathParts = [])
     {
         $this->initParamsFromRequestBodyOrUrl();
@@ -381,6 +440,13 @@ class Calendar
         $this->initReturnType();
     }
 
+    /**
+     * Updates the CalendarParams object based on the settings defined in the NationalData object for the
+     * NationalCalendar that has been requested. If the NationalCalendar is 'VATICAN', it will use the default
+     * settings for the Vatican, otherwise it will use the settings defined in the NationalData object.
+     *
+     * @return void
+     */
     private function updateSettingsBasedOnNationalCalendar(): void
     {
         if ($this->CalendarParams->NationalCalendar !== null) {
@@ -426,6 +492,12 @@ class Calendar
         }
     }
 
+    /**
+     * If a Diocesan calendar is specified, we need to check if any of the settings for Epiphany, Ascension, Corpus Christi
+     * have been overridden. If so, we update the CalendarParams object with the new values.
+     *
+     * @return void
+     */
     private function updateSettingsBasedOnDiocesanCalendar(): void
     {
         if ($this->CalendarParams->DiocesanCalendar !== null && $this->DiocesanData !== null) {
@@ -454,6 +526,11 @@ class Calendar
     }
 
 
+    /**
+     * Loads the JSON data for the specified Diocesan calendar.
+     *
+     * @return void
+     */
     private function loadDiocesanCalendarData(): void
     {
         if ($this->CalendarParams->DiocesanCalendar !== null) {
@@ -472,6 +549,16 @@ class Calendar
         }
     }
 
+    /**
+     * Determines if a cache file is available for the current request.
+     *
+     * This function will determine if a cache file is available for the current request.
+     * This is done by checking if a file exists in the engine cache directory with the
+     * name of the md5 hash of the serialized CalendarParams object, followed by the
+     * CacheDuration (in minutes) and the ReturnType of the request.
+     *
+     * @return bool true if a cache file is available, false otherwise
+     */
     private function cacheFileIsAvailable(): bool
     {
         $cacheFilePath = "engineCache/v" . str_replace(".", "_", self::API_VERSION) . "/";
@@ -483,6 +570,15 @@ class Calendar
         return file_exists($this->CACHEFILE);
     }
 
+    /**
+     * Creates the IntlDateFormatter objects used to format dates and ordinals in output.
+     *
+     * This method creates the objects used to format dates and ordinals in the output of the
+     * Liturgical Calendar API. The objects are configured according to the locale specified
+     * in the CalendarParams object passed to the constructor of this class.
+     *
+     * @return void
+     */
     private function createFormatters(): void
     {
         $baseLocale = LitLocale::$PRIMARY_LANGUAGE;
@@ -527,12 +623,18 @@ class Calendar
         }
     }
 
+    /**
+     * This function will produce a 400 Bad Request error if the year requested
+     * is earlier than 1970, the year in which the Prima Editio
+     * Typica of the Roman Missal and the General Norms were promulgated with
+     * the Motu Proprio "Mysterii Paschali".
+     *
+     * @see https://w2.vatican.va/content/paul-vi/en/motu_proprio/documents/hf_p-vi_motu-proprio_19690214_mysterii-paschalis.html
+     *
+     * @return void
+     */
     private function dieIfBeforeMinYear(): void
     {
-        //for the time being, we cannot accept a year any earlier than 1970,
-        // since this engine is based on the liturgical reform from Vatican II
-        // with the Prima Editio Typica of the Roman Missal and the General Norms
-        // promulgated with the Motu Proprio "Mysterii Paschali" in 1969
         if ($this->CalendarParams->Year < 1970) {
             $message = sprintf(
                 _("Only years from 1970 and after are supported. You tried requesting the year %d."),
@@ -542,6 +644,16 @@ class Calendar
         }
     }
 
+    /**
+     * Loads localization data stored in JSON format from a file in the
+     * data/propriumdetempore directory, named according to the locale
+     * specified in LitLocale::$PRIMARY_LANGUAGE.
+     *
+     * If the file does not exist, or if there is an error decoding the
+     * JSON data, a 503 Service Unavailable error is thrown.
+     *
+     * @return array|null The loaded data, or null if there was an error.
+     */
     private function loadPropriumDeTemporeI18nData(): ?array
     {
         $locale = LitLocale::$PRIMARY_LANGUAGE;
@@ -603,6 +715,15 @@ class Calendar
         }
     }
 
+    /**
+     * Loads the Proprium de Sanctis (Sanctorale) data from JSON files for the given
+     * Roman Missal.
+     *
+     * Will produce an Http Status code of 503 Service Unavailable for the API response if it encounters an error
+     * while parsing the JSON data.
+     *
+     * @param string $missal The name of the Roman Missal to load the data for.
+     */
     private function loadPropriumDeSanctisData(string $missal): void
     {
         $propriumdesanctisFile = RomanMissal::getSanctoraleFileName($missal);
@@ -682,6 +803,13 @@ class Calendar
         }
     }
 
+    /**
+     * Loads the Memorials based on Decrees of the Congregation for Divine Worship
+     * data from JSON files.
+     *
+     * Will produce an Http Status code of 503 Service Unavailable for the API
+     * response if it encounters an error while parsing the JSON data.
+     */
     private function loadMemorialsFromDecreesData(): void
     {
         $memorialsFromDecreesFile       = "data/memorialsFromDecrees/memorialsFromDecrees.json";
@@ -732,6 +860,11 @@ class Calendar
         }
     }
 
+    /**
+     * Creates a Festivity object from an entry in the Proprium de Tempore and adds it to the calendar
+     * @param string $key The key of the Festivity in the Proprium de Tempore
+     * @return Festivity The new Festivity object
+     */
     private function createPropriumDeTemporeFestivityByKey(?string $key = null): Festivity
     {
         if ($key) {
@@ -749,6 +882,10 @@ class Calendar
         }
     }
 
+    /**
+     * Calculates the dates for Holy Thursday, Good Friday, Easter Vigil and Easter Sunday
+     * and creates the corresponding Festivities in the calendar
+     */
     private function calculateEasterTriduum(): void
     {
         $this->PropriumDeTempore[ "HolyThurs" ][ "date" ]   = LitFunc::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P3D'));
@@ -762,7 +899,7 @@ class Calendar
     }
 
     /**
-     * Function calculateEpiphanyJan6
+     * Calculates the dates for Epiphany and creates the corresponding Festivities in the calendar
      *
      * @var DateTime|false $dateTime
      *
@@ -872,6 +1009,26 @@ class Calendar
         }
     }
 
+    /**
+     * Calculates the dates for Epiphany and creates the corresponding Festivities in the calendar
+     *
+     * If January 2nd is a Sunday, then go with Jan 2nd
+     * otherwise find the Sunday following Jan 2nd
+     *
+     * Weekdays from Jan. 2 until the following Sunday are called "*day before Epiphany"
+     * (in which calendar? England?)
+     * Actually in Latin they are "Feria II temporis Nativitatis",
+     * in English "Monday - Christmas Weekday",
+     * in Italian "Feria propria del 3 gennaio" etc.
+     *
+     * Weekdays from the Sunday of Epiphany until Baptism of the Lord are called "*day after Epiphany"
+     * (in which calendar? England?)
+     * Actually in Latin they are still "Feria II temporis Nativitatis",
+     * in English "Monday - Christmas Weekday",
+     * in Italian "Feria propria del 3 gennaio" etc.
+     *
+     * @return void
+     */
     private function calculateEpiphanySunday(): void
     {
         //If January 2nd is a Sunday, then go with Jan 2nd
@@ -988,6 +1145,14 @@ class Calendar
         }
     }
 
+    /**
+     * Calculates the dates for Christmas and Epiphany and creates the corresponding Festivities in the calendar
+     *
+     * Christmas is fixed date, so just create a Festivity
+     * Epiphany depends on the calendar settings, so call either calculateEpiphanyJan6 or calculateEpiphanySunday
+     *
+     * @return void
+     */
     private function calculateChristmasEpiphany(): void
     {
         $this->PropriumDeTempore[ "Christmas" ][ "date" ]   = DateTime::createFromFormat('!j-n-Y', '25-12-' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
@@ -999,9 +1164,18 @@ class Calendar
         }
     }
 
+    /**
+     * Calculates the dates for Ascension and Pentecost and creates the corresponding Festivities in the calendar
+     *
+     * Ascension can be either Thursday or Sunday, depending on the calendar settings,
+     * so call either calculateAscensionThursday or calculateAscensionSunday
+     *
+     * Pentecost is fixed date, so just create a Festivity
+     *
+     * @return void
+     */
     private function calculateAscensionPentecost(): void
     {
-
         if ($this->CalendarParams->Ascension === Ascension::THURSDAY) {
             $this->PropriumDeTempore[ "Ascension" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P39D'));
             $this->createPropriumDeTemporeFestivityByKey("Ascension");
@@ -1019,6 +1193,12 @@ class Calendar
         $this->createPropriumDeTemporeFestivityByKey("Pentecost");
     }
 
+    /**
+     * Calculates the dates for Sundays of Advent, Lent, Easter, Ordinary Time, and special Sundays like Palm Sunday, Corpus Christi, and Trinity Sunday
+     * and creates the corresponding Festivities in the calendar
+     *
+     * @return void
+     */
     private function calculateSundaysMajorSeasons(): void
     {
         //We calculate Sundays of Advent based on Christmas
@@ -1102,6 +1282,12 @@ class Calendar
         }
     }
 
+    /**
+     * Calculates the date for Ash Wednesday
+     * and creates the corresponding Festivity in the calendar
+     *
+     * @return void
+     */
     private function calculateAshWednesday(): void
     {
         $this->PropriumDeTempore[ "AshWednesday" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
@@ -1109,6 +1295,12 @@ class Calendar
         $this->createPropriumDeTemporeFestivityByKey("AshWednesday");
     }
 
+    /**
+     * Calculates the dates for Weekdays of Holy Week from Monday to Thursday inclusive
+     * and creates the corresponding Festivities in the calendar
+     *
+     * @return void
+     */
     private function calculateWeekdaysHolyWeek(): void
     {
         //Weekdays of Holy Week from Monday to Thursday inclusive
@@ -1124,6 +1316,12 @@ class Calendar
         $this->createPropriumDeTemporeFestivityByKey("WedHolyWeek");
     }
 
+    /**
+     * Calculates the dates for Monday to Saturday of the Octave of Easter
+     * and creates the corresponding Festivities in the calendar
+     *
+     * @return void
+     */
     private function calculateEasterOctave(): void
     {
         $this->PropriumDeTempore[ "MonOctaveEaster" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
@@ -1146,6 +1344,11 @@ class Calendar
         $this->createPropriumDeTemporeFestivityByKey("SatOctaveEaster");
     }
 
+    /**
+     * Calculates the dates for Sacred Heart and Christ the King and creates the corresponding Festivities in the calendar
+     *
+     * @return void
+     */
     private function calculateMobileSolemnitiesOfTheLord(): void
     {
         $this->PropriumDeTempore[ "SacredHeart" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
@@ -1161,6 +1364,15 @@ class Calendar
         $this->createPropriumDeTemporeFestivityByKey("ChristKing");
     }
 
+/**
+ * Calculates the dates for fixed date Solemnities and creates the corresponding Festivities in the calendar.
+ *
+ * Solemnities are celebrations of the highest rank in the Liturgical Calendar. They are days of special importance
+ * in the Roman Rite, and are usually observed with a Vigil, proper readings, and a special Mass formulary.
+ * Fixed date Solemnities, as the name implies, are Solemnities that fall on the same date every year.
+ *
+ * @return void
+ */
     private function calculateFixedSolemnities(): void
     {
         //even though Mary Mother of God is a fixed date solemnity,
@@ -1367,6 +1579,16 @@ class Calendar
         ]);
     }
 
+
+    /**
+     * Calculates the dates for the Baptism of the Lord, Holy Family, and the other feasts of the Lord
+     * (Presentation, Transfiguration, Triumph of the Holy Cross and Dedication of the Lateran Basilica)
+     * and creates the corresponding Festivities in the calendar.
+     *
+     * Also creates the Festivity for Christ the Eternal High Priest for those areas that have adopted this festivity
+     *
+     * @return void
+     */
     private function calculateFeastsOfTheLord(): void
     {
         //Baptism of the Lord is celebrated the Sunday after Epiphany, for exceptions see immediately below...
@@ -1469,6 +1691,15 @@ class Calendar
         }
     }
 
+    /**
+     * Calculates the dates for Sundays of Christmas and Ordinary Time and creates the corresponding Festivities in the calendar
+     *
+     * Sundays of Ordinary Time in the First part of the year are numbered from after the Baptism of the Lord
+     * ( which begins the 1st week of Ordinary Time ) until Ash Wednesday
+     * Sundays of Ordinary Time in the Latter part of the year are numbered backwards from Christ the King ( 34th ) to Pentecost
+     *
+     * @return void
+     */
     private function calculateSundaysChristmasOrdinaryTime(): void
     {
         //If a fixed date Solemnity occurs on a Sunday of Ordinary Time or on a Sunday of Christmas,
@@ -1537,6 +1768,19 @@ class Calendar
         }
     }
 
+    /**
+     * Calculates the dates for Feasts of Mary and Saints and creates the corresponding Festivities in the calendar
+     *
+     * If a Feast ( not of the Lord ) occurs on a Sunday in Ordinary Time, the Sunday is celebrated.  ( e.g., St. Luke, 1992 )
+     * obviously solemnities also have precedence
+     * The Dedication of the Lateran Basilica is an exceptional case, where it is treated as a Feast of the Lord, even if it is displayed as a Feast
+     *  source: in the Missale Romanum, in the section Index Alphabeticus Celebrationum,
+     *    under Iesus Christus D. N., the Dedicatio Basilicae Lateranensis is also listed
+     *  so we give it a grade of 5 === FEAST_LORD but a displayGrade of FEAST
+     *  it should therefore have already been handled in $this->calculateFeastsOfTheLord(), see :DedicationLateran
+     *
+     * @return void
+     */
     private function calculateFeastsMarySaints(): void
     {
         $tempCal = array_filter($this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ], function ($el) {
@@ -1567,12 +1811,13 @@ class Calendar
         // see :MEMORIALS_FROM_DECREES
     }
 
+    /**
+     * Calculates all weekdays of Advent, but gives a certain importance to the weekdays of Advent from 17 Dec. to 24 Dec.
+     * ( the same will be true of the Octave of Christmas and weekdays of Lent )
+     * on which days obligatory memorials can only be celebrated in partial form
+     */
     private function calculateWeekdaysAdvent(): void
     {
-        //  Here we are calculating all weekdays of Advent, but we are giving a certain importance to the weekdays of Advent from 17 Dec. to 24 Dec.
-        //  ( the same will be true of the Octave of Christmas and weekdays of Lent )
-        //  on which days obligatory memorials can only be celebrated in partial form
-
         $DoMAdvent1     = $this->Cal->getFestivity("Advent1")->date->format('j'); //DoM == Day of Month
         $MonthAdvent1   = $this->Cal->getFestivity("Advent1")->date->format('n');
         $weekdayAdvent  = DateTime::createFromFormat('!j-n-Y', $DoMAdvent1 . '-' . $MonthAdvent1 . '-' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
@@ -1612,6 +1857,13 @@ class Calendar
         }
     }
 
+
+    /**
+     * Calculates all weekdays of the Octave of Christmas, but gives a certain importance to the weekdays of Christmas from 25 Dec. to 31 Dec.
+     * (the same will be true of the Octave of Easter and weekdays of Advent)
+     *
+     * @return void
+     */
     private function calculateWeekdaysChristmasOctave(): void
     {
         $weekdayChristmas = DateTime::createFromFormat('!j-n-Y', '25-12-' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
@@ -1641,6 +1893,12 @@ class Calendar
         }
     }
 
+    /**
+     * Calculates all weekdays of Lent, but gives a certain importance to the weekdays of Lent from Ash Wednesday to the day before Palm Sunday
+     * (the same will be true of the Octave of Christmas and weekdays of Advent)
+     *
+     * @return void
+     */
     private function calculateWeekdaysLent(): void
     {
 
@@ -1687,6 +1945,16 @@ class Calendar
         }
     }
 
+    /**
+     * Adds a message to the API response indicating that a given memorial has been added to the calendar
+     *
+     * @param object $row a JSON object representing data for the liturgical festivity in question, with the following properties:
+     *                    - grade: the grade of the festivity (e.g. 'memorial', 'feast', etc.)
+     *                    - name: the name of the festivity
+     *                    - date: the date of the festivity (DateTime object)
+     *                    - year_since: the year from which the festivity has been added
+     *                    - decree: the decree or source of the information
+     */
     private function addMissalMemorialMessage(object $row)
     {
         $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
@@ -1713,6 +1981,12 @@ class Calendar
         );
     }
 
+    /**
+     * Calculates memorials to add to the calendar, following the rules of the Roman Missal.
+     *
+     * @param int $grade the grade of the festivity (e.g. 'memorial', 'feast', etc.)
+     * @param string $missal the edition of the Roman Missal
+     */
     private function calculateMemorials(int $grade = LitGrade::MEMORIAL, string $missal = RomanMissal::EDITIO_TYPICA_1970): void
     {
         if ($missal === RomanMissal::EDITIO_TYPICA_1970 && $grade === LitGrade::MEMORIAL) {
@@ -1773,6 +2047,14 @@ class Calendar
         }
     }
 
+
+    /**
+     * If a fixed date optional memorial falls between 17 Dec. to 24 Dec., the Octave of Christmas or weekdays of the Lenten season,
+     * it is reduced in rank to a Commemoration ( only the collect can be used )
+     *
+     * @param DateTime $currentFeastDate the date of the festivity to be checked
+     * @param \stdClass $row the row of data comprising the event_key and grade of the memorial
+     */
     private function reduceMemorialsInAdventLentToCommemoration(DateTime $currentFeastDate, \stdClass $row)
     {
         //If a fixed date optional memorial falls between 17 Dec. to 24 Dec., the Octave of Christmas or weekdays of the Lenten season,
@@ -1794,6 +2076,11 @@ class Calendar
         }
     }
 
+    /**
+     * If a weekday of Epiphany is overridden by a Memorial, remove the weekday of Epiphany
+     *
+     * @param string $tag the tag of the festivity that may be overriding a weekday of Epiphany
+     */
     private function removeWeekdaysEpiphanyOverridenByMemorials(string $tag)
     {
         $festivity = $this->Cal->getFestivity($tag);
@@ -1821,6 +2108,12 @@ class Calendar
         }
     }
 
+    /**
+     * Handles a coincidence of a festivity with a Sunday Solemnity or Feast.
+     *
+     * @param \stdClass $row the festivity that may be coinciding with a Sunday Solemnity or Feast
+     * @param string $missal the edition of the Roman Missal to check against
+     */
     private function handleCoincidence(\stdClass $row, string $missal = RomanMissal::EDITIO_TYPICA_1970)
     {
         $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast($row->date, $this->CalendarParams);
@@ -1873,6 +2166,15 @@ class Calendar
         );
     }
 
+    /**
+     * Adds a message to the list of messages for the calendar indicating that
+     * a festivity that would have been added to the calendar via a Decree of the Congregation for Divine Worship
+     * is however superseded by a Sunday Solemnity or Feast.
+     *
+     * @param object $row A row from the database containing the information
+     *                    about the festivity that has been superseded.
+     * @return void
+     */
     private function handleCoincidenceDecree(object $row): void
     {
         $url = $row->metadata->url;
@@ -1909,6 +2211,14 @@ class Calendar
         );
     }
 
+    /**
+     * Checks if the festivity in $row coincides with the Immaculate Heart of Mary.
+     * If it does, it reduces both in rank to optional memorials.
+     *
+     * @param DateTime $currentFeastDate The date to check for coincidence
+     * @param \stdClass $row The database row of the festivity to check
+     * @return bool True if the festivity coincides with the Immaculate Heart of Mary, false otherwise
+     */
     private function checkImmaculateHeartCoincidence(DateTime $currentFeastDate, \stdClass $row): bool
     {
         $coincidence = false;
@@ -1949,6 +2259,12 @@ class Calendar
         return $coincidence;
     }
 
+    /**
+     * Handle a mobile festivity whose date is specified using the "strtotime" property
+     *
+     * @param object $row the row containing data for the mobile festivity from the JSON file
+     * @return void
+     */
     private function handleFestivityDecreeTypeMobile(object $row): void
     {
         //we won't have a date defined for mobile festivites, we'll have to calculate them here case by case
@@ -2039,6 +2355,12 @@ class Calendar
         }
     }
 
+    /**
+     * Handle a fixed festivity whose date is specified using the "day" and "month" properties
+     *
+     * @param object $row the row containing data for the fixed festivity from the JSON file
+     * @return void
+     */
     private function handleFestivityDecreeTypeFixed(object $row): void
     {
         $row->festivity->date = DateTime::createFromFormat(
@@ -2086,6 +2408,13 @@ class Calendar
         }
     }
 
+
+    /**
+     * Creates a Festivity object based on information from a Decree of the Congregation for Divine Worship
+     * and adds it to the calendar.
+     * @param object $row The row from the database containing the information about the festivity
+     * @return void
+     */
     private function createFestivityFromDecree(object $row): void
     {
         $festivityType = $row->festivity->type;
@@ -2096,6 +2425,13 @@ class Calendar
         }
     }
 
+    /**
+     * Sets a property of a festivity (name, grade) based on a Decree of the Congregation for Divine Worship
+     * and adds a message to the list of messages for the calendar indicating that the property has been changed.
+     * @param object $row A row from the database containing the information
+     *                    about the festivity whose property is being changed.
+     * @return void
+     */
     private function setPropertyBasedOnDecree(object $row): void
     {
         $festivity = $this->Cal->getFestivity($row->festivity->event_key);
@@ -2162,6 +2498,19 @@ class Calendar
         }
     }
 
+    /**
+     * This function takes the list of Decrees of the Congregation for Divine Worship
+     * which have elevated a festivity to the rank of Doctor of the Church and
+     * updates the calendar accordingly.
+     *
+     * In particular, it checks if the year of the decree is not later than
+     * the year of the calendar being generated, and if the festivity is
+     * already present in the calendar. If so, it updates the name of the
+     * festivity and adds a message to the list of messages for the calendar
+     * indicating that the property has been changed.
+     *
+     * @return void
+     */
     private function createDoctorsFromDecrees(): void
     {
         $DoctorsDecrees = array_filter(
@@ -2196,6 +2545,22 @@ class Calendar
         }
     }
 
+    /**
+     * Given an object with language codes as properties, returns the string
+     * associated with the best language code available.
+     *
+     * The best language code is determined as follows:
+     *
+     * 1. If the object has a property with the value of
+     *    {@see LitLocale::$PRIMARY_LANGUAGE}, that value is returned.
+     * 2. If the object has a "la" property, that value is returned.
+     * 3. If the object has an "en" property, that value is returned.
+     * 4. Otherwise, the key of the first property in the object is returned.
+     *
+     * @param object $map The object with language codes as properties
+     *
+     * @return string The string associated with the best language code
+     */
     private function getBestLangFromMap(object $map): string
     {
         if (property_exists($map, LitLocale::$PRIMARY_LANGUAGE)) {
@@ -2210,6 +2575,17 @@ class Calendar
         }
     }
 
+    /**
+     * Given a decree object, returns an HTML string representing the decree source,
+     * with a link to the original decree document.
+     *
+     * If the decree URL contains a language placeholder, it is replaced with the
+     * best language code available from the language map.
+     *
+     * @param object $row The decree object
+     *
+     * @return string The HTML string representing the decree source
+     */
     private function elaborateDecreeSource(object $row): string
     {
         $url = $row->metadata->url;
@@ -2220,6 +2596,14 @@ class Calendar
         return '<a href="' . $url . '">' . _("Decree of the Congregation for Divine Worship") . '</a>';
     }
 
+    /**
+     * Applies memorials based on Decrees of the Congregation for Divine Worship to the calendar.
+     *
+     * @param int|string $grade The grade of the festivity (e.g. 'memorial', 'feast', etc.)
+     *                          or the special string "DOCTORS" to apply the Decrees related to Doctors of the Church.
+     *                          Defaults to LitGrade::MEMORIAL if not provided.
+     * @return void
+     */
     private function applyDecrees(int|string $grade = LitGrade::MEMORIAL): void
     {
         if (!isset($this->tempCal[ "MEMORIALS_FROM_DECREES" ]) || !is_array($this->tempCal[ "MEMORIALS_FROM_DECREES" ])) {
@@ -2257,6 +2641,12 @@ class Calendar
         }
     }
 
+    /**
+     * Creates a mobile Festivity object based on information from a Decree of the Congregation for Divine Worship
+     * and adds it to the calendar.
+     * @param object $row The row from the database containing the information about the festivity
+     * @return void
+     */
     private function createMobileFestivity(object $row): void
     {
         $festivity = new Festivity(
@@ -2294,6 +2684,16 @@ class Calendar
         );
     }
 
+    /**
+     * Checks if a newly added mobile festivity of grade Memorial has any coincidences
+     * with existing Solemnities or Feasts in the calendar, and if so, removes the
+     * coinciding festivity from the calendar and adds a message to the list of messages
+     * indicating what has happened.
+     *
+     * @param object $row The row from the database containing the information about the festivity
+     * @return bool True if the mobile festivity can be added to the calendar, false if it has been
+     *              superseded by a Solemnity or Feast.
+     */
     private function checkCoincidencesNewMobileFestivity(object $row): bool
     {
         if ($row->festivity->grade === LitGrade::MEMORIAL) {
@@ -2369,6 +2769,14 @@ class Calendar
         return false;
     }
 
+    /**
+     * Creates the memorial of the Immaculate Heart of Mary, if it does not fall on a Solemnity or Feast.
+     * If it does not, we check if it coincides with another obligatory memorial in which case both are reduced to optional memorials.
+     *
+     * @return void
+     *
+     * @see https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
+     */
     private function createImmaculateHeart()
     {
         $row = new \stdClass();
@@ -2647,6 +3055,11 @@ class Calendar
         }
     }
 
+    /**
+     * Loads the JSON data for the specified National calendar.
+     *
+     * @return void
+     */
     private function loadNationalCalendarData(): void
     {
         $nationalDataFile = "nations/{$this->CalendarParams->NationalCalendar}/{$this->CalendarParams->NationalCalendar}.json";
@@ -2681,6 +3094,17 @@ class Calendar
         }
     }
 
+    /**
+     * Handles a festivity for a National calendar that is missing from the calendar.
+     * If the festivity is suppressed by a Sunday or a Solemnity,
+     * a message is added to the Messages array, indicating what has happened.
+     *
+     * If the festivity coincides with another festivity, it is added to the calendar,
+     * but the message is still added to the Messages array.
+     *
+     * @param object $row the row of data from the JSON file containing the information about the festivity
+     * @return void
+     */
     private function handleMissingFestivity(object $row): void
     {
         $currentFeastDate = DateTime::createFromFormat('!j-n-Y', "{$row->festivity->day}-{$row->festivity->month}-" . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
@@ -2721,6 +3145,12 @@ class Calendar
         }
     }
 
+    /**
+     * Checks if a Festivity can be created on a given date
+     * This means that the Festivity is not superseded by a Solemnity or a Feast of higher rank
+     * @param object $row the row of data from the JSON file containing the information about the festivity
+     * @return bool true if the festivity can be created, false if it is superseded by a Solemnity or a Feast
+     */
     private function festivityCanBeCreated(object $row): bool
     {
         switch ($row->festivity->grade) {
@@ -2739,6 +3169,11 @@ class Calendar
         return false;
     }
 
+    /**
+     * Checks if a Festivity does not coincide with another Festivity of equal or higher rank
+     * @param object $row the row of data from the JSON file containing the information about the festivity
+     * @return bool true if the festivity does not coincide with another festivity of equal or higher rank, false if it does
+     */
     private function festivityDoesNotCoincide(object $row): bool
     {
         switch ($row->festivity->grade) {
@@ -2757,6 +3192,13 @@ class Calendar
         //we really need to cover all cases and give a sure return value
     }
 
+    /**
+     * Handles a festivity that coincides with another festivity of equal or higher rank in the calendar.
+     * If the coinciding festivity is a Memorial, both are reduced in rank to optional memorials.
+     * If the coinciding festivity is a Feast or a Solemnity, a message is added to the Messages array.
+     * @param object $row the row of data from the JSON file containing the information about the festivity
+     * @return void
+     */
     private function handleFestivityCreationWithCoincidence(object $row): void
     {
         switch ($row->festivity->grade) {
@@ -2833,6 +3275,13 @@ class Calendar
         }
     }
 
+    /**
+     * Creates a new regional or national festivity and adds it to the calendar.
+     *
+     * @param object $row The row from the database containing the information about the festivity
+     *
+     * @return void
+     */
     private function createNewRegionalOrNationalFestivity(object $row): void
     {
         if (
@@ -2919,6 +3368,22 @@ class Calendar
         //}
     }
 
+    /**
+     * Handles an array of rows from the national calendar JSON file that
+     * describe changes to the calendar that should be applied.
+     *
+     * These changes may be:
+     * - create a new regional or national festivity
+     * - change the grade of a festivity
+     * - change the name of a festivity
+     * - move a festivity to a different date
+     *
+     * Each row in the array is processed in the order in which it appears in
+     * the JSON file. If the row describes a change that is outside the
+     * applicable date range, the row is skipped.
+     *
+     * @param array $rows The array of rows from the national calendar JSON file
+     */
     private function handleNationalCalendarRows(array $rows): void
     {
         foreach ($rows as $row) {
@@ -2967,6 +3432,11 @@ class Calendar
         }
     }
 
+    /**
+     * Applies any national calendar changes from the national calendar JSON file including any data from a wider region
+     *
+     * @return void
+     */
     private function applyNationalCalendar(): void
     {
         //first thing is apply any wider region festivities, such as Patron Saints of the Wider Region (example: Europe)
@@ -3139,16 +3609,46 @@ class Calendar
         }
     }
 
+
+    /**
+     * Returns true if the given date is a Sunday.
+     *
+     * @param DateTime $dt The date to check.
+     * @return bool True if the given date is a Sunday, false otherwise.
+     */
     private static function dateIsSunday(DateTime $dt): bool
     {
         return (int)$dt->format('N') === 7;
     }
 
+    /**
+     * Returns true if the given date is not a Sunday.
+     *
+     * @param DateTime $dt The date to check.
+     * @return bool True if the given date is not a Sunday, false otherwise.
+     */
     private static function dateIsNotSunday(DateTime $dt): bool
     {
         return (int)$dt->format('N') !== 7;
     }
 
+    /**
+     * Calculates the liturgical events based on the order of precedence of liturgical days
+     * as per the General Norms for the Liturgical Year and the Calendar ( issued on Feb. 14 1969 )
+     *
+     * The following events are calculated:
+     * 1. Easter Triduum of the Lord's Passion and Resurrection
+     * 2. Christmas, Epiphany, Ascension, and Pentecost
+     * 3. Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar
+     * 4. Sundays of Advent, Lent, and Easter Time
+     * 5. Weekdays of Advent from 17 December to 24 December inclusive
+     * 6. Weekdays of the Octave of Christmas
+     * 7. Weekdays of Lent
+     * 8. Obligatory memorials in the General Calendar
+     * 9. Weekdays of Ordinary Time
+     *
+     * @return void
+     */
     private function calculateUniversalCalendar(): void
     {
         $this->loadPropriumDeTemporeData();
@@ -3255,6 +3755,18 @@ class Calendar
         // see :SATURDAY_MEMORIAL_BVM
     }
 
+    /**
+     * Validates that a strtotime object or string is correctly formatted
+     *
+     * If the strtotime is a string, it must not be empty.
+     * If the strtotime is an object, it must have the following properties:
+     *  - day_of_the_week
+     *  - relative_time
+     *  - festivity_key
+     *
+     * @param object|string $strtotime the strtotime object or string to validate
+     * @return bool true if the strtotime is valid, false otherwise
+     */
     private function validateStrToTime(object|string $strtotime): bool
     {
         if (is_string($strtotime)) {
@@ -3269,6 +3781,20 @@ class Calendar
         return false;
     }
 
+    /**
+     * Handles a mobile festivity whose date is specified using a strtotime object
+     *
+     * The strtotime object must have the following properties:
+     *  - day_of_the_week (e.g. 'monday', 'tuesday', etc.)
+     *  - relative_time (either 'before' or 'after')
+     *  - festivity_key (the key of the festivity that this mobile festivity is relative to)
+     *
+     * If the strtotime object is invalid, or if the festivity that it is relative to does not exist,
+     * an error message will be added to the Messages array and null will be returned.
+     *
+     * @param object $row the row containing data for the mobile festivity from the JSON file
+     * @return ?DateTime the date of the mobile festivity, or null if there was an error
+     */
     private function handleObjectStrtotime(object $row): ?DateTime
     {
         if (false === $this->validateStrToTime($row->metadata->strtotime)) {
@@ -3312,6 +3838,18 @@ class Calendar
         }
     }
 
+
+    /**
+     * Handle a mobile festivity whose date is specified using the "strtotime" property
+     *
+     * The "strtotime" property must be a string that can be interpreted by PHP's strtotime function.
+     * If the string contains the word 'before' or 'after', it will be interpreted as being relative to
+     * another festivity. If it does not contain either of these words, it will be interpreted as an
+     * absolute date.
+     *
+     * @param object $row the row containing data for the mobile festivity from the JSON file
+     * @return ?DateTime the date of the mobile festivity, or null if there was an error
+     */
     private function handleStringStrtotime(object $row): ?DateTime
     {
         if (false === $this->validateStrToTime($row->metadata->strtotime)) {
@@ -3365,6 +3903,24 @@ class Calendar
         }
     }
 
+    /**
+     * Interpret the 'strtotime' property of a mobile festivity into a date.
+     *
+     * The 'strtotime' property can be either an object or a string.
+     * If it is an object, it must have the following properties:
+     *  - day_of_the_week (e.g. 'monday', 'tuesday', etc.)
+     *  - relative_time (either 'before' or 'after')
+     *  - festivity_key (the key of the festivity that this mobile festivity is relative to)
+     * If it is a string, it must be a string that can be interpreted by PHP's strtotime function.
+     * If the string contains the word 'before' or 'after', it will be interpreted as being relative to
+     * another festivity. If it does not contain either of these words, it will be interpreted as an
+     * absolute date.
+     *
+     * If the 'strtotime' property is invalid, an error message will be added to the Messages array and null will be returned.
+     *
+     * @param object $row The row containing data for the mobile festivity from the JSON file
+     * @return ?DateTime The date of the mobile festivity, or null if there was an error
+     */
     private function interpretStrtotime(object $row): ?DateTime
     {
         $strtotime = $row->metadata->strtotime;
@@ -3385,6 +3941,21 @@ class Calendar
         }
     }
 
+    /**
+     * Apply the diocesan calendar specified in the calendar parameters.
+     *
+     * The diocesan calendar is applied by iterating over the litcal array of the diocesan calendar data.
+     * For each festivity found in the array, the following is done:
+     *  - If the 'sinceYear' property is undefined or null or empty, the festivity is created in any case.
+     *    Otherwise, the festivity is only created if the current year is greater or equal to the 'sinceYear' value.
+     *  - If the 'untilYear' property is undefined or null or empty, the festivity is created in any case.
+     *    Otherwise, the festivity is only created if the current year is less or equal to the 'untilYear' value.
+     *  - If the festivity has a 'strtotime' property, the date of the festivity is calculated using the interpretStrtotime method.
+     *    Otherwise, the date of the festivity is calculated using the format '!j-n-Y' and the day, month and year are taken from the festivity data.
+     *  - If the festivity has a grade greater than FEAST, and there is a coincidence with a different Solemnity on the same day, a message is added to the Messages array.
+     *  - If the festivity has a grade less or equal to FEAST and there is no coincidence with a Solemnity on the same day, the festivity is added to the calendar.
+     *  - If the festivity has a grade less or equal to FEAST and there is a coincidence with a Solemnity on the same day, the festivity is suppressed and a message is added to the Messages array.
+     */
     private function applyDiocesanCalendar()
     {
         foreach ($this->DiocesanData->litcal as $key => $obj) {
@@ -3470,6 +4041,18 @@ class Calendar
         }
     }
 
+    /**
+     * Returns the latest release information from the Liturgical Calendar API
+     * on Github. The response is cached for the amount of time specified in the
+     * CacheDuration property of the class.
+     *
+     * If the cache file does not exist, it will make a GET request to the Github
+     * API to retrieve the latest release. The response is then cached to the
+     * file.
+     *
+     * @return \stdClass containing the status of the operation and either the
+     *         Github API response or an error message.
+     */
     private function getGithubReleaseInfo(): \stdClass
     {
         $returnObj = new \stdClass();
@@ -3503,6 +4086,24 @@ class Calendar
         return $returnObj;
     }
 
+    /**
+     * Given a SerializeableLitCal object and a GithubReleases object,
+     * constructs and returns a string representing the contents of an iCal
+     * file for the requested Liturgical Calendar for the given year.
+     *
+     * Each event in the iCal file is specific to the requested year and
+     * calendar type, so the UID is constructed by hashing the name of the
+     * festivity, the year, and the date of the festivity. This ensures that
+     * next year's event will not cancel this year's event.
+     *
+     * The event created in the calendar is specific to this year, next year
+     * it may be different. So UID must take into account the year
+     *
+     * @param \stdClass $SerializeableLitCal
+     * @param \stdClass $GitHubReleasesObj
+     *
+     * @return string
+     */
     private function produceIcal(\stdClass $SerializeableLitCal, \stdClass $GitHubReleasesObj): string
     {
         $publishDate = $GitHubReleasesObj->published_at;
@@ -3595,6 +4196,18 @@ class Calendar
         return $ical;
     }
 
+    /**
+     * This function generates the response for the requested Liturgical Calendar.
+     *
+     * Depending on the value of $this->CalendarParams->ReturnType, it will either return a JSON object,
+     * a string containing an XML representation of the Liturgical Calendar, a YAML representation of the
+     * Liturgical Calendar, or an iCal representation of the Liturgical Calendar.
+     *
+     * The response is cached for the duration of CacheDuration::LITURGICAL_CALENDAR. If the user requests the
+     * same Liturgical Calendar within this time period, the cached response is returned instead of re-calculating
+     * the Liturgical Calendar. If the file does not exist or is stale, the function will re-calculate the Liturgical
+     * Calendar and cache the response.
+     */
     private function generateResponse()
     {
         $SerializeableLitCal                                = new \stdClass();
@@ -3708,6 +4321,17 @@ class Calendar
         die();
     }
 
+    /**
+     * Set up the locale for this API request.
+     *
+     * Uses the passed-in locale to set the locale for PHP's built-in
+     * internationalization functions. Also sets up the formatters for the
+     * dates and ordinals, and loads the translation files for the
+     * requested locale.
+     *
+     * @return string|false The system locale set by this function, or false
+     *                      if the locale could not be set.
+     */
     private function prepareL10N(): string|false
     {
         $baseLocale = $this->CalendarParams->Locale !== LitLocale::LATIN
@@ -3735,6 +4359,14 @@ class Calendar
         return $systemLocale;
     }
 
+    /**
+     * Set the cache duration to use for this calendar.
+     *
+     * Sets the cache duration for the calendar to one of the predefined
+     * values in \Johnrdorazio\LitCal\Enum\CacheDuration.
+     *
+     * @param string $duration The cache duration to use.
+     */
     public function setCacheDuration(string $duration): void
     {
         switch ($duration) {
@@ -3753,13 +4385,21 @@ class Calendar
         }
     }
 
+    /**
+     * Set the allowed return types.
+     *
+     * The allowed return types are used to determine which types of responses
+     * can be returned by the API.
+     *
+     * @param array $returnTypes The return types to allow.
+     */
     public function setAllowedReturnTypes(array $returnTypes): void
     {
         $this->AllowedReturnTypes = array_values(array_intersect(ReturnType::$values, $returnTypes));
     }
 
     /**
-     * The LitCalEngine will only work once you call the public Init() method
+     * The LitCalEngine will only work once you call the public init() method.
      * Do not change the order of the methods that follow,
      * each one can depend on the one before it in order to function correctly!
      */
