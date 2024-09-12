@@ -231,7 +231,7 @@
             "uniqueItems": true,
             "description": "Missals as defined in the PHP RomanMissal enum, from which data for the current calendar is drawn",
             "items": {
-                "$ref": "#/definitions/Missal"
+                "$ref": "#/definitions/MissalID"
             }
         },
         "MissalDef": {
