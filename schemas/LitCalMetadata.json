@@ -127,7 +127,7 @@
                 "wider_regions_keys": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/WiderRegionNames"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/WiderRegionNames"
                     }
                 }
             },
