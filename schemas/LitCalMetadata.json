@@ -24,10 +24,13 @@
                             "calendar_id": {
                                 "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
                             },
+                            "country_iso": {
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CountryISO"
+                            },
                             "missals": {
                                 "type": "array",
                                 "items": {
-                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Missal"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/MissalID"
                                 }
                             },
                             "wider_regions": {
@@ -47,7 +50,7 @@
                                 "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CalendarSettings"
                             }
                         },
-                        "required": ["calendar_id", "missals"]
+                        "required": ["calendar_id", "country_iso", "missals"]
                     }
                 },
                 "national_calendars_keys": {
@@ -126,77 +129,6 @@
                     "items": {
                         "$ref": "#/definitions/WiderRegionNames"
                     }
-                },
-                "roman_missals": {
-                    "type": "object",
-                    "propertyNames": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/MissalDef"
-                    },
-                    "patternProperties": {
-                        "": {
-                            "type": "object",
-                            "properties": {
-                                "missal_id": {
-                                    "type": "string",
-                                    "pattern": "^(EDITIO_TYPICA|ITALY|USA|NETHERLANDS)_(19[7-9]|[2-9][0-9][0-9])[0-9]$"
-                                },
-                                "name": {
-                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/MissalName"
-                                },
-                                "data_path": {
-                                    "oneOf": [
-                                        {
-                                            "type": "string",
-                                            "pattern": "^data\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\.json$"
-                                        },
-                                        {
-                                            "type": "boolean",
-                                            "enum": [false]
-                                        }
-                                    ]
-                                },
-                                "i18n_path": {
-                                    "oneOf": [
-                                        {
-                                            "type": "string",
-                                            "pattern": "^data\\\/propriumdesanctis_(ITALY_|USA_|NETHERLANDS_)?(19[7-9]|20[0-9])[0-9]\\\/i18n\\\/$"
-                                        },
-                                        {
-                                            "type": "boolean",
-                                            "enum": [false]
-                                        }
-                                    ]
-                                },
-                                "year_limits": {
-                                    "type": "object",
-                                    "properties": {
-                                        "since_year": {
-                                            "type": "integer"
-                                        },
-                                        "until_year": {
-                                            "type": "integer"
-                                        }
-                                    },
-                                    "required": [ "since_year" ],
-                                    "additionalProperties": false
-                                },
-                                "year_published": {
-                                    "type": "integer",
-                                    "minimum": 1970,
-                                    "maximum": 9999
-                                }
-                            },
-                            "required": [
-                                "missal_id",
-                                "name",
-                                "data_path",
-                                "i18n_path",
-                                "year_limits",
-                                "year_published"
-                            ],
-                            "additionalProperties": false
-                        }
-                    }
                 }
             },
             "required": [
@@ -206,8 +138,7 @@
                 "diocesan_calendars_keys",
                 "diocesan_groups",
                 "wider_regions",
-                "wider_regions_keys",
-                "roman_missals"
+                "wider_regions_keys"
             ],
             "additionalProperties": false
         },
@@ -216,7 +147,7 @@
             "additionalProperties": false,
             "properties": {
                 "name": {
-                    "$ref": "#/definitions/WiderRegionNames"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/WiderRegionNames"
                 },
                 "languages": {
                     "type": "array",
@@ -238,27 +169,6 @@
                 }
             },
             "required": ["name", "languages", "data_path", "i18n_path", "api_path"]
-        },
-        "WiderRegionNames": {
-            "type": "string",
-            "enum": [
-                "Africa",
-                "Alsace",
-                "Americas",
-                "Anatolia",
-                "Antarctica",
-                "Asia",
-                "Australasia",
-                "Central Africa",
-                "Central America",
-                "Europe",
-                "Indies",
-                "North Africa",
-                "Oceania",
-                "Scandinavia",
-                "South America",
-                "West Indies"
-            ]
         }
     }
 }

@@ -4,6 +4,7 @@ namespace Johnrdorazio\LitCal\Paths;
 
 use Johnrdorazio\LitCal\Enum\RomanMissal;
 use Johnrdorazio\LitCal\Enum\StatusCode;
+use Johnrdorazio\LitCal\WorldCountries;
 
 class Metadata
 {
@@ -197,7 +198,8 @@ class Metadata
         $nationalCalendars = [];
         $nationalCalendars[] = [
             "calendar_id" => "VATICAN",
-            "missals" => [
+            "country_iso" => "VA",
+            "missals"     => [
                 "EDITIO_TYPICA_1970",
                 "EDITIO_TYPICA_1971",
                 "EDITIO_TYPICA_1975",
@@ -208,6 +210,7 @@ class Metadata
         foreach (Metadata::$nationalCalendars as $key => $calendar) {
             $nationalCalendars[] = [
                 "calendar_id" => $key,
+                "country_iso" => WorldCountries::countryToIso($key),
                 ...Metadata::$nationalCalendarsMetadata[$key]
             ];
         }
@@ -223,8 +226,7 @@ class Metadata
                 "diocesan_calendars_keys"     => array_keys(Metadata::$diocesanCalendars),
                 "diocesan_groups"             => $diocesanGroups,
                 "wider_regions"               => Metadata::$widerRegions,
-                "wider_regions_keys"          => Metadata::$widerRegionsNames,
-                "roman_missals"               => RomanMissal::produceMetadata()
+                "wider_regions_keys"          => Metadata::$widerRegionsNames
             ]
         ], JSON_PRETTY_PRINT);
         $responseHash = md5($response);

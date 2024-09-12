@@ -9,6 +9,7 @@ use Johnrdorazio\LitCal\Enum\LitLocale;
 use Johnrdorazio\LitCal\Enum\RequestContentType;
 use Johnrdorazio\LitCal\Enum\RequestMethod;
 use Johnrdorazio\LitCal\Enum\StatusCode;
+use Johnrdorazio\LitCal\Enum\RomanMissal;
 
 class Missals
 {
@@ -17,6 +18,34 @@ class Missals
     public static object $missalsIndex;
     private static array $requestPathParts = [];
 
+    /**
+     * Initialize the payload from the request body.
+     *
+     * If the request body is a JSON or YAML encoded object, it will attempt to
+     * retrieve the locale, region, and year from the object.
+     * Else if the request body is Form encoded and the method is POST, it will attempt to
+     * retrieve the locale, region, and year from the form encoded values.
+     * If however the method is PUT or PATCH, the request body must be a JSON or YAML encoded object,
+     * otherwise it will produce a 404 Bad Request error.
+     *
+     * If the object or form does not have a 'locale' property, it will attempt to
+     * retrieve the locale from the 'Accept-Language' header of the request.
+     * If it does not find a valid locale, it will default to 'la' (Latin).
+     *
+     * If the object or form does not have a 'region' property, it will not set the
+     * 'REGION' key in the returned array.
+     *
+     * If the object or form does not have a 'year' property, it will not set the
+     * 'YEAR' key in the returned array.
+     *
+     * If the request did not provide a 'locale' parameter and there is no
+     * 'Accept-Language' header, it will default to 'la' (Latin).
+     *
+     * If the request did not provide a 'locale' parameter and the 'Accept-Language'
+     * header is not in the list of supported locales, it will default to 'la' (Latin).
+     *
+     * @return ?object the initialized payload, or null if the request body was not a JSON or YAML encoded object or a Form encoded object
+     */
     private static function initPayloadFromRequestBody(): ?object
     {
         $payload = null;
@@ -39,6 +68,26 @@ class Missals
         return $payload;
     }
 
+    /**
+     * Handles the POST request payload for the Missals endpoint.
+     *
+     * If the request body is a JSON or YAML encoded object, it will attempt to
+     * retrieve the locale, region, and year from the object.
+     *
+     * If the object does not have a 'locale' property, it will attempt to
+     * retrieve the locale from the 'Accept-Language' header of the request.
+     * If it does not find a valid locale, it will default to 'la' (Latin).
+     *
+     * If the object does not have a 'region' property, it will not set the
+     * 'REGION' key in the returned array.
+     *
+     * If the object does not have a 'year' property, it will not set the
+     * 'YEAR' key in the returned array.
+     *
+     * @param ?object $payload the JSON or YAML encoded object or null if the
+     *                          request body was not a JSON or YAML encoded object
+     * @return array the initialized request parameters
+     */
     private static function handlePostPayload(?object $payload): array
     {
         $data = [];
@@ -61,6 +110,11 @@ class Missals
         return $data;
     }
 
+    /**
+     * Handles the GET request payload for the Missals endpoint.
+     *
+     * @return array the initialized request parameters
+     */
     private static function handleGetPayload(): array
     {
         $data = [];
@@ -83,6 +137,20 @@ class Missals
         return $data;
     }
 
+    /**
+     * Initialize the request parameters for the Missals endpoint.
+     *
+     * When the request method is POST, PUT or PATCH, the request body is expected to be a JSON or YAML encoded object,
+     * or in the case of a POST request method, possible a Form encoded object.
+     * The object (or form data) may contain the following properties:
+     * - locale: a string indicating the locale of the calendar
+     * - region: a string indicating the region of the calendar
+     * - year: an integer indicating the year for which the calendar should be calculated
+     *
+     * When the request method is GET, the query parameters are expected to have the same structure as the request body in the previous case.
+     *
+     * @return array the initialized request parameters
+     */
     private static function initRequestParams(): array
     {
         $data = [];
@@ -99,6 +167,20 @@ class Missals
         return $data;
     }
 
+    /**
+     * Handles the path parameter(s) for the /missals path, if there are any.
+     *
+     * If there is more than one path parameter, it will produce an error response with a status code of 404.
+     * If there is one path parameter, it will attempt to retrieve the Missal with the given ID, and if found:
+     * - if the Missal has localized data, it will attempt to retrieve the localized data for the base locale,
+     *   and if found, it will return the localized data.
+     * - if the Missal does not have localized data, or if the localized data for the base locale was not found,
+     *   it will return the Missal data.
+     * If the Missal was not found, it will produce an error response with a status code of 404, listing the available
+     * Missal IDs.
+     *
+     * @return void
+     */
     private static function handlePathParams()
     {
         $numPathParts = count(self::$requestPathParts);
@@ -159,6 +241,17 @@ class Missals
         }
     }
 
+    /**
+     * Produce an error response with the given HTTP status code and description.
+     *
+     * The description is a short string that should be used to give more context to the error.
+     *
+     * The function will output the error in the response format specified by the Accept header
+     * of the request (JSON or YAML) and terminate the script execution with a call to die().
+     *
+     * @param int $statusCode the HTTP status code to return
+     * @param string $description a short description of the error
+     */
     public static function produceErrorResponse(int $statusCode, string $description): void
     {
         header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
@@ -193,6 +286,15 @@ class Missals
         die();
     }
 
+    /**
+     * Outputs the response for the /missals endpoint.
+     *
+     * Outputs the response as either JSON or YAML, depending on the value of
+     * self::$APICore->getResponseContentType(). If the request method was PUT or
+     * PATCH, it also sets a 201 Created status code.
+     *
+     * @param string $jsonEncodedResponse the response as a JSON encoded string
+     */
     private static function produceResponse(string $jsonEncodedResponse): void
     {
         if (in_array(self::$APICore->getRequestMethod(), ['PUT','PATCH'])) {
@@ -210,6 +312,25 @@ class Missals
         die();
     }
 
+    /**
+     * Initializes the Missals class.
+     *
+     * @param array $requestPathParts the path parameters from the request
+     *
+     * This method will:
+     * - Create an instance of the APICore class
+     * - Create an instance of the MissalsParams class
+     * - If the $requestPathParts argument is not empty, it will set the request path parts
+     * - It will create an empty stdClass object to store the Missal metadata
+     * - It will loop over the directories in the 'data' directory and if the directory contains
+     *   a file with the same name as the directory and the extension '.json', it will create a
+     *   stdClass object with the properties 'missal_id', 'name', 'region', 'year_published',
+     *   'data_path', 'languages', 'i18n_path', and 'api_path', and add it to the
+     *   self::$missalsIndex->litcal_missals array.
+     * - Finally, it will set the request parameters using the initRequestParams method.
+     *
+     * @see \Johnrdorazio\LitCal\Paths\Missals::initRequestParams()
+     */
     public static function init(array $requestPathParts = [])
     {
         self::$APICore = new APICore();
@@ -222,12 +343,11 @@ class Missals
         $directories = array_map('basename', glob('data/propriumdesanctis*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
             if (file_exists("data/$directory/$directory.json")) {
+                $missal = new \stdClass();
                 if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
-                    $missal                 = new \stdClass();
                     $missal->missal_id      = "EDITIO_TYPICA_{$matches[1]}";
                     $missal->region         = "VATICAN";
-                    $missal->year_published = intval($matches[1]);
-                    $missal->data_path      = "data/$directory/$directory.json";
+                    //$missal->year_published = intval($matches[1]);
                     $it = new \DirectoryIterator("glob://data/$directory/i18n/*.json");
                     $languages = [];
                     foreach ($it as $f) {
@@ -235,24 +355,44 @@ class Missals
                     }
                     $missal->languages      = $languages;
                     $missal->i18n_path      = "data/$directory/i18n/";
-                    $missal->api_path       = API_BASE_PATH . "/missals/EDITIO_TYPICA_{$matches[1]}";
+                    //$missal->api_path       = API_BASE_PATH . "/missals/EDITIO_TYPICA_{$matches[1]}";
                 } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
-                    $missal                 = new \stdClass();
                     $missal->missal_id      = "{$matches[1]}_{$matches[2]}";
                     $missal->region         = $matches[1];
-                    $missal->year_published = intval($matches[2]);
-                    $missal->data_path      = "data/$directory/$directory.json";
-                    $missal->api_path       = API_BASE_PATH . "/missals/{$matches[1]}_{$matches[2]}";
+                    //$missal->year_published = intval($matches[2]);
+                    //$missal->api_path       = API_BASE_PATH . "/missals/{$matches[1]}_{$matches[2]}";
                 }
+                $missal->name           = RomanMissal::getName($missal->missal_id);
+                $missal->year_limits    = RomanMissal::$yearLimits[$missal->missal_id];
+                $missal->year_published = RomanMissal::$yearLimits[$missal->missal_id][ "since_year" ];
+                $missal->data_path      = "data/$directory/$directory.json";
+                $missal->api_path       = API_BASE_PATH . "/missals/$missal->missal_id";
                 self::$missalsIndex->litcal_missals[] = $missal;
-                self::$params->setMissalRegion($missal->region);
-                self::$params->setMissalYear($missal->year_published);
+                self::$params->addMissalRegion($missal->region);
+                self::$params->addMissalYear($missal->year_published);
             }
         }
         // we only set the request parameters after we have collected the MissalRegions and MissalYears
         self::$params->setData(self::initRequestParams());
     }
 
+    /**
+     * Handles the request for the /missals endpoint.
+     *
+     * If the request method is GET, it will validate the Accept header and set the
+     * response content type header.
+     * If the request method is POST, PUT, or PATCH, it will validate the request body
+     * and set the response content type header.
+     * If there are no path parameters, it will return all the Missal metadata.
+     * If there is one path parameter, it will attempt to retrieve the Missal with the
+     * given ID, and if found:
+     * - if the Missal has localized data, it will attempt to retrieve the localized
+     *   data for the base locale, and if found, it will return the localized data.
+     * - if the Missal does not have localized data, or if the localized data for the
+     *   base locale was not found, it will return the Missal data.
+     * If the Missal was not found, it will produce an error response with a status code
+     * of 404, listing the available Missal IDs.
+     */
     public static function handleRequest()
     {
         self::$APICore->init();

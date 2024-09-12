@@ -23,6 +23,9 @@
                     "type": "string",
                     "pattern": "^(EDITIO_TYPICA|ITALY|USA|NETHERLANDS)_(19[7-9]|[2-9][0-9][0-9])[0-9]$"
                 },
+                "name": {
+                    "type": "string"
+                },
                 "region": {
                     "type": "string",
                     "enum": [
@@ -36,6 +39,21 @@
                     "type": "integer",
                     "minimum": 1970,
                     "maximum": 9999
+                },
+                "year_limits": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "since_year": {
+                            "type": "integer",
+                            "minimum": 1970
+                        },
+                        "until_year": {
+                            "type": "integer",
+                            "minimum": 1970
+                        }
+                    },
+                    "required": [ "since_year" ]
                 },
                 "data_path": {
                     "type": "string",

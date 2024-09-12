@@ -109,7 +109,7 @@
                     "type": "integer"
                 },
                 "missal": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Missal"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/MissalID"
                 },
                 "reason": {
                     "type": "string"

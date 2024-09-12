@@ -43,6 +43,10 @@
     {
       "name": "Easter",
       "description": "dates of easter whether gregorian or julian from 1583 to 1999"
+    },
+    {
+      "name": "Missals",
+      "description": "Retrieve / create / update / delete Roman Missal definitions"
     }
   ],
   "paths": {
@@ -467,36 +471,36 @@
                   },
                   {
                     "name": "PrayerUnbornTest",
-                    "eventkey": "PrayerUnborn",
+                    "event_key": "PrayerUnborn",
                     "description": "USA: The National Day of Prayer for the Unborn is set to Jan 22 as per the 2011 Roman Missal issued by the USCCB, however if it coincides with a Sunday or a Solemnity, it should be moved to Jan 23",
-                    "testType": "exactCorrespondenceSince",
-                    "yearSince": 2011,
-                    "appliesTo": {
+                    "test_type": "exactCorrespondenceSince",
+                    "year_since": 2011,
+                    "applies_to": {
                       "nationalcalendar": "USA"
                     },
                     "assertions": [
                       {
                         "year": 2010,
-                        "expectedValue": null,
+                        "expected_value": null,
                         "assert": "eventNotExists",
                         "assertion": "should not exist before 2011"
                       },
                       {
                         "year": 2011,
-                        "expectedValue": 1295654400,
+                        "expected_value": 1295654400,
                         "assert": "eventExists AND hasExpectedTimestamp",
                         "assertion": "should fall on expected date January 22"
                       },
                       {
                         "year": 2012,
-                        "expectedValue": 1327276800,
+                        "expected_value": 1327276800,
                         "assert": "eventExists AND hasExpectedTimestamp",
                         "assertion": "should fall on expected date January 23",
                         "comment": "this test is significant since January 22nd falls on a Sunday, so the National Day of Prayer for the Unborn should have been moved to January 23rd"
                       },
                       {
                         "year": 2045,
-                        "expectedValue": 2368742400,
+                        "expected_value": 2368742400,
                         "assert": "eventExists AND hasExpectedTimestamp",
                         "assertion": "should fall on expected date January 23",
                         "comment": "this test is significant since January 22nd falls on a Sunday, so the National Day of Prayer for the Unborn should have been moved to January 23rd"
@@ -505,32 +509,32 @@
                   },
                   {
                     "name": "StJaneFrancesDeChantalTest",
-                    "eventkey": "StJaneFrancesDeChantal",
+                    "event_key": "StJaneFrancesDeChantal",
                     "description": "Saint Jane Frances de Chantal was moved from December 12 to August 12 in the 2002 Latin Edition of the Roman Missal, to allow bishops conferences to insert Our Lady of Guadalupe as an optional memorial on December 12. DOES ST JANE FRANCES DE CHANTAL FALL ON THE RIGHT DAY BOTH BEFORE AND AFTER 2002, OR IT CORRECTLY OVERRIDEN BY GREATER FESTIVITIES?",
-                    "testType": "variableCorrespondence",
+                    "test_type": "variableCorrespondence",
                     "assertions": [
                       {
                         "year": 2001,
-                        "expectedValue": 1008115200,
+                        "expected_value": 1008115200,
                         "assert": "eventExists AND hasExpectedTimestamp",
                         "assertion": "should fall on expected date December 12"
                       },
                       {
                         "year": 2002,
-                        "expectedValue": 1029110400,
+                        "expected_value": 1029110400,
                         "assert": "eventExists AND hasExpectedTimestamp",
                         "assertion": "should fall on expected date August 12"
                       },
                       {
                         "year": 2010,
-                        "expectedValue": 1281571200,
+                        "expected_value": 1281571200,
                         "assert": "eventExists AND hasExpectedTimestamp",
                         "assertion": "should fall on expected date August 12",
                         "comment": "this test is significant since December 12th falls on a Sunday, so the memorial would have been suppressed if it hadn't been moved"
                       },
                       {
                         "year": 1971,
-                        "expectedValue": null,
+                        "expected_value": null,
                         "assert": "eventNotExists",
                         "assertion": "should not exist, December 12th is a Sunday"
                       }
@@ -1521,6 +1525,56 @@
           }
         }
       }
+    },
+    "/missals": {
+      "get": {
+        "tags": [
+          "Missals"
+        ],
+        "security": [{}],
+        "summary": "retrieve the index of defined Roman Missals",
+        "operationId": "missalsGET",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "de",
+                "en",
+                "es",
+                "fr",
+                "it",
+                "pt",
+                "la",
+                "nl"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: an index of defined Roman Missals",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "litcal_missals": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalMissalsPath.json#/definitions/Missal"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2033,151 +2087,151 @@
       },
       "LitCalMetadata": {
         "type": "object",
-        "description": "",
         "properties": {
-          "NationalCalendars": {
+          "litcal_metadata": {
             "type": "object",
-            "description": "each property corresponds to supported national calendars, the value of which is an array corresponding to the supported diocesan calendars for the given national calendar",
             "properties": {
-              "VATICAN": {
+              "national_calendars": {
                 "type": "array",
-                "description": "empty array because there are no associated dioceses",
-                "maxItems": 0
-              }
-            },
-            "patternProperties": {
-              "^[A-Z]{3,45}$": {
-                "type": "array",
-                "description": "English uppercase name of a nation with a corresponding liturgical calendar; value is an array of the related supported diocesan calendars",
                 "items": {
-                  "type": "string"
+                  "type": "object",
+                  "properties": {
+                    "calendar_id": {
+                      "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
+                    },
+                    "country_iso": {
+                      "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CountryISO"
+                    },
+                    "missals": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/MissalID"
+                        }
+                    },
+                    "wider_regions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/WiderRegionNames"
+                        }
+                    },
+                    "dioceses": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "pattern": "^[A-Z]+$"
+                        }
+                    },
+                    "settings": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CalendarSettings"
+                    }
+                  }
                 }
-              }
-            }
-          },
-          "NationalCalendarsMetadata": {
-            "type": "object",
-            "description": "",
-            "patternProperties": {
-              "^[A-Z]{3,45}$": {
-                "type": "object",
-                "properties": {
-                  "missals": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "wider_regions": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "dioceses": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "settings": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CalendarSettings"
-                  }
-                },
-                "additionalProperties": false
-              }
-            }
-          },
-          "DiocesanCalendars": {
-            "type": "object",
-            "patternProperties": {
-              "^[A-Z]{3,45}$": {
-                "type": "object",
-                "description": "Normalized name of the diocese, only uppercase characters (no spaces, hyphens, apostrophes, or non alphabetic characters of any kind)",
-                "properties": {
-                  "nation": {
-                    "type": "string",
-                    "description": "Uppercase English name of the nation that corresponds to the current diocesan calendar"
-                  },
-                  "diocese": {
-                    "type": "string",
-                    "description": "Actual name of the diocese, including spaces, hyphens, apostrophes or any other character"
-                  },
-                  "group": {
-                    "type": "string",
-                    "description": "Named group of diocesan calendars which can be pooled together"
-                  },
-                  "settings": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CalendarSettings"
-                  }
-                },
-                "additionalProperties": false,
-                "required": [
-                  "nation",
-                  "diocese"
-                ]
-              }
-            }
-          },
-          "DiocesanGroups": {
-            "type": "object",
-            "patternProperties": {
-              "^[A-Za-z ]{3,45}$": {
+              },
+              "national_calendars_keys": {
                 "type": "array",
-                "description": "Named groups of diocesan calendars which can be pooled together",
                 "items": {
                   "type": "string",
-                  "description": "Normalized name of the diocese, only uppercase characters (no spaces, hyphens, apostrophes, or non alphabetic characters of any kind)"
+                  "pattern": "^[A-Z]{3,45}$"
+                }
+              },
+              "diocesan_calendars": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "calendar_id": {
+                      "type": "string",
+                      "description": "Normalized name of the diocese, only uppercase characters (no spaces, hyphens, apostrophes, or non alphabetic characters of any kind)",
+                      "pattern": "^[A-Z]+$"
+                    },
+                    "nation": {
+                      "type": "string",
+                      "description": "Uppercase English name of the nation that corresponds to the current diocesan calendar"
+                    },
+                    "diocese": {
+                      "type": "string",
+                      "description": "Actual name of the diocese, including spaces, hyphens, apostrophes or any other character"
+                    },
+                    "group": {
+                      "type": "string",
+                      "description": "Named group of diocesan calendars which can be pooled together"
+                    },
+                    "settings": {
+                      "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CalendarSettings"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "nation",
+                    "diocese"
+                  ]
+                }
+              },
+              "diocesan_calendars_keys": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z]+$"
+                }
+              },
+              "diocesan_groups": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "group_name": {
+                      "type": "string",
+                      "description": "Named groups of diocesan calendars which can be pooled together"
+                    },
+                    "dioceses": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[A-Z]+$",
+                        "description": "Normalized name of the diocese, only uppercase characters (no spaces, hyphens, apostrophes, or non alphabetic characters of any kind)"
+                      }
+                    }
+                  }
+                }
+              },
+              "wider_regions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/WiderRegionNames"
+                    },
+                    "languages": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "description": "IETF language codes comprehensive of region and optionally an ISO 15924 script code, following the BCP 47 standard as implemented in PHP intl",
+                        "pattern": "^[a-z][a-z](?:_[A-Z][a-z]{3})_[A-Z][A-Z]$"
+                      }
+                    },
+                    "data_path": {
+                      "type": "string",
+                      "description": "Server path to the resource file containing the wider region data"
+                    },
+                    "i18n_path": {
+                      "type": "string",
+                      "description": "Server path to the folder containing the i18n files for the wider region"
+                    },
+                    "api_path": {
+                      "type": "string",
+                      "description": "API URL with which to request the localized wider region data"
+                    }
+                  }
+                }
+              },
+              "wider_regions_keys": {
+                "type": "array",
+                "items": {
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/WiderRegionNames"
                 }
               }
             }
-          },
-          "WiderRegions": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "RomanMissals": {
-            "type": "object",
-            "properties": {
-              "value": {
-                "type": "string"
-              },
-              "name": {
-                "type": "string"
-              },
-              "sanctoraleFileName": {
-                "oneOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "boolean"
-                  }
-                ]
-              },
-              "yearLimits": {
-                "type": "object",
-                "properties": {
-                  "sinceYear": {
-                    "type": "integer"
-                  },
-                  "untilYear": {
-                    "type": "integer"
-                  }
-                },
-                "required": [
-                  "sinceYear"
-                ]
-              }
-            },
-            "required": [
-              "value",
-              "name",
-              "sanctoraleFileName",
-              "yearLimits"
-            ]
           }
         }
       },

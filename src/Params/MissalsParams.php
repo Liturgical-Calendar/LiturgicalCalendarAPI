@@ -15,11 +15,11 @@ class MissalsParams
     private array $availableLangs       = [];
     private static array $MissalRegions = [];
     private static array $MissalYears   = [];
-    // public const int ERROR_NONE         = 0;
-    // public const int ERROR              = 1;
-    // private static int $last_error      = MissalsParams::ERROR_NONE;
-    // private static StatusCode $last_error_status;
-    // private static string $last_error_msg;
+    public const int ERROR_NONE         = 0;
+    public const int ERROR              = 1;
+    private static int $last_error      = MissalsParams::ERROR_NONE;
+    private static int $last_error_status;
+    private static string $last_error_msg;
 
     public function __construct(?array $DATA = null)
     {
@@ -89,8 +89,7 @@ class MissalsParams
  *      if (self::$params->last_error() !== MissalsParams::ERROR_NONE) {
  *          self::produceErrorMessage(self::$params->last_error_status(), self::$params->last_error_msg());
  *      }
- * I would do this if I could follow the JSON convention of snake case last_error() and last_error_msg()
- * However this triggers codesniffers rule about method casing ...
+ */
     private function setLastError(StatusCode $status, string $message): void
     {
         self::$last_error        = self::ERROR;
@@ -98,29 +97,32 @@ class MissalsParams
         self::$last_error_msg    = $message;
     }
 
+    //phpcs:ignore PSR1.Methods.CamelCapsMethodName
     public function last_error()
     {
         return self::$last_error;
     }
 
+    //phpcs:ignore PSR1.Methods.CamelCapsMethodName
     public function last_error_msg()
     {
         return self::$last_error_msg;
     }
 
+    //phpcs:ignore PSR1.Methods.CamelCapsMethodName
     public function last_error_status()
     {
         return self::$last_error_status;
     }
- */
-    public function setMissalRegion(string $region)
+
+    public function addMissalRegion(string $region)
     {
         if (false === in_array($region, self::$MissalRegions)) {
             self::$MissalRegions[] = $region;
         }
     }
 
-    public function setMissalYear(string $year)
+    public function addMissalYear(string $year)
     {
         if (false === in_array($year, self::$MissalYears)) {
             self::$MissalYears[] = $year;

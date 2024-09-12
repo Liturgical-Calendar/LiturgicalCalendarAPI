@@ -108,20 +108,58 @@ class RomanMissal
         return (object) self::$yearLimits[ $value ];
     }
 
+    /**
+     * This method was used by the /calendars route, to add metadata about the Roman Missals,
+     * however we have created the /missals route which also produces this metadata
+     * using however a different approach, by globbing the data directory.
+     * In order for a request to the /missals route to use this method,
+     * the method would need access to the MissalsParams instance in the Paths\Missals class,
+     * or this RomanMissal enum would need to store arrays of current Missal regions and years,
+     * and the MissalsParams class would need to check against the RomanMissal enum
+     * rather than against it's own arrays.
+     *
+     * @return array an array of metadata objects each describing a Roman Missal,
+     *      with the following properties:
+     *      - `missal_id`: the value of the enumeration constant for the Roman Missal
+     *      - `name`: the name of the Roman Missal
+     *      - `region`: the region for which the Roman Missal is intended
+     *      - `data_path`: the path to the JSON file containing the sanctorale
+     *      - `i18n_path`: the path to the directory containing the JSON files for the i18n of the sanctorale
+     *      - `languages`: an array of the languages for which i18n data is available
+     *      - `year_limits`: an object with two properties:
+     *          - `since_year`: the year since when the Roman Missal is to be used
+     *          - `until_year`: the year until when the Roman Missal is to be used (null if no end year is specified)
+     *      - `year_published`: the year when the Roman Missal was published
+     */
     public static function produceMetadata(): array
     {
         $reflectionClass = new \ReflectionClass(static::class);
-        $metadata = $reflectionClass->getConstants();
-        array_walk($metadata, function (string &$v) {
-            $v = [
-                "missal_id" => $v,
-                "name" => self::getName($v),
-                "data_path" => self::getSanctoraleFileName($v),
-                "i18n_path" => self::getSanctoraleI18nFilePath($v),
-                "year_limits" => self::$yearLimits[ $v ],
-                "year_published" => self::$yearLimits[ $v ][ "since_year" ]
+        $missal_ids = $reflectionClass->getConstants();
+        $metadata = [];
+        foreach ($missal_ids as $key => $missal_id) {
+            $i18n_path = self::getSanctoraleI18nFilePath($missal_id);
+            $it = new \DirectoryIterator("glob://$i18n_path*.json");
+            $languages = [];
+            foreach ($it as $f) {
+                $languages[] = $f->getBasename('.json');
+            }
+            $region = null;
+            if (str_starts_with($missal_id, "EDITIO_TYPICA_")) {
+                $region = "VATICAN";
+            } else {
+                $region = explode("_", $missal_id)[0];
+            }
+            $metadata[] = [
+                "missal_id" => $missal_id,
+                "name" => self::getName($missal_id),
+                "region" => $region,
+                "data_path" => self::getSanctoraleFileName($missal_id),
+                "i18n_path" => self::getSanctoraleI18nFilePath($missal_id),
+                "languages" => $languages,
+                "year_limits" => self::$yearLimits[ $missal_id ],
+                "year_published" => self::$yearLimits[ $missal_id ][ "since_year" ]
             ];
-        });
+        }
         return $metadata;
     }
 }

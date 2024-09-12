@@ -141,7 +141,7 @@
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitFeastType"
                   },
                   "missal": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Missal"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/MissalID"
                   },
                   "decree": {
                     "type": "string",

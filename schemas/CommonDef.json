@@ -248,7 +248,7 @@
                 "NETHERLANDS_EDITION_1978"
             ]
         },
-        "Missal": {
+        "MissalID": {
             "type": "string",
             "enum": [
                 "EDITIO_TYPICA_1970",
@@ -727,6 +727,48 @@
                 {
                     "pattern": "^(?:af|agq|ak|am|ar|as|asa|ast|az|bas|be|bem|bez|bg|bm|bn|bo|br|brx|bs|ca|ccp|ce|ceb|cgg|chr|ckb|cs|cy|da|dav|de|dje|dsb|dua|dyo|dz|ebu|ee|el|en|eo|es|et|eu|ewo|fa|ff|fi|fil|fo|fr|fur|fy|ga|gd|gl|gsw|gu|guz|gv|ha|haw|he|hi|hr|hsb|hu|hy|ia|id|ig|ii|is|it|ja|jgo|jmc|jv|ka|kab|kam|kde|kea|khq|ki|kk|kkj|kl|kln|km|kn|ko|kok|ks|ksb|ksf|ksh|ku|kw|ky|lag|lb|lg|lkt|ln|lo|lrc|lt|lu|luo|luy|lv|mas|mer|mfe|mg|mgh|mgo|mi|mk|ml|mn|mr|ms|mt|mua|my|mzn|naq|nb|nd|nds|ne|nl|nmg|nn|nnh|nus|nyn|om|or|os|pa|pl|ps|pt|qu|rm|rn|ro|rof|ru|rw|rwk|sah|saq|sbp|sd|se|seh|ses|sg|shi|si|sk|sl|smn|sn|so|sq|sr|sv|sw|ta|te|teo|tg|th|ti|tk|to|tr|tt|twq|tzm|ug|uk|ur|uz|vai|vi|vun|wae|wo|xh|xog|yav|yi|yo|yue|zgh|zh|zu)(?:-(?:001|150|419|AD|AE|AF|AG|AI|AL|AM|AO|AR|AS|AT|AU|AW|AX|Arab|Arab-AF|Arab-PK|BA|BB|BD|BE|BF|BG|BH|BI|BJ|BL|BM|BN|BO|BQ|BR|BS|BT|BW|BY|BZ|CA|CC|CD|CF|CG|CH|CI|CK|CL|CM|CN|CO|CR|CU|CV|CW|CX|CY|CZ|Cyrl|Cyrl-AZ|Cyrl-BA|Cyrl-ME|Cyrl-RS|Cyrl-UZ|Cyrl-XK|DE|DG|DJ|DK|DM|DO|DZ|EA|EC|EE|EG|EH|ER|ES|ET|FI|FJ|FK|FM|FO|FR|GA|GB|GD|GE|GF|GG|GH|GI|GL|GM|GN|GP|GQ|GR|GT|GU|GW|GY|Guru|Guru-IN|HK|HN|HR|HT|HU|Hans|Hans-CN|Hans-HK|Hans-MO|Hans-SG|Hant|Hant-HK|Hant-MO|Hant-TW|IC|ID|IE|IL|IM|IN|IO|IQ|IR|IS|IT|JE|JM|JO|JP|KE|KG|KH|KI|KM|KN|KP|KR|KW|KY|KZ|LA|LB|LC|LI|LK|LR|LS|LT|LU|LV|LY|Latn|Latn-AZ|Latn-BA|Latn-BF|Latn-CM|Latn-GH|Latn-GM|Latn-GN|Latn-GW|Latn-LR|Latn-MA|Latn-ME|Latn-MR|Latn-NE|Latn-NG|Latn-RS|Latn-SL|Latn-SN|Latn-UZ|Latn-XK|MA|MC|MD|MF|MG|MH|MK|ML|MM|MN|MO|MP|MQ|MR|MS|MT|MU|MW|MX|MY|MZ|NA|NC|NE|NF|NG|NI|NL|NO|NP|NR|NU|NZ|OM|PA|PE|PF|PG|PH|PK|PL|PM|PN|PR|PS|PT|PW|PY|QA|RE|RO|RU|RW|SA|SB|SC|SD|SE|SG|SH|SI|SJ|SK|SL|SM|SN|SO|SR|SS|ST|SV|SX|SY|SZ|TC|TD|TG|TH|TJ|TK|TL|TM|TN|TO|TR|TT|TV|TZ|Tfng|Tfng-MA|UA|UG|UM|US|UY|VA|VC|VE|VG|VI|VN|VU|Vaii|Vaii-LR|WF|WS|XK|YE|YT|ZA|ZM|ZW))?"
                 }
+            ]
+        },
+        "WiderRegionNames": {
+            "type": "string",
+            "enum": [
+                "Africa",
+                "Alsace",
+                "Americas",
+                "Anatolia",
+                "Antarctica",
+                "Asia",
+                "Australasia",
+                "Central Africa",
+                "Central America",
+                "Europe",
+                "Indies",
+                "North Africa",
+                "Oceania",
+                "Scandinavia",
+                "South America",
+                "West Indies"
+            ]
+        },
+        "CountryISO": {
+            "type": "string",
+            "enum": [
+                "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ",
+                "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS",
+                "BT", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN",
+                "CO", "CR", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DJ", "DK", "DM", "DO", "DZ", "EC", "EE",
+                "EG", "EH", "ER", "ES", "ET", "FI", "FJ", "FK", "FM", "FO", "FR", "GA", "GB", "GD", "GE", "GF",
+                "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM",
+                "HN", "HR", "HT", "HU", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM",
+                "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC",
+                "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK",
+                "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA",
+                "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NU", "NZ", "OM", "PA", "PE", "PF", "PG",
+                "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW",
+                "SA", "SB", "SC", "SD", "SE", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS",
+                "ST", "SV", "SX", "SY", "SZ", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO",
+                "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI",
+                "VN", "VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW"
             ]
         }
     }
