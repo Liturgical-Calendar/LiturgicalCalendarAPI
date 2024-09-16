@@ -241,6 +241,15 @@ class Metadata
 
     public static function init()
     {
+        if (isset($_SERVER[ 'REQUEST_METHOD' ])) {
+            if (isset($_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_METHOD' ])) {
+                header("Access-Control-Allow-Methods: OPTIONS,GET,POST");
+            }
+            if (isset($_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' ])) {
+                header("Access-Control-Allow-Headers: {$_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' ]}");
+            }
+        }
+
         $requestHeaders = getallheaders();
         if (isset($requestHeaders[ "Origin" ])) {
             header("Access-Control-Allow-Origin: {$requestHeaders[ "Origin" ]}");
