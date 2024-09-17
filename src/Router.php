@@ -55,6 +55,13 @@ class Router
         return explode('/', $requestPath);
     }
 
+    /**
+     * This is the main entry point of the API. It takes care of determining which
+     * endpoint is being requested and delegates the request to the appropriate
+     * class.
+     *
+     * @return void
+     */
     public static function route(): void
     {
         if (false === defined('API_BASE_PATH')) {
@@ -62,14 +69,20 @@ class Router
         }
         $requestPathParts = self::buildRequestPathParts();
         $route = array_shift($requestPathParts);
+
+        /**
+         * N.B. Classes that can be instantiated and that use the APICore,
+         * MUST be instantiated before calling APICore methods,
+         * because the relative class constructors also instantiate the APICore for the class.
+         */
         switch ($route) {
             case '':
             case 'calendar':
+                $LitCalEngine = new Calendar();
                 //Calendar::$APICore->setAllowedOrigins(self::$allowedOrigins);
                 Calendar::$APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
                 Calendar::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
                 Calendar::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS, AcceptHeader::YAML ]);
-                $LitCalEngine = new Calendar();
                 $LitCalEngine->setAllowedReturnTypes([ ReturnType::JSON, ReturnType::XML, ReturnType::ICS, ReturnType::YAML ]);
                 $LitCalEngine->setCacheDuration(CacheDuration::MONTH);
                 $LitCalEngine->init($requestPathParts);
@@ -96,16 +109,17 @@ class Router
                 Tests::handleRequest();
                 break;
             case 'events':
+                $Events = new Events();
                 Events::$APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
                 if (in_array(Events::$APICore->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
                     Events::$APICore->setAllowedOrigins(self::$allowedOrigins);
                 }
                 Events::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
                 Events::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
-                $Events = new Events();
                 $Events->init($requestPathParts);
                 break;
             case 'data':
+                $RegionalData = new RegionalData();
                 RegionalData::$APICore->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST,
@@ -134,7 +148,6 @@ class Router
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
-                $RegionalData = new RegionalData();
                 $RegionalData->init($requestPathParts);
                 break;
             case 'missals':
