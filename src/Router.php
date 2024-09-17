@@ -66,7 +66,7 @@ class Router
             case '':
             case 'calendar':
                 $LitCalEngine = new Calendar();
-                Calendar::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                //Calendar::$APICore->setAllowedOrigins(self::$allowedOrigins);
                 Calendar::$APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
                 Calendar::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
                 Calendar::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS, AcceptHeader::YAML ]);
