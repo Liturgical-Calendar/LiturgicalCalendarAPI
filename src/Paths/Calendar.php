@@ -4484,7 +4484,7 @@ class Calendar
 
                 // let's calculate the calendar for the previous year
                 $this->CalendarParams->Year--;
-                $this->Cal           = new FestivityCollection($this->CalendarParams);
+                $this->Cal = new FestivityCollection($this->CalendarParams);
 
                 $this->calculateUniversalCalendar();
 
