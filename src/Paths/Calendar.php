@@ -66,10 +66,9 @@ class Calendar
 
     /**
      * The following schemas for ordinal spellouts have been taken from
-     * https://www.saxonica.com/html/documentation11/extensibility/localizing/ICU-numbering-dates/ICU-numbering.html
+     * https://www.saxonica.com/html/documentation12/localization/ICU-numbers-and-dates/ICU-numbering.html
      *
      * verbose forms supported by certain languages
-     *   (see https://www.saxonica.com/html/documentation9.6/extensibility/config-extend/localizing/ICU-numbering-dates/)
      *   - such as "one hundred and two" of British English
      *   - as opposed to the shorter "one hundred two" of US English
      *   should not be necessary in this project,
@@ -80,6 +79,10 @@ class Calendar
      *   - such as "los primeros hombres", "las primeras mujeres" in Spanish
      *   also should not be necessary, since we refer to single weeks or days
      *   so again in these cases we can stick with the singular masculine / feminine forms
+     */
+
+    /**
+     * Languages that use spellout-ordinal, without masculine or feminine specifications
      */
     private static $genericSpelloutOrdinal          = [
         'af', //Afrikaans
@@ -150,6 +153,9 @@ class Calendar
         'zu'  //Zulu
     ];
 
+    /**
+     * Languages that use spellout-ordinal-masculine and spellout-ordinal-feminine
+     */
     private static $mascFemSpelloutOrdinal          = [
         'ar', //Arabic
         'ca', //Catalan
@@ -161,7 +167,11 @@ class Calendar
         'pt'  //Portuguese
     ];
 
+    /**
+     * Languages that use spellout-ordinal-masculine, spellout-ordinal-feminine, and spellout-ordinal-neuter
+     */
     private static $mascFemNeutSpelloutOrdinal      = [
+        'bg', //Bulgarian
         'be', //Belarusian
         'el', //Greek
         'hr', //Croatian
@@ -172,7 +182,6 @@ class Calendar
 
     //even though these do not yet support spellout-ordinal, however they do support digits-ordinal
     /*private static $noSpelloutOrdinal               = [
-        'bg', //Bulgarian
         'bs', //Bosnian
         'cs', //Czech
         'cy', //Welsh
@@ -183,7 +192,7 @@ class Calendar
         'hy', //Armenian
         'is', //Icelandic
         'ka', //Georgian
-        'kl', //Greenlandic
+        'kl', //Greenlandic aka Kalaallisut
         'ko', //Korean : supports specific forms spellout-ordinal-native etc. but too complicated to handle for now
         'lt', //Lithuanian
         'lv', //Latvian
@@ -199,7 +208,18 @@ class Calendar
         'uq'  //Ukrainian
     ];*/
 
-    //whatever does spellout-ordinal-common mean? perhaps it's common to both masculine and feminine? with neuter being different?
+    /**
+     * Whatever does spellout-ordinal-common mean?
+     * ChatGPT tells us:
+     * In Danish, ordinals are formed by adding "-te" (for most ordinals) or "-ende" (for some specific cases).
+     * Danish ordinal formation becomes relatively regular after the first few numbers, with "-te" being the primary suffix.
+     * In Danish, ordinals may change depending on gender. For example, "2nd -> second": Anden (for common gender) vs. andet (for neuter gender).
+     * Examples:
+     *  - "anden plads" (second place)
+     *  - "andet hus" (second house) for neuter gender
+     *
+     * So apparently it is very similar to spellout-ordinal with a few cases using neutral gender.
+     */
     private static $commonNeutSpelloutOrdinal       = [
         'da'  //Danish
     ];
@@ -1099,7 +1119,7 @@ class Calendar
                 $this->Cal->addFestivity("DayBeforeEpiphany" . $nth, $festivity);
             }
         }
-        //Weekday from the Sunday of Epiphany until Baptism of the Lord are called "*day after Epiphany"
+        //Weekdays from the Sunday of Epiphany until Baptism of the Lord are called "*day after Epiphany"
         // (in which calendar? England?)
         //Actually in Latin they are still "Feria II temporis Nativitatis",
         // in English "Monday - Christmas Weekday",
