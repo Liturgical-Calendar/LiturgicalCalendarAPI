@@ -250,6 +250,7 @@ class Metadata
             }
         }
 
+        /*
         $requestHeaders = getallheaders();
         if (isset($requestHeaders[ "Origin" ])) {
             header("Access-Control-Allow-Origin: {$requestHeaders[ "Origin" ]}");
@@ -257,6 +258,8 @@ class Metadata
         } else {
             header('Access-Control-Allow-Origin: *');
         }
+        */
+        header('Access-Control-Allow-Origin: *');
         header('Access-Control-Max-Age: 86400');    // cache for 1 day
         header('Cache-Control: must-revalidate, max-age=259200');
         header('Content-Type: application/json');
