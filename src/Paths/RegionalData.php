@@ -24,21 +24,27 @@ use Johnrdorazio\LitCal\Params\RegionalDataParams;
  */
 class RegionalData
 {
-    private ?object $generalIndex = null;
+    private ?object $diocesanCalendarsIndex = null;
     private RegionalDataParams $params;
     public static APICore $APICore;
 
     /**
-     * LitCalRegionalData Constructor
+     * Constructor
+     *
+     * Initializes the RegionalData class.
+     *
+     * @return void
      */
     public function __construct()
     {
-        self::$APICore                              = new APICore();
-        $this->params                               = new RegionalDataParams();
+        self::$APICore = new APICore();
+        $this->params  = new RegionalDataParams();
     }
 
     /**
-     * Function handleRequestMethod
+     * Handle the request method.
+     *
+     * Depending on the request method, it will call the appropriate class method to handle the request.
      *
      * @return void
      */
@@ -65,15 +71,27 @@ class RegionalData
     }
 
     /**
-     * Function handleGetPostRequests
+     * Handle GET and POST requests to retrieve a Regional Calendar data resource.
      *
-     * @return void
+     * The `category` parameter is required and must be one of the following values:
+     * - DIOCESANCALENDAR
+     * - WIDERREGIONCALENDAR
+     * - NATIONALCALENDAR
+     *
+     * The `key` parameter is required and must be a valid key for the requested category.
+     *
+     * The `locale` parameter is optional and only applies to WIDERREGIONCALENDAR category requests.
+     * If present, it must be a valid locale listed in the metadata of the requested Wider region calendar data.
+     *
+     * If the requested resource exists, it will be returned as JSON.
+     * If the resource does not exist, a 404 error will be returned.
+     * If the `category` or `locale` parameters are invalid, a 400 error will be returned.
      */
     private function handleGetPostRequests(): void
     {
         switch ($this->params->category) {
             case "DIOCESANCALENDAR":
-                $calendarDataFile = $this->generalIndex->{$this->params->key}->path;
+                $calendarDataFile = $this->diocesanCalendarsIndex->{$this->params->key}->path;
                 break;
             case "WIDERREGIONCALENDAR":
                 $calendarDataFile = "nations/{$this->params->key}.json";
@@ -113,11 +131,11 @@ class RegionalData
     }
 
     /**
-     * Function handlePutPatchDeleteRequests
+     * Handle PUT, PATCH, and DELETE requests.
      *
-     * @param string $requestMethod Method of the current request
+     * It is private as it is called from {@see handleRequestMethod}.
      *
-     * @return void
+     * @param string $requestMethod the HTTP request method
      */
     private function handlePutPatchDeleteRequests(string $requestMethod)
     {
@@ -130,6 +148,18 @@ class RegionalData
         }
     }
 
+    /**
+     * Handle PUT requests to create or update a national calendar data resource.
+     *
+     * It is private as it is called from {@see handlePutPatchDeleteRequests}.
+     *
+     * The resource is created or updated in the `nations/` directory.
+     *
+     * If the payload is valid according to {@see LitSchema::NATIONAL}, the response will be a JSON object
+     * containing a success message.
+     *
+     * If the payload is invalid, the response will be a JSON error response with a 422 status code.
+     */
     private function handleNationalCalendarWrite()
     {
         $response = new \stdClass();
@@ -153,6 +183,18 @@ class RegionalData
         }
     }
 
+    /**
+     * Handle PUT requests to create or update a wider region calendar data resource.
+     *
+     * It is private as it is called from {@see handlePutPatchDeleteRequests}.
+     *
+     * The resource is created or updated in the `nations/` directory.
+     *
+     * If the payload is valid according to {@see LitSchema::WIDERREGION}, the response will be a JSON object
+     * containing a success message.
+     *
+     * If the payload is invalid, the response will be a JSON error response with a 422 status code.
+     */
     private function handleWiderRegionCalendarWrite()
     {
         $response = new \stdClass();
@@ -190,6 +232,18 @@ class RegionalData
         }
     }
 
+    /**
+     * Handle PUT requests to create or update a diocesan calendar data resource.
+     *
+     * It is private as it is called from {@see handlePutPatchDeleteRequests}.
+     *
+     * The resource is created or updated in the `nations/` directory.
+     *
+     * If the payload is valid according to {@see LitSchema::DIOCESAN}, the response will be a JSON object
+     * containing a success message.
+     *
+     * If the payload is invalid, the response will be a JSON error response with a 422 status code.
+     */
     private function handleDiocesanCalendarWrite()
     {
         $response = new \stdClass();
@@ -234,9 +288,16 @@ class RegionalData
     }
 
     /**
-     * Function writeRegionalCalendar
+     * Handle PUT requests to create or update a regional calendar data resource.
      *
-     * @return void
+     * This is a private method and should only be called from {@see handlePutPatchDeleteRequests}.
+     *
+     * The resource is created or updated in the `data/` directory.
+     *
+     * If the payload is valid according to the associated schema, the response will be a JSON object
+     * containing a success message.
+     *
+     * If the payload is invalid, the response will be a JSON error response with a 422 status code.
      */
     private function writeRegionalCalendar()
     {
@@ -253,16 +314,23 @@ class RegionalData
     }
 
     /**
-     * Function deleteRegionalCalendar
+     * Handle DELETE requests to delete a regional calendar data resource.
      *
-     * @return void
+     * This is a private method and should only be called from {@see handleDeleteRequests}.
+     *
+     * The resource is deleted from the `data/` directory.
+     *
+     * If the resource is successfully deleted, the response will be a JSON object
+     * containing a success message.
+     *
+     * If the resource does not exist, a 404 error will be returned.
      */
     private function deleteRegionalCalendar()
     {
         $response = new \stdClass();
         switch ($this->params->category) {
             case "DIOCESANCALENDAR":
-                $calendarDataFile = $this->generalIndex->{$this->params->key}->path;
+                $calendarDataFile = $this->diocesanCalendarsIndex->{$this->params->key}->path;
                 break;
             case "WIDERREGIONCALENDAR":
                 $calendarDataFile = "nations/{$this->params->key}.json";
@@ -284,14 +352,15 @@ class RegionalData
     }
 
     /**
-     * Function loadIndex
+     * Loads the JSON data for the diocesan calendars index.
      *
-     * @return void
+     * This file is used to keep track of which diocesan calendars are available
+     * and their respective paths.
      */
-    private function loadIndex()
+    private function loadDiocesanCalendarsIndex()
     {
         if (file_exists("nations/index.json")) {
-            $this->generalIndex = json_decode(file_get_contents("nations/index.json"));
+            $this->diocesanCalendarsIndex = json_decode(file_get_contents("nations/index.json"));
         }
     }
 
@@ -305,30 +374,30 @@ class RegionalData
      */
     private function createOrUpdateIndex(?object $data = null, bool $delete = false)
     {
-        if (null === $this->generalIndex) {
-            $this->generalIndex = new \stdClass();
+        if (null === $this->diocesanCalendarsIndex) {
+            $this->diocesanCalendarsIndex = new \stdClass();
         }
         $key = strtoupper(preg_replace("/[^a-zA-Z]/", "", $data->diocese));
 
         if ($delete) {
-            if (property_exists($this->generalIndex, $key)) {
-                unset($this->generalIndex->$key);
+            if (property_exists($this->diocesanCalendarsIndex, $key)) {
+                unset($this->diocesanCalendarsIndex->$key);
             }
         } else {
-            if (!property_exists($this->generalIndex, $key)) {
-                $this->generalIndex->$key = new \stdClass();
+            if (!property_exists($this->diocesanCalendarsIndex, $key)) {
+                $this->diocesanCalendarsIndex->$key = new \stdClass();
             }
-            $this->generalIndex->$key->path = $data->path . "/{$data->diocese}.json";
-            $this->generalIndex->$key->nation = $data->nation;
-            $this->generalIndex->$key->diocese = $data->diocese;
+            $this->diocesanCalendarsIndex->$key->path = $data->path . "/{$data->diocese}.json";
+            $this->diocesanCalendarsIndex->$key->nation = $data->nation;
+            $this->diocesanCalendarsIndex->$key->diocese = $data->diocese;
             if (property_exists($data, 'group')) {
-                $this->generalIndex->$key->group = $data->group;
+                $this->diocesanCalendarsIndex->$key->group = $data->group;
             }
         }
 
-        $test = $this->validateDataAgainstSchema($this->generalIndex, LitSchema::INDEX);
+        $test = $this->validateDataAgainstSchema($this->diocesanCalendarsIndex, LitSchema::INDEX);
         if ($test === true) {
-            $jsonEncodedContents = json_encode($this->generalIndex, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            $jsonEncodedContents = json_encode($this->diocesanCalendarsIndex, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             file_put_contents("nations/index.json", $jsonEncodedContents . PHP_EOL);
         } else {
             self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, json_encode($test));
@@ -354,6 +423,19 @@ class RegionalData
         }
     }
 
+    /**
+     * Retrieves the payload from the request body, either JSON or YAML encoded, for PUT, PATCH, and POST requests.
+     *
+     * If the request method is POST, it will also retrieve the locale from the payload, if present, and set it on the
+     * `$data` object passed as argument.
+     *
+     * If the request method is PUT or PATCH, and the payload is not either JSON or YAML encoded, it will produce a
+     * 400 Bad Request error.
+     *
+     * @param object $data the object to set the locale and payload on
+     *
+     * @return object the object with the locale and payload set
+     */
     private static function retrievePayloadFromPostPutPatchRequest(object $data): ?object
     {
         $payload = null;
@@ -386,6 +468,13 @@ class RegionalData
         return $data;
     }
 
+    /**
+     * Set the category, key, and locale (if applicable) based on the request path parts and method.
+     *
+     * @param array $requestPathParts the parts of the request path
+     *
+     * @return object the object with the category, key, and locale set
+     */
     private static function setDataFromPath(array $requestPathParts): object
     {
         $data = new \stdClass();
@@ -403,6 +492,13 @@ class RegionalData
         return $data;
     }
 
+    /**
+     * Validate the request path parts for the RegionalData resource.
+     *
+     * Will produce a 400 error response if the request path parts are invalid.
+     *
+     * @param array $requestPathParts the parts of the request path
+     */
     private static function validateRequestPath(array $requestPathParts): void
     {
         if (count($requestPathParts) !== 2) {
@@ -421,6 +517,19 @@ class RegionalData
         }
     }
 
+    /**
+     * Handle the request parameters for the RegionalData resource.
+     *
+     * The request parameters are expected to be in the request path, or in the request body when the request content type is JSON or YAML.
+     * The request body is expected to be a JSON or YAML encoded object, with the following properties:
+     * - category: a string indicating the category of the Regional Calendar data, one of the values in RegionalDataParams::EXPECTED_CATEGORIES
+     * - key: a string indicating the key of the Regional Calendar data
+     * - locale: a string indicating the locale of the Regional Calendar data, only applicable for the WIDERREGIONCALENDAR category
+     *
+     * If the request parameters are invalid, it will produce an error response with a status code of 400.
+     *
+     * @param array $requestPathParts the parts of the request path
+     */
     private function handleRequestParams(array $requestPathParts = []): void
     {
         if (count($requestPathParts)) {
@@ -438,6 +547,17 @@ class RegionalData
         }
     }
 
+    /**
+     * Produce an error response with the given HTTP status code and description.
+     *
+     * The description is a short string that should be used to give more context to the error.
+     *
+     * The function will output the error in the response format specified by the Accept header
+     * of the request (JSON or YAML) and terminate the script execution with a call to die().
+     *
+     * @param int $statusCode the HTTP status code to return
+     * @param string $description a short description of the error
+     */
     public static function produceErrorResponse(int $statusCode, string $description): void
     {
         header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
@@ -472,6 +592,15 @@ class RegionalData
         die();
     }
 
+    /**
+     * Outputs the response for the /data endpoint.
+     *
+     * Outputs the response as either JSON or YAML, depending on the value of
+     * self::$APICore->getResponseContentType(). If the request method was PUT or
+     * PATCH, it also sets a 201 Created status code.
+     *
+     * @param string $jsonEncodedResponse the response as a JSON encoded string
+     */
     private static function produceResponse(string $jsonEncodedResponse): void
     {
         if (in_array(self::$APICore->getRequestMethod(), ['PUT','PATCH'])) {
@@ -490,20 +619,28 @@ class RegionalData
     }
 
     /**
-     * Function init
+     * Initializes the RegionalData class.
      *
-     * @return void
+     * @param array $requestPathParts the path parameters from the request
+     *
+     * This method will:
+     * - Initialize the instance of the APICore class
+     * - If the $requestPathParts argument is not empty, it will set the request path parts
+     * - It will validate the request content type
+     * - It will set the request headers
+     * - It will load the Diocesan Calendars index
+     * - It will handle the request method
      */
     public function init(array $requestPathParts = [])
     {
         self::$APICore->init();
-        if (self::$APICore->getRequestMethod() === RequestMethod::GET) {
+        if (self::$APICore->getRequestMethod() === RequestMethod::GET || self::$APICore->getRequestMethod() === RequestMethod::OPTIONS) {
             self::$APICore->validateAcceptHeader(true);
         } else {
             self::$APICore->validateAcceptHeader(false);
         }
         self::$APICore->setResponseContentTypeHeader();
-        $this->loadIndex();
+        $this->loadDiocesanCalendarsIndex();
         $this->handleRequestParams($requestPathParts);
         $this->handleRequestMethod();
     }
