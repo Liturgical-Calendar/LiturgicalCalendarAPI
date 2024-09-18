@@ -128,16 +128,13 @@ class Router
                     RequestMethod::DELETE,
                     RequestMethod::OPTIONS
                 ]);
+                if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
+                    if (in_array($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'], [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
+                        RegionalData::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                    }
+                }
                 if (in_array(RegionalData::$APICore->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
                     RegionalData::$APICore->setAllowedOrigins(self::$allowedOrigins);
-                    /*RegionalData::$APICore->setAllowedReferers(
-                        array_map(
-                            function ($el) {
-                                return $el . "/";
-                            },
-                            self::$allowedOrigins
-                        )
-                    );*/
                 }
                 RegionalData::$APICore->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
