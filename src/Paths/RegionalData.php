@@ -639,6 +639,9 @@ class RegionalData
         } else {
             self::$APICore->validateAcceptHeader(false);
         }
+        if (self::$APICore->getRequestMethod() === RequestMethod::OPTIONS) {
+            return;
+        }
         self::$APICore->setResponseContentTypeHeader();
         $this->loadDiocesanCalendarsIndex();
         $this->handleRequestParams($requestPathParts);
