@@ -62,9 +62,6 @@ class RegionalData
             case RequestMethod::DELETE:
                 $this->handlePutPatchDeleteRequests(RequestMethod::DELETE);
                 break;
-            case RequestMethod::OPTIONS:
-                // nothing to do here, should be handled by APICore
-                break;
             default:
                 self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, "The method " . $_SERVER['REQUEST_METHOD'] . " cannot be handled by this endpoint");
         }
@@ -520,7 +517,7 @@ class RegionalData
     /**
      * Handle the request parameters for the RegionalData resource.
      *
-     * The request parameters are expected to be in the request path, or in the request body when the request content type is JSON or YAML.
+     * The request parameters are expected to be in the request path (or possibly in the request body when the request content type is JSON or YAML).
      * The request body is expected to be a JSON or YAML encoded object, with the following properties:
      * - category: a string indicating the category of the Regional Calendar data, one of the values in RegionalDataParams::EXPECTED_CATEGORIES
      * - key: a string indicating the key of the Regional Calendar data
