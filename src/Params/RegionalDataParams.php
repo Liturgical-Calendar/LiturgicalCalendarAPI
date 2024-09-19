@@ -11,7 +11,7 @@ use Johnrdorazio\LitCal\Enum\RequestMethod;
 class RegionalDataParams
 {
     private ?object $calendars              = null;
-    private static array $widerRegionNames         = [];
+    private static array $widerRegionNames  = [];
     public const array EXPECTED_CATEGORIES  = [
         "nation"      => "NATIONALCALENDAR",
         "diocese"     => "DIOCESANCALENDAR",
@@ -87,20 +87,18 @@ class RegionalDataParams
         ) {
             $validVals = implode(', ', self::$widerRegionNames);
             $message = "Invalid value {$data->key} for param `key`, valid values are: {$validVals}";
-            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+            RegionalData::produceErrorResponse(StatusCode::NOT_FOUND, $message);
         }
+
         // A locale parameter is required for WiderRegion data, whether supplied by the Accept-Language header or by a `locale` parameter
         $currentWiderRegionArr = array_values(array_filter($this->calendars->wider_regions, fn ($el) => $el->name === $data->key));
-
         if (!count($currentWiderRegionArr)) {
             $message = "I thought I told you that {$data->key} was an invalid wider region value for param `key`, I could not find such a key in a `name` prop in the array: "
                 . json_encode($this->calendars->wider_regions, JSON_PRETTY_PRINT);
-            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+            RegionalData::produceErrorResponse(StatusCode::NOT_FOUND, $message);
         }
-
         $currentWiderRegion = $currentWiderRegionArr[0];
         $validLangs = $currentWiderRegion->languages;
-
         if (property_exists($data, 'locale')) {
             $data->locale = \Locale::canonicalize($data->locale);
             if (in_array($data->locale, $validLangs)) {
