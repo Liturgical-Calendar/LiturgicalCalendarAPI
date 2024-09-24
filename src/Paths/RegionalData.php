@@ -364,23 +364,20 @@ class RegionalData
     /**
      * Function createOrUpdateIndex
      *  only needed when a diocesan calendar is created, updated or deleted
-     * @param object  $data   Path of the resource file, Nation, Diocese, Group
+     * @param ?object $data   Data to add to index.json: path of the diocesan calendar data, nation, diocese name, and optionally group; null when deleting
      * @param boolean $delete Delete from the index rather than create/update the index
      *
      * @return void
      */
     private function createOrUpdateIndex(?object $data = null, bool $delete = false)
     {
-        if (null === $this->diocesanCalendarsIndex) {
-            $this->diocesanCalendarsIndex = new \stdClass();
-        }
-        $key = strtoupper(preg_replace("/[^a-zA-Z]/", "", $data->diocese));
-
         if ($delete) {
+            $key = $this->params->key;
             if (property_exists($this->diocesanCalendarsIndex, $key)) {
                 unset($this->diocesanCalendarsIndex->$key);
             }
         } else {
+            $key = strtoupper(preg_replace("/[^a-zA-Z]/", "", $data->diocese));
             if (!property_exists($this->diocesanCalendarsIndex, $key)) {
                 $this->diocesanCalendarsIndex->$key = new \stdClass();
             }
