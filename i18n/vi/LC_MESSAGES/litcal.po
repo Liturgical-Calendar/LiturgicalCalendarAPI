@@ -5,22 +5,25 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-09-17 18:45+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2024-09-27 07:40+0000\n"
+"Last-Translator: Long Truong <binhlong@gmail.com>\n"
+"Language-Team: Vietnamese <https://translate.johnromanodorazio.com/projects/"
+"liturgical-calendar/api-strings/vi/>\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.6.1\n"
 
 #: src/Paths/Calendar.php:660
 #, php-format
 msgid ""
 "Only years from 1970 and after are supported. You tried requesting the year "
 "%d."
-msgstr ""
+msgstr "Chỉ hỗ trợ từ năm 1970 trở về sau. Bạn đã yêu cầu năm %d."
 
 #. translators: Temporale refers to the Proprium de Tempore
 #: src/Paths/Calendar.php:689
@@ -28,28 +31,30 @@ msgstr ""
 msgid ""
 "There was an error trying to decode localized JSON data for the Temporale: %s"
 msgstr ""
+"Đã xảy ra lỗi khi cố gắng giải mã dữ liệu JSON được bản địa hóa cho "
+"Temporale: %s"
 
 #. translators: Temporale refers to the Proprium de Tempore
 #: src/Paths/Calendar.php:696
 msgid "There was an error trying to retrieve localized data for the Temporale."
-msgstr ""
+msgstr "Đã xảy ra lỗi khi cố gắng truy xuất dữ liệu bản địa hóa cho Temporale."
 
 #. translators: Temporale refers to the Proprium de Tempore
 #: src/Paths/Calendar.php:726
 #, php-format
 msgid "There was an error trying to decode JSON data for the Temporale: %s"
-msgstr ""
+msgstr "Đã xảy ra lỗi khi cố gắng giải mã dữ liệu JSON cho Temporale: %s"
 
 #. translators: Temporale refers to the Proprium de Tempore
 #: src/Paths/Calendar.php:733
 msgid "There was an error trying to retrieve data for the Temporale."
-msgstr ""
+msgstr "Đã xảy ra lỗi khi cố gắng truy xuất dữ liệu cho Temporale."
 
 #. translators: name of the Roman Missal
 #: src/Paths/Calendar.php:761
-#, php-format
+#, fuzzy, php-format
 msgid "Translation data for the sanctorale from %s could not be found."
-msgstr ""
+msgstr "Không tìm thấy dữ liệu dịch cho sanctorale từ %s."
 
 #. translators:
 #.   do not translate 'JSON';
@@ -63,12 +68,14 @@ msgid ""
 "There was an error trying to decode JSON localization data for the "
 "Sanctorale for the Missal %1$s: %2$s"
 msgstr ""
+"Đã xảy ra lỗi khi giải mã dữ liệu bản địa hóa JSON cho Sanctorale của Sách "
+"lễ %1$s: %2$s"
 
 #. translators: Sanctorale refers to the Proprium de Sanctis; %s = name of the Roman Missal
 #: src/Paths/Calendar.php:789
 #, php-format
 msgid "Data for the Sanctorale from %s could not be found."
-msgstr ""
+msgstr "Không tìm thấy dữ liệu cho Sanctorale từ %s."
 
 #. translators: Sanctorale refers to the Proprium de Sanctis;
 #.  1: name of the Roman Missal
@@ -80,24 +87,31 @@ msgid ""
 "There was an error trying to decode JSON data for the Sanctorale for the "
 "Missal %1$s: %2$s."
 msgstr ""
+"Có lỗi xảy ra khi cố gắng giải mã dữ liệu JSON cho Sanctorale của sách lễ "
+"%1$s: %2$s."
 
 #. translators: Sanctorale refers to Proprium de Sanctis
 #: src/Paths/Calendar.php:821
 msgid "Could not find the Sanctorale data"
-msgstr ""
+msgstr "Không thể tìm thấy dữ liệu Sanctorale"
 
 #: src/Paths/Calendar.php:846
-#, php-format
+#, fuzzy, php-format
 msgid ""
 "There was an error trying to decode translation data for Memorials based on "
 "Decrees of the Congregation for Divine Worship: %s"
 msgstr ""
+"Đã xảy ra lỗi khi cố gắng giải mã dữ liệu dịch thuật cho Lễ nhớ dựa trên Sắc "
+"lệnh của Thánh bộ Phụng tự: %s"
 
 #: src/Paths/Calendar.php:852
+#, fuzzy
 msgid ""
 "Could not find translation data for Memorials based on Decrees of the "
 "Congregation for Divine Worship"
 msgstr ""
+"Không tìm thấy dữ liệu dịch thuật cho Lễ nhớ dựa trên Sắc lệnh của Thánh bộ "
+"Phụng tự"
 
 #: src/Paths/Calendar.php:861
 #, php-format
