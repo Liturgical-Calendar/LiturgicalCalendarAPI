@@ -56,11 +56,11 @@ class RegionalData
                 $this->handleGetPostRequests();
                 break;
             case RequestMethod::PUT:
-            case RequestMethod::PATCH:
-                $this->handlePutPatchDeleteRequests(RequestMethod::PUT);
+                $this->handlePutRequests(RequestMethod::PUT);
                 break;
+            case RequestMethod::PATCH:
             case RequestMethod::DELETE:
-                $this->handlePutPatchDeleteRequests(RequestMethod::DELETE);
+                $this->handlePatchDeleteRequests(RequestMethod::DELETE);
                 break;
             default:
                 self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, "The method " . $_SERVER['REQUEST_METHOD'] . " cannot be handled by this endpoint");
@@ -128,13 +128,13 @@ class RegionalData
     }
 
     /**
-     * Handle PUT, PATCH, and DELETE requests.
+     * Handle PATCH, and DELETE requests.
      *
      * It is private as it is called from {@see handleRequestMethod}.
      *
      * @param string $requestMethod the HTTP request method
      */
-    private function handlePutPatchDeleteRequests(string $requestMethod)
+    private function handlePatchDeleteRequests(string $requestMethod)
     {
         //self::$APICore->enforceAjaxRequest();
         //self::$APICore->enforceReferer();
@@ -183,7 +183,7 @@ class RegionalData
     /**
      * Handle PUT requests to create or update a wider region calendar data resource.
      *
-     * It is private as it is called from {@see handlePutPatchDeleteRequests}.
+     * It is private as it is called from {@see handlePatchDeleteRequests}.
      *
      * The resource is created or updated in the `nations/` directory.
      *
@@ -232,7 +232,7 @@ class RegionalData
     /**
      * Handle PUT requests to create or update a diocesan calendar data resource.
      *
-     * It is private as it is called from {@see handlePutPatchDeleteRequests}.
+     * It is private as it is called from {@see writeRegionalCalendar}.
      *
      * The resource is created or updated in the `nations/` directory.
      *
@@ -287,7 +287,7 @@ class RegionalData
     /**
      * Handle PUT requests to create or update a regional calendar data resource.
      *
-     * This is a private method and should only be called from {@see handlePutPatchDeleteRequests}.
+     * This is a private method and should only be called from {@see handlePatchDeleteRequests}.
      *
      * The resource is created or updated in the `data/` directory.
      *
@@ -526,7 +526,8 @@ class RegionalData
      */
     private function handleRequestParams(array $requestPathParts = []): void
     {
-        if (count($requestPathParts)) {
+        $data = null;
+        if (count($requestPathParts) && self::$APICore->getRequestMethod() !== RequestMethod::PUT) {
             RegionalData::validateRequestPath($requestPathParts);
             $data = RegionalData::setDataFromPath($requestPathParts);
         } elseif (self::$APICore->getRequestContentType() === RequestContentType::JSON) {
@@ -536,6 +537,28 @@ class RegionalData
         } else {
             $data = (object)$_REQUEST;
         }
+        if (self::$APICore->getRequestMethod() === RequestMethod::PUT) {
+            if (null === $data || !property_exists($data, 'payload') || !property_exists($data, 'key')) {
+                self::produceErrorResponse(StatusCode::BAD_REQUEST, "No payload received. Must receive payload in body of request, in JSON or YAML format, with properties `key` and `payload`");
+            }
+            if (false === count($requestPathParts)) {
+                self::produceErrorResponse(StatusCode::BAD_REQUEST, "No request path received. Must receive request path with path param `category`");
+            }
+            switch ($requestPathParts[0]) {
+                case 'nation':
+                    $data->category = 'NATIONALCALENDAR';
+                    break;
+                case 'diocese':
+                    $data->category = 'DIOCESANCALENDAR';
+                    break;
+                case 'widerregion':
+                    $data->category = 'WIDERREGIONCALENDAR';
+                    break;
+                default:
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Unexpected path param {$requestPathParts[0]}, acceptable values are: nation, diocese, widerregion");
+            }
+        }
+
         if (false === $this->params->setData($data)) {
             self::produceErrorResponse(StatusCode::BAD_REQUEST, "The params do not seem to be correct, must have params `category` and `key` with acceptable values");
         }

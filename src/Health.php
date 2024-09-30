@@ -109,14 +109,14 @@ class Health implements MessageComponentInterface
     }
 
     public const DATA_PATH_TO_SCHEMA = [
-        "data/propriumdetempore.json"                                => LitSchema::PROPRIUMDETEMPORE,
-        "data/propriumdesanctis_1970/propriumdesanctis_1970.json"    => LitSchema::PROPRIUMDESANCTIS,
-        "data/propriumdesanctis_2002/propriumdesanctis_2002.json"    => LitSchema::PROPRIUMDESANCTIS,
-        "data/propriumdesanctis_2008/propriumdesanctis_2008.json"    => LitSchema::PROPRIUMDESANCTIS,
-        "data/propriumdesanctis_ITALY_1983/propriumdesanctis_ITALY_1983.json"
+        "data/missals/propriumdetempore.json"                                => LitSchema::PROPRIUMDETEMPORE,
+        "data/missals/propriumdesanctis_1970/propriumdesanctis_1970.json"    => LitSchema::PROPRIUMDESANCTIS,
+        "data/missals/propriumdesanctis_2002/propriumdesanctis_2002.json"    => LitSchema::PROPRIUMDESANCTIS,
+        "data/missals/propriumdesanctis_2008/propriumdesanctis_2008.json"    => LitSchema::PROPRIUMDESANCTIS,
+        "data/missals/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json"
                                                                      => LitSchema::PROPRIUMDESANCTIS,
-        "data/propriumdesanctis_USA_2011/propriumdesanctis_USA_2011" => LitSchema::PROPRIUMDESANCTIS,
-        "nations/index.json"                                         => LitSchema::INDEX,
+        "data/missals/propriumdesanctis_US_2011/propriumdesanctis_US_2011" => LitSchema::PROPRIUMDESANCTIS,
+        "data/nations/index.json"                                         => LitSchema::INDEX,
         API_BASE_PATH . '/calendars'                                 => LitSchema::METADATA,
         API_BASE_PATH . '/decrees'                                   => LitSchema::DECREES,
         API_BASE_PATH . '/events'                                    => LitSchema::EVENTS,
@@ -260,14 +260,14 @@ class Health implements MessageComponentInterface
         ];
         $context = stream_context_create($opts);
         if ($Calendar === 'VATICAN') {
-            $req = "/$Year?calendartype=CIVIL";
+            $req = "/$Year?year_type=CIVIL";
         } else {
             switch ($category) {
                 case 'nationalcalendar':
-                    $req = "/nation/$Calendar/$Year?calendartype=CIVIL";
+                    $req = "/nation/$Calendar/$Year?year_type=CIVIL";
                     break;
                 case 'diocesancalendar':
-                    $req = "/diocese/$Calendar/$Year?calendartype=CIVIL";
+                    $req = "/diocese/$Calendar/$Year?year_type=CIVIL";
                     break;
                 default:
                     //we shouldn't ever get any other categories
@@ -460,14 +460,14 @@ class Health implements MessageComponentInterface
         ];
         $context = stream_context_create($opts);
         if ($Calendar === 'VATICAN') {
-            $req = "/$Year?calendartype=CIVIL";
+            $req = "/$Year?year_type=CIVIL";
         } else {
             switch ($category) {
                 case 'nationalcalendar':
-                    $req = "/nation/$Calendar/$Year?calendartype=CIVIL";
+                    $req = "/nation/$Calendar/$Year?year_type=CIVIL";
                     break;
                 case 'diocesancalendar':
-                    $req = "/diocese/$Calendar/$Year?calendartype=CIVIL";
+                    $req = "/diocese/$Calendar/$Year?year_type=CIVIL";
                     break;
                 default:
                     //we shouldn't ever get any other categories

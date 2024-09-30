@@ -43,11 +43,11 @@
         "locale": "it_IT"
     },
     "metadata": {
-        "region": "ITALY",
+        "region": "IT",
         "wider_region": {
             "name": "Europe",
-            "json_file": "nations\/Europe.json",
-            "i18n_file": "nations\/EUROPE\/it_IT.json"
+            "json_file": "data\/wider_regions\/Europe.json",
+            "i18n_file": "data\/wider_regions\/EUROPE\/it_IT.json"
         },
         "missals": [
             "ITALY_1983",

@@ -167,11 +167,11 @@
         "eternal_high_priest": true
     },
     "metadata": {
-        "region": "NETHERLANDS",
+        "region": "NL",
         "wider_region": {
             "name": "Europe",
-            "json_file": "nations\/Europe.json",
-            "i18n_file": "nations\/EUROPE\/nl_NL.json"
+            "json_file": "data\/wider_regions\/Europe.json",
+            "i18n_file": "data\/wider_regions\/EUROPE\/nl_NL.json"
         },
         "missals": [
             "NETHERLANDS_1978"

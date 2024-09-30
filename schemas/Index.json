@@ -11,7 +11,7 @@
                     "properties": {
                         "path": {
                             "type": "string",
-                            "pattern": "^nations\\\/[A-Z &()\\-]+\\\/[a-zA-Z0-9 ()'-]+\\.json$"
+                            "pattern": "^data\\\/nations\\\/[A-Z]{2}\\\/[a-zA-Z0-9 ()'-]+\\.json$"
                         },
                         "nation": {
                             "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"

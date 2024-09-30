@@ -1,0 +1,54 @@
+{
+    "DIOCESIDIROMA": {
+        "path": "data\/nations\/IT\/Diocesi di Roma.json",
+        "nation": "IT",
+        "diocese": "Diocesi di Roma",
+        "group": "Diocesi del Lazio"
+    },
+    "ARCHDIOCESEOFBOSTONMASSACHUSETTS": {
+        "path": "data\/nations\/US\/Archdiocese of Boston (Massachusetts).json",
+        "nation": "US",
+        "diocese": "Archdiocese of Boston (Massachusetts)"
+    },
+    "DIOCESIDISORACASSINOAQUINOPONTECORVO": {
+        "path": "data\/nations\/IT\/Diocesi di Sora - Cassino - Aquino - Pontecorvo.json",
+        "nation": "IT",
+        "diocese": "Diocesi di Sora - Cassino - Aquino - Pontecorvo",
+        "group": "Diocesi del Lazio"
+    },
+    "ROERMOND": {
+        "path": "data\/nations\/NL\/Roermond.json",
+        "nation": "NL",
+        "diocese": "Roermond"
+    },
+    "SHERTOGENBOSCH": {
+        "path": "data\/nations\/NL\/'s-Hertogenbosch.json",
+        "nation": "NL",
+        "diocese": "'s-Hertogenbosch"
+    },
+    "UTRECHT": {
+        "path": "data\/nations\/NL\/Utrecht.json",
+        "nation": "NL",
+        "diocese": "Utrecht"
+    },
+    "ROTTERDAM": {
+        "path": "data\/nations\/NL\/Rotterdam.json",
+        "nation": "NL",
+        "diocese": "Rotterdam"
+    },
+    "GRONINGENLEEUWARDEN": {
+        "path": "data\/nations\/NL\/Groningen-Leeuwarden.json",
+        "nation": "NL",
+        "diocese": "Groningen-Leeuwarden"
+    },
+    "BREDA": {
+        "path": "data\/nations\/NL\/Breda.json",
+        "nation": "NL",
+        "diocese": "Breda"
+    },
+    "HAARLEMAMSTERDAM": {
+        "path": "data\/nations\/NL\/Haarlem-Amsterdam.json",
+        "nation": "NL",
+        "diocese": "Haarlem-Amsterdam"
+    }
+}

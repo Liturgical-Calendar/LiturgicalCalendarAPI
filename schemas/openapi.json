@@ -946,186 +946,7 @@
         }
       }
     },
-    "/data": {
-      "get": {
-        "tags": [
-          "RegionalData"
-        ],
-        "security": [{}],
-        "summary": "retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
-        "operationId": "regionalDataGET",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "category",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "nationalCalendar",
-                "diocesanCalendar",
-                "widerRegionCalendar"
-              ],
-              "examples": [
-                "diocesanCalendar",
-                "nationalCalendar",
-                "widerRegionCalendar"
-              ]
-            },
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "key",
-            "schema": {
-              "type": "string",
-              "pattern": "^[A-Z]{3,45}$",
-              "examples": [
-                "DIOCESIDIROMA",
-                "NETHERLANDS",
-                "AMERICAS"
-              ]
-            },
-            "description": "national, diocesan or wider region calendar name as a normalized uppercase key without spaces or any non alphabetic characters",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "400 Bad Request: missing required parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "example": {
-                  "error": "Missing required parameter(s) `category` and `key`"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "404 Not Found: the requested national or diocesan or wider region data resource was not found on the server",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "example": {
-                  "message": "file nations/USA/Archdiocese of Milwaukee (Wisconsin).json does not exist"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "RegionalData"
-        ],
-        "security": [{}],
-        "summary": "retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
-        "operationId": "regionalDataPOST",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "category": {
-                    "type": "string",
-                    "enum": [
-                      "nationalCalendar",
-                      "diocesanCalendar",
-                      "widerRegionCalendar"
-                    ],
-                    "example": "diocesanCalendar"
-                  },
-                  "key": {
-                    "type": "string",
-                    "pattern": "^[A-Z]{3,45}$",
-                    "example": "DIOCESIDIROMA",
-                    "description": "national, diocesan, or wider region calendar name as a normalized uppercase key without spaces or any non alphabetic characters"
-                  }
-                },
-                "additionalProperties": false
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "400 Bad Request: missing required parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "example": {
-                  "error": "Missing required parameter(s) `category` and `key`"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "404 Not Found: the requested national or diocesan or wider region data resource was not found on the server",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "example": {
-                  "message": "file nations/USA/Archdiocese of Milwaukee (Wisconsin).json does not exist"
-                }
-              }
-            }
-          }
-        }
-      },
+    "/data/{category}": {
       "put": {
         "tags": [
           "RegionalData"
@@ -1133,19 +954,49 @@
         "security": [{}],
         "summary": "create a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataPUT",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "national",
+                "widerregion",
+                "diocesan"
+              ]
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "description": "The name of the diocese, nation or wider region to be created",
+                    "examples": [
+                      "Archdiocese of Boston (Massachusetts)",
+                      "IT",
+                      "Europe"
+                    ]
+                  },
+                  "payload": {
+                    "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                  }
+                }
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "201 Created. Even when updating an existing resource, we will still get the same 201 Created because we are basically overwriting the previous resource",
+            "description": "201 Created",
             "content": {
               "application/json": {
                 "schema": {
@@ -1212,6 +1063,172 @@
             }
           }
         }
+      }
+    },
+    "/data/{category}/{key}": {
+      "get": {
+        "tags": [
+          "RegionalData"
+        ],
+        "security": [{}],
+        "summary": "retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
+        "operationId": "regionalDataGET",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "national",
+                "widerregion",
+                "diocesan"
+              ]
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z]{2,45}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request: missing required parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "example": {
+                  "error": "Missing required parameter(s) `category` and `key`"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404 Not Found: the requested national or diocesan or wider region data resource was not found on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "example": {
+                  "message": "file nations/USA/Archdiocese of Milwaukee (Wisconsin).json does not exist"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "RegionalData"
+        ],
+        "security": [{}],
+        "summary": "retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
+        "operationId": "regionalDataPOST",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "national",
+                "widerregion",
+                "diocesan"
+              ]
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z]{2,45}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request: missing required parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "example": {
+                  "error": "Missing required parameter(s) `category` and `key`"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404 Not Found: the requested national or diocesan or wider region data resource was not found on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "example": {
+                  "message": "file nations/USA/Archdiocese of Milwaukee (Wisconsin).json does not exist"
+                }
+              }
+            }
+          }
+        }
       },
       "patch": {
         "tags": [
@@ -1220,6 +1237,30 @@
         "security": [{}],
         "summary": "update a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataPATCH",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "national",
+                "widerregion",
+                "diocesan"
+              ]
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z]{2,45}$"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1305,45 +1346,32 @@
           "RegionalData"
         ],
         "security": [{}],
-        "summary": "delete a diocesan calendar data resource (national calendar and wider region calendar deletion not currently supported)",
+        "summary": "delete a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataDELETE",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "LitCal": {
-                    "type": "string",
-                    "pattern": "^[A-Z]{3,45}$",
-                    "description": "Normalized name of the diocese for which calendar data should be deleted; only uppercase characters (no spaces, hyphens, apostrophes, or non alphabetic characters of any kind)"
-                  },
-                  "Diocese": {
-                    "type": "string",
-                    "description": "Name of the diocese for which calendar data should be deleted; this should be the exact name of the resource file with extension `.json`. Spaces, hyphens, apostrophes and non alphabetic characters allowed"
-                  },
-                  "Nation": {
-                    "type": "string",
-                    "pattern": "^[A-Z]{3,45}$",
-                    "description": "Uppercase English name of the nation to which the diocesan calendar to be deleted belongs"
-                  },
-                  "category": {
-                    "type": "string",
-                    "const": "diocesanCalendar"
-                  }
-                },
-                "required": [
-                  "LitCal",
-                  "Diocese",
-                  "Nation",
-                  "category"
-                ]
-              }
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "national",
+                "widerregion",
+                "diocesan"
+              ]
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z]{2,45}$"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "200 OK: the resource was successfully deleted from the server",
@@ -2254,10 +2282,10 @@
       "NationalCalendarRequestBody": {
         "type": "object",
         "title": "National Calendar",
-        "description": "When requesting a national calendar, the only other parameters allowed are `year`, `calendartype`, and `returntype` (though it's preferable to request the media type using the `Accept` header)",
+        "description": "When requesting a national calendar, the only other parameters allowed are `year`, `year_type`, and `return_type` (though it's preferable to request the media type using the `Accept` header)",
         "additionalProperties": false,
         "properties": {
-          "nationalcalendar": {
+          "national_calendar": {
             "type": "string"
           },
           "year": {
@@ -2266,14 +2294,14 @@
             "minimum": 1970,
             "maximum": 9999
           },
-          "calendartype": {
+          "year_type": {
             "type": "string",
             "enum": [
               "CIVIL",
               "LITURGICAL"
             ]
           },
-          "returntype": {
+          "return_type": {
             "type": ["string", "null"],
             "enum": [
               null,
@@ -2284,15 +2312,15 @@
             ]
           }
         },
-        "required": [ "nationalcalendar" ]
+        "required": [ "national_calendar" ]
       },
       "DiocesanCalendarRequestBody": {
         "type": "object",
         "title": "Diocesan Calendar",
-        "description": "When requesting a diocesan calendar, the only other parameters allowed are `year`, `calendartype`, and `returntype` (though it's preferable to request the media type using the `Accept` header)",
+        "description": "When requesting a diocesan calendar, the only other parameters allowed are `year`, `year_type`, and `return_type` (though it's preferable to request the media type using the `Accept` header)",
         "additionalProperties": false,
         "properties": {
-          "diocesancalendar": {
+          "diocesan_calendar": {
             "type": "string",
             "pattern": "^[A-Z]{3,45}$"
           },
@@ -2302,7 +2330,7 @@
             "minimum": 1970,
             "maximum": 9999
           },
-          "calendartype": {
+          "year_type": {
             "type": "string",
             "enum": [
               "CIVIL",
@@ -2320,12 +2348,12 @@
             ]
           }
         },
-        "required": [ "diocesancalendar" ]
+        "required": [ "diocesan_calendar" ]
       },
       "GeneralRomanCalendarRequestBody": {
         "type": "object",
         "title": "General Roman Calendar",
-        "description": "The liturgical calendar in Latin, as used in the Vatican, basis of all other national and diocesan calendars. The only permitted parameters are `year`, `calendartype`, and `returntype` (though it's preferable to request the media type using the `Accept` header)",
+        "description": "The liturgical calendar in Latin, as used in the Vatican, basis of all other national and diocesan calendars. The only permitted parameters are `year`, `year_type`, and `return_type` (though it's preferable to request the media type using the `Accept` header)",
         "additionalProperties": false,
         "properties": {
           "year": {
@@ -2334,14 +2362,14 @@
             "minimum": 1970,
             "maximum": 9999
           },
-          "calendartype": {
+          "year_type": {
             "type": "string",
             "enum": [
               "CIVIL",
               "LITURGICAL"
             ]
           },
-          "returntype": {
+          "return_type": {
             "type": ["string", "null"],
             "enum": [
               null,
@@ -2376,14 +2404,14 @@
               "SUNDAY"
             ]
           },
-          "corpuschristi": {
+          "corpus_christi": {
             "type": "string",
             "enum": [
               "THURSDAY",
               "SUNDAY"
             ]
           },
-          "eternalhighpriest": {
+          "eternal_high_priest": {
             "type": "boolean"
           },
           "year": {
@@ -2392,14 +2420,14 @@
             "minimum": 1970,
             "maximum": 9999
           },
-          "calendartype": {
+          "year_type": {
             "type": "string",
             "enum": [
               "CIVIL",
               "LITURGICAL"
             ]
           },
-          "returntype": {
+          "return_type": {
             "type": ["string", "null"],
             "enum": [
               null,
@@ -2938,7 +2966,7 @@
         "summary": "General Roman Calendar in Latin",
         "description": "The General Roman Calendar in Latin is observed in the Vatican, and is the basis for all national and diocesan calendars",
         "value": {
-          "calendartype": "LITURGICAL",
+          "year_type": "LITURGICAL",
           "year": 2024
         }
       },
@@ -2946,8 +2974,8 @@
         "summary": "National Liturgical Calendar request",
         "description": "A national calendar is a calendar that corresponds to a language edition of the Roman Missal as curated by an Episcopal Conference in a given region",
         "value": {
-          "nationalcalendar": "USA",
-          "calendartype": "LITURGICAL",
+          "national_calendar": "USA",
+          "year_type": "LITURGICAL",
           "year": 2024
         }
       },
@@ -2955,8 +2983,8 @@
         "summary": "Diocesan Liturgical Calendar request",
         "description": "Diocesan calendars inherit directly from a corresponding national calendar, and add a few local liturgical events",
         "value": {
-          "diocesancalendar": "DIOCESIDIROMA",
-          "calendartype": "LITURGICAL",
+          "diocesan_calendar": "DIOCESIDIROMA",
+          "year_type": "LITURGICAL",
           "year": 2024
         }
       },
@@ -2964,13 +2992,13 @@
         "summary": "General Roman Calendar translated",
         "description": "Request the data of the General Roman calendar in a language other than Latin, or with a few underlying parameters tweaked",
         "value": {
-          "calendartype": "CIVIL",
+          "year_type": "CIVIL",
           "year": 2000,
           "locale": "IT",
           "epiphany": "SUNDAY_JAN2_JAN8",
           "ascension": "SUNDAY",
-          "corpuschristi": "THURSDAY",
-          "eternalhighpriest": true
+          "corpus_christi": "THURSDAY",
+          "eternal_high_priest": true
         }
       }
     }

@@ -63,10 +63,12 @@
                                     "type": "integer"
                                 },
                                 "since_year": {
-                                    "type": "integer"
+                                    "type": "integer",
+                                    "minimum": 1970
                                 },
                                 "until_year": {
-                                    "type": "integer"
+                                    "type": "integer",
+                                    "maximum": 9999
                                 },
                                 "strtotime": {
                                     "type": "string"

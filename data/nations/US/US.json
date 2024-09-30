@@ -175,11 +175,11 @@
         "locale": "en_US"
     },
     "metadata": {
-        "region": "UNITED STATES",
+        "region": "US",
         "wider_region": {
             "name": "Americas",
-            "json_file": "nations\/Americas.json",
-            "i18n_file": "nations\/AMERICAS\/en_US.json"
+            "json_file": "data\/wider_regions\/Americas.json",
+            "i18n_file": "data\/wider_regions\/AMERICAS\/en_US.json"
         },
         "missals": [
             "USA_2011"

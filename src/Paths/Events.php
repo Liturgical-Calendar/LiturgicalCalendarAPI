@@ -300,8 +300,8 @@ class Events
 
     private function processMemorialsFromDecreesData(): void
     {
-        $DataFile = 'data/memorialsFromDecrees/memorialsFromDecrees.json';
-        $I18nFile = 'data/memorialsFromDecrees/i18n/' . $this->EventsParams->Locale . ".json";
+        $DataFile = 'data/decrees/decrees.json';
+        $I18nFile = 'data/decrees/i18n/' . $this->EventsParams->Locale . ".json";
         if (!file_exists($DataFile) || !file_exists($I18nFile)) {
             echo self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DataFile or resource file $I18nFile");
             die();

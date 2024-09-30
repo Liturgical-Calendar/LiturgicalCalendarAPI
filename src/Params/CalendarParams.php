@@ -28,15 +28,15 @@ class CalendarParams
 
     public const ALLOWED_PARAMS  = [
         "year",
-        "calendartype",
+        "year_type",
         "epiphany",
         "ascension",
-        "corpuschristi",
-        "eternalhighpriest",
+        "corpus_christi",
+        "eternal_high_priest",
         "locale",
-        "returntype",
-        "nationalcalendar",
-        "diocesancalendar"
+        "return_type",
+        "national_calendar",
+        "diocesan_calendar"
     ];
 
     // If we can get more data from 1582 (year of the Gregorian reform) to 1969
@@ -98,7 +98,7 @@ class CalendarParams
             $key = str_replace('_', '', $key);
             $key = strtolower($key);
             if (in_array($key, self::ALLOWED_PARAMS)) {
-                if ($key !== 'year' && $key !== 'eternalhighpriest') {
+                if ($key !== 'year' && $key !== 'eternal_high_priest') {
                     // all other parameters expect a string value
                     $value = CalendarParams::validateStringValue($key, $value);
                 }
@@ -112,25 +112,25 @@ class CalendarParams
                     case "ascension":
                         $this->validateAscensionParam($value);
                         break;
-                    case "corpuschristi":
+                    case "corpus_christi":
                         $this->validateCorpusChristiParam($value);
                         break;
                     case "locale":
                         $this->validateLocaleParam($value);
                         break;
-                    case "returntype":
+                    case "return_type":
                         $this->validateReturnTypeParam($value);
                         break;
-                    case "nationalcalendar":
+                    case "national_calendar":
                         $this->validateNationalCalendarParam($value);
                         break;
-                    case "diocesancalendar":
+                    case "diocesan_calendar":
                         $this->validateDiocesanCalendarParam($value);
                         break;
-                    case "calendartype":
+                    case "year_type":
                         $this->validateYearTypeParam($value);
                         break;
-                    case "eternalhighpriest":
+                    case "eternal_high_priest":
                         $this->validateEternalHighPriestParam($value);
                         break;
                 }
