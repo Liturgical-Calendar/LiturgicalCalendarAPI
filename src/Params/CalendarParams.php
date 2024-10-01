@@ -95,8 +95,6 @@ class CalendarParams
     public function setData(array $DATA = [])
     {
         foreach ($DATA as $key => $value) {
-            $key = str_replace('_', '', $key);
-            $key = strtolower($key);
             if (in_array($key, self::ALLOWED_PARAMS)) {
                 if ($key !== 'year' && $key !== 'eternal_high_priest') {
                     // all other parameters expect a string value
