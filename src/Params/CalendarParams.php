@@ -12,6 +12,45 @@ use Johnrdorazio\LitCal\Enum\Route;
 use Johnrdorazio\LitCal\Enum\StatusCode;
 use Johnrdorazio\LitCal\Paths\Calendar;
 
+/**
+ * Class CalendarParams
+ *
+ * This class is responsible for handling the parameters provided to the Johnrdorazio\LitCal\PathsCalendar class.
+ *
+ * The class is initialized with a set of parameters passed in from the API request. These parameters
+ * are used to determine which calendar data to retrieve or update or delete.
+ *
+ * @package Johnrdorazio\LitCal\Params
+ *
+ * @property object|null $calendars
+ * @property int $Year
+ * @property string $YearType
+ * @property string $Epiphany
+ * @property string $Ascension
+ * @property string $CorpusChristi
+ * @property bool $EternalHighPriest
+ * @property string|null $ReturnType
+ * @property string|null $Locale
+ * @property string|null $NationalCalendar
+ * @property string|null $DiocesanCalendar
+ * @property const array ALLOWED_PARAMS
+ * @property const int YEAR_LOWER_LIMIT
+ * @property const int YEAR_UPPER_LIMIT
+ *
+ * @method static string validateStringValue(string $key, mixed $value)
+ * @method void __construct(array $DATA)
+ * @method void setData(array $DATA)
+ * @method void validateYearParam(int|string $value)
+ * @method void validateEpiphanyParam(string $value)
+ * @method void validateAscensionParam(string $value)
+ * @method void validateCorpusChristiParam(string $value)
+ * @method void validateLocaleParam(string $value)
+ * @method void validateReturnTypeParam(string $value)
+ * @method void validateNationalCalendarParam(string $value)
+ * @method void validateDiocesanCalendarParam(string $value)
+ * @method void validateYearTypeParam(string $value)
+ * @method void validateEternalHighPriestParam(bool $value)
+ */
 class CalendarParams
 {
     private ?object $calendars;
@@ -53,11 +92,36 @@ class CalendarParams
         file_put_contents("debug.log", $string . PHP_EOL, FILE_APPEND);
     }*/
 
+    /**
+     * Validates parameter values that are expected to be strings.
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return string
+     * @throws a 400 Bad Request error if the value is not a string
+     */
+    private static function validateStringValue(string $key, mixed $value): string
+    {
+        if (gettype($value) !== 'string') {
+            $description = "Expected value of type String for parameter `{$key}`, instead found type " . gettype($value);
+            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+        }
+        return filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
+    }
+
+    /**
+     * Constructor for CalendarParams
+     *
+     * @param array $DATA
+     * @throws a 503 Service Unavailable error if the API was unable to load calendars metadata
+     *
+     * - Loads calendars metadata
+     * - Sets a default value for the Year parameter, defaulting to current year
+     * - Sets a default value for language starting from Accept-Language header (a `locale` parameter can then override this value)
+     * - Applies the values from $DATA to the corresponding properties
+     */
     public function __construct(array $DATA)
     {
-        // set a default value for the Year parameter, defaulting to current year
-        $this->Year = (int)date("Y");
-
         $calendarsRoute = (defined('API_BASE_PATH') ? API_BASE_PATH : "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}/api/dev") . Route::CALENDARS->value;
         $metadataRaw = file_get_contents($calendarsRoute);
         if ($metadataRaw) {
@@ -71,8 +135,8 @@ class CalendarParams
             Calendar::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The API was unable to load calendars metadata");
         }
 
-        // set a default value for language starting from Accept-Language header
-        // a LOCALE parameter can then override this value
+        $this->Year = (int)date("Y");
+
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
             $this->Locale = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
@@ -83,15 +147,24 @@ class CalendarParams
         $this->setData($DATA);
     }
 
-    private static function validateStringValue(string $key, mixed $value): string
-    {
-        if (gettype($value) !== 'string') {
-            $description = "Expected value of type String for parameter `{$key}`, instead found type " . gettype($value);
-            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-        }
-        return filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
-    }
-
+    /**
+     * Sets the parameters for the Calendar class using the provided associative array of values.
+     *
+     * The array keys should be one of the following:
+     * - year: the year for which to calculate the calendar
+     * - epiphany: whether Epiphany should be calculated on January 6th or on the Sunday between January 2nd and January 8th
+     * - ascension: whether Ascension should be calculated on Thursday or on Sunday
+     * - corpus_christi: whether Corpus Christi should be calculated on Thursday or on Sunday
+     * - locale: the language in which to calculate the calendar
+     * - return_type: the format in which to return the calendar, either JSON, XML, ICS, or YML
+     * - national_calendar: the national calendar to use for the calculation
+     * - diocesan_calendar: the diocesan calendar to use for the calculation
+     * - year_type: whether to calculate the calendar based on the Civil year or the Liturgical year
+     * - eternal_high_priest: whether to include the eternal high priest in the calendar
+     *
+     * All parameters are optional, and default values will be used if they are not provided.
+     * @param array $DATA an associative array of values to use for the calculation
+     */
     public function setData(array $DATA = [])
     {
         foreach ($DATA as $key => $value) {
@@ -136,6 +209,17 @@ class CalendarParams
         }
     }
 
+    /**
+     * Validate the year parameter.
+     *
+     * The year parameter must be a 4 digit numeric string or an integer
+     * between {@see CalendarParams::YEAR_LOWER_LIMIT} and {@see CalendarParams::YEAR_UPPER_LIMIT}.
+     * If the year parameter is invalid, a 400 Bad Request error will be produced.
+     *
+     * @param int|string $value the value of the year parameter
+     *
+     * @return void
+     */
     private function validateYearParam(int|string $value)
     {
         if (gettype($value) === 'string') {
@@ -157,6 +241,13 @@ class CalendarParams
         }
     }
 
+    /**
+     * Validate the epiphany parameter.
+     *
+     * @param string $value a string indicating whether Epiphany should be calculated on Jan 6th or on the Sunday between Jan 2nd and Jan 8th {@see Epiphany::$values}
+     *
+     * @throws a 400 Bad Request error if the value is not one of the valid values
+     */
     private function validateEpiphanyParam(string $value)
     {
         if (Epiphany::isValid(strtoupper($value))) {
@@ -167,6 +258,13 @@ class CalendarParams
         }
     }
 
+    /**
+     * Validate the ascension parameter.
+     *
+     * @param string $value one of the values in {@see Ascension::$values}
+     *
+     * @throws a 400 Bad Request error if the value is not one of the valid values
+     */
     private function validateAscensionParam(string $value)
     {
         if (Ascension::isValid(strtoupper($value))) {
@@ -177,6 +275,13 @@ class CalendarParams
         }
     }
 
+    /**
+     * Validate the corpus_christi parameter.
+     *
+     * @param string $value one of the values in {@see CorpusChristi::$values}
+     *
+     * @throws a 400 Bad Request error if the value is not one of the valid values
+     */
     private function validateCorpusChristiParam(string $value)
     {
         if (CorpusChristi::isValid(strtoupper($value))) {
@@ -187,6 +292,13 @@ class CalendarParams
         }
     }
 
+    /**
+     * Validate the locale parameter.
+     *
+     * @param string $value a valid locale string that can be used to set the language of the response
+     *
+     * @throws a 400 Bad Request error if the value is not a valid locale string
+     */
     private function validateLocaleParam(string $value)
     {
         if ($value !== 'LA' && $value !== 'la') {
@@ -200,6 +312,13 @@ class CalendarParams
         }
     }
 
+    /**
+     * Validate the return_type parameter.
+     *
+     * @param string $value one of the values in {@see ReturnType::$values}
+     *
+     * @throws a 400 Bad Request error if the value is not one of the valid values
+     */
     private function validateReturnTypeParam(string $value)
     {
         if (ReturnType::isValid(strtoupper($value))) {
@@ -210,6 +329,13 @@ class CalendarParams
         }
     }
 
+    /**
+     * Validate the national_calendar parameter.
+     *
+     * @param string $value a valid national calendar key as listed in {@see CalendarParams::$calendars::$national_calendars_keys}
+     *
+     * @throws a 400 Bad Request error if the value of the national_calendar parameter is invalid
+     */
     private function validateNationalCalendarParam(string $value)
     {
         if (in_array($value, $this->calendars->national_calendars_keys)) {
@@ -221,6 +347,13 @@ class CalendarParams
         }
     }
 
+    /**
+     * Validate the diocesan_calendar parameter.
+     *
+     * @param string $value a valid diocesan calendar key as listed in {@see CalendarParams::$calendars::$diocesan_calendars_keys}
+     *
+     * @throws a 400 Bad Request error if the value of the diocesan_calendar parameter is invalid
+     */
     private function validateDiocesanCalendarParam(string $value)
     {
         if (in_array($value, $this->calendars->diocesan_calendars_keys)) {
@@ -232,6 +365,13 @@ class CalendarParams
         }
     }
 
+    /**
+     * Validate the year_type parameter.
+     *
+     * @param string $value one of the values in {@see YearType::$values}
+     *
+     * @throws a 400 Bad Request error if the value is not one of the valid values
+     */
     private function validateYearTypeParam(string $value)
     {
         if (YearType::isValid(strtoupper($value))) {
@@ -242,6 +382,13 @@ class CalendarParams
         }
     }
 
+    /**
+     * Validate the eternal_high_priest parameter.
+     *
+     * @param mixed $value a boolean value, or a value that can be interpreted as a boolean
+     *
+     * @throws a 400 Bad Request error if the value is not a boolean
+     */
     private function validateEternalHighPriestParam(mixed $value)
     {
         if (gettype($value) !== 'boolean') {

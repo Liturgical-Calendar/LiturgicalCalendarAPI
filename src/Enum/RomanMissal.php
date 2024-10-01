@@ -5,20 +5,20 @@ namespace Johnrdorazio\LitCal\Enum;
 /**
  * Enum class for the different Roman Missals that are used in the LitCal
  *
- * @var const string EDITIO_TYPICA_1970 "EDITIO_TYPICA_1970"
- * @var const string REIMPRESSIO_EMENDATA_1971 "EDITIO_TYPICA_1971"
- * @var const string EDITIO_TYPICA_SECUNDA_1975 "EDITIO_TYPICA_1975"
- * @var const string EDITIO_TYPICA_TERTIA_2002 "EDITIO_TYPICA_2002"
- * @var const string EDITIO_TYPICA_TERTIA_EMENDATA_2008 "EDITIO_TYPICA_2008"
- * @var const string USA_EDITION_2011 "USA_2011"
- * @var const string ITALY_EDITION_1983 "ITALY_1983"
- * @var const string ITALY_EDITION_2020 "ITALY_2020"
- * @var const string NETHERLANDS_EDITION_1978 "NETHERLANDS_1978"
- * @var static array $values An array of the Roman Missal values defined in the class constants
- * @var static array $names An associative array of the Roman Missal names, where the key is the value of a Roman Missal constant
- * @var static array $jsonFiles An associative array of the JSON file paths, where the key is the value of a Roman Missal constant
- * @var static array $i18nPath An associative array of the i18n file paths, where the key is the value of a Roman Missal constant
- * @var static array $yearLimits An associative array of the year limits, where the key is the value of a Roman Missal constant and the value is an associative array with the properties 'since_year' and optionally 'until_year'
+ * @property const string EDITIO_TYPICA_1970 "EDITIO_TYPICA_1970"
+ * @property const string REIMPRESSIO_EMENDATA_1971 "EDITIO_TYPICA_1971"
+ * @property const string EDITIO_TYPICA_SECUNDA_1975 "EDITIO_TYPICA_1975"
+ * @property const string EDITIO_TYPICA_TERTIA_2002 "EDITIO_TYPICA_2002"
+ * @property const string EDITIO_TYPICA_TERTIA_EMENDATA_2008 "EDITIO_TYPICA_2008"
+ * @property const string USA_EDITION_2011 "USA_2011"
+ * @property const string ITALY_EDITION_1983 "ITALY_1983"
+ * @property const string ITALY_EDITION_2020 "ITALY_2020"
+ * @property const string NETHERLANDS_EDITION_1978 "NETHERLANDS_1978"
+ * @property static array $values An array of the Roman Missal values defined in the class constants
+ * @property static array $names An associative array of the Roman Missal names, where the key is the value of a Roman Missal constant
+ * @property static array $jsonFiles An associative array of the JSON file paths, where the key is the value of a Roman Missal constant
+ * @property static array $i18nPath An associative array of the i18n file paths, where the key is the value of a Roman Missal constant
+ * @property static array $yearLimits An associative array of the year limits, where the key is the value of a Roman Missal constant and the value is an associative array with the properties 'since_year' and optionally 'until_year'
  * @method static bool isValid($value)
  * @method static bool isLatinMissal($value)
  * @method static string getName($value)
