@@ -3470,9 +3470,6 @@ class Calendar
         }
 
         if ($this->NationalData !== null && property_exists($this->NationalData, "metadata") && property_exists($this->NationalData->metadata, "missals")) {
-            if ($this->NationalData->metadata->region === 'UNITED STATES') {
-                $this->NationalData->metadata->region = 'USA';
-            }
             $this->Messages[] = "Found Missals for region " . $this->NationalData->metadata->region . ": " . implode(', ', $this->NationalData->metadata->missals);
             foreach ($this->NationalData->metadata->missals as $missal) {
                 $yearLimits = RomanMissal::getYearLimits($missal);

@@ -373,9 +373,6 @@ class Events
                 }
             }
             if (property_exists(self::$NationalData, "metadata") && property_exists(self::$NationalData->metadata, "missals")) {
-                if (self::$NationalData->metadata->region === 'UNITED STATES') {
-                    self::$NationalData->metadata->region = 'USA';
-                }
                 foreach (self::$NationalData->metadata->missals as $missal) {
                     $DataFile = RomanMissal::getSanctoraleFileName($missal);
                     if ($DataFile !== false) {

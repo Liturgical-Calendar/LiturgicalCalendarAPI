@@ -18,9 +18,9 @@ class Metadata
 
     private static function retrieveNationalCalendarNamesFromFolders()
     {
-        $directories = array_map('basename', glob('nations/*', GLOB_ONLYDIR));
+        $directories = array_map('basename', glob('data/nations/*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
-            if (file_exists("nations/$directory/$directory.json")) {
+            if (file_exists("data/nations/$directory/$directory.json")) {
                 $nationalCalendarDefinition = file_get_contents("nations/$directory/$directory.json");
                 $nationalCalendarData = json_decode($nationalCalendarDefinition);
                 if (JSON_ERROR_NONE === json_last_error()) {
@@ -34,26 +34,26 @@ class Metadata
 
     private static function buildWiderRegionData()
     {
-        $filterDirResults = ['..', '.', 'index.json'];
-        $dirResults = array_diff(scandir('nations'), $filterDirResults);
+        $filterDirResults = ['..', '.'];
+        $dirResults = array_diff(scandir('data/wider_regions'), $filterDirResults);
         $widerRegionsFiles = array_values(array_filter($dirResults, function ($el) {
-            return !is_dir('nations/' . $el) && pathinfo('nations/' . $el, PATHINFO_EXTENSION) === 'json';
+            return !is_dir('data/wider_regions/' . $el) && pathinfo('data/wider_regions/' . $el, PATHINFO_EXTENSION) === 'json';
         }));
         Metadata::$widerRegions = array_map(function ($el) {
-            $dirName = strtoupper(pathinfo('nations/' . $el, PATHINFO_FILENAME));
-            $langsInFolder = array_diff(scandir("nations/$dirName"), ['..','.']);
+            $dirName = strtoupper(pathinfo('data/wider_regions/' . $el, PATHINFO_FILENAME));
+            $langsInFolder = array_diff(scandir("data/wider_regions/$dirName"), ['..','.']);
             $widerRegionLanguages = array_values(array_filter($langsInFolder, function ($elem) use ($dirName) {
-                return pathinfo("nations/$dirName/$elem", PATHINFO_EXTENSION) === 'json';
+                return pathinfo("data/wider_regions/$dirName/$elem", PATHINFO_EXTENSION) === 'json';
             }));
-            $widerRegionLanguages = array_map(fn ($el) => pathinfo("nations/$dirName/$el", PATHINFO_FILENAME), $widerRegionLanguages);
-            $widerRegionName = pathinfo('nations/' . $el, PATHINFO_FILENAME);
+            $widerRegionLanguages = array_map(fn ($el) => pathinfo("data/wider_regions/$dirName/$el", PATHINFO_FILENAME), $widerRegionLanguages);
+            $widerRegionName = pathinfo('data/wider_regions/' . $el, PATHINFO_FILENAME);
             Metadata::$widerRegionsNames[] = $widerRegionName;
             return [
                 "name"      => $widerRegionName,
                 "languages" => $widerRegionLanguages,
-                "data_path" => "nations/$el",
-                "i18n_path" => "nations/$dirName",
-                "api_path"  => API_BASE_PATH . '/data/widerregion/' . pathinfo('nations/' . $el, PATHINFO_FILENAME) . '?locale={language}'
+                "data_path" => "data/wider_regions/$el",
+                "i18n_path" => "data/wider_regions/$dirName",
+                "api_path"  => API_BASE_PATH . '/data/widerregion/' . pathinfo('data/wider_regions/' . $el, PATHINFO_FILENAME) . '?locale={language}'
             ];
         }, $widerRegionsFiles);
     }
@@ -89,7 +89,7 @@ class Metadata
     private static function buildIndex(): int
     {
         // The first way of retrieving the names of currently supported National calendars
-        // is by scanning the `nations/` folder and picking out folder names
+        // is by scanning the `data/nations/` folder and picking out folder names
         // for folders that contain a JSON file of the same name
         // If a folder doesn't contain a JSON file of the same name it's a Wider Region rather than a Nation
         // A National calendar can exist without any Diocesan calendars defined,
@@ -98,11 +98,11 @@ class Metadata
         Metadata::retrieveNationalCalendarNamesFromFolders();
 
         // Information about Diocesan Calendars is stored in an index.json file to make life easier
-        if (false === file_exists('nations/index.json')) {
+        if (false === file_exists('data/nations/index.json')) {
             return StatusCode::NOT_FOUND;
         }
 
-        $index = file_get_contents('nations/index.json');
+        $index = file_get_contents('data/nations/index.json');
         if (false === $index) {
             return StatusCode::SERVICE_UNAVAILABLE;
         }
@@ -197,7 +197,7 @@ class Metadata
         }
         $nationalCalendars = [];
         $nationalCalendars[] = [
-            "calendar_id" => "VATICAN",
+            "calendar_id" => "VA",
             "country_iso" => "VA",
             "missals"     => [
                 "EDITIO_TYPICA_1970",
@@ -215,7 +215,7 @@ class Metadata
             ];
         }
         $nationalCalendarsKeys = [
-            "VATICAN",
+            "VA",
             ...array_keys(Metadata::$nationalCalendars)
         ];
         $response = json_encode([

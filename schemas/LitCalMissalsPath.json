@@ -29,10 +29,10 @@
                 "region": {
                     "type": "string",
                     "enum": [
-                        "VATICAN",
-                        "ITALY",
-                        "USA",
-                        "NETHERLANDS"
+                        "VA",
+                        "IT",
+                        "US",
+                        "NL"
                     ]
                 },
                 "year_published": {
