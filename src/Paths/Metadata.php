@@ -2,7 +2,6 @@
 
 namespace Johnrdorazio\LitCal\Paths;
 
-use Johnrdorazio\LitCal\Enum\RomanMissal;
 use Johnrdorazio\LitCal\Enum\StatusCode;
 use Johnrdorazio\LitCal\WorldCountries;
 
@@ -21,7 +20,7 @@ class Metadata
         $directories = array_map('basename', glob('data/nations/*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
             if (file_exists("data/nations/$directory/$directory.json")) {
-                $nationalCalendarDefinition = file_get_contents("nations/$directory/$directory.json");
+                $nationalCalendarDefinition = file_get_contents("data/nations/$directory/$directory.json");
                 $nationalCalendarData = json_decode($nationalCalendarDefinition);
                 if (JSON_ERROR_NONE === json_last_error()) {
                     Metadata::$baseNationalCalendars[$directory] = $nationalCalendarData;
