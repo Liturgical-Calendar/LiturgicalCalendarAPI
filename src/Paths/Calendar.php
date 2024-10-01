@@ -490,16 +490,16 @@ class Calendar
                         $this->CalendarParams->Ascension       = $this->NationalData->settings->ascension;
                     }
                     if (
-                        property_exists($this->NationalData->settings, 'corpuschristi')
-                        && CorpusChristi::isValid($this->NationalData->settings->corpuschristi)
+                        property_exists($this->NationalData->settings, 'corpus_christi')
+                        && CorpusChristi::isValid($this->NationalData->settings->corpus_christi)
                     ) {
-                        $this->CalendarParams->CorpusChristi   = $this->NationalData->settings->corpuschristi;
+                        $this->CalendarParams->CorpusChristi   = $this->NationalData->settings->corpus_christi;
                     }
                     if (
-                        property_exists($this->NationalData->settings, 'eternalhighpriest')
-                        && is_bool($this->NationalData->settings->eternalhighpriest)
+                        property_exists($this->NationalData->settings, 'eternal_high_priest')
+                        && is_bool($this->NationalData->settings->eternal_high_priest)
                     ) {
-                        $this->CalendarParams->EternalHighPriest = $this->NationalData->settings->eternalhighpriest;
+                        $this->CalendarParams->EternalHighPriest = $this->NationalData->settings->eternal_high_priest;
                     }
                     if (
                         property_exists($this->NationalData->settings, 'locale')

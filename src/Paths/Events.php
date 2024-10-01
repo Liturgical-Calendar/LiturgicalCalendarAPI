@@ -15,15 +15,15 @@ use Johnrdorazio\LitCal\Params\EventsParams;
 class Events
 {
     public static APICore $APICore;
-    private static array $FestivityCollection        = [];
-    private static array $LatinMissals               = [];
-    private static ?object $GeneralIndex             = null;
-    private static ?object $WiderRegionData          = null;
-    private static ?object $NationalData             = null;
-    private static ?object $DiocesanData             = null;
-    private static ?LitGrade $LitGrade               = null;
-    private static ?LitCommon $LitCommon             = null;
-    private static array $requestPathParts           = [];
+    private static array $FestivityCollection = [];
+    private static array $LatinMissals        = [];
+    private static ?object $GeneralIndex      = null;
+    private static ?object $WiderRegionData   = null;
+    private static ?object $NationalData      = null;
+    private static ?object $DiocesanData      = null;
+    private static ?LitGrade $LitGrade        = null;
+    private static ?LitCommon $LitCommon      = null;
+    private static array $requestPathParts    = [];
     private EventsParams $EventsParams;
 
     public function __construct(array $requestPathParts = [])
@@ -63,13 +63,13 @@ class Events
         }
         if (count(self::$requestPathParts) === 2) {
             if (self::$requestPathParts[0] === "nation") {
-                $data = [ "NATIONALCALENDAR" => self::$requestPathParts[1] ];
+                $data = [ "national_calendar" => self::$requestPathParts[1] ];
                 if (false === $this->EventsParams->setData($data)) {
                     echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
                     die();
                 }
             } elseif (self::$requestPathParts[0] === "diocese") {
-                $data = [ "DIOCESANCALENDAR" => self::$requestPathParts[1] ];
+                $data = [ "diocesan_calendar" => self::$requestPathParts[1] ];
                 if (false === $this->EventsParams->setData($data)) {
                     echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
                     die();
