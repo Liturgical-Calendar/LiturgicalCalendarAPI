@@ -11,14 +11,14 @@ class EventsParams
     public ?string $Locale                    = null;
     public ?string $NationalCalendar          = null;
     public ?string $DiocesanCalendar          = null;
-    private array $SupportedNationalCalendars = [ "VATICAN" ];
+    private array $SupportedNationalCalendars = [ "VA" ];
     private static string $lastError          = '';
 
     public const ALLOWED_PARAMS  = [
-        "ETERNALHIGHPRIEST",
-        "LOCALE",
-        "NATIONALCALENDAR",
-        "DIOCESANCALENDAR"
+        "eternal_high_priest",
+        "locale",
+        "national_calendar",
+        "diocesan_calendar"
     ];
 
     // If we can get more data from 1582 (year of the Gregorian reform) to 1969
@@ -46,11 +46,11 @@ class EventsParams
             $this->Locale = LitLocale::LATIN;
         }
 
-        $directories = array_map('basename', glob('nations/*', GLOB_ONLYDIR));
+        $directories = array_map('basename', glob('data/nations/*', GLOB_ONLYDIR));
         //self::debugWrite(json_encode($directories));
         foreach ($directories as $directory) {
             //self::debugWrite($directory);
-            if (file_exists("nations/$directory/$directory.json")) {
+            if (file_exists("data/nations/$directory/$directory.json")) {
                 $this->SupportedNationalCalendars[] = $directory;
             }
         }
@@ -62,14 +62,13 @@ class EventsParams
     public function setData(array $DATA): bool
     {
         foreach ($DATA as $key => $value) {
-            $key = strtoupper($key);
             if (in_array($key, self::ALLOWED_PARAMS)) {
                 switch ($key) {
-                    case "LOCALE":
+                    case "locale":
                         $this->Locale = \Locale::canonicalize($this->Locale);
                         $this->Locale = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
                         break;
-                    case "NATIONALCALENDAR":
+                    case "national_calendar":
                         if (false === in_array(strtoupper($value), $this->SupportedNationalCalendars)) {
                             self::$lastError = "uknown value `$value` for nation parameter, supported national calendars are: ["
                                 . implode(',', $this->SupportedNationalCalendars) . "]";
@@ -77,10 +76,10 @@ class EventsParams
                         }
                         $this->NationalCalendar =  strtoupper($value);
                         break;
-                    case "DIOCESANCALENDAR":
+                    case "diocesan_calendar":
                         $this->DiocesanCalendar = strtoupper($value);
                         break;
-                    case "ETERNALHIGHPRIEST":
+                    case "eternal_high_priest":
                         $this->EternalHighPriest = filter_var($value, FILTER_VALIDATE_BOOLEAN);
                         break;
                 }

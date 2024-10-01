@@ -462,7 +462,7 @@ class Calendar
 
     /**
      * Updates the CalendarParams object based on the settings defined in the NationalData object for the
-     * NationalCalendar that has been requested. If the NationalCalendar is 'VATICAN', it will use the default
+     * NationalCalendar that has been requested. If the NationalCalendar is 'VA', it will use the default
      * settings for the Vatican, otherwise it will use the settings defined in the NationalData object.
      *
      * @return void
@@ -470,7 +470,7 @@ class Calendar
     private function updateSettingsBasedOnNationalCalendar(): void
     {
         if ($this->CalendarParams->NationalCalendar !== null) {
-            if ($this->CalendarParams->NationalCalendar === 'VATICAN') {
+            if ($this->CalendarParams->NationalCalendar === 'VA') {
                 $this->CalendarParams->Epiphany        = Epiphany::JAN6;
                 $this->CalendarParams->Ascension       = Ascension::THURSDAY;
                 $this->CalendarParams->CorpusChristi   = CorpusChristi::THURSDAY;

@@ -259,7 +259,7 @@ class Health implements MessageComponentInterface
             ]
         ];
         $context = stream_context_create($opts);
-        if ($Calendar === 'VATICAN') {
+        if ($Calendar === 'VA') {
             $req = "/$Year?year_type=CIVIL";
         } else {
             switch ($category) {
@@ -459,7 +459,7 @@ class Health implements MessageComponentInterface
             ]
         ];
         $context = stream_context_create($opts);
-        if ($Calendar === 'VATICAN') {
+        if ($Calendar === 'VA') {
             $req = "/$Year?year_type=CIVIL";
         } else {
             switch ($category) {

@@ -2,6 +2,31 @@
 
 namespace Johnrdorazio\LitCal\Enum;
 
+/**
+ * Enum class for the different Roman Missals that are used in the LitCal
+ *
+ * @var const string EDITIO_TYPICA_1970 "EDITIO_TYPICA_1970"
+ * @var const string REIMPRESSIO_EMENDATA_1971 "EDITIO_TYPICA_1971"
+ * @var const string EDITIO_TYPICA_SECUNDA_1975 "EDITIO_TYPICA_1975"
+ * @var const string EDITIO_TYPICA_TERTIA_2002 "EDITIO_TYPICA_2002"
+ * @var const string EDITIO_TYPICA_TERTIA_EMENDATA_2008 "EDITIO_TYPICA_2008"
+ * @var const string USA_EDITION_2011 "USA_2011"
+ * @var const string ITALY_EDITION_1983 "ITALY_1983"
+ * @var const string ITALY_EDITION_2020 "ITALY_2020"
+ * @var const string NETHERLANDS_EDITION_1978 "NETHERLANDS_1978"
+ * @var static array $values An array of the Roman Missal values defined in the class constants
+ * @var static array $names An associative array of the Roman Missal names, where the key is the value of a Roman Missal constant
+ * @var static array $jsonFiles An associative array of the JSON file paths, where the key is the value of a Roman Missal constant
+ * @var static array $i18nPath An associative array of the i18n file paths, where the key is the value of a Roman Missal constant
+ * @var static array $yearLimits An associative array of the year limits, where the key is the value of a Roman Missal constant and the value is an associative array with the properties 'since_year' and optionally 'until_year'
+ * @method static bool isValid($value)
+ * @method static bool isLatinMissal($value)
+ * @method static string getName($value)
+ * @method static string getSanctoraleFileName($value)
+ * @method static string getSanctoraleI18nFilePath($value)
+ * @method static object getYearLimits($value)
+ * @method static array produceMetadata()
+ */
 class RomanMissal
 {
     public const EDITIO_TYPICA_1970                    = "EDITIO_TYPICA_1970";
@@ -78,32 +103,69 @@ class RomanMissal
     ];
 
 
-    public static function isValid($value): bool
+    /**
+     * Check if a given value is a valid Roman Missal enumeration constant.
+     *
+     * @param string $value the value to check
+     * @return bool true if the value is a valid Roman Missal enumeration constant, false otherwise
+     */
+    public static function isValid(string $value): bool
     {
         return in_array($value, self::$values);
     }
 
-    public static function isLatinMissal($value): bool
+    /**
+     * Checks if a given value is a Latin Missal (Editio Typica).
+     *
+     * @param string $value the value to check
+     * @return bool true if the value is a Latin Missal, false otherwise
+     */
+    public static function isLatinMissal(string $value): bool
     {
-        return in_array($value, self::$values) && strpos($value, "VATICAN_");
+        return in_array($value, self::$values) && strpos($value, "EDITIO_TYPICA_");
     }
 
-    public static function getName($value): string
+    /**
+     * Gets the name of the Roman Missal corresponding to the given value.
+     *
+     * @param string $value the value of the Roman Missal
+     * @return string the name of the Roman Missal
+     */
+    public static function getName(string $value): string
     {
         return self::$names[ $value ];
     }
 
-    public static function getSanctoraleFileName($value): string|false
+    /**
+     * Gets the path to the JSON file containing the sanctorale data for the given Roman Missal.
+     *
+     * @param string $value the value of the Roman Missal
+     * @return string|false the path to the JSON file, or false if the Roman Missal does not have any JSON data
+     */
+    public static function getSanctoraleFileName(string $value): string|false
     {
         return self::$jsonFiles[ $value ];
     }
 
-    public static function getSanctoraleI18nFilePath($value): string|false
+    /**
+     * Gets the path to the i18n directory for the sanctorale of the given Roman Missal.
+     *
+     * @param string $value the value of the Roman Missal
+     * @return string|false the path to the i18n directory, or false if the Roman Missal does not have any i18n data
+     */
+    public static function getSanctoraleI18nFilePath(string $value): string|false
     {
         return self::$i18nPath[ $value ];
     }
 
-    public static function getYearLimits($value): object
+    /**
+     * Gets the year limits for the given Roman Missal.
+     *
+     * @param string $value the value of the Roman Missal
+     * @return object an object containing the year limits for the Roman Missal,
+     *   with properties named 'minYear' and 'maxYear'
+     */
+    public static function getYearLimits(string $value): object
     {
         return (object) self::$yearLimits[ $value ];
     }
@@ -145,7 +207,7 @@ class RomanMissal
             }
             $region = null;
             if (str_starts_with($missal_id, "EDITIO_TYPICA_")) {
-                $region = "VATICAN";
+                $region = "VA";
             } else {
                 $region = explode("_", $missal_id)[0];
             }
