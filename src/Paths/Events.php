@@ -265,8 +265,8 @@ class Events
 
     private function processPropriumDeTemporeData(): void
     {
-        $DataFile = 'data/propriumdetempore.json';
-        $I18nFile = 'data/propriumdetempore/' . $this->EventsParams->Locale . ".json";
+        $DataFile = 'data/missals/propriumdetempore.json';
+        $I18nFile = 'data/missals/propriumdetempore/' . $this->EventsParams->Locale . ".json";
         if (!file_exists($DataFile) || !file_exists($I18nFile)) {
             echo self::produceErrorResponse(
                 StatusCode::NOT_FOUND,
