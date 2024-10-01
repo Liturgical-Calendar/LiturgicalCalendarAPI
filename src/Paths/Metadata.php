@@ -3,7 +3,6 @@
 namespace Johnrdorazio\LitCal\Paths;
 
 use Johnrdorazio\LitCal\Enum\StatusCode;
-use Johnrdorazio\LitCal\WorldCountries;
 
 class Metadata
 {

@@ -291,31 +291,4 @@ class WorldCountries
     {
         return \Locale::getDisplayRegion('-' . $iso, 'en');
     }
-
-
-    /**
-     * Given a country name in English, returns the ISO 3166-1 ALPHA-2 code for that country.
-     * The country name has to correspond to a country name as produced by the PHP function `Locale::getDisplayRegion()`.
-     * (See comments in `WorldCountries::isoToCountry()` for more information.)
-     *
-     * @param string $country The name of the country, in English.
-     * @return string|null The ISO 3166-1 ALPHA-2 code for the country, or null if the country could not be found.
-     */
-    public static function countryToIso(string $country): ?string
-    {
-        foreach (self::ISO_3166_1_ALPHA_2 as $iso) {
-            $displayRegion = \Locale::getDisplayRegion('-' . $iso, 'en');
-            if (strcasecmp($displayRegion, $country) === 0) {
-                return $iso;
-            }
-            // We are currently making an exception for Vatican and USA. Should we change that?
-            if (strcasecmp('Vatican', $country) === 0) {
-                return 'VA';
-            }
-            if (strcasecmp('USA', $country) === 0) {
-                return 'US';
-            }
-        }
-        return null;
-    }
 }
