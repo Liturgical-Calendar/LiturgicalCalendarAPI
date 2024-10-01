@@ -351,7 +351,7 @@ class Calendar
                 ) {
                     self::produceErrorResponse(StatusCode::BAD_REQUEST, "path parameter expected to represent Year value but did not have type Integer or numeric String");
                 } else {
-                    $DATA["YEAR"] = $requestPathParts[0];
+                    $DATA["year"] = $requestPathParts[0];
                 }
             } elseif ($numPathParts > 3) {
                 $description = "Expected at least one and at most three path parameters, instead found " . $numPathParts;
@@ -363,9 +363,9 @@ class Calendar
                     self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                 } else {
                     if ($requestPathParts[0] === 'nation') {
-                        $DATA['NATIONALCALENDAR'] = $requestPathParts[1];
+                        $DATA['national_calendar'] = $requestPathParts[1];
                     } elseif ($requestPathParts[0] === 'diocese') {
-                        $DATA['DIOCESANCALENDAR'] = $requestPathParts[1];
+                        $DATA['diocesan_calendar'] = $requestPathParts[1];
                     }
                 }
                 if ($numPathParts === 3) {
@@ -382,7 +382,7 @@ class Calendar
                     ) {
                         self::produceErrorResponse(StatusCode::BAD_REQUEST, "path parameter expected to represent Year value but did not have type Integer or numeric String");
                     } else {
-                        $DATA["YEAR"] = $requestPathParts[2];
+                        $DATA["year"] = $requestPathParts[2];
                     }
                 }
             }
