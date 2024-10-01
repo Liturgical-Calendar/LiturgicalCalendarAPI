@@ -197,7 +197,6 @@ class Metadata
         $nationalCalendars = [];
         $nationalCalendars[] = [
             "calendar_id" => "VA",
-            "country_iso" => "VA",
             "missals"     => [
                 "EDITIO_TYPICA_1970",
                 "EDITIO_TYPICA_1971",
@@ -209,7 +208,6 @@ class Metadata
         foreach (Metadata::$nationalCalendars as $key => $calendar) {
             $nationalCalendars[] = [
                 "calendar_id" => $key,
-                "country_iso" => WorldCountries::countryToIso($key),
                 ...Metadata::$nationalCalendarsMetadata[$key]
             ];
         }

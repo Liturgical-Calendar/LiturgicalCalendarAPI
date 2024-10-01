@@ -2127,9 +2127,6 @@
                     "calendar_id": {
                       "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
                     },
-                    "country_iso": {
-                      "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CountryISO"
-                    },
                     "missals": {
                         "type": "array",
                         "items": {

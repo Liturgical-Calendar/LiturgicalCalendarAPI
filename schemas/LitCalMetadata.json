@@ -24,9 +24,6 @@
                             "calendar_id": {
                                 "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
                             },
-                            "country_iso": {
-                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CountryISO"
-                            },
                             "missals": {
                                 "type": "array",
                                 "items": {
@@ -50,7 +47,7 @@
                                 "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CalendarSettings"
                             }
                         },
-                        "required": ["calendar_id", "country_iso", "missals"]
+                        "required": ["calendar_id", "missals"]
                     }
                 },
                 "national_calendars_keys": {
