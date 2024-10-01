@@ -109,7 +109,7 @@ class Health implements MessageComponentInterface
     }
 
     public const DATA_PATH_TO_SCHEMA = [
-        "data/missals/propriumdetempore.json"                                => LitSchema::PROPRIUMDETEMPORE,
+        "data/missals/propriumdetempore/propriumdetempore.json"                                => LitSchema::PROPRIUMDETEMPORE,
         "data/missals/propriumdesanctis_1970/propriumdesanctis_1970.json"    => LitSchema::PROPRIUMDESANCTIS,
         "data/missals/propriumdesanctis_2002/propriumdesanctis_2002.json"    => LitSchema::PROPRIUMDESANCTIS,
         "data/missals/propriumdesanctis_2008/propriumdesanctis_2008.json"    => LitSchema::PROPRIUMDESANCTIS,

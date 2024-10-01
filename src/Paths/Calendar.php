@@ -667,7 +667,7 @@ class Calendar
 
     /**
      * Loads localization data stored in JSON format from a file in the
-     * data/missals/propriumdetempore directory, named according to the locale
+     * data/missals/propriumdetempore/i18n directory, named according to the locale
      * specified in LitLocale::$PRIMARY_LANGUAGE.
      *
      * If the file does not exist, or if there is an error decoding the
@@ -678,7 +678,7 @@ class Calendar
     private function loadPropriumDeTemporeI18nData(): ?array
     {
         $locale = LitLocale::$PRIMARY_LANGUAGE;
-        $propriumDeTemporeI18nFile = "data/missals/propriumdetempore/{$locale}.json";
+        $propriumDeTemporeI18nFile = "data/missals/propriumdetempore/i18n/{$locale}.json";
         if (file_exists($propriumDeTemporeI18nFile)) {
             $rawData = file_get_contents($propriumDeTemporeI18nFile);
             $PropriumDeTemporeI18n = json_decode($rawData, true);
@@ -705,7 +705,7 @@ class Calendar
      */
     private function loadPropriumDeTemporeData(): void
     {
-        $propriumDeTemporeFile = "data/missals/propriumdetempore.json";
+        $propriumDeTemporeFile = "data/missals/propriumdetempore/propriumdetempore.json";
         if (file_exists($propriumDeTemporeFile)) {
             $rawData = file_get_contents($propriumDeTemporeFile);
             $PropriumDeTempore = json_decode($rawData, true);
