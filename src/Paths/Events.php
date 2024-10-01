@@ -42,9 +42,9 @@ class Events
 
     private static function retrieveGeneralIndex(): void
     {
-        $GeneralIndexContents = file_exists("nations/index.json") ? file_get_contents("nations/index.json") : null;
+        $GeneralIndexContents = file_exists("data/nations/index.json") ? file_get_contents("data/nations/index.json") : null;
         if (null === $GeneralIndexContents || false === $GeneralIndexContents) {
-            echo self::produceErrorResponse(StatusCode::NOT_FOUND, "path nations/index.json not found");
+            echo self::produceErrorResponse(StatusCode::NOT_FOUND, "path data/nations/index.json not found");
             die();
         }
         self::$GeneralIndex = json_decode($GeneralIndexContents);
