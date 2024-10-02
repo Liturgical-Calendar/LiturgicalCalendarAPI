@@ -202,7 +202,7 @@ class Events
 
     private function setLocale(): void
     {
-        $this->EventsParams->Locale = $this->EventsParams->Locale !== "LA" && $this->EventsParams->Locale !== "la" ? \Locale::getPrimaryLanguage($this->EventsParams->Locale) : "la";
+        $this->EventsParams->Locale = \Locale::getPrimaryLanguage($this->EventsParams->Locale);
         $localeArray = [
             $this->EventsParams->Locale . '.utf8',
             $this->EventsParams->Locale . '.UTF-8',
@@ -324,8 +324,8 @@ class Events
                 self::$FestivityCollection[ $key ][ "name" ] = $NAME[ $key ];
                 if (array_key_exists("languages", $festivity[ "metadata" ])) {
                     $decreeURL = sprintf($festivity[ "metadata" ][ "url" ], 'LA');
-                    if (array_key_exists(strtoupper($this->EventsParams->Locale), $festivity[ "metadata" ][ "languages" ])) {
-                        $decreeLang = $festivity[ "metadata" ][ "languages" ][ strtoupper($this->EventsParams->Locale) ];
+                    if (array_key_exists($this->EventsParams->Locale, $festivity[ "metadata" ][ "languages" ])) {
+                        $decreeLang = $festivity[ "metadata" ][ "languages" ][ $this->EventsParams->Locale ];
                         $decreeURL = sprintf($festivity[ "metadata" ][ "url" ], $decreeLang);
                     }
                 } else {
