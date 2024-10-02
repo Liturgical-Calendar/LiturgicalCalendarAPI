@@ -950,16 +950,16 @@ class Calendar
                 //$nthStr = $this->CalendarParams->Locale === LitLocale::LATIN
                 // ? LitMessages::LATIN_ORDINAL[ $nth ]
                 // : $this->formatter->format( $nth );
-                $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
-                $dayOfTheWeek = $locale === LitLocale::LATIN
+                $locale = LitLocale::$PRIMARY_LANGUAGE;
+                $dayOfTheWeek = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
                     ? LitMessages::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
-                    : ( $locale === 'IT'
+                    : ( $locale === 'it'
                         ? $this->dayAndMonth->format($dateTime->format('U'))
                         : ucfirst($this->dayOfTheWeek->format($dateTime->format('U')))
                     );
-                $name = $locale === LitLocale::LATIN
+                $name = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
                     ? sprintf("%s temporis Nativitatis", $dayOfTheWeek)
-                    : ( $locale === 'IT'
+                    : ( $locale === 'it'
                         ? sprintf("Feria propria del %s", $dayOfTheWeek)
                         : sprintf(
                             /**translators: days before Epiphany when Epiphany falls on Jan 6 (not useful in Italian!) */
@@ -999,19 +999,19 @@ class Calendar
                     $i . '-1-' . $this->CalendarParams->Year,
                     new \DateTimeZone('UTC')
                 );
-                $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
-                $dayOfTheWeek = $locale === LitLocale::LATIN
+                $locale = LitLocale::$PRIMARY_LANGUAGE;
+                $dayOfTheWeek = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
                     ? LitMessages::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
-                    : ( $locale === 'IT'
+                    : ( $locale === 'it'
                         ? $this->dayAndMonth->format($dateTime->format('U'))
                         : ucfirst($this->dayOfTheWeek->format($dateTime->format('U')))
                     );
                 //$name = $locale === LitLocale::LATIN
                 // ? sprintf( "Dies %s post Epiphaniam", $nthStr )
                 // : sprintf( _( "%s day after Epiphany" ), ucfirst( $nthStr ) );
-                $name = $locale === LitLocale::LATIN
+                $name = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
                     ? sprintf("%s temporis Nativitatis", $dayOfTheWeek)
-                    : ( $locale === 'IT'
+                    : ( $locale === 'it'
                         ? sprintf("Feria propria del %s", $dayOfTheWeek)
                         : sprintf(
                             /**translators: days after Epiphany when Epiphany falls on Jan 6 (not useful in Italian!) */
@@ -1096,17 +1096,17 @@ class Calendar
                     $i . '-1-' . $this->CalendarParams->Year,
                     new \DateTimeZone('UTC')
                 );
-                $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
-                $dayOfTheWeek = $locale === LitLocale::LATIN
+                $locale = LitLocale::$PRIMARY_LANGUAGE;
+                $dayOfTheWeek = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
                     ? LitMessages::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
-                    : ( $locale === 'IT'
+                    : ( $locale === 'it'
                         ? $this->dayAndMonth->format($dateTime->format('U'))
                         : ucfirst($this->dayOfTheWeek->format($dateTime->format('U')))
                     );
                 //$name = $locale === LitLocale::LATIN
                 // ? sprintf( "Dies %s ante Epiphaniam", $nthStr )
                 // : sprintf( _( "%s day before Epiphany" ), ucfirst( $nthStr ) );
-                $name = $locale === LitLocale::LATIN
+                $name = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
                     ? sprintf("%s temporis Nativitatis", $dayOfTheWeek)
                     : ( $locale === 'IT'
                         ? sprintf("Feria propria del %s", $dayOfTheWeek)
@@ -1136,19 +1136,19 @@ class Calendar
                 $i . '-1-' . $this->CalendarParams->Year,
                 new \DateTimeZone('UTC')
             );
-            $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
-            $dayOfTheWeek = $locale === LitLocale::LATIN
+            $locale = LitLocale::$PRIMARY_LANGUAGE;
+            $dayOfTheWeek = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
                 ? LitMessages::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
-                : ( $locale === 'IT'
+                : ( $locale === 'it'
                     ? $this->dayAndMonth->format($dateTime->format('U'))
                     : ucfirst($this->dayOfTheWeek->format($dateTime->format('U')))
                 );
             //$name = $locale === LitLocale::LATIN
             // ? sprintf( "Dies %s post Epiphaniam", $nthStr )
             // : sprintf( _( "%s day after Epiphany" ), ucfirst( $nthStr ) );
-            $name = $locale === LitLocale::LATIN
+            $name = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
                 ? sprintf("%s temporis Nativitatis", $dayOfTheWeek)
-                : ( $locale === 'IT'
+                : ( $locale === 'it'
                     ? sprintf("Feria propria del %s", $dayOfTheWeek)
                     : sprintf(
                         /**translators: days after Epiphany when Epiphany is on a Sunday (not useful in Italian!) */
@@ -1449,7 +1449,7 @@ class Calendar
                     //Notitiæ vol. 42 [ 2006 ] num. 3/4, 475-476, p. 96
                     //http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html
                     //https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-42-(2006)/Notitiae-475-476-2006.pdf
-                    $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
+                    $locale = LitLocale::$PRIMARY_LANGUAGE;
                 if (
                     $row->event_key === "StJoseph"
                     && $currentFeastDate >= $this->Cal->getFestivity("PalmSun")->date
@@ -1463,9 +1463,11 @@ class Calendar
                         $this->Cal->solemnityFromDate($currentFeastDate)->name,
                         $this->CalendarParams->Year,
                         _("the Saturday preceding Palm Sunday"),
-                        $locale === LitLocale::LATIN ? ( $tempFestivity->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$tempFestivity->date->format('n') ] ) :
-                            ( $locale === 'EN' ? $tempFestivity->date->format('F jS') :
-                                $this->dayAndMonth->format($tempFestivity->date->format('U'))
+                        $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                            ? ( $tempFestivity->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$tempFestivity->date->format('n') ] )
+                            : ( $locale === 'en'
+                                ? $tempFestivity->date->format('F jS')
+                                : $this->dayAndMonth->format($tempFestivity->date->format('U'))
                             ),
                         '<a href="https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-42-(2006)/Notitiae-475-476-2006.pdf">'
                             . _('Decree of the Congregation for Divine Worship')
@@ -1481,9 +1483,9 @@ class Calendar
                         $this->Cal->solemnityFromDate($currentFeastDate)->name,
                         $this->CalendarParams->Year,
                         _('the Monday following the Second Sunday of Easter'),
-                        $locale === LitLocale::LATIN
+                        $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
                             ? ( $tempFestivity->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$tempFestivity->date->format('n') ] )
-                            : ( $locale === 'EN'
+                            : ( $locale === 'en'
                                 ? $tempFestivity->date->format('F jS')
                                 : $this->dayAndMonth->format($tempFestivity->date->format('U'))
                             ),
@@ -1521,9 +1523,9 @@ class Calendar
                         $this->Cal->solemnityFromDate($currentFeastDate)->name,
                         $this->CalendarParams->Year,
                         _("the following Monday"),
-                        $locale === LitLocale::LATIN
+                        $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
                             ? ( $tempFestivity->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$tempFestivity->date->format('n') ] )
-                            : ( $locale === 'EN'
+                            : ( $locale === 'en'
                                     ? $tempFestivity->date->format('F jS')
                                     : $this->dayAndMonth->format($tempFestivity->date->format('U'))
                         ),
@@ -1659,7 +1661,7 @@ class Calendar
         }
 
         //Holy Family is celebrated the Sunday after Christmas, unless Christmas falls on a Sunday, in which case it is celebrated Dec. 30
-        $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
+        $locale = LitLocale::$PRIMARY_LANGUAGE;
         if (self::dateIsSunday($this->Cal->getFestivity("Christmas")->date)) {
             $this->PropriumDeTempore[ "HolyFamily" ][ "date" ] = DateTime::createFromFormat(
                 '!j-n-Y',
@@ -1673,9 +1675,11 @@ class Calendar
                 $this->Cal->getFestivity("Christmas")->name,
                 $this->CalendarParams->Year,
                 $HolyFamily->name,
-                $locale === LitLocale::LATIN ? ( $HolyFamily->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$HolyFamily->date->format('n') ] ) :
-                    ( $locale === 'EN' ? $HolyFamily->date->format('F jS') :
-                        $this->dayAndMonth->format($HolyFamily->date->format('U'))
+                $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                    ? ( $HolyFamily->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$HolyFamily->date->format('n') ] )
+                    : ( $locale === 'en'
+                        ? $HolyFamily->date->format('F jS')
+                        : $this->dayAndMonth->format($HolyFamily->date->format('U'))
                     )
             );
         } else {
@@ -1694,10 +1698,11 @@ class Calendar
         if ($this->CalendarParams->Year >= 2012 && true === $this->CalendarParams->EternalHighPriest) {
             $EternalHighPriestDate = clone( $this->Cal->getFestivity("Pentecost")->date );
             $EternalHighPriestDate->modify('next Thursday');
-            $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
-            $EternalHighPriestName = $locale === LitLocale::LATIN ? 'Domini Nostri Iesu Christi Summi et Aeterni Sacerdotis' :
+            $locale = LitLocale::$PRIMARY_LANGUAGE;
+            $EternalHighPriestName = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                ? 'Domini Nostri Iesu Christi Summi et Aeterni Sacerdotis'
                 /**translators: You can ignore this translation if the Feast has not been inserted by the Episcopal Conference */
-                _('Our Lord Jesus Christ, The Eternal High Priest');
+                : _('Our Lord Jesus Christ, The Eternal High Priest');
             $festivity = new Festivity($EternalHighPriestName, $EternalHighPriestDate, LitColor::WHITE, LitFeastType::FIXED, LitGrade::FEAST_LORD, LitCommon::PROPRIO);
             $this->Cal->addFestivity('JesusChristEternalHighPriest', $festivity);
             $this->Messages[] = sprintf(
@@ -1978,7 +1983,7 @@ class Calendar
      */
     private function addMissalMemorialMessage(object $row)
     {
-        $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
+        $locale = LitLocale::$PRIMARY_LANGUAGE;
         /**translators:
          * 1. Grade or rank of the festivity
          * 2. Name of the festivity
@@ -1992,9 +1997,11 @@ class Calendar
             $message,
             $this->LitGrade->i18n($row->grade, false),
             $row->name,
-            $locale === LitLocale::LATIN ? ( $row->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->date->format('n') ] ) :
-                ( $locale === 'EN' ? $row->date->format('F jS') :
-                    $this->dayAndMonth->format($row->date->format('U'))
+            $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                ? ( $row->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->date->format('n') ] )
+                : ( $locale === 'en'
+                    ? $row->date->format('F jS')
+                    : $this->dayAndMonth->format($row->date->format('U'))
                 ),
             $row->year_since,
             $row->decree,
@@ -2168,7 +2175,7 @@ class Calendar
          * 8. Name of the festivity that is superseding
          * 9. Requested calendar year
          */
-        $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
+        $locale = LitLocale::$PRIMARY_LANGUAGE;
         $message = _('The %1$s \'%2$s\', added in the %3$s of the Roman Missal since the year %4$d (%5$s) and usually celebrated on %6$s, is suppressed by the %7$s \'%8$s\' in the year %9$d.');
         $this->Messages[] = sprintf(
             $message,
@@ -2177,9 +2184,11 @@ class Calendar
             RomanMissal::getName($missal),
             $YEAR,
             $DECREE,
-            $locale === LitLocale::LATIN ? ( $row->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[  (int)$row->date->format('n') ] ) :
-                ( $locale === 'EN' ? $row->date->format('F jS') :
-                    $this->dayAndMonth->format($row->date->format('U'))
+            $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                ? ( $row->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[  (int)$row->date->format('n') ] )
+                : ( $locale === 'en'
+                    ? $row->date->format('F jS')
+                    : $this->dayAndMonth->format($row->date->format('U'))
                 ),
             $coincidingFestivity->grade,
             $coincidingFestivity->event->name,
@@ -2205,7 +2214,7 @@ class Calendar
         }
         $decree = '<a href="' . $url . '">' . _("Decree of the Congregation for Divine Worship") . '</a>';
         $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast($row->festivity->date, $this->CalendarParams);
-        $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
+        $locale = LitLocale::$PRIMARY_LANGUAGE;
         $this->Messages[] = sprintf(
             /**translators:
              * 1. Grade or rank of the festivity
@@ -2220,9 +2229,11 @@ class Calendar
             _('The %1$s \'%2$s\', added on %3$s since the year %4$d (%5$s), is however superseded by a %6$s \'%7$s\' in the year %8$d.'),
             $this->LitGrade->i18n($row->festivity->grade),
             $row->festivity->name,
-            $locale === LitLocale::LATIN ? ( $row->festivity->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->festivity->date->format('n') ] ) :
-                ( $locale === 'EN' ? $row->festivity->date->format('F jS') :
-                    $this->dayAndMonth->format($row->festivity->date->format('U'))
+            $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                ? ( $row->festivity->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->festivity->date->format('n') ] )
+                : ( $locale === 'en'
+                    ? $row->festivity->date->format('F jS')
+                    : $this->dayAndMonth->format($row->festivity->date->format('U'))
                 ),
             $row->metadata->since_year,
             $decree,
@@ -2390,7 +2401,7 @@ class Calendar
             new \DateTimeZone('UTC')
         );
         $decree = $this->elaborateDecreeSource($row);
-        $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
+        $locale = LitLocale::$PRIMARY_LANGUAGE;
         if ($row->festivity->grade === LitGrade::MEMORIAL_OPT) {
             if ($this->Cal->notInSolemnitiesFeastsOrMemorials($row->festivity->date)) {
                 $festivity = new Festivity(
@@ -2414,9 +2425,9 @@ class Calendar
                     _('The %1$s \'%2$s\' has been added on %3$s since the year %4$d (%5$s), applicable to the year %6$d.'),
                     $this->LitGrade->i18n($row->festivity->grade, false),
                     $row->festivity->name,
-                    $locale === LitLocale::LATIN
+                    $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
                         ? ( $row->festivity->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->festivity->date->format('n') ] )
-                        : ( $locale === 'EN' ? $row->festivity->date->format('F jS') :
+                        : ( $locale === 'en' ? $row->festivity->date->format('F jS') :
                             $this->dayAndMonth->format($row->festivity->date->format('U'))
                         ),
                     $row->metadata->since_year,
@@ -3357,10 +3368,10 @@ class Calendar
                 $infoSource = RomanMissal::getName($row->metadata->missal);
             }
 
-            $locale = strtoupper(LitLocale::$PRIMARY_LANGUAGE);
-            $formattedDateStr = $this->CalendarParams->Locale === LitLocale::LATIN
+            $locale = LitLocale::$PRIMARY_LANGUAGE;
+            $formattedDateStr = $this->CalendarParams->Locale === LitLocale::LATIN_PRIMARY_LANGUAGE
                 ? ( $row->festivity->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->festivity->date->format('n') ] )
-                : ( $locale === 'EN'
+                : ( $locale === 'en'
                     ? $row->festivity->date->format('F jS')
                     : $this->dayAndMonth->format($row->festivity->date->format('U'))
                 );
@@ -4352,9 +4363,7 @@ class Calendar
      */
     private function prepareL10N(): string|false
     {
-        $baseLocale = $this->CalendarParams->Locale !== LitLocale::LATIN
-            ? strtolower(\Locale::getPrimaryLanguage($this->CalendarParams->Locale))
-            : strtolower(LitLocale::LATIN);
+        $baseLocale = \Locale::getPrimaryLanguage($this->CalendarParams->Locale);
         LitLocale::$PRIMARY_LANGUAGE = $baseLocale;
         $localeArray = [
             $this->CalendarParams->Locale . '.utf8',

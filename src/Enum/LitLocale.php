@@ -5,6 +5,7 @@ namespace Johnrdorazio\LitCal\Enum;
 class LitLocale
 {
     public const LATIN                        = "la_VA";
+    public const LATIN_PRIMARY_LANGUAGE       = "la";
     public static array $values               = [ "la", "la_VA" ];
     public static string $PRIMARY_LANGUAGE    = "la";
     public static ?array $AllAvailableLocales = null;
