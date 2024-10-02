@@ -37,19 +37,6 @@ use Johnrdorazio\LitCal\Paths\Calendar;
  * @property const int YEAR_LOWER_LIMIT
  * @property const int YEAR_UPPER_LIMIT
  *
- * @method static string validateStringValue(string $key, mixed $value)
- * @method void __construct(array $DATA)
- * @method void setData(array $DATA)
- * @method void validateYearParam(int|string $value)
- * @method void validateEpiphanyParam(string $value)
- * @method void validateAscensionParam(string $value)
- * @method void validateCorpusChristiParam(string $value)
- * @method void validateLocaleParam(string $value)
- * @method void validateReturnTypeParam(string $value)
- * @method void validateNationalCalendarParam(string $value)
- * @method void validateDiocesanCalendarParam(string $value)
- * @method void validateYearTypeParam(string $value)
- * @method void validateEternalHighPriestParam(bool $value)
  */
 class CalendarParams
 {
@@ -301,13 +288,11 @@ class CalendarParams
      */
     private function validateLocaleParam(string $value)
     {
-        if ($value !== 'LA' && $value !== 'la') {
-            $value = \Locale::canonicalize($value);
-        }
+        $value = \Locale::canonicalize($value);
         if (LitLocale::isValid($value)) {
             $this->Locale = $value;
         } else {
-            $description = "Invalid value `{$value}` for parameter `locale`, valid values are: LA, " . implode(', ', LitLocale::$AllAvailableLocales);
+            $description = "Invalid value `{$value}` for parameter `locale`, valid values are: la, la_VA, " . implode(', ', LitLocale::$AllAvailableLocales);
             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
         }
     }

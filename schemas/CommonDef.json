@@ -340,7 +340,7 @@
         "Locale": {
             "type": "string",
             "description": "must have a value corresponding to a locale enabled on the LitCal server",
-            "default": "LA",
+            "default": "la_VA",
             "enum": [
                 "af_NA","af_ZA","agq_CM","ak_GH","am_ET",
                 "ar_001","ar_AE","ar_BH","ar_DJ","ar_DZ","ar_EG","ar_EH",
@@ -479,7 +479,7 @@
                 "sq",   "sr",  "sv",    "sw",   "ta",   "te",   "teo",   "tg",  "th",   "ti",
                 "tk",   "to",  "tr",    "tt",   "twq",  "tzm",  "ug",    "uk",  "ur",   "uz",
                 "vai",  "vi",  "vun",   "wae",  "wo",   "xh",   "xog",   "yav", "yi",   "yo",
-                "yue",  "zgh", "zh",    "zu",   "LA",   "la"
+                "yue",  "zgh", "zh",    "zu",   "LA",   "la",   "la_VA"
             ]
         },
         "AcceptLanguage": {

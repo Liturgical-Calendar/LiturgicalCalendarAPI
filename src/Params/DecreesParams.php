@@ -19,16 +19,13 @@ class DecreesParams
     {
         if (count($DATA)) {
             foreach ($DATA as $key => $value) {
-                $key = strtoupper($key);
                 switch ($key) {
-                    case 'LOCALE':
-                        if ($value !== 'la' && $value !== 'LA') {
-                            $value = \Locale::canonicalize($value);
-                        }
+                    case 'locale':
+                        $value = \Locale::canonicalize($value);
                         if (LitLocale::isValid($value)) {
                             $this->Locale = $value;
                         } else {
-                            $error = "Invalid value `$value` for param `locale`, valid values are: "
+                            $error = "Invalid value `$value` for param `locale`, valid values are: la, la_VA, "
                                 . implode(', ', LitLocale::$AllAvailableLocales);
                             Decrees::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
                         }

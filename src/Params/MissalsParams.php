@@ -32,19 +32,14 @@ class MissalsParams
     {
         if (count($DATA)) {
             foreach ($DATA as $key => $value) {
-                $key = strtoupper($key);
                 switch ($key) {
-                    case 'LOCALE':
-                        if ($value !== 'la' && $value !== 'LA') {
-                            $value = \Locale::canonicalize($value);
-                        } else {
-                            $value = strtoupper($value);
-                        }
+                    case 'locale':
+                        $value = \Locale::canonicalize($value);
                         if (LitLocale::isValid($value)) {
                             $this->Locale = $value;
                             $this->baseLocale = \Locale::getPrimaryLanguage($value);
                         } else {
-                            $error = "Locale `$value` set in param `locale` is not supported by this server, supported locales are: "
+                            $error = "Locale `$value` set in param `locale` is not supported by this server, supported locales are: la, la_VA, "
                                 . implode(', ', LitLocale::$AllAvailableLocales);
                             //$this->setLastError(StatusCode::BAD_REQUEST, $error);
                             Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
@@ -56,7 +51,7 @@ class MissalsParams
                             Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                         }
                         break;
-                    case 'YEAR':
+                    case 'year':
                         if (gettype($value) === 'string') {
                             $value = intval($value);
                         }
@@ -69,7 +64,7 @@ class MissalsParams
                             Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                         }
                         break;
-                    case 'REGION':
+                    case 'region':
                         if (in_array($value, self::$MissalRegions)) {
                             $this->Region = $value;
                         } else {

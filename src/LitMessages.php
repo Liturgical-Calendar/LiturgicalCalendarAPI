@@ -195,12 +195,12 @@ class LitMessages
     public static function getOrdinal(int $num, string $LOCALE, \NumberFormatter $formatter, array $latinOrdinals): string
     {
         $ordinal = "";
-        $baseLocale = $LOCALE !== "LA" && $LOCALE !== "la" ? \Locale::getPrimaryLanguage($LOCALE) : "LA";
-        switch (strtoupper($baseLocale)) {
-            case LitLocale::LATIN:
+        $baseLocale = \Locale::getPrimaryLanguage($LOCALE);
+        switch ($baseLocale) {
+            case "la":
                 $ordinal = $latinOrdinals[$num];
                 break;
-            case "EN":
+            case "en":
                 $ordinal = $num . self::ordSuffix($num);
                 break;
             default:
