@@ -107,13 +107,13 @@ class RegionalData
                 $response = json_decode(file_get_contents($calendarDataFile));
                 $uKey = strtoupper($this->params->key);
                 if ($this->params->category === "WIDERREGIONCALENDAR") {
-                    $isMultilingual = is_dir("data/nations/{$uKey}");
+                    $isMultilingual = is_dir("data/wider_regions/{$uKey}");
                     if ($isMultilingual) {
                         if (false === in_array($this->params->locale, $response->metadata->languages)) {
                             self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value `{$this->params->locale}` for param `locale`. Valid values for current requested Wider region calendar data `{$this->params->key}` are: " . implode(', ', $response->metadata->languages));
                         }
-                        if (file_exists("data/nations/{$uKey}/{$this->params->locale}.json")) {
-                            $localeData = json_decode(file_get_contents("data/nations/{$uKey}/{$this->params->locale}.json"));
+                        if (file_exists("data/wider_regions/{$uKey}/{$this->params->locale}.json")) {
+                            $localeData = json_decode(file_get_contents("data/wider_regions/{$uKey}/{$this->params->locale}.json"));
                             foreach ($response->litcal as $idx => $el) {
                                 $response->litcal[$idx]->festivity->name = $localeData->{$response->litcal[$idx]->festivity->event_key};
                             }
