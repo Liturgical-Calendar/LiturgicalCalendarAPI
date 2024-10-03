@@ -339,14 +339,16 @@ class RegionalData
                 break;
         }
         if (file_exists($calendarDataFile)) {
-            unlink($calendarDataFile);
+            if (false === unlink($calendarDataFile)) {
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully.");
+            };
             if ($this->params->category === 'DIOCESANCALENDAR') {
                 $this->createOrUpdateIndex(null, true);
             }
         } else {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "The resource '{$this->params->key}' requested for deletion was not found on this server");
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "The resource '{$this->params->key}' requested for deletion was not found on this server.");
         }
-        $response->success = "Calendar data \"{$this->params->key}\" deleted successfully";
+        $response->success = "Calendar data \"{$this->params->key}\" deleted successfully.";
         self::produceResponse(json_encode($response));
     }
 
@@ -384,8 +386,8 @@ class RegionalData
             if (!property_exists($this->diocesanCalendarsIndex, $key)) {
                 $this->diocesanCalendarsIndex->$key = new \stdClass();
             }
-            $this->diocesanCalendarsIndex->$key->path = $data->path . "/{$data->diocese}.json";
-            $this->diocesanCalendarsIndex->$key->nation = $data->nation;
+            $this->diocesanCalendarsIndex->$key->path    = $data->path . "/{$data->diocese}.json";
+            $this->diocesanCalendarsIndex->$key->nation  = $data->nation;
             $this->diocesanCalendarsIndex->$key->diocese = $data->diocese;
             if (property_exists($data, 'group')) {
                 $this->diocesanCalendarsIndex->$key->group = $data->group;
