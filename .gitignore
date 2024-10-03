@@ -6,3 +6,5 @@ vendor/*
 debug.log
 ValidateTestsAgainstSchema.php
 .envrc
+debuginfo.php
+testYaml.php
