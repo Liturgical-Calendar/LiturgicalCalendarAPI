@@ -339,6 +339,9 @@ class RegionalData
                 break;
         }
         if (file_exists($calendarDataFile)) {
+            if (false === is_writable($calendarDataFile)) {
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, check file and folder permissions.");
+            }
             if (false === unlink($calendarDataFile)) {
                 self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully.");
             };
