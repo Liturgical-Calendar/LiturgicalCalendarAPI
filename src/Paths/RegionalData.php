@@ -2,6 +2,7 @@
 
 namespace Johnrdorazio\LitCal\Paths;
 
+use GuzzleHttp\Psr7\Request;
 use Swaggest\JsonSchema\Schema;
 use Swaggest\JsonSchema\InvalidValue;
 use Johnrdorazio\LitCal\APICore;
@@ -596,17 +597,17 @@ class RegionalData
     private function handleRequestParams(array $requestPathParts = []): void
     {
         $data = null;
-        if (count($requestPathParts) && self::$APICore->getRequestMethod() !== RequestMethod::PUT) {
-            RegionalData::validateRequestPath($requestPathParts);
-            $data = RegionalData::setDataFromPath($requestPathParts);
-        } elseif (self::$APICore->getRequestContentType() === RequestContentType::JSON) {
-            $data = self::$APICore->retrieveRequestParamsFromJsonBody();
-        } elseif (self::$APICore->getRequestContentType() === RequestContentType::YAML) {
-            $data = self::$APICore->retrieveRequestParamsFromYamlBody();
-        } else {
-            $data = (object)$_REQUEST;
-        }
         if (self::$APICore->getRequestMethod() === RequestMethod::PUT) {
+            switch (self::$APICore->getRequestContentType()) {
+                case RequestContentType::JSON:
+                    $data = self::$APICore->retrieveRequestParamsFromJsonBody();
+                    break;
+                case RequestContentType::YAML:
+                    $data = self::$APICore->retrieveRequestParamsFromYamlBody();
+                    break;
+                default:
+                    $data = (object)$_REQUEST;
+            }
             if (null === $data || !property_exists($data, 'payload')) {
                 self::produceErrorResponse(StatusCode::BAD_REQUEST, "No payload received. Must receive payload in body of request, in JSON or YAML format, with properties `key` and `caldata`");
             }
@@ -626,6 +627,27 @@ class RegionalData
                 default:
                     self::produceErrorResponse(StatusCode::BAD_REQUEST, "Unexpected path param {$requestPathParts[0]}, acceptable values are: nation, diocese, widerregion");
             }
+        } elseif (count($requestPathParts)) {
+            RegionalData::validateRequestPath($requestPathParts);
+            $data = RegionalData::setDataFromPath($requestPathParts);
+        }
+
+        if (self::$APICore->getRequestMethod() === RequestMethod::PATCH) {
+            $bodyData = null;
+            switch (self::$APICore->getRequestContentType()) {
+                case RequestContentType::JSON:
+                    $bodyData = self::$APICore->retrieveRequestParamsFromJsonBody();
+                    break;
+                case RequestContentType::YAML:
+                    $bodyData = self::$APICore->retrieveRequestParamsFromYamlBody();
+                    break;
+                default:
+                    $bodyData = (object)$_REQUEST;
+            }
+            if (null === $bodyData || !property_exists($bodyData, 'payload')) {
+                self::produceErrorResponse(StatusCode::BAD_REQUEST, "No payload received. Must receive payload in body of request, in JSON or YAML format, with properties `key` and `caldata`");
+            }
+            $data->payload = $bodyData->payload;
         }
 
         if (false === $this->params->setData($data)) {
