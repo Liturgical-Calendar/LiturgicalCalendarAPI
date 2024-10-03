@@ -183,13 +183,23 @@ class RegionalDataParams
                 }
                 break;
             case 'DIOCESANCALENDAR':
-                if (
-                    false === property_exists($payload, 'litcal')
-                    || false === property_exists($payload, 'diocese')
-                    || false === property_exists($payload, 'nation')
-                ) {
-                    $message = "Cannot create or update Diocesan calendar data when the payload does not have required properties `litcal`, `diocese` or `nation`. Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
-                    RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+                switch (RegionalData::$APICore->getRequestMethod()) {
+                    case 'PUT':
+                        if (
+                            false === property_exists($payload, 'litcal')
+                            || false === property_exists($payload, 'diocese')
+                            || false === property_exists($payload, 'nation')
+                        ) {
+                            $message = "Cannot create Diocesan calendar data when the payload does not have required properties `litcal`, `diocese` or `nation`. Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
+                            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+                        }
+                        break;
+                    case 'PATCH':
+                        if (false === property_exists($payload, 'litcal')) {
+                            $message = "Cannot update Diocesan calendar data when the payload does not have required property `litcal`. Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
+                            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+                        }
+                        break;
                 }
                 break;
             case 'WIDERREGIONCALENDAR':

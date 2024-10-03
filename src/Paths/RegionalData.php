@@ -53,14 +53,16 @@ class RegionalData
         switch (self::$APICore->getRequestMethod()) {
             case RequestMethod::GET:
             case RequestMethod::POST:
-                $this->handleGetPostRequests();
+                $this->getRegionalCalendar();
                 break;
             case RequestMethod::PUT:
-                $this->handlePutRequests(RequestMethod::PUT);
+                $this->createRegionalCalendar();
                 break;
             case RequestMethod::PATCH:
+                $this->updateRegionalCalendar();
+                break;
             case RequestMethod::DELETE:
-                $this->handlePatchDeleteRequests(RequestMethod::DELETE);
+                $this->deleteRegionalCalendar();
                 break;
             default:
                 self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, "The method " . $_SERVER['REQUEST_METHOD'] . " cannot be handled by this endpoint");
@@ -69,6 +71,8 @@ class RegionalData
 
     /**
      * Handle GET and POST requests to retrieve a Regional Calendar data resource.
+     *
+     * This is a private method and should only be called from {@see handleRequestMethod}.
      *
      * The `category` parameter is required and must be one of the following values:
      * - DIOCESANCALENDAR
@@ -84,7 +88,7 @@ class RegionalData
      * If the resource does not exist, a 404 error will be returned.
      * If the `category` or `locale` parameters are invalid, a 400 error will be returned.
      */
-    private function handleGetPostRequests(): void
+    private function getRegionalCalendar(): void
     {
         switch ($this->params->category) {
             case "DIOCESANCALENDAR":
@@ -128,32 +132,67 @@ class RegionalData
     }
 
     /**
-     * Handle PATCH and DELETE requests.
+     * Handle PUT requests to create or update a regional calendar data resource.
      *
-     * It is private as it is called from {@see handleRequestMethod}.
+     * This is a private method and should only be called from {@see handleRequestMethod}.
      *
-     * @param string $requestMethod the HTTP request method
+     * The resource is created or updated in the `data/` directory.
+     *
+     * If the payload is valid according to the associated schema, the response will be a JSON object
+     * containing a success message.
+     *
+     * If the payload is invalid, the response will be a JSON error response with a 422 status code.
      */
-    private function handlePatchDeleteRequests(string $requestMethod)
+    private function createRegionalCalendar(): void
     {
-        //self::$APICore->enforceAjaxRequest();
-        //self::$APICore->enforceReferer();
-        if (RequestMethod::PATCH === $requestMethod) {
-            $this->writeRegionalCalendar();
-        } elseif (RequestMethod::DELETE === $requestMethod) {
-            $this->deleteRegionalCalendar();
-        }
-    }
+        $response = new \stdClass();
+        $updateData = new \stdClass();
+        switch ($this->params->category) {
+            case 'DIOCESANCALENDAR':
+                $nationType = gettype($this->params->payload->nation);
+                $dioceseType = gettype($this->params->payload->diocese);
+                if ($nationType !== 'string' || $dioceseType !== 'string') {
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Params `nation` and `key` in payload are expected to be of type string, instead `nation` was of type `{$nationType}` and `key` was of type `{$dioceseType}`");
+                }
+                $updateData->nation = strip_tags($this->params->payload->nation);
+                $updateData->diocese = strip_tags($this->params->payload->diocese);
+                if (false === $this->params->payload instanceof \stdClass) {
+                    $calType = gettype($this->params->payload);
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "`caldata` param in payload expected to be serialized object, instead it was of type `{$calType}` after unserialization");
+                }
+                if (property_exists($this->params->payload, 'group')) {
+                    $groupType = gettype($this->params->payload->group);
+                    if ($groupType !== 'string') {
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Param `group` in payload is expected to be of type `string`, instead it was of type `{$groupType}`");
+                    }
+                    $updateData->group = strip_tags($this->params->payload->group);
+                }
+                $updateData->path = "data/nations/{$updateData->nation}";
+                if (!file_exists($updateData->path)) {
+                    mkdir($updateData->path, 0755, true);
+                }
 
-    private function handlePutRequests(): void
-    {
-        // TODO
+                $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
+                if ($test === true) {
+                    $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                    file_put_contents(
+                        $updateData->path . "/{$updateData->diocese}.json",
+                        $calendarData . PHP_EOL
+                    );
+                    $this->createOrUpdateIndex($updateData, false);
+                    $response->success = "Calendar data created or updated for Diocese \"{$updateData->diocese}\" (Nation: \"$updateData->nation\")";
+                    self::produceResponse(json_encode($response));
+                } else {
+                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+                }
+                break;
+        }
     }
 
     /**
      * Handle PATCH requests to create or update a national calendar data resource.
      *
-     * It is private as it is called from {@see writeRegionalCalendar}.
+     * It is private as it is called from {@see updateRegionalCalendar}.
      *
      * The resource is created or updated in the `data/nations/` directory.
      *
@@ -162,7 +201,7 @@ class RegionalData
      *
      * If the payload is invalid, the response will be a JSON error response with a 422 status code.
      */
-    private function handleNationalCalendarWrite()
+    private function handleNationalCalendarUpdate()
     {
         $response = new \stdClass();
         $region = $this->params->payload->metadata->region;
@@ -185,7 +224,7 @@ class RegionalData
     /**
      * Handle PATCH requests to create or update a wider region calendar data resource.
      *
-     * It is private as it is called from {@see writeRegionalCalendar}.
+     * It is private as it is called from {@see updateRegionalCalendar}.
      *
      * The resource is created or updated in the `data/wider_regions/` directory.
      *
@@ -194,7 +233,7 @@ class RegionalData
      *
      * If the payload is invalid, the response will be a JSON error response with a 422 status code.
      */
-    private function handleWiderRegionCalendarWrite()
+    private function handleWiderRegionCalendarUpdate()
     {
         $response = new \stdClass();
         $this->params->payload->metadata->wider_region = ucfirst(strtolower($this->params->payload->metadata->wider_region));
@@ -234,62 +273,74 @@ class RegionalData
     /**
      * Handle PATCH requests to create or update a diocesan calendar data resource.
      *
-     * It is private as it is called from {@see writeRegionalCalendar}.
+     * It is private as it is called from {@see updateRegionalCalendar}.
      *
      * The resource is created or updated in the `data/nations/` directory.
      *
      * If the payload is valid according to {@see LitSchema::DIOCESAN}, the response will be a JSON object
      * containing a success message.
      *
-     * If the payload is invalid, the response will be a JSON error response with a 422 status code.
+     * If the resource to update is not found in the diocesan calendars index or in the `data/nations/{nation}/` directory, the response will be a JSON error response with a status code of 404 Not Found.
+     * If the payload is not an object, the response will be a JSON error response with a status code of 400 Bad Request.
+     * If the resource to update is not writable or the write was not successful, the response will be a JSON error response with a status code of 503 Service Unavailable.
+     * If the payload is not valid according to {@see LitSchema::DIOCESAN}, the response will be a JSON error response with a status code of 422 Unprocessable Content.
+     *
      */
-    private function handleDiocesanCalendarWrite()
+    private function handleDiocesanCalendarUpdate()
     {
-        $response = new \stdClass();
-        $updateData = new \stdClass();
-        $nationType = gettype($this->params->payload->nation);
-        $dioceseType = gettype($this->params->payload->diocese);
-        if ($nationType !== 'string' || $dioceseType !== 'string') {
-            self::produceErrorResponse(StatusCode::BAD_REQUEST, "Params `nation` and `diocese` in payload are expected to be of type string, instead `nation` was of type `{$nationType}` and `diocese` was of type `{$dioceseType}`");
+        if (
+            false === property_exists($this->diocesanCalendarsIndex, $this->params->key)
+            ||
+            false === property_exists($this->diocesanCalendarsIndex->{$this->params->key}, 'path')
+        ) {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendar resource {$this->params->key}, not found in diocesan calendars index `data/nations/index.json`.");
         }
-        $updateData->nation = strip_tags($this->params->payload->nation);
-        $updateData->diocese = strip_tags($this->params->payload->diocese);
-        $CalData = $this->params->payload->caldata;
-        if (false === $CalData instanceof \stdClass) {
-            $calType = gettype($CalData);
-            self::produceErrorResponse(StatusCode::BAD_REQUEST, "`caldata` param in payload expected to be serialized object, instead it was of type `{$calType}` after unserialization");
+
+        if (false === file_exists($this->diocesanCalendarsIndex->{$this->params->key}->path)) {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendar resource, not found in path {$this->diocesanCalendarsIndex->{$this->params->key}->path}.");
         }
+
+        if (false === is_writable($this->diocesanCalendarsIndex->{$this->params->key}->path)) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendar resource for {$this->params->key} in path {$this->diocesanCalendarsIndex->{$this->params->key}->path}, check file and folder permissions.");
+        }
+
+        if (false === $this->params->payload instanceof \stdClass) {
+            $calType = gettype($this->params->payload);
+            self::produceErrorResponse(StatusCode::BAD_REQUEST, "`payload` param in payload was expected to be a serialized object, instead it was of type `{$calType}` after unserialization");
+        }
+
+        // In case the "group" property is getting updated too
         if (property_exists($this->params->payload, 'group')) {
             $groupType = gettype($this->params->payload->group);
             if ($groupType !== 'string') {
                 self::produceErrorResponse(StatusCode::BAD_REQUEST, "Param `group` in payload is expected to be of type `string`, instead it was of type `{$groupType}`");
             }
-            $updateData->group = strip_tags($this->params->payload->group);
-        }
-        $updateData->path = "data/nations/{$updateData->nation}";
-        if (!file_exists($updateData->path)) {
-            mkdir($updateData->path, 0755, true);
         }
 
-        $test = $this->validateDataAgainstSchema($CalData, LitSchema::DIOCESAN);
-        if ($test === true) {
-            $calendarData = json_encode($CalData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            file_put_contents(
-                $updateData->path . "/{$updateData->diocese}.json",
-                $calendarData . PHP_EOL
-            );
-            $this->createOrUpdateIndex($updateData);
-            $response->success = "Calendar data created or updated for Diocese \"{$updateData->diocese}\" (Nation: \"$updateData->nation\")";
-            self::produceResponse(json_encode($response));
-        } else {
+        $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
+        if (false === $test) {
             self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
         }
+
+        $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if (
+            false === file_put_contents(
+                $this->diocesanCalendarsIndex->{$this->params->key}->path,
+                $calendarData . PHP_EOL
+            )
+        ) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update diocesan calendar resource {$this->params->key} in path {$this->diocesanCalendarsIndex->{$this->params->key}->path}.");
+        }
+
+        $response = new \stdClass();
+        $response->success = "Calendar data created or updated for Diocese \"{$this->params->key}\" (Nation: \"{$this->diocesanCalendarsIndex->{$this->params->key}->nation}\")";
+        self::produceResponse(json_encode($response));
     }
 
     /**
-     * Handle PATCH / DELETE requests to create or update a regional calendar data resource.
+     * Handle PATCH requests to create or update a regional calendar data resource.
      *
-     * This is a private method and should only be called from {@see handlePatchDeleteRequests}.
+     * This is a private method and should only be called from {@see handleRequestMethod}.
      *
      * The resource is created or updated in the `data/` directory.
      *
@@ -298,24 +349,24 @@ class RegionalData
      *
      * If the payload is invalid, the response will be a JSON error response with a 422 status code.
      */
-    private function writeRegionalCalendar()
+    private function updateRegionalCalendar()
     {
         switch ($this->params->category) {
             case 'NATIONALCALENDAR':
-                $this->handleNationalCalendarWrite();
+                $this->handleNationalCalendarUpdate();
                 break;
             case 'WIDERREGIONCALENDAR':
-                $this->handleWiderRegionCalendarWrite();
+                $this->handleWiderRegionCalendarUpdate();
                 break;
             case 'DIOCESANCALENDAR':
-                $this->handleDiocesanCalendarWrite();
+                $this->handleDiocesanCalendarUpdate();
         }
     }
 
     /**
      * Handle DELETE requests to delete a regional calendar data resource.
      *
-     * This is a private method and should only be called from {@see handlePatchDeleteRequests}.
+     * This is a private method and should only be called from {@see handleRequestMethod}.
      *
      * The resource is deleted from the `data/` directory.
      *
@@ -546,8 +597,8 @@ class RegionalData
             $data = (object)$_REQUEST;
         }
         if (self::$APICore->getRequestMethod() === RequestMethod::PUT) {
-            if (null === $data || !property_exists($data, 'payload') || !property_exists($data, 'key')) {
-                self::produceErrorResponse(StatusCode::BAD_REQUEST, "No payload received. Must receive payload in body of request, in JSON or YAML format, with properties `key` and `payload`");
+            if (null === $data || !property_exists($data, 'payload')) {
+                self::produceErrorResponse(StatusCode::BAD_REQUEST, "No payload received. Must receive payload in body of request, in JSON or YAML format, with properties `key` and `caldata`");
             }
             if (false === count($requestPathParts)) {
                 self::produceErrorResponse(StatusCode::BAD_REQUEST, "No request path received. Must receive request path with path param `category`");
