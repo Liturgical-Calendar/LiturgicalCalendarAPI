@@ -380,7 +380,7 @@ class RegionalData
                 unset($this->diocesanCalendarsIndex->$key);
             }
         } else {
-            $key = strtoupper(preg_replace("/[^a-zA-Z]/", "", $data->diocese));
+            $key = mb_strtoupper(preg_replace("/[^\p{L}]/u", "", $data->diocese));
             if (!property_exists($this->diocesanCalendarsIndex, $key)) {
                 $this->diocesanCalendarsIndex->$key = new \stdClass();
             }
