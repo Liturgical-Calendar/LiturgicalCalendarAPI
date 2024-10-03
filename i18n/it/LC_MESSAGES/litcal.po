@@ -5,13 +5,14 @@
 # John R. D'Orazio <priest@johnromanodorazio.com>, 2022, 2023.
 # "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024.
 # Weblate Admin <admin@example.com>, 2024.
+# OpenAI <noreply-mt-openai@weblate.org>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-10-02 17:55+0000\n"
-"PO-Revision-Date: 2024-06-27 22:33+0000\n"
-"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2024-10-03 13:34+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
 "Language: it\n"
@@ -36,22 +37,30 @@ msgstr ""
 msgid ""
 "There was an error trying to decode localized JSON data for the Temporale: %s"
 msgstr ""
+"Si è verificato un errore nel tentativo di decodificare i dati JSON "
+"localizzati per il Temporale: %s"
 
 #. translators: Temporale refers to the Proprium de Tempore
 #: src/Paths/Calendar.php:697
 msgid "There was an error trying to retrieve localized data for the Temporale."
 msgstr ""
+"Si è verificato un errore nel tentativo di recuperare i dati localizzati per "
+"il Temporale."
 
 #. translators: Temporale refers to the Proprium de Tempore
 #: src/Paths/Calendar.php:727
 #, php-format
 msgid "There was an error trying to decode JSON data for the Temporale: %s"
 msgstr ""
+"Si è verificato un errore nel tentativo di decodificare i dati JSON per il "
+"Temporale: %s"
 
 #. translators: Temporale refers to the Proprium de Tempore
 #: src/Paths/Calendar.php:734
 msgid "There was an error trying to retrieve data for the Temporale."
 msgstr ""
+"Si è verificato un errore nel tentativo di recuperare i dati per il "
+"Temporale."
 
 #. translators: name of the Roman Missal
 #: src/Paths/Calendar.php:762
@@ -71,6 +80,8 @@ msgid ""
 "There was an error trying to decode JSON localization data for the "
 "Sanctorale for the Missal %1$s: %2$s"
 msgstr ""
+"Si è verificato un errore nel tentativo di decodificare i dati di "
+"localizzazione JSON per il Sanctorale del Messale %1$s: %2$s"
 
 #. translators: Sanctorale refers to the Proprium de Sanctis; %s = name of the Roman Missal
 #: src/Paths/Calendar.php:790
@@ -89,6 +100,8 @@ msgid ""
 "There was an error trying to decode JSON data for the Sanctorale for the "
 "Missal %1$s: %2$s."
 msgstr ""
+"Si è verificato un errore nel tentativo di decodificare i dati JSON per il "
+"Sanctorale del Messale %1$s: %2$s."
 
 #. translators: Sanctorale refers to Proprium de Sanctis
 #: src/Paths/Calendar.php:822
@@ -103,6 +116,8 @@ msgid ""
 "There was an error trying to decode translation data for Memorials based on "
 "Decrees of the Congregation for Divine Worship: %s"
 msgstr ""
+"Si è verificato un errore nel tentativo di decodificare i dati di traduzione "
+"per le Memorie basate sui Decreti della Congregazione per il Culto Divino: %s"
 
 #: src/Paths/Calendar.php:853
 #, fuzzy
@@ -118,6 +133,8 @@ msgid ""
 "There was an error trying to decode JSON data for Memorials based on Decrees "
 "of the Congregation for Divine Worship: %s"
 msgstr ""
+"Si è verificato un errore nel tentativo di decodificare i dati JSON per le "
+"Memorie basate sui Decreti della Congregazione per il Culto Divino: %s"
 
 #. translators: days before Epiphany when Epiphany falls on Jan 6 (not useful in Italian!)
 #. translators: days after Epiphany when Epiphany falls on Jan 6 (not useful in Italian!)
@@ -127,7 +144,7 @@ msgstr ""
 #: src/Paths/Calendar.php:1115 src/Paths/Calendar.php:1155
 #, php-format
 msgid "%s - Christmas Weekday"
-msgstr ""
+msgstr "%s - Giorno feriale di Natale"
 
 #. translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
@@ -745,6 +762,9 @@ msgid ""
 "celebrated on %3$s, coincides with the Sunday or Solemnity '%4$s' in the "
 "year %5$d! Does something need to be done about this?"
 msgstr ""
+"La Solennità '%1$s', propria del calendario del %2$s e solitamente celebrata "
+"il %3$s, coincide con la Domenica o Solennità '%4$s' nell'anno %5$d! Bisogna "
+"fare qualcosa a riguardo?"
 
 #. translators: 1: Festivity grade, 2: Festivity name, 3: Name of the diocese, 4: Festivity date, 5: Coinciding festivity name, 6: Requested calendar year
 #: src/Paths/Calendar.php:4059
@@ -760,6 +780,8 @@ msgstr ""
 #, php-format
 msgid "Error receiving or parsing info from github about latest release: %s."
 msgstr ""
+"Errore nel ricevere o nel fare il parsing delle informazioni da github "
+"sull'ultima release: %s."
 
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
 #: src/FestivityCollection.php:48
