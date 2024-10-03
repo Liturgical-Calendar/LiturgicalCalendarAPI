@@ -1,6 +1,6 @@
 <?php
 
-namespace Johnrdorazio\LitCal;
+namespace LiturgicalCalendar\Api;
 
 class DateTime extends \DateTime implements \JsonSerializable
 {

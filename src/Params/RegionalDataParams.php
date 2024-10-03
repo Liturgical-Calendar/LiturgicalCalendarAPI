@@ -1,12 +1,12 @@
 <?php
 
-namespace Johnrdorazio\LitCal\Params;
+namespace LiturgicalCalendar\Api\Params;
 
-use Johnrdorazio\LitCal\Paths\RegionalData;
-use Johnrdorazio\LitCal\Enum\Route;
-use Johnrdorazio\LitCal\Enum\StatusCode;
-use Johnrdorazio\LitCal\Enum\LitLocale;
-use Johnrdorazio\LitCal\Enum\RequestMethod;
+use LiturgicalCalendar\Api\Paths\RegionalData;
+use LiturgicalCalendar\Api\Enum\Route;
+use LiturgicalCalendar\Api\Enum\StatusCode;
+use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\RequestMethod;
 
 /**
  * Class RegionalDataParams
@@ -16,7 +16,7 @@ use Johnrdorazio\LitCal\Enum\RequestMethod;
  * The class is initialized with a set of parameters passed in from the API request. These parameters
  * are used to determine which calendar data to retrieve or update or delete.
  *
- * @package Johnrdorazio\LitCal\Params
+ * @package LiturgicalCalendar\Api\Params
  */
 class RegionalDataParams
 {
@@ -58,7 +58,7 @@ class RegionalDataParams
 
     private function checkNationalCalendarConditions(object $data): string
     {
-        if (RegionalData::$APICore->getRequestMethod() === RequestMethod::PUT) {
+        if (RegionalData::$Core->getRequestMethod() === RequestMethod::PUT) {
             // Cannot PUT a National calendar data if it already exists
             if (in_array($data->key, $this->calendars->national_calendars_keys)) {
                 RegionalData::produceErrorResponse(
@@ -75,7 +75,7 @@ class RegionalDataParams
                     "Cannot PUT National Calendar data for an invalid nation. Valid nations are: " . implode(', ', $uniqueRegions) . "."
                 );
             }
-        } elseif (RegionalData::$APICore->getRequestMethod() === RequestMethod::DELETE) {
+        } elseif (RegionalData::$Core->getRequestMethod() === RequestMethod::DELETE) {
             // Cannot DELETE a National calendar data if it is still in use by a Diocesan calendar
             foreach ($this->calendars->diocesan_calendars as $diocesanCalendar) {
                 if ($diocesanCalendar->nation === $data->key) {
@@ -102,7 +102,7 @@ class RegionalDataParams
     {
         if (
             false === in_array($data->key, $this->calendars->diocesan_calendars_keys)
-            && RegionalData::$APICore->getRequestMethod() !== RequestMethod::PUT
+            && RegionalData::$Core->getRequestMethod() !== RequestMethod::PUT
         ) {
             $validVals = implode(', ', $this->calendars->diocesan_calendars_keys);
             RegionalData::produceErrorResponse(
@@ -117,7 +117,7 @@ class RegionalDataParams
     {
         if (
             false === in_array($data->key, self::$widerRegionNames)
-            && RegionalData::$APICore->getRequestMethod() !== RequestMethod::PUT
+            && RegionalData::$Core->getRequestMethod() !== RequestMethod::PUT
         ) {
             $validVals = implode(', ', self::$widerRegionNames);
             $message = "Invalid value {$data->key} for param `key`, valid values are: {$validVals}";
@@ -155,7 +155,7 @@ class RegionalDataParams
             RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "`locale` param or `Accept-Language` header required for Wider Region calendar data");
         }
         // Check the request method: cannot DELETE Wider Region calendar data if there are national calendars that depend on it
-        if (RegionalData::$APICore->getRequestMethod() === RequestMethod::DELETE) {
+        if (RegionalData::$Core->getRequestMethod() === RequestMethod::DELETE) {
             foreach ($this->calendars->national_calendars as $nationalCalendar) {
                 if (in_array($data->key, $nationalCalendar->wider_regions)) {
                     RegionalData::produceErrorResponse(
@@ -183,7 +183,7 @@ class RegionalDataParams
                 }
                 break;
             case 'DIOCESANCALENDAR':
-                switch (RegionalData::$APICore->getRequestMethod()) {
+                switch (RegionalData::$Core->getRequestMethod()) {
                     case 'PUT':
                         if (
                             false === property_exists($payload, 'litcal')
@@ -258,7 +258,7 @@ class RegionalDataParams
                 $this->key = null;
         }
 
-        if (in_array(RegionalData::$APICore->getRequestMethod(), [RequestMethod::PUT,RequestMethod::PATCH])) {
+        if (in_array(RegionalData::$Core->getRequestMethod(), [RequestMethod::PUT,RequestMethod::PATCH])) {
             if (false === property_exists($data, 'payload') || false === $data->payload instanceof \stdClass) {
                 RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Cannot create or update Calendar data without a payload");
             }

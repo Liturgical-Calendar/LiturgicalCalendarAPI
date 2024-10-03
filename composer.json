@@ -1,5 +1,5 @@
 {
-    "name": "johnrdorazio/litcal",
+    "name": "liturgical-calendar/api",
     "description": "an API for a perpetual Catholic Liturgical Calendar",
     "type": "library",
     "keywords": ["api","rest","restful","liturgy","calendar","liturgical","universal","roman","catholic"],
@@ -16,7 +16,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Johnrdorazio\\LitCal\\": "src/"
+            "LiturgicalCalendar\\Api\\": "src/"
         },
         "files": ["src/pgettext.php"]
     },
@@ -29,10 +29,10 @@
     "minimum-stability": "stable",
     "scripts": {
         "post-install-cmd": [
-            "Johnrdorazio\\LitCal\\LitMessages::postInstall"
+            "LiturgicalCalendar\\Api\\LitMessages::postInstall"
         ],
         "post-update-cmd": [
-            "Johnrdorazio\\LitCal\\LitMessages::postInstall"
+            "LiturgicalCalendar\\Api\\LitMessages::postInstall"
         ]
     }
 }

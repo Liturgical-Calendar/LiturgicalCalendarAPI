@@ -1,19 +1,19 @@
 <?php
 
-namespace Johnrdorazio\LitCal\Paths;
+namespace LiturgicalCalendar\Api\Paths;
 
-use Johnrdorazio\LitCal\APICore;
-use Johnrdorazio\LitCal\Params\MissalsParams;
-use Johnrdorazio\LitCal\Enum\AcceptHeader;
-use Johnrdorazio\LitCal\Enum\LitLocale;
-use Johnrdorazio\LitCal\Enum\RequestContentType;
-use Johnrdorazio\LitCal\Enum\RequestMethod;
-use Johnrdorazio\LitCal\Enum\StatusCode;
-use Johnrdorazio\LitCal\Enum\RomanMissal;
+use LiturgicalCalendar\Api\Core;
+use LiturgicalCalendar\Api\Params\MissalsParams;
+use LiturgicalCalendar\Api\Enum\AcceptHeader;
+use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\RequestContentType;
+use LiturgicalCalendar\Api\Enum\RequestMethod;
+use LiturgicalCalendar\Api\Enum\StatusCode;
+use LiturgicalCalendar\Api\Enum\RomanMissal;
 
 class Missals
 {
-    public static APICore $APICore;
+    public static Core $Core;
     public static MissalsParams $params;
     public static object $missalsIndex;
     private static array $requestPathParts = [];
@@ -49,18 +49,18 @@ class Missals
     private static function initPayloadFromRequestBody(): ?object
     {
         $payload = null;
-        switch (self::$APICore->getRequestContentType()) {
+        switch (self::$Core->getRequestContentType()) {
             case RequestContentType::JSON:
-                $payload = self::$APICore->retrieveRequestParamsFromJsonBody();
+                $payload = self::$Core->retrieveRequestParamsFromJsonBody();
                 break;
             case RequestContentType::YAML:
-                $payload = self::$APICore->retrieveRequestParamsFromYamlBody();
+                $payload = self::$Core->retrieveRequestParamsFromYamlBody();
                 break;
             case RequestContentType::FORMDATA:
                 $payload = (object)$_POST;
                 break;
             default:
-                if (in_array(self::$APICore->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
+                if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
                     // the payload MUST be in the body of the request, either JSON encoded or YAML encoded
                     self::produceErrorResponse(StatusCode::BAD_REQUEST, "Expected payload in body of request, either JSON encoded or YAML encoded");
                 }
@@ -154,14 +154,14 @@ class Missals
     private static function initRequestParams(): array
     {
         $data = [];
-        if (in_array(self::$APICore->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH])) {
+        if (in_array(self::$Core->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH])) {
             $payload = self::initPayloadFromRequestBody();
-            if (self::$APICore->getRequestMethod() === RequestMethod::POST) {
+            if (self::$Core->getRequestMethod() === RequestMethod::POST) {
                 $data = self::handlePostPayload($payload);
             } else {
                 $data["PAYLOAD"] = $payload;
             }
-        } elseif (self::$APICore->getRequestMethod() === RequestMethod::GET) {
+        } elseif (self::$Core->getRequestMethod() === RequestMethod::GET) {
             $data = self::handleGetPayload();
         }
         return $data;
@@ -258,7 +258,7 @@ class Missals
         $message = new \stdClass();
         $message->status = "ERROR";
         $statusMessage = "";
-        switch (self::$APICore->getRequestMethod()) {
+        switch (self::$Core->getRequestMethod()) {
             case RequestMethod::PUT:
                 $statusMessage = "Resource not Created";
                 break;
@@ -274,7 +274,7 @@ class Missals
         $message->response = $statusCode === 404 ? "Resource not Found" : $statusMessage;
         $message->description = $description;
         $response = json_encode($message);
-        switch (self::$APICore->getResponseContentType()) {
+        switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
                 $responseObj = json_decode($response, true);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
@@ -290,17 +290,17 @@ class Missals
      * Outputs the response for the /missals endpoint.
      *
      * Outputs the response as either JSON or YAML, depending on the value of
-     * self::$APICore->getResponseContentType(). If the request method was PUT or
+     * self::$Core->getResponseContentType(). If the request method was PUT or
      * PATCH, it also sets a 201 Created status code.
      *
      * @param string $jsonEncodedResponse the response as a JSON encoded string
      */
     private static function produceResponse(string $jsonEncodedResponse): void
     {
-        if (in_array(self::$APICore->getRequestMethod(), ['PUT','PATCH'])) {
+        if (in_array(self::$Core->getRequestMethod(), ['PUT','PATCH'])) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
         }
-        switch (self::$APICore->getResponseContentType()) {
+        switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
                 $responseObj = json_decode($jsonEncodedResponse, true);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
@@ -318,7 +318,7 @@ class Missals
      * @param array $requestPathParts the path parameters from the request
      *
      * This method will:
-     * - Create an instance of the APICore class
+     * - Create an instance of the Core class
      * - Create an instance of the MissalsParams class
      * - If the $requestPathParts argument is not empty, it will set the request path parts
      * - It will create an empty stdClass object to store the Missal metadata
@@ -329,11 +329,11 @@ class Missals
      *   self::$missalsIndex->litcal_missals array.
      * - Finally, it will set the request parameters using the initRequestParams method.
      *
-     * @see \Johnrdorazio\LitCal\Paths\Missals::initRequestParams()
+     * @see \LiturgicalCalendar\Api\Paths\Missals::initRequestParams()
      */
     public static function init(array $requestPathParts = [])
     {
-        self::$APICore = new APICore();
+        self::$Core = new Core();
         self::$params = new MissalsParams();
         if (count($requestPathParts)) {
             self::$requestPathParts = $requestPathParts;
@@ -395,13 +395,13 @@ class Missals
      */
     public static function handleRequest()
     {
-        self::$APICore->init();
-        if (self::$APICore->getRequestMethod() === RequestMethod::GET) {
-            self::$APICore->validateAcceptHeader(true);
+        self::$Core->init();
+        if (self::$Core->getRequestMethod() === RequestMethod::GET) {
+            self::$Core->validateAcceptHeader(true);
         } else {
-            self::$APICore->validateAcceptHeader(false);
+            self::$Core->validateAcceptHeader(false);
         }
-        self::$APICore->setResponseContentTypeHeader();
+        self::$Core->setResponseContentTypeHeader();
         if (count(self::$requestPathParts) === 0) {
             if (null !== self::$params->Locale) {
                 header("X-Litcal-Missals-Locale: " . self::$params->Locale, false);

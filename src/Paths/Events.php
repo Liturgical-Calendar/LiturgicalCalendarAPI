@@ -1,20 +1,20 @@
 <?php
 
-namespace Johnrdorazio\LitCal\Paths;
+namespace LiturgicalCalendar\Api\Paths;
 
-use Johnrdorazio\LitCal\APICore;
-use Johnrdorazio\LitCal\Enum\RomanMissal;
-use Johnrdorazio\LitCal\Enum\LitGrade;
-use Johnrdorazio\LitCal\Enum\LitCommon;
-use Johnrdorazio\LitCal\Enum\StatusCode;
-use Johnrdorazio\LitCal\Enum\RequestMethod;
-use Johnrdorazio\LitCal\Enum\RequestContentType;
-use Johnrdorazio\LitCal\Enum\AcceptHeader;
-use Johnrdorazio\LitCal\Params\EventsParams;
+use LiturgicalCalendar\Api\Core;
+use LiturgicalCalendar\Api\Enum\RomanMissal;
+use LiturgicalCalendar\Api\Enum\LitGrade;
+use LiturgicalCalendar\Api\Enum\LitCommon;
+use LiturgicalCalendar\Api\Enum\StatusCode;
+use LiturgicalCalendar\Api\Enum\RequestMethod;
+use LiturgicalCalendar\Api\Enum\RequestContentType;
+use LiturgicalCalendar\Api\Enum\AcceptHeader;
+use LiturgicalCalendar\Api\Params\EventsParams;
 
 class Events
 {
-    public static APICore $APICore;
+    public static Core $Core;
     private static array $FestivityCollection = [];
     private static array $LatinMissals        = [];
     private static ?object $GeneralIndex      = null;
@@ -28,7 +28,7 @@ class Events
 
     public function __construct(array $requestPathParts = [])
     {
-        self::$APICore = new APICore();
+        self::$Core = new Core();
         self::$requestPathParts = $requestPathParts;
         $this->EventsParams = new EventsParams();
     }
@@ -87,7 +87,7 @@ class Events
 
     private function validatePostParams(): void
     {
-        if (self::$APICore->getRequestContentType() === RequestContentType::JSON) {
+        if (self::$Core->getRequestContentType() === RequestContentType::JSON) {
             $json = file_get_contents('php://input');
             if (false !== $json && "" !== $json) {
                 $data = json_decode($json, true);
@@ -102,7 +102,7 @@ class Events
                     }
                 }
             }
-        } elseif (self::$APICore->getRequestContentType() === RequestContentType::FORMDATA) {
+        } elseif (self::$Core->getRequestContentType() === RequestContentType::FORMDATA) {
             if (count($_POST)) {
                 if (false === $this->EventsParams->setData($_POST)) {
                     echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
@@ -128,7 +128,7 @@ class Events
             $this->validateRequestPathParams();
         }
 
-        switch (self::$APICore->getRequestMethod()) {
+        switch (self::$Core->getRequestMethod()) {
             case RequestMethod::POST:
                 $this->validatePostParams();
                 break;
@@ -140,9 +140,9 @@ class Events
                 break;
             default:
                 $description = "You seem to be forming a strange kind of request? Allowed Request Methods are "
-                    . implode(' and ', self::$APICore->getAllowedRequestMethods())
+                    . implode(' and ', self::$Core->getAllowedRequestMethods())
                     . ', but your Request Method was '
-                    . self::$APICore->getRequestMethod();
+                    . self::$Core->getRequestMethod();
                 echo self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, $description);
                 die();
         }
@@ -414,7 +414,7 @@ class Events
         $message->response = StatusCode::toString($statusCode);
         $message->description = $description;
         $errResponse = json_encode($message);
-        switch (self::$APICore->getResponseContentType()) {
+        switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
                 $response = json_decode($errResponse, true);
                 return yaml_emit($response, YAML_UTF8_ENCODING);
@@ -443,7 +443,7 @@ class Events
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified");
             header('Content-Length: 0');
         } else {
-            switch (self::$APICore->getResponseContentType()) {
+            switch (self::$Core->getResponseContentType()) {
                 case AcceptHeader::YAML:
                     echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
                     break;
@@ -457,9 +457,9 @@ class Events
 
     public function init(array $requestPathParts = [])
     {
-        self::$APICore->init();
-        self::$APICore->validateAcceptHeader(true);
-        self::$APICore->setResponseContentTypeHeader();
+        self::$Core->init();
+        self::$Core->validateAcceptHeader(true);
+        self::$Core->setResponseContentTypeHeader();
 
         self::$requestPathParts = $requestPathParts;
         self::retrieveLatinMissals();

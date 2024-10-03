@@ -1,43 +1,43 @@
 <?php
 
-namespace Johnrdorazio\LitCal\Paths;
+namespace LiturgicalCalendar\Api\Paths;
 
-use Johnrdorazio\LitCal\APICore;
-use Johnrdorazio\LitCal\Params\DecreesParams;
-use Johnrdorazio\LitCal\Enum\AcceptHeader;
-use Johnrdorazio\LitCal\Enum\LitLocale;
-use Johnrdorazio\LitCal\Enum\RequestContentType;
-use Johnrdorazio\LitCal\Enum\RequestMethod;
-use Johnrdorazio\LitCal\Enum\StatusCode;
+use LiturgicalCalendar\Api\Core;
+use LiturgicalCalendar\Api\Params\DecreesParams;
+use LiturgicalCalendar\Api\Enum\AcceptHeader;
+use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\RequestContentType;
+use LiturgicalCalendar\Api\Enum\RequestMethod;
+use LiturgicalCalendar\Api\Enum\StatusCode;
 
 class Decrees
 {
-    public static APICore $APICore;
+    public static Core $Core;
     public static object $decreesIndex;
     private static array $requestPathParts = [];
 
     private static function initRequestParams(): array
     {
         $data = [];
-        if (in_array(self::$APICore->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH])) {
+        if (in_array(self::$Core->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH])) {
             $payload = null;
-            switch (self::$APICore->getRequestContentType()) {
+            switch (self::$Core->getRequestContentType()) {
                 case RequestContentType::JSON:
-                    $payload = self::$APICore->retrieveRequestParamsFromJsonBody();
+                    $payload = self::$Core->retrieveRequestParamsFromJsonBody();
                     break;
                 case RequestContentType::YAML:
-                    $payload = self::$APICore->retrieveRequestParamsFromYamlBody();
+                    $payload = self::$Core->retrieveRequestParamsFromYamlBody();
                     break;
                 case RequestContentType::FORMDATA:
                     $payload = (object)$_POST;
                     break;
                 default:
-                    if (in_array(self::$APICore->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
+                    if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
                         // the payload MUST be in the body of the request, either JSON encoded or YAML encoded
                         self::produceErrorResponse(StatusCode::BAD_REQUEST, "Expected payload in body of request, either JSON encoded or YAML encoded");
                     }
             }
-            if (self::$APICore->getRequestMethod() === RequestMethod::POST) {
+            if (self::$Core->getRequestMethod() === RequestMethod::POST) {
                 if ($payload !== null && property_exists($payload, 'locale')) {
                     $data["LOCALE"] = $payload->locale;
                 } else {
@@ -46,7 +46,7 @@ class Decrees
             } else {
                 $data["PAYLOAD"] = $payload;
             }
-        } elseif (self::$APICore->getRequestMethod() === RequestMethod::GET) {
+        } elseif (self::$Core->getRequestMethod() === RequestMethod::GET) {
             $_GET = array_change_key_case($_GET, CASE_LOWER);
             if (isset($_GET['locale'])) {
                 $data["LOCALE"] = $_GET['locale'];
@@ -88,7 +88,7 @@ class Decrees
         $message = new \stdClass();
         $message->status = "ERROR";
         $statusMessage = "";
-        switch (self::$APICore->getRequestMethod()) {
+        switch (self::$Core->getRequestMethod()) {
             case RequestMethod::PUT:
                 $statusMessage = "Resource not Created";
                 break;
@@ -104,7 +104,7 @@ class Decrees
         $message->response = $statusCode === 404 ? "Resource not Found" : $statusMessage;
         $message->description = $description;
         $response = json_encode($message);
-        switch (self::$APICore->getResponseContentType()) {
+        switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
                 $responseObj = json_decode($response, true);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
@@ -118,10 +118,10 @@ class Decrees
 
     private static function produceResponse(string $jsonEncodedResponse): void
     {
-        if (in_array(self::$APICore->getRequestMethod(), ['PUT','PATCH'])) {
+        if (in_array(self::$Core->getRequestMethod(), ['PUT','PATCH'])) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
         }
-        switch (self::$APICore->getResponseContentType()) {
+        switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
                 $responseObj = json_decode($jsonEncodedResponse, true);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
@@ -151,18 +151,18 @@ class Decrees
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
             die('Decrees file not found');
         }
-        self::$APICore = new APICore();
+        self::$Core = new Core();
     }
 
     public static function handleRequest()
     {
-        self::$APICore->init();
-        if (self::$APICore->getRequestMethod() === RequestMethod::GET) {
-            self::$APICore->validateAcceptHeader(true);
+        self::$Core->init();
+        if (self::$Core->getRequestMethod() === RequestMethod::GET) {
+            self::$Core->validateAcceptHeader(true);
         } else {
-            self::$APICore->validateAcceptHeader(false);
+            self::$Core->validateAcceptHeader(false);
         }
-        self::$APICore->setResponseContentTypeHeader();
+        self::$Core->setResponseContentTypeHeader();
         if (count(self::$requestPathParts) === 0) {
             self::produceResponse(json_encode(self::$decreesIndex));
         }

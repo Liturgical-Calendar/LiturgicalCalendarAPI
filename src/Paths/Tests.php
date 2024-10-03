@@ -1,17 +1,17 @@
 <?php
 
-namespace Johnrdorazio\LitCal\Paths;
+namespace LiturgicalCalendar\Api\Paths;
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
-use Johnrdorazio\LitCal\APICore;
-use Johnrdorazio\LitCal\Enum\StatusCode;
-use Johnrdorazio\LitCal\Enum\RequestMethod;
-use Johnrdorazio\LitCal\Enum\AcceptHeader;
+use LiturgicalCalendar\Api\Core;
+use LiturgicalCalendar\Api\Enum\StatusCode;
+use LiturgicalCalendar\Api\Enum\RequestMethod;
+use LiturgicalCalendar\Api\Enum\AcceptHeader;
 
 class Tests
 {
-    public static APICore $APICore;
+    public static Core $Core;
     private static array $requestPathParts = [];
     private static array $propsToSanitize = [
         "description",
@@ -147,18 +147,18 @@ class Tests
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
             $message = new \stdClass();
             $message->status = "OK";
-            $message->response = self::$APICore->getRequestMethod() === RequestMethod::PUT ? "Resource Created" : "Resource Updated";
+            $message->response = self::$Core->getRequestMethod() === RequestMethod::PUT ? "Resource Created" : "Resource Updated";
             return json_encode($message, JSON_PRETTY_PRINT);
         }
     }
 
     public static function handleRequest(): void
     {
-        self::$APICore->init();
-        self::$APICore->validateAcceptHeader(true);
-        self::$APICore->setResponseContentTypeHeader();
+        self::$Core->init();
+        self::$Core->validateAcceptHeader(true);
+        self::$Core->setResponseContentTypeHeader();
         $response = '';
-        switch (self::$APICore->getRequestMethod()) {
+        switch (self::$Core->getRequestMethod()) {
             case RequestMethod::GET:
                 $response = self::handleGetRequest();
                 break;
@@ -172,7 +172,7 @@ class Tests
                 $response = self::handleDeleteRequest();
                 break;
             case RequestMethod::OPTIONS:
-                // nothing to do here, should be handled by APICore
+                // nothing to do here, should be handled by Core
                 break;
             default:
                 $response = self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, "The method " . $_SERVER['REQUEST_METHOD'] . " cannot be handled by this endpoint");
@@ -186,7 +186,7 @@ class Tests
         $message = new \stdClass();
         $message->status = "ERROR";
         $statusMessage = "";
-        switch (self::$APICore->getRequestMethod()) {
+        switch (self::$Core->getRequestMethod()) {
             case RequestMethod::PUT:
                 $statusMessage = "Resource not Created";
                 break;
@@ -206,7 +206,7 @@ class Tests
 
     private static function produceResponse(string $response): void
     {
-        switch (self::$APICore->getResponseContentType()) {
+        switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
                 $responseObj = json_decode($response, true);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
@@ -220,7 +220,7 @@ class Tests
 
     public static function init(array $requestPathParts = []): void
     {
-        self::$APICore = new APICore();
+        self::$Core = new Core();
         self::$requestPathParts = $requestPathParts;
     }
 }

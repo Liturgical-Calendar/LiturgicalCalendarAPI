@@ -1,9 +1,8 @@
 <?php
 
-namespace Johnrdorazio\LitCal;
+namespace LiturgicalCalendar\Api;
 
-use Johnrdorazio\LitCal\Enum\LitColor;
-use Johnrdorazio\LitCal\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\LitColor;
 
 class LitMessages
 {

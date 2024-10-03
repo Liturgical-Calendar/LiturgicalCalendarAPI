@@ -6,7 +6,7 @@
  * for a Request that the API might receive
  */
 
-namespace Johnrdorazio\LitCal\Enum;
+namespace LiturgicalCalendar\Api\Enum;
 
 class RequestContentType
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Johnrdorazio\LitCal\Paths;
+namespace LiturgicalCalendar\Api\Paths;
 
-use Johnrdorazio\LitCal\Enum\StatusCode;
+use LiturgicalCalendar\Api\Enum\StatusCode;
 
 class Metadata
 {

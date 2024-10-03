@@ -1,10 +1,10 @@
 <?php
 
-namespace Johnrdorazio\LitCal\Params;
+namespace LiturgicalCalendar\Api\Params;
 
-use Johnrdorazio\LitCal\Enum\LitLocale;
-use Johnrdorazio\LitCal\Enum\StatusCode;
-use Johnrdorazio\LitCal\Paths\Missals;
+use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\StatusCode;
+use LiturgicalCalendar\Api\Paths\Missals;
 
 class MissalsParams
 {

@@ -1,14 +1,14 @@
 <?php
 
-namespace Johnrdorazio\LitCal;
+namespace LiturgicalCalendar\Api;
 
-use Johnrdorazio\LitCal\DateTime;
-use Johnrdorazio\LitCal\Enum\LitColor;
-use Johnrdorazio\LitCal\Enum\LitFeastType;
-use Johnrdorazio\LitCal\Enum\LitLocale;
-use Johnrdorazio\LitCal\Enum\LitGrade;
-use Johnrdorazio\LitCal\Enum\LitCommon;
-use Johnrdorazio\LitCal\Enum\LitSeason;
+use LiturgicalCalendar\Api\DateTime;
+use LiturgicalCalendar\Api\Enum\LitColor;
+use LiturgicalCalendar\Api\Enum\LitFeastType;
+use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\LitGrade;
+use LiturgicalCalendar\Api\Enum\LitCommon;
+use LiturgicalCalendar\Api\Enum\LitSeason;
 
 class Festivity implements \JsonSerializable
 {

@@ -1,21 +1,21 @@
 <?php
 
-namespace Johnrdorazio\LitCal;
+namespace LiturgicalCalendar\Api;
 
-use Johnrdorazio\LitCal\Enum\RequestMethod;
-use Johnrdorazio\LitCal\Enum\RequestContentType;
-use Johnrdorazio\LitCal\Enum\AcceptHeader;
-use Johnrdorazio\LitCal\Enum\ReturnType;
-use Johnrdorazio\LitCal\Enum\CacheDuration;
-use Johnrdorazio\LitCal\Paths\Calendar;
-use Johnrdorazio\LitCal\Paths\Easter;
-use Johnrdorazio\LitCal\Paths\Events;
-use Johnrdorazio\LitCal\Paths\Metadata;
-use Johnrdorazio\LitCal\Paths\Tests;
-use Johnrdorazio\LitCal\Paths\RegionalData;
-use Johnrdorazio\LitCal\Paths\Missals;
-use Johnrdorazio\LitCal\Paths\Decrees;
-use Johnrdorazio\LitCal\Paths\Schemas;
+use LiturgicalCalendar\Api\Enum\RequestMethod;
+use LiturgicalCalendar\Api\Enum\RequestContentType;
+use LiturgicalCalendar\Api\Enum\AcceptHeader;
+use LiturgicalCalendar\Api\Enum\ReturnType;
+use LiturgicalCalendar\Api\Enum\CacheDuration;
+use LiturgicalCalendar\Api\Paths\Calendar;
+use LiturgicalCalendar\Api\Paths\Easter;
+use LiturgicalCalendar\Api\Paths\Events;
+use LiturgicalCalendar\Api\Paths\Metadata;
+use LiturgicalCalendar\Api\Paths\Tests;
+use LiturgicalCalendar\Api\Paths\RegionalData;
+use LiturgicalCalendar\Api\Paths\Missals;
+use LiturgicalCalendar\Api\Paths\Decrees;
+use LiturgicalCalendar\Api\Paths\Schemas;
 
 class Router
 {
@@ -71,18 +71,18 @@ class Router
         $route = array_shift($requestPathParts);
 
         /**
-         * N.B. Classes that can be instantiated and that use the APICore,
-         * MUST be instantiated before calling APICore methods,
-         * because the relative class constructors also instantiate the APICore for the class.
+         * N.B. Classes that can be instantiated and that use the Core,
+         * MUST be instantiated before calling Core methods,
+         * because the relative class constructors also instantiate the Core for the class.
          */
         switch ($route) {
             case '':
             case 'calendar':
                 $LitCalEngine = new Calendar();
-                //Calendar::$APICore->setAllowedOrigins(self::$allowedOrigins);
-                Calendar::$APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
-                Calendar::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
-                Calendar::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS, AcceptHeader::YAML ]);
+                //Calendar::$Core->setAllowedOrigins(self::$allowedOrigins);
+                Calendar::$Core->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
+                Calendar::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
+                Calendar::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS, AcceptHeader::YAML ]);
                 $LitCalEngine->setAllowedReturnTypes([ ReturnType::JSON, ReturnType::XML, ReturnType::ICS, ReturnType::YAML ]);
                 $LitCalEngine->setCacheDuration(CacheDuration::MONTH);
                 $LitCalEngine->init($requestPathParts);
@@ -93,7 +93,7 @@ class Router
                 break;
             case 'tests':
                 Tests::init($requestPathParts);
-                Tests::$APICore->setAllowedRequestMethods([
+                Tests::$Core->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST,
                     RequestMethod::PUT,
@@ -101,26 +101,26 @@ class Router
                     RequestMethod::DELETE,
                     RequestMethod::OPTIONS
                 ]);
-                if (in_array(Tests::$APICore->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
-                    Tests::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                if (in_array(Tests::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
+                    Tests::$Core->setAllowedOrigins(self::$allowedOrigins);
                 }
-                Tests::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON ]);
-                Tests::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                Tests::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON ]);
+                Tests::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 Tests::handleRequest();
                 break;
             case 'events':
                 $Events = new Events();
-                Events::$APICore->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
-                if (in_array(Events::$APICore->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
-                    Events::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                Events::$Core->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
+                if (in_array(Events::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
+                    Events::$Core->setAllowedOrigins(self::$allowedOrigins);
                 }
-                Events::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
-                Events::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                Events::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
+                Events::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 $Events->init($requestPathParts);
                 break;
             case 'data':
                 $RegionalData = new RegionalData();
-                RegionalData::$APICore->setAllowedRequestMethods([
+                RegionalData::$Core->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST,
                     RequestMethod::PUT,
@@ -130,18 +130,18 @@ class Router
                 ]);
                 if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
                     if (in_array($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'], [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
-                        RegionalData::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                        RegionalData::$Core->setAllowedOrigins(self::$allowedOrigins);
                     }
                 }
-                if (in_array(RegionalData::$APICore->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
-                    RegionalData::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                if (in_array(RegionalData::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
+                    RegionalData::$Core->setAllowedOrigins(self::$allowedOrigins);
                 }
-                RegionalData::$APICore->setAllowedRequestContentTypes([
+                RegionalData::$Core->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
                 ]);
-                RegionalData::$APICore->setAllowedAcceptHeaders([
+                RegionalData::$Core->setAllowedAcceptHeaders([
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
@@ -149,7 +149,7 @@ class Router
                 break;
             case 'missals':
                 Missals::init($requestPathParts);
-                Missals::$APICore->setAllowedRequestMethods([
+                Missals::$Core->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST,
                     RequestMethod::PUT,
@@ -157,11 +157,11 @@ class Router
                     RequestMethod::DELETE,
                     RequestMethod::OPTIONS
                 ]);
-                if (in_array(Missals::$APICore->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
-                    Missals::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                if (in_array(Missals::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
+                    Missals::$Core->setAllowedOrigins(self::$allowedOrigins);
                 }
-                Missals::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
-                Missals::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                Missals::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
+                Missals::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 Missals::handleRequest();
                 break;
             case 'easter':
@@ -172,7 +172,7 @@ class Router
                 break;
             case 'decrees':
                 Decrees::init($requestPathParts);
-                Decrees::$APICore->setAllowedRequestMethods([
+                Decrees::$Core->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST,
                     RequestMethod::PUT,
@@ -180,11 +180,11 @@ class Router
                     RequestMethod::DELETE,
                     RequestMethod::OPTIONS
                 ]);
-                if (in_array(Decrees::$APICore->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
-                    Decrees::$APICore->setAllowedOrigins(self::$allowedOrigins);
+                if (in_array(Decrees::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
+                    Decrees::$Core->setAllowedOrigins(self::$allowedOrigins);
                 }
-                Decrees::$APICore->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
-                Decrees::$APICore->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                Decrees::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
+                Decrees::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 Decrees::handleRequest();
                 break;
             default:

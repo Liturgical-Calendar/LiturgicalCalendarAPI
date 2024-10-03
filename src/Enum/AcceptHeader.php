@@ -1,6 +1,6 @@
 <?php
 
-namespace Johnrdorazio\LitCal\Enum;
+namespace LiturgicalCalendar\Api\Enum;
 
 class AcceptHeader
 {

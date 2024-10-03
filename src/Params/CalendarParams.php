@@ -1,26 +1,26 @@
 <?php
 
-namespace Johnrdorazio\LitCal\Params;
+namespace LiturgicalCalendar\Api\Params;
 
-use Johnrdorazio\LitCal\Enum\YearType;
-use Johnrdorazio\LitCal\Enum\Epiphany;
-use Johnrdorazio\LitCal\Enum\Ascension;
-use Johnrdorazio\LitCal\Enum\CorpusChristi;
-use Johnrdorazio\LitCal\Enum\LitLocale;
-use Johnrdorazio\LitCal\Enum\ReturnType;
-use Johnrdorazio\LitCal\Enum\Route;
-use Johnrdorazio\LitCal\Enum\StatusCode;
-use Johnrdorazio\LitCal\Paths\Calendar;
+use LiturgicalCalendar\Api\Enum\YearType;
+use LiturgicalCalendar\Api\Enum\Epiphany;
+use LiturgicalCalendar\Api\Enum\Ascension;
+use LiturgicalCalendar\Api\Enum\CorpusChristi;
+use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\ReturnType;
+use LiturgicalCalendar\Api\Enum\Route;
+use LiturgicalCalendar\Api\Enum\StatusCode;
+use LiturgicalCalendar\Api\Paths\Calendar;
 
 /**
  * Class CalendarParams
  *
- * This class is responsible for handling the parameters provided to the Johnrdorazio\LitCal\PathsCalendar class.
+ * This class is responsible for handling the parameters provided to the LiturgicalCalendar\Api\PathsCalendar class.
  *
  * The class is initialized with a set of parameters passed in from the API request. These parameters
  * are used to determine which calendar data to retrieve or update or delete.
  *
- * @package Johnrdorazio\LitCal\Params
+ * @package LiturgicalCalendar\Api\Params
  *
  * @property object|null $calendars
  * @property int $Year

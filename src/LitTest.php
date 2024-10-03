@@ -1,6 +1,6 @@
 <?php
 
-namespace Johnrdorazio\LitCal;
+namespace LiturgicalCalendar\Api;
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;

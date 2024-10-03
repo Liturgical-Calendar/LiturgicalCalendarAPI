@@ -1,35 +1,35 @@
 <?php
 
-namespace Johnrdorazio\LitCal\Paths;
+namespace LiturgicalCalendar\Api\Paths;
 
-use Johnrdorazio\LitCal\APICore;
-use Johnrdorazio\LitCal\DateTime;
-use Johnrdorazio\LitCal\Festivity;
-use Johnrdorazio\LitCal\FestivityCollection;
-use Johnrdorazio\LitCal\LitFunc;
-use Johnrdorazio\LitCal\LitMessages;
-use Johnrdorazio\LitCal\Enum\Ascension;
-use Johnrdorazio\LitCal\Enum\CorpusChristi;
-use Johnrdorazio\LitCal\Enum\Epiphany;
-use Johnrdorazio\LitCal\Enum\AcceptHeader;
-use Johnrdorazio\LitCal\Enum\CacheDuration;
-use Johnrdorazio\LitCal\Enum\YearType;
-use Johnrdorazio\LitCal\Enum\LitColor;
-use Johnrdorazio\LitCal\Enum\LitCommon;
-use Johnrdorazio\LitCal\Enum\LitFeastType;
-use Johnrdorazio\LitCal\Enum\LitGrade;
-use Johnrdorazio\LitCal\Enum\LitLocale;
-use Johnrdorazio\LitCal\Enum\RequestContentType;
-use Johnrdorazio\LitCal\Enum\RequestMethod;
-use Johnrdorazio\LitCal\Enum\ReturnType;
-use Johnrdorazio\LitCal\Enum\RomanMissal;
-use Johnrdorazio\LitCal\Enum\StatusCode;
-use Johnrdorazio\LitCal\Params\CalendarParams;
+use LiturgicalCalendar\Api\Core;
+use LiturgicalCalendar\Api\DateTime;
+use LiturgicalCalendar\Api\Festivity;
+use LiturgicalCalendar\Api\FestivityCollection;
+use LiturgicalCalendar\Api\LitFunc;
+use LiturgicalCalendar\Api\LitMessages;
+use LiturgicalCalendar\Api\Enum\Ascension;
+use LiturgicalCalendar\Api\Enum\CorpusChristi;
+use LiturgicalCalendar\Api\Enum\Epiphany;
+use LiturgicalCalendar\Api\Enum\AcceptHeader;
+use LiturgicalCalendar\Api\Enum\CacheDuration;
+use LiturgicalCalendar\Api\Enum\YearType;
+use LiturgicalCalendar\Api\Enum\LitColor;
+use LiturgicalCalendar\Api\Enum\LitCommon;
+use LiturgicalCalendar\Api\Enum\LitFeastType;
+use LiturgicalCalendar\Api\Enum\LitGrade;
+use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\RequestContentType;
+use LiturgicalCalendar\Api\Enum\RequestMethod;
+use LiturgicalCalendar\Api\Enum\ReturnType;
+use LiturgicalCalendar\Api\Enum\RomanMissal;
+use LiturgicalCalendar\Api\Enum\StatusCode;
+use LiturgicalCalendar\Api\Params\CalendarParams;
 
 class Calendar
 {
     public const API_VERSION                        = '3.9';
-    public static APICore $APICore;
+    public static Core $Core;
 
     private string $CacheDuration                   = "";
     private string $CACHEFILE                       = "";
@@ -228,7 +228,7 @@ class Calendar
     {
         $this->startTime        = hrtime(true);
         $this->CacheDuration    = "_" . CacheDuration::MONTH . date("m");
-        self::$APICore          = new APICore();
+        self::$Core          = new Core();
     }
 
     private static function debugWrite(string $string)
@@ -246,17 +246,17 @@ class Calendar
      */
     public static function produceErrorResponse(int $statusCode, string $description): void
     {
-        if (self::$APICore->getResponseContentType() === null) {
+        if (self::$Core->getResponseContentType() === null) {
             // set a default response content type that can be overriden by a parameter or an accept header
-            self::$APICore->setResponseContentType(self::$APICore->getAllowedAcceptHeaders()[ 0 ]);
-            self::$APICore->setResponseContentTypeHeader();
+            self::$Core->setResponseContentType(self::$Core->getAllowedAcceptHeaders()[ 0 ]);
+            self::$Core->setResponseContentTypeHeader();
         }
         header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
         $message = new \stdClass();
         $message->status = "ERROR";
         $message->description = $description;
         $response = json_encode($message);
-        switch (self::$APICore->getResponseContentType()) {
+        switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
                 $responseObj = json_decode($response, true);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
@@ -294,14 +294,14 @@ class Calendar
      */
     private function initParamsFromRequestBodyOrUrl()
     {
-        if (self::$APICore->getRequestContentType() === RequestContentType::JSON) {
-            $data = self::$APICore->retrieveRequestParamsFromJsonBody(true);
+        if (self::$Core->getRequestContentType() === RequestContentType::JSON) {
+            $data = self::$Core->retrieveRequestParamsFromJsonBody(true);
             $this->CalendarParams = new CalendarParams($data);
-        } elseif (self::$APICore->getRequestContentType() === RequestContentType::YAML) {
-            $data = self::$APICore->retrieveRequestParamsFromYamlBody(true);
+        } elseif (self::$Core->getRequestContentType() === RequestContentType::YAML) {
+            $data = self::$Core->retrieveRequestParamsFromYamlBody(true);
             $this->CalendarParams = new CalendarParams($data);
         } else {
-            switch (self::$APICore->getRequestMethod()) {
+            switch (self::$Core->getRequestMethod()) {
                 case RequestMethod::POST:
                     $this->CalendarParams = new CalendarParams($_POST);
                     break;
@@ -313,9 +313,9 @@ class Calendar
                     break;
                 default:
                     $description = "Allowed Request Methods are "
-                    . implode(' and ', self::$APICore->getAllowedRequestMethods())
+                    . implode(' and ', self::$Core->getAllowedRequestMethods())
                     . ', but your Request Method was '
-                    . self::$APICore->getRequestMethod();
+                    . self::$Core->getRequestMethod();
                     self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, $description);
             }
         }
@@ -415,32 +415,32 @@ class Calendar
                     . strtoupper($this->CalendarParams->ReturnType);
                 self::produceErrorResponse(StatusCode::NOT_ACCEPTABLE, $description);
             }
-            self::$APICore->setResponseContentType(
-                self::$APICore->getAllowedAcceptHeaders()[ array_search($this->CalendarParams->ReturnType, $this->AllowedReturnTypes) ]
+            self::$Core->setResponseContentType(
+                self::$Core->getAllowedAcceptHeaders()[ array_search($this->CalendarParams->ReturnType, $this->AllowedReturnTypes) ]
             );
         } else {
-            if (self::$APICore->hasAcceptHeader()) {
-                if (self::$APICore->isAllowedAcceptHeader()) {
-                    $this->CalendarParams->ReturnType = $this->AllowedReturnTypes[ self::$APICore->getIdxAcceptHeaderInAllowed() ];
-                    self::$APICore->setResponseContentType(self::$APICore->getAcceptHeader());
+            if (self::$Core->hasAcceptHeader()) {
+                if (self::$Core->isAllowedAcceptHeader()) {
+                    $this->CalendarParams->ReturnType = $this->AllowedReturnTypes[ self::$Core->getIdxAcceptHeaderInAllowed() ];
+                    self::$Core->setResponseContentType(self::$Core->getAcceptHeader());
                 } else {
                     //Requests from browser windows using the address bar will probably have an Accept header of text/html
                     //In order to not be too drastic, let's treat text/html as though it were application/json
-                    $acceptHeaders = explode(",", self::$APICore->getAcceptHeader());
+                    $acceptHeaders = explode(",", self::$Core->getAcceptHeader());
                     if (in_array('text/html', $acceptHeaders) || in_array('text/plain', $acceptHeaders) || in_array('*/*', $acceptHeaders)) {
                         $this->CalendarParams->ReturnType = ReturnType::JSON;
-                        self::$APICore->setResponseContentType(AcceptHeader::JSON);
+                        self::$Core->setResponseContentType(AcceptHeader::JSON);
                     } else {
                         $description = "You are requesting a content type which this API cannot produce. Allowed Accept headers are "
-                            . implode(' and ', self::$APICore->getAllowedAcceptHeaders())
+                            . implode(' and ', self::$Core->getAllowedAcceptHeaders())
                             . ', but you have issued an request with an Accept header of '
-                            . self::$APICore->getAcceptHeader();
+                            . self::$Core->getAcceptHeader();
                         self::produceErrorResponse(StatusCode::NOT_ACCEPTABLE, $description);
                     }
                 }
             } else {
                 $this->CalendarParams->ReturnType = $this->AllowedReturnTypes[ 0 ];
-                self::$APICore->setResponseContentType(self::$APICore->getAllowedAcceptHeaders()[ 0 ]);
+                self::$Core->setResponseContentType(self::$Core->getAllowedAcceptHeaders()[ 0 ]);
             }
         }
     }
@@ -4262,7 +4262,7 @@ class Calendar
         $SerializeableLitCal->metadata->version             = self::API_VERSION;
         $SerializeableLitCal->metadata->timestamp           = time();
         $SerializeableLitCal->metadata->date_time           = date(DATE_ATOM);
-        $SerializeableLitCal->metadata->request_headers     = self::$APICore->getRequestHeaders();
+        $SerializeableLitCal->metadata->request_headers     = self::$Core->getRequestHeaders();
         $SerializeableLitCal->metadata->solemnities         = $this->Cal->getSolemnitiesCollection();
         $SerializeableLitCal->metadata->solemnities_keys    = $this->Cal->getSolemnitiesKeys();
         $SerializeableLitCal->metadata->feasts              = $this->Cal->getFeastsCollection();
@@ -4390,7 +4390,7 @@ class Calendar
      * Set the cache duration to use for this calendar.
      *
      * Sets the cache duration for the calendar to one of the predefined
-     * values in \Johnrdorazio\LitCal\Enum\CacheDuration.
+     * values in \LiturgicalCalendar\Api\Enum\CacheDuration.
      *
      * @param string $duration The cache duration to use.
      */
@@ -4432,13 +4432,13 @@ class Calendar
      */
     public function init(array $requestPathParts = [])
     {
-        self::$APICore->init();
+        self::$Core->init();
         $this->initParameterData($requestPathParts);
         $this->loadDiocesanCalendarData();
         $this->loadNationalCalendarData();
         $this->updateSettingsBasedOnNationalCalendar();
         $this->updateSettingsBasedOnDiocesanCalendar();
-        self::$APICore->setResponseContentTypeHeader();
+        self::$Core->setResponseContentTypeHeader();
 
         if ($this->cacheFileIsAvailable()) {
             //If we already have done the calculation

@@ -1,8 +1,8 @@
 <?php
 
-namespace Johnrdorazio\LitCal;
+namespace LiturgicalCalendar\Api;
 
-use Johnrdorazio\LitCal\DateTime;
+use LiturgicalCalendar\Api\DateTime;
 
 /**
  * Class LitFunc

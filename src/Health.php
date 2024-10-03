@@ -1,17 +1,17 @@
 <?php
 
-namespace Johnrdorazio\LitCal;
+namespace LiturgicalCalendar\Api;
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
 use Sabre\VObject;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
-use Johnrdorazio\LitCal\Enum\AcceptHeader;
-use Johnrdorazio\LitCal\Enum\ICSErrorLevel;
-use Johnrdorazio\LitCal\Enum\LitSchema;
-use Johnrdorazio\LitCal\Enum\ReturnType;
-use Johnrdorazio\LitCal\Enum\Route;
+use LiturgicalCalendar\Api\Enum\AcceptHeader;
+use LiturgicalCalendar\Api\Enum\ICSErrorLevel;
+use LiturgicalCalendar\Api\Enum\LitSchema;
+use LiturgicalCalendar\Api\Enum\ReturnType;
+use LiturgicalCalendar\Api\Enum\Route;
 
 class Health implements MessageComponentInterface
 {

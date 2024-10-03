@@ -9,7 +9,7 @@ require_once 'vendor/autoload.php';
 use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
-use Johnrdorazio\LitCal\Health;
+use LiturgicalCalendar\Api\Health;
 
 $apiVersion = basename(__DIR__);
 define('API_BASE_PATH', "https://litcal.johnromanodorazio.com/api/{$apiVersion}");

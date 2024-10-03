@@ -12,9 +12,9 @@
  * @link      https://litcal.johnromanodorazio.com
  */
 
-namespace Johnrdorazio\LitCal\Paths;
+namespace LiturgicalCalendar\Api\Paths;
 
-use Johnrdorazio\LitCal\Router;
+use LiturgicalCalendar\Api\Router;
 
 class Schemas
 {

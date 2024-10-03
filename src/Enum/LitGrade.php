@@ -8,7 +8,7 @@
  *  A COPY OF THE DOCUMENT IS INCLUDED ALONGSIDE THIS ENGINE, SEEING THAT THERE IS NO DIRECT ONLINE LINK TO THE ACTUAL NORMS
  */
 
-namespace Johnrdorazio\LitCal\Enum;
+namespace LiturgicalCalendar\Api\Enum;
 
 /*****************************************************
  * DEFINE THE ORDER OF IMPORTANCE OF THE FESTIVITIES *

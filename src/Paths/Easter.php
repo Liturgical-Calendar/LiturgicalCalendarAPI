@@ -1,10 +1,10 @@
 <?php
 
-namespace Johnrdorazio\LitCal\Paths;
+namespace LiturgicalCalendar\Api\Paths;
 
-use Johnrdorazio\LitCal\LitFunc;
-use Johnrdorazio\LitCal\LitMessages;
-use Johnrdorazio\LitCal\Enum\LitLocale;
+use LiturgicalCalendar\Api\LitFunc;
+use LiturgicalCalendar\Api\LitMessages;
+use LiturgicalCalendar\Api\Enum\LitLocale;
 
 class Easter
 {

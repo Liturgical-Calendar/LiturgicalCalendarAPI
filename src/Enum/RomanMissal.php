@@ -1,6 +1,6 @@
 <?php
 
-namespace Johnrdorazio\LitCal\Enum;
+namespace LiturgicalCalendar\Api\Enum;
 
 /**
  * Enum class for the different Roman Missals that are used in the LitCal

@@ -1,8 +1,8 @@
 <?php
 
-namespace Johnrdorazio\LitCal\Params;
+namespace LiturgicalCalendar\Api\Params;
 
-use Johnrdorazio\LitCal\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\LitLocale;
 
 class EventsParams
 {

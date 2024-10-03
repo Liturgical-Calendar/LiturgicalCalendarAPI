@@ -1,12 +1,12 @@
 <?php
 
-namespace Johnrdorazio\LitCal;
+namespace LiturgicalCalendar\Api;
 
-use Johnrdorazio\LitCal\DateTime;
-use Johnrdorazio\LitCal\Enum\LitGrade;
-use Johnrdorazio\LitCal\Enum\LitLocale;
-use Johnrdorazio\LitCal\Enum\LitSeason;
-use Johnrdorazio\LitCal\Params\CalendarParams;
+use LiturgicalCalendar\Api\DateTime;
+use LiturgicalCalendar\Api\Enum\LitGrade;
+use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\LitSeason;
+use LiturgicalCalendar\Api\Params\CalendarParams;
 
 #[\AllowDynamicProperties]
 class FestivityCollection
@@ -533,7 +533,7 @@ class FestivityCollection
     //So in order to sort by date we have to be sure to maintain the association with the proper key, uasort allows us to do this
     public function sortFestivities(): void
     {
-        uasort($this->festivities, array( "Johnrdorazio\LitCal\Festivity", "compDate" ));
+        uasort($this->festivities, array( "LiturgicalCalendar\Api\Festivity", "compDate" ));
     }
 
     public function getFestivities(): array

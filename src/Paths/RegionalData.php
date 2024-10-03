@@ -1,17 +1,17 @@
 <?php
 
-namespace Johnrdorazio\LitCal\Paths;
+namespace LiturgicalCalendar\Api\Paths;
 
 use GuzzleHttp\Psr7\Request;
 use Swaggest\JsonSchema\Schema;
 use Swaggest\JsonSchema\InvalidValue;
-use Johnrdorazio\LitCal\APICore;
-use Johnrdorazio\LitCal\Enum\RequestMethod;
-use Johnrdorazio\LitCal\Enum\AcceptHeader;
-use Johnrdorazio\LitCal\Enum\StatusCode;
-use Johnrdorazio\LitCal\Enum\LitSchema;
-use Johnrdorazio\LitCal\Enum\RequestContentType;
-use Johnrdorazio\LitCal\Params\RegionalDataParams;
+use LiturgicalCalendar\Api\Core;
+use LiturgicalCalendar\Api\Enum\RequestMethod;
+use LiturgicalCalendar\Api\Enum\AcceptHeader;
+use LiturgicalCalendar\Api\Enum\StatusCode;
+use LiturgicalCalendar\Api\Enum\LitSchema;
+use LiturgicalCalendar\Api\Enum\RequestContentType;
+use LiturgicalCalendar\Api\Params\RegionalDataParams;
 
 /**
  * RegionalData
@@ -27,7 +27,7 @@ class RegionalData
 {
     private ?object $diocesanCalendarsIndex = null;
     private RegionalDataParams $params;
-    public static APICore $APICore;
+    public static Core $Core;
 
     /**
      * Constructor
@@ -38,7 +38,7 @@ class RegionalData
      */
     public function __construct()
     {
-        self::$APICore = new APICore();
+        self::$Core = new Core();
         $this->params  = new RegionalDataParams();
     }
 
@@ -51,7 +51,7 @@ class RegionalData
      */
     private function handleRequestMethod()
     {
-        switch (self::$APICore->getRequestMethod()) {
+        switch (self::$Core->getRequestMethod()) {
             case RequestMethod::GET:
             case RequestMethod::POST:
                 $this->getRegionalCalendar();
@@ -503,18 +503,18 @@ class RegionalData
     private static function retrievePayloadFromPostPutPatchRequest(object $data): ?object
     {
         $payload = null;
-        switch (self::$APICore->getRequestContentType()) {
+        switch (self::$Core->getRequestContentType()) {
             case RequestContentType::JSON:
-                $payload = self::$APICore->retrieveRequestParamsFromJsonBody();
+                $payload = self::$Core->retrieveRequestParamsFromJsonBody();
                 break;
             case RequestContentType::YAML:
-                $payload = self::$APICore->retrieveRequestParamsFromYamlBody();
+                $payload = self::$Core->retrieveRequestParamsFromYamlBody();
                 break;
             case RequestContentType::FORMDATA:
                 $payload = (object)$_POST;
                 break;
             default:
-                if (in_array(self::$APICore->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
+                if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
                     // the payload MUST be in the body of the request, either JSON encoded or YAML encoded
                     self::produceErrorResponse(
                         StatusCode::BAD_REQUEST,
@@ -522,7 +522,7 @@ class RegionalData
                     );
                 }
         }
-        if (self::$APICore->getRequestMethod() === RequestMethod::POST && $payload !== null) {
+        if (self::$Core->getRequestMethod() === RequestMethod::POST && $payload !== null) {
             if (property_exists($payload, 'locale')) {
                 $data->locale = $payload->locale;
             }
@@ -545,10 +545,10 @@ class RegionalData
         $data->category = RegionalDataParams::EXPECTED_CATEGORIES[$requestPathParts[0]];
         $data->key = $requestPathParts[1];
 
-        if (in_array(self::$APICore->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH])) {
+        if (in_array(self::$Core->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH])) {
             $data = RegionalData::retrievePayloadFromPostPutPatchRequest($data);
         } elseif (
-            self::$APICore->getRequestMethod() === RequestMethod::GET
+            self::$Core->getRequestMethod() === RequestMethod::GET
             && isset($_GET['locale'])
         ) {
             $data->locale = $_GET['locale'];
@@ -597,13 +597,13 @@ class RegionalData
     private function handleRequestParams(array $requestPathParts = []): void
     {
         $data = null;
-        if (self::$APICore->getRequestMethod() === RequestMethod::PUT) {
-            switch (self::$APICore->getRequestContentType()) {
+        if (self::$Core->getRequestMethod() === RequestMethod::PUT) {
+            switch (self::$Core->getRequestContentType()) {
                 case RequestContentType::JSON:
-                    $data = self::$APICore->retrieveRequestParamsFromJsonBody();
+                    $data = self::$Core->retrieveRequestParamsFromJsonBody();
                     break;
                 case RequestContentType::YAML:
-                    $data = self::$APICore->retrieveRequestParamsFromYamlBody();
+                    $data = self::$Core->retrieveRequestParamsFromYamlBody();
                     break;
                 default:
                     $data = (object)$_REQUEST;
@@ -632,14 +632,14 @@ class RegionalData
             $data = RegionalData::setDataFromPath($requestPathParts);
         }
 
-        if (self::$APICore->getRequestMethod() === RequestMethod::PATCH) {
+        if (self::$Core->getRequestMethod() === RequestMethod::PATCH) {
             $bodyData = null;
-            switch (self::$APICore->getRequestContentType()) {
+            switch (self::$Core->getRequestContentType()) {
                 case RequestContentType::JSON:
-                    $bodyData = self::$APICore->retrieveRequestParamsFromJsonBody();
+                    $bodyData = self::$Core->retrieveRequestParamsFromJsonBody();
                     break;
                 case RequestContentType::YAML:
-                    $bodyData = self::$APICore->retrieveRequestParamsFromYamlBody();
+                    $bodyData = self::$Core->retrieveRequestParamsFromYamlBody();
                     break;
                 default:
                     $bodyData = (object)$_REQUEST;
@@ -672,7 +672,7 @@ class RegionalData
         $message = new \stdClass();
         $message->status = "ERROR";
         $statusMessage = "";
-        switch (self::$APICore->getRequestMethod()) {
+        switch (self::$Core->getRequestMethod()) {
             case RequestMethod::PUT:
                 $statusMessage = "Resource not Created";
                 break;
@@ -688,7 +688,7 @@ class RegionalData
         $message->response = $statusCode === 404 ? "Resource not Found" : $statusMessage;
         $message->description = $description;
         $response = json_encode($message);
-        switch (self::$APICore->getResponseContentType()) {
+        switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
                 $responseObj = json_decode($response, true);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
@@ -704,17 +704,17 @@ class RegionalData
      * Outputs the response for the /data endpoint.
      *
      * Outputs the response as either JSON or YAML, depending on the value of
-     * self::$APICore->getResponseContentType(). If the request method was PUT or
+     * self::$Core->getResponseContentType(). If the request method was PUT or
      * PATCH, it also sets a 201 Created status code.
      *
      * @param string $jsonEncodedResponse the response as a JSON encoded string
      */
     private static function produceResponse(string $jsonEncodedResponse): void
     {
-        if (in_array(self::$APICore->getRequestMethod(), ['PUT','PATCH'])) {
+        if (in_array(self::$Core->getRequestMethod(), ['PUT','PATCH'])) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
         }
-        switch (self::$APICore->getResponseContentType()) {
+        switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
                 $responseObj = json_decode($jsonEncodedResponse, true);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
@@ -732,7 +732,7 @@ class RegionalData
      * @param array $requestPathParts the path parameters from the request
      *
      * This method will:
-     * - Initialize the instance of the APICore class
+     * - Initialize the instance of the Core class
      * - If the $requestPathParts argument is not empty, it will set the request path parts
      * - It will validate the request content type
      * - It will set the request headers
@@ -741,16 +741,16 @@ class RegionalData
      */
     public function init(array $requestPathParts = [])
     {
-        self::$APICore->init();
-        if (self::$APICore->getRequestMethod() === RequestMethod::GET || self::$APICore->getRequestMethod() === RequestMethod::OPTIONS) {
-            self::$APICore->validateAcceptHeader(true);
+        self::$Core->init();
+        if (self::$Core->getRequestMethod() === RequestMethod::GET || self::$Core->getRequestMethod() === RequestMethod::OPTIONS) {
+            self::$Core->validateAcceptHeader(true);
         } else {
-            self::$APICore->validateAcceptHeader(false);
+            self::$Core->validateAcceptHeader(false);
         }
-        if (self::$APICore->getRequestMethod() === RequestMethod::OPTIONS) {
+        if (self::$Core->getRequestMethod() === RequestMethod::OPTIONS) {
             return;
         }
-        self::$APICore->setResponseContentTypeHeader();
+        self::$Core->setResponseContentTypeHeader();
         $this->loadDiocesanCalendarsIndex();
         $this->handleRequestParams($requestPathParts);
         $this->handleRequestMethod();
