@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-10-02 17:55+0000\n"
-"PO-Revision-Date: 2024-09-30 19:40+0000\n"
+"PO-Revision-Date: 2024-10-03 11:32+0000\n"
 "Last-Translator: Milan Šalka <salka.milan@googlemail.com>\n"
 "Language-Team: Slovak <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/sk/>\n"
@@ -946,7 +946,7 @@ msgstr "Pre jedného zakladateľa"
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:104
 msgid "For Several Founders"
-msgstr "Pre viacerých zakladateľov"
+msgstr "Za viacerých zakladateľov"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:106
@@ -976,7 +976,7 @@ msgstr "Pre jedného svätého"
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:116
 msgid "For an Abbot"
-msgstr "Pre opáta"
+msgstr "Za opáta"
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:118
@@ -1006,7 +1006,7 @@ msgstr "Pre pedagógov"
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:128
 msgid "For Holy Women"
-msgstr "Pre sväté ženy"
+msgstr "Za sväté ženy"
 
 #. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: src/Enum/LitCommon.php:176 src/Enum/LitCommon.php:188
