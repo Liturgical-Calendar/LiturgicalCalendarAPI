@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
-"POT-Creation-Date: 2024-10-02 17:55+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-10-03 23:51+0000\n"
 "PO-Revision-Date: 2024-10-03 13:34+0000\n"
 "Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Vietnamese <https://translate.johnromanodorazio.com/projects/"
@@ -135,7 +135,7 @@ msgstr "%s - Ngày trong tuần Giáng Sinh"
 
 #. translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
-#: src/Paths/Calendar.php:1296 src/LitMessages.php:149 src/LitMessages.php:154
+#: src/Paths/Calendar.php:1296 src/LitMessages.php:148 src/LitMessages.php:153
 #: src/Enum/LitCommon.php:385
 msgid "or"
 msgstr "hoặc"
@@ -219,8 +219,8 @@ msgid ""
 "'%1$s' falls on a Sunday in the year %2$d, therefore the Feast '%3$s' is "
 "celebrated on %4$s rather than on the Sunday after Christmas."
 msgstr ""
-"'%1$s' rơi vào Chủ nhật trong năm %2$d, do đó Lễ '%3$s' được cử hành vào %4$"
-"s thay vì vào Chủ nhật sau Giáng Sinh."
+"'%1$s' rơi vào Chủ nhật trong năm %2$d, do đó Lễ '%3$s' được cử hành vào "
+"%4$s thay vì vào Chủ nhật sau Giáng Sinh."
 
 #. translators: You can ignore this translation if the Feast has not been inserted by the Episcopal Conference
 #: src/Paths/Calendar.php:1705
@@ -238,8 +238,8 @@ msgid ""
 msgstr ""
 "Năm 2012, Đức Giáo Hoàng Benedict XVI đã cho phép các Hội đồng Giám mục đưa "
 "Lễ Chúa Giêsu Kitô Thượng Tế Vĩnh Cửu vào lịch phụng vụ riêng của họ vào thứ "
-"Năm sau Lễ Chúa Thánh Thần Hiện Xuống: áp dụng cho lịch '%1$s' trong năm '%2$"
-"d' (%3$s)."
+"Năm sau Lễ Chúa Thánh Thần Hiện Xuống: áp dụng cho lịch '%1$s' trong năm "
+"'%2$d' (%3$s)."
 
 #. translators: 1: Festivity name, 2: Superseding Festivity grade, 3: Superseding Festivity name, 4: Requested calendar year
 #: src/Paths/Calendar.php:1754 src/Paths/Calendar.php:1787
@@ -501,8 +501,8 @@ msgid ""
 "'%1$s' has been declared a Doctor of the Church since the year %2$d, "
 "applicable to the year %3$d (%4$s)."
 msgstr ""
-"'%1$s' đã được tuyên bố là Tiến sĩ Hội Thánh từ năm %2$d, áp dụng cho năm %3$"
-"d (%4$s)."
+"'%1$s' đã được tuyên bố là Tiến sĩ Hội Thánh từ năm %2$d, áp dụng cho năm "
+"%3$d (%4$s)."
 
 #: src/Paths/Calendar.php:2573
 msgid "and Doctor of the Church"
@@ -773,8 +773,8 @@ msgid ""
 "year %5$d. As per %6$s, the first has precedence, therefore the Vigil Mass "
 "is confirmed as are I Vespers."
 msgstr ""
-"Thánh lễ vọng cho %1$s '%2$s' trùng với %3$s '%4$s' trong năm %5$d. Theo %6$"
-"s, cái đầu tiên được ưu tiên, do đó Thánh lễ vọng được xác nhận cũng như "
+"Thánh lễ vọng cho %1$s '%2$s' trùng với %3$s '%4$s' trong năm %5$d. Theo "
+"%6$s, cái đầu tiên được ưu tiên, do đó Thánh lễ vọng được xác nhận cũng như "
 "Kinh Chiều I."
 
 #: src/FestivityCollection.php:444
