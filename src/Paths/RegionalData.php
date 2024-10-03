@@ -449,11 +449,21 @@ class RegionalData
         }
 
         $test = $this->validateDataAgainstSchema($this->diocesanCalendarsIndex, LitSchema::INDEX);
-        if ($test === true) {
-            $jsonEncodedContents = json_encode($this->diocesanCalendarsIndex, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            file_put_contents("data/nations/index.json", $jsonEncodedContents . PHP_EOL);
-        } else {
+        if (false === $test) {
             self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, json_encode($test));
+        }
+
+        if (false === file_exists("data/nations/index.json")) {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendars index, not found in path data/nations/index.json.");
+        }
+
+        if (false === is_writable("data/nations/index.json")) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendars index in path data/nations/index.json, check file and folder permissions.");
+        }
+
+        $jsonEncodedContents = json_encode($this->diocesanCalendarsIndex, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if (false === file_put_contents("data/nations/index.json", $jsonEncodedContents . PHP_EOL)) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update diocesan calendars index in path data/nations/index.json.");
         }
     }
 
