@@ -8,9 +8,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-10-02 17:55+0000\n"
-"PO-Revision-Date: 2024-08-30 11:45+0000\n"
+"PO-Revision-Date: 2024-10-03 13:34+0000\n"
 "Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Spanish <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/es/>\n"
@@ -35,22 +35,25 @@ msgstr ""
 msgid ""
 "There was an error trying to decode localized JSON data for the Temporale: %s"
 msgstr ""
+"Hubo un error al intentar decodificar datos JSON localizados para el "
+"Temporale: %s"
 
 #. translators: Temporale refers to the Proprium de Tempore
 #: src/Paths/Calendar.php:697
 msgid "There was an error trying to retrieve localized data for the Temporale."
 msgstr ""
+"Hubo un error al intentar recuperar datos localizados para el Temporale."
 
 #. translators: Temporale refers to the Proprium de Tempore
 #: src/Paths/Calendar.php:727
 #, php-format
 msgid "There was an error trying to decode JSON data for the Temporale: %s"
-msgstr ""
+msgstr "Hubo un error al intentar decodificar datos JSON para el Temporale: %s"
 
 #. translators: Temporale refers to the Proprium de Tempore
 #: src/Paths/Calendar.php:734
 msgid "There was an error trying to retrieve data for the Temporale."
-msgstr ""
+msgstr "Hubo un error al intentar recuperar datos para el Temporale."
 
 #. translators: name of the Roman Missal
 #: src/Paths/Calendar.php:762
@@ -70,6 +73,8 @@ msgid ""
 "There was an error trying to decode JSON localization data for the "
 "Sanctorale for the Missal %1$s: %2$s"
 msgstr ""
+"Hubo un error al intentar decodificar los datos de localización JSON para el "
+"Sanctorale del Misal %1$s: %2$s"
 
 #. translators: Sanctorale refers to the Proprium de Sanctis; %s = name of the Roman Missal
 #: src/Paths/Calendar.php:790
@@ -88,6 +93,8 @@ msgid ""
 "There was an error trying to decode JSON data for the Sanctorale for the "
 "Missal %1$s: %2$s."
 msgstr ""
+"Hubo un error al intentar decodificar datos JSON para el Sanctorale del "
+"Misal %1$s: %2$s."
 
 #. translators: Sanctorale refers to Proprium de Sanctis
 #: src/Paths/Calendar.php:822
@@ -102,6 +109,8 @@ msgid ""
 "There was an error trying to decode translation data for Memorials based on "
 "Decrees of the Congregation for Divine Worship: %s"
 msgstr ""
+"Hubo un error al intentar decodificar datos de traducción para Memorias "
+"basadas en Decretos de la Congregación para el Culto Divino: %s"
 
 #: src/Paths/Calendar.php:853
 #, fuzzy
@@ -117,6 +126,8 @@ msgid ""
 "There was an error trying to decode JSON data for Memorials based on Decrees "
 "of the Congregation for Divine Worship: %s"
 msgstr ""
+"Hubo un error al intentar decodificar datos JSON para Memorias basadas en "
+"Decretos de la Congregación para el Culto Divino: %s"
 
 #. translators: days before Epiphany when Epiphany falls on Jan 6 (not useful in Italian!)
 #. translators: days after Epiphany when Epiphany falls on Jan 6 (not useful in Italian!)
@@ -760,6 +771,8 @@ msgstr ""
 #, php-format
 msgid "Error receiving or parsing info from github about latest release: %s."
 msgstr ""
+"Error al recibir o analizar información de github sobre la última versión: "
+"%s."
 
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
 #: src/FestivityCollection.php:48
