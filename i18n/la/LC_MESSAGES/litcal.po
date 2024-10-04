@@ -73,7 +73,6 @@ msgstr ""
 #. translators: Sanctorale refers to the Proprium de Sanctis; %s = name of the Roman Missal
 #: src/Paths/Calendar.php:790
 #, fuzzy, php-format
-#| msgid "Data for the sanctorale from %s could not be found."
 msgid "Data for the Sanctorale from %s could not be found."
 msgstr "Data pro sanctorale ex %s reperiri non potuit."
 
@@ -91,7 +90,6 @@ msgstr ""
 #. translators: Sanctorale refers to Proprium de Sanctis
 #: src/Paths/Calendar.php:822
 #, fuzzy
-#| msgid "Could not find a sanctorale data file for %s"
 msgid "Could not find the Sanctorale data"
 msgstr "Archivum datarum de Sanctorale pro %s non inventa est"
 
@@ -104,7 +102,6 @@ msgstr ""
 
 #: src/Paths/Calendar.php:853
 #, fuzzy
-#| msgid "Decree of the Congregation for Divine Worship"
 msgid ""
 "Could not find translation data for Memorials based on Decrees of the "
 "Congregation for Divine Worship"
@@ -130,7 +127,7 @@ msgstr ""
 #. translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
 #: src/Paths/Calendar.php:1296 src/LitMessages.php:148 src/LitMessages.php:153
-#: src/Enum/LitCommon.php:385
+#: src/Enum/LitCommon.php:385 src/LatinUtils.php:149 src/LatinUtils.php:154
 msgid "or"
 msgstr "vel"
 
@@ -652,9 +649,6 @@ msgstr ""
 #. translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year
 #: src/Paths/Calendar.php:3286
 #, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
-#| "'%5$s' in the year %6$d."
 msgid ""
 "The Feast '%1$s', usually celebrated on %2$s, coincides with another Feast "
 "'%3$s' in the year %4$d! Does something need to be done about this?"
@@ -665,10 +659,6 @@ msgstr ""
 #. translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year
 #: src/Paths/Calendar.php:3300
 #, fuzzy, php-format
-#| msgid ""
-#| "The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year "
-#| "%3$d. We should ask the Congregation for Divine Worship what to do about "
-#| "this!"
 msgid ""
 "The Solemnity '%1$s', usually celebrated on %2$s, coincides with the Sunday "
 "or Solemnity '%3$s' in the year %4$d! Does something need to be done about "
@@ -749,9 +739,6 @@ msgstr ""
 #. translators: 1: Festivity grade, 2: Festivity name, 3: Name of the diocese, 4: Festivity date, 5: Coinciding festivity name, 6: Requested calendar year
 #: src/Paths/Calendar.php:4059
 #, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
-#| "'%5$s' in the year %6$d."
 msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
 "on %4$s, is suppressed by the Sunday or Solemnity %5$s in the year %6$d"

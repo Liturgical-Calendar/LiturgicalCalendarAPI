@@ -79,7 +79,6 @@ msgstr ""
 #. translators: Sanctorale refers to the Proprium de Sanctis; %s = name of the Roman Missal
 #: src/Paths/Calendar.php:790
 #, fuzzy, php-format
-#| msgid "Data for the sanctorale from %s could not be found."
 msgid "Data for the Sanctorale from %s could not be found."
 msgstr "Los datos del sanctorale de %s no se encontraron."
 
@@ -99,7 +98,6 @@ msgstr ""
 #. translators: Sanctorale refers to Proprium de Sanctis
 #: src/Paths/Calendar.php:822
 #, fuzzy
-#| msgid "Could not find a sanctorale data file for %s"
 msgid "Could not find the Sanctorale data"
 msgstr "No se pudo encontrar un archivo de datos del sanctoral para %s"
 
@@ -114,7 +112,6 @@ msgstr ""
 
 #: src/Paths/Calendar.php:853
 #, fuzzy
-#| msgid "Decree of the Congregation for Divine Worship"
 msgid ""
 "Could not find translation data for Memorials based on Decrees of the "
 "Congregation for Divine Worship"
@@ -142,7 +139,7 @@ msgstr "%s - Día de la Semana de Navidad"
 #. translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
 #: src/Paths/Calendar.php:1296 src/LitMessages.php:148 src/LitMessages.php:153
-#: src/Enum/LitCommon.php:385
+#: src/Enum/LitCommon.php:385 src/LatinUtils.php:149 src/LatinUtils.php:154
 msgid "or"
 msgstr "o"
 

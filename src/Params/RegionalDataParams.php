@@ -258,7 +258,7 @@ class RegionalDataParams
                 $this->key = null;
         }
 
-        if (in_array(RegionalData::$Core->getRequestMethod(), [RequestMethod::PUT,RequestMethod::PATCH])) {
+        if (in_array(RegionalData::$Core->getRequestMethod(), [RequestMethod::PUT,RequestMethod::PATCH], true)) {
             if (false === property_exists($data, 'payload') || false === $data->payload instanceof \stdClass) {
                 RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Cannot create or update Calendar data without a payload");
             }
