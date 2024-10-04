@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-03 23:51+0000\n"
+"POT-Creation-Date: 2024-10-04 00:52+0000\n"
 "PO-Revision-Date: 2024-10-03 11:32+0000\n"
 "Last-Translator: Milan Šalka <salka.milan@googlemail.com>\n"
 "Language-Team: Slovak <https://translate.johnromanodorazio.com/projects/"
@@ -136,8 +136,7 @@ msgstr "%s - Vianočný všedný deň"
 
 #. translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
-#: src/Paths/Calendar.php:1296 src/LatinUtils.php:148 src/LatinUtils.php:153
-#: src/Enum/LitCommon.php:385
+#: src/Paths/Calendar.php:1296 src/Enum/LitCommon.php:385
 msgid "or"
 msgstr "alebo"
 
