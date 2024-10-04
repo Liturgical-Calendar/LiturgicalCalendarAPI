@@ -149,7 +149,7 @@ msgstr "%s - Wochentag in der Weihnachtszeit"
 
 #. translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
-#: src/Paths/Calendar.php:1296 src/LitMessages.php:149 src/LitMessages.php:154
+#: src/Paths/Calendar.php:1296 src/LatinUtils.php:149 src/LatinUtils.php:154
 #: src/Enum/LitCommon.php:385
 msgid "or"
 msgstr "oder"

@@ -2,8 +2,8 @@
 
 namespace LiturgicalCalendar\Api\Paths;
 
-use LiturgicalCalendar\Api\LitFunc;
-use LiturgicalCalendar\Api\LitMessages;
+use LiturgicalCalendar\Api\Utilities;
+use LiturgicalCalendar\Api\LatinUtils;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 
 class Easter
@@ -90,9 +90,9 @@ class Easter
 
         for ($i = 1583; $i <= 9999; $i++) {
             self::$EasterDates->litcal_easter[$i - 1583] = new \stdClass();
-            $gregorian_easter                    = LitFunc::calcGregEaster($i);
-            $julian_easter                       = LitFunc::calcJulianEaster($i);
-            $western_julian_easter               = LitFunc::calcJulianEaster($i, true);
+            $gregorian_easter                    = Utilities::calcGregEaster($i);
+            $julian_easter                       = Utilities::calcJulianEaster($i);
+            $western_julian_easter               = Utilities::calcJulianEaster($i, true);
             $same_easter                         = false;
 
             if ($gregorian_easter->format('l, F jS, Y') === $western_julian_easter->format('l, F jS, Y')) {
@@ -103,13 +103,13 @@ class Easter
             switch (strtoupper(self::$baseLocale)) {
                 case LitLocale::LATIN:
                     $month                      = (int)$gregorian_easter->format('n'); //n      = 1-January to 12-December
-                    $monthLatin                 = LitMessages::LATIN_MONTHS[$month];
+                    $monthLatin                 = LatinUtils::LATIN_MONTHS[$month];
                     $gregDateString             = 'Dies Domini, ' . $gregorian_easter->format('j') . ' ' . $monthLatin . ' ' . $gregorian_easter->format('Y');
                     $month                      = (int)$julian_easter->format('n'); //n         = 1-January to 12-December
-                    $monthLatin                 = LitMessages::LATIN_MONTHS[$month];
+                    $monthLatin                 = LatinUtils::LATIN_MONTHS[$month];
                     $julianDateString           = 'Dies Domini, ' . $julian_easter->format('j') . ' ' . $monthLatin . ' ' . $julian_easter->format('Y');
                     $month                      = (int)$western_julian_easter->format('n'); //n = 1-January to 12-December
-                    $monthLatin                 = LitMessages::LATIN_MONTHS[$month];
+                    $monthLatin                 = LatinUtils::LATIN_MONTHS[$month];
                     $westernJulianDateString    = 'Dies Domini, ' . $western_julian_easter->format('j') . ' ' . $monthLatin . ' ' . $western_julian_easter->format('Y');
                     break;
                 case 'EN':

@@ -3,16 +3,17 @@
 namespace LiturgicalCalendar\Api;
 
 use LiturgicalCalendar\Api\DateTime;
+use LiturgicalCalendar\Api\Enum\LitColor;
 
 /**
- * Class LitFunc
+ * Class Utilities
  * Useful functions for LitCal\API
  * @author: John Romano D'Orazio
  * THE ENTIRE LITURGICAL CALENDAR DEPENDS MAINLY ON THE DATE OF EASTER
  * This class defines among other things the function
  *  for calculating Gregorian Easter for a given year as used by the latin rite
  */
-class LitFunc
+class Utilities
 {
     // NON_EVENT_KEYS are keys whose value is an array, but are not a LitCalEvent
     private const NON_EVENT_KEYS = [
@@ -191,8 +192,105 @@ class LitFunc
     }
     /**
     private static function debugWrite( string $string ) {
-      $debugFile = "LitFuncDebug_" . LitFunc::$HASH_REQUEST . ".log";
+      $debugFile = "UtilitiesDebug_" . Utilities::$HASH_REQUEST . ".log";
       file_put_contents( $debugFile, date('c') . "\t" . $string . PHP_EOL, FILE_APPEND );
     }
     */
+
+    public static function colorToHex(string $color): string
+    {
+        $hex = "#";
+        switch ($color) {
+            case "red":
+                $hex .= "FF0000";
+                break;
+            case "green":
+                $hex .= "00AA00";
+                break;
+            case "white":
+                $hex .= "AAAAAA";
+                break;
+            case "purple":
+                $hex .= "AA00AA";
+                break;
+            case "pink":
+                $hex .= "FFAAAA";
+                break;
+            default:
+                $hex .= "000000";
+        }
+        return $hex;
+    }
+
+    public static function parseColorString(string|array $colors, string $LOCALE, bool $html = false): string
+    {
+        if (is_string($colors)) {
+            $colors = explode(",", $colors);
+        }
+        if ($html === true) {
+            $colors = array_map(function ($txt) use ($LOCALE) {
+                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::colorToHex($txt) . '">'
+                    . LitColor::i18n($txt, $LOCALE)
+                    . '</FONT></SPAN></I></B>';
+            }, $colors);
+            return implode(' <I><FONT FACE="Calibri">' . _("or") . "</FONT></I> ", $colors);
+        } else {
+            $colors = array_map(function ($txt) use ($LOCALE) {
+                return LitColor::i18n($txt, $LOCALE);
+            }, $colors);
+            return implode(" " . _("or") . " ", $colors);
+        }
+        return ""; //should never get here
+    }
+
+    /**
+     * Ordinal Suffix function
+     * Useful for choosing the correct suffix for ordinal numbers
+     * in the English language
+     * @Author: John Romano D'Orazio
+     */
+    public static function ordSuffix(int $ord): string
+    {
+        $ord_suffix = ''; //st, nd, rd, th
+        if ($ord === 1 || ($ord % 10 === 1  && $ord <> 11)) {
+            $ord_suffix = 'st';
+        } elseif ($ord === 2 || ($ord % 10 === 2  && $ord <> 12)) {
+            $ord_suffix = 'nd';
+        } elseif ($ord === 3 || ($ord % 10 === 3  && $ord <> 13)) {
+            $ord_suffix = 'rd';
+        } else {
+            $ord_suffix = 'th';
+        }
+        return $ord_suffix;
+    }
+
+    /**
+     * @param int $num
+     * @param string $locale
+     * @param \NumberFormatter $formatter
+     * @param string[] $latinOrdinals
+     */
+    public static function getOrdinal(int $num, string $locale, \NumberFormatter $formatter, array $latinOrdinals): string
+    {
+        $ordinal = "";
+        $baseLocale = \Locale::getPrimaryLanguage($locale);
+        switch ($baseLocale) {
+            case "la":
+                $ordinal = $latinOrdinals[$num];
+                break;
+            case "en":
+                $ordinal = $num . self::ordSuffix($num);
+                break;
+            default:
+                $ordinal = $formatter->format($num);
+        }
+        return $ordinal;
+    }
+
+    public static function postInstall(): void
+    {
+        printf("\t\033[4m\033[1;44mCatholic Liturgical Calendar\033[0m\n");
+        printf("\t\033[0;33mAd Majorem Dei Gloriam\033[0m\n");
+        printf("\t\033[0;36mOremus pro Pontifice nostro Francisco Dominus\n\tconservet eum et vivificet eum et beatum faciat eum in terra\n\tet non tradat eum in animam inimicorum ejus\033[0m\n");
+    }
 }

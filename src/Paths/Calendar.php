@@ -6,8 +6,8 @@ use LiturgicalCalendar\Api\Core;
 use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Festivity;
 use LiturgicalCalendar\Api\FestivityCollection;
-use LiturgicalCalendar\Api\LitFunc;
-use LiturgicalCalendar\Api\LitMessages;
+use LiturgicalCalendar\Api\Utilities;
+use LiturgicalCalendar\Api\LatinUtils;
 use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
 use LiturgicalCalendar\Api\Enum\Epiphany;
@@ -585,7 +585,7 @@ class Calendar
         $cacheFilePath = "engineCache/v" . str_replace(".", "_", self::API_VERSION) . "/";
         $paramsHash = md5(serialize($this->CalendarParams));
         LitCommon::$HASH_REQUEST = $paramsHash;
-        LitFunc::$HASH_REQUEST = $paramsHash;
+        Utilities::$HASH_REQUEST = $paramsHash;
         $cacheFileName = $paramsHash . $this->CacheDuration . "." . strtolower($this->CalendarParams->ReturnType);
         $this->CACHEFILE = $cacheFilePath . $cacheFileName;
         return file_exists($this->CACHEFILE);
@@ -909,10 +909,10 @@ class Calendar
      */
     private function calculateEasterTriduum(): void
     {
-        $this->PropriumDeTempore[ "HolyThurs" ][ "date" ]   = LitFunc::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P3D'));
-        $this->PropriumDeTempore[ "GoodFri" ][ "date" ]     = LitFunc::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P2D'));
-        $this->PropriumDeTempore[ "EasterVigil" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P1D'));
-        $this->PropriumDeTempore[ "Easter" ][ "date" ]      = LitFunc::calcGregEaster($this->CalendarParams->Year);
+        $this->PropriumDeTempore[ "HolyThurs" ][ "date" ]   = Utilities::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P3D'));
+        $this->PropriumDeTempore[ "GoodFri" ][ "date" ]     = Utilities::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P2D'));
+        $this->PropriumDeTempore[ "EasterVigil" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P1D'));
+        $this->PropriumDeTempore[ "Easter" ][ "date" ]      = Utilities::calcGregEaster($this->CalendarParams->Year);
         $this->createPropriumDeTemporeFestivityByKey("HolyThurs");
         $this->createPropriumDeTemporeFestivityByKey("GoodFri");
         $this->createPropriumDeTemporeFestivityByKey("EasterVigil");
@@ -948,11 +948,11 @@ class Calendar
             } else {
                 $nth++;
                 //$nthStr = $this->CalendarParams->Locale === LitLocale::LATIN
-                // ? LitMessages::LATIN_ORDINAL[ $nth ]
+                // ? LatinUtils::LATIN_ORDINAL[ $nth ]
                 // : $this->formatter->format( $nth );
                 $locale = LitLocale::$PRIMARY_LANGUAGE;
                 $dayOfTheWeek = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                    ? LitMessages::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
+                    ? LatinUtils::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
                     : ( $locale === 'it'
                         ? $this->dayAndMonth->format($dateTime->format('U'))
                         : ucfirst($this->dayOfTheWeek->format($dateTime->format('U')))
@@ -992,7 +992,7 @@ class Calendar
             for ($i = 7; $i < $SundayAfterEpiphany; $i++) {
                 $nth++;
                 //$nthStr = $this->CalendarParams->Locale === LitLocale::LATIN
-                // ? LitMessages::LATIN_ORDINAL[ $nth ]
+                // ? LatinUtils::LATIN_ORDINAL[ $nth ]
                 // : $this->formatter->format( $nth );
                 $dateTime = DateTime::createFromFormat(
                     '!j-n-Y',
@@ -1001,7 +1001,7 @@ class Calendar
                 );
                 $locale = LitLocale::$PRIMARY_LANGUAGE;
                 $dayOfTheWeek = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                    ? LitMessages::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
+                    ? LatinUtils::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
                     : ( $locale === 'it'
                         ? $this->dayAndMonth->format($dateTime->format('U'))
                         : ucfirst($this->dayOfTheWeek->format($dateTime->format('U')))
@@ -1089,7 +1089,7 @@ class Calendar
             for ($i = 2; $i < $DayOfEpiphany - 1; $i++) {
                 $nth++;
                 //$nthStr = $this->CalendarParams->Locale === LitLocale::LATIN
-                // ? LitMessages::LATIN_ORDINAL[ $nth ]
+                // ? LatinUtils::LATIN_ORDINAL[ $nth ]
                 // : $this->formatter->format( $nth );
                 $dateTime = DateTime::createFromFormat(
                     '!j-n-Y',
@@ -1098,7 +1098,7 @@ class Calendar
                 );
                 $locale = LitLocale::$PRIMARY_LANGUAGE;
                 $dayOfTheWeek = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                    ? LitMessages::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
+                    ? LatinUtils::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
                     : ( $locale === 'it'
                         ? $this->dayAndMonth->format($dateTime->format('U'))
                         : ucfirst($this->dayOfTheWeek->format($dateTime->format('U')))
@@ -1129,7 +1129,7 @@ class Calendar
         for ($i = $DayOfEpiphany + 1; $i < $SundayAfterEpiphany - 1; $i++) {
             $nth++;
             //$nthStr = $this->CalendarParams->Locale === LitLocale::LATIN
-            // ? LitMessages::LATIN_ORDINAL[ $nth ]
+            // ? LatinUtils::LATIN_ORDINAL[ $nth ]
             // : $this->formatter->format( $nth );
             $dateTime = DateTime::createFromFormat(
                 '!j-n-Y',
@@ -1138,7 +1138,7 @@ class Calendar
             );
             $locale = LitLocale::$PRIMARY_LANGUAGE;
             $dayOfTheWeek = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                ? LitMessages::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
+                ? LatinUtils::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
                 : ( $locale === 'it'
                     ? $this->dayAndMonth->format($dateTime->format('U'))
                     : ucfirst($this->dayOfTheWeek->format($dateTime->format('U')))
@@ -1198,18 +1198,18 @@ class Calendar
     private function calculateAscensionPentecost(): void
     {
         if ($this->CalendarParams->Ascension === Ascension::THURSDAY) {
-            $this->PropriumDeTempore[ "Ascension" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P39D'));
+            $this->PropriumDeTempore[ "Ascension" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P39D'));
             $this->createPropriumDeTemporeFestivityByKey("Ascension");
-            $this->PropriumDeTempore[ "Easter7" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+            $this->PropriumDeTempore[ "Easter7" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
                 ->add(new \DateInterval('P' . ( 7 * 6 ) . 'D'));
             $this->createPropriumDeTemporeFestivityByKey("Easter7");
         } elseif ($this->CalendarParams->Ascension === Ascension::SUNDAY) {
-            $this->PropriumDeTempore[ "Ascension" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+            $this->PropriumDeTempore[ "Ascension" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
                 ->add(new \DateInterval('P' . ( 7 * 6 ) . 'D'));
             $this->createPropriumDeTemporeFestivityByKey("Ascension");
         }
 
-        $this->PropriumDeTempore[ "Pentecost" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "Pentecost" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->add(new \DateInterval('P' . ( 7 * 7 ) . 'D'));
         $this->createPropriumDeTemporeFestivityByKey("Pentecost");
     }
@@ -1239,34 +1239,34 @@ class Calendar
         $this->createPropriumDeTemporeFestivityByKey("Advent4");
 
         //We calculate Sundays of Lent, Palm Sunday, Sundays of Easter, Trinity Sunday and Corpus Christi based on Easter
-        $this->PropriumDeTempore[ "Lent1" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "Lent1" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->sub(new \DateInterval('P' . ( 6 * 7 ) . 'D'));
-        $this->PropriumDeTempore[ "Lent2" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "Lent2" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->sub(new \DateInterval('P' . ( 5 * 7 ) . 'D'));
-        $this->PropriumDeTempore[ "Lent3" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "Lent3" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->sub(new \DateInterval('P' . ( 4 * 7 ) . 'D'));
-        $this->PropriumDeTempore[ "Lent4" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "Lent4" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->sub(new \DateInterval('P' . ( 3 * 7 ) . 'D'));
-        $this->PropriumDeTempore[ "Lent5" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "Lent5" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->sub(new \DateInterval('P' . ( 2 * 7 ) . 'D'));
         $this->createPropriumDeTemporeFestivityByKey("Lent1");
         $this->createPropriumDeTemporeFestivityByKey("Lent2");
         $this->createPropriumDeTemporeFestivityByKey("Lent3");
         $this->createPropriumDeTemporeFestivityByKey("Lent4");
         $this->createPropriumDeTemporeFestivityByKey("Lent5");
-        $this->PropriumDeTempore[ "PalmSun" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "PalmSun" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->sub(new \DateInterval('P7D'));
-        $this->PropriumDeTempore[ "Easter2" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "Easter2" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->add(new \DateInterval('P7D'));
-        $this->PropriumDeTempore[ "Easter3" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "Easter3" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->add(new \DateInterval('P' . ( 7 * 2 ) . 'D'));
-        $this->PropriumDeTempore[ "Easter4" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "Easter4" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->add(new \DateInterval('P' . ( 7 * 3 ) . 'D'));
-        $this->PropriumDeTempore[ "Easter5" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "Easter5" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->add(new \DateInterval('P' . ( 7 * 4 ) . 'D'));
-        $this->PropriumDeTempore[ "Easter6" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "Easter6" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->add(new \DateInterval('P' . ( 7 * 5 ) . 'D'));
-        $this->PropriumDeTempore[ "Trinity" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "Trinity" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->add(new \DateInterval('P' . ( 7 * 8 ) . 'D'));
         $this->createPropriumDeTemporeFestivityByKey("PalmSun");
         $this->createPropriumDeTemporeFestivityByKey("Easter2");
@@ -1276,13 +1276,13 @@ class Calendar
         $this->createPropriumDeTemporeFestivityByKey("Easter6");
         $this->createPropriumDeTemporeFestivityByKey("Trinity");
         if ($this->CalendarParams->CorpusChristi === CorpusChristi::THURSDAY) {
-            $this->PropriumDeTempore[ "CorpusChristi" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+            $this->PropriumDeTempore[ "CorpusChristi" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
                 ->add(new \DateInterval('P' . ( 7 * 8 + 4 ) . 'D'));
             $this->createPropriumDeTemporeFestivityByKey("CorpusChristi");
             //Seeing the Sunday is not taken by Corpus Christi, it should be later taken by a Sunday of Ordinary Time
             // (they are calculated back to Pentecost)
         } elseif ($this->CalendarParams->CorpusChristi === CorpusChristi::SUNDAY) {
-            $this->PropriumDeTempore[ "CorpusChristi" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+            $this->PropriumDeTempore[ "CorpusChristi" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
                 ->add(new \DateInterval('P' . ( 7 * 9 ) . 'D'));
             $this->createPropriumDeTemporeFestivityByKey("CorpusChristi");
         }
@@ -1311,7 +1311,7 @@ class Calendar
      */
     private function calculateAshWednesday(): void
     {
-        $this->PropriumDeTempore[ "AshWednesday" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "AshWednesday" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->sub(new \DateInterval('P46D'));
         $this->createPropriumDeTemporeFestivityByKey("AshWednesday");
     }
@@ -1326,11 +1326,11 @@ class Calendar
     {
         //Weekdays of Holy Week from Monday to Thursday inclusive
         // ( that is, thursday morning chrism Mass... the In Coena Domini Mass begins the Easter Triduum )
-        $this->PropriumDeTempore[ "MonHolyWeek" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "MonHolyWeek" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->sub(new \DateInterval('P6D'));
-        $this->PropriumDeTempore[ "TueHolyWeek" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "TueHolyWeek" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->sub(new \DateInterval('P5D'));
-        $this->PropriumDeTempore[ "WedHolyWeek" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "WedHolyWeek" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->sub(new \DateInterval('P4D'));
         $this->createPropriumDeTemporeFestivityByKey("MonHolyWeek");
         $this->createPropriumDeTemporeFestivityByKey("TueHolyWeek");
@@ -1345,17 +1345,17 @@ class Calendar
      */
     private function calculateEasterOctave(): void
     {
-        $this->PropriumDeTempore[ "MonOctaveEaster" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "MonOctaveEaster" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->add(new \DateInterval('P1D'));
-        $this->PropriumDeTempore[ "TueOctaveEaster" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "TueOctaveEaster" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->add(new \DateInterval('P2D'));
-        $this->PropriumDeTempore[ "WedOctaveEaster" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "WedOctaveEaster" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->add(new \DateInterval('P3D'));
-        $this->PropriumDeTempore[ "ThuOctaveEaster" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "ThuOctaveEaster" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->add(new \DateInterval('P4D'));
-        $this->PropriumDeTempore[ "FriOctaveEaster" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "FriOctaveEaster" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->add(new \DateInterval('P5D'));
-        $this->PropriumDeTempore[ "SatOctaveEaster" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "SatOctaveEaster" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->add(new \DateInterval('P6D'));
         $this->createPropriumDeTemporeFestivityByKey("MonOctaveEaster");
         $this->createPropriumDeTemporeFestivityByKey("TueOctaveEaster");
@@ -1372,7 +1372,7 @@ class Calendar
      */
     private function calculateMobileSolemnitiesOfTheLord(): void
     {
-        $this->PropriumDeTempore[ "SacredHeart" ][ "date" ] = LitFunc::calcGregEaster($this->CalendarParams->Year)
+        $this->PropriumDeTempore[ "SacredHeart" ][ "date" ] = Utilities::calcGregEaster($this->CalendarParams->Year)
             ->add(new \DateInterval('P' . ( 7 * 9 + 5 ) . 'D'));
         $this->createPropriumDeTemporeFestivityByKey("SacredHeart");
 
@@ -1455,7 +1455,7 @@ class Calendar
                     && $currentFeastDate >= $this->Cal->getFestivity("PalmSun")->date
                     && $currentFeastDate <= $this->Cal->getFestivity("Easter")->date
                 ) {
-                    $tempFestivity->date = LitFunc::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P8D'));
+                    $tempFestivity->date = Utilities::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P8D'));
                     $this->Messages[] = sprintf(
                         /**translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship  */
                         _('The Solemnity \'%1$s\' falls on %2$s in the year %3$d, the celebration has been transferred to %4$s (%5$s) as per the %6$s.'),
@@ -1464,7 +1464,7 @@ class Calendar
                         $this->CalendarParams->Year,
                         _("the Saturday preceding Palm Sunday"),
                         $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                            ? ( $tempFestivity->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$tempFestivity->date->format('n') ] )
+                            ? ( $tempFestivity->date->format('j') . ' ' . LatinUtils::LATIN_MONTHS[ (int)$tempFestivity->date->format('n') ] )
                             : ( $locale === 'en'
                                 ? $tempFestivity->date->format('F jS')
                                 : $this->dayAndMonth->format($tempFestivity->date->format('U'))
@@ -1475,7 +1475,7 @@ class Calendar
                     );
                 } elseif ($row->event_key === "Annunciation" && $currentFeastDate >= $this->Cal->getFestivity("PalmSun")->date && $currentFeastDate <= $this->Cal->getFestivity("Easter2")->date) {
                     //if the Annunciation falls during Holy Week or within the Octave of Easter, it is transferred to the Monday after the Second Sunday of Easter.
-                    $tempFestivity->date = LitFunc::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P8D'));
+                    $tempFestivity->date = Utilities::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P8D'));
                     $this->Messages[] = sprintf(
                         /**translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship */
                         _('The Solemnity \'%1$s\' falls on %2$s in the year %3$d, the celebration has been transferred to %4$s (%5$s) as per the %6$s.'),
@@ -1484,7 +1484,7 @@ class Calendar
                         $this->CalendarParams->Year,
                         _('the Monday following the Second Sunday of Easter'),
                         $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                            ? ( $tempFestivity->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$tempFestivity->date->format('n') ] )
+                            ? ( $tempFestivity->date->format('j') . ' ' . LatinUtils::LATIN_MONTHS[ (int)$tempFestivity->date->format('n') ] )
                             : ( $locale === 'en'
                                 ? $tempFestivity->date->format('F jS')
                                 : $this->dayAndMonth->format($tempFestivity->date->format('U'))
@@ -1524,7 +1524,7 @@ class Calendar
                         $this->CalendarParams->Year,
                         _("the following Monday"),
                         $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                            ? ( $tempFestivity->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$tempFestivity->date->format('n') ] )
+                            ? ( $tempFestivity->date->format('j') . ' ' . LatinUtils::LATIN_MONTHS[ (int)$tempFestivity->date->format('n') ] )
                             : ( $locale === 'en'
                                     ? $tempFestivity->date->format('F jS')
                                     : $this->dayAndMonth->format($tempFestivity->date->format('U'))
@@ -1676,7 +1676,7 @@ class Calendar
                 $this->CalendarParams->Year,
                 $HolyFamily->name,
                 $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                    ? ( $HolyFamily->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$HolyFamily->date->format('n') ] )
+                    ? ( $HolyFamily->date->format('j') . ' ' . LatinUtils::LATIN_MONTHS[ (int)$HolyFamily->date->format('n') ] )
                     : ( $locale === 'en'
                         ? $HolyFamily->date->format('F jS')
                         : $this->dayAndMonth->format($HolyFamily->date->format('U'))
@@ -1737,7 +1737,7 @@ class Calendar
         $firstOrdinary = DateTime::createFromFormat('!j-n-Y', $this->BaptismLordFmt, new \DateTimeZone('UTC'))->modify($this->BaptismLordMod);
         //Basically we take Ash Wednesday as the limit...
         //Here is ( Ash Wednesday - 7 ) since one more cycle will complete...
-        $firstOrdinaryLimit = LitFunc::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P53D'));
+        $firstOrdinaryLimit = Utilities::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P53D'));
         $ordSun = 1;
         while ($firstOrdinary >= $this->Cal->getFestivity("BaptismLord")->date && $firstOrdinary < $firstOrdinaryLimit) {
             $firstOrdinary = DateTime::createFromFormat(
@@ -1768,7 +1768,7 @@ class Calendar
         )->modify('last Sunday')->sub(new \DateInterval('P' . ( 4 * 7 ) . 'D'));
         //We take Trinity Sunday as the limit...
         //Here is ( Trinity Sunday + 7 ) since one more cycle will complete...
-        $lastOrdinaryLowerLimit = LitFunc::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P' . ( 7 * 9 ) . 'D'));
+        $lastOrdinaryLowerLimit = Utilities::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P' . ( 7 * 9 ) . 'D'));
         $ordSun = 34;
         $ordSunCycle = 4;
 
@@ -1862,10 +1862,10 @@ class Calendar
                 $currentAdvWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1; //week count between current day and First Sunday of Advent
 
                 $dayOfTheWeek = $this->CalendarParams->Locale === LitLocale::LATIN
-                    ? LitMessages::LATIN_DAYOFTHEWEEK[ $weekdayAdvent->format('w') ]
+                    ? LatinUtils::LATIN_DAYOFTHEWEEK[ $weekdayAdvent->format('w') ]
                     : ucfirst($this->dayOfTheWeek->format($weekdayAdvent->format('U')));
                 $ordinal = ucfirst(
-                    LitMessages::getOrdinal($currentAdvWeek, $this->CalendarParams->Locale, $this->formatterFem, LitMessages::LATIN_ORDINAL_FEM_GEN)
+                    Utilities::getOrdinal($currentAdvWeek, $this->CalendarParams->Locale, $this->formatterFem, LatinUtils::LATIN_ORDINAL_FEM_GEN)
                 );
                 $nthStr = $this->CalendarParams->Locale === LitLocale::LATIN
                     ? sprintf("Hebdomadæ %s Adventus", $ordinal)
@@ -1904,7 +1904,7 @@ class Calendar
                 new \DateTimeZone('UTC')
             )->add(new \DateInterval('P' . $weekdayChristmasCnt . 'D'));
             if ($this->Cal->notInSolemnitiesFeastsOrMemorials($weekdayChristmas) && self::dateIsNotSunday($weekdayChristmas)) {
-                $ordinal = ucfirst(LitMessages::getOrdinal(( $weekdayChristmasCnt + 1 ), $this->CalendarParams->Locale, $this->formatter, LitMessages::LATIN_ORDINAL));
+                $ordinal = ucfirst(Utilities::getOrdinal(( $weekdayChristmasCnt + 1 ), $this->CalendarParams->Locale, $this->formatter, LatinUtils::LATIN_ORDINAL));
                 $name = $this->CalendarParams->Locale === LitLocale::LATIN
                     ? sprintf("Dies %s Octavæ Nativitatis", $ordinal)
                     : sprintf(
@@ -1944,9 +1944,9 @@ class Calendar
                     $upper =  (int)$weekdayLent->format('z');
                     $diff = $upper -  (int)$this->Cal->getFestivity("Lent1")->date->format('z'); //day count between current day and First Sunday of Lent
                     $currentLentWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1; //week count between current day and First Sunday of Lent
-                    $ordinal = ucfirst(LitMessages::getOrdinal($currentLentWeek, $this->CalendarParams->Locale, $this->formatterFem, LitMessages::LATIN_ORDINAL_FEM_GEN));
+                    $ordinal = ucfirst(Utilities::getOrdinal($currentLentWeek, $this->CalendarParams->Locale, $this->formatterFem, LatinUtils::LATIN_ORDINAL_FEM_GEN));
                     $dayOfTheWeek = $this->CalendarParams->Locale == LitLocale::LATIN
-                        ? LitMessages::LATIN_DAYOFTHEWEEK[ $weekdayLent->format('w') ]
+                        ? LatinUtils::LATIN_DAYOFTHEWEEK[ $weekdayLent->format('w') ]
                         : ucfirst($this->dayOfTheWeek->format($weekdayLent->format('U')));
                     $nthStr = $this->CalendarParams->Locale === LitLocale::LATIN
                         ? sprintf("Hebdomadæ %s Quadragesimæ", $ordinal)
@@ -1959,7 +1959,7 @@ class Calendar
                     $festivity = new Festivity($name, $weekdayLent, LitColor::PURPLE, LitFeastType::MOBILE);
                 } else {
                     $dayOfTheWeek = $this->CalendarParams->Locale == LitLocale::LATIN
-                        ? LitMessages::LATIN_DAYOFTHEWEEK[ $weekdayLent->format('w') ]
+                        ? LatinUtils::LATIN_DAYOFTHEWEEK[ $weekdayLent->format('w') ]
                         : ucfirst($this->dayOfTheWeek->format($weekdayLent->format('U')));
                     $postStr = $this->CalendarParams->Locale === LitLocale::LATIN ? "post Feria IV Cinerum" : _("after Ash Wednesday");
                     $name = $dayOfTheWeek . " " . $postStr;
@@ -1998,7 +1998,7 @@ class Calendar
             $this->LitGrade->i18n($row->grade, false),
             $row->name,
             $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                ? ( $row->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->date->format('n') ] )
+                ? ( $row->date->format('j') . ' ' . LatinUtils::LATIN_MONTHS[ (int)$row->date->format('n') ] )
                 : ( $locale === 'en'
                     ? $row->date->format('F jS')
                     : $this->dayAndMonth->format($row->date->format('U'))
@@ -2185,7 +2185,7 @@ class Calendar
             $YEAR,
             $DECREE,
             $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                ? ( $row->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[  (int)$row->date->format('n') ] )
+                ? ( $row->date->format('j') . ' ' . LatinUtils::LATIN_MONTHS[  (int)$row->date->format('n') ] )
                 : ( $locale === 'en'
                     ? $row->date->format('F jS')
                     : $this->dayAndMonth->format($row->date->format('U'))
@@ -2230,7 +2230,7 @@ class Calendar
             $this->LitGrade->i18n($row->festivity->grade),
             $row->festivity->name,
             $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                ? ( $row->festivity->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->festivity->date->format('n') ] )
+                ? ( $row->festivity->date->format('j') . ' ' . LatinUtils::LATIN_MONTHS[ (int)$row->festivity->date->format('n') ] )
                 : ( $locale === 'en'
                     ? $row->festivity->date->format('F jS')
                     : $this->dayAndMonth->format($row->festivity->date->format('U'))
@@ -2336,7 +2336,7 @@ class Calendar
                                     break;
                             }
                             $dayOfTheWeek = $this->CalendarParams->Locale === LitLocale::LATIN
-                                ? LitMessages::LATIN_DAYOFTHEWEEK[ $row->festivity->date->format('w') ]
+                                ? LatinUtils::LATIN_DAYOFTHEWEEK[ $row->festivity->date->format('w') ]
                                 : ucfirst($this->dayOfTheWeek->format($row->festivity->date->format('U')));
                             $row->metadata->added_when = $dayOfTheWeek . ' ' . $relString . ' ' . $festivity->name;
                             if (true === $this->checkCoincidencesNewMobileFestivity($row)) {
@@ -2426,7 +2426,7 @@ class Calendar
                     $this->LitGrade->i18n($row->festivity->grade, false),
                     $row->festivity->name,
                     $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                        ? ( $row->festivity->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->festivity->date->format('n') ] )
+                        ? ( $row->festivity->date->format('j') . ' ' . LatinUtils::LATIN_MONTHS[ (int)$row->festivity->date->format('n') ] )
                         : ( $locale === 'en' ? $row->festivity->date->format('F jS') :
                             $this->dayAndMonth->format($row->festivity->date->format('U'))
                         ),
@@ -2812,13 +2812,13 @@ class Calendar
     private function createImmaculateHeart()
     {
         $row = new \stdClass();
-        $row->date = LitFunc::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P' . ( 7 * 9 + 6 ) . 'D'));
+        $row->date = Utilities::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P' . ( 7 * 9 + 6 ) . 'D'));
         if ($this->Cal->notInSolemnitiesFeastsOrMemorials($row->date)) {
             //Immaculate Heart of Mary fixed on the Saturday following the second Sunday after Pentecost
             //( see Calendarium Romanum Generale in Missale Romanum Editio Typica 1970 )
-            //Pentecost = LitFunc::calcGregEaster( $this->CalendarParams->Year )->add( new \DateInterval( 'P'.( 7*7 ).'D' ) )
-            //Second Sunday after Pentecost = LitFunc::calcGregEaster( $this->CalendarParams->Year )->add( new \DateInterval( 'P'.( 7*9 ).'D' ) )
-            //Following Saturday = LitFunc::calcGregEaster( $this->CalendarParams->Year )->add( new \DateInterval( 'P'.( 7*9+6 ).'D' ) )
+            //Pentecost = Utilities::calcGregEaster( $this->CalendarParams->Year )->add( new \DateInterval( 'P'.( 7*7 ).'D' ) )
+            //Second Sunday after Pentecost = Utilities::calcGregEaster( $this->CalendarParams->Year )->add( new \DateInterval( 'P'.( 7*9 ).'D' ) )
+            //Following Saturday = Utilities::calcGregEaster( $this->CalendarParams->Year )->add( new \DateInterval( 'P'.( 7*9+6 ).'D' ) )
             $this->Cal->addFestivity(
                 "ImmaculateHeart",
                 new Festivity(
@@ -2836,7 +2836,7 @@ class Calendar
         } else {
             $row = (object)$this->PropriumDeTempore[ "ImmaculateHeart" ];
             $row->grade = LitGrade::MEMORIAL;
-            $row->date = LitFunc::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P' . ( 7 * 9 + 6 ) . 'D'));
+            $row->date = Utilities::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P' . ( 7 * 9 + 6 ) . 'D'));
             $this->handleCoincidence($row, RomanMissal::EDITIO_TYPICA_1970);
         }
     }
@@ -2962,9 +2962,9 @@ class Calendar
                 $upper =  (int)$weekdayEaster->format('z');
                 $diff = $upper - (int)$this->Cal->getFestivity("Easter")->date->format('z'); //day count between current day and Easter Sunday
                 $currentEasterWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1; //week count between current day and Easter Sunday
-                $ordinal = ucfirst(LitMessages::getOrdinal($currentEasterWeek, $this->CalendarParams->Locale, $this->formatterFem, LitMessages::LATIN_ORDINAL_FEM_GEN));
+                $ordinal = ucfirst(Utilities::getOrdinal($currentEasterWeek, $this->CalendarParams->Locale, $this->formatterFem, LatinUtils::LATIN_ORDINAL_FEM_GEN));
                 $dayOfTheWeek = $this->CalendarParams->Locale === LitLocale::LATIN
-                    ? LitMessages::LATIN_DAYOFTHEWEEK[ $weekdayEaster->format('w') ]
+                    ? LatinUtils::LATIN_DAYOFTHEWEEK[ $weekdayEaster->format('w') ]
                     : ucfirst($this->dayOfTheWeek->format($weekdayEaster->format('U')));
                 $t = $this->CalendarParams->Locale === LitLocale::LATIN
                     ? sprintf("Hebdomadæ %s Temporis Paschali", $ordinal)
@@ -3007,9 +3007,9 @@ class Calendar
                     $diff           = $upper - $dayFirstSunday;
                     $currentOrdWeek = ( ( $diff - $diff % 7 ) / 7 ) + 2;
                 }
-                $ordinal = ucfirst(LitMessages::getOrdinal($currentOrdWeek, $this->CalendarParams->Locale, $this->formatterFem, LitMessages::LATIN_ORDINAL_FEM_GEN));
+                $ordinal = ucfirst(Utilities::getOrdinal($currentOrdWeek, $this->CalendarParams->Locale, $this->formatterFem, LatinUtils::LATIN_ORDINAL_FEM_GEN));
                 $dayOfTheWeek = $this->CalendarParams->Locale === LitLocale::LATIN
-                    ? LitMessages::LATIN_DAYOFTHEWEEK[ $firstOrdinary->format('w') ]
+                    ? LatinUtils::LATIN_DAYOFTHEWEEK[ $firstOrdinary->format('w') ]
                     : ucfirst($this->dayOfTheWeek->format($firstOrdinary->format('U')));
                 $nthStr = $this->CalendarParams->Locale === LitLocale::LATIN
                     ? sprintf("Hebdomadæ %s Temporis Ordinarii", $ordinal)
@@ -3033,7 +3033,7 @@ class Calendar
 
         $ordWeekday = 1;
         //$currentOrdWeek = 1;
-        $lastOrdinary = LitFunc::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P' . ( 7 * 7 ) . 'D'));
+        $lastOrdinary = Utilities::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P' . ( 7 * 7 ) . 'D'));
         $dayLastSunday =  (int)DateTime::createFromFormat(
             '!j-n-Y',
             '25-12-' . $this->CalendarParams->Year,
@@ -3041,16 +3041,16 @@ class Calendar
         )->modify('last Sunday')->sub(new \DateInterval('P' . ( 3 * 7 ) . 'D'))->format('z');
 
         while ($lastOrdinary >= $SecondWeekdaysLowerLimit && $lastOrdinary < $SecondWeekdaysUpperLimit) {
-            $lastOrdinary = LitFunc::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P' . ( 7 * 7 + $ordWeekday ) . 'D'));
+            $lastOrdinary = Utilities::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P' . ( 7 * 7 + $ordWeekday ) . 'D'));
             if ($this->Cal->notInSolemnitiesFeastsOrMemorials($lastOrdinary)) {
                 $lower          = (int)$lastOrdinary->format('z');
                 $diff           = $dayLastSunday - $lower; //day count between current day and Christ the King Sunday
                 $weekDiff       = ( ( $diff - $diff % 7 ) / 7 ); //week count between current day and Christ the King Sunday;
                 $currentOrdWeek = 34 - $weekDiff;
 
-                $ordinal = ucfirst(LitMessages::getOrdinal($currentOrdWeek, $this->CalendarParams->Locale, $this->formatterFem, LitMessages::LATIN_ORDINAL_FEM_GEN));
+                $ordinal = ucfirst(Utilities::getOrdinal($currentOrdWeek, $this->CalendarParams->Locale, $this->formatterFem, LatinUtils::LATIN_ORDINAL_FEM_GEN));
                 $dayOfTheWeek = $this->CalendarParams->Locale === LitLocale::LATIN
-                    ? LitMessages::LATIN_DAYOFTHEWEEK[ $lastOrdinary->format('w') ]
+                    ? LatinUtils::LATIN_DAYOFTHEWEEK[ $lastOrdinary->format('w') ]
                     : ucfirst($this->dayOfTheWeek->format($lastOrdinary->format('U')));
                 $nthStr = $this->CalendarParams->Locale === LitLocale::LATIN
                     ? sprintf("Hebdomadæ %s Temporis Ordinarii", $ordinal)
@@ -3370,7 +3370,7 @@ class Calendar
 
             $locale = LitLocale::$PRIMARY_LANGUAGE;
             $formattedDateStr = $this->CalendarParams->Locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                ? ( $row->festivity->date->format('j') . ' ' . LitMessages::LATIN_MONTHS[ (int)$row->festivity->date->format('n') ] )
+                ? ( $row->festivity->date->format('j') . ' ' . LatinUtils::LATIN_MONTHS[ (int)$row->festivity->date->format('n') ] )
                 : ( $locale === 'en'
                     ? $row->festivity->date->format('F jS')
                     : $this->dayAndMonth->format($row->festivity->date->format('U'))
@@ -4176,7 +4176,7 @@ class Calendar
             $description .=  '\n' . $displayGrade;
             $description .= (is_string($CalEvent->color) && $CalEvent->color != "")
                 || (is_array($CalEvent->color) && count($CalEvent->color) > 0 )
-                ? '\n' . LitMessages::parseColorString($CalEvent->color, $this->CalendarParams->Locale, false)
+                ? '\n' . Utilities::parseColorString($CalEvent->color, $this->CalendarParams->Locale, false)
                 : "";
             $description .= property_exists($CalEvent, 'liturgical_year')
                 && $CalEvent->liturgical_year !== null
@@ -4187,7 +4187,7 @@ class Calendar
             $htmlDescription .=  '<BR>' . $displayGradeHTML;
             $htmlDescription .= (is_string($CalEvent->color) && $CalEvent->color != "")
                 || (is_array($CalEvent->color) && count($CalEvent->color) > 0 )
-                ? "<BR>" . LitMessages::parseColorString($CalEvent->color, $this->CalendarParams->Locale, true)
+                ? "<BR>" . Utilities::parseColorString($CalEvent->color, $this->CalendarParams->Locale, true)
                 : "";
             $htmlDescription .= property_exists($CalEvent, 'liturgical_year')
                 && $CalEvent->liturgical_year !== null
@@ -4293,7 +4293,7 @@ class Calendar
                     . " xsi:schemaLocation=\"$ns $schemaLocation\""
                     . " xmlns=\"$ns\"/>"
                 );
-                LitFunc::convertArray2XML($jsonObj, $xml);
+                Utilities::convertArray2XML($jsonObj, $xml);
                 $rawXML = $xml->asXML(); //this gives us non pretty XML, basically a single long string
 
                 // finally let's pretty print the XML to make the cached file more readable
