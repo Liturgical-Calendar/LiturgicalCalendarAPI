@@ -113,8 +113,41 @@ class Festivity implements \JsonSerializable
         return ( $a->date > $b->date ) ? +1 : -1;
     }
 
-    /* Per trasformare i dati in JSON, dobbiamo indicare come trasformare soprattutto l'oggetto DateTime */
-    public function jsonSerialize(): mixed
+    /**
+     * @inheritDoc
+     *
+     * This function is used to output the object as a JSON string.
+     * It returns an associative array with the following keys:
+     * - event_idx: the index of the event in the array of festivities
+     * - name: the name of the festivity
+     * - date: a PHP timestamp (seconds since the Unix Epoch) for the date of the festivity
+     * - color: the color of the festivity
+     * - color_lcl: the color of the festivity, translated according to the current locale
+     * - type: the type of the festivity
+     * - grade: the grade of the festivity
+     * - grade_lcl: the grade of the festivity, translated according to the current locale
+     * - display_grade: a boolean indicating whether the grade of the festivity should be displayed
+     * - common: an array of common prayers associated with the festivity
+     * - common_lcl: an array of common prayers associated with the festivity, translated according to the current locale
+     * - day_of_the_week_iso8601: the day of the week of the festivity, in the ISO 8601 format (1 for Monday, 7 for Sunday)
+     * - month: the month of the festivity, in the ISO 8601 format (1 for January, 12 for December)
+     * - day: the day of the month of the festivity
+     * - year: the year of the festivity
+     * - month_short: the short month name for the festivity, translated according to the current locale
+     * - month_long: the long month name for the festivity, translated according to the current locale
+     * - day_of_the_week_short: the short day of the week name for the festivity, translated according to the current locale
+     * - day_of_the_week_long: the long day of the week name for the festivity, translated according to the current locale
+     * - liturgical_year: the liturgical year of the festivity, if applicable
+     * - is_vigil_mass: a boolean indicating whether the festivity is a vigil mass, if applicable
+     * - is_vigil_for: the festivity that the current festivity is a vigil for, if applicable
+     * - has_vigil_mass: a boolean indicating whether the festivity has a vigil mass, if applicable
+     * - has_vesper_i: a boolean indicating whether the festivity has a first vespers, if applicable
+     * - has_vesper_ii: a boolean indicating whether the festivity has a second vespers, if applicable
+     * - psalter_week: the psalter week of the festivity, if applicable
+     * - liturgical_season: the liturgical season of the festivity, if applicable
+     * - liturgical_season_lcl: the liturgical season of the festivity, translated according to the current locale
+     */
+    public function jsonSerialize(): array
     {
         $returnArr = [
             'event_idx'                => $this->idx,
@@ -166,12 +199,19 @@ class Festivity implements \JsonSerializable
         return $returnArr;
     }
 
-    public static function setLocale(string $locale, string|false $systemLocale): void
+    /**
+     * Sets the locale for this Festivity class, affecting the translations of
+     * common liturgical texts and the formatting of dates.
+     *
+     * @param string $locale A valid locale string.
+     * @return void
+     */
+    public static function setLocale(string $locale): void
     {
         if (LitLocale::isValid($locale)) {
             self::$locale               = $locale;
             self::$LitGrade             = new LitGrade($locale);
-            self::$LitCommon            = new LitCommon($locale, $systemLocale);
+            self::$LitCommon            = new LitCommon($locale);
             self::$dayOfTheWeekShort    = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, "EEE");
             self::$dayOfTheWeekLong     = \IntlDateFormatter::create($locale, \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, "EEEE");
             self::$monthShort           = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, "MMM");

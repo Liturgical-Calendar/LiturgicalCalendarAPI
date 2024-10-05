@@ -4358,7 +4358,7 @@ class Calendar
      * dates and ordinals, and loads the translation files for the
      * requested locale.
      *
-     * @return string|false The system locale set by this function, or false
+     * @return string|false The locale set by this function, or false
      *                      if the locale could not be set.
      */
     private function prepareL10N(): string|false
@@ -4376,14 +4376,14 @@ class Calendar
             $baseLocale . '.UTF-8',
             $baseLocale
         ];
-        $systemLocale = setlocale(LC_ALL, $localeArray);
+        $localeThatWasSet = setlocale(LC_ALL, $localeArray);
         $this->createFormatters();
         bindtextdomain("litcal", "i18n");
         textdomain("litcal");
         $this->Cal          = new FestivityCollection($this->CalendarParams);
-        $this->LitCommon    = new LitCommon($this->CalendarParams->Locale, $systemLocale);
+        $this->LitCommon    = new LitCommon($this->CalendarParams->Locale);
         $this->LitGrade     = new LitGrade($this->CalendarParams->Locale);
-        return $systemLocale;
+        return $localeThatWasSet;
     }
 
     /**
@@ -4466,8 +4466,8 @@ class Calendar
             die();
         } else {
             $this->dieIfBeforeMinYear();
-            $systemLocale = $this->prepareL10N();
-            Festivity::setLocale($this->CalendarParams->Locale, $systemLocale);
+            $localeThatWasSet = $this->prepareL10N();
+            Festivity::setLocale($this->CalendarParams->Locale);
             $this->calculateUniversalCalendar();
             if ($this->CalendarParams->NationalCalendar !== null && $this->NationalData !== null) {
                 $this->applyNationalCalendar();

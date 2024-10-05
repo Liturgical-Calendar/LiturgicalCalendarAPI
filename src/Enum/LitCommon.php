@@ -2,6 +2,11 @@
 
 namespace LiturgicalCalendar\Api\Enum;
 
+/**
+ * An enumeration of possible values for the "Common" field of a festivity.
+ * The $values array of a "Common" field must contain only values from the $values array
+ *  in the \LitCal\Enum\LitCommon class.
+ */
 class LitCommon
 {
     public const PROPRIO                   = "Proper";
@@ -52,11 +57,16 @@ class LitCommon
     public static string $HASH_REQUEST          = "";
     public static array $REQUEST_PARAMS         = [];
 
-    public function __construct(string $locale, string|false $systemLocale = false)
+    /**
+     * Construct a new instance of LitCommon.
+     *
+     * @param string $locale The locale to use for translation.
+     *
+     * @throws \InvalidArgumentException If the locale is not recognized.
+     */
+    public function __construct(string $locale)
     {
-        $this->locale = $locale;//strtoupper( $locale );
-        //LitCommon::debugWrite( "INSTANTIATING NEW INSTANCE OF LITCOMMON CLASS" );
-        //LitCommon::debugWrite( "current system locale = $systemLocale" );
+        $this->locale = $locale;
         $this->GTXT = [
             self::PROPRIO                           => _("Proper"),
             /**translators: context = from the Common of nn */
@@ -127,10 +137,14 @@ class LitCommon
             /**translators: context = from the Common of nn: nn */
             self::PRO_SANCTIS_MULIERIBUS                => _("For Holy Women")
         ];
-        //LitCommon::debugWrite( "value of this->GTXT:" );
-        //LitCommon::debugWrite( json_encode( $this->GTXT, JSON_PRETTY_PRINT ) );
     }
 
+
+    /**
+     * Latin names of the Commons of Saints.
+     *
+     * @var array<string,string>
+     */
     public const LATIN = [
         self::PROPRIO                               => "Proprio",
         self::DEDICATIONIS_ECCLESIAE                => "Dedicationis ecclesiæ",
@@ -168,30 +182,49 @@ class LitCommon
         self::PRO_SANCTIS_MULIERIBUS                => "Pro sanctis mulieribus"
     ];
 
+    /**
+     * @param string $value
+     * @return string
+     *
+     * Returns glue string for use between "From the Common" and the actual common.
+     * If the value is "Blessed Virgin Mary", returns "of the".
+     * If the value is "Virgins", returns "of".
+     * If the value is one of "Martyrs", "Pastors", "Doctors", "Holy Men and Women",
+     * returns "of".
+     * If the value is "Dedication of a Church", returns "of the".
+     * Otherwise, returns "of the".
+     */
     private static function possessive(string $value): string
     {
         switch ($value) {
             case "Blessed Virgin Mary":
                 /**translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                return \pgettext("(SING_FEMM)", "of the");
+                return pgettext("(SING_FEMM)", "of the");
             case "Virgins":
                 /**translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                return \pgettext("(PLUR_FEMM)", "of");
+                return pgettext("(PLUR_FEMM)", "of");
             case "Martyrs":
             case "Pastors":
             case "Doctors":
             case "Holy Men and Women":
                 /**translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                return \pgettext("(PLUR_MASC)", "of");
+                return pgettext("(PLUR_MASC)", "of");
             case "Dedication of a Church":
                 /**translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                return \pgettext("(SING_FEMM)", "of the");
+                return pgettext("(SING_FEMM)", "of the");
             default:
                 /**translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty! */
-                return \pgettext("(SING_MASC)", "of the");
+                return pgettext("(SING_MASC)", "of the");
         }
     }
 
+    /**
+     * List of possible values for the "Common" field of a festivity.
+     * These values are used in the "Common" field of a festivity,
+     * and are also used as the key in the associative array returned by the
+     * {@see i18n()} and {@see getPossessive()} methods.
+     * @var string[]
+     */
     public static array $values = [
         "Proper",
         "Dedication of a Church",
@@ -267,6 +300,13 @@ class LitCommon
         self::PRO_SANCTIS_MULIERIBUS
     ];
 
+    /**
+     * Validate a value (or values) against the list of $values property of this class.
+     * If the value contains a comma or colon, it is split into an array and tested with the areValid() method.
+     * Otherwise the value is tested directly with the in_array() function.
+     * @param string|array $value The value to be validated.
+     * @return bool True if the value is valid, false otherwise.
+     */
     public static function isValid(string $value)
     {
         if (strpos($value, ',') || strpos($value, ':')) {
@@ -276,6 +316,13 @@ class LitCommon
         return in_array($value, self::$values);
     }
 
+    /**
+     * Validate an array of values against the list of $values property of this class.
+     * If a value contains a colon, it is split into an array and tested with the areValid() method.
+     * Otherwise the value is tested directly with the in_array() function.
+     * @param array $values The values to be validated.
+     * @return bool True if the values are valid, false otherwise.
+     */
     public static function areValid(array $values)
     {
         $values = array_reduce($values, function ($carry, $key) {
@@ -284,46 +331,37 @@ class LitCommon
         return empty(array_diff($values, self::$values));
     }
 
-    /*
-    public static function AB( string|array $value ) : string {
-        if( is_array( $value ) ) {
-            $mapped = array_map('self::AB', $value);
-            return implode( ',', $mapped );
-        } else {
-            if( in_array($value, self::$MARTYRUM) ) {
-                return self::MARTYRUM . ':' . $value;
-            }
-            if( in_array($value, self::$PASTORUM) ) {
-                return self::PASTORUM . ':' . $value;
-            }
-            if( in_array($value, self::$VIRGINUM) ) {
-                return self::VIRGINUM . ':' . $value;
-            }
-            if( in_array($value, self::$SANCTORUM) ) {
-                return self::SANCTORUM_ET_SANCTARUM . ':' . $value;
-            }
-        }
-    }
-    */
 
+    /**
+     * Translates a given value into the currently set locale.
+     * If the value is an array, each element of the array is translated.
+     * If the value is a string that is not a valid value for this class,
+     * it is left unchanged.
+     * @param string|array $value the value to translate
+     * @return string|array the translated value
+     */
     private function i18n(string|array $value): string|array
     {
         if (is_array($value) && self::areValid($value)) {
-            //LitCommon::debugWrite( "FUNCTION LitCommon->i18n: value for translation is an array, mapping all values to translation function" );
             return array_map([$this, 'i18n'], $value);
         } elseif (self::isValid($value)) {
             if ($this->locale === LitLocale::LATIN) {
-                //LitCommon::debugWrite( "translating value $value to LATIN = " . self::LATIN[ $value ]);
                 return self::LATIN[ $value ];
             } else {
-                //LitCommon::debugWrite( "translating value $value to locale $this->locale : " . $this->GTXT[ $value ]);
                 return $this->GTXT[ $value ];
             }
         }
-        //LitCommon::debugWrite( "final value from FUNCTION LitCommon->i18n is of type " . gettype( $value ) . " :: we should never get here?" );
         return $value;
     }
 
+    /**
+     * If the locale is Latin, returns an empty string.
+     * Otherwise returns the possessive form of the given string,
+     * according to the rules defined in the possessive() method.
+     * If the given string is an array, applies the same rules to each element of the array.
+     * @param string|array $value the string or array of strings to get the possessive of
+     * @return string|array the possessive form of the given string, or an array of such strings
+     */
     private function getPossessive(string|array $value): string|array
     {
         if (is_array($value)) {
@@ -333,8 +371,9 @@ class LitCommon
     }
 
     /**
-     * Function C
      * Returns a translated human readable string of the Common or the Proper
+     * @param string|array $common the Common or Proper to translate
+     * @return string the translated human readable string
      */
     public function c(string|array $common = ""): string
     {
