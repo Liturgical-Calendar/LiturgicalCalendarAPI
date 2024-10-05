@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-04 00:52+0000\n"
+"POT-Creation-Date: 2024-10-05 09:17+0000\n"
 "PO-Revision-Date: 2024-10-03 13:34+0000\n"
 "Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Vietnamese <https://translate.johnromanodorazio.com/projects/"
@@ -135,7 +135,7 @@ msgstr "%s - Ngày trong tuần Giáng Sinh"
 
 #. translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
-#: src/Paths/Calendar.php:1296 src/Enum/LitCommon.php:385
+#: src/Paths/Calendar.php:1296 src/Enum/LitCommon.php:424
 msgid "or"
 msgstr "hoặc"
 
@@ -835,200 +835,200 @@ msgstr "đỏ"
 msgid "pink"
 msgstr "hồng"
 
-#: src/Enum/LitCommon.php:61
+#: src/Enum/LitCommon.php:71
 msgid "Proper"
 msgstr "Riêng"
 
 #. translators: context = from the Common of nn
-#: src/Enum/LitCommon.php:63
+#: src/Enum/LitCommon.php:73
 msgid "Dedication of a Church"
 msgstr "Cung hiến Nhà thờ"
 
 #. translators: context = from the Common of nn
-#: src/Enum/LitCommon.php:65
+#: src/Enum/LitCommon.php:75
 msgid "Blessed Virgin Mary"
 msgstr "Đức Trinh Nữ Maria"
 
 #. translators: context = from the Common of nn
-#: src/Enum/LitCommon.php:67
+#: src/Enum/LitCommon.php:77
 msgid "Martyrs"
 msgstr "Tử đạo"
 
 #. translators: context = from the Common of nn
-#: src/Enum/LitCommon.php:69
+#: src/Enum/LitCommon.php:79
 msgid "Pastors"
 msgstr "Mục tử"
 
 #. translators: context = from the Common of nn
-#: src/Enum/LitCommon.php:71
+#: src/Enum/LitCommon.php:81
 msgid "Doctors"
 msgstr "Tiến sĩ"
 
 #. translators: context = from the Common of nn
-#: src/Enum/LitCommon.php:73
+#: src/Enum/LitCommon.php:83
 msgid "Virgins"
 msgstr "Trinh nữ"
 
 #. translators: context = from the Common of nn
-#: src/Enum/LitCommon.php:75
+#: src/Enum/LitCommon.php:85
 msgid "Holy Men and Women"
 msgstr "Các Thánh Nam Nữ"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:78
+#: src/Enum/LitCommon.php:88
 msgid "For One Martyr"
 msgstr "Dành cho một Thánh Tử đạo"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:80
+#: src/Enum/LitCommon.php:90
 msgid "For Several Martyrs"
 msgstr "Cho Nhiều Vị Tử Đạo"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:82
+#: src/Enum/LitCommon.php:92
 msgid "For Missionary Martyrs"
 msgstr "Dành cho các Thánh Tử đạo Truyền giáo"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:84
+#: src/Enum/LitCommon.php:94
 msgid "For One Missionary Martyr"
 msgstr "Cho Một Tử đạo Truyền giáo"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:86
+#: src/Enum/LitCommon.php:96
 msgid "For Several Missionary Martyrs"
 msgstr "Cho Nhiều Vị Tử Đạo Truyền Giáo"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:88
+#: src/Enum/LitCommon.php:98
 msgid "For a Virgin Martyr"
 msgstr "Cho một Trinh Nữ Tử Đạo"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:90
+#: src/Enum/LitCommon.php:100
 msgid "For a Holy Woman Martyr"
 msgstr "Dành cho một Nữ thánh Tử đạo"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:92
+#: src/Enum/LitCommon.php:102
 msgid "For a Pope"
 msgstr "Cho Một Giáo Hoàng"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:94
+#: src/Enum/LitCommon.php:104
 msgid "For a Bishop"
 msgstr "Dành cho một Giám mục"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:96
+#: src/Enum/LitCommon.php:106
 msgid "For One Pastor"
 msgstr "Cho Một Mục Tử"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:98
+#: src/Enum/LitCommon.php:108
 msgid "For Several Pastors"
 msgstr "Cho Nhiều Mục Tử"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:100
+#: src/Enum/LitCommon.php:110
 msgid "For Founders of a Church"
 msgstr "Cho Các Nhà Sáng Lập Giáo Hội"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:102
+#: src/Enum/LitCommon.php:112
 msgid "For One Founder"
 msgstr "Dành cho một Đấng sáng lập"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:104
+#: src/Enum/LitCommon.php:114
 msgid "For Several Founders"
 msgstr "Cho Nhiều Đấng Sáng Lập"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:106
+#: src/Enum/LitCommon.php:116
 msgid "For Missionaries"
 msgstr "Cho Các Nhà Truyền Giáo"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:108
+#: src/Enum/LitCommon.php:118
 msgid "For One Virgin"
 msgstr "Cho Một Trinh nữ"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:110
+#: src/Enum/LitCommon.php:120
 msgid "For Several Virgins"
 msgstr "Dành cho nhiều Trinh nữ"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:112
+#: src/Enum/LitCommon.php:122
 msgid "For Several Saints"
 msgstr "Dành cho nhiều Thánh"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:114
+#: src/Enum/LitCommon.php:124
 msgid "For One Saint"
 msgstr "Cho Một Thánh"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:116
+#: src/Enum/LitCommon.php:126
 msgid "For an Abbot"
 msgstr "Cho một Viện Phụ"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:118
+#: src/Enum/LitCommon.php:128
 msgid "For a Monk"
 msgstr "Cho Một Tu Sĩ"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:120
+#: src/Enum/LitCommon.php:130
 msgid "For a Nun"
 msgstr "Cho Một Nữ Tu"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:122
+#: src/Enum/LitCommon.php:132
 msgid "For Religious"
 msgstr "Cho Tu Sĩ"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:124
+#: src/Enum/LitCommon.php:134
 msgid "For Those Who Practiced Works of Mercy"
 msgstr "Cho Những Người Thực Hành Các Công Việc Từ Thiện"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:126
+#: src/Enum/LitCommon.php:136
 msgid "For Educators"
 msgstr "Cho Các Nhà Giáo Dục"
 
 #. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:128
+#: src/Enum/LitCommon.php:138
 msgid "For Holy Women"
 msgstr "Cho Các Thánh Nữ"
 
 #. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: src/Enum/LitCommon.php:176 src/Enum/LitCommon.php:188
+#: src/Enum/LitCommon.php:202 src/Enum/LitCommon.php:214
 msgctxt "(SING_FEMM)"
 msgid "of the"
 msgstr "của"
 
 #. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: src/Enum/LitCommon.php:179
+#: src/Enum/LitCommon.php:205
 msgctxt "(PLUR_FEMM)"
 msgid "of"
 msgstr "của"
 
 #. translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: src/Enum/LitCommon.php:185
+#: src/Enum/LitCommon.php:211
 msgctxt "(PLUR_MASC)"
 msgid "of"
 msgstr "của"
 
 #. translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: src/Enum/LitCommon.php:191
+#: src/Enum/LitCommon.php:217
 msgctxt "(SING_MASC)"
 msgid "of the"
 msgstr "của"
 
-#: src/Enum/LitCommon.php:368
+#: src/Enum/LitCommon.php:407
 msgid "From the Common"
 msgstr "Từ Phổ thông"
 
