@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-02 17:55+0000\n"
+"POT-Creation-Date: 2024-10-04 00:52+0000\n"
 "PO-Revision-Date: 2024-06-27 22:33+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Dutch <https://translate.johnromanodorazio.com/projects/"
@@ -76,7 +76,6 @@ msgstr ""
 #. translators: Sanctorale refers to the Proprium de Sanctis; %s = name of the Roman Missal
 #: src/Paths/Calendar.php:790
 #, fuzzy, php-format
-#| msgid "Data for the sanctorale from %s could not be found."
 msgid "Data for the Sanctorale from %s could not be found."
 msgstr ""
 "Gegevens voor het eigen van de heiligen van %s kon niet worden gevonden."
@@ -95,7 +94,6 @@ msgstr ""
 #. translators: Sanctorale refers to Proprium de Sanctis
 #: src/Paths/Calendar.php:822
 #, fuzzy
-#| msgid "Could not find a sanctorale data file for %s"
 msgid "Could not find the Sanctorale data"
 msgstr "Een sanctorale data bestand voor %s is niet gevonden"
 
@@ -108,7 +106,6 @@ msgstr ""
 
 #: src/Paths/Calendar.php:853
 #, fuzzy
-#| msgid "Decree of the Congregation for Divine Worship"
 msgid ""
 "Could not find translation data for Memorials based on Decrees of the "
 "Congregation for Divine Worship"
@@ -133,8 +130,7 @@ msgstr "%s van de kersttijd"
 
 #. translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
-#: src/Paths/Calendar.php:1296 src/LatinUtils.php:149 src/LatinUtils.php:154
-#: src/Enum/LitCommon.php:385
+#: src/Paths/Calendar.php:1296 src/Enum/LitCommon.php:385
 msgid "or"
 msgstr "of"
 
