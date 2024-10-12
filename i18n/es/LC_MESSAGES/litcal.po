@@ -5,13 +5,14 @@
 # John R. D'Orazio <priest@johnromanodorazio.com>, 2022, 2023.
 # Jeff Roedel <jeff.roedel.isp@gmail.com>, 2022.
 # OpenAI <noreply-mt-openai@weblate.org>, 2024.
+# Weblate Admin <admin@example.com>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-10-05 09:17+0000\n"
-"PO-Revision-Date: 2024-10-03 13:34+0000\n"
-"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
+"PO-Revision-Date: 2024-10-13 17:40+0000\n"
+"Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: Spanish <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/es/>\n"
 "Language: es\n"
@@ -1043,7 +1044,7 @@ msgstr "de"
 #: src/Enum/LitCommon.php:217
 msgctxt "(SING_MASC)"
 msgid "of the"
-msgstr "de la"
+msgstr "del"
 
 #: src/Enum/LitCommon.php:407
 msgid "From the Common"
