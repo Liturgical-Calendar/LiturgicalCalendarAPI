@@ -93,10 +93,6 @@
                         "Accept-Language": {
                             "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/AcceptLanguage"
                         },
-                        "Host": {
-                            "type": "string",
-                            "const": "litcal.johnromanodorazio.com"
-                        },
                         "X-Requested-With": {
                             "type": "string",
                             "description": "Will only appear for AJAX requests, and will only ever have a value of XMLHttpRequest",
