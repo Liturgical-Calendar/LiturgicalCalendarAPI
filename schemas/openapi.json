@@ -2312,8 +2312,7 @@
         "additionalProperties": false,
         "properties": {
           "diocesan_calendar": {
-            "type": "string",
-            "pattern": "^[A-Z]{3,45}$"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
           },
           "year": {
             "type": "integer",
@@ -2974,7 +2973,7 @@
         "summary": "Diocesan Liturgical Calendar request",
         "description": "Diocesan calendars inherit directly from a corresponding national calendar, and add a few local liturgical events",
         "value": {
-          "diocesan_calendar": "DIOCESIDIROMA",
+          "diocesan_calendar": "romamo_it",
           "year_type": "LITURGICAL",
           "year": 2024
         }
