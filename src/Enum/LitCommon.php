@@ -5,7 +5,7 @@ namespace LiturgicalCalendar\Api\Enum;
 /**
  * An enumeration of possible values for the "Common" field of a festivity.
  * The $values array of a "Common" field must contain only values from the $values array
- *  in the \LitCal\Enum\LitCommon class.
+ *  in the current LiturgicalCalendar\Api\Enum\LitCommon class.
  */
 class LitCommon
 {

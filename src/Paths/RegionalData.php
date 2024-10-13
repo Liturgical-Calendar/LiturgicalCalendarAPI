@@ -25,7 +25,7 @@ use LiturgicalCalendar\Api\Params\RegionalDataParams;
  */
 class RegionalData
 {
-    private ?object $diocesanCalendarsIndex = null;
+    private ?array $DiocesanCalendarsIndex = null;
     private RegionalDataParams $params;
     public static Core $Core;
 
@@ -93,7 +93,13 @@ class RegionalData
     {
         switch ($this->params->category) {
             case "DIOCESANCALENDAR":
-                $calendarDataFile = $this->diocesanCalendarsIndex->{$this->params->key}->path;
+                $dioceseEntry = array_values(array_filter($this->DiocesanCalendarsIndex, function ($el) {
+                    return $el->calendar_id === $this->params->key;
+                }));
+                if (empty($dioceseEntry)) {
+                    self::produceErrorResponse(StatusCode::NOT_FOUND, "The requested resource {$this->params->key} was not found in the index");
+                }
+                $calendarDataFile = $dioceseEntry[0]->path;
                 break;
             case "WIDERREGIONCALENDAR":
                 $calendarDataFile = "data/wider_regions/{$this->params->key}.json";
@@ -289,20 +295,23 @@ class RegionalData
      */
     private function handleDiocesanCalendarUpdate()
     {
+        $dioceseEntry = array_values(array_filter($this->DiocesanCalendarsIndex, function ($item) {
+            return $item->calendar_id === $this->params->key;
+        }));
         if (
-            false === property_exists($this->diocesanCalendarsIndex, $this->params->key)
+            empty($dioceseEntry)
             ||
-            false === property_exists($this->diocesanCalendarsIndex->{$this->params->key}, 'path')
+            false === property_exists($dioceseEntry[0], 'path')
         ) {
             self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendar resource {$this->params->key}, not found in diocesan calendars index `data/nations/index.json`.");
         }
 
-        if (false === file_exists($this->diocesanCalendarsIndex->{$this->params->key}->path)) {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendar resource, not found in path {$this->diocesanCalendarsIndex->{$this->params->key}->path}.");
+        if (false === file_exists($dioceseEntry[0]->path)) {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendar resource, not found in path {$dioceseEntry[0]->path}.");
         }
 
-        if (false === is_writable($this->diocesanCalendarsIndex->{$this->params->key}->path)) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendar resource for {$this->params->key} in path {$this->diocesanCalendarsIndex->{$this->params->key}->path}, check file and folder permissions.");
+        if (false === is_writable($dioceseEntry[0]->path)) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendar resource for {$this->params->key} in path {$dioceseEntry[0]->path}, check file and folder permissions.");
         }
 
         // Check whether the "group" property in the Diocese index is getting updated too
@@ -326,32 +335,32 @@ class RegionalData
         $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         if (
             false === file_put_contents(
-                $this->diocesanCalendarsIndex->{$this->params->key}->path,
+                $dioceseEntry[0]->path,
                 $calendarData . PHP_EOL
             )
         ) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update diocesan calendar resource {$this->params->key} in path {$this->diocesanCalendarsIndex->{$this->params->key}->path}.");
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update diocesan calendar resource {$this->params->key} in path {$dioceseEntry[0]->path}.");
         }
 
         // In case the "group" property is getting updated, update the diocesan calendar index
         if (
-            false === property_exists($this->diocesanCalendarsIndex->{$this->params->key}, 'group')
+            false === property_exists($dioceseEntry[0], 'group')
             && $diocesanGroup !== null
             && $diocesanGroup !== ''
         ) {
-            $this->diocesanCalendarsIndex->{$this->params->key}->group = $diocesanGroup;
-            $this->createOrUpdateIndex(DioceseIndexAction::UPDATE, $this->diocesanCalendarsIndex->{$this->params->key});
-        } elseif ($this->diocesanCalendarsIndex->{$this->params->key}->group !== $diocesanGroup) {
+            $dioceseEntry[0]->group = $diocesanGroup;
+            $this->createOrUpdateIndex(DioceseIndexAction::UPDATE, $dioceseEntry[0]);
+        } elseif ($dioceseEntry[0]->group !== $diocesanGroup) {
             if ($diocesanGroup === null || $diocesanGroup === '') {
-                unset($this->diocesanCalendarsIndex->{$this->params->key}->group);
+                unset($dioceseEntry[0]->group);
             } else {
-                $this->diocesanCalendarsIndex->{$this->params->key}->group = $diocesanGroup;
+                $dioceseEntry[0]->group = $diocesanGroup;
             }
-            $this->createOrUpdateIndex(DioceseIndexAction::UPDATE, $this->diocesanCalendarsIndex->{$this->params->key});
+            $this->createOrUpdateIndex(DioceseIndexAction::UPDATE, $dioceseEntry[0]);
         }
 
         $response = new \stdClass();
-        $response->success = "Calendar data created or updated for Diocese \"{$this->params->key}\" (Nation: \"{$this->diocesanCalendarsIndex->{$this->params->key}->nation}\")";
+        $response->success = "Calendar data created or updated for Diocese \"{$this->params->key}\" (Nation: \"{$dioceseEntry[0]->nation}\")";
         self::produceResponse(json_encode($response));
     }
 
@@ -398,7 +407,13 @@ class RegionalData
         $response = new \stdClass();
         switch ($this->params->category) {
             case "DIOCESANCALENDAR":
-                $calendarDataFile = $this->diocesanCalendarsIndex->{$this->params->key}->path;
+                $dioceseEntry = array_values(array_filter($this->DiocesanCalendarsIndex, function ($el) {
+                    return $el->calendar_id === $this->params->key;
+                }));
+                if (empty($dioceseEntry)) {
+                    self::produceErrorResponse(StatusCode::NOT_FOUND, "The resource requested for deletion {$this->params->key} was not found in the index");
+                }
+                $calendarDataFile = $dioceseEntry[0]->path;
                 break;
             case "WIDERREGIONCALENDAR":
                 $calendarDataFile = "data/wider_regions/{$this->params->key}.json";
@@ -434,7 +449,7 @@ class RegionalData
     {
         $diocesanIndexPath = "data/nations/index.json";
         if (file_exists($diocesanIndexPath)) {
-            $this->diocesanCalendarsIndex = json_decode(file_get_contents($diocesanIndexPath));
+            $this->DiocesanCalendarsIndex = json_decode(file_get_contents($diocesanIndexPath));
         }
     }
 
@@ -451,29 +466,35 @@ class RegionalData
         switch ($action) {
             case DioceseIndexAction::DELETE:
                 $key = $this->params->key;
-                if (property_exists($this->diocesanCalendarsIndex, $key)) {
-                    unset($this->diocesanCalendarsIndex->$key);
-                }
+                $this->DiocesanCalendarsIndex = array_values(array_filter($this->DiocesanCalendarsIndex, function ($el) use ($key) {
+                    return $el->calendar_id !== $key;
+                }));
                 break;
             case DioceseIndexAction::CREATE:
-                $key = mb_strtoupper(preg_replace("/[^\p{L}]/u", "", $data->diocese));
-                if (!property_exists($this->diocesanCalendarsIndex, $key)) {
-                    $this->diocesanCalendarsIndex->$key = new \stdClass();
+                // The client should provide the `calendar_id` property based on the pregenerated ids
+                // in the WorldDiocesesByNation.json file. We should no longer generate the id on the fly.
+                $key = $data->calendar_id;
+                // We can't create an entry with a calendar_id that already exists!
+                if (false !== array_search($key, array_column($this->DiocesanCalendarsIndex, 'calendar_id'), true)) {
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "The calendar_id {$key} already exists in the index. Perhaps you were meaning to update rather than create?");
                 }
-                $this->diocesanCalendarsIndex->$key->path    = $data->path . "/{$data->diocese}.json";
-                $this->diocesanCalendarsIndex->$key->nation  = $data->nation;
-                $this->diocesanCalendarsIndex->$key->diocese = $data->diocese;
-                if (property_exists($data, 'group')) {
-                    $this->diocesanCalendarsIndex->$key->group = $data->group;
-                }
+                // TODO: should we check to make sure that the provided `calendar_id` is a valid value
+                // as in the WorldDiocesesByNation.json file?
+                $data->path .= "/{$data->diocese}.json";
+                $this->DiocesanCalendarsIndex[] = $data;
                 break;
             case DioceseIndexAction::UPDATE:
                 $key = $this->params->key;
-                $this->diocesanCalendarsIndex->$key = $data;
+                $indexEntryToUpdate = array_search($key, array_column($this->DiocesanCalendarsIndex, 'calendar_id'), true);
+                // The client should provide the `calendar_id` property, but if it's missing, add it
+                if (false === property_exists($data, 'calendar_id')) {
+                    $data->calendar_id = $key;
+                }
+                $this->DiocesanCalendarsIndex[$indexEntryToUpdate] = $data;
                 break;
         }
 
-        $test = $this->validateDataAgainstSchema($this->diocesanCalendarsIndex, LitSchema::INDEX);
+        $test = $this->validateDataAgainstSchema($this->DiocesanCalendarsIndex, LitSchema::INDEX);
         if (false === $test) {
             self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, json_encode($test));
         }
@@ -486,7 +507,7 @@ class RegionalData
             self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendars index in path data/nations/index.json, check file and folder permissions.");
         }
 
-        $jsonEncodedContents = json_encode($this->diocesanCalendarsIndex, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $jsonEncodedContents = json_encode($this->DiocesanCalendarsIndex, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         if (false === file_put_contents("data/nations/index.json", $jsonEncodedContents . PHP_EOL)) {
             self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update diocesan calendars index in path data/nations/index.json.");
         }
@@ -495,12 +516,12 @@ class RegionalData
     /**
      * Function validateDataAgainstSchema
      *
-     * @param object $data      Data to validate
-     * @param string $schemaUrl Schema to validate against
+     * @param array|object $data Data to validate
+     * @param string $schemaUrl  Schema to validate against
      *
      * @return boolean
      */
-    private function validateDataAgainstSchema(object $data, string $schemaUrl): bool
+    private function validateDataAgainstSchema(array|object $data, string $schemaUrl): bool
     {
         $schema = Schema::import($schemaUrl);
         try {

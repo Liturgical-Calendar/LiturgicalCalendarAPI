@@ -38,10 +38,11 @@ class Calendar
     private LitCommon $LitCommon;
     private LitGrade $LitGrade;
 
+    private ?array $DioceseIndex                    = null;
+    private ?object $DioceseEntry                   = null;
     private ?object $DiocesanData                   = null;
     private ?object $NationalData                   = null;
     private ?object $WiderRegionData                = null;
-    private ?object $GeneralIndex                   = null;
     private \NumberFormatter $formatter;
     private \NumberFormatter $formatterFem;
     private \IntlDateFormatter $dayAndMonth;
@@ -57,12 +58,12 @@ class Calendar
     private int $startTime;
     private int $endTime;
 
-    private const EASTER_TRIDUUM_EVENT_KEYS = [
-        "HolyThurs",
-        "GoodFri",
-        "EasterVigil",
-        "Easter"
-    ];
+    // private const EASTER_TRIDUUM_EVENT_KEYS = [
+    //     "HolyThurs",
+    //     "GoodFri",
+    //     "EasterVigil",
+    //     "Easter"
+    // ];
 
     /**
      * The following schemas for ordinal spellouts have been taken from
@@ -283,12 +284,12 @@ class Calendar
      * - ascension: a string indicating whether Ascension should be calculated on a Thursday or on a Sunday
      * - corpus_christi: a string indicating whether Corpus Christi should be calculated on a Thursday or on a Sunday
      * - eternal_high_priest: a string indicating whether the celebration of Jesus Christ Eternal High Priest is applicable to the current requested calendar
-     * - national_calendar: a string indicating the national calendar to produce
-     * - diocesan_calendar: a string indicating the diocesan calendar to produce
-     * - locale: a string representing the locale of the calendar
-     * - return_type: a string indicating the format of the response
      * - year_type: a string indicating whether the calendar should be caculated according to the Civil year or the Liturgical year
-     * - year: an integer indicating the year for which the calendar should be calculated
+     * - year: an integer indicating the year for which the calendar should be calculated (preferably indicated in the path rather than in the request body)
+     * - national_calendar: a string indicating the national calendar to produce (preferably indicated in the path rather than in the request body)
+     * - diocesan_calendar: a string indicating the diocesan calendar to produce (preferably indicated in the path rather than in the request body)
+     * - locale: a string representing the locale of the calendar (preferably indicated in the Accept-Language header rather than in the request body)
+     * - return_type: a string indicating the format of the response (preferably indicated in the Accept header rather than in the request body)
      *
      * @return void
      */
@@ -558,10 +559,14 @@ class Calendar
             //first we need to discover the path, so let's retrieve our index file
             $dioceseIndexPath = "data/nations/index.json";
             if (file_exists($dioceseIndexPath)) {
-                $this->GeneralIndex = json_decode(file_get_contents($dioceseIndexPath));
-                if (property_exists($this->GeneralIndex, $this->CalendarParams->DiocesanCalendar)) {
-                    $diocesanDataFile = $this->GeneralIndex->{$this->CalendarParams->DiocesanCalendar}->path;
-                    $this->CalendarParams->NationalCalendar = $this->GeneralIndex->{$this->CalendarParams->DiocesanCalendar}->nation;
+                $this->DioceseIndex = json_decode(file_get_contents($dioceseIndexPath));
+                $dioceseData = array_values(array_filter($this->DioceseIndex, function ($el) {
+                    return $el->calendar_id === $this->CalendarParams->DiocesanCalendar;
+                }));
+                if (count($dioceseData) === 1) {
+                    $this->DioceseEntry = $dioceseData[0];
+                    $this->CalendarParams->NationalCalendar = $dioceseData[0]->nation;
+                    $diocesanDataFile = $dioceseData[0]->path;
                     if (file_exists($diocesanDataFile)) {
                         $this->DiocesanData = json_decode(file_get_contents($diocesanDataFile));
                     }
@@ -4024,7 +4029,7 @@ class Calendar
                                     /**translators: 1: Festivity name, 2: Name of the diocese, 3: Festivity date, 4: Coinciding festivity name, 5: Requested calendar year */
                                     _('The Solemnity \'%1$s\', proper to the calendar of the %2$s and usually celebrated on %3$s, coincides with the Sunday or Solemnity \'%4$s\' in the year %5$d! Does something need to be done about this?'),
                                     '<i>' . $obj->festivity->name . '</i>',
-                                    $this->GeneralIndex->{$this->CalendarParams->DiocesanCalendar}->diocese,
+                                    $this->DioceseEntry->diocese,
                                     '<b>' . $this->dayAndMonth->format($currentFeastDate->format('U')) . '</b>',
                                     '<i>' . $this->Cal->solemnityFromDate($currentFeastDate)->name . '</i>',
                                     $this->CalendarParams->Year
@@ -4033,7 +4038,7 @@ class Calendar
                         $this->Cal->addFestivity(
                             $this->CalendarParams->DiocesanCalendar . "_" . $key,
                             new Festivity(
-                                "[ " . $this->GeneralIndex->{$this->CalendarParams->DiocesanCalendar}->diocese . " ] " . $obj->festivity->name,
+                                "[ " . $this->DioceseEntry->diocese . " ] " . $obj->festivity->name,
                                 $currentFeastDate,
                                 $obj->festivity->color,
                                 LitFeastType::FIXED,
@@ -4045,7 +4050,7 @@ class Calendar
                         $this->Cal->addFestivity(
                             $this->CalendarParams->DiocesanCalendar . "_" . $key,
                             new Festivity(
-                                "[ " . $this->GeneralIndex->{$this->CalendarParams->DiocesanCalendar}->diocese . " ] " . $obj->festivity->name,
+                                "[ " . $this->DioceseEntry->diocese . " ] " . $obj->festivity->name,
                                 $currentFeastDate,
                                 $obj->festivity->color,
                                 LitFeastType::FIXED,
@@ -4059,7 +4064,7 @@ class Calendar
                             _('The %1$s \'%2$s\', proper to the calendar of the %3$s and usually celebrated on %4$s, is suppressed by the Sunday or Solemnity %5$s in the year %6$d'),
                             $this->LitGrade->i18n($obj->festivity->grade, false),
                             '<i>' . $obj->festivity->name . '</i>',
-                            $this->GeneralIndex->{$this->CalendarParams->DiocesanCalendar}->diocese,
+                            $this->DioceseEntry->diocese,
                             '<b>' . $this->dayAndMonth->format($currentFeastDate->format('U')) . '</b>',
                             '<i>' . $this->Cal->solemnityFromDate($currentFeastDate)->name . '</i>',
                             $this->CalendarParams->Year
