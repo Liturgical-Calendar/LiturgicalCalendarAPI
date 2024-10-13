@@ -109,22 +109,22 @@ class Health implements MessageComponentInterface
     }
 
     public const DATA_PATH_TO_SCHEMA = [
-        "data/missals/propriumdetempore/propriumdetempore.json"                                => LitSchema::PROPRIUMDETEMPORE,
+        "data/missals/propriumdetempore/propriumdetempore.json"              => LitSchema::PROPRIUMDETEMPORE,
         "data/missals/propriumdesanctis_1970/propriumdesanctis_1970.json"    => LitSchema::PROPRIUMDESANCTIS,
         "data/missals/propriumdesanctis_2002/propriumdesanctis_2002.json"    => LitSchema::PROPRIUMDESANCTIS,
         "data/missals/propriumdesanctis_2008/propriumdesanctis_2008.json"    => LitSchema::PROPRIUMDESANCTIS,
         "data/missals/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json"
-                                                                     => LitSchema::PROPRIUMDESANCTIS,
-        "data/missals/propriumdesanctis_US_2011/propriumdesanctis_US_2011" => LitSchema::PROPRIUMDESANCTIS,
-        "data/nations/index.json"                                         => LitSchema::INDEX,
-        API_BASE_PATH . '/calendars'                                 => LitSchema::METADATA,
-        API_BASE_PATH . '/decrees'                                   => LitSchema::DECREES,
-        API_BASE_PATH . '/events'                                    => LitSchema::EVENTS,
-        API_BASE_PATH . '/tests'                                     => LitSchema::TESTS,
-        API_BASE_PATH . '/easter'                                    => LitSchema::EASTER,
-        API_BASE_PATH . '/missals'                                   => LitSchema::MISSALS,
-        API_BASE_PATH . '/data'                                      => LitSchema::DATA,
-        API_BASE_PATH . '/schemas'                                   => LitSchema::SCHEMAS
+                                                                             => LitSchema::PROPRIUMDESANCTIS,
+        "data/missals/propriumdesanctis_US_2011/propriumdesanctis_US_2011"   => LitSchema::PROPRIUMDESANCTIS,
+        "data/nations/index.json"                                            => LitSchema::INDEX,
+        API_BASE_PATH . '/calendars'                                         => LitSchema::METADATA,
+        API_BASE_PATH . '/decrees'                                           => LitSchema::DECREES,
+        API_BASE_PATH . '/events'                                            => LitSchema::EVENTS,
+        API_BASE_PATH . '/tests'                                             => LitSchema::TESTS,
+        API_BASE_PATH . '/easter'                                            => LitSchema::EASTER,
+        API_BASE_PATH . '/missals'                                           => LitSchema::MISSALS,
+        API_BASE_PATH . '/data'                                              => LitSchema::DATA,
+        API_BASE_PATH . '/schemas'                                           => LitSchema::SCHEMAS
     ];
 
     public function __construct()

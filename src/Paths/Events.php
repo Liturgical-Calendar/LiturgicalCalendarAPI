@@ -17,7 +17,7 @@ class Events
     public static Core $Core;
     private static array $FestivityCollection = [];
     private static array $LatinMissals        = [];
-    private static ?object $GeneralIndex      = null;
+    private static ?array $DioceseIndex       = null;
     private static ?object $WiderRegionData   = null;
     private static ?object $NationalData      = null;
     private static ?object $DiocesanData      = null;
@@ -40,14 +40,14 @@ class Events
         });
     }
 
-    private static function retrieveGeneralIndex(): void
+    private static function retrieveDioceseIndex(): void
     {
-        $GeneralIndexContents = file_exists("data/nations/index.json") ? file_get_contents("data/nations/index.json") : null;
-        if (null === $GeneralIndexContents || false === $GeneralIndexContents) {
+        $DioceseIndexContents = file_exists("data/nations/index.json") ? file_get_contents("data/nations/index.json") : null;
+        if (null === $DioceseIndexContents || false === $DioceseIndexContents) {
             echo self::produceErrorResponse(StatusCode::NOT_FOUND, "path data/nations/index.json not found");
             die();
         }
-        self::$GeneralIndex = json_decode($GeneralIndexContents);
+        self::$DioceseIndex = json_decode($DioceseIndexContents);
         if (json_last_error() !== JSON_ERROR_NONE) {
             echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
             die();
@@ -151,9 +151,12 @@ class Events
     private function loadDiocesanData(): void
     {
         if ($this->EventsParams->DiocesanCalendar !== null) {
-            if (property_exists(self::$GeneralIndex, $this->EventsParams->DiocesanCalendar)) {
-                $this->EventsParams->NationalCalendar = self::$GeneralIndex->{$this->EventsParams->DiocesanCalendar}->nation;
-                $diocesanDataFile = self::$GeneralIndex->{$this->EventsParams->DiocesanCalendar}->path;
+            $DiocesanData = array_values(array_filter(self::$DioceseIndex, function ($el) {
+                return $el->calendar_id === $this->EventsParams->DiocesanCalendar;
+            }));
+            if (count($DiocesanData) === 1) {
+                $this->EventsParams->NationalCalendar = $DiocesanData[0]->nation;
+                $diocesanDataFile = $DiocesanData[0]->path;
                 if (file_exists($diocesanDataFile)) {
                     self::$DiocesanData = json_decode(file_get_contents($diocesanDataFile));
                 } else {
@@ -162,7 +165,7 @@ class Events
                 }
             } else {
                 $description = "unknown diocese `{$this->EventsParams->DiocesanCalendar}`, supported values are: ["
-                    . implode(',', array_keys(get_object_vars(self::$GeneralIndex))) . "]";
+                    . implode(',', array_column(self::$DioceseIndex, 'calendar_id')) . "]";
                 echo self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                 die();
             }
@@ -463,7 +466,7 @@ class Events
 
         self::$requestPathParts = $requestPathParts;
         self::retrieveLatinMissals();
-        self::retrieveGeneralIndex();
+        self::retrieveDioceseIndex();
         $this->handleRequestParams();
         $this->loadDiocesanData();
         $this->loadNationalAndWiderRegionData();

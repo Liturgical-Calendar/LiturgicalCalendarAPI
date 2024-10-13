@@ -110,23 +110,23 @@ class Metadata
             return StatusCode::UNPROCESSABLE_CONTENT;
         }
 
-        foreach (Metadata::$diocesanCalendars as $diocesan_key => $diocesan_calendar_info) {
+        foreach (Metadata::$diocesanCalendars as $idx => $dioceseEntry) {
             // The client does not need to know where the file resides on the server.
             // This information is only useful to the API itself, when processing the data.
-            $diocesanCalendarPathOnServer = Metadata::$diocesanCalendars[$diocesan_key]["path"];
-            unset(Metadata::$diocesanCalendars[$diocesan_key]["path"]);
+            $diocesanCalendarPathOnServer = Metadata::$diocesanCalendars[$idx]["path"];
+            unset(Metadata::$diocesanCalendars[$idx]["path"]);
 
             // Build any diocesan groups that might be defined
-            if (array_key_exists("group", $diocesan_calendar_info) && $diocesan_calendar_info["group"] !== "") {
-                $diocesan_group_name = $diocesan_calendar_info["group"];
+            if (array_key_exists("group", $dioceseEntry) && $dioceseEntry["group"] !== "") {
+                $diocesan_group_name = $dioceseEntry["group"];
                 if (!array_key_exists($diocesan_group_name, Metadata::$diocesanGroups)) {
                     Metadata::$diocesanGroups[$diocesan_group_name] = [];
                 }
                 // Push the name of the diocese to the group that it belongs to
-                Metadata::$diocesanGroups[$diocesan_group_name][] = $diocesan_key;
+                Metadata::$diocesanGroups[$diocesan_group_name][] = $dioceseEntry["calendar_id"];
             }
 
-            Metadata::retrieveDiocesanSettings($diocesan_key, $diocesanCalendarPathOnServer);
+            Metadata::retrieveDiocesanSettings($dioceseEntry["calendar_id"], $diocesanCalendarPathOnServer);
 
             // Build national calendars and national calendars metadata.
             // This is a second approach to retrieving the names of National calendars,
@@ -141,7 +141,7 @@ class Metadata
             // adding the information about Dioceses associated with them,
             // then we will subsequently check against the Metadata::$baseNationalCalendars array
             // to fill in any missing National calendars that have no Dioceses associated with them yet.
-            $nation = $diocesan_calendar_info["nation"];
+            $nation = $dioceseEntry["nation"];
             if (!array_key_exists($nation, Metadata::$nationalCalendars)) {
                 Metadata::$nationalCalendars[$nation] = [];
                 Metadata::$nationalCalendarsMetadata[$nation] = [
@@ -151,8 +151,8 @@ class Metadata
                     "settings"      => []
                 ];
             }
-            Metadata::$nationalCalendars[$nation][] = $diocesan_key;
-            Metadata::$nationalCalendarsMetadata[$nation]["dioceses"][] = $diocesan_key;
+            Metadata::$nationalCalendars[$nation][] = $dioceseEntry["calendar_id"];
+            Metadata::$nationalCalendarsMetadata[$nation]["dioceses"][] = $dioceseEntry["calendar_id"];
         }
 
         // Now we double check against the ::$baseNationalCalendars array
@@ -186,13 +186,7 @@ class Metadata
                 "dioceses" => $group
             ];
         }
-        $diocesanCalendars = [];
-        foreach (Metadata::$diocesanCalendars as $key => $calendar) {
-            $diocesanCalendars[] = [
-                "calendar_id" => $key,
-                ...$calendar
-            ];
-        }
+        $diocesanCalendars = Metadata::$diocesanCalendars;
         $nationalCalendars = [];
         $nationalCalendars[] = [
             "calendar_id" => "VA",
