@@ -75,7 +75,8 @@ class Metadata
             return;
         }
         if (property_exists($diocesanCalendarData, 'overrides')) {
-            Metadata::$diocesanCalendars[$diocesan_key]['settings'] = $diocesanCalendarData->overrides;
+            $idx = array_search($diocesan_key, array_column(Metadata::$diocesanCalendars, 'calendar_id'), true);
+            Metadata::$diocesanCalendars[$idx]['settings'] = $diocesanCalendarData->overrides;
         }
     }
 
