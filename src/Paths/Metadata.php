@@ -186,7 +186,6 @@ class Metadata
                 "dioceses" => $group
             ];
         }
-        $diocesanCalendars = Metadata::$diocesanCalendars;
         $nationalCalendars = [];
         $nationalCalendars[] = [
             "calendar_id" => "VA",
@@ -212,7 +211,7 @@ class Metadata
             "litcal_metadata" => [
                 "national_calendars"          => $nationalCalendars,
                 "national_calendars_keys"     => $nationalCalendarsKeys,
-                "diocesan_calendars"          => $diocesanCalendars,
+                "diocesan_calendars"          => array_values(Metadata::$diocesanCalendars),
                 "diocesan_calendars_keys"     => array_column(Metadata::$diocesanCalendars, 'calendar_id'),
                 "diocesan_groups"             => $diocesanGroups,
                 "wider_regions"               => Metadata::$widerRegions,
