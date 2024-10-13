@@ -979,9 +979,9 @@
                 "properties": {
                   "key": {
                     "type": "string",
-                    "description": "The name of the diocese, nation or wider region to be created",
+                    "description": "The id of the diocese, nation or wider region to be created. In the case of a wider region, it is the English name of the wider region. In the case of a nation, it is the uppercase ISO 3166-2 code of the nation. In the case of a diocese, it is the key as defined in WorldDioceseByNation.json.",
                     "examples": [
-                      "Archdiocese of Boston (Massachusetts)",
+                      "boston_us",
                       "IT",
                       "Europe"
                     ]
@@ -2142,8 +2142,7 @@
                     "dioceses": {
                         "type": "array",
                         "items": {
-                            "type": "string",
-                            "pattern": "^[A-Z]+$"
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
                         }
                     },
                     "settings": {
@@ -2165,9 +2164,7 @@
                   "type": "object",
                   "properties": {
                     "calendar_id": {
-                      "type": "string",
-                      "description": "Normalized name of the diocese, only uppercase characters (no spaces, hyphens, apostrophes, or non alphabetic characters of any kind)",
-                      "pattern": "^[A-Z]+$"
+                      "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
                     },
                     "nation": {
                       "type": "string",
@@ -2195,8 +2192,7 @@
               "diocesan_calendars_keys": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "pattern": "^[A-Z]+$"
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
                 }
               },
               "diocesan_groups": {
@@ -2211,9 +2207,7 @@
                     "dioceses": {
                       "type": "array",
                       "items": {
-                        "type": "string",
-                        "pattern": "^[A-Z]+$",
-                        "description": "Normalized name of the diocese, only uppercase characters (no spaces, hyphens, apostrophes, or non alphabetic characters of any kind)"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
                       }
                     }
                   }
