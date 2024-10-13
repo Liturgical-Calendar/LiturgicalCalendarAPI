@@ -213,7 +213,7 @@ class Metadata
                 "national_calendars"          => $nationalCalendars,
                 "national_calendars_keys"     => $nationalCalendarsKeys,
                 "diocesan_calendars"          => $diocesanCalendars,
-                "diocesan_calendars_keys"     => array_keys(Metadata::$diocesanCalendars),
+                "diocesan_calendars_keys"     => array_column(Metadata::$diocesanCalendars, 'calendar_id'),
                 "diocesan_groups"             => $diocesanGroups,
                 "wider_regions"               => Metadata::$widerRegions,
                 "wider_regions_keys"          => Metadata::$widerRegionsNames
