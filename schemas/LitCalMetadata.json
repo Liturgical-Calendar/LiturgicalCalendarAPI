@@ -39,8 +39,7 @@
                             "dioceses": {
                                 "type": "array",
                                 "items": {
-                                    "type": "string",
-                                    "pattern": "^[A-Z]+$"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
                                 }
                             },
                             "settings": {
@@ -63,15 +62,14 @@
                         "additionalProperties": false,
                         "properties": {
                             "calendar_id": {
-                                "type": "string",
-                                "pattern": "^[A-Z]+$",
-                                "description": "uppercase normalized string from the name of the diocese, without any spaces or special characters"
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
                             },
                             "nation": {
                                 "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
                             },
                             "diocese": {
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^[a-zA-Z0-9 ()'-]+$"
                             },
                             "group": {
                                 "type": "string"
@@ -90,9 +88,7 @@
                 "diocesan_calendars_keys": {
                     "type": "array",
                     "items": {
-                        "type": "string",
-                        "pattern": "^[A-Z]+$",
-                        "description": "uppercase normalized string from the name of the diocese, without any spaces or special characters"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
                     }
                 },
                 "diocesan_groups": {
@@ -107,8 +103,7 @@
                             "dioceses": {
                                 "type": "array",
                                 "items": {
-                                    "type": "string",
-                                    "pattern": "^[A-Z]+$"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
                                 }
                             }
                         },
