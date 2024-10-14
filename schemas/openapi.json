@@ -3268,7 +3268,7 @@
                     "description": "a liturgical event that has a rank of solemnity, and which can therefore supersede a feast or a memorial",
                     "properties": {
                       "idx": {
-                        "type": "string",
+                        "type": "integer",
                         "xml": {
                           "attribute": true
                         }
@@ -3309,7 +3309,7 @@
                     "description": "a liturgical event that has a rank of feast or memorial, and which can therefore supersede a feast (if this event is a higher ranking feast of the Lord, of the BVM, of John the Baptist etc.), a memorial (if this event is a feast) or an optional memorial  (if this event is a memorial)",
                     "properties": {
                       "idx": {
-                        "type": "string",
+                        "type": "integer",
                         "xml": {
                           "attribute": true
                         }
@@ -3350,7 +3350,7 @@
                     "description": "a liturgical event that has a rank of feast or memorial, and which can therefore supersede a feast (if this event is a higher ranking feast of the Lord, of the BVM, of John the Baptist etc.), a memorial (if this event is a feast) or an optional memorial  (if this event is a memorial)",
                     "properties": {
                       "idx": {
-                        "type": "string",
+                        "type": "integer",
                         "xml": {
                           "attribute": true
                         }
@@ -4145,7 +4145,7 @@
     },
     "examples": {
       "GeneralRomanCalendarRequestBody": {
-        "summary": "General Roman Calendar in Latin",
+        "summary": "General Roman Calendar as used in the Vatican",
         "description": "The General Roman Calendar in Latin is observed in the Vatican, and is the basis for all national and diocesan calendars",
         "value": {
           "year_type": "LITURGICAL"
@@ -4166,8 +4166,8 @@
         }
       },
       "GeneralRomanCalendarTranslatedRequestBody": {
-        "summary": "General Roman Calendar translated",
-        "description": "Request the data of the General Roman calendar in a language other than Latin, or with a few underlying parameters tweaked",
+        "summary": "General Roman Calendar with settings tweaked similarly to how a National or Diocesan calendar would set them",
+        "description": "Request the data of the General Roman calendar with a few underlying parameters tweaked",
         "value": {
           "year_type": "CIVIL",
           "epiphany": "SUNDAY_JAN2_JAN8",
