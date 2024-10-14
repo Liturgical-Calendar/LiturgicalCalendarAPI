@@ -342,7 +342,7 @@ class Missals
         self::$missalsIndex->litcal_missals = [];
         $directories = array_map('basename', glob('data/missals/propriumdesanctis*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
-            if (file_exists("data/$directory/$directory.json")) {
+            if (file_exists("data/missals/$directory/$directory.json")) {
                 $missal = new \stdClass();
                 if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
                     $missal->missal_id      = "EDITIO_TYPICA_{$matches[1]}";
