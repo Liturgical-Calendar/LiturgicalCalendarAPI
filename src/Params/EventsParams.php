@@ -12,6 +12,7 @@ class EventsParams
     public ?string $NationalCalendar          = null;
     public ?string $DiocesanCalendar          = null;
     private array $SupportedNationalCalendars = [ "VA" ];
+    private array $SupportedDiocesanCalendars = [];
     private static string $lastError          = '';
 
     public const ALLOWED_PARAMS  = [
@@ -54,6 +55,14 @@ class EventsParams
                 $this->SupportedNationalCalendars[] = $directory;
             }
         }
+
+        if (file_exists("data/nations/index.json")) {
+            $DiocesesIndex = json_decode(file_get_contents("data/nations/index.json"), true);
+            if (JSON_ERROR_NONE === json_last_error()) {
+                $this->SupportedDiocesanCalendars = array_column($DiocesesIndex, 'calendar_id');
+            }
+        }
+
         if (count($DATA)) {
             $this->setData($DATA);
         }
@@ -77,7 +86,12 @@ class EventsParams
                         $this->NationalCalendar =  strtoupper($value);
                         break;
                     case "diocesan_calendar":
-                        $this->DiocesanCalendar = strtoupper($value);
+                        if (false === in_array($value, $this->SupportedDiocesanCalendars)) {
+                            self::$lastError = "uknown value `$value` for diocese parameter, supported diocesan calendars are: ["
+                                . implode(',', $this->SupportedDiocesanCalendars) . "]";
+                            return false;
+                        }
+                        $this->DiocesanCalendar = $value;
                         break;
                     case "eternal_high_priest":
                         $this->EternalHighPriest = filter_var($value, FILTER_VALIDATE_BOOLEAN);
