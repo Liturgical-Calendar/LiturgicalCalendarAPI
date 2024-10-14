@@ -92,18 +92,22 @@
                   "$ref": "#/components/schemas/GeneralRomanCalendarRequestBody"
                 },
                 {
-                  "$ref": "#/components/schemas/GeneralRomanCalendarTranslatedRequestBody"
+                  "$ref": "#/components/schemas/GeneralRomanCalendarTweakedRequestBody"
                 }
               ]
             },
             "examples": {
-              "GeneralRomanCalendar":
+              "LiturgicalYearCalendar":
                 {
-                  "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
                 },
-              "GeneralRomanCalendarTranslated":
+              "CivilYearCalendar":
                 {
-                  "$ref": "#/components/examples/GeneralRomanCalendarTranslatedRequestBody"
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                },
+              "GeneralRomanCalendarTweaked":
+                {
+                  "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
                 }
             }
           }
@@ -228,13 +232,17 @@
                 "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
               },
               "examples": {
-                "GeneralRomanCalendar":
+                "LiturgicalYearCalendar":
                   {
-                    "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
+                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
                   },
-                "GeneralRomanCalendarTranslated":
+                "CivilYearCalendar":
                   {
-                    "$ref": "#/components/examples/GeneralRomanCalendarTranslatedRequestBody"
+                    "$ref": "#/components/examples/CivilYearRequestBody"
+                  },
+                "GeneralRomanCalendarTweaked":
+                  {
+                    "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
                   }
               }
             },
@@ -243,13 +251,17 @@
                 "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
               },
               "examples": {
-                "GeneralRomanCalendar":
+                "LiturgicalYearCalendar":
                   {
-                    "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
+                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
                   },
-                "GeneralRomanCalendarTranslated":
+                "CivilYearCalendar":
                   {
-                    "$ref": "#/components/examples/GeneralRomanCalendarTranslatedRequestBody"
+                    "$ref": "#/components/examples/CivilYearRequestBody"
+                  },
+                "GeneralRomanCalendarTweaked":
+                  {
+                    "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
                   }
               }
             }
@@ -390,18 +402,22 @@
                   "$ref": "#/components/schemas/GeneralRomanCalendarRequestBody"
                 },
                 {
-                  "$ref": "#/components/schemas/GeneralRomanCalendarTranslatedRequestBody"
+                  "$ref": "#/components/schemas/GeneralRomanCalendarTweakedRequestBody"
                 }
               ]
             },
             "examples": {
-              "GeneralRomanCalendar":
+              "LiturgicalYearCalendar":
                 {
-                  "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
                 },
-              "GeneralRomanCalendarTranslated":
+              "CivilYearCalendar":
                 {
-                  "$ref": "#/components/examples/GeneralRomanCalendarTranslatedRequestBody"
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                },
+              "GeneralRomanCalendarTweaked":
+                {
+                  "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
                 }
             }
           }
@@ -537,13 +553,17 @@
                 "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
               },
               "examples": {
-                "GeneralRomanCalendar":
+                "LiturgicalYearCalendar":
                   {
-                    "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
+                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
                   },
-                "GeneralRomanCalendarTranslated":
+                "CivilYearCalendar":
                   {
-                    "$ref": "#/components/examples/GeneralRomanCalendarTranslatedRequestBody"
+                    "$ref": "#/components/examples/CivilYearRequestBody"
+                  },
+                "GeneralRomanCalendarTweaked":
+                  {
+                    "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
                   }
               }
             },
@@ -552,13 +572,17 @@
                 "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
               },
               "examples": {
-                "GeneralRomanCalendar":
+                "LiturgicalYearCalendar":
                   {
-                    "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
+                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
                   },
-                "GeneralRomanCalendarTranslated":
+                "CivilYearCalendar":
                   {
-                    "$ref": "#/components/examples/GeneralRomanCalendarTranslatedRequestBody"
+                    "$ref": "#/components/examples/CivilYearRequestBody"
+                  },
+                "GeneralRomanCalendarTweaked":
+                  {
+                    "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
                   }
               }
             }
@@ -2500,14 +2524,14 @@
         }
       }
     },
-    "/events/{category}/{key}": {
+    "/events/nation/{calendar_id}": {
       "get": {
         "tags": [
           "All possible liturgical events endpoint"
         ],
         "security": [{}],
-        "summary": "Retrieve all possible liturgical events from the given national or diocesan calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
-        "operationId": "retrieveEventsForNationalOrDiocesanCalendarGET",
+        "summary": "Retrieve all possible liturgical events from the given national calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
+        "operationId": "retrieveEventsForNationalCalendarGET",
         "parameters": [
           {
             "in": "header",
@@ -2518,34 +2542,15 @@
           },
           {
             "in": "path",
-            "name": "category",
+            "name": "calendar_id",
             "required": true,
             "schema": {
               "type": "string",
               "enum": [
-                "nation",
-                "diocese"
-              ]
-            }
-          },
-          {
-            "in": "path",
-            "name": "key",
-            "required": true,
-            "schema": {
-              "oneOf": [
-                {
-                  "type": "string",
-                  "enum": [
-                    "IT",
-                    "US",
-                    "NL",
-                    "VA"
-                  ]
-                },
-                {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
-                }
+                "IT",
+                "US",
+                "NL",
+                "VA"
               ]
             }
           }
@@ -2630,8 +2635,8 @@
           "All possible liturgical events endpoint"
         ],
         "security": [{}],
-        "summary": "Retrieve all possible liturgical events from the given national or diocesan calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
-        "operationId": "retrieveEventsForNationalOrDiocesanCalendarPOST",
+        "summary": "Retrieve all possible liturgical events from the given national calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
+        "operationId": "retrieveEventsForNationalCalendarPOST",
         "parameters": [
           {
             "in": "header",
@@ -2642,35 +2647,216 @@
           },
           {
             "in": "path",
-            "name": "category",
+            "name": "calendar_id",
             "required": true,
             "schema": {
               "type": "string",
               "enum": [
-                "nation",
-                "diocese"
+                "IT",
+                "US",
+                "NL",
+                "VA"
               ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: A collection of all possible liturgical events that can be found in a liturgical calendar produced by the LitCal API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
+                },
+                "example": {
+                  "litcal_events": {
+                    "StsBasilGreg": {
+                      "month": 1,
+                      "day": 2,
+                      "event_key": "StsBasilGreg",
+                      "grade": 3,
+                      "common": [
+                        "Proper"
+                      ],
+                      "calendar": "GENERAL ROMAN",
+                      "color": [
+                        "white"
+                      ],
+                      "readings": {
+                        "first_reading": "Ef 4, 1-7.11-13",
+                        "responsorial_psalm": "Salmo 23",
+                        "second_reading": "",
+                        "alleluia_verse": "Mt 23, 9b.10b",
+                        "gospel": "Mt 23, 8-12"
+                      },
+                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
+                      "missal": "VATICAN_1970"
+                    },
+                    "StRayPenyafort": {
+                      "month": 1,
+                      "day": 7,
+                      "event_key": "StRayPenyafort",
+                      "grade": 2,
+                      "common": [
+                        "Pastors:For One Pastor"
+                      ],
+                      "calendar": "GENERAL ROMAN",
+                      "color": [
+                        "white"
+                      ],
+                      "readings": {
+                        "first_reading": "2 Cor 5, 14-20",
+                        "responsorial_psalm": "Salmo 103",
+                        "second_reading": "",
+                        "alleluia_verse": "Mt 24, 42a.44",
+                        "gospel": "Lc 12, 35-40"
+                      },
+                      "name": "Sancti Raimundi de Penyafort, presbyteri",
+                      "missal": "VATICAN_1970"
+                    }
+                  },
+                  "settings": {
+                    "locale": "la",
+                    "national_calendar": null,
+                    "diocesan_calendar": null
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "304 Not Modified"
+          },
+          "404": {
+            "description": "404 Not Found: resource file not found"
+          },
+          "503": {
+            "description": "503 Service Unavailable: could not decode resource files"
+          }
+        }
+      }
+    },
+    "/events/diocese/{calendar_id}": {
+      "get": {
+        "tags": [
+          "All possible liturgical events endpoint"
+        ],
+        "security": [{}],
+        "summary": "Retrieve all possible liturgical events from the given diocesan calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
+        "operationId": "retrieveEventsForDiocesanCalendarGET",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
             }
           },
           {
             "in": "path",
-            "name": "key",
+            "name": "calendar_id",
             "required": true,
             "schema": {
-              "oneOf": [
-                {
-                  "type": "string",
-                  "enum": [
-                    "IT",
-                    "US",
-                    "NL",
-                    "VA"
-                  ]
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: A collection of all possible liturgical events that can be found in a liturgical calendar produced by the LitCal API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
                 },
-                {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                "example": {
+                  "litcal_events": {
+                    "StsBasilGreg": {
+                      "month": 1,
+                      "day": 2,
+                      "event_key": "StsBasilGreg",
+                      "grade": 3,
+                      "common": [
+                        "Proper"
+                      ],
+                      "calendar": "GENERAL ROMAN",
+                      "color": [
+                        "white"
+                      ],
+                      "readings": {
+                        "first_reading": "Ef 4, 1-7.11-13",
+                        "responsorial_psalm": "Salmo 23",
+                        "second_reading": "",
+                        "alleluia_verse": "Mt 23, 9b.10b",
+                        "gospel": "Mt 23, 8-12"
+                      },
+                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
+                      "missal": "VATICAN_1970"
+                    },
+                    "StRayPenyafort": {
+                      "month": 1,
+                      "day": 7,
+                      "event_key": "StRayPenyafort",
+                      "grade": 2,
+                      "common": [
+                        "Pastors:For One Pastor"
+                      ],
+                      "calendar": "GENERAL ROMAN",
+                      "color": [
+                        "white"
+                      ],
+                      "readings": {
+                        "first_reading": "2 Cor 5, 14-20",
+                        "responsorial_psalm": "Salmo 103",
+                        "second_reading": "",
+                        "alleluia_verse": "Mt 24, 42a.44",
+                        "gospel": "Lc 12, 35-40"
+                      },
+                      "name": "Sancti Raimundi de Penyafort, presbyteri",
+                      "missal": "VATICAN_1970"
+                    }
+                  },
+                  "settings": {
+                    "locale": "en",
+                    "national_calendar": "US",
+                    "diocesan_calendar": "boston_us"
+                  }
                 }
-              ]
+              }
+            }
+          },
+          "304": {
+            "description": "304 Not Modified"
+          },
+          "404": {
+            "description": "404 Not Found: resource file not found"
+          },
+          "503": {
+            "description": "503 Service Unavailable: could not decode resource files"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "All possible liturgical events endpoint"
+        ],
+        "security": [{}],
+        "summary": "Retrieve all possible liturgical events from the given diocesan calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
+        "operationId": "retrieveEventsForDiocesanCalendarPOST",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
+            }
+          },
+          {
+            "in": "path",
+            "name": "calendar_id",
+            "required": true,
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
             }
           }
         ],
@@ -4105,7 +4291,7 @@
             "$ref": "#/components/schemas/GeneralRomanCalendarRequestBody"
           },
           {
-            "$ref": "#/components/schemas/GeneralRomanCalendarTranslatedRequestBody"
+            "$ref": "#/components/schemas/GeneralRomanCalendarTweakedRequestBody"
           }
         ]
       },
@@ -4124,7 +4310,7 @@
           }
         }
       },
-      "GeneralRomanCalendarTranslatedRequestBody": {
+      "GeneralRomanCalendarTweakedRequestBody": {
         "type": "object",
         "title": "General Roman Calendar translated",
         "description": "General Roman Calendar in another language or with tweaked parameters, perhaps for testing purposes",
@@ -4671,13 +4857,6 @@
       }
     },
     "examples": {
-      "GeneralRomanCalendarRequestBody": {
-        "summary": "General Roman Calendar as used in the Vatican",
-        "description": "The General Roman Calendar in Latin is observed in the Vatican, and is the basis for all national and diocesan calendars",
-        "value": {
-          "year_type": "LITURGICAL"
-        }
-      },
       "LiturgicalYearRequestBody": {
         "summary": "Liturgical Year Calendar request",
         "description": "The liturgical year starts from the First Sunday of Advent of the preceding year and ends on the Saturday of the 34th week of Ordinary Time",
@@ -4692,11 +4871,10 @@
           "year_type": "CIVIL"
         }
       },
-      "GeneralRomanCalendarTranslatedRequestBody": {
+      "GeneralRomanCalendarTweakedRequestBody": {
         "summary": "General Roman Calendar with settings tweaked similarly to how a National or Diocesan calendar would set them",
         "description": "Request the data of the General Roman calendar with a few underlying parameters tweaked",
         "value": {
-          "year_type": "CIVIL",
           "epiphany": "SUNDAY_JAN2_JAN8",
           "ascension": "SUNDAY",
           "corpus_christi": "THURSDAY",
