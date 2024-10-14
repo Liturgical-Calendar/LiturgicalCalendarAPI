@@ -1529,7 +1529,7 @@
           "Metadata API endpoint"
         ],
         "security": [{}],
-        "summary": "gives information about current supported national and diocesan calendars and relative locales",
+        "summary": "index of current supported national and diocesan calendars and relative locales, settings, etc.",
         "operationId": "retrieveMetadataPOST",
         "responses": {
           "200": {
@@ -1915,7 +1915,7 @@
           "All possible liturgical events endpoint"
         ],
         "security": [{}],
-        "summary": "retrieves all possible liturgical events from the General Roman Calendar even if they won't appear in the Liturgical Calendar in any given year; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
+        "summary": "Retrieve all possible liturgical events from the General Roman Calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
         "operationId": "retrieveEventsGET",
         "parameters": [
           {
@@ -2006,7 +2006,7 @@
           "All possible liturgical events endpoint"
         ],
         "security": [{}],
-        "summary": "retrieves all possible liturgical events from the General Roman Calendar for any given year even if they won't appear in the Liturgical Calendar for that year; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
+        "summary": "Retrieve all possible liturgical events from the General Roman Calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
         "operationId": "retrieveEventsPOST",
         "parameters": [
           {
@@ -2099,7 +2099,7 @@
           "All possible liturgical events endpoint"
         ],
         "security": [{}],
-        "summary": "retrieves all possible liturgical events from the given national or diocesan calendar even if they won't appear in the Liturgical Calendar in any given year; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
+        "summary": "Retrieve all possible liturgical events from the given national or diocesan calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
         "operationId": "retrieveEventsForNationalOrDiocesanCalendarGET",
         "parameters": [
           {
@@ -2223,7 +2223,7 @@
           "All possible liturgical events endpoint"
         ],
         "security": [{}],
-        "summary": "retrieves all possible liturgical events that may or may not appear in the Liturgical Calendar for any given year, based on the calculations done by the LitCal API; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
+        "summary": "Retrieve all possible liturgical events from the given national or diocesan calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
         "operationId": "retrieveEventsForNationalOrDiocesanCalendarPOST",
         "parameters": [
           {
