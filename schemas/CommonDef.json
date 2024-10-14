@@ -3456,6 +3456,17 @@
                 "masvin_zw",
                 "mutare_zw"
             ]
+        },
+        "NationalCalendarId": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "enum": [
+                "IT",
+                "US",
+                "NL",
+                "VA"
+            ]
         }
     }
 }
