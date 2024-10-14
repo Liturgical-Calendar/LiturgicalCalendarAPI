@@ -238,7 +238,7 @@ class Events
                     echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
                     die();
                 }
-                foreach ($DATA as $idx => $festivity) {
+                foreach ($DATA as $festivity) {
                     $key = $festivity[ "event_key" ];
                     self::$FestivityCollection[ $key ] = $festivity;
                     self::$FestivityCollection[ $key ][ "missal" ] = $LatinMissal;
@@ -257,7 +257,7 @@ class Events
                         echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
                         die();
                     }
-                    foreach ($DATA as $idx => $festivity) {
+                    foreach ($DATA as $festivity) {
                         $key = $festivity[ "event_key" ];
                         self::$FestivityCollection[ $key ][ "name" ] = $NAME[ $key ];
                     }

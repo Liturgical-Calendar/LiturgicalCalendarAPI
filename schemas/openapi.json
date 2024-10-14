@@ -1915,7 +1915,7 @@
           "All possible liturgical events endpoint"
         ],
         "security": [{}],
-        "summary": "retrieves all possible liturgical events that may or may not appear in the Liturgical Calendar for any given year, based on the calculations done by the LitCal API; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
+        "summary": "retrieves all possible liturgical events from the General Roman Calendar even if they won't appear in the Liturgical Calendar in any given year; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
         "operationId": "retrieveEventsGET",
         "parameters": [
           {
@@ -1923,15 +1923,6 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
-            }
-          },
-          {
-            "in": "query",
-            "name": "settings",
-            "style": "form",
-            "explode": true,
-            "schema": {
-              "$ref": "#/components/schemas/EventsRequestBody"
             }
           }
         ],
@@ -1944,51 +1935,273 @@
                   "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
                 },
                 "example": {
-                  "LitCalAllFestivities": {
+                  "litcal_events": {
                     "StsBasilGreg": {
-                      "MONTH": 1,
-                      "DAY": 2,
+                      "month": 1,
+                      "day": 2,
                       "event_key": "StsBasilGreg",
-                      "GRADE": 3,
-                      "COMMON": [
+                      "grade": 3,
+                      "common": [
                         "Proper"
                       ],
-                      "CALENDAR": "GENERAL ROMAN",
-                      "COLOR": [
+                      "calendar": "GENERAL ROMAN",
+                      "color": [
                         "white"
                       ],
-                      "READINGS": {
+                      "readings": {
                         "first_reading": "Ef 4, 1-7.11-13",
                         "responsorial_psalm": "Salmo 23",
                         "second_reading": "",
                         "alleluia_verse": "Mt 23, 9b.10b",
                         "gospel": "Mt 23, 8-12"
                       },
-                      "NAME": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
-                      "MISSAL": "VATICAN_1970"
+                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
+                      "missal": "VATICAN_1970"
                     },
                     "StRayPenyafort": {
-                      "MONTH": 1,
-                      "DAY": 7,
+                      "month": 1,
+                      "day": 7,
                       "event_key": "StRayPenyafort",
-                      "GRADE": 2,
-                      "COMMON": [
+                      "grade": 2,
+                      "common": [
                         "Pastors:For One Pastor"
                       ],
-                      "CALENDAR": "GENERAL ROMAN",
-                      "COLOR": [
+                      "calendar": "GENERAL ROMAN",
+                      "color": [
                         "white"
                       ],
-                      "READINGS": {
+                      "readings": {
                         "first_reading": "2 Cor 5, 14-20",
                         "responsorial_psalm": "Salmo 103",
                         "second_reading": "",
                         "alleluia_verse": "Mt 24, 42a.44",
                         "gospel": "Lc 12, 35-40"
                       },
-                      "NAME": "Sancti Raimundi de Penyafort, presbyteri",
-                      "MISSAL": "VATICAN_1970"
+                      "name": "Sancti Raimundi de Penyafort, presbyteri",
+                      "missal": "VATICAN_1970"
                     }
+                  },
+                  "settings": {
+                    "locale": "en",
+                    "national_calendar": "US",
+                    "diocesan_calendar": "boston_us"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "304 Not Modified"
+          },
+          "404": {
+            "description": "404 Not Found: resource file not found"
+          },
+          "503": {
+            "description": "503 Service Unavailable: could not decode resource files"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "All possible liturgical events endpoint"
+        ],
+        "security": [{}],
+        "summary": "retrieves all possible liturgical events from the General Roman Calendar for any given year even if they won't appear in the Liturgical Calendar for that year; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
+        "operationId": "retrieveEventsPOST",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: A collection of all possible liturgical events that can be found in a liturgical calendar produced by the LitCal API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
+                },
+                "example": {
+                  "litcal_events": {
+                    "StsBasilGreg": {
+                      "month": 1,
+                      "day": 2,
+                      "event_key": "StsBasilGreg",
+                      "grade": 3,
+                      "common": [
+                        "Proper"
+                      ],
+                      "calendar": "GENERAL ROMAN",
+                      "color": [
+                        "white"
+                      ],
+                      "readings": {
+                        "first_reading": "Ef 4, 1-7.11-13",
+                        "responsorial_psalm": "Salmo 23",
+                        "second_reading": "",
+                        "alleluia_verse": "Mt 23, 9b.10b",
+                        "gospel": "Mt 23, 8-12"
+                      },
+                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
+                      "missal": "VATICAN_1970"
+                    },
+                    "StRayPenyafort": {
+                      "month": 1,
+                      "day": 7,
+                      "event_key": "StRayPenyafort",
+                      "grade": 2,
+                      "common": [
+                        "Pastors:For One Pastor"
+                      ],
+                      "calendar": "GENERAL ROMAN",
+                      "color": [
+                        "white"
+                      ],
+                      "readings": {
+                        "first_reading": "2 Cor 5, 14-20",
+                        "responsorial_psalm": "Salmo 103",
+                        "second_reading": "",
+                        "alleluia_verse": "Mt 24, 42a.44",
+                        "gospel": "Lc 12, 35-40"
+                      },
+                      "name": "Sancti Raimundi de Penyafort, presbyteri",
+                      "missal": "VATICAN_1970"
+                    }
+                  },
+                  "settings": {
+                    "locale": "la",
+                    "national_calendar": null,
+                    "diocesan_calendar": null
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "304 Not Modified"
+          },
+          "404": {
+            "description": "404 Not Found: resource file not found"
+          },
+          "503": {
+            "description": "503 Service Unavailable: could not decode resource files"
+          }
+        }
+      }
+    },
+    "/events/{category}/{key}": {
+      "get": {
+        "tags": [
+          "All possible liturgical events endpoint"
+        ],
+        "security": [{}],
+        "summary": "retrieves all possible liturgical events from the given national or diocesan calendar even if they won't appear in the Liturgical Calendar in any given year; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
+        "operationId": "retrieveEventsForNationalOrDiocesanCalendarGET",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
+            }
+          },
+          {
+            "in": "path",
+            "name": "category",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "nation",
+                "diocese"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "IT",
+                    "US",
+                    "NL",
+                    "VA"
+                  ]
+                },
+                {
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: A collection of all possible liturgical events that can be found in a liturgical calendar produced by the LitCal API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
+                },
+                "example": {
+                  "litcal_events": {
+                    "StsBasilGreg": {
+                      "month": 1,
+                      "day": 2,
+                      "event_key": "StsBasilGreg",
+                      "grade": 3,
+                      "common": [
+                        "Proper"
+                      ],
+                      "calendar": "GENERAL ROMAN",
+                      "color": [
+                        "white"
+                      ],
+                      "readings": {
+                        "first_reading": "Ef 4, 1-7.11-13",
+                        "responsorial_psalm": "Salmo 23",
+                        "second_reading": "",
+                        "alleluia_verse": "Mt 23, 9b.10b",
+                        "gospel": "Mt 23, 8-12"
+                      },
+                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
+                      "missal": "VATICAN_1970"
+                    },
+                    "StRayPenyafort": {
+                      "month": 1,
+                      "day": 7,
+                      "event_key": "StRayPenyafort",
+                      "grade": 2,
+                      "common": [
+                        "Pastors:For One Pastor"
+                      ],
+                      "calendar": "GENERAL ROMAN",
+                      "color": [
+                        "white"
+                      ],
+                      "readings": {
+                        "first_reading": "2 Cor 5, 14-20",
+                        "responsorial_psalm": "Salmo 103",
+                        "second_reading": "",
+                        "alleluia_verse": "Mt 24, 42a.44",
+                        "gospel": "Lc 12, 35-40"
+                      },
+                      "name": "Sancti Raimundi de Penyafort, presbyteri",
+                      "missal": "VATICAN_1970"
+                    }
+                  },
+                  "settings": {
+                    "locale": "en",
+                    "national_calendar": "US",
+                    "diocesan_calendar": "boston_us"
                   }
                 }
               }
@@ -2011,7 +2224,7 @@
         ],
         "security": [{}],
         "summary": "retrieves all possible liturgical events that may or may not appear in the Liturgical Calendar for any given year, based on the calculations done by the LitCal API; useful mostly for frontend select inputs to choose an `eventkey` that corresponds with an actual liturgical event",
-        "operationId": "retrieveEventsPOST",
+        "operationId": "retrieveEventsForNationalOrDiocesanCalendarPOST",
         "parameters": [
           {
             "in": "header",
@@ -2019,17 +2232,41 @@
             "schema": {
               "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
             }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "$ref": "#/components/schemas/EventsRequestBody"
-              }
+          },
+          {
+            "in": "path",
+            "name": "category",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "nation",
+                "diocese"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "IT",
+                    "US",
+                    "NL",
+                    "VA"
+                  ]
+                },
+                {
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                }
+              ]
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK: A collection of all possible liturgical events that can be found in a liturgical calendar produced by the LitCal API",
@@ -2039,51 +2276,56 @@
                   "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
                 },
                 "example": {
-                  "LitCalAllFestivities": {
+                  "litcal_events": {
                     "StsBasilGreg": {
-                      "MONTH": 1,
-                      "DAY": 2,
+                      "month": 1,
+                      "day": 2,
                       "event_key": "StsBasilGreg",
-                      "GRADE": 3,
-                      "COMMON": [
+                      "grade": 3,
+                      "common": [
                         "Proper"
                       ],
-                      "CALENDAR": "GENERAL ROMAN",
-                      "COLOR": [
+                      "calendar": "GENERAL ROMAN",
+                      "color": [
                         "white"
                       ],
-                      "READINGS": {
+                      "readings": {
                         "first_reading": "Ef 4, 1-7.11-13",
                         "responsorial_psalm": "Salmo 23",
                         "second_reading": "",
                         "alleluia_verse": "Mt 23, 9b.10b",
                         "gospel": "Mt 23, 8-12"
                       },
-                      "NAME": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
-                      "MISSAL": "VATICAN_1970"
+                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
+                      "missal": "VATICAN_1970"
                     },
                     "StRayPenyafort": {
-                      "MONTH": 1,
-                      "DAY": 7,
+                      "month": 1,
+                      "day": 7,
                       "event_key": "StRayPenyafort",
-                      "GRADE": 2,
-                      "COMMON": [
+                      "grade": 2,
+                      "common": [
                         "Pastors:For One Pastor"
                       ],
-                      "CALENDAR": "GENERAL ROMAN",
-                      "COLOR": [
+                      "calendar": "GENERAL ROMAN",
+                      "color": [
                         "white"
                       ],
-                      "READINGS": {
+                      "readings": {
                         "first_reading": "2 Cor 5, 14-20",
                         "responsorial_psalm": "Salmo 103",
                         "second_reading": "",
                         "alleluia_verse": "Mt 24, 42a.44",
                         "gospel": "Lc 12, 35-40"
                       },
-                      "NAME": "Sancti Raimundi de Penyafort, presbyteri",
-                      "MISSAL": "VATICAN_1970"
+                      "name": "Sancti Raimundi de Penyafort, presbyteri",
+                      "missal": "VATICAN_1970"
                     }
+                  },
+                  "settings": {
+                    "locale": "la",
+                    "national_calendar": null,
+                    "diocesan_calendar": null
                   }
                 }
               }
@@ -3509,39 +3751,6 @@
           }
         }
       },
-      "EventsRequestBody": {
-        "type": "object",
-        "title": "",
-        "description": "",
-        "additionalProperties": false,
-        "oneOf": [
-          {
-            "properties": {
-              "nationalcalendar": {
-                "type": "string",
-                "description": "requests liturgical calendar data for a particular geographic area, on a national level or according to specifications defined be one or more Episcopal Conferences or on a Roman Missal published for a certain language or geographic area."
-              }
-            }
-          },
-          {
-            "properties": {
-              "diocesancalendar": {
-                "type": "string",
-                "description": "requests liturgical calendar data for a particular diocese"
-              }
-            }
-          },
-          {
-            "properties": {
-              "locale": {
-                "type": "string",
-                "description": "request the localization of the General Roman Calendar; however it is preferable to set the Accept-Language header",
-                "default": "la"
-              }
-            }
-          }
-        ]
-      },
       "UnitTestArray": {
         "type": "array",
         "items": {
@@ -3737,19 +3946,19 @@
       "LitCalAllFestivitiesResponse": {
         "type": "object",
         "properties": {
-          "LitCalAllFestivities": {
+          "litcal_events": {
             "type": "object",
             "patternProperties": {
               "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$": {
                 "type": "object",
                 "properties": {
-                  "MONTH": {
+                  "month": {
                     "type": "integer",
                     "format": "int32",
                     "minimum": 1,
                     "maximum": 12
                   },
-                  "DAY": {
+                  "day": {
                     "type": "integer",
                     "format": "int32",
                     "minimum": 1,
@@ -3760,23 +3969,23 @@
                     "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$",
                     "description": "corresponds to the `eventkey` property of liturgical events in the output of the LitCal API and similar endpoints"
                   },
-                  "GRADE": {
+                  "grade": {
                     "type": "integer",
                     "format": "int32",
                     "minimum": 1,
                     "maximum": 7
                   },
-                  "COMMON": {
+                  "common": {
                     "type": "array",
                     "items": {
                       "type": "string"
                     }
                   },
-                  "CALENDAR": {
+                  "calendar": {
                     "type": "string",
                     "const": "GENERAL ROMAN"
                   },
-                  "COLOR": {
+                  "color": {
                     "type": "array",
                     "items": {
                       "type": "string",
@@ -3789,7 +3998,7 @@
                       ]
                     }
                   },
-                  "READINGS": {
+                  "readings": {
                     "type": "object",
                     "properties": {
                       "first_reading": {
@@ -3849,18 +4058,18 @@
                     },
                     "additionalProperties": false
                   },
-                  "NAME": {
+                  "name": {
                     "type": "string",
                     "description": "The actual name of the liturgical event as defined in the latest edition of the source Roman Missal indicated in the key `MISSAL` (i.e. if the Missal is the Latin edition of the Roman Missal, the name should be from the latest edition of the Latin Roman Missal)"
                   },
-                  "TYPE": {
+                  "type": {
                     "type": "string",
                     "enum": [
                       "mobile",
                       "fixed"
                     ]
                   },
-                  "MISSAL": {
+                  "missal": {
                     "type": "string",
                     "enum": [
                       "VATICAN_1970",
@@ -3869,83 +4078,85 @@
                     ],
                     "description": "When a liturgical event is defined in a Roman Missal, this property will be present with an indication of the Roman Missal in question"
                   },
-                  "DECREE": {
+                  "decree": {
                     "type": "string",
                     "description": "When a liturgical event is defined ex-novo by a decree of the Congregation of Divine Worship rather than by a Roman Missal, this property will be present with a reference to the decree"
                   }
                 },
                 "additionalProperties": false,
                 "required": [
-                  "MONTH",
-                  "DAY",
+                  "month",
+                  "day",
                   "event_key",
-                  "GRADE",
-                  "COMMON",
-                  "CALENDAR",
-                  "COLOR",
-                  "READINGS",
-                  "NAME"
+                  "grade",
+                  "common",
+                  "calendar",
+                  "color",
+                  "readings",
+                  "name"
                 ]
               }
             }
           },
-          "Settings": {
+          "settings": {
             "type": "object",
-            "additionalProperties": false,
             "oneOf": [
               {
                 "title": "Diocesan Calendar requested",
                 "properties": {
-                  "Locale": {
+                  "locale": {
                     "type": "string",
                     "pattern": "^[a-z][a-z]$",
-                    "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
+                    "description": "indicates the locale used to produce localized data in litcal_events"
                   },
-                  "NationalCalendar": {
+                  "national_calendar": {
                     "type": "string",
-                    "pattern": "^[A-Z]{3,45}$",
-                    "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
+                    "pattern": "^[A-Z]{2}$",
+                    "description": "indicates the National Calendar used to produce the data in litcal_events"
                   },
-                  "DiocesanCalendar": {
+                  "diocesan_calendar": {
                     "type": "string",
-                    "pattern": "^[A-Z]{3,45}$",
-                    "description": "indicates the Diocesan Calendar used to produce the data in LitCalAllFestivities"
+                    "pattern": "^[a-z]{6}_[a-z]{2}$",
+                    "description": "indicates the Diocesan Calendar used to produce the data in litcal_events"
                   }
-                }
+                },
+                "additionalProperties": false
               },
               {
                 "title": "National Calendar requested",
                 "properties": {
-                  "Locale": {
+                  "locale": {
                     "type": "string",
                     "pattern": "^[a-z][a-z]$",
-                    "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
+                    "description": "indicates the locale used to produce localized data in litcal_events"
                   },
-                  "NationalCalendar": {
+                  "national_calendar": {
                     "type": "string",
-                    "pattern": "^[A-Z]{3,45}$",
-                    "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
+                    "pattern": "^[A-Z]{2}$",
+                    "description": "indicates the National Calendar used to produce the data in litcal_events"
                   },
-                  "DiocesanCalendar": {
+                  "diocesan_calendar": {
                     "type": "null"
                   }
-                }
+                },
+                "additionalProperties": false
               },
               {
                 "title": "Universal Roman Calendar requested",
                 "properties": {
-                  "Locale": {
+                  "locale": {
                     "type": "string",
                     "pattern": "^[a-z][a-z]$",
-                    "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
+                    "description": "indicates the locale used to produce localized data in litcal_events"
                   },
-                  "NationalCalendar": {
+                  "national_calendar": {
                     "type": "null"
                   },
-                  "DiocesanCalendar": {
+                  "diocesan_calendar": {
                     "type": "null"
                   }
-                }
+                },
+                "additionalProperties": false
               }
             ]
           }
