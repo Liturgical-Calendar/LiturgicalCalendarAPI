@@ -77,7 +77,8 @@
                 "application/xml",
                 "application/yaml",
                 "text/calendar"
-              ]
+              ],
+              "default": "application/json"
             }
           },
           {
@@ -89,12 +90,6 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/GeneralRomanCalendarRequestBody"
-                },
-                {
-                  "$ref": "#/components/schemas/NationalCalendarRequestBody"
-                },
-                {
-                  "$ref": "#/components/schemas/DiocesanCalendarRequestBody"
                 },
                 {
                   "$ref": "#/components/schemas/GeneralRomanCalendarTranslatedRequestBody"
@@ -228,7 +223,8 @@
                 "application/xml",
                 "application/yaml",
                 "text/calendar"
-              ]
+              ],
+              "default": "application/json"
             }
           }
         ],
@@ -244,14 +240,6 @@
                   {
                     "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
                   },
-                "NationalCalendar":
-                  {
-                    "$ref": "#/components/examples/NationalCalendarRequestBody"
-                  },
-                "DiocesanCalendar":
-                  {
-                    "$ref": "#/components/examples/DiocesanCalendarRequestBody"
-                  },
                 "GeneralRomanCalendarTranslated":
                   {
                     "$ref": "#/components/examples/GeneralRomanCalendarTranslatedRequestBody"
@@ -266,14 +254,6 @@
                 "GeneralRomanCalendar":
                   {
                     "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
-                  },
-                "NationalCalendar":
-                  {
-                    "$ref": "#/components/examples/NationalCalendarRequestBody"
-                  },
-                "DiocesanCalendar":
-                  {
-                    "$ref": "#/components/examples/DiocesanCalendarRequestBody"
                   },
                 "GeneralRomanCalendarTranslated":
                   {
@@ -392,7 +372,8 @@
                 "application/xml",
                 "application/yaml",
                 "text/calendar"
-              ]
+              ],
+              "default": "application/json"
             }
           },
           {
@@ -417,12 +398,6 @@
                   "$ref": "#/components/schemas/GeneralRomanCalendarRequestBody"
                 },
                 {
-                  "$ref": "#/components/schemas/NationalCalendarRequestBody"
-                },
-                {
-                  "$ref": "#/components/schemas/DiocesanCalendarRequestBody"
-                },
-                {
                   "$ref": "#/components/schemas/GeneralRomanCalendarTranslatedRequestBody"
                 }
               ]
@@ -431,14 +406,6 @@
               "GeneralRomanCalendar":
                 {
                   "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
-                },
-              "NationalCalendar":
-                {
-                  "$ref": "#/components/examples/NationalCalendarRequestBody"
-                },
-              "DiocesanCalendar":
-                {
-                  "$ref": "#/components/examples/DiocesanCalendarRequestBody"
                 },
               "GeneralRomanCalendarTranslated":
                 {
@@ -554,7 +521,8 @@
                 "application/xml",
                 "application/yaml",
                 "text/calendar"
-              ]
+              ],
+              "default": "application/json"
             }
           },
           {
@@ -581,14 +549,6 @@
                   {
                     "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
                   },
-                "NationalCalendar":
-                  {
-                    "$ref": "#/components/examples/NationalCalendarRequestBody"
-                  },
-                "DiocesanCalendar":
-                  {
-                    "$ref": "#/components/examples/DiocesanCalendarRequestBody"
-                  },
                 "GeneralRomanCalendarTranslated":
                   {
                     "$ref": "#/components/examples/GeneralRomanCalendarTranslatedRequestBody"
@@ -603,14 +563,6 @@
                 "GeneralRomanCalendar":
                   {
                     "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
-                  },
-                "NationalCalendar":
-                  {
-                    "$ref": "#/components/examples/NationalCalendarRequestBody"
-                  },
-                "DiocesanCalendar":
-                  {
-                    "$ref": "#/components/examples/DiocesanCalendarRequestBody"
                   },
                 "GeneralRomanCalendarTranslated":
                   {
@@ -729,7 +681,8 @@
                 "application/xml",
                 "application/yaml",
                 "text/calendar"
-              ]
+              ],
+              "default": "application/json"
             }
           },
           {
@@ -778,21 +731,11 @@
                   "$ref": "#/components/schemas/GeneralRomanCalendarRequestBody"
                 },
                 {
-                  "$ref": "#/components/schemas/NationalCalendarRequestBody"
-                },
-                {
-                  "$ref": "#/components/schemas/DiocesanCalendarRequestBody"
-                },
-                {
                   "$ref": "#/components/schemas/GeneralRomanCalendarTranslatedRequestBody"
                 }
               ]
             },
             "examples": {
-              "GeneralRomanCalendar":
-                {
-                  "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
-                },
               "NationalCalendar":
                 {
                   "$ref": "#/components/examples/NationalCalendarRequestBody"
@@ -800,10 +743,6 @@
               "DiocesanCalendar":
                 {
                   "$ref": "#/components/examples/DiocesanCalendarRequestBody"
-                },
-              "GeneralRomanCalendarTranslated":
-                {
-                  "$ref": "#/components/examples/GeneralRomanCalendarTranslatedRequestBody"
                 }
             }
           }
@@ -915,7 +854,8 @@
                 "application/xml",
                 "application/yaml",
                 "text/calendar"
-              ]
+              ],
+              "default": "application/json"
             }
           },
           {
@@ -962,10 +902,6 @@
                 "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
               },
               "examples": {
-                "GeneralRomanCalendar":
-                  {
-                    "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
-                  },
                 "NationalCalendar":
                   {
                     "$ref": "#/components/examples/NationalCalendarRequestBody"
@@ -973,10 +909,6 @@
                 "DiocesanCalendar":
                   {
                     "$ref": "#/components/examples/DiocesanCalendarRequestBody"
-                  },
-                "GeneralRomanCalendarTranslated":
-                  {
-                    "$ref": "#/components/examples/GeneralRomanCalendarTranslatedRequestBody"
                   }
               }
             },
@@ -985,10 +917,6 @@
                 "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
               },
               "examples": {
-                "GeneralRomanCalendar":
-                  {
-                    "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
-                  },
                 "NationalCalendar":
                   {
                     "$ref": "#/components/examples/NationalCalendarRequestBody"
@@ -996,10 +924,6 @@
                 "DiocesanCalendar":
                   {
                     "$ref": "#/components/examples/DiocesanCalendarRequestBody"
-                  },
-                "GeneralRomanCalendarTranslated":
-                  {
-                    "$ref": "#/components/examples/GeneralRomanCalendarTranslatedRequestBody"
                   }
               }
             }
@@ -1114,7 +1038,8 @@
                 "application/xml",
                 "application/yaml",
                 "text/calendar"
-              ]
+              ],
+              "default": "application/json"
             }
           },
           {
@@ -1174,21 +1099,11 @@
                   "$ref": "#/components/schemas/GeneralRomanCalendarRequestBody"
                 },
                 {
-                  "$ref": "#/components/schemas/NationalCalendarRequestBody"
-                },
-                {
-                  "$ref": "#/components/schemas/DiocesanCalendarRequestBody"
-                },
-                {
                   "$ref": "#/components/schemas/GeneralRomanCalendarTranslatedRequestBody"
                 }
               ]
             },
             "examples": {
-              "GeneralRomanCalendar":
-                {
-                  "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
-                },
               "NationalCalendar":
                 {
                   "$ref": "#/components/examples/NationalCalendarRequestBody"
@@ -1196,10 +1111,6 @@
               "DiocesanCalendar":
                 {
                   "$ref": "#/components/examples/DiocesanCalendarRequestBody"
-                },
-              "GeneralRomanCalendarTranslated":
-                {
-                  "$ref": "#/components/examples/GeneralRomanCalendarTranslatedRequestBody"
                 }
             }
           }
@@ -1311,7 +1222,8 @@
                 "application/xml",
                 "application/yaml",
                 "text/calendar"
-              ]
+              ],
+              "default": "application/json"
             }
           },
           {
@@ -1369,10 +1281,6 @@
                 "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
               },
               "examples": {
-                "GeneralRomanCalendar":
-                  {
-                    "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
-                  },
                 "NationalCalendar":
                   {
                     "$ref": "#/components/examples/NationalCalendarRequestBody"
@@ -1380,10 +1288,6 @@
                 "DiocesanCalendar":
                   {
                     "$ref": "#/components/examples/DiocesanCalendarRequestBody"
-                  },
-                "GeneralRomanCalendarTranslated":
-                  {
-                    "$ref": "#/components/examples/GeneralRomanCalendarTranslatedRequestBody"
                   }
               }
             },
@@ -1392,10 +1296,6 @@
                 "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
               },
               "examples": {
-                "GeneralRomanCalendar":
-                  {
-                    "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
-                  },
                 "NationalCalendar":
                   {
                     "$ref": "#/components/examples/NationalCalendarRequestBody"
@@ -1403,10 +1303,6 @@
                 "DiocesanCalendar":
                   {
                     "$ref": "#/components/examples/DiocesanCalendarRequestBody"
-                  },
-                "GeneralRomanCalendarTranslated":
-                  {
-                    "$ref": "#/components/examples/GeneralRomanCalendarTranslatedRequestBody"
                   }
               }
             }
@@ -3473,12 +3369,6 @@
                       "application/xml",
                       "text/calendar"
                     ]
-                  },
-                  "Host": {
-                    "type": "string",
-                    "examples": [
-                      "litcal.johnromanodorazio.com"
-                    ]
                   }
                 }
               }
@@ -3654,48 +3544,12 @@
       "RetrieveCalendarRequestBody": {
         "anyOf": [
           {
-            "$ref": "#/components/schemas/NationalCalendarRequestBody"
-          },
-          {
-            "$ref": "#/components/schemas/DiocesanCalendarRequestBody"
-          },
-          {
             "$ref": "#/components/schemas/GeneralRomanCalendarRequestBody"
           },
           {
             "$ref": "#/components/schemas/GeneralRomanCalendarTranslatedRequestBody"
           }
         ]
-      },
-      "NationalCalendarRequestBody": {
-        "type": "object",
-        "title": "National Calendar",
-        "description": "When requesting a national calendar, the only other parameters allowed are `year`, `year_type`, and `return_type` (though it's preferable to request the media type using the `Accept` header)",
-        "additionalProperties": false,
-        "properties": {
-          "year_type": {
-            "type": "string",
-            "enum": [
-              "CIVIL",
-              "LITURGICAL"
-            ]
-          }
-        }
-      },
-      "DiocesanCalendarRequestBody": {
-        "type": "object",
-        "title": "Diocesan Calendar",
-        "description": "When requesting a diocesan calendar, the only other parameters allowed are `year`, `year_type`, and `return_type` (though it's preferable to request the media type using the `Accept` header)",
-        "additionalProperties": false,
-        "properties": {
-          "year_type": {
-            "type": "string",
-            "enum": [
-              "CIVIL",
-              "LITURGICAL"
-            ]
-          }
-        }
       },
       "GeneralRomanCalendarRequestBody": {
         "type": "object",
