@@ -175,7 +175,7 @@ class Events
     private function loadNationalAndWiderRegionData(): void
     {
         if ($this->EventsParams->NationalCalendar !== null) {
-            $nationalDataFile = "nations/" . $this->EventsParams->NationalCalendar . "/" . $this->EventsParams->NationalCalendar . ".json";
+            $nationalDataFile = "data/nations/" . $this->EventsParams->NationalCalendar . "/" . $this->EventsParams->NationalCalendar . ".json";
             if (file_exists($nationalDataFile)) {
                 self::$NationalData = json_decode(file_get_contents($nationalDataFile));
                 if (json_last_error() === JSON_ERROR_NONE) {
