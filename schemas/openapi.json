@@ -893,7 +893,7 @@
               "schema": {
                 "type": "object",
                 "title": "Liturgical or Civil year",
-                "description": "The liturgical year starts from the First Sunday of Advent of the preceding year and ends on the Saturday of the 34th week of Ordinary Time",
+                "description": "The liturgical year starts from the First Sunday of Advent of the preceding year and ends on the Saturday of the 34th week of Ordinary Time, as opposed to the civil year which starts on Jan 1st and ends on Dec 31st",
                 "additionalProperties": false,
                 "properties": {
                   "year_type": {
@@ -4196,15 +4196,15 @@
         }
       },
       "LiturgicalYearRequestBody": {
-        "summary": "National Liturgical Calendar request",
-        "description": "A national calendar is a calendar that corresponds to a language edition of the Roman Missal as curated by an Episcopal Conference in a given region",
+        "summary": "Liturgical Year Calendar request",
+        "description": "The liturgical year starts from the First Sunday of Advent of the preceding year and ends on the Saturday of the 34th week of Ordinary Time",
         "value": {
           "year_type": "LITURGICAL"
         }
       },
       "CivilYearRequestBody": {
-        "summary": "Diocesan Liturgical Calendar request",
-        "description": "Diocesan calendars inherit directly from a corresponding national calendar, and add a few local liturgical events",
+        "summary": "Civil Year Calendar request",
+        "description": "The civil year starts on Jan 1st and ends on Dec 31st of the requested year",
         "value": {
           "year_type": "CIVIL"
         }
