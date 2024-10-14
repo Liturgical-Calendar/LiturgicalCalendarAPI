@@ -340,7 +340,7 @@ class Missals
         }
         self::$missalsIndex = new \stdClass();
         self::$missalsIndex->litcal_missals = [];
-        $directories = array_map('basename', glob('data/propriumdesanctis*', GLOB_ONLYDIR));
+        $directories = array_map('basename', glob('data/missals/propriumdesanctis*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
             if (file_exists("data/$directory/$directory.json")) {
                 $missal = new \stdClass();
@@ -348,13 +348,13 @@ class Missals
                     $missal->missal_id      = "EDITIO_TYPICA_{$matches[1]}";
                     $missal->region         = "VA";
                     //$missal->year_published = intval($matches[1]);
-                    $it = new \DirectoryIterator("glob://data/$directory/i18n/*.json");
+                    $it = new \DirectoryIterator("glob://data/missals/$directory/i18n/*.json");
                     $languages = [];
                     foreach ($it as $f) {
                         $languages[] = $f->getBasename('.json');
                     }
                     $missal->languages      = $languages;
-                    $missal->i18n_path      = "data/$directory/i18n/";
+                    $missal->i18n_path      = "data/missals/$directory/i18n/";
                     //$missal->api_path       = API_BASE_PATH . "/missals/EDITIO_TYPICA_{$matches[1]}";
                 } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
                     $missal->missal_id      = "{$matches[1]}_{$matches[2]}";
@@ -365,7 +365,7 @@ class Missals
                 $missal->name           = RomanMissal::getName($missal->missal_id);
                 $missal->year_limits    = RomanMissal::$yearLimits[$missal->missal_id];
                 $missal->year_published = RomanMissal::$yearLimits[$missal->missal_id][ "since_year" ];
-                $missal->data_path      = "data/$directory/$directory.json";
+                $missal->data_path      = "data/missals/$directory/$directory.json";
                 $missal->api_path       = API_BASE_PATH . "/missals/$missal->missal_id";
                 self::$missalsIndex->litcal_missals[] = $missal;
                 self::$params->addMissalRegion($missal->region);
