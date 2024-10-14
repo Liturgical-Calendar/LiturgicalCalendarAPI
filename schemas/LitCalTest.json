@@ -12,21 +12,21 @@
             "minProperties": 1,
             "properties": {
                 "national_calendar": {
-                    "type": "string"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/NationalCalendarId"
                 },
                 "diocesan_calendar": {
-                    "type": "string"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
                 },
                 "national_calendars": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/NationalCalendarId"
                     }
                 },
                 "diocesan_calendars": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
                     }
                 }
             },

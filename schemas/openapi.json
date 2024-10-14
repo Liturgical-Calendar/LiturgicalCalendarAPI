@@ -1500,7 +1500,7 @@
           "Metadata API endpoint"
         ],
         "security": [{}],
-        "summary": "index of current supported national and diocesan calendars and relative locales, settings, etc.",
+        "summary": "Retrieve an index of current supported national and diocesan calendars and relative locales, settings, etc.",
         "operationId": "retrieveMetadataGET",
         "responses": {
           "200": {
@@ -1529,7 +1529,7 @@
           "Metadata API endpoint"
         ],
         "security": [{}],
-        "summary": "index of current supported national and diocesan calendars and relative locales, settings, etc.",
+        "summary": "Retrieve an index of current supported national and diocesan calendars and relative locales, settings, etc.",
         "operationId": "retrieveMetadataPOST",
         "responses": {
           "200": {
@@ -1560,7 +1560,7 @@
           "Unit Test Index endpoint"
         ],
         "security": [{}],
-        "summary": "retrieves all the unit tests defined in the API `tests` folder and serves an index useful for frontend processing",
+        "summary": "Retrieve all the unit tests defined in the API `tests` folder as an index useful for frontend processing",
         "operationId": "retrieveTestIndexGET",
         "responses": {
           "200": {
@@ -1573,26 +1573,26 @@
                 "example": [
                   {
                     "name": "MaryMotherChurchTest",
-                    "eventkey": "MaryMotherChurch",
+                    "event_key": "MaryMotherChurch",
                     "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Congregation for Divine Worship on the Monday after Pentecost",
-                    "testType": "exactCorrespondenceSince",
-                    "yearSince": 2018,
+                    "test_type": "exactCorrespondenceSince",
+                    "year_since": 2018,
                     "assertions": [
                       {
                         "year": 2017,
-                        "expectedValue": null,
+                        "expected_value": null,
                         "assert": "eventNotExists",
                         "assertion": "The memorial 'Mary Mother of the Church' should not exist before the year 2018"
                       },
                       {
                         "year": 2018,
-                        "expectedValue": 1526860800,
+                        "expected_value": 1526860800,
                         "assert": "eventExists AND hasExpectedTimestamp",
                         "assertion": "The memorial 'Mary Mother of the Church' should be created on the expected date"
                       },
                       {
                         "year": 2019,
-                        "expectedValue": 1560124800,
+                        "expected_value": 1560124800,
                         "assert": "eventExists AND hasExpectedTimestamp",
                         "assertion": "The memorial 'Mary Mother of the Church' should be created on the expected date"
                       }
@@ -1600,25 +1600,25 @@
                   },
                   {
                     "name": "NativityJohnBaptistTest",
-                    "eventkey": "NativityJohnBaptist",
+                    "event_key": "NativityJohnBaptist",
                     "description": "When the Nativity of John the Baptist coincides with the Solemnity of the Sacred Heart, is it correctly moved to June 23?",
-                    "testType": "exactCorrespondence",
+                    "test_type": "exactCorrespondence",
                     "assertions": [
                       {
                         "year": 2022,
-                        "expectedValue": 1655942400,
+                        "expected_value": 1655942400,
                         "assert": "eventExists AND hasExpectedTimestamp",
                         "assertion": "Nativity of John the Baptist should be moved to June 23"
                       },
                       {
                         "year": 2033,
-                        "expectedValue": 2003097600,
+                        "expected_value": 2003097600,
                         "assert": "eventExists AND hasExpectedTimestamp",
                         "assertion": "Nativity of John the Baptist should be moved to June 23"
                       },
                       {
                         "year": 2044,
-                        "expectedValue": 2350252800,
+                        "expected_value": 2350252800,
                         "assert": "eventExists AND hasExpectedTimestamp",
                         "assertion": "Nativity of John the Baptist should be moved to June 23"
                       }
@@ -1631,7 +1631,7 @@
                     "test_type": "exactCorrespondenceSince",
                     "year_since": 2011,
                     "applies_to": {
-                      "nationalcalendar": "USA"
+                      "national_calendar": "USA"
                     },
                     "assertions": [
                       {
@@ -1732,7 +1732,7 @@
           "Unit Test Index endpoint"
         ],
         "security": [{}],
-        "summary": "create a new unit test in the API `tests` folder",
+        "summary": "Create a new unit test in the API `tests` folder",
         "operationId": "testsIndexPUT",
         "requestBody": {
           "required": true,
@@ -3778,7 +3778,7 @@
             "description": "identifies the Unit Test, and follows the pattern `{eventkey}Test`",
             "pattern": "^[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
           },
-          "eventkey": {
+          "event_key": {
             "type": "string",
             "description": "the liturgical event we are testing, must be the exact key of a corresponding liturgical event in the LitCal API",
             "pattern": "^[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
@@ -3787,7 +3787,7 @@
             "type": "string",
             "description": "describes what the test intends to accomplish"
           },
-          "testType": {
+          "test_type": {
             "type": "string",
             "description": "* `exactCorrespondence`: the liturgical event should exist on an expected date for each of the years defined in the `years` array\n* `variableCorrespondence`: the liturgical event should not exist for certain years, and should exist on an expected date for other years",
             "enum": [
@@ -3808,7 +3808,7 @@
               ]
             }
           },
-          "appliesTo": {
+          "applies_to": {
             "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
           },
           "excludes": {
@@ -3817,9 +3817,9 @@
         },
         "required": [
           "name",
-          "eventkey",
+          "event_key",
           "description",
-          "testType",
+          "test_type",
           "assertions"
         ]
       },
@@ -3831,10 +3831,10 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "identifies the Unit Test, and follows the pattern `{eventkey}Test`",
+            "description": "identifies the Unit Test, and follows the pattern `{event_key}Test`",
             "pattern": "^[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
           },
-          "eventkey": {
+          "event_key": {
             "type": "string",
             "description": "the liturgical event we are testing, must be the exact key of a corresponding liturgical event in the LitCal API",
             "pattern": "^[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
@@ -3843,12 +3843,12 @@
             "type": "string",
             "description": "describes what the test intends to accomplish"
           },
-          "testType": {
+          "test_type": {
             "type": "string",
             "description": "the liturgical event should exist on an expected date starting from the year indicated in the `yearSince` key, before such year the liturgical event should not exist",
             "const": "exactCorrespondenceSince"
           },
-          "yearSince": {
+          "year_since": {
             "type": "integer",
             "format": "int32",
             "minimum": 1970,
@@ -3867,7 +3867,7 @@
               ]
             }
           },
-          "appliesTo": {
+          "applies_to": {
             "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
           },
           "excludes": {
@@ -3876,11 +3876,11 @@
         },
         "required": [
           "name",
-          "eventkey",
+          "event_key",
           "description",
-          "testType",
+          "test_type",
           "assertions",
-          "yearSince"
+          "year_since"
         ]
       },
       "ExactCorrespondenceUntilUnitTest": {
@@ -3894,7 +3894,7 @@
             "description": "identifies the Unit Test, and follows the pattern `{eventkey}Test`",
             "pattern": "^[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
           },
-          "eventkey": {
+          "event_key": {
             "type": "string",
             "description": "the liturgical event we are testing, must be the exact key of a corresponding liturgical event in the LitCal API",
             "pattern": "^[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
@@ -3903,12 +3903,12 @@
             "type": "string",
             "description": "describes what the test intends to accomplish"
           },
-          "testType": {
+          "test_type": {
             "type": "string",
             "description": "the liturgical event should exist on an expected date until the year indicated in the `yearUntil` key, after such year the liturgical event should not exist",
             "const": "exactCorrespondenceUntil"
           },
-          "yearUntil": {
+          "year_until": {
             "type": "integer",
             "format": "int32",
             "minimum": 1970,
@@ -3927,7 +3927,7 @@
               ]
             }
           },
-          "appliesTo": {
+          "applies_to": {
             "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
           },
           "excludes": {
@@ -4176,7 +4176,7 @@
             "minimum": 1970,
             "maximum": 9999
           },
-          "expectedValue": {
+          "expected_value": {
             "type": "integer",
             "format": "int64",
             "minimum": -2851200,
@@ -4195,7 +4195,7 @@
             "description": "any extra information about the significance of the expected value for this year compared to other years"
           }
         },
-        "required": [ "year", "expectedValue", "assert", "assertion" ]
+        "required": [ "year", "expected_value", "assert", "assertion" ]
       },
       "EventNotExistsAssertion": {
         "title": "Event not exists",
@@ -4210,7 +4210,7 @@
             "minimum": 1970,
             "maximum": 9999
           },
-          "expectedValue": {
+          "expected_value": {
             "type": "null"
           },
           "assert": {
@@ -4226,7 +4226,7 @@
             "description": "any extra information about the significance of the expected value for this year compared to other years"
           }
         },
-        "required": [ "year", "expectedValue", "assert", "assertion" ]
+        "required": [ "year", "expected_value", "assert", "assertion" ]
       },
       "NationalDiocesanWiderRegionCalendar": {
         "oneOf": [
