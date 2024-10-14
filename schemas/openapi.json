@@ -2349,7 +2349,7 @@
           "RegionalData"
         ],
         "security": [{}],
-        "summary": "create a national calendar, diocesan calendar, or wider region calendar data resource",
+        "summary": "Create a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataPUT",
         "parameters": [
           {
@@ -2468,7 +2468,7 @@
           "RegionalData"
         ],
         "security": [{}],
-        "summary": "retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
+        "summary": "Retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataGET",
         "parameters": [
           {
@@ -2550,7 +2550,7 @@
           "RegionalData"
         ],
         "security": [{}],
-        "summary": "retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
+        "summary": "Retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataPOST",
         "parameters": [
           {
@@ -2632,7 +2632,7 @@
           "RegionalData"
         ],
         "security": [{}],
-        "summary": "update a national calendar, diocesan calendar, or wider region calendar data resource",
+        "summary": "Update a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataPATCH",
         "parameters": [
           {
@@ -2743,7 +2743,7 @@
           "RegionalData"
         ],
         "security": [{}],
-        "summary": "delete a national calendar, diocesan calendar, or wider region calendar data resource",
+        "summary": "Delete a national calendar, diocesan calendar, or wider region calendar data resource",
         "operationId": "regionalDataDELETE",
         "parameters": [
           {
@@ -2839,7 +2839,7 @@
           "Easter"
         ],
         "security": [{}],
-        "summary": "retrieve the date of Easter, both gregorian and julian, for the years 1583 to 1999",
+        "summary": "Retrieve the date of Easter, both gregorian and julian, for the years 1583 to 1999",
         "operationId": "easterGET",
         "parameters": [
           {
@@ -2957,7 +2957,7 @@
           "Missals"
         ],
         "security": [{}],
-        "summary": "retrieve the index of defined Roman Missals",
+        "summary": "Retrieve the index of defined Roman Missals",
         "operationId": "missalsGET",
         "parameters": [
           {
