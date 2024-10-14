@@ -101,14 +101,6 @@
                 {
                   "$ref": "#/components/examples/GeneralRomanCalendarRequestBody"
                 },
-              "NationalCalendar":
-                {
-                  "$ref": "#/components/examples/NationalCalendarRequestBody"
-                },
-              "DiocesanCalendar":
-                {
-                  "$ref": "#/components/examples/DiocesanCalendarRequestBody"
-                },
               "GeneralRomanCalendarTranslated":
                 {
                   "$ref": "#/components/examples/GeneralRomanCalendarTranslatedRequestBody"
@@ -736,13 +728,13 @@
               ]
             },
             "examples": {
-              "NationalCalendar":
+              "LiturgicalYearCalendar":
                 {
-                  "$ref": "#/components/examples/NationalCalendarRequestBody"
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
                 },
-              "DiocesanCalendar":
+              "CivilYearCalendar":
                 {
-                  "$ref": "#/components/examples/DiocesanCalendarRequestBody"
+                  "$ref": "#/components/examples/CivilYearRequestBody"
                 }
             }
           }
@@ -899,31 +891,57 @@
           "content": {
             "application/x-www-form-urlencoded": {
               "schema": {
-                "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
+                "type": "object",
+                "title": "Liturgical or Civil year",
+                "description": "The liturgical year starts from the First Sunday of Advent of the preceding year and ends on the Saturday of the 34th week of Ordinary Time",
+                "additionalProperties": false,
+                "properties": {
+                  "year_type": {
+                    "type": "string",
+                    "enum": [
+                      "CIVIL",
+                      "LITURGICAL"
+                    ],
+                    "default": "LITURGICAL"
+                  }
+                }
               },
               "examples": {
-                "NationalCalendar":
+                "LiturgicalYearCalendar":
                   {
-                    "$ref": "#/components/examples/NationalCalendarRequestBody"
+                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
                   },
-                "DiocesanCalendar":
+                "CivilYearCalendar":
                   {
-                    "$ref": "#/components/examples/DiocesanCalendarRequestBody"
+                    "$ref": "#/components/examples/CivilYearRequestBody"
                   }
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
+                "type": "object",
+                "title": "Liturgical or Civil year",
+                "description": "The liturgical year starts from the First Sunday of Advent of the preceding year and ends on the Saturday of the 34th week of Ordinary Time",
+                "additionalProperties": false,
+                "properties": {
+                  "year_type": {
+                    "type": "string",
+                    "enum": [
+                      "CIVIL",
+                      "LITURGICAL"
+                    ],
+                    "default": "LITURGICAL"
+                  }
+                }
               },
               "examples": {
-                "NationalCalendar":
+                "LiturgicalYearCalendar":
                   {
-                    "$ref": "#/components/examples/NationalCalendarRequestBody"
+                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
                   },
-                "DiocesanCalendar":
+                "CivilYearCalendar":
                   {
-                    "$ref": "#/components/examples/DiocesanCalendarRequestBody"
+                    "$ref": "#/components/examples/CivilYearRequestBody"
                   }
               }
             }
@@ -1104,13 +1122,13 @@
               ]
             },
             "examples": {
-              "NationalCalendar":
+              "LiturgicalYearCalendar":
                 {
-                  "$ref": "#/components/examples/NationalCalendarRequestBody"
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
                 },
-              "DiocesanCalendar":
+              "CivilYearCalendar":
                 {
-                  "$ref": "#/components/examples/DiocesanCalendarRequestBody"
+                  "$ref": "#/components/examples/CivilYearRequestBody"
                 }
             }
           }
@@ -1278,31 +1296,57 @@
           "content": {
             "application/x-www-form-urlencoded": {
               "schema": {
-                "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
+                "type": "object",
+                "title": "Liturgical or Civil year",
+                "description": "The liturgical year starts from the First Sunday of Advent of the preceding year and ends on the Saturday of the 34th week of Ordinary Time",
+                "additionalProperties": false,
+                "properties": {
+                  "year_type": {
+                    "type": "string",
+                    "enum": [
+                      "CIVIL",
+                      "LITURGICAL"
+                    ],
+                    "default": "LITURGICAL"
+                  }
+                }
               },
               "examples": {
-                "NationalCalendar":
+                "LiturgicalYearCalendar":
                   {
-                    "$ref": "#/components/examples/NationalCalendarRequestBody"
+                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
                   },
-                "DiocesanCalendar":
+                "CivilYearCalendar":
                   {
-                    "$ref": "#/components/examples/DiocesanCalendarRequestBody"
+                    "$ref": "#/components/examples/CivilYearRequestBody"
                   }
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
+                "type": "object",
+                "title": "Liturgical or Civil year",
+                "description": "The liturgical year starts from the First Sunday of Advent of the preceding year and ends on the Saturday of the 34th week of Ordinary Time",
+                "additionalProperties": false,
+                "properties": {
+                  "year_type": {
+                    "type": "string",
+                    "enum": [
+                      "CIVIL",
+                      "LITURGICAL"
+                    ],
+                    "default": "LITURGICAL"
+                  }
+                }
               },
               "examples": {
-                "NationalCalendar":
+                "LiturgicalYearCalendar":
                   {
-                    "$ref": "#/components/examples/NationalCalendarRequestBody"
+                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
                   },
-                "DiocesanCalendar":
+                "CivilYearCalendar":
                   {
-                    "$ref": "#/components/examples/DiocesanCalendarRequestBody"
+                    "$ref": "#/components/examples/CivilYearRequestBody"
                   }
               }
             }
@@ -4151,18 +4195,18 @@
           "year_type": "LITURGICAL"
         }
       },
-      "NationalCalendarRequestBody": {
+      "LiturgicalYearRequestBody": {
         "summary": "National Liturgical Calendar request",
         "description": "A national calendar is a calendar that corresponds to a language edition of the Roman Missal as curated by an Episcopal Conference in a given region",
         "value": {
           "year_type": "LITURGICAL"
         }
       },
-      "DiocesanCalendarRequestBody": {
+      "CivilYearRequestBody": {
         "summary": "Diocesan Liturgical Calendar request",
         "description": "Diocesan calendars inherit directly from a corresponding national calendar, and add a few local liturgical events",
         "value": {
-          "year_type": "LITURGICAL"
+          "year_type": "CIVIL"
         }
       },
       "GeneralRomanCalendarTranslatedRequestBody": {
