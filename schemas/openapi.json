@@ -207,7 +207,7 @@
           "Main API endpoint"
         ],
         "security": [{}],
-        "summary": "retrieves liturgical events for each day of the year",
+        "summary": "Retrieve liturgical events for the General Roman Calendar for each day of the current year",
         "operationId": "retrieveGeneralRomanCalendarPOST",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
         "parameters": [
@@ -371,7 +371,7 @@
           "Main API endpoint"
         ],
         "security": [{}],
-        "summary": "Retrieve liturgical events from the General Roman Calendar for each day of a given year",
+        "summary": "Retrieve liturgical events from the General Roman Calendar for each day of the given year",
         "operationId": "retrieveGeneralRomanCalendarForYearGET",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
         "parameters": [
@@ -533,7 +533,7 @@
           "Main API endpoint"
         ],
         "security": [{}],
-        "summary": "Retrieve liturgical events from the liturgical calendar for a given nation or diocese for each day of a given year",
+        "summary": "Retrieve liturgical events from the General Roman Calendar for each day of the given year",
         "operationId": "retrieveGeneralRomanCalendarForYearPOST",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
         "parameters": [
@@ -708,7 +708,7 @@
           "Main API endpoint"
         ],
         "security": [{}],
-        "summary": "Retrieve liturgical events from the liturgical calendar for a given nation or diocese for each day of a given year",
+        "summary": "Retrieve liturgical events from the liturgical calendar for a given nation or diocese for each day of the current year",
         "operationId": "retrieveNationalOrDiocesanCalendarGET",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
         "parameters": [
@@ -894,7 +894,7 @@
           "Main API endpoint"
         ],
         "security": [{}],
-        "summary": "retrieves liturgical events for each day of the year",
+        "summary": "Retrieve liturgical events from the liturgical calendar for a given nation or diocese for each day of the current year",
         "operationId": "retrieveNationalOrDiocesanCalendarPOST",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
         "parameters": [
