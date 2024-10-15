@@ -50,8 +50,8 @@
             "i18n_file": "data\/wider_regions\/EUROPE\/it_IT.json"
         },
         "missals": [
-            "ITALY_1983",
-            "ITALY_2020"
+            "IT_1983",
+            "IT_2020"
         ]
     }
 }
