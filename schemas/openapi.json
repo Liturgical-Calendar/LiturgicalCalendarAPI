@@ -25,11 +25,11 @@
       "description": "Retrieve a liturgical calendar"
     },
     {
-      "name": "Metadata API endpoint",
+      "name": "Calendars Index",
       "description": "Retrieve information about available calendars"
     },
     {
-      "name": "All possible liturgical events endpoint",
+      "name": "Liturgical events",
       "description": "All liturgical events by key without the calendar calculation"
     },
     {
@@ -41,11 +41,15 @@
       "description": "Retrieve / create / update / delete Roman Missal definitions"
     },
     {
-      "name": "Easter",
-      "description": "dates of easter whether gregorian or julian from 1583 to 1999"
+      "name": "Decrees",
+      "description": "Retrieve / create / update / delete Decrees of the Congregation for Divine Worship"
     },
     {
-      "name": "Unit Test Index endpoint",
+      "name": "Easter",
+      "description": "Dates of easter whether gregorian or julian from 1583 to 1999"
+    },
+    {
+      "name": "Unit Tests",
       "description": "Retrieve / create / update / delete unit tests"
     }
   ],
@@ -1928,7 +1932,7 @@
     "/calendars": {
       "get": {
         "tags": [
-          "Metadata API endpoint"
+          "Calendars Index"
         ],
         "security": [{}],
         "summary": "Retrieve an index of current supported national and diocesan calendars and relative locales, settings, etc.",
@@ -1957,7 +1961,7 @@
       },
       "post": {
         "tags": [
-          "Metadata API endpoint"
+          "Calendars Index"
         ],
         "security": [{}],
         "summary": "Retrieve an index of current supported national and diocesan calendars and relative locales, settings, etc.",
@@ -1988,7 +1992,7 @@
     "/events": {
       "get": {
         "tags": [
-          "All possible liturgical events endpoint"
+          "Liturgical events"
         ],
         "security": [{}],
         "summary": "Retrieve all possible liturgical events from the General Roman Calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
@@ -2079,7 +2083,7 @@
       },
       "post": {
         "tags": [
-          "All possible liturgical events endpoint"
+          "Liturgical events"
         ],
         "security": [{}],
         "summary": "Retrieve all possible liturgical events from the General Roman Calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
@@ -2172,7 +2176,7 @@
     "/events/nation/{calendar_id}": {
       "get": {
         "tags": [
-          "All possible liturgical events endpoint"
+          "Liturgical events"
         ],
         "security": [{}],
         "summary": "Retrieve all possible liturgical events from the given national calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
@@ -2277,7 +2281,7 @@
       },
       "post": {
         "tags": [
-          "All possible liturgical events endpoint"
+          "Liturgical events"
         ],
         "security": [{}],
         "summary": "Retrieve all possible liturgical events from the given national calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
@@ -2384,7 +2388,7 @@
     "/events/diocese/{calendar_id}": {
       "get": {
         "tags": [
-          "All possible liturgical events endpoint"
+          "Liturgical events"
         ],
         "security": [{}],
         "summary": "Retrieve all possible liturgical events from the given diocesan calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
@@ -2483,7 +2487,7 @@
       },
       "post": {
         "tags": [
-          "All possible liturgical events endpoint"
+          "Liturgical events"
         ],
         "security": [{}],
         "summary": "Retrieve all possible liturgical events from the given diocesan calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
@@ -4093,10 +4097,66 @@
         }
       }
     },
+    "/decrees": {
+      "get": {
+        "tags": [
+          "Decrees"
+        ],
+        "security": [{}],
+        "summary": "Retrieve the index of defined Decrees of the Congregation for Divine Worship",
+        "operationId": "decreesGET",
+        "responses": {
+          "200": {
+            "description": "OK: an index of defined Decrees",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "litcal_decrees": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalDecreesPath.json#/definitions/LitCalDecree"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404 Not Found: no Decrees defined",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "const": "ERROR"
+                    },
+                    "response": {
+                      "type": "string",
+                      "const": "404 Resource not Found"
+                    },
+                    "description": {
+                      "type": "string",
+                      "const": "No Decrees found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/tests": {
       "get": {
         "tags": [
-          "Unit Test Index endpoint"
+          "Unit Tests"
         ],
         "security": [{}],
         "summary": "Retrieve all the unit tests defined in the API `tests` folder as an index useful for frontend processing",
@@ -4268,7 +4328,7 @@
       },
       "put": {
         "tags": [
-          "Unit Test Index endpoint"
+          "Unit Tests"
         ],
         "security": [{}],
         "summary": "Create a new unit test in the API `tests` folder",
@@ -4451,7 +4511,7 @@
     "/tests/{test_name}": {
       "get": {
         "tags": [
-          "Unit Test Index endpoint"
+          "Unit Tests"
         ],
         "security": [{}],
         "summary": "Retrieve a single unit test defined in the API `tests` by it's name",
