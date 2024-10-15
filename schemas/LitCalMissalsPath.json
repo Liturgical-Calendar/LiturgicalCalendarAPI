@@ -21,7 +21,7 @@
             "properties": {
                 "missal_id": {
                     "type": "string",
-                    "pattern": "^(EDITIO_TYPICA|ITALY|USA|NETHERLANDS)_(19[7-9]|[2-9][0-9][0-9])[0-9]$"
+                    "pattern": "^(EDITIO_TYPICA|IT|US|NL)_(19[7-9]|[2-9][0-9][0-9])[0-9]$"
                 },
                 "name": {
                     "type": "string"
@@ -73,7 +73,7 @@
                 "api_path": {
                     "type": "string",
                     "format": "uri",
-                    "pattern": "https?:\\\/\\\/litcal\\.johnromanodorazio\\.com\\\/api\\\/(dev|v[3-9])\\\/missals\\\/(EDITIO_TYPICA|ITALY|USA|NETHERLANDS)_(19[7-9]|[2-9][0-9][0-9])[0-9]$"
+                    "pattern": "https?:\\\/\\\/litcal\\.johnromanodorazio\\.com\\\/api\\\/(dev|v[3-9])\\\/missals\\\/(EDITIO_TYPICA|IT|US|NL)_(19[7-9]|[2-9][0-9][0-9])[0-9]$"
                 }
             },
             "required": [
