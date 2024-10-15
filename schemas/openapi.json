@@ -4159,7 +4159,7 @@
           "Decrees"
         ],
         "security": [{}],
-        "summary": "Retrieve the index of defined Decrees of the Congregation for Divine Worship",
+        "summary": "Retrieve the data for a Decree of the Congregation for Divine Worship",
         "operationId": "decreeByIdGET",
         "parameters": [
           {
