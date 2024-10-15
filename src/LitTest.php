@@ -5,6 +5,29 @@ namespace LiturgicalCalendar\Api;
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
 
+/**
+ * Class LitTest
+ * @package LiturgicalCalendar\Api
+ *
+ * @property private bool $readyState              Whether the test is ready to be run
+ * @property private ?object $testInstructions     The JSON instructions for the test
+ * @property private ?object $dataToTest           The data to be tested
+ * @property private ?object $Message              The message returned by the test
+ * @property private ?string $Test                 The name of the test
+ * @property private ?object $testCache            The test cache
+ *
+ * @method void __construct(string $Test, object $dataToTest)               Initializes the test object with the provided Test and test data.
+ * @method bool isReady()                                                   Returns whether the test is ready to be run
+ * @method void runTest()                                                   Runs the test
+ * @method private string getCalendarType()                                 Returns the type of the calendar
+ * @method private string getCalendarName()                                 Returns the name of the calendar
+ * @method private void setMessage(string $type, ?string $message)          Sets the message for the test results, whether of type success or error
+ * @method private void setError(string $message)                           Sets the error message
+ * @method private void setSuccess(?string $message)                        Sets the success message
+ * @method object getMessage()                                              Returns the message returned by the test
+ * @method private ?object retrieveAssertionForYear(int $year)              Retrieves the assertion for the given year
+ * @method private array detectYearsSupported()                             Detects the years supported by the test
+ */
 class LitTest
 {
     private bool $readyState            = false;
@@ -15,6 +38,15 @@ class LitTest
 
     private static ?object $testCache   = null;
 
+    /**
+     * Initializes the test object with the provided Test and test data.
+     * Loads test instructions from a JSON file and validates them against the LitCalTest schema.
+     * Populates the test cache with the test instructions and supported years.
+     * Updates the ready state based on successful initialization.
+     *
+     * @param string $Test The name of the test.
+     * @param object $testData The test data object.
+     */
     public function __construct(string $Test, object $testData)
     {
         $this->Test = $Test;
@@ -58,11 +90,41 @@ class LitTest
         }
     }
 
+    /**
+     * Indicates whether the LitTest is ready to run.
+     *
+     * When the server loads a new test, it will attempt to load the test instructions JSON file and validate it against the schema.
+     * If the loading and validation are successful, the readyState is set to true.
+     * All subsequent calls to isReady() will return the value of readyState.
+     *
+     * @return bool true if the test is ready to run, false otherwise
+     */
     public function isReady(): bool
     {
         return $this->readyState;
     }
 
+    /**
+     * Run the test.
+     *
+     * If the test is not ready (i.e. has not been loaded and validated), it will
+     * do nothing.
+     *
+     * Otherwise, it will retrieve the assertion for the year we are testing,
+     * and check if it is within the bounds of the supported years. If it is,
+     * it will run the test according to the assertion type.
+     *
+     * If the assertion is of type "eventNotExists", it will check if the event
+     * does not exist in the calendar. If it does, it will set an error message.
+     * Otherwise, it will set a success message.
+     *
+     * If the assertion is of type "eventExists AND hasExpectedTimestamp", it
+     * will check if the event exists in the calendar and has the expected
+     * timestamp. If it does not, it will set an error message. Otherwise, it
+     * will set a success message.
+     *
+     * If the assertion is of any other type, it will set an error message.
+     */
     public function runTest(): void
     {
         if ($this->readyState) {
@@ -72,7 +134,7 @@ class LitTest
                 return;
             }
 
-            $calendarType = $this->getYearTypeStr();
+            $calendarType = $this->getCalendarType();
             $calendarName = $this->getCalendarName();
             $messageIfError = "{$this->Test} Assertion '{$assertion->assertion}' failed for Year " . $this->dataToTest->settings->year . " in {$calendarType}{$calendarName}.";
             $eventKey = self::$testCache->{$this->Test}->testInstructions->event_key;
@@ -110,20 +172,36 @@ class LitTest
         }
     }
 
-    private function getYearTypeStr(): string
+    /**
+     * Get a string to describe the calendar type used in the test (national, diocesan).
+     *
+     * @return string
+     */
+    private function getCalendarType(): string
     {
         return property_exists($this->dataToTest->settings, 'national_calendar') ? 'the national calendar of ' : (
             property_exists($this->dataToTest->settings, 'diocesan_calendar') ? 'the diocesan calendar of ' : ''
         );
     }
 
+    /**
+     * Returns the name of the calendar used in the test,
+     * which will be a diocesan calendar, a national calendar, or 'the Universal Roman Calendar'.
+     * @return string
+     */
     private function getCalendarName(): string
     {
         return property_exists($this->dataToTest->settings, 'diocesan_calendar') ? $this->dataToTest->settings->diocesan_calendar : (
-            property_exists($this->dataToTest->settings, 'natinal_calendar') ? $this->dataToTest->settings->natinal_calendar : 'the Universal Roman Calendar'
+            property_exists($this->dataToTest->settings, 'national_calendar') ? $this->dataToTest->settings->national_calendar : 'the Universal Roman Calendar'
         );
     }
 
+    /**
+     * Sets the message details based on the provided type and optional text. Called by {@see setError()} and {@see setSuccess()}.
+     *
+     * @param string $type The type of the message ('success' or 'error').
+     * @param string|null $text The optional text to include in the message.
+     */
     private function setMessage(string $type, ?string $text = null): void
     {
         $this->Message = new \stdClass();
@@ -142,16 +220,33 @@ class LitTest
         }
     }
 
+    /**
+     * Sets the message to be an error message with the provided text. Called in {@see __construct()} and in {@see runTest()}.
+     *
+     * @param string $text The text of the error message.
+     */
     private function setError(string $text): void
     {
         $this->setMessage('error', $text);
     }
 
+    /**
+     * Sets the message to be a success message with the provided text. Called in {@see runTest()}.
+     *
+     * @param string|null $text The optional text to include in the message.
+     */
     private function setSuccess(?string $text = null): void
     {
         $this->setMessage('success', $text);
     }
 
+    /**
+     * Gets the message for the test result.
+     * If the test has not been run yet, sets the message to an error message
+     * and returns it.
+     *
+     * @return object The message object.
+     */
     public function getMessage(): object
     {
         if (is_null($this->Message)) {
@@ -160,6 +255,12 @@ class LitTest
         return $this->Message;
     }
 
+    /**
+     * Retrieves the assertion for a given year, if it exists. Called in {@see runTest()}.
+     *
+     * @param int $year The year for which to retrieve the assertion.
+     * @return object|null The assertion, or null if no assertion exists for the given year.
+     */
     private function retrieveAssertionForYear(int $year): ?object
     {
         $assertions = self::$testCache->{$this->Test}->testInstructions->assertions;
@@ -171,6 +272,11 @@ class LitTest
         return null;
     }
 
+    /**
+     * Retrieves an array of all years for which there are assertions. Called in {@see __construct()}.
+     *
+     * @return array The years for which there are assertions.
+     */
     private function detectYearsSupported(): array
     {
         $years = [];
