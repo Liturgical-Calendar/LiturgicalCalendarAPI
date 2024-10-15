@@ -15,13 +15,13 @@ class Tests
     private static array $requestPathParts = [];
     private static array $propsToSanitize = [
         "description",
-        "appliesTo",
+        "applies_to",
         "excludes",
         "assertions",
-        "nationalcalendar",
-        "diocesancalendar",
-        "nationalcalendars",
-        "diocesancalendars",
+        "national_calendar",
+        "diocesan_calendar",
+        "national_calendars",
+        "diocesan_calendars",
         "assertion",
         "comment"
     ];
