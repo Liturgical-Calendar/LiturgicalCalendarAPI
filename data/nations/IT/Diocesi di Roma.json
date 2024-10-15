@@ -15,7 +15,8 @@
             },
             "metadata": {
                 "form_rownum": 0,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SanVincenzoPallottisacerdote": {
@@ -33,7 +34,8 @@
             },
             "metadata": {
                 "form_rownum": 1,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "BeataLudovicaAlbertoni": {
@@ -69,7 +71,8 @@
             },
             "metadata": {
                 "form_rownum": 2,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SanFeliceIIIpapa": {
@@ -87,7 +90,8 @@
             },
             "metadata": {
                 "form_rownum": 3,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SanMartinoIpapaemartire": {
@@ -107,7 +111,8 @@
             },
             "metadata": {
                 "form_rownum": 2,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SanBenedettoGiuseppeLabre": {
@@ -125,7 +130,8 @@
             },
             "metadata": {
                 "form_rownum": 3,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SanLeoneIXpapa": {
@@ -143,7 +149,8 @@
             },
             "metadata": {
                 "form_rownum": 4,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SanPioVpapa": {
@@ -161,7 +168,8 @@
             },
             "metadata": {
                 "form_rownum": 5,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SanFelicedaCantalicereligioso": {
@@ -172,7 +180,7 @@
                 ],
                 "grade": 2,
                 "common": [
-                    "Proper"
+                    "Holy Men and Women:For Religious"
                 ],
                 "day": 18,
                 "month": 5
@@ -197,7 +205,8 @@
             },
             "metadata": {
                 "form_rownum": 6,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "BeataMariaVergineAuxiliumChristianorum": {
@@ -215,7 +224,8 @@
             },
             "metadata": {
                 "form_rownum": 5,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SanGregorioVIIpapa": {
@@ -233,7 +243,8 @@
             },
             "metadata": {
                 "form_rownum": 7,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SantiMarcellinoePietromartiri": {
@@ -251,7 +262,8 @@
             },
             "metadata": {
                 "form_rownum": 8,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "BeataAnnaMariaTaigi": {
@@ -287,43 +299,8 @@
             },
             "metadata": {
                 "form_rownum": 6,
-                "since_year": 1973
-            }
-        },
-        "SantiPietroePaoloApostoliPatroniprincipalidiRoma": {
-            "festivity": {
-                "name": "Santi Pietro e Paolo, Apostoli, Patroni principali di Roma",
-                "color": [
-                    "red"
-                ],
-                "grade": 6,
-                "common": [
-                    "Proper"
-                ],
-                "day": 29,
-                "month": 6
-            },
-            "metadata": {
-                "form_rownum": 0,
-                "since_year": 1973
-            }
-        },
-        "SantiPrimiMartiridellaChiesaRomana": {
-            "festivity": {
-                "name": "Santi Primi Martiri della Chiesa Romana",
-                "color": [
-                    "red"
-                ],
-                "grade": 3,
-                "common": [
-                    "Martyrs:For Several Martyrs"
-                ],
-                "day": 30,
-                "month": 6
-            },
-            "metadata": {
-                "form_rownum": 10,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SantaBrigidareligiosa": {
@@ -342,7 +319,8 @@
             },
             "metadata": {
                 "form_rownum": 11,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "BeatoInnocenzoXIpapa": {
@@ -360,7 +338,8 @@
             },
             "metadata": {
                 "form_rownum": 8,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SanSistoIIIpapa": {
@@ -378,7 +357,8 @@
             },
             "metadata": {
                 "form_rownum": 9,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SanGasparedelBufalosacerdote": {
@@ -396,7 +376,8 @@
             },
             "metadata": {
                 "form_rownum": 13,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SanNicolaIpapa": {
@@ -414,7 +395,8 @@
             },
             "metadata": {
                 "form_rownum": 14,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SanGelasioIpapa": {
@@ -432,7 +414,8 @@
             },
             "metadata": {
                 "form_rownum": 10,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SanClementeIpapaemartire": {
@@ -452,7 +435,8 @@
             },
             "metadata": {
                 "form_rownum": 15,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SanSiriciopapa": {
@@ -470,25 +454,8 @@
             },
             "metadata": {
                 "form_rownum": 11,
-                "since_year": 1973
-            }
-        },
-        "SanLeonardodaPortoMauriziosacerdote": {
-            "festivity": {
-                "name": "San Leonardo da Porto Maurizio, sacerdote",
-                "color": [
-                    "white"
-                ],
-                "grade": 2,
-                "common": [
-                    "Holy Men and Women:For Religious"
-                ],
-                "day": 26,
-                "month": 11
-            },
-            "metadata": {
-                "form_rownum": 12,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SanDamasoIpapa": {
@@ -506,25 +473,8 @@
             },
             "metadata": {
                 "form_rownum": 16,
-                "since_year": 1973
-            }
-        },
-        "DedicazionedellaBasilicaPapaledelSSSalvatoreCattedralediRoma": {
-            "festivity": {
-                "name": "Dedicazione della Basilica Papale del SS. Salvatore, Cattedrale di Roma",
-                "color": [
-                    "white"
-                ],
-                "grade": 4,
-                "common": [
-                    "Dedication of a Church"
-                ],
-                "day": 9,
-                "month": 11
-            },
-            "metadata": {
-                "form_rownum": 1,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SanGiovanniPaoloIIpapa": {
@@ -542,7 +492,8 @@
             },
             "metadata": {
                 "form_rownum": 17,
-                "since_year": 2014
+                "since_year": 2014,
+                "until_year": 2023
             }
         },
         "BeatoUrbanoIIpapa": {
@@ -560,7 +511,8 @@
             },
             "metadata": {
                 "form_rownum": 7,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SantAgatonepapa": {
@@ -578,7 +530,8 @@
             },
             "metadata": {
                 "form_rownum": 0,
-                "since_year": 1973
+                "since_year": 1973,
+                "until_year": 2023
             }
         },
         "SanCallistoIpapaemartire": {
@@ -598,7 +551,260 @@
             },
             "metadata": {
                 "form_rownum": 12,
-                "since_year": 1970
+                "since_year": 1970,
+                "until_year": 2023
+            }
+        },
+        "SanVincenzoPallottipresbitero": {
+            "festivity": {
+                "name": "San Vincenzo Pallotti, presbitero",
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Pastors"
+                ],
+                "day": 22,
+                "month": 1
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 13
+            }
+        },
+        "SantiPietroePaoloApostoliPatronidellaChiesaromana": {
+            "festivity": {
+                "name": "Santi Pietro e Paolo, Apostoli, Patroni della Chiesa romana",
+                "color": [
+                    "white"
+                ],
+                "grade": 6,
+                "common": [
+                    "Proper"
+                ],
+                "day": 29,
+                "month": 6
+            },
+            "metadata": {
+                "form_rownum": 0,
+                "since_year": 1973
+            }
+        },
+        "SanBenedettoGiuseppeLabre_2": {
+            "festivity": {
+                "name": "San Benedetto Giuseppe Labre",
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Holy Men and Women"
+                ],
+                "day": 16,
+                "month": 4
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 14
+            }
+        },
+        "SanGiovanniBattistadeRossipresbitero": {
+            "festivity": {
+                "name": "San Giovanni Battista de Rossi, presbitero",
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Pastors"
+                ],
+                "day": 23,
+                "month": 5
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 15
+            }
+        },
+        "BeataVergineMariaSalusPopuliRomani": {
+            "festivity": {
+                "name": "Beata Vergine Maria Salus Populi Romani",
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Proper"
+                ],
+                "day": 4,
+                "month": 6
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 18
+            }
+        },
+        "SanJosemaraEscrivdeBalaguerpresbitero": {
+            "festivity": {
+                "name": "San Josemaría Escrivá de Balaguer, presbitero",
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Pastors"
+                ],
+                "day": 26,
+                "month": 6
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 16
+            }
+        },
+        "SantiVescovidellaChiesaromana": {
+            "festivity": {
+                "name": "Santi Vescovi della Chiesa romana",
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Proper"
+                ],
+                "day": 7,
+                "month": 7
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 19
+            }
+        },
+        "SantiPrimiMartiridellaChiesaromana": {
+            "festivity": {
+                "name": "Santi Primi Martiri della Chiesa romana",
+                "color": [
+                    "red"
+                ],
+                "grade": 3,
+                "common": [
+                    "Martyrs:For Several Martyrs"
+                ],
+                "day": 30,
+                "month": 6
+            },
+            "metadata": {
+                "form_rownum": 10,
+                "since_year": 1973
+            }
+        },
+        "AnniversariodellaDedicazionedellapropriachiesa": {
+            "festivity": {
+                "name": "Anniversario della Dedicazione della propria chiesa",
+                "color": [
+                    "white"
+                ],
+                "grade": 6,
+                "common": [
+                    "Dedication of a Church"
+                ],
+                "day": 25,
+                "month": 10
+            },
+            "metadata": {
+                "since_year": 1970,
+                "form_rownum": 2
+            }
+        },
+        "SanGasparedelBufalopresbitero": {
+            "festivity": {
+                "name": "San Gaspare del Bufalo, presbitero",
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Pastors"
+                ],
+                "day": 21,
+                "month": 10
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 17
+            }
+        },
+        "TuttiiSantidellaChiesaromana": {
+            "festivity": {
+                "name": "Tutti i Santi della Chiesa romana",
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Proper"
+                ],
+                "day": 8,
+                "month": 11
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 20
+            }
+        },
+        "Dedicazionedellabasilicalateranense": {
+            "festivity": {
+                "name": "Dedicazione della basilica lateranense",
+                "color": [
+                    "white"
+                ],
+                "grade": 4,
+                "common": [
+                    "Dedication of a Church"
+                ],
+                "day": 9,
+                "month": 11
+            },
+            "metadata": {
+                "form_rownum": 1,
+                "since_year": 1973
+            }
+        },
+        "BeatiLuigieMariaBeltrameQuattrocchisposi": {
+            "festivity": {
+                "name": "Beati Luigi e Maria Beltrame Quattrocchi, sposi",
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Holy Men and Women"
+                ],
+                "day": 25,
+                "month": 11
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 18
+            }
+        },
+        "SanLeonardodaPortoMauriziopresbitero": {
+            "festivity": {
+                "name": "San Leonardo da Porto Maurizio, presbitero",
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Holy Men and Women:For Religious"
+                ],
+                "day": 26,
+                "month": 11
+            },
+            "metadata": {
+                "form_rownum": 12,
+                "since_year": 1973
             }
         }
     }
