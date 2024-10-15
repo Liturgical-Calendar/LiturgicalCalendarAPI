@@ -10,10 +10,10 @@ namespace LiturgicalCalendar\Api\Enum;
  * @property const string EDITIO_TYPICA_SECUNDA_1975 "EDITIO_TYPICA_1975"
  * @property const string EDITIO_TYPICA_TERTIA_2002 "EDITIO_TYPICA_2002"
  * @property const string EDITIO_TYPICA_TERTIA_EMENDATA_2008 "EDITIO_TYPICA_2008"
- * @property const string USA_EDITION_2011 "USA_2011"
- * @property const string ITALY_EDITION_1983 "ITALY_1983"
- * @property const string ITALY_EDITION_2020 "ITALY_2020"
- * @property const string NETHERLANDS_EDITION_1978 "NETHERLANDS_1978"
+ * @property const string USA_EDITION_2011 "US_2011"
+ * @property const string ITALY_EDITION_1983 "IT_1983"
+ * @property const string ITALY_EDITION_2020 "IT_2020"
+ * @property const string NETHERLANDS_EDITION_1978 "NL_1978"
  * @property static array $values An array of the Roman Missal values defined in the class constants
  * @property static array $names An associative array of the Roman Missal names, where the key is the value of a Roman Missal constant
  * @property static array $jsonFiles An associative array of the JSON file paths, where the key is the value of a Roman Missal constant
@@ -35,10 +35,10 @@ class RomanMissal
     public const EDITIO_TYPICA_TERTIA_2002             = "EDITIO_TYPICA_2002";
     public const EDITIO_TYPICA_TERTIA_EMENDATA_2008    = "EDITIO_TYPICA_2008";
 
-    public const USA_EDITION_2011                      = "USA_2011";
-    public const ITALY_EDITION_1983                    = "ITALY_1983";
-    public const ITALY_EDITION_2020                    = "ITALY_2020";
-    public const NETHERLANDS_EDITION_1978              = "NETHERLANDS_1978";
+    public const USA_EDITION_2011                      = "US_2011";
+    public const ITALY_EDITION_1983                    = "IT_1983";
+    public const ITALY_EDITION_2020                    = "IT_2020";
+    public const NETHERLANDS_EDITION_1978              = "NL_1978";
 
     public static array $values = [
         "EDITIO_TYPICA_1970",
@@ -46,10 +46,10 @@ class RomanMissal
         "EDITIO_TYPICA_1975",
         "EDITIO_TYPICA_2002",
         "EDITIO_TYPICA_2008",
-        "USA_2011",
-        "ITALY_1983",
-        "ITALY_2020",
-        "NETHERLANDS_1978"
+        "US_2011",
+        "IT_1983",
+        "IT_2020",
+        "NL_1978"
     ];
 
     public static array $names = [
@@ -163,7 +163,7 @@ class RomanMissal
      *
      * @param string $missal_id the id of the Roman Missal
      * @return ?object an object containing the year limits for the Roman Missal,
-     *   with properties named 'minYear' and 'maxYear', or null if missal_id not valid
+     *   with properties named 'since_year' and 'until_year', or null if missal_id not valid
      */
     public static function getYearLimits(string $missal_id): ?object
     {
