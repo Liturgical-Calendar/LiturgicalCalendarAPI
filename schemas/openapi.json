@@ -29,24 +29,24 @@
       "description": "Retrieve information about available calendars"
     },
     {
-      "name": "Unit Test Index endpoint",
-      "description": "Retrieve / create / update / delete unit tests"
-    },
-    {
       "name": "All possible liturgical events endpoint",
       "description": "All liturgical events by key without the calendar calculation"
     },
     {
-      "name": "RegionalData",
-      "description": "Retrieve / create / update / delete National, Diocesan or Wider Region calendars "
+      "name": "Calendar Source Data",
+      "description": "Retrieve / create / update / delete source data for National, Diocesan or Wider Region calendars "
+    },
+    {
+      "name": "Missals",
+      "description": "Retrieve / create / update / delete Roman Missal definitions"
     },
     {
       "name": "Easter",
       "description": "dates of easter whether gregorian or julian from 1583 to 1999"
     },
     {
-      "name": "Missals",
-      "description": "Retrieve / create / update / delete Roman Missal definitions"
+      "name": "Unit Test Index endpoint",
+      "description": "Retrieve / create / update / delete unit tests"
     }
   ],
   "paths": {
@@ -2581,29 +2581,14 @@
         }
       }
     },
-    "/data/{category}": {
+    "/data/national": {
       "put": {
         "tags": [
-          "RegionalData"
+          "Calendar Source Data"
         ],
         "security": [{}],
-        "summary": "Create a national calendar, diocesan calendar, or wider region calendar data resource",
-        "operationId": "regionalDataPUT",
-        "parameters": [
-          {
-            "name": "category",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "national",
-                "widerregion",
-                "diocesan"
-              ]
-            }
-          }
-        ],
+        "summary": "Create a national calendar data resource",
+        "operationId": "nationalCalendarDataPUT",
         "requestBody": {
           "required": true,
           "content": {
@@ -2614,11 +2599,11 @@
                 "properties": {
                   "key": {
                     "type": "string",
-                    "description": "The id of the diocese, nation or wider region to be created. In the case of a wider region, it is the English name of the wider region. In the case of a nation, it is the uppercase ISO 3166-2 code of the nation. In the case of a diocese, it is the key as defined in WorldDioceseByNation.json.",
+                    "description": "The id of the national calendar to be created: the uppercase ISO 3166-2 code of the nation.",
                     "examples": [
-                      "boston_us",
                       "IT",
-                      "Europe"
+                      "US",
+                      "NL"
                     ]
                   },
                   "payload": {
@@ -2641,8 +2626,212 @@
                     "success": {
                       "type": "string",
                       "examples": [
-                        "National calendar created or updated for nation {NATION}",
-                        "Wider region calendar created or updated for region {REGION}",
+                        "National calendar created or updated for nation {NATION}"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "examples": [
+                        "Not all required parameters were received (LitCal, Metadata, Settings|NationalCalendars OR LitCal, Diocese, Nation)",
+                        "Malformed data received in <LitCal> parameters"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422 Unprocessable Entity. The request body does not conform to it's defined schema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "the error message will contain the reason for which the request body does not conform to it's defined schema"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data/widerregion": {
+      "put": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [{}],
+        "summary": "Create a wider region data resource",
+        "operationId": "widerregionDataPUT",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "description": "The id of the wider region for whic data is being created: the English name of the wider region.",
+                    "examples": [
+                      "Americas",
+                      "Asia",
+                      "Europe",
+                      "Africa",
+                      "Oceania"
+                    ]
+                  },
+                  "payload": {
+                    "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "examples": [
+                        "Wider region calendar created or updated for region {REGION}"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "examples": [
+                        "Not all required parameters were received (LitCal, Metadata, Settings|NationalCalendars OR LitCal, Diocese, Nation)",
+                        "Malformed data received in <LitCal> parameters"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422 Unprocessable Entity. The request body does not conform to it's defined schema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "the error message will contain the reason for which the request body does not conform to it's defined schema"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data/diocesan": {
+      "put": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [{}],
+        "summary": "Create a national calendar, diocesan calendar, or wider region calendar data resource",
+        "operationId": "diocesanDataPUT",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "description": "The id of the diocese for which data is being created: diocese_id as defined in WorldDioceseByNation.json.",
+                    "examples": [
+                      "boston_us",
+                      "romamo_it",
+                      "roermo_nl"
+                    ]
+                  },
+                  "payload": {
+                    "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "examples": [
                         "Diocesan calendar created or updated for diocese {DIOCESE}"
                       ]
                     }
@@ -2700,41 +2889,27 @@
         }
       }
     },
-    "/data/{category}/{key}": {
+    "/data/national/{key}": {
       "get": {
         "tags": [
-          "RegionalData"
+          "Calendar Source Data"
         ],
         "security": [{}],
-        "summary": "Retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
-        "operationId": "regionalDataGET",
+        "summary": "Retrieve a national calendar data resource",
+        "operationId": "nationalDataGET",
         "parameters": [
-          {
-            "name": "category",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "national",
-                "widerregion",
-                "diocesan"
-              ]
-            }
-          },
           {
             "name": "key",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "pattern": "^[A-Z]{2,45}$"
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
+            "description": "OK: National calendar data resource retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -2776,7 +2951,7 @@
                   "additionalProperties": false
                 },
                 "example": {
-                  "message": "file nations/USA/Archdiocese of Milwaukee (Wisconsin).json does not exist"
+                  "message": "file data/nations/US/Archdiocese of Milwaukee (Wisconsin).json does not exist"
                 }
               }
             }
@@ -2785,32 +2960,18 @@
       },
       "post": {
         "tags": [
-          "RegionalData"
+          "Calendar Source Data"
         ],
         "security": [{}],
-        "summary": "Retrieve a national calendar, diocesan calendar, or wider region calendar data resource",
-        "operationId": "regionalDataPOST",
+        "summary": "Retrieve a national calendar data resource",
+        "operationId": "nationalDataPOST",
         "parameters": [
-          {
-            "name": "category",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "national",
-                "widerregion",
-                "diocesan"
-              ]
-            }
-          },
           {
             "name": "key",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "pattern": "^[A-Z]{2,45}$"
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
             }
           }
         ],
@@ -2858,7 +3019,7 @@
                   "additionalProperties": false
                 },
                 "example": {
-                  "message": "file nations/USA/Archdiocese of Milwaukee (Wisconsin).json does not exist"
+                  "message": "file data/nations/US/Archdiocese of Milwaukee (Wisconsin).json does not exist"
                 }
               }
             }
@@ -2867,25 +3028,12 @@
       },
       "patch": {
         "tags": [
-          "RegionalData"
+          "Calendar Source Data"
         ],
         "security": [{}],
-        "summary": "Update a national calendar, diocesan calendar, or wider region calendar data resource",
-        "operationId": "regionalDataPATCH",
+        "summary": "Update a national calendar data resource",
+        "operationId": "nationalDataPATCH",
         "parameters": [
-          {
-            "name": "category",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "national",
-                "widerregion",
-                "diocesan"
-              ]
-            }
-          },
           {
             "name": "key",
             "in": "path",
@@ -2978,32 +3126,649 @@
       },
       "delete": {
         "tags": [
-          "RegionalData"
+          "Calendar Source Data"
         ],
         "security": [{}],
-        "summary": "Delete a national calendar, diocesan calendar, or wider region calendar data resource",
-        "operationId": "regionalDataDELETE",
+        "summary": "Delete a national calendar data resource",
+        "operationId": "nationalDataDELETE",
         "parameters": [
-          {
-            "name": "category",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "national",
-                "widerregion",
-                "diocesan"
-              ]
-            }
-          },
           {
             "name": "key",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
-              "pattern": "^[A-Z]{2,45}$"
+              "pattern": "^[A-Z]{2}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 OK: the resource was successfully deleted from the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "example": "Diocesan calendar {DIOCESE} deleted from nation {NATION}"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request: missing required parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "const": "Required parameters were not received"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404 Not Found: the resource requested for deletion was not found on this server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "const": "The resource requested for deletion was not found on this server"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data/diocesan/{key}": {
+      "get": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [{}],
+        "summary": "Retrieve a diocesan calendar data resource",
+        "operationId": "diocesanDataGET",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request: missing required parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "example": {
+                  "error": "Missing required parameter(s) `category` and `key`"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404 Not Found: the requested national or diocesan or wider region data resource was not found on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "example": {
+                  "message": "file data/nations/US/Archdiocese of Milwaukee (Wisconsin).json does not exist"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [{}],
+        "summary": "Retrieve a diocesan calendar data resource",
+        "operationId": "diocesanDataPOST",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request: missing required parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "example": {
+                  "error": "Missing required parameter(s) `category` and `key`"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404 Not Found: the requested national or diocesan or wider region data resource was not found on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "example": {
+                  "message": "file data/nations/US/Archdiocese of Milwaukee (Wisconsin).json does not exist"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [{}],
+        "summary": "Update a diocesan calendar data resource",
+        "operationId": "diocesanDataPATCH",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created. Even when updating an existing resource, we will still get the same 201 Created because we are basically overwriting the previous resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "examples": [
+                        "National calendar created or updated for nation {NATION}",
+                        "Wider region calendar created or updated for region {REGION}",
+                        "Diocesan calendar created or updated for diocese {DIOCESE}"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "examples": [
+                        "Not all required parameters were received (LitCal, Metadata, Settings|NationalCalendars OR LitCal, Diocese, Nation)",
+                        "Malformed data received in <LitCal> parameters"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422 Unprocessable Entity. The request body does not conform to it's defined schema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "the error message will contain the reason for which the request body does not conform to it's defined schema"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [{}],
+        "summary": "Delete a wider region calendar data resource",
+        "operationId": "diocesanDataDELETE",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 OK: the resource was successfully deleted from the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "example": "Diocesan calendar {DIOCESE} deleted from nation {NATION}"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request: missing required parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "const": "Required parameters were not received"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404 Not Found: the resource requested for deletion was not found on this server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "const": "The resource requested for deletion was not found on this server"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data/widerregion/{key}": {
+      "get": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [{}],
+        "summary": "Retrieve a wider region calendar data resource",
+        "operationId": "widerregionDataGET",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/WiderRegionNames"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request: missing required parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "example": {
+                  "error": "Missing required parameter(s) `category` and `key`"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404 Not Found: the requested national or diocesan or wider region data resource was not found on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "example": {
+                  "message": "file data/nations/US/Archdiocese of Milwaukee (Wisconsin).json does not exist"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [{}],
+        "summary": "Retrieve a wider region calendar data resource",
+        "operationId": "widerregionDataPOST",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/WiderRegionNames"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request: missing required parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "example": {
+                  "error": "Missing required parameter(s) `category` and `key`"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404 Not Found: the requested national or diocesan or wider region data resource was not found on the server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "example": {
+                  "message": "file data/nations/US/Archdiocese of Milwaukee (Wisconsin).json does not exist"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [{}],
+        "summary": "Update a wider region calendar data resource",
+        "operationId": "widerregionDataPATCH",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/WiderRegionNames"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created. Even when updating an existing resource, we will still get the same 201 Created because we are basically overwriting the previous resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "examples": [
+                        "National calendar created or updated for nation {NATION}",
+                        "Wider region calendar created or updated for region {REGION}",
+                        "Diocesan calendar created or updated for diocese {DIOCESE}"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "examples": [
+                        "Not all required parameters were received (LitCal, Metadata, Settings|NationalCalendars OR LitCal, Diocese, Nation)",
+                        "Malformed data received in <LitCal> parameters"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422 Unprocessable Entity. The request body does not conform to it's defined schema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "the error message will contain the reason for which the request body does not conform to it's defined schema"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [{}],
+        "summary": "Delete a wider region calendar data resource",
+        "operationId": "widerregionDataDELETE",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/WiderRegionNames"
             }
           }
         ],
@@ -3197,25 +3962,6 @@
         "security": [{}],
         "summary": "Retrieve the index of defined Roman Missals",
         "operationId": "missalsGET",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "locale",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "de",
-                "en",
-                "es",
-                "fr",
-                "it",
-                "pt",
-                "la",
-                "nl"
-              ]
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK: an index of defined Roman Missals",
@@ -3230,6 +3976,114 @@
                       "items": {
                         "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalMissalsPath.json#/definitions/Missal"
                       }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404 Not Found: no Roman Missals defined",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "const": "ERROR"
+                    },
+                    "response": {
+                      "type": "string",
+                      "const": "404 Resource not Found"
+                    },
+                    "description": {
+                      "type": "string",
+                      "const": "No Missals found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "503 Service Unavailable: the server is not ready to handle the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "const": "ERROR"
+                    },
+                    "response": {
+                      "type": "string",
+                      "const": "503 Service Unavailable"
+                    },
+                    "description": {
+                      "type": "string",
+                      "enum": [
+                        "Unable to read the data/missals directory",
+                        "Unable to read the data/missals directory contents"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/missals/{missal_id}": {
+      "get": {
+        "tags": [
+          "Missals"
+        ],
+        "security": [{}],
+        "summary": "Retrieve a Roman Missal by it's ID",
+        "operationId": "missalGET",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "missal_id",
+            "schema": {
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/MissalID"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: the data for the requested Roman Missal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalMissalsPath.json#/definitions/Missal"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404 Not Found: Roman Missal data not found for given {missal_id}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "const": "ERROR"
+                    },
+                    "response": {
+                      "type": "string",
+                      "const": "Resource not Found"
+                    },
+                    "description": {
+                      "type": "string"
                     }
                   }
                 }
@@ -3316,7 +4170,7 @@
                     "test_type": "exactCorrespondenceSince",
                     "year_since": 2011,
                     "applies_to": {
-                      "national_calendar": "USA"
+                      "national_calendar": "US"
                     },
                     "assertions": [
                       {
