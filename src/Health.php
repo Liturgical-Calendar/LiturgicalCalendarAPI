@@ -147,7 +147,7 @@ class Health implements MessageComponentInterface
                 return LitSchema::PROPRIUMDESANCTIS;
             case 'resourceDataCheck':
                 if (
-                    preg_match("/\/missals\/[_A-Z0-9]+$/", $dataPath)
+                    preg_match("/\/data\/missals\/[_A-Z0-9]+$/", $dataPath)
                 ) {
                     return LitSchema::PROPRIUMDESANCTIS;
                 } elseif (
