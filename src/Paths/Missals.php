@@ -338,34 +338,50 @@ class Missals
         if (count($requestPathParts)) {
             self::$requestPathParts = $requestPathParts;
         }
+
         self::$missalsIndex = new \stdClass();
         self::$missalsIndex->litcal_missals = [];
-        $directories = array_map('basename', glob('data/missals/propriumdesanctis*', GLOB_ONLYDIR));
-        foreach ($directories as $directory) {
-            if (file_exists("data/missals/$directory/$directory.json")) {
+
+        if (false === is_readable('data/missals')) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Unable to read the data/missals directory');
+        }
+        $missalFolderPaths = glob('data/missals/propriumdesanctis*', GLOB_ONLYDIR);
+        if (false === $missalFolderPaths) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Unable to read the data/missals directory contents');
+        }
+        if (count($missalFolderPaths) === 0) {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, 'No Missals found');
+        }
+
+        $missalFolderNames = array_map('basename', $missalFolderPaths);
+        foreach ($missalFolderNames as $missalFolderName) {
+            if (file_exists("data/missals/$missalFolderName/$missalFolderName.json")) {
                 $missal = new \stdClass();
-                if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
+                if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
                     $missal->missal_id      = "EDITIO_TYPICA_{$matches[1]}";
                     $missal->region         = "VA";
-                    //$missal->year_published = intval($matches[1]);
-                    $it = new \DirectoryIterator("glob://data/missals/$directory/i18n/*.json");
-                    $languages = [];
-                    foreach ($it as $f) {
-                        $languages[] = $f->getBasename('.json');
+                    if (is_readable("data/missals/$missalFolderName/i18n")) {
+                        $it = new \DirectoryIterator("glob://data/missals/$missalFolderName/i18n/*.json");
+                        $languages = [];
+                        foreach ($it as $f) {
+                            $languages[] = $f->getBasename('.json');
+                        }
+                        $missal->languages      = $languages;
+                        $missal->i18n_path      = "data/missals/$missalFolderName/i18n/";
+                    } else {
+                        $missal->languages      = null;
+                        $missal->i18n_path      = null;
                     }
-                    $missal->languages      = $languages;
-                    $missal->i18n_path      = "data/missals/$directory/i18n/";
-                    //$missal->api_path       = API_BASE_PATH . "/missals/EDITIO_TYPICA_{$matches[1]}";
-                } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $directory, $matches)) {
+                    //$missal->year_published = intval($matches[1]);
+                } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
                     $missal->missal_id      = "{$matches[1]}_{$matches[2]}";
                     $missal->region         = $matches[1];
                     //$missal->year_published = intval($matches[2]);
-                    //$missal->api_path       = API_BASE_PATH . "/missals/{$matches[1]}_{$matches[2]}";
                 }
                 $missal->name           = RomanMissal::getName($missal->missal_id);
                 $missal->year_limits    = RomanMissal::$yearLimits[$missal->missal_id];
                 $missal->year_published = RomanMissal::$yearLimits[$missal->missal_id][ "since_year" ];
-                $missal->data_path      = "data/missals/$directory/$directory.json";
+                $missal->data_path      = "data/missals/$missalFolderName/$missalFolderName.json";
                 $missal->api_path       = API_BASE_PATH . "/missals/$missal->missal_id";
                 self::$missalsIndex->litcal_missals[] = $missal;
                 self::$params->addMissalRegion($missal->region);
@@ -413,17 +429,17 @@ class Missals
             } else {
                 $filteredResults = self::$missalsIndex;
                 if (null !== self::$params->Region) {
-                    $filteredResults->litcal_missals = array_filter(
+                    $filteredResults->litcal_missals = array_values(array_filter(
                         $filteredResults->litcal_missals,
                         fn ($missal) => $missal->region === self::$params->Region
-                    );
+                    ));
                     header("X-Litcal-Missals-Region: " . self::$params->Region, false);
                 }
                 if (null !== self::$params->Year) {
-                    $filteredResults->litcal_missals = array_filter(
+                    $filteredResults->litcal_missals = array_values(array_filter(
                         $filteredResults->litcal_missals,
                         fn ($missal) => $missal->year_published === self::$params->Year
-                    );
+                    ));
                     header("X-Litcal-Missals-Year: " . self::$params->Year, false);
                 }
                 self::produceResponse(json_encode($filteredResults));

@@ -104,14 +104,14 @@ class RomanMissal
 
 
     /**
-     * Check if a given value is a valid Roman Missal enumeration constant.
+     * Check if a given missal_id is a valid Roman Missal enumeration constant.
      *
-     * @param string $value the value to check
-     * @return bool true if the value is a valid Roman Missal enumeration constant, false otherwise
+     * @param string $missal_id the missal_id to check
+     * @return bool true if the missal_id is a valid Roman Missal enumeration constant, false otherwise
      */
-    public static function isValid(string $value): bool
+    public static function isValid(string $missal_id): bool
     {
-        return in_array($value, self::$values);
+        return in_array($missal_id, self::$values);
     }
 
     /**
@@ -126,48 +126,48 @@ class RomanMissal
     }
 
     /**
-     * Gets the name of the Roman Missal corresponding to the given value.
+     * Gets the name of the Roman Missal corresponding to the given Missal id.
      *
-     * @param string $value the value of the Roman Missal
-     * @return string the name of the Roman Missal
+     * @param string $missal_id the id of the Roman Missal
+     * @return ?string the name of the Roman Missal, or null if missal_id not valid
      */
-    public static function getName(string $value): string
+    public static function getName(string $missal_id): ?string
     {
-        return self::$names[ $value ];
+        return self::$names[ $missal_id ] ?? null;
     }
 
     /**
      * Gets the path to the JSON file containing the sanctorale data for the given Roman Missal.
      *
-     * @param string $value the value of the Roman Missal
-     * @return string|false the path to the JSON file, or false if the Roman Missal does not have any JSON data
+     * @param string $missal_id the id of the Roman Missal
+     * @return string|false|null the path to the JSON file, or false if the Roman Missal does not have any JSON data, or null if missal_id not valid
      */
-    public static function getSanctoraleFileName(string $value): string|false
+    public static function getSanctoraleFileName(string $missal_id): string|false|null
     {
-        return self::$jsonFiles[ $value ];
+        return self::$jsonFiles[ $missal_id ] ?? null;
     }
 
     /**
      * Gets the path to the i18n directory for the sanctorale of the given Roman Missal.
      *
-     * @param string $value the value of the Roman Missal
-     * @return string|false the path to the i18n directory, or false if the Roman Missal does not have any i18n data
+     * @param string $missal_id the id of the Roman Missal
+     * @return string|false|null the path to the i18n directory, or false if the Roman Missal does not have any i18n data, or null if id not valid
      */
-    public static function getSanctoraleI18nFilePath(string $value): string|false
+    public static function getSanctoraleI18nFilePath(string $missal_id): string|false|null
     {
-        return self::$i18nPath[ $value ];
+        return self::$i18nPath[ $missal_id ] ?? null;
     }
 
     /**
      * Gets the year limits for the given Roman Missal.
      *
-     * @param string $value the value of the Roman Missal
-     * @return object an object containing the year limits for the Roman Missal,
-     *   with properties named 'minYear' and 'maxYear'
+     * @param string $missal_id the id of the Roman Missal
+     * @return ?object an object containing the year limits for the Roman Missal,
+     *   with properties named 'minYear' and 'maxYear', or null if missal_id not valid
      */
-    public static function getYearLimits(string $value): object
+    public static function getYearLimits(string $missal_id): ?object
     {
-        return (object) self::$yearLimits[ $value ];
+        return (object) self::$yearLimits[ $missal_id ] ?? null;
     }
 
     /**
