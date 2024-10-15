@@ -269,7 +269,7 @@ class Missals
                 $statusMessage = "Resource not Deleted";
                 break;
             default:
-                $statusMessage = "Sorry what was it you wanted to do with this resource?";
+                $statusMessage = StatusCode::toString($statusCode);
         }
         $message->response = $statusCode === 404 ? "Resource not Found" : $statusMessage;
         $message->description = $description;
