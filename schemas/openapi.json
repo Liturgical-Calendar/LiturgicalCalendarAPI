@@ -4153,6 +4153,63 @@
         }
       }
     },
+    "/decrees/{decree_id}": {
+      "get": {
+        "tags": [
+          "Decrees"
+        ],
+        "security": [{}],
+        "summary": "Retrieve the index of defined Decrees of the Congregation for Divine Worship",
+        "operationId": "decreeByIdGET",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "decree_id",
+            "schema": {
+              "type": "string",
+              "pattern": "[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: an index of defined Decrees",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalDecreesPath.json#/definitions/LitCalDecree"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404 Not Found: Decree not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "const": "ERROR"
+                    },
+                    "response": {
+                      "type": "string",
+                      "const": "404 Resource not Found"
+                    },
+                    "description": {
+                      "type": "string",
+                      "const": "Decree not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/tests": {
       "get": {
         "tags": [
