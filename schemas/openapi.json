@@ -2797,7 +2797,7 @@
           "Calendar Source Data"
         ],
         "security": [{}],
-        "summary": "Create a national calendar, diocesan calendar, or wider region calendar data resource",
+        "summary": "Create a diocesan calendar data resource",
         "operationId": "diocesanDataPUT",
         "requestBody": {
           "required": true,
