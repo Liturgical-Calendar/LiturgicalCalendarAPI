@@ -18,12 +18,11 @@
                   },
                   "national_calendar": {
                     "type": "string",
-                    "pattern": "^[A-Z]{3,45}$",
+                    "pattern": "^[A-Z]{2}$",
                     "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
                   },
                   "diocesan_calendar": {
-                    "type": "string",
-                    "pattern": "^[A-Z]{3,45}$",
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId",
                     "description": "indicates the Diocesan Calendar used to produce the data in LitCalAllFestivities"
                   }
                 },
@@ -38,7 +37,7 @@
                   },
                   "national_calendar": {
                     "type": "string",
-                    "pattern": "^[A-Z]{3,45}$",
+                    "pattern": "^[A-Z]{2}$",
                     "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
                   },
                   "diocesan_calendar": {
