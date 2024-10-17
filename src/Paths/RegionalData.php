@@ -254,7 +254,7 @@ class RegionalData
             foreach ($this->params->payload->litcal as $CalEvent) {
                 $translationJSON->{ $CalEvent->festivity->event_key } = '';
             }
-            if (count($this->params->payload->netadata->languages) > 0) {
+            if (count($this->params->payload->metadata->languages) > 0) {
                 foreach ($this->params->payload->metadata->languages as $iso) {
                     if (!file_exists("data/wider_regions/{$widerRegion}/{$iso}.json")) {
                         file_put_contents(
