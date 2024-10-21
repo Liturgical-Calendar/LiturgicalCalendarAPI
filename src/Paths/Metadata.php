@@ -98,9 +98,18 @@ class Metadata
         }
     }
 
-    private static function getLocales(): array
+    /**
+     * Populates the Metadata::$locales array with the list of supported locales.
+     *
+     * It does this by scanning the i18n/ folder and retrieving the folder names
+     * of all its subfolders. The result is an array of strings, where each string
+     * is a locale code. The locale code is in the format of a single string
+     * containing the language code, optionally followed by an underscore and the
+     * region code. Examples of valid locale codes are: en, en_GB, it_IT, pt_PT.
+     */
+    private static function getLocales(): void
     {
-        return array_map('basename', glob('i18n/*', GLOB_ONLYDIR));
+        Metadata::$locales = array_map('basename', glob('i18n/*', GLOB_ONLYDIR));
     }
 
     /**
