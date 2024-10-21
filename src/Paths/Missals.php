@@ -51,10 +51,10 @@ class Missals
         $payload = null;
         switch (self::$Core->getRequestContentType()) {
             case RequestContentType::JSON:
-                $payload = self::$Core->retrieveRequestParamsFromJsonBody();
+                $payload = self::$Core->readJsonBody();
                 break;
             case RequestContentType::YAML:
-                $payload = self::$Core->retrieveRequestParamsFromYamlBody();
+                $payload = self::$Core->readYamlBody();
                 break;
             case RequestContentType::FORMDATA:
                 $payload = (object)$_POST;
