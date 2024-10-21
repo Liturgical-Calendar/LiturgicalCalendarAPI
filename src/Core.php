@@ -499,7 +499,7 @@ class Core
      *
      * @return object|array The request parameters, either as a stdClass object or an associative array.
      */
-    public function retrieveRequestParamsFromJsonBody(bool $assoc = false): object|array
+    public function readJsonBody(bool $assoc = false): object|array
     {
         $rawData = file_get_contents('php://input');
         if ("" === $rawData) {
@@ -541,7 +541,7 @@ class Core
      *
      * @return object|array The request parameters, either as a stdClass object or an associative array.
      */
-    public function retrieveRequestParamsFromYamlBody(bool $assoc = false): object|array
+    public function readYamlBody(bool $assoc = false): object|array
     {
         $rawData = file_get_contents('php://input');
         if ("" === $rawData) {

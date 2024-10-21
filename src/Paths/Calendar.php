@@ -296,10 +296,10 @@ class Calendar
     private function initParamsFromRequestBodyOrUrl()
     {
         if (self::$Core->getRequestContentType() === RequestContentType::JSON) {
-            $data = self::$Core->retrieveRequestParamsFromJsonBody(true);
+            $data = self::$Core->readJsonBody(true);
             $this->CalendarParams = new CalendarParams($data);
         } elseif (self::$Core->getRequestContentType() === RequestContentType::YAML) {
-            $data = self::$Core->retrieveRequestParamsFromYamlBody(true);
+            $data = self::$Core->readYamlBody(true);
             $this->CalendarParams = new CalendarParams($data);
         } else {
             switch (self::$Core->getRequestMethod()) {

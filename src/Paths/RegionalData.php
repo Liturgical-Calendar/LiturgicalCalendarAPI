@@ -550,10 +550,10 @@ class RegionalData
         $payload = null;
         switch (self::$Core->getRequestContentType()) {
             case RequestContentType::JSON:
-                $payload = self::$Core->retrieveRequestParamsFromJsonBody();
+                $payload = self::$Core->readJsonBody();
                 break;
             case RequestContentType::YAML:
-                $payload = self::$Core->retrieveRequestParamsFromYamlBody();
+                $payload = self::$Core->readYamlBody();
                 break;
             case RequestContentType::FORMDATA:
                 $payload = (object)$_POST;
@@ -642,13 +642,15 @@ class RegionalData
     private function handleRequestParams(array $requestPathParts = []): void
     {
         $data = null;
+
+        // In the case of a PUT request, we don't expect any PATH parameters, we only retrieve the payload from the request body
         if (self::$Core->getRequestMethod() === RequestMethod::PUT) {
             switch (self::$Core->getRequestContentType()) {
                 case RequestContentType::JSON:
-                    $data = self::$Core->retrieveRequestParamsFromJsonBody();
+                    $data = self::$Core->readJsonBody();
                     break;
                 case RequestContentType::YAML:
-                    $data = self::$Core->retrieveRequestParamsFromYamlBody();
+                    $data = self::$Core->readYamlBody();
                     break;
                 default:
                     $data = (object)$_REQUEST;
@@ -677,14 +679,16 @@ class RegionalData
             $data = RegionalData::setDataFromPath($requestPathParts);
         }
 
+        // In the case of a PATCH request, we expect the request body to contain the payload with calendar data,
+        // either in JSON format, in YAML format, or as form data
         if (self::$Core->getRequestMethod() === RequestMethod::PATCH) {
             $bodyData = null;
             switch (self::$Core->getRequestContentType()) {
                 case RequestContentType::JSON:
-                    $bodyData = self::$Core->retrieveRequestParamsFromJsonBody();
+                    $bodyData = self::$Core->readJsonBody();
                     break;
                 case RequestContentType::YAML:
-                    $bodyData = self::$Core->retrieveRequestParamsFromYamlBody();
+                    $bodyData = self::$Core->readYamlBody();
                     break;
                 default:
                     $bodyData = (object)$_REQUEST;
