@@ -13,6 +13,7 @@ class Metadata
     private static array $nationalCalendarsMetadata = [];
     private static array $widerRegions              = [];
     private static array $widerRegionsNames         = [];
+    private static array $locales                   = [];
 
     private static function retrieveNationalCalendarNamesFromFolders()
     {
@@ -30,6 +31,18 @@ class Metadata
         }
     }
 
+    /**
+     * @return void
+     * @description
+     * This static function processes the contents of the data/wider_regions directory.
+     * It takes the files in the directory, checks if they are JSON files and if they are wider region definitions.
+     * If they are, it reads the languages and builds the data for the wider region metadata.
+     * The data is then stored in the Metadata::$widerRegions array.
+     * The function also builds the data for the API path and the i18n path, which are stored in the same array.
+     * The function also stores the names of the wider regions in the Metadata::$widerRegionsNames array.
+     * @see Metadata::$widerRegions
+     * @see Metadata::$widerRegionsNames
+     */
     private static function buildWiderRegionData()
     {
         $filterDirResults = ['..', '.'];
@@ -57,9 +70,14 @@ class Metadata
     }
 
     /**
+     * Retrieves and applies the settings overrides for a specific diocesan calendar based on the provided key and server path.
      * Diocesan calendars inherit their settings regarding Epiphany, Ascension, Corpus Christi etc. from National calendars,
      * however they can override some of these settings. Here we check if a Diocesan calendar has any overrides defined,
      * and if so we add this information to the response object.
+     *
+     * If the server path file does not exist, the function returns early.
+     * It reads the diocesan calendar definition from the server path, decodes it, and checks for JSON decoding errors.
+     * If there are overrides defined in the calendar data, it updates the settings for the corresponding diocesan calendar.
      */
     private static function retrieveDiocesanSettings(string $diocesan_key, string $server_path)
     {
@@ -80,8 +98,18 @@ class Metadata
         }
     }
 
+    private static function getLocales(): array
+    {
+        $locales = [];
+        foreach (glob('i18n/*', GLOB_ONLYDIR) as $path) {
+            $locales[] = pathinfo($path, PATHINFO_FILENAME);
+        }
+        return $locales;
+    }
+
     /**
-     * Builds an index of all National and Diocesan calendars
+     * Builds an index of all National and Diocesan calendars,
+     * and of locales supported for the General Roman Calendar
      *
      * @return int Returns the HTTP Status Code for the Response
      */
@@ -172,9 +200,12 @@ class Metadata
             }
         }
 
-        // Finally we will build information about Wider Regions
+        // We will build information about Wider Regions
         // that National calendars might be associated with.
         Metadata::buildWiderRegionData();
+
+        // Finally we retrieve all available locales for the General Roman Calendar
+        Metadata::getLocales();
         return 200;
     }
 
@@ -216,7 +247,8 @@ class Metadata
                 "diocesan_calendars_keys"     => array_column(Metadata::$diocesanCalendars, 'calendar_id'),
                 "diocesan_groups"             => $diocesanGroups,
                 "wider_regions"               => Metadata::$widerRegions,
-                "wider_regions_keys"          => Metadata::$widerRegionsNames
+                "wider_regions_keys"          => Metadata::$widerRegionsNames,
+                "locales"                     => Metadata::$locales
             ]
         ], JSON_PRETTY_PRINT);
         $responseHash = md5($response);
@@ -229,6 +261,13 @@ class Metadata
         }
     }
 
+    /**
+     * Initialization function for the metadata API.
+     *
+     * It sets the appropriate CORS headers and calls the `buildIndex` and `response` methods.
+     *
+     * @return void
+     */
     public static function init()
     {
         if (isset($_SERVER[ 'REQUEST_METHOD' ])) {
