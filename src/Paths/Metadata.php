@@ -100,11 +100,7 @@ class Metadata
 
     private static function getLocales(): array
     {
-        $locales = [];
-        foreach (glob('i18n/*', GLOB_ONLYDIR) as $path) {
-            $locales[] = pathinfo($path, PATHINFO_FILENAME);
-        }
-        return $locales;
+        return array_map('basename', glob('i18n/*', GLOB_ONLYDIR));
     }
 
     /**
