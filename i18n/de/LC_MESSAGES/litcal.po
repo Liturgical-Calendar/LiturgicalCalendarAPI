@@ -5,13 +5,14 @@
 # John R. D'Orazio <priest@johnromanodorazio.com>, 2022, 2023.
 # OpenAI <noreply-mt-openai@weblate.org>, 2024.
 # "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024.
+# Weblate Admin <admin@example.com>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-10-13 19:52+0000\n"
-"PO-Revision-Date: 2024-10-03 13:34+0000\n"
-"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
+"PO-Revision-Date: 2024-11-03 10:52+0000\n"
+"Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: German <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/de/>\n"
 "Language: de\n"
@@ -84,7 +85,7 @@ msgstr ""
 
 #. translators: Sanctorale refers to the Proprium de Sanctis; %s = name of the Roman Missal
 #: src/Paths/Calendar.php:795
-#, fuzzy, php-format
+#, php-format
 msgid "Data for the Sanctorale from %s could not be found."
 msgstr "Daten für das Sanctorale von %s konnten nicht gefunden werden."
 
@@ -103,9 +104,8 @@ msgstr ""
 
 #. translators: Sanctorale refers to Proprium de Sanctis
 #: src/Paths/Calendar.php:827
-#, fuzzy
 msgid "Could not find the Sanctorale data"
-msgstr "Konnte keine Sanctorale-Datendatei für %s finden"
+msgstr "Konnte die Sanctorale-Daten nicht finden"
 
 #: src/Paths/Calendar.php:852
 #, php-format
@@ -118,11 +118,12 @@ msgstr ""
 "%s"
 
 #: src/Paths/Calendar.php:858
-#, fuzzy
 msgid ""
 "Could not find translation data for Memorials based on Decrees of the "
 "Congregation for Divine Worship"
-msgstr "Dekret der Kongregation für den Gottesdienst"
+msgstr ""
+"Konnte keine Übersetzungsdaten für Gedenktage basierend auf Dekreten der "
+"Kongregation für den Gottesdienst finden"
 
 #: src/Paths/Calendar.php:867
 #, php-format
@@ -426,8 +427,8 @@ msgstr ""
 msgid ""
 "Cannot create mobile festivity '%1$s' relative to festivity with key '%2$s'"
 msgstr ""
-"Kann mobile Festivität '%1$s' nicht erstellen, die sich auf Festivität mit "
-"Schlüssel '%2$s' bezieht."
+"Kann das mobile Festivität '%1$s' relativ zum Festivität mit dem Schlüssel "
+"'%2$s', nicht erstellen"
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created 2. list of properties
 #: src/Paths/Calendar.php:2361 src/Paths/Calendar.php:3837
@@ -699,7 +700,7 @@ msgid ""
 "correct date information in order to proceed"
 msgstr ""
 "Wir sollten ein neues Fest schaffen, aber wir scheinen nicht die richtigen "
-"Datumsinformationen zu haben, um fortzufahren."
+"Datumsinformationen zu haben, um fortzufahren"
 
 #. translators: Name of the Roman Missal
 #: src/Paths/Calendar.php:3499
@@ -722,8 +723,8 @@ msgid ""
 "The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
 "superseded by the %5$s '%6$s' in the year %7$d"
 msgstr ""
-"Der %1$s '%2$s' (%3$s), der in den %4$s in den nationalen Kalender "
-"aufgenommen wurde, wird im Jahr %7$d durch den %5$s '%6$s' ersetzt."
+"Der %1$s '%2$s' (%3$s), der im %4$s in den nationalen Kalender aufgenommen "
+"wurde, wird im Jahr %7$d durch den %5$s '%6$s' ersetzt"
 
 #. translators: Name of the Roman Missal
 #: src/Paths/Calendar.php:3563
@@ -772,9 +773,9 @@ msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
 "on %4$s, is suppressed by the Sunday or Solemnity %5$s in the year %6$d"
 msgstr ""
-"Der %1$s '%2$s', der normalerweise am %4$s im Kalender der %3$s gefeiert "
-"wird, wird im Jahr %6$d durch den Sonntag oder die Feierlichkeit %5$s "
-"unterdrückt."
+"Der %1$s '%2$s', der dem Kalender des %3$s eigen ist und normalerweise am %4$"
+"s gefeiert wird, wird im Jahr %6$d durch den Sonntag oder die Feierlichkeit "
+"%5$s unterdrückt"
 
 #: src/Paths/Calendar.php:4327
 #, php-format
@@ -892,7 +893,7 @@ msgstr "Pastoren"
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:81
 msgid "Doctors"
-msgstr "Ärzte"
+msgstr "Kirchenlehrer"
 
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:83
@@ -1125,7 +1126,7 @@ msgstr "Österliches Triduum"
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:37
 msgid "Easter"
-msgstr "Ostern"
+msgstr "Osterzeit"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:40
