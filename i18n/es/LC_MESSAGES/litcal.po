@@ -9,9 +9,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-10-13 19:52+0000\n"
-"PO-Revision-Date: 2024-10-13 17:40+0000\n"
+"PO-Revision-Date: 2024-11-03 10:52+0000\n"
 "Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: Spanish <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/es/>\n"
@@ -79,9 +79,9 @@ msgstr ""
 
 #. translators: Sanctorale refers to the Proprium de Sanctis; %s = name of the Roman Missal
 #: src/Paths/Calendar.php:795
-#, fuzzy, php-format
+#, php-format
 msgid "Data for the Sanctorale from %s could not be found."
-msgstr "Los datos del sanctorale de %s no se encontraron."
+msgstr "No se pudieron encontrar datos para el Sanctorale de %s."
 
 #. translators: Sanctorale refers to the Proprium de Sanctis;
 #.  1: name of the Roman Missal
@@ -98,9 +98,8 @@ msgstr ""
 
 #. translators: Sanctorale refers to Proprium de Sanctis
 #: src/Paths/Calendar.php:827
-#, fuzzy
 msgid "Could not find the Sanctorale data"
-msgstr "No se pudo encontrar un archivo de datos del sanctoral para %s"
+msgstr "No se pudo encontrar la información del Sanctorale"
 
 #: src/Paths/Calendar.php:852
 #, php-format
@@ -112,11 +111,12 @@ msgstr ""
 "basadas en Decretos de la Congregación para el Culto Divino: %s"
 
 #: src/Paths/Calendar.php:858
-#, fuzzy
 msgid ""
 "Could not find translation data for Memorials based on Decrees of the "
 "Congregation for Divine Worship"
-msgstr "Decreto de la Congregación para el Culto Divino"
+msgstr ""
+"No se pudo encontrar datos de traducción para los Memoriales basados en los "
+"Decretos de la Congregación para el Culto Divino"
 
 #: src/Paths/Calendar.php:867
 #, php-format
@@ -688,7 +688,7 @@ msgid ""
 "correct date information in order to proceed"
 msgstr ""
 "Deberíamos estar creando una nueva festividad, sin embargo, parece que no "
-"tenemos la información correcta de la fecha para proceder."
+"tenemos la información correcta sobre la fecha para proceder"
 
 #. translators: Name of the Roman Missal
 #: src/Paths/Calendar.php:3499
@@ -875,7 +875,7 @@ msgstr "Mártires"
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:79
 msgid "Pastors"
-msgstr "Párrocos"
+msgstr "Pastores"
 
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:81
