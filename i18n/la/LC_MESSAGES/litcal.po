@@ -7,9 +7,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-10-13 19:52+0000\n"
-"PO-Revision-Date: 2024-10-13 17:40+0000\n"
+"PO-Revision-Date: 2024-11-03 10:52+0000\n"
 "Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/la/>\n"
@@ -647,24 +647,24 @@ msgstr ""
 
 #. translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year
 #: src/Paths/Calendar.php:3291
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The Feast '%1$s', usually celebrated on %2$s, coincides with another Feast "
 "'%3$s' in the year %4$d! Does something need to be done about this?"
 msgstr ""
-"%1$s '%2$s', celebrata plerumque in die %3$s, subplantata est ab %4$s '%5$s' "
-"in anno %6$d."
+"Festum '%1$s', sollemniter celebratum die %2$s, coincidet cum alio Festum "
+"'%3$s' anno %4$d! Opus est aliquid de hoc agere?"
 
 #. translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year
 #: src/Paths/Calendar.php:3305
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The Solemnity '%1$s', usually celebrated on %2$s, coincides with the Sunday "
 "or Solemnity '%3$s' in the year %4$d! Does something need to be done about "
 "this?"
 msgstr ""
-"Sollemnitas <i>'%1$s'</i> coincidet cum Sollemnitate <i>'%2$s'</i> in anno "
-"%3$d. Oportet quaerere a Congregatione Cultu Divino quid facere!"
+"Solemnitas '%1$s', quae plerumque celebratur die %2$s, coincidet cum "
+"Dominica vel Solemnitate '%3$s' anno %4$d! Opus est aliquid de hoc agere?"
 
 #: src/Paths/Calendar.php:3349
 msgid ""
@@ -737,13 +737,13 @@ msgstr ""
 
 #. translators: 1: Festivity grade, 2: Festivity name, 3: Name of the diocese, 4: Festivity date, 5: Coinciding festivity name, 6: Requested calendar year
 #: src/Paths/Calendar.php:4064
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
 "on %4$s, is suppressed by the Sunday or Solemnity %5$s in the year %6$d"
 msgstr ""
-"%1$s '%2$s', celebrata plerumque in die %3$s, subplantata est ab %4$s '%5$s' "
-"in anno %6$d."
+"%1$s '%2$s', proprio calendario %3$s et plerumque celebratur die %4$s, "
+"supprimatur a Dominica vel Sollemnitate %5$s anno %6$d"
 
 #: src/Paths/Calendar.php:4327
 #, php-format
