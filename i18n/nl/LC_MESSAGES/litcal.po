@@ -8,10 +8,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-10-13 19:52+0000\n"
-"PO-Revision-Date: 2024-06-27 22:33+0000\n"
-"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2024-11-03 10:52+0000\n"
+"Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: Dutch <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/nl/>\n"
 "Language: nl\n"
@@ -35,22 +35,29 @@ msgstr ""
 msgid ""
 "There was an error trying to decode localized JSON data for the Temporale: %s"
 msgstr ""
+"Er is een fout opgetreden bij het decoderen van gelokaliseerde JSON-gegevens "
+"voor de Temporale: %s"
 
 #. translators: Temporale refers to the Proprium de Tempore
 #: src/Paths/Calendar.php:702
 msgid "There was an error trying to retrieve localized data for the Temporale."
 msgstr ""
+"Er is een fout opgetreden bij het ophalen van gelokaliseerde gegevens voor "
+"de Temporale."
 
 #. translators: Temporale refers to the Proprium de Tempore
 #: src/Paths/Calendar.php:732
 #, php-format
 msgid "There was an error trying to decode JSON data for the Temporale: %s"
 msgstr ""
+"Er is een fout opgetreden bij het decoderen van JSON-gegevens voor de "
+"Temporale: %s"
 
 #. translators: Temporale refers to the Proprium de Tempore
 #: src/Paths/Calendar.php:739
 msgid "There was an error trying to retrieve data for the Temporale."
 msgstr ""
+"Er is een fout opgetreden bij het ophalen van gegevens voor de Temporale."
 
 #. translators: name of the Roman Missal
 #: src/Paths/Calendar.php:767
@@ -72,6 +79,8 @@ msgid ""
 "There was an error trying to decode JSON localization data for the "
 "Sanctorale for the Missal %1$s: %2$s"
 msgstr ""
+"Er is een fout opgetreden bij het decoderen van JSON-lokalisatiegegevens "
+"voor het Sanctorale voor het Missaal %1$s: %2$s"
 
 #. translators: Sanctorale refers to the Proprium de Sanctis; %s = name of the Roman Missal
 #: src/Paths/Calendar.php:795
@@ -90,6 +99,8 @@ msgid ""
 "There was an error trying to decode JSON data for the Sanctorale for the "
 "Missal %1$s: %2$s."
 msgstr ""
+"Er is een fout opgetreden bij het decoderen van JSON-gegevens voor het "
+"Sanctorale voor het Missaal %1$s: %2$s."
 
 #. translators: Sanctorale refers to Proprium de Sanctis
 #: src/Paths/Calendar.php:827
@@ -103,6 +114,9 @@ msgid ""
 "There was an error trying to decode translation data for Memorials based on "
 "Decrees of the Congregation for Divine Worship: %s"
 msgstr ""
+"Er is een fout opgetreden bij het decoderen van vertaalgegevens voor "
+"Herdenkingen op basis van Decreten van de Congregatie voor de Goddelijke "
+"Eredienst: %s"
 
 #: src/Paths/Calendar.php:858
 #, fuzzy
@@ -117,6 +131,9 @@ msgid ""
 "There was an error trying to decode JSON data for Memorials based on Decrees "
 "of the Congregation for Divine Worship: %s"
 msgstr ""
+"Er is een fout opgetreden bij het decoderen van JSON-gegevens voor "
+"Herdenkingen op basis van Decreten van de Congregatie voor de Goddelijke "
+"Eredienst: %s"
 
 #. translators: days before Epiphany when Epiphany falls on Jan 6 (not useful in Italian!)
 #. translators: days after Epiphany when Epiphany falls on Jan 6 (not useful in Italian!)
@@ -744,6 +761,9 @@ msgid ""
 "celebrated on %3$s, coincides with the Sunday or Solemnity '%4$s' in the "
 "year %5$d! Does something need to be done about this?"
 msgstr ""
+"De plechtigheid '%1$s', eigen aan de kalender van de %2$s en meestal gevierd "
+"op %3$s, valt samen met de zondag of plechtigheid '%4$s' in het jaar %5$d! "
+"Moet hier iets aan gedaan worden?"
 
 #. translators: 1: Festivity grade, 2: Festivity name, 3: Name of the diocese, 4: Festivity date, 5: Coinciding festivity name, 6: Requested calendar year
 #: src/Paths/Calendar.php:4064
@@ -759,6 +779,8 @@ msgstr ""
 #, php-format
 msgid "Error receiving or parsing info from github about latest release: %s."
 msgstr ""
+"Fout bij het ontvangen of verwerken van informatie van GitHub over de "
+"laatste release: %s."
 
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
 #: src/FestivityCollection.php:48
