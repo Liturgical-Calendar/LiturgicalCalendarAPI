@@ -339,9 +339,9 @@ class FestivityCollection
                 $this->festivities[ $key ]->liturgical_season = LitSeason::ADVENT;
             } elseif ($festivity->date >= $this->festivities[ "Christmas" ]->date || $festivity->date <= $this->festivities[ "BaptismLord" ]->date) {
                 $this->festivities[ $key ]->liturgical_season = LitSeason::CHRISTMAS;
-            } elseif ($festivity->date >= $this->festivities[ "AshWednesday" ]->date && $festivity->date <= $this->festivities[ "HolyThurs" ]->date) {
+            } elseif ($festivity->date >= $this->festivities[ "AshWednesday" ]->date && $festivity->date < $this->festivities[ "HolyThurs" ]->date) {
                 $this->festivities[ $key ]->liturgical_season = LitSeason::LENT;
-            } elseif ($festivity->date > $this->festivities[ "HolyThurs" ]->date && $festivity->date < $this->festivities[ "Easter" ]->date) {
+            } elseif ($festivity->date >= $this->festivities[ "HolyThurs" ]->date && $festivity->date < $this->festivities[ "Easter" ]->date) {
                 $this->festivities[ $key ]->liturgical_season = LitSeason::EASTER_TRIDUUM;
             } elseif ($festivity->date >= $this->festivities[ "Easter" ]->date && $festivity->date <= $this->festivities[ "Pentecost" ]->date) {
                 $this->festivities[ $key ]->liturgical_season = LitSeason::EASTER;

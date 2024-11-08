@@ -40,7 +40,8 @@
         "epiphany": "JAN6",
         "ascension": "SUNDAY",
         "corpus_christi": "SUNDAY",
-        "locale": "it_IT"
+        "locale": "it_IT",
+        "eternal_high_priest": false
     },
     "metadata": {
         "region": "IT",
