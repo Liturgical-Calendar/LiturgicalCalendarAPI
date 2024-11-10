@@ -4488,6 +4488,8 @@ class Calendar
             }
 
             $this->Cal->setCyclesVigilsSeasons();
+            // For any celebrations that do not yet have a psalter_week property, make an attempt to calculate the value if applicable
+            $this->Cal->calculatePsalterWeek();
 
             if ($this->CalendarParams->YearType === YearType::LITURGICAL) {
                 // Save the state of the current Calendar calculation
@@ -4514,6 +4516,7 @@ class Calendar
                 }
 
                 $this->Cal->setCyclesVigilsSeasons();
+                $this->Cal->calculatePsalterWeek();
                 $this->Cal->sortFestivities();
 
                 $this->Cal->purgeDataBeforeAdvent();
