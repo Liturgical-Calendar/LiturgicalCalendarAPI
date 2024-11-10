@@ -52,16 +52,40 @@ class FestivityCollection
         $this->LitGrade = new LitGrade($this->CalendarParams->Locale);
     }
 
+    /**
+     * Returns true if the given DateTime object represents a Sunday.
+     *
+     * @param DateTime $dt
+     * @return bool True if the given date is a Sunday, false otherwise.
+     */
     public static function dateIsSunday(DateTime $dt): bool
     {
         return (int)$dt->format('N') === 7;
     }
 
+    /**
+     * Returns true if the given DateTime object does not represent a Sunday.
+     *
+     * @param DateTime $dt The date to check.
+     * @return bool True if the given date is not a Sunday, false otherwise.
+     */
     public static function dateIsNotSunday(DateTime $dt): bool
     {
         return (int)$dt->format('N') !== 7;
     }
 
+    /**
+     * Adds a Festivity to the collection and categorizes it based on its grade and key.
+     *
+     * This method organizes festivities into different categories such as solemnities,
+     * feasts, memorials, weekdays of Advent, Christmas, Lent, and Epiphany, as well as
+     * Sundays of Advent, Lent, and Easter. It updates the festivity's display grade and
+     * psalter week as necessary.
+     *
+     * @param string $key The key associated with the festivity.
+     * @param Festivity $festivity The festivity object to be added.
+     * @return void
+     */
     public function addFestivity(string $key, Festivity $festivity): void
     {
         $this->festivities[ $key ] = $festivity;
@@ -98,11 +122,23 @@ class FestivityCollection
         }
     }
 
+    /**
+     * Adds an array of keys to the SolemnitiesLordBVM array.
+     * This is used to store the solemnities of the Lord and the BVM.
+     * @param array $keys The keys to add to the array.
+     * @return void
+     */
     public function addSolemnitiesLordBVM(array $keys): void
     {
         array_push($this->SolemnitiesLordBVM, $keys);
     }
 
+    /**
+     * Gets a Festivity object from the collection by key.
+     *
+     * @param string $key The key of the festivity to retrieve.
+     * @return Festivity|null The Festivity object if found, otherwise null.
+     */
     public function getFestivity(string $key): ?Festivity
     {
         if (array_key_exists($key, $this->festivities)) {
@@ -111,6 +147,15 @@ class FestivityCollection
         return null;
     }
 
+    /**
+     * Retrieves all festivities that occur on the specified date.
+     *
+     * This method filters the collection of festivities and returns an array
+     * of those whose date matches the given DateTime object.
+     *
+     * @param DateTime $date The date for which to retrieve festivities.
+     * @return array An array of Festivity objects occurring on the specified date.
+     */
     public function getCalEventsFromDate(DateTime $date): array
     {
         return array_filter($this->festivities, function ($el) use ($date) {
@@ -118,26 +163,56 @@ class FestivityCollection
         });
     }
 
+    /**
+     * Checks if a given key is a solemnity of the Lord or the BVM.
+     *
+     * @param string $key The key to check.
+     * @return bool True if the key is a solemnity of the Lord or the BVM, otherwise false.
+     */
     public function isSolemnityLordBVM(string $key): bool
     {
         return in_array($key, $this->SolemnitiesLordBVM);
     }
 
+    /**
+     * Checks if a given date falls on a Sunday during the seasons of Advent, Lent, or Easter.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if the date is a Sunday in Advent, Lent, or Easter, otherwise false.
+     */
     public function isSundayAdventLentEaster(DateTime $date): bool
     {
         return in_array($date, $this->SundaysAdventLentEaster);
     }
 
+    /**
+     * Checks if a given date is a solemnity.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if the date is a solemnity, otherwise false.
+     */
     public function inSolemnities(DateTime $date): bool
     {
         return in_array($date, $this->solemnities);
     }
 
+    /**
+     * Checks if a given date is not a solemnity.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if the date is not a solemnity, otherwise false.
+     */
     public function notInSolemnities(DateTime $date): bool
     {
         return !$this->inSolemnities($date);
     }
 
+    /**
+     * Checks if a given date is a feast.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if the date is a feast, otherwise false.
+     */
     public function inFeasts(DateTime $date): bool
     {
         return in_array($date, $this->feasts);
@@ -148,56 +223,123 @@ class FestivityCollection
         return !$this->inFeasts($date);
     }
 
+    /**
+     * Checks if a given date is either a solemnity or a feast.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if the date is a solemnity or a feast, otherwise false.
+     */
     public function inSolemnitiesOrFeasts(DateTime $date): bool
     {
         return $this->inSolemnities($date) || $this->inFeasts($date);
     }
 
+    /**
+     * Checks if a given date is neither a solemnity nor a feast.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if the date is not a solemnity or a feast, otherwise false.
+     */
     public function notInSolemnitiesOrFeasts(DateTime $date): bool
     {
         return !$this->inSolemnitiesOrFeasts($date);
     }
 
+    /**
+     * Checks if a given date is a memorial.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if the date is a memorial, otherwise false.
+     */
     public function inMemorials(DateTime $date): bool
     {
         return in_array($date, $this->memorials);
     }
 
+    /**
+     * Checks if a given date is not a memorial.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if the date is not a memorial, otherwise false.
+     */
     public function notInMemorials(DateTime $date): bool
     {
         return !$this->inMemorials($date);
     }
 
+    /**
+     * Checks if a given date is either a feast or a memorial.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if the date is a feast or a memorial, otherwise false.
+     */
     public function inFeastsOrMemorials(DateTime $date): bool
     {
         return $this->inFeasts($date) || $this->inMemorials($date);
     }
 
+    /**
+     * Checks if a given date is neither a feast nor a memorial.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if the date is not a feast or a memorial, otherwise false.
+     */
     public function notInFeastsOrMemorials(DateTime $date): bool
     {
         return !$this->inFeastsOrMemorials($date);
     }
 
+    /**
+     * Checks if a given date is a solemnity, feast, or memorial.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if the date is a solemnity, feast, or memorial, otherwise false.
+     */
     public function inSolemnitiesFeastsOrMemorials(DateTime $date): bool
     {
         return $this->inSolemnities($date) || $this->inFeastsOrMemorials($date);
     }
 
+    /**
+     * Checks if a given date is not a solemnity, feast, or memorial.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if the date is not a solemnity, feast, or memorial, otherwise false.
+     */
     public function notInSolemnitiesFeastsOrMemorials(DateTime $date): bool
     {
         return !$this->inSolemnitiesFeastsOrMemorials($date);
     }
 
+    /**
+     * Checks if a given date is a weekday in the seasons of Advent, Christmas, or Lent.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if the date is a weekday in Advent, Christmas, or Lent, otherwise false.
+     */
     public function inWeekdaysAdventChristmasLent(DateTime $date): bool
     {
         return in_array($date, $this->WeekdayAdventChristmasLent);
     }
 
+    /**
+     * Checks if a given date is a weekday in the season of Epiphany.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if the date is a weekday in Epiphany, otherwise false.
+     */
     public function inWeekdaysEpiphany(DateTime $date): bool
     {
         return in_array($date, $this->WeekdaysEpiphany);
     }
 
+    /**
+     * Checks if a given date exists in the current calculated Liturgical calendar.
+     * This is useful for checking coincidences between mobile festivities.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if the date is found in the calendar, otherwise false.
+     */
     public function inCalendar(DateTime $date): bool
     {
         return count(array_filter($this->festivities, function ($el) use ($date) {
@@ -205,6 +347,13 @@ class FestivityCollection
         })) > 0;
     }
 
+    /**
+     * Given a date, find the corresponding solemnity in the current calculated Liturgical calendar.
+     * If no solemnity is found, returns null.
+     *
+     * @param DateTime $date The date to find the solemnity for.
+     * @return Festivity|null The solemnity at the given date, or null if none exists.
+     */
     public function solemnityFromDate(DateTime $date): ?Festivity
     {
         $key = array_search($date, $this->solemnities);
@@ -214,16 +363,37 @@ class FestivityCollection
         return null;
     }
 
+    /**
+     * Given a date, find the corresponding solemnity key in the current calculated Liturgical calendar.
+     * If no solemnity is found, returns false.
+     *
+     * @param DateTime $date The date to find the solemnity key for.
+     * @return string|int|false The solemnity key at the given date, or false if none exists.
+     */
     public function solemnityKeyFromDate(DateTime $date): string|int|false
     {
         return array_search($date, $this->solemnities);
     }
 
+    /**
+     * Given a date, find the corresponding weekday in the Epiphany season key in the current calculated Liturgical calendar.
+     * If no weekday in the Epiphany season is found, returns false.
+     *
+     * @param DateTime $date The date to find the weekday in the Epiphany season key for.
+     * @return string|int|false The weekday in the Epiphany season key at the given date, or false if none exists.
+     */
     public function weekdayEpiphanyKeyFromDate(DateTime $date): string|int|false
     {
         return array_search($date, $this->WeekdaysEpiphany);
     }
 
+    /**
+     * Given a date, find the corresponding Feast or Memorial in the current calculated Liturgical calendar.
+     * If no Feast or Memorial is found, returns null.
+     *
+     * @param DateTime $date The date to find the Feast or Memorial for.
+     * @return Festivity|null The Feast or Memorial at the given date, or null if none exists.
+     */
     public function feastOrMemorialFromDate(DateTime $date): ?Festivity
     {
         $key = array_search($date, $this->feasts);
@@ -237,6 +407,13 @@ class FestivityCollection
         return null;
     }
 
+    /**
+     * Given a date, find the corresponding Feast or Memorial key in the current calculated Liturgical calendar.
+     * If no Feast or Memorial is found, returns false.
+     *
+     * @param DateTime $date The date to find the Feast or Memorial key for.
+     * @return string|int|false The Feast or Memorial key at the given date, or false if none exists.
+     */
     public function feastOrMemorialKeyFromDate(DateTime $date): string|int|false
     {
         $key = array_search($date, $this->feasts);
@@ -246,6 +423,13 @@ class FestivityCollection
         return array_search($date, $this->memorials);
     }
 
+    /**
+     * Given a key and a new date, moves the corresponding festivity to the new date
+     *
+     * @param string $key The key of the festivity to move
+     * @param DateTime $newDate The new date for the festivity
+     * @return void
+     */
     public function moveFestivityDate(string $key, DateTime $newDate): void
     {
         if (array_key_exists($key, $this->festivities)) {
@@ -253,6 +437,21 @@ class FestivityCollection
         }
     }
 
+    /**
+     * Updates the categorization of a festivity based on its grade and previous grade.
+     *
+     * This method modifies the festivity's position in the solemnities, feasts, or memorials
+     * collections according to its new grade. If the new grade is greater than or equal to
+     * FEAST_LORD, the festivity is added to the solemnities collection and removed from
+     * feasts or memorials if necessary. If the new grade is FEAST, it is moved to the feasts
+     * collection from solemnities or memorials. If the new grade is MEMORIAL, it is added to
+     * the memorials collection and removed from solemnities or feasts if needed.
+     *
+     * @param string $key The key associated with the festivity.
+     * @param int $value The new grade of the festivity.
+     * @param int $oldValue The previous grade of the festivity.
+     * @return void
+     */
     private function handleGradeProperty(string $key, int $value, int $oldValue): void
     {
         if ($value >= LitGrade::FEAST_LORD) {
@@ -281,6 +480,18 @@ class FestivityCollection
         }
     }
 
+    /**
+     * Sets a property of a festivity in the collection if it exists and matches the expected type.
+     *
+     * Uses reflection to ensure the property exists on the Festivity object and checks the type
+     * of the value against the expected type of the property. If the property is "grade",
+     * it calls handleGradeProperty to update the festivity's categorization.
+     *
+     * @param string $key The key of the festivity to modify.
+     * @param string $property The property name to be set.
+     * @param string|int|bool $value The new value for the property.
+     * @return bool True if the property was successfully set, otherwise false.
+     */
     public function setProperty(string $key, string $property, string|int|bool $value): bool
     {
         $reflect = new \ReflectionClass(new Festivity("test", new DateTime('NOW')));
@@ -307,6 +518,14 @@ class FestivityCollection
         return false;
     }
 
+    /**
+     * Removes a festivity from the collection and all relevant categorizations.
+     *
+     * If the festivity is a Solemnity, Feast, or Memorial, it is removed from the
+     * respective collection. The festivity is then unset from the collection.
+     *
+     * @param string $key The key of the festivity to remove.
+     */
     public function removeFestivity(string $key): void
     {
         $date = $this->festivities[ $key ]->date;
@@ -322,6 +541,15 @@ class FestivityCollection
         unset($this->festivities[ $key ]);
     }
 
+    /**
+     * Determines if a given date falls within Ordinary Time.
+     *
+     * Ordinary Time is defined as the period after the Baptism of the Lord
+     * until Ash Wednesday, and from after Pentecost until the start of Advent.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if the date is in Ordinary Time, otherwise false.
+     */
     public function inOrdinaryTime(DateTime $date): bool
     {
         return (
@@ -331,6 +559,26 @@ class FestivityCollection
         );
     }
 
+    /**
+     * Sets the liturgical seasons, year cycles, and vigil masses for each festivity in the collection.
+     *
+     * This method iterates through all festivities and assigns them to a liturgical season
+     * based on their date. It also determines the liturgical year cycle for weekdays and Sundays,
+     * and calculates vigil masses for festivities that qualify.
+     *
+     * The liturgical seasons are defined as:
+     * - Advent: from Advent1 to before Christmas
+     * - Christmas: from Christmas to Baptism of the Lord
+     * - Lent: from Ash Wednesday to before Holy Thursday
+     * - Easter Triduum: from Holy Thursday to before Easter
+     * - Easter: from Easter to Pentecost
+     * - Ordinary Time: any other time
+     *
+     * The year cycles are determined based on whether the festivity falls on a weekday or a Sunday/solemnity/feast.
+     * Vigil masses are calculated for eligible festivities.
+     *
+     * @return void
+     */
     public function setCyclesVigilsSeasons()
     {
         foreach ($this->festivities as $key => $festivity) {
@@ -369,6 +617,17 @@ class FestivityCollection
         }
     }
 
+    /**
+     * Determines if a given festivity can have a vigil mass.
+     *
+     * This function evaluates whether a festivity, identified by its key and date, is eligible for a vigil mass.
+     * It excludes specific festivities and date ranges, such as 'AllSouls', 'AshWednesday', and the period
+     * between Palm Sunday and Easter.
+     *
+     * @param Festivity|\stdClass $festivity The festivity object or a standard class instance representing the festivity.
+     * @param string|null $key The key associated with the festivity, if applicable.
+     * @return bool True if the festivity can have a vigil mass, false otherwise.
+     */
     private function festivityCanHaveVigil(Festivity|\stdClass $festivity, ?string $key = null): bool
     {
         if ($festivity instanceof Festivity) {
@@ -386,6 +645,18 @@ class FestivityCollection
         }
     }
 
+    /**
+     * Creates a Vigil Mass festivity for a given festivity.
+     *
+     * The method creates a new festivity object with the same properties as the given festivity,
+     * except for its name, which is suffixed with " Vigil Mass". The new festivity's date is set to the VigilDate.
+     * The method also sets the has_vigil_mass, has_vesper_i, and has_vesper_ii properties to true for the given festivity,
+     * and the is_vigil_mass and is_vigil_for properties to true and the given key, respectively, for the new festivity.
+     *
+     * @param string $key The key of the festivity for which a Vigil Mass is to be created.
+     * @param Festivity $festivity The festivity object for which a Vigil Mass is to be created.
+     * @param DateTime $VigilDate The date of the Vigil Mass.
+     */
     private function createVigilMass(string $key, Festivity $festivity, DateTime $VigilDate): void
     {
         $this->festivities[ $key . "_vigil" ] = new Festivity(
@@ -404,6 +675,18 @@ class FestivityCollection
         $this->festivities[ $key . "_vigil" ]->liturgical_year     = $this->festivities[ $key ]->liturgical_year;
     }
 
+    /**
+     * Determines if a coinciding festivity takes precedence over a vigil festivity.
+     *
+     * This function evaluates whether the grade of a coinciding festivity is greater than
+     * the grade of the given festivity or if the coinciding festivity is a Solemnity of
+     * the Lord or the Blessed Virgin Mary, while the given festivity is not.
+     *
+     * @param string $key The key of the given festivity.
+     * @param Festivity $festivity The festivity object for which precedence is being evaluated.
+     * @param \stdClass $coincidingFestivity The coinciding festivity object.
+     * @return bool True if the coinciding festivity takes precedence, false otherwise.
+     */
     private function coincidingFestivityTakesPrecedenceOverVigil(string $key, Festivity $festivity, \stdClass $coincidingFestivity): bool
     {
         return (
@@ -412,6 +695,18 @@ class FestivityCollection
         );
     }
 
+    /**
+     * Determines if a vigil festivity takes precedence over a coinciding festivity.
+     *
+     * This function evaluates whether the grade of the vigil festivity is greater than
+     * the grade of the coinciding festivity or if the vigil festivity is a Solemnity of
+     * the Lord or the Blessed Virgin Mary, while the coinciding festivity is not.
+     *
+     * @param string $key The key of the vigil festivity.
+     * @param Festivity $festivity The festivity object of the vigil festivity.
+     * @param \stdClass $coincidingFestivity The coinciding festivity object.
+     * @return bool True if the vigil festivity takes precedence, false otherwise.
+     */
     private function vigilTakesPrecedenceOverCoincidingFestivity(string $key, Festivity $festivity, \stdClass $coincidingFestivity): bool
     {
         return (
@@ -420,6 +715,23 @@ class FestivityCollection
         );
     }
 
+    /**
+     * Handles the coincidence of a vigil festivity with another festivity.
+     *
+     * This function determines whether the vigil festivity or the coinciding festivity
+     * takes precedence based on the provided parameters. It updates the festivity
+     * properties and appends messages to the Messages array to reflect the outcome.
+     * If the vigil festivity takes precedence, it confirms a Vigil Mass and I Vespers.
+     * If the coinciding festivity takes precedence, the vigil is removed, and II Vespers
+     * is confirmed for the coinciding festivity.
+     *
+     * @param string $key The key of the festivity being evaluated.
+     * @param Festivity $festivity The festivity object being evaluated.
+     * @param string $festivityGrade The grade of the festivity.
+     * @param \stdClass $coincidingFestivity The coinciding festivity object.
+     * @param bool|string $vigilTakesPrecedence Indicates if the vigil takes precedence or a special case string.
+     * @return void
+     */
     private function handleVigilFestivityCoincidence(string $key, Festivity $festivity, string $festivityGrade, \stdClass $coincidingFestivity, bool|string $vigilTakesPrecedence): void
     {
         if (gettype($vigilTakesPrecedence) === "string" && $vigilTakesPrecedence === "YEAR2022") {
@@ -462,9 +774,15 @@ class FestivityCollection
         }
     }
 
+    /**
+     * Given a festivity, calculate whether it should have a vigil or not, and eventually create the Vigil Mass festivity.
+     * If the Vigil coincides with another Solemnity, make a note of it and handle it accordingly.
+     *
+     * @param string $key The key of the festivity.
+     * @param Festivity $festivity The festivity object.
+     */
     private function calculateVigilMass(string $key, Festivity $festivity)
     {
-
         //Not only will we create new events, we will also add metadata to existing events
         $VigilDate = clone( $festivity->date );
         $VigilDate->sub(new \DateInterval('P1D'));
@@ -529,23 +847,45 @@ class FestivityCollection
         }
     }
 
-    //$this->getFestivities() returns an associative array, who's keys are a string that identifies the event created ( ex. ImmaculateConception )
-    //So in order to sort by date we have to be sure to maintain the association with the proper key, uasort allows us to do this
+    /**
+     * Sorts the festivities by date, while maintaining their association with their keys.
+     *
+     * The FestivityCollection contains an associative array of Festivity objects, where the key is a string that identifies the event created (ex. ImmaculateConception).
+     * In order to sort by date while preserving the key association, we use the uasort function.
+     */
     public function sortFestivities(): void
     {
         uasort($this->festivities, array( "LiturgicalCalendar\Api\Festivity", "compDate" ));
     }
 
+    /**
+     * Retrieves all festivities from the collection.
+     *
+     * @return Festivity[] An array of Festivity objects contained in the collection.
+     */
     public function getFestivities(): array
     {
         return $this->festivities;
     }
 
+    /**
+     * Retrieves all solemnities from the collection.
+     *
+     * @return DateTime[] An array of DateTime objects, each representing a date with a Solemnity.
+     */
     public function getSolemnities(): array
     {
         return $this->solemnities;
     }
 
+    /**
+     * Retrieves all solemnities from the collection in a format that can be easily converted to JSON.
+     *
+     * This method is similar to getSolemnities, but it returns an array of arrays, where each inner array contains the key of the
+     * event and the properties of the DateTime object as key-value pairs.
+     *
+     * @return array An array of arrays, where each inner array contains the key of the event and the properties of the DateTime object as key-value pairs.
+     */
     public function getSolemnitiesCollection(): array
     {
         $solemnitiesCollection = [];
@@ -558,16 +898,34 @@ class FestivityCollection
         return $solemnitiesCollection;
     }
 
+    /**
+     * Retrieves the keys of all solemnities from the collection.
+     *
+     * @return array An array of keys, each representing a solemnity in the collection.
+     */
     public function getSolemnitiesKeys(): array
     {
         return array_keys($this->solemnities);
     }
 
+    /**
+     * Retrieves all feasts from the collection.
+     *
+     * @return DateTime[] An array of DateTime objects, each representing a date with a Feast.
+     */
     public function getFeasts(): array
     {
         return $this->feasts;
     }
 
+    /**
+     * Retrieves all feasts from the collection in a format that can be easily converted to JSON.
+     *
+     * This method is similar to getFeasts, but it returns an array of arrays, where each inner array contains the key of the
+     * event and the properties of the DateTime object as key-value pairs.
+     *
+     * @return array An array of arrays, where each inner array contains the key of the event and the properties of the DateTime object as key-value pairs.
+     */
     public function getFeastsCollection(): array
     {
         $feastsCollection = [];
@@ -580,16 +938,34 @@ class FestivityCollection
         return $feastsCollection;
     }
 
+    /**
+     * Retrieves the keys of all feasts from the collection.
+     *
+     * @return array An array of keys, each representing a feast in the collection.
+     */
     public function getFeastsKeys(): array
     {
         return array_keys($this->feasts);
     }
 
+    /**
+     * Retrieves all memorials from the collection.
+     *
+     * @return DateTime[] An array of DateTime objects, each representing a date with a Memorial.
+     */
     public function getMemorials(): array
     {
         return $this->memorials;
     }
 
+    /**
+     * Retrieves all memorials from the collection in a format that can be easily converted to JSON.
+     *
+     * This method is similar to getMemorials, but it returns an array of arrays, where each inner array contains the key of the
+     * event and the properties of the DateTime object as key-value pairs.
+     *
+     * @return array An array of arrays, where each inner array contains the key of the event and the properties of the DateTime object as key-value pairs.
+     */
     public function getMemorialsCollection(): array
     {
         $memorialsCollection = [];
@@ -602,36 +978,84 @@ class FestivityCollection
         return $memorialsCollection;
     }
 
+    /**
+     * Retrieves the keys of all memorials from the collection.
+     *
+     * @return array An array of keys, each representing a memorial in the collection.
+     */
     public function getMemorialsKeys(): array
     {
         return array_keys($this->memorials);
     }
 
+    /**
+     * Retrieves all weekdays in the seasons of Advent, Christmas, or Lent.
+     *
+     * These are days on which optional memorials can only be celebrated in partial form.
+     *
+     * @return DateTime[] An array of DateTime objects, each representing a weekday in Advent, Christmas, or Lent.
+     */
     public function getWeekdaysAdventChristmasLent(): array
     {
         return $this->WeekdayAdventChristmasLent;
     }
 
+    /**
+     * Retrieves all weekdays in the Epiphany season.
+     *
+     * @return DateTime[] An array of DateTime objects, each representing a weekday in the Epiphany season.
+     */
     public function getWeekdaysEpiphany(): array
     {
         return $this->WeekdaysEpiphany;
     }
 
+    /**
+     * Retrieves all solemnities of the Lord and of the Blessed Virgin Mary.
+     *
+     * These are special solemnities that are higher in rank than regular solemnities.
+     *
+     * @return array An array of solemnities, each represented by a string key.
+     */
     public function getSolemnitiesLordBVM(): array
     {
         return $this->SolemnitiesLordBVM;
     }
 
+    /**
+     * Retrieves all Sundays in the seasons of Advent, Lent, and Easter.
+     *
+     * @return DateTime[] An array of DateTime objects, each representing a Sunday in Advent, Lent, or Easter.
+     */
     public function getSundaysAdventLentEaster(): array
     {
         return $this->SundaysAdventLentEaster;
     }
 
+    /**
+     * Retrieves all feasts and memorials from the collection.
+     *
+     * @return array An associative array of all feasts and memorials, each represented by a string key.
+     */
     public function getFeastsAndMemorials(): array
     {
         return array_merge($this->feasts, $this->memorials);
     }
 
+    /**
+     * Given a date, returns the coinciding Sunday solemnity or feast, or the coinciding feast or memorial.
+     *
+     * If the date is a Sunday, it returns the Sunday solemnity or feast.
+     * If the date is a Feast of the Lord or a Solemnity, it returns the Feast of the Lord or Solemnity.
+     * If the date is a feast or memorial, it returns the feast or memorial.
+     *
+     * The returned object contains two properties: 'event' and 'grade'.
+     * The 'event' property is the coinciding Sunday solemnity or feast, or the coinciding feast or memorial.
+     * The 'grade' property is the grade of the coinciding event, formatted as a string.
+     *
+     * @param DateTime $currentFeastDate The date to check for coinciding events.
+     * @return \stdClass An object containing the coinciding event and its grade.
+     */
     public function determineSundaySolemnityOrFeast(DateTime $currentFeastDate): \stdClass
     {
         $coincidingFestivity = new \stdClass();
@@ -656,16 +1080,29 @@ class FestivityCollection
     }
 
     /**
-     * psalterWeek function
-     * Calculates the current Week of the Psalter (from 1 to 4)
-     * based on the week of Ordinary Time
-     * OR the week of Advent, Christmas, Lent, or Easter
+     * Returns the psalter week number for a given week of Ordinary Time or a seasonal week.
+     *
+     * The psalter week number is a number from 1 to 4, where 1 is the first week of Ordinary Time,
+     * of Advent, of Christmas, of Lent, or of Easter; 2 is the second week, and so on.
+     * If the given week number is a multiple of 4, the psalter week is 4.
+     * Otherwise, the psalter week is the remainder of the week number divided by 4.
+     *
+     * @param int $weekOfOrdinaryTimeOrSeason The week number of Ordinary Time or a seasonal week.
+     * @return int The psalter week number.
      */
     public static function psalterWeek(int $weekOfOrdinaryTimeOrSeason): int
     {
         return $weekOfOrdinaryTimeOrSeason % 4 === 0 ? 4 : $weekOfOrdinaryTimeOrSeason % 4;
     }
 
+    /**
+     * Removes all festivities with a date before the First Sunday of Advent,
+     * except for the Vigil Mass for the First Sunday of Advent.
+     *
+     * This method is used to clear out festivities that are not relevant to the
+     * current liturgical year, such as festivities that occur before the First
+     * Sunday of Advent.
+     */
     public function purgeDataBeforeAdvent(): void
     {
         foreach ($this->festivities as $key => $festivity) {
@@ -690,9 +1127,17 @@ class FestivityCollection
         }
     }
 
+    /**
+     * Removes all festivities with a date after the First Sunday of Advent,
+     * including the Vigil Mass for the first Sunday of Advent, and the First
+     * Sunday of Advent itself.
+     *
+     * This method is used to clear out festivities that are not relevant to the
+     * current liturgical year, such as festivities that occur on or after the First
+     * Sunday of Advent.
+     */
     public function purgeDataAdventChristmas()
     {
-        // the buffer should allow for
         foreach ($this->festivities as $key => $festivity) {
             if ($festivity->date > $this->festivities[ "Advent1" ]->date) {
                 unset($this->festivities[ $key ]);
@@ -721,6 +1166,19 @@ class FestivityCollection
         unset($this->solemnities[ "Advent1" ]);
     }
 
+    /**
+     * Merges the current FestivityCollection with another FestivityCollection.
+     *
+     * This method merges the two collections by combining their respective
+     * collections of solemnities, feasts, memorials, weekdays of Advent,
+     * Christmas and Lent, weekdays of Epiphany, solemnities of Lord and BVM,
+     * Sundays of Advent, Lent, and Easter, and the collection of all
+     * festivities. The merged collection is then stored in the current
+     * FestivityCollection.
+     *
+     * @param FestivityCollection $festivities The FestivityCollection to merge with the current one.
+     * @return void
+     */
     public function mergeFestivityCollection(FestivityCollection $festivities)
     {
         $this->solemnities  = array_merge($this->solemnities, $festivities->getSolemnities());

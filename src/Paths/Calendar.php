@@ -1881,6 +1881,7 @@ class Calendar
                     );
                 $name = $dayOfTheWeek . " " . $nthStr;
                 $festivity = new Festivity($name, $weekdayAdvent, LitColor::PURPLE, LitFeastType::MOBILE);
+                $festivity->psalter_week = $this->Cal::psalterWeek($currentAdvWeek);
                 $this->Cal->addFestivity("AdventWeekday" . $weekdayAdventCnt, $festivity);
             }
 
@@ -1962,6 +1963,7 @@ class Calendar
                         );
                     $name = $dayOfTheWeek . " " .  $nthStr;
                     $festivity = new Festivity($name, $weekdayLent, LitColor::PURPLE, LitFeastType::MOBILE);
+                    $festivity->psalter_week = $this->Cal::psalterWeek($currentLentWeek);
                 } else {
                     $dayOfTheWeek = $this->CalendarParams->Locale == LitLocale::LATIN
                         ? LatinUtils::LATIN_DAYOFTHEWEEK[ $weekdayLent->format('w') ]
@@ -2947,8 +2949,8 @@ class Calendar
         }
     }
 
-    //13. Weekdays of Advent up until Dec. 16 included ( already calculated and defined together with weekdays 17 Dec. - 24 Dec. )
-    //    Weekdays of Christmas season from 2 Jan. until the Saturday after Epiphany
+    //13. Weekdays of Advent up until Dec. 16 included ( already calculated and defined together with weekdays 17 Dec. - 24 Dec., @see calculateWeekdaysAdvent() )
+    //    Weekdays of Christmas season from 2 Jan. until the Saturday after Epiphany (@see calculateWeekdaysChristmasOctave())
     //    Weekdays of the Easter season, from the Monday after the Octave of Easter to the Saturday before Pentecost
     private function calculateWeekdaysMajorSeasons(): void
     {
