@@ -1099,15 +1099,14 @@ class FestivityCollection
     public function calculatePsalterWeek(): void
     {
         foreach ($this->festivities as $key => $value) {
-            if (!property_exists($value, 'psalter_week')) {
+            if (false === property_exists($value, 'psalter_week')) {
                 // Vigils can inherit the value from the corresponding event for which they are vigils
                 if (property_exists($value, 'is_vigil_mass') && $value->is_vigil_mass) {
-                    $is_vigil_for = $value->is_vigil_for;
-                    if (property_exists($this->festivities[$is_vigil_for], 'psalter_week')) {
-                        $this->festivities[$key]->psalter_week = $this->festivities[$is_vigil_for]->psalter_week;
+                    if (property_exists($this->festivities[$value->is_vigil_for], 'psalter_week')) {
+                        $this->festivities[$key]->psalter_week = $this->festivities[$value->is_vigil_for]->psalter_week;
                     } else {
                         $this->festivities[$key]->psalter_week = 0;
-                        $this->festivities[$is_vigil_for]->psalter_week = 0;
+                        $this->festivities[$value->is_vigil_for]->psalter_week = 0;
                     }
                 }
 
