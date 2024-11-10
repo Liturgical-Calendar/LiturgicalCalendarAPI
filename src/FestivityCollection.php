@@ -1095,6 +1095,40 @@ class FestivityCollection
         return $weekOfOrdinaryTimeOrSeason % 4 === 0 ? 4 : $weekOfOrdinaryTimeOrSeason % 4;
     }
 
+
+    public function calculatePsalterWeek(): void
+    {
+        foreach ($this->festivities as $key => $value) {
+            if (!property_exists($value, 'psalter_week')) {
+                // Vigils can inherit the value from the corresponding event for which they are vigils
+                if (property_exists($value, 'is_vigil_mass') && $value->is_vigil_mass) {
+                    $is_vigil_for = $value->is_vigil_for;
+                    if (property_exists($this->festivities[$is_vigil_for], 'psalter_week')) {
+                        $this->festivities[$key]->psalter_week = $this->festivities[$is_vigil_for]->psalter_week;
+                    } else {
+                        $this->festivities[$key]->psalter_week = 0;
+                        $this->festivities[$is_vigil_for]->psalter_week = 0;
+                    }
+                }
+
+                // commemorations and optional memorials can inherit the value from a same day event
+                if ($this->festivities[$key]->grade === 1 || $this->festivities[$key]->grade === 2) {
+                    $ferialEventSameDay = array_values(array_filter(
+                        $this->festivities,
+                        fn ($item) => $item->grade === 0 && $item->date === $this->festivities[$key]->date
+                    ));
+                    if (count($ferialEventSameDay) && property_exists($ferialEventSameDay[0], 'psalter_week')) {
+                        $this->festivities[$key]->psalter_week = $ferialEventSameDay[0]->psalter_week;
+                    } else {
+                        $this->festivities[$key]->psalter_week = 0;
+                    }
+                } else {
+                    $this->festivities[$key]->psalter_week = 0;
+                }
+            }
+        }
+    }
+
     /**
      * Removes all festivities with a date before the First Sunday of Advent,
      * except for the Vigil Mass for the First Sunday of Advent.
