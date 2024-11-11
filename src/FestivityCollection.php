@@ -388,6 +388,18 @@ class FestivityCollection
     }
 
     /**
+     * Given a date, find the corresponding weekday in the Advent, Christmas, or Lent season key in the current calculated Liturgical calendar.
+     * If no weekday in the Advent, Christmas, or Lent season is found, returns false.
+     *
+     * @param DateTime $date The date to find the weekday in the Advent, Christmas, or Lent season key for.
+     * @return string|int|false The weekday in the Advent, Christmas, or Lent season key at the given date, or false if none exists.
+     */
+    public function weekdayAdventChristmasLentKeyFromDate(DateTime $date): string|int|false
+    {
+        return array_search($date, $this->WeekdayAdventChristmasLent);
+    }
+
+    /**
      * Given a date, find the corresponding Feast or Memorial in the current calculated Liturgical calendar.
      * If no Feast or Memorial is found, returns null.
      *
@@ -1098,34 +1110,47 @@ class FestivityCollection
 
     public function calculatePsalterWeek(): void
     {
+        $messages = [];
         foreach ($this->festivities as $key => $value) {
-            if (false === property_exists($value, 'psalter_week')) {
-                // Vigils can inherit the value from the corresponding event for which they are vigils
+            $messages[] = "Checking entry $key...";
+            if (false === property_exists($value, 'psalter_week') || null === $value->psalter_week) {
+                $messages[] = "***** The {$this->festivities[$key]->grade_lcl} of {$this->festivities[$key]->name} does not have a psalter_week property *****";
+
                 if (property_exists($value, 'is_vigil_mass') && $value->is_vigil_mass) {
-                    if (property_exists($this->festivities[$value->is_vigil_for], 'psalter_week')) {
+                    // Vigils can inherit the value from the corresponding event for which they are vigils
+                    $messages[] = "!!!!! The {$this->festivities[$key]->grade_lcl} of {$this->festivities[$key]->name} is a Vigil Mass and does not have a psalter_week property !!!!!";
+                    if (property_exists($this->festivities[$value->is_vigil_for], 'psalter_week') && null !== $this->festivities[$value->is_vigil_for]->psalter_week) {
+                        $messages[] = "The {$this->festivities[$value->is_vigil_for]->grade_lcl} of {$this->festivities[$value->is_vigil_for]->name} for which it is a Vigil Mass DOES have a psalter_week property with value {$this->festivities[$value->is_vigil_for]->psalter_week}";
                         $this->festivities[$key]->psalter_week = $this->festivities[$value->is_vigil_for]->psalter_week;
+                        $messages[] = "The psalter_week for the {$this->festivities[$key]->grade_lcl} of {$this->festivities[$key]->name} was set to {$this->festivities[$key]->psalter_week}";
                     } else {
+                        $messages[] = "The {$this->festivities[$value->is_vigil_for]->grade_lcl} of {$this->festivities[$value->is_vigil_for]->name} for which it is a Vigil Mass DOES NOT have a psalter_week property, setting both to 0";
                         $this->festivities[$key]->psalter_week = 0;
                         $this->festivities[$value->is_vigil_for]->psalter_week = 0;
                     }
-                }
-
-                // commemorations and optional memorials can inherit the value from a same day event
-                if ($this->festivities[$key]->grade === 1 || $this->festivities[$key]->grade === 2) {
+                } elseif ($this->festivities[$key]->grade === 1 || $this->festivities[$key]->grade === 2) {
+                    // Commemorations and Optional memorials can inherit the value from a same day event
+                    $messages[] = "^^^^^ The {$this->festivities[$key]->grade_lcl} of {$this->festivities[$key]->name} does not have a psalter_week property, checking in ferial events on the same day ^^^^^";
                     $ferialEventSameDay = array_values(array_filter(
                         $this->festivities,
-                        fn ($item) => $item->grade === 0 && $item->date === $this->festivities[$key]->date
+                        fn ($item) => $item->grade === 0 && $item->date == $this->festivities[$key]->date // do NOT use strict check for date, will not work
                     ));
-                    if (count($ferialEventSameDay) && property_exists($ferialEventSameDay[0], 'psalter_week')) {
+                    $messages[] = $ferialEventSameDay;
+                    if (count($ferialEventSameDay) && property_exists($ferialEventSameDay[0], 'psalter_week') && null !== $ferialEventSameDay[0]->psalter_week) {
+                        $messages[] = "Found a ferial event on the same day that has a psalter_week property with value {$ferialEventSameDay[0]->psalter_week}";
                         $this->festivities[$key]->psalter_week = $ferialEventSameDay[0]->psalter_week;
                     } else {
+                        $messages[] = "No ferial event on the same day that has a psalter_week property, setting value to 0...";
                         $this->festivities[$key]->psalter_week = 0;
                     }
+                    $messages[] = "The psalter_week property for the {$this->festivities[$key]->grade_lcl} of {$this->festivities[$key]->name} was set to {$this->festivities[$key]->psalter_week}";
                 } else {
                     $this->festivities[$key]->psalter_week = 0;
+                    $messages[] = "The psalter_week value for the {$this->festivities[$key]->grade_lcl} of {$this->festivities[$key]->name} was set to 0";
                 }
             }
         }
+        //die(json_encode($messages));
     }
 
     /**
