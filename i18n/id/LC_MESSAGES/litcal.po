@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-11 03:52+0000\n"
+"POT-Creation-Date: 2024-11-11 03:56+0000\n"
 "PO-Revision-Date: 2024-08-20 15:40+0000\n"
 "Last-Translator: User_425 <user425.itsme@gmail.com>\n"
 "Language-Team: Indonesian <https://translate.johnromanodorazio.com/projects/"
@@ -161,7 +161,7 @@ msgstr ""
 #: src/Paths/Calendar.php:2750 src/Paths/Calendar.php:2789
 #: src/Paths/Calendar.php:2918 src/Paths/Calendar.php:2933
 #: src/Paths/Calendar.php:2950 src/Paths/Calendar.php:2991
-#: src/FestivityCollection.php:790
+#: src/FestivityCollection.php:792
 msgid "Decree of the Congregation for Divine Worship"
 msgstr ""
 
@@ -679,7 +679,7 @@ msgstr ""
 msgid "Vigil Mass"
 msgstr ""
 
-#: src/FestivityCollection.php:784
+#: src/FestivityCollection.php:786
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -687,7 +687,7 @@ msgid ""
 "is confirmed as are I Vespers."
 msgstr ""
 
-#: src/FestivityCollection.php:798
+#: src/FestivityCollection.php:800
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -696,7 +696,7 @@ msgid ""
 "or an evening Mass."
 msgstr ""
 
-#: src/FestivityCollection.php:808
+#: src/FestivityCollection.php:810
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -705,7 +705,7 @@ msgid ""
 "Vigil Mass or Vespers I."
 msgstr ""
 
-#: src/FestivityCollection.php:873
+#: src/FestivityCollection.php:875
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
