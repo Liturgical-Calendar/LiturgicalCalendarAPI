@@ -621,8 +621,8 @@ class FestivityCollection
      */
     public function setCyclesVigilsSeasons()
     {
+        // DEFINE YEAR CYCLES (except for Holy Week and Easter Octave)
         foreach ($this->festivities as $key => $festivity) {
-            // DEFINE YEAR CYCLES (except for Holy Week and Easter Octave)
             if ($festivity->date <= $this->festivities[ "PalmSun" ]->date || $festivity->date >= $this->festivities[ "Easter2" ]->date) {
                 if (self::dateIsNotSunday($festivity->date) && (int)$festivity->grade === LitGrade::WEEKDAY) {
                     if ($this->inOrdinaryTime($festivity->date)) {
@@ -639,8 +639,10 @@ class FestivityCollection
                     $this->calculateVigilMass($key, $festivity);
                 }
             }
+        }
 
-            // DEFINE LITURGICAL SEASONS
+        // DEFINE LITURGICAL SEASONS
+        foreach ($this->festivities as $key => $festivity) {
             if ($festivity->date >= $this->festivities[ "Advent1" ]->date && $festivity->date < $this->festivities[ "Christmas" ]->date) {
                 $this->festivities[ $key ]->liturgical_season = LitSeason::ADVENT;
             } elseif ($festivity->date >= $this->festivities[ "Christmas" ]->date || $festivity->date <= $this->festivities[ "BaptismLord" ]->date) {
