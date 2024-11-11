@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-11 03:47+0000\n"
+"POT-Creation-Date: 2024-11-11 03:50+0000\n"
 "PO-Revision-Date: 2024-10-03 11:32+0000\n"
 "Last-Translator: Milan Šalka <salka.milan@googlemail.com>\n"
 "Language-Team: Slovak <https://translate.johnromanodorazio.com/projects/"
@@ -175,7 +175,7 @@ msgstr "sobota pred Kvetnou nedeľou"
 #: src/Paths/Calendar.php:2750 src/Paths/Calendar.php:2789
 #: src/Paths/Calendar.php:2918 src/Paths/Calendar.php:2933
 #: src/Paths/Calendar.php:2950 src/Paths/Calendar.php:2991
-#: src/FestivityCollection.php:790
+#: src/FestivityCollection.php:788
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Dekrét Kongregácie pre Boží kult"
 
@@ -768,7 +768,7 @@ msgstr "ROK"
 msgid "Vigil Mass"
 msgstr "Omšová vigília"
 
-#: src/FestivityCollection.php:784
+#: src/FestivityCollection.php:782
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -779,7 +779,7 @@ msgstr ""
 "%6$s má prvá prednosť, preto je Vigília omša potvrdená rovnako ako I. "
 "vešpery."
 
-#: src/FestivityCollection.php:798
+#: src/FestivityCollection.php:796
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -791,7 +791,7 @@ msgstr ""
 "prvá slávnosť má prednosť, bude mať prvé vešpery a vigilnú omšu, zatiaľ čo "
 "posledná slávnosť nebude mať ani druhé vešpery, ani večernú omšu."
 
-#: src/FestivityCollection.php:808
+#: src/FestivityCollection.php:806
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -803,7 +803,7 @@ msgstr ""
 "posledná slávnosť má prednosť, preto si zachová Vešpery II a večernú omšu, "
 "zatiaľ čo prvá slávnosť nebude mať vigilnú omšu ani Vešpery I."
 
-#: src/FestivityCollection.php:873
+#: src/FestivityCollection.php:871
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
