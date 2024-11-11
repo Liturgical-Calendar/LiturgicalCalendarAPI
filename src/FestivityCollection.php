@@ -707,12 +707,14 @@ class FestivityCollection
             $festivity->grade,
             $festivity->common
         );
-        $this->festivities[ $key ]->has_vigil_mass                 = true;
-        $this->festivities[ $key ]->has_vesper_i                   = true;
-        $this->festivities[ $key ]->has_vesper_ii                  = true;
-        $this->festivities[ $key . "_vigil" ]->is_vigil_mass       = true;
-        $this->festivities[ $key . "_vigil" ]->is_vigil_for        = $key;
-        $this->festivities[ $key . "_vigil" ]->liturgical_year     = $this->festivities[ $key ]->liturgical_year;
+        $this->festivities[ $key ]->has_vigil_mass                   = true;
+        $this->festivities[ $key ]->has_vesper_i                     = true;
+        $this->festivities[ $key ]->has_vesper_ii                    = true;
+        $this->festivities[ $key . "_vigil" ]->is_vigil_mass         = true;
+        $this->festivities[ $key . "_vigil" ]->is_vigil_for          = $key;
+        $this->festivities[ $key . "_vigil" ]->liturgical_year       = $this->festivities[ $key ]->liturgical_year;
+        $this->festivities[ $key . "_vigil" ]->liturgical_season     = $this->festivities[ $key ]->liturgical_season;
+        $this->festivities[ $key . "_vigil" ]->liturgical_season_lcl = $this->festivities[ $key ]->liturgical_season_lcl;
     }
 
     /**
