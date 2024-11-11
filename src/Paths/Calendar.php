@@ -2163,7 +2163,7 @@ class Calendar
             $festivity->date > $this->Cal->getFestivity("Advent1")->date
             && $festivity->date < $Dec17
         ) {
-            $key = $this->Cal->weekdayAdventChristmasLentKeyFromDate($festivity->date);
+            $key = $this->Cal->weekdayAdventBeforeDec17KeyFromDate($festivity->date);
             if (false !== $key) {
                 /**translators:
                  * 1. Grade or rank of the festivity that has been superseded
