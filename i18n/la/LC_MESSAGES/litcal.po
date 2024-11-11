@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-11 03:58+0000\n"
+"POT-Creation-Date: 2024-11-11 06:36+0000\n"
 "PO-Revision-Date: 2024-11-03 10:52+0000\n"
 "Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
@@ -745,7 +745,7 @@ msgstr ""
 "%1$s '%2$s', proprio calendario %3$s et plerumque celebratur die %4$s, "
 "supprimatur a Dominica vel Sollemnitate %5$s anno %6$d"
 
-#: src/Paths/Calendar.php:4374
+#: src/Paths/Calendar.php:4378
 #, php-format
 msgid "Error receiving or parsing info from github about latest release: %s."
 msgstr ""

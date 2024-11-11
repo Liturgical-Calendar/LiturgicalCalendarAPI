@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-11 03:58+0000\n"
+"POT-Creation-Date: 2024-11-11 06:36+0000\n"
 "PO-Revision-Date: 2024-11-03 16:24+0000\n"
 "Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -772,7 +772,7 @@ msgstr ""
 "La %1$s '%2$s', propria del calendario %3$s e solitamente celebrate il "
 "giorno %4$s, è soppressa dalla Domenica o Solennità '%5$s' nell'anno %6$d"
 
-#: src/Paths/Calendar.php:4374
+#: src/Paths/Calendar.php:4378
 #, php-format
 msgid "Error receiving or parsing info from github about latest release: %s."
 msgstr ""
