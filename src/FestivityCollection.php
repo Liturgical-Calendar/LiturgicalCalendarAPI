@@ -15,7 +15,8 @@ class FestivityCollection
     private array $solemnities      = [];
     private array $feasts           = [];
     private array $memorials        = [];
-    private array $WeekdayAdventChristmasLent   = [];
+    private array $WeekdaysAdventChristmasLent  = [];
+    private array $WeekdaysAdventBeforeDec17    = [];
     private array $WeekdaysEpiphany             = [];
     private array $SolemnitiesLordBVM           = [];
     private array $SundaysAdventLentEaster      = [];
@@ -102,12 +103,16 @@ class FestivityCollection
             $this->memorials[ $key ]    = $festivity->date;
         }
         // Weekday of Advent from 17 to 24 Dec.
-        if (str_starts_with($key, "AdventWeekday") && $festivity->date->format('j') >= 17 && $festivity->date->format('j') <= 24) {
-            $this->WeekdayAdventChristmasLent[ $key ] = $festivity->date;
+        if (str_starts_with($key, "AdventWeekday")) {
+            if ($festivity->date->format('j') >= 17 && $festivity->date->format('j') <= 24) {
+                $this->WeekdaysAdventChristmasLent[ $key ] = $festivity->date;
+            } else {
+                $this->WeekdaysAdventBeforeDec17[ $key ] = $festivity->date;
+            }
         } elseif (str_starts_with($key, "ChristmasWeekday")) {
-            $this->WeekdayAdventChristmasLent[ $key ] = $festivity->date;
+            $this->WeekdaysAdventChristmasLent[ $key ] = $festivity->date;
         } elseif (str_starts_with($key, "LentWeekday")) {
-            $this->WeekdayAdventChristmasLent[ $key ] = $festivity->date;
+            $this->WeekdaysAdventChristmasLent[ $key ] = $festivity->date;
         } elseif (str_starts_with($key, "DayBeforeEpiphany") || str_starts_with($key, "DayAfterEpiphany")) {
             $this->WeekdaysEpiphany[ $key ] = $festivity->date;
         }
@@ -312,14 +317,25 @@ class FestivityCollection
     }
 
     /**
-     * Checks if a given date is a weekday in the seasons of Advent, Christmas, or Lent.
+     * Checks if a given date is a weekday in the season of Advent before December 17th.
      *
      * @param DateTime $date The date to check.
-     * @return bool True if the date is a weekday in Advent, Christmas, or Lent, otherwise false.
+     * @return bool True if the date is a weekday in Advent before December 17th, otherwise false.
+     */
+    public function inWeekdaysAdventBeforeDec17(DateTime $date): bool
+    {
+        return in_array($date, $this->WeekdaysAdventBeforeDec17);
+    }
+
+    /**
+     * Checks if a given date is a weekday in the seasons of Advent (on or after December 17th), Christmas, or Lent.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if the date is a weekday in Advent (on or after December 17th), Christmas, or Lent, otherwise false.
      */
     public function inWeekdaysAdventChristmasLent(DateTime $date): bool
     {
-        return in_array($date, $this->WeekdayAdventChristmasLent);
+        return in_array($date, $this->WeekdaysAdventChristmasLent);
     }
 
     /**
@@ -364,11 +380,11 @@ class FestivityCollection
     }
 
     /**
-     * Given a date, find the corresponding solemnity key in the current calculated Liturgical calendar.
+     * Given a date, find the corresponding key for the solemnity in the current calculated Liturgical calendar.
      * If no solemnity is found, returns false.
      *
-     * @param DateTime $date The date to find the solemnity key for.
-     * @return string|int|false The solemnity key at the given date, or false if none exists.
+     * @param DateTime $date The date for which to find the key for the solemnity.
+     * @return string|int|false The key for the solemnity at the given date, or false if none exists.
      */
     public function solemnityKeyFromDate(DateTime $date): string|int|false
     {
@@ -376,11 +392,11 @@ class FestivityCollection
     }
 
     /**
-     * Given a date, find the corresponding weekday in the Epiphany season key in the current calculated Liturgical calendar.
+     * Given a date, find the corresponding key for the weekday in the Epiphany season in the current calculated Liturgical calendar.
      * If no weekday in the Epiphany season is found, returns false.
      *
-     * @param DateTime $date The date to find the weekday in the Epiphany season key for.
-     * @return string|int|false The weekday in the Epiphany season key at the given date, or false if none exists.
+     * @param DateTime $date The date for which to find the key for the weekday in the Epiphany season.
+     * @return string|int|false The key for the weekday in the Epiphany season key at the given date, or false if none exists.
      */
     public function weekdayEpiphanyKeyFromDate(DateTime $date): string|int|false
     {
@@ -388,15 +404,27 @@ class FestivityCollection
     }
 
     /**
-     * Given a date, find the corresponding weekday in the Advent, Christmas, or Lent season key in the current calculated Liturgical calendar.
+     * Given a date, find the corresponding key for the weekday in the Advent season before December 17th in the current calculated Liturgical calendar.
+     * If no weekday in the Advent season before December 17th is found, returns false.
+     *
+     * @param DateTime $date The date for which to find the key for the weekday in the Advent season before December 17th.
+     * @return string|int|false The key for the weekday in the Advent season before December 17th at the given date, or false if none exists.
+     */
+    public function weekdayAdventBeforeDec17KeyFromDate(DateTime $date): string|int|false
+    {
+        return array_search($date, $this->WeekdaysAdventBeforeDec17);
+    }
+
+    /**
+     * Given a date, find the corresponding key for the weekday in the Advent (on or after December 17th), Christmas, or Lent season in the current calculated Liturgical calendar.
      * If no weekday in the Advent, Christmas, or Lent season is found, returns false.
      *
-     * @param DateTime $date The date to find the weekday in the Advent, Christmas, or Lent season key for.
-     * @return string|int|false The weekday in the Advent, Christmas, or Lent season key at the given date, or false if none exists.
+     * @param DateTime $date The date for which to find the key for the weekday in the Advent (on or after December 17th), Christmas, or Lent season.
+     * @return string|int|false The key for the weekday in the Advent (on or after December 17th), Christmas, or Lent season at the given date, or false if none exists.
      */
     public function weekdayAdventChristmasLentKeyFromDate(DateTime $date): string|int|false
     {
-        return array_search($date, $this->WeekdayAdventChristmasLent);
+        return array_search($date, $this->WeekdaysAdventChristmasLent);
     }
 
     /**
@@ -420,11 +448,11 @@ class FestivityCollection
     }
 
     /**
-     * Given a date, find the corresponding Feast or Memorial key in the current calculated Liturgical calendar.
+     * Given a date, find the corresponding key for the Feast or Memorial in the current calculated Liturgical calendar.
      * If no Feast or Memorial is found, returns false.
      *
-     * @param DateTime $date The date to find the Feast or Memorial key for.
-     * @return string|int|false The Feast or Memorial key at the given date, or false if none exists.
+     * @param DateTime $date The date for which to find the key for the Feast or Memorial.
+     * @return string|int|false The key for the Feast or Memorial at the given date, or false if none exists.
      */
     public function feastOrMemorialKeyFromDate(DateTime $date): string|int|false
     {
@@ -1001,7 +1029,19 @@ class FestivityCollection
     }
 
     /**
-     * Retrieves all weekdays in the seasons of Advent, Christmas, or Lent.
+     * Retrieves all weekdays in Advent before December 17th.
+     *
+     * These are days on which obligatory memorials will suppress the Advent weekday.
+     *
+     * @return array An array of DateTime objects, each representing a weekday in Advent before December 17th.
+     */
+    public function getWeekdaysAdventBeforeDec17(): array
+    {
+        return $this->WeekdaysAdventBeforeDec17;
+    }
+
+    /**
+     * Retrieves all weekdays in the seasons of Advent (on or after December 17th), Christmas, or Lent.
      *
      * These are days on which optional memorials can only be celebrated in partial form.
      *
@@ -1009,7 +1049,7 @@ class FestivityCollection
      */
     public function getWeekdaysAdventChristmasLent(): array
     {
-        return $this->WeekdayAdventChristmasLent;
+        return $this->WeekdaysAdventChristmasLent;
     }
 
     /**
@@ -1176,7 +1216,7 @@ class FestivityCollection
                     unset($this->solemnities[ $key ]);
                     unset($this->feasts[ $key ]);
                     unset($this->memorials[ $key ]);
-                    unset($this->WeekdayAdventChristmasLent[ $key ]);
+                    unset($this->WeekdaysAdventChristmasLent[ $key ]);
                     unset($this->WeekdaysEpiphany[ $key ]);
                     unset($this->SolemnitiesLordBVM[ $key ]);
                     unset($this->SundaysAdventLentEaster[ $key ]);
@@ -1203,7 +1243,7 @@ class FestivityCollection
                 unset($this->solemnities[ $key ]);
                 unset($this->feasts[ $key ]);
                 unset($this->memorials[ $key ]);
-                unset($this->WeekdayAdventChristmasLent[ $key ]);
+                unset($this->WeekdaysAdventChristmasLent[ $key ]);
                 unset($this->SolemnitiesLordBVM[ $key ]);
                 unset($this->SundaysAdventLentEaster[ $key ]);
             }
@@ -1242,9 +1282,13 @@ class FestivityCollection
         $this->solemnities  = array_merge($this->solemnities, $festivities->getSolemnities());
         $this->feasts       = array_merge($this->feasts, $festivities->getFeasts());
         $this->memorials    = array_merge($this->memorials, $festivities->getMemorials());
-        $this->WeekdayAdventChristmasLent = array_merge(
-            $this->WeekdayAdventChristmasLent,
+        $this->WeekdaysAdventChristmasLent = array_merge(
+            $this->WeekdaysAdventChristmasLent,
             $festivities->getWeekdaysAdventChristmasLent()
+        );
+        $this->WeekdaysAdventBeforeDec17 = array_merge(
+            $this->WeekdaysAdventBeforeDec17,
+            $festivities->getWeekdaysAdventBeforeDec17()
         );
         $this->WeekdaysEpiphany         = array_merge($this->WeekdaysEpiphany, $festivities->getWeekdaysEpiphany());
         $this->SolemnitiesLordBVM       = array_merge($this->SolemnitiesLordBVM, $festivities->getSolemnitiesLordBVM());
