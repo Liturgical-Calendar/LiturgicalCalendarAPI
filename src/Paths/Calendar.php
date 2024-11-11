@@ -4321,6 +4321,10 @@ class Calendar
         $SerializeableLitCal->metadata->feasts_keys         = $this->Cal->getFeastsKeys();
         $SerializeableLitCal->metadata->memorials           = $this->Cal->getMemorialsCollection();
         $SerializeableLitCal->metadata->memorials_keys      = $this->Cal->getMemorialsKeys();
+        if ($this->CalendarParams->DiocesanCalendar !== null) {
+            $SerializeableLitCal->metadata->diocese_name    = $this->DioceseEntry->diocese;
+        }
+
         $SerializeableLitCal->messages                      = $this->Messages;
 
         //make sure we have an engineCache folder for the current Version
