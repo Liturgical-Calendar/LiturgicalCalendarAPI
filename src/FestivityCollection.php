@@ -621,6 +621,23 @@ class FestivityCollection
      */
     public function setCyclesVigilsSeasons()
     {
+        // DEFINE LITURGICAL SEASONS
+        foreach ($this->festivities as $key => $festivity) {
+            if ($festivity->date >= $this->festivities[ "Advent1" ]->date && $festivity->date < $this->festivities[ "Christmas" ]->date) {
+                $this->festivities[ $key ]->liturgical_season = LitSeason::ADVENT;
+            } elseif ($festivity->date >= $this->festivities[ "Christmas" ]->date || $festivity->date <= $this->festivities[ "BaptismLord" ]->date) {
+                $this->festivities[ $key ]->liturgical_season = LitSeason::CHRISTMAS;
+            } elseif ($festivity->date >= $this->festivities[ "AshWednesday" ]->date && $festivity->date < $this->festivities[ "HolyThurs" ]->date) {
+                $this->festivities[ $key ]->liturgical_season = LitSeason::LENT;
+            } elseif ($festivity->date >= $this->festivities[ "HolyThurs" ]->date && $festivity->date < $this->festivities[ "Easter" ]->date) {
+                $this->festivities[ $key ]->liturgical_season = LitSeason::EASTER_TRIDUUM;
+            } elseif ($festivity->date >= $this->festivities[ "Easter" ]->date && $festivity->date <= $this->festivities[ "Pentecost" ]->date) {
+                $this->festivities[ $key ]->liturgical_season = LitSeason::EASTER;
+            } else {
+                $this->festivities[ $key ]->liturgical_season = LitSeason::ORDINARY_TIME;
+            }
+        }
+
         // DEFINE YEAR CYCLES (except for Holy Week and Easter Octave)
         foreach ($this->festivities as $key => $festivity) {
             if ($festivity->date <= $this->festivities[ "PalmSun" ]->date || $festivity->date >= $this->festivities[ "Easter2" ]->date) {
@@ -638,23 +655,6 @@ class FestivityCollection
                     // DEFINE VIGIL MASSES
                     $this->calculateVigilMass($key, $festivity);
                 }
-            }
-        }
-
-        // DEFINE LITURGICAL SEASONS
-        foreach ($this->festivities as $key => $festivity) {
-            if ($festivity->date >= $this->festivities[ "Advent1" ]->date && $festivity->date < $this->festivities[ "Christmas" ]->date) {
-                $this->festivities[ $key ]->liturgical_season = LitSeason::ADVENT;
-            } elseif ($festivity->date >= $this->festivities[ "Christmas" ]->date || $festivity->date <= $this->festivities[ "BaptismLord" ]->date) {
-                $this->festivities[ $key ]->liturgical_season = LitSeason::CHRISTMAS;
-            } elseif ($festivity->date >= $this->festivities[ "AshWednesday" ]->date && $festivity->date < $this->festivities[ "HolyThurs" ]->date) {
-                $this->festivities[ $key ]->liturgical_season = LitSeason::LENT;
-            } elseif ($festivity->date >= $this->festivities[ "HolyThurs" ]->date && $festivity->date < $this->festivities[ "Easter" ]->date) {
-                $this->festivities[ $key ]->liturgical_season = LitSeason::EASTER_TRIDUUM;
-            } elseif ($festivity->date >= $this->festivities[ "Easter" ]->date && $festivity->date <= $this->festivities[ "Pentecost" ]->date) {
-                $this->festivities[ $key ]->liturgical_season = LitSeason::EASTER;
-            } else {
-                $this->festivities[ $key ]->liturgical_season = LitSeason::ORDINARY_TIME;
             }
         }
     }
@@ -715,6 +715,8 @@ class FestivityCollection
         $this->festivities[ $key . "_vigil" ]->is_vigil_mass         = true;
         $this->festivities[ $key . "_vigil" ]->is_vigil_for          = $key;
         $this->festivities[ $key . "_vigil" ]->liturgical_year       = $this->festivities[ $key ]->liturgical_year;
+        $this->festivities[ $key . "_vigil" ]->liturgical_season     = $this->festivities[ $key ]->liturgical_season;
+        $this->festivities[ $key . "_vigil" ]->liturgical_season_lcl = $this->festivities[ $key ]->liturgical_season_lcl;
     }
 
     /**
