@@ -1860,7 +1860,7 @@ class Calendar
                 new \DateTimeZone('UTC')
             )->add(new \DateInterval('P' . $weekdayAdventCnt . 'D'));
 
-            //if we're not dealing with a sunday or a solemnity, then create the weekday
+            //if we're not dealing with a sunday or a solemnity or an obligatory memorial, then create the weekday
             if ($this->Cal->notInSolemnitiesFeastsOrMemorials($weekdayAdvent) && self::dateIsNotSunday($weekdayAdvent)) {
                 $upper = (int)$weekdayAdvent->format('z');
                 $diff = $upper - (int)$this->Cal->getFestivity("Advent1")->date->format('z'); //day count between current day and First Sunday of Advent
@@ -2031,7 +2031,7 @@ class Calendar
             return $el->grade === $grade;
         });
         foreach ($tempCal as $row) {
-            //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord or a Feast or an obligatory memorial, then go ahead and create the optional memorial
+            //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord or a Feast, then go ahead and create the memorial
             $row->date = DateTime::createFromFormat('!j-n-Y', $row->day . '-' . $row->month . '-' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
             if (self::dateIsNotSunday($row->date) && $this->Cal->notInSolemnitiesFeastsOrMemorials($row->date)) {
                 $newFestivity = new Festivity($row->name, $row->date, $row->color, LitFeastType::FIXED, $row->grade, $row->common);
@@ -2068,6 +2068,7 @@ class Calendar
                 }
                 if ($grade === LitGrade::MEMORIAL && $this->Cal->getFestivity($row->event_key)->grade > LitGrade::MEMORIAL_OPT) {
                     $this->removeWeekdaysEpiphanyOverridenByMemorials($row->event_key);
+                    $this->removeWeekdaysAdventOverridenByMemorials($row->event_key);
                 }
             } else {
                 if (false === $this->checkImmaculateHeartCoincidence($row->date, $row)) {
@@ -2138,6 +2139,50 @@ class Calendar
                     $festivity->name,
                     $this->CalendarParams->Year
                 );
+                $this->Cal->removeFestivity($key);
+            }
+        }
+    }
+
+
+    /**
+     * If a weekday of Advent is overridden by a Memorial, remove the weekday of Advent
+     * and assign the psalter week of the weekday of Advent to the Memorial.
+     *
+     * @param string $tag the tag of the festivity that may be overriding a weekday of Advent
+     */
+    private function removeWeekdaysAdventOverridenByMemorials(string $tag)
+    {
+        $festivity = $this->Cal->getFestivity($tag);
+        $Dec17 = \DateTime::createFromFormat(
+            'Y-m-d',
+            '1970-12-17',
+            new \DateTimeZone('UTC')
+        );
+        if (
+            $festivity->date > $this->Cal->getFestivity("Advent1")->date
+            && $festivity->date < $Dec17
+        ) {
+            $key = $this->Cal->weekdayAdventChristmasLentKeyFromDate($festivity->date);
+            if (false !== $key) {
+                /**translators:
+                 * 1. Grade or rank of the festivity that has been superseded
+                 * 2. Name of the festivity that has been superseded
+                 * 3. Grade or rank of the festivity that is superseding
+                 * 4. Name of the festivity that is superseding
+                 * 5. Requested calendar year
+                 */
+                $message = _('The %1$s \'%2$s\' is superseded by the %3$s \'%4$s\' in the year %5$d.');
+                $this->Messages[] = sprintf(
+                    $message,
+                    $this->LitGrade->i18n($this->Cal->getFestivity($key)->grade),
+                    $this->Cal->getFestivity($key)->name,
+                    $this->LitGrade->i18n($festivity->grade, false),
+                    $festivity->name,
+                    $this->CalendarParams->Year
+                );
+                $psalter_week = $this->Cal->getFestivity($key)->psalter_week;
+                $this->Cal->setProperty($tag, "psalter_week", $psalter_week);
                 $this->Cal->removeFestivity($key);
             }
         }
