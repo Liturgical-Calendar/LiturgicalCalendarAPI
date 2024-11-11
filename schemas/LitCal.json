@@ -5,60 +5,16 @@
     "additionalProperties": false,
     "properties": {
         "settings": {
-            "type": "object",
-            "description": "echoes back the settings that were requested for the generation of this specific liturgical calendar, as feedback to be sure that the requested settings were correctly applied",
-            "additionalProperties": false,
-            "properties": {
-                "year": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/NationalCalendarSettings"
                 },
-                "year_type": {
-                    "type": "string",
-                    "enum": [
-                        "CIVIL",
-                        "LITURGICAL"
-                    ]
+                {
+                    "$ref": "#/definitions/DiocesanCalendarSettings"
                 },
-                "epiphany": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
-                },
-                "ascension": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Ascension"
-                },
-                "corpus_christi": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
-                },
-                "locale": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
-                },
-                "return_type": {
-                    "type": "string",
-                    "enum": [
-                        "ICS",
-                        "JSON",
-                        "XML",
-                        "YML"
-                    ]
-                },
-                "eternal_high_priest": {
-                    "type": "boolean"
-                },
-                "national_calendar": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
-                },
-                "diocesan_calendar": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                {
+                    "$ref": "#/definitions/GeneralRomanCalendarSettings"
                 }
-            },
-            "required": [
-                "year",
-                "epiphany",
-                "ascension",
-                "corpus_christi",
-                "locale",
-                "return_type",
-                "year_type",
-                "eternal_high_priest"
             ]
         },
         "metadata": {
@@ -127,6 +83,9 @@
                     "items": {
                         "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/EventKey"
                     }
+                },
+                "diocese_name": {
+                    "type": "string"
                 }
             },
             "required": [
@@ -148,7 +107,7 @@
                     "$ref": "#/definitions/FestivityVigil"
                 },
                 "^(?:[a-z_]+?_){0,1}[A-Z][a-zA-Z1-9]+[0-9]{0,2}$": {
-                    "$ref": "#/definitions/FestivityWithSeason"
+                    "$ref": "#/definitions/Festivity"
                 }
             },
             "additionalProperties": false
@@ -271,7 +230,9 @@
                     "day_of_the_week_long": "Saturday",
                     "liturgical_year": "ANNUM B",
                     "is_vigil_mass": true,
-                    "is_vigil_for": "Advent1"
+                    "is_vigil_for": "Advent1",
+                    "liturgical_season": "ADVENT",
+                    "liturgical_season_lcl": "Tempus Adventus"
                 },
                 "Advent1": {
                     "event_idx": 583,
@@ -418,6 +379,20 @@
                 },
                 "is_vigil_for": {
                     "type": "string"
+                },
+                "liturgical_season": {
+                    "type": "string",
+                    "enum": [
+                        "ADVENT",
+                        "CHRISTMAS",
+                        "LENT",
+                        "EASTER_TRIDUUM",
+                        "EASTER",
+                        "ORDINARY_TIME"
+                    ]
+                },
+                "liturgical_season_lcl": {
+                    "type": "string"
                 }
             },
             "required": [
@@ -440,11 +415,13 @@
                 "day_of_the_week_short",
                 "day_of_the_week_long",
                 "is_vigil_mass",
-                "is_vigil_for"
+                "is_vigil_for",
+                "liturgical_season",
+                "liturgical_season_lcl"
             ],
             "additionalProperties": false
         },
-        "FestivityWithSeason": {
+        "Festivity": {
             "properties": {
                 "event_idx": {
                     "type": "integer",
@@ -569,6 +546,171 @@
                 "liturgical_season_lcl"
             ],
             "additionalProperties": false
+        },
+        "GeneralRomanCalendarSettings": {
+            "type": "object",
+            "description": "echoes back the settings that were requested and utilized in generating the General Roman Calendar",
+            "additionalProperties": false,
+            "properties": {
+                "year": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
+                },
+                "year_type": {
+                    "type": "string",
+                    "enum": [
+                        "CIVIL",
+                        "LITURGICAL"
+                    ]
+                },
+                "epiphany": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
+                },
+                "ascension": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Ascension"
+                },
+                "corpus_christi": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
+                },
+                "locale": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
+                },
+                "return_type": {
+                    "type": "string",
+                    "enum": [
+                        "ICS",
+                        "JSON",
+                        "XML",
+                        "YML"
+                    ]
+                },
+                "eternal_high_priest": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "year",
+                "epiphany",
+                "ascension",
+                "corpus_christi",
+                "locale",
+                "return_type",
+                "year_type",
+                "eternal_high_priest"
+            ]
+        },
+        "NationalCalendarSettings": {
+            "type": "object",
+            "description": "settings utilized to generate this national calendar",
+            "additionalProperties": false,
+            "properties": {
+                "year": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
+                },
+                "year_type": {
+                    "type": "string",
+                    "enum": [
+                        "CIVIL",
+                        "LITURGICAL"
+                    ]
+                },
+                "epiphany": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
+                },
+                "ascension": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Ascension"
+                },
+                "corpus_christi": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
+                },
+                "locale": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
+                },
+                "return_type": {
+                    "type": "string",
+                    "enum": [
+                        "ICS",
+                        "JSON",
+                        "XML",
+                        "YML"
+                    ]
+                },
+                "eternal_high_priest": {
+                    "type": "boolean"
+                },
+                "national_calendar": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
+                }
+            },
+            "required": [
+                "year",
+                "epiphany",
+                "ascension",
+                "corpus_christi",
+                "locale",
+                "return_type",
+                "year_type",
+                "eternal_high_priest",
+                "national_calendar"
+            ]
+        },
+        "DiocesanCalendarSettings": {
+            "type": "object",
+            "description": "settings utilized to generate this diocesan calendar",
+            "additionalProperties": false,
+            "properties": {
+                "year": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
+                },
+                "year_type": {
+                    "type": "string",
+                    "enum": [
+                        "CIVIL",
+                        "LITURGICAL"
+                    ]
+                },
+                "epiphany": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Epiphany"
+                },
+                "ascension": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Ascension"
+                },
+                "corpus_christi": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CorpusChristi"
+                },
+                "locale": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
+                },
+                "return_type": {
+                    "type": "string",
+                    "enum": [
+                        "ICS",
+                        "JSON",
+                        "XML",
+                        "YML"
+                    ]
+                },
+                "eternal_high_priest": {
+                    "type": "boolean"
+                },
+                "national_calendar": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
+                },
+                "diocesan_calendar": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                }
+            },
+            "required": [
+                "year",
+                "epiphany",
+                "ascension",
+                "corpus_christi",
+                "locale",
+                "return_type",
+                "year_type",
+                "eternal_high_priest",
+                "national_calendar",
+                "diocesan_calendar"
+            ]
         }
     }
 }
