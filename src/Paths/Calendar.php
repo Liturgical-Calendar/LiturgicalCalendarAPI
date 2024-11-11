@@ -2156,7 +2156,7 @@ class Calendar
         $festivity = $this->Cal->getFestivity($tag);
         $Dec17 = \DateTime::createFromFormat(
             'Y-m-d',
-            '1970-12-17',
+            $this->CalendarParams->Year . '-12-17',
             new \DateTimeZone('UTC')
         );
         if (
