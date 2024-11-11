@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-11 03:56+0000\n"
+"POT-Creation-Date: 2024-11-11 03:58+0000\n"
 "PO-Revision-Date: 2024-11-03 10:52+0000\n"
 "Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: German <https://translate.johnromanodorazio.com/projects/"
@@ -186,7 +186,7 @@ msgstr "der Samstag vor dem Palmsonntag"
 #: src/Paths/Calendar.php:2750 src/Paths/Calendar.php:2789
 #: src/Paths/Calendar.php:2918 src/Paths/Calendar.php:2933
 #: src/Paths/Calendar.php:2950 src/Paths/Calendar.php:2991
-#: src/FestivityCollection.php:792
+#: src/FestivityCollection.php:791
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Dekret der Kongregation für den Gottesdienst"
 
@@ -793,7 +793,7 @@ msgstr "JAHR"
 msgid "Vigil Mass"
 msgstr "Vigilmesse"
 
-#: src/FestivityCollection.php:786
+#: src/FestivityCollection.php:785
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -804,7 +804,7 @@ msgstr ""
 "zusammen. Gemäß %6$s hat der erste Vorrang, daher wird die Vigilmesse sowie "
 "die I. Vesper bestätigt."
 
-#: src/FestivityCollection.php:800
+#: src/FestivityCollection.php:799
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -817,7 +817,7 @@ msgstr ""
 "Vigilmesse haben, während die letzte Feierlichkeit weder Vesper II noch eine "
 "Abendmesse haben wird."
 
-#: src/FestivityCollection.php:810
+#: src/FestivityCollection.php:809
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -830,7 +830,7 @@ msgstr ""
 "und eine Abendmesse beibehalten, während die erste Feierlichkeit keine "
 "Vigilmesse oder Vesper I haben wird."
 
-#: src/FestivityCollection.php:875
+#: src/FestivityCollection.php:874
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "

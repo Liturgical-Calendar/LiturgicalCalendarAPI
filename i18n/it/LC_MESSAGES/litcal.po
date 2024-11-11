@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-11 03:56+0000\n"
+"POT-Creation-Date: 2024-11-11 03:58+0000\n"
 "PO-Revision-Date: 2024-11-03 16:24+0000\n"
 "Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -184,7 +184,7 @@ msgstr "sabato che precede la Domenica delle Palme"
 #: src/Paths/Calendar.php:2750 src/Paths/Calendar.php:2789
 #: src/Paths/Calendar.php:2918 src/Paths/Calendar.php:2933
 #: src/Paths/Calendar.php:2950 src/Paths/Calendar.php:2991
-#: src/FestivityCollection.php:792
+#: src/FestivityCollection.php:791
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decreto della Congregazione per il Culto Divino"
 
@@ -788,7 +788,7 @@ msgstr "ANNO"
 msgid "Vigil Mass"
 msgstr "Messa della vigilia"
 
-#: src/FestivityCollection.php:786
+#: src/FestivityCollection.php:785
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -799,7 +799,7 @@ msgstr ""
 "nell'anno %5$d. Secondo il %6$s, la prima ha la precedenza, pertanto la "
 "Messa nella Vigilia è confermata come anche i Primi Vespri."
 
-#: src/FestivityCollection.php:800
+#: src/FestivityCollection.php:799
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -812,7 +812,7 @@ msgstr ""
 "Vespri e una Messa di Vigilia, mentre l'ultima Solennità non avrà né i "
 "Secondi Vespri né una Messa serale."
 
-#: src/FestivityCollection.php:810
+#: src/FestivityCollection.php:809
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -825,7 +825,7 @@ msgstr ""
 "Secondi Vespri e una Messa serale, mentre la prima Solennità non avrà né una "
 "Messa di Vigilia né i Primi Vespri."
 
-#: src/FestivityCollection.php:875
+#: src/FestivityCollection.php:874
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "

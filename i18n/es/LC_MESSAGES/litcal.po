@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-11 03:56+0000\n"
+"POT-Creation-Date: 2024-11-11 03:58+0000\n"
 "PO-Revision-Date: 2024-11-03 10:52+0000\n"
 "Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: Spanish <https://translate.johnromanodorazio.com/projects/"
@@ -178,7 +178,7 @@ msgstr "Sábado anterior al Domingo de Ramos"
 #: src/Paths/Calendar.php:2750 src/Paths/Calendar.php:2789
 #: src/Paths/Calendar.php:2918 src/Paths/Calendar.php:2933
 #: src/Paths/Calendar.php:2950 src/Paths/Calendar.php:2991
-#: src/FestivityCollection.php:792
+#: src/FestivityCollection.php:791
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decreto de la Congregación para el Culto Divino"
 
@@ -780,7 +780,7 @@ msgstr "AÑO"
 msgid "Vigil Mass"
 msgstr "Misa de Vigilia"
 
-#: src/FestivityCollection.php:786
+#: src/FestivityCollection.php:785
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -791,7 +791,7 @@ msgstr ""
 "%5$d. Según %6$s, el primero tiene precedencia, por lo tanto, se confirma la "
 "Misa de Vigilia así como las I Vísperas."
 
-#: src/FestivityCollection.php:800
+#: src/FestivityCollection.php:799
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -804,7 +804,7 @@ msgstr ""
 "una Misa de vigilia, mientras que la última solemnidad no tendrá ni Vísperas "
 "II ni una Misa vespertina."
 
-#: src/FestivityCollection.php:810
+#: src/FestivityCollection.php:809
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -817,7 +817,7 @@ msgstr ""
 "Vísperas II y una Misa vespertina, mientras que la primera solemnidad no "
 "tendrá Misa de Vigilia ni Vísperas I."
 
-#: src/FestivityCollection.php:875
+#: src/FestivityCollection.php:874
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
