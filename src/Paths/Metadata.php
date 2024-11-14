@@ -109,7 +109,7 @@ class Metadata
      */
     private static function getLocales(): void
     {
-        Metadata::$locales = array_merge(['en'], array_map('basename', glob('i18n/*/*', GLOB_ONLYDIR)));
+        Metadata::$locales = array_merge(['en'], array_map('basename', glob('i18n/*', GLOB_ONLYDIR)));
     }
 
     /**
