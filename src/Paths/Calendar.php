@@ -1587,7 +1587,7 @@ class Calendar
         }
 
         //let's add a displayGrade property for AllSouls so applications don't have to worry about fixing it
-        $this->Cal->setProperty("AllSouls", 'display_grade', $this->LitGrade->i18n(LitGrade::COMMEMORATION, false));
+        $this->Cal->setProperty("AllSouls", 'grade_display', $this->LitGrade->i18n(LitGrade::COMMEMORATION, false));
 
         $this->Cal->addSolemnitiesLordBVM([
             "Easter",
@@ -1660,7 +1660,7 @@ class Calendar
             $currentFeastDate = DateTime::createFromFormat('!j-n-Y', $row->day . '-' . $row->month . '-' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
             $festivity = new Festivity($row->name, $currentFeastDate, $row->color, LitFeastType::FIXED, $row->grade, $row->common);
             if ($row->event_key === 'DedicationLateran') {
-                $festivity->display_grade = $this->LitGrade->i18n(LitGrade::FEAST, false);
+                $festivity->grade_display = $this->LitGrade->i18n(LitGrade::FEAST, false);
             }
             $this->Cal->addFestivity($row->event_key, $festivity);
         }
@@ -3561,7 +3561,7 @@ class Calendar
                                         LitFeastType::FIXED,
                                         $row->grade,
                                         $row->common,
-                                        $row->display_grade
+                                        $row->grade_display
                                     );
                                     $this->Cal->addFestivity($row->event_key, $festivity);
                                 } else {
@@ -3573,7 +3573,7 @@ class Calendar
                                             LitFeastType::FIXED,
                                             $row->grade,
                                             $row->common,
-                                            $row->display_grade
+                                            $row->grade_display
                                         );
                                         $this->Cal->addFestivity($row->event_key, $festivity);
                                         $this->Messages[] = sprintf(
@@ -3593,7 +3593,7 @@ class Calendar
                                              * 7. Requested calendar year
                                              */
                                             $this->NationalData->metadata->region . ": " . _('The %1$s \'%2$s\' (%3$s), added to the national calendar in the %4$s, is superseded by the %5$s \'%6$s\' in the year %7$d'),
-                                            $row->display_grade !== "" ? $row->display_grade : $this->LitGrade->i18n($row->grade, false),
+                                            $row->grade_display !== "" ? $row->grade_display : $this->LitGrade->i18n($row->grade, false),
                                             '<i>' . $row->name . '</i>',
                                             $this->dayAndMonth->format($currentFeastDate->format('U')),
                                             RomanMissal::getName($missal),
@@ -4207,17 +4207,17 @@ class Calendar
                 $displayGrade = $this->LitGrade->i18n(LitGrade::FEAST, false);
                 $displayGradeHTML = $this->LitGrade->i18n(LitGrade::FEAST, true);
             } elseif ((int)$CalEvent->date->format('N') !== 7) {
-                if (property_exists($CalEvent, 'display_grade') && $CalEvent->display_grade !== "") {
-                    $displayGrade = $CalEvent->display_grade;
-                    $displayGradeHTML = '<B>' . $CalEvent->display_grade . '</B>';
+                if (property_exists($CalEvent, 'grade_display') && $CalEvent->grade_display !== "") {
+                    $displayGrade = $CalEvent->grade_display;
+                    $displayGradeHTML = '<B>' . $CalEvent->grade_display . '</B>';
                 } else {
                     $displayGrade = $this->LitGrade->i18n($CalEvent->grade, false);
                     $displayGradeHTML = $this->LitGrade->i18n($CalEvent->grade, true);
                 }
             } elseif ((int)$CalEvent->grade > LitGrade::MEMORIAL) {
-                if (property_exists($CalEvent, 'display_grade') && $CalEvent->display_grade !== "") {
-                    $displayGrade = $CalEvent->display_grade;
-                    $displayGradeHTML = '<B>' . $CalEvent->display_grade . '</B>';
+                if (property_exists($CalEvent, 'grade_display') && $CalEvent->grade_display !== "") {
+                    $displayGrade = $CalEvent->grade_display;
+                    $displayGradeHTML = '<B>' . $CalEvent->grade_display . '</B>';
                 } else {
                     $displayGrade = $this->LitGrade->i18n($CalEvent->grade, false);
                     $displayGradeHTML = $this->LitGrade->i18n($CalEvent->grade, true);

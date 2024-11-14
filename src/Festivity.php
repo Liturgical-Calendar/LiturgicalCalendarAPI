@@ -22,7 +22,7 @@ class Festivity implements \JsonSerializable
     public array $color = [];
     public string $type;
     public int $grade;
-    public string $display_grade;
+    public string $grade_display;
     public array $common;  //"Proper" or specified common(s) of saints...
 
     /** The following properties are set externally, but may be optional and therefore may remain null */
@@ -73,7 +73,7 @@ class Festivity implements \JsonSerializable
         $_type              = strtolower($type);
         $this->type         = LitFeastType::isValid($_type) ? $_type : '???';
         $this->grade        = $grade >= LitGrade::WEEKDAY && $grade <= LitGrade::HIGHER_SOLEMNITY ? $grade : -1;
-        $this->display_grade = $displayGrade;
+        $this->grade_display = $displayGrade;
         $this->grade_lcl     = self::$LitGrade->i18n($this->grade, false);
         //Festivity::debugWrite( "*** Festivity.php *** common vartype = " . gettype( $common ) );
         if (is_string($common)) {
@@ -126,7 +126,7 @@ class Festivity implements \JsonSerializable
      * - type: the type of the festivity
      * - grade: the grade of the festivity
      * - grade_lcl: the grade of the festivity, translated according to the current locale
-     * - display_grade: a boolean indicating whether the grade of the festivity should be displayed
+     * - grade_display: a boolean indicating whether the grade of the festivity should be displayed
      * - common: an array of common prayers associated with the festivity
      * - common_lcl: an array of common prayers associated with the festivity, translated according to the current locale
      * - day_of_the_week_iso8601: the day of the week of the festivity, in the ISO 8601 format (1 for Monday, 7 for Sunday)
@@ -159,7 +159,7 @@ class Festivity implements \JsonSerializable
             'type'                    => $this->type,
             'grade'                   => $this->grade,
             'grade_lcl'               => $this->grade_lcl,
-            'display_grade'           => $this->display_grade,
+            'grade_display'           => $this->grade_display,
             'common'                  => $this->common,
             'common_lcl'              => $this->common_lcl,
             'day_of_the_week_iso8601' => (int) $this->date->format('N'), //1 for Monday, 7 for Sunday
