@@ -98,7 +98,7 @@
                   "grade_lcl": {
                     "type": "string"
                   },
-                  "display_grade": {
+                  "grade_display": {
                     "type": "string"
                   },
                   "common": {
