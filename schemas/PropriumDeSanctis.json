@@ -24,7 +24,7 @@
                 "grade": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                 },
-                "display_grade": {
+                "grade_display": {
                     "type": "string"
                 },
                 "common": {
