@@ -217,7 +217,7 @@
                     "type": "mobile",
                     "grade": 7,
                     "grade_lcl": "celebratio altioris ordinis quam sollemnitatis",
-                    "display_grade": "",
+                    "grade_display": "",
                     "common": [],
                     "common_lcl": "",
                     "day_of_the_week_iso8601": 6,
@@ -247,7 +247,7 @@
                     "type": "mobile",
                     "grade": 7,
                     "grade_lcl": "celebratio altioris ordinis quam sollemnitatis",
-                    "display_grade": "",
+                    "grade_display": "",
                     "common": [],
                     "common_lcl": "",
                     "day_of_the_week_iso8601": 7,
@@ -330,7 +330,7 @@
                 "grade_lcl": {
                     "type": "string"
                 },
-                "display_grade": {
+                "grade_display": {
                     "type": "string"
                 },
                 "common": {
@@ -403,7 +403,7 @@
                 "color_lcl",
                 "type",
                 "grade",
-                "display_grade",
+                "grade_display",
                 "common",
                 "common_lcl",
                 "day_of_the_week_iso8601",
@@ -452,7 +452,7 @@
                 "grade_lcl": {
                     "type": "string"
                 },
-                "display_grade": {
+                "grade_display": {
                     "type": "string"
                 },
                 "common": {
@@ -531,7 +531,7 @@
                 "color_lcl",
                 "type",
                 "grade",
-                "display_grade",
+                "grade_display",
                 "common",
                 "common_lcl",
                 "day_of_the_week_iso8601",
