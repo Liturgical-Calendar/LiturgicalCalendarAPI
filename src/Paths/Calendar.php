@@ -4301,7 +4301,7 @@ class Calendar
         $SerializeableLitCal->settings->corpus_christi      = $this->CalendarParams->CorpusChristi;
         $SerializeableLitCal->settings->locale              = $this->CalendarParams->Locale;
         $SerializeableLitCal->settings->return_type         = $this->CalendarParams->ReturnType;
-        $SerializeableLitCal->settings->year_type       = $this->CalendarParams->YearType;
+        $SerializeableLitCal->settings->year_type           = $this->CalendarParams->YearType;
         $SerializeableLitCal->settings->eternal_high_priest = $this->CalendarParams->EternalHighPriest;
         if ($this->CalendarParams->NationalCalendar !== null) {
             $SerializeableLitCal->settings->national_calendar = $this->CalendarParams->NationalCalendar;
