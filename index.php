@@ -25,8 +25,8 @@ if (preg_match('/^\/api\/(.*?)\/index.php$/', $_SERVER['SCRIPT_NAME'], $matches)
 
 if (
     (isset($_SERVER['REQUEST_SCHEME']) && !empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] == 'https') ||
-    (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ||
-    (! empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443')
+    (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ||
+    (isset($_SERVER['SERVER_PORT']) && !empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443')
 ) {
     $server_request_scheme = 'https';
 } else {
