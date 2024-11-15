@@ -118,7 +118,22 @@ class CalendarParams
         } else {
             $server_request_scheme = 'http';
         }
-        $calendarsRoute = (defined('API_BASE_PATH') ? API_BASE_PATH : "{$server_request_scheme}://{$_SERVER['SERVER_NAME']}/api/dev") . Route::CALENDARS->value;
+
+        $server_name = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost';
+        if ('localhost' === $server_name) {
+            $server_name .= ':' . $_SERVER['SERVER_PORT'];
+        } else {
+            $server_name = "{$_SERVER['SERVER_NAME']}/api/dev";
+        }
+
+        $calendarsRoute = (defined('API_BASE_PATH') ? API_BASE_PATH : "{$server_request_scheme}://{$server_name}") . Route::CALENDARS->value;
+        if (stripos($calendarsRoute, '::/localhost') !== false) {
+            $concurrentServiceWorkers = getenv('PHP_CLI_SERVER_WORKERS');
+            if ((int)$concurrentServiceWorkers < 2) {
+                Calendar::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The API will be unable to load calendars metadata from {$calendarsRoute}, because there are not enough concurrent service workers. Perhaps set the `PHP_CLI_SERVER_WORKERS` environment variable to a value greater than 1? E.g. `PHP_CLI_SERVER_WORKERS=2 php -S $server_name`.");
+            }
+        }
+
         $metadataRaw = file_get_contents($calendarsRoute);
         if ($metadataRaw) {
             $metadata = json_decode($metadataRaw);
@@ -128,7 +143,7 @@ class CalendarParams
                 Calendar::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The API was unable to initialize calendars metadata: " . json_last_error_msg());
             }
         } else {
-            Calendar::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The API was unable to load calendars metadata");
+            Calendar::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The API was unable to load calendars metadata from {$calendarsRoute}");
         }
 
         $this->Year = (int)date("Y");
