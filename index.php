@@ -23,9 +23,19 @@ if (preg_match('/^\/api\/(.*?)\/index.php$/', $_SERVER['SCRIPT_NAME'], $matches)
     $apiVersion = $matches[1];
 }
 
+if (
+    (! empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] == 'https') ||
+    (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ||
+    (! empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443')
+) {
+    $server_request_scheme = 'https';
+} else {
+    $server_request_scheme = 'http';
+}
+
 // !!IMPORTANT!! There are classes that depend on this! Do NOT remove
 // Perhaps we could find a better way to set this in a class such as Core ...
-define('API_BASE_PATH', "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}/api/{$apiVersion}");
+define('API_BASE_PATH', "{$server_request_scheme}://{$_SERVER['SERVER_NAME']}/api/{$apiVersion}");
 
 Router::setAllowedOrigins('allowedOrigins.php');
 Router::route();
