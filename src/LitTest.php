@@ -138,14 +138,15 @@ class LitTest
             $calendarName = $this->getCalendarName();
             $messageIfError = "{$this->Test} Assertion '{$assertion->assertion}' failed for Year " . $this->dataToTest->settings->year . " in {$calendarType}{$calendarName}.";
             $eventKey = self::$testCache->{$this->Test}->testInstructions->event_key;
+            $eventBeingTested = array_values(array_filter($this->dataToTest->litcal, fn ($item) => $item->event_key === $eventKey))[0] ?? null;
 
             switch ($assertion->assert) {
                 case 'eventNotExists':
                     $errorMessage = is_null($assertion->expected_value)
-                        ? " The event {$eventKey} should not exist, instead the event has a timestamp of {$this->dataToTest->litcal->{$eventKey}->date}"
+                        ? " The event {$eventKey} should not exist, instead the event has a timestamp of {$eventBeingTested->date}"
                         : " What is going on here? We expected the event not to exist, and in fact it doesn't. We should never get here!";
 
-                    if (false === property_exists($this->dataToTest->litcal, $eventKey)) {
+                    if (null === $eventBeingTested) {
                         $this->setSuccess();
                     } else {
                         $this->setError($messageIfError . $errorMessage);
@@ -153,8 +154,8 @@ class LitTest
                     break;
                 case 'eventExists AND hasExpectedTimestamp':
                     $firstErrorMessage = " The event {$eventKey} should exist, instead it was not found";
-                    if (property_exists($this->dataToTest->litcal, $eventKey)) {
-                        $actualValue = $this->dataToTest->litcal->{$eventKey}->date;
+                    if (null !== $eventBeingTested) {
+                        $actualValue = $eventBeingTested->date;
                         $secondErrorMessage = " The event {$eventKey} was expected to have timestamp {$assertion->expected_value}, instead it had timestamp {$actualValue}";
                         if ($actualValue === $assertion->expected_value) {
                             $this->setSuccess("expected_value = {$assertion->expected_value}, actualValue = {$actualValue}");
