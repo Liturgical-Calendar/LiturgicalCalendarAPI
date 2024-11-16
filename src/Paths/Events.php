@@ -26,6 +26,16 @@ class Events
     private static array $requestPathParts    = [];
     private EventsParams $EventsParams;
 
+    /**
+     * @param array $requestPathParts the path parameters from the request
+     *
+     * Initializes the Events class.
+     *
+     * This method will:
+     * - Initialize the instance of the Core class
+     * - Set the request path parts
+     * - Initialize a new EventsParams object
+     */
     public function __construct(array $requestPathParts = [])
     {
         self::$Core = new Core();
@@ -33,6 +43,13 @@ class Events
         $this->EventsParams = new EventsParams();
     }
 
+    /**
+     * Populates the Latin Missals array with Roman Missal values.
+     *
+     * This method filters through the Roman Missal values and selects those
+     * that represent Latin Missals, identified by the prefix "EDITIO_TYPICA_".
+     * The filtered values are stored in the static Latin Missals array.
+     */
     private static function retrieveLatinMissals(): void
     {
         self::$LatinMissals = array_filter(RomanMissal::$values, function ($item) {
@@ -40,6 +57,12 @@ class Events
         });
     }
 
+    /**
+     * Loads the JSON data for the diocesan calendars index.
+     *
+     * This file is used to keep track of which diocesan calendars are available
+     * and their respective paths.
+     */
     private static function retrieveDioceseIndex(): void
     {
         $DioceseIndexContents = file_exists("data/nations/index.json") ? file_get_contents("data/nations/index.json") : null;
@@ -54,6 +77,18 @@ class Events
         }
     }
 
+    /**
+     * Validate the request path parameters.
+     *
+     * This method will validate the request path parameters as follows:
+     * - The first path parameter must be either "nation" or "diocese".
+     * - If the first path parameter is "nation", there must be a second path parameter which is a valid national calendar ID.
+     * - If the first path parameter is "diocese", there must be a second path parameter which is a valid diocesan calendar ID.
+     * - If the first path parameter is neither "nation" nor "diocese", it will produce an error response with a status code of 422 and a description of the error.
+     * - If the number of path parameters is not 2, it will produce an error response with a status code of 422 and a description of the error.
+     *
+     * @return void
+     */
     private function validateRequestPathParams(): void
     {
         $data = null;
@@ -85,6 +120,17 @@ class Events
         }
     }
 
+    /**
+     * Validate the POST request parameters.
+     *
+     * This method checks the content type of the request. If the content type is JSON,
+     * it reads the JSON input from the request body, decodes it, and validates it. If the
+     * JSON is malformed or the data is invalid, it produces a 400 Bad Request error response.
+     * If the content type is FORMDATA, it validates the POST data. If the data is invalid,
+     * it produces a 400 Bad Request error response.
+     *
+     * @return void
+     */
     private function validatePostParams(): void
     {
         if (self::$Core->getRequestContentType() === RequestContentType::JSON) {
@@ -112,6 +158,16 @@ class Events
         }
     }
 
+    /**
+     * Validate the GET request parameters.
+     *
+     * This method checks if there are any GET parameters present in the request.
+     * If there are, it attempts to set the data to the EventsParams object.
+     * If the data is invalid, it produces a 400 Bad Request error response
+     * with the last error message from EventsParams.
+     *
+     * @return void
+     */
     private function validateGetParams(): void
     {
         if (count($_GET)) {
@@ -122,6 +178,18 @@ class Events
         }
     }
 
+    /**
+     * Handles the request parameters for the Events resource.
+     *
+     * This method examines the request path parts and validates them if present.
+     * It then validates the request parameters based on the HTTP request method.
+     * - For POST requests, it validates the POST parameters.
+     * - For GET requests, it validates the GET parameters.
+     * - For OPTIONS requests, it continues without validation.
+     * Produces a 405 Method Not Allowed error response if the request method is not supported.
+     *
+     * @return void
+     */
     private function handleRequestParams(): void
     {
         if (count(self::$requestPathParts)) {
@@ -148,6 +216,16 @@ class Events
         }
     }
 
+    /**
+     * Loads the JSON data for the specified diocesan calendar.
+     *
+     * If the diocese is not found in the diocesan calendars index or in the `data/nations/{nation}/` directory, the response will be a JSON error response with a status code of 404 Not Found.
+     * If the diocese is not found in the diocesan calendars index, the response will be a JSON error response with a status code of 400 Bad Request.
+     * If the diocese is found in the diocesan calendars index but not in the `data/nations/{nation}/` directory, the response will be a JSON error response with a status code of 503 Service Unavailable.
+     * If the payload is not valid according to {@see LitSchema::DIOCESAN}, the response will be a JSON error response with a status code of 422 Unprocessable Content.
+     *
+     * @return void
+     */
     private function loadDiocesanData(): void
     {
         if ($this->EventsParams->DiocesanCalendar !== null) {
@@ -172,6 +250,16 @@ class Events
         }
     }
 
+    /**
+     * Loads the JSON data for the specified National and Wider Region calendars.
+     *
+     * If the National calendar is specified, it retrieves the corresponding JSON data file.
+     * If the JSON data is valid, it extracts settings like locale and checks for wider region metadata.
+     * If wider region metadata is present, it loads the corresponding wider region data and its internationalization file.
+     * Updates festivity names in the wider region data using the internationalization file.
+     *
+     * @return void
+     */
     private function loadNationalAndWiderRegionData(): void
     {
         if ($this->EventsParams->NationalCalendar !== null) {
@@ -203,6 +291,18 @@ class Events
         }
     }
 
+    /**
+     * Sets the locale for the current instance, affecting date formatting
+     * and translations of liturgical texts.
+     *
+     * This method retrieves the primary language from the current locale,
+     * constructs an array of potential locale strings, and sets the locale
+     * for PHP's internationalization functions. It also configures the domain
+     * for gettext translations and initializes LitGrade and LitCommon instances
+     * with the specified locale.
+     *
+     * @return void
+     */
     private function setLocale(): void
     {
         $this->EventsParams->Locale = \Locale::getPrimaryLanguage($this->EventsParams->Locale);
@@ -224,6 +324,39 @@ class Events
         self::$LitCommon = new LitCommon($this->EventsParams->Locale);
     }
 
+    /**
+     * This function processes the data from the Sanctorale of the Latin Missal
+     * and adds it to the FestivityCollection.
+     *
+     * The FestivityCollection is an array of festivity arrays, where each festivity
+     * array has several keys: "event_key", "grade", "common", "missal", "grade_lcl",
+     * and "common_lcl". "event_key" is the key for the festivity in the
+     * FestivityCollection, "grade" is the grade of the festivity (i.e. solemnity,
+     * feast, memorial, etc.), "common" is the common number of the festivity,
+     * "missal" is the missal to which the festivity belongs, "grade_lcl" is the
+     * localized grade of the festivity, and "common_lcl" is the localized common
+     * number of the festivity.
+     *
+     * The function first retrieves the filename of the Sanctorale of the Latin
+     * Missal. If the file does not exist, the function returns a 404 error.
+     *
+     * The function then reads the contents of the file into an array and decodes
+     * it from JSON. If there is an error in decoding the JSON, the function returns
+     * a 500 error.
+     *
+     * The function then loops through the array of festivity arrays and adds
+     * each festivity to the FestivityCollection. It also adds the missal to which
+     * the festivity belongs, the localized grade of the festivity, and the
+     * localized common number of the festivity to the festivity array.
+     *
+     * Finally, the function checks if there is a related translation file for
+     * the Sanctorale of the Latin Missal. If there is, the function reads the
+     * contents of the file into an array and decodes it from JSON. If there is an
+     * error in decoding the JSON, the function returns a 500 error.
+     *
+     * The function then loops through the array of festivity arrays and adds
+     * the translated name of the festivity to the festivity array.
+     */
     private function processMissalData(): void
     {
         foreach (self::$LatinMissals as $LatinMissal) {
@@ -266,6 +399,21 @@ class Events
         }
     }
 
+    /**
+     * Processes the Proprium de Tempore data and populates the FestivityCollection.
+     *
+     * This function reads the Proprium de Tempore data from a JSON file and its
+     * internationalization (i18n) data from another JSON file. It decodes both files
+     * and checks for JSON errors, producing appropriate error responses if any
+     * issues are encountered.
+     *
+     * For each festivity in the Proprium de Tempore data, the function checks if
+     * it is already present in the FestivityCollection. If not, it adds the festivity
+     * to the collection with its localized name and default attributes such as
+     * grade, common, common_lcl, and calendar.
+     *
+     * @return void
+     */
     private function processPropriumDeTemporeData(): void
     {
         $DataFile = 'data/missals/propriumdetempore/propriumdetempore.json';
@@ -301,6 +449,27 @@ class Events
         }
     }
 
+    /**
+     * Processes the Memorials from Decrees data and populates the FestivityCollection.
+     *
+     * This function reads the Memorials from Decrees data from a JSON file and its
+     * internationalization (i18n) data from another JSON file. It decodes both files
+     * and checks for JSON errors, producing appropriate error responses if any
+     * issues are encountered.
+     *
+     * For each festivity in the Memorials from Decrees data, the function checks if
+     * it is already present in the FestivityCollection. If not, it adds the festivity
+     * to the collection with its localized name and default attributes such as
+     * grade, common, common_lcl, and calendar. It also adds the URL of the decree
+     * promulgating the festivity.
+     *
+     * If the festivity is already present in the FestivityCollection, the function
+     * checks if the action attribute of the festivity is 'setProperty'. If so, it
+     * updates the specified property of the festivity. If the action attribute is
+     * 'makeDoctor', it updates the name of the festivity.
+     *
+     * @return void
+     */
     private function processMemorialsFromDecreesData(): void
     {
         $DataFile = 'data/decrees/decrees.json';
@@ -351,6 +520,25 @@ class Events
         }
     }
 
+    /**
+     * Processes the National Calendar data and populates the FestivityCollection.
+     *
+     * This function checks if the NationalCalendar parameter and NationalData are set.
+     * If WiderRegionData contains a 'litcal' property, it processes each festivity with
+     * the action 'createNew' and adds it to the FestivityCollection, setting localized
+     * grade and common attributes.
+     *
+     * It also iterates through the NationalData 'litcal' property and adds new festivities
+     * to the FestivityCollection with localized attributes.
+     *
+     * If NationalData metadata includes 'missals', it attempts to load festivity data
+     * from the specified Roman Missals, adding them to the FestivityCollection with
+     * localized attributes and associating the missal name.
+     *
+     * Produces error responses if required resource files are not found.
+     *
+     * @return void
+     */
     private function processNationalCalendarData(): void
     {
         if ($this->EventsParams->NationalCalendar !== null && self::$NationalData !== null) {
@@ -397,6 +585,16 @@ class Events
         }
     }
 
+    /**
+     * Processes the Diocesan Calendar data and populates the FestivityCollection.
+     *
+     * This function checks if the DiocesanCalendar parameter and DiocesanData are set.
+     * If so, it iterates through the DiocesanData 'litcal' property and adds new festivities
+     * to the FestivityCollection with localized attributes and a modified event_key
+     * incorporating the DiocesanCalendar parameter.
+     *
+     * @return void
+     */
     private function processDiocesanCalendarData(): void
     {
         if ($this->EventsParams->DiocesanCalendar !== null && self::$DiocesanData !== null) {
@@ -409,6 +607,18 @@ class Events
         }
     }
 
+    /**
+     * Produce an error response with the given HTTP status code and description.
+     *
+     * The description is a short string that should be used to give more context to the error.
+     *
+     * The function will output the error in the response format specified by the Accept header
+     * of the request (JSON or YAML) and terminate the script execution with a call to die().
+     *
+     * @param int $statusCode the HTTP status code to return
+     * @param string $description a short description of the error
+     * @return string the error response in the specified format
+     */
     private static function produceErrorResponse(int $statusCode, string $description): string
     {
         header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
@@ -429,10 +639,18 @@ class Events
         }
     }
 
+    /**
+     * Produce the response for the /events endpoint.
+     *
+     * The function will output the response in the response format specified by the Accept header
+     * of the request (JSON or YAML) and terminate the script execution with a call to die().
+     *
+     * @return void
+     */
     private function produceResponse(): void
     {
         $responseObj = [
-            "litcal_events" => self::$FestivityCollection,
+            "litcal_events" => array_values(self::$FestivityCollection),
             "settings" => [
                 "locale" => $this->EventsParams->Locale,
                 "national_calendar" => $this->EventsParams->NationalCalendar,
@@ -458,6 +676,23 @@ class Events
         }
     }
 
+    /**
+     * Initializes the Events class and processes the request.
+     *
+     * @param array $requestPathParts The path parameters from the request.
+     *
+     * This method performs the following actions:
+     * - Initializes the Core component and validates the Accept header.
+     * - Sets the response content type based on the request.
+     * - Retrieves and sets the request path parts.
+     * - Loads and processes various calendar and missal data, including Latin Missals,
+     *   Diocese Index, Diocesan Data, National and Wider Region Data.
+     * - Sets the locale for the response.
+     * - Handles request parameters and processes different types of calendar data,
+     *   such as Missal, Proprium De Tempore, Memorials from Decrees, National,
+     *   and Diocesan calendars.
+     * - Produces and sends the response to the client.
+     */
     public function init(array $requestPathParts = [])
     {
         self::$Core->init();
