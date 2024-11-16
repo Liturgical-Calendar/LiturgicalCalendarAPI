@@ -26,7 +26,7 @@ class Core
     private ?string $JsonEncodedRequestHeaders  = null;
     private ?string $RequestContentType         = null;
     private ?string $ResponseContentType        = null;
-    private static array $onlyUsefulHeaders = [
+    private const ONLY_USEFUL_HEADERS = [
         "Accept", "Accept-Language", "X-Requested-With", "Origin"
     ];
 
@@ -46,7 +46,7 @@ class Core
         $this->AllowedRequestContentTypes       = RequestContentType::$values;
 
         foreach (getallheaders() as $header => $value) {
-            if (in_array($header, self::$onlyUsefulHeaders)) {
+            if (in_array($header, self::ONLY_USEFUL_HEADERS)) {
                 $this->RequestHeaders[$header] = $value;
             }
         }

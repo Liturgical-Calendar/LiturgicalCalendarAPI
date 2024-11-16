@@ -27,6 +27,7 @@ class Router
             include_once($originsFile);
         }
 
+        // ALLOWED_ORIGINS should be defined in the $originsFile
         if (defined('ALLOWED_ORIGINS') && is_array(ALLOWED_ORIGINS)) {
             if (null !== $origins) {
                 self::$allowedOrigins = array_merge(

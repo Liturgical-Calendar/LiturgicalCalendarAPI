@@ -100,17 +100,18 @@
             ]
         },
         "litcal": {
-            "type": "object",
+            "type": "array",
             "description": "the liturgical events that make up the requested Liturgical Calendar for the given year",
-            "patternProperties": {
-                "^(?:[a-z_]+?_){0,1}[A-Z][a-zA-Z1-9]+[0-9]{0,2}_vigil$": {
-                    "$ref": "#/definitions/FestivityVigil"
-                },
-                "^(?:[a-z_]+?_){0,1}[A-Z][a-zA-Z1-9]+[0-9]{0,2}$": {
-                    "$ref": "#/definitions/Festivity"
-                }
-            },
-            "additionalProperties": false
+            "items": {
+                "anyOf": [
+                    {
+                        "$ref": "#/definitions/Festivity"
+                    },
+                    {
+                        "$ref": "#/definitions/FestivityVigil"
+                    }
+                ]
+            }
         },
         "messages": {
             "type": "array",
@@ -306,6 +307,9 @@
                     "minimum": 0,
                     "maximum": 2000
                 },
+                "event_key": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/EventKeyVigilMass"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -427,6 +431,9 @@
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 2000
+                },
+                "event_key": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/EventKeyNonVigilMass"
                 },
                 "name": {
                     "type": "string"
