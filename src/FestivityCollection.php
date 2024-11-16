@@ -1177,21 +1177,25 @@ class FestivityCollection
      * Retrieves all festivities from the collection
      * in a format that can be easily converted to JSON.
      *
-     * This method returns an array of arrays, where each inner array contains the key of the
-     * event and the properties of the DateTime object as key-value pairs.
+     * This method returns a collection of liturgical events or celebrations,
+     * each with properties such as date, name, event_key, etc.
      *
-     * @return array An array of arrays, where each inner array contains the key of the event
-     * and the properties of the DateTime object as key-value pairs.
+     * @return array A collection of liturgical events, each of which has properties
+     * such as date, name, event_key, etc.
      */
     public function getFestivitiesCollection(): array
     {
         if (empty($this->festivitiesCollection)) {
             $festivitiesCollection = [];
             foreach ($this->festivities as $key => $festivity) {
-                $festivitiesCollection[] = [
+                $gradeAbbr = $this->LitGrade->i18n($festivity->grade, false, true);
+                $festivityAssocArr = [
                     "event_key" => $key,
-                    ...json_decode(json_encode($festivity), true)
+                    ...json_decode(json_encode($festivity), true),
+                    "grade_abbr" => $gradeAbbr
                 ];
+                ksort($festivityAssocArr);
+                $festivitiesCollection[] = $festivityAssocArr;
             }
             return $festivitiesCollection;
         } else {
