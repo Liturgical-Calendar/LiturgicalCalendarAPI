@@ -11,16 +11,25 @@ use LiturgicalCalendar\Api\Params\CalendarParams;
 #[\AllowDynamicProperties]
 class FestivityCollection
 {
-    private array $festivities      = [];
-    private array $solemnities      = [];
-    private array $feasts           = [];
-    private array $memorials        = [];
-    private array $WeekdaysAdventChristmasLent  = [];
-    private array $WeekdaysAdventBeforeDec17    = [];
-    private array $WeekdaysEpiphany             = [];
-    private array $SolemnitiesLordBVM           = [];
-    private array $SundaysAdventLentEaster      = [];
-    private array $T                            = [];
+    private array $festivities                           = [];
+    private array $solemnities                           = [];
+    private array $feasts                                = [];
+    private array $memorials                             = [];
+    private array $weekdaysAdventChristmasLent           = [];
+    private array $weekdaysAdventBeforeDec17             = [];
+    private array $weekdaysEpiphany                      = [];
+    private array $solemnitiesLordBVM                    = [];
+    private array $sundaysAdventLentEaster               = [];
+    private array $festivitiesCollection                 = [];
+    private array $solemnitiesCollection                 = [];
+    private array $feastsCollection                      = [];
+    private array $memorialsCollection                   = [];
+    private array $weekdaysAdventChristmasLentCollection = [];
+    private array $weekdaysAdventBeforeDec17Collection   = [];
+    private array $weekdaysEpiphanyCollection            = [];
+    private array $solemnitiesLordBVMCollection          = [];
+    private array $sundaysAdventLentEasterCollection     = [];
+    private array $T                                     = [];
     private \IntlDateFormatter $dayOfTheWeek;
     private CalendarParams $CalendarParams;
     private LitGrade $LitGrade;
@@ -105,20 +114,20 @@ class FestivityCollection
         // Weekday of Advent from 17 to 24 Dec.
         if (str_starts_with($key, "AdventWeekday")) {
             if ($festivity->date->format('j') >= 17 && $festivity->date->format('j') <= 24) {
-                $this->WeekdaysAdventChristmasLent[ $key ] = $festivity->date;
+                $this->weekdaysAdventChristmasLent[ $key ] = $festivity->date;
             } else {
-                $this->WeekdaysAdventBeforeDec17[ $key ] = $festivity->date;
+                $this->weekdaysAdventBeforeDec17[ $key ] = $festivity->date;
             }
         } elseif (str_starts_with($key, "ChristmasWeekday")) {
-            $this->WeekdaysAdventChristmasLent[ $key ] = $festivity->date;
+            $this->weekdaysAdventChristmasLent[ $key ] = $festivity->date;
         } elseif (str_starts_with($key, "LentWeekday")) {
-            $this->WeekdaysAdventChristmasLent[ $key ] = $festivity->date;
+            $this->weekdaysAdventChristmasLent[ $key ] = $festivity->date;
         } elseif (str_starts_with($key, "DayBeforeEpiphany") || str_starts_with($key, "DayAfterEpiphany")) {
-            $this->WeekdaysEpiphany[ $key ] = $festivity->date;
+            $this->weekdaysEpiphany[ $key ] = $festivity->date;
         }
         //Sundays of Advent, Lent, Easter
         if (preg_match('/(?:Advent|Lent|Easter)([1-7])/', $key, $matches) === 1) {
-            $this->SundaysAdventLentEaster[] = $festivity->date;
+            $this->sundaysAdventLentEaster[] = $festivity->date;
             $this->festivities[ $key ]->psalter_week = self::psalterWeek(intval($matches[1]));
         }
         //Ordinary Sunday Psalter Week
@@ -135,7 +144,7 @@ class FestivityCollection
      */
     public function addSolemnitiesLordBVM(array $keys): void
     {
-        array_push($this->SolemnitiesLordBVM, $keys);
+        array_push($this->solemnitiesLordBVM, $keys);
     }
 
     /**
@@ -176,7 +185,7 @@ class FestivityCollection
      */
     public function isSolemnityLordBVM(string $key): bool
     {
-        return in_array($key, $this->SolemnitiesLordBVM);
+        return in_array($key, $this->solemnitiesLordBVM);
     }
 
     /**
@@ -187,7 +196,7 @@ class FestivityCollection
      */
     public function isSundayAdventLentEaster(DateTime $date): bool
     {
-        return in_array($date, $this->SundaysAdventLentEaster);
+        return in_array($date, $this->sundaysAdventLentEaster);
     }
 
     /**
@@ -324,7 +333,7 @@ class FestivityCollection
      */
     public function inWeekdaysAdventBeforeDec17(DateTime $date): bool
     {
-        return in_array($date, $this->WeekdaysAdventBeforeDec17);
+        return in_array($date, $this->weekdaysAdventBeforeDec17);
     }
 
     /**
@@ -335,7 +344,7 @@ class FestivityCollection
      */
     public function inWeekdaysAdventChristmasLent(DateTime $date): bool
     {
-        return in_array($date, $this->WeekdaysAdventChristmasLent);
+        return in_array($date, $this->weekdaysAdventChristmasLent);
     }
 
     /**
@@ -346,7 +355,7 @@ class FestivityCollection
      */
     public function inWeekdaysEpiphany(DateTime $date): bool
     {
-        return in_array($date, $this->WeekdaysEpiphany);
+        return in_array($date, $this->weekdaysEpiphany);
     }
 
     /**
@@ -400,7 +409,7 @@ class FestivityCollection
      */
     public function weekdayEpiphanyKeyFromDate(DateTime $date): string|int|false
     {
-        return array_search($date, $this->WeekdaysEpiphany);
+        return array_search($date, $this->weekdaysEpiphany);
     }
 
     /**
@@ -412,7 +421,7 @@ class FestivityCollection
      */
     public function weekdayAdventBeforeDec17KeyFromDate(DateTime $date): string|int|false
     {
-        return array_search($date, $this->WeekdaysAdventBeforeDec17);
+        return array_search($date, $this->weekdaysAdventBeforeDec17);
     }
 
     /**
@@ -424,7 +433,7 @@ class FestivityCollection
      */
     public function weekdayAdventChristmasLentKeyFromDate(DateTime $date): string|int|false
     {
-        return array_search($date, $this->WeekdaysAdventChristmasLent);
+        return array_search($date, $this->weekdaysAdventChristmasLent);
     }
 
     /**
@@ -912,7 +921,7 @@ class FestivityCollection
     }
 
     /**
-     * Retrieves all solemnities from the collection.
+     * Retrieves a collection of all solemnities from the collection.
      *
      * @return DateTime[] An array of DateTime objects, each representing a date with a Solemnity.
      */
@@ -931,14 +940,18 @@ class FestivityCollection
      */
     public function getSolemnitiesCollection(): array
     {
-        $solemnitiesCollection = [];
-        foreach ($this->solemnities as $key => $solemnity) {
-            $solemnitiesCollection[] = [
-                "event_key" => $key,
-                ...json_decode(json_encode($solemnity), true)
-            ];
+        if (empty($this->solemnitiesCollection)) {
+            $solemnitiesCollection = [];
+            foreach ($this->solemnities as $key => $solemnity) {
+                $solemnitiesCollection[] = [
+                    "event_key" => $key,
+                    ...json_decode(json_encode($solemnity), true)
+                ];
+            }
+            return $solemnitiesCollection;
+        } else {
+            return $this->solemnitiesCollection;
         }
-        return $solemnitiesCollection;
     }
 
     /**
@@ -971,14 +984,18 @@ class FestivityCollection
      */
     public function getFeastsCollection(): array
     {
-        $feastsCollection = [];
-        foreach ($this->feasts as $key => $feast) {
-            $feastsCollection[] = [
-                "event_key" => $key,
-                ...json_decode(json_encode($feast), true)
-            ];
+        if (empty($this->feastsCollection)) {
+            $feastsCollection = [];
+            foreach ($this->feasts as $key => $feast) {
+                $feastsCollection[] = [
+                    "event_key" => $key,
+                    ...json_decode(json_encode($feast), true)
+                ];
+            }
+            return $feastsCollection;
+        } else {
+            return $this->feastsCollection;
         }
-        return $feastsCollection;
     }
 
     /**
@@ -1011,14 +1028,175 @@ class FestivityCollection
      */
     public function getMemorialsCollection(): array
     {
-        $memorialsCollection = [];
-        foreach ($this->memorials as $key => $memorial) {
-            $memorialsCollection[] = [
-                "event_key" => $key,
-                ...json_decode(json_encode($memorial), true)
-            ];
+        if (empty($this->memorialsCollection)) {
+            $memorialsCollection = [];
+            foreach ($this->memorials as $key => $memorial) {
+                $memorialsCollection[] = [
+                    "event_key" => $key,
+                    ...json_decode(json_encode($memorial), true)
+                ];
+            }
+            return $memorialsCollection;
+        } else {
+            return $this->memorialsCollection;
         }
-        return $memorialsCollection;
+    }
+
+    /**
+     * Retrieves all weekdays in the seasons of Advent (on or after December 17th), Christmas, or Lent
+     * in a format that can be easily converted to JSON.
+     *
+     * This method returns an array of arrays, where each inner array contains the key of the
+     * event and the properties of the DateTime object as key-value pairs.
+     *
+     * @return array An array of arrays, where each inner array contains the key of the event
+     * and the properties of the DateTime object as key-value pairs.
+     */
+    public function getWeekdaysAdventChristmasLentCollection(): array
+    {
+        if (empty($this->weekdaysAdventChristmasLentCollection)) {
+            $weekdaysAdventChristmasLentCollection = [];
+            foreach ($this->weekdaysAdventChristmasLent as $key => $weekday) {
+                $weekdaysAdventChristmasLentCollection[] = [
+                    "event_key" => $key,
+                    ...json_decode(json_encode($weekday), true)
+                ];
+            }
+            return $weekdaysAdventChristmasLentCollection;
+        } else {
+            return $this->weekdaysAdventChristmasLentCollection;
+        }
+    }
+
+    /**
+     * Retrieves all weekdays in Advent before December 17th in a format that can be easily converted to JSON.
+     *
+     * This method returns an array of arrays, where each inner array contains the key of the
+     * event and the properties of the DateTime object as key-value pairs.
+     *
+     * These are days on which obligatory memorials will suppress the Advent weekday.
+     *
+     * @return array An array of arrays, where each inner array contains the key of the event
+     * and the properties of the DateTime object as key-value pairs.
+     */
+    public function getWeekdaysAdventBeforeDec17Collection(): array
+    {
+        if (empty($this->weekdaysAdventBeforeDec17Collection)) {
+            $weekdaysAdventBeforeDec17Collection = [];
+            foreach ($this->weekdaysAdventBeforeDec17 as $key => $weekday) {
+                $weekdaysAdventBeforeDec17Collection[] = [
+                    "event_key" => $key,
+                    ...json_decode(json_encode($weekday), true)
+                ];
+            }
+            return $weekdaysAdventBeforeDec17Collection;
+        } else {
+            return $this->weekdaysAdventBeforeDec17Collection;
+        }
+    }
+
+    /**
+     * Retrieves all weekdays in the season of Epiphany
+     * in a format that can be easily converted to JSON.
+     *
+     * This method returns an array of arrays, where each inner array contains the key of the
+     * event and the properties of the DateTime object as key-value pairs.
+     *
+     * @return array An array of arrays, where each inner array contains the key of the event
+     * and the properties of the DateTime object as key-value pairs.
+     */
+    public function getWeekdaysEpiphanyCollection(): array
+    {
+        if (empty($this->weekdaysEpiphanyCollection)) {
+            $weekdaysEpiphanyCollection = [];
+            foreach ($this->weekdaysEpiphany as $key => $weekday) {
+                $weekdaysEpiphanyCollection[] = [
+                    "event_key" => $key,
+                    ...json_decode(json_encode($weekday), true)
+                ];
+            }
+            return $weekdaysEpiphanyCollection;
+        } else {
+            return $this->weekdaysEpiphanyCollection;
+        }
+    }
+
+    /**
+     * Retrieves all solemnities of the Lord and the BVM from the collection
+     * in a format that can be easily converted to JSON.
+     *
+     * This method returns an array of arrays, where each inner array contains the key of the event
+     * and the properties of the DateTime object as key-value pairs.
+     *
+     * @return array An array of arrays, where each inner array contains the key of the event
+     * and the properties of the DateTime object as key-value pairs.
+     */
+    public function getSolemnitiesLordBVMCollection(): array
+    {
+        if (empty($this->solemnitiesLordBVMCollection)) {
+            $solemnitiesLordBVMCollection = [];
+            foreach ($this->solemnitiesLordBVM as $key => $solemnity) {
+                $solemnitiesLordBVMCollection[] = [
+                    "event_key" => $key,
+                    ...json_decode(json_encode($solemnity), true)
+                ];
+            }
+            return $solemnitiesLordBVMCollection;
+        } else {
+            return $this->solemnitiesLordBVMCollection;
+        }
+    }
+
+    /**
+     * Retrieves all Sundays in the seasons of Advent, Lent, and Easter
+     * in a format that can be easily converted to JSON.
+     *
+     * This method returns an array of arrays, where each inner array contains the key of the
+     * event and the properties of the DateTime object as key-value pairs.
+     *
+     * @return array An array of arrays, where each inner array contains the key of the event
+     * and the properties of the DateTime object as key-value pairs.
+     */
+    public function getSundaysAdventLentEasterCollection(): array
+    {
+        if (empty($this->sundaysAdventLentEasterCollection)) {
+            $sundaysAdventLentEasterCollection = [];
+            foreach ($this->sundaysAdventLentEaster as $key => $sunday) {
+                $sundaysAdventLentEasterCollection[] = [
+                    "event_key" => $key,
+                    ...json_decode(json_encode($sunday), true)
+                ];
+            }
+            return $sundaysAdventLentEasterCollection;
+        } else {
+            return $this->sundaysAdventLentEasterCollection;
+        }
+    }
+
+    /**
+     * Retrieves all festivities from the collection
+     * in a format that can be easily converted to JSON.
+     *
+     * This method returns an array of arrays, where each inner array contains the key of the
+     * event and the properties of the DateTime object as key-value pairs.
+     *
+     * @return array An array of arrays, where each inner array contains the key of the event
+     * and the properties of the DateTime object as key-value pairs.
+     */
+    public function getFestivitiesCollection(): array
+    {
+        if (empty($this->festivitiesCollection)) {
+            $festivitiesCollection = [];
+            foreach ($this->festivities as $key => $festivity) {
+                $festivitiesCollection[] = [
+                    "event_key" => $key,
+                    ...json_decode(json_encode($festivity), true)
+                ];
+            }
+            return $festivitiesCollection;
+        } else {
+            return $this->festivitiesCollection;
+        }
     }
 
     /**
@@ -1040,7 +1218,7 @@ class FestivityCollection
      */
     public function getWeekdaysAdventBeforeDec17(): array
     {
-        return $this->WeekdaysAdventBeforeDec17;
+        return $this->weekdaysAdventBeforeDec17;
     }
 
     /**
@@ -1052,7 +1230,7 @@ class FestivityCollection
      */
     public function getWeekdaysAdventChristmasLent(): array
     {
-        return $this->WeekdaysAdventChristmasLent;
+        return $this->weekdaysAdventChristmasLent;
     }
 
     /**
@@ -1062,7 +1240,7 @@ class FestivityCollection
      */
     public function getWeekdaysEpiphany(): array
     {
-        return $this->WeekdaysEpiphany;
+        return $this->weekdaysEpiphany;
     }
 
     /**
@@ -1074,7 +1252,7 @@ class FestivityCollection
      */
     public function getSolemnitiesLordBVM(): array
     {
-        return $this->SolemnitiesLordBVM;
+        return $this->solemnitiesLordBVM;
     }
 
     /**
@@ -1084,7 +1262,7 @@ class FestivityCollection
      */
     public function getSundaysAdventLentEaster(): array
     {
-        return $this->SundaysAdventLentEaster;
+        return $this->sundaysAdventLentEaster;
     }
 
     /**
@@ -1219,10 +1397,10 @@ class FestivityCollection
                     unset($this->solemnities[ $key ]);
                     unset($this->feasts[ $key ]);
                     unset($this->memorials[ $key ]);
-                    unset($this->WeekdaysAdventChristmasLent[ $key ]);
-                    unset($this->WeekdaysEpiphany[ $key ]);
-                    unset($this->SolemnitiesLordBVM[ $key ]);
-                    unset($this->SundaysAdventLentEaster[ $key ]);
+                    unset($this->weekdaysAdventChristmasLent[ $key ]);
+                    unset($this->weekdaysEpiphany[ $key ]);
+                    unset($this->solemnitiesLordBVM[ $key ]);
+                    unset($this->sundaysAdventLentEaster[ $key ]);
                 }
             }
         }
@@ -1246,9 +1424,9 @@ class FestivityCollection
                 unset($this->solemnities[ $key ]);
                 unset($this->feasts[ $key ]);
                 unset($this->memorials[ $key ]);
-                unset($this->WeekdaysAdventChristmasLent[ $key ]);
-                unset($this->SolemnitiesLordBVM[ $key ]);
-                unset($this->SundaysAdventLentEaster[ $key ]);
+                unset($this->weekdaysAdventChristmasLent[ $key ]);
+                unset($this->solemnitiesLordBVM[ $key ]);
+                unset($this->sundaysAdventLentEaster[ $key ]);
             }
             // also remove the Vigil Mass for the first Sunday of Advent
             // unfortunately we cannot keep it, because it would have the same key as for the other calendar year
@@ -1282,20 +1460,20 @@ class FestivityCollection
      */
     public function mergeFestivityCollection(FestivityCollection $festivities)
     {
-        $this->solemnities  = array_merge($this->solemnities, $festivities->getSolemnities());
-        $this->feasts       = array_merge($this->feasts, $festivities->getFeasts());
-        $this->memorials    = array_merge($this->memorials, $festivities->getMemorials());
-        $this->WeekdaysAdventChristmasLent = array_merge(
-            $this->WeekdaysAdventChristmasLent,
-            $festivities->getWeekdaysAdventChristmasLent()
+        $this->solemnitiesCollection  = array_merge($this->getSolemnitiesCollection(), $festivities->getSolemnitiesCollection());
+        $this->feastsCollection       = array_merge($this->getFeastsCollection(), $festivities->getFeastsCollection());
+        $this->memorialsCollection    = array_merge($this->getMemorialsCollection(), $festivities->getMemorialsCollection());
+        $this->weekdaysAdventChristmasLentCollection = array_merge(
+            $this->getWeekdaysAdventChristmasLentCollection(),
+            $festivities->getWeekdaysAdventChristmasLentCollection()
         );
-        $this->WeekdaysAdventBeforeDec17 = array_merge(
-            $this->WeekdaysAdventBeforeDec17,
-            $festivities->getWeekdaysAdventBeforeDec17()
+        $this->weekdaysAdventBeforeDec17Collection = array_merge(
+            $this->getWeekdaysAdventBeforeDec17Collection(),
+            $festivities->getWeekdaysAdventBeforeDec17Collection()
         );
-        $this->WeekdaysEpiphany         = array_merge($this->WeekdaysEpiphany, $festivities->getWeekdaysEpiphany());
-        $this->SolemnitiesLordBVM       = array_merge($this->SolemnitiesLordBVM, $festivities->getSolemnitiesLordBVM());
-        $this->SundaysAdventLentEaster  = array_merge($this->SundaysAdventLentEaster, $festivities->getSundaysAdventLentEaster());
-        $this->festivities = array_merge($this->festivities, $festivities->getFestivities());
+        $this->weekdaysEpiphanyCollection         = array_merge($this->getWeekdaysEpiphanyCollection(), $festivities->getWeekdaysEpiphanyCollection());
+        $this->solemnitiesLordBVMCollection       = array_merge($this->getSolemnitiesLordBVMCollection(), $festivities->getSolemnitiesLordBVMCollection());
+        $this->sundaysAdventLentEasterCollection  = array_merge($this->getSundaysAdventLentEasterCollection(), $festivities->getSundaysAdventLentEasterCollection());
+        $this->festivitiesCollection              = array_merge($this->getFestivitiesCollection(), $festivities->getFestivitiesCollection());
     }
 }
