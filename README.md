@@ -82,6 +82,7 @@ PHP_CLI_SERVER_WORKERS=2 php -S localhost:8000
 * fix XML response, implement XML and ICS validation
 * update the OpenAPI schema
 * add timing to response output and to response headers
+* refactor responses to use snake_case properties and collections (this also fixes `SaintAndrewAp` bug for `year_type=LITURGICAL` in `year=2023`, see issue #249)
 ## [v3.9](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.9) (April 9th 2024)
 * update PHP dependencies (`swaggest/json-schema`, `phpunit/phpunit`)
 * add swagger validation badge to README
