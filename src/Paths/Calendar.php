@@ -6,14 +6,14 @@ use LiturgicalCalendar\Api\Core;
 use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Festivity;
 use LiturgicalCalendar\Api\FestivityCollection;
-use LiturgicalCalendar\Api\Utilities;
 use LiturgicalCalendar\Api\LatinUtils;
+use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Utilities;
+use LiturgicalCalendar\Api\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\Ascension;
+use LiturgicalCalendar\Api\Enum\CacheDuration;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
 use LiturgicalCalendar\Api\Enum\Epiphany;
-use LiturgicalCalendar\Api\Enum\AcceptHeader;
-use LiturgicalCalendar\Api\Enum\CacheDuration;
-use LiturgicalCalendar\Api\Enum\YearType;
 use LiturgicalCalendar\Api\Enum\LitColor;
 use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitFeastType;
@@ -24,6 +24,7 @@ use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\ReturnType;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Enum\StatusCode;
+use LiturgicalCalendar\Api\Enum\YearType;
 use LiturgicalCalendar\Api\Params\CalendarParams;
 
 class Calendar
@@ -4327,9 +4328,11 @@ class Calendar
 
         $SerializeableLitCal->messages                      = $this->Messages;
 
-        //make sure we have an engineCache folder for the current Version
-        if (realpath("engineCache/v" . str_replace(".", "_", self::API_VERSION)) === false) {
-            mkdir("engineCache/v" . str_replace(".", "_", self::API_VERSION), 0755, true);
+        if (false === Router::isLocalhost()) {
+            //make sure we have an engineCache folder for the current Version
+            if (realpath("engineCache/v" . str_replace(".", "_", self::API_VERSION)) === false) {
+                mkdir("engineCache/v" . str_replace(".", "_", self::API_VERSION), 0755, true);
+            }
         }
 
         switch ($this->CalendarParams->ReturnType) {
@@ -4385,7 +4388,9 @@ class Calendar
                 $response = json_encode($SerializeableLitCal);
                 break;
         }
-        file_put_contents($this->CACHEFILE, $response);
+        if (false === Router::isLocalhost()) {
+            file_put_contents($this->CACHEFILE, $response);
+        }
         $responseHash = md5($response);
 
         $this->endTime = hrtime(true);
@@ -4448,22 +4453,22 @@ class Calendar
      * Sets the cache duration for the calendar to one of the predefined
      * values in \LiturgicalCalendar\Api\Enum\CacheDuration.
      *
-     * @param string $duration The cache duration to use.
+     * @param CacheDuration $duration The cache duration to use.
      */
-    public function setCacheDuration(string $duration): void
+    public function setCacheDuration(CacheDuration $duration): void
     {
         switch ($duration) {
             case CacheDuration::DAY:
-                $this->CacheDuration = "_" . $duration . date("z"); //The day of the year ( starting from 0 through 365 )
+                $this->CacheDuration = "_" . $duration->value . date("z"); //The day of the year ( starting from 0 through 365 )
                 break;
             case CacheDuration::WEEK:
-                $this->CacheDuration = "_" . $duration . date("W"); //ISO-8601 week number of year, weeks starting on Monday
+                $this->CacheDuration = "_" . $duration->value . date("W"); //ISO-8601 week number of year, weeks starting on Monday
                 break;
             case CacheDuration::MONTH:
-                $this->CacheDuration = "_" . $duration . date("m"); //Numeric representation of a month, with leading zeros
+                $this->CacheDuration = "_" . $duration->value . date("m"); //Numeric representation of a month, with leading zeros
                 break;
             case CacheDuration::YEAR:
-                $this->CacheDuration = "_" . $duration . date("Y"); //A full numeric representation of a year, 4 digits
+                $this->CacheDuration = "_" . $duration->value . date("Y"); //A full numeric representation of a year, 4 digits
                 break;
         }
     }
@@ -4496,7 +4501,7 @@ class Calendar
         $this->updateSettingsBasedOnDiocesanCalendar();
         self::$Core->setResponseContentTypeHeader();
 
-        if ($this->cacheFileIsAvailable()) {
+        if (false === Router::isLocalhost() && $this->cacheFileIsAvailable()) {
             //If we already have done the calculation
             //and stored the results in a cache file
             //then we're done, just output this and die

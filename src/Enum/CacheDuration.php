@@ -2,16 +2,10 @@
 
 namespace LiturgicalCalendar\Api\Enum;
 
-class CacheDuration
+enum CacheDuration: string
 {
-    public const DAY       = "DAY";
-    public const WEEK      = "WEEK";
-    public const MONTH     = "MONTH";
-    public const YEAR      = "YEAR";
-    public static array $values = [ "DAY", "WEEK", "MONTH", "YEAR" ];
-
-    public static function isValid($value)
-    {
-        return in_array($value, self::$values);
-    }
+    case DAY       = "DAY";
+    case WEEK      = "WEEK";
+    case MONTH     = "MONTH";
+    case YEAR      = "YEAR";
 }
