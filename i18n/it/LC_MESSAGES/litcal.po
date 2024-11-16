@@ -9,10 +9,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-11-16 19:24+0000\n"
-"PO-Revision-Date: 2024-11-03 16:24+0000\n"
-"Last-Translator: Weblate Admin <admin@example.com>\n"
+"PO-Revision-Date: 2024-11-16 19:28+0000\n"
+"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
 "Language: it\n"
@@ -1066,7 +1066,7 @@ msgstr "feria"
 #. translators: liturgical rank 'WEEKDAY' in abbreviated form
 #: src/Enum/LitGrade.php:152
 msgid "w"
-msgstr ""
+msgstr "f"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:157
@@ -1078,7 +1078,7 @@ msgstr "Commemorazione"
 #. translators: liturgical rank 'COMMEMORATION' in abbreviated form
 #: src/Enum/LitGrade.php:159
 msgid "m*"
-msgstr ""
+msgstr "mf*"
 
 #. translators: liturgical rank. Keep lowercsase
 #: src/Enum/LitGrade.php:164
@@ -1090,7 +1090,7 @@ msgstr "memoria facoltativa"
 #. translators: liturgical rank 'OPTIONAL MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:166
 msgid "m"
-msgstr ""
+msgstr "mf"
 
 #. translators: liturgical rank. Keep Capitalized
 #: src/Enum/LitGrade.php:171
@@ -1100,7 +1100,7 @@ msgstr "Memoria"
 #. translators: liturgical rank 'MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:173
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:178
@@ -1110,7 +1110,7 @@ msgstr "FESTA"
 #. translators: liturgical rank 'FEAST' in abbreviated form
 #: src/Enum/LitGrade.php:180
 msgid "F"
-msgstr ""
+msgstr "F"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:185
@@ -1120,7 +1120,7 @@ msgstr "FESTA DEL SIGNORE"
 #. translators: liturgical rank 'FEAST OF THE LORD' in abbreviated form
 #: src/Enum/LitGrade.php:187
 msgid "F✝"
-msgstr ""
+msgstr "F✝"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:192
@@ -1130,7 +1130,7 @@ msgstr "SOLENNITÀ"
 #. translators: liturgical rank 'SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:194
 msgid "S"
-msgstr ""
+msgstr "S"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:199
@@ -1140,7 +1140,7 @@ msgstr "celebrazione con precedenza sulle solennità"
 #. translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:201
 msgid "S✝"
-msgstr ""
+msgstr "S✝"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:25
