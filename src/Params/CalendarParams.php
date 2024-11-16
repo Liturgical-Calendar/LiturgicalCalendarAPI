@@ -350,7 +350,7 @@ class CalendarParams
         if (in_array($value, $this->calendars->national_calendars_keys)) {
             $this->NationalCalendar = $value;
         } else {
-            $validVals = implode(', ', $this->calendars->national_calendars);
+            $validVals = implode(', ', $this->calendars->national_calendars_keys);
             $description = "Invalid National calendar `{$value}`, valid national calendars are: $validVals.";
             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
         }
