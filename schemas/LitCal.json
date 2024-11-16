@@ -204,9 +204,10 @@
                     "StsBasilGreg"
                 ]
             },
-            "litcal": {
-                "Advent1_vigil": {
+            "litcal": [
+                {
                     "event_idx": 1076,
+                    "event_key": "Advent1_vigil",
                     "name": "Dominica Prima Adventus Missa in Vigilia",
                     "date": 1701475200,
                     "color": [
@@ -218,6 +219,7 @@
                     "type": "mobile",
                     "grade": 7,
                     "grade_lcl": "celebratio altioris ordinis quam sollemnitatis",
+                    "grade_abbr": "S✝",
                     "grade_display": "",
                     "common": [],
                     "common_lcl": "",
@@ -235,8 +237,9 @@
                     "liturgical_season": "ADVENT",
                     "liturgical_season_lcl": "Tempus Adventus"
                 },
-                "Advent1": {
+                {
                     "event_idx": 583,
+                    "event_key": "Advent1",
                     "name": "Dominica Prima Adventus",
                     "date": 1701561600,
                     "color": [
@@ -248,6 +251,7 @@
                     "type": "mobile",
                     "grade": 7,
                     "grade_lcl": "celebratio altioris ordinis quam sollemnitatis",
+                    "grade_abbr": "S✝",
                     "grade_display": "",
                     "common": [],
                     "common_lcl": "",
@@ -267,7 +271,7 @@
                     "liturgical_season": "ADVENT",
                     "liturgical_season_lcl": "Tempus Adventus"
                 }
-            },
+            ],
             "messages": [
                 "The Solemnity 'Sancti Ioseph Sponsi Beatæ Mariæ Virginis' falls on Dominica IV in Quadragesima in the year 2023, the celebration has been transferred to the following Monday (20 Martius) as per the <a href=\"http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/1990/284-285.html\">Decree of the Congregation for Divine Worship</a>.",
                 "'Dominica XVIII «Per Annum»' is superseded by the FESTUM DOMINI 'In Transfiguratione Domini' in the year 2023."
@@ -332,6 +336,9 @@
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                 },
                 "grade_lcl": {
+                    "type": "string"
+                },
+                "grade_abbr": {
                     "type": "string"
                 },
                 "grade_display": {
@@ -412,6 +419,8 @@
                 "color_lcl",
                 "type",
                 "grade",
+                "grade_lcl",
+                "grade_abbr",
                 "grade_display",
                 "common",
                 "common_lcl",
@@ -463,6 +472,9 @@
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitGrade"
                 },
                 "grade_lcl": {
+                    "type": "string"
+                },
+                "grade_abbr": {
                     "type": "string"
                 },
                 "grade_display": {
@@ -546,6 +558,8 @@
                 "color_lcl",
                 "type",
                 "grade",
+                "grade_lcl",
+                "grade_abbr",
                 "grade_display",
                 "common",
                 "common_lcl",
