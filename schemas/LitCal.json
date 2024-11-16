@@ -397,6 +397,11 @@
                 },
                 "liturgical_season_lcl": {
                     "type": "string"
+                },
+                "psalter_week": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 4
                 }
             },
             "required": [
@@ -421,7 +426,8 @@
                 "is_vigil_mass",
                 "is_vigil_for",
                 "liturgical_season",
-                "liturgical_season_lcl"
+                "liturgical_season_lcl",
+                "psalter_week"
             ],
             "additionalProperties": false
         },
@@ -527,7 +533,9 @@
                     "type": "boolean"
                 },
                 "psalter_week": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 4
                 }
             },
             "required": [
@@ -550,7 +558,8 @@
                 "day_of_the_week_short",
                 "day_of_the_week_long",
                 "liturgical_season",
-                "liturgical_season_lcl"
+                "liturgical_season_lcl",
+                "psalter_week"
             ],
             "additionalProperties": false
         },
