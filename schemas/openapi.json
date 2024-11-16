@@ -4788,6 +4788,15 @@
                       "SOLEMNITY"
                     ]
                   },
+                  "GradeAbbr": {
+                    "description": "The logical importance of the celebration, represented in abbreviated human readable form and localized according to the current requested locale",
+                    "type": "string",
+                    "examples": [
+                      "w",
+                      "F",
+                      "S"
+                    ]
+                  },
                   "DisplayGrade": {
                     "type": "string",
                     "description": "will often be empty, in which case the ***grade*** or ***gradeLcl*** properties can be used, for the purpose of displaying the rank of the current liturgical event. If non empty, will contain the localized rank of the liturgical event and should be used instead of the ***grade*** or ***gradeLcl*** properties for display purposes"
