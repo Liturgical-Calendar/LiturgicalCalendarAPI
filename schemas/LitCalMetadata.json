@@ -121,6 +121,12 @@
                     "items": {
                         "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/WiderRegionNames"
                     }
+                },
+                "locales": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
+                    }
                 }
             },
             "required": [
@@ -130,7 +136,8 @@
                 "diocesan_calendars_keys",
                 "diocesan_groups",
                 "wider_regions",
-                "wider_regions_keys"
+                "wider_regions_keys",
+                "locales"
             ],
             "additionalProperties": false
         },
