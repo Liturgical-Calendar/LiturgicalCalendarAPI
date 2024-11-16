@@ -13,15 +13,76 @@ use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\ReturnType;
 use LiturgicalCalendar\Api\Enum\Route;
 
+/**
+ * This class provides a WebSocket-based interface for executing various tests
+ * of the Liturgical Calendar API, such as JSON schema validation and unit tests.
+ *
+ * @package LiturgicalCalendar\Api
+ * @author  John Romano D'Orazio <priest@johnromanodorazio.com>
+ * @license https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
+ * @version 3.9
+ * @link    https://litcal.johnromanodorazio.com
+ */
 class Health implements MessageComponentInterface
 {
-    protected $clients;
+    /**
+     * A collection of connected clients.
+     *
+     * @var \SplObjectStorage
+     */
+    protected \SplObjectStorage $clients;
+
+    /**
+     * The path that the health check will use to query the API.
+     *
+     * @var string $REQPATH
+     */
     private const REQPATH = API_BASE_PATH . Route::CALENDAR->value;
+
+    /**
+     * Array of actions that the Health endpoint can execute.
+     * Each key is an action name. The value is an array of strings that represent the names of the
+     * parameters that the action requires.
+     *
+     * @var array<string, string[]> $ACTION_PROPERTIES
+     */
     private const ACTION_PROPERTIES = [
         "executeValidation" => ["validate", "sourceFile", "category"],
-        "validateCalendar" => ["calendar", "year", "category", "responsetype"],
-        "executeUnitTest" => ["calendar", "year", "category", "test"]
+        "validateCalendar"  => ["calendar", "year", "category", "responsetype"],
+        "executeUnitTest"   => ["calendar", "year", "category", "test"]
     ];
+
+    /**
+     * Mapping of data file paths to the LitSchema constants that their JSON data should validate against.
+     * The paths are relative to the root of the project. The LitSchema constants are used to determine
+     * which schema to use when validating the JSON data.
+     *
+     * @var string[] $DATA_PATH_TO_SCHEMA
+     */
+    public const DATA_PATH_TO_SCHEMA = [
+        "data/missals/propriumdetempore/propriumdetempore.json"              => LitSchema::PROPRIUMDETEMPORE,
+        "data/missals/propriumdesanctis_1970/propriumdesanctis_1970.json"    => LitSchema::PROPRIUMDESANCTIS,
+        "data/missals/propriumdesanctis_2002/propriumdesanctis_2002.json"    => LitSchema::PROPRIUMDESANCTIS,
+        "data/missals/propriumdesanctis_2008/propriumdesanctis_2008.json"    => LitSchema::PROPRIUMDESANCTIS,
+        "data/missals/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json"
+                                                                             => LitSchema::PROPRIUMDESANCTIS,
+        "data/missals/propriumdesanctis_US_2011/propriumdesanctis_US_2011"   => LitSchema::PROPRIUMDESANCTIS,
+        "data/nations/index.json"                                            => LitSchema::INDEX,
+        API_BASE_PATH . '/calendars'                                         => LitSchema::METADATA,
+        API_BASE_PATH . '/decrees'                                           => LitSchema::DECREES,
+        API_BASE_PATH . '/events'                                            => LitSchema::EVENTS,
+        API_BASE_PATH . '/tests'                                             => LitSchema::TESTS,
+        API_BASE_PATH . '/easter'                                            => LitSchema::EASTER,
+        API_BASE_PATH . '/missals'                                           => LitSchema::MISSALS,
+        API_BASE_PATH . '/data'                                              => LitSchema::DATA,
+        API_BASE_PATH . '/schemas'                                           => LitSchema::SCHEMAS
+    ];
+
+    /**
+     * Called when a new client connection is established.
+     *
+     * This stores the new connection to send messages to later.
+     */
     public function onOpen(ConnectionInterface $conn)
     {
         // Store the new connection to send messages to later
@@ -30,6 +91,17 @@ class Health implements MessageComponentInterface
         echo "New connection! ({$conn->resourceId})\n";
     }
 
+    /**
+     * Validates the properties of a message object.
+     *
+     * This function checks the properties of a given message object to ensure
+     * they match the expected properties defined in ACTION_PROPERTIES for the
+     * specified action. If any expected property is missing from the message
+     * object, the function returns false, indicating the message is invalid.
+     *
+     * @param object $message The message object to validate.
+     * @return bool True if all required properties are present, false otherwise.
+     */
     private static function validateMessageProperties(object $message): bool
     {
         $valid = true;
@@ -41,6 +113,16 @@ class Health implements MessageComponentInterface
         return $valid;
     }
 
+    /**
+     * Handle an incoming message.
+     *
+     * This function is called whenever a user sends a message to the WebSocket
+     * server. It is responsible for parsing the message, validating it, and then
+     * executing the action specified.
+     *
+     * @param ConnectionInterface $from The user who sent the message
+     * @param string $msg The message that was sent
+     */
     public function onMessage(ConnectionInterface $from, $msg)
     {
         echo sprintf('Receiving message "%s" from connection %d', $msg, $from->resourceId);
@@ -81,6 +163,16 @@ class Health implements MessageComponentInterface
         }
     }
 
+    /**
+     * Handles the closure of a connection.
+     *
+     * This method is invoked when a connection is closed.
+     * It detaches the connection from the clients list and
+     * logs a message indicating the disconnection.
+     *
+     * @param ConnectionInterface $conn The connection that was closed.
+     * @return void
+     */
     public function onClose(ConnectionInterface $conn)
     {
         // The connection is closed, remove it, as we can no longer send it messages
@@ -89,12 +181,28 @@ class Health implements MessageComponentInterface
         echo "Connection {$conn->resourceId} has disconnected\n";
     }
 
+    /**
+     * Handles errors that occur on a connection.
+     *
+     * Logs the error message and closes the connection.
+     *
+     * @param ConnectionInterface $conn The connection on which the error occurred
+     * @param \Exception $e The exception that was thrown
+     */
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
         echo "An error has occurred: {$e->getMessage()}\n";
         $conn->close();
     }
 
+    /**
+     * Sends a message to a client.
+     *
+     * Only the client that sent the original message will receive the response.
+     *
+     * @param ConnectionInterface $from The client that sent the original message.
+     * @param string|\stdClass $msg The message to send back to the client.
+     */
     private function sendMessage(ConnectionInterface $from, string|\stdClass $msg)
     {
         if (gettype($msg) !== 'string') {
@@ -108,30 +216,31 @@ class Health implements MessageComponentInterface
         }
     }
 
-    public const DATA_PATH_TO_SCHEMA = [
-        "data/missals/propriumdetempore/propriumdetempore.json"              => LitSchema::PROPRIUMDETEMPORE,
-        "data/missals/propriumdesanctis_1970/propriumdesanctis_1970.json"    => LitSchema::PROPRIUMDESANCTIS,
-        "data/missals/propriumdesanctis_2002/propriumdesanctis_2002.json"    => LitSchema::PROPRIUMDESANCTIS,
-        "data/missals/propriumdesanctis_2008/propriumdesanctis_2008.json"    => LitSchema::PROPRIUMDESANCTIS,
-        "data/missals/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json"
-                                                                             => LitSchema::PROPRIUMDESANCTIS,
-        "data/missals/propriumdesanctis_US_2011/propriumdesanctis_US_2011"   => LitSchema::PROPRIUMDESANCTIS,
-        "data/nations/index.json"                                            => LitSchema::INDEX,
-        API_BASE_PATH . '/calendars'                                         => LitSchema::METADATA,
-        API_BASE_PATH . '/decrees'                                           => LitSchema::DECREES,
-        API_BASE_PATH . '/events'                                            => LitSchema::EVENTS,
-        API_BASE_PATH . '/tests'                                             => LitSchema::TESTS,
-        API_BASE_PATH . '/easter'                                            => LitSchema::EASTER,
-        API_BASE_PATH . '/missals'                                           => LitSchema::MISSALS,
-        API_BASE_PATH . '/data'                                              => LitSchema::DATA,
-        API_BASE_PATH . '/schemas'                                           => LitSchema::SCHEMAS
-    ];
-
+    /**
+     * Initializes the Health object with an empty SplObjectStorage.
+     *
+     * The SplObjectStorage is used to store client connections.
+     */
     public function __construct()
     {
         $this->clients = new \SplObjectStorage();
     }
 
+    /**
+     * Returns the appropriate schema for the given category and dataPath.
+     * If dataPath is null, it will return the schema for the category.
+     * If dataPath is not null, it will return the schema for the dataPath.
+     * If the category is 'universalcalendar', it will return the schema from the DATA_PATH_TO_SCHEMA array.
+     * If the category is 'nationalcalendar', 'diocesancalendar', 'widerregioncalendar', or 'propriumdesanctis',
+     * it will return the corresponding schema constant.
+     * If the category is 'resourceDataCheck', it will return the schema for the dataPath if it matches one of the patterns,
+     * otherwise it will return the schema from the DATA_PATH_TO_SCHEMA array.
+     * If the category is not recognized, it will return null.
+     *
+     * @param string $category The category of the data.
+     * @param string|null $dataPath The path to the data.
+     * @return string|null The schema for the given category and dataPath, or null if the category is not recognized.
+     */
     private static function retrieveSchemaForCategory(string $category, ?string $dataPath = null): ?string
     {
         switch ($category) {
@@ -172,6 +281,17 @@ class Health implements MessageComponentInterface
         return null;
     }
 
+    /**
+     * Validate a data file by checking that it exists and that it is valid JSON that conforms to a specific schema.
+     *
+     * @param object $validation The validation object. It should have the following properties:
+     * - sourceFile: a string, the path to the data file
+     * - validate: an object with the following properties:
+     *   - file-exists: a string, the class name to add to the message if the file exists
+     *   - json-valid: a string, the class name to add to the message if the file is valid JSON
+     *   - schema-valid: a string, the class name to add to the message if the file is valid against the schema
+     * @param ConnectionInterface $to The connection to send the validation message to
+     */
     private function executeValidation(object $validation, ConnectionInterface $to)
     {
         $dataPath = $validation->sourceFile;
@@ -219,6 +339,13 @@ class Health implements MessageComponentInterface
         }
     }
 
+    /**
+     * Takes an array of LIBXML errors and an array of XML lines
+     * and returns a string of the errors with line numbers and column numbers.
+     * @param array $errors Array of LIBXML errors
+     * @param array $xml Array of strings, each string is a line in the XML document
+     * @return string The errors with line numbers and column numbers
+     */
     private static function retrieveXmlErrors(array $errors, array $xml): string
     {
         $return = [];
@@ -246,7 +373,21 @@ class Health implements MessageComponentInterface
         return implode('&#013;', $return);
     }
 
-    private function validateCalendar(string $Calendar, int $Year, string $category, string $responseType, ConnectionInterface $to): void
+    /**
+     * Validates the specified liturgical calendar for a given year and category,
+     * and sends the validation results to the specified connection.
+     *
+     * @param string $calendar The calendar identifier (e.g., 'VA' for Vatican).
+     * @param int $year The year for which the calendar is to be validated.
+     * @param string $category The type of calendar (e.g., 'nationalcalendar', 'diocesancalendar').
+     * @param string $responseType The response format type (e.g., 'JSON', 'XML', 'ICS', 'YML').
+     * @param ConnectionInterface $to The connection to which messages about the validation process are sent.
+     *
+     * This function retrieves the calendar data from a remote source based on the given parameters
+     * and validates it against the appropriate schema. It supports multiple response types, including
+     * XML, ICS, YML, and JSON. Validation results are sent as messages to the provided connection interface.
+     */
+    private function validateCalendar(string $calendar, int $year, string $category, string $responseType, ConnectionInterface $to): void
     {
         //get the index of the responsetype from the ReturnType class
         $responseTypeIdx = array_search($responseType, ReturnType::$values);
@@ -259,15 +400,15 @@ class Health implements MessageComponentInterface
             ]
         ];
         $context = stream_context_create($opts);
-        if ($Calendar === 'VA') {
-            $req = "/$Year?year_type=CIVIL";
+        if ($calendar === 'VA') {
+            $req = "/$year?year_type=CIVIL";
         } else {
             switch ($category) {
                 case 'nationalcalendar':
-                    $req = "/nation/$Calendar/$Year?year_type=CIVIL";
+                    $req = "/nation/$calendar/$year?year_type=CIVIL";
                     break;
                 case 'diocesancalendar':
-                    $req = "/diocese/$Calendar/$Year?year_type=CIVIL";
+                    $req = "/diocese/$calendar/$year?year_type=CIVIL";
                     break;
                 default:
                     //we shouldn't ever get any other categories
@@ -277,8 +418,8 @@ class Health implements MessageComponentInterface
         if ($data !== false) {
             $message = new \stdClass();
             $message->type = "success";
-            $message->text = "The $category of $Calendar for the year $Year exists";
-            $message->classes = ".calendar-$Calendar.file-exists.year-$Year";
+            $message->text = "The $category of $calendar for the year $year exists";
+            $message->classes = ".calendar-$calendar.file-exists.year-$year";
             $this->sendMessage($to, $message);
 
             switch ($responseType) {
@@ -294,16 +435,16 @@ class Health implements MessageComponentInterface
                         $errors = libxml_get_errors();
                         $errorString = self::retrieveXmlErrors($errors, $xmlArr);
                         libxml_clear_errors();
-                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL "
+                        $message->text = "There was an error decoding the $category of $calendar for the year $year from the URL "
                                         . self::REQPATH . $req . " as XML: " . $errorString;
-                        $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $message->classes = ".calendar-$calendar.json-valid.year-$year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
                     } else {
                         $message = new \stdClass();
                         $message->type = "success";
-                        $message->text = "The $category of $Calendar for the year $Year was successfully decoded as XML";
-                        $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $message->text = "The $category of $calendar for the year $year was successfully decoded as XML";
+                        $message->classes = ".calendar-$calendar.json-valid.year-$year";
                         $this->sendMessage($to, $message);
 
                         $validationResult = $xml->schemaValidate(API_BASE_PATH . '/schemas/LiturgicalCalendar.xsd');
@@ -311,10 +452,10 @@ class Health implements MessageComponentInterface
                             $message = new \stdClass();
                             $message->type = "success";
                             $message->text = sprintf(
-                                "The $category of $Calendar for the year $Year was successfully validated against the Schema %s",
+                                "The $category of $calendar for the year $year was successfully validated against the Schema %s",
                                 API_BASE_PATH . "/schemas/LiturgicalCalendar.xsd"
                             );
-                            $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
+                            $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
                         } else {
                             $errors = libxml_get_errors();
@@ -323,7 +464,7 @@ class Health implements MessageComponentInterface
                             $message = new \stdClass();
                             $message->type = "error";
                             $message->text = $errorString;
-                            $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
+                            $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
                         }
                     }
@@ -337,8 +478,8 @@ class Health implements MessageComponentInterface
                     if ($vcalendar instanceof VObject\Document) {
                         $message = new \stdClass();
                         $message->type = "success";
-                        $message->text = "The $category of $Calendar for the year $Year was successfully decoded as ICS";
-                        $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $message->text = "The $category of $calendar for the year $year was successfully decoded as ICS";
+                        $message->classes = ".calendar-$calendar.json-valid.year-$year";
                         $this->sendMessage($to, $message);
 
                         $result = $vcalendar->validate();
@@ -346,10 +487,10 @@ class Health implements MessageComponentInterface
                             $message = new \stdClass();
                             $message->type = "success";
                             $message->text = sprintf(
-                                "The $category of $Calendar for the year $Year was successfully validated according the iCalendar Schema %s",
+                                "The $category of $calendar for the year $year was successfully validated according the iCalendar Schema %s",
                                 "https://tools.ietf.org/html/rfc5545"
                             );
-                            $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
+                            $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
                         } else {
                             $message = new \stdClass();
@@ -361,15 +502,15 @@ class Health implements MessageComponentInterface
                                 $errorStrings[] = $errorLevel . ": " . $error['message'];// . " at line {$error['node']->lineIndex} ({$error['node']->lineString})"
                             }
                             $message->text = implode('&#013;', $errorStrings) || "validation encountered " . count($result) . " errors";
-                            $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
+                            $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
                         }
                     } else {
                         $message = new \stdClass();
                         $message->type = "error";
-                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL "
+                        $message->text = "There was an error decoding the $category of $calendar for the year $year from the URL "
                                         . self::REQPATH . $req . " as ICS: parsing resulted in type " . gettype($vcalendar) . " | " . $vcalendar;
-                        $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $message->classes = ".calendar-$calendar.json-valid.year-$year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
                     }
@@ -380,28 +521,28 @@ class Health implements MessageComponentInterface
                         if ($yamlData) {
                             $message = new \stdClass();
                             $message->type = "success";
-                            $message->text = "The $category of $Calendar for the year $Year was successfully decoded as YAML";
-                            $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                            $message->text = "The $category of $calendar for the year $year was successfully decoded as YAML";
+                            $message->classes = ".calendar-$calendar.json-valid.year-$year";
                             $this->sendMessage($to, $message);
 
                             $validationResult = $this->validateDataAgainstSchema($yamlData, LitSchema::LITCAL);
                             if (gettype($validationResult) === 'boolean' && $validationResult === true) {
                                 $message = new \stdClass();
                                 $message->type = "success";
-                                $message->text = "The $category of $Calendar for the year $Year was successfully validated against the Schema " . LitSchema::LITCAL;
-                                $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
+                                $message->text = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL;
+                                $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                                 $this->sendMessage($to, $message);
                             } elseif (gettype($validationResult === 'object')) {
-                                $validationResult->classes = ".calendar-$Calendar.schema-valid.year-$Year";
+                                $validationResult->classes = ".calendar-$calendar.schema-valid.year-$year";
                                 $this->sendMessage($to, $validationResult);
                             }
                         }
                     } catch (\Exception $ex) {
                         $message = new \stdClass();
                         $message->type = "error";
-                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL "
+                        $message->text = "There was an error decoding the $category of $calendar for the year $year from the URL "
                                         . self::REQPATH . $req . " as YAML: " . $ex->getMessage();
-                        $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $message->classes = ".calendar-$calendar.json-valid.year-$year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
                     }
@@ -412,27 +553,27 @@ class Health implements MessageComponentInterface
                     if (json_last_error() === JSON_ERROR_NONE) {
                         $message = new \stdClass();
                         $message->type = "success";
-                        $message->text = "The $category of $Calendar for the year $Year was successfully decoded as JSON";
-                        $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $message->text = "The $category of $calendar for the year $year was successfully decoded as JSON";
+                        $message->classes = ".calendar-$calendar.json-valid.year-$year";
                         $this->sendMessage($to, $message);
 
                         $validationResult = $this->validateDataAgainstSchema($jsonData, LitSchema::LITCAL);
                         if (gettype($validationResult) === 'boolean' && $validationResult === true) {
                             $message = new \stdClass();
                             $message->type = "success";
-                            $message->text = "The $category of $Calendar for the year $Year was successfully validated against the Schema " . LitSchema::LITCAL;
-                            $message->classes = ".calendar-$Calendar.schema-valid.year-$Year";
+                            $message->text = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL;
+                            $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
                         } elseif (gettype($validationResult === 'object')) {
-                            $validationResult->classes = ".calendar-$Calendar.schema-valid.year-$Year";
+                            $validationResult->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $validationResult);
                         }
                     } else {
                         $message = new \stdClass();
                         $message->type = "error";
-                        $message->text = "There was an error decoding the $category of $Calendar for the year $Year from the URL "
+                        $message->text = "There was an error decoding the $category of $calendar for the year $year from the URL "
                                         . self::REQPATH . $req . " as JSON: " . json_last_error_msg();
-                        $message->classes = ".calendar-$Calendar.json-valid.year-$Year";
+                        $message->classes = ".calendar-$calendar.json-valid.year-$year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
                     }
@@ -440,13 +581,22 @@ class Health implements MessageComponentInterface
         } else {
             $message = new \stdClass();
             $message->type = "error";
-            $message->text = "The $category of $Calendar for the year $Year does not exist at the URL " . self::REQPATH . $req;
-            $message->classes = ".calendar-$Calendar.file-exists.year-$Year";
+            $message->text = "The $category of $calendar for the year $year does not exist at the URL " . self::REQPATH . $req;
+            $message->classes = ".calendar-$calendar.file-exists.year-$year";
             $this->sendMessage($to, $message);
         }
     }
 
-    private function executeUnitTest(string $Test, string $Calendar, int $Year, string $category, ConnectionInterface $to): void
+    /**
+     * Executes a unit test for a given Liturgical Calendar test.
+     *
+     * @param string $test The name of the unit test to be executed.
+     * @param string $calendar The name of the calendar to be tested.
+     * @param int $year The year for which the test should be executed.
+     * @param string $category The type of calendar to be tested: nationalcalendar or diocesancalendar.
+     * @param ConnectionInterface $to The connection to which the test result should be sent.
+     */
+    private function executeUnitTest(string $test, string $calendar, int $year, string $category, ConnectionInterface $to): void
     {
         //get the index of the responsetype from the ReturnType class
         $responseTypeIdx = array_search("JSON", ReturnType::$values);
@@ -459,15 +609,15 @@ class Health implements MessageComponentInterface
             ]
         ];
         $context = stream_context_create($opts);
-        if ($Calendar === 'VA') {
-            $req = "/$Year?year_type=CIVIL";
+        if ($calendar === 'VA') {
+            $req = "/$year?year_type=CIVIL";
         } else {
             switch ($category) {
                 case 'nationalcalendar':
-                    $req = "/nation/$Calendar/$Year?year_type=CIVIL";
+                    $req = "/nation/$calendar/$year?year_type=CIVIL";
                     break;
                 case 'diocesancalendar':
-                    $req = "/diocese/$Calendar/$Year?year_type=CIVIL";
+                    $req = "/diocese/$calendar/$year?year_type=CIVIL";
                     break;
                 default:
                     //we shouldn't ever get any other categories
@@ -478,7 +628,7 @@ class Health implements MessageComponentInterface
         //  because this check already takes place in the validateCalendar test phase
         $jsonData = json_decode($data);
         if (json_last_error() === JSON_ERROR_NONE) {
-            $UnitTest = new LitTest($Test, $jsonData);
+            $UnitTest = new LitTest($test, $jsonData);
             if ($UnitTest->isReady()) {
                 $UnitTest->runTest();
             }
@@ -486,6 +636,14 @@ class Health implements MessageComponentInterface
         }
     }
 
+    /**
+     * Validate data against a specified schema.
+     *
+     * @param object|array $data The data to validate.
+     * @param string $schemaUrl The URL of the schema to validate against.
+     *
+     * @return bool|object Returns true if the data is valid, otherwise returns an error object with details.
+     */
     private function validateDataAgainstSchema(object|array $data, string $schemaUrl): bool|object
     {
         $res = false;
