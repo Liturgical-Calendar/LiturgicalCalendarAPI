@@ -57,6 +57,15 @@ _(See [usage.php#calSubscription](https://litcal.johnromanodorazio.com/usage.php
 * **IPHONE**: go to **`Phone Settings`** -> **`Accounts`** -> **`Add account`** -> **`Other`** -> **`Add Calendar`**, and paste in the endpoint URL with the desired parameters, (make sure you use **`ICS`** as value of the *`return_type`* parameter). And remember, if you omit the *`year`* parameter, it will use the current year. This should mean that as the iPhone Calendar continues to poll the calendar URL, on the turn of a new year new events should be created automatically for the new year.
 * **MICROSOFT OUTLOOK** *(tested with Outlook 2013)*: at the bottom of the screen, switch from **`Email`** view to **`Calendar`** view. On the ribbon of the **`Home`** menu item, click on **`Open calendar`** -> **`From the internet`**. Paste the endpoint URL with the desired parameters, (make sure you use **`ICS`** as value of the *`return_type`* parameter). And remember, if you omit the *`year`* parameter, it will use the current year. On the following screen, check the checkbox along the lines of "Poll this calendar in the interval suggested by the creator", which would mean that Outlook Calendar should poll the calendar URL once a day. This means that without the *`year`* parameter, on the turn of a new year new events should be created automatically for the new year. Make sure the Calendar is created in the **`Other calendars`** folder; if you find it under the **`Personal calendars`** folder, drag it and drop it onto the **`Other calendars`** folder, this should ensure that it is treated as a subscription internet calendar. You can manually trigger an update against the calendar URL by clicking on **`Send/receive all`** (from the **`SEND/RECEIVE`** menu item). One highlight of the calendar in Outlook is that it supports a minimal amount of HTML in the event description, so the event descriptions in the Liturgical Calendar are a little bit more "beautified" for Outlook.
 
+# Testing locally
+
+To test the API locally, you can use PHP's builtin server. However, you will need to spawn at least a couple of workers, since some routes will make a request internally to another route. For example, a request to the `/calendar` route will make a request internally to the `/calendars` route.
+
+Spawn at least two workers:
+```bash
+PHP_CLI_SERVER_WORKERS=2 php -S localhost:8000
+```
+
 # Translations
 
 <a href="https://translate.johnromanodorazio.com/engage/liturgical-calendar/">

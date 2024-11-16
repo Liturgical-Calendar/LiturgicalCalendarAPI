@@ -4292,7 +4292,7 @@ class Calendar
     private function generateResponse()
     {
         $SerializeableLitCal                                = new \stdClass();
-        $SerializeableLitCal->litcal                        = $this->Cal->getFestivities();
+        $SerializeableLitCal->litcal                        = $this->Cal->getFestivitiesCollection();
 
         $SerializeableLitCal->settings                      = new \stdClass();
         $SerializeableLitCal->settings->year                = $this->CalendarParams->Year;
