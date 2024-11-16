@@ -228,8 +228,8 @@ class Calendar
 
     public function __construct()
     {
-        $this->startTime        = hrtime(true);
-        $this->CacheDuration    = "_" . CacheDuration::MONTH . date("m");
+        $this->startTime     = hrtime(true);
+        $this->CacheDuration = "_" . CacheDuration::MONTH->value . date("m");
         self::$Core          = new Core();
     }
 
