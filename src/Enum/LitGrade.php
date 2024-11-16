@@ -196,7 +196,7 @@ class LitGrade
                 /**translators: liturgical rank. Keep lowercase  */
                 $grade = $this->locale === LitLocale::LATIN ? 'celebratio altioris ordinis quam sollemnitatis' : _("celebration with precedence over solemnities");
                 /**translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form */
-                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'S+'                : _("S+");
+                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'S✝'                : _("S✝");
                 $tags = ['<B><I>','</I></B>'];
                 break;
             default:
