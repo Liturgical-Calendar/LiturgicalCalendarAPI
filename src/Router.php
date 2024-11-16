@@ -21,6 +21,21 @@ class Router
 {
     public static array $allowedOrigins = [];
 
+    /**
+     * Set the allowed origins for Cross-Origin Resource Sharing (CORS).
+     *
+     * This function can read the allowed origins from a file that defines the
+     * ALLOWED_ORIGINS constant as an array of strings. If the file is not
+     * provided, the function will use the provided array of origins.
+     *
+     * If the file is provided, the function will merge the provided array of
+     * origins with the ones defined in the file. If the provided array is null,
+     * the function will use the array from the file.
+     *
+     * @param string|null $originsFile The path to the file that defines the allowed origins.
+     * @param array|null $origins The array of allowed origins.
+     * @return void
+     */
     public static function setAllowedOrigins(?string $originsFile = null, ?array $origins = null): void
     {
         if ($originsFile !== null && file_exists($originsFile)) {
@@ -42,6 +57,16 @@ class Router
         }
     }
 
+    /**
+     * @return array an array of strings where each string is a path segment of the request path
+     *
+     * Takes the REQUEST_URI and SCRIPT_NAME and parses out the request path segments
+     * by removing the API base path and any trailing slashes.
+     *
+     * For example, if the REQUEST_URI is '/api/dev/calendar/IT/2021' and the
+     * SCRIPT_NAME is '/api/dev/index.php', then this method will return
+     * ['calendar', 'IT', '2021']
+     */
     private static function buildRequestPathParts(): array
     {
         // 1) The script name will actually include the base path of the API (e.g. /api/{apiVersion}/index.php),
@@ -54,6 +79,15 @@ class Router
         // 4) remove any trailing slashes from the request path
         $requestPath = preg_replace('/\/$/', '', $requestPath);
         return explode('/', $requestPath);
+    }
+
+    public static function isLocalhost(): bool
+    {
+        $localhostAddresses = ['127.0.0.1', '::1'];
+        $localhostNames     = ['localhost', '127.0.0.1', '::1'];
+        return in_array($_SERVER['SERVER_ADDR'] ?? '', $localhostAddresses) ||
+               in_array($_SERVER['REMOTE_ADDR'] ?? '', $localhostAddresses) ||
+               in_array($_SERVER['SERVER_NAME'] ?? '', $localhostNames);
     }
 
     /**
