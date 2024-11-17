@@ -5,7 +5,7 @@
         "event_key": "StAdalbert",
         "name": "Sant'Adalberto, vescovo e martire",
         "grade": 2,
-        "grade_display": "",
+        "grade_display": null,
         "common": [
             "Martyrs:For One Martyr",
             "Pastors:For a Bishop"
@@ -29,7 +29,7 @@
         "event_key": "StLouisGrignonMontfort",
         "name": "San Luigi Grignon de Montfort",
         "grade": 2,
-        "grade_display": "",
+        "grade_display": null,
         "common": [
             "Pastors:For One Pastor"
         ],
@@ -51,7 +51,7 @@
         "event_key": "StPeterJulianEymard",
         "name": "San Pietro Giuliani, sacerdote",
         "grade": 2,
-        "grade_display": "",
+        "grade_display": null,
         "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Religious"
@@ -74,7 +74,7 @@
         "event_key": "StMaximilianKolbe",
         "name": "San Massimiliano Kolbe, sacerdote e martire",
         "grade": 3,
-        "grade_display": "",
+        "grade_display": null,
         "common": [
             "Proper"
         ],
@@ -97,7 +97,7 @@
         "event_key": "StPeterClaver",
         "name": "San Pietro Claver, sacerdote",
         "grade": 2,
-        "grade_display": "",
+        "grade_display": null,
         "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
@@ -120,7 +120,7 @@
         "event_key": "StAndrewKimTaegon",
         "name": "Santi Andrea Kim Taegon, sacerdote, Paolo Chong Hasang e compagni martiri",
         "grade": 3,
-        "grade_display": "",
+        "grade_display": null,
         "common": [
             "Proper"
         ],
@@ -142,7 +142,7 @@
         "event_key": "StsLawrenceRuiz",
         "name": "Santi Lorenzo Ruiz e compagni martiri",
         "grade": 2,
-        "grade_display": "",
+        "grade_display": null,
         "common": [
             "Martyrs:For Several Martyrs"
         ],
@@ -164,7 +164,7 @@
         "event_key": "StAndrewDungLac",
         "name": "Sant'Andrea Dung-Lac e compagni martiri",
         "grade": 3,
-        "grade_display": "",
+        "grade_display": null,
         "common": [
             "Proper"
         ],

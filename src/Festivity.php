@@ -22,7 +22,7 @@ class Festivity implements \JsonSerializable
     public array $color = [];
     public string $type;
     public int $grade;
-    public string $grade_display;
+    public ?string $grade_display;
     public array $common;  //"Proper" or specified common(s) of saints...
 
     /** The following properties are set externally, but may be optional and therefore may remain null */
@@ -36,9 +36,10 @@ class Festivity implements \JsonSerializable
     public ?string $liturgical_season = null;
 
     /** The following properties are set based on properties passed in the constructor or on properties set externally*/
-    public array $color_lcl;
+    private array $color_lcl;
     public string $grade_lcl;
-    public string $common_lcl;
+    private string $grade_abbr;
+    private string $common_lcl;
 
     private static string $locale   = LitLocale::LATIN;
     private static LitGrade $LitGrade;
@@ -55,53 +56,73 @@ class Festivity implements \JsonSerializable
         string $type = '???',
         int $grade = LitGrade::WEEKDAY,
         string|array $common = [ '???' ],
-        string $displayGrade = ''
+        ?string $displayGrade = null
     ) {
-        $this->idx          = self::$eventidx++;
-        $this->name         = $name;
-        $this->date         = $date; //DateTime object
-        if (is_array($color)) {
-            if (LitColor::areValid($color)) {
-                $this->color = $color;
-            }
-        } elseif (is_string($color)) {
-            $_color             = strtolower($color);
-            //the color string can contain multiple colors separated by a comma, when there are multiple commons to choose from for that festivity
-            $this->color        = strpos($_color, ",") && LitColor::areValid(explode(",", $_color)) ? explode(",", $_color) : ( LitColor::isValid($_color) ? [ $_color ] : [ '???' ] );
+        $this->idx           = self::$eventidx++;
+        $this->name          = $name;
+        $this->date          = $date; //DateTime object
+        if (is_string($color)) {
+            $color = [ $color ];
         }
-        $this->color_lcl    = array_map(fn($item) => LitColor::i18n($item, self::$locale), $this->color);
-        $_type              = strtolower($type);
-        $this->type         = LitFeastType::isValid($_type) ? $_type : '???';
-        $this->grade        = $grade >= LitGrade::WEEKDAY && $grade <= LitGrade::HIGHER_SOLEMNITY ? $grade : -1;
-        $this->grade_display = $displayGrade;
+        if (LitColor::areValid($color)) {
+            $this->color = $color;
+        }
+        $this->color_lcl     = array_map(fn($item) => LitColor::i18n($item, self::$locale), $this->color);
+        $_type               = strtolower($type);
+        $this->type          = LitFeastType::isValid($_type) ? $_type : '???';
+        $this->grade         = $grade >= LitGrade::WEEKDAY && $grade <= LitGrade::HIGHER_SOLEMNITY ? $grade : -1;
         $this->grade_lcl     = self::$LitGrade->i18n($this->grade, false);
+        $this->grade_abbr    = self::$LitGrade->i18n($this->grade, false, true);
+        $this->grade_display = $grade === LitGrade::HIGHER_SOLEMNITY ? '' : $displayGrade;
         //Festivity::debugWrite( "*** Festivity.php *** common vartype = " . gettype( $common ) );
         if (is_string($common)) {
-            //Festivity::debugWrite( "*** Festivity.php *** common vartype is string, value = $common" );
-            $this->common       = LitCommon::areValid(explode(",", $common)) ? explode(",", $common) : [];
-        } elseif (is_array($common)) {
-            //Festivity::debugWrite( "*** Festivity.php *** common vartype is array, value = " . implode( ', ', $common ) );
-            if (LitCommon::areValid($common)) {
-                $this->common = $common;
-            } else {
-                //Festivity::debugWrite( "*** Festivity.php *** common values have not passed the validity test!" );
-                $this->common = [];
-            }
+            $common = [ $common ];
         }
-        $this->common_lcl = self::$LitCommon->c($this->common);
+        //Festivity::debugWrite( "*** Festivity.php *** common vartype is array, value = " . implode( ', ', $common ) );
+        if (LitCommon::areValid($common)) {
+            $this->common = $common;
+            $this->common_lcl = self::$LitCommon->c($this->common);
+        } else {
+            //Festivity::debugWrite( "*** Festivity.php *** common values have not passed the validity test!" );
+            $this->common = [];
+            $this->common_lcl = '';
+        }
     }
+
+    /**
+     * Set the abbreviation for the grade of this festivity.
+     *
+     * @param string $abbreviation The abbreviation for the grade of this festivity.
+     * @return void
+     */
+    public function setGradeAbbreviation(string $abbreviation): void
+    {
+        $this->grade_abbr = $abbreviation;
+    }
+
     /*
     private static function debugWrite( string $string ) {
         file_put_contents( "debug.log", $string . PHP_EOL, FILE_APPEND );
     }
     */
 
-    /* * * * * * * * * * * * * * * * * * * * * * * * *
-     * Funzione statica di comparazione
-     * in vista dell'ordinamento di un array di oggetti Festivity
-     * Tiene conto non soltanto del valore della data,
-     * ma anche del grado della festa qualora ci fosse una concomitanza
-     * * * * * * * * * * * * * * * * * * * * * * * * * */
+    /**
+     * Compares two Festivity objects based on their date and grade.
+     *
+     * If the two Festivity objects have the same date, the comparison is based on their grade.
+     * If the two Festivity objects have the same grade, the comparison result is 0.
+     * If the two Festivity objects have different grades, the object with the higher grade is considered higher.
+     * If the two Festivity objects have different dates, the comparison is based on their date.
+     * If the two Festivity objects have different dates, the object with the later date is considered higher.
+     *
+     * @param Festivity $a The first Festivity object to compare.
+     * @param Festivity $b The second Festivity object to compare.
+     *
+     * @return int A value indicating the result of the comparison.
+     *  -1 if $a is less than $b
+     *   0 if $a is equal to $b
+     *   1 if $a is greater than $b
+     */
     public static function compDate(Festivity $a, Festivity $b)
     {
         if ($a->date == $b->date) {
@@ -121,12 +142,13 @@ class Festivity implements \JsonSerializable
      * - event_idx: the index of the event in the array of festivities
      * - name: the name of the festivity
      * - date: a PHP timestamp (seconds since the Unix Epoch) for the date of the festivity
-     * - color: the color of the festivity
+     * - color: the liturgical color of the festivity
      * - color_lcl: the color of the festivity, translated according to the current locale
-     * - type: the type of the festivity
-     * - grade: the grade of the festivity
+     * - type: the type of the festivity (mobile or fixed)
+     * - grade: the grade of the festivity (0=weekday, 1=commemoration, 2=optional memorial, 3=memorial, 4=feast, 5=feast of the Lord, 6=solemnity, 7=higher solemnity)
      * - grade_lcl: the grade of the festivity, translated according to the current locale
-     * - grade_display: a boolean indicating whether the grade of the festivity should be displayed
+     * - grade_abbr: the abbreviated grade of the festivity, translated according to the current locale
+     * - grade_display: a nullable string which, when not null, takes precedence over `grade_lcl` or `grade_abbr` for how the liturgical grade should be displayed
      * - common: an array of common prayers associated with the festivity
      * - common_lcl: an array of common prayers associated with the festivity, translated according to the current locale
      * - day_of_the_week_iso8601: the day of the week of the festivity, in the ISO 8601 format (1 for Monday, 7 for Sunday)
@@ -159,6 +181,7 @@ class Festivity implements \JsonSerializable
             'type'                    => $this->type,
             'grade'                   => $this->grade,
             'grade_lcl'               => $this->grade_lcl,
+            'grade_abbr'              => $this->grade_abbr,
             'grade_display'           => $this->grade_display,
             'common'                  => $this->common,
             'common_lcl'              => $this->common_lcl,
