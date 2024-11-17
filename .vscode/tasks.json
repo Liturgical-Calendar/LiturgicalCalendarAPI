@@ -1,0 +1,42 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "launch-browser",
+            "type": "shell",
+            "windows": {
+                "command": "${command:workbench.action.terminal.sendSequence}",
+                "args": [
+                {
+                    "text": "start http://localhost:8000\n" // For Windows
+                }
+                ],
+                "problemMatcher": []
+            },
+            "linux": {
+                "command": "/bin/bash",
+                "args": [
+                    "-c",
+                    "if grep -q microsoft /proc/version; then powershell.exe Start-Process http://localhost:8000; else xdg-open http://localhost:8000; fi"
+                  ],
+                "problemMatcher": []
+            },
+            "osx": {
+                "command": "open http://localhost:8000", // For macOS
+                "problemMatcher": []
+            }
+        },
+        {
+            "label": "php-server",
+            "type": "shell",
+            "command": "PHP_CLI_SERVER_WORKERS=2 php -S localhost:8000",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "launch-browser"
+            ]
+        }
+    ]
+}

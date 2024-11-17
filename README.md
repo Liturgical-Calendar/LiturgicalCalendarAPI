@@ -66,6 +66,8 @@ Spawn at least two workers:
 PHP_CLI_SERVER_WORKERS=2 php -S localhost:8000
 ```
 
+For convenience when using VSCode, a `tasks.json` has been defined so that you can simply type <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> (<kbd>CMD</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> on MacOS) to start the PHP builtin server and open the browser.
+
 # Translations
 
 <a href="https://translate.johnromanodorazio.com/engage/liturgical-calendar/">
