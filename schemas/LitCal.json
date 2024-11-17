@@ -342,7 +342,7 @@
                     "type": "string"
                 },
                 "grade_display": {
-                    "type": "string"
+                    "type": ["string", "null"]
                 },
                 "common": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitCommon"
@@ -478,7 +478,7 @@
                     "type": "string"
                 },
                 "grade_display": {
-                    "type": "string"
+                    "type": ["string", "null"]
                 },
                 "common": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/LitCommon"

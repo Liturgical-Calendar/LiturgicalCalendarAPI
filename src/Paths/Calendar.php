@@ -27,6 +27,13 @@ use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\YearType;
 use LiturgicalCalendar\Api\Params\CalendarParams;
 
+/**
+ * Class Calendar
+ *
+ * This class is responsible for generating the Liturgical Calendar.
+ *
+ * @package LiturgicalCalendar\Api
+ */
 class Calendar
 {
     public const API_VERSION                        = '3.9';
@@ -226,6 +233,12 @@ class Calendar
         'da'  //Danish
     ];
 
+
+    /**
+     * Constructor for the Calendar class.
+     *
+     * The constructor for the Calendar class has no parameters. It initializes a new instance of the Core class, and sets a cache duration of one month.
+     */
     public function __construct()
     {
         $this->startTime     = hrtime(true);
@@ -1588,7 +1601,7 @@ class Calendar
         }
 
         //let's add a displayGrade property for AllSouls so applications don't have to worry about fixing it
-        $this->Cal->setProperty("AllSouls", 'grade_display', $this->LitGrade->i18n(LitGrade::COMMEMORATION, false));
+        $this->Cal->setProperty("AllSouls", 'grade_display', ''); //$this->LitGrade->i18n(LitGrade::COMMEMORATION, false)
 
         $this->Cal->addSolemnitiesLordBVM([
             "Easter",
@@ -1662,6 +1675,7 @@ class Calendar
             $festivity = new Festivity($row->name, $currentFeastDate, $row->color, LitFeastType::FIXED, $row->grade, $row->common);
             if ($row->event_key === 'DedicationLateran') {
                 $festivity->grade_display = $this->LitGrade->i18n(LitGrade::FEAST, false);
+                $festivity->setGradeAbbreviation($this->LitGrade->i18n(LitGrade::FEAST, false, true));
             }
             $this->Cal->addFestivity($row->event_key, $festivity);
         }
@@ -1753,7 +1767,15 @@ class Calendar
             )->modify($this->BaptismLordMod)->modify('next Sunday')->add(new \DateInterval('P' . ( ( $ordSun - 1 ) * 7 ) . 'D'));
             $ordSun++;
             if (!$this->Cal->inSolemnities($firstOrdinary)) {
-                $this->Cal->addFestivity("OrdSunday" . $ordSun, new Festivity($this->PropriumDeTempore[ "OrdSunday" . $ordSun ][ "name" ], $firstOrdinary, LitColor::GREEN, LitFeastType::MOBILE, LitGrade::FEAST_LORD));
+                $this->Cal->addFestivity("OrdSunday" . $ordSun, new Festivity(
+                    $this->PropriumDeTempore[ "OrdSunday" . $ordSun ][ "name" ],
+                    $firstOrdinary,
+                    LitColor::GREEN,
+                    LitFeastType::MOBILE,
+                    LitGrade::FEAST_LORD,
+                    [],
+                    ''
+                ));
             } else {
                 $this->Messages[] = sprintf(
                     /**translators: 1: Festivity name, 2: Superseding Festivity grade, 3: Superseding Festivity name, 4: Requested calendar year */
@@ -1786,7 +1808,15 @@ class Calendar
             )->modify('last Sunday')->sub(new \DateInterval('P' . ( ++$ordSunCycle * 7 ) . 'D'));
             $ordSun--;
             if (!$this->Cal->inSolemnities($lastOrdinary)) {
-                $this->Cal->addFestivity("OrdSunday" . $ordSun, new Festivity($this->PropriumDeTempore[ "OrdSunday" . $ordSun ][ "name" ], $lastOrdinary, LitColor::GREEN, LitFeastType::MOBILE, LitGrade::FEAST_LORD));
+                $this->Cal->addFestivity("OrdSunday" . $ordSun, new Festivity(
+                    $this->PropriumDeTempore[ "OrdSunday" . $ordSun ][ "name" ],
+                    $lastOrdinary,
+                    LitColor::GREEN,
+                    LitFeastType::MOBILE,
+                    LitGrade::FEAST_LORD,
+                    [],
+                    ''
+                ));
             } else {
                 $this->Messages[] = sprintf(
                     /**translators: 1: Festivity name, 2: Superseding Festivity grade, 3: Superseding Festivity name, 4: Requested calendar year */
@@ -3594,7 +3624,7 @@ class Calendar
                                              * 7. Requested calendar year
                                              */
                                             $this->NationalData->metadata->region . ": " . _('The %1$s \'%2$s\' (%3$s), added to the national calendar in the %4$s, is superseded by the %5$s \'%6$s\' in the year %7$d'),
-                                            $row->grade_display !== "" ? $row->grade_display : $this->LitGrade->i18n($row->grade, false),
+                                            $row->grade_display !== null && $row->grade_display !== "" ? $row->grade_display : $this->LitGrade->i18n($row->grade, false),
                                             '<i>' . $row->name . '</i>',
                                             $this->dayAndMonth->format($currentFeastDate->format('U')),
                                             RomanMissal::getName($missal),
@@ -4201,26 +4231,21 @@ class Calendar
         foreach ($SerializeableLitCal->litcal as $FestivityKey => $CalEvent) {
             $displayGrade = "";
             $displayGradeHTML = "";
-            if ($FestivityKey === 'AllSouls') {
-                $displayGrade = $this->LitGrade->i18n(LitGrade::COMMEMORATION, false);
-                $displayGradeHTML = $this->LitGrade->i18n(LitGrade::COMMEMORATION, true);
-            } elseif ($FestivityKey === 'DedicationLateran') {
-                $displayGrade = $this->LitGrade->i18n(LitGrade::FEAST, false);
+            if ($CalEvent->display_grade !== null) {
+                $displayGrade = $CalEvent->display_grade;
+            }
+            if ($FestivityKey === 'DedicationLateran') {
                 $displayGradeHTML = $this->LitGrade->i18n(LitGrade::FEAST, true);
-            } elseif ((int)$CalEvent->date->format('N') !== 7) {
-                if (property_exists($CalEvent, 'grade_display') && $CalEvent->grade_display !== "") {
-                    $displayGrade = $CalEvent->grade_display;
+            } elseif (FestivityCollection::dateIsNotSunday($CalEvent->date)) {
+                if ($CalEvent->grade_display !== null && $CalEvent->grade_display !== "") {
                     $displayGradeHTML = '<B>' . $CalEvent->grade_display . '</B>';
                 } else {
-                    $displayGrade = $this->LitGrade->i18n($CalEvent->grade, false);
                     $displayGradeHTML = $this->LitGrade->i18n($CalEvent->grade, true);
                 }
-            } elseif ((int)$CalEvent->grade > LitGrade::MEMORIAL) {
-                if (property_exists($CalEvent, 'grade_display') && $CalEvent->grade_display !== "") {
-                    $displayGrade = $CalEvent->grade_display;
+            } elseif ((int)$CalEvent->grade === LitGrade::SOLEMNITY) {
+                if ($CalEvent->grade_display !== null && $CalEvent->grade_display !== "") {
                     $displayGradeHTML = '<B>' . $CalEvent->grade_display . '</B>';
                 } else {
-                    $displayGrade = $this->LitGrade->i18n($CalEvent->grade, false);
                     $displayGradeHTML = $this->LitGrade->i18n($CalEvent->grade, true);
                 }
             }
