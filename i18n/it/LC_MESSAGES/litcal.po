@@ -9,9 +9,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-11-16 19:55+0000\n"
-"PO-Revision-Date: 2024-11-16 19:28+0000\n"
+"PO-Revision-Date: 2024-11-17 07:40+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
@@ -1070,10 +1070,8 @@ msgstr "f"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:157
-#, fuzzy
-#| msgid "Commemoration"
 msgid "commemoration"
-msgstr "Commemorazione"
+msgstr "commemorazione"
 
 #. translators: liturgical rank 'COMMEMORATION' in abbreviated form
 #: src/Enum/LitGrade.php:159
@@ -1082,8 +1080,6 @@ msgstr "mf*"
 
 #. translators: liturgical rank. Keep lowercsase
 #: src/Enum/LitGrade.php:164
-#, fuzzy
-#| msgid "Optional memorial"
 msgid "optional memorial"
 msgstr "memoria facoltativa"
 
