@@ -103,36 +103,36 @@ class FestivityCollection
             $this->festivities[ $key ]->grade_display = "";
         }
         if ($festivity->grade >= LitGrade::FEAST_LORD) {
-            $this->solemnities[ $key ]  = $festivity->date;
+            $this->solemnities[ $key ] = $festivity->date;
         }
         if ($festivity->grade === LitGrade::FEAST) {
-            $this->feasts[ $key ]       = $festivity->date;
+            $this->feasts[ $key ]      = $festivity->date;
         }
         if ($festivity->grade === LitGrade::MEMORIAL) {
-            $this->memorials[ $key ]    = $festivity->date;
+            $this->memorials[ $key ]   = $festivity->date;
         }
         // Weekday of Advent from 17 to 24 Dec.
         if (str_starts_with($key, "AdventWeekday")) {
             if ($festivity->date->format('j') >= 17 && $festivity->date->format('j') <= 24) {
                 $this->weekdaysAdventChristmasLent[ $key ] = $festivity->date;
             } else {
-                $this->weekdaysAdventBeforeDec17[ $key ] = $festivity->date;
+                $this->weekdaysAdventBeforeDec17[ $key ]   = $festivity->date;
             }
         } elseif (str_starts_with($key, "ChristmasWeekday")) {
-            $this->weekdaysAdventChristmasLent[ $key ] = $festivity->date;
+            $this->weekdaysAdventChristmasLent[ $key ]     = $festivity->date;
         } elseif (str_starts_with($key, "LentWeekday")) {
-            $this->weekdaysAdventChristmasLent[ $key ] = $festivity->date;
+            $this->weekdaysAdventChristmasLent[ $key ]     = $festivity->date;
         } elseif (str_starts_with($key, "DayBeforeEpiphany") || str_starts_with($key, "DayAfterEpiphany")) {
-            $this->weekdaysEpiphany[ $key ] = $festivity->date;
+            $this->weekdaysEpiphany[ $key ]                = $festivity->date;
         }
         //Sundays of Advent, Lent, Easter
         if (preg_match('/(?:Advent|Lent|Easter)([1-7])/', $key, $matches) === 1) {
-            $this->sundaysAdventLentEaster[] = $festivity->date;
-            $this->festivities[ $key ]->psalter_week = self::psalterWeek(intval($matches[1]));
+            $this->sundaysAdventLentEaster[]               = $festivity->date;
+            $this->festivities[ $key ]->psalter_week       = self::psalterWeek(intval($matches[1]));
         }
         //Ordinary Sunday Psalter Week
         if (preg_match('/OrdSunday([1-9][0-9]*)/', $key, $matches) === 1) {
-            $this->festivities[ $key ]->psalter_week = self::psalterWeek(intval($matches[1]));
+            $this->festivities[ $key ]->psalter_week       = self::psalterWeek(intval($matches[1]));
         }
     }
 
@@ -173,6 +173,7 @@ class FestivityCollection
     public function getCalEventsFromDate(DateTime $date): array
     {
         return array_filter($this->festivities, function ($el) use ($date) {
+            // important: DateTime objects cannot use strict comparison!
             return $el->date == $date;
         });
     }
@@ -716,7 +717,8 @@ class FestivityCollection
             $festivity->color,
             $festivity->type,
             $festivity->grade,
-            $festivity->common
+            $festivity->common,
+            $festivity->grade_display
         );
         $this->festivities[ $key ]->has_vigil_mass                   = true;
         $this->festivities[ $key ]->has_vesper_i                     = true;
@@ -1191,8 +1193,7 @@ class FestivityCollection
                 $gradeAbbr = $this->LitGrade->i18n($festivity->grade, false, true);
                 $festivityAssocArr = [
                     "event_key" => $key,
-                    ...json_decode(json_encode($festivity), true),
-                    "grade_abbr" => $gradeAbbr
+                    ...json_decode(json_encode($festivity), true)
                 ];
                 ksort($festivityAssocArr);
                 $festivitiesCollection[] = $festivityAssocArr;
