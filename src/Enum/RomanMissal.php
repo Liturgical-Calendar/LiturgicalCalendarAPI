@@ -65,23 +65,23 @@ class RomanMissal
     ];
 
     public static array $jsonFiles = [
-        self::EDITIO_TYPICA_1970                    => "data/missals/propriumdesanctis_1970/propriumdesanctis_1970.json",
+        self::EDITIO_TYPICA_1970                    => "jsondata/sourcedata/missals/propriumdesanctis_1970/propriumdesanctis_1970.json",
         self::REIMPRESSIO_EMENDATA_1971             => false,
         self::EDITIO_TYPICA_SECUNDA_1975            => false,
-        self::EDITIO_TYPICA_TERTIA_2002             => "data/missals/propriumdesanctis_2002/propriumdesanctis_2002.json",
-        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008    => "data/missals/propriumdesanctis_2008/propriumdesanctis_2008.json",
-        self::USA_EDITION_2011                      => "data/missals/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json",
-        self::ITALY_EDITION_1983                    => "data/missals/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json",
+        self::EDITIO_TYPICA_TERTIA_2002             => "jsondata/sourcedata/missals/propriumdesanctis_2002/propriumdesanctis_2002.json",
+        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008    => "jsondata/sourcedata/missals/propriumdesanctis_2008/propriumdesanctis_2008.json",
+        self::USA_EDITION_2011                      => "jsondata/sourcedata/missals/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json",
+        self::ITALY_EDITION_1983                    => "jsondata/sourcedata/missals/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json",
         self::ITALY_EDITION_2020                    => false,
         self::NETHERLANDS_EDITION_1978              => false
     ];
 
     public static array $i18nPath = [
-        self::EDITIO_TYPICA_1970                    => "data/missals/propriumdesanctis_1970/i18n/",
+        self::EDITIO_TYPICA_1970                    => "jsondata/sourcedata/missals/propriumdesanctis_1970/i18n/",
         self::REIMPRESSIO_EMENDATA_1971             => false,
         self::EDITIO_TYPICA_SECUNDA_1975            => false,
-        self::EDITIO_TYPICA_TERTIA_2002             => "data/missals/propriumdesanctis_2002/i18n/",
-        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008    => "data/missals/propriumdesanctis_2008/i18n/",
+        self::EDITIO_TYPICA_TERTIA_2002             => "jsondata/sourcedata/missals/propriumdesanctis_2002/i18n/",
+        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008    => "jsondata/sourcedata/missals/propriumdesanctis_2008/i18n/",
         self::USA_EDITION_2011                      => false,
         self::ITALY_EDITION_1983                    => false,
         self::ITALY_EDITION_2020                    => false,

@@ -5,11 +5,11 @@ extends:
 
 apis:
   main:
-    root: ./schemas/openapi.json
+    root: ./jsondata/schemas/openapi.json
     #rules:
     #  # A sample custom rule. Read more about rules: https://redocly.com/docs/cli/rules/
     #  rule/operation-description:
-    #    subject: 
+    #    subject:
     #      type: Operation
     #      property: description
     #    assertions:

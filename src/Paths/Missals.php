@@ -342,12 +342,12 @@ class Missals
         self::$missalsIndex = new \stdClass();
         self::$missalsIndex->litcal_missals = [];
 
-        if (false === is_readable('data/missals')) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Unable to read the data/missals directory');
+        if (false === is_readable('jsondata/sourcedata/missals')) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Unable to read the jsondata/sourcedata/missals directory');
         }
-        $missalFolderPaths = glob('data/missals/propriumdesanctis*', GLOB_ONLYDIR);
+        $missalFolderPaths = glob('jsondata/sourcedata/missals/propriumdesanctis*', GLOB_ONLYDIR);
         if (false === $missalFolderPaths) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Unable to read the data/missals directory contents');
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Unable to read the jsondata/sourcedata/missals directory contents');
         }
         if (count($missalFolderPaths) === 0) {
             self::produceErrorResponse(StatusCode::NOT_FOUND, 'No Missals found');
@@ -355,19 +355,19 @@ class Missals
 
         $missalFolderNames = array_map('basename', $missalFolderPaths);
         foreach ($missalFolderNames as $missalFolderName) {
-            if (file_exists("data/missals/$missalFolderName/$missalFolderName.json")) {
+            if (file_exists("jsondata/sourcedata/missals/$missalFolderName/$missalFolderName.json")) {
                 $missal = new \stdClass();
                 if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
                     $missal->missal_id      = "EDITIO_TYPICA_{$matches[1]}";
                     $missal->region         = "VA";
-                    if (is_readable("data/missals/$missalFolderName/i18n")) {
-                        $it = new \DirectoryIterator("glob://data/missals/$missalFolderName/i18n/*.json");
+                    if (is_readable("jsondata/sourcedata/missals/$missalFolderName/i18n")) {
+                        $it = new \DirectoryIterator("glob://jsondata/sourcedata/missals/$missalFolderName/i18n/*.json");
                         $languages = [];
                         foreach ($it as $f) {
                             $languages[] = $f->getBasename('.json');
                         }
                         $missal->languages      = $languages;
-                        $missal->i18n_path      = "data/missals/$missalFolderName/i18n/";
+                        $missal->i18n_path      = "jsondata/sourcedata/missals/$missalFolderName/i18n/";
                     } else {
                         $missal->languages      = null;
                         $missal->i18n_path      = null;
@@ -381,7 +381,7 @@ class Missals
                 $missal->name           = RomanMissal::getName($missal->missal_id);
                 $missal->year_limits    = RomanMissal::$yearLimits[$missal->missal_id];
                 $missal->year_published = RomanMissal::$yearLimits[$missal->missal_id][ "since_year" ];
-                $missal->data_path      = "data/missals/$missalFolderName/$missalFolderName.json";
+                $missal->data_path      = "jsondata/sourcedata/missals/$missalFolderName/$missalFolderName.json";
                 $missal->api_path       = API_BASE_PATH . "/missals/$missal->missal_id";
                 self::$missalsIndex->litcal_missals[] = $missal;
                 self::$params->addMissalRegion($missal->region);

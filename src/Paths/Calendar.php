@@ -571,7 +571,7 @@ class Calendar
         if ($this->CalendarParams->DiocesanCalendar !== null) {
             //since a Diocesan calendar is being requested, we need to retrieve the JSON data
             //first we need to discover the path, so let's retrieve our index file
-            $dioceseIndexPath = "data/nations/index.json";
+            $dioceseIndexPath = "jsondata/sourcedata/nations/index.json";
             if (file_exists($dioceseIndexPath)) {
                 $this->DioceseIndex = json_decode(file_get_contents($dioceseIndexPath));
                 $dioceseData = array_values(array_filter($this->DioceseIndex, function ($el) {
@@ -686,7 +686,7 @@ class Calendar
 
     /**
      * Loads localization data stored in JSON format from a file in the
-     * data/missals/propriumdetempore/i18n directory, named according to the locale
+     * jsondata/sourcedata/missals/propriumdetempore/i18n directory, named according to the locale
      * specified in LitLocale::$PRIMARY_LANGUAGE.
      *
      * If the file does not exist, or if there is an error decoding the
@@ -697,7 +697,7 @@ class Calendar
     private function loadPropriumDeTemporeI18nData(): ?array
     {
         $locale = LitLocale::$PRIMARY_LANGUAGE;
-        $propriumDeTemporeI18nFile = "data/missals/propriumdetempore/i18n/{$locale}.json";
+        $propriumDeTemporeI18nFile = "jsondata/sourcedata/missals/propriumdetempore/i18n/{$locale}.json";
         if (file_exists($propriumDeTemporeI18nFile)) {
             $rawData = file_get_contents($propriumDeTemporeI18nFile);
             $PropriumDeTemporeI18n = json_decode($rawData, true);
@@ -724,7 +724,7 @@ class Calendar
      */
     private function loadPropriumDeTemporeData(): void
     {
-        $propriumDeTemporeFile = "data/missals/propriumdetempore/propriumdetempore.json";
+        $propriumDeTemporeFile = "jsondata/sourcedata/missals/propriumdetempore/propriumdetempore.json";
         if (file_exists($propriumDeTemporeFile)) {
             $rawData = file_get_contents($propriumDeTemporeFile);
             $PropriumDeTempore = json_decode($rawData, true);
@@ -852,8 +852,8 @@ class Calendar
      */
     private function loadMemorialsFromDecreesData(): void
     {
-        $decreesFile       = "data/decrees/decrees.json";
-        $decreesI18nPath   = "data/decrees/i18n/";
+        $decreesFile       = "jsondata/sourcedata/decrees/decrees.json";
+        $decreesI18nPath   = "jsondata/sourcedata/decrees/i18n/";
         $locale = LitLocale::$PRIMARY_LANGUAGE;
         $decreesI18nFile = $decreesI18nPath . $locale . ".json";
         $NAME = null;
@@ -3177,7 +3177,7 @@ class Calendar
      */
     private function loadNationalCalendarData(): void
     {
-        $nationalDataFile = "data/nations/{$this->CalendarParams->NationalCalendar}/{$this->CalendarParams->NationalCalendar}.json";
+        $nationalDataFile = "jsondata/sourcedata/nations/{$this->CalendarParams->NationalCalendar}/{$this->CalendarParams->NationalCalendar}.json";
         if (file_exists($nationalDataFile)) {
             $this->NationalData = json_decode(file_get_contents($nationalDataFile));
             if (json_last_error() === JSON_ERROR_NONE) {

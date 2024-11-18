@@ -55,13 +55,13 @@ class LitTest
             self::$testCache = new \stdClass();
         }
         if (false === property_exists(self::$testCache, $Test)) {
-            $testPath = "tests/{$Test}.json";
+            $testPath = "jsondata/tests/{$Test}.json";
             if (file_exists($testPath)) {
                 $testInstructions = file_get_contents($testPath);
                 if ($testInstructions) {
                     $this->testInstructions = json_decode($testInstructions);
                     if (JSON_ERROR_NONE === json_last_error()) {
-                        $schemaFile = 'schemas/LitCalTest.json';
+                        $schemaFile = 'jsondata/schemas/LitCalTest.json';
                         $schemaContents = file_get_contents($schemaFile);
                         $jsonSchema = json_decode($schemaContents);
                         try {

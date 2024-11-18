@@ -17,10 +17,10 @@ class Metadata
 
     private static function retrieveNationalCalendarNamesFromFolders()
     {
-        $directories = array_map('basename', glob('data/nations/*', GLOB_ONLYDIR));
+        $directories = array_map('basename', glob('jsondata/sourcedata/nations/*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
-            if (file_exists("data/nations/$directory/$directory.json")) {
-                $nationalCalendarDefinition = file_get_contents("data/nations/$directory/$directory.json");
+            if (file_exists("jsondata/sourcedata/nations/$directory/$directory.json")) {
+                $nationalCalendarDefinition = file_get_contents("jsondata/sourcedata/nations/$directory/$directory.json");
                 $nationalCalendarData = json_decode($nationalCalendarDefinition);
                 if (JSON_ERROR_NONE === json_last_error()) {
                     Metadata::$baseNationalCalendars[$directory] = $nationalCalendarData;
@@ -34,7 +34,7 @@ class Metadata
     /**
      * @return void
      * @description
-     * This static function processes the contents of the data/wider_regions directory.
+     * This static function processes the contents of the jsondata/sourcedata/wider_regions directory.
      * It takes the files in the directory, checks if they are JSON files and if they are wider region definitions.
      * If they are, it reads the languages and builds the data for the wider region metadata.
      * The data is then stored in the Metadata::$widerRegions array.
@@ -46,25 +46,25 @@ class Metadata
     private static function buildWiderRegionData()
     {
         $filterDirResults = ['..', '.'];
-        $dirResults = array_diff(scandir('data/wider_regions'), $filterDirResults);
+        $dirResults = array_diff(scandir('jsondata/sourcedata/wider_regions'), $filterDirResults);
         $widerRegionsFiles = array_values(array_filter($dirResults, function ($el) {
-            return !is_dir('data/wider_regions/' . $el) && pathinfo('data/wider_regions/' . $el, PATHINFO_EXTENSION) === 'json';
+            return !is_dir('jsondata/sourcedata/wider_regions/' . $el) && pathinfo('jsondata/sourcedata/wider_regions/' . $el, PATHINFO_EXTENSION) === 'json';
         }));
         Metadata::$widerRegions = array_map(function ($el) {
-            $dirName = strtoupper(pathinfo('data/wider_regions/' . $el, PATHINFO_FILENAME));
-            $langsInFolder = array_diff(scandir("data/wider_regions/$dirName"), ['..','.']);
+            $dirName = strtoupper(pathinfo('jsondata/sourcedata/wider_regions/' . $el, PATHINFO_FILENAME));
+            $langsInFolder = array_diff(scandir("jsondata/sourcedata/wider_regions/$dirName"), ['..','.']);
             $widerRegionLanguages = array_values(array_filter($langsInFolder, function ($elem) use ($dirName) {
-                return pathinfo("data/wider_regions/$dirName/$elem", PATHINFO_EXTENSION) === 'json';
+                return pathinfo("jsondata/sourcedata/wider_regions/$dirName/$elem", PATHINFO_EXTENSION) === 'json';
             }));
-            $widerRegionLanguages = array_map(fn ($el) => pathinfo("data/wider_regions/$dirName/$el", PATHINFO_FILENAME), $widerRegionLanguages);
-            $widerRegionName = pathinfo('data/wider_regions/' . $el, PATHINFO_FILENAME);
+            $widerRegionLanguages = array_map(fn ($el) => pathinfo("jsondata/sourcedata/wider_regions/$dirName/$el", PATHINFO_FILENAME), $widerRegionLanguages);
+            $widerRegionName = pathinfo('jsondata/sourcedata/wider_regions/' . $el, PATHINFO_FILENAME);
             Metadata::$widerRegionsNames[] = $widerRegionName;
             return [
                 "name"      => $widerRegionName,
                 "languages" => $widerRegionLanguages,
-                "data_path" => "data/wider_regions/$el",
-                "i18n_path" => "data/wider_regions/$dirName",
-                "api_path"  => API_BASE_PATH . '/data/widerregion/' . pathinfo('data/wider_regions/' . $el, PATHINFO_FILENAME) . '?locale={language}'
+                "data_path" => "jsondata/sourcedata/wider_regions/$el",
+                "i18n_path" => "jsondata/sourcedata/wider_regions/$dirName",
+                "api_path"  => API_BASE_PATH . '/data/widerregion/' . pathinfo('jsondata/sourcedata/wider_regions/' . $el, PATHINFO_FILENAME) . '?locale={language}'
             ];
         }, $widerRegionsFiles);
     }
@@ -121,7 +121,7 @@ class Metadata
     private static function buildIndex(): int
     {
         // The first way of retrieving the names of currently supported National calendars
-        // is by scanning the `data/nations/` folder and picking out folder names
+        // is by scanning the `jsondata/sourcedata/nations/` folder and picking out folder names
         // for folders that contain a JSON file of the same name
         // If a folder doesn't contain a JSON file of the same name it's a Wider Region rather than a Nation
         // A National calendar can exist without any Diocesan calendars defined,
@@ -130,11 +130,11 @@ class Metadata
         Metadata::retrieveNationalCalendarNamesFromFolders();
 
         // Information about Diocesan Calendars is stored in an index.json file to make life easier
-        if (false === file_exists('data/nations/index.json')) {
+        if (false === file_exists('jsondata/sourcedata/nations/index.json')) {
             return StatusCode::NOT_FOUND;
         }
 
-        $index = file_get_contents('data/nations/index.json');
+        $index = file_get_contents('jsondata/sourcedata/nations/index.json');
         if (false === $index) {
             return StatusCode::SERVICE_UNAVAILABLE;
         }

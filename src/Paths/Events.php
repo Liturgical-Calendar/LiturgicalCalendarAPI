@@ -65,9 +65,9 @@ class Events
      */
     private static function retrieveDioceseIndex(): void
     {
-        $DioceseIndexContents = file_exists("data/nations/index.json") ? file_get_contents("data/nations/index.json") : null;
+        $DioceseIndexContents = file_exists("jsondata/sourcedata/nations/index.json") ? file_get_contents("jsondata/sourcedata/nations/index.json") : null;
         if (null === $DioceseIndexContents || false === $DioceseIndexContents) {
-            echo self::produceErrorResponse(StatusCode::NOT_FOUND, "path data/nations/index.json not found");
+            echo self::produceErrorResponse(StatusCode::NOT_FOUND, "path jsondata/sourcedata/nations/index.json not found");
             die();
         }
         self::$DioceseIndex = json_decode($DioceseIndexContents);
@@ -219,9 +219,9 @@ class Events
     /**
      * Loads the JSON data for the specified diocesan calendar.
      *
-     * If the diocese is not found in the diocesan calendars index or in the `data/nations/{nation}/` directory, the response will be a JSON error response with a status code of 404 Not Found.
+     * If the diocese is not found in the diocesan calendars index or in the `jsondata/sourcedata/nations/{nation}/` directory, the response will be a JSON error response with a status code of 404 Not Found.
      * If the diocese is not found in the diocesan calendars index, the response will be a JSON error response with a status code of 400 Bad Request.
-     * If the diocese is found in the diocesan calendars index but not in the `data/nations/{nation}/` directory, the response will be a JSON error response with a status code of 503 Service Unavailable.
+     * If the diocese is found in the diocesan calendars index but not in the `jsondata/sourcedata/nations/{nation}/` directory, the response will be a JSON error response with a status code of 503 Service Unavailable.
      * If the payload is not valid according to {@see LitSchema::DIOCESAN}, the response will be a JSON error response with a status code of 422 Unprocessable Content.
      *
      * @return void
@@ -263,7 +263,7 @@ class Events
     private function loadNationalAndWiderRegionData(): void
     {
         if ($this->EventsParams->NationalCalendar !== null) {
-            $nationalDataFile = "data/nations/" . $this->EventsParams->NationalCalendar . "/" . $this->EventsParams->NationalCalendar . ".json";
+            $nationalDataFile = "jsondata/sourcedata/nations/" . $this->EventsParams->NationalCalendar . "/" . $this->EventsParams->NationalCalendar . ".json";
             if (file_exists($nationalDataFile)) {
                 self::$NationalData = json_decode(file_get_contents($nationalDataFile));
                 if (json_last_error() === JSON_ERROR_NONE) {
@@ -416,8 +416,8 @@ class Events
      */
     private function processPropriumDeTemporeData(): void
     {
-        $DataFile = 'data/missals/propriumdetempore/propriumdetempore.json';
-        $I18nFile = 'data/missals/propriumdetempore/i18n/' . $this->EventsParams->Locale . ".json";
+        $DataFile = 'jsondata/sourcedata/missals/propriumdetempore/propriumdetempore.json';
+        $I18nFile = 'jsondata/sourcedata/missals/propriumdetempore/i18n/' . $this->EventsParams->Locale . ".json";
         if (!file_exists($DataFile) || !file_exists($I18nFile)) {
             echo self::produceErrorResponse(
                 StatusCode::NOT_FOUND,
@@ -472,8 +472,8 @@ class Events
      */
     private function processMemorialsFromDecreesData(): void
     {
-        $DataFile = 'data/decrees/decrees.json';
-        $I18nFile = 'data/decrees/i18n/' . $this->EventsParams->Locale . ".json";
+        $DataFile = 'jsondata/sourcedata/decrees/decrees.json';
+        $I18nFile = 'jsondata/sourcedata/decrees/i18n/' . $this->EventsParams->Locale . ".json";
         if (!file_exists($DataFile) || !file_exists($I18nFile)) {
             echo self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DataFile or resource file $I18nFile");
             die();
