@@ -5,7 +5,7 @@
  */
 
 var fs = require('fs');
-var openAPI = fs.readFileSync('schemas/openapi.json', 'utf8');
+var openAPI = fs.readFileSync('jsondata/schemas/openapi.json', 'utf8');
 
 var obj = JSON.parse(openAPI);
 

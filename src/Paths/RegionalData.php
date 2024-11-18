@@ -102,10 +102,10 @@ class RegionalData
                 $calendarDataFile = $dioceseEntry[0]->path;
                 break;
             case "WIDERREGIONCALENDAR":
-                $calendarDataFile = "data/wider_regions/{$this->params->key}.json";
+                $calendarDataFile = "jsondata/sourcedata/wider_regions/{$this->params->key}.json";
                 break;
             case "NATIONALCALENDAR":
-                $calendarDataFile = "data/nations/{$this->params->key}/{$this->params->key}.json";
+                $calendarDataFile = "jsondata/sourcedata/nations/{$this->params->key}/{$this->params->key}.json";
                 break;
             default:
                 self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value <{$this->params->category}> for param `category`: valid values are: " . implode(', ', array_values(RegionalDataParams::EXPECTED_CATEGORIES)));
@@ -118,13 +118,13 @@ class RegionalData
                 $response = json_decode(file_get_contents($calendarDataFile));
                 $uKey = strtoupper($this->params->key);
                 if ($this->params->category === "WIDERREGIONCALENDAR") {
-                    $isMultilingual = is_dir("data/wider_regions/{$uKey}");
+                    $isMultilingual = is_dir("jsondata/sourcedata/wider_regions/{$uKey}");
                     if ($isMultilingual) {
                         if (false === in_array($this->params->locale, $response->metadata->languages)) {
                             self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value `{$this->params->locale}` for param `locale`. Valid values for current requested Wider region calendar data `{$this->params->key}` are: " . implode(', ', $response->metadata->languages));
                         }
-                        if (file_exists("data/wider_regions/{$uKey}/{$this->params->locale}.json")) {
-                            $localeData = json_decode(file_get_contents("data/wider_regions/{$uKey}/{$this->params->locale}.json"));
+                        if (file_exists("jsondata/sourcedata/wider_regions/{$uKey}/{$this->params->locale}.json")) {
+                            $localeData = json_decode(file_get_contents("jsondata/sourcedata/wider_regions/{$uKey}/{$this->params->locale}.json"));
                             foreach ($response->litcal as $idx => $el) {
                                 $response->litcal[$idx]->festivity->name = $localeData->{$response->litcal[$idx]->festivity->event_key};
                             }
@@ -143,7 +143,7 @@ class RegionalData
      *
      * This is a private method and should only be called from {@see handleRequestMethod}.
      *
-     * The resource is created or updated in the `data/` directory.
+     * The resource is created or updated in the `jsondata/sourcedata/` directory.
      *
      * If the payload is valid according to the associated schema, the response will be a JSON object
      * containing a success message.
@@ -174,7 +174,7 @@ class RegionalData
                     }
                     $updateData->group = strip_tags($this->params->payload->group);
                 }
-                $updateData->path = "data/nations/{$updateData->nation}";
+                $updateData->path = "jsondata/sourcedata/nations/{$updateData->nation}";
                 if (!file_exists($updateData->path)) {
                     mkdir($updateData->path, 0755, true);
                 }
@@ -201,7 +201,7 @@ class RegionalData
      *
      * It is private as it is called from {@see updateRegionalCalendar}.
      *
-     * The resource is created or updated in the `data/nations/` directory.
+     * The resource is created or updated in the `jsondata/sourcedata/nations/` directory.
      *
      * If the payload is valid according to {@see LitSchema::NATIONAL}, the response will be a JSON object
      * containing a success message.
@@ -212,7 +212,7 @@ class RegionalData
     {
         $response = new \stdClass();
         $region = $this->params->payload->metadata->region;
-        $path = "data/nations/{$region}";
+        $path = "jsondata/sourcedata/nations/{$region}";
         if (!file_exists($path)) {
             mkdir($path, 0755, true);
         }
@@ -233,7 +233,7 @@ class RegionalData
      *
      * It is private as it is called from {@see updateRegionalCalendar}.
      *
-     * The resource is created or updated in the `data/wider_regions/` directory.
+     * The resource is created or updated in the `jsondata/sourcedata/wider_regions/` directory.
      *
      * If the payload is valid according to {@see LitSchema::WIDERREGION}, the response will be a JSON object
      * containing a success message.
@@ -246,7 +246,7 @@ class RegionalData
         $this->params->payload->metadata->wider_region = ucfirst(strtolower($this->params->payload->metadata->wider_region));
         $widerRegion = strtoupper($this->params->payload->metadata->wider_region);
         if ($this->params->payload->metadata->multilingual === true) {
-            $path = "data/wider_regions/{$widerRegion}";
+            $path = "jsondata/sourcedata/wider_regions/{$widerRegion}";
             if (!file_exists($path)) {
                 mkdir($path, 0755, true);
             }
@@ -256,9 +256,9 @@ class RegionalData
             }
             if (count($this->params->payload->metadata->languages) > 0) {
                 foreach ($this->params->payload->metadata->languages as $iso) {
-                    if (!file_exists("data/wider_regions/{$widerRegion}/{$iso}.json")) {
+                    if (!file_exists("jsondata/sourcedata/wider_regions/{$widerRegion}/{$iso}.json")) {
                         file_put_contents(
-                            "data/wider_regions/{$widerRegion}/{$iso}.json",
+                            "jsondata/sourcedata/wider_regions/{$widerRegion}/{$iso}.json",
                             json_encode($translationJSON, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
                         );
                     }
@@ -269,7 +269,7 @@ class RegionalData
         $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::WIDERREGION);
         if ($test === true) {
             $data = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            file_put_contents("data/wider_regions/{$this->params->payload->metadata->wider_region}.json", $data . PHP_EOL);
+            file_put_contents("jsondata/sourcedata/wider_regions/{$this->params->payload->metadata->wider_region}.json", $data . PHP_EOL);
             $response->success = "Calendar data created or updated for Wider Region \"{$this->params->payload->metadata->wider_region}\"";
             self::produceResponse(json_encode($response));
         } else {
@@ -282,12 +282,12 @@ class RegionalData
      *
      * It is private as it is called from {@see updateRegionalCalendar}.
      *
-     * The resource is created or updated in the `data/nations/` directory.
+     * The resource is created or updated in the `jsondata/sourcedata/nations/` directory.
      *
      * If the payload is valid according to {@see LitSchema::DIOCESAN}, the response will be a JSON object
      * containing a success message.
      *
-     * If the resource to update is not found in the diocesan calendars index or in the `data/nations/{nation}/` directory, the response will be a JSON error response with a status code of 404 Not Found.
+     * If the resource to update is not found in the diocesan calendars index or in the `jsondata/sourcedata/nations/{nation}/` directory, the response will be a JSON error response with a status code of 404 Not Found.
      * If the payload is not an object, the response will be a JSON error response with a status code of 400 Bad Request.
      * If the resource to update is not writable or the write was not successful, the response will be a JSON error response with a status code of 503 Service Unavailable.
      * If the payload is not valid according to {@see LitSchema::DIOCESAN}, the response will be a JSON error response with a status code of 422 Unprocessable Content.
@@ -303,7 +303,7 @@ class RegionalData
             ||
             false === property_exists($dioceseEntry[0], 'path')
         ) {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendar resource {$this->params->key}, not found in diocesan calendars index `data/nations/index.json`.");
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendar resource {$this->params->key}, not found in diocesan calendars index `jsondata/sourcedata/nations/index.json`.");
         }
 
         if (false === file_exists($dioceseEntry[0]->path)) {
@@ -369,7 +369,7 @@ class RegionalData
      *
      * This is a private method and should only be called from {@see handleRequestMethod}.
      *
-     * The resource is created or updated in the `data/` directory.
+     * The resource is created or updated in the `jsondata/sourcedata/` directory.
      *
      * If the payload is valid according to the associated schema, the response will be a JSON object
      * containing a success message.
@@ -395,7 +395,7 @@ class RegionalData
      *
      * This is a private method and should only be called from {@see handleRequestMethod}.
      *
-     * The resource is deleted from the `data/` directory.
+     * The resource is deleted from the `jsondata/sourcedata/` directory.
      *
      * If the resource is successfully deleted, the response will be a JSON object
      * containing a success message.
@@ -416,10 +416,10 @@ class RegionalData
                 $calendarDataFile = $dioceseEntry[0]->path;
                 break;
             case "WIDERREGIONCALENDAR":
-                $calendarDataFile = "data/wider_regions/{$this->params->key}.json";
+                $calendarDataFile = "jsondata/sourcedata/wider_regions/{$this->params->key}.json";
                 break;
             case "NATIONALCALENDAR":
-                $calendarDataFile = "data/nations/{$this->params->key}/{$this->params->key}.json";
+                $calendarDataFile = "jsondata/sourcedata/nations/{$this->params->key}/{$this->params->key}.json";
                 break;
         }
         if (file_exists($calendarDataFile)) {
@@ -447,7 +447,7 @@ class RegionalData
      */
     private function loadDiocesanCalendarsIndex()
     {
-        $diocesanIndexPath = "data/nations/index.json";
+        $diocesanIndexPath = "jsondata/sourcedata/nations/index.json";
         if (file_exists($diocesanIndexPath)) {
             $this->DiocesanCalendarsIndex = json_decode(file_get_contents($diocesanIndexPath));
         }
@@ -499,17 +499,17 @@ class RegionalData
             self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, json_encode($test));
         }
 
-        if (false === file_exists("data/nations/index.json")) {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendars index, not found in path data/nations/index.json.");
+        if (false === file_exists("jsondata/sourcedata/nations/index.json")) {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendars index, not found in path jsondata/sourcedata/nations/index.json.");
         }
 
-        if (false === is_writable("data/nations/index.json")) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendars index in path data/nations/index.json, check file and folder permissions.");
+        if (false === is_writable("jsondata/sourcedata/nations/index.json")) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendars index in path jsondata/sourcedata/nations/index.json, check file and folder permissions.");
         }
 
         $jsonEncodedContents = json_encode($this->DiocesanCalendarsIndex, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        if (false === file_put_contents("data/nations/index.json", $jsonEncodedContents . PHP_EOL)) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update diocesan calendars index in path data/nations/index.json.");
+        if (false === file_put_contents("jsondata/sourcedata/nations/index.json", $jsonEncodedContents . PHP_EOL)) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update diocesan calendars index in path jsondata/sourcedata/nations/index.json.");
         }
     }
 
@@ -674,7 +674,7 @@ class RegionalData
                 default:
                     self::produceErrorResponse(StatusCode::BAD_REQUEST, "Unexpected path param {$requestPathParts[0]}, acceptable values are: nation, diocese, widerregion");
             }
-        } elseif (count($requestPathParts)) {
+        } else {
             RegionalData::validateRequestPath($requestPathParts);
             $data = RegionalData::setDataFromPath($requestPathParts);
         }

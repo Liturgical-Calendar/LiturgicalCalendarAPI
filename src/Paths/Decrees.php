@@ -138,7 +138,7 @@ class Decrees
         if (count($requestPathParts)) {
             self::$requestPathParts = $requestPathParts;
         }
-        $decreesFile = 'data/decrees/decrees.json';
+        $decreesFile = 'jsondata/sourcedata/decrees/decrees.json';
         if (file_exists($decreesFile)) {
             $rawData = file_get_contents($decreesFile);
             self::$decreesIndex = new \stdClass();
