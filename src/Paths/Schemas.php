@@ -55,7 +55,7 @@ class Schemas
                 $schemaIndex->litcal_schemas = [];
                 $it = new \DirectoryIterator("glob://jsondata/schemas/*.json");
                 foreach ($it as $f) {
-                    $schemaIndex->litcal_schemas[] = API_BASE_PATH . '/schemas/' . $f->getFilename();
+                    $schemaIndex->litcal_schemas[] = API_BASE_PATH . '/jsondata/schemas/' . $f->getFilename();
                 }
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode($schemaIndex);
