@@ -156,11 +156,11 @@
                 },
                 "data_path": {
                     "type": "string",
-                    "pattern": "^data/wider_regions/[ACEINOSW][flmnsueoc][rseatindo][a-zA-Z\\s]+.json$"
+                    "pattern": "^jsondata/sourcedata/wider_regions/[ACEINOSW][flmnsueoc][rseatindo][a-zA-Z\\s]+.json$"
                 },
                 "i18n_path": {
                     "type": "string",
-                    "pattern": "^data/wider_regions/[ACEINOSW][FLMNSUEOC][RSEATINDO][A-Z\\s]+$"
+                    "pattern": "^jsondata/sourcedata/wider_regions/[ACEINOSW][FLMNSUEOC][RSEATINDO][A-Z\\s]+$"
                 },
                 "api_path": {
                     "type": "string",
