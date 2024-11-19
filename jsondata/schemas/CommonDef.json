@@ -3,7 +3,7 @@
     "definitions": {
         "EventKey": {
             "type": "string",
-            "pattern": "^(?:[a-z_]+?_){0,1}[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$",
+            "pattern": "^(?:[a-z_]+?_){0,1}[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil|_[1-9])?$",
             "description": "corresponds to the `event_key` property of liturgical events in the output of the LitCal API and similar endpoints"
         },
         "EventKeyVigilMass": {
