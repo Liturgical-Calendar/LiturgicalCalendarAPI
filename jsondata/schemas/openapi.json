@@ -368,7 +368,8 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
-            }
+            },
+            "required": true
           },
           {
             "in": "header",
@@ -4056,7 +4057,8 @@
             "name": "missal_id",
             "schema": {
               "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/MissalID"
-            }
+            },
+            "required": true
           }
         ],
         "responses": {
@@ -4168,7 +4170,8 @@
             "schema": {
               "type": "string",
               "pattern": "[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)"
-            }
+            },
+            "required": true
           }
         ],
         "responses": {
