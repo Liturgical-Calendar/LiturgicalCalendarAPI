@@ -57,7 +57,7 @@
                 },
                 "data_path": {
                     "type": "string",
-                    "pattern": "^data\\\/missals\\\/propriumdesanctis_(IT_|US_|NL_)?(19[7-9]|20[0-9])[0-9]\\\/propriumdesanctis_(IT_|US_|NL_)?(19[7-9]|20[0-9])[0-9]\\.json$"
+                    "pattern": "^jsondata\\\/sourcedata\\\/missals\\\/propriumdesanctis_(IT_|US_|NL_)?(19[7-9]|20[0-9])[0-9]\\\/propriumdesanctis_(IT_|US_|NL_)?(19[7-9]|20[0-9])[0-9]\\.json$"
                 },
                 "languages": {
                     "type": "array",
@@ -68,7 +68,7 @@
                 },
                 "i18n_path": {
                     "type": "string",
-                    "pattern": "^data\\\/missals\\\/propriumdesanctis_(IT_|US_|NL_)?(19[7-9]|20[0-9])[0-9]\\\/i18n\\\/$"
+                    "pattern": "^jsondata\\\/sourcedata\\\/missals\\\/propriumdesanctis_(IT_|US_|NL_)?(19[7-9]|20[0-9])[0-9]\\\/i18n\\\/$"
                 },
                 "api_path": {
                     "type": "string",

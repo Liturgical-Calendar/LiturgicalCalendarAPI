@@ -4030,8 +4030,8 @@
                     "description": {
                       "type": "string",
                       "enum": [
-                        "Unable to read the data/missals directory",
-                        "Unable to read the data/missals directory contents"
+                        "Unable to read the jsondata/sourcedata/missals directory",
+                        "Unable to read the jsondata/sourcedata/missals directory contents"
                       ]
                     }
                   }
