@@ -12,21 +12,21 @@
             "minProperties": 1,
             "properties": {
                 "national_calendar": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/NationalCalendarId"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/NationalCalendarId"
                 },
                 "diocesan_calendar": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
                 },
                 "national_calendars": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/NationalCalendarId"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/NationalCalendarId"
                     }
                 },
                 "diocesan_calendars": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
                     }
                 }
             },
@@ -91,7 +91,7 @@
                     "const": "exactCorrespondenceSince"
                 },
                 "year_since": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Year"
                 },
                 "applies_to": {
                     "$ref": "#/definitions/AppliesToOrExcludes"
@@ -125,7 +125,7 @@
                     "const": "exactCorrespondenceUntil"
                 },
                 "year_until": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Year"
                 },
                 "applies_to": {
                     "$ref": "#/definitions/AppliesToOrExcludes"
@@ -148,7 +148,7 @@
                         "type": "object",
                         "properties": {
                             "year": {
-                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Year"
                             },
                             "expected_value": {
                                 "type": "null"
@@ -171,10 +171,10 @@
                         "type": "object",
                         "properties": {
                             "year": {
-                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Year"
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Year"
                             },
                             "expected_value": {
-                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Timestamp"
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Timestamp"
                             },
                             "assert": {
                                 "type": "string",

@@ -7,7 +7,7 @@
         "litcal_tests": {
             "type": "array",
             "items": {
-                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalTest.json"
+                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCalTest.json"
             }
         }
     },

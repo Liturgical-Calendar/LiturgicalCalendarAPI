@@ -6,14 +6,14 @@
         "additionalProperties": false,
         "properties": {
             "calendar_id": {
-                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
             },
             "path": {
                 "type": "string",
                 "pattern": "^jsondata\\\/sourcedata\\\/nations\\\/[A-Z]{2}\\\/[a-zA-Z0-9 ()'-]+\\.json$"
             },
             "nation": {
-                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
+                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Region"
             },
             "diocese": {
                 "type": "string",

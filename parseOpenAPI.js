@@ -69,7 +69,7 @@ const setNewValForFlattenedPath = (obj,keys,newVal) => {
 const substituteRefs = (objWithRefs,flatObject) => {
     for(const [key,value] of Object.entries(flatObject)) {
       let myKeys = key.split('.');
-      if(myKeys.includes('$ref') && value.includes('https://litcal.johnromanodorazio.com/api/dev/schemas/') ) {
+      if(myKeys.includes('$ref') && value.includes('https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/') ) {
         let schemaFileAndHashValue = value.replace('https://litcal.johnromanodorazio.com/api/dev/','').split('#/');
         let hashKeys = schemaFileAndHashValue[1].split('/');
         let schemaFile = fs.readFileSync(schemaFileAndHashValue[0], 'utf8');
@@ -107,7 +107,7 @@ const substituteRefs = (objWithRefs,flatObject) => {
     const newFlatObject = flattenObject(objWithRefs);
     for(const [keyX,valueX] of Object.entries(newFlatObject)) {
         let myKeysX = keyX.split('.');
-        if(myKeysX.includes('$ref') && valueX.includes('https://litcal.johnromanodorazio.com/api/dev/schemas/') ) {
+        if(myKeysX.includes('$ref') && valueX.includes('https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/') ) {
             objWithRefs = substituteRefs(objWithRefs,newFlatObject);
         }
     }

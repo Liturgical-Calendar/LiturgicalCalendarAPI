@@ -22,28 +22,28 @@
                         "additionalProperties": false,
                         "properties": {
                             "calendar_id": {
-                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Region"
                             },
                             "missals": {
                                 "type": "array",
                                 "items": {
-                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/MissalID"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/MissalID"
                                 }
                             },
                             "wider_regions": {
                                 "type": "array",
                                 "items": {
-                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/WiderRegionNames"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/WiderRegionNames"
                                 }
                             },
                             "dioceses": {
                                 "type": "array",
                                 "items": {
-                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
                                 }
                             },
                             "settings": {
-                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CalendarSettings"
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/CalendarSettings"
                             }
                         },
                         "required": ["calendar_id", "missals"]
@@ -52,7 +52,7 @@
                 "national_calendars_keys": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Region"
                     }
                 },
                 "diocesan_calendars": {
@@ -62,10 +62,10 @@
                         "additionalProperties": false,
                         "properties": {
                             "calendar_id": {
-                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
                             },
                             "nation": {
-                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Region"
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Region"
                             },
                             "diocese": {
                                 "type": "string",
@@ -75,7 +75,7 @@
                                 "type": "string"
                             },
                             "settings": {
-                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/CalendarSettings"
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/CalendarSettings"
                             }
                         },
                         "required": [
@@ -88,7 +88,7 @@
                 "diocesan_calendars_keys": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
                     }
                 },
                 "diocesan_groups": {
@@ -103,7 +103,7 @@
                             "dioceses": {
                                 "type": "array",
                                 "items": {
-                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
                                 }
                             }
                         },
@@ -119,13 +119,13 @@
                 "wider_regions_keys": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/WiderRegionNames"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/WiderRegionNames"
                     }
                 },
                 "locales": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
                     }
                 }
             },
@@ -146,12 +146,12 @@
             "additionalProperties": false,
             "properties": {
                 "name": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/WiderRegionNames"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/WiderRegionNames"
                 },
                 "languages": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/schemas/CommonDef.json#/definitions/Locale"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
                     }
                 },
                 "data_path": {
