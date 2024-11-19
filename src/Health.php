@@ -296,13 +296,6 @@ class Health implements MessageComponentInterface
     {
         $dataPath = $validation->sourceFile;
         $schema = Health::retrieveSchemaForCategory($validation->category, $dataPath);
-        if (null === $schema) {
-            $message = new \stdClass();
-            $message->type = "error";
-            $message->text = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category}";
-            $message->classes = ".$validation->validate.schema-valid";
-            $this->sendMessage($to, $message);
-        }
         $data = file_get_contents($dataPath);
         if ($data !== false) {
             $message = new \stdClass();
@@ -319,16 +312,24 @@ class Health implements MessageComponentInterface
                 $message->classes = ".$validation->validate.json-valid";
                 $this->sendMessage($to, $message);
 
-                $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
-                if (gettype($validationResult) === 'boolean' && $validationResult === true) {
+                if (null !== $schema) {
+                    $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
+                    if (gettype($validationResult) === 'boolean' && $validationResult === true) {
+                        $message = new \stdClass();
+                        $message->type = "success";
+                        $message->text = "The Data file $dataPath was successfully validated against the Schema $schema";
+                        $message->classes = ".$validation->validate.schema-valid";
+                        $this->sendMessage($to, $message);
+                    } elseif (gettype($validationResult === 'object')) {
+                        $validationResult->classes = ".$validation->validate.schema-valid";
+                        $this->sendMessage($to, $validationResult);
+                    }
+                } else {
                     $message = new \stdClass();
-                    $message->type = "success";
-                    $message->text = "The Data file $dataPath was successfully validated against the Schema $schema";
+                    $message->type = "error";
+                    $message->text = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category}";
                     $message->classes = ".$validation->validate.schema-valid";
                     $this->sendMessage($to, $message);
-                } elseif (gettype($validationResult === 'object')) {
-                    $validationResult->classes = ".$validation->validate.schema-valid";
-                    $this->sendMessage($to, $validationResult);
                 }
             } else {
                 $message = new \stdClass();
