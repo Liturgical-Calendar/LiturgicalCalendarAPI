@@ -296,6 +296,13 @@ class Health implements MessageComponentInterface
     {
         $dataPath = $validation->sourceFile;
         $schema = Health::retrieveSchemaForCategory($validation->category, $dataPath);
+        if (null === $schema) {
+            $message = new \stdClass();
+            $message->type = "error";
+            $message->text = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category}";
+            $message->classes = ".$validation->validate.schema-valid";
+            $this->sendMessage($to, $message);
+        }
         $data = file_get_contents($dataPath);
         if ($data !== false) {
             $message = new \stdClass();
