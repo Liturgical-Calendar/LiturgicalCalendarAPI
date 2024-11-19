@@ -4,7 +4,7 @@ namespace LiturgicalCalendar\Api\Enum;
 
 class LitSchema
 {
-    private const SCHEMA_BASE_PATH = API_BASE_PATH . Route::SCHEMAS->value;
+    private const SCHEMA_BASE_PATH = API_BASE_PATH . '/jsondata/schemas';
     public const INDEX             = self::SCHEMA_BASE_PATH . "/Index.json";
     public const DIOCESAN          = self::SCHEMA_BASE_PATH . "/DiocesanCalendar.json";
     public const NATIONAL          = self::SCHEMA_BASE_PATH . "/NationalCalendar.json";
