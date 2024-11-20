@@ -343,12 +343,18 @@ class Health implements MessageComponentInterface
     private function executeValidation(object $validation, ConnectionInterface $to)
     {
         if ($validation->category === 'sourceDataCheck') {
-            $dataPath = $validation->validate;
+            if (property_exists($validation, 'sourceFolder')) {
+                $dataPath       = $validation->sourceFolder;
+            } else {
+                $dataPath       = $validation->sourceFile;
+            }
+            $pathForSchema      = $validation->validate;
         } else {
-            $dataPath = $validation->sourceFile;
+            $pathForSchema      = $validation->sourceFile;
+            $dataPath           = $validation->sourceFile;
         }
 
-        $schema = Health::retrieveSchemaForCategory($validation->category, $dataPath);
+        $schema = Health::retrieveSchemaForCategory($validation->category, $pathForSchema);
 
         if (property_exists($validation, 'sourceFolder')) {
             $files = glob($validation->sourceFolder . '/*.json');
