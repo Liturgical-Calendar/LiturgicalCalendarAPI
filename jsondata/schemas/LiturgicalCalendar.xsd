@@ -363,6 +363,7 @@
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
+              <xs:element name="DioceseName" type="xs:string" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
