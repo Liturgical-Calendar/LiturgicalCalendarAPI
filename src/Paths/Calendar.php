@@ -4371,7 +4371,7 @@ class Calendar
 
                 // then create an XML representation from the Array
                 $ns = "http://www.bibleget.io/catholicliturgy";
-                $schemaLocation = API_BASE_PATH . '/schemas/LiturgicalCalendar.xsd';
+                $schemaLocation = API_BASE_PATH . '/jsondata/schemas/LiturgicalCalendar.xsd';
                 $xml = new \SimpleXMLElement(
                     "<?xml version=\"1.0\" encoding=\"UTF-8\"?" . "><LiturgicalCalendar xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
                     . " xsi:schemaLocation=\"$ns $schemaLocation\""
