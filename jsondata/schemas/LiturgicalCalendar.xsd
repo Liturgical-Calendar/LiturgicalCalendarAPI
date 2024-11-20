@@ -13,9 +13,6 @@
               <xs:element name="LitCalEvent" maxOccurs="unbounded">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="EventIdx" type="xs:string" />
-                    <xs:element name="Name" type="xs:string" />
-                    <xs:element name="Date" type="xs:long" />
                     <xs:element name="Color">
                       <xs:complexType>
                         <xs:sequence>
@@ -46,30 +43,6 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
-                    <xs:element name="Type">
-                      <xs:simpleType>
-                        <xs:restriction base="xs:string">
-                          <xs:enumeration value="mobile" />
-                          <xs:enumeration value="fixed" />
-                        </xs:restriction>
-                      </xs:simpleType>
-                    </xs:element>
-                    <xs:element name="Grade">
-                      <xs:simpleType>
-                        <xs:restriction base="xs:byte">
-                          <xs:enumeration value="0" />
-                          <xs:enumeration value="1" />
-                          <xs:enumeration value="2" />
-                          <xs:enumeration value="3" />
-                          <xs:enumeration value="4" />
-                          <xs:enumeration value="5" />
-                          <xs:enumeration value="6" />
-                          <xs:enumeration value="7" />
-                        </xs:restriction>
-                      </xs:simpleType>
-                    </xs:element>
-                    <xs:element name="GradeLcl" type="xs:string" />
-                    <xs:element name="DisplayGrade" type="xs:string" />
                     <xs:element name="Common">
                       <xs:complexType mixed="true">
                         <xs:sequence>
@@ -86,6 +59,15 @@
                       </xs:complexType>
                     </xs:element>
                     <xs:element name="CommonLcl" type="xs:string" />
+                    <xs:element name="Date" type="xs:long" />
+                    <xs:element name="Day">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:positiveInteger">
+                          <xs:minInclusive value="1" />
+                          <xs:maxInclusive value="31" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
                     <xs:element name="DayOfTheWeekIso8601">
                       <xs:simpleType>
                         <xs:restriction base="xs:positiveInteger">
@@ -94,6 +76,36 @@
                         </xs:restriction>
                       </xs:simpleType>
                     </xs:element>
+                    <xs:element name="DayOfTheWeekShort" type="xs:string" />
+                    <xs:element name="DayOfTheWeekLong" type="xs:string" />
+                    <xs:element name="EventIdx" type="xs:string" />
+                    <xs:element name="EventKey" type="xs:string" />
+                    <xs:element name="Name" type="xs:string" />
+                    <xs:element name="Grade">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:byte">
+                          <xs:enumeration value="0" />
+                          <xs:enumeration value="1" />
+                          <xs:enumeration value="2" />
+                          <xs:enumeration value="3" />
+                          <xs:enumeration value="4" />
+                          <xs:enumeration value="5" />
+                          <xs:enumeration value="6" />
+                          <xs:enumeration value="7" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="GradeAbbr" type="xs:string" />
+                    <xs:element name="GradeDisplay" type="xs:string" />
+                    <xs:element name="GradeLcl" type="xs:string" />
+                    <xs:element name="HasVesperI" minOccurs="0" type="xs:boolean" />
+                    <xs:element name="HasVesperII" minOccurs="0" type="xs:boolean" />
+                    <xs:element name="HasVigilMass" minOccurs="0" type="xs:boolean" />
+                    <xs:element name="IsVigilFor" minOccurs="0" type="xs:string" />
+                    <xs:element name="IsVigilMass" minOccurs="0" type="xs:boolean" />
+                    <xs:element name="LiturgicalSeason" minOccurs="0" type="xs:string" />
+                    <xs:element name="LiturgicalSeasonLcl" minOccurs="0" type="xs:string" />
+                    <xs:element name="LiturgicalYear" minOccurs="0" type="xs:string" />
                     <xs:element name="Month">
                       <xs:simpleType>
                         <xs:restriction base="xs:positiveInteger">
@@ -102,11 +114,23 @@
                         </xs:restriction>
                       </xs:simpleType>
                     </xs:element>
-                    <xs:element name="Day">
+                    <xs:element name="MonthLong" type="xs:string" />
+                    <xs:element name="MonthShort" type="xs:string" />
+                    <xs:element name="PsalterWeek" minOccurs="0">
                       <xs:simpleType>
-                        <xs:restriction base="xs:positiveInteger">
-                          <xs:minInclusive value="1" />
-                          <xs:maxInclusive value="31" />
+                        <xs:restriction base="xs:byte">
+                          <xs:enumeration value="1" />
+                          <xs:enumeration value="2" />
+                          <xs:enumeration value="3" />
+                          <xs:enumeration value="4" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="Type">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="mobile" />
+                          <xs:enumeration value="fixed" />
                         </xs:restriction>
                       </xs:simpleType>
                     </xs:element>
@@ -118,30 +142,8 @@
                         </xs:restriction>
                       </xs:simpleType>
                     </xs:element>
-                    <xs:element name="MonthShort" type="xs:string" />
-                    <xs:element name="MonthLong" type="xs:string" />
-                    <xs:element name="DayOfTheWeekShort" type="xs:string" />
-                    <xs:element name="DayOfTheWeekLong" type="xs:string" />
-                    <xs:element name="LiturgicalYear" minOccurs="0" type="xs:string" />
-                    <xs:element name="IsVigilMass" minOccurs="0" type="xs:boolean" />
-                    <xs:element name="IsVigilFor" minOccurs="0" type="xs:string" />
-                    <xs:element name="HasVigilMass" minOccurs="0" type="xs:boolean" />
-                    <xs:element name="HasVesperI" minOccurs="0" type="xs:boolean" />
-                    <xs:element name="HasVesperII" minOccurs="0" type="xs:boolean" />
-                    <xs:element name="PsalterWeek" minOccurs="0">
-                      <xs:simpleType>
-                        <xs:restriction base="xs:byte">
-                          <xs:enumeration value="1" />
-                          <xs:enumeration value="2" />
-                          <xs:enumeration value="3" />
-                          <xs:enumeration value="4" />
-                        </xs:restriction>
-                      </xs:simpleType>
-                    </xs:element>
-                    <xs:element name="LiturgicalSeason" minOccurs="0" type="xs:string" />
-                    <xs:element name="LiturgicalSeasonLcl" minOccurs="0" type="xs:string" />
                   </xs:sequence>
-                  <xs:attribute name="eventKey" type="xs:ID" use="required" />
+                  <xs:attribute name="idx" type="xs:integer" use="required" />
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
