@@ -341,6 +341,9 @@ class Health implements MessageComponentInterface
                 if (preg_match("/^diocesan-calendar-[a-z]{6}_[a-z]{2}$/", $dataPath)) {
                     return LitSchema::DIOCESAN;
                 }
+                if (preg_match("/^tests-[a-zA-Z0-9_]+$/", $dataPath)) {
+                    return LitSchema::TEST_SRC;
+                }
                 return null;
         }
         return null;
