@@ -281,6 +281,33 @@ class Health implements MessageComponentInterface
                     return $schema;
                 }
                 return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
+                break;
+            case 'sourceDataCheck':
+                if (preg_match("/-i18n(?:-[A-Z][a-z]+)?$/", $dataPath)) {
+                    return LitSchema::I18N;
+                }
+                if (preg_match("/^memorials-from-decrees$/", $dataPath)) {
+                    return LitSchema::DECREES;
+                }
+                if (preg_match("/^proprium-de-sanctis(?:-[A-Z]{2})-[0-9]{4}$/", $dataPath)) {
+                    return LitSchema::PROPRIUMDESANCTIS;
+                }
+                if (preg_match("/^proprium-de-tempore$/", $dataPath)) {
+                    return LitSchema::PROPRIUMDETEMPORE;
+                }
+                if (preg_match("/^regional-calendars-index$/", $dataPath)) {
+                    return LitSchema::INDEX;
+                }
+                if (preg_match("/^wider-region-[A-Z][a-z]+$/", $dataPath)) {
+                    return LitSchema::WIDERREGION;
+                }
+                if (preg_match("/^national-calendar-[A-Z]{2}$/", $dataPath)) {
+                    return LitSchema::NATIONAL;
+                }
+                if (preg_match("/^diocesan-calendar-[a-z]{6}_[a-z]{2}+$/", $dataPath)) {
+                    return LitSchema::DIOCESAN;
+                }
+                return null;
         }
         return null;
     }
@@ -298,9 +325,104 @@ class Health implements MessageComponentInterface
      */
     private function executeValidation(object $validation, ConnectionInterface $to)
     {
-        $dataPath = $validation->sourceFile;
-        $schema = Health::retrieveSchemaForCategory($validation->category, $dataPath);
-        $data = file_get_contents($dataPath);
+        if (property_exists($validation, 'sourceFolder')) {
+            $dataPath = $validation->sourceFolder;
+        } elseif (property_exists($validation, 'sourceFile')) {
+            $dataPath = $validation->sourceFile;
+        } else {
+            $message = new \stdClass();
+            $message->type = "error";
+            $message->text = "The validation object is missing the sourceFile or sourceFolder property";
+            $this->sendMessage($to, $message);
+            return;
+        }
+        if ($validation->category === 'sourceDataCheck') {
+            $schema = Health::retrieveSchemaForCategory($validation->category, $validation->validate);
+        } else {
+            $schema = Health::retrieveSchemaForCategory($validation->category, $dataPath);
+        }
+        if (property_exists($validation, 'sourceFolder')) {
+            $files = glob($validation->sourceFolder . '/*.json');
+            if (false === $files || empty($files)) {
+                $message = new \stdClass();
+                $message->type = "error";
+                $message->text = "Data folder $validation->sourceFolder does not exist or does not contain any json files";
+                $message->classes = ".$validation->validate.file-exists";
+                $this->sendMessage($to, $message);
+                return;
+            }
+
+            foreach ($files as $file) {
+                $filename = pathinfo($file, PATHINFO_BASENAME);
+
+                $matchI8nFile = preg_match("/[a-z]{2}(?:_[A-Za-z]+)?(?:_[A-Z]{2})?\.json$/", $filename);
+                if (false === $matchI8nFile || 0 === $matchI8nFile) {
+                    $message = new \stdClass();
+                    $message->type = "error";
+                    $message->text = "Data folder $validation->sourceFolder contains an invalid i18n json filename $filename";
+                    $message->classes = ".$validation->validate.file-exists";
+                    $this->sendMessage($to, $message);
+                    return;
+                }
+
+                $fileData = file_get_contents($file);
+                if (false === $fileData) {
+                    $message = new \stdClass();
+                    $message->type = "error";
+                    $message->text = "Data folder $validation->sourceFolder contains an unreadable i18n json file $filename";
+                    $message->classes = ".$validation->validate.file-exists";
+                    $this->sendMessage($to, $message);
+                    return;
+                }
+
+                $jsonData = json_decode($fileData);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    $message = new \stdClass();
+                    $message->type = "error";
+                    $message->text = "The i18n json file $filename was not successfully decoded as JSON: " . json_last_error_msg();
+                    $message->classes = ".$validation->validate.json-valid";
+                    $this->sendMessage($to, $message);
+                    return;
+                }
+
+                if (null !== $schema) {
+                    $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
+                    if (gettype($validationResult) === 'object') {
+                        $validationResult->classes = ".$validation->validate.schema-valid";
+                        $this->sendMessage($to, $validationResult);
+                        return;
+                    }
+                } else {
+                    $message = new \stdClass();
+                    $message->type = "error";
+                    $message->text = "Unable to detect a schema for {$validation->validate} and category {$validation->category}";
+                    $message->classes = ".$validation->validate.schema-valid";
+                    $this->sendMessage($to, $message);
+                    return;
+                }
+            }
+            // if we haven't returned yet, the validation was successful
+            $message = new \stdClass();
+            $message->type = "success";
+            $message->text = "The Data folder $validation->sourceFolder exists and contains valid i18n json files";
+            $message->classes = ".$validation->validate.file-exists";
+            $this->sendMessage($to, $message);
+
+            $message = new \stdClass();
+            $message->type = "success";
+            $message->text = "The i18n json files in Data folder $validation->sourceFolder were successfully decoded as JSON";
+            $message->classes = ".$validation->validate.json-valid";
+            $this->sendMessage($to, $message);
+
+            $message = new \stdClass();
+            $message->type = "success";
+            $message->text = "The i18n json files in Data folder $validation->sourceFolder were successfully validated against the Schema $schema";
+            $message->classes = ".$validation->validate.schema-valid";
+            $this->sendMessage($to, $message);
+            return;
+        } else {
+            $data = file_get_contents($dataPath);
+        }
         if ($data !== false) {
             $message = new \stdClass();
             $message->type = "success";
