@@ -362,7 +362,7 @@ class Health implements MessageComponentInterface
         if ($validation->category === 'sourceDataCheck') {
             $pathForSchema      = $validation->validate;
             if (property_exists($validation, 'sourceFolder')) {
-                $dataPath       = $validation->sourceFolder;
+                $dataPath       = rtrim($validation->sourceFolder, '/');
             } else {
                 $dataPath       = $validation->sourceFile;
             }
@@ -374,7 +374,6 @@ class Health implements MessageComponentInterface
         $schema = Health::retrieveSchemaForCategory($validation->category, $pathForSchema);
 
         if (property_exists($validation, 'sourceFolder')) {
-            $dataPath = rtrim($validation->sourceFolder, '/');
             $files = glob($dataPath . '/*.json');
             if (false === $files || empty($files)) {
                 $message = new \stdClass();
