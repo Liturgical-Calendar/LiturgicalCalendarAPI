@@ -107,6 +107,9 @@ class Health implements MessageComponentInterface
         $valid = true;
         foreach (Health::ACTION_PROPERTIES[$message->action] as $prop) {
             if (false === property_exists($message, $prop)) {
+                if ($prop === 'sourceFile' && $message->action === 'executeValidation' && property_exists($message, 'sourceFolder')) {
+                    continue;
+                }
                 return false;
             }
         }
