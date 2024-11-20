@@ -581,13 +581,13 @@ class Health implements MessageComponentInterface
                         $message->classes = ".calendar-$calendar.json-valid.year-$year";
                         $this->sendMessage($to, $message);
 
-                        $validationResult = $xml->schemaValidate(API_BASE_PATH . '/schemas/LiturgicalCalendar.xsd');
+                        $validationResult = $xml->schemaValidate('jsondata/schemas/LiturgicalCalendar.xsd');
                         if ($validationResult) {
                             $message = new \stdClass();
                             $message->type = "success";
                             $message->text = sprintf(
                                 "The $category of $calendar for the year $year was successfully validated against the Schema %s",
-                                API_BASE_PATH . "/schemas/LiturgicalCalendar.xsd"
+                                "jsondata/schemas/LiturgicalCalendar.xsd"
                             );
                             $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
