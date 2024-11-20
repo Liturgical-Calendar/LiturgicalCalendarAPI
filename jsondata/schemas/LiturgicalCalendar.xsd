@@ -76,11 +76,10 @@
                         </xs:restriction>
                       </xs:simpleType>
                     </xs:element>
-                    <xs:element name="DayOfTheWeekShort" type="xs:string" />
                     <xs:element name="DayOfTheWeekLong" type="xs:string" />
+                    <xs:element name="DayOfTheWeekShort" type="xs:string" />
                     <xs:element name="EventIdx" type="xs:string" />
                     <xs:element name="EventKey" type="xs:string" />
-                    <xs:element name="Name" type="xs:string" />
                     <xs:element name="Grade">
                       <xs:simpleType>
                         <xs:restriction base="xs:byte">
@@ -116,6 +115,7 @@
                     </xs:element>
                     <xs:element name="MonthLong" type="xs:string" />
                     <xs:element name="MonthShort" type="xs:string" />
+                    <xs:element name="Name" type="xs:string" />
                     <xs:element name="PsalterWeek" minOccurs="0">
                       <xs:simpleType>
                         <xs:restriction base="xs:byte">
