@@ -12,6 +12,7 @@ class LitSchema
     public const PROPRIUMDETEMPORE = self::SCHEMA_BASE_PATH . "/PropriumDeTempore.json";
     public const WIDERREGION       = self::SCHEMA_BASE_PATH . "/WiderRegionCalendar.json";
     public const DECREES           = self::SCHEMA_BASE_PATH . "/LitCalDecreesPath.json";
+    public const DECREES_SRC       = self::SCHEMA_BASE_PATH . "/LitCalDecreesSource.json";
     public const I18N              = self::SCHEMA_BASE_PATH . "/LitCalTranslation.json";
     public const METADATA          = self::SCHEMA_BASE_PATH . "/LitCalMetadata.json";
     public const LITCAL            = self::SCHEMA_BASE_PATH . "/LitCal.json";

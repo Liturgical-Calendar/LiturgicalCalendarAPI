@@ -287,7 +287,7 @@ class Health implements MessageComponentInterface
                     return LitSchema::I18N;
                 }
                 if (preg_match("/^memorials-from-decrees$/", $dataPath)) {
-                    return LitSchema::DECREES;
+                    return LitSchema::DECREES_SRC;
                 }
                 if (preg_match("/^proprium-de-sanctis(?:-[A-Z]{2})-[0-9]{4}$/", $dataPath)) {
                     return LitSchema::PROPRIUMDESANCTIS;
