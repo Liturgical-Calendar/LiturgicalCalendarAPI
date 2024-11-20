@@ -317,7 +317,7 @@ class Health implements MessageComponentInterface
                 return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
                 break;
             case 'sourceDataCheck':
-                if (preg_match("/-i18n(?:-[A-Z][a-z]+)?$/", $dataPath)) {
+                if (preg_match("/-i18n$/", $dataPath)) {
                     return LitSchema::I18N;
                 }
                 if (preg_match("/^memorials-from-decrees$/", $dataPath)) {
