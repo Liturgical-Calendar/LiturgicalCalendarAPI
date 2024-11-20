@@ -179,8 +179,8 @@
         "region": "US",
         "wider_region": {
             "name": "Americas",
-            "json_file": "data\/wider_regions\/Americas.json",
-            "i18n_file": "data\/wider_regions\/AMERICAS\/en_US.json"
+            "json_file": "jsondata\/sourcedata\/wider_regions\/Americas.json",
+            "i18n_file": "jsondata\/sourcedata\/wider_regions\/AMERICAS\/en_US.json"
         },
         "missals": [
             "US_2011"

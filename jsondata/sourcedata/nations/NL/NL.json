@@ -170,8 +170,8 @@
         "region": "NL",
         "wider_region": {
             "name": "Europe",
-            "json_file": "data\/wider_regions\/Europe.json",
-            "i18n_file": "data\/wider_regions\/EUROPE\/nl_NL.json"
+            "json_file": "jsondata\/sourcedata\/wider_regions\/Europe.json",
+            "i18n_file": "jsondata\/sourcedata\/wider_regions\/EUROPE\/nl_NL.json"
         },
         "missals": [
             "NL_1978"
