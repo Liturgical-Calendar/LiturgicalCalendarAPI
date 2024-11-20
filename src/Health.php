@@ -342,16 +342,10 @@ class Health implements MessageComponentInterface
      */
     private function executeValidation(object $validation, ConnectionInterface $to)
     {
-        if (property_exists($validation, 'sourceFolder')) {
+        if ($validation->category === 'sourceDataCheck') {
             $dataPath = $validation->validate;
-        } elseif (property_exists($validation, 'sourceFile')) {
-            $dataPath = $validation->sourceFile;
         } else {
-            $message = new \stdClass();
-            $message->type = "error";
-            $message->text = "The validation object is missing the sourceFile or sourceFolder property";
-            $this->sendMessage($to, $message);
-            return;
+            $dataPath = $validation->sourceFile;
         }
 
         $schema = Health::retrieveSchemaForCategory($validation->category, $dataPath);
