@@ -460,7 +460,7 @@ class Health implements MessageComponentInterface
             if (preg_match("/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/", $pathForSchema, $matches)) {
                 $dioceseId = $matches[1];
                 $dioceseName = array_values(array_filter(self::$metadata->litcal_metadata->diocesan_calendars, fn ($diocesan_calendar) => $diocesan_calendar->calendar_id === $dioceseId))[0]->diocese;
-                $dataPath = preg_replace("/^nations\/([A-Z]{2})\/(?:[a-z]{6}_[a-z]{2})\.json$/", "nations/$1/$dioceseName.json", $dataPath);
+                $dataPath = preg_replace("/nations\/([A-Z]{2})\/(?:[a-z]{6}_[a-z]{2})\.json$/", "nations/$1/$dioceseName.json", $dataPath);
             }
             $data = file_get_contents($dataPath);
             if ($data !== false) {
