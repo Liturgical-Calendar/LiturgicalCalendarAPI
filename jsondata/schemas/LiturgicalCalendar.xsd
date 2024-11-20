@@ -119,6 +119,7 @@
                     <xs:element name="PsalterWeek" minOccurs="0">
                       <xs:simpleType>
                         <xs:restriction base="xs:byte">
+                          <xs:enumeration value="0" />
                           <xs:enumeration value="1" />
                           <xs:enumeration value="2" />
                           <xs:enumeration value="3" />
