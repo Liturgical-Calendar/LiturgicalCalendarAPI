@@ -103,6 +103,7 @@ class Health implements MessageComponentInterface
                 echo "Metadata was already loaded and has required diocesan_calendars property\n";
             } else {
                 echo "Error loading metadata: missing diocesan_calendars property\n";
+                echo json_encode(self::$metadata);
             }
         }
     }
