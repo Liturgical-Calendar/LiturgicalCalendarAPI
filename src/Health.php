@@ -98,6 +98,8 @@ class Health implements MessageComponentInterface
             } else {
                 echo "Error loading metadata: " . json_last_error_msg() . "\n";
             }
+        } else {
+            echo "Metadata was already loaded\n";
         }
     }
 
