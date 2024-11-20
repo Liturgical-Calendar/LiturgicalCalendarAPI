@@ -128,7 +128,7 @@ class Health implements MessageComponentInterface
      */
     public function onMessage(ConnectionInterface $from, $msg)
     {
-        echo sprintf('Receiving message "%s" from connection %d', $msg, $from->resourceId);
+        echo sprintf('Receiving message from connection %d: %s', $from->resourceId, $msg);
         $messageReceived = json_decode($msg);
         if (
             json_last_error() === JSON_ERROR_NONE
@@ -163,6 +163,20 @@ class Health implements MessageComponentInterface
                     $message->text = $msg;
                     $this->sendMessage($from, $message);
             }
+        } else {
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $errorMsg = json_last_error_msg();
+            } elseif (!property_exists($messageReceived, 'action')) {
+                $errorMsg = 'No action specified';
+            } elseif (!self::validateMessageProperties($messageReceived)) {
+                $errorMsg = 'Invalid message properties';
+            }
+            echo sprintf('Invalid message from connection %1$d: %2$s (%3$s)', $from->resourceId, $errorMsg, $msg);
+            $message = new \stdClass();
+            $message->type = "echobot";
+            $message->errorMsg = $errorMsg;
+            $message->text = sprintf('Invalid message from connection %d: %s', $from->resourceId, $msg);
+            $this->sendMessage($from, $message);
         }
     }
 
