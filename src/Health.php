@@ -343,12 +343,12 @@ class Health implements MessageComponentInterface
     private function executeValidation(object $validation, ConnectionInterface $to)
     {
         if ($validation->category === 'sourceDataCheck') {
+            $pathForSchema      = $validation->validate;
             if (property_exists($validation, 'sourceFolder')) {
-                $dataPath       = $validation->sourceFolder;
+                $dataPath       = $validation->sourceFolder; // won't actually be used
             } else {
                 $dataPath       = $validation->sourceFile;
             }
-            $pathForSchema      = $validation->validate;
         } else {
             $pathForSchema      = $validation->sourceFile;
             $dataPath           = $validation->sourceFile;
