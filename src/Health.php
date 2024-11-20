@@ -89,12 +89,16 @@ class Health implements MessageComponentInterface
     {
         // Store the new connection to send messages to later
         $this->clients->attach($conn);
+        echo "New connection! ({$conn->resourceId})\n";
 
         if (null === self::$metadata) {
             self::$metadata = json_decode(file_get_contents(API_BASE_PATH . '/calendars'));
+            if (JSON_ERROR_NONE === json_last_error()) {
+                echo "Loaded metadata\n";
+            } else {
+                echo "Error loading metadata: " . json_last_error_msg() . "\n";
+            }
         }
-
-        echo "New connection! ({$conn->resourceId})\n";
     }
 
     /**
