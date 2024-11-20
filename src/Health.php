@@ -52,6 +52,8 @@ class Health implements MessageComponentInterface
         "executeUnitTest"   => ["calendar", "year", "category", "test"]
     ];
 
+    private static ?object $metadata = null;
+
     /**
      * Mapping of data file paths to the LitSchema constants that their JSON data should validate against.
      * The paths are relative to the root of the project. The LitSchema constants are used to determine
@@ -87,6 +89,10 @@ class Health implements MessageComponentInterface
     {
         // Store the new connection to send messages to later
         $this->clients->attach($conn);
+
+        if (null === self::$metadata) {
+            self::$metadata = json_decode(file_get_contents(API_BASE_PATH . '/calendars'));
+        }
 
         echo "New connection! ({$conn->resourceId})\n";
     }
@@ -321,7 +327,7 @@ class Health implements MessageComponentInterface
                 if (preg_match("/^national-calendar-[A-Z]{2}$/", $dataPath)) {
                     return LitSchema::NATIONAL;
                 }
-                if (preg_match("/^diocesan-calendar-[a-z]{6}_[a-z]{2}+$/", $dataPath)) {
+                if (preg_match("/^diocesan-calendar-[a-z]{6}_[a-z]{2}$/", $dataPath)) {
                     return LitSchema::DIOCESAN;
                 }
                 return null;
@@ -372,7 +378,7 @@ class Health implements MessageComponentInterface
             foreach ($files as $file) {
                 $filename = pathinfo($file, PATHINFO_BASENAME);
 
-                $matchI8nFile = preg_match("/[a-z]{2}(?:_[A-Z][a-z]+)?(?:_[A-Z]{2})?\.json$/", $filename);
+                $matchI8nFile = preg_match("/(?:[a-z]{2,3}(?:_[A-Z][a-z]{3})?(?:_[A-Z]{2})?|(?:ar|en|eo)_001|(?:en_150|es_419))\.json$/", $filename);
                 if (false === $matchI8nFile || 0 === $matchI8nFile) {
                     $fileExistsAndIsReadable = false;
                     $message = new \stdClass();
@@ -439,6 +445,12 @@ class Health implements MessageComponentInterface
                 $this->sendMessage($to, $message);
             }
         } else {
+            $matches = null;
+            if (preg_match("/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/", $pathForSchema, $matches)) {
+                $dioceseId = $matches[1];
+                $dioceseName = array_values(array_filter(self::$metadata->diocesan_calendars, fn ($diocesan_calendar) => $diocesan_calendar->calendar_id === $dioceseId))[0]->diocese;
+                $dataPath = preg_replace("/^nations\/([A-Z]{2})\/(?:[a-z]{6}_[a-z]{2})\.json$/", "nations/$1/$dioceseName.json", $dataPath);
+            }
             $data = file_get_contents($dataPath);
             if ($data !== false) {
                 $message = new \stdClass();
