@@ -1,8 +1,9 @@
 {
-    "litcal": {
-        "DedicationoftheCathedraloftheHolyCross": {
+    "$schema": "../../../../../schemas/DiocesanCalendar.json",
+    "litcal": [
+        {
             "festivity": {
-                "name": "Dedication of the Cathedral of the Holy Cross",
+                "event_key": "DedicationoftheCathedraloftheHolyCross",
                 "color": ["white"],
                 "grade": 4,
                 "common": ["Dedication of a Church"],
@@ -14,10 +15,17 @@
                 "since_year": 1970
             }
         }
-    },
+    ],
     "overrides": {
         "epiphany": "JAN6",
         "ascension": "THURSDAY",
         "corpus_christi": "THURSDAY"
+    },
+    "metadata": {
+        "diocese_id": "boston_us",
+        "diocese_name": "Archdiocese of Boston (Massachusetts)",
+        "nation": "US",
+        "locales": ["en_US"],
+        "timezone": "America/New_York"
     }
 }

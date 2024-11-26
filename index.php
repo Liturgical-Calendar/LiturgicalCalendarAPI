@@ -57,8 +57,6 @@ if (Router::isLocalhost()) {
  * Perhaps we could find a better way to set this in a class such as Core ...
  */
 define('API_BASE_PATH', "{$server_request_scheme}://{$server_name}");
-define('SCHEMAS_FOLDER', 'jsondata/schemas');
-define('TESTS_FOLDER', 'jsondata/tests');
 
 if (false === Router::isLocalhost()) {
     Router::setAllowedOrigins('allowedOrigins.php');

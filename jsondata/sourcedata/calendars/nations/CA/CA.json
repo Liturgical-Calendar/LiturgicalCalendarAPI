@@ -486,8 +486,8 @@
         "region": "CA",
         "wider_region": {
             "name": "Americas",
-            "json_file": "jsondata\/sourcedata\/calendars\/wider_regions\/AMERICAS\/Americas.json",
-            "i18n_path": "jsondata\/sourcedata\/calendars\/wider_regions\/AMERICAS\/i18n\/"
+            "json_file": "jsondata\/sourcedata\/calendars\/wider_regions\/Americas\/Americas.json",
+            "i18n_path": "jsondata\/sourcedata\/calendars\/wider_regions\/Americas\/i18n\/"
         },
         "missals": [
             "CA_2011"

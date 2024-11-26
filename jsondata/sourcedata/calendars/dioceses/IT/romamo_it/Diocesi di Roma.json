@@ -1,8 +1,8 @@
 {
-    "litcal": {
-        "BeatoGregorioXpapa": {
+    "$schema": "../../../../../schemas/DiocesanCalendar.json",
+    "litcal": [
+        {
             "festivity": {
-                "name": "Beato Gregorio X, papa",
                 "color": [
                     "white"
                 ],
@@ -11,7 +11,8 @@
                     "Pastors:For a Pope"
                 ],
                 "day": 9,
-                "month": 1
+                "month": 1,
+                "event_key": "BeatoGregorioX"
             },
             "metadata": {
                 "form_rownum": 0,
@@ -19,9 +20,8 @@
                 "until_year": 2023
             }
         },
-        "SanVincenzoPallottisacerdote": {
+        {
             "festivity": {
-                "name": "San Vincenzo Pallotti, sacerdote",
                 "color": [
                     "white"
                 ],
@@ -30,7 +30,8 @@
                     "Proper"
                 ],
                 "day": 22,
-                "month": 1
+                "month": 1,
+                "event_key": "SanVincenzoPallotti"
             },
             "metadata": {
                 "form_rownum": 1,
@@ -38,9 +39,8 @@
                 "until_year": 2023
             }
         },
-        "BeataLudovicaAlbertoni": {
+        {
             "festivity": {
-                "name": "Beata Ludovica Albertoni",
                 "color": [
                     "white"
                 ],
@@ -49,16 +49,16 @@
                     "Holy Men and Women:For Those Who Practiced Works of Mercy"
                 ],
                 "day": 1,
-                "month": 2
+                "month": 2,
+                "event_key": "BeataLudovicaAlbertoni"
             },
             "metadata": {
                 "form_rownum": 1,
                 "since_year": 1973
             }
         },
-        "SantoIlaropapa": {
+        {
             "festivity": {
-                "name": "Santo Ilaro, papa",
                 "color": [
                     "white"
                 ],
@@ -67,7 +67,8 @@
                     "Pastors:For a Pope"
                 ],
                 "day": 28,
-                "month": 2
+                "month": 2,
+                "event_key": "SantoIlaro"
             },
             "metadata": {
                 "form_rownum": 2,
@@ -75,9 +76,8 @@
                 "until_year": 2023
             }
         },
-        "SanFeliceIIIpapa": {
+        {
             "festivity": {
-                "name": "San Felice III, papa",
                 "color": [
                     "white"
                 ],
@@ -86,7 +86,8 @@
                     "Pastors:For a Pope"
                 ],
                 "day": 1,
-                "month": 3
+                "month": 3,
+                "event_key": "SanFeliceIII"
             },
             "metadata": {
                 "form_rownum": 3,
@@ -94,9 +95,8 @@
                 "until_year": 2023
             }
         },
-        "SanMartinoIpapaemartire": {
+        {
             "festivity": {
-                "name": "San Martino I, papa e martire",
                 "color": [
                     "red",
                     "white"
@@ -107,7 +107,8 @@
                     "Pastors:For a Pope"
                 ],
                 "day": 13,
-                "month": 4
+                "month": 4,
+                "event_key": "SanMartinoI"
             },
             "metadata": {
                 "form_rownum": 2,
@@ -115,9 +116,8 @@
                 "until_year": 2023
             }
         },
-        "SanBenedettoGiuseppeLabre": {
+        {
             "festivity": {
-                "name": "San Benedetto Giuseppe Labre",
                 "color": [
                     "white"
                 ],
@@ -126,7 +126,8 @@
                     "Proper"
                 ],
                 "day": 16,
-                "month": 4
+                "month": 4,
+                "event_key": "SanBenedettoGiuseppeLabre"
             },
             "metadata": {
                 "form_rownum": 3,
@@ -134,9 +135,8 @@
                 "until_year": 2023
             }
         },
-        "SanLeoneIXpapa": {
+        {
             "festivity": {
-                "name": "San Leone IX, papa",
                 "color": [
                     "white"
                 ],
@@ -145,7 +145,8 @@
                     "Proper"
                 ],
                 "day": 19,
-                "month": 4
+                "month": 4,
+                "event_key": "SanLeoneIX"
             },
             "metadata": {
                 "form_rownum": 4,
@@ -153,9 +154,8 @@
                 "until_year": 2023
             }
         },
-        "SanPioVpapa": {
+        {
             "festivity": {
-                "name": "San Pio V, papa",
                 "color": [
                     "white"
                 ],
@@ -164,7 +164,8 @@
                     "Pastors:For a Pope"
                 ],
                 "day": 30,
-                "month": 4
+                "month": 4,
+                "event_key": "SanPioV"
             },
             "metadata": {
                 "form_rownum": 5,
@@ -172,9 +173,8 @@
                 "until_year": 2023
             }
         },
-        "SanFelicedaCantalicereligioso": {
+        {
             "festivity": {
-                "name": "San Felice da Cantalice, religioso",
                 "color": [
                     "white"
                 ],
@@ -183,16 +183,16 @@
                     "Holy Men and Women:For Religious"
                 ],
                 "day": 18,
-                "month": 5
+                "month": 5,
+                "event_key": "SanFelicedaCantalice"
             },
             "metadata": {
                 "form_rownum": 4,
                 "since_year": 1973
             }
         },
-        "SanGiovanniBattistadeRossisacerdote": {
+        {
             "festivity": {
-                "name": "San Giovanni Battista de Rossi, sacerdote",
                 "color": [
                     "white"
                 ],
@@ -201,7 +201,8 @@
                     "Proper"
                 ],
                 "day": 23,
-                "month": 5
+                "month": 5,
+                "event_key": "SanGiovanniBattistadeRossi"
             },
             "metadata": {
                 "form_rownum": 6,
@@ -209,9 +210,8 @@
                 "until_year": 2023
             }
         },
-        "BeataMariaVergineAuxiliumChristianorum": {
+        {
             "festivity": {
-                "name": "Beata Maria Vergine «Auxilium Christianorum»",
                 "color": [
                     "white"
                 ],
@@ -220,7 +220,8 @@
                     "Proper"
                 ],
                 "day": 24,
-                "month": 5
+                "month": 5,
+                "event_key": "BeataMariaVergineAuxiliumChristianorum"
             },
             "metadata": {
                 "form_rownum": 5,
@@ -228,9 +229,8 @@
                 "until_year": 2023
             }
         },
-        "SanGregorioVIIpapa": {
+        {
             "festivity": {
-                "name": "San Gregorio VII, papa",
                 "color": [
                     "white"
                 ],
@@ -239,7 +239,8 @@
                     "Pastors:For a Pope"
                 ],
                 "day": 25,
-                "month": 5
+                "month": 5,
+                "event_key": "SanGregorioVII"
             },
             "metadata": {
                 "form_rownum": 7,
@@ -247,9 +248,8 @@
                 "until_year": 2023
             }
         },
-        "SantiMarcellinoePietromartiri": {
+        {
             "festivity": {
-                "name": "Santi Marcellino e Pietro, martiri",
                 "color": [
                     "red"
                 ],
@@ -258,7 +258,8 @@
                     "Martyrs:For Several Martyrs"
                 ],
                 "day": 2,
-                "month": 6
+                "month": 6,
+                "event_key": "SantiMarcellinoePietro"
             },
             "metadata": {
                 "form_rownum": 8,
@@ -266,9 +267,8 @@
                 "until_year": 2023
             }
         },
-        "BeataAnnaMariaTaigi": {
+        {
             "festivity": {
-                "name": "Beata Anna Maria Taigi",
                 "color": [
                     "white"
                 ],
@@ -277,16 +277,16 @@
                     "Holy Men and Women:For Holy Women"
                 ],
                 "day": 9,
-                "month": 6
+                "month": 6,
+                "event_key": "BeataAnnaMariaTaigi"
             },
             "metadata": {
                 "form_rownum": 9,
                 "since_year": 1973
             }
         },
-        "SantiGiovanniePaolomartiri": {
+        {
             "festivity": {
-                "name": "Santi Giovanni e Paolo, martiri",
                 "color": [
                     "red"
                 ],
@@ -295,7 +295,8 @@
                     "Martyrs"
                 ],
                 "day": 26,
-                "month": 6
+                "month": 6,
+                "event_key": "SantiGiovanniePaolo"
             },
             "metadata": {
                 "form_rownum": 6,
@@ -303,9 +304,8 @@
                 "until_year": 2023
             }
         },
-        "SantaBrigidareligiosa": {
+        {
             "festivity": {
-                "name": "Santa Brigida, religiosa",
                 "color": [
                     "white"
                 ],
@@ -315,7 +315,8 @@
                     "Holy Men and Women:For Holy Women"
                 ],
                 "day": 23,
-                "month": 7
+                "month": 7,
+                "event_key": "SantaBrigida"
             },
             "metadata": {
                 "form_rownum": 11,
@@ -323,9 +324,8 @@
                 "until_year": 2023
             }
         },
-        "BeatoInnocenzoXIpapa": {
+        {
             "festivity": {
-                "name": "Beato Innocenzo XI, papa",
                 "color": [
                     "white"
                 ],
@@ -334,7 +334,8 @@
                     "Pastors:For a Pope"
                 ],
                 "day": 12,
-                "month": 8
+                "month": 8,
+                "event_key": "BeatoInnocenzoXI"
             },
             "metadata": {
                 "form_rownum": 8,
@@ -342,9 +343,8 @@
                 "until_year": 2023
             }
         },
-        "SanSistoIIIpapa": {
+        {
             "festivity": {
-                "name": "San Sisto III, papa",
                 "color": [
                     "white"
                 ],
@@ -353,7 +353,8 @@
                     "Pastors:For a Pope"
                 ],
                 "day": 19,
-                "month": 8
+                "month": 8,
+                "event_key": "SanSistoIII"
             },
             "metadata": {
                 "form_rownum": 9,
@@ -361,9 +362,8 @@
                 "until_year": 2023
             }
         },
-        "SanGasparedelBufalosacerdote": {
+        {
             "festivity": {
-                "name": "San Gaspare del Bufalo, sacerdote",
                 "color": [
                     "white"
                 ],
@@ -372,7 +372,8 @@
                     "Proper"
                 ],
                 "day": 21,
-                "month": 10
+                "month": 10,
+                "event_key": "SanGasparedelBufalo"
             },
             "metadata": {
                 "form_rownum": 13,
@@ -380,9 +381,8 @@
                 "until_year": 2023
             }
         },
-        "SanNicolaIpapa": {
+        {
             "festivity": {
-                "name": "San Nicola I, papa",
                 "color": [
                     "white"
                 ],
@@ -391,7 +391,8 @@
                     "Pastors:For a Pope"
                 ],
                 "day": 13,
-                "month": 11
+                "month": 11,
+                "event_key": "SanNicolaI"
             },
             "metadata": {
                 "form_rownum": 14,
@@ -399,9 +400,8 @@
                 "until_year": 2023
             }
         },
-        "SanGelasioIpapa": {
+        {
             "festivity": {
-                "name": "San Gelasio I, papa",
                 "color": [
                     "white"
                 ],
@@ -410,7 +410,8 @@
                     "Pastors:For a Pope"
                 ],
                 "day": 20,
-                "month": 11
+                "month": 11,
+                "event_key": "SanGelasioI"
             },
             "metadata": {
                 "form_rownum": 10,
@@ -418,9 +419,8 @@
                 "until_year": 2023
             }
         },
-        "SanClementeIpapaemartire": {
+        {
             "festivity": {
-                "name": "San Clemente I, papa e martire",
                 "color": [
                     "red",
                     "white"
@@ -431,7 +431,8 @@
                     "Pastors:For a Pope"
                 ],
                 "day": 23,
-                "month": 11
+                "month": 11,
+                "event_key": "SanClementeI"
             },
             "metadata": {
                 "form_rownum": 15,
@@ -439,9 +440,8 @@
                 "until_year": 2023
             }
         },
-        "SanSiriciopapa": {
+        {
             "festivity": {
-                "name": "San Siricio, papa",
                 "color": [
                     "white"
                 ],
@@ -450,7 +450,8 @@
                     "Pastors:For a Pope"
                 ],
                 "day": 26,
-                "month": 11
+                "month": 11,
+                "event_key": "SanSiricio"
             },
             "metadata": {
                 "form_rownum": 11,
@@ -458,9 +459,8 @@
                 "until_year": 2023
             }
         },
-        "SanDamasoIpapa": {
+        {
             "festivity": {
-                "name": "San Damaso I, papa",
                 "color": [
                     "white"
                 ],
@@ -469,7 +469,8 @@
                     "Pastors:For a Pope"
                 ],
                 "day": 11,
-                "month": 12
+                "month": 12,
+                "event_key": "SanDamasoI"
             },
             "metadata": {
                 "form_rownum": 16,
@@ -477,9 +478,8 @@
                 "until_year": 2023
             }
         },
-        "SanGiovanniPaoloIIpapa": {
+        {
             "festivity": {
-                "name": "San Giovanni Paolo II, papa",
                 "color": [
                     "white"
                 ],
@@ -488,7 +488,8 @@
                     "Pastors:For a Pope"
                 ],
                 "day": 22,
-                "month": 10
+                "month": 10,
+                "event_key": "SanGiovanniPaoloII"
             },
             "metadata": {
                 "form_rownum": 17,
@@ -496,9 +497,8 @@
                 "until_year": 2023
             }
         },
-        "BeatoUrbanoIIpapa": {
+        {
             "festivity": {
-                "name": "Beato Urbano II, papa",
                 "color": [
                     "white"
                 ],
@@ -507,7 +507,8 @@
                     "Pastors:For a Pope"
                 ],
                 "day": 28,
-                "month": 7
+                "month": 7,
+                "event_key": "BeatoUrbanoII"
             },
             "metadata": {
                 "form_rownum": 7,
@@ -515,9 +516,8 @@
                 "until_year": 2023
             }
         },
-        "SantAgatonepapa": {
+        {
             "festivity": {
-                "name": "Sant'Agatone, papa",
                 "color": [
                     "white"
                 ],
@@ -526,7 +526,8 @@
                     "Pastors:For a Pope"
                 ],
                 "day": 10,
-                "month": 1
+                "month": 1,
+                "event_key": "SantAgatone"
             },
             "metadata": {
                 "form_rownum": 0,
@@ -534,9 +535,8 @@
                 "until_year": 2023
             }
         },
-        "SanCallistoIpapaemartire": {
+        {
             "festivity": {
-                "name": "San Callisto I, papa e martire",
                 "color": [
                     "red",
                     "white"
@@ -547,7 +547,8 @@
                     "Pastors:For a Pope"
                 ],
                 "day": 14,
-                "month": 10
+                "month": 10,
+                "event_key": "SanCallistoI"
             },
             "metadata": {
                 "form_rownum": 12,
@@ -555,9 +556,8 @@
                 "until_year": 2023
             }
         },
-        "SanVincenzoPallottipresbitero": {
+        {
             "festivity": {
-                "name": "San Vincenzo Pallotti, presbitero",
                 "color": [
                     "white"
                 ],
@@ -566,16 +566,16 @@
                     "Pastors"
                 ],
                 "day": 22,
-                "month": 1
+                "month": 1,
+                "event_key": "SanVincenzoPallotti_1"
             },
             "metadata": {
                 "since_year": 2024,
                 "form_rownum": 13
             }
         },
-        "SantiPietroePaoloApostoliPatronidellaChiesaromana": {
+        {
             "festivity": {
-                "name": "Santi Pietro e Paolo, Apostoli, Patroni della Chiesa romana",
                 "color": [
                     "white"
                 ],
@@ -584,16 +584,16 @@
                     "Proper"
                 ],
                 "day": 29,
-                "month": 6
+                "month": 6,
+                "event_key": "SantiPietroePaoloApostoliPatroniChiesaRomana"
             },
             "metadata": {
                 "form_rownum": 0,
                 "since_year": 1973
             }
         },
-        "SanBenedettoGiuseppeLabre_2": {
+        {
             "festivity": {
-                "name": "San Benedetto Giuseppe Labre",
                 "color": [
                     "white"
                 ],
@@ -602,16 +602,16 @@
                     "Holy Men and Women"
                 ],
                 "day": 16,
-                "month": 4
+                "month": 4,
+                "event_key": "SanBenedettoGiuseppeLabre"
             },
             "metadata": {
                 "since_year": 2024,
                 "form_rownum": 14
             }
         },
-        "SanGiovanniBattistadeRossipresbitero": {
+        {
             "festivity": {
-                "name": "San Giovanni Battista de Rossi, presbitero",
                 "color": [
                     "white"
                 ],
@@ -620,16 +620,16 @@
                     "Pastors"
                 ],
                 "day": 23,
-                "month": 5
+                "month": 5,
+                "event_key": "SanGiovanniBattistadeRossi_1"
             },
             "metadata": {
                 "since_year": 2024,
                 "form_rownum": 15
             }
         },
-        "BeataVergineMariaSalusPopuliRomani": {
+        {
             "festivity": {
-                "name": "Beata Vergine Maria Salus Populi Romani",
                 "color": [
                     "white"
                 ],
@@ -638,16 +638,16 @@
                     "Proper"
                 ],
                 "day": 4,
-                "month": 6
+                "month": 6,
+                "event_key": "BeataVergineMariaSalusPopuliRomani"
             },
             "metadata": {
                 "since_year": 2024,
                 "form_rownum": 18
             }
         },
-        "SanJosemaraEscrivdeBalaguerpresbitero": {
+        {
             "festivity": {
-                "name": "San Josemaría Escrivá de Balaguer, presbitero",
                 "color": [
                     "white"
                 ],
@@ -656,16 +656,16 @@
                     "Pastors"
                 ],
                 "day": 26,
-                "month": 6
+                "month": 6,
+                "event_key": "SanJosemariaEscrivaBalaguer"
             },
             "metadata": {
                 "since_year": 2024,
                 "form_rownum": 16
             }
         },
-        "SantiVescovidellaChiesaromana": {
+        {
             "festivity": {
-                "name": "Santi Vescovi della Chiesa romana",
                 "color": [
                     "white"
                 ],
@@ -674,16 +674,16 @@
                     "Proper"
                 ],
                 "day": 7,
-                "month": 7
+                "month": 7,
+                "event_key": "SantiVescoviChiesaRomana"
             },
             "metadata": {
                 "since_year": 2024,
                 "form_rownum": 19
             }
         },
-        "SantiPrimiMartiridellaChiesaromana": {
+        {
             "festivity": {
-                "name": "Santi Primi Martiri della Chiesa romana",
                 "color": [
                     "red"
                 ],
@@ -692,16 +692,16 @@
                     "Martyrs:For Several Martyrs"
                 ],
                 "day": 30,
-                "month": 6
+                "month": 6,
+                "event_key": "SantiPrimiMartiriChiesaRomana"
             },
             "metadata": {
                 "form_rownum": 10,
                 "since_year": 1973
             }
         },
-        "AnniversariodellaDedicazionedellapropriachiesa": {
+        {
             "festivity": {
-                "name": "Anniversario della Dedicazione della propria chiesa",
                 "color": [
                     "white"
                 ],
@@ -710,16 +710,16 @@
                     "Dedication of a Church"
                 ],
                 "day": 25,
-                "month": 10
+                "month": 10,
+                "event_key": "AnniversarioDedicazionePropriaChiesa"
             },
             "metadata": {
                 "since_year": 1970,
                 "form_rownum": 2
             }
         },
-        "SanGasparedelBufalopresbitero": {
+        {
             "festivity": {
-                "name": "San Gaspare del Bufalo, presbitero",
                 "color": [
                     "white"
                 ],
@@ -728,16 +728,16 @@
                     "Pastors"
                 ],
                 "day": 21,
-                "month": 10
+                "month": 10,
+                "event_key": "SanGaspareBufalo"
             },
             "metadata": {
                 "since_year": 2024,
                 "form_rownum": 17
             }
         },
-        "TuttiiSantidellaChiesaromana": {
+        {
             "festivity": {
-                "name": "Tutti i Santi della Chiesa romana",
                 "color": [
                     "white"
                 ],
@@ -746,16 +746,16 @@
                     "Proper"
                 ],
                 "day": 8,
-                "month": 11
+                "month": 11,
+                "event_key": "TuttiSantiChiesaRomana"
             },
             "metadata": {
                 "since_year": 2024,
                 "form_rownum": 20
             }
         },
-        "Dedicazionedellabasilicalateranense": {
+        {
             "festivity": {
-                "name": "Dedicazione della basilica lateranense",
                 "color": [
                     "white"
                 ],
@@ -764,16 +764,16 @@
                     "Dedication of a Church"
                 ],
                 "day": 9,
-                "month": 11
+                "month": 11,
+                "event_key": "DedicazioneBasilicaLateranense"
             },
             "metadata": {
                 "form_rownum": 1,
                 "since_year": 1973
             }
         },
-        "BeatiLuigieMariaBeltrameQuattrocchisposi": {
+        {
             "festivity": {
-                "name": "Beati Luigi e Maria Beltrame Quattrocchi, sposi",
                 "color": [
                     "white"
                 ],
@@ -782,16 +782,16 @@
                     "Holy Men and Women"
                 ],
                 "day": 25,
-                "month": 11
+                "month": 11,
+                "event_key": "BeatiLuigieMariaBeltrameQuattrocchi"
             },
             "metadata": {
                 "since_year": 2024,
                 "form_rownum": 18
             }
         },
-        "SanLeonardodaPortoMauriziopresbitero": {
+        {
             "festivity": {
-                "name": "San Leonardo da Porto Maurizio, presbitero",
                 "color": [
                     "white"
                 ],
@@ -800,12 +800,22 @@
                     "Holy Men and Women:For Religious"
                 ],
                 "day": 26,
-                "month": 11
+                "month": 11,
+                "event_key": "SanLeonardodaPortoMaurizio"
             },
             "metadata": {
                 "form_rownum": 12,
                 "since_year": 1973
             }
         }
+    ],
+    "metadata": {
+        "diocese_id": "romamo_it",
+        "diocese_name": "Diocesi di Roma",
+        "nation": "IT",
+        "locales": [
+            "it-IT"
+        ],
+        "timezone": "Europe/Rome"
     }
 }

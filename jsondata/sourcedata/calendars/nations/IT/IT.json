@@ -45,8 +45,8 @@
         "region": "IT",
         "wider_region": {
             "name": "Europe",
-            "json_file": "jsondata\/sourcedata\/calendars\/wider_regions\/EUROPE\/Europe.json",
-            "i18n_path": "jsondata\/sourcedata\/calendars\/wider_regions\/EUROPE\/i18n\/"
+            "json_file": "jsondata\/sourcedata\/calendars\/wider_regions\/Europe\/Europe.json",
+            "i18n_path": "jsondata\/sourcedata\/calendars\/wider_regions\/Europe\/i18n\/"
         },
         "missals": [
             "IT_1983",
