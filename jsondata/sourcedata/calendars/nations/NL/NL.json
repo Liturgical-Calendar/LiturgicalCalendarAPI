@@ -163,15 +163,15 @@
         "epiphany": "SUNDAY_JAN2_JAN8",
         "ascension": "THURSDAY",
         "corpus_christi": "SUNDAY",
-        "locale": "nl_NL",
+        "locales": ["nl_NL"],
         "eternal_high_priest": true
     },
     "metadata": {
         "region": "NL",
         "wider_region": {
             "name": "Europe",
-            "json_file": "jsondata\/sourcedata\/wider_regions\/Europe.json",
-            "i18n_file": "jsondata\/sourcedata\/wider_regions\/EUROPE\/nl_NL.json"
+            "json_file": "jsondata\/sourcedata\/calendars\/wider_regions\/EUROPE\/Europe.json",
+            "i18n_path": "jsondata\/sourcedata\/calendars\/wider_regions\/EUROPE\/i18n\/"
         },
         "missals": [
             "NL_1978"

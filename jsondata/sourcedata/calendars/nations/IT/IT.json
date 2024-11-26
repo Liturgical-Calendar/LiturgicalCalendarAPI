@@ -3,7 +3,6 @@
         {
             "festivity": {
                 "event_key": "StCatherineSiena",
-                "name": "Santa Caterina da Siena, vergine e dottore della Chiesa, patrona d'Italia",
                 "color": [
                     "white"
                 ],
@@ -21,7 +20,6 @@
         {
             "festivity": {
                 "event_key": "StFrancisAssisi",
-                "name": "San Francesco d'Assisi, patrono d'Italia",
                 "color": [
                     "white"
                 ],
@@ -40,15 +38,15 @@
         "epiphany": "JAN6",
         "ascension": "SUNDAY",
         "corpus_christi": "SUNDAY",
-        "locale": "it_IT",
+        "locales": ["it_IT"],
         "eternal_high_priest": false
     },
     "metadata": {
         "region": "IT",
         "wider_region": {
             "name": "Europe",
-            "json_file": "jsondata\/sourcedata\/wider_regions\/Europe.json",
-            "i18n_file": "jsondata\/sourcedata\/wider_regions\/EUROPE\/it_IT.json"
+            "json_file": "jsondata\/sourcedata\/calendars\/wider_regions\/EUROPE\/Europe.json",
+            "i18n_path": "jsondata\/sourcedata\/calendars\/wider_regions\/EUROPE\/i18n\/"
         },
         "missals": [
             "IT_1983",
