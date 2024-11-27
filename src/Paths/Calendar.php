@@ -3248,41 +3248,17 @@ class Calendar
      */
     private function loadWiderRegionData(): void
     {
-        if (
-            false === property_exists($this->NationalData->metadata->wider_region, 'json_file')
-            || false === property_exists($this->NationalData->metadata->wider_region, 'i18n_path')
-        ) {
-            $this->Messages[] = sprintf(
-                _('The National Calendar Metadata, though having a %1$s property, does not have the required %2$s and %3$s entries.'),
-                '`wider_region`',
-                '`json_file`',
-                '`i18n_path`'
-            );
-        } else {
-            $widerRegionDataFile = $this->NationalData->metadata->wider_region->json_file;
-            $widerRegionI18nPath = $this->NationalData->metadata->wider_region->i18n_path;
-            $widerRegionI18nFile = $widerRegionI18nPath . "/{$this->CalendarParams->Locale}.json";
-            if (file_exists($widerRegionI18nFile)) {
-                $widerRegionI18nData = json_decode(file_get_contents($widerRegionI18nFile));
-                if (json_last_error() === JSON_ERROR_NONE && file_exists($widerRegionDataFile)) {
-                    $this->WiderRegionData = json_decode(file_get_contents($widerRegionDataFile));
-                    if (json_last_error() === JSON_ERROR_NONE && property_exists($this->WiderRegionData, "litcal")) {
-                        foreach ($this->WiderRegionData->litcal as $idx => $value) {
-                            $tag = $value->festivity->event_key;
-                            $this->WiderRegionData->litcal[$idx]->festivity->name = $widerRegionI18nData->{ $tag };
-                        }
-                    } else {
-                        $this->Messages[] = sprintf(
-                            _("Error retrieving and decoding Wider Region data from file %s."),
-                            $widerRegionDataFile
-                        ) . ": " . json_last_error_msg();
-                    }
-                } else {
-                    $this->Messages[] = sprintf(
-                        _("Error retrieving and decoding Wider Region data from file %s."),
-                        $widerRegionI18nFile
-                    ) . ": " . json_last_error_msg();
-                }
+        $widerRegionDataFile = strtr(
+            JsonData::WIDER_REGIONS_FILE,
+            ['{wider_region}' => $this->NationalData->metadata->wider_region]
+        );
+        if (file_exists($widerRegionDataFile)) {
+            $this->WiderRegionData = json_decode(file_get_contents($widerRegionDataFile));
+            if (json_last_error() !== JSON_ERROR_NONE || false === property_exists($this->WiderRegionData, "litcal")) {
+                $this->Messages[] = sprintf(
+                    _("Error retrieving and decoding Wider Region data from file %s."),
+                    $widerRegionDataFile
+                ) . ": " . json_last_error_msg();
             }
         }
     }
@@ -3294,7 +3270,10 @@ class Calendar
      */
     private function loadNationalCalendarData(): void
     {
-        $NationalDataFile = JsonData::NATIONAL_CALENDARS_FOLDER . "/{$this->CalendarParams->NationalCalendar}/{$this->CalendarParams->NationalCalendar}.json";
+        $NationalDataFile = strtr(
+            JsonData::NATIONAL_CALENDARS_FILE,
+            [ '{nation}' => $this->CalendarParams->NationalCalendar ]
+        );
         if (file_exists($NationalDataFile)) {
             $this->NationalData = json_decode(file_get_contents($NationalDataFile));
             if (json_last_error() === JSON_ERROR_NONE) {
@@ -3318,7 +3297,6 @@ class Calendar
                 if (
                     property_exists($this->NationalData, 'metadata')
                     && property_exists($this->NationalData->metadata, 'wider_region')
-                    && property_exists($this->NationalData, 'litcal')
                 ) {
                     $this->loadWiderRegionData();
                 } else {
@@ -4650,11 +4628,14 @@ class Calendar
      * determined either by the Accept-Language header or the first valid locale
      * for the calendar requested.
      *
-     * If we are using a national calendar,
+     * If we are requesting a national calendar,
      * this method will apply the i18n data for the national calendar.
+     * 
+     * If the national calendar belongs to a wider region,
+     * this method will apply the i18n data for the wider region.
      *
-     * If we are using a diocesan calendar, this method will apply the i18n
-     * data for the diocesan calendar. And a national calendar will also apply in this case.
+     * If we are requesting a diocesan calendar, this method will apply the i18n
+     * data for the diocesan calendar and for the related national calendar (and wider region if applicable).
      *
      * @return void
      */
@@ -4675,13 +4656,26 @@ class Calendar
         }
 
         if ($this->CalendarParams->NationalCalendar !== null && $this->NationalData !== null) {
-            $nationalDataI18nFile = strtr(
-                JsonData::NATIONAL_CALENDARS_I18N_FOLDER, '{nation}', $this->CalendarParams->NationalCalendar
+            $NationalDataI18nFile = strtr(
+                JsonData::NATIONAL_CALENDARS_I18N_FOLDER,
+                ['{nation}' => $this->CalendarParams->NationalCalendar]
             ) . "/{$this->CalendarParams->Locale}.json";
-            $NationalDataI18nData = json_decode(file_get_contents($nationalDataI18nFile));
+            $NationalDataI18nData = json_decode(file_get_contents($NationalDataI18nFile));
             foreach($this->NationalData->litcal as $idx => $value) {
                 $tag = $value->festivity->event_key;
                 $this->NationalData->litcal[$idx]->festivity->name = $NationalDataI18nData->{ $tag };
+            }
+        }
+
+        if ($this->WiderRegionData !== null && property_exists($this->WiderRegionData, "litcal")) {
+            $WiderRegionDataI18nFile = strtr(
+                JsonData::WIDER_REGIONS_I18N_FOLDER,
+                ['{wider_region}' => $this->NationalData->metadata->wider_region]
+            ) . "/{$this->CalendarParams->Locale}.json";
+            $WiderRegionI18nData = json_decode(file_get_contents($WiderRegionDataI18nFile));
+            foreach ($this->WiderRegionData->litcal as $idx => $value) {
+                $tag = $value->festivity->event_key;
+                $this->WiderRegionData->litcal[$idx]->festivity->name = $WiderRegionI18nData->{ $tag };
             }
         }
     }
