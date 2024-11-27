@@ -623,7 +623,7 @@ class Calendar
                 );
             } else {
                 ['diocese_name' => $dioceseName, 'nation' => $nation] = $idTransform;
-                $this->CalendarParams->NationalCalendar = $nation;
+                $this->CalendarParams->NationalCalendar = strtoupper($nation);
                 $diocesanDataFile = strtr(
                     JsonData::DIOCESAN_CALENDARS_FILE, [
                         '{nation}'       => $this->CalendarParams->NationalCalendar,
