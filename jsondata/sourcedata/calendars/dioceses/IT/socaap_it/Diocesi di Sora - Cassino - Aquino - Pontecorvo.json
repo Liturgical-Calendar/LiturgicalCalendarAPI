@@ -37,8 +37,9 @@
         "diocese_name": "Diocesi di Sora - Cassino - Aquino - Pontecorvo",
         "nation": "IT",
         "locales": [
-            "it-IT"
+            "it_IT"
         ],
-        "timezone": "Europe/Rome"
+        "timezone": "Europe/Rome",
+        "group": "Diocesi del Lazio"
     }
 }

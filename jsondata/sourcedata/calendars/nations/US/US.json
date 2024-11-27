@@ -1,9 +1,9 @@
 {
+    "$schema": "../../../../schemas/NationalCalendar.json",
     "litcal": [
         {
             "festivity": {
                 "event_key": "ImmaculateConception",
-                "name": "The Immaculate Conception of the Blessed Virgin Mary, Patronal feastday of the United States of America",
                 "color": [
                     "white"
                 ],
@@ -19,7 +19,6 @@
         {
             "festivity": {
                 "event_key": "StVincentDeacon",
-                "name": "Saint Vincent, Deacon and Martyr",
                 "day": 23,
                 "month": 1
             },
@@ -32,21 +31,7 @@
         },
         {
             "festivity": {
-                "event_key": "StVincentDeacon",
-                "name": "[ USA ] Saint Vincent, Deacon and Martyr",
-                "day": 22,
-                "month": 1
-            },
-            "metadata": {
-                "action": "setProperty",
-                "property": "name",
-                "since_year": 1970
-            }
-        },
-        {
-            "festivity": {
                 "event_key": "StPaulCross",
-                "name": "Saint Paul of the Cross, Priest",
                 "day": 20,
                 "month": 10
             },
@@ -59,21 +44,7 @@
         },
         {
             "festivity": {
-                "event_key": "StPaulCross",
-                "name": "[ USA ] Saint Paul of the Cross, Priest",
-                "day": 19,
-                "month": 10
-            },
-            "metadata": {
-                "action": "setProperty",
-                "property": "name",
-                "since_year": 1970
-            }
-        },
-        {
-            "festivity": {
                 "event_key": "StsJeanBrebeuf",
-                "name": "Saints John de Brébeuf and Isaac Jogues, Priests, and Companions, Martyrs",
                 "grade": 3,
                 "day": 19,
                 "month": 10
@@ -86,21 +57,7 @@
         },
         {
             "festivity": {
-                "event_key": "StsJeanBrebeuf",
-                "name": "[ USA ] Saints John de Brébeuf and Isaac Jogues, Priests, and Companions, Martyrs",
-                "day": 19,
-                "month": 10
-            },
-            "metadata": {
-                "action": "setProperty",
-                "property": "name",
-                "since_year": 1970
-            }
-        },
-        {
-            "festivity": {
                 "event_key": "ThanksgivingDay",
-                "name": "[ USA ] Thanksgiving",
                 "color": [
                     "white"
                 ],
@@ -116,7 +73,6 @@
         {
             "festivity": {
                 "event_key": "StCamillusDeLellis",
-                "name": "Saint Camillus de Lellis, Priest",
                 "day": 18,
                 "month": 7
             },
@@ -129,21 +85,7 @@
         },
         {
             "festivity": {
-                "event_key": "StCamillusDeLellis",
-                "name": "[ USA ] Saint Camillus de Lellis, Priest",
-                "day": 14,
-                "month": 7
-            },
-            "metadata": {
-                "action": "setProperty",
-                "property": "name",
-                "since_year": 1970
-            }
-        },
-        {
-            "festivity": {
                 "event_key": "StElizabethPortugal",
-                "name": "Saint Elizabeth of Portugal",
                 "day": 5,
                 "month": 7
             },
@@ -153,35 +95,18 @@
                 "reason": "Independence Day",
                 "since_year": 1970
             }
-        },
-        {
-            "festivity": {
-                "event_key": "StElizabethPortugal",
-                "name": "[ USA ] Saint Elizabeth of Portugal",
-                "day": 4,
-                "month": 7
-            },
-            "metadata": {
-                "action": "setProperty",
-                "property": "name",
-                "since_year": 1970
-            }
         }
     ],
     "settings": {
         "epiphany": "SUNDAY_JAN2_JAN8",
         "ascension": "SUNDAY",
         "corpus_christi": "SUNDAY",
-        "locales": ["en_US"],
         "eternal_high_priest": false
     },
     "metadata": {
-        "region": "US",
-        "wider_region": {
-            "name": "Americas",
-            "json_file": "jsondata\/sourcedata\/calendars\/wider_regions\/Americas\/Americas.json",
-            "i18n_path": "jsondata\/sourcedata\/calendars\/wider_regions\/Americas\/i18n\/"
-        },
+        "nation": "US",
+        "locales": ["en_US"],
+        "wider_region": "Americas",
         "missals": [
             "US_2011"
         ]

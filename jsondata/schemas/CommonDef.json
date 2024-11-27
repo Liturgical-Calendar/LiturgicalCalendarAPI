@@ -219,9 +219,6 @@
                 },
                 "eternal_high_priest": {
                     "$ref": "#/definitions/EternalHighPriest"
-                },
-                "locale": {
-                    "$ref": "#/definitions/Locale"
                 }
             }
         },
@@ -297,7 +294,7 @@
                 false
             ]
         },
-        "Region": {
+        "Nation": {
             "type": "string",
             "enum": [
                 "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ",

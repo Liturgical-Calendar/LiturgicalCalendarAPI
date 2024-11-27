@@ -4,6 +4,9 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
+        "$schema": {
+            "type": "string"
+        },
         "litcal": {
             "type": "array",
             "items": {
@@ -47,9 +50,6 @@
                 "event_key": {
                     "type": "string"
                 },
-                "name": {
-                    "type": "string"
-                },
                 "color": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
                 },
@@ -78,14 +78,12 @@
                     "required": [
                         "day",
                         "month",
-                        "name",
                         "event_key"
                     ]
                 },
                 {
                     "required": [
                         "strtotime",
-                        "name",
                         "event_key",
                         "common",
                         "color",
@@ -136,43 +134,30 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "region": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Region"
+                "nation": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Nation"
+                },
+                "locales": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "$ref": "#/definitions/Locale"
+                    }
                 },
                 "wider_region": {
-                    "$ref": "#/definitions/WiderRegion"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/WiderRegionNames"
                 },
                 "missals": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Missals"
                 }
             },
             "required": [
-                "missals",
-                "region",
-                "wider_region"
+                "nation",
+                "locales",
+                "wider_region",
+                "missals"
             ],
             "title": "NationalCalendarMetadata"
-        },
-        "WiderRegion": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "json_file": {
-                    "type": "string"
-                },
-                "i18n_file": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "i18n_file",
-                "json_file",
-                "name"
-            ],
-            "title": "WiderRegion"
         },
         "Settings": {
             "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/CalendarSettings",

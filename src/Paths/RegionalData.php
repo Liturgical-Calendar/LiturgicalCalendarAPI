@@ -211,7 +211,7 @@ class RegionalData
     private function handleNationalCalendarUpdate()
     {
         $response = new \stdClass();
-        $region = $this->params->payload->metadata->region;
+        $region = $this->params->payload->metadata->nation;
         $path = "jsondata/sourcedata/nations/{$region}";
         if (!file_exists($path)) {
             mkdir($path, 0755, true);
@@ -221,7 +221,7 @@ class RegionalData
         if ($test === true) {
             $data = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             file_put_contents($path . "/{$region}.json", $data . PHP_EOL);
-            $response->success = "Calendar data created or updated for Nation \"{$this->params->payload->metadata->region}\"";
+            $response->success = "Calendar data created or updated for Nation \"{$this->params->payload->metadata->nation}\"";
             self::produceResponse(json_encode($response));
         } else {
             self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);

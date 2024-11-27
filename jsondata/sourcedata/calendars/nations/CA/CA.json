@@ -1,11 +1,11 @@
 {
+    "$schema": "../../../../schemas/NationalCalendar.json",
     "litcal": [
         {
             "festivity": {
                 "month": 1,
                 "day": 7,
                 "event_key": "StAndréBessette",
-                "name": "Saint André Bessette, Religious",
                 "grade": 3,
                 "color": [
                     "white"
@@ -36,7 +36,6 @@
                 "month": 1,
                 "day": 12,
                 "event_key": "StMargueriteBourgeoys",
-                "name": "Saint Marguerite Bourgeoys, Virgin",
                 "grade": 3,
                 "color": [
                     "white"
@@ -52,7 +51,6 @@
                 "month": 3,
                 "day": 19,
                 "event_key": "StJoseph",
-                "name": "Saint Joseph, Husband of the Blessed Virgin Mary, Principal Patron of Canada",
                 "grade": 6,
                 "color": [
                     "white"
@@ -68,7 +66,6 @@
                 "month": 4,
                 "day": 17,
                 "event_key": "KateriTekakwitha",
-                "name": "Saint Kateri Tekakwitha, Virgin",
                 "grade": 3,
                 "color": [
                     "white"
@@ -85,7 +82,6 @@
                 "month": 4,
                 "day": 18,
                 "event_key": "BlMarieAnneBlondin",
-                "name": "Blessed Marie-Anne Blondin, Virgin",
                 "grade": 2,
                 "color": [
                     "white"
@@ -101,7 +97,6 @@
                 "month": 4,
                 "day": 26,
                 "event_key": "OurLadyofGoodCounsel",
-                "name": "Our Lady of Good Counsel",
                 "grade": 2,
                 "color": [
                     "white"
@@ -117,7 +112,6 @@
                 "month": 4,
                 "day": 30,
                 "event_key": "StMariedelIncarnation",
-                "name": "Saint Marie de l'Incarnation, Religious",
                 "grade": 3,
                 "color": [
                     "white"
@@ -133,7 +127,6 @@
                 "month": 5,
                 "day": 1,
                 "event_key": "StPiusV",
-                "name": "Saint Pius V, Pope",
                 "grade": 2,
                 "color": [
                     "white"
@@ -149,7 +142,6 @@
                 "month": 5,
                 "day": 4,
                 "event_key": "BlMarieLéonieParadis",
-                "name": "Blessed Marie-Léonie Paradis, Virgin",
                 "grade": 2,
                 "color": [
                     "white"
@@ -165,7 +157,6 @@
                 "month": 5,
                 "day": 6,
                 "event_key": "StFrançoisdeLaval",
-                "name": "Saint François de Laval, Bishop",
                 "grade": 3,
                 "color": [
                     "white"
@@ -181,7 +172,6 @@
                 "month": 5,
                 "day": 8,
                 "event_key": "BlCatherinedeSaintAugustin",
-                "name": "Blessed Catherine de Saint-Augustin, Virgin",
                 "grade": 2,
                 "color": [
                     "white"
@@ -197,7 +187,6 @@
                 "month": 5,
                 "day": 21,
                 "event_key": "StEugenedeMazenod",
-                "name": "Saint Eugène de Mazenod, Bishop",
                 "grade": 2,
                 "color": [
                     "white"
@@ -213,7 +202,6 @@
                 "month": 5,
                 "day": 24,
                 "event_key": "BlLousisZéphirinMoreau",
-                "name": "Blessed Louis-Zéphirin Moreau, Bishop",
                 "grade": 2,
                 "color": [
                     "white"
@@ -229,7 +217,6 @@
                 "month": 6,
                 "day": 27,
                 "event_key": "BlNykytaBudkaVasylVelychkowsky",
-                "name": "Blessed Nykyta Budka and Vasyl Velychkowsky, Bishops and Martyrs",
                 "grade": 2,
                 "color": [
                     "red"
@@ -260,7 +247,6 @@
                 "month": 7,
                 "day": 26,
                 "event_key": "StsJoachimAnne",
-                "name": "Saint Anne, Patron of the Province of Quebec and Saint Joachim, Parents of the Blessed Virgin Mary",
                 "grade": 4,
                 "color": [
                     "white"
@@ -276,7 +262,6 @@
                 "month": 8,
                 "day": 5,
                 "event_key": "BlFrédéricJanssoone",
-                "name": "Blessed Frédéric Janssoone, Priest",
                 "grade": 2,
                 "color": [
                     "white"
@@ -292,7 +277,6 @@
                 "month": 9,
                 "day": 2,
                 "event_key": "BlAndréGrasset",
-                "name": "Saint André Grasset, Priest and Martyr",
                 "grade": 2,
                 "color": [
                     "red"
@@ -308,7 +292,6 @@
                 "month": 9,
                 "day": 4,
                 "event_key": "BlDinaBélanger",
-                "name": "Blessed Dina Bélanger, Virgin",
                 "grade": 2,
                 "color": [
                     "white"
@@ -324,7 +307,6 @@
                 "month": 9,
                 "day": 24,
                 "event_key": "BlÉmilieTavernierGamelin",
-                "name": "Blessed Émilie Tavernier-Gamelin, Religious",
                 "grade": 2,
                 "color": [
                     "white"
@@ -355,7 +337,6 @@
                 "month": 9,
                 "day": 26,
                 "event_key": "StsJeanBrebeuf",
-                "name": "Saints Jean de Brebeuf, Isaac Jogues, Priests, and Companions, Martrys, Secondary Patrons of Canada",
                 "grade": 4,
                 "color": [
                     "white"
@@ -369,11 +350,11 @@
         {
             "festivity": {
                 "event_key": "LabourDay",
-                "name": "Labour Day",
                 "grade": 3,
                 "color": [
                     "white"
                 ],
+                "common": [],
                 "strtotime": "first monday of september"
             },
             "metadata": {
@@ -386,7 +367,6 @@
                 "month": 10,
                 "day": 6,
                 "event_key": "BlMarieRoseDurocher",
-                "name": "Blessed Marie-Rose Durocher, Virgin",
                 "grade": 2,
                 "color": [
                     "white"
@@ -402,7 +382,6 @@
                 "month": 10,
                 "day": 16,
                 "event_key": "StMargueritedYouville",
-                "name": "Saint Marguerite d'Youville, Religious",
                 "grade": 3,
                 "color": [
                     "white"
@@ -448,7 +427,6 @@
                 "month": 10,
                 "day": 22,
                 "event_key": "DedicationUnknown",
-                "name": "Dedication of Consecrated Churches Whose Date of Consecration is Unknown",
                 "grade": 4,
                 "color": [
                     "white"
@@ -469,26 +447,25 @@
                     "white"
                 ]
             },
-            "metadata": {}
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2016
+            }
         }
     ],
     "settings": {
         "epiphany": "SUNDAY_JAN2_JAN8",
         "ascension": "SUNDAY",
         "corpus_christi": "SUNDAY",
-        "eternal_high_priest": false,
+        "eternal_high_priest": false
+    },
+    "metadata": {
+        "nation": "CA",
         "locales": [
             "en_CA",
             "fr_CA"
-        ]
-    },
-    "metadata": {
-        "region": "CA",
-        "wider_region": {
-            "name": "Americas",
-            "json_file": "jsondata\/sourcedata\/calendars\/wider_regions\/Americas\/Americas.json",
-            "i18n_path": "jsondata\/sourcedata\/calendars\/wider_regions\/Americas\/i18n\/"
-        },
+        ],
+        "wider_region": "Americas",
         "missals": [
             "CA_2011"
         ]

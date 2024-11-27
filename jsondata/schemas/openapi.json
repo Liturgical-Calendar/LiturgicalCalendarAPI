@@ -2908,7 +2908,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Region"
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Nation"
             }
           }
         ],
@@ -2976,7 +2976,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Region"
+              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Nation"
             }
           }
         ],
@@ -5235,7 +5235,7 @@
                   "type": "object",
                   "properties": {
                     "calendar_id": {
-                      "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Region"
+                      "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Nation"
                     },
                     "missals": {
                         "type": "array",

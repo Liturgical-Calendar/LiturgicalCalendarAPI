@@ -3,6 +3,7 @@
 namespace LiturgicalCalendar\Api\Params;
 
 use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\JsonData;
 
 class EventsParams
 {
@@ -47,17 +48,17 @@ class EventsParams
             $this->Locale = LitLocale::LATIN;
         }
 
-        $directories = array_map('basename', glob('jsondata/sourcedata/nations/*', GLOB_ONLYDIR));
+        $directories = array_map('basename', glob(JsonData::NATIONAL_CALENDARS_FOLDER . '/*', GLOB_ONLYDIR));
         //self::debugWrite(json_encode($directories));
         foreach ($directories as $directory) {
             //self::debugWrite($directory);
-            if (file_exists("jsondata/sourcedata/nations/$directory/$directory.json")) {
+            if (file_exists(JsonData::NATIONAL_CALENDARS_FOLDER . "/$directory/$directory.json")) {
                 $this->SupportedNationalCalendars[] = $directory;
             }
         }
 
-        if (file_exists("jsondata/sourcedata/nations/index.json")) {
-            $DiocesesIndex = json_decode(file_get_contents("jsondata/sourcedata/nations/index.json"), true);
+        if (file_exists(JsonData::DIOCESAN_CALENDARS_FOLDER . "/index.json")) {
+            $DiocesesIndex = json_decode(file_get_contents(JsonData::DIOCESAN_CALENDARS_FOLDER . "/index.json"), true);
             if (JSON_ERROR_NONE === json_last_error()) {
                 $this->SupportedDiocesanCalendars = array_column($DiocesesIndex, 'calendar_id');
             }

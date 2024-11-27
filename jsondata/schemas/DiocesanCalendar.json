@@ -18,13 +18,14 @@
             "additionalProperties": false,
             "properties": {
                 "diocese_id": {
-                    "type": "string"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
                 },
                 "diocese_name": {
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9 ()'-]+$"
                 },
                 "nation": {
-                    "type": "string"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Nation"
                 },
                 "locales": {
                     "type": "array",

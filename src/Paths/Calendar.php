@@ -25,6 +25,7 @@ use LiturgicalCalendar\Api\Enum\ReturnType;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\YearType;
+use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Params\CalendarParams;
 
 /**
@@ -517,10 +518,20 @@ class Calendar
                         $this->CalendarParams->EternalHighPriest = $this->NationalData->settings->eternal_high_priest;
                     }
                     if (
-                        property_exists($this->NationalData->settings, 'locale')
-                        && LitLocale::isValid($this->NationalData->settings->locale)
+                        property_exists($this->NationalData->settings, 'locales')
+                        && LitLocale::areValid($this->NationalData->settings->locale)
                     ) {
-                        $this->CalendarParams->Locale          = $this->NationalData->settings->locale;
+                        if (count($this->NationalData->settings->locales) === 1) {
+                            $this->CalendarParams->Locale      = $this->NationalData->settings->locales[0];
+                        } else {
+                            // If multiple locales are available for the national calendar,
+                            // the desired locale should be set in the Accept-Language header.
+                            // We should however check that this is an available locale for the current National Calendar,
+                            // and if not use the first valid value.
+                            if (false === in_array($this->CalendarParams->Locale, $this->NationalData->settings->locales)) {
+                                $this->CalendarParams->Locale  = $this->NationalData->settings->locales[0];
+                            }
+                        }
                     }
                 }
             }
@@ -571,7 +582,7 @@ class Calendar
         if ($this->CalendarParams->DiocesanCalendar !== null) {
             //since a Diocesan calendar is being requested, we need to retrieve the JSON data
             //first we need to discover the path, so let's retrieve our index file
-            $dioceseIndexPath = "jsondata/sourcedata/nations/index.json";
+            $dioceseIndexPath = JsonData::DIOCESAN_CALENDARS_FOLDER . "/index.json";
             if (file_exists($dioceseIndexPath)) {
                 $this->DioceseIndex = json_decode(file_get_contents($dioceseIndexPath));
                 $dioceseData = array_values(array_filter($this->DioceseIndex, function ($el) {
@@ -584,6 +595,11 @@ class Calendar
                     if (file_exists($diocesanDataFile)) {
                         $this->DiocesanData = json_decode(file_get_contents($diocesanDataFile));
                     }
+                } else {
+                    $this->Messages[] = sprintf(
+                        _('The Diocesan calendar "%s" was not found in the index file.'),
+                        $this->CalendarParams->DiocesanCalendar
+                    );
                 }
             }
         }
@@ -3171,40 +3187,89 @@ class Calendar
     }
 
     /**
+     * Loads wider region data into the calendar.
+     * This method is responsible for adding festivities to the calendar that are applicable in a broader geographic area such as a Continent.
+     *
+     * @return void
+     */
+    private function loadWiderRegionData(): void
+    {
+        if (
+            false === property_exists($this->NationalData->metadata->wider_region, 'json_file')
+            || false === property_exists($this->NationalData->metadata->wider_region, 'i18n_path')
+        ) {
+            $this->Messages[] = sprintf(
+                _('The National Calendar Metadata, though having a %1$s property, does not have the required %2$s and %3$s entries.'),
+                '`wider_region`',
+                '`json_file`',
+                '`i18n_path`'
+            );
+        } else {
+            $widerRegionDataFile = $this->NationalData->metadata->wider_region->json_file;
+            $widerRegionI18nPath = $this->NationalData->metadata->wider_region->i18n_path;
+            $widerRegionI18nFile = $widerRegionI18nPath . "/{$this->CalendarParams->Locale}.json";
+            if (file_exists($widerRegionI18nFile)) {
+                $widerRegionI18nData = json_decode(file_get_contents($widerRegionI18nFile));
+                if (json_last_error() === JSON_ERROR_NONE && file_exists($widerRegionDataFile)) {
+                    $this->WiderRegionData = json_decode(file_get_contents($widerRegionDataFile));
+                    if (json_last_error() === JSON_ERROR_NONE && property_exists($this->WiderRegionData, "litcal")) {
+                        foreach ($this->WiderRegionData->litcal as $idx => $value) {
+                            $tag = $value->festivity->event_key;
+                            $this->WiderRegionData->litcal[$idx]->festivity->name = $widerRegionI18nData->{ $tag };
+                        }
+                    } else {
+                        $this->Messages[] = sprintf(
+                            _("Error retrieving and decoding Wider Region data from file %s."),
+                            $widerRegionDataFile
+                        ) . ": " . json_last_error_msg();
+                    }
+                } else {
+                    $this->Messages[] = sprintf(
+                        _("Error retrieving and decoding Wider Region data from file %s."),
+                        $widerRegionI18nFile
+                    ) . ": " . json_last_error_msg();
+                }
+            }
+        }
+    }
+
+    /**
      * Loads the JSON data for the specified National calendar.
      *
      * @return void
      */
     private function loadNationalCalendarData(): void
     {
-        $nationalDataFile = "jsondata/sourcedata/nations/{$this->CalendarParams->NationalCalendar}/{$this->CalendarParams->NationalCalendar}.json";
-        if (file_exists($nationalDataFile)) {
-            $this->NationalData = json_decode(file_get_contents($nationalDataFile));
+        $nationalDataFile = JsonData::NATIONAL_CALENDARS_FOLDER . "/{$this->CalendarParams->NationalCalendar}/{$this->CalendarParams->NationalCalendar}.json";
+        $nationalDataI18nFile = strtr(JsonData::NATIONAL_CALENDARS_I18N_FOLDER, '{nation}', $this->CalendarParams->NationalCalendar) . "/{$this->CalendarParams->Locale}.json";
+        if (file_exists($nationalDataI18nFile)) {
+            $nationalDataI18nData = json_decode(file_get_contents($nationalDataI18nFile));
             if (json_last_error() === JSON_ERROR_NONE) {
-                if (property_exists($this->NationalData, "metadata") && property_exists($this->NationalData->metadata, "wider_region")) {
-                    $widerRegionDataFile = $this->NationalData->metadata->wider_region->json_file;
-                    $widerRegionI18nFile = $this->NationalData->metadata->wider_region->i18n_file;
-                    if (file_exists($widerRegionI18nFile)) {
-                        $widerRegionI18nData = json_decode(file_get_contents($widerRegionI18nFile));
-                        if (json_last_error() === JSON_ERROR_NONE && file_exists($widerRegionDataFile)) {
-                            $this->WiderRegionData = json_decode(file_get_contents($widerRegionDataFile));
-                            if (json_last_error() === JSON_ERROR_NONE && property_exists($this->WiderRegionData, "litcal")) {
-                                foreach ($this->WiderRegionData->litcal as $idx => $value) {
-                                    $tag = $value->festivity->event_key;
-                                    $this->WiderRegionData->litcal[$idx]->festivity->name = $widerRegionI18nData->{ $tag };
-                                }
-                            } else {
-                                $this->Messages[] = sprintf(_("Error retrieving and decoding Wider Region data from file %s."), $widerRegionDataFile) . ": " . json_last_error_msg();
-                            }
-                        } else {
-                            $this->Messages[] = sprintf(_("Error retrieving and decoding Wider Region data from file %s."), $widerRegionI18nFile) . ": " . json_last_error_msg();
-                        }
-                    }
+                $this->NationalData = json_decode(file_get_contents($nationalDataFile));
+                foreach($this->NationalData->litcal as $idx => $value) {
+                    $tag = $value->festivity->event_key;
+                    $this->NationalData->litcal[$idx]->festivity->name = $nationalDataI18nData->{ $tag };
+                }
+                if (
+                    json_last_error() === JSON_ERROR_NONE
+                    && property_exists($this->NationalData, 'metadata')
+                    && property_exists($this->NationalData->metadata, 'wider_region')
+                    && property_exists($this->NationalData, 'litcal')
+                ) {
+                    $this->loadWiderRegionData();
                 } else {
-                    $this->Messages[] = "Could not find a WiderRegion property in the Metadata for the National Calendar {$this->CalendarParams->NationalCalendar}";
+                    $this->Messages[] = sprintf(
+                        _('Could not find a %1$s property in the %2$s for the National Calendar %3$s.'),
+                        "`wider_region`",
+                        "`metadata`",
+                        $this->CalendarParams->NationalCalendar
+                    );
                 }
             } else {
-                $this->Messages[] = sprintf(_("Error retrieving and decoding National data from file %s."), $nationalDataFile) . ": " . json_last_error_msg();
+                $this->Messages[] = sprintf(
+                    _("Error retrieving and decoding National Calendar data from file %s."),
+                    $nationalDataI18nFile
+                ) . ": " . json_last_error_msg();
             }
         }
     }
@@ -3564,7 +3629,7 @@ class Calendar
         }
 
         if ($this->NationalData !== null && property_exists($this->NationalData, "metadata") && property_exists($this->NationalData->metadata, "missals")) {
-            $this->Messages[] = "Found Missals for region " . $this->NationalData->metadata->region . ": " . implode(', ', $this->NationalData->metadata->missals);
+            $this->Messages[] = "Found Missals for region {$this->NationalData->metadata->nation}: " . implode(', ', $this->NationalData->metadata->missals);
             foreach ($this->NationalData->metadata->missals as $missal) {
                 $yearLimits = RomanMissal::getYearLimits($missal);
                 if ($this->CalendarParams->Year >= $yearLimits->since_year) {
@@ -3586,7 +3651,7 @@ class Calendar
                                 );
                                 if (!$this->Cal->inSolemnitiesOrFeasts($currentFeastDate)) {
                                     $festivity = new Festivity(
-                                        "[ {$this->NationalData->metadata->region} ] " . $row->name,
+                                        "[ {$this->NationalData->metadata->nation} ] " . $row->name,
                                         $currentFeastDate,
                                         $row->color,
                                         LitFeastType::FIXED,
@@ -3623,7 +3688,7 @@ class Calendar
                                              * 6. Superseding festivity name
                                              * 7. Requested calendar year
                                              */
-                                            $this->NationalData->metadata->region . ": " . _('The %1$s \'%2$s\' (%3$s), added to the national calendar in the %4$s, is superseded by the %5$s \'%6$s\' in the year %7$d'),
+                                            $this->NationalData->metadata->nation . ": " . _('The %1$s \'%2$s\' (%3$s), added to the national calendar in the %4$s, is superseded by the %5$s \'%6$s\' in the year %7$d'),
                                             $row->grade_display !== null && $row->grade_display !== "" ? $row->grade_display : $this->LitGrade->i18n($row->grade, false),
                                             '<i>' . $row->name . '</i>',
                                             $this->dayAndMonth->format($currentFeastDate->format('U')),
@@ -3646,8 +3711,12 @@ class Calendar
                 }
             }
         } else {
-            if ($this->NationalData !== null && property_exists($this->NationalData, 'metadata') && property_exists($this->NationalData->metadata, 'region')) {
-                $this->Messages[] = "Did not find any Missals for region " . $this->NationalData->metadata->region;
+            if (
+                $this->NationalData !== null
+                && property_exists($this->NationalData, 'metadata')
+                && property_exists($this->NationalData->metadata, "nation")
+            ) {
+                $this->Messages[] = "Did not find any Missals for region " . $this->NationalData->metadata->nation;
             }
         }
     }
