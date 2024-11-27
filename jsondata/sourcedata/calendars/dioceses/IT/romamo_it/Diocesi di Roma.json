@@ -816,6 +816,7 @@
         "locales": [
             "it-IT"
         ],
-        "timezone": "Europe/Rome"
+        "timezone": "Europe/Rome",
+        "group": "Diocesi del Lazio"
     }
 }
