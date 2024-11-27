@@ -23,6 +23,7 @@ use LiturgicalCalendar\Api\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\ReturnType;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
+use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\YearType;
 use LiturgicalCalendar\Api\Enum\JsonData;
@@ -47,7 +48,7 @@ class Calendar
     private LitCommon $LitCommon;
     private LitGrade $LitGrade;
 
-    private ?array $DioceseIndex                    = null;
+    private ?array $worldDiocesesLatinRite          = null;
     private ?object $DioceseEntry                   = null;
     private ?object $DiocesanData                   = null;
     private ?object $NationalData                   = null;
@@ -517,22 +518,6 @@ class Calendar
                     ) {
                         $this->CalendarParams->EternalHighPriest = $this->NationalData->settings->eternal_high_priest;
                     }
-                    if (
-                        property_exists($this->NationalData->settings, 'locales')
-                        && LitLocale::areValid($this->NationalData->settings->locale)
-                    ) {
-                        if (count($this->NationalData->settings->locales) === 1) {
-                            $this->CalendarParams->Locale      = $this->NationalData->settings->locales[0];
-                        } else {
-                            // If multiple locales are available for the national calendar,
-                            // the desired locale should be set in the Accept-Language header.
-                            // We should however check that this is an available locale for the current National Calendar,
-                            // and if not use the first valid value.
-                            if (false === in_array($this->CalendarParams->Locale, $this->NationalData->settings->locales)) {
-                                $this->CalendarParams->Locale  = $this->NationalData->settings->locales[0];
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -568,9 +553,59 @@ class Calendar
                     }
                 }
             }
+            if (
+                property_exists($this->DiocesanData->metadata, 'locales')
+                && LitLocale::areValid($this->DiocesanData->metadata->locale)
+            ) {
+                if (count($this->DiocesanData->metadata->locales) === 1) {
+                    $this->CalendarParams->Locale      = $this->DiocesanData->metadata->locales[0];
+                } else {
+                    // If multiple locales are available for the diocesan calendar,
+                    // the desired locale should be set in the Accept-Language header.
+                    // We should however check that this is an available locale for the current Diocesan Calendar,
+                    // and if not use the first valid value.
+                    if (false === in_array($this->CalendarParams->Locale, $this->DiocesanData->metadata->locales)) {
+                        $this->CalendarParams->Locale  = $this->DiocesanData->metadata->locales[0];
+                    }
+                }
+            }
+
+
         }
     }
 
+    /**
+     * Takes a diocese ID and returns the corresponding diocese name.
+     * If the diocese ID is not found, returns null.
+     *
+     * @param string $id The diocese ID.
+     * @return array|null The diocese name and nation, or null if not found.
+     */
+    private static function dioceseIdToName(string $id): ?array
+    {
+        if (empty(Calendar::$worldDiocesesLatinRite)) {
+            $worldDiocesesFile = JsonData::FOLDER . "/world_dioceses.json";
+            Calendar::$worldDiocesesLatinRite = json_decode(
+                file_get_contents($worldDiocesesFile)
+            )->catholic_dioceses_latin_rite;
+        }
+        $dioceseName = null;
+        $nation      = null;
+        // Search for the diocese by its ID in the worldDioceseLatinRite data
+        foreach (Calendar::$worldDiocesesLatinRite as $country) {
+            foreach ($country->dioceses as $diocese) {
+                if ($diocese->diocese_id === $id) {
+                    $dioceseName = $diocese->diocese_name;
+                    if (property_exists($diocese, 'province')) {
+                        $dioceseName .= " (" . $diocese->province . ")";
+                    }
+                    $nation = $country;
+                    break 2; // Break out of both loops
+                }
+            }
+        }
+        return [ 'diocese_name' => $dioceseName, 'nation' => $nation];
+    }
 
     /**
      * Loads the JSON data for the specified Diocesan calendar.
@@ -580,20 +615,39 @@ class Calendar
     private function loadDiocesanCalendarData(): void
     {
         if ($this->CalendarParams->DiocesanCalendar !== null) {
-            //since a Diocesan calendar is being requested, we need to retrieve the JSON data
-            //first we need to discover the path, so let's retrieve our index file
-            $dioceseIndexPath = JsonData::DIOCESAN_CALENDARS_FOLDER . "/index.json";
-            if (file_exists($dioceseIndexPath)) {
-                $this->DioceseIndex = json_decode(file_get_contents($dioceseIndexPath));
-                $dioceseData = array_values(array_filter($this->DioceseIndex, function ($el) {
-                    return $el->calendar_id === $this->CalendarParams->DiocesanCalendar;
-                }));
-                if (count($dioceseData) === 1) {
-                    $this->DioceseEntry = $dioceseData[0];
-                    $this->CalendarParams->NationalCalendar = $dioceseData[0]->nation;
-                    $diocesanDataFile = $dioceseData[0]->path;
-                    if (file_exists($diocesanDataFile)) {
-                        $this->DiocesanData = json_decode(file_get_contents($diocesanDataFile));
+            $idTransform = Calendar::dioceseIdToName($this->CalendarParams->DiocesanCalendar);
+            if (null === $idTransform) {
+                $this->Messages[] = sprintf(
+                    _('The name of the diocese could not be derived from the diocese ID "%s".'),
+                    $this->CalendarParams->DiocesanCalendar
+                );
+            } else {
+                ['diocese_name' => $dioceseName, 'nation' => $nation] = $idTransform;
+                $this->CalendarParams->NationalCalendar = $nation;
+                $diocesanDataFile = strtr(
+                    JsonData::DIOCESAN_CALENDARS_FILE, [
+                        '{nation}'       => $this->CalendarParams->NationalCalendar,
+                        '{diocese}'      => $this->CalendarParams->DiocesanCalendar,
+                        '{diocese_name}' => $dioceseName
+                    ]
+                );
+                if (file_exists($diocesanDataFile)) {
+                    $this->DiocesanData = json_decode(file_get_contents($diocesanDataFile));
+                    if (
+                        property_exists($this->DiocesanData->metadata, 'locales')
+                        && LitLocale::areValid($this->DiocesanData->metadata->locales)
+                    ) {
+                        if (count($this->DiocesanData->metadata->locales) === 1) {
+                            $this->CalendarParams->Locale      = $this->DiocesanData->metadata->locales[0];
+                        } else {
+                            // If multiple locales are available for the national calendar,
+                            // the desired locale should be set in the Accept-Language header.
+                            // We should however check that this is an available locale for the current Diocesan Calendar,
+                            // and if not use the first valid value.
+                            if (false === in_array($this->CalendarParams->Locale, $this->DiocesanData->metadata->locales)) {
+                                $this->CalendarParams->Locale  = $this->DiocesanData->metadata->locales[0];
+                            }
+                        }
                     }
                 } else {
                     $this->Messages[] = sprintf(
@@ -3240,19 +3294,29 @@ class Calendar
      */
     private function loadNationalCalendarData(): void
     {
-        $nationalDataFile = JsonData::NATIONAL_CALENDARS_FOLDER . "/{$this->CalendarParams->NationalCalendar}/{$this->CalendarParams->NationalCalendar}.json";
-        $nationalDataI18nFile = strtr(JsonData::NATIONAL_CALENDARS_I18N_FOLDER, '{nation}', $this->CalendarParams->NationalCalendar) . "/{$this->CalendarParams->Locale}.json";
-        if (file_exists($nationalDataI18nFile)) {
-            $nationalDataI18nData = json_decode(file_get_contents($nationalDataI18nFile));
+        $NationalDataFile = JsonData::NATIONAL_CALENDARS_FOLDER . "/{$this->CalendarParams->NationalCalendar}/{$this->CalendarParams->NationalCalendar}.json";
+        if (file_exists($NationalDataFile)) {
+            $this->NationalData = json_decode(file_get_contents($NationalDataFile));
             if (json_last_error() === JSON_ERROR_NONE) {
-                $this->NationalData = json_decode(file_get_contents($nationalDataFile));
-                foreach($this->NationalData->litcal as $idx => $value) {
-                    $tag = $value->festivity->event_key;
-                    $this->NationalData->litcal[$idx]->festivity->name = $nationalDataI18nData->{ $tag };
-                }
                 if (
-                    json_last_error() === JSON_ERROR_NONE
-                    && property_exists($this->NationalData, 'metadata')
+                    property_exists($this->NationalData->metadata, 'locales')
+                    && LitLocale::areValid($this->NationalData->metadata->locales)
+                ) {
+                    if (count($this->NationalData->metadata->locales) === 1) {
+                        $this->CalendarParams->Locale      = $this->NationalData->metadata->locales[0];
+                    } else {
+                        // If multiple locales are available for the national calendar,
+                        // the desired locale should be set in the Accept-Language header.
+                        // We should however check that this is an available locale for the current National Calendar,
+                        // and if not use the first valid value.
+                        if (false === in_array($this->CalendarParams->Locale, $this->NationalData->metadata->locales)) {
+                            $this->CalendarParams->Locale  = $this->NationalData->metadata->locales[0];
+                        }
+                    }
+                }
+
+                if (
+                    property_exists($this->NationalData, 'metadata')
                     && property_exists($this->NationalData->metadata, 'wider_region')
                     && property_exists($this->NationalData, 'litcal')
                 ) {
@@ -3268,7 +3332,7 @@ class Calendar
             } else {
                 $this->Messages[] = sprintf(
                     _("Error retrieving and decoding National Calendar data from file %s."),
-                    $nationalDataI18nFile
+                    $NationalDataFile
                 ) . ": " . json_last_error_msg();
             }
         }
@@ -4580,6 +4644,48 @@ class Calendar
         $this->AllowedReturnTypes = array_values(array_intersect(ReturnType::$values, $returnTypes));
     }
 
+
+    /**
+     * Applies the i18n data for the current calendar and the current locale,
+     * determined either by the Accept-Language header or the first valid locale
+     * for the calendar requested.
+     *
+     * If we are using a national calendar,
+     * this method will apply the i18n data for the national calendar.
+     *
+     * If we are using a diocesan calendar, this method will apply the i18n
+     * data for the diocesan calendar. And a national calendar will also apply in this case.
+     *
+     * @return void
+     */
+    private function applyCalendarI18nData(): void
+    {
+        if ($this->CalendarParams->DiocesanCalendar !== null && $this->DiocesanData !== null) {
+            $DiocesanDataI18nFile = strtr(
+                JsonData::DIOCESAN_CALENDARS_I18N_FOLDER, [
+                    '{nation}'       => $this->CalendarParams->NationalCalendar,
+                    '{diocese}'      => $this->CalendarParams->DiocesanCalendar
+                ]
+            ) . "/{$this->CalendarParams->Locale}.json";
+            $DiocesanDataI18nData = json_decode(file_get_contents($DiocesanDataI18nFile), true);
+            foreach($this->DiocesanData->litcal as $idx => $value) {
+                $tag = $value->festivity->event_key;
+                $this->DiocesanData->litcal[$idx]->festivity->name = $DiocesanDataI18nData->{ $tag };
+            }
+        }
+
+        if ($this->CalendarParams->NationalCalendar !== null && $this->NationalData !== null) {
+            $nationalDataI18nFile = strtr(
+                JsonData::NATIONAL_CALENDARS_I18N_FOLDER, '{nation}', $this->CalendarParams->NationalCalendar
+            ) . "/{$this->CalendarParams->Locale}.json";
+            $NationalDataI18nData = json_decode(file_get_contents($nationalDataI18nFile));
+            foreach($this->NationalData->litcal as $idx => $value) {
+                $tag = $value->festivity->event_key;
+                $this->NationalData->litcal[$idx]->festivity->name = $NationalDataI18nData->{ $tag };
+            }
+        }
+    }
+
     /**
      * The LitCalEngine will only work once you call the public init() method.
      * Do not change the order of the methods that follow,
@@ -4593,6 +4699,7 @@ class Calendar
         $this->loadNationalCalendarData();
         $this->updateSettingsBasedOnNationalCalendar();
         $this->updateSettingsBasedOnDiocesanCalendar();
+        $this->applyCalendarI18nData();
         self::$Core->setResponseContentTypeHeader();
 
         if (false === Router::isLocalhost() && $this->cacheFileIsAvailable()) {
