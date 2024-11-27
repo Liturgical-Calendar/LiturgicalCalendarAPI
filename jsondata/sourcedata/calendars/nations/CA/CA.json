@@ -9,7 +9,8 @@
                 "grade": 3,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -20,11 +21,7 @@
             "festivity": {
                 "month": 1,
                 "day": 8,
-                "event_key": "StRayPenyafort",
-                "grade": 2,
-                "color": [
-                    "white"
-                ]
+                "event_key": "StRayPenyafort"
             },
             "metadata": {
                 "action": "moveFestivity",
@@ -39,7 +36,8 @@
                 "grade": 3,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -51,14 +49,11 @@
                 "month": 3,
                 "day": 19,
                 "event_key": "StJoseph",
-                "grade": 6,
-                "color": [
-                    "white"
-                ]
+                "grade": 6
             },
             "metadata": {
-                    "action": "makePatron",
-                    "since_year": 1870
+                "action": "makePatron",
+                "since_year": 1870
             }
         },
         {
@@ -69,7 +64,8 @@
                 "grade": 3,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -85,7 +81,8 @@
                 "grade": 2,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -100,7 +97,8 @@
                 "grade": 2,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -115,7 +113,8 @@
                 "grade": 3,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -130,7 +129,8 @@
                 "grade": 2,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -145,7 +145,8 @@
                 "grade": 2,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -160,7 +161,8 @@
                 "grade": 3,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -175,7 +177,8 @@
                 "grade": 2,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -190,7 +193,8 @@
                 "grade": 2,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -205,7 +209,8 @@
                 "grade": 2,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -220,7 +225,8 @@
                 "grade": 2,
                 "color": [
                     "red"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -235,7 +241,8 @@
                 "grade": 2,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -247,13 +254,10 @@
                 "month": 7,
                 "day": 26,
                 "event_key": "StsJoachimAnne",
-                "grade": 4,
-                "color": [
-                    "white"
-                ]
+                "grade": 4
             },
             "metadata": {
-                "action": "setProperty",
+                "action": "makePatron",
                 "since_year": 1876
             }
         },
@@ -265,7 +269,8 @@
                 "grade": 2,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -280,7 +285,8 @@
                 "grade": 2,
                 "color": [
                     "red"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -295,7 +301,8 @@
                 "grade": 2,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -310,7 +317,8 @@
                 "grade": 2,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -321,11 +329,7 @@
             "festivity": {
                 "month": 9,
                 "day": 25,
-                "event_key": "StsCosmasDamian",
-                "grade": 2,
-                "color": [
-                    "red"
-                ]
+                "event_key": "StsCosmasDamian"
             },
             "metadata": {
                 "action": "moveFestivity",
@@ -340,7 +344,8 @@
                 "grade": 4,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -370,7 +375,8 @@
                 "grade": 2,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -385,7 +391,8 @@
                 "grade": 3,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -396,11 +403,7 @@
             "festivity": {
                 "month": 10,
                 "day": 20,
-                "event_key": "StHedwig",
-                "grade": 2,
-                "color": [
-                    "white"
-                ]
+                "event_key": "StHedwig"
             },
             "metadata": {
                 "action": "moveFestivity",
@@ -411,11 +414,7 @@
             "festivity": {
                 "month": 10,
                 "day": 20,
-                "event_key": "StMargaretAlacoque",
-                "grade": 2,
-                "color": [
-                    "white"
-                ]
+                "event_key": "StMargaretAlacoque"
             },
             "metadata": {
                 "action": "moveFestivity",
@@ -430,7 +429,8 @@
                 "grade": 4,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -445,7 +445,8 @@
                 "grade": 3,
                 "color": [
                     "white"
-                ]
+                ],
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
