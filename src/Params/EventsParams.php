@@ -3,8 +3,24 @@
 namespace LiturgicalCalendar\Api\Params;
 
 use LiturgicalCalendar\Api\Enum\LitLocale;
-use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\Route;
 
+/**
+ * This class encapsulates the parameters that can be passed to the Events endpoint.
+ *
+ * The parameters are:
+ * - year: the year for which to retrieve the events
+ * - locale: the language in which to retrieve the events
+ * - national_calendar: the national calendar to use for the calculation
+ * - diocesan_calendar: the diocesan calendar to use for the calculation
+ * - eternal_high_priest: whether to include the eternal high priest in the events
+ *
+ * The class also provides a way to retrieve the last error message set by the class,
+ * as well as to check if the parameters are valid.
+ *
+ * @package LiturgicalCalendar\Api\Params
+ * @author John Roman Odron
+ */
 class EventsParams
 {
     public int $Year;
@@ -12,8 +28,9 @@ class EventsParams
     public ?string $Locale                    = null;
     public ?string $NationalCalendar          = null;
     public ?string $DiocesanCalendar          = null;
-    private array $SupportedNationalCalendars = [ "VA" ];
+    private array $SupportedNationalCalendars = [];
     private array $SupportedDiocesanCalendars = [];
+    private static ?object $calendarsMetadata = null;
     private static string $lastError          = '';
 
     public const ALLOWED_PARAMS  = [
@@ -37,6 +54,20 @@ class EventsParams
         file_put_contents("debug.log", $string . PHP_EOL, FILE_APPEND);
     }*/
 
+    /**
+     * Constructor for EventsParams
+     *
+     * @param array $DATA
+     * 
+     * The constructor sets a default value for the Year parameter, defaulting to current year
+     * and for the Locale parameter, defaulting to latin.
+     * 
+     * It also sets the SupportedDiocesanCalendars and SupportedNationalCalendars properties
+     * by reading the data from the calendars metadata.
+     * 
+     * If the $DATA array is not empty, it calls the setData method
+     * to apply the values from $DATA to the corresponding properties.
+     */
     public function __construct(array $DATA = [])
     {
         //we need at least a default value for the current year and for the locale
@@ -48,27 +79,32 @@ class EventsParams
             $this->Locale = LitLocale::LATIN;
         }
 
-        $directories = array_map('basename', glob(JsonData::NATIONAL_CALENDARS_FOLDER . '/*', GLOB_ONLYDIR));
-        //self::debugWrite(json_encode($directories));
-        foreach ($directories as $directory) {
-            //self::debugWrite($directory);
-            if (file_exists(JsonData::NATIONAL_CALENDARS_FOLDER . "/$directory/$directory.json")) {
-                $this->SupportedNationalCalendars[] = $directory;
-            }
+        if (null === EventsParams::$calendarsMetadata) {
+            EventsParams::$calendarsMetadata = json_decode(file_get_contents(API_BASE_PATH . Route::CALENDARS));
         }
+        $this->SupportedDiocesanCalendars = EventsParams::$calendarsMetadata->diocesan_calendars_keys;
+        $this->SupportedNationalCalendars = EventsPArams::$calendarsMetadata->national_calendars_keys;
 
-        if (file_exists(JsonData::DIOCESAN_CALENDARS_FOLDER . "/index.json")) {
-            $DiocesesIndex = json_decode(file_get_contents(JsonData::DIOCESAN_CALENDARS_FOLDER . "/index.json"), true);
-            if (JSON_ERROR_NONE === json_last_error()) {
-                $this->SupportedDiocesanCalendars = array_column($DiocesesIndex, 'calendar_id');
-            }
-        }
 
         if (count($DATA)) {
             $this->setData($DATA);
         }
     }
 
+    /**
+     * Set the parameters for the Events class using the provided associative array of values.
+     *
+     * The array keys should be one of the following:
+     * - year: the year for which to retrieve the events
+     * - locale: the language in which to retrieve the events
+     * - national_calendar: the national calendar to use for the calculation
+     * - diocesan_calendar: the diocesan calendar to use for the calculation
+     * - eternal_high_priest: whether to include the eternal high priest in the events
+     *
+     * All parameters are optional, and default values will be used if they are not provided.
+     * @param array $DATA an associative array of values to use for the calculation
+     * @return bool true if the parameters were successfully set, or false if an error occurred
+     */
     public function setData(array $DATA): bool
     {
         foreach ($DATA as $key => $value) {
@@ -103,6 +139,11 @@ class EventsParams
         return true;
     }
 
+    /**
+     * Retrieves the last error message set by the EventsParams class.
+     *
+     * @return string The last error message, or an empty string if no error has occurred.
+     */
     public static function getLastErrorMessage(): string
     {
         return self::$lastError;
