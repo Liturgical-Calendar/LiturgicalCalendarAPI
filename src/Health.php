@@ -298,7 +298,7 @@ class Health implements MessageComponentInterface
                 ) {
                     return LitSchema::EVENTS;
                 } elseif (
-                    preg_match("/\/data\/(nation|diocese|widerregion)(?:\?locale=[a-zA-Z0-9_]+)?/", $dataPath, $matches)
+                    preg_match("/\/data\/(nation|diocese|widerregion)\/[_a-zA-Z0-9]+(?:\?locale=[a-zA-Z0-9_]+)?$/", $dataPath, $matches)
                 ) {
                     $schema = LitSchema::DATA;
                     switch ($matches[1]) {

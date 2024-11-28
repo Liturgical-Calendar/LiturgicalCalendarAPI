@@ -103,7 +103,7 @@ const substituteRefs = (objWithRefs,flatObject) => {
         //console.log('setting new value for path ' + key);
         objWithRefs = setNewValForFlattenedPath(obj,myKeys,schemaHashObj);
       }
-    };
+    }
     const newFlatObject = flattenObject(objWithRefs);
     for(const [keyX,valueX] of Object.entries(newFlatObject)) {
         let myKeysX = keyX.split('.');
