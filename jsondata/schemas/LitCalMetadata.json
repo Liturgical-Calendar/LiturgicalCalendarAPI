@@ -71,8 +71,7 @@
                                 "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Nation"
                             },
                             "diocese": {
-                                "type": "string",
-                                "pattern": "^[a-zA-Z0-9 ()'-]+$"
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DioceseName"
                             },
                             "locales": {
                                 "type": "array",
