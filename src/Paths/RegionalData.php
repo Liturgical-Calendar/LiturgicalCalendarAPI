@@ -162,7 +162,9 @@ class RegionalData
             if (file_exists($CalendarDataI18nFile)) {
                 $localeData = json_decode(file_get_contents($CalendarDataI18nFile));
                 foreach ($CalendarData->litcal as $idx => $el) {
-                    $CalendarData->litcal[$idx]->festivity->name = $localeData->{$CalendarData->litcal[$idx]->festivity->event_key};
+                    if (property_exists($localeData, $CalendarData->litcal[$idx]->festivity->event_key)) {
+                        $CalendarData->litcal[$idx]->festivity->name = $localeData->{$CalendarData->litcal[$idx]->festivity->event_key};
+                    }
                 }
             } else {
                 self::produceErrorResponse(StatusCode::NOT_FOUND, "file $CalendarDataI18nFile does not exist");
