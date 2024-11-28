@@ -250,7 +250,7 @@ class Events
     private function loadNationalAndWiderRegionData(): void
     {
         if ($this->EventsParams->NationalCalendar !== null) {
-            $nationalDataFile= strtr(
+            $nationalDataFile = strtr(
                 JsonData::NATIONAL_CALENDARS_FILE,
                 [
                     '{nation}' => $this->EventsParams->NationalCalendar
@@ -259,8 +259,13 @@ class Events
             if (file_exists($nationalDataFile)) {
                 self::$NationalData = json_decode(file_get_contents($nationalDataFile));
                 if (json_last_error() === JSON_ERROR_NONE) {
-                    if (property_exists(self::$NationalData, "settings") && property_exists(self::$NationalData->settings, "locale")) {
-                        $this->EventsParams->Locale = self::$NationalData->settings->locale;
+                    if (property_exists(self::$NationalData, "metadata") && property_exists(self::$NationalData->metadata, "locales")) {
+                        if (
+                            null === $this->EventsParams->Locale
+                            || !in_array($this->EventsParams->Locale, self::$NationalData->metadata->locales)
+                        ) {
+                            $this->EventsParams->Locale = self::$NationalData->metadata->locales[0];
+                        }
                     }
                     if (property_exists(self::$NationalData, "metadata") && property_exists(self::$NationalData->metadata, "wider_region")) {
                         $widerRegionDataFile = strtr(
@@ -270,11 +275,12 @@ class Events
                             ]
                         );
                         $widerRegionI18nFile = strtr(
-                            JsonData::WIDER_REGIONS_I18N_FOLDER,
+                            JsonData::WIDER_REGIONS_I18N_FILE,
                             [
-                                '{wider_region}' => self::$NationalData->metadata->wider_region
+                                '{wider_region}' => self::$NationalData->metadata->wider_region,
+                                '{locale}' => $this->EventsParams->Locale
                             ]
-                        ) . $this->EventsParams->Locale. '.json';
+                        );
                         if (file_exists($widerRegionI18nFile)) {
                             $widerRegionI18nData = json_decode(file_get_contents($widerRegionI18nFile));
                             if (json_last_error() === JSON_ERROR_NONE && file_exists($widerRegionDataFile)) {
