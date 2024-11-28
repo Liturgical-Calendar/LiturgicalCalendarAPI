@@ -48,9 +48,6 @@
                 "event_key": {
                     "type": "string"
                 },
-                "name": {
-                    "type": "string"
-                },
                 "color": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
                 },
