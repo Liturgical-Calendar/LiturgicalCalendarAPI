@@ -229,7 +229,8 @@
                 "GENERAL ROMAN",
                 "IT",
                 "US",
-                "NL"
+                "NL",
+                "CA"
             ],
             "title": "Calendar"
         },
@@ -252,7 +253,9 @@
                 "USA_EDITION_2011",
                 "ITALY_EDITION_1983",
                 "ITALY_EDITION_2020",
-                "NETHERLANDS_EDITION_1978"
+                "NETHERLANDS_EDITION_1978",
+                "CANADA_EDITION_2011",
+                "CANADA_EDITION_2016"
             ]
         },
         "MissalID": {
@@ -266,7 +269,9 @@
                 "US_2011",
                 "IT_1983",
                 "IT_2020",
-                "NL_1978"
+                "NL_1978",
+                "CA_2011",
+                "CA_2016"
             ]
         },
         "MissalName": {
@@ -280,7 +285,9 @@
                 "2011 Roman Missal issued by the USCCB",
                 "Messale Romano ed. 1983 pubblicata dalla CEI",
                 "Messale Romano ed. 2020 pubblicata dalla CEI",
-                "Romeins Missaal ed. 1978 goedgekeurd door de Nederlandse bisschoppenconferentie"
+                "Romeins Missaal ed. 1978 goedgekeurd door de Nederlandse bisschoppenconferentie",
+                "2011 Roman Missal issued by the CCCB",
+                "2016 Roman Missal issued by the CCCB"
             ]
         },
         "MissalFileName": {
