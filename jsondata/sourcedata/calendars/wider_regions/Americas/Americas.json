@@ -51,8 +51,7 @@
         "Puerto Rico": "PR"
     },
     "metadata": {
-        "multilingual": true,
-        "languages": [
+        "locales": [
             "en_CA",
             "en_US",
             "fr_CA",

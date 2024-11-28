@@ -814,7 +814,7 @@
         "diocese_name": "Diocesi di Roma",
         "nation": "IT",
         "locales": [
-            "it-IT"
+            "it_IT"
         ],
         "timezone": "Europe/Rome",
         "group": "Diocesi del Lazio"

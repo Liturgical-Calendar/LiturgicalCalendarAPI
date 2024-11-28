@@ -346,7 +346,7 @@
         },
         "Locale": {
             "type": "string",
-            "description": "must have a value corresponding to a locale enabled on the LitCal server",
+            "description": "IETF language codes comprehensive of region and optionally an ISO 15924 script code, following the BCP 47 standard as implemented in PHP intl",
             "default": "la_VA",
             "enum": [
                 "af_NA","af_ZA","agq_CM","ak_GH","am_ET",

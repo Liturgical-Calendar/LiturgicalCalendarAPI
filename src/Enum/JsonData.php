@@ -77,6 +77,13 @@ class JsonData
     public const WIDER_REGIONS_I18N_FOLDER = JsonData::WIDER_REGIONS_FOLDER . '/{wider_region}/i18n';
 
     /**
+     * The file containing the i18n data for the specified Wider Region calendar,
+     * with placeholders for the actual region name and locale.
+     * Evaluates to 'jsondata/sourcedata/calendars/wider_regions/{wider_region}/i18n/{locale}.json'.
+     */
+    public const WIDER_REGIONS_I18N_FILE = JsonData::WIDER_REGIONS_I18N_FOLDER . '/{locale}.json';
+
+    /**
      * The folder containing national calendars, with a placeholder for the actual nation name.
      * Evaluates to 'jsondata/sourcedata/calendars/nations'.
      */
@@ -92,7 +99,14 @@ class JsonData
      * The folder containing i18n files for national calendars, with placeholders for the actual nation and calendar names.
      * Evaluates to 'jsondata/sourcedata/calendars/nations/{nation}/i18n'.
      */
-    public const NATIONAL_CALENDARS_I18N_FOLDER = JsonData::NATIONAL_CALENDARS_FOLDER . '/{nation}/i18n'; 
+    public const NATIONAL_CALENDARS_I18N_FOLDER = JsonData::NATIONAL_CALENDARS_FOLDER . '/{nation}/i18n';
+
+    /**
+     * The file containing the i18n data for the specified national calendar,
+     * with placeholders for the actual nation name and locale.
+     * Evaluates to 'jsondata/sourcedata/calendars/nations/{nation}/i18n/{locale}.json'.
+     */
+    public const NATIONAL_CALENDARS_I18N_FILE = JsonData::NATIONAL_CALENDARS_I18N_FOLDER . '/{locale}.json';
 
     /**
      * The folder containing diocesan calendars, with a placeholder for the actual nation and diocese names.
@@ -111,4 +125,11 @@ class JsonData
      * Evaluates to 'jsondata/sourcedata/calendars/dioceses/{nation}/{diocese}/i18n'.
      */
     public const DIOCESAN_CALENDARS_I18N_FOLDER = JsonData::DIOCESAN_CALENDARS_FOLDER . '/{nation}/{diocese}/i18n';
+
+    /**
+     * The file containing the i18n data for the specified diocesan calendar,
+     * with placeholders for the actual nation name, diocese name, and locale.
+     * Evaluates to 'jsondata/sourcedata/calendars/dioceses/{nation}/{diocese}/i18n/{locale}.json'.
+     */
+    public const DIOCESAN_CALENDARS_I18N_FILE = JsonData::DIOCESAN_CALENDARS_I18N_FOLDER . '/{locale}.json';
 }

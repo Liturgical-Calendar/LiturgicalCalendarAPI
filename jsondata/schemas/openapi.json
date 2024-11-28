@@ -5331,21 +5331,11 @@
                     "name": {
                       "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/WiderRegionNames"
                     },
-                    "languages": {
+                    "locales": {
                       "type": "array",
                       "items": {
-                        "type": "string",
-                        "description": "IETF language codes comprehensive of region and optionally an ISO 15924 script code, following the BCP 47 standard as implemented in PHP intl",
-                        "pattern": "^[a-z][a-z](?:_[A-Z][a-z]{3})_[A-Z][A-Z]$"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
                       }
-                    },
-                    "data_path": {
-                      "type": "string",
-                      "description": "Server path to the resource file containing the wider region data"
-                    },
-                    "i18n_path": {
-                      "type": "string",
-                      "description": "Server path to the folder containing the i18n files for the wider region"
                     },
                     "api_path": {
                       "type": "string",

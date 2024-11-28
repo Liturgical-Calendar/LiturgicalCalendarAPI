@@ -201,7 +201,7 @@ class RomanMissal
      *      - `region`: the region for which the Roman Missal is intended
      *      - `data_path`: the path to the JSON file containing the sanctorale
      *      - `i18n_path`: the path to the directory containing the JSON files for the i18n of the sanctorale
-     *      - `languages`: an array of the languages for which i18n data is available
+     *      - `locales`: an array of the locales for which i18n data is available
      *      - `year_limits`: an object with two properties:
      *          - `since_year`: the year since when the Roman Missal is to be used
      *          - `until_year`: the year until when the Roman Missal is to be used (null if no end year is specified)
@@ -215,9 +215,9 @@ class RomanMissal
         foreach ($missal_ids as $key => $missal_id) {
             $i18n_path = self::getSanctoraleI18nFilePath($missal_id);
             $it = new \DirectoryIterator("glob://$i18n_path*.json");
-            $languages = [];
+            $locales = [];
             foreach ($it as $f) {
-                $languages[] = $f->getBasename('.json');
+                $locales[] = $f->getBasename('.json');
             }
             $region = null;
             if (str_starts_with($missal_id, "EDITIO_TYPICA_")) {
@@ -231,7 +231,7 @@ class RomanMissal
                 "region"         => $region,
                 "data_path"      => self::getSanctoraleFileName($missal_id),
                 "i18n_path"      => self::getSanctoraleI18nFilePath($missal_id),
-                "languages"      => $languages,
+                "locales"        => $locales,
                 "year_limits"    => self::$yearLimits[ $missal_id ],
                 "year_published" => self::$yearLimits[ $missal_id ][ "since_year" ]
             ];

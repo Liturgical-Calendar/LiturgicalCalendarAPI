@@ -196,8 +196,7 @@
         "Hungary": "HU"
     },
     "metadata": {
-        "multilingual": true,
-        "languages": [
+        "locales": [
             "bg_BG",
             "cs_CZ",
             "hr_HR",

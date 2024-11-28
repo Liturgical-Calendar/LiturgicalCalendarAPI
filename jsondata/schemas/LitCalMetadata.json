@@ -158,26 +158,18 @@
                 "name": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/WiderRegionNames"
                 },
-                "languages": {
+                "locales": {
                     "type": "array",
                     "items": {
                         "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
                     }
-                },
-                "data_path": {
-                    "type": "string",
-                    "pattern": "^jsondata/sourcedata/calendars/wider_regions/[ACEINOSW][flmnsueoc][rseatindo][a-zA-Z\\s]+.json$"
-                },
-                "i18n_path": {
-                    "type": "string",
-                    "pattern": "^jsondata/sourcedata/calendars/wider_regions/[ACEINOSW][FLMNSUEOC][RSEATINDO][A-Z\\s]+$"
                 },
                 "api_path": {
                     "type": "string",
                     "pattern": "^https:\\\/\\\/litcal\\.johnromanodorazio\\.com\\\/api\\\/dev\\\/data\\\/widerregion\\\/[ACEINOSW][flmnsueoc][rseatindo][a-zA-Z\\s]+\\?locale=\\{language\\}$"
                 }
             },
-            "required": ["name", "languages", "data_path", "i18n_path", "api_path"]
+            "required": ["name", "locales", "api_path"]
         }
     }
 }

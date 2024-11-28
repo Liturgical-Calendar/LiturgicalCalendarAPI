@@ -5,12 +5,13 @@ namespace LiturgicalCalendar\Api\Paths;
 use Swaggest\JsonSchema\Schema;
 use Swaggest\JsonSchema\InvalidValue;
 use LiturgicalCalendar\Api\Core;
+use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\RequestContentType;
-use LiturgicalCalendar\Api\Enum\DioceseIndexAction;
 use LiturgicalCalendar\Api\Params\RegionalDataParams;
 
 /**
@@ -25,7 +26,7 @@ use LiturgicalCalendar\Api\Params\RegionalDataParams;
  */
 class RegionalData
 {
-    private ?array $DiocesanCalendarsIndex = null;
+    private readonly ?object $CalendarsMetadata;
     private RegionalDataParams $params;
     public static Core $Core;
 
@@ -40,6 +41,7 @@ class RegionalData
     {
         self::$Core = new Core();
         $this->params  = new RegionalDataParams();
+        $this->CalendarsMetadata = json_decode(file_get_contents(API_BASE_PATH . Route::CALENDARS->value))->litcal_metadata;
     }
 
     /**
@@ -82,8 +84,9 @@ class RegionalData
      *
      * The `key` parameter is required and must be a valid key for the requested category.
      *
-     * The `locale` parameter is optional and only applies to WIDERREGIONCALENDAR category requests.
-     * If present, it must be a valid locale listed in the metadata of the requested Wider region calendar data.
+     * The `locale` parameter is optional.
+     * If present, it must be a valid locale listed in the metadata of the requested calendar.
+     * If not present, the first valid locale for the requested category will be used.
      *
      * If the requested resource exists, it will be returned as JSON.
      * If the resource does not exist, a 404 error will be returned.
@@ -93,46 +96,78 @@ class RegionalData
     {
         switch ($this->params->category) {
             case "DIOCESANCALENDAR":
-                $dioceseEntry = array_values(array_filter($this->DiocesanCalendarsIndex, function ($el) {
+                $dioceseEntry = array_values(array_filter($this->CalendarsMetadata->diocesan_calendars, function ($el) {
                     return $el->calendar_id === $this->params->key;
                 }));
                 if (empty($dioceseEntry)) {
                     self::produceErrorResponse(StatusCode::NOT_FOUND, "The requested resource {$this->params->key} was not found in the index");
                 }
-                $calendarDataFile = $dioceseEntry[0]->path;
+                $calendarDataFile = strtr(JsonData::DIOCESAN_CALENDARS_FILE, [
+                    '{nation}' => $dioceseEntry[0]->nation,
+                    '{diocese}' => $this->params->key,
+                    '{diocese_name}' => $dioceseEntry[0]->diocese
+                ]);
                 break;
             case "WIDERREGIONCALENDAR":
-                $calendarDataFile = "jsondata/sourcedata/wider_regions/{$this->params->key}.json";
+                $calendarDataFile = strtr(JsonData::WIDER_REGIONS_FILE, [
+                    '{wider_region}' => $this->params->key
+                ]);
                 break;
             case "NATIONALCALENDAR":
-                $calendarDataFile = "jsondata/sourcedata/nations/{$this->params->key}/{$this->params->key}.json";
+                $calendarDataFile = strtr(JsonData::NATIONAL_CALENDARS_FILE, [
+                    '{nation}' => $this->params->key
+                ]);
                 break;
             default:
-                self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value <{$this->params->category}> for param `category`: valid values are: " . implode(', ', array_values(RegionalDataParams::EXPECTED_CATEGORIES)));
+                self::produceErrorResponse(
+                    StatusCode::BAD_REQUEST,
+                    "Invalid value <{$this->params->category}> for param `category`: valid values are: "
+                        . implode(', ', array_values(RegionalDataParams::EXPECTED_CATEGORIES))
+                );
         }
 
         if (file_exists($calendarDataFile)) {
-            if ($this->params->category === "DIOCESANCALENDAR") {
-                self::produceResponse(file_get_contents($calendarDataFile));
-            } else {
-                $response = json_decode(file_get_contents($calendarDataFile));
-                $uKey = strtoupper($this->params->key);
-                if ($this->params->category === "WIDERREGIONCALENDAR") {
-                    $isMultilingual = is_dir("jsondata/sourcedata/wider_regions/{$uKey}");
-                    if ($isMultilingual) {
-                        if (false === in_array($this->params->locale, $response->metadata->languages)) {
-                            self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid value `{$this->params->locale}` for param `locale`. Valid values for current requested Wider region calendar data `{$this->params->key}` are: " . implode(', ', $response->metadata->languages));
-                        }
-                        if (file_exists("jsondata/sourcedata/wider_regions/{$uKey}/{$this->params->locale}.json")) {
-                            $localeData = json_decode(file_get_contents("jsondata/sourcedata/wider_regions/{$uKey}/{$this->params->locale}.json"));
-                            foreach ($response->litcal as $idx => $el) {
-                                $response->litcal[$idx]->festivity->name = $localeData->{$response->litcal[$idx]->festivity->event_key};
-                            }
-                        }
-                    }
-                }
-                self::produceResponse(json_encode($response));
+            $CalendarData = json_decode(file_get_contents($calendarDataFile));
+            if (null === $this->params->locale) {
+                $this->params->locale = $CalendarData->metadata->locales[0];
             }
+            elseif (false === in_array($this->params->locale, $CalendarData->metadata->locales)) {
+                self::produceErrorResponse(
+                    StatusCode::BAD_REQUEST,
+                    "Invalid value `{$this->params->locale}` for param `locale`. Valid values for current requested Wider region calendar data `{$this->params->key}` are: "
+                        . implode(', ', $CalendarData->metadata->locales)
+                );
+            }
+            switch ($this->params->category) {
+                case 'DIOCESANCALENDAR':
+                    $CalendarDataI18nFile = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FILE, [
+                        '{nation}' => $dioceseEntry[0]->nation,
+                        '{diocese}' => $this->params->key,
+                        '{locale}' => $this->params->locale
+                    ]);
+                    break;
+                case 'WIDERREGIONCALENDAR':
+                    $CalendarDataI18nFile = strtr(JsonData::WIDER_REGIONS_I18N_FILE, [
+                        '{wider_region}' => $this->params->key,
+                        '{locale}' => $this->params->locale
+                    ]);
+                    break;
+                case 'NATIONALCALENDAR':
+                    $CalendarDataI18nFile = strtr(JsonData::NATIONAL_CALENDARS_I18N_FILE, [
+                        '{nation}' => $this->params->key,
+                        '{locale}' => $this->params->locale
+                    ]);
+                    break;
+            }
+            if (file_exists($CalendarDataI18nFile)) {
+                $localeData = json_decode(file_get_contents($CalendarDataI18nFile));
+                foreach ($CalendarData->litcal as $idx => $el) {
+                    $CalendarData->litcal[$idx]->festivity->name = $localeData->{$CalendarData->litcal[$idx]->festivity->event_key};
+                }
+            } else {
+                self::produceErrorResponse(StatusCode::NOT_FOUND, "file $CalendarDataI18nFile does not exist");
+            }
+            self::produceResponse(json_encode($CalendarData));
         } else {
             self::produceErrorResponse(StatusCode::NOT_FOUND, "file $calendarDataFile does not exist");
         }
@@ -174,9 +209,16 @@ class RegionalData
                     }
                     $updateData->group = strip_tags($this->params->payload->group);
                 }
-                $updateData->path = "jsondata/sourcedata/nations/{$updateData->nation}";
-                if (!file_exists($updateData->path)) {
-                    mkdir($updateData->path, 0755, true);
+
+                // make sure we have all the necessary folders in place
+                if (!file_exists(JsonData::DIOCESAN_CALENDARS_FOLDER . $this->params->payload->nation)) {
+                    mkdir(JsonData::DIOCESAN_CALENDARS_FOLDER . $this->params->payload->nation, 0755, true);
+                }
+                if(!file_exists(JsonData::DIOCESAN_CALENDARS_FOLDER . $this->params->payload->nation . '/' . $this->params->payload->diocese)) {
+                    mkdir(JsonData::DIOCESAN_CALENDARS_FOLDER . $this->params->payload->nation . '/' . $this->params->payload->diocese, 0755, true);
+                }
+                if (!file_exists(JsonData::DIOCESAN_CALENDARS_I18N_FOLDER . $this->params->payload->nation)) {
+
                 }
 
                 $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
@@ -186,7 +228,6 @@ class RegionalData
                         $updateData->path . "/{$updateData->diocese}.json",
                         $calendarData . PHP_EOL
                     );
-                    $this->createOrUpdateIndex(DioceseIndexAction::CREATE, $updateData);
                     $response->success = "Calendar data created or updated for Diocese \"{$updateData->diocese}\" (Nation: \"$updateData->nation\")";
                     self::produceResponse(json_encode($response));
                 } else {
@@ -212,7 +253,7 @@ class RegionalData
     {
         $response = new \stdClass();
         $region = $this->params->payload->metadata->nation;
-        $path = "jsondata/sourcedata/nations/{$region}";
+        $path = JsonData::NATIONAL_CALENDARS_FOLDER . '/' . $region;
         if (!file_exists($path)) {
             mkdir($path, 0755, true);
         }
@@ -244,24 +285,32 @@ class RegionalData
     {
         $response = new \stdClass();
         $this->params->payload->metadata->wider_region = ucfirst(strtolower($this->params->payload->metadata->wider_region));
-        $widerRegion = strtoupper($this->params->payload->metadata->wider_region);
-        if ($this->params->payload->metadata->multilingual === true) {
-            $path = "jsondata/sourcedata/wider_regions/{$widerRegion}";
-            if (!file_exists($path)) {
-                mkdir($path, 0755, true);
-            }
-            $translationJSON = new \stdClass();
-            foreach ($this->params->payload->litcal as $CalEvent) {
-                $translationJSON->{ $CalEvent->festivity->event_key } = '';
-            }
-            if (count($this->params->payload->metadata->languages) > 0) {
-                foreach ($this->params->payload->metadata->languages as $iso) {
-                    if (!file_exists("jsondata/sourcedata/wider_regions/{$widerRegion}/{$iso}.json")) {
-                        file_put_contents(
-                            "jsondata/sourcedata/wider_regions/{$widerRegion}/{$iso}.json",
-                            json_encode($translationJSON, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
-                        );
-                    }
+        $widerRegion = $this->params->payload->metadata->wider_region;
+        $widerRegionPath = JsonData::WIDER_REGIONS_FOLDER . '/' . $widerRegion;
+        $i18npath = strtr(JsonData::WIDER_REGIONS_I18N_FOLDER, [
+            '{wider_region}' => $widerRegion
+        ]);
+        if (!file_exists($widerRegionPath)) {
+            mkdir($widerRegionPath, 0755, true);
+        }
+        if (!file_exists($i18npath)) {
+            mkdir($i18npath, 0755, true);
+        }
+        $translationJSON = new \stdClass();
+        foreach ($this->params->payload->litcal as $CalEvent) {
+            $translationJSON->{ $CalEvent->festivity->event_key } = '';
+        }
+        if (count($this->params->payload->metadata->locales) > 0) {
+            foreach ($this->params->payload->metadata->locales as $iso) {
+                $widerRegionI18nFile = strtr(JsonData::WIDER_REGIONS_I18N_FILE, [
+                    '{wider_region}' => $widerRegion,
+                    '{locale}' => $iso
+                ]);
+                if (!file_exists($widerRegionI18nFile)) {
+                    file_put_contents(
+                        $widerRegionI18nFile,
+                        json_encode($translationJSON, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+                    );
                 }
             }
         }
@@ -269,8 +318,14 @@ class RegionalData
         $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::WIDERREGION);
         if ($test === true) {
             $data = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            file_put_contents("jsondata/sourcedata/wider_regions/{$this->params->payload->metadata->wider_region}.json", $data . PHP_EOL);
-            $response->success = "Calendar data created or updated for Wider Region \"{$this->params->payload->metadata->wider_region}\"";
+            $widerRegionFile = strtr(
+                JsonData::WIDER_REGIONS_FILE,
+                [
+                    '{wider_region}' => $widerRegion
+                ]
+            );
+            file_put_contents($widerRegionFile, $data . PHP_EOL);
+            $response->success = "Calendar data created or updated for Wider Region \"{$widerRegion}\"";
             self::produceResponse(json_encode($response));
         } else {
             self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
@@ -295,34 +350,28 @@ class RegionalData
      */
     private function handleDiocesanCalendarUpdate()
     {
-        $dioceseEntry = array_values(array_filter($this->DiocesanCalendarsIndex, function ($item) {
+        $dioceseEntry = array_values(array_filter($this->CalendarsMetadata->diocesan_calendars, function ($item) {
             return $item->calendar_id === $this->params->key;
         }));
         if (
             empty($dioceseEntry)
-            ||
-            false === property_exists($dioceseEntry[0], 'path')
         ) {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendar resource {$this->params->key}, not found in diocesan calendars index `jsondata/sourcedata/nations/index.json`.");
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendar resource {$this->params->key}.");
         }
-
-        if (false === file_exists($dioceseEntry[0]->path)) {
+        $DiocesanCalendarFile = strtr(
+            JsonData::DIOCESAN_CALENDARS_FILE,
+            [
+                '{nation}' => $dioceseEntry[0]->nation,
+                '{diocese}' => $dioceseEntry[0]->calendar_id,
+                '{diocese_name}' => $dioceseEntry[0]->diocese
+            ]
+        );
+        if (false === file_exists($DiocesanCalendarFile)) {
             self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendar resource, not found in path {$dioceseEntry[0]->path}.");
         }
 
-        if (false === is_writable($dioceseEntry[0]->path)) {
+        if (false === is_writable($DiocesanCalendarFile)) {
             self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendar resource for {$this->params->key} in path {$dioceseEntry[0]->path}, check file and folder permissions.");
-        }
-
-        // Check whether the "group" property in the Diocese index is getting updated too
-        $diocesanGroup = null;
-        if (property_exists($this->params->payload, 'group')) {
-            $groupType = gettype($this->params->payload->group);
-            if ($groupType !== 'string') {
-                self::produceErrorResponse(StatusCode::BAD_REQUEST, "Param `group` in payload is expected to be of type `string`, instead it was of type `{$groupType}`");
-            }
-            $diocesanGroup = strip_tags($this->params->payload->group);
-            unset($this->params->payload->group);
         }
 
         // Validate payload against schema
@@ -335,28 +384,11 @@ class RegionalData
         $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         if (
             false === file_put_contents(
-                $dioceseEntry[0]->path,
+                $DiocesanCalendarFile,
                 $calendarData . PHP_EOL
             )
         ) {
             self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update diocesan calendar resource {$this->params->key} in path {$dioceseEntry[0]->path}.");
-        }
-
-        // In case the "group" property is getting updated, update the diocesan calendar index
-        if (
-            false === property_exists($dioceseEntry[0], 'group')
-            && $diocesanGroup !== null
-            && $diocesanGroup !== ''
-        ) {
-            $dioceseEntry[0]->group = $diocesanGroup;
-            $this->createOrUpdateIndex(DioceseIndexAction::UPDATE, $dioceseEntry[0]);
-        } elseif ($dioceseEntry[0]->group !== $diocesanGroup) {
-            if ($diocesanGroup === null || $diocesanGroup === '') {
-                unset($dioceseEntry[0]->group);
-            } else {
-                $dioceseEntry[0]->group = $diocesanGroup;
-            }
-            $this->createOrUpdateIndex(DioceseIndexAction::UPDATE, $dioceseEntry[0]);
         }
 
         $response = new \stdClass();
@@ -407,19 +439,36 @@ class RegionalData
         $response = new \stdClass();
         switch ($this->params->category) {
             case "DIOCESANCALENDAR":
-                $dioceseEntry = array_values(array_filter($this->DiocesanCalendarsIndex, function ($el) {
+                $dioceseEntry = array_values(array_filter($this->CalendarsMetadata->diocesan_calendars, function ($el) {
                     return $el->calendar_id === $this->params->key;
                 }));
                 if (empty($dioceseEntry)) {
-                    self::produceErrorResponse(StatusCode::NOT_FOUND, "The resource requested for deletion {$this->params->key} was not found in the index");
+                    self::produceErrorResponse(StatusCode::NOT_FOUND, "The resource requested for deletion {$this->params->key} is not known.");
                 }
-                $calendarDataFile = $dioceseEntry[0]->path;
+                $calendarDataFile = strtr(
+                    JsonData::DIOCESAN_CALENDARS_FILE,
+                    [
+                        '{nation}' => $dioceseEntry[0]->nation,
+                        '{diocese}' => $dioceseEntry[0]->calendar_id,
+                        '{diocese_name}' => $dioceseEntry[0]->diocese
+                    ]
+                );
                 break;
             case "WIDERREGIONCALENDAR":
-                $calendarDataFile = "jsondata/sourcedata/wider_regions/{$this->params->key}.json";
+                $calendarDataFile = strtr(
+                    JsonData::WIDER_REGIONS_FILE,
+                    [
+                        '{wider_region}' => $this->params->key
+                    ]
+                );
                 break;
             case "NATIONALCALENDAR":
-                $calendarDataFile = "jsondata/sourcedata/nations/{$this->params->key}/{$this->params->key}.json";
+                $calendarDataFile = strtr(
+                    JsonData::NATIONAL_CALENDARS_FILE,
+                    [
+                        '{nation}' => $this->params->key
+                    ]
+                );
                 break;
         }
         if (file_exists($calendarDataFile)) {
@@ -429,9 +478,6 @@ class RegionalData
             if (false === unlink($calendarDataFile)) {
                 self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully.");
             };
-            if ($this->params->category === 'DIOCESANCALENDAR') {
-                $this->createOrUpdateIndex(DioceseIndexAction::DELETE);
-            }
         } else {
             self::produceErrorResponse(StatusCode::NOT_FOUND, "The resource '{$this->params->key}' requested for deletion was not found on this server.");
         }
@@ -439,79 +485,7 @@ class RegionalData
         self::produceResponse(json_encode($response));
     }
 
-    /**
-     * Loads the JSON data for the diocesan calendars index.
-     *
-     * This file is used to keep track of which diocesan calendars are available
-     * and their respective paths.
-     */
-    private function loadDiocesanCalendarsIndex()
-    {
-        $diocesanIndexPath = "jsondata/sourcedata/nations/index.json";
-        if (file_exists($diocesanIndexPath)) {
-            $this->DiocesanCalendarsIndex = json_decode(file_get_contents($diocesanIndexPath));
-        }
-    }
 
-    /**
-     * Function createOrUpdateIndex
-     *  only needed when a diocesan calendar is created, updated or deleted
-     * @param ?object $data   Data to add to index.json: path of the diocesan calendar data, nation, diocese name, and optionally group; null when deleting
-     * @param boolean $delete Delete from the index rather than create/update the index
-     *
-     * @return void
-     */
-    private function createOrUpdateIndex(DioceseIndexAction $action, ?object $data = null)
-    {
-        switch ($action) {
-            case DioceseIndexAction::DELETE:
-                $key = $this->params->key;
-                $this->DiocesanCalendarsIndex = array_values(array_filter($this->DiocesanCalendarsIndex, function ($el) use ($key) {
-                    return $el->calendar_id !== $key;
-                }));
-                break;
-            case DioceseIndexAction::CREATE:
-                // The client should provide the `calendar_id` property based on the pregenerated ids
-                // in the WorldDiocesesByNation.json file. We should no longer generate the id on the fly.
-                $key = $data->calendar_id;
-                // We can't create an entry with a calendar_id that already exists!
-                if (false !== array_search($key, array_column($this->DiocesanCalendarsIndex, 'calendar_id'), true)) {
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "The calendar_id {$key} already exists in the index. Perhaps you were meaning to update rather than create?");
-                }
-                // TODO: should we check to make sure that the provided `calendar_id` is a valid value
-                // as in the WorldDiocesesByNation.json file?
-                $data->path .= "/{$data->diocese}.json";
-                $this->DiocesanCalendarsIndex[] = $data;
-                break;
-            case DioceseIndexAction::UPDATE:
-                $key = $this->params->key;
-                $indexEntryToUpdate = array_search($key, array_column($this->DiocesanCalendarsIndex, 'calendar_id'), true);
-                // The client should provide the `calendar_id` property, but if it's missing, add it
-                if (false === property_exists($data, 'calendar_id')) {
-                    $data->calendar_id = $key;
-                }
-                $this->DiocesanCalendarsIndex[$indexEntryToUpdate] = $data;
-                break;
-        }
-
-        $test = $this->validateDataAgainstSchema($this->DiocesanCalendarsIndex, LitSchema::INDEX);
-        if (false === $test) {
-            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, json_encode($test));
-        }
-
-        if (false === file_exists("jsondata/sourcedata/nations/index.json")) {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendars index, not found in path jsondata/sourcedata/nations/index.json.");
-        }
-
-        if (false === is_writable("jsondata/sourcedata/nations/index.json")) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendars index in path jsondata/sourcedata/nations/index.json, check file and folder permissions.");
-        }
-
-        $jsonEncodedContents = json_encode($this->DiocesanCalendarsIndex, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        if (false === file_put_contents("jsondata/sourcedata/nations/index.json", $jsonEncodedContents . PHP_EOL)) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update diocesan calendars index in path jsondata/sourcedata/nations/index.json.");
-        }
-    }
 
     /**
      * Function validateDataAgainstSchema
@@ -596,7 +570,7 @@ class RegionalData
             self::$Core->getRequestMethod() === RequestMethod::GET
             && isset($_GET['locale'])
         ) {
-            $data->locale = $_GET['locale'];
+            $data->locale = \Locale::canonicalize($_GET['locale']);
         }
         return $data;
     }
@@ -800,7 +774,6 @@ class RegionalData
             return;
         }
         self::$Core->setResponseContentTypeHeader();
-        $this->loadDiocesanCalendarsIndex();
         $this->handleRequestParams($requestPathParts);
         $this->handleRequestMethod();
     }

@@ -32,8 +32,7 @@
         "Japan": "JP"
     },
     "metadata": {
-        "multilingual": true,
-        "languages": [
+        "locales": [
             "zh_Hans_CN",
             "ja_JP"
         ],

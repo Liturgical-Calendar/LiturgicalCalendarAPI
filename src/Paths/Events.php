@@ -496,10 +496,10 @@ class Events
             if (false === array_key_exists($key, self::$FestivityCollection)) {
                 self::$FestivityCollection[ $key ] = $festivity[ "festivity" ];
                 self::$FestivityCollection[ $key ][ "name" ] = $NAME[ $key ];
-                if (array_key_exists("languages", $festivity[ "metadata" ])) {
+                if (array_key_exists("locales", $festivity[ "metadata" ])) {
                     $decreeURL = sprintf($festivity[ "metadata" ][ "url" ], 'LA');
-                    if (array_key_exists($this->EventsParams->Locale, $festivity[ "metadata" ][ "languages" ])) {
-                        $decreeLang = $festivity[ "metadata" ][ "languages" ][ $this->EventsParams->Locale ];
+                    if (array_key_exists($this->EventsParams->Locale, $festivity[ "metadata" ][ "locales" ])) {
+                        $decreeLang = $festivity[ "metadata" ][ "locales" ][ $this->EventsParams->Locale ];
                         $decreeURL = sprintf($festivity[ "metadata" ][ "url" ], $decreeLang);
                     }
                 } else {

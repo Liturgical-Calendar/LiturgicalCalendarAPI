@@ -446,14 +446,10 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "multilingual": {
-                    "type": "boolean"
-                },
-                "languages": {
+                "locales": {
                     "type": "array",
                     "items": {
-                        "type": "string",
-                        "pattern": "[a-z]{2}_[A-Z1-9]{2,3}"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
                     },
                     "minItems": 1
                 },
@@ -469,8 +465,8 @@
                 }
             },
             "required": [
-                "multilingual",
-                "wider_region"
+                "wider_region",
+                "locales"
             ],
             "title": "CalendarMetadata"
         },
