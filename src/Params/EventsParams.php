@@ -26,6 +26,7 @@ class EventsParams
     public int $Year;
     public bool $EternalHighPriest            = false;
     public ?string $Locale                    = null;
+    public ?string $baseLocale                = null;
     public ?string $NationalCalendar          = null;
     public ?string $DiocesanCalendar          = null;
     private array $SupportedNationalCalendars = [];
@@ -78,6 +79,7 @@ class EventsParams
         } else {
             $this->Locale = LitLocale::LATIN;
         }
+        $this->baseLocale = \Locale::getPrimaryLanguage($this->Locale);
 
         $this->calendarsMetadata = json_decode(file_get_contents(API_BASE_PATH . Route::CALENDARS->value))->litcal_metadata;
         $this->SupportedDiocesanCalendars = $this->calendarsMetadata->diocesan_calendars_keys;
@@ -111,6 +113,7 @@ class EventsParams
                     case "locale":
                         $this->Locale = \Locale::canonicalize($this->Locale);
                         $this->Locale = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
+                        $this->baseLocale = \Locale::getPrimaryLanguage($this->Locale);
                         break;
                     case "national_calendar":
                         if (false === in_array(strtoupper($value), $this->SupportedNationalCalendars)) {

@@ -265,6 +265,7 @@ class Events
                             || !in_array($this->EventsParams->Locale, self::$NationalData->metadata->locales)
                         ) {
                             $this->EventsParams->Locale = self::$NationalData->metadata->locales[0];
+                            $this->EventsParams->baseLocale = \Locale::getPrimaryLanguage($this->EventsParams->Locale);
                         }
                     }
                     if (property_exists(self::$NationalData, "metadata") && property_exists(self::$NationalData->metadata, "wider_region")) {
@@ -278,7 +279,7 @@ class Events
                             JsonData::WIDER_REGIONS_I18N_FILE,
                             [
                                 '{wider_region}' => self::$NationalData->metadata->wider_region,
-                                '{locale}' => $this->EventsParams->Locale
+                                '{locale}' => $this->EventsParams->baseLocale
                             ]
                         );
                         if (file_exists($widerRegionI18nFile)) {
@@ -313,23 +314,22 @@ class Events
      */
     private function setLocale(): void
     {
-        $baseLocale = \Locale::getPrimaryLanguage($this->EventsParams->Locale);
         $localeArray = [
             $this->EventsParams->Locale . '.utf8',
             $this->EventsParams->Locale . '.UTF-8',
             $this->EventsParams->Locale,
-            $baseLocale . '_' . strtoupper($baseLocale) . '.utf8',
-            $baseLocale . '_' . strtoupper($baseLocale) . '.UTF-8',
-            $baseLocale . '_' . strtoupper($baseLocale),
-            $baseLocale . '.utf8',
-            $baseLocale . '.UTF-8',
-            $baseLocale
+            $this->EventsParams->baseLocale . '_' . strtoupper($this->EventsParams->baseLocale) . '.utf8',
+            $this->EventsParams->baseLocale . '_' . strtoupper($this->EventsParams->baseLocale) . '.UTF-8',
+            $this->EventsParams->baseLocale . '_' . strtoupper($this->EventsParams->baseLocale),
+            $this->EventsParams->baseLocale . '.utf8',
+            $this->EventsParams->baseLocale . '.UTF-8',
+            $this->EventsParams->baseLocale
         ];
         setlocale(LC_ALL, $localeArray);
         bindtextdomain("litcal", "i18n");
         textdomain("litcal");
-        self::$LitGrade = new LitGrade($baseLocale);
-        self::$LitCommon = new LitCommon($baseLocale);
+        self::$LitGrade = new LitGrade($this->EventsParams->baseLocale);
+        self::$LitCommon = new LitCommon($this->EventsParams->baseLocale);
     }
 
     /**
@@ -389,11 +389,11 @@ class Events
                 // There may or may not be a related translation file; if there is, we get the translated name from here
                 $I18nPath = RomanMissal::getSanctoraleI18nFilePath($LatinMissal);
                 if ($I18nPath !== false) {
-                    if (false === file_exists($I18nPath . "/" . $this->EventsParams->Locale . ".json")) {
+                    if (false === file_exists($I18nPath . "/" . $this->EventsParams->baseLocale . ".json")) {
                         echo self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource $I18nPath");
                         die();
                     }
-                    $NAME = json_decode(file_get_contents($I18nPath . "/" . $this->EventsParams->Locale . ".json"), true);
+                    $NAME = json_decode(file_get_contents($I18nPath . "/" . $this->EventsParams->baseLocale . ".json"), true);
                     if (json_last_error() !== JSON_ERROR_NONE) {
                         echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
                         die();
@@ -425,7 +425,7 @@ class Events
     private function processPropriumDeTemporeData(): void
     {
         $DataFile = 'jsondata/sourcedata/missals/propriumdetempore/propriumdetempore.json';
-        $I18nFile = 'jsondata/sourcedata/missals/propriumdetempore/i18n/' . $this->EventsParams->Locale . ".json";
+        $I18nFile = 'jsondata/sourcedata/missals/propriumdetempore/i18n/' . $this->EventsParams->baseLocale . ".json";
         if (!file_exists($DataFile) || !file_exists($I18nFile)) {
             echo self::produceErrorResponse(
                 StatusCode::NOT_FOUND,
@@ -481,7 +481,7 @@ class Events
     private function processMemorialsFromDecreesData(): void
     {
         $DataFile = 'jsondata/sourcedata/decrees/decrees.json';
-        $I18nFile = 'jsondata/sourcedata/decrees/i18n/' . $this->EventsParams->Locale . ".json";
+        $I18nFile = 'jsondata/sourcedata/decrees/i18n/' . $this->EventsParams->baseLocale . ".json";
         if (!file_exists($DataFile) || !file_exists($I18nFile)) {
             echo self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DataFile or resource file $I18nFile");
             die();
@@ -504,8 +504,8 @@ class Events
                 self::$FestivityCollection[ $key ][ "name" ] = $NAME[ $key ];
                 if (array_key_exists("locales", $festivity[ "metadata" ])) {
                     $decreeURL = sprintf($festivity[ "metadata" ][ "url" ], 'LA');
-                    if (array_key_exists($this->EventsParams->Locale, $festivity[ "metadata" ][ "locales" ])) {
-                        $decreeLang = $festivity[ "metadata" ][ "locales" ][ $this->EventsParams->Locale ];
+                    if (array_key_exists($this->EventsParams->baseLocale, $festivity[ "metadata" ][ "locales" ])) {
+                        $decreeLang = $festivity[ "metadata" ][ "locales" ][ $this->EventsParams->baseLocale ];
                         $decreeURL = sprintf($festivity[ "metadata" ][ "url" ], $decreeLang);
                     }
                 } else {
