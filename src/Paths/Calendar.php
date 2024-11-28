@@ -568,8 +568,6 @@ class Calendar
                     }
                 }
             }
-
-
         }
     }
 
@@ -625,7 +623,8 @@ class Calendar
                 $this->DioceseName = $dioceseName;
                 $this->CalendarParams->NationalCalendar = strtoupper($nation);
                 $diocesanDataFile = strtr(
-                    JsonData::DIOCESAN_CALENDARS_FILE, [
+                    JsonData::DIOCESAN_CALENDARS_FILE,
+                    [
                         '{nation}'       => $this->CalendarParams->NationalCalendar,
                         '{diocese}'      => $this->CalendarParams->DiocesanCalendar,
                         '{diocese_name}' => $dioceseName
@@ -4651,7 +4650,7 @@ class Calendar
                 ]
             );
             $DiocesanDataI18nData = json_decode(file_get_contents($DiocesanDataI18nFile));
-            foreach($this->DiocesanData->litcal as $idx => $value) {
+            foreach ($this->DiocesanData->litcal as $idx => $value) {
                 $tag = $value->festivity->event_key;
                 $this->DiocesanData->litcal[$idx]->festivity->name = $DiocesanDataI18nData->{ $tag };
             }
@@ -4666,7 +4665,7 @@ class Calendar
                 ]
             );
             $NationalDataI18nData = json_decode(file_get_contents($NationalDataI18nFile));
-            foreach($this->NationalData->litcal as $idx => $value) {
+            foreach ($this->NationalData->litcal as $idx => $value) {
                 $tag = $value->festivity->event_key;
                 if (property_exists($NationalDataI18nData, $tag)) {
                     $this->NationalData->litcal[$idx]->festivity->name = $NationalDataI18nData->{ $tag };

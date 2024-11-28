@@ -214,11 +214,15 @@ class RegionalData
                 if (!file_exists(JsonData::DIOCESAN_CALENDARS_FOLDER . $this->params->payload->nation)) {
                     mkdir(JsonData::DIOCESAN_CALENDARS_FOLDER . $this->params->payload->nation, 0755, true);
                 }
-                if(!file_exists(JsonData::DIOCESAN_CALENDARS_FOLDER . $this->params->payload->nation . '/' . $this->params->payload->diocese)) {
+                if (!file_exists(JsonData::DIOCESAN_CALENDARS_FOLDER . $this->params->payload->nation . '/' . $this->params->payload->diocese)) {
                     mkdir(JsonData::DIOCESAN_CALENDARS_FOLDER . $this->params->payload->nation . '/' . $this->params->payload->diocese, 0755, true);
                 }
-                if (!file_exists(JsonData::DIOCESAN_CALENDARS_I18N_FOLDER . $this->params->payload->nation)) {
-
+                $diocesanCalendarI18nFolder = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FOLDER, [
+                    '{nation}' => $this->params->payload->nation,
+                    '{diocese}' => $this->params->payload->diocese
+                ]);
+                if (!file_exists($diocesanCalendarI18nFolder)) {
+                    mkdir($diocesanCalendarI18nFolder, 0755, true);
                 }
 
                 $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
