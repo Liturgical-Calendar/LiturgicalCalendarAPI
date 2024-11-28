@@ -10,6 +10,7 @@ use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Enum\AcceptHeader;
+use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Params\EventsParams;
 
 class Events
@@ -17,7 +18,6 @@ class Events
     public static Core $Core;
     private static array $FestivityCollection = [];
     private static array $LatinMissals        = [];
-    private static ?array $DioceseIndex       = null;
     private static ?object $WiderRegionData   = null;
     private static ?object $NationalData      = null;
     private static ?object $DiocesanData      = null;
@@ -35,6 +35,9 @@ class Events
      * - Initialize the instance of the Core class
      * - Set the request path parts
      * - Initialize a new EventsParams object
+     * - Initialize the WorldDioceses object from the world_dioceses.json file
+     *
+     * @throws \Exception if there is an issue with reading the world_dioceses.json file
      */
     public function __construct(array $requestPathParts = [])
     {
@@ -55,26 +58,6 @@ class Events
         self::$LatinMissals = array_filter(RomanMissal::$values, function ($item) {
             return str_starts_with($item, "EDITIO_TYPICA_");
         });
-    }
-
-    /**
-     * Loads the JSON data for the diocesan calendars index.
-     *
-     * This file is used to keep track of which diocesan calendars are available
-     * and their respective paths.
-     */
-    private static function retrieveDioceseIndex(): void
-    {
-        $DioceseIndexContents = file_exists("jsondata/sourcedata/nations/index.json") ? file_get_contents("jsondata/sourcedata/nations/index.json") : null;
-        if (null === $DioceseIndexContents || false === $DioceseIndexContents) {
-            echo self::produceErrorResponse(StatusCode::NOT_FOUND, "path jsondata/sourcedata/nations/index.json not found");
-            die();
-        }
-        self::$DioceseIndex = json_decode($DioceseIndexContents);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
-            die();
-        }
     }
 
     /**
@@ -219,9 +202,6 @@ class Events
     /**
      * Loads the JSON data for the specified diocesan calendar.
      *
-     * If the diocese is not found in the diocesan calendars index or in the `jsondata/sourcedata/nations/{nation}/` directory, the response will be a JSON error response with a status code of 404 Not Found.
-     * If the diocese is not found in the diocesan calendars index, the response will be a JSON error response with a status code of 400 Bad Request.
-     * If the diocese is found in the diocesan calendars index but not in the `jsondata/sourcedata/nations/{nation}/` directory, the response will be a JSON error response with a status code of 503 Service Unavailable.
      * If the payload is not valid according to {@see LitSchema::DIOCESAN}, the response will be a JSON error response with a status code of 422 Unprocessable Content.
      *
      * @return void
@@ -229,12 +209,19 @@ class Events
     private function loadDiocesanData(): void
     {
         if ($this->EventsParams->DiocesanCalendar !== null) {
-            $DiocesanData = array_values(array_filter(self::$DioceseIndex, function ($el) {
+            $DiocesanData = array_values(array_filter($this->EventsParams->calendarsMetadata->diocesan_calendars, function ($el) {
                 return $el->calendar_id === $this->EventsParams->DiocesanCalendar;
             }));
             if (count($DiocesanData) === 1) {
                 $this->EventsParams->NationalCalendar = $DiocesanData[0]->nation;
-                $diocesanDataFile = $DiocesanData[0]->path;
+                $diocesanDataFile = strtr(
+                    JsonData::DIOCESAN_CALENDARS_FILE,
+                    [
+                        '{nation}' => $this->EventsParams->NationalCalendar,
+                        '{diocese}' => $this->EventsParams->DiocesanCalendar,
+                        '{diocese_name}' => $DiocesanData[0]->diocese
+                    ]
+                );
                 if (file_exists($diocesanDataFile)) {
                     self::$DiocesanData = json_decode(file_get_contents($diocesanDataFile));
                 } else {
@@ -243,7 +230,7 @@ class Events
                 }
             } else {
                 $description = "unknown diocese `{$this->EventsParams->DiocesanCalendar}`, supported values are: ["
-                    . implode(',', array_column(self::$DioceseIndex, 'calendar_id')) . "]";
+                    . implode(',', $this->EventsParams->calendarsMetadata->diocesan_calendars) . "]";
                 echo self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                 die();
             }
@@ -263,7 +250,12 @@ class Events
     private function loadNationalAndWiderRegionData(): void
     {
         if ($this->EventsParams->NationalCalendar !== null) {
-            $nationalDataFile = "jsondata/sourcedata/nations/" . $this->EventsParams->NationalCalendar . "/" . $this->EventsParams->NationalCalendar . ".json";
+            $nationalDataFile= strtr(
+                JsonData::NATIONAL_CALENDARS_FILE,
+                [
+                    '{nation}' => $this->EventsParams->NationalCalendar
+                ]
+            );
             if (file_exists($nationalDataFile)) {
                 self::$NationalData = json_decode(file_get_contents($nationalDataFile));
                 if (json_last_error() === JSON_ERROR_NONE) {
@@ -271,8 +263,18 @@ class Events
                         $this->EventsParams->Locale = self::$NationalData->settings->locale;
                     }
                     if (property_exists(self::$NationalData, "metadata") && property_exists(self::$NationalData->metadata, "wider_region")) {
-                        $widerRegionDataFile = self::$NationalData->metadata->wider_region->json_file;
-                        $widerRegionI18nFile = self::$NationalData->metadata->wider_region->i18n_file;
+                        $widerRegionDataFile = strtr(
+                            JsonData::WIDER_REGIONS_FILE,
+                            [
+                                '{wider_region}' => self::$NationalData->metadata->wider_region
+                            ]
+                        );
+                        $widerRegionI18nFile = strtr(
+                            JsonData::WIDER_REGIONS_I18N_FOLDER,
+                            [
+                                '{wider_region}' => self::$NationalData->metadata->wider_region
+                            ]
+                        ) . $this->EventsParams->Locale. '.json';
                         if (file_exists($widerRegionI18nFile)) {
                             $widerRegionI18nData = json_decode(file_get_contents($widerRegionI18nFile));
                             if (json_last_error() === JSON_ERROR_NONE && file_exists($widerRegionDataFile)) {
@@ -494,10 +496,10 @@ class Events
             if (false === array_key_exists($key, self::$FestivityCollection)) {
                 self::$FestivityCollection[ $key ] = $festivity[ "festivity" ];
                 self::$FestivityCollection[ $key ][ "name" ] = $NAME[ $key ];
-                if (array_key_exists("languages", $festivity[ "metadata" ])) {
+                if (array_key_exists("locales", $festivity[ "metadata" ])) {
                     $decreeURL = sprintf($festivity[ "metadata" ][ "url" ], 'LA');
-                    if (array_key_exists($this->EventsParams->Locale, $festivity[ "metadata" ][ "languages" ])) {
-                        $decreeLang = $festivity[ "metadata" ][ "languages" ][ $this->EventsParams->Locale ];
+                    if (array_key_exists($this->EventsParams->Locale, $festivity[ "metadata" ][ "locales" ])) {
+                        $decreeLang = $festivity[ "metadata" ][ "locales" ][ $this->EventsParams->Locale ];
                         $decreeURL = sprintf($festivity[ "metadata" ][ "url" ], $decreeLang);
                     }
                 } else {
@@ -701,7 +703,6 @@ class Events
 
         self::$requestPathParts = $requestPathParts;
         self::retrieveLatinMissals();
-        self::retrieveDioceseIndex();
         $this->handleRequestParams();
         $this->loadDiocesanData();
         $this->loadNationalAndWiderRegionData();

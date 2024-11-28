@@ -12,6 +12,7 @@ use LiturgicalCalendar\Api\Enum\ICSErrorLevel;
 use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\ReturnType;
 use LiturgicalCalendar\Api\Enum\Route;
+use LiturgicalCalendar\Api\Enum\JsonData;
 
 /**
  * This class provides a WebSocket-based interface for executing various tests
@@ -69,7 +70,6 @@ class Health implements MessageComponentInterface
         "jsondata/sourcedata/missals/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json"
                                                                              => LitSchema::PROPRIUMDESANCTIS,
         "jsondata/sourcedata/missals/propriumdesanctis_US_2011/propriumdesanctis_US_2011"   => LitSchema::PROPRIUMDESANCTIS,
-        "jsondata/sourcedata/nations/index.json"                                            => LitSchema::INDEX,
         API_BASE_PATH . '/calendars'                                         => LitSchema::METADATA,
         API_BASE_PATH . '/decrees'                                           => LitSchema::DECREES,
         API_BASE_PATH . '/events'                                            => LitSchema::EVENTS,
@@ -328,9 +328,6 @@ class Health implements MessageComponentInterface
                 }
                 if (preg_match("/^proprium-de-tempore$/", $dataPath)) {
                     return LitSchema::PROPRIUMDETEMPORE;
-                }
-                if (preg_match("/^regional-calendars-index$/", $dataPath)) {
-                    return LitSchema::INDEX;
                 }
                 if (preg_match("/^wider-region-[A-Z][a-z]+$/", $dataPath)) {
                     return LitSchema::WIDERREGION;

@@ -21,7 +21,7 @@
             "properties": {
                 "missal_id": {
                     "type": "string",
-                    "pattern": "^(EDITIO_TYPICA|IT|US|NL)_(19[7-9]|[2-9][0-9][0-9])[0-9]$"
+                    "pattern": "^(EDITIO_TYPICA|IT|US|NL|CA)_(19[7-9]|[2-9][0-9][0-9])[0-9]$"
                 },
                 "name": {
                     "type": "string"
@@ -32,7 +32,8 @@
                         "VA",
                         "IT",
                         "US",
-                        "NL"
+                        "NL",
+                        "CA"
                     ]
                 },
                 "year_published": {
@@ -55,20 +56,12 @@
                     },
                     "required": [ "since_year" ]
                 },
-                "data_path": {
-                    "type": "string",
-                    "pattern": "^jsondata\\\/sourcedata\\\/missals\\\/propriumdesanctis_(IT_|US_|NL_)?(19[7-9]|20[0-9])[0-9]\\\/propriumdesanctis_(IT_|US_|NL_)?(19[7-9]|20[0-9])[0-9]\\.json$"
-                },
-                "languages": {
+                "locales": {
                     "type": "array",
                     "items": {
                         "type": "string",
                         "pattern": "^[a-z]{2}$"
                     }
-                },
-                "i18n_path": {
-                    "type": "string",
-                    "pattern": "^jsondata\\\/sourcedata\\\/missals\\\/propriumdesanctis_(IT_|US_|NL_)?(19[7-9]|20[0-9])[0-9]\\\/i18n\\\/$"
                 },
                 "api_path": {
                     "type": "string",

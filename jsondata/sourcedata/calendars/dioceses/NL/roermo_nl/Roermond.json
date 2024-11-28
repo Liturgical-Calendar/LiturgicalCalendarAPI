@@ -1,0 +1,322 @@
+{
+  "$schema": "../../../../../schemas/DiocesanCalendar.json",
+  "litcal": [
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 6,
+        "common": [
+          "Proper"
+        ],
+        "day": 8,
+        "month": 12,
+        "event_key": "OnbevlekteOntvangenisvandeHeiligeMaagdMariaPatroonsfeestvanhetbisdom"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 3,
+        "common": [
+          "Proper"
+        ],
+        "day": 15,
+        "month": 1,
+        "event_key": "ZArnoldJanssenpriester"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0,
+        "until_year": 2003
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 3,
+        "common": [
+          "Pastors:For a Pope",
+          "Doctors"
+        ],
+        "day": 4,
+        "month": 9,
+        "event_key": "HGregoriusdeGrotepausenkerkleraar"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 1
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Holy Men and Women:For Religious"
+        ],
+        "day": 5,
+        "month": 1,
+        "event_key": "HGerlachkluizenaar"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Pastors:For Missionaries"
+        ],
+        "day": 8,
+        "month": 5,
+        "event_key": "HHWiroPlechelmusenOtger"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 1
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Proper"
+        ],
+        "day": 14,
+        "month": 5,
+        "event_key": "AlleheiligeBisschoppenvanMaastricht"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 2
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Proper"
+        ],
+        "day": 17,
+        "month": 9,
+        "event_key": "HLambertusbisschopenmartelaar"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 3
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Pastors"
+        ],
+        "day": 3,
+        "month": 11,
+        "event_key": "HHubertusbisschop"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 4
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Pastors"
+        ],
+        "day": 5,
+        "month": 1,
+        "event_key": "HKarelvanSintAndriesKarelHoubenpriester"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 5
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Virgins"
+        ],
+        "day": 8,
+        "month": 5,
+        "event_key": "ZClaravanhetArmeKindJezuzClaraFeymaagd"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 6
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Virgins"
+        ],
+        "day": 20,
+        "month": 5,
+        "event_key": "ZJosefaStenmannsmaagd"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 7
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Virgins"
+        ],
+        "day": 30,
+        "month": 10,
+        "event_key": "ZMariaTeresavandeHJozefAnnaMariaTauschermaagd"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 8
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Virgins"
+        ],
+        "day": 28,
+        "month": 11,
+        "event_key": "ZMariaHelenaStollenwerkmaagd"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 9
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 4,
+        "common": [
+          "Proper"
+        ],
+        "day": 13,
+        "month": 5,
+        "event_key": "HServatiusbiscchop"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 4,
+        "common": [
+          "Dedication of a Church"
+        ],
+        "day": 3,
+        "month": 9,
+        "event_key": "VerjaardagvandeWijdingvandekathedraal"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 1
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 3,
+        "common": [
+          "Proper"
+        ],
+        "day": 10,
+        "month": 10,
+        "event_key": "HeiligeMaagdMariaSterrederZee"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 2
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 3,
+        "common": [
+          "Proper"
+        ],
+        "day": 15,
+        "month": 1,
+        "event_key": "HArnoldJanssenpriester"
+      },
+      "metadata": {
+        "since_year": 2004,
+        "form_rownum": 3
+      }
+    }
+  ],
+  "metadata": {
+    "diocese_id": "roermo_nl",
+    "diocese_name": "Roermond",
+    "nation": "NL",
+    "locales": [
+      "nl_NL"
+    ],
+    "timezone": "Europe/Amsterdam"
+  }
+}

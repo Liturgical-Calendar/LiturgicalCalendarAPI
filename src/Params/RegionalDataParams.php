@@ -20,8 +20,7 @@ use LiturgicalCalendar\Api\Enum\RequestMethod;
  */
 class RegionalDataParams
 {
-    private ?object $calendars              = null;
-    private static array $widerRegionNames  = [];
+    private readonly object $calendars;
 
     /**
      * An array of expected values for the category parameter of requests to the /data API path.
@@ -43,19 +42,36 @@ class RegionalDataParams
 
     public function __construct()
     {
-        $calendarsRoute = (defined('API_BASE_PATH') ? API_BASE_PATH : 'https://litcal.johnromanodorazio.com/api/dev') . Route::CALENDARS->value;
+        $calendarsRoute = API_BASE_PATH . Route::CALENDARS->value;
         $metadataRaw = file_get_contents($calendarsRoute);
         if ($metadataRaw) {
             $metadata = json_decode($metadataRaw);
             if (JSON_ERROR_NONE === json_last_error() && property_exists($metadata, 'litcal_metadata')) {
-                $this->calendars = $metadata->litcal_metadata;
                 //let's remove the Vatican calendar from the list
-                array_pop($this->calendars->national_calendars);
-                self::$widerRegionNames = $this->calendars->wider_regions_keys;
+                array_pop($metadata->litcal_metadata->national_calendars);
+                $this->calendars = $metadata->litcal_metadata;
             }
         }
     }
 
+    /**
+     * Validate the parameters provided to the RegionalData class for a National Calendar.
+     *
+     * The method checks the following:
+     * - The `category` parameter is "NATIONALCALENDAR".
+     * - The `key` parameter is a valid nation.
+     * - The `locale` parameter is a valid locale for the given nation.
+     * - The `payload` parameter is a valid JSON object.
+     * - If the request method is PUT, the National Calendar data does not already exist.
+     * - If the request method is DELETE, the National Calendar data is not in use by a Diocesan calendar.
+     *
+     * If any of the checks fail, the method will produce an error response with a 400 status code.
+     *
+     * @param object $data
+     *      The parameters provided to the RegionalData class.
+     * @return string
+     *      The validated nation value.
+     */
     private function checkNationalCalendarConditions(object $data): string
     {
         if (RegionalData::$Core->getRequestMethod() === RequestMethod::PUT) {
@@ -95,9 +111,52 @@ class RegionalDataParams
                 "Invalid value {$data->key} for param `key`, valid values are: {$validVals}"
             );
         }
+
+        $currentNation = array_values(array_filter($this->calendars->national_calendars, fn ($el) => $el->calendar_id === $data->key))[0];
+        $validLangs = $currentNation->locales;
+        if (property_exists($data, 'locale')) {
+            $data->locale = \Locale::canonicalize($data->locale);
+            if (in_array($data->locale, $validLangs)) {
+                $this->locale = $data->locale;
+            } else {
+                $message = "Invalid value {$data->locale} for param `locale`, valid values for nation {$data->key} are: "
+                            . implode(', ', $validLangs);
+                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+            }
+        } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+            if (in_array($value, $validLangs)) {
+                $this->locale = $value;
+            } else {
+                $message = "Invalid value {$value} for Accept-Language header, valid values for nation {$data->key} are: "
+                            . implode(', ', $validLangs);
+                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+            }
+        } else {
+            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "`locale` param or `Accept-Language` header required for Wider Region calendar data");
+        }
+
+
         return $data->key;
     }
 
+    /**
+     * Validate the parameters provided to the RegionalData class for a Diocesan Calendar.
+     *
+     * The method checks the following:
+     * - The `category` parameter is "DIOCESANCALENDAR".
+     * - The `key` parameter is a valid diocesan calendar key.
+     * - The `locale` parameter is a valid locale for the given diocesan calendar. ::TODO::
+     * - The `payload` parameter is a valid JSON object.
+     * - If the request method is PUT, the Diocesan Calendar data does not already exist.
+     *
+     * If any of the checks fail, the method will produce an error response with a 400 status code.
+     *
+     * @param object $data
+     *      The parameters provided to the RegionalData class.
+     * @return string
+     *      The validated diocesan calendar value.
+     */
     private function checkDiocesanCalendarConditions(object $data): string
     {
         if (
@@ -110,29 +169,65 @@ class RegionalDataParams
                 "Invalid value {$data->key} for param `key`, valid values are: {$validVals}"
             );
         }
+
+        $currentDiocese = array_values(array_filter($this->calendars->diocesan_calendars, fn ($el) => $el->calendar_id === $data->key))[0];
+        $validLangs = $currentDiocese->locales;
+        if (property_exists($data, 'locale')) {
+            $data->locale = \Locale::canonicalize($data->locale);
+            if (in_array($data->locale, $validLangs)) {
+                $this->locale = $data->locale;
+            } else {
+                $message = "Invalid value {$data->locale} for param `locale`, valid values for {$currentDiocese->diocese} are: "
+                            . implode(', ', $validLangs);
+                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+            }
+        } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+            if (in_array($value, $validLangs)) {
+                $this->locale = $value;
+            } else {
+                $message = "Invalid value {$value} for Accept-Language header, valid values for {$currentDiocese->diocese} are: "
+                            . implode(', ', $validLangs);
+                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+            }
+        } else {
+            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "`locale` param or `Accept-Language` header required for Wider Region calendar data");
+        }
+
         return $data->key;
     }
 
+    /**
+     * Validate the parameters provided to the RegionalData class for a Wider Region Calendar.
+     *
+     * The method checks the following:
+     * - The `category` parameter is "WIDERREGIONCALENDAR".
+     * - The `key` parameter is a valid wider region calendar key.
+     * - The `locale` parameter is a valid locale for the given wider region calendar.
+     * - If the request method is PUT, the Wider Region Calendar data does not already exist. ::TODO::
+     * - If the request method is DELETE, there are no national calendars that depend on the wider region calendar.
+     *
+     * If any of the checks fail, the method will produce an error response with a 400 status code.
+     *
+     * @param object $data
+     *      The parameters provided to the RegionalData class.
+     * @return string
+     *      The validated wider region calendar value.
+     */
     private function checkWiderRegionCalendarConditions(object $data)
     {
         if (
-            false === in_array($data->key, self::$widerRegionNames)
+            false === in_array($data->key, $this->calendars->wider_regions_keys)
             && RegionalData::$Core->getRequestMethod() !== RequestMethod::PUT
         ) {
-            $validVals = implode(', ', self::$widerRegionNames);
+            $validVals = implode(', ', $this->calendars->wider_regions_keys);
             $message = "Invalid value {$data->key} for param `key`, valid values are: {$validVals}";
             RegionalData::produceErrorResponse(StatusCode::NOT_FOUND, $message);
         }
 
-        // A locale parameter is required for WiderRegion data, whether supplied by the Accept-Language header or by a `locale` parameter
-        $currentWiderRegionArr = array_values(array_filter($this->calendars->wider_regions, fn ($el) => $el->name === $data->key));
-        if (!count($currentWiderRegionArr)) {
-            $message = "I thought I told you that {$data->key} was an invalid wider region value for param `key`, I could not find such a key in a `name` prop in the array: "
-                . json_encode($this->calendars->wider_regions, JSON_PRETTY_PRINT);
-            RegionalData::produceErrorResponse(StatusCode::NOT_FOUND, $message);
-        }
-        $currentWiderRegion = $currentWiderRegionArr[0];
-        $validLangs = $currentWiderRegion->languages;
+        // The locale parameter can be supplied by the Accept-Language header or by a `locale` property in the payload.
+        $currentWiderRegion = array_values(array_filter($this->calendars->wider_regions, fn ($el) => $el->name === $data->key))[0];
+        $validLangs = $currentWiderRegion->locales;
         if (property_exists($data, 'locale')) {
             $data->locale = \Locale::canonicalize($data->locale);
             if (in_array($data->locale, $validLangs)) {
@@ -177,6 +272,7 @@ class RegionalDataParams
                     false === property_exists($payload, 'litcal')
                     || false === property_exists($payload, 'metadata')
                     || false === property_exists($payload, 'settings')
+                    || false === property_exists($payload->metadata, 'locales')
                 ) {
                     $message = "Cannot create or update National calendar data when the payload does not have required properties `litcal`, `metadata` or `settings`. Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
                     RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
@@ -189,6 +285,7 @@ class RegionalDataParams
                             false === property_exists($payload, 'litcal')
                             || false === property_exists($payload, 'diocese')
                             || false === property_exists($payload, 'nation')
+                            || false === property_exists($payload->metadata, 'locales')
                         ) {
                             $message = "Cannot create Diocesan calendar data when the payload does not have required properties `litcal`, `diocese` or `nation`. Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
                             RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
@@ -208,16 +305,9 @@ class RegionalDataParams
                     || false === property_exists($payload, 'metadata')
                     || false === property_exists($payload, 'national_calendars')
                     || false === property_exists($payload->metadata, 'wider_region')
-                    || false === property_exists($payload->metadata, 'multilingual')
+                    || false === property_exists($payload->metadata, 'locales')
                 ) {
-                    $message = "Cannot create or update Wider Region calendar data when the payload does not have required properties `litcal`, `national_calendars`, `metadata`, `metadata->wider_region`, `metadata->multilingual`. Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
-                    RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
-                }
-                if (
-                    true === $payload->metadata->multilingual
-                    && false === property_exists($payload->metadata, 'languages')
-                ) {
-                    $message = "Cannot create or update Wider Region calendar data when the payload has value `true` for `metadata->multilingual` but does not have required array `metadata->languages`. Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
+                    $message = "Cannot create or update Wider Region calendar data when the payload does not have required properties `litcal`, `national_calendars`, `metadata`, `metadata->wider_region`, `metadata->locales`. Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
                     RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                 }
                 break;

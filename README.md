@@ -14,7 +14,7 @@
             <td><a href="https://translate.johnromanodorazio.com/engage/liturgical-calendar/">
 <img src="https://translate.johnromanodorazio.com/widgets/liturgical-calendar/-/287x66-white.png" alt="Translation status" />
 </a></td>
-            <td> <a href="https://validator.swagger.io/validator?url=https://raw.githubusercontent.com/Liturgical-Calendar/LiturgicalCalendarAPI/development/jsondata/schemas/openapi.json"><img src="https://validator.swagger.io/validator?url=https://raw.githubusercontent.com/Liturgical-Calendar/LiturgicalCalendarAPI/master/jsondata/schemas/openapi.json" alt="OpenAPI validation result" /></a></td>
+            <td> <a href="https://validator.swagger.io/validator?url=https://raw.githubusercontent.com/Liturgical-Calendar/LiturgicalCalendarAPI/development/jsondata/schemas/openapi.json"><img src="https://validator.swagger.io/validator?url=https://raw.githubusercontent.com/Liturgical-Calendar/LiturgicalCalendarAPI/development/jsondata/schemas/openapi.json" alt="OpenAPI validation result" /></a></td>
         </tr>
     </tbody>
 </table>

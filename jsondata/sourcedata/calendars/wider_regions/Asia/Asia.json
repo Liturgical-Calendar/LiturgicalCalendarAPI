@@ -1,0 +1,41 @@
+{
+    "litcal": [
+        {
+            "festivity": {
+                "event_key": "StFrancisXavier",
+                "name": "San Francesco Saverio, sacerdote",
+                "color": [
+                    "white"
+                ],
+                "grade": 4,
+                "day": 3,
+                "month": 12
+            },
+            "metadata": {
+                "action": "makePatron",
+                "since_year": 1970,
+                "url": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/apost_exhortations\/documents\/hf_jp-ii_exh_06111999_ecclesia-in-asia.html",
+                "url_lang_map": {
+                    "de": "de",
+                    "en": "en",
+                    "es": "es",
+                    "fr": "fr",
+                    "it": "it",
+                    "pt": "pt",
+                    "zh": "zh"
+                }
+            }
+        }
+    ],
+    "national_calendars": {
+        "China": "CN",
+        "Japan": "JP"
+    },
+    "metadata": {
+        "locales": [
+            "zh_Hans_CN",
+            "ja_JP"
+        ],
+        "wider_region": "Asia"
+    }
+}

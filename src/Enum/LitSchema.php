@@ -5,7 +5,6 @@ namespace LiturgicalCalendar\Api\Enum;
 class LitSchema
 {
     private const SCHEMA_BASE_PATH = API_BASE_PATH . '/jsondata/schemas';
-    public const INDEX             = self::SCHEMA_BASE_PATH . "/Index.json";
     public const DIOCESAN          = self::SCHEMA_BASE_PATH . "/DiocesanCalendar.json";
     public const NATIONAL          = self::SCHEMA_BASE_PATH . "/NationalCalendar.json";
     public const PROPRIUMDESANCTIS = self::SCHEMA_BASE_PATH . "/PropriumDeSanctis.json";
@@ -26,7 +25,6 @@ class LitSchema
 
     private const ERRMSG           = "Schema validation error: ";
     public const ERROR_MESSAGES = [
-        LitSchema::INDEX             => self::ERRMSG . "Index not updated",
         LitSchema::DIOCESAN          => self::ERRMSG . "Diocesan Calendar not created / updated",
         LitSchema::NATIONAL          => self::ERRMSG . "National Calendar not created / updated",
         LitSchema::PROPRIUMDESANCTIS => self::ERRMSG . "Proprium de Sanctis data not created / updated",

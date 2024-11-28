@@ -1,0 +1,822 @@
+{
+    "$schema": "../../../../../schemas/DiocesanCalendar.json",
+    "litcal": [
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Pastors:For a Pope"
+                ],
+                "day": 9,
+                "month": 1,
+                "event_key": "BeatoGregorioX"
+            },
+            "metadata": {
+                "form_rownum": 0,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Proper"
+                ],
+                "day": 22,
+                "month": 1,
+                "event_key": "SanVincenzoPallotti"
+            },
+            "metadata": {
+                "form_rownum": 1,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Holy Men and Women:For Those Who Practiced Works of Mercy"
+                ],
+                "day": 1,
+                "month": 2,
+                "event_key": "BeataLudovicaAlbertoni"
+            },
+            "metadata": {
+                "form_rownum": 1,
+                "since_year": 1973
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Pastors:For a Pope"
+                ],
+                "day": 28,
+                "month": 2,
+                "event_key": "SantoIlaro"
+            },
+            "metadata": {
+                "form_rownum": 2,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Pastors:For a Pope"
+                ],
+                "day": 1,
+                "month": 3,
+                "event_key": "SanFeliceIII"
+            },
+            "metadata": {
+                "form_rownum": 3,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "red",
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Martyrs:For One Martyr",
+                    "Pastors:For a Pope"
+                ],
+                "day": 13,
+                "month": 4,
+                "event_key": "SanMartinoI"
+            },
+            "metadata": {
+                "form_rownum": 2,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Proper"
+                ],
+                "day": 16,
+                "month": 4,
+                "event_key": "SanBenedettoGiuseppeLabre"
+            },
+            "metadata": {
+                "form_rownum": 3,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Proper"
+                ],
+                "day": 19,
+                "month": 4,
+                "event_key": "SanLeoneIX"
+            },
+            "metadata": {
+                "form_rownum": 4,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Pastors:For a Pope"
+                ],
+                "day": 30,
+                "month": 4,
+                "event_key": "SanPioV"
+            },
+            "metadata": {
+                "form_rownum": 5,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Holy Men and Women:For Religious"
+                ],
+                "day": 18,
+                "month": 5,
+                "event_key": "SanFelicedaCantalice"
+            },
+            "metadata": {
+                "form_rownum": 4,
+                "since_year": 1973
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Proper"
+                ],
+                "day": 23,
+                "month": 5,
+                "event_key": "SanGiovanniBattistadeRossi"
+            },
+            "metadata": {
+                "form_rownum": 6,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Proper"
+                ],
+                "day": 24,
+                "month": 5,
+                "event_key": "BeataMariaVergineAuxiliumChristianorum"
+            },
+            "metadata": {
+                "form_rownum": 5,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Pastors:For a Pope"
+                ],
+                "day": 25,
+                "month": 5,
+                "event_key": "SanGregorioVII"
+            },
+            "metadata": {
+                "form_rownum": 7,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "red"
+                ],
+                "grade": 3,
+                "common": [
+                    "Martyrs:For Several Martyrs"
+                ],
+                "day": 2,
+                "month": 6,
+                "event_key": "SantiMarcellinoePietro"
+            },
+            "metadata": {
+                "form_rownum": 8,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Holy Men and Women:For Holy Women"
+                ],
+                "day": 9,
+                "month": 6,
+                "event_key": "BeataAnnaMariaTaigi"
+            },
+            "metadata": {
+                "form_rownum": 9,
+                "since_year": 1973
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "red"
+                ],
+                "grade": 2,
+                "common": [
+                    "Martyrs"
+                ],
+                "day": 26,
+                "month": 6,
+                "event_key": "SantiGiovanniePaolo"
+            },
+            "metadata": {
+                "form_rownum": 6,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Holy Men and Women:For Religious",
+                    "Holy Men and Women:For Holy Women"
+                ],
+                "day": 23,
+                "month": 7,
+                "event_key": "SantaBrigida"
+            },
+            "metadata": {
+                "form_rownum": 11,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Pastors:For a Pope"
+                ],
+                "day": 12,
+                "month": 8,
+                "event_key": "BeatoInnocenzoXI"
+            },
+            "metadata": {
+                "form_rownum": 8,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Pastors:For a Pope"
+                ],
+                "day": 19,
+                "month": 8,
+                "event_key": "SanSistoIII"
+            },
+            "metadata": {
+                "form_rownum": 9,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Proper"
+                ],
+                "day": 21,
+                "month": 10,
+                "event_key": "SanGasparedelBufalo"
+            },
+            "metadata": {
+                "form_rownum": 13,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Pastors:For a Pope"
+                ],
+                "day": 13,
+                "month": 11,
+                "event_key": "SanNicolaI"
+            },
+            "metadata": {
+                "form_rownum": 14,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Pastors:For a Pope"
+                ],
+                "day": 20,
+                "month": 11,
+                "event_key": "SanGelasioI"
+            },
+            "metadata": {
+                "form_rownum": 10,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "red",
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Martyrs:For One Martyr",
+                    "Pastors:For a Pope"
+                ],
+                "day": 23,
+                "month": 11,
+                "event_key": "SanClementeI"
+            },
+            "metadata": {
+                "form_rownum": 15,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Pastors:For a Pope"
+                ],
+                "day": 26,
+                "month": 11,
+                "event_key": "SanSiricio"
+            },
+            "metadata": {
+                "form_rownum": 11,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Pastors:For a Pope"
+                ],
+                "day": 11,
+                "month": 12,
+                "event_key": "SanDamasoI"
+            },
+            "metadata": {
+                "form_rownum": 16,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Pastors:For a Pope"
+                ],
+                "day": 22,
+                "month": 10,
+                "event_key": "SanGiovanniPaoloII"
+            },
+            "metadata": {
+                "form_rownum": 17,
+                "since_year": 2014,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Pastors:For a Pope"
+                ],
+                "day": 28,
+                "month": 7,
+                "event_key": "BeatoUrbanoII"
+            },
+            "metadata": {
+                "form_rownum": 7,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Pastors:For a Pope"
+                ],
+                "day": 10,
+                "month": 1,
+                "event_key": "SantAgatone"
+            },
+            "metadata": {
+                "form_rownum": 0,
+                "since_year": 1973,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "red",
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Martyrs:For One Martyr",
+                    "Pastors:For a Pope"
+                ],
+                "day": 14,
+                "month": 10,
+                "event_key": "SanCallistoI"
+            },
+            "metadata": {
+                "form_rownum": 12,
+                "since_year": 1970,
+                "until_year": 2023
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Pastors"
+                ],
+                "day": 22,
+                "month": 1,
+                "event_key": "SanVincenzoPallotti_1"
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 13
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 6,
+                "common": [
+                    "Proper"
+                ],
+                "day": 29,
+                "month": 6,
+                "event_key": "SantiPietroePaoloApostoliPatroniChiesaRomana"
+            },
+            "metadata": {
+                "form_rownum": 0,
+                "since_year": 1973
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Holy Men and Women"
+                ],
+                "day": 16,
+                "month": 4,
+                "event_key": "SanBenedettoGiuseppeLabre"
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 14
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Pastors"
+                ],
+                "day": 23,
+                "month": 5,
+                "event_key": "SanGiovanniBattistadeRossi_1"
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 15
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Proper"
+                ],
+                "day": 4,
+                "month": 6,
+                "event_key": "BeataVergineMariaSalusPopuliRomani"
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 18
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Pastors"
+                ],
+                "day": 26,
+                "month": 6,
+                "event_key": "SanJosemariaEscrivaBalaguer"
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 16
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Proper"
+                ],
+                "day": 7,
+                "month": 7,
+                "event_key": "SantiVescoviChiesaRomana"
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 19
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "red"
+                ],
+                "grade": 3,
+                "common": [
+                    "Martyrs:For Several Martyrs"
+                ],
+                "day": 30,
+                "month": 6,
+                "event_key": "SantiPrimiMartiriChiesaRomana"
+            },
+            "metadata": {
+                "form_rownum": 10,
+                "since_year": 1973
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 6,
+                "common": [
+                    "Dedication of a Church"
+                ],
+                "day": 25,
+                "month": 10,
+                "event_key": "AnniversarioDedicazionePropriaChiesa"
+            },
+            "metadata": {
+                "since_year": 1970,
+                "form_rownum": 2
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Pastors"
+                ],
+                "day": 21,
+                "month": 10,
+                "event_key": "SanGaspareBufalo"
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 17
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": [
+                    "Proper"
+                ],
+                "day": 8,
+                "month": 11,
+                "event_key": "TuttiSantiChiesaRomana"
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 20
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 4,
+                "common": [
+                    "Dedication of a Church"
+                ],
+                "day": 9,
+                "month": 11,
+                "event_key": "DedicazioneBasilicaLateranense"
+            },
+            "metadata": {
+                "form_rownum": 1,
+                "since_year": 1973
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Holy Men and Women"
+                ],
+                "day": 25,
+                "month": 11,
+                "event_key": "BeatiLuigieMariaBeltrameQuattrocchi"
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 18
+            }
+        },
+        {
+            "festivity": {
+                "color": [
+                    "white"
+                ],
+                "grade": 2,
+                "common": [
+                    "Holy Men and Women:For Religious"
+                ],
+                "day": 26,
+                "month": 11,
+                "event_key": "SanLeonardodaPortoMaurizio"
+            },
+            "metadata": {
+                "form_rownum": 12,
+                "since_year": 1973
+            }
+        }
+    ],
+    "metadata": {
+        "diocese_id": "romamo_it",
+        "diocese_name": "Diocesi di Roma",
+        "nation": "IT",
+        "locales": [
+            "it_IT"
+        ],
+        "timezone": "Europe/Rome",
+        "group": "Diocesi del Lazio"
+    }
+}

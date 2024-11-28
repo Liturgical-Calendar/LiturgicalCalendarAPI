@@ -196,8 +196,8 @@ class Missals
                 if ($missal->missal_id === self::$requestPathParts[0]) {
                     $missalData = file_get_contents($missal->data_path);
                     if ($missalData) {
-                        if (property_exists($missal, 'languages') && self::$params->baseLocale !== null) {
-                            if (in_array(self::$params->baseLocale, $missal->languages) && property_exists($missal, 'i18n_path')) {
+                        if (property_exists($missal, 'locales') && self::$params->baseLocale !== null) {
+                            if (in_array(self::$params->baseLocale, $missal->locales) && property_exists($missal, 'i18n_path')) {
                                 $i18nFile = $missal->i18n_path . self::$params->baseLocale . ".json";
                                 $i18nData = file_get_contents($i18nFile);
                                 if ($i18nData) {
@@ -325,7 +325,7 @@ class Missals
      * - It will loop over the directories in the 'data' directory and if the directory contains
      *   a file with the same name as the directory and the extension '.json', it will create a
      *   stdClass object with the properties 'missal_id', 'name', 'region', 'year_published',
-     *   'data_path', 'languages', 'i18n_path', and 'api_path', and add it to the
+     *   'data_path', 'locales', 'i18n_path', and 'api_path', and add it to the
      *   self::$missalsIndex->litcal_missals array.
      * - Finally, it will set the request parameters using the initRequestParams method.
      *
@@ -362,14 +362,14 @@ class Missals
                     $missal->region         = "VA";
                     if (is_readable("jsondata/sourcedata/missals/$missalFolderName/i18n")) {
                         $it = new \DirectoryIterator("glob://jsondata/sourcedata/missals/$missalFolderName/i18n/*.json");
-                        $languages = [];
+                        $locales = [];
                         foreach ($it as $f) {
-                            $languages[] = $f->getBasename('.json');
+                            $locales[] = $f->getBasename('.json');
                         }
-                        $missal->languages      = $languages;
+                        $missal->locales      = $locales;
                         $missal->i18n_path      = "jsondata/sourcedata/missals/$missalFolderName/i18n/";
                     } else {
-                        $missal->languages      = null;
+                        $missal->locales      = null;
                         $missal->i18n_path      = null;
                     }
                     //$missal->year_published = intval($matches[1]);

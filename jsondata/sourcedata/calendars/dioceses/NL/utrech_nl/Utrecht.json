@@ -1,0 +1,122 @@
+{
+  "$schema": "../../../../../schemas/DiocesanCalendar.json",
+  "litcal": [
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 6,
+        "common": [
+          "Proper"
+        ],
+        "day": 7,
+        "month": 11,
+        "event_key": "HWillibrordbisschopverkondigervanonsgeloofenpatroonvandeNederlandsekerkprovinciepatroonvanhetaartsbisdomUtrechtenvanhetbisdomHaarlem"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 4,
+        "common": [
+          "Dedication of a Church"
+        ],
+        "day": 22,
+        "month": 8,
+        "event_key": "VerjaardagvandeWijdingvandekathedraal"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 1
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 3,
+        "common": [
+          "Proper"
+        ],
+        "day": 8,
+        "month": 11,
+        "event_key": "AlleHHBisschoppenvanUtrechtAlbrikAnsfriedBernulfFrederikHungerRadboudenabtGregorius"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Pastors:For Missionaries"
+        ],
+        "day": 1,
+        "month": 3,
+        "event_key": "HSwietbertbisschop"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Pastors:For Missionaries"
+        ],
+        "day": 26,
+        "month": 3,
+        "event_key": "HLudgerbisschop"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 1
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Pastors:For One Pastor"
+        ],
+        "day": 26,
+        "month": 6,
+        "event_key": "HJozefmariaEscrivpriester"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 2
+      }
+    }
+  ],
+  "metadata": {
+    "diocese_id": "utrech_nl",
+    "diocese_name": "Utrecht",
+    "nation": "NL",
+    "locales": [
+      "nl_NL"
+    ],
+    "timezone": "Europe/Amsterdam"
+  }
+}
