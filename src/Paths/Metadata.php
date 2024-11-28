@@ -4,6 +4,7 @@ namespace LiturgicalCalendar\Api\Paths;
 
 use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\Route;
 
 class Metadata
 {
@@ -140,7 +141,7 @@ class Metadata
      * Wider region identifiers are added to the Metadata::$widerRegionsNames array.
      * Supported locales are retrieved by scanning the `i18n` subfolder for each Wider region,
      * based on the JSON files present.
-     * The data for each wider region (name, locales, data_file, i18n_path, and api_path) is stored in the Metadata::$widerRegions array.
+     * The data for each wider region (name, locales, and api_path) is stored in the Metadata::$widerRegions array.
      * @see Metadata::$widerRegions
      * @see Metadata::$widerRegionsNames
      *
@@ -162,7 +163,7 @@ class Metadata
                 Metadata::$widerRegions[] = [
                     'name' => $directory,
                     'locales' => $locales,
-                    'api_path' => API_BASE_PATH . '/data/widerregion/' . $directory . '?locale={language}'
+                    'api_path' => API_BASE_PATH . Route::DATA_WIDERREGION->value . '/' . $directory . '?locale={language}'
                 ];
             }
         }
