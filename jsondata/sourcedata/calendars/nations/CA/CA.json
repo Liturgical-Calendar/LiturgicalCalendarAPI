@@ -25,7 +25,9 @@
             },
             "metadata": {
                 "action": "moveFestivity",
-                "since_year": 2016
+                "since_year": 2016,
+                "reason": "make way for StAndréBessette on January 7",
+                "missal": "CA_2016"
             }
         },
         {
@@ -118,23 +120,20 @@
             },
             "metadata": {
                 "action": "createNew",
-                "since_year": 2014
+                "since_year": 2016
             }
         },
         {
             "festivity": {
                 "month": 5,
                 "day": 1,
-                "event_key": "StPiusV",
-                "grade": 2,
-                "color": [
-                    "white"
-                ],
-                "common": []
+                "event_key": "StPiusV"
             },
             "metadata": {
-                "action": "createNew",
-                "since_year": 2016
+                "action": "moveFestivity",
+                "since_year": 2016,
+                "reason": "make way for StMariedelIncarnation on April 30",
+                "missal": "CA_2016"
             }
         },
         {
@@ -205,7 +204,7 @@
             "festivity": {
                 "month": 5,
                 "day": 24,
-                "event_key": "BlLousisZéphirinMoreau",
+                "event_key": "BlLouisZéphirinMoreau",
                 "grade": 2,
                 "color": [
                     "white"
@@ -333,23 +332,32 @@
             },
             "metadata": {
                 "action": "moveFestivity",
-                "since_year": 2016
+                "since_year": 2016,
+                "missal": "CA_2016",
+                "reason": "make way for StsJeanBrebeuf on September 26"
             }
         },
         {
             "festivity": {
                 "month": 9,
                 "day": 26,
-                "event_key": "StsJeanBrebeuf",
-                "grade": 4,
-                "color": [
-                    "white"
-                ],
-                "common": []
+                "event_key": "StsJeanBrebeuf"
             },
             "metadata": {
-                "action": "createNew",
-                "since_year": 1962
+                "action": "moveFestivity",
+                "since_year": 2016,
+                "missal": "CA_2016",
+                "reason": "Canada celebrates on September 26 instead of October 19"
+            }
+        },
+        {
+            "festivity": {
+                "event_key": "StsJeanBrebeuf",
+                "grade": 4
+            },
+            "metadata": {
+                "action": "makePatron",
+                "since_year": 2016
             }
         },
         {
@@ -407,7 +415,9 @@
             },
             "metadata": {
                 "action": "moveFestivity",
-                "since_year": 2016
+                "since_year": 2016,
+                "reason": "make way for StMargueritedYouville on October 16",
+                "missal": "CA_2016"
             }
         },
         {
@@ -418,7 +428,9 @@
             },
             "metadata": {
                 "action": "moveFestivity",
-                "since_year": 2016
+                "since_year": 2016,
+                "reason": "make way for StMargueriteYouville on October 16",
+                "missal": "CA_2016"
             }
         },
         {

@@ -2,6 +2,8 @@
 
 namespace LiturgicalCalendar\Api\Enum;
 
+use LiturgicalCalendar\Api\Enum\JsonData;
+
 /**
  * Enum class for the different Roman Missals that are used in the LitCal
  *
@@ -39,6 +41,7 @@ class RomanMissal
     public const ITALY_EDITION_1983                    = "IT_1983";
     public const ITALY_EDITION_2020                    = "IT_2020";
     public const NETHERLANDS_EDITION_1978              = "NL_1978";
+    public const CANADA_EDITION_2016                   = "CA_2016";
 
     public static array $values = [
         "EDITIO_TYPICA_1970",
@@ -49,7 +52,8 @@ class RomanMissal
         "US_2011",
         "IT_1983",
         "IT_2020",
-        "NL_1978"
+        "NL_1978",
+        "CA_2016"
     ];
 
     public static array $names = [
@@ -61,31 +65,34 @@ class RomanMissal
         self::USA_EDITION_2011                      => "2011 Roman Missal issued by the USCCB",
         self::ITALY_EDITION_1983                    => "Messale Romano ed. 1983 pubblicata dalla CEI",
         self::ITALY_EDITION_2020                    => "Messale Romano ed. 2020 pubblicata dalla CEI",
-        self::NETHERLANDS_EDITION_1978              => "Romeins Missaal ed. 1978 goedgekeurd door de Nederlandse bisschoppenconferentie"
+        self::NETHERLANDS_EDITION_1978              => "Romeins Missaal ed. 1978 goedgekeurd door de Nederlandse bisschoppenconferentie",
+        self::CANADA_EDITION_2016                   => "2016 Roman Missal issued by the CCCB"
     ];
 
     public static array $jsonFiles = [
-        self::EDITIO_TYPICA_1970                    => "jsondata/sourcedata/missals/propriumdesanctis_1970/propriumdesanctis_1970.json",
+        self::EDITIO_TYPICA_1970                    => JsonData::MISSALS_FOLDER . "/propriumdesanctis_1970/propriumdesanctis_1970.json",
         self::REIMPRESSIO_EMENDATA_1971             => false,
         self::EDITIO_TYPICA_SECUNDA_1975            => false,
-        self::EDITIO_TYPICA_TERTIA_2002             => "jsondata/sourcedata/missals/propriumdesanctis_2002/propriumdesanctis_2002.json",
-        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008    => "jsondata/sourcedata/missals/propriumdesanctis_2008/propriumdesanctis_2008.json",
-        self::USA_EDITION_2011                      => "jsondata/sourcedata/missals/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json",
-        self::ITALY_EDITION_1983                    => "jsondata/sourcedata/missals/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json",
+        self::EDITIO_TYPICA_TERTIA_2002             => JsonData::MISSALS_FOLDER . "/propriumdesanctis_2002/propriumdesanctis_2002.json",
+        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008    => JsonData::MISSALS_FOLDER . "/propriumdesanctis_2008/propriumdesanctis_2008.json",
+        self::USA_EDITION_2011                      => JsonData::MISSALS_FOLDER . "/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json",
+        self::ITALY_EDITION_1983                    => JsonData::MISSALS_FOLDER . "/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json",
         self::ITALY_EDITION_2020                    => false,
-        self::NETHERLANDS_EDITION_1978              => false
+        self::NETHERLANDS_EDITION_1978              => false,
+        self::CANADA_EDITION_2016                   => false
     ];
 
     public static array $i18nPath = [
-        self::EDITIO_TYPICA_1970                    => "jsondata/sourcedata/missals/propriumdesanctis_1970/i18n/",
+        self::EDITIO_TYPICA_1970                    => JsonData::MISSALS_FOLDER . "/propriumdesanctis_1970/i18n/",
         self::REIMPRESSIO_EMENDATA_1971             => false,
         self::EDITIO_TYPICA_SECUNDA_1975            => false,
-        self::EDITIO_TYPICA_TERTIA_2002             => "jsondata/sourcedata/missals/propriumdesanctis_2002/i18n/",
-        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008    => "jsondata/sourcedata/missals/propriumdesanctis_2008/i18n/",
+        self::EDITIO_TYPICA_TERTIA_2002             => JsonData::MISSALS_FOLDER . "/propriumdesanctis_2002/i18n/",
+        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008    => JsonData::MISSALS_FOLDER . "/propriumdesanctis_2008/i18n/",
         self::USA_EDITION_2011                      => false,
         self::ITALY_EDITION_1983                    => false,
         self::ITALY_EDITION_2020                    => false,
-        self::NETHERLANDS_EDITION_1978              => false
+        self::NETHERLANDS_EDITION_1978              => false,
+        self::CANADA_EDITION_2016                   => false
     ];
 
     public static array $yearLimits = [
@@ -99,7 +106,8 @@ class RomanMissal
         //therefore we no longer need to apply them after the year 2002 since the Latin edition takes precedence
         self::ITALY_EDITION_1983                    => [ "since_year" => 1983, "until_year" => 2002 ],
         self::ITALY_EDITION_2020                    => [ "since_year" => 2020 ],
-        self::NETHERLANDS_EDITION_1978              => [ "since_year" => 1979 ]
+        self::NETHERLANDS_EDITION_1978              => [ "since_year" => 1979 ],
+        self::CANADA_EDITION_2016                   => [ "since_year" => 2016 ]
     ];
 
 
@@ -212,13 +220,13 @@ class RomanMissal
                 $region = explode("_", $missal_id)[0];
             }
             $metadata[] = [
-                "missal_id" => $missal_id,
-                "name" => self::getName($missal_id),
-                "region" => $region,
-                "data_path" => self::getSanctoraleFileName($missal_id),
-                "i18n_path" => self::getSanctoraleI18nFilePath($missal_id),
-                "languages" => $languages,
-                "year_limits" => self::$yearLimits[ $missal_id ],
+                "missal_id"      => $missal_id,
+                "name"           => self::getName($missal_id),
+                "region"         => $region,
+                "data_path"      => self::getSanctoraleFileName($missal_id),
+                "i18n_path"      => self::getSanctoraleI18nFilePath($missal_id),
+                "languages"      => $languages,
+                "year_limits"    => self::$yearLimits[ $missal_id ],
                 "year_published" => self::$yearLimits[ $missal_id ][ "since_year" ]
             ];
         }
