@@ -11,6 +11,8 @@ enum Route: string
     case DECREES           = '/decrees';
     case TESTS             = '/tests';
     case EVENTS            = '/events';
+    case EVENTS_NATIONAL   = '/events/nation';
+    case EVENTS_DIOCESAN   = '/events/diocese';
     case DATA              = '/data';
     case DATA_WIDERREGION  = '/data/widerregion';
     case DATA_NATIONAL     = '/data/nation';
