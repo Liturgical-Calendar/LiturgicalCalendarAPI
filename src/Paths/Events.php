@@ -313,23 +313,23 @@ class Events
      */
     private function setLocale(): void
     {
-        $this->EventsParams->Locale = \Locale::getPrimaryLanguage($this->EventsParams->Locale);
+        $baseLocale = \Locale::getPrimaryLanguage($this->EventsParams->Locale);
         $localeArray = [
             $this->EventsParams->Locale . '.utf8',
             $this->EventsParams->Locale . '.UTF-8',
             $this->EventsParams->Locale,
-            $this->EventsParams->Locale . '_' . strtoupper($this->EventsParams->Locale) . '.utf8',
-            $this->EventsParams->Locale . '_' . strtoupper($this->EventsParams->Locale) . '.UTF-8',
-            $this->EventsParams->Locale . '_' . strtoupper($this->EventsParams->Locale),
-            $this->EventsParams->Locale . '.utf8',
-            $this->EventsParams->Locale . '.UTF-8',
-            $this->EventsParams->Locale
+            $baseLocale . '_' . strtoupper($baseLocale) . '.utf8',
+            $baseLocale . '_' . strtoupper($baseLocale) . '.UTF-8',
+            $baseLocale . '_' . strtoupper($baseLocale),
+            $baseLocale . '.utf8',
+            $baseLocale . '.UTF-8',
+            $baseLocale
         ];
         setlocale(LC_ALL, $localeArray);
         bindtextdomain("litcal", "i18n");
         textdomain("litcal");
-        self::$LitGrade = new LitGrade($this->EventsParams->Locale);
-        self::$LitCommon = new LitCommon($this->EventsParams->Locale);
+        self::$LitGrade = new LitGrade($baseLocale);
+        self::$LitCommon = new LitCommon($baseLocale);
     }
 
     /**
