@@ -30,7 +30,7 @@ class EventsParams
     public ?string $DiocesanCalendar          = null;
     private array $SupportedNationalCalendars = [];
     private array $SupportedDiocesanCalendars = [];
-    private static ?object $calendarsMetadata = null;
+    public readonly object $calendarsMetadata;
     private static string $lastError          = '';
 
     public const ALLOWED_PARAMS  = [
@@ -79,11 +79,9 @@ class EventsParams
             $this->Locale = LitLocale::LATIN;
         }
 
-        if (null === EventsParams::$calendarsMetadata) {
-            EventsParams::$calendarsMetadata = json_decode(file_get_contents(API_BASE_PATH . Route::CALENDARS));
-        }
-        $this->SupportedDiocesanCalendars = EventsParams::$calendarsMetadata->diocesan_calendars_keys;
-        $this->SupportedNationalCalendars = EventsPArams::$calendarsMetadata->national_calendars_keys;
+        $this->calendarsMetadata = json_decode(file_get_contents(API_BASE_PATH . Route::CALENDARS->value))->litcal_metadata;
+        $this->SupportedDiocesanCalendars = $this->calendarsMetadata->diocesan_calendars_keys;
+        $this->SupportedNationalCalendars = $this->calendarsMetadata->national_calendars_keys;
 
 
         if (count($DATA)) {
