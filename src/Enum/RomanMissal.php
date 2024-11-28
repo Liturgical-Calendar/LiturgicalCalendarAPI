@@ -41,6 +41,7 @@ class RomanMissal
     public const ITALY_EDITION_1983                    = "IT_1983";
     public const ITALY_EDITION_2020                    = "IT_2020";
     public const NETHERLANDS_EDITION_1978              = "NL_1978";
+    public const CANADA_EDITION_2011                   = "CA_2011";
     public const CANADA_EDITION_2016                   = "CA_2016";
 
     public static array $values = [
@@ -53,6 +54,7 @@ class RomanMissal
         "IT_1983",
         "IT_2020",
         "NL_1978",
+        "CA_2011",
         "CA_2016"
     ];
 
@@ -66,6 +68,7 @@ class RomanMissal
         self::ITALY_EDITION_1983                    => "Messale Romano ed. 1983 pubblicata dalla CEI",
         self::ITALY_EDITION_2020                    => "Messale Romano ed. 2020 pubblicata dalla CEI",
         self::NETHERLANDS_EDITION_1978              => "Romeins Missaal ed. 1978 goedgekeurd door de Nederlandse bisschoppenconferentie",
+        self::CANADA_EDITION_2011                   => "2011 Roman Missal issued by the CCCB",
         self::CANADA_EDITION_2016                   => "2016 Roman Missal issued by the CCCB"
     ];
 
@@ -79,6 +82,7 @@ class RomanMissal
         self::ITALY_EDITION_1983                    => JsonData::MISSALS_FOLDER . "/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json",
         self::ITALY_EDITION_2020                    => false,
         self::NETHERLANDS_EDITION_1978              => false,
+        self::CANADA_EDITION_2011                   => false,
         self::CANADA_EDITION_2016                   => false
     ];
 
@@ -92,6 +96,7 @@ class RomanMissal
         self::ITALY_EDITION_1983                    => false,
         self::ITALY_EDITION_2020                    => false,
         self::NETHERLANDS_EDITION_1978              => false,
+        self::CANADA_EDITION_2011                   => false,
         self::CANADA_EDITION_2016                   => false
     ];
 
@@ -107,6 +112,7 @@ class RomanMissal
         self::ITALY_EDITION_1983                    => [ "since_year" => 1983, "until_year" => 2002 ],
         self::ITALY_EDITION_2020                    => [ "since_year" => 2020 ],
         self::NETHERLANDS_EDITION_1978              => [ "since_year" => 1979 ],
+        self::CANADA_EDITION_2011                   => [ "since_year" => 2011 ],
         self::CANADA_EDITION_2016                   => [ "since_year" => 2016 ]
     ];
 
