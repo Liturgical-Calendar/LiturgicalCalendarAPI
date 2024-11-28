@@ -4,9 +4,6 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-        "$schema": {
-            "type": "string"
-        },
         "litcal": {
             "type": "array",
             "items": {

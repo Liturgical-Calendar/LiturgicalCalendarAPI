@@ -1,5 +1,4 @@
 {
-    "$schema": "../../../../schemas/NationalCalendar.json",
     "litcal": [
         {
             "festivity": {
