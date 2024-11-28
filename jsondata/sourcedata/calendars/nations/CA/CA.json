@@ -1,5 +1,4 @@
 {
-    "$schema": "../../../../schemas/NationalCalendar.json",
     "litcal": [
         {
             "festivity": {
@@ -73,7 +72,7 @@
                 "action": "createNew",
                 "since_year": 2012
             }
-            
+
         },
         {
             "festivity": {
