@@ -127,7 +127,7 @@ class Metadata
                 } else {
                     Metadata::$messages[] = "Diocesan calendar file not found: $diocesanCalendarFile";
                 }
-            }                
+            }
         }
     }
 
@@ -150,7 +150,8 @@ class Metadata
     {
         $directories = array_map('basename', glob(JsonData::WIDER_REGIONS_FOLDER . '/*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
-            if (file_exists(JsonData::WIDER_REGIONS_FOLDER . "/$directory/$directory.json")) {
+            $WiderRegionFile = strtr(JsonData::WIDER_REGIONS_FILE, ['{wider_region}' => $directory]);
+            if (file_exists($WiderRegionFile)) {
                 Metadata::$widerRegionsNames[] = $directory;
                 $widerRegionI18nFolder = strtr(JsonData::WIDER_REGIONS_I18N_FOLDER, [
                     '{wider_region}' => $directory,
@@ -161,8 +162,6 @@ class Metadata
                 Metadata::$widerRegions[] = [
                     'name' => $directory,
                     'locales' => $locales,
-                    'data_file' => JsonData::WIDER_REGIONS_FOLDER . "/$directory/$directory.json",
-                    'i18n_path' => $widerRegionI18nFolder,
                     'api_path' => API_BASE_PATH . '/data/widerregion/' . $directory . '?locale={language}'
                 ];
             }
