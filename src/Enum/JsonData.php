@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace LiturgicalCalendar\Api\Enum;
 
@@ -57,7 +57,7 @@ class JsonData
      * Evaluates to 'jsondata/sourcedata/calendars'.
      */
     public const CALENDARS_FOLDER = JsonData::SOURCEDATA_FOLDER . '/calendars';
-    
+
     /**
      * The folder containing wider regions calendar data, with a placeholder for the actual region name.
      * Evaluates to 'jsondata/sourcedata/calendars/wider_regions'.

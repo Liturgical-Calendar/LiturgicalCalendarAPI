@@ -130,14 +130,14 @@ class RegionalData
             $CalendarData = json_decode(file_get_contents($calendarDataFile));
             if (null === $this->params->locale) {
                 $this->params->locale = $CalendarData->metadata->locales[0];
-            }
-            elseif (false === in_array($this->params->locale, $CalendarData->metadata->locales)) {
+            } elseif (false === in_array($this->params->locale, $CalendarData->metadata->locales)) {
                 self::produceErrorResponse(
                     StatusCode::BAD_REQUEST,
                     "Invalid value `{$this->params->locale}` for param `locale`. Valid values for current requested Wider region calendar data `{$this->params->key}` are: "
                         . implode(', ', $CalendarData->metadata->locales)
                 );
             }
+
             switch ($this->params->category) {
                 case 'DIOCESANCALENDAR':
                     $CalendarDataI18nFile = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FILE, [

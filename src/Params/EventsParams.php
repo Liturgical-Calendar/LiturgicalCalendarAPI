@@ -58,13 +58,13 @@ class EventsParams
      * Constructor for EventsParams
      *
      * @param array $DATA
-     * 
+     *
      * The constructor sets a default value for the Year parameter, defaulting to current year
      * and for the Locale parameter, defaulting to latin.
-     * 
+     *
      * It also sets the SupportedDiocesanCalendars and SupportedNationalCalendars properties
      * by reading the data from the calendars metadata.
-     * 
+     *
      * If the $DATA array is not empty, it calls the setData method
      * to apply the values from $DATA to the corresponding properties.
      */

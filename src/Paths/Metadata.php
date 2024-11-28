@@ -157,9 +157,7 @@ class Metadata
                 $widerRegionI18nFolder = strtr(JsonData::WIDER_REGIONS_I18N_FOLDER, [
                     '{wider_region}' => $directory,
                 ]);
-                $locales = array_map(function($filename) {
-                    return pathinfo($filename, PATHINFO_FILENAME);
-                }, glob($widerRegionI18nFolder . '/*.json'));
+                $locales = array_map(fn ($filename) => pathinfo($filename, PATHINFO_FILENAME), glob($widerRegionI18nFolder . '/*.json'));
                 Metadata::$widerRegions[] = [
                     'name' => $directory,
                     'locales' => $locales,
