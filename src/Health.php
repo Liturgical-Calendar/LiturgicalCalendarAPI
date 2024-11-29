@@ -364,7 +364,38 @@ class Health implements MessageComponentInterface
             if (property_exists($validation, 'sourceFolder')) {
                 $dataPath       = rtrim($validation->sourceFolder, '/');
             } else {
-                $dataPath       = $validation->sourceFile;
+                if (property_exists($validation, 'sourceFile')) {
+                    $dataPath       = $validation->sourceFile;
+                } else {
+                    $matches = null;
+                    if (preg_match("/^(wider-region|national-calendar|diocesan-calendar)-([A-Z][a-z]+)$/i", $validation->validate, $matches)) {
+                        switch ($matches[1]) {
+                            case 'wider-region':
+                                $dataPath = strtr(
+                                    JsonData::WIDER_REGIONS_FILE,
+                                    ['{wider_region}' => $matches[2]]
+                                );
+                                break;
+                            case 'national-calendar':
+                                $dataPath = strtr(
+                                    JsonData::NATIONAL_CALENDARS_FILE,
+                                    ['{nation}' => $matches[2]]
+                                );
+                                break;
+                            case 'diocesan-calendar':
+                                $diocese = array_values(array_filter(self::$metadata->litcal_metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]));
+                                $nation = $diocese[0]->nation;
+                                $dioceseName = $diocese[0]->diocese;
+                                $dataPath = strtr(
+                                    JsonData::DIOCESAN_CALENDARS_FILE,
+                                    ['{diocese}' => $matches[2]],
+                                    ['{nation}' => $nation],
+                                    ['{diocese_name}' => $dioceseName]
+                                );
+                                break;
+                        }
+                    }
+                }
             }
         } else {
             $pathForSchema      = $validation->sourceFile;
