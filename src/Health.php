@@ -363,6 +363,32 @@ class Health implements MessageComponentInterface
             $pathForSchema      = $validation->validate;
             if (property_exists($validation, 'sourceFolder')) {
                 $dataPath       = rtrim($validation->sourceFolder, '/');
+                $matches = null;
+                if (preg_match("/^(wider-region|national-calendar|diocesan-calendar)-([A-Z][a-z]+)-i18n$/i", $validation->validate, $matches)) {
+                    switch ($matches[1]) {
+                        case 'wider-region':
+                            $dataPath = strtr(
+                                JsonData::WIDER_REGIONS_I18N_FOLDER,
+                                ['{wider_region}' => $matches[2]]
+                            );
+                            break;
+                        case 'national-calendar':
+                            $dataPath = strtr(
+                                JsonData::NATIONAL_CALENDARS_I18N_FOLDER,
+                                ['{nation}' => $matches[2]]
+                            );
+                            break;
+                        case 'diocesan-calendar':
+                            $diocese = array_values(array_filter(self::$metadata->litcal_metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]));
+                            $nation = $diocese[0]->nation;
+                            $dataPath = strtr(
+                                JsonData::DIOCESAN_CALENDARS_I18N_FOLDER,
+                                ['{diocese}' => $matches[2]],
+                                ['{nation}' => $nation]
+                            );
+                            break;
+                    }
+                }
             } else {
                 if (property_exists($validation, 'sourceFile')) {
                     $dataPath       = $validation->sourceFile;
