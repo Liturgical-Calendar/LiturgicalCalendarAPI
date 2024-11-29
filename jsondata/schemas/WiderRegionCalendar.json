@@ -69,9 +69,7 @@
             },
             "required": [
                 "event_key",
-                "grade",
-                "day",
-                "month"
+                "grade"
             ],
             "title": "Festivity"
         },
