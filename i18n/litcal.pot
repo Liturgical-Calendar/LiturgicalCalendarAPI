@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-29 19:49+0000\n"
+"POT-Creation-Date: 2024-11-29 20:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -168,7 +168,7 @@ msgstr ""
 #: src/Paths/Calendar.php:2851 src/Paths/Calendar.php:2890
 #: src/Paths/Calendar.php:3019 src/Paths/Calendar.php:3034
 #: src/Paths/Calendar.php:3051 src/Paths/Calendar.php:3092
-#: src/FestivityCollection.php:827
+#: src/FestivityCollection.php:888
 msgid "Decree of the Congregation for Divine Worship"
 msgstr ""
 
@@ -697,21 +697,21 @@ msgid ""
 "on %4$s, is suppressed by the Sunday or Solemnity %5$s in the year %6$d"
 msgstr ""
 
-#: src/Paths/Calendar.php:4541
+#: src/Paths/Calendar.php:4545
 #, php-format
 msgid "Error receiving or parsing info from github about latest release: %s."
 msgstr ""
 
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
-#: src/FestivityCollection.php:59
+#: src/FestivityCollection.php:60
 msgid "YEAR"
 msgstr ""
 
-#: src/FestivityCollection.php:60
+#: src/FestivityCollection.php:61
 msgid "Vigil Mass"
 msgstr ""
 
-#: src/FestivityCollection.php:821
+#: src/FestivityCollection.php:882
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -719,7 +719,7 @@ msgid ""
 "is confirmed as are I Vespers."
 msgstr ""
 
-#: src/FestivityCollection.php:835
+#: src/FestivityCollection.php:896
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -728,7 +728,7 @@ msgid ""
 "or an evening Mass."
 msgstr ""
 
-#: src/FestivityCollection.php:845
+#: src/FestivityCollection.php:906
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -737,7 +737,7 @@ msgid ""
 "Vigil Mass or Vespers I."
 msgstr ""
 
-#: src/FestivityCollection.php:910
+#: src/FestivityCollection.php:971
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
