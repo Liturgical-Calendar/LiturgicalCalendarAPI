@@ -68,6 +68,10 @@
                 "strtotime": {
                     "type": "string",
                     "description": "supports PHP strtotime string format"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "should only be present on /events path, not in original resource where it will be present in the i18n file"
                 }
             },
             "anyOf": [
