@@ -4,7 +4,7 @@
             "festivity": {
                 "month": 1,
                 "day": 7,
-                "event_key": "StAndréBessette",
+                "event_key": "StAndreBessette",
                 "grade": 3,
                 "color": [
                     "white"
@@ -25,7 +25,7 @@
             "metadata": {
                 "action": "moveFestivity",
                 "since_year": 2016,
-                "reason": "make way for StAndréBessette on January 7",
+                "reason": "make way for StAndreBessette on January 7",
                 "missal": "CA_2016"
             }
         },
@@ -137,7 +137,7 @@
             "festivity": {
                 "month": 5,
                 "day": 4,
-                "event_key": "BlMarieLéonieParadis",
+                "event_key": "BlMarieLeonieParadis",
                 "grade": 2,
                 "color": [
                     "white"
@@ -153,7 +153,7 @@
             "festivity": {
                 "month": 5,
                 "day": 6,
-                "event_key": "StFrançoisdeLaval",
+                "event_key": "StFrancoisdeLaval",
                 "grade": 3,
                 "color": [
                     "white"
@@ -201,7 +201,7 @@
             "festivity": {
                 "month": 5,
                 "day": 24,
-                "event_key": "BlLouisZéphirinMoreau",
+                "event_key": "BlLouisZephirinMoreau",
                 "grade": 2,
                 "color": [
                     "white"
@@ -259,7 +259,7 @@
             "festivity": {
                 "month": 8,
                 "day": 5,
-                "event_key": "BlFrédéricJanssoone",
+                "event_key": "BlFredericJanssoone",
                 "grade": 2,
                 "color": [
                     "white"
@@ -275,7 +275,7 @@
             "festivity": {
                 "month": 9,
                 "day": 2,
-                "event_key": "BlAndréGrasset",
+                "event_key": "BlAndreGrasset",
                 "grade": 2,
                 "color": [
                     "red"
@@ -291,7 +291,7 @@
             "festivity": {
                 "month": 9,
                 "day": 4,
-                "event_key": "BlDinaBélanger",
+                "event_key": "BlDinaBelanger",
                 "grade": 2,
                 "color": [
                     "white"
@@ -307,7 +307,7 @@
             "festivity": {
                 "month": 9,
                 "day": 24,
-                "event_key": "BlÉmilieTavernierGamelin",
+                "event_key": "BlEmilieTavernierGamelin",
                 "grade": 2,
                 "color": [
                     "white"

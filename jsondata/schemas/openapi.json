@@ -4119,7 +4119,7 @@
                     "litcal_decrees": {
                       "type": "array",
                       "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCalDecreesPath.json#/definitions/LitCalDecree"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCalDecreesSource.json#/definitions/LitCalDecree"
                       }
                     }
                   }
@@ -4180,7 +4180,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCalDecreesPath.json#/definitions/LitCalDecree"
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCalDecreesSource.json#/definitions/LitCalDecree"
                 }
               }
             }
