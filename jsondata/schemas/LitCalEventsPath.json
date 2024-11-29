@@ -12,9 +12,7 @@
               {
                 "properties": {
                   "locale": {
-                    "type": "string",
-                    "pattern": "^[a-z][a-z]$",
-                    "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
                   },
                   "national_calendar": {
                     "type": "string",
@@ -31,9 +29,7 @@
               {
                 "properties": {
                   "locale": {
-                    "type": "string",
-                    "pattern": "^[a-z][a-z]$",
-                    "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
                   },
                   "national_calendar": {
                     "type": "string",
@@ -49,9 +45,7 @@
               {
                 "properties": {
                   "locale": {
-                    "type": "string",
-                    "pattern": "^[a-z][a-z]$",
-                    "description": "indicates the locale used to produce localized data in LitCalAllFestivities"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
                   },
                   "national_calendar": {
                     "type": "null"
