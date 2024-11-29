@@ -1498,7 +1498,7 @@ class FestivityCollection
         }
         foreach ($this->suppressedEvents as $key => $festivity) {
             if ($festivity->date < $this->festivities[ "Advent1" ]->date) {
-                unset($this->suppressedEvents[ $festivity->key ]);
+                unset($this->suppressedEvents[ $key ]);
             }
         }
     }
@@ -1540,7 +1540,7 @@ class FestivityCollection
         }
         foreach ($this->suppressedEvents as $key => $festivity) {
             if ($festivity->date > $this->festivities[ "Advent1" ]->date) {
-                unset($this->suppressedEvents[ $festivity->key ]);
+                unset($this->suppressedEvents[ $key ]);
             }
         }
         //lastly remove First Sunday of Advent
