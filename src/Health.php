@@ -393,8 +393,8 @@ class Health implements MessageComponentInterface
                 if (false === $matchI8nFile || 0 === $matchI8nFile) {
                     $fileExistsAndIsReadable = false;
                     $message = new \stdClass();
-                    $message->type = "error";
-                    $message->text = "Data folder $validation->sourceFolder contains an invalid i18n json filename $filename";
+                    $message->type    = "error";
+                    $message->text    = "Data folder $validation->sourceFolder contains an invalid i18n json filename $filename";
                     $message->classes = ".$validation->validate.file-exists";
                     $this->sendMessage($to, $message);
                 } else {
@@ -402,8 +402,8 @@ class Health implements MessageComponentInterface
                     if (false === $fileData) {
                         $fileExistsAndIsReadable = false;
                         $message = new \stdClass();
-                        $message->type = "error";
-                        $message->text = "Data folder $validation->sourceFolder contains an unreadable i18n json file $filename";
+                        $message->type    = "error";
+                        $message->text    = "Data folder $validation->sourceFolder contains an unreadable i18n json file $filename";
                         $message->classes = ".$validation->validate.file-exists";
                         $this->sendMessage($to, $message);
                     } else {
@@ -411,8 +411,8 @@ class Health implements MessageComponentInterface
                         if (json_last_error() !== JSON_ERROR_NONE) {
                             $jsonDecodable = false;
                             $message = new \stdClass();
-                            $message->type = "error";
-                            $message->text = "The i18n json file $filename was not successfully decoded as JSON: " . json_last_error_msg();
+                            $message->type    = "error";
+                            $message->text    = "The i18n json file $filename was not successfully decoded as JSON: " . json_last_error_msg();
                             $message->classes = ".$validation->validate.json-valid";
                             $this->sendMessage($to, $message);
                         } else {
@@ -425,8 +425,8 @@ class Health implements MessageComponentInterface
                                 }
                             } else {
                                 $message = new \stdClass();
-                                $message->type = "error";
-                                $message->text = "Unable to detect a schema for {$validation->validate} and category {$validation->category}";
+                                $message->type    = "error";
+                                $message->text    = "Unable to detect a schema for {$validation->validate} and category {$validation->category}";
                                 $message->classes = ".$validation->validate.schema-valid";
                                 $this->sendMessage($to, $message);
                             }
@@ -436,56 +436,73 @@ class Health implements MessageComponentInterface
             }
             if ($fileExistsAndIsReadable) {
                 $message = new \stdClass();
-                $message->type = "success";
-                $message->text = "The Data folder $validation->sourceFolder exists and contains valid i18n json files";
+                $message->type    = "success";
+                $message->text    = "The Data folder $validation->sourceFolder exists and contains valid i18n json files";
                 $message->classes = ".$validation->validate.file-exists";
                 $this->sendMessage($to, $message);
             }
             if ($jsonDecodable) {
                 $message = new \stdClass();
-                $message->type = "success";
-                $message->text = "The i18n json files in Data folder $validation->sourceFolder were successfully decoded as JSON";
+                $message->type    = "success";
+                $message->text    = "The i18n json files in Data folder $validation->sourceFolder were successfully decoded as JSON";
                 $message->classes = ".$validation->validate.json-valid";
                 $this->sendMessage($to, $message);
             }
             if ($schemaValidated) {
                 $message = new \stdClass();
-                $message->type = "success";
-                $message->text = "The i18n json files in Data folder $validation->sourceFolder were successfully validated against the Schema $schema";
+                $message->type    = "success";
+                $message->text    = "The i18n json files in Data folder $validation->sourceFolder were successfully validated against the Schema $schema";
                 $message->classes = ".$validation->validate.schema-valid";
                 $this->sendMessage($to, $message);
             }
         } else {
             $matches = null;
             if (preg_match("/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/", $pathForSchema, $matches)) {
-                $dioceseId = $matches[1];
+                $dioceseId   = $matches[1];
                 $dioceseData = array_values(array_filter(self::$metadata->litcal_metadata->diocesan_calendars, fn ($diocesan_calendar) => $diocesan_calendar->calendar_id === $dioceseId))[0];
+                $nation      = $dioceseData->nation;
                 $dioceseName = $dioceseData->diocese;
-                $nation = $dioceseData->nation;
-                $dataPath = strtr(JsonData::DIOCESAN_CALENDARS_FILE, [
-                    '{nation}' => $nation,
-                    '{diocese}' => $dioceseId,
+                $dataPath    = strtr(JsonData::DIOCESAN_CALENDARS_FILE, [
+                    '{nation}'       => $nation,
+                    '{diocese}'      => $dioceseId,
                     '{diocese_name}' => $dioceseName
                 ]);
             } elseif (preg_match("/^national-calendar-([A-Z]{2})$/", $pathForSchema, $matches)) {
-                $nation = $matches[1];
+                $nation   = $matches[1];
                 $dataPath = strtr(JsonData::NATIONAL_CALENDARS_FILE, [
                     '{nation}' => $nation
                 ]);
             }
-            $data = file_get_contents($dataPath);
+            if (false === file_exists($dataPath)) {
+                $data = false;
+                $message = new \stdClass();
+                $message->type    = "error";
+                $message->text    = "Data file $dataPath does not exist";
+                $message->classes = ".$validation->validate.file-exists";
+                $this->sendMessage($to, $message);
+            } else {
+                $data = file_get_contents($dataPath);
+                if (false === $data) {
+                    $message = new \stdClass();
+                    $message->type    = "error";
+                    $message->text    = "Data file $dataPath is not readable";
+                    $message->classes = ".$validation->validate.file-exists";
+                    $this->sendMessage($to, $message);
+                }
+            }
+
             if ($data !== false) {
                 $message = new \stdClass();
-                $message->type = "success";
-                $message->text = "The Data file $dataPath exists";
+                $message->type    = "success";
+                $message->text    = "The Data file $dataPath exists";
                 $message->classes = ".$validation->validate.file-exists";
                 $this->sendMessage($to, $message);
 
                 $jsonData = json_decode($data);
                 if (json_last_error() === JSON_ERROR_NONE) {
                     $message = new \stdClass();
-                    $message->type = "success";
-                    $message->text = "The Data file $dataPath was successfully decoded as JSON";
+                    $message->type    = "success";
+                    $message->text    = "The Data file $dataPath was successfully decoded as JSON";
                     $message->classes = ".$validation->validate.json-valid";
                     $this->sendMessage($to, $message);
 
@@ -493,8 +510,8 @@ class Health implements MessageComponentInterface
                         $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
                         if (gettype($validationResult) === 'boolean' && $validationResult === true) {
                             $message = new \stdClass();
-                            $message->type = "success";
-                            $message->text = "The Data file $dataPath was successfully validated against the Schema $schema";
+                            $message->type    = "success";
+                            $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
                             $message->classes = ".$validation->validate.schema-valid";
                             $this->sendMessage($to, $message);
                         } elseif (gettype($validationResult === 'object')) {
@@ -503,23 +520,29 @@ class Health implements MessageComponentInterface
                         }
                     } else {
                         $message = new \stdClass();
-                        $message->type = "error";
-                        $message->text = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category}";
+                        $message->type    = "error";
+                        $message->text    = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category}";
                         $message->classes = ".$validation->validate.schema-valid";
                         $this->sendMessage($to, $message);
                     }
                 } else {
                     $message = new \stdClass();
-                    $message->type = "error";
-                    $message->text = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . " :: Raw data = <<<JSON\n$data\n>>>";
+                    $message->type    = "error";
+                    $message->text    = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . " :: Raw data = <<<JSON\n$data\n>>>";
                     $message->classes = ".$validation->validate.json-valid";
                     $this->sendMessage($to, $message);
                 }
             } else {
                 $message = new \stdClass();
-                $message->type = "error";
-                $message->text = "Data file $dataPath does not exist";
-                $message->classes = ".$validation->validate.file-exists";
+                $message->type    = "error";
+                $message->text    = "Could not decode the Data file $dataPath as JSON because it is not readable";
+                $message->classes = ".$validation->validate.json-valid";
+                $this->sendMessage($to, $message);
+
+                $message = new \stdClass();
+                $message->type    = "error";
+                $message->text    = "Unable to verify schema for dataPath {$dataPath} and category {$validation->category} since Data file $dataPath does not exist or is not readable";
+                $message->classes = ".$validation->validate.schema-valid";
                 $this->sendMessage($to, $message);
             }
         }
