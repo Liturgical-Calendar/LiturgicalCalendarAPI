@@ -33,7 +33,9 @@
                 },
                 "timezone": {
                     "type": "string"
-                }
+                },
+                "group": {
+                    "type": "string"}
             },
             "required": [
                 "diocese_id",
