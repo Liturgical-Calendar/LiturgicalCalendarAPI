@@ -3,13 +3,7 @@
         {
             "festivity": {
                 "event_key": "StFrancisXavier",
-                "name": "San Francesco Saverio, sacerdote",
-                "color": [
-                    "white"
-                ],
-                "grade": 4,
-                "day": 3,
-                "month": 12
+                "grade": 4
             },
             "metadata": {
                 "action": "makePatron",

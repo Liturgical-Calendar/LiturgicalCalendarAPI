@@ -3,13 +3,7 @@
         {
             "festivity": {
                 "event_key": "StBenedict",
-                "name": "San Benedetto, abate, patrono d'Europa",
-                "color": [
-                    "white"
-                ],
-                "grade": 4,
-                "day": 11,
-                "month": 7
+                "grade": 4
             },
             "metadata": {
                 "action": "makePatron",
@@ -25,13 +19,7 @@
         {
             "festivity": {
                 "event_key": "StsCyrilMethodius",
-                "name": "Santi Cirillo, monaco, e Metodio, vescovo, patroni d'Europa",
-                "color": [
-                    "white"
-                ],
-                "grade": 4,
-                "day": 14,
-                "month": 2
+                "grade": 4
             },
             "metadata": {
                 "action": "makePatron",
@@ -48,13 +36,7 @@
         {
             "festivity": {
                 "event_key": "StBridget",
-                "name": "Santa Brigida, religiosa, patrona d'Europa",
-                "color": [
-                    "white"
-                ],
-                "grade": 4,
-                "day": 23,
-                "month": 7
+                "grade": 4
             },
             "metadata": {
                 "action": "makePatron",
@@ -74,13 +56,7 @@
         {
             "festivity": {
                 "event_key": "StCatherineSiena",
-                "name": "Santa Caterina da Siena, vergine e dottore della Chiesa, patrona d'Italia e d'Europa",
-                "color": [
-                    "white"
-                ],
-                "grade": 4,
-                "day": 29,
-                "month": 4
+                "grade": 4
             },
             "metadata": {
                 "action": "makePatron",
@@ -100,7 +76,6 @@
         {
             "festivity": {
                 "event_key": "StEdithStein",
-                "name": "Santa Teresa Benedetta della Croce, vergine e martire, patrona d'Europa",
                 "color": [
                     "white",
                     "red"
@@ -139,14 +114,7 @@
         {
             "festivity": {
                 "event_key": "StEdithStein",
-                "name": "Santa Teresa Benedetta della Croce, vergine e martire, patrona d'Europa",
-                "color": [
-                    "white",
-                    "red"
-                ],
-                "grade": 4,
-                "day": 9,
-                "month": 8
+                "grade": 4
             },
             "metadata": {
                 "action": "makePatron",
