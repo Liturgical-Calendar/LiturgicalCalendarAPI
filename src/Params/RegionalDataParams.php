@@ -116,7 +116,9 @@ class RegionalDataParams
         if (empty($currentNation)) {
             RegionalData::produceErrorResponse(
                 StatusCode::BAD_REQUEST,
-                "Invalid value {$data->key} for param `key`, valid values are: " . implode(', ', $this->calendars->national_calendars_keys)
+                "Invalid value {$data->key} for param `key`, valid values are: "
+                    . implode(', ', $this->calendars->national_calendars_keys) . '\n\n'
+                    . json_encode($this->calendars->national_calendars, JSON_PRETTY_PRINT)
             );
         }
         $validLangs = $currentNation[0]->locales;
