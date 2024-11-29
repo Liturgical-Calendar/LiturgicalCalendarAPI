@@ -391,18 +391,21 @@ class Events
                 // There may or may not be a related translation file; if there is, we get the translated name from here
                 $I18nPath = RomanMissal::getSanctoraleI18nFilePath($LatinMissal);
                 if ($I18nPath !== false) {
-                    if (false === file_exists($I18nPath . "/" . $this->EventsParams->baseLocale . ".json")) {
+                    $I18nFile = $I18nPath . "/" . $this->EventsParams->baseLocale . ".json";
+                    if (false === file_exists($I18nFile)) {
                         echo self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource $I18nPath");
                         die();
                     }
-                    $NAME = json_decode(file_get_contents($I18nPath . "/" . $this->EventsParams->baseLocale . ".json"), true);
+                    $NAME = json_decode(file_get_contents($I18nFile), true);
                     if (json_last_error() !== JSON_ERROR_NONE) {
                         echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
                         die();
                     }
                     foreach ($DATA as $festivity) {
                         $key = $festivity[ "event_key" ];
-                        self::$FestivityCollection[ $key ][ "name" ] = $NAME[ $key ];
+                        if (array_key_exists($key, $NAME)) {
+                            self::$FestivityCollection[ $key ][ "name" ] = $NAME[ $key ];
+                        }
                     }
                 }
             }
