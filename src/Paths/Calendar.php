@@ -12,6 +12,7 @@ use LiturgicalCalendar\Api\Utilities;
 use LiturgicalCalendar\Api\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\CacheDuration;
+use LiturgicalCalendar\Api\Enum\CalEventAction;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
 use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Enum\LitColor;
@@ -3328,41 +3329,67 @@ class Calendar
      */
     private function handleMissingFestivity(object $row): void
     {
-        $currentFeastDate = DateTime::createFromFormat('!j-n-Y', "{$row->festivity->day}-{$row->festivity->month}-" . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
-        //let's also get the name back from the database, so we can give some feedback and maybe even recreate the festivity
-        if ($this->Cal->inSolemnitiesFeastsOrMemorials($currentFeastDate) || self::dateIsSunday($currentFeastDate)) {
-            $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast($currentFeastDate, $this->CalendarParams);
-            if ($this->Cal->inFeastsOrMemorials($currentFeastDate)) {
-                //we should probably be able to create it anyways in this case?
-                $this->Cal->addFestivity(
-                    $row->festivity->event_key,
-                    new Festivity(
+        if ($this->Cal->isSuppressed($row->festivity->event_key)) {
+            $suppressedEvent = $this->Cal->getSuppressedEventByKey($row->festivity->event_key);
+            // Let's check if it was suppressed by a Solemnity, Feast, Memorial or Sunday,
+            // so we can give some feedback and maybe even recreate the festivity if applicable
+            if ($this->Cal->inSolemnitiesFeastsOrMemorials($suppressedEvent->date) || self::dateIsSunday($suppressedEvent->date)) {
+                $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast($suppressedEvent->date, $this->CalendarParams);
+                // If it was suppressed by a Feast or Memorial, we should be able to create it
+                // so we'll get the required properties back from the suppressed event
+                if ($this->Cal->inFeastsOrMemorials($suppressedEvent->date)) {
+                    $this->Cal->addFestivity(
+                        $row->festivity->event_key,
+                        new Festivity(
+                            $row->festivity->name,
+                            $suppressedEvent->date,
+                            $suppressedEvent->color,
+                            LitFeastType::FIXED,
+                            $row->festivity->grade,
+                            LitCommon::PROPRIO
+                        )
+                    );
+                    $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                        /**translators:
+                         * 1. Grade of the festivity
+                         * 2. Name of the festivity
+                         * 3. Date on which the festivity is usually celebrated
+                         * 4. Grade of the superseding festivity
+                         * 5. Name of the superseding festivity
+                         * 6. Requested calendar year
+                         * 7. National or wider region calendar
+                         */
+                        _('The %1$s \'%2$s\', usually celebrated on %3$s, was suppressed by the %4$s \'%5$s\' in the year %6$d, however being elevated to a Patronal festivity for the Calendar %7$s, it has been reinstated.'),
+                        $this->LitGrade->i18n($row->festivity->grade, false),
                         $row->festivity->name,
-                        $currentFeastDate,
-                        $row->festivity->color,
-                        LitFeastType::FIXED,
-                        $row->festivity->grade,
-                        LitCommon::PROPRIO
-                    )
-                );
+                        $this->dayAndMonth->format($suppressedEvent->date->format('U')),
+                        $coincidingFestivity->grade,
+                        $coincidingFestivity->event->name,
+                        $this->CalendarParams->Year,
+                        $this->CalendarParams->NationalCalendar
+                    );
+                } else {
+                    $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                        /**translators:
+                         * 1. Grade of the festivity
+                         * 2. Name of the festivity
+                         * 3. Date on which the festivity is usually celebrated
+                         * 4. Grade of the superseding festivity
+                         * 5. Name of the superseding festivity
+                         * 6. Requested calendar year
+                         * 7. National or wider region calendar
+                         */
+                        _('The %1$s \'%2$s\', usually celebrated on %3$s, was suppressed by the %4$s \'%5$s\' in the year %6$d, and though it would be elevated to a Patronal festivity for the Calendar %7$s, it has not been reinstated.'),
+                        $this->LitGrade->i18n($row->festivity->grade, false),
+                        $row->festivity->name,
+                        $this->dayAndMonth->format($suppressedEvent->date->format('U')),
+                        $coincidingFestivity->grade,
+                        $coincidingFestivity->event->name,
+                        $this->CalendarParams->Year,
+                        $this->CalendarParams->NationalCalendar
+                    );
+                }
             }
-            $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                /**translators:
-                 * 1. Grade of the festivity
-                 * 2. Name of the festivity
-                 * 3. Date on which the festivity is usually celebrated
-                 * 4. Grade of the superseding festivity
-                 * 5. Name of the superseding festivity
-                 * 6. Requested calendar year
-                 */
-                _('The %1$s \'%2$s\', usually celebrated on %3$s, is suppressed by the %4$s \'%5$s\' in the year %6$d.'),
-                $this->LitGrade->i18n($row->festivity->grade, false),
-                $row->festivity->name,
-                $this->dayAndMonth->format($currentFeastDate->format('U')),
-                $coincidingFestivity->grade,
-                $coincidingFestivity->event->name,
-                $this->CalendarParams->Year
-            );
         }
     }
 
@@ -3601,7 +3628,7 @@ class Calendar
      *
      * Each row in the array is processed in the order in which it appears in
      * the JSON file. If the row describes a change that is outside the
-     * applicable date range, the row is skipped.
+     * applicable year, the row is skipped.
      *
      * @param array $rows The array of rows from the national calendar JSON file
      */
@@ -3611,43 +3638,41 @@ class Calendar
             if ($this->CalendarParams->Year >= $row->metadata->since_year) {
                 if (property_exists($row->metadata, "until_year") && $this->CalendarParams->Year >= $row->metadata->until_year) {
                     continue;
-                } else {
-                    //if either the property doesn't exist (so no limit is set)
-                    //or there is a limit but we are within those limits
-                    switch ($row->metadata->action) {
-                        case "makePatron":
-                            $festivity = $this->Cal->getFestivity($row->festivity->event_key);
-                            if ($festivity !== null) {
-                                if ($festivity->grade !== $row->festivity->grade) {
-                                    $this->Cal->setProperty($row->festivity->event_key, "grade", $row->festivity->grade);
-                                }
+                }
+                $action = CalEventAction::from($row->metadata->action);
+                switch ($action) {
+                    case CalEventAction::MakePatron:
+                        $festivity = $this->Cal->getFestivity($row->festivity->event_key);
+                        if ($festivity !== null) {
+                            if ($festivity->grade !== $row->festivity->grade) {
+                                $this->Cal->setProperty($row->festivity->event_key, "grade", $row->festivity->grade);
+                            }
+                            $this->Cal->setProperty($row->festivity->event_key, "name", $row->festivity->name);
+                        } else {
+                            $this->handleMissingFestivity($row);
+                        }
+                        break;
+                    case CalEventAction::CreateNew:
+                        $this->createNewRegionalOrNationalFestivity($row);
+                        break;
+                    case CalEventAction::SetProperty:
+                        switch ($row->metadata->property) {
+                            case "name":
                                 $this->Cal->setProperty($row->festivity->event_key, "name", $row->festivity->name);
-                            } else {
-                                $this->handleMissingFestivity($row);
-                            }
-                            break;
-                        case "createNew":
-                            $this->createNewRegionalOrNationalFestivity($row);
-                            break;
-                        case "setProperty":
-                            switch ($row->metadata->property) {
-                                case "name":
-                                    $this->Cal->setProperty($row->festivity->event_key, "name", $row->festivity->name);
-                                    break;
-                                case "grade":
-                                    $this->Cal->setProperty($row->festivity->event_key, "grade", $row->festivity->grade);
-                                    break;
-                            }
-                            break;
-                        case "moveFestivity":
-                            $festivityNewDate = DateTime::createFromFormat(
-                                '!j-n-Y',
-                                $row->festivity->day . '-' . $row->festivity->month . '-' . $this->CalendarParams->Year,
-                                new \DateTimeZone('UTC')
-                            );
-                            $this->moveFestivityDate($row->festivity->event_key, $festivityNewDate, $row->metadata->reason, $row->metadata->missal);
-                            break;
-                    }
+                                break;
+                            case "grade":
+                                $this->Cal->setProperty($row->festivity->event_key, "grade", $row->festivity->grade);
+                                break;
+                        }
+                        break;
+                    case CalEventAction::MoveFestivity:
+                        $festivityNewDate = DateTime::createFromFormat(
+                            '!j-n-Y',
+                            $row->festivity->day . '-' . $row->festivity->month . '-' . $this->CalendarParams->Year,
+                            new \DateTimeZone('UTC')
+                        );
+                        $this->moveFestivityDate($row->festivity->event_key, $festivityNewDate, $row->metadata->reason, $row->metadata->missal);
+                        break;
                 }
             }
         }

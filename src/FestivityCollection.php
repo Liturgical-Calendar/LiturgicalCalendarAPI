@@ -29,6 +29,7 @@ class FestivityCollection
     private array $weekdaysEpiphanyCollection            = [];
     private array $solemnitiesLordBVMCollection          = [];
     private array $sundaysAdventLentEasterCollection     = [];
+    private array $suppressedEvents                      = [];
     private array $T                                     = [];
     private \IntlDateFormatter $dayOfTheWeek;
     private CalendarParams $CalendarParams;
@@ -572,7 +573,8 @@ class FestivityCollection
      * Removes a festivity from the collection and all relevant categorizations.
      *
      * If the festivity is a Solemnity, Feast, or Memorial, it is removed from the
-     * respective collection. The festivity is then unset from the collection.
+     * respective collection. The festivity is then unset from the collection,
+     * after being added to the suppressedEvents collection.
      *
      * @param string $key The key of the festivity to remove.
      */
@@ -588,7 +590,30 @@ class FestivityCollection
         if ($this->inMemorials($date) && $this->feastOrMemorialKeyFromDate($date) === $key) {
             unset($this->memorials[ $key ]);
         }
+        $this->suppressedEvents[ $key ] = $this->festivities[ $key ];
         unset($this->festivities[ $key ]);
+    }
+
+    /**
+     * Checks if a given key is associated with a suppressed event.
+     *
+     * @param string $key The key to check.
+     * @return bool True if the key is associated with a suppressed event, otherwise false.
+     */
+    public function isSuppressed(string $key): bool
+    {
+        return array_key_exists($key, $this->suppressedEvents);
+    }
+
+    /**
+     * Retrieves a suppressed event by its key.
+     *
+     * @param string $key The key of the suppressed event.
+     * @return Festivity The suppressed event.
+     */
+    public function getSuppressedEventByKey(string $key): Festivity
+    {
+        return $this->suppressedEvents[ $key ];
     }
 
     /**
