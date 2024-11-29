@@ -47,8 +47,6 @@
         },
         {
             "festivity": {
-                "month": 3,
-                "day": 19,
                 "event_key": "StJoseph",
                 "grade": 6
             },
@@ -249,8 +247,6 @@
         },
         {
             "festivity": {
-                "month": 7,
-                "day": 26,
                 "event_key": "StsJoachimAnne",
                 "grade": 4
             },
