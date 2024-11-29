@@ -474,6 +474,31 @@ class Health implements MessageComponentInterface
                 ]);
             }
 
+            if($validation->category === 'resourceDataCheck') {
+                $headers = get_headers($dataPath);
+                if (!$headers || strpos($headers[0], '200') === false) {
+                    $message = new \stdClass();
+                    $message->type    = "error";
+                    $message->text    = "URL $dataPath is giving an error: " . $headers[0];
+                    $message->classes = ".$validation->validate.file-exists";
+                    $this->sendMessage($to, $message);
+
+                    $message = new \stdClass();
+                    $message->type    = "error";
+                    $message->text    = "Could not decode the Data file $dataPath as JSON because it is not readable";
+                    $message->classes = ".$validation->validate.json-valid";
+                    $this->sendMessage($to, $message);
+
+                    $message = new \stdClass();
+                    $message->type    = "error";
+                    $message->text    = "Unable to verify schema for dataPath {$dataPath} and category {$validation->category} since Data file $dataPath does not exist or is not readable";
+                    $message->classes = ".$validation->validate.schema-valid";
+                    $this->sendMessage($to, $message);
+
+                    return;
+                }
+            }
+
             $data = file_get_contents($dataPath);
             if (false === $data) {
                 $message = new \stdClass();
