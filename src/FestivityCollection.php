@@ -30,6 +30,7 @@ class FestivityCollection
     private array $solemnitiesLordBVMCollection          = [];
     private array $sundaysAdventLentEasterCollection     = [];
     private array $suppressedEvents                      = [];
+    private array $reinstatedEvents                      = [];
     private array $T                                     = [];
     private \IntlDateFormatter $dayOfTheWeek;
     private CalendarParams $CalendarParams;
@@ -614,6 +615,66 @@ class FestivityCollection
     public function getSuppressedEventByKey(string $key): Festivity
     {
         return $this->suppressedEvents[ $key ];
+    }
+
+    /**
+     * Reinstates a suppressed event by moving it from the suppressedEvents collection to the reinstatedEvents collection.
+     *
+     * The event is removed from the suppressedEvents collection and added to the reinstatedEvents collection.
+     *
+     * @param string $key The key of the suppressed event.
+     */
+    public function reinstateEvent(string $key): void
+    {
+        $this->reinstatedEvents[ $key ] = $this->suppressedEvents[ $key ];
+        unset($this->suppressedEvents[ $key ]);
+    }
+
+
+    /**
+     * Retrieves the keys of all suppressed events.
+     * @return array An array of event keys, each representing a suppressed event.
+     */
+    public function getSuppressedKeys(): array
+    {
+        return array_keys($this->suppressedEvents);
+    }
+
+    /**
+     * Retrieves the keys of all reinstated events.
+     *
+     * @return array An array of event keys, each representing a reinstated event.
+     */
+    public function getReinstatedKeys(): array
+    {
+        return array_keys($this->reinstatedEvents);
+    }
+
+    /**
+     * Retrieves an array of suppressed events.
+     *
+     * The array contains Festivity objects that were previously in the collection
+     * but have been removed. The keys of the array are the event keys of the
+     * suppressed events.
+     *
+     * @return array An array of Festivity objects, each representing a suppressed event.
+     */
+    public function getSuppressedEvents(): array
+    {
+        return array_values($this->suppressedEvents);
+    }
+
+    /**
+     * Retrieves an array of reinstated events.
+     *
+     * The array contains Festivity objects that were previously suppressed
+     * and have been moved back into the collection as reinstated events.
+     *
+     * @return array An array of Festivity objects, each representing a reinstated event.
+     */
+    public function getReinstatedEvents(): array
+    {
+        return array_values($this->reinstatedEvents);
     }
 
     /**
@@ -1431,7 +1492,13 @@ class FestivityCollection
                     unset($this->weekdaysEpiphany[ $key ]);
                     unset($this->solemnitiesLordBVM[ $key ]);
                     unset($this->sundaysAdventLentEaster[ $key ]);
+                    unset($this->reinstatedEvents[ $key ]);
                 }
+            }
+        }
+        foreach ($this->suppressedEvents as $key => $festivity) {
+            if ($festivity->date < $this->festivities[ "Advent1" ]->date) {
+                unset($this->suppressedEvents[ $festivity->key ]);
             }
         }
     }
@@ -1457,6 +1524,7 @@ class FestivityCollection
                 unset($this->weekdaysAdventChristmasLent[ $key ]);
                 unset($this->solemnitiesLordBVM[ $key ]);
                 unset($this->sundaysAdventLentEaster[ $key ]);
+                unset($this->reinstatedEvents[ $key ]);
             }
             // also remove the Vigil Mass for the first Sunday of Advent
             // unfortunately we cannot keep it, because it would have the same key as for the other calendar year
@@ -1468,6 +1536,11 @@ class FestivityCollection
                 $festivity->is_vigil_for === "Advent1"
             ) {
                 unset($this->festivities[ $key ]);
+            }
+        }
+        foreach ($this->suppressedEvents as $key => $festivity) {
+            if ($festivity->date > $this->festivities[ "Advent1" ]->date) {
+                unset($this->suppressedEvents[ $festivity->key ]);
             }
         }
         //lastly remove First Sunday of Advent
