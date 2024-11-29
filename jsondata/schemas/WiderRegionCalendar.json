@@ -69,7 +69,6 @@
             },
             "required": [
                 "event_key",
-                "color",
                 "grade",
                 "day",
                 "month"
