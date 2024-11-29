@@ -82,6 +82,9 @@
                             },
                             "readings": {
                                 "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                            },
+                            "name": {
+                                "type": "string"
                             }
                         },
                         "required": [
