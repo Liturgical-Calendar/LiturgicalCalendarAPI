@@ -87,7 +87,7 @@
                     "description": "should only be present on /events path, not in original resource where it will be present in the i18n file"
                 }
             },
-            "oneOf": [
+            "anyOf": [
                 {
                     "required": [
                         "day",
@@ -132,7 +132,7 @@
             "title": "LitCalMetadataCreateNew"
         },
         "LitCalSetProperty": {
-            "oneOf": [
+            "anyOf": [
                 {
                     "type": "object",
                     "additionalProperties": false,
