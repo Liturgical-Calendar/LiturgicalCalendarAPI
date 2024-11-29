@@ -41,7 +41,14 @@
             "additionalProperties": false,
             "properties": {
                 "festivity": {
-                    "$ref": "#/definitions/FestivityCreateNew"
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/FestivityCreateNewFixed"
+                        },
+                        {
+                            "$ref": "#/definitions/FestivityCreateNewMobile"
+                        }
+                    ]
                 },
                 "metadata": {
                     "$ref": "#/definitions/LitCalMetadataCreateNew"
@@ -53,12 +60,12 @@
             ],
             "title": "LitCalCreateNew"
         },
-        "FestivityCreateNew": {
+        "FestivityCreateNewFixed": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
                 "event_key": {
-                    "type": "string"
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
                 },
                 "color": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
@@ -78,6 +85,40 @@
                 "readings": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
                 },
+                "name": {
+                    "type": "string",
+                    "description": "should only be present on /events path, not in original resource where it will be present in the i18n file"
+                }
+            },
+            "required": [
+                "event_key",
+                "color",
+                "grade",
+                "day",
+                "month",
+                "common"
+            ],
+            "title": "Festivity"
+        },
+        "FestivityCreateNewMobile": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "event_key": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                },
+                "color": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
+                },
+                "grade": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                },
+                "common": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitCommon"
+                },
+                "readings": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                },
                 "strtotime": {
                     "type": "string",
                     "description": "supports PHP strtotime string format"
@@ -87,28 +128,14 @@
                     "description": "should only be present on /events path, not in original resource where it will be present in the i18n file"
                 }
             },
-            "anyOf": [
-                {
-                    "required": [
-                        "day",
-                        "month",
-                        "event_key",
-                        "common",
-                        "grade",
-                        "color"
-                    ]
-                },
-                {
-                    "required": [
-                        "strtotime",
-                        "event_key",
-                        "common",
-                        "grade",
-                        "color"
-                    ]
-                }
+            "required": [
+                "strtotime",
+                "event_key",
+                "common",
+                "grade",
+                "color"
             ],
-            "title": "Festivity"
+            "title": "FestivityCreateNewMobile"
         },
         "LitCalMetadataCreateNew": {
             "type": "object",
