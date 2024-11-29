@@ -3,9 +3,7 @@
         {
             "festivity": {
                 "event_key": "StPeterCanisius",
-                "grade": 3,
-                "day": 21,
-                "month": 12
+                "grade": 3
             },
             "metadata": {
                 "action": "setProperty",
@@ -20,7 +18,7 @@
                     "white"
                 ],
                 "grade": 4,
-                "day": 14,
+                "day": 4,
                 "month": 6,
                 "common": [
                     "Proper"

@@ -3,12 +3,7 @@
         {
             "festivity": {
                 "event_key": "StCatherineSiena",
-                "color": [
-                    "white"
-                ],
-                "grade": 4,
-                "day": 29,
-                "month": 4
+                "grade": 4
             },
             "metadata": {
                 "action": "makePatron",
@@ -20,12 +15,7 @@
         {
             "festivity": {
                 "event_key": "StFrancisAssisi",
-                "color": [
-                    "white"
-                ],
-                "grade": 4,
-                "day": 29,
-                "month": 4
+                "grade": 4
             },
             "metadata": {
                 "action": "makePatron",
