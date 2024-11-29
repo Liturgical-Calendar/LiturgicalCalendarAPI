@@ -41,7 +41,7 @@
             "additionalProperties": false,
             "properties": {
                 "festivity": {
-                    "anyOf": [
+                    "oneOf": [
                         {
                             "$ref": "#/definitions/FestivityCreateNewFixed"
                         },
