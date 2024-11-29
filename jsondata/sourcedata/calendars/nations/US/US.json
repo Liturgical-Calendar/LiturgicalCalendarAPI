@@ -39,9 +39,7 @@
         {
             "festivity": {
                 "event_key": "StsJeanBrebeuf",
-                "grade": 3,
-                "day": 19,
-                "month": 10
+                "grade": 3
             },
             "metadata": {
                 "action": "setProperty",
