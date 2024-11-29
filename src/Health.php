@@ -366,7 +366,6 @@ class Health implements MessageComponentInterface
             } else {
                 if (property_exists($validation, 'sourceFile')) {
                     $dataPath       = $validation->sourceFile;
-                } else {
                     $matches = null;
                     if (preg_match("/^(wider-region|national-calendar|diocesan-calendar)-([A-Z][a-z]+)$/i", $validation->validate, $matches)) {
                         switch ($matches[1]) {
