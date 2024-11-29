@@ -199,7 +199,8 @@ class RegionalDataParams
                 RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
             }
         } else {
-            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "`locale` param or `Accept-Language` header required for Wider Region calendar data");
+            // if no locale was requested, just use the first valid locale
+            $this->locale = $validLangs[0];
         }
 
         return $data->key;
