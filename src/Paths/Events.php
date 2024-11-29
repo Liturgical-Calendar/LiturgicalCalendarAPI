@@ -575,7 +575,7 @@ class Events
                     '{locale}' => $this->EventsParams->Locale
                 ]
             );
-            $NationalCalendarI18nData = json_decode(file_get_contents($NationalCalendarI18nFile));
+            $NationalCalendarI18nData = json_decode(file_get_contents($NationalCalendarI18nFile), true);
             foreach (self::$NationalData->litcal as $row) {
                 if ($row->metadata->action === 'createNew') {
                     $key = $row->festivity->event_key;
