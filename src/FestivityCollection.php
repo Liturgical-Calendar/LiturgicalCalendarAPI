@@ -661,7 +661,14 @@ class FestivityCollection
      */
     public function getSuppressedEvents(): array
     {
-        return array_values($this->suppressedEvents);
+        $suppressedEvents = [];
+        foreach ($this->suppressedEvents as $key => $event) {
+            $suppressedEvents[] = [
+                "event_key" => $key,
+                ...json_decode(json_encode($event->date), true)
+            ];
+        }
+        return $suppressedEvents;
     }
 
     /**
@@ -674,7 +681,14 @@ class FestivityCollection
      */
     public function getReinstatedEvents(): array
     {
-        return array_values($this->reinstatedEvents);
+        $reinstatedEvents = [];
+        foreach ($this->reinstatedEvents as $key => $event) {
+            $reinstatedEvents[] = [
+                "event_key" => $key,
+                ...json_decode(json_encode($event->date), true)
+            ];
+        }
+        return $reinstatedEvents;
     }
 
     /**
