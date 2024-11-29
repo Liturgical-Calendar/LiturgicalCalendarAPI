@@ -85,10 +85,7 @@
                     }
                 },
                 "suppressed_events": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/DateTimeObjectCollection"
-                    }
+                    "$ref": "#/definitions/DateTimeObjectCollection"
                 },
                 "suppressed_events_keys": {
                     "type": "array",
@@ -97,10 +94,7 @@
                     }
                 },
                 "reinstated_events": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/DateTimeObjectCollection"
-                    }
+                    "$ref": "#/definitions/DateTimeObjectCollection"
                 },
                 "reinstated_events_keys": {
                     "type": "array",
