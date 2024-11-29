@@ -112,8 +112,14 @@ class RegionalDataParams
             );
         }
 
-        $currentNation = array_values(array_filter($this->calendars->national_calendars, fn ($el) => $el->calendar_id === $data->key))[0];
-        $validLangs = $currentNation->locales;
+        $currentNation = array_values(array_filter($this->calendars->national_calendars, fn ($el) => $el->calendar_id === $data->key));
+        if (empty($currentNation)) {
+            RegionalData::produceErrorResponse(
+                StatusCode::BAD_REQUEST,
+                "Invalid value {$data->key} for param `key`, valid values are: " . implode(', ', $this->calendars->national_calendars_keys)
+            );
+        }
+        $validLangs = $currentNation[0]->locales;
         if (property_exists($data, 'locale')) {
             $data->locale = \Locale::canonicalize($data->locale);
             if (in_array($data->locale, $validLangs)) {
