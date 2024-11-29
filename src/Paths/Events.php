@@ -568,12 +568,21 @@ class Events
                     }
                 }
             }
+            $NationalCalendarI18nFile = strtr(
+                JsonData::NATIONAL_CALENDARS_I18N_FILE,
+                [
+                    '{nation}' => $this->EventsParams->NationalCalendar,
+                    '{locale}' => $this->EventsParams->Locale
+                ]
+            );
+            $NationalCalendarI18nData = json_decode(file_get_contents($NationalCalendarI18nFile));
             foreach (self::$NationalData->litcal as $row) {
                 if ($row->metadata->action === 'createNew') {
                     $key = $row->festivity->event_key;
                     self::$FestivityCollection[ $key ] = (array) $row->festivity;
                     self::$FestivityCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($row->festivity->grade, false);
                     self::$FestivityCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c($row->festivity->common);
+                    self::$FestivityCollection[ $key ][ "name" ] = $NationalCalendarI18nData[ $key ];
                 }
             }
             if (property_exists(self::$NationalData, "metadata") && property_exists(self::$NationalData->metadata, "missals")) {
