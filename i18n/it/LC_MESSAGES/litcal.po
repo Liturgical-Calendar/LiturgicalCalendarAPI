@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-29 20:27+0000\n"
+"POT-Creation-Date: 2024-11-29 20:54+0000\n"
 "PO-Revision-Date: 2024-11-17 07:40+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -195,7 +195,7 @@ msgstr "sabato che precede la Domenica delle Palme"
 #: src/Paths/Calendar.php:2851 src/Paths/Calendar.php:2890
 #: src/Paths/Calendar.php:3019 src/Paths/Calendar.php:3034
 #: src/Paths/Calendar.php:3051 src/Paths/Calendar.php:3092
-#: src/FestivityCollection.php:888
+#: src/FestivityCollection.php:902
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decreto della Congregazione per il Culto Divino"
 
@@ -833,7 +833,7 @@ msgstr "ANNO"
 msgid "Vigil Mass"
 msgstr "Messa della vigilia"
 
-#: src/FestivityCollection.php:882
+#: src/FestivityCollection.php:896
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -844,7 +844,7 @@ msgstr ""
 "nell'anno %5$d. Secondo il %6$s, la prima ha la precedenza, pertanto la "
 "Messa nella Vigilia è confermata come anche i Primi Vespri."
 
-#: src/FestivityCollection.php:896
+#: src/FestivityCollection.php:910
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -857,7 +857,7 @@ msgstr ""
 "Vespri e una Messa di Vigilia, mentre l'ultima Solennità non avrà né i "
 "Secondi Vespri né una Messa serale."
 
-#: src/FestivityCollection.php:906
+#: src/FestivityCollection.php:920
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -870,7 +870,7 @@ msgstr ""
 "Secondi Vespri e una Messa serale, mentre la prima Solennità non avrà né una "
 "Messa di Vigilia né i Primi Vespri."
 
-#: src/FestivityCollection.php:971
+#: src/FestivityCollection.php:985
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "

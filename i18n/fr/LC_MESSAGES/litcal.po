@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-29 20:27+0000\n"
+"POT-Creation-Date: 2024-11-29 20:54+0000\n"
 "PO-Revision-Date: 2024-11-03 10:52+0000\n"
 "Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: French <https://translate.johnromanodorazio.com/projects/"
@@ -197,7 +197,7 @@ msgstr "le samedi précédant le dimanche des Rameaux"
 #: src/Paths/Calendar.php:2851 src/Paths/Calendar.php:2890
 #: src/Paths/Calendar.php:3019 src/Paths/Calendar.php:3034
 #: src/Paths/Calendar.php:3051 src/Paths/Calendar.php:3092
-#: src/FestivityCollection.php:888
+#: src/FestivityCollection.php:902
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Décret de la Congrégation pour le Culte Divin"
 
@@ -836,7 +836,7 @@ msgstr "ANNÉE"
 msgid "Vigil Mass"
 msgstr "Messe de la Veillée"
 
-#: src/FestivityCollection.php:882
+#: src/FestivityCollection.php:896
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -847,7 +847,7 @@ msgstr ""
 "l'année %5$d. Selon %6$s, le premier a la préséance, donc la Messe de la "
 "Veillée est confirmée ainsi que les I Vêpres."
 
-#: src/FestivityCollection.php:896
+#: src/FestivityCollection.php:910
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -860,7 +860,7 @@ msgstr ""
 "Vêpres I et une messe de vigile, tandis que la dernière solennité n'aura ni "
 "Vêpres II ni messe du soir."
 
-#: src/FestivityCollection.php:906
+#: src/FestivityCollection.php:920
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -873,7 +873,7 @@ msgstr ""
 "les Vêpres II et une messe du soir, tandis que la première Solennité n'aura "
 "pas de Messe de la Veillée ni de Vêpres I."
 
-#: src/FestivityCollection.php:971
+#: src/FestivityCollection.php:985
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
