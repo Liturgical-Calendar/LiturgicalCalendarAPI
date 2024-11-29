@@ -4471,17 +4471,21 @@ class Calendar
             $SerializeableLitCal->settings->diocesan_calendar = $this->CalendarParams->DiocesanCalendar;
         }
 
-        $SerializeableLitCal->metadata                      = new \stdClass();
-        $SerializeableLitCal->metadata->version             = self::API_VERSION;
-        $SerializeableLitCal->metadata->timestamp           = time();
-        $SerializeableLitCal->metadata->date_time           = date(DATE_ATOM);
-        $SerializeableLitCal->metadata->request_headers     = self::$Core->getRequestHeaders();
-        $SerializeableLitCal->metadata->solemnities         = $this->Cal->getSolemnitiesCollection();
-        $SerializeableLitCal->metadata->solemnities_keys    = $this->Cal->getSolemnitiesKeys();
-        $SerializeableLitCal->metadata->feasts              = $this->Cal->getFeastsCollection();
-        $SerializeableLitCal->metadata->feasts_keys         = $this->Cal->getFeastsKeys();
-        $SerializeableLitCal->metadata->memorials           = $this->Cal->getMemorialsCollection();
-        $SerializeableLitCal->metadata->memorials_keys      = $this->Cal->getMemorialsKeys();
+        $SerializeableLitCal->metadata                         = new \stdClass();
+        $SerializeableLitCal->metadata->version                = self::API_VERSION;
+        $SerializeableLitCal->metadata->timestamp              = time();
+        $SerializeableLitCal->metadata->date_time              = date(DATE_ATOM);
+        $SerializeableLitCal->metadata->request_headers        = self::$Core->getRequestHeaders();
+        $SerializeableLitCal->metadata->solemnities            = $this->Cal->getSolemnitiesCollection();
+        $SerializeableLitCal->metadata->solemnities_keys       = $this->Cal->getSolemnitiesKeys();
+        $SerializeableLitCal->metadata->feasts                 = $this->Cal->getFeastsCollection();
+        $SerializeableLitCal->metadata->feasts_keys            = $this->Cal->getFeastsKeys();
+        $SerializeableLitCal->metadata->memorials              = $this->Cal->getMemorialsCollection();
+        $SerializeableLitCal->metadata->memorials_keys         = $this->Cal->getMemorialsKeys();
+        $SerializeableLitCal->metadata->suppressed_events      = $this->Cal->getSuppressedEvents();
+        $SerializeableLitCal->metadata->suppressed_events_keys = $this->Cal->getSuppressedKeys();
+        $SerializeableLitCal->metadata->reinstated_events      = $this->Cal->getReinstatedEvents();
+        $SerializeableLitCal->metadata->reinstated_events_keys = $this->Cal->getReinstatedKeys();
         if ($this->CalendarParams->DiocesanCalendar !== null) {
             $SerializeableLitCal->metadata->diocese_name    = $this->DioceseName;
         }
