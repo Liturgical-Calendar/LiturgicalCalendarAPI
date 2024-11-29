@@ -199,8 +199,6 @@ class RomanMissal
      *      - `missal_id`: the value of the enumeration constant for the Roman Missal
      *      - `name`: the name of the Roman Missal
      *      - `region`: the region for which the Roman Missal is intended
-     *      - `data_path`: the path to the JSON file containing the sanctorale
-     *      - `i18n_path`: the path to the directory containing the JSON files for the i18n of the sanctorale
      *      - `locales`: an array of the locales for which i18n data is available
      *      - `year_limits`: an object with two properties:
      *          - `since_year`: the year since when the Roman Missal is to be used

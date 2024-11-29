@@ -194,11 +194,11 @@ class Missals
             // the only path parameter we expect is the ID of the Missal
             foreach (self::$missalsIndex->litcal_missals as $idx => $missal) {
                 if ($missal->missal_id === self::$requestPathParts[0]) {
-                    $missalData = file_get_contents($missal->data_path);
+                    $missalData = file_get_contents(RomanMissal::$jsonFiles[$missal->missal_id]);
                     if ($missalData) {
                         if (property_exists($missal, 'locales') && self::$params->baseLocale !== null) {
-                            if (in_array(self::$params->baseLocale, $missal->locales) && property_exists($missal, 'i18n_path')) {
-                                $i18nFile = $missal->i18n_path . self::$params->baseLocale . ".json";
+                            if (in_array(self::$params->baseLocale, $missal->locales)) {
+                                $i18nFile = RomanMissal::$i18nPath[$missal->missal_id] . self::$params->baseLocale . ".json";
                                 $i18nData = file_get_contents($i18nFile);
                                 if ($i18nData) {
                                     $i18nObj = json_decode($i18nData);
@@ -325,7 +325,7 @@ class Missals
      * - It will loop over the directories in the 'data' directory and if the directory contains
      *   a file with the same name as the directory and the extension '.json', it will create a
      *   stdClass object with the properties 'missal_id', 'name', 'region', 'year_published',
-     *   'data_path', 'locales', 'i18n_path', and 'api_path', and add it to the
+     *   'locales', and 'api_path', and add it to the
      *   self::$missalsIndex->litcal_missals array.
      * - Finally, it will set the request parameters using the initRequestParams method.
      *
@@ -367,10 +367,8 @@ class Missals
                             $locales[] = $f->getBasename('.json');
                         }
                         $missal->locales      = $locales;
-                        $missal->i18n_path      = "jsondata/sourcedata/missals/$missalFolderName/i18n/";
                     } else {
                         $missal->locales      = null;
-                        $missal->i18n_path      = null;
                     }
                     //$missal->year_published = intval($matches[1]);
                 } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
@@ -381,7 +379,6 @@ class Missals
                 $missal->name           = RomanMissal::getName($missal->missal_id);
                 $missal->year_limits    = RomanMissal::$yearLimits[$missal->missal_id];
                 $missal->year_published = RomanMissal::$yearLimits[$missal->missal_id][ "since_year" ];
-                $missal->data_path      = "jsondata/sourcedata/missals/$missalFolderName/$missalFolderName.json";
                 $missal->api_path       = API_BASE_PATH . "/missals/$missal->missal_id";
                 self::$missalsIndex->litcal_missals[] = $missal;
                 self::$params->addMissalRegion($missal->region);
