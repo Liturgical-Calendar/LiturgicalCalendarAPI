@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-29 19:49+0000\n"
+"POT-Creation-Date: 2024-11-29 20:27+0000\n"
 "PO-Revision-Date: 2024-11-03 10:52+0000\n"
 "Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: French <https://translate.johnromanodorazio.com/projects/"
@@ -197,7 +197,7 @@ msgstr "le samedi précédant le dimanche des Rameaux"
 #: src/Paths/Calendar.php:2851 src/Paths/Calendar.php:2890
 #: src/Paths/Calendar.php:3019 src/Paths/Calendar.php:3034
 #: src/Paths/Calendar.php:3051 src/Paths/Calendar.php:3092
-#: src/FestivityCollection.php:827
+#: src/FestivityCollection.php:888
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Décret de la Congrégation pour le Culte Divin"
 
@@ -820,7 +820,7 @@ msgstr ""
 "La %1$s '%2$s', propre au calendrier du %3$s et habituellement célébrée le "
 "%4$s, est supprimée par le dimanche ou la solennité %5$s en l'année %6$d"
 
-#: src/Paths/Calendar.php:4541
+#: src/Paths/Calendar.php:4545
 #, php-format
 msgid "Error receiving or parsing info from github about latest release: %s."
 msgstr ""
@@ -828,15 +828,15 @@ msgstr ""
 "concernant la dernière version : %s."
 
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
-#: src/FestivityCollection.php:59
+#: src/FestivityCollection.php:60
 msgid "YEAR"
 msgstr "ANNÉE"
 
-#: src/FestivityCollection.php:60
+#: src/FestivityCollection.php:61
 msgid "Vigil Mass"
 msgstr "Messe de la Veillée"
 
-#: src/FestivityCollection.php:821
+#: src/FestivityCollection.php:882
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -847,7 +847,7 @@ msgstr ""
 "l'année %5$d. Selon %6$s, le premier a la préséance, donc la Messe de la "
 "Veillée est confirmée ainsi que les I Vêpres."
 
-#: src/FestivityCollection.php:835
+#: src/FestivityCollection.php:896
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -860,7 +860,7 @@ msgstr ""
 "Vêpres I et une messe de vigile, tandis que la dernière solennité n'aura ni "
 "Vêpres II ni messe du soir."
 
-#: src/FestivityCollection.php:845
+#: src/FestivityCollection.php:906
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -873,7 +873,7 @@ msgstr ""
 "les Vêpres II et une messe du soir, tandis que la première Solennité n'aura "
 "pas de Messe de la Veillée ni de Vêpres I."
 
-#: src/FestivityCollection.php:910
+#: src/FestivityCollection.php:971
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "

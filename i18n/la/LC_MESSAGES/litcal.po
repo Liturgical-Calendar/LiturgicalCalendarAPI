@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-29 19:49+0000\n"
+"POT-Creation-Date: 2024-11-29 20:27+0000\n"
 "PO-Revision-Date: 2024-11-03 10:52+0000\n"
 "Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
@@ -176,7 +176,7 @@ msgstr "sabbatum ante Dominicam in Palmis"
 #: src/Paths/Calendar.php:2851 src/Paths/Calendar.php:2890
 #: src/Paths/Calendar.php:3019 src/Paths/Calendar.php:3034
 #: src/Paths/Calendar.php:3051 src/Paths/Calendar.php:3092
-#: src/FestivityCollection.php:827
+#: src/FestivityCollection.php:888
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decretum Congregationis pro Cultu Divino"
 
@@ -792,21 +792,21 @@ msgstr ""
 "%1$s '%2$s', proprio calendario %3$s et plerumque celebratur die %4$s, "
 "supprimatur a Dominica vel Sollemnitate %5$s anno %6$d"
 
-#: src/Paths/Calendar.php:4541
+#: src/Paths/Calendar.php:4545
 #, php-format
 msgid "Error receiving or parsing info from github about latest release: %s."
 msgstr ""
 
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
-#: src/FestivityCollection.php:59
+#: src/FestivityCollection.php:60
 msgid "YEAR"
 msgstr "ANNUM"
 
-#: src/FestivityCollection.php:60
+#: src/FestivityCollection.php:61
 msgid "Vigil Mass"
 msgstr "Missa in Vigilia"
 
-#: src/FestivityCollection.php:821
+#: src/FestivityCollection.php:882
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -817,7 +817,7 @@ msgstr ""
 "%6$s, prima praecedentia habet, ergo Missa vesperum et Missa in Vigilia "
 "servabuntur."
 
-#: src/FestivityCollection.php:835
+#: src/FestivityCollection.php:896
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -830,7 +830,7 @@ msgstr ""
 "Missa vesperum, cum Sollemnitas ultima neque Missa in Vigilia neque Primis "
 "Vesperis servabit."
 
-#: src/FestivityCollection.php:845
+#: src/FestivityCollection.php:906
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -843,7 +843,7 @@ msgstr ""
 "Missa vesperum, cum Sollemnitas prima neque Missa in Vigilia neque Primis "
 "Vesperis servabit."
 
-#: src/FestivityCollection.php:910
+#: src/FestivityCollection.php:971
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
