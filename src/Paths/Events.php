@@ -583,6 +583,14 @@ class Events
                     self::$FestivityCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($row->festivity->grade, false);
                     self::$FestivityCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c($row->festivity->common);
                     self::$FestivityCollection[ $key ][ "name" ] = $NationalCalendarI18nData[ $key ];
+                } elseif ($row->metadata->action === 'setProperty') {
+                    if ($row->metadata->property === 'name') {
+                        self::$FestivityCollection[ $row->festivity->event_key ][ "name" ] = $NationalCalendarI18nData[ $row->festivity->event_key ];
+                    }
+                    if ($row->metadata->property === 'grade') {
+                        self::$FestivityCollection[ $row->festivity->event_key ][ "grade" ] = $row->festivity->grade;
+                        self::$FestivityCollection[ $row->festivity->event_key ][ "grade_lcl" ] = self::$LitGrade->i18n($row->festivity->grade, false);
+                    }
                 }
             }
             if (property_exists(self::$NationalData, "metadata") && property_exists(self::$NationalData->metadata, "missals")) {
