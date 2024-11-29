@@ -473,25 +473,27 @@ class Health implements MessageComponentInterface
                     '{nation}' => $nation
                 ]);
             }
-            if (false === file_exists($dataPath)) {
-                $data = false;
+
+            $data = file_get_contents($dataPath);
+            if (false === $data) {
                 $message = new \stdClass();
                 $message->type    = "error";
-                $message->text    = "Data file $dataPath does not exist";
+                $message->text    = "Data file $dataPath is not readable";
                 $message->classes = ".$validation->validate.file-exists";
                 $this->sendMessage($to, $message);
-            } else {
-                $data = file_get_contents($dataPath);
-                if (false === $data) {
-                    $message = new \stdClass();
-                    $message->type    = "error";
-                    $message->text    = "Data file $dataPath is not readable";
-                    $message->classes = ".$validation->validate.file-exists";
-                    $this->sendMessage($to, $message);
-                }
-            }
 
-            if ($data !== false) {
+                $message = new \stdClass();
+                $message->type    = "error";
+                $message->text    = "Could not decode the Data file $dataPath as JSON because it is not readable";
+                $message->classes = ".$validation->validate.json-valid";
+                $this->sendMessage($to, $message);
+
+                $message = new \stdClass();
+                $message->type    = "error";
+                $message->text    = "Unable to verify schema for dataPath {$dataPath} and category {$validation->category} since Data file $dataPath does not exist or is not readable";
+                $message->classes = ".$validation->validate.schema-valid";
+                $this->sendMessage($to, $message);
+            } else {
                 $message = new \stdClass();
                 $message->type    = "success";
                 $message->text    = "The Data file $dataPath exists";
@@ -532,18 +534,6 @@ class Health implements MessageComponentInterface
                     $message->classes = ".$validation->validate.json-valid";
                     $this->sendMessage($to, $message);
                 }
-            } else {
-                $message = new \stdClass();
-                $message->type    = "error";
-                $message->text    = "Could not decode the Data file $dataPath as JSON because it is not readable";
-                $message->classes = ".$validation->validate.json-valid";
-                $this->sendMessage($to, $message);
-
-                $message = new \stdClass();
-                $message->type    = "error";
-                $message->text    = "Unable to verify schema for dataPath {$dataPath} and category {$validation->category} since Data file $dataPath does not exist or is not readable";
-                $message->classes = ".$validation->validate.schema-valid";
-                $this->sendMessage($to, $message);
             }
         }
     }
