@@ -298,7 +298,7 @@ class Health implements MessageComponentInterface
                 ) {
                     return LitSchema::EVENTS;
                 } elseif (
-                    preg_match("/\/data\/(nation|diocese|widerregion)\/[_a-zA-Z0-9]+(?:\?locale=[a-zA-Z0-9_]+)?$/", $dataPath, $matches)
+                    preg_match("/\/data\/(?:nation\/[A-Z]{2}|diocese\/[a-z]{6}_[a-z]{2}|widerregion\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/", $dataPath, $matches)
                 ) {
                     $schema = LitSchema::DATA;
                     switch ($matches[1]) {
@@ -459,8 +459,19 @@ class Health implements MessageComponentInterface
             $matches = null;
             if (preg_match("/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/", $pathForSchema, $matches)) {
                 $dioceseId = $matches[1];
-                $dioceseName = array_values(array_filter(self::$metadata->litcal_metadata->diocesan_calendars, fn ($diocesan_calendar) => $diocesan_calendar->calendar_id === $dioceseId))[0]->diocese;
-                $dataPath = preg_replace("/nations\/([A-Z]{2})\/(?:[a-z]{6}_[a-z]{2})\.json$/", "nations/$1/$dioceseName.json", $dataPath);
+                $dioceseData = array_values(array_filter(self::$metadata->litcal_metadata->diocesan_calendars, fn ($diocesan_calendar) => $diocesan_calendar->calendar_id === $dioceseId))[0];
+                $dioceseName = $dioceseData->diocese;
+                $nation = $dioceseData->nation;
+                $dataPath = strtr(JsonData::DIOCESAN_CALENDARS_FILE, [
+                    '{nation}' => $nation,
+                    '{diocese}' => $dioceseId,
+                    '{diocese_name}' => $dioceseName
+                ]);
+            } elseif (preg_match("/^national-calendar-([A-Z]{2})$/", $pathForSchema, $matches)) {
+                $nation = $matches[1];
+                $dataPath = strtr(JsonData::NATIONAL_CALENDARS_FILE, [
+                    '{nation}' => $nation
+                ]);
             }
             $data = file_get_contents($dataPath);
             if ($data !== false) {
