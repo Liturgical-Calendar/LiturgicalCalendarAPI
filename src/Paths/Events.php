@@ -289,7 +289,9 @@ class Events
                                 if (json_last_error() === JSON_ERROR_NONE && property_exists(self::$WiderRegionData, "litcal")) {
                                     foreach (self::$WiderRegionData->litcal as $idx => $value) {
                                         $event_key = $value->festivity->event_key;
-                                        self::$WiderRegionData->litcal[$idx]->festivity->name = $widerRegionI18nData->{ $event_key };
+                                        if (property_exists($widerRegionI18nData, $event_key)) {
+                                            self::$WiderRegionData->litcal[$idx]->festivity->name = $widerRegionI18nData->{$event_key};
+                                        }
                                     }
                                 }
                             }
