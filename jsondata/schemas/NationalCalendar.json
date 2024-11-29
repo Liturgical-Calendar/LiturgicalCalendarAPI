@@ -85,10 +85,7 @@
                 {
                     "required": [
                         "strtotime",
-                        "event_key",
-                        "common",
-                        "color",
-                        "grade"
+                        "event_key"
                     ]
                 }
             ],
