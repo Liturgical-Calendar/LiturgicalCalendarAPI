@@ -301,16 +301,20 @@ class Health implements MessageComponentInterface
                     preg_match("/\/data\/(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/", $dataPath, $matches)
                 ) {
                     $schema = LitSchema::DATA;
-                    switch ($matches[1]) {
-                        case 'nation':
-                            $schema = LitSchema::NATIONAL;
-                            break;
-                        case 'diocese':
-                            $schema = LitSchema::DIOCESAN;
-                            break;
-                        case 'widerregion':
-                            $schema = LitSchema::WIDERREGION;
-                            break;
+                    foreach ($matches as $idx =>$match) {
+                        if ($idx > 0) {
+                            switch ($matches[$idx]) {
+                                case 'nation':
+                                    $schema = LitSchema::NATIONAL;
+                                    break;
+                                case 'diocese':
+                                    $schema = LitSchema::DIOCESAN;
+                                    break;
+                                case 'widerregion':
+                                    $schema = LitSchema::WIDERREGION;
+                                    break;
+                            }
+                        }
                     }
                     return $schema;
                 }
