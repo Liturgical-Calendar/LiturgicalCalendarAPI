@@ -9,19 +9,19 @@
             "items": {
                 "anyOf": [
                     {
-                        "$ref": "#/definitions/LitCalCreateNewFixed"
-                    },
-                    {
-                        "$ref": "#/definitions/LitCalCreateNewMobile"
+                        "$ref": "#/definitions/LitCalMoveFestivity"
                     },
                     {
                         "$ref": "#/definitions/LitCalSetProperty"
                     },
                     {
-                        "$ref": "#/definitions/LitCalMoveFestivity"
+                        "$ref": "#/definitions/LitCalMakePatron"
                     },
                     {
-                        "$ref": "#/definitions/LitCalMakePatron"
+                        "$ref": "#/definitions/LitCalCreateNewFixed"
+                    },
+                    {
+                        "$ref": "#/definitions/LitCalCreateNewMobile"
                     }
                 ]
             }
