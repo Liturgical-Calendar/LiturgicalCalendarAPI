@@ -364,7 +364,7 @@ class Health implements MessageComponentInterface
             if (property_exists($validation, 'sourceFolder')) {
                 $dataPath       = rtrim($validation->sourceFolder, '/');
                 $matches = null;
-                if (preg_match("/^(wider-region|national-calendar|diocesan-calendar)-([A-Z][a-z]+)-i18n$/i", $validation->validate, $matches)) {
+                if (preg_match("/^(wider\-region|national\-calendar|diocesan\-calendar)\-([A-Z][_a-z]+)\-i18n$/", $validation->validate, $matches)) {
                     switch ($matches[1]) {
                         case 'wider-region':
                             $dataPath = strtr(
@@ -393,7 +393,7 @@ class Health implements MessageComponentInterface
                 if (property_exists($validation, 'sourceFile')) {
                     $dataPath       = $validation->sourceFile;
                     $matches = null;
-                    if (preg_match("/^(wider-region|national-calendar|diocesan-calendar)-([A-Z][a-z]+)$/i", $validation->validate, $matches)) {
+                    if (preg_match("/^(wider-region|national-calendar|diocesan-calendar)-([A-Z][a-z]+)$/", $validation->validate, $matches)) {
                         switch ($matches[1]) {
                             case 'wider-region':
                                 $dataPath = strtr(
