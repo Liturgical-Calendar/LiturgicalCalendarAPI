@@ -628,11 +628,23 @@ class Events
     private function processDiocesanCalendarData(): void
     {
         if ($this->EventsParams->DiocesanCalendar !== null && self::$DiocesanData !== null) {
-            foreach (self::$DiocesanData->litcal as $key => $row) {
-                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ] = (array) $row->festivity;
-                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ][ "event_key" ] = $this->EventsParams->DiocesanCalendar . '_' . $key;
-                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ][ "grade_lcl" ] = self::$LitGrade->i18n($row->festivity->grade, false);
-                self::$FestivityCollection[ $this->EventsParams->DiocesanCalendar . '_' . $key ][ "common_lcl" ] = self::$LitCommon->c($row->festivity->common);
+            $DiocesanCalendarI18nFile = strtr(
+                JsonData::DIOCESAN_CALENDARS_I18N_FILE,
+                [
+                    '{nation}' => $this->EventsParams->NationalCalendar,
+                    '{diocese}' => $this->EventsParams->DiocesanCalendar,
+                    '{locale}' => $this->EventsParams->Locale
+                ]
+            );
+            $DiocesanCalendarI18nData = json_decode(file_get_contents($DiocesanCalendarI18nFile), true);
+
+            foreach (self::$DiocesanData->litcal as $row) {
+                $key = $this->EventsParams->DiocesanCalendar . '_' . $row->festivity->event_key;
+                self::$FestivityCollection[ $key ] = (array) $row->festivity;
+                self::$FestivityCollection[ $key ][ "event_key" ] = $key;
+                self::$FestivityCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($row->festivity->grade, false);
+                self::$FestivityCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c($row->festivity->common);
+                self::$FestivityCollection[ $key ][ "name" ] = $DiocesanCalendarI18nData[ $row->festivity->event_key ];
             }
         }
     }
