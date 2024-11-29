@@ -48,7 +48,7 @@ class RegionalDataParams
             $metadata = json_decode($metadataRaw);
             if (JSON_ERROR_NONE === json_last_error() && property_exists($metadata, 'litcal_metadata')) {
                 //let's remove the Vatican calendar from the list
-                array_pop($metadata->litcal_metadata->national_calendars);
+                array_shift($metadata->litcal_metadata->national_calendars);
                 $this->calendars = $metadata->litcal_metadata;
             }
         }
@@ -117,7 +117,7 @@ class RegionalDataParams
             RegionalData::produceErrorResponse(
                 StatusCode::BAD_REQUEST,
                 "Invalid value {$data->key} for param `key`, valid values are: "
-                    . implode(', ', $this->calendars->national_calendars_keys) . '\n\n'
+                    . implode(', ', $this->calendars->national_calendars_keys) . "\n\n"
                     . json_encode($this->calendars->national_calendars, JSON_PRETTY_PRINT)
             );
         }
