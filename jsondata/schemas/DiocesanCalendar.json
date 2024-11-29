@@ -45,7 +45,6 @@
         }
     },
     "required": [
-        "$schema",
         "litcal",
         "metadata"
     ],
