@@ -26,8 +26,9 @@
                 },
                 "locales": {
                     "type": "array",
+                    "uniqueItems": true,
                     "items": {
-                        "type": "string"
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
                     }
                 },
                 "timezone": {
