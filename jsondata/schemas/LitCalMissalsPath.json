@@ -71,8 +71,10 @@
             },
             "required": [
                 "missal_id",
+                "name",
                 "region",
                 "year_published",
+                "year_limits",
                 "api_path"
             ]
         }
