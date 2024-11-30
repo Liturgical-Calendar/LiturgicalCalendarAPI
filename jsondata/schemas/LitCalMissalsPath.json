@@ -73,7 +73,6 @@
                 "missal_id",
                 "region",
                 "year_published",
-                "data_path",
                 "api_path"
             ]
         }
