@@ -13,6 +13,7 @@ use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\ReturnType;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\RomanMissal;
 
 /**
  * This class provides a WebSocket-based interface for executing various tests
@@ -392,6 +393,10 @@ class Health implements MessageComponentInterface
                             );
                             break;
                     }
+                } elseif (preg_match("/^proprium\-de\-sanctis(?:\-([A-Z]{2}))?\-([1-2][0-9]{3})\-i18n$/", $validation->validate, $matches)) {
+                    $region = $matches[1] !== '' ? $matches[1] : 'EDITIO_TYPICA';
+                    $year = $matches[2];
+                    $dataPath = RomanMissal::$i18nPath["{$region}_{$year}"];
                 }
             } else {
                 if (property_exists($validation, 'sourceFile')) {
@@ -423,6 +428,10 @@ class Health implements MessageComponentInterface
                                 );
                                 break;
                         }
+                    } elseif (preg_match("/^proprium\-de\-sanctis(?:\-([A-Z]{2}))?\-([1-2][0-9]{3})$/", $validation->validate, $matches)) {
+                        $region = $matches[1] !== '' ? $matches[1] : 'EDITIO_TYPICA';
+                        $year = $matches[2];
+                        $dataPath = RomanMissal::$jsonFiles["{$region}_{$year}"];
                     }
                 }
             }
