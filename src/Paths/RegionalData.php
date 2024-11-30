@@ -257,18 +257,19 @@ class RegionalData
      */
     private function handleNationalCalendarUpdate()
     {
-        $response = new \stdClass();
-        $region = $this->params->payload->metadata->nation;
-        $path = JsonData::NATIONAL_CALENDARS_FOLDER . '/' . $region;
-        if (!file_exists($path)) {
-            mkdir($path, 0755, true);
-        }
+        $response     = new \stdClass();
+        $calendarFile = strtr(
+            JsonData::NATIONAL_CALENDARS_FILE,
+            [
+                '{nation}' => $this->params->key
+            ]
+        );
 
         $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::NATIONAL);
         if ($test === true) {
             $data = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            file_put_contents($path . "/{$region}.json", $data . PHP_EOL);
-            $response->success = "Calendar data created or updated for Nation \"{$this->params->payload->metadata->nation}\"";
+            file_put_contents($calendarFile, $data . PHP_EOL);
+            $response->success = "Calendar data created or updated for Nation \"{$this->params->key}\"";
             self::produceResponse(json_encode($response));
         } else {
             self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
@@ -673,10 +674,10 @@ class RegionalData
                 default:
                     $bodyData = (object)$_REQUEST;
             }
-            if (null === $bodyData || !property_exists($bodyData, 'payload')) {
+            if (null === $bodyData) {
                 self::produceErrorResponse(StatusCode::BAD_REQUEST, "No payload received. Must receive payload in body of request, in JSON or YAML format, with properties `key` and `caldata`");
             }
-            $data->payload = $bodyData->payload;
+            $data->payload = $bodyData;
         }
 
         if (false === $this->params->setData($data)) {
