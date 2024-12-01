@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-01 21:18+0000\n"
+"POT-Creation-Date: 2024-12-01 21:32+0000\n"
 "PO-Revision-Date: 2024-10-03 13:34+0000\n"
 "Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Vietnamese <https://translate.johnromanodorazio.com/projects/"
@@ -185,7 +185,7 @@ msgstr "thứ Bảy trước Chúa Nhật Lễ Lá"
 #: src/Paths/Calendar.php:2851 src/Paths/Calendar.php:2890
 #: src/Paths/Calendar.php:3019 src/Paths/Calendar.php:3034
 #: src/Paths/Calendar.php:3051 src/Paths/Calendar.php:3092
-#: src/FestivityCollection.php:902
+#: src/FestivityCollection.php:905
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Sắc lệnh của Bộ Phụng tự và Kỷ luật Bí tích"
 
@@ -871,7 +871,7 @@ msgstr "NĂM"
 msgid "Vigil Mass"
 msgstr "Thánh lễ vọng"
 
-#: src/FestivityCollection.php:896
+#: src/FestivityCollection.php:899
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -882,7 +882,7 @@ msgstr ""
 "%6$s, cái đầu tiên được ưu tiên, do đó Thánh lễ vọng được xác nhận cũng như "
 "Kinh Chiều I."
 
-#: src/FestivityCollection.php:910
+#: src/FestivityCollection.php:913
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -894,7 +894,7 @@ msgstr ""
 "trọng đầu tiên có ưu tiên, nó sẽ có Kinh Chiều I và Thánh lễ vọng, trong khi "
 "Lễ trọng cuối cùng sẽ không có Kinh Chiều II hoặc Thánh lễ buổi tối."
 
-#: src/FestivityCollection.php:920
+#: src/FestivityCollection.php:923
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -906,7 +906,7 @@ msgstr ""
 "cuối cùng này được ưu tiên, do đó sẽ giữ Vespers II và một Thánh lễ buổi "
 "tối, trong khi Lễ trọng đầu tiên sẽ không có Thánh lễ Vọng hoặc Vespers I."
 
-#: src/FestivityCollection.php:985
+#: src/FestivityCollection.php:988
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "

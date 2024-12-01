@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-01 21:18+0000\n"
+"POT-Creation-Date: 2024-12-01 21:32+0000\n"
 "PO-Revision-Date: 2024-11-03 10:52+0000\n"
 "Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: Dutch <https://translate.johnromanodorazio.com/projects/"
@@ -197,7 +197,7 @@ msgstr "de zaterdag voorafgaand aan Palmzondag"
 #: src/Paths/Calendar.php:2851 src/Paths/Calendar.php:2890
 #: src/Paths/Calendar.php:3019 src/Paths/Calendar.php:3034
 #: src/Paths/Calendar.php:3051 src/Paths/Calendar.php:3092
-#: src/FestivityCollection.php:902
+#: src/FestivityCollection.php:905
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Decreet van de Congregatie voor de Goddelijke Eredienst"
 
@@ -897,7 +897,7 @@ msgstr "JAAR"
 msgid "Vigil Mass"
 msgstr "Vigiliemis"
 
-#: src/FestivityCollection.php:896
+#: src/FestivityCollection.php:899
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -908,7 +908,7 @@ msgstr ""
 "%5$d. Overeenkomstig %6$s heeft de eerste voorrang, waardoor de vigiliemis "
 "en het avondgebed op de vooravond zijn vastgesteld."
 
-#: src/FestivityCollection.php:910
+#: src/FestivityCollection.php:913
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -921,7 +921,7 @@ msgstr ""
 "de vooravond en een vigiliemis, terwijl het tweede hoogfeest geen avondgebed "
 "of een avondmis heeft."
 
-#: src/FestivityCollection.php:920
+#: src/FestivityCollection.php:923
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -934,7 +934,7 @@ msgstr ""
 "vooravond en een avondmis behoudt, terwijl het eerste hoogfeest geen "
 "vigiliemis of avondgebed heeft."
 
-#: src/FestivityCollection.php:985
+#: src/FestivityCollection.php:988
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
