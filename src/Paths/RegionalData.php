@@ -292,7 +292,7 @@ class RegionalData
             }
             $data     = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             $i18nData = json_encode($i18nPayload,           JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            file_put_contents($calendarFile, $data . PHP_EOL);
+            file_put_contents($calendarFile,     $data     . PHP_EOL);
             file_put_contents($calendarI18nFile, $i18nData . PHP_EOL);
             $response->success = "Calendar data created or updated for Nation \"{$this->params->key}\"";
             self::produceResponse(json_encode($response));

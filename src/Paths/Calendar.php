@@ -3636,6 +3636,7 @@ class Calendar
     {
         foreach ($rows as $row) {
             if ($this->CalendarParams->Year >= $row->metadata->since_year) {
+                // Until year is exclusive with this logic
                 if (property_exists($row->metadata, "until_year") && $this->CalendarParams->Year >= $row->metadata->until_year) {
                     continue;
                 }
@@ -3658,18 +3659,74 @@ class Calendar
                     case CalEventAction::SetProperty:
                         switch ($row->metadata->property) {
                             case "name":
+                                $festivity = $this->Cal->getFestivity($row->festivity->event_key);
+                                $this->Messages[] = sprintf(
+                                    /**translators:
+                                     * 1. Liturgical grade
+                                     * 2. Original name of the liturgical event
+                                     * 3. New name of the liturgical event
+                                     * 4. ID of the national calendar
+                                     * 5. Year from which the name has been changed
+                                     * 6. Requested calendar year
+                                     */
+                                    _('The name of the %1$s \'%2$s\' has been changed to \'%3$s\' in the national calendar \'%4$s\' since the year %5$d, applicable to the year %6$d.'),
+                                    $this->LitGrade->i18n($festivity->grade, false),
+                                    $festivity->name,
+                                    $row->festivity->name,
+                                    $this->CalendarParams->NationalCalendar,
+                                    $row->metadata->since_year,
+                                    $this->CalendarParams->Year
+                                );
                                 $this->Cal->setProperty($row->festivity->event_key, "name", $row->festivity->name);
                                 break;
                             case "grade":
+                                $festivity = $this->Cal->getFestivity($row->festivity->event_key);
+                                $this->Messages[] = sprintf(
+                                    /**translators:
+                                     * 1. Original liturgical grade
+                                     * 2. Name of the liturgical event
+                                     * 3. New liturgical grade
+                                     * 4. ID of the national calendar
+                                     * 5. Year from which the grade has been changed
+                                     * 6. Requested calendar year
+                                     */
+                                    _('The grade of the %1$s \'%2$s\' has been changed to \'%3$s\' in the national calendar \'%4$s\' since the year %5$d, applicable to the year %6$d.'),
+                                    $this->LitGrade->i18n($festivity->grade, false),
+                                    $festivity->name,
+                                    $this->LitGrade->i18n($row->festivity->grade, false),
+                                    $this->CalendarParams->NationalCalendar,
+                                    $row->metadata->since_year,
+                                    $this->CalendarParams->Year
+                                );
                                 $this->Cal->setProperty($row->festivity->event_key, "grade", $row->festivity->grade);
                                 break;
                         }
                         break;
                     case CalEventAction::MoveFestivity:
+                        $festivity = $this->Cal->getFestivity($row->festivity->event_key);
                         $festivityNewDate = DateTime::createFromFormat(
                             '!j-n-Y',
                             $row->festivity->day . '-' . $row->festivity->month . '-' . $this->CalendarParams->Year,
                             new \DateTimeZone('UTC')
+                        );
+                        $this->Messages[] = sprintf(
+                            /**translators:
+                             * 1. Liturgical grade
+                             * 2. Name of the liturgical event
+                             * 3. Original date of the liturgical event
+                             * 4. New date of the liturgical event
+                             * 5. Year from which the date has been changed
+                             * 6. ID of the national calendar
+                             * 7. Requested calendar year
+                             */
+                            _('The %1$s \'%2$s\' has been moved from %3$s to %4$s since the year %5$d in the national calendar \'%6$s\', applicable to the year %7$d.'),
+                            $this->LitGrade->i18n($festivity->grade, false),
+                            $festivity->name,
+                            $this->dayAndMonth->format($festivity->date->format('U')),
+                            $this->dayAndMonth->format($festivityNewDate->format('U')),
+                            $row->metadata->since_year,
+                            $this->CalendarParams->NationalCalendar,
+                            $this->CalendarParams->Year
                         );
                         $this->moveFestivityDate($row->festivity->event_key, $festivityNewDate, $row->metadata->reason, $row->metadata->missal);
                         break;
