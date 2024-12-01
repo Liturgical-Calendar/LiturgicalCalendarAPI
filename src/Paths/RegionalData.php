@@ -265,10 +265,27 @@ class RegionalData
             ]
         );
 
+        $calendarI18nFile = strtr(
+            JsonData::NATIONAL_CALENDARS_I18N_FILE,
+            [
+                '{nation}' => $this->params->key,
+                '{locale}' => $this->params->locale
+            ]
+        );
+
         $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::NATIONAL);
         if ($test === true) {
-            $data = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            // we need to extract localized name properties from the payload,
+            // and write them to the corresponding locale file
+            $i18nPayload = [];
+            foreach ($this->params->payload->litcal as $idx => $value) {
+                $i18nData[$value->festivity->event_key] = $value->festivity->name;
+                unset($value->festivity->name);
+            }
+            $data     = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            $i18nData = json_encode($i18nPayload,           JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             file_put_contents($calendarFile, $data . PHP_EOL);
+            file_put_contents($calendarI18nFile, $i18nData . PHP_EOL);
             $response->success = "Calendar data created or updated for Nation \"{$this->params->key}\"";
             self::produceResponse(json_encode($response));
         } else {
@@ -675,7 +692,7 @@ class RegionalData
                     $bodyData = (object)$_REQUEST;
             }
             if (null === $bodyData) {
-                self::produceErrorResponse(StatusCode::BAD_REQUEST, "No payload received. Must receive payload in body of request, in JSON or YAML format, with properties `key` and `caldata`");
+                self::produceErrorResponse(StatusCode::BAD_REQUEST, "No payload received. Must receive payload in body of request, in JSON or YAML format");
             }
             $data->payload = $bodyData;
         }

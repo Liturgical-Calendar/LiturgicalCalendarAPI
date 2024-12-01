@@ -357,7 +357,8 @@
                     },
                     "required": [
                         "event_key",
-                        "grade"
+                        "grade",
+                        "name"
                     ]
                 },
                 "metadata": {
