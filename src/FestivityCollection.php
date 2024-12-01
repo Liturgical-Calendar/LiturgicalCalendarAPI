@@ -563,6 +563,9 @@ class FestivityCollection
                 }
                 if ($key === "grade") {
                     $this->handleGradeProperty($key, $value, $oldValue);
+                    // Consequentially, we also need to update the grade_lcl and grade_abbr properties
+                    $this->festivities[ $key ]->grade_lcl  = self::$LitGrade->i18n($this->grade, false);
+                    $this->festivities[ $key ]->grade_abbr = self::$LitGrade->i18n($this->grade, false, true);
                 }
                 return true;
             }
