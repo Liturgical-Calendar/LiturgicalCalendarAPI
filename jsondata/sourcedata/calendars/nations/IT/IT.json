@@ -22,6 +22,18 @@
                 "since_year": 1939,
                 "url": "https:\/\/www.vatican.va\/content\/pius-xii\/it\/briefs\/documents\/hf_p-xii_brief_19390618_patroni-italia.html"
             }
+        },
+        {
+            "festivity": {
+                "event_key": "StNicholas",
+                "grade": 3
+            },
+            "metadata": {
+                "action": "setProperty",
+                "property": "grade",
+                "since_year": 2017,
+                "url": "https:\/\/liturgico.chiesacattolica.it\/memoria-di-san-nicola\/"
+            }
         }
     ],
     "settings": {
@@ -32,11 +44,13 @@
     },
     "metadata": {
         "nation": "IT",
-        "locales": ["it_IT"],
         "wider_region": "Europe",
         "missals": [
             "IT_1983",
             "IT_2020"
+        ],
+        "locales": [
+            "it_IT"
         ]
     }
 }
