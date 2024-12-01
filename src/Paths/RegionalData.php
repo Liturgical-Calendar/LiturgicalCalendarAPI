@@ -276,10 +276,18 @@ class RegionalData
         $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::NATIONAL);
         if ($test === true) {
             // we need to extract localized name properties from the payload,
-            // and write them to the corresponding locale file
+            // and write them to the corresponding locale file,
+            // but only for createNew or setProperty::name actions,
+            // or for the makePatron action
             $i18nPayload = [];
-            foreach ($this->params->payload->litcal as $idx => $value) {
-                $i18nData[$value->festivity->event_key] = $value->festivity->name;
+            foreach ($this->params->payload->litcal as $value) {
+                if (
+                    $value->metadata->action === 'createNew'
+                    || ($value->metadata->action === 'setProperty' && $value->metadata->property === 'name')
+                    || $value->metadata->action === 'makePatron'
+                ) {
+                    $i18nPayload[$value->festivity->event_key] = $value->festivity->name;
+                }
                 unset($value->festivity->name);
             }
             $data     = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
