@@ -561,11 +561,11 @@ class FestivityCollection
                 ) {
                     $this->festivities[ $key ]->{$property} = $value;
                 }
-                if ($key === "grade") {
+                if ($property === "grade") {
                     $this->handleGradeProperty($key, $value, $oldValue);
                     // Consequentially, we also need to update the grade_lcl and grade_abbr properties
-                    $this->festivities[ $key ]->grade_lcl  = self::$LitGrade->i18n($this->festivities[ $key ]->grade, false);
-                    $this->festivities[ $key ]->grade_abbr = self::$LitGrade->i18n($this->festivities[ $key ]->grade, false, true);
+                    $this->festivities[ $key ]->grade_lcl  = $this->LitGrade->i18n($value, false);
+                    $this->festivities[ $key ]->setGradeAbbreviation($this->LitGrade->i18n($value, false, true));
                 }
                 return true;
             }
