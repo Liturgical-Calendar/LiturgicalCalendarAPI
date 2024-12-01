@@ -208,6 +208,10 @@
                         "property": {
                             "type": "string",
                             "const": "grade"
+                        },
+                        "url": {
+                            "type": "string",
+                            "format": "uri"
                         }
                     },
                     "required": [
@@ -260,6 +264,10 @@
                         "property": {
                             "type": "string",
                             "const": "name"
+                        },
+                        "url": {
+                            "type": "string",
+                            "format": "uri"
                         }
                     },
                     "required": [
