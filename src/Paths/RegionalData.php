@@ -275,12 +275,13 @@ class RegionalData
 
         $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::NATIONAL);
         if ($test === true) {
-            // we need to extract localized name properties from the payload,
+            // We need to extract localized name properties from the payload,
             // and write them to the corresponding locale file,
             // but only for createNew or setProperty::name actions,
-            // or for the makePatron action
+            // or for the makePatron action.
+            // Make sure &$value is a reference, not a copy, so that the `name` property will be deleted on the original object.
             $i18nPayload = [];
-            foreach ($this->params->payload->litcal as $value) {
+            foreach ($this->params->payload->litcal as &$value) {
                 if (
                     $value->metadata->action === 'createNew'
                     || ($value->metadata->action === 'setProperty' && $value->metadata->property === 'name')
@@ -398,18 +399,50 @@ class RegionalData
                 '{diocese_name}' => $dioceseEntry[0]->diocese
             ]
         );
+        $DiocesanCalendarI18nFile = strtr(
+            JsonData::DIOCESAN_CALENDARS_I18N_FILE,
+            [
+                '{nation}' => $dioceseEntry[0]->nation,
+                '{diocese}' => $dioceseEntry[0]->calendar_id,
+                '{locale}' => $this->params->locale
+            ]
+        );
         if (false === file_exists($DiocesanCalendarFile)) {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendar resource, not found in path {$dioceseEntry[0]->path}.");
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendar resource at {$DiocesanCalendarFile}, file not found.");
         }
 
         if (false === is_writable($DiocesanCalendarFile)) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendar resource for {$this->params->key} in path {$dioceseEntry[0]->path}, check file and folder permissions.");
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendar resource for {$this->params->key} at {$DiocesanCalendarFile}, check file and folder permissions.");
+        }
+
+        if (false === is_writable($DiocesanCalendarI18nFile)) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendar i18n resource for {$this->params->key} at {$DiocesanCalendarI18nFile}, check file and folder permissions.");
         }
 
         // Validate payload against schema
         $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
         if (false === $test) {
             self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+        }
+
+        // Extract localized name properties from the payload,
+        // and write them to the corresponding locale file.
+        // Make sure &$value is a reference, not a copy, so that the `name` property will be deleted on the original object.
+        $i18nPayload = [];
+        foreach ($this->params->payload->litcal as &$value) {
+            $i18nPayload[$value->festivity->event_key] = $value->festivity->name;
+            unset($value->festivity->name);
+        }
+
+        // Update diocesan calendar i18n data
+        $calendarI18nData = json_encode($i18nPayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if (
+            false === file_put_contents(
+                $DiocesanCalendarI18nFile,
+                $calendarI18nData . PHP_EOL
+            )
+        ) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update diocesan calendar i18n resource {$this->params->key} in path {$DiocesanCalendarI18nFile}.");
         }
 
         // Update diocesan calendar data
@@ -420,7 +453,7 @@ class RegionalData
                 $calendarData . PHP_EOL
             )
         ) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update diocesan calendar resource {$this->params->key} in path {$dioceseEntry[0]->path}.");
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update diocesan calendar resource {$this->params->key} in path {$DiocesanCalendarFile}.");
         }
 
         $response = new \stdClass();
