@@ -81,6 +81,11 @@ class Router
         return explode('/', $requestPath);
     }
 
+    /**
+     * Returns true if the server is running on localhost.
+     *
+     * @return bool true if the server is running on localhost, false otherwise
+     */
     public static function isLocalhost(): bool
     {
         $localhostAddresses = ['127.0.0.1', '::1'];
@@ -136,7 +141,10 @@ class Router
                     RequestMethod::DELETE,
                     RequestMethod::OPTIONS
                 ]);
-                if (in_array(Tests::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
+                if (
+                    in_array(Tests::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
+                    && false === Router::isLocalhost()
+                ) {
                     Tests::$Core->setAllowedOrigins(self::$allowedOrigins);
                 }
                 Tests::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON ]);
@@ -146,7 +154,18 @@ class Router
             case 'events':
                 $Events = new Events();
                 Events::$Core->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
-                if (in_array(Events::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
+                if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
+                    if (
+                        in_array($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'], [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
+                        && false === Router::isLocalhost()
+                    ) {
+                        Events::$Core->setAllowedOrigins(self::$allowedOrigins);
+                    }
+                }
+                if (
+                    in_array(Events::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
+                    && false === Router::isLocalhost()
+                ) {
                     Events::$Core->setAllowedOrigins(self::$allowedOrigins);
                 }
                 Events::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
@@ -164,11 +183,17 @@ class Router
                     RequestMethod::OPTIONS
                 ]);
                 if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
-                    if (in_array($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'], [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
+                    if (
+                        in_array($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'], [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
+                        && false === Router::isLocalhost()
+                    ) {
                         RegionalData::$Core->setAllowedOrigins(self::$allowedOrigins);
                     }
                 }
-                if (in_array(RegionalData::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
+                if (
+                    in_array(RegionalData::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
+                    && false === Router::isLocalhost()
+                ) {
                     RegionalData::$Core->setAllowedOrigins(self::$allowedOrigins);
                 }
                 RegionalData::$Core->setAllowedRequestContentTypes([
@@ -192,7 +217,18 @@ class Router
                     RequestMethod::DELETE,
                     RequestMethod::OPTIONS
                 ]);
-                if (in_array(Missals::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
+                if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
+                    if (
+                        in_array($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'], [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
+                        && false === Router::isLocalhost()
+                    ) {
+                        Missals::$Core->setAllowedOrigins(self::$allowedOrigins);
+                    }
+                }
+                if (
+                    in_array(Missals::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
+                    && false === Router::isLocalhost()
+                ) {
                     Missals::$Core->setAllowedOrigins(self::$allowedOrigins);
                 }
                 Missals::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
@@ -215,7 +251,18 @@ class Router
                     RequestMethod::DELETE,
                     RequestMethod::OPTIONS
                 ]);
-                if (in_array(Decrees::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)) {
+                if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
+                    if (
+                        in_array($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'], [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
+                        && false === Router::isLocalhost()
+                    ) {
+                        Decrees::$Core->setAllowedOrigins(self::$allowedOrigins);
+                    }
+                }
+                if (
+                    in_array(Decrees::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
+                    && false === Router::isLocalhost()
+                ) {
                     Decrees::$Core->setAllowedOrigins(self::$allowedOrigins);
                 }
                 Decrees::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
