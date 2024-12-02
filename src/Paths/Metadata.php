@@ -112,8 +112,8 @@ class Metadata
                             // Push the name of the diocese to the group that it belongs to
                             Metadata::$diocesanGroups[$groupName][] = $calendar_id;
                         }
-                        if (property_exists($diocesanCalendarData, 'overrides')) {
-                            $dioceseArr['settings'] = $diocesanCalendarData->overrides;
+                        if (property_exists($diocesanCalendarData, 'settings')) {
+                            $dioceseArr['settings'] = $diocesanCalendarData->settings;
                         }
                         Metadata::$diocesanCalendars[] = $dioceseArr;
 

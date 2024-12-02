@@ -15,7 +15,7 @@
             }
         }
     ],
-    "overrides": {
+    "settings": {
         "epiphany": "JAN6",
         "ascension": "THURSDAY",
         "corpus_christi": "THURSDAY"

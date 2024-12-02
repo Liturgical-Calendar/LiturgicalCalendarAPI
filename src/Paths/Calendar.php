@@ -532,8 +532,8 @@ class Calendar
     private function updateSettingsBasedOnDiocesanCalendar(): void
     {
         if ($this->CalendarParams->DiocesanCalendar !== null && $this->DiocesanData !== null) {
-            if (property_exists($this->DiocesanData, "overrides")) {
-                foreach ($this->DiocesanData->overrides as $key => $value) {
+            if (property_exists($this->DiocesanData, "settings")) {
+                foreach ($this->DiocesanData->settings as $key => $value) {
                     switch ($key) {
                         case "epiphany":
                             if (Epiphany::isValid($value)) {
