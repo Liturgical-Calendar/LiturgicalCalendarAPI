@@ -7,7 +7,7 @@
         "litcal": {
             "$ref": "#/definitions/LitCal"
         },
-        "overrides": {
+        "settings": {
             "$ref": "#/definitions/Overrides"
         },
         "metadata": {
