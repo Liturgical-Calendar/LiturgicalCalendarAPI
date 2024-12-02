@@ -8,7 +8,7 @@
   ],
   "info": {
     "description": "An API which allows to retrieve data about the **Roman Calendar** for any given year, between 1970 and 9999. The data strives for historical accuracy (memorials and feast days are only generated from the year in which they were effectively introduced). The data is based on original sources (Roman Missals, Decrees of the Congregation for Divine Worship, Mysterii Paschalis, etc.), not on data copied or retrieved from online sources which may not be accurate. The API offers multiple locales and multiple calendars, from the **General Roman Calendar** to national or diocesan calendars.",
-    "version": "3.9",
+    "version": "4.0",
     "title": "Liturgical Calendar",
     "contact": {
       "email": "priest@johnromanodorazio.com",
