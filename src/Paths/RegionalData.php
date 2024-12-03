@@ -518,6 +518,13 @@ class RegionalData
                         '{diocese_name}' => $dioceseEntry[0]->diocese
                     ]
                 );
+                $calendarI18nFolder = strtr(
+                    JsonData::DIOCESAN_CALENDARS_I18N_FOLDER,
+                    [
+                        '{nation}' => $dioceseEntry[0]->nation,
+                        '{diocese}' => $dioceseEntry[0]->calendar_id
+                    ]
+                    );
                 break;
             case "WIDERREGIONCALENDAR":
                 $calendarDataFile = strtr(
@@ -526,6 +533,12 @@ class RegionalData
                         '{wider_region}' => $this->params->key
                     ]
                 );
+                $calendarI18nFolder = strtr(
+                    JsonData::WIDER_REGIONS_I18N_FOLDER,
+                    [
+                        '{wider_region}' => $this->params->key
+                    ]
+                    );
                 break;
             case "NATIONALCALENDAR":
                 $calendarDataFile = strtr(
@@ -534,17 +547,31 @@ class RegionalData
                         '{nation}' => $this->params->key
                     ]
                 );
+                $calendarI18nFolder = strtr(
+                    JsonData::NATIONAL_CALENDARS_I18N_FOLDER,
+                    [
+                        '{nation}' => $this->params->key
+                    ]
+                    );
                 break;
         }
-        if (file_exists($calendarDataFile)) {
+        if (file_exists($calendarDataFile) && file_exists($calendarI18nFolder)) {
             if (false === is_writable($calendarDataFile)) {
                 self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, check file and folder permissions.");
             }
             if (false === unlink($calendarDataFile)) {
                 self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully.");
             };
+            foreach(glob($calendarI18nFolder . "/*.json") as $file) {
+                if (false === is_writable($file)) {
+                    self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, check i18n file and folder permissions.");
+                }
+                if (false === unlink($file)) {
+                    self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, i18n file could not be removed.");
+                };
+            }
         } else {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "The resource '{$this->params->key}' requested for deletion was not found on this server.");
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "The resource '{$this->params->key}' requested for deletion (or the relative i18n folder) was not found on this server.");
         }
         $response->success = "Calendar data \"{$this->params->key}\" deleted successfully.";
         self::produceResponse(json_encode($response));
