@@ -121,27 +121,31 @@ class RegionalDataParams
                     . json_encode($this->calendars->national_calendars, JSON_PRETTY_PRINT)
             );
         }
-        $validLangs = $currentNation[0]->locales;
-        if (property_exists($data, 'locale')) {
-            $data->locale = \Locale::canonicalize($data->locale);
-            if (in_array($data->locale, $validLangs)) {
-                $this->locale = $data->locale;
+
+        // we don't care about locale for DELETE requests
+        if (RegionalData::$Core->getRequestMethod() !== RequestMethod::DELETE) {
+            $validLangs = $currentNation[0]->locales;
+            if (property_exists($data, 'locale')) {
+                $data->locale = \Locale::canonicalize($data->locale);
+                if (in_array($data->locale, $validLangs)) {
+                    $this->locale = $data->locale;
+                } else {
+                    $message = "Invalid value {$data->locale} for param `locale`, valid values for nation {$data->key} are: "
+                                . implode(', ', $validLangs);
+                    RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+                }
+            } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+                $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+                if (in_array($value, $validLangs)) {
+                    $this->locale = $value;
+                } else {
+                    $message = "Invalid value {$value} for Accept-Language header, valid values for nation {$data->key} are: "
+                                . implode(', ', $validLangs);
+                    RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+                }
             } else {
-                $message = "Invalid value {$data->locale} for param `locale`, valid values for nation {$data->key} are: "
-                            . implode(', ', $validLangs);
-                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "`locale` param or `Accept-Language` header required for Wider Region calendar data");
             }
-        } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-            if (in_array($value, $validLangs)) {
-                $this->locale = $value;
-            } else {
-                $message = "Invalid value {$value} for Accept-Language header, valid values for nation {$data->key} are: "
-                            . implode(', ', $validLangs);
-                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
-            }
-        } else {
-            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "`locale` param or `Accept-Language` header required for Wider Region calendar data");
         }
 
 
