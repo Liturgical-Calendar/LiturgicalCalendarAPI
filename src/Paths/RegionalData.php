@@ -573,7 +573,7 @@ class RegionalData
         } else {
             self::produceErrorResponse(StatusCode::NOT_FOUND, "The resource '{$this->params->key}' requested for deletion (or the relative i18n folder) was not found on this server.");
         }
-        $response->success = "Calendar data \"{$this->params->key}\" deleted successfully.";
+        $response->success = "Calendar data \"{$this->params->category}/{$this->params->key}\" deletion successful.";
         self::produceResponse(json_encode($response));
     }
 
