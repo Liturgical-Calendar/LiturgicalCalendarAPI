@@ -858,7 +858,7 @@ class Calendar
             $propriumdesanctisI18nFile = $propriumdesanctisI18nPath . $locale . ".json";
             if (file_exists($propriumdesanctisI18nFile)) {
                 $rawData = file_get_contents($propriumdesanctisI18nFile);
-                $NAME = json_decode($rawData, true);
+                $i18nData = json_decode($rawData, true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     $message = sprintf(
                         /**translators:
@@ -889,8 +889,8 @@ class Calendar
             if (json_last_error() === JSON_ERROR_NONE) {
                 $this->tempCal[ $missal ] = [];
                 foreach ($PropriumDeSanctis as $row) {
-                    if ($propriumdesanctisI18nPath !== false && $NAME !== null) {
-                        $row->name = $NAME[ $row->event_key ];
+                    if ($propriumdesanctisI18nPath !== false && $i18nData !== null) {
+                        $row->name = $i18nData[ $row->event_key ];
                     }
                     $this->tempCal[ $missal ][ $row->event_key ] = $row;
                 }
@@ -2172,10 +2172,9 @@ class Calendar
                     $this->removeWeekdaysAdventOverridenByMemorials($row->event_key);
                 }
             } else {
-                if (false === $this->checkImmaculateHeartCoincidence($row->date, $row)) {
-                    $this->handleCoincidence($row, RomanMissal::EDITIO_TYPICA_1970);
-                } elseif ($missal === RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008) {
-                    $this->handleCoincidence($row, RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008);
+                // checkImmaculateHeartCoincidence will take care of the case of the Immaculate Heart, reducing both memorials to optional memorials in case of coincidence
+                if (false === $this->checkImmaculateHeartCoincidence($row)) {
+                    $this->handleCoincidence($row, $missal);
                 }
             }
         }
@@ -2347,6 +2346,17 @@ class Calendar
             $coincidingFestivity->event->name,
             $this->CalendarParams->Year
         );
+
+        // Add the celebration to FestivityCollection::suppressedEvents
+        $suppressedEvent = new Festivity(
+            $row->name,
+            $row->date,
+            $row->color,
+            LitFeastType::FIXED,
+            $row->grade,
+            $row->common
+        );
+        $this->Cal->addSuppressedEvent($row->event_key, $suppressedEvent);
     }
 
     /**
@@ -2400,11 +2410,10 @@ class Calendar
      * Checks if the festivity in $row coincides with the Immaculate Heart of Mary.
      * If it does, it reduces both in rank to optional memorials.
      *
-     * @param DateTime $currentFeastDate The date to check for coincidence
      * @param \stdClass $row The database row of the festivity to check
      * @return bool True if the festivity coincides with the Immaculate Heart of Mary, false otherwise
      */
-    private function checkImmaculateHeartCoincidence(DateTime $currentFeastDate, \stdClass $row): bool
+    private function checkImmaculateHeartCoincidence(\stdClass $row): bool
     {
         $coincidence = false;
         //IMMACULATEHEART: in years when the memorial of the Immaculate Heart of Mary coincides with another obligatory memorial,
@@ -2413,11 +2422,11 @@ class Calendar
         $ImmaculateHeart = $this->Cal->getFestivity("ImmaculateHeart");
         if ($ImmaculateHeart !== null) {
             if ((int)$row->grade === LitGrade::MEMORIAL) {
-                if ($currentFeastDate->format('U') === $ImmaculateHeart->date->format('U')) {
+                if ($row->date->format('U') === $ImmaculateHeart->date->format('U')) {
                     $this->Cal->setProperty("ImmaculateHeart", "grade", LitGrade::MEMORIAL_OPT);
                     $festivity = $this->Cal->getFestivity($row->event_key);
                     if ($festivity === null) {
-                        $festivity = new Festivity($row->name, $currentFeastDate, $row->color, LitFeastType::FIXED, LitGrade::MEMORIAL_OPT, $row->common);
+                        $festivity = new Festivity($row->name, $row->date, $row->color, LitFeastType::FIXED, LitGrade::MEMORIAL_OPT, $row->common);
                         $this->Cal->addFestivity($row->event_key, $festivity);
                     } else {
                         $this->Cal->setProperty($row->event_key, "grade", LitGrade::MEMORIAL_OPT);
@@ -3660,45 +3669,49 @@ class Calendar
                         switch ($row->metadata->property) {
                             case "name":
                                 $festivity = $this->Cal->getFestivity($row->festivity->event_key);
-                                $this->Messages[] = sprintf(
-                                    /**translators:
-                                     * 1. Liturgical grade
-                                     * 2. Original name of the liturgical event
-                                     * 3. New name of the liturgical event
-                                     * 4. ID of the national calendar
-                                     * 5. Year from which the name has been changed
-                                     * 6. Requested calendar year
-                                     */
-                                    _('The name of the %1$s \'%2$s\' has been changed to \'%3$s\' in the national calendar \'%4$s\' since the year %5$d, applicable to the year %6$d.'),
-                                    $this->LitGrade->i18n($festivity->grade, false),
-                                    $festivity->name,
-                                    $row->festivity->name,
-                                    $this->CalendarParams->NationalCalendar,
-                                    $row->metadata->since_year,
-                                    $this->CalendarParams->Year
-                                );
-                                $this->Cal->setProperty($row->festivity->event_key, "name", $row->festivity->name);
+                                if (null !== $festivity) {
+                                    $this->Messages[] = sprintf(
+                                        /**translators:
+                                         * 1. Liturgical grade
+                                         * 2. Original name of the liturgical event
+                                         * 3. New name of the liturgical event
+                                         * 4. ID of the national calendar
+                                         * 5. Year from which the name has been changed
+                                         * 6. Requested calendar year
+                                         */
+                                        _('The name of the %1$s \'%2$s\' has been changed to \'%3$s\' in the national calendar \'%4$s\' since the year %5$d, applicable to the year %6$d.'),
+                                        $this->LitGrade->i18n($festivity->grade, false),
+                                        $festivity->name,
+                                        $row->festivity->name,
+                                        $this->CalendarParams->NationalCalendar,
+                                        $row->metadata->since_year,
+                                        $this->CalendarParams->Year
+                                    );
+                                    $this->Cal->setProperty($row->festivity->event_key, "name", $row->festivity->name);
+                                }
                                 break;
                             case "grade":
                                 $festivity = $this->Cal->getFestivity($row->festivity->event_key);
-                                $this->Messages[] = sprintf(
-                                    /**translators:
-                                     * 1. Original liturgical grade
-                                     * 2. Name of the liturgical event
-                                     * 3. New liturgical grade
-                                     * 4. ID of the national calendar
-                                     * 5. Year from which the grade has been changed
-                                     * 6. Requested calendar year
-                                     */
-                                    _('The grade of the %1$s \'%2$s\' has been changed to \'%3$s\' in the national calendar \'%4$s\' since the year %5$d, applicable to the year %6$d.'),
-                                    $this->LitGrade->i18n($festivity->grade, false),
-                                    $festivity->name,
-                                    $this->LitGrade->i18n($row->festivity->grade, false),
-                                    $this->CalendarParams->NationalCalendar,
-                                    $row->metadata->since_year,
-                                    $this->CalendarParams->Year
-                                );
-                                $this->Cal->setProperty($row->festivity->event_key, "grade", $row->festivity->grade);
+                                if (null !== $festivity) {
+                                    $this->Messages[] = sprintf(
+                                        /**translators:
+                                         * 1. Original liturgical grade
+                                         * 2. Name of the liturgical event
+                                         * 3. New liturgical grade
+                                         * 4. ID of the national calendar
+                                         * 5. Year from which the grade has been changed
+                                         * 6. Requested calendar year
+                                         */
+                                        _('The grade of the %1$s \'%2$s\' has been changed to \'%3$s\' in the national calendar \'%4$s\' since the year %5$d, applicable to the year %6$d.'),
+                                        $this->LitGrade->i18n($festivity->grade, false),
+                                        $festivity->name,
+                                        $this->LitGrade->i18n($row->festivity->grade, false),
+                                        $this->CalendarParams->NationalCalendar,
+                                        $row->metadata->since_year,
+                                        $this->CalendarParams->Year
+                                    );
+                                    $this->Cal->setProperty($row->festivity->event_key, "grade", $row->festivity->grade);
+                                }
                                 break;
                         }
                         break;
@@ -3709,26 +3722,65 @@ class Calendar
                             $row->festivity->day . '-' . $row->festivity->month . '-' . $this->CalendarParams->Year,
                             new \DateTimeZone('UTC')
                         );
-                        $this->Messages[] = sprintf(
-                            /**translators:
-                             * 1. Liturgical grade
-                             * 2. Name of the liturgical event
-                             * 3. Original date of the liturgical event
-                             * 4. New date of the liturgical event
-                             * 5. Year from which the date has been changed
-                             * 6. ID of the national calendar
-                             * 7. Requested calendar year
-                             */
-                            _('The %1$s \'%2$s\' has been moved from %3$s to %4$s since the year %5$d in the national calendar \'%6$s\', applicable to the year %7$d.'),
-                            $this->LitGrade->i18n($festivity->grade, false),
-                            $festivity->name,
-                            $this->dayAndMonth->format($festivity->date->format('U')),
-                            $this->dayAndMonth->format($festivityNewDate->format('U')),
-                            $row->metadata->since_year,
-                            $this->CalendarParams->NationalCalendar,
-                            $this->CalendarParams->Year
-                        );
-                        $this->moveFestivityDate($row->festivity->event_key, $festivityNewDate, $row->metadata->reason, $row->metadata->missal);
+                        if (self::dateIsNotSunday($festivityNewDate) && $this->Cal->notInSolemnitiesFeastsOrMemorials($festivityNewDate)) {
+                            if (null === $festivity) {
+                                if ($this->Cal->isSuppressed($row->festivity->event_key)) {
+                                    $festivity = $this->Cal->getSuppressedEventByKey($row->festivity->event_key);
+                                    $this->Messages[] = sprintf(
+                                        /**translators:
+                                         * 1. Liturgical grade
+                                         * 2. Name of the liturgical event
+                                         * 3. Original date of the liturgical event
+                                         * 4. New date of the liturgical event
+                                         * 5. Year from which the date has been changed
+                                         * 6. ID of the national calendar
+                                         * 7. Requested calendar year
+                                         */
+                                        _('The %1$s \'%2$s\' has been moved from %3$s to %4$s since the year %5$d in the national calendar \'%6$s\', applicable to the year %7$d.'),
+                                        $this->LitGrade->i18n($festivity->grade, false),
+                                        $festivity->name,
+                                        $this->dayAndMonth->format($festivity->date->format('U')),
+                                        $this->dayAndMonth->format($festivityNewDate->format('U')),
+                                        $row->metadata->since_year,
+                                        $this->CalendarParams->NationalCalendar,
+                                        $this->CalendarParams->Year
+                                    );
+                                    $this->moveFestivityDate($row->festivity->event_key, $festivityNewDate, $row->metadata->reason, $row->metadata->missal);
+                                } else {
+                                    $this->Messages[] = sprintf(
+                                        /**translators:
+                                         * 1. Name of the liturgical event
+                                         * 2. New date of the liturgical event
+                                         * 3. Year from which the date has been changed
+                                         * 4. ID of the national calendar
+                                         * 5. Requested calendar year
+                                         */
+                                        _('The liturgical event \'%1$s\' has been moved to %2$s since the year %3$d in the national calendar \'%4$s\', but cannot be applied in the year %5$d simply because we could not find the data for it from the Roman Missal events.'),
+                                        $row->name,
+                                        $this->dayAndMonth->format($festivityNewDate->format('U')),
+                                        $row->metadata->since_year,
+                                        $this->CalendarParams->NationalCalendar,
+                                        $this->CalendarParams->Year
+                                    );
+                                }
+                            }
+                        } else {
+                            $this->Messages[] = sprintf(
+                                /**translators:
+                                 * 1. ID of the liturgical event
+                                 * 2. New date of the liturgical event
+                                 * 3. Year from which the date has been changed
+                                 * 4. ID of the national calendar
+                                 * 5. Requested calendar year
+                                 */
+                                _('The liturgical event \'%1$s\' has been moved to %2$s since the year %3$d in the national calendar \'%4$s\', but this could not take place in the year %5$d since the new date %2$s seems to be a Sunday or a festivity of greater rank.'),
+                                $row->festivity->event_key,
+                                $this->dayAndMonth->format($festivityNewDate->format('U')),
+                                $row->metadata->since_year,
+                                $this->CalendarParams->NationalCalendar,
+                                $this->CalendarParams->Year
+                            );
+                        }
                         break;
                 }
             }
@@ -3742,15 +3794,7 @@ class Calendar
      */
     private function applyNationalCalendar(): void
     {
-        //first thing is apply any wider region festivities, such as Patron Saints of the Wider Region (example: Europe)
-        if ($this->WiderRegionData !== null && property_exists($this->WiderRegionData, "litcal")) {
-            $this->handleNationalCalendarRows($this->WiderRegionData->litcal);
-        }
-
-        if ($this->NationalData !== null && property_exists($this->NationalData, "litcal")) {
-            $this->handleNationalCalendarRows($this->NationalData->litcal);
-        }
-
+        // Apply any new celebrations that the National Calendar introduces via it's Missals
         if ($this->NationalData !== null && property_exists($this->NationalData, "metadata") && property_exists($this->NationalData->metadata, "missals")) {
             $this->Messages[] = "Found Missals for region {$this->NationalData->metadata->nation}: " . implode(', ', $this->NationalData->metadata->missals);
             foreach ($this->NationalData->metadata->missals as $missal) {
@@ -3842,6 +3886,17 @@ class Calendar
                 $this->Messages[] = "Did not find any Missals for region " . $this->NationalData->metadata->nation;
             }
         }
+
+        // Apply any actions that modify celebrations from the General Roman Calendar for the Wider Region (such as Europe, or Americas)
+        if ($this->WiderRegionData !== null && property_exists($this->WiderRegionData, "litcal")) {
+            $this->handleNationalCalendarRows($this->WiderRegionData->litcal);
+        }
+
+        // Apply any actions that modify celebrations from the General Roman Calendar for the National Calendar
+        if ($this->NationalData !== null && property_exists($this->NationalData, "litcal")) {
+            $this->handleNationalCalendarRows($this->NationalData->litcal);
+        }
+
     }
 
     /**
@@ -3849,29 +3904,56 @@ class Calendar
      * and they are currently only celebrations from the USA calendar...
      * However the method should work for any calendar
      */
-    private function moveFestivityDate(string $tag, DateTime $newDate, string $inFavorOf, $missal)
+    private function moveFestivityDate(string $event_key, DateTime $newDate, string $inFavorOf, $missal)
     {
-        $festivity = $this->Cal->getFestivity($tag);
-        $newDateStr = $newDate->format('F jS');
+        $festivity = $this->Cal->getFestivity($event_key);
+        $locale = LitLocale::$PRIMARY_LANGUAGE;
+
+        $newDateStr = $this->CalendarParams->Locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+            ? ( $newDate->format('j') . ' ' . LatinUtils::LATIN_MONTHS[ (int)$newDate->format('n') ] )
+            : ( $locale === 'en'
+                ? $newDate->format('F jS')
+                : $this->dayAndMonth->format($newDate->format('U'))
+            );
+
         if (!$this->Cal->inSolemnitiesFeastsOrMemorials($newDate)) {
             if ($festivity !== null) {
-                $oldDateStr = $festivity->date->format('F jS');
-                $this->Cal->moveFestivityDate($tag, $newDate);
+                $oldDateStr = $this->CalendarParams->Locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                    ? ( $festivity->date->format('j') . ' ' . LatinUtils::LATIN_MONTHS[ (int)$festivity->date->format('n') ] )
+                    : ( $locale === 'en'
+                        ? $festivity->date->format('F jS')
+                        : $this->dayAndMonth->format($festivity->date->format('U'))
+                    );
+                $this->Cal->moveFestivityDate($event_key, $festivity->date);
             } else {
                 //if it was suppressed on the original date because of a higher ranking celebration,
                 //we should recreate it on the new date
                 //except in the case of Saint Vincent Deacon when we're dealing with the Roman Missal USA edition,
                 //since the National Day of Prayer will take over the new date
-                if ($tag !== "StVincentDeacon" || $missal !== RomanMissal::USA_EDITION_2011) {
-                    $row = $this->tempCal[ RomanMissal::EDITIO_TYPICA_1970 ][ $tag ];
-                    $festivity = new Festivity($row->name, $newDate, $row->color, LitFeastType::FIXED, $row->grade, $row->common);
-                    $this->Cal->addFestivity($tag, $festivity);
-                    $oldDate = DateTime::createFromFormat(
-                        '!j-n-Y',
-                        $row->day . '-' . $row->month . '-' . $this->CalendarParams->Year,
-                        new \DateTimeZone('UTC')
-                    );
-                    $oldDateStr = $oldDate->format('F jS');
+                if ($event_key !== "StVincentDeacon" || $missal !== RomanMissal::USA_EDITION_2011) {
+                    if ($this->Cal->isSuppressed($event_key)) {
+                        $suppressedEvent = $this->Cal->getSuppressedEventByKey($event_key);
+                        $festivity = new Festivity(
+                            $suppressedEvent->name,
+                            $newDate,
+                            $suppressedEvent->color,
+                            LitFeastType::FIXED,
+                            $suppressedEvent->grade,
+                            $suppressedEvent->common
+                        );
+                        $this->Cal->addFestivity($event_key, $festivity);
+                        // if it was suppressed previously (which it should have been), we should remove from the suppressed events collection
+                        $this->Cal->reinstateEvent($event_key);
+                        $oldDate = $suppressedEvent->date;
+                        $oldDateStr = $this->CalendarParams->Locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                            ? ( $oldDate->format('j') . ' ' . LatinUtils::LATIN_MONTHS[ (int)$oldDate->format('n') ] )
+                            : ( $locale === 'en'
+                                ? $oldDate->format('F jS')
+                                : $this->dayAndMonth->format($oldDate->format('U'))
+                            );
+                    } else {
+                        die("this is strange, {$event_key} is not suppressed? Where is it?");
+                    }
                 }
             }
 
@@ -3888,11 +3970,16 @@ class Calendar
                     $newDateStr,
                     RomanMissal::getName($missal)
                 );
-                //$this->Cal->setProperty( $tag, "name", "[ USA ] " . $festivity->name );
+                //$this->Cal->setProperty( $event_key, "name", "[ USA ] " . $festivity->name );
             }
         } else {
             if ($festivity !== null) {
-                $oldDateStr = $festivity->date->format('F jS');
+                $oldDateStr = $this->CalendarParams->Locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                    ? ( $festivity->date->format('j') . ' ' . LatinUtils::LATIN_MONTHS[ (int)$festivity->date->format('n') ] )
+                    : ( $locale === 'en'
+                        ? $festivity->date->format('F jS')
+                        : $this->dayAndMonth->format($festivity->date->format('U'))
+                    );
                 $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast($newDate);
                 //If the new date is already covered by a Solemnity, Feast or Memorial, then we can't move the celebration, so we simply suppress it
                 $this->Messages[] = sprintf(
@@ -3908,7 +3995,7 @@ class Calendar
                     $coincidingFestivity->event->name,
                     $this->CalendarParams->Year
                 );
-                $this->Cal->removeFestivity($tag);
+                $this->Cal->removeFestivity($event_key);
             }
         }
     }
@@ -3995,7 +4082,7 @@ class Calendar
         //d ) feast of the titular, of the founder, of the principal patron of an Order or Congregation and of the religious province, without prejudice to the prescriptions of n. 4 d
         //e ) other feasts proper to an individual church
         //f ) other feasts inscribed in the calendar of a diocese or of a religious order or congregation
-        //these will be dealt with later when loading Local Calendar Data
+        //these will be dealt with later when loading Local Calendar Data, {@see Calendar::applyNationalCalendarData()}
 
         //9. WEEKDAYS of ADVENT FROM 17 DECEMBER TO 24 DECEMBER INCLUSIVE
         $this->calculateWeekdaysAdvent();

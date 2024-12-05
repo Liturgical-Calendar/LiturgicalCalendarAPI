@@ -599,6 +599,21 @@ class FestivityCollection
     }
 
     /**
+     * Adds a Festivity to the collection of suppressed events.
+     *
+     * This method does not perform any checks and simply adds the festivity to the
+     * suppressedEvents collection with the given key.
+     *
+     * @param string $key The key associated with the festivity.
+     * @param Festivity $festivity The festivity to be added.
+     * @return void
+     */
+    public function addSuppressedEvent(string $key, Festivity $festivity): void
+    {
+        $this->suppressedEvents[ $key ] = $festivity;
+    }
+
+    /**
      * Checks if a given key is associated with a suppressed event.
      *
      * @param string $key The key to check.
@@ -615,9 +630,9 @@ class FestivityCollection
      * @param string $key The key of the suppressed event.
      * @return Festivity The suppressed event.
      */
-    public function getSuppressedEventByKey(string $key): Festivity
+    public function getSuppressedEventByKey(string $key): ?Festivity
     {
-        return $this->suppressedEvents[ $key ];
+        return $this->suppressedEvents[ $key ] ?? null;
     }
 
     /**
@@ -644,16 +659,6 @@ class FestivityCollection
     }
 
     /**
-     * Retrieves the keys of all reinstated events.
-     *
-     * @return array An array of event keys, each representing a reinstated event.
-     */
-    public function getReinstatedKeys(): array
-    {
-        return array_keys($this->reinstatedEvents);
-    }
-
-    /**
      * Retrieves an array of suppressed events.
      *
      * The array contains Festivity objects that were previously in the collection
@@ -672,6 +677,16 @@ class FestivityCollection
             ];
         }
         return $suppressedEvents;
+    }
+
+    /**
+     * Retrieves the keys of all reinstated events.
+     *
+     * @return array An array of event keys, each representing a reinstated event.
+     */
+    public function getReinstatedKeys(): array
+    {
+        return array_keys($this->reinstatedEvents);
     }
 
     /**
@@ -1595,5 +1610,7 @@ class FestivityCollection
         $this->solemnitiesLordBVMCollection       = array_merge($this->getSolemnitiesLordBVMCollection(), $festivities->getSolemnitiesLordBVMCollection());
         $this->sundaysAdventLentEasterCollection  = array_merge($this->getSundaysAdventLentEasterCollection(), $festivities->getSundaysAdventLentEasterCollection());
         $this->festivitiesCollection              = array_merge($this->getFestivitiesCollection(), $festivities->getFestivitiesCollection());
+        $this->suppressedEvents                   = array_merge($this->suppressedEvents, $festivities->suppressedEvents);
+        $this->reinstatedEvents                   = array_merge($this->reinstatedEvents, $festivities->reinstatedEvents);
     }
 }

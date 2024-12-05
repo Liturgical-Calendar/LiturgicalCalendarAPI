@@ -1,5 +1,12 @@
 {
     "version": "2.0.0",
+    "options": {
+        "env": {
+            "APP_PROTOCOL": "http",
+            "APP_HOST": "localhost",
+            "APP_PORT": "8000"
+        }
+    },
     "tasks": [
         {
             "label": "launch-browser",
@@ -8,7 +15,7 @@
                 "command": "${command:workbench.action.terminal.sendSequence}",
                 "args": [
                 {
-                    "text": "start http://localhost:8000\n" // For Windows
+                    "text": "start ${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}\n" // For Windows
                 }
                 ],
                 "problemMatcher": []
@@ -17,19 +24,19 @@
                 "command": "/bin/bash",
                 "args": [
                     "-c",
-                    "if grep -q microsoft /proc/version; then powershell.exe Start-Process http://localhost:8000; else xdg-open http://localhost:8000; fi"
+                    "if grep -q microsoft /proc/version; then powershell.exe Start-Process ${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}; else xdg-open ${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}; fi"
                   ],
                 "problemMatcher": []
             },
             "osx": {
-                "command": "open http://localhost:8000", // For macOS
+                "command": "open ${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}", // For macOS
                 "problemMatcher": []
             }
         },
         {
             "label": "php-server",
             "type": "shell",
-            "command": "PHP_CLI_SERVER_WORKERS=2 php -S localhost:8000",
+            "command": "PHP_CLI_SERVER_WORKERS=2 php -S ${APP_HOST}:${APP_PORT}",
             "group": {
                 "kind": "build",
                 "isDefault": true
