@@ -3687,21 +3687,24 @@ class Calendar
                                 }
                             }
                         } else {
-                            $this->Messages[] = sprintf(
-                                /**translators:
-                                 * 1. ID of the liturgical event
-                                 * 2. New date of the liturgical event
-                                 * 3. Year from which the date has been changed
-                                 * 4. ID of the national calendar
-                                 * 5. Requested calendar year
-                                 */
-                                _('The liturgical event \'%1$s\' has been moved to %2$s since the year %3$d in the national calendar \'%4$s\', but this could not take place in the year %5$d since the new date %2$s seems to be a Sunday or a festivity of greater rank.'),
-                                $row->festivity->event_key,
-                                $this->dayAndMonth->format($festivityNewDate->format('U')),
-                                $row->metadata->since_year,
-                                $this->CalendarParams->NationalCalendar,
-                                $this->CalendarParams->Year
-                            );
+                            if (null !== $festivity) {
+                                $this->Messages[] = sprintf(
+                                    /**translators:
+                                     * 1. ID of the liturgical event
+                                     * 2. New date of the liturgical event
+                                     * 3. Year from which the date has been changed
+                                     * 4. ID of the national calendar
+                                     * 5. Requested calendar year
+                                     */
+                                    _('The liturgical event \'%1$s\' has been moved to %2$s since the year %3$d in the national calendar \'%4$s\', but this could not take place in the year %5$d since the new date %2$s seems to be a Sunday or a festivity of greater rank.'),
+                                    $row->festivity->event_key,
+                                    $this->dayAndMonth->format($festivityNewDate->format('U')),
+                                    $row->metadata->since_year,
+                                    $this->CalendarParams->NationalCalendar,
+                                    $this->CalendarParams->Year
+                                );
+                                $this->Cal->removeFestivity($row->festivity->event_key);
+                            }
                         }
                         break;
                 }
