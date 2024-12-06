@@ -1083,7 +1083,7 @@ class Calendar
                 $i . '-1-' . $this->CalendarParams->Year,
                 new \DateTimeZone('UTC')
             );
-            if (false === self::dateIsSunday($dateTime)) {
+            if (false === self::dateIsSunday($dateTime) && $this->Cal->notInSolemnitiesFeastsOrMemorials($dateTime)) {
                 $nth++;
                 $locale = LitLocale::$PRIMARY_LANGUAGE;
                 $dayOfTheWeek = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
@@ -1135,30 +1135,32 @@ class Calendar
                 $i . '-1-' . $this->CalendarParams->Year,
                 new \DateTimeZone('UTC')
             );
-            $locale = LitLocale::$PRIMARY_LANGUAGE;
-            $dayOfTheWeek = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                ? LatinUtils::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
-                : ( $locale === 'it'
-                    ? $this->dayAndMonth->format($dateTime->format('U'))
-                    : ucfirst($this->dayOfTheWeek->format($dateTime->format('U')))
+            if ($this->Cal->notInSolemnitiesFeastsOrMemorials($dateTime)) {
+                $locale = LitLocale::$PRIMARY_LANGUAGE;
+                $dayOfTheWeek = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                    ? LatinUtils::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
+                    : ( $locale === 'it'
+                        ? $this->dayAndMonth->format($dateTime->format('U'))
+                        : ucfirst($this->dayOfTheWeek->format($dateTime->format('U')))
+                    );
+                $name = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                    ? sprintf("%s temporis Nativitatis", $dayOfTheWeek)
+                    : ( $locale === 'it'
+                        ? sprintf("Feria propria del %s", $dayOfTheWeek)
+                        : sprintf(
+                            /**translators: days after Epiphany when Epiphany falls on Jan 6 (not useful in Italian!) */
+                            _("%s - Christmas Weekday"),
+                            ucfirst($dayOfTheWeek)
+                        )
+                    );
+                $festivity = new Festivity(
+                    $name,
+                    $dateTime,
+                    LitColor::WHITE,
+                    LitFeastType::MOBILE
                 );
-            $name = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                ? sprintf("%s temporis Nativitatis", $dayOfTheWeek)
-                : ( $locale === 'it'
-                    ? sprintf("Feria propria del %s", $dayOfTheWeek)
-                    : sprintf(
-                        /**translators: days after Epiphany when Epiphany falls on Jan 6 (not useful in Italian!) */
-                        _("%s - Christmas Weekday"),
-                        ucfirst($dayOfTheWeek)
-                    )
-                );
-            $festivity = new Festivity(
-                $name,
-                $dateTime,
-                LitColor::WHITE,
-                LitFeastType::MOBILE
-            );
-            $this->Cal->addFestivity("DayAfterEpiphany" . $nth, $festivity);
+                $this->Cal->addFestivity("DayAfterEpiphany" . $nth, $festivity);
+            }
         }
     }
 
