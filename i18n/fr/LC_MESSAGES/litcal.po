@@ -6,13 +6,14 @@
 # Weblate Admin <admin@example.com>, 2024.
 # OpenAI <noreply-mt-openai@weblate.org>, 2024.
 # chrissherren <sherrenchris@icloud.com>, 2024.
+# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2024-12-06 22:48+0000\n"
-"PO-Revision-Date: 2024-12-01 21:18+0000\n"
-"Last-Translator: chrissherren <sherrenchris@icloud.com>\n"
+"PO-Revision-Date: 2024-12-06 23:24+0000\n"
+"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: French <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/fr/>\n"
 "Language: fr\n"
@@ -26,12 +27,13 @@ msgstr ""
 #, php-format
 msgid ""
 "The name of the diocese could not be derived from the diocese ID \"%s\"."
-msgstr ""
+msgstr "Le nom du diocèse n'a pas pu être dérivé de l'ID du diocèse \"%s\"."
 
 #: src/Paths/Calendar.php:654
 #, php-format
 msgid "The Diocesan calendar \"%s\" was not found in the index file."
 msgstr ""
+"Le calendrier diocésain \"%s\" n'a pas été trouvé dans le fichier d'index."
 
 #: src/Paths/Calendar.php:750
 #, php-format
@@ -646,6 +648,8 @@ msgstr ""
 msgid ""
 "Could not find a %1$s property in the %2$s for the National Calendar %3$s."
 msgstr ""
+"Impossible de trouver une propriété %1$s dans le %2$s pour le Calendrier "
+"National %3$s."
 
 #: src/Paths/Calendar.php:3211
 #, fuzzy, php-format
@@ -665,17 +669,15 @@ msgstr ""
 #.  7. National or wider region calendar
 #.
 #: src/Paths/Calendar.php:3261
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
-#| "'%5$s' in the year %6$d."
+#, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, was suppressed by the %4$s "
 "'%5$s' in the year %6$d, however being elevated to a Patronal festivity for "
 "the Calendar %7$s, it has been reinstated."
 msgstr ""
-"Le %1$s '%2$s', habituellement célébré le %3$s, est supprimé par le %4$s "
-"'%5$s' en l'année %6$d."
+"La %1$s '%2$s', habituellement célébrée le %3$s, a été supprimée par le %4$s "
+"'%5$s' en l'année %6$d, mais ayant été élevée à une fête patronale pour le "
+"calendrier %7$s, elle a été rétablie."
 
 #. translators:
 #.  1. Grade of the festivity
@@ -687,17 +689,15 @@ msgstr ""
 #.  7. National or wider region calendar
 #.
 #: src/Paths/Calendar.php:3281
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
-#| "'%5$s' in the year %6$d."
+#, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, was suppressed by the %4$s "
 "'%5$s' in the year %6$d, and though it would be elevated to a Patronal "
 "festivity for the Calendar %7$s, it has not been reinstated."
 msgstr ""
-"Le %1$s '%2$s', habituellement célébré le %3$s, est supprimé par le %4$s "
-"'%5$s' en l'année %6$d."
+"La %1$s '%2$s', habituellement célébrée le %3$s, a été supprimée par le %4$s "
+"'%5$s' en l'année %6$d, et bien qu'elle ait été élevée à une fête patronale "
+"pour le calendrier %7$s, elle n'a pas été rétablie."
 
 #. translators:
 #.  1. Name of the first coinciding Memorial
@@ -753,16 +753,13 @@ msgstr ""
 #.  6. Requested calendar year
 #.
 #: src/Paths/Calendar.php:3572
-#, fuzzy, php-format
-#| msgid ""
-#| "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
-#| "applicable to the year %5$d (%6$s)."
+#, php-format
 msgid ""
 "The name of the %1$s '%2$s' has been changed to '%3$s' in the national "
 "calendar '%4$s' since the year %5$d, applicable to the year %6$d."
 msgstr ""
-"Le nom du %1$s '%2$s' a été changé en %3$s depuis l'année %4$d, applicable à "
-"l'année %5$d (%6$s)."
+"Le nom de %1$s '%2$s' a été changé en '%3$s' dans le calendrier national '%4$"
+"s' depuis l'année %5$d, applicable à l'année %6$d."
 
 #. translators:
 #.  1. Event key of the liturgical event
@@ -772,17 +769,15 @@ msgstr ""
 #.  5. Requested calendar year
 #.
 #: src/Paths/Calendar.php:3590
-#, fuzzy, php-format
-#| msgid ""
-#| "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
-#| "applicable to the year %5$d (%6$s)."
+#, php-format
 msgid ""
 "The name of the celebration '%1$s' has been changed to '%2$s' in the "
 "national calendar '%3$s' since the year %4$d, but could not be applied to "
 "the year %5$d because the celebration was not found."
 msgstr ""
-"Le nom du %1$s '%2$s' a été changé en %3$s depuis l'année %4$d, applicable à "
-"l'année %5$d (%6$s)."
+"Le nom de la célébration '%1$s' a été changé en '%2$s' dans le calendrier "
+"national '%3$s' depuis l'année %4$d, mais n'a pas pu être appliqué à l'année "
+"%5$d car la célébration n'a pas été trouvée."
 
 #. translators:
 #.  1. Original liturgical grade
@@ -793,16 +788,13 @@ msgstr ""
 #.  6. Requested calendar year
 #.
 #: src/Paths/Calendar.php:3611
-#, fuzzy, php-format
-#| msgid ""
-#| "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
-#| "applicable to the year %5$d (%6$s)."
+#, php-format
 msgid ""
 "The grade of the %1$s '%2$s' has been changed to '%3$s' in the national "
 "calendar '%4$s' since the year %5$d, applicable to the year %6$d."
 msgstr ""
-"Le nom du %1$s '%2$s' a été changé en %3$s depuis l'année %4$d, applicable à "
-"l'année %5$d (%6$s)."
+"Le grade de %1$s '%2$s' a été changé en '%3$s' dans le calendrier national "
+"'%4$s' depuis l'année %5$d, applicable à l'année %6$d."
 
 #. translators:
 #.  1. Event key of the liturgical event
@@ -812,17 +804,15 @@ msgstr ""
 #.  5. Requested calendar year
 #.
 #: src/Paths/Calendar.php:3629
-#, fuzzy, php-format
-#| msgid ""
-#| "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
-#| "applicable to the year %5$d (%6$s)."
+#, php-format
 msgid ""
 "The grade of the celebration '%1$s' has been changed to '%2$s' in the "
 "national calendar '%3$s' since the year %4$d, but could not be applied to "
 "the year %5$d because the celebration was not found."
 msgstr ""
-"Le nom du %1$s '%2$s' a été changé en %3$s depuis l'année %4$d, applicable à "
-"l'année %5$d (%6$s)."
+"Le grade de la célébration '%1$s' a été changé en '%2$s' dans le calendrier "
+"national '%3$s' depuis l'année %4$d, mais n'a pas pu être appliqué à l'année "
+"%5$d car la célébration n'a pas été trouvée."
 
 #. translators:
 #.  1. Liturgical grade
@@ -834,16 +824,13 @@ msgstr ""
 #.  7. Requested calendar year
 #.
 #: src/Paths/Calendar.php:3661
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
-#| "applicable to the year %6$d."
+#, php-format
 msgid ""
 "The %1$s '%2$s' has been moved from %3$s to %4$s since the year %5$d in the "
 "national calendar '%6$s', applicable to the year %7$d."
 msgstr ""
-"Le %1$s '%2$s' a été ajouté le %3$s depuis l'année %4$d (%5$s), applicable à "
-"l'année %6$d."
+"Le %1$s '%2$s' a été déplacé de %3$s à %4$s depuis l'année %5$d dans le "
+"calendrier national '%6$s', applicable à l'année %7$d."
 
 #. translators:
 #.  1. Name of the liturgical event
@@ -859,6 +846,10 @@ msgid ""
 "the national calendar '%4$s', but cannot be applied in the year %5$d simply "
 "because we could not find the data for it from the Roman Missal events."
 msgstr ""
+"L'événement liturgique '%1$s' a été déplacé à %2$s depuis l'année %3$d dans "
+"le calendrier national '%4$s', mais ne peut pas être appliqué en l'année %5$"
+"d simplement parce que nous n'avons pas pu trouver les données pour cela "
+"dans les événements du Missel Romain."
 
 #. translators:
 #.  1. ID of the liturgical event
@@ -874,6 +865,10 @@ msgid ""
 "the national calendar '%4$s', but this could not take place in the year %5$d "
 "since the new date %2$s seems to be a Sunday or a festivity of greater rank."
 msgstr ""
+"L'événement liturgique '%1$s' a été déplacé à %2$s depuis l'année %3$d dans "
+"le calendrier national '%4$s', mais cela n'a pas pu avoir lieu en l'année %5$"
+"d car la nouvelle date %2$s semble être un dimanche ou une fête de rang "
+"supérieur."
 
 #. translators: Name of the Roman Missal
 #: src/Paths/Calendar.php:3734
@@ -1243,7 +1238,7 @@ msgstr "jour de la semaine"
 #. translators: liturgical rank 'WEEKDAY' in abbreviated form
 #: src/Enum/LitGrade.php:152
 msgid "w"
-msgstr ""
+msgstr "js"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:157
@@ -1253,7 +1248,7 @@ msgstr "commémoration"
 #. translators: liturgical rank 'COMMEMORATION' in abbreviated form
 #: src/Enum/LitGrade.php:159
 msgid "m*"
-msgstr ""
+msgstr "m*"
 
 #. translators: liturgical rank. Keep lowercsase
 #: src/Enum/LitGrade.php:164
@@ -1263,7 +1258,7 @@ msgstr "mémoire facultative"
 #. translators: liturgical rank 'OPTIONAL MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:166
 msgid "m"
-msgstr ""
+msgstr "mf"
 
 #. translators: liturgical rank. Keep Capitalized
 #: src/Enum/LitGrade.php:171
@@ -1273,7 +1268,7 @@ msgstr "Mémoire"
 #. translators: liturgical rank 'MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:173
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:178
@@ -1283,7 +1278,7 @@ msgstr "FÊTE"
 #. translators: liturgical rank 'FEAST' in abbreviated form
 #: src/Enum/LitGrade.php:180
 msgid "F"
-msgstr ""
+msgstr "F"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:185
@@ -1293,7 +1288,7 @@ msgstr "FÊTE DU SEIGNEUR"
 #. translators: liturgical rank 'FEAST OF THE LORD' in abbreviated form
 #: src/Enum/LitGrade.php:187
 msgid "F✝"
-msgstr ""
+msgstr "F✝"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:192
@@ -1303,7 +1298,7 @@ msgstr "SOLENNITÉ"
 #. translators: liturgical rank 'SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:194
 msgid "S"
-msgstr ""
+msgstr "S"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:199
@@ -1313,7 +1308,7 @@ msgstr "célébration qui prime sur les solennités"
 #. translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:201
 msgid "S✝"
-msgstr ""
+msgstr "S✝"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:25
