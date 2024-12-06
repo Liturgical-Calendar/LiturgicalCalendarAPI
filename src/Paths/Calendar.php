@@ -1052,7 +1052,6 @@ class Calendar
                 if (self::dateIsSunday($dateTime)) {
                     $this->PropriumDeTempore[ "Epiphany" ][ "date" ] = $dateTime;
                     $this->createPropriumDeTemporeFestivityByKey("Epiphany");
-
                 } else {
                     //otherwise find the Sunday following Jan 2nd
                     $SundayOfEpiphany = $dateTime->modify('next Sunday');
