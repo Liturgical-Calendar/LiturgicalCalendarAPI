@@ -1022,11 +1022,12 @@ class Calendar
         $this->PropriumDeTempore[ "Christmas" ][ "date" ]   = DateTime::createFromFormat('!j-n-Y', '25-12-' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
         $this->createPropriumDeTemporeFestivityByKey("Christmas");
 
-        // Calculate Epiphany
+        // Calculate Epiphany (and the "Second Sunday of Christmas" if applicable)
         switch ($this->CalendarParams->Epiphany) {
             case Epiphany::JAN6:
                 $this->PropriumDeTempore[ "Epiphany" ][ "date" ] = DateTime::createFromFormat('!j-n-Y', '6-1-' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
                 $this->createPropriumDeTemporeFestivityByKey("Epiphany");
+
                 // if a Sunday falls between Jan. 2 and Jan. 5, it is called the "Second Sunday of Christmas"
                 for ($i = 2; $i < 6; $i++) {
                     $dateTime = DateTime::createFromFormat(
@@ -1063,12 +1064,12 @@ class Calendar
     }
 
     /**
-     * When Epiphany is Jan 6th, if a Sunday occurs on a day from Jan. 2 through Jan. 5, it is called the "Second Sunday of Christmas";
-     *   in the case of Epiphany on a Sunday, that Sunday will be Epiphany itself.
-     * Weekdays from Jan. 2 through Jan. 5 are called "*day before Epiphany" (in which calendar? England?)
+     * Weekdays from Jan. 2 to the day before Epiphany are called "*day before Epiphany" (in which calendar? England?)
      * Actually in Latin they are "Feria II temporis Nativitatis",
      *  in English "Monday - Christmas Weekday",
      *  in Italian "Feria propria del 3 gennaio" etc.
+     *
+     * We have to make sure to skip any Sunday that might fall between Jan. 2 and Epiphany when Epiphany is on Jan 6
      *
      * @return void
      */
@@ -3807,7 +3808,7 @@ class Calendar
             }
         }
 
-         // Apply any actions that modify celebrations from the General Roman Calendar for the Wider Region (such as Europe, or Americas)
+        // Apply any actions that modify celebrations from the General Roman Calendar for the Wider Region (such as Europe, or Americas)
         if ($this->WiderRegionData !== null && property_exists($this->WiderRegionData, "litcal")) {
             $this->handleNationalCalendarRows($this->WiderRegionData->litcal);
         }
