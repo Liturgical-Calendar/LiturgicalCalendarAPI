@@ -1008,37 +1008,83 @@ class Calendar
         $this->createPropriumDeTemporeFestivityByKey("Easter");
     }
 
+
     /**
-     * Calculates the dates for Epiphany and creates the corresponding Festivities in the calendar
+     * Calculates the dates for Christmas and Epiphany and creates the corresponding Festivities in the calendar
      *
-     * @var DateTime|false $dateTime
+     * Christmas is a fixed date, but Epiphany depends on the calendar settings (JAN6 or SUNDAY_JAN2_JAN8).
      *
      * @return void
      */
-    private function calculateEpiphanyJan6(): void
+    private function calculateChristmasEpiphany(): void
     {
-        $this->PropriumDeTempore[ "Epiphany" ][ "date" ] = DateTime::createFromFormat('!j-n-Y', '6-1-' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
-        $this->createPropriumDeTemporeFestivityByKey("Epiphany");
-        //If a Sunday occurs on a day from Jan. 2 through Jan. 5, it is called the "Second Sunday of Christmas"
-        //Weekdays from Jan. 2 through Jan. 5 are called "*day before Epiphany" (in which calendar? England?)
-        //Actually in Latin they are "Feria II temporis Nativitatis",
-        // in English "Monday - Christmas Weekday",
-        // in Italian "Feria propria del 3 gennaio" etc.
+        // Calculate Christmas
+        $this->PropriumDeTempore[ "Christmas" ][ "date" ]   = DateTime::createFromFormat('!j-n-Y', '25-12-' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
+        $this->createPropriumDeTemporeFestivityByKey("Christmas");
+
+        // Calculate Epiphany (and the "Second Sunday of Christmas" if applicable)
+        switch ($this->CalendarParams->Epiphany) {
+            case Epiphany::JAN6:
+                $this->PropriumDeTempore[ "Epiphany" ][ "date" ] = DateTime::createFromFormat('!j-n-Y', '6-1-' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
+                $this->createPropriumDeTemporeFestivityByKey("Epiphany");
+
+                // if a Sunday falls between Jan. 2 and Jan. 5, it is called the "Second Sunday of Christmas"
+                for ($i = 2; $i < 6; $i++) {
+                    $dateTime = DateTime::createFromFormat(
+                        '!j-n-Y',
+                        $i . '-1-' . $this->CalendarParams->Year,
+                        new \DateTimeZone('UTC')
+                    );
+                    if (self::dateIsSunday($dateTime)) {
+                        $this->PropriumDeTempore[ "Christmas2" ][ "date" ] = $dateTime;
+                        $this->createPropriumDeTemporeFestivityByKey("Christmas2");
+                        break;
+                    }
+                }
+                break;
+            case Epiphany::SUNDAY_JAN2_JAN8:
+                //If January 2nd is a Sunday, then go with Jan 2nd
+                $dateTime = DateTime::createFromFormat(
+                    '!j-n-Y',
+                    '2-1-' . $this->CalendarParams->Year,
+                    new \DateTimeZone('UTC')
+                );
+                if (self::dateIsSunday($dateTime)) {
+                    $this->PropriumDeTempore[ "Epiphany" ][ "date" ] = $dateTime;
+                    $this->createPropriumDeTemporeFestivityByKey("Epiphany");
+                } else {
+                    //otherwise find the Sunday following Jan 2nd
+                    $SundayOfEpiphany = $dateTime->modify('next Sunday');
+                    $this->PropriumDeTempore[ "Epiphany" ][ "date" ] = $SundayOfEpiphany;
+                    $this->createPropriumDeTemporeFestivityByKey("Epiphany");
+                }
+                break;
+        }
+    }
+
+    /**
+     * Weekdays from Jan. 2 to the day before Epiphany are called "*day before Epiphany" (in which calendar? England?)
+     * Actually in Latin they are "Feria II temporis Nativitatis",
+     *  in English "Monday - Christmas Weekday",
+     *  in Italian "Feria propria del 3 gennaio" etc.
+     *
+     * We have to make sure to skip any Sunday that might fall between Jan. 2 and Epiphany when Epiphany is on Jan 6
+     *
+     * @return void
+     */
+    private function calculateChristmasWeekdaysThroughEpiphany(): void
+    {
         $nth = 0;
-        for ($i = 2; $i <= 5; $i++) {
+        $Epiphany = $this->Cal->getFestivity("Epiphany");
+        $DayOfEpiphany = (int)$Epiphany->date->format('j');
+        for ($i = 2; $i < $DayOfEpiphany; $i++) {
             $dateTime = DateTime::createFromFormat(
                 '!j-n-Y',
                 $i . '-1-' . $this->CalendarParams->Year,
                 new \DateTimeZone('UTC')
             );
-            if (self::dateIsSunday($dateTime)) {
-                $this->PropriumDeTempore[ "Christmas2" ][ "date" ] = $dateTime;
-                $this->createPropriumDeTemporeFestivityByKey("Christmas2");
-            } else {
+            if (false === self::dateIsSunday($dateTime) && $this->Cal->notInSolemnitiesFeastsOrMemorials($dateTime)) {
                 $nth++;
-                //$nthStr = $this->CalendarParams->Locale === LitLocale::LATIN
-                // ? LatinUtils::LATIN_ORDINAL[ $nth ]
-                // : $this->formatter->format( $nth );
                 $locale = LitLocale::$PRIMARY_LANGUAGE;
                 $dayOfTheWeek = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
                     ? LatinUtils::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
@@ -1051,7 +1097,7 @@ class Calendar
                     : ( $locale === 'it'
                         ? sprintf("Feria propria del %s", $dayOfTheWeek)
                         : sprintf(
-                            /**translators: days before Epiphany when Epiphany falls on Jan 6 (not useful in Italian!) */
+                            /**translators: days before Epiphany (not useful in Italian!) */
                             _("%s - Christmas Weekday"),
                             ucfirst($dayOfTheWeek)
                         )
@@ -1065,29 +1111,31 @@ class Calendar
                 $this->Cal->addFestivity("DayBeforeEpiphany" . $nth, $festivity);
             }
         }
+    }
 
-        //Weekdays from Jan. 7 until the following Sunday are called "*day after Epiphany" (in which calendar? England?)
-        //Actually in Latin they are still "Feria II temporis Nativitatis",
-        // in English "Monday - Christmas Weekday",
-        // in Italian "Feria propria del 3 gennaio" etc.
-        $SundayAfterEpiphany = (int)DateTime::createFromFormat(
-            '!j-n-Y',
-            '6-1-' . $this->CalendarParams->Year,
-            new \DateTimeZone('UTC')
-        )->modify('next Sunday')->format('j');
-        //this means January 7th, it does not refer to the day of the week which is obviously Sunday in this case
-        if ($SundayAfterEpiphany !== 7) {
-            $nth = 0;
-            for ($i = 7; $i < $SundayAfterEpiphany; $i++) {
-                $nth++;
-                //$nthStr = $this->CalendarParams->Locale === LitLocale::LATIN
-                // ? LatinUtils::LATIN_ORDINAL[ $nth ]
-                // : $this->formatter->format( $nth );
-                $dateTime = DateTime::createFromFormat(
-                    '!j-n-Y',
-                    $i . '-1-' . $this->CalendarParams->Year,
-                    new \DateTimeZone('UTC')
-                );
+    /**
+     * Weekdays after Epiphany until the Baptism of the Lord are called "*day after Epiphany" (in which calendar? England?)
+     * Actually in Latin they are still "Feria II temporis Nativitatis",
+     *   in English "Monday - Christmas Weekday",
+     *   in Italian "Feria propria del 3 gennaio" etc.
+     *
+     * @return void
+     */
+    private function calculateChristmasWeekdaysAfterEpiphany(): void
+    {
+        $Epiphany = $this->Cal->getFestivity("Epiphany");
+        $DayOfEpiphany = (int)$Epiphany->date->format('j');
+        $BaptismLord = $this->Cal->getFestivity("BaptismLord");
+        $DayOfBaptismLord = (int)$BaptismLord->date->format('j');
+        $nth = 0;
+        for ($i = $DayOfEpiphany + 1; $i < $DayOfBaptismLord; $i++) {
+            $nth++;
+            $dateTime = DateTime::createFromFormat(
+                '!j-n-Y',
+                $i . '-1-' . $this->CalendarParams->Year,
+                new \DateTimeZone('UTC')
+            );
+            if ($this->Cal->notInSolemnitiesFeastsOrMemorials($dateTime)) {
                 $locale = LitLocale::$PRIMARY_LANGUAGE;
                 $dayOfTheWeek = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
                     ? LatinUtils::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
@@ -1095,9 +1143,6 @@ class Calendar
                         ? $this->dayAndMonth->format($dateTime->format('U'))
                         : ucfirst($this->dayOfTheWeek->format($dateTime->format('U')))
                     );
-                //$name = $locale === LitLocale::LATIN
-                // ? sprintf( "Dies %s post Epiphaniam", $nthStr )
-                // : sprintf( _( "%s day after Epiphany" ), ucfirst( $nthStr ) );
                 $name = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
                     ? sprintf("%s temporis Nativitatis", $dayOfTheWeek)
                     : ( $locale === 'it'
@@ -1116,161 +1161,6 @@ class Calendar
                 );
                 $this->Cal->addFestivity("DayAfterEpiphany" . $nth, $festivity);
             }
-        }
-    }
-
-    /**
-     * Calculates the dates for Epiphany and creates the corresponding Festivities in the calendar
-     *
-     * If January 2nd is a Sunday, then go with Jan 2nd
-     * otherwise find the Sunday following Jan 2nd
-     *
-     * Weekdays from Jan. 2 until the following Sunday are called "*day before Epiphany"
-     * (in which calendar? England?)
-     * Actually in Latin they are "Feria II temporis Nativitatis",
-     * in English "Monday - Christmas Weekday",
-     * in Italian "Feria propria del 3 gennaio" etc.
-     *
-     * Weekdays from the Sunday of Epiphany until Baptism of the Lord are called "*day after Epiphany"
-     * (in which calendar? England?)
-     * Actually in Latin they are still "Feria II temporis Nativitatis",
-     * in English "Monday - Christmas Weekday",
-     * in Italian "Feria propria del 3 gennaio" etc.
-     *
-     * @return void
-     */
-    private function calculateEpiphanySunday(): void
-    {
-        //If January 2nd is a Sunday, then go with Jan 2nd
-        $dateTime = DateTime::createFromFormat(
-            '!j-n-Y',
-            '2-1-' . $this->CalendarParams->Year,
-            new \DateTimeZone('UTC')
-        );
-        if (self::dateIsSunday($dateTime)) {
-            $this->PropriumDeTempore[ "Epiphany" ][ "date" ] = $dateTime;
-            $Epiphany = $this->createPropriumDeTemporeFestivityByKey("Epiphany");
-
-            $DayOfEpiphany = (int)$Epiphany->date->format('j');
-            $SundayAfterEpiphany =  (int)DateTime::createFromFormat(
-                '!j-n-Y',
-                '2-1-' . $this->CalendarParams->Year,
-                new \DateTimeZone('UTC')
-            )->modify('next Sunday')->format('j');
-        } else {
-            //otherwise find the Sunday following Jan 2nd
-            $SundayOfEpiphany = $dateTime->modify('next Sunday');
-            $this->PropriumDeTempore[ "Epiphany" ][ "date" ] = $SundayOfEpiphany;
-            $Epiphany = $this->createPropriumDeTemporeFestivityByKey("Epiphany");
-
-            //Weekdays from Jan. 2 until the following Sunday are called "*day before Epiphany"
-            // (in which calendar? England?)
-            //Actually in Latin they are "Feria II temporis Nativitatis",
-            // in English "Monday - Christmas Weekday",
-            // in Italian "Feria propria del 3 gennaio" etc.
-            $DayOfEpiphany = (int)$SundayOfEpiphany->format('j');
-            $SundayAfterEpiphany = (int)DateTime::createFromFormat(
-                '!j-n-Y',
-                '2-1-' . $this->CalendarParams->Year,
-                new \DateTimeZone('UTC')
-            )->modify('next Sunday')->modify('next Sunday')->format('j');
-            $nth = 0;
-            for ($i = 2; $i < $DayOfEpiphany - 1; $i++) {
-                $nth++;
-                //$nthStr = $this->CalendarParams->Locale === LitLocale::LATIN
-                // ? LatinUtils::LATIN_ORDINAL[ $nth ]
-                // : $this->formatter->format( $nth );
-                $dateTime = DateTime::createFromFormat(
-                    '!j-n-Y',
-                    $i . '-1-' . $this->CalendarParams->Year,
-                    new \DateTimeZone('UTC')
-                );
-                $locale = LitLocale::$PRIMARY_LANGUAGE;
-                $dayOfTheWeek = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                    ? LatinUtils::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
-                    : ( $locale === 'it'
-                        ? $this->dayAndMonth->format($dateTime->format('U'))
-                        : ucfirst($this->dayOfTheWeek->format($dateTime->format('U')))
-                    );
-                //$name = $locale === LitLocale::LATIN
-                // ? sprintf( "Dies %s ante Epiphaniam", $nthStr )
-                // : sprintf( _( "%s day before Epiphany" ), ucfirst( $nthStr ) );
-                $name = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                    ? sprintf("%s temporis Nativitatis", $dayOfTheWeek)
-                    : ( $locale === 'IT'
-                        ? sprintf("Feria propria del %s", $dayOfTheWeek)
-                        : sprintf(
-                            /**translators: days before Epiphany when Epiphany is on a Sunday (not useful in Italian!) */
-                            _("%s - Christmas Weekday"),
-                            ucfirst($dayOfTheWeek)
-                        )
-                    );
-                $festivity = new Festivity($name, $dateTime, LitColor::WHITE, LitFeastType::MOBILE);
-                $this->Cal->addFestivity("DayBeforeEpiphany" . $nth, $festivity);
-            }
-        }
-        //Weekdays from the Sunday of Epiphany until Baptism of the Lord are called "*day after Epiphany"
-        // (in which calendar? England?)
-        //Actually in Latin they are still "Feria II temporis Nativitatis",
-        // in English "Monday - Christmas Weekday",
-        // in Italian "Feria propria del 3 gennaio" ecc.
-        $nth = 0;
-        for ($i = $DayOfEpiphany + 1; $i < $SundayAfterEpiphany - 1; $i++) {
-            $nth++;
-            //$nthStr = $this->CalendarParams->Locale === LitLocale::LATIN
-            // ? LatinUtils::LATIN_ORDINAL[ $nth ]
-            // : $this->formatter->format( $nth );
-            $dateTime = DateTime::createFromFormat(
-                '!j-n-Y',
-                $i . '-1-' . $this->CalendarParams->Year,
-                new \DateTimeZone('UTC')
-            );
-            $locale = LitLocale::$PRIMARY_LANGUAGE;
-            $dayOfTheWeek = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                ? LatinUtils::LATIN_DAYOFTHEWEEK[ $dateTime->format('w') ]
-                : ( $locale === 'it'
-                    ? $this->dayAndMonth->format($dateTime->format('U'))
-                    : ucfirst($this->dayOfTheWeek->format($dateTime->format('U')))
-                );
-            //$name = $locale === LitLocale::LATIN
-            // ? sprintf( "Dies %s post Epiphaniam", $nthStr )
-            // : sprintf( _( "%s day after Epiphany" ), ucfirst( $nthStr ) );
-            $name = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                ? sprintf("%s temporis Nativitatis", $dayOfTheWeek)
-                : ( $locale === 'it'
-                    ? sprintf("Feria propria del %s", $dayOfTheWeek)
-                    : sprintf(
-                        /**translators: days after Epiphany when Epiphany is on a Sunday (not useful in Italian!) */
-                        _("%s - Christmas Weekday"),
-                        ucfirst($dayOfTheWeek)
-                    )
-                );
-            $festivity = new Festivity(
-                $name,
-                $dateTime,
-                LitColor::WHITE,
-                LitFeastType::MOBILE
-            );
-            $this->Cal->addFestivity("DayAfterEpiphany" . $nth, $festivity);
-        }
-    }
-
-    /**
-     * Calculates the dates for Christmas and Epiphany and creates the corresponding Festivities in the calendar
-     *
-     * Christmas is fixed date, so just create a Festivity
-     * Epiphany depends on the calendar settings, so call either calculateEpiphanyJan6 or calculateEpiphanySunday
-     *
-     * @return void
-     */
-    private function calculateChristmasEpiphany(): void
-    {
-        $this->PropriumDeTempore[ "Christmas" ][ "date" ]   = DateTime::createFromFormat('!j-n-Y', '25-12-' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
-        $this->createPropriumDeTemporeFestivityByKey("Christmas");
-        if ($this->CalendarParams->Epiphany === Epiphany::JAN6) {
-            $this->calculateEpiphanyJan6();
-        } elseif ($this->CalendarParams->Epiphany === Epiphany::SUNDAY_JAN2_JAN8) {
-            $this->calculateEpiphanySunday();
         }
     }
 
@@ -2410,7 +2300,7 @@ class Calendar
      * Checks if the festivity in $row coincides with the Immaculate Heart of Mary.
      * If it does, it reduces both in rank to optional memorials.
      *
-     * @param \stdClass $row The database row of the festivity to check
+     * @param \stdClass $row The row of data of the festivity to check
      * @return bool True if the festivity coincides with the Immaculate Heart of Mary, false otherwise
      */
     private function checkImmaculateHeartCoincidence(\stdClass $row): bool
@@ -3107,7 +2997,7 @@ class Calendar
     //13. Weekdays of Advent up until Dec. 16 included ( already calculated and defined together with weekdays 17 Dec. - 24 Dec., @see calculateWeekdaysAdvent() )
     //    Weekdays of Christmas season from 2 Jan. until the Saturday after Epiphany (@see calculateWeekdaysChristmasOctave())
     //    Weekdays of the Easter season, from the Monday after the Octave of Easter to the Saturday before Pentecost
-    private function calculateWeekdaysMajorSeasons(): void
+    private function calculateWeekdaysEaster(): void
     {
         $DoMEaster = $this->Cal->getFestivity("Easter")->date->format('j');      //day of the month of Easter
         $MonthEaster = $this->Cal->getFestivity("Easter")->date->format('n');    //month of Easter
@@ -3688,6 +3578,22 @@ class Calendar
                                         $this->CalendarParams->Year
                                     );
                                     $this->Cal->setProperty($row->festivity->event_key, "name", $row->festivity->name);
+                                } else {
+                                    $this->Messages[] = sprintf(
+                                        /**translators:
+                                         * 1. Event key of the liturgical event
+                                         * 2. New name of the liturgical event
+                                         * 3. ID of the national calendar
+                                         * 4. Year from which the name has been changed
+                                         * 5. Requested calendar year
+                                         */
+                                        _('The name of the celebration \'%1$s\' has been changed to \'%2$s\' in the national calendar \'%3$s\' since the year %4$d, but could not be applied to the year %5$d because the celebration was not found.'),
+                                        $row->festivity->event_key,
+                                        $row->festivity->name,
+                                        $this->CalendarParams->NationalCalendar,
+                                        $row->metadata->since_year,
+                                        $this->CalendarParams->Year
+                                    );
                                 }
                                 break;
                             case "grade":
@@ -3711,6 +3617,22 @@ class Calendar
                                         $this->CalendarParams->Year
                                     );
                                     $this->Cal->setProperty($row->festivity->event_key, "grade", $row->festivity->grade);
+                                } else {
+                                    $this->Messages[] = sprintf(
+                                        /**translators:
+                                         * 1. Event key of the liturgical event
+                                         * 2. New name of the liturgical event
+                                         * 3. ID of the national calendar
+                                         * 4. Year from which the name has been changed
+                                         * 5. Requested calendar year
+                                         */
+                                        _('The grade of the celebration \'%1$s\' has been changed to \'%2$s\' in the national calendar \'%3$s\' since the year %4$d, but could not be applied to the year %5$d because the celebration was not found.'),
+                                        $row->festivity->event_key,
+                                        $this->LitGrade->i18n($row->festivity->grade, false),
+                                        $this->CalendarParams->NationalCalendar,
+                                        $row->metadata->since_year,
+                                        $this->CalendarParams->Year
+                                    );
                                 }
                                 break;
                         }
@@ -3900,9 +3822,15 @@ class Calendar
     }
 
     /**
-     * So far, the celebrations being transferred are all originally from the 1970 Editio Typica
-     * and they are currently only celebrations from the USA calendar...
-     * However the method should work for any calendar
+     * Moves a festivity to a new date in the calendar. If the festivity doesn't exist at the original date
+     * (because it was suppressed by a higher-ranking celebration), it will be recreated on the new date.
+     * However, if the new date is already covered by a Solemnity, Feast or Memorial, the festivity will be
+     * suppressed instead.
+     *
+     * @param string $event_key The festivity key to move
+     * @param DateTime $newDate The new date to move the festivity to
+     * @param string $inFavorOf The name of the festivity that is taking over the original date
+     * @param string $missal The Roman Missal edition to use
      */
     private function moveFestivityDate(string $event_key, DateTime $newDate, string $inFavorOf, $missal)
     {
@@ -4138,7 +4066,9 @@ class Calendar
         //    Weekdays of Christmas season from 2 Jan. until the Saturday after Epiphany
         //    Weekdays of the Easter season, from the Monday after the Octave of Easter to the Saturday before Pentecost
         //    Weekdays of Ordinary time
-        $this->calculateWeekdaysMajorSeasons();
+        $this->calculateChristmasWeekdaysThroughEpiphany();
+        $this->calculateChristmasWeekdaysAfterEpiphany();
+        $this->calculateWeekdaysEaster();
         $this->calculateWeekdaysOrdinaryTime();
 
         //15. On Saturdays in Ordinary Time when there is no obligatory memorial, an optional memorial of the Blessed Virgin Mary is allowed.
