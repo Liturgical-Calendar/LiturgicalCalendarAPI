@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-06 22:48+0000\n"
+"POT-Creation-Date: 2024-12-08 04:18+0000\n"
 "PO-Revision-Date: 2024-10-03 11:32+0000\n"
 "Last-Translator: Milan Šalka <salka.milan@googlemail.com>\n"
 "Language-Team: Slovak <https://translate.johnromanodorazio.com/projects/"
@@ -181,8 +181,8 @@ msgstr "sobota pred Kvetnou nedeľou"
 #: src/Paths/Calendar.php:2054 src/Paths/Calendar.php:2268
 #: src/Paths/Calendar.php:2336 src/Paths/Calendar.php:2680
 #: src/Paths/Calendar.php:2750 src/Paths/Calendar.php:2789
-#: src/Paths/Calendar.php:2918 src/Paths/Calendar.php:2933
-#: src/Paths/Calendar.php:2950 src/Paths/Calendar.php:2991
+#: src/Paths/Calendar.php:2921 src/Paths/Calendar.php:2936
+#: src/Paths/Calendar.php:2953 src/Paths/Calendar.php:2994
 #: src/FestivityCollection.php:920
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Dekrét Kongregácie pre Boží kult"
@@ -302,7 +302,7 @@ msgstr "po Popolcovej strede"
 #.  6. Requested calendar year
 #.
 #: src/Paths/Calendar.php:1993 src/Paths/Calendar.php:2477
-#: src/Paths/Calendar.php:2761 src/Paths/Calendar.php:3505
+#: src/Paths/Calendar.php:2761 src/Paths/Calendar.php:3508
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
@@ -405,7 +405,7 @@ msgid "after"
 msgstr "po"
 
 #. translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to
-#: src/Paths/Calendar.php:2383 src/Paths/Calendar.php:4156
+#: src/Paths/Calendar.php:2383 src/Paths/Calendar.php:4159
 #, php-format
 msgid ""
 "Cannot create mobile festivity '%1$s': can only be relative to festivity "
@@ -415,7 +415,7 @@ msgstr ""
 "slávnosti s kľúčom '%2$s' pomocou kľúčových slov %3$s"
 
 #. translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to
-#: src/Paths/Calendar.php:2400 src/Paths/Calendar.php:4138
+#: src/Paths/Calendar.php:2400 src/Paths/Calendar.php:4141
 #, php-format
 msgid ""
 "Cannot create mobile festivity '%1$s' relative to festivity with key '%2$s'"
@@ -423,7 +423,7 @@ msgstr ""
 "Nemožno vytvoriť mobilnú slávnosť '%1$s' vzhľadom na slávnosť s kľúčom '%2$s'"
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created 2. list of properties
-#: src/Paths/Calendar.php:2408 src/Paths/Calendar.php:4127
+#: src/Paths/Calendar.php:2408 src/Paths/Calendar.php:4130
 #, php-format
 msgid ""
 "Cannot create mobile festivity '%1$s': when the 'strtotime' property is an "
@@ -433,7 +433,7 @@ msgstr ""
 "objektom, musí mať vlastnosti %2$s"
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created
-#: src/Paths/Calendar.php:2428 src/Paths/Calendar.php:4260
+#: src/Paths/Calendar.php:2428 src/Paths/Calendar.php:4263
 #, php-format
 msgid ""
 "Cannot create mobile festivity '%1$s': 'strtotime' property must be either "
@@ -558,7 +558,7 @@ msgstr ""
 "%7$d (%8$s)."
 
 #. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
-#: src/Paths/Calendar.php:2915
+#: src/Paths/Calendar.php:2918
 #, php-format
 msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
@@ -568,7 +568,7 @@ msgstr ""
 "roku 2002 (%2$s), platná pre rok %3$d."
 
 #. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
-#: src/Paths/Calendar.php:2930
+#: src/Paths/Calendar.php:2933
 #, php-format
 msgid ""
 "The optional memorial '%1$s', which would have been superseded this year by "
@@ -579,7 +579,7 @@ msgstr ""
 "slávnosťou, keby bola 12. decembra, bola však od roku 2002 (%2$s) presunutá "
 "na 12. augusta, platná pre rok %3$d."
 
-#: src/Paths/Calendar.php:2947
+#: src/Paths/Calendar.php:2950
 #, php-format
 msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
@@ -591,7 +591,7 @@ msgstr ""
 "nedeľou, slávnosťou alebo sviatkom '%4$s'."
 
 #. translators: 1: Festivity name, 2: Source of the information
-#: src/Paths/Calendar.php:2988
+#: src/Paths/Calendar.php:2991
 #, php-format
 msgid ""
 "The Feast '%1$s' would have been suppressed this year ( 2009 ) since it "
@@ -603,33 +603,33 @@ msgstr ""
 "avšak keďže je Rok apoštola Pavla, podľa %2$s bol obnovený, aby miestne "
 "cirkvi mohli voliteľne sláviť pamätný deň."
 
-#: src/Paths/Calendar.php:3023
+#: src/Paths/Calendar.php:3026
 #, php-format
 msgid "of the %s Week of Easter"
 msgstr "týždňa Veľkej noci %s"
 
-#: src/Paths/Calendar.php:3068 src/Paths/Calendar.php:3109
+#: src/Paths/Calendar.php:3071 src/Paths/Calendar.php:3112
 #, php-format
 msgid "of the %s Week of Ordinary Time"
 msgstr "týždňa v období cez rok %s"
 
-#: src/Paths/Calendar.php:3135
+#: src/Paths/Calendar.php:3138
 msgid "Saturday Memorial of the Blessed Virgin Mary"
 msgstr "Sobotná pamiatka Preblahoslavenej Panny Márie"
 
-#: src/Paths/Calendar.php:3158
+#: src/Paths/Calendar.php:3161
 #, php-format
 msgid "Error retrieving and decoding Wider Region data from file %s."
 msgstr ""
 "Chyba pri načítaní a dekódovaní údajov z širšieho regiónu zo súboru %s."
 
-#: src/Paths/Calendar.php:3203
+#: src/Paths/Calendar.php:3206
 #, php-format
 msgid ""
 "Could not find a %1$s property in the %2$s for the National Calendar %3$s."
 msgstr ""
 
-#: src/Paths/Calendar.php:3211
+#: src/Paths/Calendar.php:3214
 #, fuzzy, php-format
 #| msgid "Error retrieving and decoding National data from file %s."
 msgid "Error retrieving and decoding National Calendar data from file %s."
@@ -644,7 +644,7 @@ msgstr "Chyba pri načítaní a dekódovaní národných údajov zo súboru %s."
 #.  6. Requested calendar year
 #.  7. National or wider region calendar
 #.
-#: src/Paths/Calendar.php:3261
+#: src/Paths/Calendar.php:3264
 #, fuzzy, php-format
 #| msgid ""
 #| "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
@@ -665,7 +665,7 @@ msgstr ""
 #.  6. Requested calendar year
 #.  7. National or wider region calendar
 #.
-#: src/Paths/Calendar.php:3281
+#: src/Paths/Calendar.php:3284
 #, fuzzy, php-format
 #| msgid ""
 #| "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
@@ -683,7 +683,7 @@ msgstr ""
 #.  3. Requested calendar year
 #.  4. Source of the information
 #.
-#: src/Paths/Calendar.php:3379
+#: src/Paths/Calendar.php:3382
 #, php-format
 msgid ""
 "The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
@@ -693,7 +693,7 @@ msgstr ""
 "sú znížené na ľubovoľné spomienky."
 
 #. translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year
-#: src/Paths/Calendar.php:3401
+#: src/Paths/Calendar.php:3404
 #, php-format
 msgid ""
 "The Feast '%1$s', usually celebrated on %2$s, coincides with another Feast "
@@ -703,7 +703,7 @@ msgstr ""
 "sviatkom '%3$s'! Treba s tým niečo urobiť?"
 
 #. translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year
-#: src/Paths/Calendar.php:3415
+#: src/Paths/Calendar.php:3418
 #, php-format
 msgid ""
 "The Solemnity '%1$s', usually celebrated on %2$s, coincides with the Sunday "
@@ -713,7 +713,7 @@ msgstr ""
 "Slávnosť '%1$s', zvyčajne slávená %2$s, sa v roku %4$d zhoduje s nedeľou "
 "alebo slávnosťou '%3$s'! Treba s tým niečo urobiť?"
 
-#: src/Paths/Calendar.php:3459
+#: src/Paths/Calendar.php:3462
 msgid ""
 "We should be creating a new festivity, however we do not seem to have the "
 "correct date information in order to proceed"
@@ -729,7 +729,7 @@ msgstr ""
 #.  5. Year from which the name has been changed
 #.  6. Requested calendar year
 #.
-#: src/Paths/Calendar.php:3572
+#: src/Paths/Calendar.php:3575
 #, fuzzy, php-format
 #| msgid ""
 #| "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
@@ -748,7 +748,7 @@ msgstr ""
 #.  4. Year from which the name has been changed
 #.  5. Requested calendar year
 #.
-#: src/Paths/Calendar.php:3590
+#: src/Paths/Calendar.php:3593
 #, fuzzy, php-format
 #| msgid ""
 #| "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
@@ -769,7 +769,7 @@ msgstr ""
 #.  5. Year from which the grade has been changed
 #.  6. Requested calendar year
 #.
-#: src/Paths/Calendar.php:3611
+#: src/Paths/Calendar.php:3614
 #, fuzzy, php-format
 #| msgid ""
 #| "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
@@ -788,7 +788,7 @@ msgstr ""
 #.  4. Year from which the name has been changed
 #.  5. Requested calendar year
 #.
-#: src/Paths/Calendar.php:3629
+#: src/Paths/Calendar.php:3632
 #, fuzzy, php-format
 #| msgid ""
 #| "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
@@ -810,7 +810,7 @@ msgstr ""
 #.  6. ID of the national calendar
 #.  7. Requested calendar year
 #.
-#: src/Paths/Calendar.php:3661
+#: src/Paths/Calendar.php:3664
 #, fuzzy, php-format
 #| msgid ""
 #| "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
@@ -828,7 +828,7 @@ msgstr ""
 #.  4. ID of the national calendar
 #.  5. Requested calendar year
 #.
-#: src/Paths/Calendar.php:3680
+#: src/Paths/Calendar.php:3683
 #, php-format
 msgid ""
 "The liturgical event '%1$s' has been moved to %2$s since the year %3$d in "
@@ -843,7 +843,7 @@ msgstr ""
 #.  4. ID of the national calendar
 #.  5. Requested calendar year
 #.
-#: src/Paths/Calendar.php:3699
+#: src/Paths/Calendar.php:3702
 #, php-format
 msgid ""
 "The liturgical event '%1$s' has been moved to %2$s since the year %3$d in "
@@ -852,7 +852,7 @@ msgid ""
 msgstr ""
 
 #. translators: Name of the Roman Missal
-#: src/Paths/Calendar.php:3734
+#: src/Paths/Calendar.php:3737
 #, php-format
 msgid "Found a sanctorale data file for %s"
 msgstr "Našiel som súbor sanctorale pre %s"
@@ -866,7 +866,7 @@ msgstr "Našiel som súbor sanctorale pre %s"
 #.  6. Superseding festivity name
 #.  7. Requested calendar year
 #.
-#: src/Paths/Calendar.php:3783
+#: src/Paths/Calendar.php:3786
 #, php-format
 msgid ""
 "The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
@@ -876,13 +876,13 @@ msgstr ""
 "'%6$s' v roku %7$d"
 
 #. translators: Name of the Roman Missal
-#: src/Paths/Calendar.php:3798
+#: src/Paths/Calendar.php:3801
 #, php-format
 msgid "Could not find a sanctorale data file for %s"
 msgstr "Nepodarilo sa nájsť súbor sanctorale pre %s"
 
 #. translators: 1. Festivity grade, 2. Festivity name, 3. New festivity name, 4: Requested calendar year, 5. Old date, 6. New date
-#: src/Paths/Calendar.php:3895
+#: src/Paths/Calendar.php:3898
 #, php-format
 msgid ""
 "The %1$s '%2$s' is transferred from %5$s to %6$s as per the %7$s, to make "
@@ -892,7 +892,7 @@ msgstr ""
 "pre '%3$s': platné pre rok %4$d."
 
 #. translators: 1. Festivity grade, 2. Festivity name, 3. Old date, 4. New date, 5. Source of the information, 6. New festivity name, 7. Superseding festivity grade, 8. Superseding festivity name, 9: Requested calendar year
-#: src/Paths/Calendar.php:3918
+#: src/Paths/Calendar.php:3921
 #, php-format
 msgid ""
 "The %1$s '%2$s' would have been transferred from %3$s to %4$s as per the "
@@ -903,7 +903,7 @@ msgstr ""
 "miesto pre '%6$s', avšak je potlačený %7$s '%8$s' v roku %9$d."
 
 #. translators: 1: Festivity name, 2: Name of the diocese, 3: Festivity date, 4: Coinciding festivity name, 5: Requested calendar year
-#: src/Paths/Calendar.php:4320
+#: src/Paths/Calendar.php:4323
 #, php-format
 msgid ""
 "The Solemnity '%1$s', proper to the calendar of the %2$s and usually "
@@ -914,7 +914,7 @@ msgstr ""
 "%5$d zhoduje s nedeľou alebo slávnosťou '%4$s'! Treba s tým niečo urobiť?"
 
 #. translators: 1: Festivity grade, 2: Festivity name, 3: Name of the diocese, 4: Festivity date, 5: Coinciding festivity name, 6: Requested calendar year
-#: src/Paths/Calendar.php:4354
+#: src/Paths/Calendar.php:4357
 #, php-format
 msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
@@ -923,7 +923,7 @@ msgstr ""
 "Slávnosť %1$s '%2$s', vlastná kalendáru %3$s a zvyčajne slávená %4$s, je v "
 "roku %6$d potlačená nedeľou alebo slávnosťou %5$s"
 
-#: src/Paths/Calendar.php:4622
+#: src/Paths/Calendar.php:4625
 #, php-format
 msgid "Error receiving or parsing info from github about latest release: %s."
 msgstr ""
