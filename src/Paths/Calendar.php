@@ -2882,13 +2882,16 @@ class Calendar
                 )
             );
 
-            //In years when this memorial coincides with another obligatory memorial, as happened in 2014 [ 28 June, Saint Irenaeus ] and 2015 [ 13 June, Saint Anthony of Padua ], both must be considered optional for that year
+            //In years when this memorial coincides with another obligatory memorial, as happened in 2014 [ 28 June, Saint Irenaeus ] and 2015 [ 13 June, Saint Anthony of Padua ],
+            // both must be considered optional for that year
             //source: https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
             //This is taken care of in the next code cycle, see tag IMMACULATEHEART: in the code comments ahead
         } else {
             $row = (object)$this->PropriumDeTempore[ "ImmaculateHeart" ];
+            $row->event_key = "ImmaculateHeart";
             $row->grade = LitGrade::MEMORIAL;
             $row->date = Utilities::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P' . ( 7 * 9 + 6 ) . 'D'));
+            $row->common = [];
             $this->handleCoincidence($row, RomanMissal::EDITIO_TYPICA_1970);
         }
     }
