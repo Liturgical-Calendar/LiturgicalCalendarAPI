@@ -7,7 +7,7 @@
         "litcal": {
             "type": "array",
             "items": {
-                "anyOf": [
+                "oneOf": [
                     {
                         "$ref": "#/definitions/LitCalMoveFestivity"
                     },
@@ -365,8 +365,7 @@
                     },
                     "required": [
                         "event_key",
-                        "grade",
-                        "name"
+                        "grade"
                     ]
                 },
                 "metadata": {
