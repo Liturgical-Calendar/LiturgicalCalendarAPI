@@ -1364,15 +1364,15 @@ class Calendar
         $this->createPropriumDeTemporeFestivityByKey("ChristKing");
     }
 
-/**
- * Calculates the dates for fixed date Solemnities and creates the corresponding Festivities in the calendar.
- *
- * Solemnities are celebrations of the highest rank in the Liturgical Calendar. They are days of special importance
- * in the Roman Rite, and are usually observed with a Vigil, proper readings, and a special Mass formulary.
- * Fixed date Solemnities, as the name implies, are Solemnities that fall on the same date every year.
- *
- * @return void
- */
+    /**
+     * Calculates the dates for fixed date Solemnities and creates the corresponding Festivities in the calendar.
+     *
+     * Solemnities are celebrations of the highest rank in the Liturgical Calendar. They are days of special importance
+     * in the Roman Rite, and are usually observed with a Vigil, proper readings, and a special Mass formulary.
+     * Fixed date Solemnities, as the name implies, are Solemnities that fall on the same date every year.
+     *
+     * @return void
+     */
     private function calculateFixedSolemnities(): void
     {
         //even though Mary Mother of God is a fixed date solemnity,
@@ -1394,40 +1394,46 @@ class Calendar
                 new \DateTimeZone('UTC')
             );
             $tempFestivity = new Festivity($row->name, $currentFeastDate, $row->color, LitFeastType::FIXED, $row->grade, $row->common);
-            //A Solemnity impeded in any given year is transferred to the nearest day following designated in nn. 1-8 of the Tables given above ( LY 60 )
-            //However if a solemnity is impeded by a Sunday of Advent, Lent or Easter Time, the solemnity is transferred to the Monday following,
-            // or to the nearest free day, as laid down by the General Norms.
-            //This affects Joseph, Husband of Mary ( Mar 19 ), Annunciation ( Mar 25 ), and Immaculate Conception ( Dec 8 ).
-            //It is not possible for a fixed date Solemnity to fall on a Sunday of Easter.
-
-            //However, if a solemnity is impeded by Palm Sunday or by Easter Sunday, it is transferred to the first free day ( Monday? )
-            // after the Second Sunday of Easter ( decision of the Congregation of Divine Worship, dated 22 April 1990,
-            // in Notitiæ vol. 26 [ 1990 ] num. 3/4, p. 160, Prot. CD 500/89 ).
-            //Any other celebrations that are impeded are omitted for that year.
 
             /**
+             * A Solemnity impeded in any given year is transferred to the nearest day following designated in nn. 1-8 of the Tables given above ( LY 60 )
+             * However if a solemnity is impeded by a Sunday of Advent, Lent or Easter Time, the solemnity is transferred to the Monday following,
+             *  or to the nearest free day, as laid down by the General Norms.
+             * This affects Joseph, Husband of Mary ( Mar 19 ), Annunciation ( Mar 25 ), and Immaculate Conception ( Dec 8 ).
+             * It is not possible for a fixed date Solemnity to fall on a Sunday of Easter.
+
+             * However, if a solemnity is impeded by Palm Sunday or by Easter Sunday, it is transferred to the first free day ( Monday? )
+             *  after the Second Sunday of Easter ( decision of the Congregation of Divine Worship, dated 22 April 1990,
+             *  in Notitiæ vol. 26 [ 1990 ] num. 3/4, p. 160, Prot. CD 500/89 ).
+             * Any other celebrations that are impeded are omitted for that year.
+             *
              * <<
              * Quando vero sollemnitates in his dominicis ( i.e. Adventus, Quadragesimae et Paschae ),
-             * iuxta n.5 "Normarum universalium de anno liturgico et de calendario" sabbato anticipari debent.
+             *  iuxta n.5 "Normarum universalium de anno liturgico et de calendario" sabbato anticipari debent.
              * Experientia autem pastoralis ostendit quod solutio huiusmodi nonnullas praebet difficultates praesertim quoad occurrentiam
-             * celebrationis Missae vespertinae et II Vesperarum Liturgiae Horarum cuiusdam sollemnitatis
-             * cum celebratione Missae vespertinae et I Vesperarum diei dominicae.
+             *  celebrationis Missae vespertinae et II Vesperarum Liturgiae Horarum cuiusdam sollemnitatis
+             *  cum celebratione Missae vespertinae et I Vesperarum diei dominicae.
              * [ ... Perciò facciamo la seguente modifica al n. 5 delle norme universali: ]
              * Sollemnitates autem in his dominicis occurrentes ad feriam secundam sequentem transferuntur,
-             * nisi agatur de occurrentia in Dominica in Palmis aut in Dominica Resurrectionis Domini.
+             *  nisi agatur de occurrentia in Dominica in Palmis aut in Dominica Resurrectionis Domini.
              * >>
              *
              * http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/1990/284-285.html
              * https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-284-285-1990.pdf
+             * 
+             * In the year 2024, an exemption was decreed by the Dicastery for Divine Worship upon the request of Cardinal Zuppi,
+             *  to maintain the celebration of the Immaculate Conception on December 8th notwithstanding the coincidence with the
+             *  Second Sunday of Advent, rather than transfer it to the Monday following the Second Sunday of Lent.
+             * https://liturgico.chiesacattolica.it/solennita-dellimmacolata-concezione-2024/
              */
 
             if ($this->Cal->inSolemnities($currentFeastDate)) {
-                    //if Joseph, Husband of Mary ( Mar 19 ) falls on Palm Sunday or during Holy Week, it is moved to the Saturday preceding Palm Sunday
-                    //this is correct and the reason for this is that, in this case, Annunciation will also fall during Holy Week,
-                    //and the Annunciation will be transferred to the Monday following the Second Sunday of Easter
-                    //Notitiæ vol. 42 [ 2006 ] num. 3/4, 475-476, p. 96
-                    //http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html
-                    //https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-42-(2006)/Notitiae-475-476-2006.pdf
+                    // If Joseph, Husband of Mary ( Mar 19 ) falls on Palm Sunday or during Holy Week, it is moved to the Saturday preceding Palm Sunday
+                    //  this is correct and the reason for this is that, in this case, Annunciation will also fall during Holy Week,
+                    //  and the Annunciation will be transferred to the Monday following the Second Sunday of Easter
+                    // Notitiæ vol. 42 [ 2006 ] num. 3/4, 475-476, p. 96
+                    // http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html
+                    // https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-42-(2006)/Notitiae-475-476-2006.pdf
                     $locale = LitLocale::$PRIMARY_LANGUAGE;
                 if (
                     $row->event_key === "StJoseph"
@@ -1436,7 +1442,7 @@ class Calendar
                 ) {
                     $tempFestivity->date = Utilities::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P8D'));
                     $this->Messages[] = sprintf(
-                        /**translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship  */
+                        /**translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship  */
                         _('The Solemnity \'%1$s\' falls on %2$s in the year %3$d, the celebration has been transferred to %4$s (%5$s) as per the %6$s.'),
                         $tempFestivity->name,
                         $this->Cal->solemnityFromDate($currentFeastDate)->name,
@@ -1486,30 +1492,41 @@ class Calendar
                     in_array($row->event_key, [ "Annunciation", "StJoseph", "ImmaculateConception" ])
                     && $this->Cal->isSundayAdventLentEaster($currentFeastDate)
                 ) {
-                    $tempFestivity->date = clone( $currentFeastDate );
-                    $tempFestivity->date->add(new \DateInterval('P1D'));
-                    $this->Messages[] = sprintf(
-                        /**translators:
-                         * 1: Festivity name,
-                         * 2: Festivity date,
-                         * 3: Requested calendar year,
-                         * 4: Explicatory string for the transferral,
-                         * 5: actual date for the transferral,
-                         * 6: Decree of the Congregation for Divine Worship
-                         */
-                        _('The Solemnity \'%1$s\' falls on %2$s in the year %3$d, the celebration has been transferred to %4$s (%5$s) as per the %6$s.'),
-                        $tempFestivity->name,
-                        $this->Cal->solemnityFromDate($currentFeastDate)->name,
-                        $this->CalendarParams->Year,
-                        _("the following Monday"),
-                        $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                            ? ( $tempFestivity->date->format('j') . ' ' . LatinUtils::LATIN_MONTHS[ (int)$tempFestivity->date->format('n') ] )
-                            : ( $locale === 'en'
-                                    ? $tempFestivity->date->format('F jS')
-                                    : $this->dayAndMonth->format($tempFestivity->date->format('U'))
-                        ),
-                        '<a href="https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-284-285-1990.pdf">' . _('Decree of the Congregation for Divine Worship') . '</a>'
-                    );
+                    // Take into account the exemption made for Italy since 2024, when the Immaculate Conception coincides with the Second Sunday of Advent
+                    if ($this->CalendarParams->Year >= 2024 && $row->event_key === "ImmaculateConception" && $this->CalendarParams->NationalCalendar === 'IT') {
+                        // We actually suppress the Second Sunday of Advent in this case
+                        $this->Cal->removeFestivity("Advent2");
+                        $this->Messages[] = sprintf(
+                            'La solennità dell\'Immacolata Concezione\' coincide con la Seconda Domenica dell\'Avvento nell\'anno %1$d, e per <a href="%2$s" target="_blank">decreto della Congregazione per il Culto Divino</a> del 6 ottobre 2023 viene fatta deroga alla regola del trasferimento al lunedì seguente per tutte le diocesi dell\'Italia, per le quali verrà celebrata comunque il giorno 8 dicembre.',
+                            $this->CalendarParams->Year,
+                            'https://liturgico.chiesacattolica.it/solennita-dellimmacolata-concezione-2024/'
+                        );
+                    } else {
+                        $tempFestivity->date = clone( $currentFeastDate );
+                        $tempFestivity->date->add(new \DateInterval('P1D'));
+                        $this->Messages[] = sprintf(
+                            /**translators:
+                             * 1: Festivity name,
+                             * 2: Festivity date,
+                             * 3: Requested calendar year,
+                             * 4: Explicatory string for the transferral,
+                             * 5: actual date for the transferral,
+                             * 6: Decree of the Congregation for Divine Worship
+                             */
+                            _('The Solemnity \'%1$s\' falls on %2$s in the year %3$d, the celebration has been transferred to %4$s (%5$s) as per the %6$s.'),
+                            $tempFestivity->name,
+                            $this->Cal->solemnityFromDate($currentFeastDate)->name,
+                            $this->CalendarParams->Year,
+                            _("the following Monday"),
+                            $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                                ? ( $tempFestivity->date->format('j') . ' ' . LatinUtils::LATIN_MONTHS[ (int)$tempFestivity->date->format('n') ] )
+                                : ( $locale === 'en'
+                                        ? $tempFestivity->date->format('F jS')
+                                        : $this->dayAndMonth->format($tempFestivity->date->format('U'))
+                            ),
+                            '<a href="https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-284-285-1990.pdf">' . _('Decree of the Congregation for Divine Worship') . '</a>'
+                        );
+                    }
                 } else {
                     //In all other cases, let's make a note of what's happening and ask the Congegation for Divine Worship
                     $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
