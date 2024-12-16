@@ -291,10 +291,22 @@ class RegionalData
                 }
                 unset($value->festivity->name);
             }
-            $data     = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            $i18nData = json_encode($i18nPayload,           JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            file_put_contents($calendarFile,     $data     . PHP_EOL);
-            file_put_contents($calendarI18nFile, $i18nData . PHP_EOL);
+            $data = json_encode(
+                $this->params->payload,
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
+            );
+            $i18nData = json_encode(
+                $i18nPayload,
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
+            );
+            file_put_contents(
+                $calendarFile,
+                $data . PHP_EOL
+            );
+            file_put_contents(
+                $calendarI18nFile,
+                $i18nData . PHP_EOL
+            );
             $response->success = "Calendar data created or updated for Nation \"{$this->params->key}\"";
             self::produceResponse(json_encode($response));
         } else {
@@ -524,7 +536,7 @@ class RegionalData
                         '{nation}' => $dioceseEntry[0]->nation,
                         '{diocese}' => $dioceseEntry[0]->calendar_id
                     ]
-                    );
+                );
                 break;
             case "WIDERREGIONCALENDAR":
                 $calendarDataFile = strtr(
@@ -552,7 +564,7 @@ class RegionalData
                     [
                         '{nation}' => $this->params->key
                     ]
-                    );
+                );
                 break;
         }
         if (file_exists($calendarDataFile) && file_exists($calendarI18nFolder)) {
@@ -562,7 +574,7 @@ class RegionalData
             if (false === unlink($calendarDataFile)) {
                 self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully.");
             };
-            foreach(glob($calendarI18nFolder . "/*.json") as $file) {
+            foreach (glob($calendarI18nFolder . "/*.json") as $file) {
                 if (false === is_writable($file)) {
                     self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, check i18n file and folder permissions.");
                 }
