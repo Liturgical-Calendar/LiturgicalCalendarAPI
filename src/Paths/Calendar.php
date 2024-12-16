@@ -1398,43 +1398,45 @@ class Calendar
             /**
              * A Solemnity impeded in any given year is transferred to the nearest day following designated in nn. 1-8 of the Tables given above ( LY 60 )
              * However if a solemnity is impeded by a Sunday of Advent, Lent or Easter Time, the solemnity is transferred to the Monday following,
-             *  or to the nearest free day, as laid down by the General Norms.
+             *   or to the nearest free day, as laid down by the General Norms.
              * This affects Joseph, Husband of Mary ( Mar 19 ), Annunciation ( Mar 25 ), and Immaculate Conception ( Dec 8 ).
              * It is not possible for a fixed date Solemnity to fall on a Sunday of Easter.
 
              * However, if a solemnity is impeded by Palm Sunday or by Easter Sunday, it is transferred to the first free day ( Monday? )
-             *  after the Second Sunday of Easter ( decision of the Congregation of Divine Worship, dated 22 April 1990,
-             *  in Notitiæ vol. 26 [ 1990 ] num. 3/4, p. 160, Prot. CD 500/89 ).
+             *   after the Second Sunday of Easter ( decision of the Congregation of Divine Worship, dated 22 April 1990,
+             *   in Notitiæ vol. 26 [ 1990 ] num. 3/4, p. 160, Prot. CD 500/89 ).
              * Any other celebrations that are impeded are omitted for that year.
              *
              * <<
              * Quando vero sollemnitates in his dominicis ( i.e. Adventus, Quadragesimae et Paschae ),
-             *  iuxta n.5 "Normarum universalium de anno liturgico et de calendario" sabbato anticipari debent.
+             *   iuxta n.5 "Normarum universalium de anno liturgico et de calendario" sabbato anticipari debent.
              * Experientia autem pastoralis ostendit quod solutio huiusmodi nonnullas praebet difficultates praesertim quoad occurrentiam
-             *  celebrationis Missae vespertinae et II Vesperarum Liturgiae Horarum cuiusdam sollemnitatis
-             *  cum celebratione Missae vespertinae et I Vesperarum diei dominicae.
+             *   celebrationis Missae vespertinae et II Vesperarum Liturgiae Horarum cuiusdam sollemnitatis
+             *   cum celebratione Missae vespertinae et I Vesperarum diei dominicae.
              * [ ... Perciò facciamo la seguente modifica al n. 5 delle norme universali: ]
              * Sollemnitates autem in his dominicis occurrentes ad feriam secundam sequentem transferuntur,
-             *  nisi agatur de occurrentia in Dominica in Palmis aut in Dominica Resurrectionis Domini.
+             *   nisi agatur de occurrentia in Dominica in Palmis aut in Dominica Resurrectionis Domini.
              * >>
              *
              * http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/1990/284-285.html
              * https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-284-285-1990.pdf
-             * 
+             *
              * In the year 2024, an exemption was decreed by the Dicastery for Divine Worship upon the request of Cardinal Zuppi,
-             *  to maintain the celebration of the Immaculate Conception on December 8th notwithstanding the coincidence with the
-             *  Second Sunday of Advent, rather than transfer it to the Monday following the Second Sunday of Lent.
+             *   to maintain the celebration of the Immaculate Conception on December 8th notwithstanding the coincidence with the
+             *   Second Sunday of Advent, rather than transfer it to the Monday following the Second Sunday of Lent.
              * https://liturgico.chiesacattolica.it/solennita-dellimmacolata-concezione-2024/
              */
 
             if ($this->Cal->inSolemnities($currentFeastDate)) {
-                    // If Joseph, Husband of Mary ( Mar 19 ) falls on Palm Sunday or during Holy Week, it is moved to the Saturday preceding Palm Sunday
-                    //  this is correct and the reason for this is that, in this case, Annunciation will also fall during Holy Week,
-                    //  and the Annunciation will be transferred to the Monday following the Second Sunday of Easter
-                    // Notitiæ vol. 42 [ 2006 ] num. 3/4, 475-476, p. 96
-                    // http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html
-                    // https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-42-(2006)/Notitiae-475-476-2006.pdf
-                    $locale = LitLocale::$PRIMARY_LANGUAGE;
+                /**
+                 * If Joseph, Husband of Mary ( Mar 19 ) falls on Palm Sunday or during Holy Week, it is moved to the Saturday preceding Palm Sunday
+                 * This is correct and the reason for this is that, in this case, Annunciation will also fall during Holy Week,
+                 *   and the Annunciation will be transferred to the Monday following the Second Sunday of Easter
+                 * Notitiæ vol. 42 [ 2006 ] num. 3/4, 475-476, p. 96
+                 * http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html
+                 * https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-42-(2006)/Notitiae-475-476-2006.pdf
+                 */
+                $locale = LitLocale::$PRIMARY_LANGUAGE;
                 if (
                     $row->event_key === "StJoseph"
                     && $currentFeastDate >= $this->Cal->getFestivity("PalmSun")->date
