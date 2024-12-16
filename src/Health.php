@@ -302,7 +302,7 @@ class Health implements MessageComponentInterface
                     preg_match("/\/data\/(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/", $dataPath, $matches)
                 ) {
                     $schema = LitSchema::DATA;
-                    foreach ($matches as $idx =>$match) {
+                    foreach ($matches as $idx => $match) {
                         if ($idx > 0) {
                             switch ($matches[$idx]) {
                                 case 'nation':
@@ -543,7 +543,7 @@ class Health implements MessageComponentInterface
                 ]);
             }
 
-            if($validation->category === 'resourceDataCheck') {
+            if ($validation->category === 'resourceDataCheck') {
                 $headers = get_headers($dataPath);
                 if (!$headers || strpos($headers[0], '200') === false) {
                     $message = new \stdClass();

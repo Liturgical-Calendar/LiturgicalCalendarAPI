@@ -3843,7 +3843,6 @@ class Calendar
         if ($this->NationalData !== null && property_exists($this->NationalData, "litcal")) {
             $this->handleNationalCalendarRows($this->NationalData->litcal);
         }
-
     }
 
     /**
