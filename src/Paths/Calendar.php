@@ -4824,6 +4824,9 @@ class Calendar
     public function init(array $requestPathParts = [])
     {
         self::$Core->init();
+        if (self::$Core->getRequestMethod() === RequestMethod::OPTIONS) {
+            die();
+        }
         $this->initParameterData($requestPathParts);
         $this->loadDiocesanCalendarData();
         $this->loadNationalCalendarData();
