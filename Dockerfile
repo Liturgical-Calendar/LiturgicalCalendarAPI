@@ -9,9 +9,10 @@ RUN apk add --no-cache --virtual .build-deps \
     icu-dev \
     oniguruma-dev \
     libzip-dev \
+    gettext-dev \
     curl \
     && docker-php-ext-configure intl \
-    && docker-php-ext-install intl mbstring zip \
+    && docker-php-ext-install intl mbstring zip gettext \
     && rm -rf /var/cache/apk/*
 
 # Install Composer
@@ -34,7 +35,8 @@ FROM php:8.3-cli-alpine
 RUN apk add --no-cache \
     icu \
     oniguruma \
-    libzip
+    libzip \
+    gettext
 
 # Set the working directory
 WORKDIR /var/www/html
@@ -46,6 +48,9 @@ COPY --from=builder /usr/local/bin/composer /usr/local/bin/composer
 
 # Copy the application files from the builder stage
 COPY --from=builder /var/www/html /var/www/html
+
+# Ensure gettext extension is enabled
+RUN docker-php-ext-enable intl mbstring zip gettext
 
 # Set the environment variable
 ENV PHP_CLI_SERVER_WORKERS=2
