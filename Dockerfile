@@ -1,15 +1,15 @@
 # Use the official PHP 8.3 CLI image as the base image
 FROM php:8.3-cli AS build
 
-# Install necessary PHP extensions
+# Install necessary PHP extensions and Composer in one step to minimize layers
 RUN apt update -y && \
     apt upgrade -y && \
-    apt install -y --no-install-recommends libicu-dev libonig-dev libzip-dev gettext && \
+    apt install -y --no-install-suggests --no-install-recommends libicu-dev libonig-dev libzip-dev gettext && \
     docker-php-ext-configure intl && \
-    docker-php-ext-install intl mbstring zip gettext calendar
-
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    docker-php-ext-install intl mbstring zip gettext calendar && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
 WORKDIR /var/www/html
@@ -28,7 +28,7 @@ FROM php:8.3-cli AS main
 # Set the working directory
 WORKDIR /var/www/html
 
-# Copy the compiled PHP extensions from the builder stage
+# Copy the compiled PHP extensions from the build stage
 COPY --from=build /usr/local/lib/php/extensions /usr/local/lib/php/extensions
 COPY --from=build /usr/local/etc/php/conf.d /usr/local/etc/php/conf.d
 COPY --from=build /usr/local/bin/composer /usr/local/bin/composer
@@ -36,7 +36,7 @@ COPY --from=build /var/www/html /var/www/html
 
 RUN apt update -y && \
     apt upgrade -y && \
-    apt install -y --no-install-recommends locales-all && \
+    apt install -y --no-install-suggests --no-install-recommends locales-all && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     docker-php-ext-enable intl mbstring zip gettext calendar
