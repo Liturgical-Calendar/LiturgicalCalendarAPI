@@ -1,19 +1,12 @@
-# Stage 1: Build environment
-FROM php:8.3-cli-alpine AS builder
+# Use the official PHP 8.3 CLI image as the base image
+FROM php:8.3-cli AS build
 
-# Install necessary packages
-RUN apk add --no-cache --virtual .build-deps \
-    autoconf \
-    g++ \
-    make \
-    icu-dev \
-    oniguruma-dev \
-    libzip-dev \
-    gettext-dev \
-    curl \
-    && docker-php-ext-configure intl \
-    && docker-php-ext-install intl mbstring zip gettext \
-    && rm -rf /var/cache/apk/*
+# Install necessary PHP extensions
+RUN apt update -y && \
+    apt upgrade -y && \
+    apt install -y --no-install-recommends libicu-dev libonig-dev libzip-dev gettext && \
+    docker-php-ext-configure intl && \
+    docker-php-ext-install intl mbstring zip gettext calendar
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -21,42 +14,38 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Set the working directory
 WORKDIR /var/www/html
 
-# Copy composer files and install dependencies
 COPY composer.json composer.lock ./
+
+# Run composer install to install dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
 # Copy the rest of the application code
 COPY . .
 
-# Stage 2: Production environment
-FROM php:8.3-cli-alpine
-
-# Install necessary runtime packages
-RUN apk add --no-cache \
-    icu \
-    oniguruma \
-    libzip \
-    gettext
+# Stage 2: final build
+FROM php:8.3-cli AS main
 
 # Set the working directory
 WORKDIR /var/www/html
 
 # Copy the compiled PHP extensions from the builder stage
-COPY --from=builder /usr/local/lib/php/extensions /usr/local/lib/php/extensions
-COPY --from=builder /usr/local/etc/php/conf.d /usr/local/etc/php/conf.d
-COPY --from=builder /usr/local/bin/composer /usr/local/bin/composer
+COPY --from=build /usr/local/lib/php/extensions /usr/local/lib/php/extensions
+COPY --from=build /usr/local/etc/php/conf.d /usr/local/etc/php/conf.d
+COPY --from=build /usr/local/bin/composer /usr/local/bin/composer
+COPY --from=build /var/www/html /var/www/html
 
-# Copy the application files from the builder stage
-COPY --from=builder /var/www/html /var/www/html
-
-# Ensure gettext extension is enabled
-RUN docker-php-ext-enable intl mbstring zip gettext
-
-# Set the environment variable
-ENV PHP_CLI_SERVER_WORKERS=2
+RUN apt update -y && \
+    apt upgrade -y && \
+    apt install -y --no-install-recommends locales-all && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    docker-php-ext-enable intl mbstring zip gettext calendar
 
 # Expose port 8000 to the host
 EXPOSE 8000
+
+# Set the environment variable
+ENV PHP_CLI_SERVER_WORKERS=2
 
 # Command to run PHP's built-in server
 CMD ["php", "-S", "0.0.0.0:8000", "-t", "/var/www/html"]
