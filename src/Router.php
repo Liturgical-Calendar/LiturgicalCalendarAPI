@@ -88,8 +88,8 @@ class Router
      */
     public static function isLocalhost(): bool
     {
-        $localhostAddresses = ['127.0.0.1', '::1'];
-        $localhostNames     = ['localhost', '127.0.0.1', '::1'];
+        $localhostAddresses = ['127.0.0.1', '::1', '0.0.0.0'];
+        $localhostNames     = ['localhost', '127.0.0.1', '::1', '0.0.0.0'];
         return in_array($_SERVER['SERVER_ADDR'] ?? '', $localhostAddresses) ||
                in_array($_SERVER['REMOTE_ADDR'] ?? '', $localhostAddresses) ||
                in_array($_SERVER['SERVER_NAME'] ?? '', $localhostNames);
@@ -105,7 +105,7 @@ class Router
     public static function route(): void
     {
         if (false === defined('API_BASE_PATH')) {
-            define('API_BASE_PATH', "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}");
+            define('API_BASE_PATH', Router::determineBasePath());
         }
         $requestPathParts = self::buildRequestPathParts();
         $route = array_shift($requestPathParts);
@@ -119,6 +119,7 @@ class Router
             case '':
             case 'calendar':
                 $LitCalEngine = new Calendar();
+                // Calendar::$Core will not exist until the Calendar class is instantiated!
                 //Calendar::$Core->setAllowedOrigins(self::$allowedOrigins);
                 Calendar::$Core->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
                 Calendar::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
@@ -272,5 +273,60 @@ class Router
             default:
                 http_response_code(404);
         }
+    }
+
+    public static function determineBasePath(): string
+    {
+        /**
+         * Detect server Request Scheme
+         */
+        if (
+            (isset($_SERVER['REQUEST_SCHEME']) && !empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] == 'https') ||
+            (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ||
+            (isset($_SERVER['SERVER_PORT']) && !empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443')
+        ) {
+            $server_request_scheme = 'https';
+        } else {
+            $server_request_scheme = 'http';
+        }
+
+        /**
+         * Detect server name or server address if name is not available
+         */
+        $server_name = isset($_SERVER['SERVER_NAME'])
+            ? $_SERVER['SERVER_NAME']
+            : (
+                isset($_SERVER['SERVER_ADDR'])
+                ? $_SERVER['SERVER_ADDR']
+                : 'localhost'
+            );
+
+        /**
+         * Add port to server name when port is not 80 or 443
+         */
+        if (false === in_array($_SERVER['SERVER_PORT'], ['80', '443'])) {
+            $server_name .= ':' . $_SERVER['SERVER_PORT'];
+        }
+
+        /**
+         * In a localhost instance, ensure that PHP_CLI_SERVER_WORKERS is set to at least 2.
+         * In a production instance add `/api/{api_version}` (following the schema of the current production server)
+         */
+        if (Router::isLocalhost()) {
+            $concurrentServiceWorkers = getenv('PHP_CLI_SERVER_WORKERS');
+            if (false === $concurrentServiceWorkers || (int)$concurrentServiceWorkers < 2) {
+                $pre1 = '<pre style="color:red;background-color:#EFEFEF;display:inline-block;padding: 5px;">PHP_CLI_SERVER_WORKERS</pre>';
+                $pre2 = sprintf('<pre style="color:red;background-color:#EFEFEF;display:inline-block;padding:5px;">PHP_CLI_SERVER_WORKERS=2 php -S %1$s</pre>', $server_name);
+                die("Not enough concurrent service workers.<br>Perhaps set the {$pre1} environment variable to a value greater than 1? E.g. {$pre2}.");
+            }
+        } else {
+            $apiVersion = 'dev';
+            if (preg_match('/^\/api\/(.*?)\/index.php$/', $_SERVER['SCRIPT_NAME'], $matches)) {
+                $apiVersion = $matches[1];
+            }
+            $server_name = "{$_SERVER['SERVER_NAME']}/api/{$apiVersion}";
+        }
+
+        return "{$server_request_scheme}://{$server_name}";
     }
 }

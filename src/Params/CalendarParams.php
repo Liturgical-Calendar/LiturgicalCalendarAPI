@@ -2,6 +2,7 @@
 
 namespace LiturgicalCalendar\Api\Params;
 
+use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Enum\YearType;
 use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Enum\Ascension;
@@ -109,27 +110,17 @@ class CalendarParams
      */
     public function __construct(array $DATA)
     {
-        if (
-            (isset($_SERVER['REQUEST_SCHEME']) && !empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] == 'https') ||
-            (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ||
-            (isset($_SERVER['SERVER_PORT']) && !empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443')
-        ) {
-            $server_request_scheme = 'https';
+        // API_BASE_PATH should have been defined in index.php
+        if (defined('API_BASE_PATH')) {
+            $calendarsRoute = API_BASE_PATH . Route::CALENDARS->value;
         } else {
-            $server_request_scheme = 'http';
+            $calendarsRoute = Router::determineBasePath() . Route::CALENDARS->value;
         }
 
-        $server_name = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost';
-        if ('localhost' === $server_name) {
-            $server_name .= ':' . $_SERVER['SERVER_PORT'];
-        } else {
-            $server_name = "{$_SERVER['SERVER_NAME']}/api/dev";
-        }
-
-        $calendarsRoute = (defined('API_BASE_PATH') ? API_BASE_PATH : "{$server_request_scheme}://{$server_name}") . Route::CALENDARS->value;
-        if (stripos($calendarsRoute, '::/localhost') !== false) {
+        if (Router::isLocalhost()) {
             $concurrentServiceWorkers = getenv('PHP_CLI_SERVER_WORKERS');
             if ((int)$concurrentServiceWorkers < 2) {
+                $server_name = $_SERVER['SERVER_NAME'] ?? $_SERVER['SERVER_ADDR'];
                 Calendar::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The API will be unable to load calendars metadata from {$calendarsRoute}, because there are not enough concurrent service workers. Perhaps set the `PHP_CLI_SERVER_WORKERS` environment variable to a value greater than 1? E.g. `PHP_CLI_SERVER_WORKERS=2 php -S $server_name`.");
             }
         }
