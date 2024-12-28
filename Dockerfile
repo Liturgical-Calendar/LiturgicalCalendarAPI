@@ -1,5 +1,5 @@
 # Use the official PHP 8.3 CLI image as the base image
-FROM php:8.3-cli AS build
+FROM php:8.4-cli AS build
 
 # Install necessary PHP extensions and Composer in one step to minimize layers
 RUN apt update -y && \
@@ -23,7 +23,7 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-d
 COPY . .
 
 # Stage 2: final build
-FROM php:8.3-cli AS main
+FROM php:8.4-cli AS main
 
 # Set the working directory
 WORKDIR /var/www/html
