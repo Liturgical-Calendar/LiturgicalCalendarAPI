@@ -756,7 +756,7 @@ class Calendar
 
     /**
      * Loads localization data stored in JSON format from a file in the
-     * jsondata/sourcedata/missals/propriumdetempore/i18n directory, named according to the locale
+     * `{JsonData::MISSALS_FOLDER}/propriumdetempore/i18n` directory, named according to the locale
      * specified in LitLocale::$PRIMARY_LANGUAGE.
      *
      * If the file does not exist, or if there is an error decoding the
@@ -767,7 +767,10 @@ class Calendar
     private function loadPropriumDeTemporeI18nData(): ?array
     {
         $locale = LitLocale::$PRIMARY_LANGUAGE;
-        $propriumDeTemporeI18nFile = "jsondata/sourcedata/missals/propriumdetempore/i18n/{$locale}.json";
+        $propriumDeTemporeI18nFile = strtr(
+            JsonData::MISSALS_I18N_FILE,
+            ['{missal_folder}' => 'propriumdetempore', '{locale}' => $locale]
+        );
         if (file_exists($propriumDeTemporeI18nFile)) {
             $rawData = file_get_contents($propriumDeTemporeI18nFile);
             $PropriumDeTemporeI18n = json_decode($rawData, true);
@@ -794,7 +797,10 @@ class Calendar
      */
     private function loadPropriumDeTemporeData(): void
     {
-        $propriumDeTemporeFile = "jsondata/sourcedata/missals/propriumdetempore/propriumdetempore.json";
+        $propriumDeTemporeFile = strtr(
+            JsonData::MISSALS_FILE,
+            ['{missal_folder}' => 'propriumdetempore']
+        );
         if (file_exists($propriumDeTemporeFile)) {
             $rawData = file_get_contents($propriumDeTemporeFile);
             $PropriumDeTempore = json_decode($rawData, true);
@@ -922,10 +928,11 @@ class Calendar
      */
     private function loadMemorialsFromDecreesData(): void
     {
-        $decreesFile       = "jsondata/sourcedata/decrees/decrees.json";
-        $decreesI18nPath   = "jsondata/sourcedata/decrees/i18n/";
         $locale = LitLocale::$PRIMARY_LANGUAGE;
-        $decreesI18nFile = $decreesI18nPath . $locale . ".json";
+        $decreesI18nFile = strtr(
+            JsonData::DECREES_I18N_FILE,
+            ['{locale}' => $locale]
+        );
         $NAME = null;
 
         if (file_exists($decreesI18nFile)) {
@@ -943,8 +950,8 @@ class Calendar
             self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
         }
 
-        if (file_exists($decreesFile)) {
-            $decreesRawData = file_get_contents($decreesFile);
+        if (file_exists(JsonData::DECREES_FILE)) {
+            $decreesRawData = file_get_contents(JsonData::DECREES_FILE);
             $decrees = json_decode($decreesRawData);
             if (json_last_error() !== JSON_ERROR_NONE) {
                 $message = sprintf(
@@ -4608,7 +4615,7 @@ class Calendar
 
                 // then create an XML representation from the Array
                 $ns = "http://www.bibleget.io/catholicliturgy";
-                $schemaLocation = API_BASE_PATH . '/jsondata/schemas/LiturgicalCalendar.xsd';
+                $schemaLocation = API_BASE_PATH . '/' . JsonData::SCHEMAS_FOLDER . '/LiturgicalCalendar.xsd';
                 $xml = new \SimpleXMLElement(
                     "<?xml version=\"1.0\" encoding=\"UTF-8\"?" . "><LiturgicalCalendar xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
                     . " xsi:schemaLocation=\"$ns $schemaLocation\""

@@ -35,22 +35,48 @@ class JsonData
     public const DECREES_FOLDER = JsonData::SOURCEDATA_FOLDER . '/decrees';
 
     /**
+     * The file containing the data with the Decrees of the Congregation for Divine Worship.
+     * Evaluates to 'jsondata/sourcedata/decrees/decrees.json'.
+     */
+    public const DECREES_FILE = JsonData::DECREES_FOLDER . '/decrees.json';
+
+    /**
      * The folder containing i18n files for ecclesiastical decrees.
      * Evaluates to 'jsondata/sourcedata/decrees/i18n'.
      */
     public const DECREES_I18N_FOLDER = JsonData::DECREES_FOLDER . '/i18n';
 
     /**
-     * The folder containing missal materials.
+     * The file containing the i18n data for the decrees of the Congregation for Divine Worship,
+     * with a placeholder for the locale.
+     * Evaluates to 'jsondata/sourcedata/decrees/i18n/{locale}.json'.
+     */
+    public const DECREES_I18N_FILE = JsonData::DECREES_I18N_FOLDER . '/{locale}.json';
+
+    /**
+     * The folder containing missal resources.
      * Evaluates to 'jsondata/sourcedata/missals'.
      */
     public const MISSALS_FOLDER = JsonData::SOURCEDATA_FOLDER . '/missals';
+
+    /**
+     * The file containing the missal data, with a placeholder for the actual missal folder name.
+     * Evaluates to 'jsondata/sourcedata/missals/{missal_folder}/{missal_folder}.json'.
+     */
+    public const MISSALS_FILE = JsonData::MISSALS_FOLDER . '/{missal_folder}/{missal_folder}.json';
 
     /**
      * The folder containing i18n files for missals, with a placeholder for the actual missal folder name.
      * Evaluates to 'jsondata/sourcedata/missals/{missal_folder}/i18n'.
      */
     public const MISSALS_I18N_FOLDER = JsonData::MISSALS_FOLDER . '/{missal_folder}/i18n';
+
+    /**
+     * The file containing the i18n data for the specified missal,
+     * with placeholders for the actual missal folder name and locale.
+     * Evaluates to 'jsondata/sourcedata/missals/{missal_folder}/i18n/{locale}.json'.
+     */
+    public const MISSALS_I18N_FILE = JsonData::MISSALS_I18N_FOLDER . '/{locale}.json';
 
     /**
      * The folder containing calendar data.
