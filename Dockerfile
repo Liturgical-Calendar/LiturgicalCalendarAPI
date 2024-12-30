@@ -20,8 +20,11 @@ COPY composer.json composer.lock ./
 # Run composer install to install dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
-# Copy the rest of the application code
-COPY . .
+# Copy the rest of the application code (.dockerignore not working when building from docker compose and remote repo)
+COPY ./src ./src
+COPY ./i18n ./i18n
+COPY ./jsondata ./jsondata
+COPY LitCalTestServer.php index.php ./
 
 # Stage 2: final build
 FROM php:8.4-cli AS main
