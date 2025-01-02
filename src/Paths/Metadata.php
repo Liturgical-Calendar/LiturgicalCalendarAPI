@@ -2,7 +2,6 @@
 
 namespace LiturgicalCalendar\Api\Paths;
 
-use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\Route;
 
@@ -17,6 +16,7 @@ class Metadata
     private static array $locales                   = [];
     private static array $worldDiocesesLatinRite    = [];
     private static array $messages                  = [];
+    private const array FULLY_TRANSLATED_LOCALES = ['en', 'fr', 'it', 'nl', 'la'];
 
     /**
      * Scans the JsonData::NATIONAL_CALENDARS_FOLDER directory and builds an index of all National calendars,
@@ -173,12 +173,17 @@ class Metadata
      * It does this by scanning the i18n/ folder and retrieving the folder names
      * of all its subfolders. The result is an array of strings, where each string
      * is a locale code. The locale code is in the format of a single string
-     * containing the language code, optionally followed by an underscore and the
-     * region code. Examples of valid locale codes are: en, en_GB, it_IT, pt_PT.
+     * containing the language code (optionally followed by an underscore and the
+     * region code; for now none of the locales have regional identifiers).
      */
     private static function getLocales(): void
     {
-        Metadata::$locales = array_merge(['en'], array_map('basename', glob('i18n/*', GLOB_ONLYDIR)));
+        // Since we can't actually request the General Roman Calendar for locales that are not fully translated,
+        // we remove those locales from the list of supported locales
+        Metadata::$locales = array_intersect(
+            array_merge(['en'], array_map('basename', glob('i18n/*', GLOB_ONLYDIR))),
+            Metadata::FULLY_TRANSLATED_LOCALES
+        );
     }
 
     /**
