@@ -180,10 +180,10 @@ class Metadata
     {
         // Since we can't actually request the General Roman Calendar for locales that are not fully translated,
         // we remove those locales from the list of supported locales
-        Metadata::$locales = array_intersect(
+        Metadata::$locales = array_values(array_intersect(
             array_merge(['en'], array_map('basename', glob('i18n/*', GLOB_ONLYDIR))),
             Metadata::FULLY_TRANSLATED_LOCALES
-        );
+        ));
     }
 
     /**
