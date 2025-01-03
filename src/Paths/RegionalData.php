@@ -550,7 +550,7 @@ class RegionalData
                     [
                         '{wider_region}' => $this->params->key
                     ]
-                    );
+                );
                 break;
             case "NATIONALCALENDAR":
                 $calendarDataFile = strtr(

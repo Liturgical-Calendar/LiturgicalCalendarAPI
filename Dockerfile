@@ -2,9 +2,9 @@
 FROM php:8.4-cli AS build
 
 # Install necessary PHP extensions and Composer in one step to minimize layers
-RUN apt update -y && \
-    apt upgrade -y && \
-    apt install -y --no-install-suggests --no-install-recommends libicu-dev libonig-dev libzip-dev gettext libyaml-dev && \
+RUN apt-get update -y && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-suggests --no-install-recommends libicu-dev libonig-dev libzip-dev gettext libyaml-dev && \
     docker-php-ext-install intl zip gettext calendar && \
     pecl install yaml && \
     docker-php-ext-enable intl zip gettext calendar yaml && \
@@ -40,9 +40,9 @@ COPY --from=build /usr/local/etc/php/conf.d /usr/local/etc/php/conf.d
 COPY --from=build /usr/local/bin/composer /usr/local/bin/composer
 COPY --from=build /var/www/html /var/www/html
 
-RUN apt update -y && \
-    apt upgrade -y && \
-    apt install -y --no-install-suggests --no-install-recommends locales-all && \
+RUN apt-get update -y && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-suggests --no-install-recommends locales-all && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
