@@ -75,7 +75,7 @@ For convenience when using VSCode, a `tasks.json` has been defined so that you c
 </a>
 
 # CHANGELOG
-## [v4.0](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v4.0) (not yet released)
+## [v4.0](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v4.0) (January 3rd 2025)
 * package the API source as a composer library for autoload functionality
 * move the endpoints from PHP scripts to resource paths, and create a router
 * add `YAML` as a response media type
@@ -85,6 +85,22 @@ For convenience when using VSCode, a `tasks.json` has been defined so that you c
 * update the OpenAPI schema
 * add timing to response output and to response headers
 * refactor responses to use snake_case properties and collections (this also fixes `SaintAndrewAp` bug for `year_type=LITURGICAL` in `year=2023`, see issue #249)
+* add Calendars for Netherlands and for Canada, kudos to Steven van Roode and to Fr. @chrissherren for the contributions
+* add a Dockerfile to easily spin up a Docker container with a local instance of the API
+* fix for cases in which Immaculate Heart of Mary is suppressed, see commit 6f16f130fb2df88488f8ad9ddcc5c8961380f387
+* fix calculation of weekdays between Epiphany and Baptism of the Lord, see issue [#237](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/237)
+* fix Chritmas weekdays should not be created when there is an obligatory memorial, see commit a8ca47744582d89aaed195658a40a22145659eee
+* fix moving of celebrations by a National Calendar that were suppressed in the General Roman Calendar, see issue [#271](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/271)
+* add abbreviated form of the liturgical rank / grade to the `Festivity` output, see issue [#251](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/251)
+* use ISO 3166-1 Alpha-2 codes to identify nations, see issue [#231](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/231)
+* created an interface that allows to create Unit Tests, see issue [#205](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/205)
+* added an index of all dioceses of Latin rite, kudos to Gabriel Chow of gcatholic.org for the contribution
+* add Decree of the Congregation for Divine Worship for Italy: Immaculate Heart suppresses 2nd Sunday of Advent, see commit 191d3247838a4da18ce1ab7c0ca2f16a1b2d516e
+* add Decree of the Congregation for Divine Worship for Italy: Saint Nicholas obligatory memorial since 2020, see issue [#248](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/248)
+* feature: discoverability of supported locales, see issue [#240](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/240)
+* feature: all national and diocesan calendars are now multilingual by default, see issue [#150](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/150)
+* and a number of other bugfixes, features, and improvements
+
 ## [v3.9](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.9) (April 9th 2024)
 * update PHP dependencies (`swaggest/json-schema`, `phpunit/phpunit`)
 * add swagger validation badge to README
@@ -102,6 +118,7 @@ For convenience when using VSCode, a `tasks.json` has been defined so that you c
 * fix rank Dedication Lateran Basilica
 * allow national calendars to adhere to Feast of Jesus Christ Eternal Hight Priest [fix issue](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/200b4ddbf8b7e1c5f3f22f3b8e24961a2e1e545a) https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/96 [enable Feast Eternal High Priest](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/200b4ddbf8b7e1c5f3f22f3b8e24961a2e1e545a), [update EternalHighPriest setting based on national calendar](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/256409be041825a1acc22dcc6c204e0d760578eb)
 * update schemas to account for new settings and new properties in response output
+
 ## [v3.8](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.8) (February 1st 2023)
  * fix language for iCal / ICS format
  * fix bug in LitColor enum (static class variable)
@@ -109,20 +126,24 @@ For convenience when using VSCode, a `tasks.json` has been defined so that you c
  * add localized info to Festivity output for liturgical color, common, grade...
  * define Divine Mercy Sunday starting from the year 2000
  * update OpenAPI schema to v3.1
+
 ## [v3.7](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.7) (December 14th 2022)
  * fix support for correct ordinal number spelling for any language
  * fix "Year I", "Year II" references which should only concern weekdays of Ordinary Time
  * fix: in cases where the diocesancalendar parameter was set, but the nationalcalendar parameter was not, the national calendar settings were not being picked up correctly
  * fix for Netherlands national calendar data (Ascension on Thursday)
+
 ## [v3.6](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.6) (December 13th 2022)
  * allow Diocesan calendars to define mobile festivities
  * allow Diocesan calendars to define `untilYear` properties for festivities that may have changes after a given year
  * remove hardcoding of English, Latin and the 5 main European languages and allow for any possible language
  * allow for geographic locales, in order to better identify source data for a given national or diocesan calendar
  * remove hardcoding of supported national calendars, and automate the scan for existing calendars
+
 ## [v3.5](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.5) (December 4th 2022)
  * Fix days before / after Epiphany (handled differently in different national calendars!)
  * Add Dutch translation for Netherlands, thanks to Steven van Roode
+
 ## [v3.4](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.4) (June 6th 2022)
  * Fix issue with Saint Vincent deacon in national calendar for USA • [c27289f](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/c27289f3c893a184d605e8b1a495a48e2e76669d)
  * simplify calculation of Vigil Masses • [0afa39b](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/0afa39b838611554d32fd0d1c2a80a11a92ec696)
@@ -142,12 +163,15 @@ For convenience when using VSCode, a `tasks.json` has been defined so that you c
  * create JSON schema validation • [3938a27](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/3938a278a7fe78bdda30d5d77de6766baa9c7ea1) • [85702b0](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/85702b023e78159d140cdb301f06d22f0cad4efe) • [a296cc5](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/a296cc556ef5d166e5cea4b66c2ddd2fd83334f0) • [21f2540](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/21f254090b4be79fef871ca02fb9c7fb4b2f5ebb) • [765bac9](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/765bac9eba97910f200d6cc6f0030f0ada17975f) • [10d7619](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/10d7619811bef7f55a6498cf3c3351ddfe1f6ae6) • [4828724](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/4828724ff4ce90ed66e1572ccec5ede20aa21004) • [9cbb8e6](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/9cbb8e637b3785ae2839a75c0eb63434b1232bcb) • [16809cb](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/16809cbc78ee9aa2b9155f0347f49af81f7322c3) • [a1de05c](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/a1de05c641b6d103b89577ca225da3d95073bb65)
  * add more data for National Calendars to the Metadata endpoint • [34ef54f](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/34ef54f06d5183b463cce0305f649c182edca2b3)
  * update translations
+
 ## [v3.3](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.3) (January 27th 2022)
  * move festivity data from the 2008 Editio Typica Tertia emendata out from the `LitCalAPI.php`, to a JSON file
  * move data for festivities from Decrees of the Congregation of Divine Worship out from the `LitCalAPI.php`, to a JSON file
+
 ## [v3.2](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.2) (January 23rd 2022)
  * allow full CORS requests from enabled domains
  * allow Diocesan overrides for Epiphany, Ascension and Corpus Christi
+
 ## [v3.1](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.1) (December 26th 2021)
  * bugfix which was missed in the v3.0 release: 86ee62ad68d58736880da2b5b39117dec7386dfc
 
