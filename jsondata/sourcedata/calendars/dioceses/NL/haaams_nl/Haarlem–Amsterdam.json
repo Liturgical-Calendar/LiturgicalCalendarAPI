@@ -1,0 +1,198 @@
+{
+  "litcal": [
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 6,
+        "common": [
+          "Proper"
+        ],
+        "day": 7,
+        "month": 11,
+        "event_key": "HWillibrordbisschopverkondigervanonsgeloofpatroonvanhetbisdom"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 4,
+        "common": [
+          "Dedication of a Church"
+        ],
+        "day": 2,
+        "month": 5,
+        "event_key": "VerjaardagvandeWijdingvandekathedraal"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 1
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 3,
+        "common": [
+          "Pastors:For a Bishop",
+          "Doctors"
+        ],
+        "day": 4,
+        "month": 5,
+        "event_key": "HAthanasiusbisschopenkerkleraar"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "red",
+          "white"
+        ],
+        "grade": 3,
+        "common": [
+          "Martyrs",
+          "Pastors:For Missionaries"
+        ],
+        "day": 5,
+        "month": 6,
+        "event_key": "HHBonifatiusbisschopengezellenmartelarenbijpatronenvanhetbisdom"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 1
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 3,
+        "common": [
+          "Pastors:For Missionaries"
+        ],
+        "day": 25,
+        "month": 6,
+        "event_key": "HAdalbertdiaken"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 2
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 3,
+        "common": [
+          "Proper"
+        ],
+        "day": 1,
+        "month": 1,
+        "event_key": "OnzeLieveVrouwterNood"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 3,
+        "strtotime": "last saturday of May"
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Proper"
+        ],
+        "day": 1,
+        "month": 1,
+        "event_key": "MirakelvanhetHSacramentteAmsterdam"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0,
+        "strtotime": "wednesday after March 12"
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Proper"
+        ],
+        "day": 1,
+        "month": 10,
+        "event_key": "HBavo"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 1
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Proper"
+        ],
+        "day": 1,
+        "month": 10,
+        "event_key": "HTeresiavanhetKindJezusmaagd"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 2
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Pastors:For One Pastor"
+        ],
+        "day": 26,
+        "month": 6,
+        "event_key": "HJozefmariaEscrivapriester"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 3
+      }
+    }
+  ],
+  "metadata": {
+    "diocese_id": "haaams_nl",
+    "diocese_name": "Haarlem-Amsterdam",
+    "nation": "NL",
+    "locales": [
+      "nl_NL"
+    ],
+    "timezone": "Europe/Amsterdam"
+  }
+}

@@ -1,0 +1,9 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "LitCalDataPath",
+    "oneOf": [
+        { "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/DiocesanCalendar.json" },
+        { "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/NationalCalendar.json" },
+        { "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/WiderRegionCalendar.json" }
+    ]
+}

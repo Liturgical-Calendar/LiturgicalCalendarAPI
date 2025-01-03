@@ -1,15 +1,23 @@
 <?php
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+require_once 'vendor/autoload.php';
+
 use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
+use LiturgicalCalendar\Api\Health;
 
-include_once( 'LitCalHealth.php' );
-include_once( 'vendor/autoload.php' );
+$apiVersion = basename(__DIR__);
+define('API_BASE_PATH', "https://litcal.johnromanodorazio.com/api/{$apiVersion}");
 
 $server = IoServer::factory(
     new HttpServer(
         new WsServer(
-            new LitCalHealth()
+            new Health()
         )
     ),
     8080

@@ -1,0 +1,482 @@
+{
+    "litcal": [
+        {
+            "festivity": {
+                "month": 1,
+                "day": 7,
+                "event_key": "StAndreBessette",
+                "grade": 3,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2010
+            }
+        },
+        {
+            "festivity": {
+                "month": 1,
+                "day": 8,
+                "event_key": "StRayPenyafort"
+            },
+            "metadata": {
+                "action": "moveFestivity",
+                "since_year": 2016,
+                "reason": "make way for StAndreBessette on January 7",
+                "missal": "CA_2016"
+            }
+        },
+        {
+            "festivity": {
+                "month": 1,
+                "day": 12,
+                "event_key": "StMargueriteBourgeoys",
+                "grade": 3,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1982
+            }
+        },
+        {
+            "festivity": {
+                "event_key": "StJoseph",
+                "grade": 6
+            },
+            "metadata": {
+                "action": "makePatron",
+                "since_year": 1870
+            }
+        },
+        {
+            "festivity": {
+                "month": 4,
+                "day": 17,
+                "event_key": "KateriTekakwitha",
+                "grade": 3,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2012
+            }
+
+        },
+        {
+            "festivity": {
+                "month": 4,
+                "day": 18,
+                "event_key": "BlMarieAnneBlondin",
+                "grade": 2,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2001
+            }
+        },
+        {
+            "festivity": {
+                "month": 4,
+                "day": 26,
+                "event_key": "OurLadyofGoodCounsel",
+                "grade": 2,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2016
+            }
+        },
+        {
+            "festivity": {
+                "month": 4,
+                "day": 30,
+                "event_key": "StMariedelIncarnation",
+                "grade": 3,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2016
+            }
+        },
+        {
+            "festivity": {
+                "month": 5,
+                "day": 1,
+                "event_key": "StPiusV"
+            },
+            "metadata": {
+                "action": "moveFestivity",
+                "since_year": 2016,
+                "reason": "make way for StMariedelIncarnation on April 30",
+                "missal": "CA_2016"
+            }
+        },
+        {
+            "festivity": {
+                "month": 5,
+                "day": 4,
+                "event_key": "BlMarieLeonieParadis",
+                "grade": 2,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1984
+            }
+        },
+        {
+            "festivity": {
+                "month": 5,
+                "day": 6,
+                "event_key": "StFrancoisdeLaval",
+                "grade": 3,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2014
+            }
+        },
+        {
+            "festivity": {
+                "month": 5,
+                "day": 8,
+                "event_key": "BlCatherinedeSaintAugustin",
+                "grade": 2,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1989
+            }
+        },
+        {
+            "festivity": {
+                "month": 5,
+                "day": 21,
+                "event_key": "StEugenedeMazenod",
+                "grade": 2,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1995
+            }
+        },
+        {
+            "festivity": {
+                "month": 5,
+                "day": 24,
+                "event_key": "BlLouisZephirinMoreau",
+                "grade": 2,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1987
+            }
+        },
+        {
+            "festivity": {
+                "month": 6,
+                "day": 27,
+                "event_key": "BlNykytaBudkaVasylVelychkowsky",
+                "grade": 2,
+                "color": [
+                    "red"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2001
+            }
+        },
+        {
+            "festivity": {
+                "month": 7,
+                "day": 1,
+                "event_key": "CanadaDay",
+                "grade": 2,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2016
+            }
+        },
+        {
+            "festivity": {
+                "event_key": "StsJoachimAnne",
+                "grade": 4
+            },
+            "metadata": {
+                "action": "makePatron",
+                "since_year": 1876
+            }
+        },
+        {
+            "festivity": {
+                "month": 8,
+                "day": 5,
+                "event_key": "BlFredericJanssoone",
+                "grade": 2,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1988
+            }
+        },
+        {
+            "festivity": {
+                "month": 9,
+                "day": 2,
+                "event_key": "BlAndreGrasset",
+                "grade": 2,
+                "color": [
+                    "red"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1926
+            }
+        },
+        {
+            "festivity": {
+                "month": 9,
+                "day": 4,
+                "event_key": "BlDinaBelanger",
+                "grade": 2,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1993
+            }
+        },
+        {
+            "festivity": {
+                "month": 9,
+                "day": 24,
+                "event_key": "BlEmilieTavernierGamelin",
+                "grade": 2,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2001
+            }
+        },
+        {
+            "festivity": {
+                "month": 9,
+                "day": 25,
+                "event_key": "StsCosmasDamian"
+            },
+            "metadata": {
+                "action": "moveFestivity",
+                "since_year": 2016,
+                "missal": "CA_2016",
+                "reason": "make way for StsJeanBrebeuf on September 26"
+            }
+        },
+        {
+            "festivity": {
+                "month": 9,
+                "day": 26,
+                "event_key": "StsJeanBrebeuf"
+            },
+            "metadata": {
+                "action": "moveFestivity",
+                "since_year": 2016,
+                "missal": "CA_2016",
+                "reason": "Canada celebrates on September 26 instead of October 19"
+            }
+        },
+        {
+            "festivity": {
+                "event_key": "StsJeanBrebeuf",
+                "grade": 4
+            },
+            "metadata": {
+                "action": "makePatron",
+                "since_year": 2016
+            }
+        },
+        {
+            "festivity": {
+                "event_key": "LabourDay",
+                "grade": 3,
+                "color": [
+                    "white"
+                ],
+                "common": [],
+                "strtotime": "first monday of september"
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2016
+            }
+        },
+        {
+            "festivity": {
+                "month": 10,
+                "day": 6,
+                "event_key": "BlMarieRoseDurocher",
+                "grade": 2,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1982
+            }
+        },
+        {
+            "festivity": {
+                "month": 10,
+                "day": 16,
+                "event_key": "StMargueritedYouville",
+                "grade": 3,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1990
+            }
+        },
+        {
+            "festivity": {
+                "month": 10,
+                "day": 20,
+                "event_key": "StHedwig"
+            },
+            "metadata": {
+                "action": "moveFestivity",
+                "since_year": 2016,
+                "reason": "make way for StMargueritedYouville on October 16",
+                "missal": "CA_2016"
+            }
+        },
+        {
+            "festivity": {
+                "month": 10,
+                "day": 20,
+                "event_key": "StMargaretAlacoque"
+            },
+            "metadata": {
+                "action": "moveFestivity",
+                "since_year": 2016,
+                "reason": "make way for StMargueriteYouville on October 16",
+                "missal": "CA_2016"
+            }
+        },
+        {
+            "festivity": {
+                "month": 10,
+                "day": 22,
+                "event_key": "DedicationUnknown",
+                "grade": 4,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2016
+            }
+        },
+        {
+            "festivity": {
+                "month": 11,
+                "day": 11,
+                "event_key": "RemembranceDay",
+                "grade": 3,
+                "color": [
+                    "white"
+                ],
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2016
+            }
+        }
+    ],
+    "settings": {
+        "epiphany": "SUNDAY_JAN2_JAN8",
+        "ascension": "SUNDAY",
+        "corpus_christi": "SUNDAY",
+        "eternal_high_priest": false
+    },
+    "metadata": {
+        "nation": "CA",
+        "locales": [
+            "en_CA",
+            "fr_CA"
+        ],
+        "wider_region": "Americas",
+        "missals": [
+            "CA_2011",
+            "CA_2016"
+        ]
+    }
+}

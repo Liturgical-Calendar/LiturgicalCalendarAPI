@@ -1,0 +1,197 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "LitCalTest",
+    "oneOf": [
+        { "$ref": "#/definitions/ExactCorrespondenceType" },
+        { "$ref": "#/definitions/ExactCorrespondenceSinceType" },
+        { "$ref": "#/definitions/ExactCorrespondenceUntilType" }
+    ],
+    "definitions": {
+        "AppliesToOrExcludes": {
+            "type": "object",
+            "minProperties": 1,
+            "properties": {
+                "national_calendar": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/NationalCalendarId"
+                },
+                "diocesan_calendar": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                },
+                "national_calendars": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/NationalCalendarId"
+                    }
+                },
+                "diocesan_calendars": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                    }
+                }
+            },
+            "anyOf": [
+                { "required": ["national_calendar"] },
+                { "required": ["national_calendars"] },
+                { "required": ["diocesan_calendar"] },
+                { "required": ["diocesan_calendars"] }
+            ],
+            "additionalProperties": false
+        },
+        "ExactCorrespondenceType": {
+            "type": "object",
+            "properties": {
+                "name" : {
+                    "type": "string",
+                    "pattern": "^(?:[a-z_]+?_){0,1}[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
+                },
+                "event_key": {
+                    "type": "string",
+                    "pattern": "^(?:[a-z_]+?_){0,1}[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "test_type": {
+                    "type": "string",
+                    "enum": [
+                        "exactCorrespondence",
+                        "variableCorrespondence"
+                    ]
+                },
+                "applies_to": {
+                    "$ref": "#/definitions/AppliesToOrExcludes"
+                },
+                "excludes": {
+                    "$ref": "#/definitions/AppliesToOrExcludes"
+                },
+                "assertions": {
+                    "$ref": "#/definitions/Assertions"
+                }
+            },
+            "required": [ "name", "event_key", "description", "test_type", "assertions" ],
+            "additionalProperties": false
+        },
+        "ExactCorrespondenceSinceType": {
+            "type": "object",
+            "properties": {
+                "name" : {
+                    "type": "string",
+                    "pattern": "^(?:[a-z_]+?_){0,1}[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
+                },
+                "event_key": {
+                    "type": "string",
+                    "pattern": "^(?:[a-z_]+?_){0,1}[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "test_type": {
+                    "type": "string",
+                    "const": "exactCorrespondenceSince"
+                },
+                "year_since": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Year"
+                },
+                "applies_to": {
+                    "$ref": "#/definitions/AppliesToOrExcludes"
+                },
+                "excludes": {
+                    "$ref": "#/definitions/AppliesToOrExcludes"
+                },
+                "assertions": {
+                    "$ref": "#/definitions/Assertions"
+                }
+            },
+            "required": [ "name", "event_key", "description", "test_type", "assertions", "year_since" ],
+            "additionalProperties": false
+        },
+        "ExactCorrespondenceUntilType": {
+            "type": "object",
+            "properties": {
+                "name" : {
+                    "type": "string",
+                    "pattern": "^(?:[a-z_]+?_){0,1}[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
+                },
+                "event_key": {
+                    "type": "string",
+                    "pattern": "^(?:[a-z_]+?_){0,1}[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "test_type": {
+                    "type": "string",
+                    "const": "exactCorrespondenceUntil"
+                },
+                "year_until": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Year"
+                },
+                "applies_to": {
+                    "$ref": "#/definitions/AppliesToOrExcludes"
+                },
+                "excludes": {
+                    "$ref": "#/definitions/AppliesToOrExcludes"
+                },
+                "assertions": {
+                    "$ref": "#/definitions/Assertions"
+                }
+            },
+            "required": [ "name", "event_key", "description", "test_type", "assertions", "year_until" ],
+            "additionalProperties": false
+        },
+        "Assertions": {
+            "type": "array",
+            "items": {
+                "anyOf": [
+                    {
+                        "type": "object",
+                        "properties": {
+                            "year": {
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Year"
+                            },
+                            "expected_value": {
+                                "type": "null"
+                            },
+                            "assert": {
+                                "type": "string",
+                                "const": "eventNotExists"
+                            },
+                            "assertion": {
+                                "type": "string"
+                            },
+                            "comment": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [ "year", "expected_value", "assert", "assertion" ],
+                        "additionalProperties": false
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "year": {
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Year"
+                            },
+                            "expected_value": {
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Timestamp"
+                            },
+                            "assert": {
+                                "type": "string",
+                                "const": "eventExists AND hasExpectedTimestamp"
+                            },
+                            "assertion": {
+                                "type": "string"
+                            },
+                            "comment": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [ "year", "expected_value", "assert", "assertion" ],
+                        "additionalProperties": false
+                    }
+                ]
+            }
+        }
+    }
+}

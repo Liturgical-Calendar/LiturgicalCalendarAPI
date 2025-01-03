@@ -1,0 +1,529 @@
+[
+    {
+        "decree_id": "StMaryMagdalene_Upgrade",
+        "decree_date": "2016-06-03",
+        "decree_protocol": "Prot. N. 257/16",
+        "description": "By the express wish of the Holy Father, Pope Francis, the Congregation for Divine Worship and the Discipline of the Sacraments published a new Decree on the Solemnity of the Most Sacred Heart of Jesus, 3 June 2016, in which the celebration of Saint Mary Magdalene was elevated and inscribed in the General Roman Calendar with the rank of Feast.",
+        "festivity": {
+            "event_key": "StMaryMagdalene",
+            "grade": 4
+        },
+        "metadata": {
+            "action": "setProperty",
+            "since_year": 2016,
+            "property": "grade",
+            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_%s.pdf",
+            "url_lang_map": {
+                "de": "ge",
+                "en": "en",
+                "es": "sp",
+                "fr": "fr",
+                "it": "it",
+                "la": "la",
+                "pl": "pl",
+                "pt": "po"
+            },
+            "urls_langs": {
+                "de": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_ge.pdf",
+                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_en.pdf",
+                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_sp.pdf",
+                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_fr.pdf",
+                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf",
+                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_la.pdf",
+                "pl": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_pl.pdf",
+                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_po.pdf"
+            }
+        }
+    },
+    {
+        "decree_id": "MaryMotherChurch_Create",
+        "decree_date": "2018-02-11",
+        "decree_protocol": "Prot. N. 10/18",
+        "description": "Pope Francis has decreed that the Memorial of the Blessed Virgin Mary, Mother of the Church, should be inscribed in the Roman Calendar on the Monday after Pentecost and be now celebrated every year.",
+        "festivity": {
+            "event_key": "MaryMotherChurch",
+            "grade": 3,
+            "common": ["Proper"],
+            "calendar": "GENERAL ROMAN",
+            "color": ["white"],
+            "type": "mobile",
+            "readings": {
+                "first_reading": "",
+                "responsorial_psalm": "",
+                "second_reading": "",
+                "alleluia_verse": "",
+                "gospel": ""
+            }
+        },
+        "metadata": {
+            "action": "createNew",
+            "since_year": 2018,
+            "url": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2018/03/03/0168/00350.html#%s",
+            "url_lang_map": {
+                "la": "lat",
+                "it": "italD",
+                "fr": "francD",
+                "en": "ingD",
+                "de": "tedeD",
+                "es": "spagnD",
+                "pt": "portD"
+            },
+            "urls_langs": {
+                "la": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2018/03/03/0168/00350.html#lat",
+                "it": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2018/03/03/0168/00350.html#italD",
+                "fr": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2018/03/03/0168/00350.html#francD",
+                "en": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2018/03/03/0168/00350.html#ingD",
+                "de": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2018/03/03/0168/00350.html#tedeD",
+                "es": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2018/03/03/0168/00350.html#spagnD",
+                "pt": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2018/03/03/0168/00350.html#portD"
+            },
+            "strtotime": {
+                "day_of_the_week": "Monday",
+                "relative_time": "after",
+                "festivity_key": "Pentecost"
+            }
+        }
+    },
+    {
+        "decree_id": "StMartha_NameChange",
+        "decree_date": "2021-01-26",
+        "decree_protocol": "Prot. N. 35/21",
+        "description": "The Supreme Pontiff Pope FRANCIS, considering the important evangelical witness offered by Martha, Mary and Lazarus in welcoming the Lord Jesus into their home, in listening to him attentively, in believing that he is the resurrection and the life, and accepting the proposal of this Dicastery, has decreed that 29 July be designated in the General Roman Calendar as the Memorial of Saints Martha, Mary and Lazarus.",
+        "festivity": {
+            "event_key": "StMartha",
+            "grade": 3
+        },
+        "metadata": {
+            "action": "setProperty",
+            "property": "name",
+            "since_year": 2021,
+            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_%s.html",
+            "url_lang_map": {
+                "de": "ge",
+                "en": "en",
+                "es": "sp",
+                "fr": "fr",
+                "it": "it",
+                "la": "la",
+                "pt": "po"
+            },
+            "urls_langs": {
+                "de": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_ge.html",
+                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_en.html",
+                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_sp.html",
+                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_fr.html",
+                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_it.html",
+                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_la.html",
+                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_po.html"
+            }
+        }
+    },
+    {
+        "decree_id": "StJohnXXIII_Create",
+        "decree_date": "2014-05-29",
+        "decree_protocol": "Prot. N. 309/14",
+        "description": "The Supreme Pontiff Francis, taking into consideration the universal whishes of the People of God from many and diverse regions of the world, has decreed that the celebrations of Pope Saint John XXIII and Pope Saint John Paul II should be inserted into the General Roman Calendar, to be observed annually with the rank of Optional Memorial, the first on 11 October, the second on 22 October.",
+        "festivity": {
+            "event_key": "StJohnXXIII",
+            "grade": 2,
+            "month": 10,
+            "day": 11,
+            "common": ["Pastors:For a Pope"],
+            "calendar": "GENERAL ROMAN",
+            "color": ["white"],
+            "type": "fixed",
+            "readings": {
+                "first_reading": "",
+                "responsorial_psalm": "",
+                "second_reading": "",
+                "alleluia_verse": "",
+                "gospel": ""
+            }
+        },
+        "metadata": {
+            "action": "createNew",
+            "since_year": 2014,
+            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_%s.html",
+            "url_lang_map": {
+                "en": "en",
+                "es": "sp",
+                "fr": "fr",
+                "it": "it",
+                "la": "la",
+                "pt": "po"
+            },
+            "urls_langs": {
+                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_en.html",
+                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_sp.html",
+                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_fr.html",
+                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_it.html",
+                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_la.html",
+                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_po.html"
+            }
+        }
+    },
+    {
+        "decree_id": "StJohnPaulII_Create",
+        "decree_date": "2014-05-29",
+        "decree_protocol": "Prot. N. 309/14",
+        "description": "The Supreme Pontiff Francis, taking into consideration the universal whishes of the People of God from many and diverse regions of the world, has decreed that the celebrations of Pope Saint John XXIII and Pope Saint John Paul II should be inserted into the General Roman Calendar, to be observed annually with the rank of Optional Memorial, the first on 11 October, the second on 22 October.",
+        "festivity": {
+            "event_key": "StJohnPaulII",
+            "grade": 2,
+            "month": 10,
+            "day": 22,
+            "common": ["Pastors:For a Pope"],
+            "calendar": "GENERAL ROMAN",
+            "color": ["white"],
+            "type": "fixed",
+            "readings": {
+                "first_reading": "",
+                "responsorial_psalm": "",
+                "second_reading": "",
+                "alleluia_verse": "",
+                "gospel": ""
+            }
+        },
+        "metadata": {
+            "action": "createNew",
+            "since_year": 2014,
+            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_%s.html",
+            "url_lang_map": {
+                "en": "en",
+                "es": "sp",
+                "fr": "fr",
+                "it": "it",
+                "la": "la",
+                "pt": "po"
+            },
+            "urls_langs": {
+                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_en.html",
+                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_sp.html",
+                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_fr.html",
+                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_it.html",
+                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_la.html",
+                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_po.html"
+            }
+        }
+    },
+    {
+        "decree_id": "LadyLoreto_Create",
+        "decree_date": "2019-10-07",
+        "decree_protocol": "Prot. N. 404/19",
+        "description": "Pope Francis has decreed, by his own authority, that the optional memorial of the Blessed Virgin Mary of Loreto should be inscribed in the Roman Calendar on 10 December, the day on which the feast falls in Loreto, and celebrated every year.",
+        "festivity": {
+            "event_key": "LadyLoreto",
+            "grade": 2,
+            "month": 12,
+            "day": 10,
+            "common": ["Blessed Virgin Mary"],
+            "calendar": "GENERAL ROMAN",
+            "color": ["white"],
+            "type": "fixed",
+            "readings": {
+                "first_reading": "",
+                "responsorial_psalm": "",
+                "second_reading": "",
+                "alleluia_verse": "",
+                "gospel": ""
+            }
+        },
+        "metadata": {
+            "action": "createNew",
+            "since_year": 2019,
+            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_%s.html",
+            "url_lang_map": {
+                "en": "en",
+                "es": "sp",
+                "fr": "fr",
+                "it": "it",
+                "la": "la",
+                "pt": "po"
+            },
+            "urls_langs": {
+                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_en.html",
+                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_sp.html",
+                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_fr.html",
+                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_it.html",
+                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_la.html",
+                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_po.html"
+            }
+        }
+    },
+    {
+        "decree_id": "StPaulVI_Create",
+        "decree_date": "2019-01-25",
+        "decree_protocol": "Prot. N. 29/19",
+        "description": "Pope Francis, assenting to the petitions and desires of the People of God, has decreed that the celebration of Pope Saint Paul VI, should be inserted into the Roman Calendar on 29 May with the rank of optional memorial.",
+        "festivity": {
+            "event_key": "StPaulVI",
+            "grade": 2,
+            "month": 5,
+            "day": 29,
+            "common": ["Pastors:For a Pope"],
+            "calendar": "GENERAL ROMAN",
+            "color": ["white"],
+            "type": "fixed",
+            "readings": {
+                "first_reading": "",
+                "responsorial_psalm": "",
+                "second_reading": "",
+                "alleluia_verse": "",
+                "gospel": ""
+            }
+        },
+        "metadata": {
+            "action": "createNew",
+            "since_year": 2019,
+            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_%s.html",
+            "url_lang_map": {
+                "de": "ge",
+                "en": "en",
+                "es": "sp",
+                "fr": "fr",
+                "it": "it",
+                "la": "la",
+                "pt": "po"
+            },
+            "urls_langs": {
+                "de": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_ge.html",
+                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_en.html",
+                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_sp.html",
+                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_fr.html",
+                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_it.html",
+                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_la.html",
+                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_po.html"
+            }
+        }
+    },
+    {
+        "decree_id": "StFaustinaKowalska_Create",
+        "decree_date": "2020-01-18",
+        "decree_protocol": "Prot. N. 229/20",
+        "description": "The Supreme Pontiff Francis, accepting the petitions and wishes of Pastors, religious women and men, as well as associations of the faithful and having considered the influence exercised by the spirituality of Saint Faustina in different parts of the world, has decreed that the name of Saint Maria Faustina (Helena) Kowalska, virgin, be inscribed in the General Roman Calendar and that her optional memorial be celebrated by all on 5 October.",
+        "festivity": {
+            "event_key": "StFaustinaKowalska",
+            "grade": 2,
+            "month": 10,
+            "day": 5,
+            "common": ["Holy Men and Women:For Religious"],
+            "calendar": "GENERAL ROMAN",
+            "color": ["white"],
+            "type": "fixed",
+            "readings": {
+                "first_reading": "",
+                "responsorial_psalm": "",
+                "second_reading": "",
+                "alleluia_verse": "",
+                "gospel": ""
+            }
+        },
+        "metadata": {
+            "action": "createNew",
+            "since_year": 2020,
+            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_%s.html",
+            "url_lang_map": {
+                "en": "en",
+                "es": "sp",
+                "fr": "fr",
+                "it": "it",
+                "la": "la",
+                "pt": "po"
+            },
+            "urls_langs": {
+                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_en.html",
+                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_sp.html",
+                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_fr.html",
+                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_it.html",
+                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_la.html",
+                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_po.html"
+            }
+        }
+    },
+    {
+        "decree_id": "StGregoryNarek_Create",
+        "decree_date": "2021-01-25",
+        "decree_protocol": "Prot. N. 40/21",
+        "description": "The Supreme Pontiff Pope FRANCIS has decreed the following celebrations to be inscribed in the General Roman Calendar with the rank of Optional Memorial: Saint Gregory of Narek, Abbot and Doctor of the Church, on 27 February",
+        "festivity": {
+            "event_key": "StGregoryNarek",
+            "grade": 2,
+            "month": 2,
+            "day": 27,
+            "common": ["Holy Men and Women:For an Abbot", "Doctors"],
+            "calendar": "GENERAL ROMAN",
+            "color": ["white"],
+            "type": "fixed",
+            "readings": {
+                "first_reading": "",
+                "responsorial_psalm": "",
+                "second_reading": "",
+                "alleluia_verse": "",
+                "gospel": ""
+            }
+        },
+        "metadata": {
+            "action": "createNew",
+            "since_year": 2021,
+            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_%s.html",
+            "url_lang_map": {
+                "de": "ge",
+                "en": "en",
+                "es": "sp",
+                "fr": "fr",
+                "it": "it",
+                "la": "la",
+                "pt": "po"
+            },
+            "urls_langs": {
+                "de": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_ge.html",
+                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_en.html",
+                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_sp.html",
+                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_fr.html",
+                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_it.html",
+                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_la.html",
+                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_po.html"
+            }
+        }
+    },
+    {
+        "decree_id": "StJohnAvila_Create",
+        "decree_date": "2021-01-25",
+        "decree_protocol": "Prot. N. 40/21",
+        "description": "The Supreme Pontiff Pope FRANCIS has decreed the following celebrations to be inscribed in the General Roman Calendar with the rank of Optional Memorial: Saint John De Avila, Priest and Doctor of the Church, on 10 May",
+        "festivity": {
+            "event_key": "StJohnAvila",
+            "grade": 2,
+            "month": 5,
+            "day": 10,
+            "common": ["Pastors:For One Pastor", "Doctors"],
+            "calendar": "GENERAL ROMAN",
+            "color": ["white"],
+            "type": "fixed",
+            "readings": {
+                "first_reading": "",
+                "responsorial_psalm": "",
+                "second_reading": "",
+                "alleluia_verse": "",
+                "gospel": ""
+            }
+        },
+        "metadata": {
+            "action": "createNew",
+            "since_year": 2021,
+            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_%s.html",
+            "url_lang_map": {
+                "de": "ge",
+                "en": "en",
+                "es": "sp",
+                "fr": "fr",
+                "it": "it",
+                "la": "la",
+                "pt": "po"
+            },
+            "urls_langs": {
+                "de": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_ge.html",
+                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_en.html",
+                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_sp.html",
+                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_fr.html",
+                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_it.html",
+                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_la.html",
+                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_po.html"
+            }
+        }
+    },
+    {
+        "decree_id": "StHildegardBingen_Create",
+        "decree_date": "2021-01-25",
+        "decree_protocol": "Prot. N. 40/21",
+        "description": "The Supreme Pontiff Pope FRANCIS has decreed the following celebrations to be inscribed in the General Roman Calendar with the rank of Optional Memorial: Saint Hildegard of Bingen, Virgin and Doctor of the Church, on 17 September",
+        "festivity": {
+            "event_key": "StHildegardBingen",
+            "grade": 2,
+            "month": 9,
+            "day": 17,
+            "common": ["Virgins:For One Virgin", "Doctors"],
+            "calendar": "GENERAL ROMAN",
+            "color": ["white"],
+            "type": "fixed",
+            "readings": {
+                "first_reading": "",
+                "responsorial_psalm": "",
+                "second_reading": "",
+                "alleluia_verse": "",
+                "gospel": ""
+            }
+        },
+        "metadata": {
+            "action": "createNew",
+            "since_year": 2021,
+            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_%s.html",
+            "url_lang_map": {
+                "de": "ge",
+                "en": "en",
+                "es": "sp",
+                "fr": "fr",
+                "it": "it",
+                "la": "la",
+                "pt": "po"
+            },
+            "urls_langs": {
+                "de": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_ge.html",
+                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_en.html",
+                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_sp.html",
+                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_fr.html",
+                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_it.html",
+                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_la.html",
+                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_po.html"
+            }
+        }
+    },
+    {
+        "decree_id": "StThereseChildJesus_Doctor",
+        "decree_date": "1997-10-19",
+        "decree_protocol": "",
+        "description": "Fulfilling the wishes of many Brothers in the Episcopate and of a great number of the faithful throughout the world, after consulting the Congregation for the Causes of Saints and hearing the opinion of the Congregation for the Doctrine of the Faith regarding her eminent doctrine, with certain knowledge and after lengthy reflection, with the fullness of Our apostolic authority We declare Saint Thérèse of the Child Jesus and the Holy Face, virgin, to be a Doctor of the Universal Church.",
+        "festivity": {
+            "event_key": "StThereseChildJesus",
+            "common": ["Proper"]
+        },
+        "metadata": {
+            "action": "makeDoctor",
+            "since_year": 1998,
+            "url": "https://www.vatican.va/content/john-paul-ii/%s/apost_letters/1997/documents/hf_jp-ii_apl_19101997_divini-amoris.html",
+            "url_lang_map": {
+                "de": "de",
+                "en": "en",
+                "es": "es",
+                "fr": "fr",
+                "it": "it",
+                "la": "la",
+                "pt": "pt"
+            },
+            "urls_langs": {
+                "de": "https://www.vatican.va/content/john-paul-ii/de/apost_letters/1997/documents/hf_jp-ii_apl_19101997_divini-amoris.html",
+                "en": "https://www.vatican.va/content/john-paul-ii/en/apost_letters/1997/documents/hf_jp-ii_apl_19101997_divini-amoris.html",
+                "es": "https://www.vatican.va/content/john-paul-ii/es/apost_letters/1997/documents/hf_jp-ii_apl_19101997_divini-amoris.html",
+                "fr": "https://www.vatican.va/content/john-paul-ii/fr/apost_letters/1997/documents/hf_jp-ii_apl_19101997_divini-amoris.html",
+                "it": "https://www.vatican.va/content/john-paul-ii/it/apost_letters/1997/documents/hf_jp-ii_apl_19101997_divini-amoris.html",
+                "la": "https://www.vatican.va/content/john-paul-ii/la/apost_letters/1997/documents/hf_jp-ii_apl_19101997_divini-amoris.html",
+                "pt": "https://www.vatican.va/content/john-paul-ii/pt/apost_letters/1997/documents/hf_jp-ii_apl_19101997_divini-amoris.html"
+            }
+        }
+    },
+    {
+        "decree_id": "StIrenaeus_Doctor",
+        "decree_date": "2022-01-22",
+        "decree_protocol": "B0048-XX.01 00099-IT.01",
+        "description": "Dopo aver avuto il parere della Congregazione delle Cause dei Santi, con la mia Autorità Apostolica lo DICHIARO Sant'Ireneo di Lione Dottore della Chiesa con il titolo di Doctor unitatis.",
+        "festivity": {
+            "event_key": "StIrenaeus",
+            "common": ["Proper"]
+        },
+        "metadata": {
+            "action": "makeDoctor",
+            "since_year": 2022,
+            "url": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2022/01/21/0048/00099.html"
+        }
+    }
+]

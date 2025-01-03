@@ -1,0 +1,124 @@
+{
+  "litcal": [
+    {
+      "festivity": {
+        "color": [
+          "red",
+          "white"
+        ],
+        "grade": 4,
+        "common": [
+          "Martyrs",
+          "Pastors:For Missionaries"
+        ],
+        "day": 5,
+        "month": 6,
+        "event_key": "HHBonifatiusbisschoppatroonvanhetbisdomengezellenmartelaren"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 4,
+        "common": [
+          "Dedication of a Church"
+        ],
+        "day": 19,
+        "month": 9,
+        "event_key": "VerjaardagvandeWijdingvandekathedraal"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 1,
+        "until_year": 2019
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 4,
+        "common": [
+          "Dedication of a Church"
+        ],
+        "day": 25,
+        "month": 5,
+        "event_key": "VerjaardagvandeWijdingvandekathedraal"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 2
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 3,
+        "common": [
+          "Pastors:For Missionaries"
+        ],
+        "day": 8,
+        "month": 11,
+        "event_key": "HWillehadbisschop"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Holy Men and Women:For Religious"
+        ],
+        "day": 3,
+        "month": 3,
+        "event_key": "HFrederikabt"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Pastors:For Missionaries"
+        ],
+        "day": 26,
+        "month": 3,
+        "event_key": "HLudgerbisschop"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 1
+      }
+    }
+  ],
+  "metadata": {
+    "diocese_id": "grolee_nl",
+    "diocese_name": "Groningen-Leeuwarden",
+    "nation": "NL",
+    "locales": [
+      "nl_NL"
+    ],
+    "timezone": "Europe/Amsterdam"
+  }
+}

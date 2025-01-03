@@ -1,0 +1,339 @@
+[
+    {
+        "month": 1,
+        "day": 4,
+        "event_key": "StElizabethSeton",
+        "name": "Saint Elizabeth Ann Seton, Religious",
+        "grade": 3,
+        "grade_display": null,
+        "common": [
+            "Proper"
+        ],
+        "calendar": "US",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 1,
+        "day": 5,
+        "event_key": "StJohnNeumann",
+        "name": "Saint John Neumann, Bishop",
+        "grade": 3,
+        "grade_display": null,
+        "common": [
+            "Proper"
+        ],
+        "calendar": "US",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 1,
+        "day": 6,
+        "event_key": "StAndreBessette",
+        "name": "Saint André Bessette, Religious",
+        "grade": 2,
+        "grade_display": null,
+        "common": [
+            "Holy Men and Women:For Religious"
+        ],
+        "calendar": "US",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 1,
+        "day": 22,
+        "event_key": "PrayerUnborn",
+        "name": "Day of Prayer for the Legal Protection of Unborn Children",
+        "grade": 3,
+        "grade_display": "National Day of Prayer",
+        "common": [
+            "Masses and Prayers for Various Needs and Occasions:For Giving Thanks to God for the Gift of Human Life",
+            "Preservation of Peace and Justice"
+        ],
+        "calendar": "US",
+        "color": [
+            "purple",
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 3,
+        "day": 3,
+        "event_key": "StKatharineDrexel",
+        "name": "Saint Katharine Drexel, Virgin",
+        "grade": 2,
+        "grade_display": null,
+        "common": [
+            "Virgins:For One Virgin"
+        ],
+        "calendar": "US",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 5,
+        "day": 10,
+        "event_key": "StDamienVeuster",
+        "name": "Saint Damien de Veuster, Priest",
+        "grade": 2,
+        "grade_display": null,
+        "common": [
+            "Pastors:For Missionaries"
+        ],
+        "calendar": "US",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 5,
+        "day": 15,
+        "event_key": "StIsidore",
+        "name": "Saint Isidore",
+        "grade": 2,
+        "grade_display": null,
+        "common": [
+            "Holy Men and Women:For One Saint"
+        ],
+        "calendar": "US",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 7,
+        "day": 1,
+        "event_key": "JuniperoSerra",
+        "name": "Blessed Junípero Serra, Priest",
+        "grade": 2,
+        "grade_display": null,
+        "common": [
+            "Pastors:For One Pastor",
+            "Pastors:For Missionaries"
+        ],
+        "calendar": "US",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 7,
+        "day": 4,
+        "event_key": "IndependenceDay",
+        "name": "Independence Day",
+        "grade": 3,
+        "grade_display": "National Holiday",
+        "common": [
+            "Proper"
+        ],
+        "calendar": "US",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 7,
+        "day": 14,
+        "event_key": "KateriTekakwitha",
+        "name": "Blessed Kateri Tekakwitha, Virgin",
+        "grade": 3,
+        "grade_display": null,
+        "common": [
+            "Virgins:For One Virgin"
+        ],
+        "calendar": "US",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 9,
+        "day": 9,
+        "event_key": "StPeterClaver",
+        "name": "Saint Peter Claver, Priest",
+        "grade": 3,
+        "grade_display": null,
+        "common": [
+            "Pastors:For One Pastor",
+            "Holy Men and Women:For Those Who Practiced Works of Mercy"
+        ],
+        "calendar": "US",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 10,
+        "day": 6,
+        "event_key": "MarieDurocher",
+        "name": "Blessed Marie Rose Durocher, Virgin",
+        "grade": 2,
+        "grade_display": null,
+        "common": [
+            "Virgins:For One Virgin"
+        ],
+        "calendar": "US",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 11,
+        "day": 13,
+        "event_key": "StFrancesXCabrini",
+        "name": "Saint Frances Xavier Cabrini, Virgin",
+        "grade": 3,
+        "grade_display": null,
+        "common": [
+            "Virgins:For One Virgin",
+            "Holy Men and Women:For Those Who Practiced Works of Mercy"
+        ],
+        "calendar": "US",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 11,
+        "day": 18,
+        "event_key": "StRoseDuchesne",
+        "name": "Saint Rose Philippine Duchesne, Virgin",
+        "grade": 2,
+        "grade_display": null,
+        "common": [
+            "Virgins:For One Virgin"
+        ],
+        "calendar": "US",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 11,
+        "day": 23,
+        "event_key": "MiguelPro",
+        "name": "Blessed Miguel Agustín Pro, Priest and Martyr",
+        "grade": 2,
+        "grade_display": null,
+        "common": [
+            "Martyrs:For One Martyr",
+            "Pastors:For One Pastor"
+        ],
+        "calendar": "US",
+        "color": [
+            "white",
+            "red"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    }
+]

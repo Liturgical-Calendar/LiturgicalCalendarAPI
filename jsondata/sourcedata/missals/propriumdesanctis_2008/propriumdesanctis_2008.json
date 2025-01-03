@@ -1,0 +1,63 @@
+[
+    {
+        "month": 9,
+        "day": 23,
+        "event_key": "StPioPietrelcina",
+        "grade": 3,
+        "common": [
+            "Pastors:For One Pastor",
+            "Holy Men and Women:For Religious"
+        ],
+        "calendar": "GENERAL ROMAN",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 12,
+        "day": 12,
+        "event_key": "LadyGuadalupe",
+        "grade": 2,
+        "common": [
+            "Blessed Virgin Mary"
+        ],
+        "calendar": "GENERAL ROMAN",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 12,
+        "day": 9,
+        "event_key": "JuanDiego",
+        "grade": 2,
+        "common": [
+            "Holy Men and Women:For One Saint"
+        ],
+        "calendar": "GENERAL ROMAN",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    }
+]

@@ -1,0 +1,49 @@
+{
+    "version": "2.0.0",
+    "options": {
+        "env": {
+            "APP_PROTOCOL": "http",
+            "APP_HOST": "localhost",
+            "APP_PORT": "8000"
+        }
+    },
+    "tasks": [
+        {
+            "label": "launch-browser",
+            "type": "shell",
+            "windows": {
+                "command": "${command:workbench.action.terminal.sendSequence}",
+                "args": [
+                {
+                    "text": "start ${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}\n" // For Windows
+                }
+                ],
+                "problemMatcher": []
+            },
+            "linux": {
+                "command": "/bin/bash",
+                "args": [
+                    "-c",
+                    "if grep -q microsoft /proc/version; then powershell.exe Start-Process ${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}; else xdg-open ${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}; fi"
+                  ],
+                "problemMatcher": []
+            },
+            "osx": {
+                "command": "open ${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}", // For macOS
+                "problemMatcher": []
+            }
+        },
+        {
+            "label": "php-server",
+            "type": "shell",
+            "command": "PHP_CLI_SERVER_WORKERS=6 php -S ${APP_HOST}:${APP_PORT}",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "launch-browser"
+            ]
+        }
+    ]
+}

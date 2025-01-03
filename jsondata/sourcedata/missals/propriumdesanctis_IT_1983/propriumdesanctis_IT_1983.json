@@ -1,0 +1,183 @@
+[
+    {
+        "month": 4,
+        "day": 23,
+        "event_key": "StAdalbert",
+        "name": "Sant'Adalberto, vescovo e martire",
+        "grade": 2,
+        "grade_display": null,
+        "common": [
+            "Martyrs:For One Martyr",
+            "Pastors:For a Bishop"
+        ],
+        "calendar": "IT",
+        "color": [
+            "white",
+            "red"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 4,
+        "day": 28,
+        "event_key": "StLouisGrignonMontfort",
+        "name": "San Luigi Grignon de Montfort",
+        "grade": 2,
+        "grade_display": null,
+        "common": [
+            "Pastors:For One Pastor"
+        ],
+        "calendar": "IT",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 8,
+        "day": 2,
+        "event_key": "StPeterJulianEymard",
+        "name": "San Pietro Giuliani, sacerdote",
+        "grade": 2,
+        "grade_display": null,
+        "common": [
+            "Pastors:For One Pastor",
+            "Holy Men and Women:For Religious"
+        ],
+        "calendar": "IT",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 8,
+        "day": 14,
+        "event_key": "StMaximilianKolbe",
+        "name": "San Massimiliano Kolbe, sacerdote e martire",
+        "grade": 3,
+        "grade_display": null,
+        "common": [
+            "Proper"
+        ],
+        "calendar": "IT",
+        "color": [
+            "white",
+            "red"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 9,
+        "day": 9,
+        "event_key": "StPeterClaver",
+        "name": "San Pietro Claver, sacerdote",
+        "grade": 2,
+        "grade_display": null,
+        "common": [
+            "Pastors:For One Pastor",
+            "Holy Men and Women:For Those Who Practiced Works of Mercy"
+        ],
+        "calendar": "IT",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 9,
+        "day": 20,
+        "event_key": "StAndrewKimTaegon",
+        "name": "Santi Andrea Kim Taegon, sacerdote, Paolo Chong Hasang e compagni martiri",
+        "grade": 3,
+        "grade_display": null,
+        "common": [
+            "Proper"
+        ],
+        "calendar": "IT",
+        "color": [
+            "white"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 9,
+        "day": 28,
+        "event_key": "StsLawrenceRuiz",
+        "name": "Santi Lorenzo Ruiz e compagni martiri",
+        "grade": 2,
+        "grade_display": null,
+        "common": [
+            "Martyrs:For Several Martyrs"
+        ],
+        "calendar": "IT",
+        "color": [
+            "red"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    },
+    {
+        "month": 11,
+        "day": 24,
+        "event_key": "StAndrewDungLac",
+        "name": "Sant'Andrea Dung-Lac e compagni martiri",
+        "grade": 3,
+        "grade_display": null,
+        "common": [
+            "Proper"
+        ],
+        "calendar": "IT",
+        "color": [
+            "red"
+        ],
+        "readings": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "alleluia_verse": "",
+            "gospel": ""
+        }
+    }
+]

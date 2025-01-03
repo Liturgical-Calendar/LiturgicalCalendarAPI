@@ -1,0 +1,44 @@
+{
+    "litcal": [
+        {
+            "festivity": {
+                "event_key": "DedicazionedellaChiesaMadrediCassinoinCassino",
+                "color": ["white"],
+                "grade": 6,
+                "common": ["Dedication of a Church"],
+                "day": 5,
+                "month": 6
+            },
+            "metadata": {
+                "form_rownum": 1,
+                "since_year": 1970
+            }
+        },
+        {
+            "festivity": {
+                "event_key": "SantaRestituta",
+                "color": [
+                    "white"
+                ],
+                "grade": 4,
+                "common": ["Proper"],
+                "day": 27,
+                "month": 5
+            },
+            "metadata": {
+                "form_rownum": 0,
+                "since_year": 1970
+            }
+        }
+    ],
+    "metadata": {
+        "diocese_id": "socaap_it",
+        "diocese_name": "Diocesi di Sora - Cassino - Aquino - Pontecorvo",
+        "nation": "IT",
+        "locales": [
+            "it_IT"
+        ],
+        "timezone": "Europe/Rome",
+        "group": "Diocesi del Lazio"
+    }
+}

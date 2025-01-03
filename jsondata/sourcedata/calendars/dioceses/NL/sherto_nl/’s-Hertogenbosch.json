@@ -1,0 +1,194 @@
+{
+  "litcal": [
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 4,
+        "common": [
+          "Dedication of a Church"
+        ],
+        "day": 25,
+        "month": 8,
+        "event_key": "VerjaardagvandeWijdingvandekathedraal"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 1
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 4,
+        "common": [
+          "Proper"
+        ],
+        "day": 27,
+        "month": 12,
+        "event_key": "HJohannesapostelenevangelistpatroonvanhetbisdom"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 3,
+        "common": [
+          "Pastors:For One Pastor",
+          "Holy Men and Women:For Those Who Practiced Works of Mercy"
+        ],
+        "day": 14,
+        "month": 1,
+        "event_key": "ZPetrusDonderspriester"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 3,
+        "common": [
+          "Pastors"
+        ],
+        "day": 12,
+        "month": 6,
+        "event_key": "HOdulfuspriester"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 1
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Pastors"
+        ],
+        "day": 13,
+        "month": 5,
+        "event_key": "HServatiusbisschop"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Proper"
+        ],
+        "day": 17,
+        "month": 9,
+        "event_key": "HLambertusbisschopenmartelaar"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 1
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Pastors:For a Bishop"
+        ],
+        "day": 3,
+        "month": 11,
+        "event_key": "HHubertusbisschop"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 2
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 3,
+        "common": [
+          "Blessed Virgin Mary"
+        ],
+        "day": 7,
+        "month": 7,
+        "event_key": "HeiligeMaagdMariaZoeteMoedervanDenBosch"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 2
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Pastors:For One Pastor"
+        ],
+        "day": 30,
+        "month": 8,
+        "event_key": "ZEustachiusvanLieshoutpriester"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 3
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Virgins:For One Virgin"
+        ],
+        "day": 27,
+        "month": 11,
+        "event_key": "HOdamaagd"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 4
+      }
+    }
+  ],
+  "metadata": {
+    "diocese_id": "sherto_nl",
+    "diocese_name": "'s-Hertogenbosch",
+    "nation": "NL",
+    "locales": [
+      "nl_NL"
+    ],
+    "timezone": "Europe/Amsterdam"
+  }
+}

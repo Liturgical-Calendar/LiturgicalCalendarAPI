@@ -1,0 +1,106 @@
+{
+    "litcal": [
+        {
+            "festivity": {
+                "event_key": "ImmaculateConception",
+                "grade": 6
+            },
+            "metadata": {
+                "action": "makePatron",
+                "since_year": 1970
+            }
+        },
+        {
+            "festivity": {
+                "event_key": "StVincentDeacon",
+                "day": 23,
+                "month": 1
+            },
+            "metadata": {
+                "action": "moveFestivity",
+                "missal": "US_2011",
+                "reason": "National Day of Prayer for the Unborn",
+                "since_year": 1970
+            }
+        },
+        {
+            "festivity": {
+                "event_key": "StPaulCross",
+                "day": 20,
+                "month": 10
+            },
+            "metadata": {
+                "action": "moveFestivity",
+                "missal": "US_2011",
+                "reason": "Saint John Brebeuf (elevated to memorial)",
+                "since_year": 1970
+            }
+        },
+        {
+            "festivity": {
+                "event_key": "StsJeanBrebeuf",
+                "grade": 3
+            },
+            "metadata": {
+                "action": "setProperty",
+                "property": "grade",
+                "since_year": 1970
+            }
+        },
+        {
+            "festivity": {
+                "event_key": "ThanksgivingDay",
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "strtotime": "fourth thursday of november",
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1970
+            }
+        },
+        {
+            "festivity": {
+                "event_key": "StCamillusDeLellis",
+                "day": 18,
+                "month": 7
+            },
+            "metadata": {
+                "action": "moveFestivity",
+                "missal": "US_2011",
+                "reason": "Blessed Kateri Tekakwitha",
+                "since_year": 1970
+            }
+        },
+        {
+            "festivity": {
+                "event_key": "StElizabethPortugal",
+                "day": 5,
+                "month": 7
+            },
+            "metadata": {
+                "action": "moveFestivity",
+                "missal": "US_2011",
+                "reason": "Independence Day",
+                "since_year": 1970
+            }
+        }
+    ],
+    "settings": {
+        "epiphany": "SUNDAY_JAN2_JAN8",
+        "ascension": "SUNDAY",
+        "corpus_christi": "SUNDAY",
+        "eternal_high_priest": false
+    },
+    "metadata": {
+        "nation": "US",
+        "locales": ["en_US"],
+        "wider_region": "Americas",
+        "missals": [
+            "US_2011"
+        ]
+    }
+}

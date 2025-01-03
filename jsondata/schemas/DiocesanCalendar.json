@@ -1,0 +1,138 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "DiocesanCalendar",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "litcal": {
+            "$ref": "#/definitions/LitCal"
+        },
+        "settings": {
+            "$ref": "#/definitions/Overrides"
+        },
+        "metadata": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "diocese_id": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                },
+                "diocese_name": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9 ()'-]+$"
+                },
+                "nation": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Nation"
+                },
+                "locales": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+                    }
+                },
+                "timezone": {
+                    "type": "string"
+                },
+                "group": {
+                    "type": "string"}
+            },
+            "required": [
+                "diocese_id",
+                "diocese_name",
+                "nation",
+                "locales",
+                "timezone"
+            ]
+        }
+    },
+    "required": [
+        "litcal",
+        "metadata"
+    ],
+    "definitions": {
+        "LitCal": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "festivity": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                            "event_key": {
+                                "type": "string",
+                                "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil|_[0-9])?$"
+                            },
+                            "color": {
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
+                            },
+                            "grade": {
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                            },
+                            "common": {
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitCommon"
+                            },
+                            "day": {
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Day"
+                            },
+                            "month": {
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Month"
+                            },
+                            "readings": {
+                                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "event_key",
+                            "color",
+                            "grade",
+                            "common"
+                        ]
+                    },
+                    "metadata": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                            "form_rownum": {
+                                "type": "integer"
+                            },
+                            "since_year": {
+                                "type": "integer",
+                                "minimum": 1970
+                            },
+                            "until_year": {
+                                "type": "integer",
+                                "maximum": 9999
+                            },
+                            "strtotime": {
+                                "type": "string"
+                            },
+                            "url": {
+                                "type": "string",
+                                "format": "uri"
+                            }
+                        },
+                        "required": [
+                            "form_rownum",
+                            "since_year"
+                        ]
+                    }
+                },
+                "required": [
+                    "festivity",
+                    "metadata"
+                ]
+            },
+            "title": "LitCal"
+        },
+        "Overrides": {
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/CalendarSettings",
+            "title": "Overrides"
+        }
+    }
+}

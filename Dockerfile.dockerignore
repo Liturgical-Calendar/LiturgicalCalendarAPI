@@ -1,0 +1,8 @@
+*
+!src
+!i18n
+!jsondata
+!composer.json
+!composer.lock
+!LitCalTestServer.php
+!index.php

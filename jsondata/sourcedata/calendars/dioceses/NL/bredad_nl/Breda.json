@@ -1,0 +1,215 @@
+{
+  "litcal": [
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 6,
+        "common": [
+          "Proper"
+        ],
+        "day": 15,
+        "month": 8,
+        "event_key": "MariaTenhemelopnemingPatroonsfeestvanhetbisdom"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 4,
+        "common": [
+          "Dedication of a Church"
+        ],
+        "day": 20,
+        "month": 12,
+        "event_key": "VerjaardagvandeWijdingvandebisschopskerk"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 1,
+        "until_year": 2019
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 4,
+        "common": [
+          "Dedication of a Church"
+        ],
+        "day": 12,
+        "month": 12,
+        "event_key": "VerjaardagvandeWijdingvandebisschopskerk_2"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 2
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "red"
+        ],
+        "grade": 4,
+        "common": [
+          "Proper"
+        ],
+        "day": 8,
+        "month": 7,
+        "event_key": "HHMariaAdolfinaengezellinnenmaagdenenmartelaressen"
+      },
+      "metadata": {
+        "since_year": 2001,
+        "form_rownum": 3
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "red"
+        ],
+        "grade": 3,
+        "common": [
+          "Proper"
+        ],
+        "day": 8,
+        "month": 7,
+        "event_key": "ZZMariaAdolfinaengezellinnenmaagdenenmartelaressen"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0,
+        "until_year": 2000
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Pastors:For One Pastor",
+          "Holy Men and Women:For Those Who Practiced Works of Mercy"
+        ],
+        "day": 14,
+        "month": 1,
+        "event_key": "ZPetrusDonderspriester"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Pastors:For Missionaries"
+        ],
+        "day": 6,
+        "month": 2,
+        "event_key": "HAmandusbisschop"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 1
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Virgins:For One Virgin",
+          "Holy Men and Women:For Religious"
+        ],
+        "day": 17,
+        "month": 3,
+        "event_key": "HGertrudismaagd"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 2
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "red"
+        ],
+        "grade": 2,
+        "common": [
+          "Proper"
+        ],
+        "day": 17,
+        "month": 9,
+        "event_key": "HLambertusbisschopenmartelaar"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 3
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Pastors:For a Bishop"
+        ],
+        "day": 3,
+        "month": 11,
+        "event_key": "HHubertusbisschop"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 4
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Pastors:For Missionaries"
+        ],
+        "day": 1,
+        "month": 12,
+        "event_key": "HEligiusbisschop"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 5
+      }
+    }
+  ],
+  "metadata": {
+    "diocese_id": "bredad_nl",
+    "diocese_name": "Breda",
+    "nation": "NL",
+    "locales": [
+      "nl_NL"
+    ],
+    "timezone": "Europe/Amsterdam"
+  }
+}

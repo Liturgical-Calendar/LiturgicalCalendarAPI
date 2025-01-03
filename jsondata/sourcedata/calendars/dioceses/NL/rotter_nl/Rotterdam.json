@@ -1,0 +1,106 @@
+{
+  "litcal": [
+    {
+      "festivity": {
+        "color": [
+          "white",
+          "red"
+        ],
+        "grade": 4,
+        "common": [
+          "Proper"
+        ],
+        "day": 10,
+        "month": 8,
+        "event_key": "HLaurentiusdiakenenmartelaarpatroonvanhetbisdom"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 4,
+        "common": [
+          "Dedication of a Church"
+        ],
+        "day": 8,
+        "month": 5,
+        "event_key": "VerjaardagvandeWijdingvandekathedraal"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 1
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Proper"
+        ],
+        "day": 1,
+        "month": 3,
+        "event_key": "HSwietbertbisschop"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 0
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "red",
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Martyrs:For One Martyr",
+          "Pastors:For Missionaries"
+        ],
+        "day": 17,
+        "month": 8,
+        "event_key": "HJeroenpriesterenmartelaar"
+      },
+      "metadata": {
+        "since_year": 1979,
+        "form_rownum": 1
+      }
+    },
+    {
+      "festivity": {
+        "color": [
+          "white"
+        ],
+        "grade": 2,
+        "common": [
+          "Proper"
+        ],
+        "day": 20,
+        "month": 10,
+        "event_key": "MariaterWegheOnzeLieveVrouwvanHaastrecht"
+      },
+      "metadata": {
+        "since_year": 2020,
+        "form_rownum": 2
+      }
+    }
+  ],
+  "metadata": {
+    "diocese_id": "rotter_nl",
+    "diocese_name": "Rotterdam",
+    "nation": "NL",
+    "locales": [
+      "nl_NL"
+    ],
+    "timezone": "Europe/Amsterdam"
+  }
+}

@@ -1,0 +1,436 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "NationalCalendar",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "litcal": {
+            "type": "array",
+            "items": {
+                "oneOf": [
+                    {
+                        "$ref": "#/definitions/LitCalMoveFestivity"
+                    },
+                    {
+                        "$ref": "#/definitions/LitCalSetPropertyGrade"
+                    },
+                    {
+                        "$ref": "#/definitions/LitCalSetPropertyName"
+                    },
+                    {
+                        "$ref": "#/definitions/LitCalMakePatron"
+                    },
+                    {
+                        "$ref": "#/definitions/LitCalCreateNewFixed"
+                    },
+                    {
+                        "$ref": "#/definitions/LitCalCreateNewMobile"
+                    }
+                ]
+            }
+        },
+        "settings": {
+            "$ref": "#/definitions/Settings"
+        },
+        "metadata": {
+            "$ref": "#/definitions/NationalCalendarMetadata"
+        }
+    },
+    "required": [
+        "litcal",
+        "metadata",
+        "settings"
+    ],
+    "definitions": {
+        "LitCalCreateNewFixed": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "festivity": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "event_key": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                        },
+                        "color": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
+                        },
+                        "grade": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                        },
+                        "day": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Day"
+                        },
+                        "month": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Month"
+                        },
+                        "common": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitCommon"
+                        },
+                        "readings": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                        },
+                        "name": {
+                            "type": "string",
+                            "description": "should only be present on /events path, not in original resource where it will be present in the i18n file"
+                        }
+                    },
+                    "required": [
+                        "event_key",
+                        "color",
+                        "grade",
+                        "day",
+                        "month",
+                        "common"
+                    ],
+                    "title": "Festivity"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/LitCalMetadataCreateNew"
+                }
+            },
+            "required": [
+                "festivity",
+                "metadata"
+            ],
+            "title": "LitCalCreateNew"
+        },
+        "LitCalCreateNewMobile": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "festivity": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "event_key": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                        },
+                        "color": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
+                        },
+                        "grade": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                        },
+                        "common": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitCommon"
+                        },
+                        "readings": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                        },
+                        "strtotime": {
+                            "type": "string",
+                            "description": "supports PHP strtotime string format"
+                        },
+                        "name": {
+                            "type": "string",
+                            "description": "should only be present on /events path, not in original resource where it will be present in the i18n file"
+                        }
+                    },
+                    "required": [
+                        "strtotime",
+                        "event_key",
+                        "common",
+                        "grade",
+                        "color"
+                    ],
+                    "title": "FestivityCreateNewMobile"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/LitCalMetadataCreateNew"
+                }
+            },
+            "required": [
+                "festivity",
+                "metadata"
+            ],
+            "title": "LitCalCreateNew"
+        },
+        "LitCalMetadataCreateNew": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "const": "createNew"
+                },
+                "since_year": {
+                    "type": "integer"
+                },
+                "until_year": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "action",
+                "since_year"
+            ],
+            "title": "LitCalMetadataCreateNew"
+        },
+        "LitCalSetPropertyGrade": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "festivity": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "event_key": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                        },
+                        "grade": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "event_key",
+                        "grade"
+                    ]
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "since_year": {
+                            "type": "integer"
+                        },
+                        "until_year": {
+                            "type": "integer"
+                        },
+                        "action": {
+                            "type": "string",
+                            "const": "setProperty"
+                        },
+                        "property": {
+                            "type": "string",
+                            "const": "grade"
+                        },
+                        "url": {
+                            "type": "string",
+                            "format": "uri"
+                        }
+                    },
+                    "required": [
+                        "action",
+                        "since_year",
+                        "property"
+                    ]
+                }
+            },
+            "required": [
+                "festivity",
+                "metadata"
+            ],
+            "title": "LitCalSetGradeProperty"
+        },
+        "LitCalSetPropertyName": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "festivity": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "event_key": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "event_key",
+                        "name"
+                    ]
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "since_year": {
+                            "type": "integer"
+                        },
+                        "until_year": {
+                            "type": "integer"
+                        },
+                        "action": {
+                            "type": "string",
+                            "const": "setProperty"
+                        },
+                        "property": {
+                            "type": "string",
+                            "const": "name"
+                        },
+                        "url": {
+                            "type": "string",
+                            "format": "uri"
+                        }
+                    },
+                    "required": [
+                        "action",
+                        "since_year",
+                        "property"
+                    ]
+                }
+            },
+            "required": [
+                "festivity",
+                "metadata"
+            ],
+            "title": "LitCalSetNameProperty"
+        },
+        "LitCalMoveFestivity": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "festivity": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "event_key": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                        },
+                        "month": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Month"
+                        },
+                        "day": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Day"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "event_key",
+                        "month",
+                        "day"
+                    ]
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "since_year": {
+                            "type": "integer"
+                        },
+                        "until_year": {
+                            "type": "integer"
+                        },
+                        "action": {
+                            "type": "string",
+                            "const": "moveFestivity"
+                        },
+                        "missal": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/MissalID"
+                        },
+                        "reason": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "action",
+                        "since_year",
+                        "missal",
+                        "reason"
+                    ]
+                }
+            },
+            "required": [
+                "festivity",
+                "metadata"
+            ],
+            "title": "LitCalMoveFestivity"
+        },
+        "LitCalMakePatron": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "festivity": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "event_key": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                        },
+                        "grade": {
+                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "event_key",
+                        "grade"
+                    ]
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "since_year": {
+                            "type": "integer"
+                        },
+                        "until_year": {
+                            "type": "integer"
+                        },
+                        "action": {
+                            "type": "string",
+                            "const": "makePatron"
+                        },
+                        "url": {
+                            "type": "string",
+                            "format": "uri"
+                        }
+                    },
+                    "required": [
+                        "action",
+                        "since_year"
+                    ]
+                }
+            },
+            "required": [
+                "festivity",
+                "metadata"
+            ],
+            "title": "LitCalMakePatron"
+        },
+        "NationalCalendarMetadata": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "nation": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Nation"
+                },
+                "locales": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+                    }
+                },
+                "wider_region": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/WiderRegionNames"
+                },
+                "missals": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Missals"
+                }
+            },
+            "required": [
+                "nation",
+                "locales",
+                "wider_region",
+                "missals"
+            ],
+            "title": "NationalCalendarMetadata"
+        },
+        "Settings": {
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/CalendarSettings",
+            "title": "Settings"
+        }
+    }
+}

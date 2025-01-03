@@ -1,0 +1,68 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "litcal_easter": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/EasterItem"
+            }
+        },
+        "lastCoincidenceString": {
+            "type": "string"
+        },
+        "lastCoincidence": {
+            "type": "integer",
+            "const": 22983264000
+        }
+    },
+    "required": ["litcal_easter"],
+    "definitions": {
+        "EasterItem": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "gregorianEaster": {
+                    "type": "integer",
+                    "format": "int64",
+                    "minimum": -12204000000,
+                    "maximum": 253378195200
+                },
+                "julianEaster": {
+                    "type": "integer",
+                    "format": "int64",
+                    "minimum": -12204864000,
+                    "maximum": 253379750400
+                },
+                "westernJulianEaster": {
+                    "type": "integer",
+                    "format": "int64",
+                    "minimum": -12204000000,
+                    "maximum": 253386057600
+                },
+                "coinciding": {
+                    "type": "boolean"
+                },
+                "gregorianDateString": {
+                    "type": "string"
+                },
+                "julianDateString": {
+                    "type": "string"
+                },
+                "westernJulianDateString": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "gregorianEaster",
+                "julianEaster",
+                "westernJulianEaster",
+                "coinciding",
+                "gregorianDateString",
+                "julianDateString",
+                "westernJulianDateString"
+            ]
+        }
+    }
+}

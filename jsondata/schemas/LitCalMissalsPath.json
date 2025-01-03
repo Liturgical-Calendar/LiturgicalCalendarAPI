@@ -1,0 +1,82 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "LitCalMissalsPath",
+    "description": "A collection of the Missals from which sanctorale data is used to define one or another Liturgical Calendar",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "litcal_missals": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Missal"
+            },
+            "additionalItems": false
+        }
+    },
+    "required": [ "litcal_missals" ],
+    "definitions": {
+        "Missal": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "missal_id": {
+                    "type": "string",
+                    "pattern": "^(EDITIO_TYPICA|IT|US|NL|CA)_(19[7-9]|[2-9][0-9][0-9])[0-9]$"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "region": {
+                    "type": "string",
+                    "enum": [
+                        "VA",
+                        "IT",
+                        "US",
+                        "NL",
+                        "CA"
+                    ]
+                },
+                "year_published": {
+                    "type": "integer",
+                    "minimum": 1970,
+                    "maximum": 9999
+                },
+                "year_limits": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "since_year": {
+                            "type": "integer",
+                            "minimum": 1970
+                        },
+                        "until_year": {
+                            "type": "integer",
+                            "minimum": 1970
+                        }
+                    },
+                    "required": [ "since_year" ]
+                },
+                "locales": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "pattern": "^[a-z]{2}$"
+                    }
+                },
+                "api_path": {
+                    "type": "string",
+                    "format": "uri",
+                    "pattern": "https?:\\\/\\\/litcal\\.johnromanodorazio\\.com\\\/api\\\/(dev|v[3-9])\\\/missals\\\/(EDITIO_TYPICA|IT|US|NL)_(19[7-9]|[2-9][0-9][0-9])[0-9]$"
+                }
+            },
+            "required": [
+                "missal_id",
+                "name",
+                "region",
+                "year_published",
+                "year_limits",
+                "api_path"
+            ]
+        }
+    }
+}
