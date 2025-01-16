@@ -35,7 +35,8 @@
                     "type": "string"
                 },
                 "group": {
-                    "type": "string"}
+                    "type": "string"
+                }
             },
             "required": [
                 "diocese_id",

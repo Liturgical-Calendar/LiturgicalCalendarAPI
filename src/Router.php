@@ -2,6 +2,7 @@
 
 namespace LiturgicalCalendar\Api;
 
+use GuzzleHttp\Psr7\Request;
 use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Enum\AcceptHeader;
@@ -120,9 +121,12 @@ class Router
             case 'calendar':
                 $LitCalEngine = new Calendar();
                 // Calendar::$Core will not exist until the Calendar class is instantiated!
-                //Calendar::$Core->setAllowedOrigins(self::$allowedOrigins);
-                Calendar::$Core->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
-                Calendar::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
+                Calendar::$Core->setAllowedRequestMethods([
+                    RequestMethod::GET,
+                    RequestMethod::POST,
+                    RequestMethod::OPTIONS
+                ]);
+                Calendar::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
                 Calendar::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS, AcceptHeader::YAML ]);
                 $LitCalEngine->setAllowedReturnTypes([ ReturnType::JSON, ReturnType::XML, ReturnType::ICS, ReturnType::YAML ]);
                 $LitCalEngine->setCacheDuration(CacheDuration::MONTH);
@@ -148,13 +152,17 @@ class Router
                 ) {
                     Tests::$Core->setAllowedOrigins(self::$allowedOrigins);
                 }
-                Tests::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON ]);
+                Tests::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML ]);
                 Tests::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 Tests::handleRequest();
                 break;
             case 'events':
                 $Events = new Events();
-                Events::$Core->setAllowedRequestMethods([ RequestMethod::GET, RequestMethod::POST, RequestMethod::OPTIONS ]);
+                Events::$Core->setAllowedRequestMethods([
+                    RequestMethod::GET,
+                    RequestMethod::POST,
+                    RequestMethod::OPTIONS
+                ]);
                 if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
                     if (
                         in_array($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'], [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)

@@ -8,3 +8,6 @@ ValidateTestsAgainstSchema.php
 .envrc
 debuginfo.php
 testYaml.php
+.env
+.env.*
+!.env.example
