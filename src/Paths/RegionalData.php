@@ -249,7 +249,6 @@ class RegionalData
 
         $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
         if ($test === true) {
-
             // make sure we have all the necessary folders in place
             if (!file_exists(JsonData::DIOCESAN_CALENDARS_FOLDER . $this->params->payload->metadata->nation)) {
                 mkdir(JsonData::DIOCESAN_CALENDARS_FOLDER . $this->params->payload->metadata->nation, 0755, true);
@@ -311,7 +310,7 @@ class RegionalData
             );
 
             $calendarI18nDataOtherLocales = json_encode($litCalEventsI18nOtherLocales, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            foreach($otherLocales as $locale) {
+            foreach ($otherLocales as $locale) {
                 $diocesanCalendarI18nFileOtherLocales = strtr(
                     JsonData::DIOCESAN_CALENDARS_I18N_FILE,
                     [
@@ -766,8 +765,7 @@ class RegionalData
 
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH], true)) {
             $data = RegionalData::retrievePayloadFromPostPutPatchRequest($data);
-        }
-        elseif (self::$Core->getRequestMethod() === RequestMethod::GET) {
+        } elseif (self::$Core->getRequestMethod() === RequestMethod::GET) {
             if (isset($_GET['locale'])) {
                 $data->locale = \Locale::canonicalize($_GET['locale']);
             }
@@ -791,8 +789,7 @@ class RegionalData
                     "Expected at least two and at most three path params for GET and POST requests, received " . count($requestPathParts)
                 );
             }
-        }
-        else if (count($requestPathParts) !== 2) {
+        } elseif (count($requestPathParts) !== 2) {
             self::produceErrorResponse(
                 StatusCode::BAD_REQUEST,
                 "Expected two and exactly two path params for PATCH and DELETE requests, received " . count($requestPathParts)
