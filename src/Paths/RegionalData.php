@@ -80,7 +80,7 @@ class RegionalData
     }
 
     /**
-     * Handle a request for i18n data.
+     * Handle GET and POST requests for i18n data.
      *
      * The request params should include the following values:
      * - `category`: the category of regional data to retrieve (DIOCESANCALENDAR, WIDERREGIONCALENDAR or NATIONALCALENDAR)
@@ -88,6 +88,8 @@ class RegionalData
      * - `i18nRequest`: the locale to retrieve the i18n data for
      *
      * The method will return the i18n data for the requested calendar in the requested locale.
+     * If the requested resource exists, it will be returned as JSON.
+     * If the resource does not exist, a 404 error will be returned.
      *
      * @return void
      */
@@ -190,7 +192,6 @@ class RegionalData
                 );
         }
 
-        // Else if a calendar data request was made, we return the calendar data with the requested locale
         if (null !== $calendarDataFile && file_exists($calendarDataFile)) {
             $CalendarData = json_decode(file_get_contents($calendarDataFile));
 
@@ -245,22 +246,6 @@ class RegionalData
     }
 
     /**
-    private static function getCountryIsoByDioceseId($data, $targetDioceseId) {
-        foreach ($data as $country) {
-            foreach ($country['dioceses'] as $diocese) {
-                if ($diocese['diocese_id'] === $targetDioceseId) {
-                    return [
-                        'country_iso' =>  $country['country_iso'],
-                        'diocese_name' => $diocese['diocese_name']
-                    ];
-                }
-            }
-        }
-        return null; // Return null if no match is found
-    }
-    */
-
-    /**
      * Handle PUT requests to create or update a regional calendar data resource.
      *
      * This is a private method and should only be called from {@see handleRequestMethod}.
@@ -271,6 +256,9 @@ class RegionalData
      * containing a success message.
      *
      * If the payload is invalid, the response will be a JSON error response with a 422 status code.
+     *
+     * TODO: we are currently only handling creation of diocesan calendar data, this should be expanded
+     *       to handle creation of wider region and national calendar data
      */
     private function createRegionalCalendar(): void
     {
