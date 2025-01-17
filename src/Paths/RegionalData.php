@@ -57,7 +57,13 @@ class RegionalData
         switch (self::$Core->getRequestMethod()) {
             case RequestMethod::GET:
             case RequestMethod::POST:
-                $this->getRegionalCalendar();
+                if (property_exists($this->params, 'i18nRequest') && null !== $this->params->i18nRequest) {
+                    // If a simple i18n data request was made, retrieve the i18n data
+                    $this->getI18nData();
+                } else {
+                    // Else retrieve the calendar data
+                    $this->getRegionalCalendarData();
+                }
                 break;
             case RequestMethod::PUT:
                 $this->createRegionalCalendar();
@@ -70,6 +76,61 @@ class RegionalData
                 break;
             default:
                 self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, "The method " . $_SERVER['REQUEST_METHOD'] . " cannot be handled by this endpoint");
+        }
+    }
+
+    /**
+     * Handle a request for i18n data.
+     *
+     * The request params should include the following values:
+     * - `category`: the category of regional data to retrieve (DIOCESANCALENDAR, WIDERREGIONCALENDAR or NATIONALCALENDAR)
+     * - `key`: the ID of the regional calendar to retrieve i18n data for
+     * - `i18nRequest`: the locale to retrieve the i18n data for
+     *
+     * The method will return the i18n data for the requested calendar in the requested locale.
+     *
+     * @return void
+     */
+    private function getI18nData(): void
+    {
+        $i18nDataFile = null;
+        switch ($this->params->category) {
+            case "DIOCESANCALENDAR":
+                $dioceseEntry = array_values(array_filter($this->CalendarsMetadata->diocesan_calendars, function ($el) {
+                    return $el->calendar_id === $this->params->key;
+                }));
+                if (empty($dioceseEntry)) {
+                    self::produceErrorResponse(StatusCode::NOT_FOUND, "The requested resource {$this->params->key} was not found in the index");
+                }
+                $i18nDataFile = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FILE, [
+                    '{nation}' => $dioceseEntry[0]->nation,
+                    '{diocese}' => $this->params->key,
+                    '{locale}' => $this->params->i18nRequest
+                ]);
+                break;
+            case "WIDERREGIONCALENDAR":
+                $i18nDataFile = strtr(JsonData::WIDER_REGIONS_I18N_FILE, [
+                    '{wider_region}' => $this->params->key,
+                    '{locale}' => $this->params->i18nRequest
+                ]);
+                break;
+            case "NATIONALCALENDAR":
+                $i18nDataFile = strtr(JsonData::NATIONAL_CALENDARS_I18N_FILE, [
+                    '{nation}' => $this->params->key,
+                    '{locale}' => $this->params->i18nRequest
+                ]);
+                break;
+            default:
+                self::produceErrorResponse(
+                    StatusCode::BAD_REQUEST,
+                    "RegionalData::getI18nData: invalid value <{$this->params->category}> for param `category`: valid values are: "
+                        . implode(', ', array_values(RegionalDataParams::EXPECTED_CATEGORIES))
+                );
+        }
+        if (null !== $i18nDataFile && file_exists($i18nDataFile)) {
+            self::produceResponse(file_get_contents($i18nDataFile));
+        } else {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "RegionalData::getI18nData: file $i18nDataFile does not exist");
         }
     }
 
@@ -93,9 +154,8 @@ class RegionalData
      * If the resource does not exist, a 404 error will be returned.
      * If the `category` or `locale` parameters are invalid, a 400 error will be returned.
      */
-    private function getRegionalCalendar(): void
+    private function getRegionalCalendarData(): void
     {
-        $i18nDataFile = null;
         $calendarDataFile = null;
         switch ($this->params->category) {
             case "DIOCESANCALENDAR":
@@ -106,43 +166,21 @@ class RegionalData
                     self::produceErrorResponse(StatusCode::NOT_FOUND, "The requested resource {$this->params->key} was not found in the index");
                 }
 
-                if (property_exists($this->params, 'i18nRequest') && null !== $this->params->i18nRequest) {
-                    $i18nDataFile = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FILE, [
-                        '{nation}' => $dioceseEntry[0]->nation,
-                        '{diocese}' => $this->params->key,
-                        '{locale}' => $this->params->i18nRequest
-                    ]);
-                } else {
-                    $calendarDataFile = strtr(JsonData::DIOCESAN_CALENDARS_FILE, [
-                        '{nation}' => $dioceseEntry[0]->nation,
-                        '{diocese}' => $this->params->key,
-                        '{diocese_name}' => $dioceseEntry[0]->diocese
-                    ]);
-                }
+                $calendarDataFile = strtr(JsonData::DIOCESAN_CALENDARS_FILE, [
+                    '{nation}' => $dioceseEntry[0]->nation,
+                    '{diocese}' => $this->params->key,
+                    '{diocese_name}' => $dioceseEntry[0]->diocese
+                ]);
                 break;
             case "WIDERREGIONCALENDAR":
-                if (property_exists($this->params, 'i18nRequest') && null !== $this->params->i18nRequest) {
-                    $i18nDataFile = strtr(JsonData::WIDER_REGIONS_I18N_FILE, [
-                        '{wider_region}' => $this->params->key,
-                        '{locale}' => $this->params->i18nRequest
-                    ]);
-                } else {
-                    $calendarDataFile = strtr(JsonData::WIDER_REGIONS_FILE, [
-                        '{wider_region}' => $this->params->key
-                    ]);
-                }
+                $calendarDataFile = strtr(JsonData::WIDER_REGIONS_FILE, [
+                    '{wider_region}' => $this->params->key
+                ]);
                 break;
             case "NATIONALCALENDAR":
-                if (property_exists($this->params, 'i18nRequest') && null !== $this->params->i18nRequest) {
-                    $i18nDataFile = strtr(JsonData::NATIONAL_CALENDARS_I18N_FILE, [
-                        '{nation}' => $this->params->key,
-                        '{locale}' => $this->params->i18nRequest
-                    ]);
-                } else {
-                    $calendarDataFile = strtr(JsonData::NATIONAL_CALENDARS_FILE, [
-                        '{nation}' => $this->params->key
-                    ]);
-                }
+                $calendarDataFile = strtr(JsonData::NATIONAL_CALENDARS_FILE, [
+                    '{nation}' => $this->params->key
+                ]);
                 break;
             default:
                 self::produceErrorResponse(
@@ -152,18 +190,12 @@ class RegionalData
                 );
         }
 
-        // If a simple i18n data request was made, we only return the i18n data
-        if (null !== $i18nDataFile) {
-            if (file_exists($i18nDataFile)) {
-                self::produceResponse(file_get_contents($i18nDataFile));
-            } else {
-                self::produceErrorResponse(StatusCode::NOT_FOUND, "RegionalData::getRegionalCalendar: file $i18nDataFile does not exist");
-            }
-        }
-
         // Else if a calendar data request was made, we return the calendar data with the requested locale
         if (null !== $calendarDataFile && file_exists($calendarDataFile)) {
             $CalendarData = json_decode(file_get_contents($calendarDataFile));
+
+            // If a locale was not requested, use the first valid locale for the current requested calendar data
+            // Else if a locale was requested, make sure it is a valid locale for the current requested calendar data
             if (null === $this->params->locale) {
                 $this->params->locale = $CalendarData->metadata->locales[0];
             } elseif (false === in_array($this->params->locale, $CalendarData->metadata->locales, true)) {
@@ -174,6 +206,7 @@ class RegionalData
                 );
             }
 
+            // Based on the locale requested, retrieve the appropriate locale data
             switch ($this->params->category) {
                 case 'DIOCESANCALENDAR':
                     $CalendarDataI18nFile = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FILE, [
@@ -203,11 +236,11 @@ class RegionalData
                     }
                 }
             } else {
-                self::produceErrorResponse(StatusCode::NOT_FOUND, "RegionalData::getRegionalCalendar: file $CalendarDataI18nFile does not exist");
+                self::produceErrorResponse(StatusCode::NOT_FOUND, "RegionalData::getRegionalCalendarData: file $CalendarDataI18nFile does not exist");
             }
             self::produceResponse(json_encode($CalendarData));
         } else {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "RegionalData::getRegionalCalendar: file $calendarDataFile does not exist");
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "RegionalData::getRegionalCalendarData: file $calendarDataFile does not exist");
         }
     }
 
