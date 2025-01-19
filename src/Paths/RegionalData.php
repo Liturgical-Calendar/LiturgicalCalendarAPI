@@ -271,12 +271,15 @@ class RegionalData
         $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
         if ($test === true) {
             // make sure we have all the necessary folders in place
-            if (!file_exists(JsonData::DIOCESAN_CALENDARS_FOLDER . $this->params->payload->metadata->nation)) {
-                mkdir(JsonData::DIOCESAN_CALENDARS_FOLDER . $this->params->payload->metadata->nation, 0755, true);
+            /*
+            if (!file_exists(JsonData::DIOCESAN_CALENDARS_FOLDER . '/' . $this->params->payload->metadata->nation)) {
+                mkdir(JsonData::DIOCESAN_CALENDARS_FOLDER . '/' . $this->params->payload->metadata->nation, 0755, true);
             }
             if (!file_exists(JsonData::DIOCESAN_CALENDARS_FOLDER . $this->params->payload->metadata->nation . '/' . $this->params->payload->metadata->diocese_id)) {
                 mkdir(JsonData::DIOCESAN_CALENDARS_FOLDER . $this->params->payload->metadata->nation . '/' . $this->params->payload->metadata->diocese_id, 0755, true);
             }
+                // we don't need the two above mkdir calls, since we are passing `true` to the `i18n` mkdir, which means recursively create all missing parent folders
+            */
             $diocesanCalendarI18nFolder = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FOLDER, [
                 '{nation}' => $this->params->payload->metadata->nation,
                 '{diocese}' => $this->params->payload->metadata->diocese_id
@@ -681,6 +684,15 @@ class RegionalData
             if (false === is_writable($calendarDataFile)) {
                 self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, check file and folder permissions.");
             }
+
+            // We want to make sure to also remove the containing folder, let's get the parent folder for later removal
+            $calendarDataFolder = dirname($calendarDataFile);
+
+            // And in the case of a diocesan calendar, if the parent `nation_id` folder is empty, remove it as well
+            if ($this->params->category === "DIOCESANCALENDAR") {
+                $dioceseNationFolder = dirname($calendarDataFolder);
+            }
+
             if (false === unlink($calendarDataFile)) {
                 self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully.");
             };
@@ -691,6 +703,19 @@ class RegionalData
                 if (false === unlink($file)) {
                     self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, i18n file could not be removed.");
                 };
+            }
+            if (false === rmdir($calendarI18nFolder)) {
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, i18n folder could not be removed.");
+            }
+            if (false === rmdir($calendarDataFolder)) {
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, data folder could not be removed.");
+            }
+            if ($this->params->category === "DIOCESANCALENDAR") {
+                if (count(scandir($dioceseNationFolder)) === 2) { // only . and ..
+                    if (false === rmdir($dioceseNationFolder)) {
+                        self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, diocese nation folder could not be removed.");
+                    }
+                }
             }
         } else {
             self::produceErrorResponse(StatusCode::NOT_FOUND, "The resource '{$this->params->key}' requested for deletion (or the relative i18n folder) was not found on this server.");
