@@ -282,6 +282,21 @@ class RegionalData
                 mkdir($diocesanCalendarI18nFolder, 0755, true);
             }
 
+            foreach($this->params->payload->i18n as $locale => $litCalEventsI18n) {
+                $diocesanCalendarI18nFile = strtr(
+                    JsonData::DIOCESAN_CALENDARS_I18N_FILE,
+                    [
+                        '{nation}' => $this->params->payload->metadata->nation,
+                        '{diocese}' => $this->params->payload->metadata->diocese_id,
+                        '{locale}' => $locale
+                    ]
+                );
+                file_put_contents($diocesanCalendarI18nFile, json_encode($litCalEventsI18n, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL);
+            }
+
+            // We no longer need the i18n data, we can now remove it
+            unset($this->params->payload->i18n);
+
             $diocesanCalendarFile = strtr(
                 JsonData::DIOCESAN_CALENDARS_FILE,
                 [
@@ -297,19 +312,8 @@ class RegionalData
                 $calendarData . PHP_EOL
             );
 
-            foreach($this->params->payload->i18n as $locale => $litCalEventsI18n) {
-                $diocesanCalendarI18nFile = strtr(
-                    JsonData::DIOCESAN_CALENDARS_I18N_FILE,
-                    [
-                        '{nation}' => $this->params->payload->metadata->nation,
-                        '{diocese}' => $this->params->payload->metadata->diocese_id,
-                        '{locale}' => $locale
-                    ]
-                );
-                file_put_contents($diocesanCalendarI18nFile, json_encode($litCalEventsI18n, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL);
-            }
-
             $response->success = "Calendar data created or updated for Diocese \"{$this->params->payload->metadata->diocese_name}\" (Nation: \"{$this->params->payload->metadata->nation}\")";
+            $response->data = $this->params->payload;
             self::produceResponse(json_encode($response));
         } else {
             self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
@@ -471,37 +475,9 @@ class RegionalData
         $dioceseEntry = array_values(array_filter($this->CalendarsMetadata->diocesan_calendars, function ($item) {
             return $item->calendar_id === $this->params->key;
         }));
-        if (
-            empty($dioceseEntry)
-        ) {
+
+        if ( empty($dioceseEntry) ) {
             self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendar resource {$this->params->key}.");
-        }
-        $DiocesanCalendarFile = strtr(
-            JsonData::DIOCESAN_CALENDARS_FILE,
-            [
-                '{nation}' => $dioceseEntry[0]->nation,
-                '{diocese}' => $dioceseEntry[0]->calendar_id,
-                '{diocese_name}' => $dioceseEntry[0]->diocese
-            ]
-        );
-        $DiocesanCalendarI18nFile = strtr(
-            JsonData::DIOCESAN_CALENDARS_I18N_FILE,
-            [
-                '{nation}' => $dioceseEntry[0]->nation,
-                '{diocese}' => $dioceseEntry[0]->calendar_id,
-                '{locale}' => $this->params->locale
-            ]
-        );
-        if (false === file_exists($DiocesanCalendarFile)) {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendar resource at {$DiocesanCalendarFile}, file not found.");
-        }
-
-        if (false === is_writable($DiocesanCalendarFile)) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendar resource for {$this->params->key} at {$DiocesanCalendarFile}, check file and folder permissions.");
-        }
-
-        if (false === is_writable($DiocesanCalendarI18nFile)) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendar i18n resource for {$this->params->key} at {$DiocesanCalendarI18nFile}, check file and folder permissions.");
         }
 
         // Validate payload against schema
@@ -510,27 +486,52 @@ class RegionalData
             self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
         }
 
-        // Extract localized name properties from the payload,
-        // and write them to the corresponding locale file.
-        // Make sure &$value is a reference, not a copy, so that the `name` property will be deleted on the original object.
-        $i18nPayload = [];
-        foreach ($this->params->payload->litcal as &$value) {
-            $i18nPayload[$value->festivity->event_key] = $value->festivity->name;
-            unset($value->festivity->name);
+        foreach ($this->params->payload->i18n as $locale => $i18nData) {
+            $DiocesanCalendarI18nFile = strtr(
+                JsonData::DIOCESAN_CALENDARS_I18N_FILE,
+                [
+                    '{nation}' => $dioceseEntry[0]->nation,
+                    '{diocese}' => $dioceseEntry[0]->calendar_id,
+                    '{locale}' => $locale
+                ]
+            );
+
+            if (false === is_writable($DiocesanCalendarI18nFile)) {
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendar i18n resource for {$this->params->key} at {$DiocesanCalendarI18nFile}, check file and folder permissions.");
+            }
+
+            // Update diocesan calendar i18n data for locale
+            $calendarI18nData = json_encode($i18nData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            if (
+                false === file_put_contents(
+                    $DiocesanCalendarI18nFile,
+                    $calendarI18nData . PHP_EOL
+                )
+            ) {
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update diocesan calendar i18n resource {$this->params->key} in path {$DiocesanCalendarI18nFile}.");
+            }
         }
 
-        // Update diocesan calendar i18n data
-        $calendarI18nData = json_encode($i18nPayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        if (
-            false === file_put_contents(
-                $DiocesanCalendarI18nFile,
-                $calendarI18nData . PHP_EOL
-            )
-        ) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update diocesan calendar i18n resource {$this->params->key} in path {$DiocesanCalendarI18nFile}.");
+        $DiocesanCalendarFile = strtr(
+            JsonData::DIOCESAN_CALENDARS_FILE,
+            [
+                '{nation}' => $dioceseEntry[0]->nation,
+                '{diocese}' => $dioceseEntry[0]->calendar_id,
+                '{diocese_name}' => $dioceseEntry[0]->diocese
+            ]
+        );
+
+        if (false === file_exists($DiocesanCalendarFile)) {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendar resource at {$DiocesanCalendarFile}, file not found.");
+        }
+
+        if (false === is_writable($DiocesanCalendarFile)) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendar resource for {$this->params->key} at {$DiocesanCalendarFile}, check file and folder permissions.");
         }
 
         // Update diocesan calendar data
+        // We no longer need the `i18n` property, so delete it
+        unset($this->params->payload->i18n);
         $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         if (
             false === file_put_contents(
@@ -542,7 +543,8 @@ class RegionalData
         }
 
         $response = new \stdClass();
-        $response->success = "Calendar data created or updated for Diocese \"{$this->params->key}\" (Nation: \"{$dioceseEntry[0]->nation}\")";
+        $response->success = "Calendar data created or updated for Diocese \"{$dioceseEntry[0]->diocese}\" (Nation: \"{$dioceseEntry[0]->nation}\")";
+        $response->data = $this->params->payload;
         self::produceResponse(json_encode($response));
     }
 
@@ -721,37 +723,48 @@ class RegionalData
     private static function retrievePayloadFromPostPutPatchRequest(object $data): ?object
     {
         $payload = null;
+        $required = self::$Core->getRequestMethod() !== RequestMethod::POST;
         switch (self::$Core->getRequestContentType()) {
             case RequestContentType::JSON:
-                $payload = self::$Core->readJsonBody();
+                $payload = self::$Core->readJsonBody($required);
                 break;
             case RequestContentType::YAML:
-                $payload = self::$Core->readYamlBody();
+                $payload = self::$Core->readYamlBody($required);
                 break;
             case RequestContentType::FORMDATA:
-                $payload = (object)$_POST;
-                break;
-            default:
-                if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH], true)) {
-                    // the payload MUST be in the body of the request, either JSON encoded or YAML encoded
+                if ($required && count($_REQUEST) === 0) {
                     self::produceErrorResponse(
                         StatusCode::BAD_REQUEST,
-                        "Expected payload in body of request, either JSON encoded or YAML encoded"
+                        "Expected non empty payload in body of request, either JSON encoded or YAML encoded or form encoded."
+                    );
+                }
+                $payload = (object)$_REQUEST;
+                break;
+            default:
+                if ($required) {
+                    // the payload MUST be in the body of the request, either JSON encoded or YAML encoded or form encoded
+                    self::produceErrorResponse(
+                        StatusCode::BAD_REQUEST,
+                        "Expected non empty payload in body of request, either JSON encoded or YAML encoded or form encoded."
                     );
                 }
         }
+
         if (self::$Core->getRequestMethod() === RequestMethod::POST && $payload !== null) {
             if (property_exists($payload, 'locale')) {
                 $data->locale = $payload->locale;
             }
-        } else {
+        }
+
+        if ($payload !== null) {
             $data->payload = $payload;
         }
+
         return $data;
     }
 
     /**
-     * Set the category, key, and locale (if applicable) based on the request path parts and method.
+     * Set the category, key (if applicable), and locale (if applicable) based on the request path parts and method.
      *
      * @param array $requestPathParts the parts of the request path
      *
@@ -760,18 +773,29 @@ class RegionalData
     private static function setDataFromPath(array $requestPathParts): object
     {
         $data = new \stdClass();
-        $data->category = RegionalDataParams::EXPECTED_CATEGORIES[$requestPathParts[0]];
-        $data->key = $requestPathParts[1];
 
+        $data->category = RegionalDataParams::EXPECTED_CATEGORIES[$requestPathParts[0]];
+
+        if (self::$Core->getRequestMethod() !== RequestMethod::PUT) {
+            $data->key = $requestPathParts[1];
+        }
+
+        // For GET and POST request, there may be an optional third path parameter (= locale),
+        // which will determine whether we are requesting calendar data or i18n data
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::GET, RequestMethod::POST], true)) {
             if (isset($requestPathParts[2])) {
                 $data->i18n = $requestPathParts[2];
             }
         }
 
+        // If the request method is PATCH, or PUT, we expect a payload
+        // For POST requests, there might be a payload
+        // So in all these cases, we attempt to retrieve the payload from the request body if present
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH], true)) {
             $data = RegionalData::retrievePayloadFromPostPutPatchRequest($data);
-        } elseif (self::$Core->getRequestMethod() === RequestMethod::GET) {
+        }
+        // For GET requests, we attempt to retrieve the locale from the query string if present
+        elseif (self::$Core->getRequestMethod() === RequestMethod::GET) {
             if (isset($_GET['locale'])) {
                 $data->locale = \Locale::canonicalize($_GET['locale']);
             }
@@ -788,6 +812,8 @@ class RegionalData
      */
     private static function validateRequestPath(array $requestPathParts): void
     {
+        // For GET and POST requests, we expect at least two path params (= category and key) for Calendar Data requests,
+        // and at most three path params (= category, key, and locale) for I18n Data requests
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::GET, RequestMethod::POST], true)) {
             if (count($requestPathParts) < 2 || count($requestPathParts) > 3) {
                 self::produceErrorResponse(
@@ -795,13 +821,25 @@ class RegionalData
                     "Expected at least two and at most three path params for GET and POST requests, received " . count($requestPathParts)
                 );
             }
-        } elseif (count($requestPathParts) !== 2) {
+        }
+        // For PUT requests, we expect exactly one path param (= category)
+        elseif (self::$Core->getRequestMethod() === RequestMethod::PUT) {
+            if (count($requestPathParts) !== 1) {
+                self::produceErrorResponse(
+                    StatusCode::BAD_REQUEST,
+                    "Expected one path param for PUT requests, received " . count($requestPathParts)
+                );
+            }
+        }
+        // For PATCH and DELETE requests, we expect exactly two path params
+        elseif (count($requestPathParts) !== 2) {
             self::produceErrorResponse(
                 StatusCode::BAD_REQUEST,
                 "Expected two and exactly two path params for PATCH and DELETE requests, received " . count($requestPathParts)
             );
         }
 
+        // In all cases, we check if the category param is valid
         if (false === array_key_exists($requestPathParts[0], RegionalDataParams::EXPECTED_CATEGORIES)) {
             self::produceErrorResponse(
                 StatusCode::BAD_REQUEST,
@@ -826,70 +864,35 @@ class RegionalData
      */
     private function handleRequestParams(array $requestPathParts = []): void
     {
-        $data = null;
+        RegionalData::validateRequestPath($requestPathParts);
+        $data = RegionalData::setDataFromPath($requestPathParts);
 
-        // In the case of a PUT request, we don't expect any PATH parameters, we only retrieve the payload from the request body
+        // In the case of a PUT request, we expect only one PATH parameter, we only retrieve the payload from the request body
         if (self::$Core->getRequestMethod() === RequestMethod::PUT) {
-            switch (self::$Core->getRequestContentType()) {
-                case RequestContentType::JSON:
-                    $data = self::$Core->readJsonBody();
-                    break;
-                case RequestContentType::YAML:
-                    $data = self::$Core->readYamlBody();
-                    break;
-                default:
-                    $data = (object)$_REQUEST;
-            }
             if (
-                null === $data
-                || !property_exists($data, 'payload')
+                !property_exists($data, 'payload')
+                || $data->payload === null
                 || !property_exists($data->payload, 'litcal')
+                || !property_exists($data->payload, 'i18n')
                 || !property_exists($data->payload, 'metadata')
                 || !property_exists($data->payload->metadata, 'diocese_id')
             ) {
-                self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive payload in body of request, in JSON or YAML format, with properties `payload`, `payload.litcal`, `payload.metadata`, and `payload.metadata.diocese_id`");
+                self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.metadata`, and `payload.metadata.diocese_id`");
+            } else {
+                $data->key = $data->payload->metadata->diocese_id;
             }
-            if (false === count($requestPathParts)) {
-                self::produceErrorResponse(StatusCode::BAD_REQUEST, "No request path received. Must receive request path with path param `category`");
-            }
-            switch ($requestPathParts[0]) {
-                case 'nation':
-                    $data->category = 'NATIONALCALENDAR';
-                    break;
-                case 'diocese':
-                    $data->category = 'DIOCESANCALENDAR';
-                    $data->key = $data->payload->metadata->diocese_id;
-                    break;
-                case 'widerregion':
-                    $data->category = 'WIDERREGIONCALENDAR';
-                    break;
-                default:
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Unexpected path param {$requestPathParts[0]}, acceptable values are: nation, diocese, widerregion");
-            }
-        } else {
-            RegionalData::validateRequestPath($requestPathParts);
-            $data = RegionalData::setDataFromPath($requestPathParts);
         }
 
-        // In the case of a PATCH request, we expect the request body to contain the payload with calendar data,
-        // either in JSON format, in YAML format, or as form data
         if (self::$Core->getRequestMethod() === RequestMethod::PATCH) {
-            $bodyData = null;
-            switch (self::$Core->getRequestContentType()) {
-                case RequestContentType::JSON:
-                    $bodyData = self::$Core->readJsonBody();
-                    break;
-                case RequestContentType::YAML:
-                    $bodyData = self::$Core->readYamlBody();
-                    break;
-                default:
-                    $bodyData = (object)$_REQUEST;
+            if (
+                !property_exists($data, 'payload')
+                || $data->payload === null
+                || !property_exists($data->payload, 'litcal')
+                || !property_exists($data->payload, 'i18n')
+                || !property_exists($data->payload, 'metadata')
+            ) {
+                self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, and `payload.metadata`");
             }
-            if (null === $bodyData) {
-                self::produceErrorResponse(StatusCode::BAD_REQUEST, "No payload received. Must receive payload in body of request, in JSON or YAML format");
-            }
-            $data = new stdClass();
-            $data->payload = $bodyData;
         }
 
         if (false === $this->params->setData($data)) {

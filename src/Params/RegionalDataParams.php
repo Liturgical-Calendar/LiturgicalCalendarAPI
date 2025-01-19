@@ -367,6 +367,26 @@ class RegionalDataParams
         return true;
     }
 
+    /**
+     * Validates and sets the parameters for the RegionalData class.
+     *
+     * The method expects the following properties on the `$data` object:
+     * - `category`: one of the values in {@see RegionalDataParams::EXPECTED_CATEGORIES}
+     * - `key`: a valid key for the given category
+     *
+     * The method will produce a 400 error if either of the above properties are missing or invalid.
+     *
+     * If the request method is GET or POST and the `i18n` property is present in the `$data` object,
+     * it will be used to set the `i18nRequest` property (meaning the request is for i18n data, not calendar data).
+     *
+     * If the request method is PUT or PATCH, we validate the payload and set the `payload` property.
+     *
+     * @param object $data
+     *      The parameters to validate and set.
+     *
+     * @return bool
+     *      True if the parameters are valid, false otherwise.
+     */
     public function setData(object $data): bool
     {
         if (false === property_exists($data, 'category') || false === property_exists($data, 'key')) {

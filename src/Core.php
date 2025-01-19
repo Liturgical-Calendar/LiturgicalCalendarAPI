@@ -491,25 +491,28 @@ class Core
     /**
      * Retrieves the request parameters from the body of the request, assuming it is a JSON encoded object.
      *
-     * If the request body is empty, it will return a 400 Bad Request error and die.
+     * If the request body is empty and $required is true, it will return a 400 Bad Request error and die.
      *
-     * If the request body is not a valid JSON encoded object, it will return a 400 Bad Request error and die.
+     * If the request body is not empty but is not a valid JSON encoded object, it will return a 400 Bad Request error and die.
      *
+     * @param bool $required Whether the request body is required or not.
      * @param bool $assoc Whether to return the object as an associative array or a stdClass object.
      *
-     * @return object|array The request parameters, either as a stdClass object or an associative array.
+     * @return object|array|null The request parameters, either as a stdClass object or an associative array, or null if the request body was not required and is empty.
      */
-    public function readJsonBody(bool $assoc = false): object|array
+    public function readJsonBody(bool $required = false, bool $assoc = false): object|array|null
     {
+        $data = null;
         $rawData = file_get_contents('php://input');
-        if ("" === $rawData) {
+        if ("" === $rawData && $required) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
             die('{"error":"No JSON data received in the request"}');
-        }
-        $data = json_decode($rawData, $assoc);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
-            die('{"error":"Malformed JSON data received in the request: <' . $rawData . '>, ' . json_last_error_msg() . '"}');
+        } elseif ("" !== $rawData) {
+            $data = json_decode($rawData, $assoc);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
+                die('{"error":"Malformed JSON data received in the request: <' . $rawData . '>, ' . json_last_error_msg() . '"}');
+            }
         }
         return $data;
     }
@@ -533,43 +536,45 @@ class Core
     /**
      * Retrieve the request parameters from the request body, expected to be a YAML encoded object.
      *
-     * If the request body is empty, it will return a 400 Bad Request error and die.
+     * If the request body is empty and $required is true, it will return a 400 Bad Request error and die.
      *
-     * If the request body is not a valid YAML encoded object, it will return a 400 Bad Request error and die.
+     * If the request body is not empty but is not a valid YAML encoded object, it will return a 400 Bad Request error and die.
      *
+     * @param bool $required Whether the request body is required or not.
      * @param bool $assoc Whether to return the object as an associative array or a stdClass object.
      *
-     * @return object|array The request parameters, either as a stdClass object or an associative array.
+     * @return object|array|null The request parameters, either as a stdClass object or an associative array, or null if the request body was not required and is empty.
      */
-    public function readYamlBody(bool $assoc = false): object|array
+    public function readYamlBody(bool $required = false, bool $assoc = false): object|array
     {
         $rawData = file_get_contents('php://input');
-        if ("" === $rawData) {
+        if ("" === $rawData && $required) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
             die('{"error":"No YAML data received in the request"}');
-        }
-
-        set_error_handler(array('self', 'warningHandler'), E_WARNING);
-        try {
-            $data = yaml_parse($rawData);
-            if (false === $data) {
+        } elseif ("" !== $rawData) {
+            set_error_handler(array('self', 'warningHandler'), E_WARNING);
+            try {
+                $data = yaml_parse($rawData);
+                if (false === $data) {
+                    header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
+                    $response = new \stdClass();
+                    $response->error = "Malformed YAML data received in the request";
+                    die(json_encode($response));
+                } else {
+                    return $assoc ? $data : json_decode(json_encode($data));
+                }
+            } catch (\Exception $e) {
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
                 $response = new \stdClass();
-                $response->error = "Malformed YAML data received in the request";
+                $response->status = "error";
+                $response->message = "Malformed YAML data received in the request";
+                $response->error = $e->getMessage();
+                $response->line = $e->getLine();
+                $response->code = $e->getCode();
                 die(json_encode($response));
-            } else {
-                return $assoc ? $data : json_decode(json_encode($data));
             }
-        } catch (\Exception $e) {
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
-            $response = new \stdClass();
-            $response->status = "error";
-            $response->message = "Malformed YAML data received in the request";
-            $response->error = $e->getMessage();
-            $response->line = $e->getLine();
-            $response->code = $e->getCode();
-            die(json_encode($response));
         }
+        return null;
     }
 
     /**
