@@ -14,6 +14,7 @@ use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Params\RegionalDataParams;
 use PHP_CodeSniffer\Tokenizers\JS;
+use stdClass;
 
 /**
  * RegionalData
@@ -264,22 +265,15 @@ class RegionalData
     {
         $response = new \stdClass();
         if (false === $this->params->payload instanceof \stdClass) {
-            $calType = gettype($this->params->payload);
-            self::produceErrorResponse(StatusCode::BAD_REQUEST, "`payload` param expected to be serialized object, instead it was of type `{$calType}` after unserialization");
+            $payloadType = gettype($this->params->payload);
+            self::produceErrorResponse(StatusCode::BAD_REQUEST, "`payload` param expected to be serialized object, instead it was of type `{$payloadType}` after unserialization");
         }
 
         $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
         if ($test === true) {
-            // make sure we have all the necessary folders in place
-            /*
-            if (!file_exists(JsonData::DIOCESAN_CALENDARS_FOLDER . '/' . $this->params->payload->metadata->nation)) {
-                mkdir(JsonData::DIOCESAN_CALENDARS_FOLDER . '/' . $this->params->payload->metadata->nation, 0755, true);
-            }
-            if (!file_exists(JsonData::DIOCESAN_CALENDARS_FOLDER . $this->params->payload->metadata->nation . '/' . $this->params->payload->metadata->diocese_id)) {
-                mkdir(JsonData::DIOCESAN_CALENDARS_FOLDER . $this->params->payload->metadata->nation . '/' . $this->params->payload->metadata->diocese_id, 0755, true);
-            }
-                // we don't need the two above mkdir calls, since we are passing `true` to the `i18n` mkdir, which means recursively create all missing parent folders
-            */
+            // Ensure we have all the necessary folders in place
+            // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
+            // so we don't have to worry about manually checking and creating each one individually
             $diocesanCalendarI18nFolder = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FOLDER, [
                 '{nation}' => $this->params->payload->metadata->nation,
                 '{diocese}' => $this->params->payload->metadata->diocese_id
@@ -297,45 +291,14 @@ class RegionalData
                 ]
             );
 
-            $diocesanCalendarI18nFile = strtr(
-                JsonData::DIOCESAN_CALENDARS_I18N_FILE,
-                [
-                    '{nation}' => $this->params->payload->metadata->nation,
-                    '{diocese}' => $this->params->payload->metadata->diocese_id,
-                    '{locale}' => $this->params->locale
-                ]
-            );
-
-            $litCalEventsI18n = array_reduce($this->params->payload->litcal, function ($carry, $item) {
-                $carry[$item->festivity->event_key] = $item->festivity->name;
-                unset($item->festivity->name);
-                return $carry;
-            }, []);
-
-            $litCalEventsI18nOtherLocales = array_reduce(array_keys($litCalEventsI18n), function ($carry, $key) {
-                $carry[$key] = '';
-                return $carry;
-            }, []);
-
-            $otherLocales = array_values(array_filter($this->params->payload->metadata->locales, function ($el) {
-                return $el !== $this->params->locale;
-            }));
-
             $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             file_put_contents(
                 $diocesanCalendarFile,
                 $calendarData . PHP_EOL
             );
 
-            $calendarI18nData = json_encode($litCalEventsI18n, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            file_put_contents(
-                $diocesanCalendarI18nFile,
-                $calendarI18nData . PHP_EOL
-            );
-
-            $calendarI18nDataOtherLocales = json_encode($litCalEventsI18nOtherLocales, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            foreach ($otherLocales as $locale) {
-                $diocesanCalendarI18nFileOtherLocales = strtr(
+            foreach($this->params->payload->i18n as $locale => $litCalEventsI18n) {
+                $diocesanCalendarI18nFile = strtr(
                     JsonData::DIOCESAN_CALENDARS_I18N_FILE,
                     [
                         '{nation}' => $this->params->payload->metadata->nation,
@@ -343,10 +306,7 @@ class RegionalData
                         '{locale}' => $locale
                     ]
                 );
-                file_put_contents(
-                    $diocesanCalendarI18nFileOtherLocales,
-                    $calendarI18nDataOtherLocales . PHP_EOL
-                );
+                file_put_contents($diocesanCalendarI18nFile, json_encode($litCalEventsI18n, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL);
             }
 
             $response->success = "Calendar data created or updated for Diocese \"{$this->params->payload->metadata->diocese_name}\" (Nation: \"{$this->params->payload->metadata->nation}\")";
@@ -928,6 +888,7 @@ class RegionalData
             if (null === $bodyData) {
                 self::produceErrorResponse(StatusCode::BAD_REQUEST, "No payload received. Must receive payload in body of request, in JSON or YAML format");
             }
+            $data = new stdClass();
             $data->payload = $bodyData;
         }
 
