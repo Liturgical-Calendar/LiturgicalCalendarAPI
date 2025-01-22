@@ -282,7 +282,7 @@ class RegionalData
                 mkdir($diocesanCalendarI18nFolder, 0755, true);
             }
 
-            foreach($this->params->payload->i18n as $locale => $litCalEventsI18n) {
+            foreach ($this->params->payload->i18n as $locale => $litCalEventsI18n) {
                 $diocesanCalendarI18nFile = strtr(
                     JsonData::DIOCESAN_CALENDARS_I18N_FILE,
                     [
@@ -574,21 +574,8 @@ class RegionalData
         }
     }
 
-    /**
-     * Handle DELETE requests to delete a regional calendar data resource.
-     *
-     * This is a private method and should only be called from {@see handleRequestMethod}.
-     *
-     * The resource is deleted from the `jsondata/sourcedata/` directory.
-     *
-     * If the resource is successfully deleted, the response will be a JSON object
-     * containing a success message.
-     *
-     * If the resource does not exist, a 404 error will be returned.
-     */
-    private function deleteRegionalCalendar()
+    private function getPathsForCalendarDelete(): array
     {
-        $response = new \stdClass();
         switch ($this->params->category) {
             case "DIOCESANCALENDAR":
                 $dioceseEntry = array_values(array_filter($this->CalendarsMetadata->diocesan_calendars, function ($el) {
@@ -642,6 +629,28 @@ class RegionalData
                 );
                 break;
         }
+
+        return [$calendarDataFile, $calendarI18nFolder];
+    }
+
+    /**
+     * Handle DELETE requests to delete a regional calendar data resource.
+     *
+     * This is a private method and should only be called from {@see handleRequestMethod}.
+     *
+     * The resource is deleted from the `jsondata/sourcedata/` directory.
+     *
+     * If the resource is successfully deleted, the response will be a JSON object
+     * containing a success message.
+     *
+     * If the resource does not exist, a 404 error will be returned.
+     */
+    private function deleteRegionalCalendar()
+    {
+        $response = new \stdClass();
+
+        [$calendarDataFile, $calendarI18nFolder] = $this->getPathsForCalendarDelete();
+
         if (file_exists($calendarDataFile) && file_exists($calendarI18nFolder)) {
             if (false === is_writable($calendarDataFile)) {
                 self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, check file and folder permissions.");
@@ -651,6 +660,7 @@ class RegionalData
             $calendarDataFolder = dirname($calendarDataFile);
 
             // And in the case of a diocesan calendar, if the parent `nation_id` folder is empty, remove it as well
+            // so let's get a reference to the parent folder to check later
             if ($this->params->category === "DIOCESANCALENDAR") {
                 $dioceseNationFolder = dirname($calendarDataFolder);
             }
@@ -673,6 +683,7 @@ class RegionalData
                 self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, data folder could not be removed.");
             }
             if ($this->params->category === "DIOCESANCALENDAR") {
+                // Check if the parent `nation_id` folder is empty, if it is, remove it too
                 if (count(scandir($dioceseNationFolder)) === 2) { // only . and ..
                     if (false === rmdir($dioceseNationFolder)) {
                         self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, diocese nation folder could not be removed.");
@@ -780,11 +791,15 @@ class RegionalData
             $data->key = $requestPathParts[1];
         }
 
-        // For GET and POST request, there may be an optional third path parameter (= locale),
-        // which will determine whether we are requesting calendar data or i18n data
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::GET, RequestMethod::POST], true)) {
+            // For GET and POST request, there may be an optional third path parameter (= locale),
+            // which will determine whether we are requesting calendar data or i18n data
             if (isset($requestPathParts[2])) {
                 $data->i18n = $requestPathParts[2];
+            }
+            // For GET requests, we attempt to retrieve the locale from the query string if present
+            if (self::$Core->getRequestMethod() === RequestMethod::GET && isset($_GET['locale'])) {
+                $data->locale = \Locale::canonicalize($_GET['locale']);
             }
         }
 
@@ -793,12 +808,6 @@ class RegionalData
         // So in all these cases, we attempt to retrieve the payload from the request body if present
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH], true)) {
             $data = RegionalData::retrievePayloadFromPostPutPatchRequest($data);
-        }
-        // For GET requests, we attempt to retrieve the locale from the query string if present
-        elseif (self::$Core->getRequestMethod() === RequestMethod::GET) {
-            if (isset($_GET['locale'])) {
-                $data->locale = \Locale::canonicalize($_GET['locale']);
-            }
         }
         return $data;
     }
