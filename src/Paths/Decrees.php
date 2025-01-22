@@ -21,12 +21,13 @@ class Decrees
         $data = [];
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH])) {
             $payload = null;
+            $required = in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH]);
             switch (self::$Core->getRequestContentType()) {
                 case RequestContentType::JSON:
-                    $payload = self::$Core->readJsonBody();
+                    $payload = self::$Core->readJsonBody($required);
                     break;
                 case RequestContentType::YAML:
-                    $payload = self::$Core->readYamlBody();
+                    $payload = self::$Core->readYamlBody($required);
                     break;
                 case RequestContentType::FORMDATA:
                     $payload = (object)$_POST;
@@ -34,7 +35,7 @@ class Decrees
                 default:
                     if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
                         // the payload MUST be in the body of the request, either JSON encoded or YAML encoded
-                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Expected payload in body of request, either JSON encoded or YAML encoded");
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Decrees::initRequestParams: Expected payload in body of request, either JSON encoded, YAML encoded, or Form Data encoded");
                     }
             }
             if (self::$Core->getRequestMethod() === RequestMethod::POST) {
