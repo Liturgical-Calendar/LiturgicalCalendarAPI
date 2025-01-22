@@ -158,4 +158,10 @@ class JsonData
      * Evaluates to 'jsondata/sourcedata/calendars/dioceses/{nation}/{diocese}/i18n/{locale}.json'.
      */
     public const DIOCESAN_CALENDARS_I18N_FILE = JsonData::DIOCESAN_CALENDARS_I18N_FOLDER . '/{locale}.json';
+
+    /**
+     * The file containing the data for the world dioceses of the Latin Rite.
+     * Evaluates to 'jsondata/world_dioceses.json'.
+     */
+    public const WORLD_DIOCESES_LATIN_RITE = JsonData::FOLDER . '/world_dioceses.json';
 }

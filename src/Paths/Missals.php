@@ -49,12 +49,13 @@ class Missals
     private static function initPayloadFromRequestBody(): ?object
     {
         $payload = null;
+        $required = in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH]);
         switch (self::$Core->getRequestContentType()) {
             case RequestContentType::JSON:
-                $payload = self::$Core->readJsonBody();
+                $payload = self::$Core->readJsonBody($required);
                 break;
             case RequestContentType::YAML:
-                $payload = self::$Core->readYamlBody();
+                $payload = self::$Core->readYamlBody($required);
                 break;
             case RequestContentType::FORMDATA:
                 $payload = (object)$_POST;

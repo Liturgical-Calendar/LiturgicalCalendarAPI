@@ -27,15 +27,22 @@ class Utilities
         'feasts_keys',
         'memorials',
         'memorials_keys',
+        'suppressed_events',
+        'suppressed_events_keys',
+        'reinstated_events',
+        'reinstated_events_keys',
         'request_headers',
         'color',
         'color_lcl',
         'common'
     ];
     private static string $LAST_ARRAY_KEY = '';
+    /**
+     * All snake_case keys are automatically transformed to their PascalCase equivalent.
+     * If any key needs a specific case transformation other than the automatic snake_case to PascalCase, add it to this array.
+     */
     private const TRANSFORM_KEYS = [
-      "litcal"            => "LitCal",
-      "has_vesper_ii"     => "HasVesperII"
+      "litcal"            => "LitCal"
     ];
     public static string $HASH_REQUEST    = '';
 
@@ -75,36 +82,41 @@ class Utilities
                 //self::debugWrite( "proceeding to convert array value of <$key> to xml sequence..." );
                 self::convertArray2XML($value, $new_object);
             } else {
-              // XML elements cannot have numerical names, they must have text
+                // XML elements cannot have numerical names, they must have text
                 if (is_numeric($key)) {
-                    //self::debugWrite( "key <$key> is numerical, have to deal with this..." );
                     if (self::$LAST_ARRAY_KEY === 'messages') {
-                      //self::debugWrite( "key <$key> seems to belong to the Messages array: will create a corresponding <message> element with attribute 'idx'" );
                         $el = $xml->addChild('Message', htmlspecialchars($value));
                         $el->addAttribute("idx", $key);
-                    } elseif (in_array(self::$LAST_ARRAY_KEY, ['solemnities_keys','feasts_keys','memorials_keys'])) {
+                    } elseif (in_array(self::$LAST_ARRAY_KEY, ['solemnities_keys','feasts_keys','memorials_keys','suppressed_events_keys','reinstated_events_keys'])) {
                         $el = $xml->addChild('Key', $value);
                         $el->addAttribute("idx", $key);
                     } else {
-                      //self::debugWrite( "key <$key> does not seem to belong to the Messages array: will create a corresponding <option> element with attribute 'idx'" );
                         $el = $xml->addChild('Option', $value);
                         $el->addAttribute("idx", $key);
                     }
                 } elseif (is_bool($value)) {
                     $boolVal = $value ? 1 : 0;
                     if (self::isTransformKey($key)) {
+                        // For cases in which the automatic transformation from snake_case to PascalCase would not work
                         $key = self::TRANSFORM_KEYS[$key];
                     } else {
+                        // Transform snake_case to PascalCase
                         $key = str_replace('_', '', ucwords($key, '_'));
                     }
                     $xml->addChild($key, $boolVal);
                 } else {
                     if (self::isTransformKey($key)) {
+                        // For cases in which the automatic transformation from snake_case to PascalCase would not work
                         $key = self::TRANSFORM_KEYS[$key];
                     } else {
+                        // Transform snake_case to PascalCase
                         $key = str_replace('_', '', ucwords($key, '_'));
                     }
-                    $xml->addChild($key, htmlspecialchars($value));
+                    if (gettype($value) === 'string') {
+                        $xml->addChild($key, htmlspecialchars($value));
+                    } else {
+                        $xml->addChild($key);
+                    }
                 }
             }
         }

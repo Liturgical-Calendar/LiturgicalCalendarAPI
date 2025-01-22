@@ -39,6 +39,7 @@ class RegionalDataParams
     public ?string $key = null;
     public ?string $locale = null;
     public ?object $payload = null;
+    public ?string $i18nRequest = null;
 
     public function __construct()
     {
@@ -127,7 +128,11 @@ class RegionalDataParams
             $validLangs = $currentNation[0]->locales;
             if (property_exists($data, 'locale')) {
                 $data->locale = \Locale::canonicalize($data->locale);
-                if (in_array($data->locale, $validLangs)) {
+                if (
+                    RegionalData::$Core->getRequestMethod() === RequestMethod::PUT // short circuit for PUT requests that don't need to validate against existing locales
+                    || null !== $this->i18nRequest // short circuit for i18n requests
+                    || in_array($data->locale, $validLangs, true)
+                ) {
                     $this->locale = $data->locale;
                 } else {
                     $message = "Invalid value {$data->locale} for param `locale`, valid values for nation {$data->key} are: "
@@ -136,7 +141,11 @@ class RegionalDataParams
                 }
             } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
                 $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-                if (in_array($value, $validLangs)) {
+                if (
+                    RegionalData::$Core->getRequestMethod() === RequestMethod::PUT // short circuit for PUT requests that don't need to validate against existing locales
+                    || null !== $this->i18nRequest // short circuit for i18n requests
+                    || in_array($value, $validLangs, true)
+                ) {
                     $this->locale = $value;
                 } else {
                     $message = "Invalid value {$value} for Accept-Language header, valid values for nation {$data->key} are: "
@@ -171,40 +180,50 @@ class RegionalDataParams
      */
     private function checkDiocesanCalendarConditions(object $data): string
     {
-        if (
-            false === in_array($data->key, $this->calendars->diocesan_calendars_keys)
-            && RegionalData::$Core->getRequestMethod() !== RequestMethod::PUT
-        ) {
-            $validVals = implode(', ', $this->calendars->diocesan_calendars_keys);
-            RegionalData::produceErrorResponse(
-                StatusCode::BAD_REQUEST,
-                "Invalid value {$data->key} for param `key`, valid values are: {$validVals}"
-            );
-        }
+        // For all requests other than PUT, we expect the diocese_id to exist
+        if (RegionalData::$Core->getRequestMethod() !== RequestMethod::PUT) {
+            if (false === in_array($data->key, $this->calendars->diocesan_calendars_keys)) {
+                $validVals = implode(', ', $this->calendars->diocesan_calendars_keys);
+                RegionalData::produceErrorResponse(
+                    StatusCode::BAD_REQUEST,
+                    "Invalid value {$data->key} for param `key`, valid values are: {$validVals}"
+                );
+            }
 
-        $currentDiocese = array_values(array_filter($this->calendars->diocesan_calendars, fn ($el) => $el->calendar_id === $data->key))[0];
-        $validLangs = $currentDiocese->locales;
-        if (property_exists($data, 'locale')) {
-            $data->locale = \Locale::canonicalize($data->locale);
-            if (in_array($data->locale, $validLangs)) {
-                $this->locale = $data->locale;
-            } else {
-                $message = "Invalid value {$data->locale} for param `locale`, valid values for {$currentDiocese->diocese} are: "
-                            . implode(', ', $validLangs);
-                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+            // For all requests other than PUT and DELETE, we expect a valid locale parameter
+            if (RegionalData::$Core->getRequestMethod() !== RequestMethod::DELETE) {
+                $currentDiocese = array_values(array_filter($this->calendars->diocesan_calendars, fn ($el) => $el->calendar_id === $data->key))[0];
+                $validLangs = $currentDiocese->locales;
+                if (property_exists($data, 'locale')) {
+                    $data->locale = \Locale::canonicalize($data->locale);
+                    if (
+                        RegionalData::$Core->getRequestMethod() === RequestMethod::PUT // short circuit for PUT requests that don't need to validate against existing locales
+                        || null !== $this->i18nRequest // short circuit for i18n requests
+                        || in_array($data->locale, $validLangs, true)
+                    ) {
+                        $this->locale = $data->locale;
+                    } else {
+                        $message = "Invalid value {$data->locale} for param `locale`, valid values for {$currentDiocese->diocese} are: "
+                                    . implode(', ', $validLangs);
+                        RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+                    }
+                } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+                    $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+                    if (
+                        RegionalData::$Core->getRequestMethod() === RequestMethod::PUT // short circuit for PUT requests which don't require a check against valid langs
+                        || null !== $this->i18nRequest // short circuit for i18n requests
+                        || in_array($value, $validLangs, true) // otherwise check against valid langs
+                    ) {
+                        $this->locale = $value;
+                    } else {
+                        $message = "Invalid value {$value} for Accept-Language header, valid values for {$currentDiocese->diocese} are: "
+                                    . implode(', ', $validLangs);
+                        RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+                    }
+                } else {
+                    RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "`locale` param or `Accept-Language` header required for Diocesan calendar data when request method is GET, POST, or PATCH");
+                }
             }
-        } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-            if (in_array($value, $validLangs)) {
-                $this->locale = $value;
-            } else {
-                $message = "Invalid value {$value} for Accept-Language header, valid values for {$currentDiocese->diocese} are: "
-                            . implode(', ', $validLangs);
-                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
-            }
-        } else {
-            // if no locale was requested, just use the first valid locale
-            $this->locale = $validLangs[0];
         }
 
         return $data->key;
@@ -230,7 +249,7 @@ class RegionalDataParams
     private function checkWiderRegionCalendarConditions(object $data)
     {
         if (
-            false === in_array($data->key, $this->calendars->wider_regions_keys)
+            false === in_array($data->key, $this->calendars->wider_regions_keys, true)
             && RegionalData::$Core->getRequestMethod() !== RequestMethod::PUT
         ) {
             $validVals = implode(', ', $this->calendars->wider_regions_keys);
@@ -243,7 +262,11 @@ class RegionalDataParams
         $validLangs = $currentWiderRegion->locales;
         if (property_exists($data, 'locale')) {
             $data->locale = \Locale::canonicalize($data->locale);
-            if (in_array($data->locale, $validLangs)) {
+            if (
+                RegionalData::$Core->getRequestMethod() === RequestMethod::PUT // short circuit for PUT requests that don't need to validate against existing locales
+                || null !== $this->i18nRequest // short circuit for i18n requests
+                || in_array($data->locale, $validLangs, true)
+            ) {
                 $this->locale = $data->locale;
             } else {
                 $message = "Invalid value {$data->locale} for param `locale`, valid values for wider region {$currentWiderRegion->name} are: "
@@ -252,7 +275,11 @@ class RegionalDataParams
             }
         } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-            if (in_array($value, $validLangs)) {
+            if (
+                RegionalData::$Core->getRequestMethod() === RequestMethod::PUT // short circuit for PUT requests that don't need to validate against existing locales
+                || null !== $this->i18nRequest // short circuit for i18n requests
+                || in_array($value, $validLangs, true)
+            ) {
                 $this->locale = $value;
             } else {
                 $message = "Invalid value {$value} for Accept-Language header, valid values for wider region {$currentWiderRegion->name} are: "
@@ -296,17 +323,27 @@ class RegionalDataParams
                     case 'PUT':
                         if (
                             false === property_exists($payload, 'litcal')
-                            || false === property_exists($payload, 'diocese')
-                            || false === property_exists($payload, 'nation')
+                            || false === property_exists($payload, 'i18n')
+                            || false === property_exists($payload, 'metadata')
                             || false === property_exists($payload->metadata, 'locales')
+                            || false === property_exists($payload->metadata, 'timezone')
+                            || false === property_exists($payload->metadata, 'nation')
+                            || false === property_exists($payload->metadata, 'diocese_id')
+                            || false === property_exists($payload->metadata, 'diocese_name')
                         ) {
-                            $message = "Cannot create Diocesan calendar data when the payload does not have required properties `litcal`, `diocese` or `nation`. Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
+                            $message = "Cannot create Diocesan calendar data when the payload does not have required properties `litcal`, `i18n`, `metadata`, `metadata.locales`, `metadata.timezone`, `metadata.nation`, `metadata.diocese_id` or `metadata.diocese_name`. Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
                             RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                         }
                         break;
                     case 'PATCH':
-                        if (false === property_exists($payload, 'litcal')) {
-                            $message = "Cannot update Diocesan calendar data when the payload does not have required property `litcal`. Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
+                        if (
+                            false === property_exists($payload, 'litcal')
+                            || false === property_exists($payload, 'i18n')
+                            || false === property_exists($payload, 'metadata')
+                            || false === property_exists($payload->metadata, 'locales')
+                            || false === property_exists($payload->metadata, 'timezone')
+                        ) {
+                            $message = "Cannot update Diocesan calendar data when the payload does not have required properties `litcal`, `i18n`, `metadata`, `metadata.locales` or `metadata.timezone`. Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
                             RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                         }
                         break;
@@ -330,6 +367,26 @@ class RegionalDataParams
         return true;
     }
 
+    /**
+     * Validates and sets the parameters for the RegionalData class.
+     *
+     * The method expects the following properties on the `$data` object:
+     * - `category`: one of the values in {@see RegionalDataParams::EXPECTED_CATEGORIES}
+     * - `key`: a valid key for the given category
+     *
+     * The method will produce a 400 error if either of the above properties are missing or invalid.
+     *
+     * If the request method is GET or POST and the `i18n` property is present in the `$data` object,
+     * it will be used to set the `i18nRequest` property (meaning the request is for i18n data, not calendar data).
+     *
+     * If the request method is PUT or PATCH, we validate the payload and set the `payload` property.
+     *
+     * @param object $data
+     *      The parameters to validate and set.
+     *
+     * @return bool
+     *      True if the parameters are valid, false otherwise.
+     */
     public function setData(object $data): bool
     {
         if (false === property_exists($data, 'category') || false === property_exists($data, 'key')) {
@@ -342,8 +399,14 @@ class RegionalDataParams
         if (false === in_array($data->category, self::EXPECTED_CATEGORIES)) {
             RegionalData::produceErrorResponse(
                 StatusCode::BAD_REQUEST,
-                "Unexpected value '{$data->category}' for param `category`, acceptable values are: " . implode(', ', array_values(self::EXPECTED_CATEGORIES))
+                "Unexpected value '{$data->category}' for param `category`, acceptable values are: " . implode(', ', array_keys(self::EXPECTED_CATEGORIES))
             );
+        }
+
+        if (in_array(RegionalData::$Core->getRequestMethod(), [RequestMethod::GET, RequestMethod::POST], true)) {
+            if (property_exists($data, 'i18n')) {
+                $this->i18nRequest = $data->i18n;
+            }
         }
 
         $this->category = $data->category;
@@ -361,7 +424,7 @@ class RegionalDataParams
                 $this->key = null;
         }
 
-        if (in_array(RegionalData::$Core->getRequestMethod(), [RequestMethod::PUT,RequestMethod::PATCH], true)) {
+        if (in_array(RegionalData::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH], true)) {
             if (false === property_exists($data, 'payload') || false === $data->payload instanceof \stdClass) {
                 RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Cannot create or update Calendar data without a payload");
             }

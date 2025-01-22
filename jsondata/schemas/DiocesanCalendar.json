@@ -8,7 +8,8 @@
             "$ref": "#/definitions/LitCal"
         },
         "settings": {
-            "$ref": "#/definitions/Overrides"
+            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/CalendarSettings",
+            "title": "Settings"
         },
         "metadata": {
             "type": "object",
@@ -35,7 +36,8 @@
                     "type": "string"
                 },
                 "group": {
-                    "type": "string"}
+                    "type": "string"
+                }
             },
             "required": [
                 "diocese_id",
@@ -44,6 +46,28 @@
                 "locales",
                 "timezone"
             ]
+        },
+        "i18n": {
+            "type": "object",
+            "description": "A JSON object of the form { \"locale\": { \"key\": \"value\" } }, used only in PUT and PATCH requests.",
+            "additionalProperties": false,
+            "propertyNames": {
+                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+            },
+            "patternProperties": {
+                "": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "propertyNames": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                    },
+                    "patternProperties": {
+                        "": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "required": [
@@ -129,10 +153,6 @@
                 ]
             },
             "title": "LitCal"
-        },
-        "Overrides": {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/CalendarSettings",
-            "title": "Overrides"
         }
     }
 }

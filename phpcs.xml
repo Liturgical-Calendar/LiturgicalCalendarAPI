@@ -2,6 +2,7 @@
 <ruleset name="PHP_CodeSniffer">
     <rule ref="PSR12"> <!-- ruleset standard -->
         <exclude name="Generic.Files.LineLength"/>
+        <exclude name="Squiz.ControlStructures.ControlSignature.SpaceAfterCloseBrace"/>
     </rule>
     <file>./</file> <!-- directory you want to analyze -->
     <exclude-pattern>/vendor/</exclude-pattern>
