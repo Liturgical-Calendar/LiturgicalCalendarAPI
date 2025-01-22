@@ -292,10 +292,8 @@ class Calendar
     /**
      * Initialize the CalendarParams object from the body of the request or from the URL query parameters.
      *
-     * If the request method is not POST, GET or OPTIONS, the function will produce an error response with HTTP status code 405.
-     *
-     * The request body is expected to be a JSON or YAML encoded object.
-     * The object may contain the following properties:
+     * The request body is expected to be a JSON, YAML or Form encoded object.
+     * The following URL query parameters / request body properties are supported:
      * - epiphany: a string indicating whether Epiphany should be calculated on Jan 6th or on the Sunday between Jan 2nd and Jan 8th
      * - ascension: a string indicating whether Ascension should be calculated on a Thursday or on a Sunday
      * - corpus_christi: a string indicating whether Corpus Christi should be calculated on a Thursday or on a Sunday
@@ -311,31 +309,37 @@ class Calendar
      */
     private function initParamsFromRequestBodyOrUrl()
     {
+        // initialize an empty temporary array
+        $data = [];
+
+        // Any request with URL parameters (a query string) will populate the $_GET global associative array
+        if (!empty($_GET)) {
+            $data = $_GET;
+        }
+
+        // Merge any URL parameters with the data from the request body
+        // Body parameters will override URL parameters
         if (self::$Core->getRequestContentType() === RequestContentType::JSON) {
-            $data = self::$Core->readJsonBody(true);
-            $this->CalendarParams = new CalendarParams($data);
-        } elseif (self::$Core->getRequestContentType() === RequestContentType::YAML) {
-            $data = self::$Core->readYamlBody(true);
-            $this->CalendarParams = new CalendarParams($data);
-        } else {
-            switch (self::$Core->getRequestMethod()) {
-                case RequestMethod::POST:
-                    $this->CalendarParams = new CalendarParams($_POST);
-                    break;
-                case RequestMethod::GET:
-                    $this->CalendarParams = new CalendarParams($_GET);
-                    break;
-                case RequestMethod::OPTIONS:
-                    //continue
-                    break;
-                default:
-                    $description = "Allowed Request Methods are "
-                    . implode(' and ', self::$Core->getAllowedRequestMethods())
-                    . ', but your Request Method was '
-                    . self::$Core->getRequestMethod();
-                    self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, $description);
+            $data = array_merge(
+                $data,
+                (self::$Core->readJsonBody(false, true) ?? [])
+            );
+        }
+        elseif (self::$Core->getRequestContentType() === RequestContentType::YAML) {
+            $data = array_merge(
+                $data,
+                (self::$Core->readYamlBody(false, true) ?? [])
+            );
+        }
+        elseif (self::$Core->getRequestContentType() === RequestContentType::FORMDATA) {
+            if (!empty($_POST)) {
+                $data = array_merge(
+                    $data,
+                    $_POST
+                );
             }
         }
+        $this->CalendarParams = new CalendarParams($data);
     }
 
     /**

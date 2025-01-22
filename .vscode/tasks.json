@@ -44,6 +44,15 @@
             "dependsOn": [
                 "launch-browser"
             ]
+        },
+        {
+            "label": "litcal-tests-websockets",
+            "type": "shell",
+            "command": "php LitCalTestServer.php",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }
