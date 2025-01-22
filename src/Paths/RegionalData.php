@@ -574,6 +574,21 @@ class RegionalData
         }
     }
 
+    /**
+     * Get the paths for deleting a regional calendar data resource.
+     *
+     * The return value is an array with two elements:
+     * - The first element is the path to the JSON file containing the calendar data.
+     * - The second element is the path to the folder containing the i18n data for the calendar.
+     *
+     * This is a private method and should only be called from {@see deleteRegionalCalendar}.
+     *
+     * If the calendar for which deletion is requested is a diocesan calendar,
+     * but a correponding entry is not found in the `/calendars` metadata index,
+     * a 404 Not Found error response will be produced.
+     *
+     * @return array The paths for deleting a regional calendar data resource.
+     */
     private function getPathsForCalendarDelete(): array
     {
         switch ($this->params->category) {
