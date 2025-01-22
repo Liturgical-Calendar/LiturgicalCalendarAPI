@@ -94,6 +94,9 @@ docker run -p 8000:8000 -d liturgy-api:{branch}
 </a>
 
 # CHANGELOG
+## [v4.1](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v4.1) (January 22nd 2025)
+* restore diocesan calendar `PUT`, `PATCH` and `DELETE` requests with full support for all i18n languages (issue #284)
+
 ## [v4.0](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v4.0) (January 3rd 2025)
 * package the API source as a composer library for autoload functionality
 * move the endpoints from PHP scripts to resource paths, and create a router
@@ -108,13 +111,13 @@ docker run -p 8000:8000 -d liturgy-api:{branch}
 * add a Dockerfile to easily spin up a Docker container with a local instance of the API
 * fix for cases in which Immaculate Heart of Mary is suppressed, see commit 6f16f130fb2df88488f8ad9ddcc5c8961380f387
 * fix calculation of weekdays between Epiphany and Baptism of the Lord, see issue [#237](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/237)
-* fix Chritmas weekdays should not be created when there is an obligatory memorial, see commit a8ca47744582d89aaed195658a40a22145659eee
+* fix Christmas weekdays should not be created when there is an obligatory memorial, see commit a8ca47744582d89aaed195658a40a22145659eee
 * fix moving of celebrations by a National Calendar that were suppressed in the General Roman Calendar, see issue [#271](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/271)
 * add abbreviated form of the liturgical rank / grade to the `Festivity` output, see issue [#251](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/251)
 * use ISO 3166-1 Alpha-2 codes to identify nations, see issue [#231](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/231)
 * created an interface that allows to create Unit Tests, see issue [#205](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/205)
 * added an index of all dioceses of Latin rite, kudos to Gabriel Chow of gcatholic.org for the contribution
-* add Decree of the Congregation for Divine Worship for Italy: Immaculate Heart suppresses 2nd Sunday of Advent, see commit 191d3247838a4da18ce1ab7c0ca2f16a1b2d516e
+* add Decree of the Congregation for Divine Worship for Italy: Immaculate Conception suppresses 2nd Sunday of Advent, see commit 191d3247838a4da18ce1ab7c0ca2f16a1b2d516e
 * add Decree of the Congregation for Divine Worship for Italy: Saint Nicholas obligatory memorial since 2020, see issue [#248](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/248)
 * feature: discoverability of supported locales, see issue [#240](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/240)
 * feature: all national and diocesan calendars are now multilingual by default, see issue [#150](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/150)
