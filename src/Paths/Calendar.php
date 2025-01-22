@@ -314,7 +314,7 @@ class Calendar
 
         // Any request with URL parameters (a query string) will populate the $_GET global associative array
         if (!empty($_GET)) {
-           $data = $_GET;
+            $data = $_GET;
         }
 
         // Merge any URL parameters with the data from the request body
