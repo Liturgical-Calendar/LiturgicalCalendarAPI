@@ -4509,7 +4509,7 @@ class Calendar
                 || (is_array($CalEvent['color']) && count($CalEvent['color']) > 0 )
                 ? "<BR>" . Utilities::parseColorString($CalEvent['color'], $this->CalendarParams->Locale, true)
                 : "";
-            $htmlDescription .= property_exists($CalEvent, 'liturgical_year')
+            $htmlDescription .= isset($CalEvent['liturgical_year'])
                 && $CalEvent['liturgical_year'] !== null
                 && $CalEvent['liturgical_year'] != ""
                 ? '<BR>' . $CalEvent['liturgical_year'] . "</P>"
