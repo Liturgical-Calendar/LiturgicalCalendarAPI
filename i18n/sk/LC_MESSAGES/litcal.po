@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-22 06:46+0000\n"
+"POT-Creation-Date: 2025-01-25 15:13+0000\n"
 "PO-Revision-Date: 2024-10-03 11:32+0000\n"
 "Last-Translator: Milan Šalka <salka.milan@googlemail.com>\n"
 "Language-Team: Slovak <https://translate.johnromanodorazio.com/projects/"
@@ -924,7 +924,7 @@ msgstr ""
 "Slávnosť %1$s '%2$s', vlastná kalendáru %3$s a zvyčajne slávená %4$s, je v "
 "roku %6$d potlačená nedeľou alebo slávnosťou %5$s"
 
-#: src/Paths/Calendar.php:4654
+#: src/Paths/Calendar.php:4652
 #, php-format
 msgid "Error receiving or parsing info from github about latest release: %s."
 msgstr ""
