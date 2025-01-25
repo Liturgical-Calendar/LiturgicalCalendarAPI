@@ -24,9 +24,8 @@ body:
       label: Version
       description: What version of the API where you using when you noticed the bug?
       options:
-        - v1
-        - v2
-        - v3 (Default)
+        - v3
+        - v4 (Default)
         - dev (Edge)
     validations:
       required: true
