@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-25 15:13+0000\n"
+"POT-Creation-Date: 2025-01-25 15:28+0000\n"
 "PO-Revision-Date: 2024-08-20 15:40+0000\n"
 "Last-Translator: User_425 <user425.itsme@gmail.com>\n"
 "Language-Team: Indonesian <https://translate.johnromanodorazio.com/projects/"
@@ -805,7 +805,7 @@ msgid ""
 "on %4$s, is suppressed by the Sunday or Solemnity %5$s in the year %6$d"
 msgstr ""
 
-#: src/Paths/Calendar.php:4652
+#: src/Paths/Calendar.php:4653
 #, php-format
 msgid "Error receiving or parsing info from github about latest release: %s."
 msgstr ""

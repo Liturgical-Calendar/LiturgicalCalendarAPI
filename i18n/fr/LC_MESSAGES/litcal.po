@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-25 15:13+0000\n"
+"POT-Creation-Date: 2025-01-25 15:28+0000\n"
 "PO-Revision-Date: 2024-12-06 23:24+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: French <https://translate.johnromanodorazio.com/projects/"
@@ -945,7 +945,7 @@ msgstr ""
 "La %1$s '%2$s', propre au calendrier du %3$s et habituellement célébrée le "
 "%4$s, est supprimée par le dimanche ou la solennité %5$s en l'année %6$d"
 
-#: src/Paths/Calendar.php:4652
+#: src/Paths/Calendar.php:4653
 #, php-format
 msgid "Error receiving or parsing info from github about latest release: %s."
 msgstr ""
