@@ -4517,15 +4517,15 @@ class Calendar
             $ical .= "BEGIN:VEVENT\r\n";
             $ical .= "CLASS:PUBLIC\r\n";
             $icalDate = \DateTime::createFromFormat('U', $CalEvent['date'], new \DateTimeZone('UTC'));
-            $ical .= "DTSTART;VALUE=DATE:" . $icalDate->format('Ymd') . "\r\n";// . "T" . $$icalDate->format( 'His' ) . "Z\r\n";
+            $ical .= "DTSTART;VALUE=DATE:" . $icalDate->format('Ymd') . "\r\n";// . "T" . $icalDate->format( 'His' ) . "Z\r\n";
             //$CalEvent['date']->add( new \DateInterval( 'P1D' ) );
-            //$ical .= "DTEND:" . $$icalDate->format( 'Ymd' ) . "T" . $$icalDate->format( 'His' ) . "Z\r\n";
+            //$ical .= "DTEND:" . $icalDate->format( 'Ymd' ) . "T" . $icalDate->format( 'His' ) . "Z\r\n";
             $ical .= "DTSTAMP:" . date('Ymd') . "T" . date('His') . "Z\r\n";
             /** The event created in the calendar is specific to this year, next year it may be different.
              *  So UID must take into account the year
              *  Next year's event should not cancel this year's event, they are different events
              **/
-            $ical .= "UID:" . md5("LITCAL-" . $FestivityKey . '-' . $$icalDate->format('Y')) . "\r\n";
+            $ical .= "UID:" . md5("LITCAL-" . $FestivityKey . '-' . $icalDate->format('Y')) . "\r\n";
             $ical .= "CREATED:" . str_replace(':', '', str_replace('-', '', $publishDate)) . "\r\n";
             $desc = "DESCRIPTION:" . str_replace(',', '\,', $description);
             $ical .= strlen($desc) > 75 ? rtrim(chunk_split($desc, 71, "\r\n\t")) . "\r\n" : "$desc\r\n";
