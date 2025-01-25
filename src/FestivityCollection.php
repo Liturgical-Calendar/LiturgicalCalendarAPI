@@ -1308,7 +1308,7 @@ class FestivityCollection
         if (empty($this->festivitiesCollection)) {
             $festivitiesCollection = [];
             foreach ($this->festivities as $key => $festivity) {
-                $gradeAbbr = $this->LitGrade->i18n($festivity->grade, false, true);
+                //$gradeAbbr = $this->LitGrade->i18n($festivity->grade, false, true);
                 $festivityAssocArr = [
                     "event_key" => $key,
                     ...json_decode(json_encode($festivity), true)

@@ -4478,19 +4478,17 @@ class Calendar
             if ($CalEvent['grade_display'] !== null) {
                 $displayGrade = $CalEvent['grade_display'];
             }
-            if ($FestivityKey === 'DedicationLateran') {
+            if ($FestivityKey === 'DedicationLateran' || $FestivityKey === 'DedicationLateran_vigil') {
                 $displayGradeHTML = $this->LitGrade->i18n(LitGrade::FEAST, true);
-            } elseif (FestivityCollection::dateIsNotSunday($CalEvent['date'])) {
-                if ($CalEvent['grade_display'] !== null && $CalEvent['grade_display'] !== "") {
+            } elseif ($CalEvent['grade_display'] === null) {
+                $displayGradeHTML = $this->LitGrade->i18n((int)$CalEvent['grade'], true);
+            } else {
+                if ($CalEvent['grade_display'] === '') {
+                    $displayGradeHTML = '';
+                } elseif ((int)$CalEvent['grade'] >= LitGrade::FEAST) {
                     $displayGradeHTML = '<B>' . $CalEvent['grade_display'] . '</B>';
                 } else {
-                    $displayGradeHTML = $this->LitGrade->i18n($CalEvent['grade'], true);
-                }
-            } elseif ((int)$CalEvent['grade'] === LitGrade::SOLEMNITY) {
-                if ($CalEvent['grade_display'] !== null && $CalEvent['grade_display'] !== "") {
-                    $displayGradeHTML = '<B>' . $CalEvent['grade_display'] . '</B>';
-                } else {
-                    $displayGradeHTML = $this->LitGrade->i18n($CalEvent['grade'], true);
+                    $displayGradeHTML = $CalEvent['grade_display'];
                 }
             }
 
