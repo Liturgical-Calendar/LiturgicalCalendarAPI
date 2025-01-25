@@ -4480,7 +4480,7 @@ class Calendar
             }
             if ($FestivityKey === 'DedicationLateran') {
                 $displayGradeHTML = $this->LitGrade->i18n(LitGrade::FEAST, true);
-            } elseif (FestivityCollection::dateIsNotSunday($CalEvent->date)) {
+            } elseif (FestivityCollection::dateIsNotSunday($CalEvent['date'])) {
                 if ($CalEvent['grade_display'] !== null && $CalEvent['grade_display'] !== "") {
                     $displayGradeHTML = '<B>' . $CalEvent['grade_display'] . '</B>';
                 } else {
