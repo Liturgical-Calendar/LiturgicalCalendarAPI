@@ -1,0 +1,50 @@
+{
+    "litcal": [
+        {
+            "festivity": {
+                "event_key": "DedicationoftheCathedral",
+                "color": [
+                    "white"
+                ],
+                "grade": 6,
+                "common": [
+                    "Dedication of a Church"
+                ],
+                "day": 26,
+                "month": 6
+            },
+            "metadata": {
+                "since_year": 1970,
+                "form_rownum": 1
+            }
+        },
+        {
+            "festivity": {
+                "event_key": "StDunstanpatronoftheDiocese",
+                "color": [
+                    "white"
+                ],
+                "grade": 6,
+                "common": [
+                    "Pastors:For a Bishop"
+                ],
+                "day": 19,
+                "month": 5
+            },
+            "metadata": {
+                "since_year": 1970,
+                "form_rownum": 0
+            }
+        }
+    ],
+    "metadata": {
+        "nation": "CA",
+        "diocese_id": "charlo_ca",
+        "diocese_name": "Charlottetown",
+        "locales": [
+            "en_CA",
+            "fr_CA"
+        ],
+        "timezone": "America\/Halifax"
+    }
+}
