@@ -4475,64 +4475,64 @@ class Calendar
         foreach ($SerializeableLitCal->litcal as $FestivityKey => $CalEvent) {
             $displayGrade = "";
             $displayGradeHTML = "";
-            if ($CalEvent->display_grade !== null) {
-                $displayGrade = $CalEvent->display_grade;
+            if ($CalEvent['grade_display'] !== null) {
+                $displayGrade = $CalEvent['grade_display'];
             }
             if ($FestivityKey === 'DedicationLateran') {
                 $displayGradeHTML = $this->LitGrade->i18n(LitGrade::FEAST, true);
             } elseif (FestivityCollection::dateIsNotSunday($CalEvent->date)) {
-                if ($CalEvent->grade_display !== null && $CalEvent->grade_display !== "") {
-                    $displayGradeHTML = '<B>' . $CalEvent->grade_display . '</B>';
+                if ($CalEvent['grade_display'] !== null && $CalEvent['grade_display'] !== "") {
+                    $displayGradeHTML = '<B>' . $CalEvent['grade_display'] . '</B>';
                 } else {
-                    $displayGradeHTML = $this->LitGrade->i18n($CalEvent->grade, true);
+                    $displayGradeHTML = $this->LitGrade->i18n($CalEvent['grade'], true);
                 }
-            } elseif ((int)$CalEvent->grade === LitGrade::SOLEMNITY) {
-                if ($CalEvent->grade_display !== null && $CalEvent->grade_display !== "") {
-                    $displayGradeHTML = '<B>' . $CalEvent->grade_display . '</B>';
+            } elseif ((int)$CalEvent['grade'] === LitGrade::SOLEMNITY) {
+                if ($CalEvent['grade_display'] !== null && $CalEvent['grade_display'] !== "") {
+                    $displayGradeHTML = '<B>' . $CalEvent['grade_display'] . '</B>';
                 } else {
-                    $displayGradeHTML = $this->LitGrade->i18n($CalEvent->grade, true);
+                    $displayGradeHTML = $this->LitGrade->i18n($CalEvent['grade'], true);
                 }
             }
 
-            $description = $this->LitCommon->c($CalEvent->common);
+            $description = $this->LitCommon->c($CalEvent['common']);
             $description .=  '\n' . $displayGrade;
-            $description .= (is_string($CalEvent->color) && $CalEvent->color != "")
-                || (is_array($CalEvent->color) && count($CalEvent->color) > 0 )
-                ? '\n' . Utilities::parseColorString($CalEvent->color, $this->CalendarParams->Locale, false)
+            $description .= (is_string($CalEvent['color']) && $CalEvent['color'] != "")
+                || (is_array($CalEvent['color']) && count($CalEvent['color']) > 0 )
+                ? '\n' . Utilities::parseColorString($CalEvent['color'], $this->CalendarParams->Locale, false)
                 : "";
-            $description .= property_exists($CalEvent, 'liturgical_year')
-                && $CalEvent->liturgical_year !== null
-                && $CalEvent->liturgical_year != ""
-                ? '\n' . $CalEvent->liturgical_year
+            $description .= isset($CalEvent['liturgical_year'])
+                && $CalEvent['liturgical_year'] !== null
+                && $CalEvent['liturgical_year'] != ""
+                ? '\n' . $CalEvent['liturgical_year']
                 : "";
-            $htmlDescription = "<P DIR=LTR>" . $this->LitCommon->c($CalEvent->common);
+            $htmlDescription = "<P DIR=LTR>" . $this->LitCommon->c($CalEvent['common']);
             $htmlDescription .=  '<BR>' . $displayGradeHTML;
-            $htmlDescription .= (is_string($CalEvent->color) && $CalEvent->color != "")
-                || (is_array($CalEvent->color) && count($CalEvent->color) > 0 )
-                ? "<BR>" . Utilities::parseColorString($CalEvent->color, $this->CalendarParams->Locale, true)
+            $htmlDescription .= (is_string($CalEvent['color']) && $CalEvent['color'] != "")
+                || (is_array($CalEvent['color']) && count($CalEvent['color']) > 0 )
+                ? "<BR>" . Utilities::parseColorString($CalEvent['color'], $this->CalendarParams->Locale, true)
                 : "";
             $htmlDescription .= property_exists($CalEvent, 'liturgical_year')
-                && $CalEvent->liturgical_year !== null
-                && $CalEvent->liturgical_year != ""
-                ? '<BR>' . $CalEvent->liturgical_year . "</P>"
+                && $CalEvent['liturgical_year'] !== null
+                && $CalEvent['liturgical_year'] != ""
+                ? '<BR>' . $CalEvent['liturgical_year'] . "</P>"
                 : "</P>";
             $ical .= "BEGIN:VEVENT\r\n";
             $ical .= "CLASS:PUBLIC\r\n";
-            $ical .= "DTSTART;VALUE=DATE:" . $CalEvent->date->format('Ymd') . "\r\n";// . "T" . $CalEvent->date->format( 'His' ) . "Z\r\n";
-            //$CalEvent->date->add( new \DateInterval( 'P1D' ) );
-            //$ical .= "DTEND:" . $CalEvent->date->format( 'Ymd' ) . "T" . $CalEvent->date->format( 'His' ) . "Z\r\n";
+            $ical .= "DTSTART;VALUE=DATE:" . $CalEvent['date']->format('Ymd') . "\r\n";// . "T" . $CalEvent['date']->format( 'His' ) . "Z\r\n";
+            //$CalEvent['date']->add( new \DateInterval( 'P1D' ) );
+            //$ical .= "DTEND:" . $CalEvent['date']->format( 'Ymd' ) . "T" . $CalEvent['date']->format( 'His' ) . "Z\r\n";
             $ical .= "DTSTAMP:" . date('Ymd') . "T" . date('His') . "Z\r\n";
             /** The event created in the calendar is specific to this year, next year it may be different.
              *  So UID must take into account the year
              *  Next year's event should not cancel this year's event, they are different events
              **/
-            $ical .= "UID:" . md5("LITCAL-" . $FestivityKey . '-' . $CalEvent->date->format('Y')) . "\r\n";
+            $ical .= "UID:" . md5("LITCAL-" . $FestivityKey . '-' . $CalEvent['date']->format('Y')) . "\r\n";
             $ical .= "CREATED:" . str_replace(':', '', str_replace('-', '', $publishDate)) . "\r\n";
             $desc = "DESCRIPTION:" . str_replace(',', '\,', $description);
             $ical .= strlen($desc) > 75 ? rtrim(chunk_split($desc, 71, "\r\n\t")) . "\r\n" : "$desc\r\n";
             $ical .= "LAST-MODIFIED:" . str_replace(':', '', str_replace('-', '', $publishDate)) . "\r\n";
             $summaryLang = ";LANGUAGE=" . strtolower(preg_replace('/_/', '-', $this->CalendarParams->Locale));
-            $summary = "SUMMARY" . $summaryLang . ":" . str_replace(',', '\,', str_replace("\r\n", " ", $CalEvent->name));
+            $summary = "SUMMARY" . $summaryLang . ":" . str_replace(',', '\,', str_replace("\r\n", " ", $CalEvent['name']));
             $ical .= strlen($summary) > 75 ? rtrim(chunk_split($summary, 75, "\r\n\t")) . "\r\n" : $summary . "\r\n";
             $ical .= "TRANSP:TRANSPARENT\r\n";
             $ical .= "X-MICROSOFT-CDO-ALLDAYEVENT:TRUE\r\n";
