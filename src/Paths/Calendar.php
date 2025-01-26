@@ -38,7 +38,7 @@ use LiturgicalCalendar\Api\Params\CalendarParams;
  */
 class Calendar
 {
-    public const API_VERSION                        = '4.2';
+    public const API_VERSION                        = '4.3';
     public static Core $Core;
 
     private string $CacheDuration                   = "";

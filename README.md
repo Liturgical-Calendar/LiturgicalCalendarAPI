@@ -94,6 +94,13 @@ docker run -p 8000:8000 -d liturgy-api:{branch}
 </a>
 
 # CHANGELOG
+
+## [v4.3](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v4.3) (January 26th 2025)
+* realign XML output with latest developments (issue #290)
+
+## [v4.2](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v4.2) (January 25th 2025)
+* realign ICS output with latest developments (issue #288)
+
 ## [v4.1](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v4.1) (January 22nd 2025)
 * restore diocesan calendar `PUT`, `PATCH` and `DELETE` requests with full support for all i18n languages (issue #284)
 
