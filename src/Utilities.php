@@ -36,26 +36,70 @@ class Utilities
         'color_lcl',
         'common'
     ];
+
+    /**
+     * Used to keep track of the current array type
+     * when processing items of the array.
+     * This way the items can be transformed to an appropriate XML element.
+     * @var string
+     */
     private static string $LAST_ARRAY_KEY = '';
+
     /**
      * All snake_case keys are automatically transformed to their PascalCase equivalent.
      * If any key needs a specific case transformation other than the automatic snake_case to PascalCase, add it to this array.
      */
-    private const TRANSFORM_KEYS = [
-      "litcal"            => "LitCal"
+    private const CUSTOM_TRANSFORM_KEYS = [
+        "litcal" => "LitCal",
+        "has_vesper_ii" => "HasVesperII"
     ];
-    public static string $HASH_REQUEST    = '';
 
+    /**
+     * Used to keep track of the current request hash value.
+     * The value is set from the Calendar.php class representing the `/calendar` API path.
+     * @var string
+     */
+    public static string $HASH_REQUEST = '';
+
+    /**
+     * Checks if a given key is not a LitCalEvent key.
+     * LitCalEvent keys are keys in the LitCal array that are associated with a LitCalEvent array.
+     * This function is used to determine if a key is a 'special' key in the LitCal array,
+     * such as 'metadata', 'settings', 'litcal', etc.
+     * @param string $key
+     * @return bool
+     */
     private static function isNotLitCalEventKey(string $key): bool
     {
         return in_array($key, self::NON_EVENT_KEYS);
     }
 
-    private static function isTransformKey(string $key): bool
+    /**
+     * Returns true if the key is present in the TRANSFORM_KEYS array, i.e. if the key needs a specific
+     * case transformation other than the automatic snake_case to PascalCase.
+     * @param string $key
+     * @return bool
+     */
+    private static function isCustomTransformKey(string $key): bool
     {
-        return array_key_exists($key, self::TRANSFORM_KEYS);
+        return array_key_exists($key, self::CUSTOM_TRANSFORM_KEYS);
     }
 
+    private static function transformKey(string $key): string
+    {
+        if (self::isCustomTransformKey($key)) {
+            return self::CUSTOM_TRANSFORM_KEYS[$key];
+        } else {
+            return str_replace('_', '', ucwords($key, '_'));
+        }
+    }
+
+    /**
+     * Recursively convert an associative array to an XML object
+     * @param array $data
+     * @param \SimpleXMLElement $xml
+     * @return void
+     */
     public static function convertArray2XML(array $data, ?\SimpleXMLElement &$xml): void
     {
         foreach ($data as $key => $value) {
@@ -63,26 +107,23 @@ class Utilities
                 self::$LAST_ARRAY_KEY = $key;
                 //self::debugWrite( "value of key <$key> is an array" );
                 if (self::isNotLitCalEventKey($key)) {
-                    //self::debugWrite( "key <$key> is not a LitCalEvent" );
-                    if (self::isTransformKey($key)) {
-                        $key = self::TRANSFORM_KEYS[$key];
-                    } else {
-                        $key = str_replace('_', '', ucwords($key, '_'));
-                    }
+                    $key = self::transformKey($key);
                     $new_object = $xml->addChild($key);
                 } else {
                     //self::debugWrite( "key <$key> is a LitCalEvent" );
                     $new_object = $xml->addChild("LitCalEvent");
                     if (is_numeric($key)) {
                         $new_object->addAttribute("idx", $key);
-                    } else {
-                        $new_object->addAttribute("eventKey", $key);
                     }
                 }
                 //self::debugWrite( "proceeding to convert array value of <$key> to xml sequence..." );
                 self::convertArray2XML($value, $new_object);
             } else {
-                // XML elements cannot have numerical names, they must have text
+                // For simple values
+
+                // A numeric key means we are dealing with an array item,
+                // however XML elements cannot have numerical names, they must have textual names,
+                // so we determine the item element name based on the array to which the item belongs
                 if (is_numeric($key)) {
                     if (self::$LAST_ARRAY_KEY === 'messages') {
                         $el = $xml->addChild('Message', htmlspecialchars($value));
@@ -91,31 +132,20 @@ class Utilities
                         $el = $xml->addChild('Key', $value);
                         $el->addAttribute("idx", $key);
                     } else {
+                        // color, color_lcl, and common array items will be converted to Option elements
                         $el = $xml->addChild('Option', $value);
                         $el->addAttribute("idx", $key);
                     }
-                } elseif (is_bool($value)) {
-                    $boolVal = $value ? 1 : 0;
-                    if (self::isTransformKey($key)) {
-                        // For cases in which the automatic transformation from snake_case to PascalCase would not work
-                        $key = self::TRANSFORM_KEYS[$key];
-                    } else {
-                        // Transform snake_case to PascalCase
-                        $key = str_replace('_', '', ucwords($key, '_'));
-                    }
-                    $xml->addChild($key, $boolVal);
                 } else {
-                    if (self::isTransformKey($key)) {
-                        // For cases in which the automatic transformation from snake_case to PascalCase would not work
-                        $key = self::TRANSFORM_KEYS[$key];
-                    } else {
-                        // Transform snake_case to PascalCase
-                        $key = str_replace('_', '', ucwords($key, '_'));
+                    $key = self::transformKey($key);
+                    if (is_bool($value)) {
+                        $boolVal = $value ? 1 : 0;
+                        $xml->addChild($key, $boolVal);
                     }
-                    if (gettype($value) === 'string') {
+                    elseif (gettype($value) === 'string') {
                         $xml->addChild($key, htmlspecialchars($value));
                     } else {
-                        $xml->addChild($key);
+                        $xml->addChild($key, $value);
                     }
                 }
             }
@@ -209,6 +239,14 @@ class Utilities
     }
     */
 
+    /**
+     * Convert a color name to its corresponding hexadecimal value.
+     *
+     * @param string $color The name of the color (e.g., "red", "green").
+     *
+     * @return string The hexadecimal representation of the color.
+     *                Returns "#000000" for unrecognized color names.
+     */
     public static function colorToHex(string $color): string
     {
         $hex = "#";
@@ -234,6 +272,14 @@ class Utilities
         return $hex;
     }
 
+    /**
+     * Converts a string of colors to a string of localized color names.
+     *
+     * @param string|array $colors A string of color names separated by commas, or an array of color names.
+     * @param string $LOCALE The locale to use when localizing the color names.
+     * @param bool $html If true, the result will be an HTML string with the color names in bold, italic font with the corresponding color.
+     * @return string The localized color names, separated by spaces and the word "or".
+     */
     public static function parseColorString(string|array $colors, string $LOCALE, bool $html = false): string
     {
         if (is_string($colors)) {
@@ -299,6 +345,12 @@ class Utilities
         return $ordinal;
     }
 
+    /**
+     * Function called after a successful installation of the Catholic Liturgical Calendar API.
+     * It prints a message of thanksgiving to God and a prayer for the Pope.
+     *
+     * @return void
+     */
     public static function postInstall(): void
     {
         printf("\t\033[4m\033[1;44mCatholic Liturgical Calendar\033[0m\n");
