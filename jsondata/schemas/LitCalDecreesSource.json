@@ -33,7 +33,7 @@
                 },
                 "api_path": {
                     "type": "string",
-                    "pattern": "^https:\\\/\\\/litcal\\.johnromanodorazio\\.com\\\/api\\\/(dev|v[4-9])\\\/decrees\\\/[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$"
+                    "pattern": "^https?:\\\/\\\/(?:litcal\\.johnromanodorazio\\.com\\\/api\\\/(?:dev|v[4-9])|localhost(?:\\:\\d+))\\\/decrees\\\/[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$"
                 }
             },
             "required": [
