@@ -228,149 +228,81 @@
               <xs:element name="Solemnities">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="LitCalEvent" maxOccurs="unbounded">
-                      <xs:complexType>
-                        <xs:sequence>
-                          <xs:element name="EventKey" type="xs:string" />
-                          <xs:element name="Date" type="xs:dateTime" />
-                          <xs:element name="TimezoneType">
-                            <xs:simpleType>
-                              <xs:restriction base="xs:byte">
-                                <!-- <xs:enumeration value="1" /> -->
-                                <!-- <xs:enumeration value="2" /> -->
-                                <xs:enumeration value="3" />
-                              </xs:restriction>
-                            </xs:simpleType>
-                          </xs:element>
-                          <xs:element name="Timezone">
-                            <xs:simpleType>
-                              <xs:restriction base="xs:string">
-                                <xs:enumeration value="UTC" />
-                              </xs:restriction>
-                            </xs:simpleType>
-                          </xs:element>
-                        </xs:sequence>
-                        <xs:attribute name="idx" type="xs:integer" use="required" />
-                      </xs:complexType>
-                    </xs:element>
+                    <xs:element name="LitCalEvent" type="cl:LitCalEventType" minOccurs="70" maxOccurs="unbounded" />
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
               <xs:element name="SolemnitiesKeys">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="Key" maxOccurs="unbounded" minOccurs="50">
-                      <xs:complexType>
-                        <xs:simpleContent>
-                          <xs:extension base="xs:string">
-                            <xs:attribute type="xs:short" name="idx" use="required" />
-                          </xs:extension>
-                        </xs:simpleContent>
-                      </xs:complexType>
-                    </xs:element>
+                    <xs:element name="Key" type="cl:KeyType" minOccurs="70" maxOccurs="unbounded" />
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
               <xs:element name="Feasts">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="LitCalEvent" maxOccurs="unbounded">
-                      <xs:complexType>
-                        <xs:sequence>
-                          <xs:element name="EventKey" type="xs:string" />
-                          <xs:element name="Date" type="xs:dateTime" />
-                          <xs:element name="TimezoneType">
-                            <xs:simpleType>
-                              <xs:restriction base="xs:byte">
-                                <!-- <xs:enumeration value="1" /> -->
-                                <!-- <xs:enumeration value="2" /> -->
-                                <xs:enumeration value="3" />
-                              </xs:restriction>
-                            </xs:simpleType>
-                          </xs:element>
-                          <xs:element name="Timezone">
-                            <xs:simpleType>
-                              <xs:restriction base="xs:string">
-                                <xs:enumeration value="UTC" />
-                              </xs:restriction>
-                            </xs:simpleType>
-                          </xs:element>
-                        </xs:sequence>
-                        <xs:attribute name="idx" type="xs:integer" use="required" />
-                      </xs:complexType>
-                    </xs:element>
+                    <xs:element name="LitCalEvent" type="cl:LitCalEventType" minOccurs="10" maxOccurs="unbounded" />
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
               <xs:element name="FeastsKeys">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="Key" maxOccurs="unbounded" minOccurs="10">
-                      <xs:complexType>
-                        <xs:simpleContent>
-                          <xs:extension base="xs:string">
-                            <xs:attribute type="xs:short" name="idx" use="required" />
-                          </xs:extension>
-                        </xs:simpleContent>
-                      </xs:complexType>
-                    </xs:element>
+                    <xs:element name="Key" type="cl:KeyType" minOccurs="10" maxOccurs="unbounded" />
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
               <xs:element name="Memorials">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="LitCalEvent" maxOccurs="unbounded">
-                      <xs:complexType>
-                        <xs:sequence>
-                          <xs:element name="EventKey" type="xs:string" />
-                          <xs:element name="Date" type="xs:dateTime" />
-                          <xs:element name="TimezoneType">
-                            <xs:simpleType>
-                              <xs:restriction base="xs:byte">
-                                <!-- <xs:enumeration value="1" /> -->
-                                <!-- <xs:enumeration value="2" /> -->
-                                <xs:enumeration value="3" />
-                              </xs:restriction>
-                            </xs:simpleType>
-                          </xs:element>
-                          <xs:element name="Timezone">
-                            <xs:simpleType>
-                              <xs:restriction base="xs:string">
-                                <xs:enumeration value="UTC" />
-                              </xs:restriction>
-                            </xs:simpleType>
-                          </xs:element>
-                        </xs:sequence>
-                        <xs:attribute name="idx" type="xs:integer" use="required" />
-                      </xs:complexType>
-                    </xs:element>
+                    <xs:element name="LitCalEvent" type="cl:LitCalEventType" minOccurs="40" maxOccurs="unbounded" />
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
               <xs:element name="MemorialsKeys">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="Key" maxOccurs="unbounded" minOccurs="40">
-                      <xs:complexType>
-                        <xs:simpleContent>
-                          <xs:extension base="xs:string">
-                            <xs:attribute type="xs:short" name="idx" use="required" />
-                          </xs:extension>
-                        </xs:simpleContent>
-                      </xs:complexType>
-                    </xs:element>
+                    <xs:element name="Key" type="cl:KeyType" minOccurs="40" maxOccurs="unbounded" />
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
-              <xs:element name="DioceseName" type="xs:string" />
+              <xs:element name="SuppressedEvents">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="LitCalEvent" type="cl:LitCalEventType" minOccurs="10" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="SuppressedEventsKeys">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Key" type="cl:KeyType" minOccurs="10" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="ReinstatedEvents">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="LitCalEvent" type="cl:LitCalEventType" minOccurs="0" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="ReinstatedEventsKeys">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Key" type="cl:KeyType" minOccurs="0" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="DioceseName" type="xs:string" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
         <xs:element name="Messages">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="Message" maxOccurs="unbounded" minOccurs="0">
+              <xs:element name="Message" minOccurs="20" maxOccurs="unbounded">
                 <xs:complexType>
                   <xs:simpleContent>
                     <xs:extension base="xs:string">
@@ -394,4 +326,34 @@
       <xs:enumeration value="pink" />
     </xs:restriction>
   </xs:simpleType>
+  <xs:complexType name="LitCalEventType">
+    <xs:sequence>
+      <xs:element name="EventKey" type="xs:string" />
+      <xs:element name="Date" type="xs:dateTime" />
+      <xs:element name="TimezoneType">
+        <xs:simpleType>
+          <xs:restriction base="xs:byte">
+            <!-- <xs:enumeration value="1" /> -->
+            <!-- <xs:enumeration value="2" /> -->
+            <xs:enumeration value="3" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="Timezone">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="UTC" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="idx" type="xs:integer" use="required" />
+  </xs:complexType>
+  <xs:complexType name="KeyType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:short" name="idx" use="required" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
 </xs:schema>
