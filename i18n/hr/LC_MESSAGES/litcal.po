@@ -5,40 +5,47 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-01-25 15:28+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2025-01-31 15:10+0000\n"
+"Last-Translator: Lovro <development.lovro@gmail.com>\n"
+"Language-Team: Croatian <https://translate.johnromanodorazio.com/projects/"
+"liturgical-calendar/api-strings/hr/>\n"
 "Language: hr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 5.8.4\n"
 
 #: src/Paths/Calendar.php:623
 #, php-format
 msgid ""
 "The name of the diocese could not be derived from the diocese ID \"%s\"."
-msgstr ""
+msgstr "Ime biskupije nije pronađeno koristeći ID biskupije \"%s\"."
 
 #: src/Paths/Calendar.php:658
 #, php-format
 msgid "The Diocesan calendar \"%s\" was not found in the index file."
-msgstr ""
+msgstr "Dijecezanski kalendar \"%s\" nije pronađen u indeksnoj datoteci."
 
 #: src/Paths/Calendar.php:754
-#, php-format
+#, fuzzy, php-format
 msgid ""
 "Only years from 1970 and after are supported. You tried requesting the year "
 "%d."
 msgstr ""
+"Podržane su samo godine od 1970. nadalje. Pokušali ste zatražiti godinu %d."
 
 #. translators: Temporale refers to the Proprium de Tempore
 #: src/Paths/Calendar.php:786
-#, php-format
+#, fuzzy, php-format
 msgid ""
 "There was an error trying to decode localized JSON data for the Temporale: %s"
 msgstr ""
+"Došlo je do pogreške prilikom dekodiranja lokaliziranih JSON podataka za "
+"Temporale: %s"
 
 #. translators: Temporale refers to the Proprium de Tempore
 #: src/Paths/Calendar.php:793
@@ -1072,52 +1079,52 @@ msgstr ""
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:150 src/Enum/LitGrade.php:205
 msgid "weekday"
-msgstr ""
+msgstr "svagdan"
 
 #. translators: liturgical rank 'WEEKDAY' in abbreviated form
 #: src/Enum/LitGrade.php:152
 msgid "w"
-msgstr ""
+msgstr "sv"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:157
 msgid "commemoration"
-msgstr ""
+msgstr "spomendan"
 
 #. translators: liturgical rank 'COMMEMORATION' in abbreviated form
 #: src/Enum/LitGrade.php:159
 msgid "m*"
-msgstr ""
+msgstr "sp*"
 
 #. translators: liturgical rank. Keep lowercsase
 #: src/Enum/LitGrade.php:164
 msgid "optional memorial"
-msgstr ""
+msgstr "neobvezatni spomendan"
 
 #. translators: liturgical rank 'OPTIONAL MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:166
 msgid "m"
-msgstr ""
+msgstr "sp"
 
 #. translators: liturgical rank. Keep Capitalized
 #: src/Enum/LitGrade.php:171
 msgid "Memorial"
-msgstr ""
+msgstr "Spomendan"
 
 #. translators: liturgical rank 'MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:173
 msgid "M"
-msgstr ""
+msgstr "Sp"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:178
 msgid "FEAST"
-msgstr ""
+msgstr "BLAGDAN"
 
 #. translators: liturgical rank 'FEAST' in abbreviated form
 #: src/Enum/LitGrade.php:180
 msgid "F"
-msgstr ""
+msgstr "B"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:185
@@ -1132,12 +1139,12 @@ msgstr ""
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:192
 msgid "SOLEMNITY"
-msgstr ""
+msgstr "SVETKOVINA"
 
 #. translators: liturgical rank 'SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:194
 msgid "S"
-msgstr ""
+msgstr "S"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:199
