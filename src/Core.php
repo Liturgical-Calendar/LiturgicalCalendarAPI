@@ -545,7 +545,7 @@ class Core
      *
      * @return object|array|null The request parameters, either as a stdClass object or an associative array, or null if the request body was not required and is empty.
      */
-    public function readYamlBody(bool $required = false, bool $assoc = false): object|array
+    public function readYamlBody(bool $required = false, bool $assoc = false): object|array|null
     {
         $rawData = file_get_contents('php://input');
         if ("" === $rawData && $required) {
