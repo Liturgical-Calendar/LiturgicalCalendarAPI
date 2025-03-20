@@ -246,77 +246,152 @@ class RegionalData
         }
     }
 
+    private function createDiocesanCalendar(): void
+    {
+        $response = new \stdClass();
+        // Ensure we have all the necessary folders in place
+        // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
+        // so we don't have to worry about manually checking and creating each one individually
+        $diocesanCalendarI18nFolder = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FOLDER, [
+            '{nation}' => $this->params->payload->metadata->nation,
+            '{diocese}' => $this->params->payload->metadata->diocese_id
+        ]);
+        if (!file_exists($diocesanCalendarI18nFolder)) {
+            mkdir($diocesanCalendarI18nFolder, 0755, true);
+        }
+
+        foreach ($this->params->payload->i18n as $locale => $litCalEventsI18n) {
+            $diocesanCalendarI18nFile = strtr(
+                JsonData::DIOCESAN_CALENDARS_I18N_FILE,
+                [
+                    '{nation}' => $this->params->payload->metadata->nation,
+                    '{diocese}' => $this->params->payload->metadata->diocese_id,
+                    '{locale}' => $locale
+                ]
+            );
+            file_put_contents($diocesanCalendarI18nFile, json_encode($litCalEventsI18n, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL);
+        }
+
+        // We no longer need the i18n data, we can now remove it
+        unset($this->params->payload->i18n);
+
+        $diocesanCalendarFile = strtr(
+            JsonData::DIOCESAN_CALENDARS_FILE,
+            [
+                '{nation}' => $this->params->payload->metadata->nation,
+                '{diocese}' => $this->params->payload->metadata->diocese_id,
+                '{diocese_name}' => $this->params->payload->metadata->diocese_name
+            ]
+        );
+
+        $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        file_put_contents(
+            $diocesanCalendarFile,
+            $calendarData . PHP_EOL
+        );
+
+        $response->success = "Calendar data created or updated for Diocese \"{$this->params->payload->metadata->diocese_name}\" (Nation: \"{$this->params->payload->metadata->nation}\")";
+        $response->data = $this->params->payload;
+        self::produceResponse(json_encode($response));
+    }
+
+    private function createNationalCalendar(): void
+    {
+        $response = new \stdClass();
+        // Ensure we have all the necessary folders in place
+        // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
+        // so we don't have to worry about manually checking and creating each one individually
+        $nationalCalendarI18nFolder = strtr(JsonData::NATIONAL_CALENDARS_I18N_FOLDER, [
+            '{nation}' => $this->params->payload->metadata->nation
+        ]);
+        if (!file_exists($nationalCalendarI18nFolder)) {
+            mkdir($nationalCalendarI18nFolder, 0755, true);
+        }
+
+        foreach ($this->params->payload->i18n as $locale => $litCalEventsI18n) {
+            $nationalCalendarI18nFile = strtr(
+                JsonData::NATIONAL_CALENDARS_I18N_FILE,
+                [
+                    '{nation}' => $this->params->payload->metadata->nation,
+                    '{locale}' => $locale
+                ]
+            );
+            file_put_contents($nationalCalendarI18nFile, json_encode($litCalEventsI18n, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL);
+        }
+
+        // We no longer need the i18n data, we can now remove it
+        unset($this->params->payload->i18n);
+
+        $nationalCalendarFile = strtr(
+            JsonData::NATIONAL_CALENDARS_FILE,
+            [
+                '{nation}' => $this->params->payload->metadata->nation
+            ]
+        );
+
+        $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        file_put_contents(
+            $nationalCalendarFile,
+            $calendarData . PHP_EOL
+        );
+        // get the nation name in English from the two letter iso code
+        $nationEnglish = \Locale::getDisplayRegion('-' . $this->params->payload->metadata->nation, 'en');
+        $response->success = "Calendar data created or updated for Nation \"{$nationEnglish}\" (\"{$this->params->payload->metadata->nation}\")";
+        $response->data = $this->params->payload;
+        self::produceResponse(json_encode($response));
+    }
+
+    private function createWiderRegionCalendar(): void
+    {
+        $response = new \stdClass();
+    }
+
     /**
      * Handle PUT requests to create or update a regional calendar data resource.
      *
      * This is a private method and should only be called from {@see handleRequestMethod}.
      *
-     * The resource is created or updated in the `jsondata/sourcedata/` directory.
+     * The resource is created or updated in the `jsondata/sourcedata/calendars/` directory.
      *
      * If the payload is valid according to the associated schema, the response will be a JSON object
      * containing a success message.
      *
      * If the payload is invalid, the response will be a JSON error response with a 422 status code.
-     *
-     * TODO: we are currently only handling creation of diocesan calendar data, this should be expanded
-     *       to handle creation of wider region and national calendar data
      */
     private function createRegionalCalendar(): void
     {
-        $response = new \stdClass();
         if (false === $this->params->payload instanceof \stdClass) {
             $payloadType = gettype($this->params->payload);
             self::produceErrorResponse(StatusCode::BAD_REQUEST, "`payload` param expected to be serialized object, instead it was of type `{$payloadType}` after unserialization");
         }
 
-        $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
-        if ($test === true) {
-            // Ensure we have all the necessary folders in place
-            // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
-            // so we don't have to worry about manually checking and creating each one individually
-            $diocesanCalendarI18nFolder = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FOLDER, [
-                '{nation}' => $this->params->payload->metadata->nation,
-                '{diocese}' => $this->params->payload->metadata->diocese_id
-            ]);
-            if (!file_exists($diocesanCalendarI18nFolder)) {
-                mkdir($diocesanCalendarI18nFolder, 0755, true);
-            }
-
-            foreach ($this->params->payload->i18n as $locale => $litCalEventsI18n) {
-                $diocesanCalendarI18nFile = strtr(
-                    JsonData::DIOCESAN_CALENDARS_I18N_FILE,
-                    [
-                        '{nation}' => $this->params->payload->metadata->nation,
-                        '{diocese}' => $this->params->payload->metadata->diocese_id,
-                        '{locale}' => $locale
-                    ]
-                );
-                file_put_contents($diocesanCalendarI18nFile, json_encode($litCalEventsI18n, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL);
-            }
-
-            // We no longer need the i18n data, we can now remove it
-            unset($this->params->payload->i18n);
-
-            $diocesanCalendarFile = strtr(
-                JsonData::DIOCESAN_CALENDARS_FILE,
-                [
-                    '{nation}' => $this->params->payload->metadata->nation,
-                    '{diocese}' => $this->params->payload->metadata->diocese_id,
-                    '{diocese_name}' => $this->params->payload->metadata->diocese_name
-                ]
-            );
-
-            $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            file_put_contents(
-                $diocesanCalendarFile,
-                $calendarData . PHP_EOL
-            );
-
-            $response->success = "Calendar data created or updated for Diocese \"{$this->params->payload->metadata->diocese_name}\" (Nation: \"{$this->params->payload->metadata->nation}\")";
-            $response->data = $this->params->payload;
-            self::produceResponse(json_encode($response));
-        } else {
-            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+        switch ($this->params->category) {
+            case "DIOCESANCALENDAR":
+                $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
+                if (true === $test) {
+                    $this->createDiocesanCalendar();
+                } else {
+                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+                }
+                break;
+            case "NATIONALCALENDAR":
+                $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::NATIONAL);
+                if (true === $test) {
+                    $this->createNationalCalendar();
+                } else {
+                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+                }
+                break;
+            case "WIDERREGIONCALENDAR":
+                $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::WIDERREGION);
+                if (true === $test) {
+                    $this->createWiderRegionCalendar();
+                } else {
+                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+                }
+                break;
+            default:
+                self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "Unknown calendar category \"{$this->params->category}\"");
         }
     }
 
@@ -730,6 +805,9 @@ class RegionalData
             return true;
         } catch (InvalidValue | \Exception $e) {
             self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, LitSchema::ERROR_MESSAGES[ $schemaUrl ] . PHP_EOL . $e->getMessage());
+            // the return here is superfluous, because produceErrorResponse terminates the script
+            // it's only here to make intelephense happy
+            return false;
         }
     }
 

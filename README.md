@@ -73,9 +73,9 @@ Spawn at least two workers:
 PHP_CLI_SERVER_WORKERS=2 php -S localhost:8000
 ```
 
-## Using a docker container
-
 For convenience when using VSCode, a `tasks.json` has been defined so that you can simply type <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> (<kbd>CMD</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> on MacOS) to start the PHP builtin server and open the browser.
+
+## Using a docker container
 
 To further simplify your setup, without having to worry about getting all the system requirements in place, you can also launch the API in a docker container using the repo `Dockerfile`:
 
