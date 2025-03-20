@@ -971,29 +971,61 @@ class RegionalData
 
         // In the case of a PUT request, we expect only one PATH parameter, we only retrieve the payload from the request body
         if (self::$Core->getRequestMethod() === RequestMethod::PUT) {
-            if (
-                !property_exists($data, 'payload')
-                || $data->payload === null
-                || !property_exists($data->payload, 'litcal')
-                || !property_exists($data->payload, 'i18n')
-                || !property_exists($data->payload, 'metadata')
-                || !property_exists($data->payload->metadata, 'diocese_id')
-            ) {
-                self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.metadata`, and `payload.metadata.diocese_id`");
-            } else {
-                $data->key = $data->payload->metadata->diocese_id;
+            switch ($data->category) {
+                case 'DIOCESANCALENDAR':
+                    if (
+                        !property_exists($data, 'payload')
+                        || $data->payload === null
+                        || !property_exists($data->payload, 'litcal')
+                        || !property_exists($data->payload, 'i18n')
+                        || !property_exists($data->payload, 'metadata')
+                        || !property_exists($data->payload->metadata, 'diocese_id')
+                    ) {
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.metadata`, and `payload.metadata.diocese_id`, instead payload was: " . json_encode($data->payload));
+                    } else {
+                        $data->key = $data->payload->metadata->diocese_id;
+                    }
+                    break;
+                case 'NATIONALCALENDAR':
+                    if (
+                        !property_exists($data, 'payload')
+                        || $data->payload === null
+                        || !property_exists($data->payload, 'litcal')
+                        || !property_exists($data->payload, 'i18n')
+                        || !property_exists($data->payload, 'metadata')
+                        || !property_exists($data->payload, 'settings')
+                        || !property_exists($data->payload->metadata, 'nation')
+                    ) {
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.metadata`, `payload.settings`, and `payload.metadata.nation`, instead payload was: " . json_encode($data->payload));
+                    } else {
+                        $data->key = $data->payload->metadata->nation;
+                    }
+                    break;
+                case 'WIDERREGIONCALENDAR':
+                    // TODO: define shape of wider region payload
+                    break;
             }
         }
 
         if (self::$Core->getRequestMethod() === RequestMethod::PATCH) {
-            if (
-                !property_exists($data, 'payload')
-                || $data->payload === null
-                || !property_exists($data->payload, 'litcal')
-                || !property_exists($data->payload, 'i18n')
-                || !property_exists($data->payload, 'metadata')
-            ) {
-                self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, and `payload.metadata`");
+            switch ($data->category) {
+                case 'DIOCESANCALENDAR':
+                    if (
+                        !property_exists($data, 'payload')
+                        || $data->payload === null
+                        || !property_exists($data->payload, 'litcal')
+                        || !property_exists($data->payload, 'i18n')
+                        || !property_exists($data->payload, 'metadata')
+                    ) {
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, and `payload.metadata`");
+                    }
+                    break;
+                case 'NATIONALCALENDAR':
+                    // TODO: define shape of nation payload
+                    break;
+                case 'WIDERREGIONCALENDAR':
+                    // TODO: define shape of wider region payload
+                    break;
             }
         }
 

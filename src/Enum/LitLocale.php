@@ -18,11 +18,7 @@ class LitLocale
      */
     public static function isValid($value)
     {
-        if (null === self::$AllAvailableLocales) {
-            self::$AllAvailableLocales = array_filter(\ResourceBundle::getLocales(''), function ($value) {
-                return strpos($value, 'POSIX') === false;
-            });
-        }
+        self::init();
         return in_array($value, self::$values) || in_array($value, self::$AllAvailableLocales);
     }
 
@@ -40,5 +36,20 @@ class LitLocale
             }
         }
         return true;
+    }
+
+    /**
+     * Initializes the list of available locales.
+     *
+     * This method loads the list of locales from the ICU data available in PHP.
+     * It then filters out the "POSIX" locale, which is not a valid regional locale.
+     */
+    public static function init()
+    {
+        if (null === self::$AllAvailableLocales) {
+            self::$AllAvailableLocales = array_filter(\ResourceBundle::getLocales(''), function ($value) {
+                return strpos($value, 'POSIX') === false;
+            });
+        }
     }
 }
