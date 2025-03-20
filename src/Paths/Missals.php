@@ -63,14 +63,14 @@ class Missals
             default:
                 if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
                     // the payload MUST be in the body of the request, either JSON encoded or YAML encoded
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Expected payload in body of request, either JSON encoded or YAML encoded");
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Expected payload in body of request, either JSON or YAML encoded");
                 }
         }
         return $payload;
     }
 
     /**
-     * Handles the POST request payload for the Missals endpoint.
+     * Handles the GET and POST request payload for the Missals endpoint.
      *
      * If the request body is a JSON or YAML encoded object, it will attempt to
      * retrieve the locale, region, and year from the object.
@@ -89,54 +89,28 @@ class Missals
      *                          request body was not a JSON or YAML encoded object
      * @return array the initialized request parameters
      */
-    private static function handlePostPayload(?object $payload): array
+    private static function initPayload(?object $payload): array
     {
         $data = [];
         if ($payload !== null && property_exists($payload, 'locale')) {
-            $data["LOCALE"] = $payload->locale;
+            $data["locale"] = $payload->locale;
         } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
             if ($locale && LitLocale::isValid($locale)) {
-                $data["LOCALE"] = $locale;
+                $data["locale"] = $locale;
             } else {
-                $data["LOCALE"] = LitLocale::LATIN;
+                $data["locale"] = LitLocale::LATIN;
             }
         }
         if (property_exists($payload, 'region')) {
-            $data["REGION"] = $payload->region;
+            $data["region"] = $payload->region;
         }
         if (property_exists($payload, 'year')) {
-            $data["YEAR"] = $payload->year;
+            $data["year"] = $payload->year;
         }
         return $data;
     }
 
-    /**
-     * Handles the GET request payload for the Missals endpoint.
-     *
-     * @return array the initialized request parameters
-     */
-    private static function handleGetPayload(): array
-    {
-        $data = [];
-        if (isset($_GET['locale'])) {
-            $data["LOCALE"] = $_GET['locale'];
-        } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-            if ($locale && LitLocale::isValid($locale)) {
-                $data["LOCALE"] = $locale;
-            } else {
-                $data["LOCALE"] = LitLocale::LATIN;
-            }
-        }
-        if (isset($_GET['region'])) {
-            $data["REGION"] = $_GET["region"];
-        }
-        if (isset($_GET['year'])) {
-            $data["YEAR"] = $_GET['year'];
-        }
-        return $data;
-    }
 
     /**
      * Initialize the request parameters for the Missals endpoint.
@@ -158,12 +132,12 @@ class Missals
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH])) {
             $payload = self::initPayloadFromRequestBody();
             if (self::$Core->getRequestMethod() === RequestMethod::POST) {
-                $data = self::handlePostPayload($payload);
+                $data = self::initPayload($payload);
             } else {
                 $data["PAYLOAD"] = $payload;
             }
         } elseif (self::$Core->getRequestMethod() === RequestMethod::GET) {
-            $data = self::handleGetPayload();
+            $data = self::initPayload((object)$_GET);
         }
         return $data;
     }
@@ -314,6 +288,62 @@ class Missals
     }
 
     /**
+     * Handles the request for the /missals endpoint.
+     *
+     * If the request method is GET, it will validate the Accept header and set the
+     * response content type header.
+     * If the request method is POST, PUT, or PATCH, it will validate the request body
+     * and set the response content type header.
+     * If there are no path parameters, it will return all the Missal metadata.
+     * If there is one path parameter, it will attempt to retrieve the Missal with the
+     * given ID, and if found:
+     * - if the Missal has localized data, it will attempt to retrieve the localized
+     *   data for the base locale, and if found, it will return the localized data.
+     * - if the Missal does not have localized data, or if the localized data for the
+     *   base locale was not found, it will return the Missal data.
+     * If the Missal was not found, it will produce an error response with a status code
+     * of 404, listing the available Missal IDs.
+     */
+    public static function handleRequest()
+    {
+        self::$Core->init();
+        if (self::$Core->getRequestMethod() === RequestMethod::GET) {
+            self::$Core->validateAcceptHeader(true);
+        } else {
+            self::$Core->validateAcceptHeader(false);
+        }
+        self::$Core->setResponseContentTypeHeader();
+        if (count(self::$requestPathParts) === 0) {
+            if (null !== self::$params->Locale) {
+                header("X-Litcal-Missals-Locale: " . self::$params->Locale, false);
+            } else {
+                header("X-Litcal-Missals-Locale: none", false);
+            }
+            if (null === self::$params->Region && null === self::$params->Year) {
+                self::produceResponse(json_encode(self::$missalsIndex));
+            } else {
+                $filteredResults = self::$missalsIndex;
+                if (null !== self::$params->Region) {
+                    $filteredResults->litcal_missals = array_values(array_filter(
+                        $filteredResults->litcal_missals,
+                        fn ($missal) => $missal->region === self::$params->Region
+                    ));
+                    header("X-Litcal-Missals-Region: " . self::$params->Region, false);
+                }
+                if (null !== self::$params->Year) {
+                    $filteredResults->litcal_missals = array_values(array_filter(
+                        $filteredResults->litcal_missals,
+                        fn ($missal) => $missal->year_published === self::$params->Year
+                    ));
+                    header("X-Litcal-Missals-Year: " . self::$params->Year, false);
+                }
+                self::produceResponse(json_encode($filteredResults));
+            }
+        }
+        self::handlePathParams();
+    }
+
+    /**
      * Initializes the Missals class.
      *
      * @param array $requestPathParts the path parameters from the request
@@ -388,61 +418,5 @@ class Missals
         }
         // we only set the request parameters after we have collected the MissalRegions and MissalYears
         self::$params->setData(self::initRequestParams());
-    }
-
-    /**
-     * Handles the request for the /missals endpoint.
-     *
-     * If the request method is GET, it will validate the Accept header and set the
-     * response content type header.
-     * If the request method is POST, PUT, or PATCH, it will validate the request body
-     * and set the response content type header.
-     * If there are no path parameters, it will return all the Missal metadata.
-     * If there is one path parameter, it will attempt to retrieve the Missal with the
-     * given ID, and if found:
-     * - if the Missal has localized data, it will attempt to retrieve the localized
-     *   data for the base locale, and if found, it will return the localized data.
-     * - if the Missal does not have localized data, or if the localized data for the
-     *   base locale was not found, it will return the Missal data.
-     * If the Missal was not found, it will produce an error response with a status code
-     * of 404, listing the available Missal IDs.
-     */
-    public static function handleRequest()
-    {
-        self::$Core->init();
-        if (self::$Core->getRequestMethod() === RequestMethod::GET) {
-            self::$Core->validateAcceptHeader(true);
-        } else {
-            self::$Core->validateAcceptHeader(false);
-        }
-        self::$Core->setResponseContentTypeHeader();
-        if (count(self::$requestPathParts) === 0) {
-            if (null !== self::$params->Locale) {
-                header("X-Litcal-Missals-Locale: " . self::$params->Locale, false);
-            } else {
-                header("X-Litcal-Missals-Locale: none", false);
-            }
-            if (null === self::$params->Region && null === self::$params->Year) {
-                self::produceResponse(json_encode(self::$missalsIndex));
-            } else {
-                $filteredResults = self::$missalsIndex;
-                if (null !== self::$params->Region) {
-                    $filteredResults->litcal_missals = array_values(array_filter(
-                        $filteredResults->litcal_missals,
-                        fn ($missal) => $missal->region === self::$params->Region
-                    ));
-                    header("X-Litcal-Missals-Region: " . self::$params->Region, false);
-                }
-                if (null !== self::$params->Year) {
-                    $filteredResults->litcal_missals = array_values(array_filter(
-                        $filteredResults->litcal_missals,
-                        fn ($missal) => $missal->year_published === self::$params->Year
-                    ));
-                    header("X-Litcal-Missals-Year: " . self::$params->Year, false);
-                }
-                self::produceResponse(json_encode($filteredResults));
-            }
-        }
-        self::handlePathParams();
     }
 }
