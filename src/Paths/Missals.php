@@ -80,16 +80,16 @@ class Missals
      * If it does not find a valid locale, it will default to 'la' (Latin).
      *
      * If the object does not have a 'region' property, it will not set the
-     * 'REGION' key in the returned array.
+     * 'region' key in the returned array.
      *
      * If the object does not have a 'year' property, it will not set the
-     * 'YEAR' key in the returned array.
+     * 'year' key in the returned array.
      *
      * @param ?object $payload the JSON or YAML encoded object or null if the
      *                          request body was not a JSON or YAML encoded object
      * @return array the initialized request parameters
      */
-    private static function initPayload(?object $payload): array
+    private static function initGetPostParams(?object $payload): array
     {
         $data = [];
         if ($payload !== null && property_exists($payload, 'locale')) {
@@ -107,6 +107,9 @@ class Missals
         }
         if (property_exists($payload, 'year')) {
             $data["year"] = $payload->year;
+        }
+        if (property_exists($payload, 'include_empty')) {
+            $data["include_empty"] = $payload->include_empty;
         }
         return $data;
     }
@@ -132,12 +135,12 @@ class Missals
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH])) {
             $payload = self::initPayloadFromRequestBody();
             if (self::$Core->getRequestMethod() === RequestMethod::POST) {
-                $data = self::initPayload($payload);
+                $data = self::initGetPostParams($payload);
             } else {
                 $data["PAYLOAD"] = $payload;
             }
         } elseif (self::$Core->getRequestMethod() === RequestMethod::GET) {
-            $data = self::initPayload((object)$_GET);
+            $data = self::initGetPostParams((object)$_GET);
         }
         return $data;
     }
@@ -418,5 +421,22 @@ class Missals
         }
         // we only set the request parameters after we have collected the MissalRegions and MissalYears
         self::$params->setData(self::initRequestParams());
+
+        // If an explicit request is made to include all Missals defined in the RomanMissal enum,
+        // even if there is no data for them in the jsondata/sourcedata/missals directory,
+        // we add them to the response.
+        if (self::$params->IncludeEmpty) {
+            $allMissals = RomanMissal::produceMetadata(true);
+            foreach ($allMissals as $missal) {
+                if (null === array_find(self::$missalsIndex->litcal_missals, function ($m) use ($missal) {
+                    return $m->missal_id === $missal->missal_id;
+                })) {
+                    //$missal->api_path = false;
+                    self::$missalsIndex->litcal_missals[] = $missal;
+                    self::$params->addMissalRegion($missal->region);
+                    self::$params->addMissalYear($missal->year_published);
+                }
+            }
+        }
     }
 }

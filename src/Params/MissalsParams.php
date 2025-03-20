@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Paths\Missals;
 
 class MissalsParams
 {
+    public bool $IncludeEmpty           = false;
     public ?string $Region              = null;
     public ?int $Year                   = null;
     public ?string $Locale              = null;
@@ -73,6 +74,12 @@ class MissalsParams
                             //$this->setLastError(StatusCode::BAD_REQUEST, $message);
                             Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                         }
+                        break;
+                    case 'include_empty':
+                        $this->IncludeEmpty = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+                        break;
+                    default:
+                        // do nothing
                         break;
                 }
             }
