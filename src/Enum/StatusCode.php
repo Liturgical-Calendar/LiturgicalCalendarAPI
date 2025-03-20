@@ -2,6 +2,11 @@
 
 namespace LiturgicalCalendar\Api\Enum;
 
+/**
+ * StatusCode provides named constants for the HTTP protocol status codes.
+ *
+ * @package LiturgicalCalendar\Api\Enum
+ */
 class StatusCode
 {
     public const BAD_REQUEST            = 400;
@@ -20,6 +25,13 @@ class StatusCode
         StatusCode::UNPROCESSABLE_CONTENT  => " 422 Unprocessable Content",
         StatusCode::SERVICE_UNAVAILABLE    => " 503 Service Unavailable"
     ];
+
+    /**
+     * Converts an HTTP status code to its corresponding string representation.
+     *
+     * @param int $code The HTTP status code.
+     * @return string The string representation of the status code.
+     */
     public static function toString(int $code): string
     {
         return StatusCode::STATUS_CODES[ $code ];
