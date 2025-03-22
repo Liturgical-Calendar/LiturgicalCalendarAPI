@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Paths\Missals;
 
 class MissalsParams
 {
+    public bool $IncludeEmpty           = false;
     public ?string $Region              = null;
     public ?int $Year                   = null;
     public ?string $Locale              = null;
@@ -18,7 +19,7 @@ class MissalsParams
     public const int ERROR_NONE         = 0;
     public const int ERROR              = 1;
     private static int $last_error      = MissalsParams::ERROR_NONE;
-    private static int $last_error_status;
+    private static StatusCode $last_error_status;
     private static string $last_error_msg;
 
     public function __construct(?array $DATA = null)
@@ -74,6 +75,12 @@ class MissalsParams
                             Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                         }
                         break;
+                    case 'include_empty':
+                        $this->IncludeEmpty = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+                        break;
+                    default:
+                        // do nothing
+                        break;
                 }
             }
         }
@@ -107,7 +114,7 @@ class MissalsParams
     }
 
     //phpcs:ignore PSR1.Methods.CamelCapsMethodName
-    public function last_error_status()
+    public function last_error_status(): StatusCode
     {
         return self::$last_error_status;
     }

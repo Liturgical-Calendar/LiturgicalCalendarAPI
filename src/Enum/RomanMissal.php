@@ -194,7 +194,9 @@ class RomanMissal
      * and the MissalsParams class would need to check against the RomanMissal enum
      * rather than against it's own arrays.
      *
-     * @return array an array of metadata objects each describing a Roman Missal,
+     * @param bool $obj whether to return an array of metadata objects or an array of associative arrays
+     *
+     * @return array an array of metadata objects or associative arrays each describing a Roman Missal,
      *      with the following properties:
      *      - `missal_id`: the value of the enumeration constant for the Roman Missal
      *      - `name`: the name of the Roman Missal
@@ -205,17 +207,19 @@ class RomanMissal
      *          - `until_year`: the year until when the Roman Missal is to be used (null if no end year is specified)
      *      - `year_published`: the year when the Roman Missal was published
      */
-    public static function produceMetadata(): array
+    public static function produceMetadata($obj = true): array
     {
         $reflectionClass = new \ReflectionClass(static::class);
         $missal_ids = $reflectionClass->getConstants();
         $metadata = [];
         foreach ($missal_ids as $key => $missal_id) {
             $i18n_path = self::getSanctoraleI18nFilePath($missal_id);
-            $it = new \DirectoryIterator("glob://$i18n_path*.json");
             $locales = [];
-            foreach ($it as $f) {
-                $locales[] = $f->getBasename('.json');
+            if ($i18n_path) {
+                $it = new \DirectoryIterator("glob://$i18n_path*.json");
+                foreach ($it as $f) {
+                    $locales[] = $f->getBasename('.json');
+                }
             }
             $region = null;
             if (str_starts_with($missal_id, "EDITIO_TYPICA_")) {
@@ -223,16 +227,19 @@ class RomanMissal
             } else {
                 $region = explode("_", $missal_id)[0];
             }
-            $metadata[] = [
+            $metadata[$key] = [
                 "missal_id"      => $missal_id,
                 "name"           => self::getName($missal_id),
                 "region"         => $region,
-                "data_path"      => self::getSanctoraleFileName($missal_id),
-                "i18n_path"      => self::getSanctoraleI18nFilePath($missal_id),
+                //"data_path"      => self::getSanctoraleFileName($missal_id),
+                //"i18n_path"      => self::getSanctoraleI18nFilePath($missal_id),
                 "locales"        => $locales,
                 "year_limits"    => self::$yearLimits[ $missal_id ],
                 "year_published" => self::$yearLimits[ $missal_id ][ "since_year" ]
             ];
+            if ($obj) {
+                $metadata[$key] = json_decode(json_encode($metadata[$key]));
+            }
         }
         return $metadata;
     }
