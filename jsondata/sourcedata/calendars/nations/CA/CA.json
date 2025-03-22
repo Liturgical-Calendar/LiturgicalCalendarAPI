@@ -2,47 +2,47 @@
     "litcal": [
         {
             "festivity": {
-                "month": 1,
-                "day": 7,
                 "event_key": "StAndreBessette",
-                "grade": 3,
+                "day": 7,
+                "month": 1,
                 "color": [
                     "white"
                 ],
+                "grade": 3,
                 "common": []
             },
             "metadata": {
                 "action": "createNew",
-                "since_year": 2010
+                "since_year": 2011
             }
         },
         {
             "festivity": {
-                "month": 1,
+                "event_key": "StRayPenyafort",
                 "day": 8,
-                "event_key": "StRayPenyafort"
+                "month": 1
             },
             "metadata": {
                 "action": "moveFestivity",
-                "since_year": 2016,
-                "reason": "make way for StAndreBessette on January 7",
-                "missal": "CA_2016"
+                "since_year": 2011,
+                "missal": "CA_2011",
+                "reason": "make way for StAndreBessette on January 7"
             }
         },
         {
             "festivity": {
-                "month": 1,
-                "day": 12,
                 "event_key": "StMargueriteBourgeoys",
-                "grade": 3,
+                "day": 12,
+                "month": 1,
                 "color": [
                     "white"
                 ],
+                "grade": 3,
                 "common": []
             },
             "metadata": {
                 "action": "createNew",
-                "since_year": 1982
+                "since_year": 1983
             }
         },
         {
@@ -52,67 +52,50 @@
             },
             "metadata": {
                 "action": "makePatron",
-                "since_year": 1870
+                "since_year": 1834
             }
         },
         {
             "festivity": {
-                "month": 4,
-                "day": 17,
                 "event_key": "KateriTekakwitha",
-                "grade": 3,
+                "day": 17,
+                "month": 4,
                 "color": [
                     "white"
                 ],
+                "grade": 3,
                 "common": []
             },
             "metadata": {
                 "action": "createNew",
-                "since_year": 2012
+                "since_year": 2013
             }
-
         },
         {
             "festivity": {
-                "month": 4,
-                "day": 18,
                 "event_key": "BlMarieAnneBlondin",
-                "grade": 2,
+                "day": 18,
+                "month": 4,
                 "color": [
                     "white"
                 ],
+                "grade": 2,
                 "common": []
             },
             "metadata": {
                 "action": "createNew",
-                "since_year": 2001
+                "since_year": 2002
             }
         },
         {
             "festivity": {
-                "month": 4,
-                "day": 26,
                 "event_key": "OurLadyofGoodCounsel",
-                "grade": 2,
-                "color": [
-                    "white"
-                ],
-                "common": []
-            },
-            "metadata": {
-                "action": "createNew",
-                "since_year": 2016
-            }
-        },
-        {
-            "festivity": {
+                "day": 26,
                 "month": 4,
-                "day": 30,
-                "event_key": "StMariedelIncarnation",
-                "grade": 3,
                 "color": [
                     "white"
                 ],
+                "grade": 2,
                 "common": []
             },
             "metadata": {
@@ -122,42 +105,58 @@
         },
         {
             "festivity": {
-                "month": 5,
+                "event_key": "StMariedelIncarnation",
+                "day": 30,
+                "month": 4,
+                "color": [
+                    "white"
+                ],
+                "grade": 3,
+                "common": []
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2016
+            }
+        },
+        {
+            "festivity": {
+                "event_key": "StPiusV",
                 "day": 1,
-                "event_key": "StPiusV"
+                "month": 5
             },
             "metadata": {
                 "action": "moveFestivity",
                 "since_year": 2016,
-                "reason": "make way for StMariedelIncarnation on April 30",
-                "missal": "CA_2016"
+                "missal": "CA_2016",
+                "reason": "make way for StMariedelIncarnation on April 30"
             }
         },
         {
             "festivity": {
-                "month": 5,
-                "day": 4,
                 "event_key": "BlMarieLeonieParadis",
-                "grade": 2,
+                "day": 4,
+                "month": 5,
                 "color": [
                     "white"
                 ],
+                "grade": 2,
                 "common": []
             },
             "metadata": {
                 "action": "createNew",
-                "since_year": 1984
+                "since_year": 1985
             }
         },
         {
             "festivity": {
-                "month": 5,
-                "day": 6,
                 "event_key": "StFrancoisdeLaval",
-                "grade": 3,
+                "day": 6,
+                "month": 5,
                 "color": [
                     "white"
                 ],
+                "grade": 3,
                 "common": []
             },
             "metadata": {
@@ -167,13 +166,13 @@
         },
         {
             "festivity": {
-                "month": 5,
-                "day": 8,
                 "event_key": "BlCatherinedeSaintAugustin",
-                "grade": 2,
+                "day": 8,
+                "month": 5,
                 "color": [
                     "white"
                 ],
+                "grade": 2,
                 "common": []
             },
             "metadata": {
@@ -183,29 +182,29 @@
         },
         {
             "festivity": {
-                "month": 5,
-                "day": 21,
                 "event_key": "StEugenedeMazenod",
-                "grade": 2,
+                "day": 21,
+                "month": 5,
                 "color": [
                     "white"
                 ],
+                "grade": 2,
                 "common": []
             },
             "metadata": {
                 "action": "createNew",
-                "since_year": 1995
+                "since_year": 1996
             }
         },
         {
             "festivity": {
-                "month": 5,
-                "day": 24,
                 "event_key": "BlLouisZephirinMoreau",
-                "grade": 2,
+                "day": 24,
+                "month": 5,
                 "color": [
                     "white"
                 ],
+                "grade": 2,
                 "common": []
             },
             "metadata": {
@@ -215,29 +214,29 @@
         },
         {
             "festivity": {
-                "month": 6,
-                "day": 27,
                 "event_key": "BlNykytaBudkaVasylVelychkowsky",
-                "grade": 2,
+                "day": 27,
+                "month": 6,
                 "color": [
                     "red"
                 ],
+                "grade": 2,
                 "common": []
             },
             "metadata": {
                 "action": "createNew",
-                "since_year": 2001
+                "since_year": 2002
             }
         },
         {
             "festivity": {
-                "month": 7,
-                "day": 1,
                 "event_key": "CanadaDay",
-                "grade": 2,
+                "day": 1,
+                "month": 7,
                 "color": [
                     "white"
                 ],
+                "grade": 2,
                 "common": []
             },
             "metadata": {
@@ -257,73 +256,73 @@
         },
         {
             "festivity": {
-                "month": 8,
-                "day": 5,
                 "event_key": "BlFredericJanssoone",
-                "grade": 2,
+                "day": 5,
+                "month": 8,
                 "color": [
                     "white"
                 ],
+                "grade": 2,
                 "common": []
             },
             "metadata": {
                 "action": "createNew",
-                "since_year": 1988
+                "since_year": 1989
             }
         },
         {
             "festivity": {
-                "month": 9,
-                "day": 2,
                 "event_key": "BlAndreGrasset",
-                "grade": 2,
+                "day": 2,
+                "month": 9,
                 "color": [
                     "red"
                 ],
+                "grade": 2,
                 "common": []
             },
             "metadata": {
                 "action": "createNew",
-                "since_year": 1926
+                "since_year": 1927
             }
         },
         {
             "festivity": {
-                "month": 9,
-                "day": 4,
                 "event_key": "BlDinaBelanger",
-                "grade": 2,
+                "day": 4,
+                "month": 9,
                 "color": [
                     "white"
                 ],
+                "grade": 2,
                 "common": []
             },
             "metadata": {
                 "action": "createNew",
-                "since_year": 1993
+                "since_year": 1992
             }
         },
         {
             "festivity": {
-                "month": 9,
-                "day": 24,
                 "event_key": "BlEmilieTavernierGamelin",
-                "grade": 2,
+                "day": 24,
+                "month": 9,
                 "color": [
                     "white"
                 ],
+                "grade": 2,
                 "common": []
             },
             "metadata": {
                 "action": "createNew",
-                "since_year": 2001
+                "since_year": 2002
             }
         },
         {
             "festivity": {
-                "month": 9,
+                "event_key": "StsCosmasDamian",
                 "day": 25,
-                "event_key": "StsCosmasDamian"
+                "month": 9
             },
             "metadata": {
                 "action": "moveFestivity",
@@ -334,9 +333,9 @@
         },
         {
             "festivity": {
-                "month": 9,
+                "event_key": "StsJeanBrebeuf",
                 "day": 26,
-                "event_key": "StsJeanBrebeuf"
+                "month": 9
             },
             "metadata": {
                 "action": "moveFestivity",
@@ -358,12 +357,12 @@
         {
             "festivity": {
                 "event_key": "LabourDay",
-                "grade": 3,
+                "strtotime": "first monday of september",
                 "color": [
                     "white"
                 ],
-                "common": [],
-                "strtotime": "first monday of september"
+                "grade": 3,
+                "common": []
             },
             "metadata": {
                 "action": "createNew",
@@ -372,13 +371,13 @@
         },
         {
             "festivity": {
-                "month": 10,
-                "day": 6,
                 "event_key": "BlMarieRoseDurocher",
-                "grade": 2,
+                "day": 6,
+                "month": 10,
                 "color": [
                     "white"
                 ],
+                "grade": 2,
                 "common": []
             },
             "metadata": {
@@ -388,55 +387,55 @@
         },
         {
             "festivity": {
-                "month": 10,
-                "day": 16,
                 "event_key": "StMargueritedYouville",
-                "grade": 3,
+                "day": 16,
+                "month": 10,
                 "color": [
                     "white"
                 ],
+                "grade": 3,
                 "common": []
             },
             "metadata": {
                 "action": "createNew",
-                "since_year": 1990
+                "since_year": 1991
             }
         },
         {
             "festivity": {
-                "month": 10,
+                "event_key": "StHedwig",
                 "day": 20,
-                "event_key": "StHedwig"
+                "month": 10
             },
             "metadata": {
                 "action": "moveFestivity",
                 "since_year": 2016,
-                "reason": "make way for StMargueritedYouville on October 16",
-                "missal": "CA_2016"
+                "missal": "CA_2016",
+                "reason": "make way for StMargueritedYouville on October 16"
             }
         },
         {
             "festivity": {
-                "month": 10,
+                "event_key": "StMargaretAlacoque",
                 "day": 20,
-                "event_key": "StMargaretAlacoque"
+                "month": 10
             },
             "metadata": {
                 "action": "moveFestivity",
                 "since_year": 2016,
-                "reason": "make way for StMargueriteYouville on October 16",
-                "missal": "CA_2016"
+                "missal": "CA_2016",
+                "reason": "make way for StMargueriteYouville on October 16"
             }
         },
         {
             "festivity": {
-                "month": 10,
-                "day": 22,
                 "event_key": "DedicationUnknown",
-                "grade": 4,
+                "day": 22,
+                "month": 10,
                 "color": [
                     "white"
                 ],
+                "grade": 4,
                 "common": []
             },
             "metadata": {
@@ -446,13 +445,13 @@
         },
         {
             "festivity": {
-                "month": 11,
-                "day": 11,
                 "event_key": "RemembranceDay",
-                "grade": 3,
+                "day": 11,
+                "month": 11,
                 "color": [
                     "white"
                 ],
+                "grade": 3,
                 "common": []
             },
             "metadata": {

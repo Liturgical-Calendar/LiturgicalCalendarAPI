@@ -99,14 +99,14 @@ class RegionalData
         $i18nDataFile = null;
         switch ($this->params->category) {
             case "DIOCESANCALENDAR":
-                $dioceseEntry = array_values(array_filter($this->CalendarsMetadata->diocesan_calendars, function ($el) {
+                $dioceseEntry = array_find($this->CalendarsMetadata->diocesan_calendars, function ($el) {
                     return $el->calendar_id === $this->params->key;
-                }));
-                if (empty($dioceseEntry)) {
+                });
+                if (null === $dioceseEntry) {
                     self::produceErrorResponse(StatusCode::NOT_FOUND, "The requested resource {$this->params->key} was not found in the index");
                 }
                 $i18nDataFile = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FILE, [
-                    '{nation}' => $dioceseEntry[0]->nation,
+                    '{nation}' => $dioceseEntry->nation,
                     '{diocese}' => $this->params->key,
                     '{locale}' => $this->params->i18nRequest
                 ]);
@@ -162,17 +162,17 @@ class RegionalData
         $calendarDataFile = null;
         switch ($this->params->category) {
             case "DIOCESANCALENDAR":
-                $dioceseEntry = array_values(array_filter($this->CalendarsMetadata->diocesan_calendars, function ($el) {
+                $dioceseEntry = array_find($this->CalendarsMetadata->diocesan_calendars, function ($el) {
                     return $el->calendar_id === $this->params->key;
-                }));
-                if (empty($dioceseEntry)) {
+                });
+                if (null === $dioceseEntry) {
                     self::produceErrorResponse(StatusCode::NOT_FOUND, "The requested resource {$this->params->key} was not found in the index");
                 }
 
                 $calendarDataFile = strtr(JsonData::DIOCESAN_CALENDARS_FILE, [
-                    '{nation}' => $dioceseEntry[0]->nation,
+                    '{nation}' => $dioceseEntry->nation,
                     '{diocese}' => $this->params->key,
-                    '{diocese_name}' => $dioceseEntry[0]->diocese
+                    '{diocese_name}' => $dioceseEntry->diocese
                 ]);
                 break;
             case "WIDERREGIONCALENDAR":
@@ -406,11 +406,11 @@ class RegionalData
      */
     private function handleNationalCalendarUpdate()
     {
-        $nationEntry = array_values(array_filter($this->CalendarsMetadata->national_calendars, function ($item) {
+        $nationEntry = array_find($this->CalendarsMetadata->national_calendars, function ($item) {
             return $item->calendar_id === $this->params->key;
-        }));
+        });
 
-        if ( empty($nationEntry) ) {
+        if (null === $nationEntry) {
             self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update unknown national calendar resource {$this->params->key}.");
         }
 
@@ -538,11 +538,11 @@ class RegionalData
      */
     private function handleDiocesanCalendarUpdate()
     {
-        $dioceseEntry = array_values(array_filter($this->CalendarsMetadata->diocesan_calendars, function ($item) {
+        $dioceseEntry = array_find($this->CalendarsMetadata->diocesan_calendars, function ($item) {
             return $item->calendar_id === $this->params->key;
-        }));
+        });
 
-        if ( empty($dioceseEntry) ) {
+        if (null === $dioceseEntry) {
             self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update unknown diocesan calendar resource {$this->params->key}.");
         }
 
@@ -550,8 +550,8 @@ class RegionalData
             $DiocesanCalendarI18nFile = strtr(
                 JsonData::DIOCESAN_CALENDARS_I18N_FILE,
                 [
-                    '{nation}' => $dioceseEntry[0]->nation,
-                    '{diocese}' => $dioceseEntry[0]->calendar_id,
+                    '{nation}' => $dioceseEntry->nation,
+                    '{diocese}' => $dioceseEntry->calendar_id,
                     '{locale}' => $locale
                 ]
             );
@@ -676,25 +676,25 @@ class RegionalData
     {
         switch ($this->params->category) {
             case "DIOCESANCALENDAR":
-                $dioceseEntry = array_values(array_filter($this->CalendarsMetadata->diocesan_calendars, function ($el) {
+                $dioceseEntry = array_find($this->CalendarsMetadata->diocesan_calendars, function ($el) {
                     return $el->calendar_id === $this->params->key;
-                }));
-                if (empty($dioceseEntry)) {
+                });
+                if (null === $dioceseEntry) {
                     self::produceErrorResponse(StatusCode::NOT_FOUND, "The resource requested for deletion {$this->params->key} is not known.");
                 }
                 $calendarDataFile = strtr(
                     JsonData::DIOCESAN_CALENDARS_FILE,
                     [
-                        '{nation}' => $dioceseEntry[0]->nation,
-                        '{diocese}' => $dioceseEntry[0]->calendar_id,
-                        '{diocese_name}' => $dioceseEntry[0]->diocese
+                        '{nation}' => $dioceseEntry->nation,
+                        '{diocese}' => $dioceseEntry->calendar_id,
+                        '{diocese_name}' => $dioceseEntry->diocese
                     ]
                 );
                 $calendarI18nFolder = strtr(
                     JsonData::DIOCESAN_CALENDARS_I18N_FOLDER,
                     [
-                        '{nation}' => $dioceseEntry[0]->nation,
-                        '{diocese}' => $dioceseEntry[0]->calendar_id
+                        '{nation}' => $dioceseEntry->nation,
+                        '{diocese}' => $dioceseEntry->calendar_id
                     ]
                 );
                 break;
@@ -736,7 +736,7 @@ class RegionalData
      *
      * This is a private method and should only be called from {@see handleRequestMethod}.
      *
-     * The resource is deleted from the `jsondata/sourcedata/` directory.
+     * The resource is deleted from the `jsondata/sourcedata/calendars/` directory.
      *
      * If the resource is successfully deleted, the response will be a JSON object
      * containing a success message.

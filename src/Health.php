@@ -384,8 +384,8 @@ class Health implements MessageComponentInterface
                             );
                             break;
                         case 'diocesan-calendar':
-                            $diocese = array_values(array_filter(self::$metadata->litcal_metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]));
-                            $nation = $diocese[0]->nation;
+                            $diocese = array_find(self::$metadata->litcal_metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]);
+                            $nation = $diocese->nation;
                             $dataPath = strtr(
                                 JsonData::DIOCESAN_CALENDARS_I18N_FOLDER,
                                 ['{diocese}' => $matches[2]],
@@ -417,9 +417,9 @@ class Health implements MessageComponentInterface
                                 );
                                 break;
                             case 'diocesan-calendar':
-                                $diocese = array_values(array_filter(self::$metadata->litcal_metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]));
-                                $nation = $diocese[0]->nation;
-                                $dioceseName = $diocese[0]->diocese;
+                                $diocese = array_find(self::$metadata->litcal_metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]);
+                                $nation = $diocese->nation;
+                                $dioceseName = $diocese->diocese;
                                 $dataPath = strtr(
                                     JsonData::DIOCESAN_CALENDARS_FILE,
                                     ['{diocese}' => $matches[2]],
@@ -528,7 +528,7 @@ class Health implements MessageComponentInterface
             $matches = null;
             if (preg_match("/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/", $pathForSchema, $matches)) {
                 $dioceseId   = $matches[1];
-                $dioceseData = array_values(array_filter(self::$metadata->litcal_metadata->diocesan_calendars, fn ($diocesan_calendar) => $diocesan_calendar->calendar_id === $dioceseId))[0];
+                $dioceseData = array_find(self::$metadata->litcal_metadata->diocesan_calendars, fn ($diocesan_calendar) => $diocesan_calendar->calendar_id === $dioceseId);
                 $nation      = $dioceseData->nation;
                 $dioceseName = $dioceseData->diocese;
                 $dataPath    = strtr(JsonData::DIOCESAN_CALENDARS_FILE, [

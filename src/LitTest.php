@@ -138,7 +138,7 @@ class LitTest
             $calendarName = $this->getCalendarName();
             $messageIfError = "{$this->Test} Assertion '{$assertion->assertion}' failed for Year " . $this->dataToTest->settings->year . " in {$calendarType}{$calendarName}.";
             $eventKey = self::$testCache->{$this->Test}->testInstructions->event_key;
-            $eventBeingTested = array_values(array_filter($this->dataToTest->litcal, fn ($item) => $item->event_key === $eventKey))[0] ?? null;
+            $eventBeingTested = array_find($this->dataToTest->litcal, fn ($item) => $item->event_key === $eventKey);
 
             switch ($assertion->assert) {
                 case 'eventNotExists':
