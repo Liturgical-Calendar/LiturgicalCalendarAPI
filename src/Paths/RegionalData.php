@@ -212,7 +212,7 @@ class RegionalData
             switch ($this->params->category) {
                 case 'DIOCESANCALENDAR':
                     $CalendarDataI18nFile = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FILE, [
-                        '{nation}' => $dioceseEntry[0]->nation,
+                        '{nation}' => $dioceseEntry->nation,
                         '{diocese}' => $this->params->key,
                         '{locale}' => $this->params->locale
                     ]);
