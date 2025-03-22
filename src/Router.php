@@ -2,7 +2,6 @@
 
 namespace LiturgicalCalendar\Api;
 
-use GuzzleHttp\Psr7\Request;
 use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Enum\AcceptHeader;
