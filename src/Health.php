@@ -378,7 +378,7 @@ class Health implements MessageComponentInterface
                 // If the 'sourceFolder' property is set, then we are validating a folder of i18n files
                 $dataPath       = rtrim($validation->sourceFolder, '/');
                 $matches = null;
-                if (preg_match("/^(wider\-region|national\-calendar|diocesan\-calendar)\-([A-Z][_a-z]+)\-i18n$/", $validation->validate, $matches)) {
+                if (preg_match("/^(wider\-region|national\-calendar|diocesan\-calendar)\-([A-Za-z_]+)\-i18n$/", $validation->validate, $matches)) {
                     switch ($matches[1]) {
                         case 'wider-region':
                             $dataPath = strtr(
@@ -397,8 +397,10 @@ class Health implements MessageComponentInterface
                             $nation = $diocese->nation;
                             $dataPath = strtr(
                                 JsonData::DIOCESAN_CALENDARS_I18N_FOLDER,
-                                ['{diocese}' => $matches[2]],
-                                ['{nation}' => $nation]
+                                [
+                                    '{diocese}' => $matches[2],
+                                    '{nation}' => $nation
+                                ]
                             );
                             break;
                     }
@@ -433,9 +435,11 @@ class Health implements MessageComponentInterface
                                 $dioceseName = $diocese->diocese;
                                 $dataPath = strtr(
                                     JsonData::DIOCESAN_CALENDARS_FILE,
-                                    ['{diocese}' => $matches[2]],
-                                    ['{nation}' => $nation],
-                                    ['{diocese_name}' => $dioceseName]
+                                    [
+                                        '{diocese}' => $matches[2],
+                                        '{nation}' => $nation,
+                                        '{diocese_name}' => $dioceseName
+                                    ]
                                 );
                                 break;
                         }
@@ -463,7 +467,7 @@ class Health implements MessageComponentInterface
             if (false === $files || empty($files)) {
                 $message = new \stdClass();
                 $message->type = "error";
-                $message->text = "Data folder $validation->sourceFolder does not exist or does not contain any json files";
+                $message->text = "Data folder $validation->sourceFolder ($dataPath) does not exist or does not contain any json files";
                 $message->classes = ".$validation->validate.file-exists";
                 $this->sendMessage($to, $message);
                 return;
