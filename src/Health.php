@@ -364,9 +364,18 @@ class Health implements MessageComponentInterface
      */
     private function executeValidation(object $validation, ConnectionInterface $to)
     {
+        // First thing is try to determine the schema that we will be validating against,
+        // and the path to the source file or folder that we will be validating against the schema.
+        // Our purpose here is to set the $pathForSchema and $dataPath variables.
+        $pathForSchema      = null;
+        $dataPath           = null;
+
+        // Source data checks validate data directly in the filesystem, not through the API
         if ($validation->category === 'sourceDataCheck') {
-            $pathForSchema      = $validation->validate;
+            $pathForSchema = $validation->validate;
+            // Are we validating a single source file, or are we validating a folder of i18n files?
             if (property_exists($validation, 'sourceFolder')) {
+                // If the 'sourceFolder' property is set, then we are validating a folder of i18n files
                 $dataPath       = rtrim($validation->sourceFolder, '/');
                 $matches = null;
                 if (preg_match("/^(wider\-region|national\-calendar|diocesan\-calendar)\-([A-Z][_a-z]+)\-i18n$/", $validation->validate, $matches)) {
@@ -399,6 +408,8 @@ class Health implements MessageComponentInterface
                     $dataPath = RomanMissal::$i18nPath["{$region}_{$year}"];
                 }
             } else {
+                // If we are not validating a folder of i18n files, then we are validating a single source file,
+                // and the 'sourceFile' property is required in this case
                 if (property_exists($validation, 'sourceFile')) {
                     $dataPath       = $validation->sourceFile;
                     $matches = null;
@@ -436,13 +447,18 @@ class Health implements MessageComponentInterface
                 }
             }
         } else {
+            // If it's not a sourceDataCheck, it's probably a resourceDataCheck
+            // That is to say, an API path
             $pathForSchema      = $validation->sourceFile;
             $dataPath           = $validation->sourceFile;
         }
 
         $schema = Health::retrieveSchemaForCategory($validation->category, $pathForSchema);
 
+        // Now that we have the correct schema to validate against,
+        // we will perform the actual validation either for all files in a folder, or for a single file
         if (property_exists($validation, 'sourceFolder')) {
+            // If the 'sourceFolder' property is set, then we are validating a folder of i18n files
             $files = glob($dataPath . '/*.json');
             if (false === $files || empty($files)) {
                 $message = new \stdClass();
@@ -525,6 +541,7 @@ class Health implements MessageComponentInterface
                 $this->sendMessage($to, $message);
             }
         } else {
+            // If the 'sourceFolder' property is not set, then we are validating a single source file or API path
             $matches = null;
             if (preg_match("/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/", $pathForSchema, $matches)) {
                 $dioceseId   = $matches[1];
@@ -543,6 +560,8 @@ class Health implements MessageComponentInterface
                 ]);
             }
 
+            // If we are validating an API path, we check for a 200 OK HTTP response from the API
+            // rather than checking for existence of the file in the filesystem
             if ($validation->category === 'resourceDataCheck') {
                 $headers = get_headers($dataPath);
                 if (!$headers || strpos($headers[0], '200') === false) {
@@ -563,11 +582,12 @@ class Health implements MessageComponentInterface
                     $message->text    = "Unable to verify schema for dataPath {$dataPath} and category {$validation->category} since Data file $dataPath does not exist or is not readable";
                     $message->classes = ".$validation->validate.schema-valid";
                     $this->sendMessage($to, $message);
-
+                    // early exit
                     return;
                 }
             }
 
+            // $dataPath could be either a source file or an API path, file_get_contents can handle both
             $data = file_get_contents($dataPath);
             if (false === $data) {
                 $message = new \stdClass();
