@@ -304,7 +304,7 @@ class Health implements MessageComponentInterface
                     $schema = LitSchema::DATA;
                     foreach ($matches as $idx => $match) {
                         if ($idx > 0) {
-                            switch ($matches[$idx]) {
+                            switch ($match) {
                                 case 'nation':
                                     $schema = LitSchema::NATIONAL;
                                     break;

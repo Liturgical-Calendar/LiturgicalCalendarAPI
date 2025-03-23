@@ -8,7 +8,7 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "pattern": "^https?:\\\/\\\/litcal\\.johnromanodorazio\\.com\\\/api\\\/(dev|v[3-9])\\\/jsondata\\\/schemas\\\/[a-zA-Z]+\\.json"
+                "pattern": "^https?:\\\/\\\/(?:litcal\\.johnromanodorazio\\.com\\\/api\\\/(?:dev|v[3-9])|localhost(?:\\:\\d{4}))\\\/jsondata\\\/schemas\\\/[a-zA-Z]+\\.json"
             }
         }
     }
