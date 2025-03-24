@@ -307,6 +307,20 @@ class RegionalDataParams
         return $data->key;
     }
 
+    /**
+     * Validate the payload for the RegionalDataParams class.
+     *
+     * This method checks whether the payload has the required properties
+     * for the given category of Regional Calendar data.
+     *
+     * If the payload is invalid, the method will produce an error response
+     * with a 400 status code.
+     *
+     * @param object $payload
+     *      The payload to validate.
+     * @return bool
+     *      Whether the payload is valid or not.
+     */
     private function validatePayload(object $payload): bool
     {
         switch ($this->category) {
