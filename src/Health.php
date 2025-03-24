@@ -369,6 +369,7 @@ class Health implements MessageComponentInterface
         // Our purpose here is to set the $pathForSchema and $dataPath variables.
         $pathForSchema      = null;
         $dataPath           = null;
+        $responseType       = 'JSON';
 
         // Source data checks validate data directly in the filesystem, not through the API
         if ($validation->category === 'sourceDataCheck') {
@@ -591,8 +592,27 @@ class Health implements MessageComponentInterface
                 }
             }
 
-            // $dataPath could be either a source file or an API path, file_get_contents can handle both
-            $data = file_get_contents($dataPath);
+            $data = false;
+            if (property_exists($validation, 'responsetype')) {
+                $responseType = $validation->responsetype;
+                //get the index of the responsetype from the ReturnType class
+                $responseTypeIdx = array_search($responseType, ReturnType::$values);
+                //get the corresponding accept mime type
+                $acceptMimeType = AcceptHeader::$values[$responseTypeIdx];
+                $opts = [
+                    "http" => [
+                        "method" => "GET",
+                        "header" => "Accept: $acceptMimeType\r\n"
+                    ]
+                ];
+                $context = stream_context_create($opts);
+                // $dataPath is probably an API path in this case
+                $data    = file_get_contents($dataPath, false, $context);
+            } else {
+                // $dataPath is probably a source file in the filesystem in this case
+                $data    = file_get_contents($dataPath);
+            }
+
             if (false === $data) {
                 $message = new \stdClass();
                 $message->type    = "error";
@@ -618,39 +638,83 @@ class Health implements MessageComponentInterface
                 $message->classes = ".$validation->validate.file-exists";
                 $this->sendMessage($to, $message);
 
-                $jsonData = json_decode($data);
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    $message = new \stdClass();
-                    $message->type    = "success";
-                    $message->text    = "The Data file $dataPath was successfully decoded as JSON";
-                    $message->classes = ".$validation->validate.json-valid";
-                    $this->sendMessage($to, $message);
+                switch ($responseType) {
+                    case 'YML':
+                        try {
+                            $yamlData = json_decode(json_encode(yaml_parse($data)));
+                            if ($yamlData) {
+                                $message = new \stdClass();
+                                $message->type    = "success";
+                                $message->text    = "The Data file $dataPath was successfully decoded as YAML";
+                                $message->classes = ".$validation->validate.json-valid";
+                                $this->sendMessage($to, $message);
 
-                    if (null !== $schema) {
-                        $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
-                        if (gettype($validationResult) === 'boolean' && $validationResult === true) {
+                                if (null !== $schema) {
+                                    $validationResult = $this->validateDataAgainstSchema($yamlData, $schema);
+                                    if (gettype($validationResult) === 'boolean' && $validationResult === true) {
+                                        $message = new \stdClass();
+                                        $message->type    = "success";
+                                        $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
+                                        $message->classes = ".$validation->validate.schema-valid";
+                                        $this->sendMessage($to, $message);
+                                    } elseif (gettype($validationResult === 'object')) {
+                                        $validationResult->classes = ".$validation->validate.schema-valid";
+                                        $this->sendMessage($to, $validationResult);
+                                    }
+                                } else {
+                                    $message = new \stdClass();
+                                    $message->type    = "error";
+                                    $message->text    = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category}";
+                                    $message->classes = ".$validation->validate.schema-valid";
+                                    $this->sendMessage($to, $message);
+                                }
+                            }
+                        } catch (\Exception $ex) {
+                            $message = new \stdClass();
+                            $message->type    = "error";
+                            $message->text    = "There was an error decoding the Data file $dataPath as YAML: " . $ex->getMessage() . " :: Raw data = <<<JSON\n$data\n>>>";
+                            $message->classes = ".$validation->validate.json-valid";
+                            $this->sendMessage($to, $message);
+                        }
+                        break;
+                    case 'JSON':
+                        // no break
+                    default:
+                        $jsonData = json_decode($data);
+                        if (json_last_error() === JSON_ERROR_NONE) {
                             $message = new \stdClass();
                             $message->type    = "success";
-                            $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
-                            $message->classes = ".$validation->validate.schema-valid";
+                            $message->text    = "The Data file $dataPath was successfully decoded as JSON";
+                            $message->classes = ".$validation->validate.json-valid";
                             $this->sendMessage($to, $message);
-                        } elseif (gettype($validationResult === 'object')) {
-                            $validationResult->classes = ".$validation->validate.schema-valid";
-                            $this->sendMessage($to, $validationResult);
+
+                            if (null !== $schema) {
+                                $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
+                                if (gettype($validationResult) === 'boolean' && $validationResult === true) {
+                                    $message = new \stdClass();
+                                    $message->type    = "success";
+                                    $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
+                                    $message->classes = ".$validation->validate.schema-valid";
+                                    $this->sendMessage($to, $message);
+                                } elseif (gettype($validationResult === 'object')) {
+                                    $validationResult->classes = ".$validation->validate.schema-valid";
+                                    $this->sendMessage($to, $validationResult);
+                                }
+                            } else {
+                                $message = new \stdClass();
+                                $message->type    = "error";
+                                $message->text    = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category}";
+                                $message->classes = ".$validation->validate.schema-valid";
+                                $this->sendMessage($to, $message);
+                            }
+                        } else {
+                            $message = new \stdClass();
+                            $message->type    = "error";
+                            $message->text    = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . " :: Raw data = <<<JSON\n$data\n>>>";
+                            $message->classes = ".$validation->validate.json-valid";
+                            $this->sendMessage($to, $message);
                         }
-                    } else {
-                        $message = new \stdClass();
-                        $message->type    = "error";
-                        $message->text    = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category}";
-                        $message->classes = ".$validation->validate.schema-valid";
-                        $this->sendMessage($to, $message);
-                    }
-                } else {
-                    $message = new \stdClass();
-                    $message->type    = "error";
-                    $message->text    = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . " :: Raw data = <<<JSON\n$data\n>>>";
-                    $message->classes = ".$validation->validate.json-valid";
-                    $this->sendMessage($to, $message);
+                        break;
                 }
             }
         }
