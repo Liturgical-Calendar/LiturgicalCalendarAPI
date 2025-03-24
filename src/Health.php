@@ -280,7 +280,15 @@ class Health implements MessageComponentInterface
     {
         switch ($category) {
             case 'universalcalendar':
-                return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
+                if (array_key_exists($dataPath, Health::DATA_PATH_TO_SCHEMA)) {
+                    return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
+                }
+                $versionedDataPath = preg_replace("/\/api\/v[4-9]\//", "/api/dev/", $dataPath);
+                if (array_key_exists($versionedDataPath, Health::DATA_PATH_TO_SCHEMA)) {
+                    $tempSchemaPath = Health::DATA_PATH_TO_SCHEMA[ $versionedDataPath ];
+                    return preg_replace("/\/api\/v[4-9]\//", "/api/dev/", $tempSchemaPath);
+                }
+                return null;
             case 'nationalcalendar':
                 return LitSchema::NATIONAL;
             case 'diocesancalendar':
