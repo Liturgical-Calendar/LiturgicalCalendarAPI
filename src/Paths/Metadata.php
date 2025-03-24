@@ -254,6 +254,7 @@ class Metadata
         } else {
             echo $response;
         }
+        die();
     }
 
     /**

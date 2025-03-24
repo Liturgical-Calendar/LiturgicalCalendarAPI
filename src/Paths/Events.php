@@ -708,6 +708,9 @@ class Events
         } else {
             switch (self::$Core->getResponseContentType()) {
                 case AcceptHeader::YAML:
+                    // We must make sure that any nested stdClass objects are converted to associative arrays
+                    $responseStr = json_encode($responseObj);
+                    $responseObj = json_decode($responseStr, true);
                     echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
                     break;
                 case AcceptHeader::JSON:
