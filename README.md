@@ -98,6 +98,10 @@ if we want to install system locales in order for `gettext` to work properly wit
 
 # CHANGELOG
 
+## [v4.5](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v4.5) (March 25th 2025)
+* restore wider region calendar `PUT`, `PATCH` and `DELETE` requests with full support for all i18n languages (issues #284, #265, and #220)
+Happy Feast of the Annunciation!
+
 ## [v4.4](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v4.4) (March 22nd 2025)
 * restore national calendar `PUT`, `PATCH` and `DELETE` requests with full support for all i18n languages (issues #284, #265, and #220)
 
