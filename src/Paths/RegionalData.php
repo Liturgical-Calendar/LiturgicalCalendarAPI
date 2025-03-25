@@ -128,6 +128,8 @@ class RegionalData
                     StatusCode::BAD_REQUEST,
                     "RegionalData::getI18nData: invalid value <{$this->params->category}> for param `category`: valid values are: "
                         . implode(', ', array_values(RegionalDataParams::EXPECTED_CATEGORIES))
+                        . " which are set based on the corresponding path parameters "
+                        . implode(', ', array_keys(RegionalDataParams::EXPECTED_CATEGORIES))
                 );
         }
         if (null !== $i18nDataFile && file_exists($i18nDataFile)) {
@@ -473,7 +475,7 @@ class RegionalData
                 ]
             );
 
-            if (false === is_writable($calendarI18nFile)) {
+            if (file_exists($calendarI18nFile) && false === is_writable($calendarI18nFile)) {
                 self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update national calendar i18n resource for {$this->params->key} at {$calendarI18nFile}, check file and folder permissions.");
             }
 
@@ -489,6 +491,23 @@ class RegionalData
             }
         }
 
+        // We also want to clean up any unneeded locale files, if a locale was removed
+        $calendarI18nFolder = strtr(
+            JsonData::NATIONAL_CALENDARS_I18N_FOLDER,
+            [
+                '{nation}' => $this->params->key
+            ]
+        );
+
+        // Get all .json files in the folder
+        $jsonFiles = glob("{$calendarI18nFolder}/*.json");
+        foreach ($jsonFiles as $jsonFile) {
+            $filename = pathinfo($jsonFile, PATHINFO_FILENAME);
+            if (false === in_array($filename, $this->params->payload->metadata->locales)) {
+                unlink($jsonFile);
+            }
+        }
+
         unset($this->params->payload->i18n);
 
         $calendarFile = strtr(
@@ -498,8 +517,15 @@ class RegionalData
             ]
         );
 
-        $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if (false === file_exists($calendarFile)) {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update unknown national calendar resource for {$this->params->key} at {$calendarFile}, file not found.");
+        }
 
+        if (false === is_writable($calendarFile)) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update national calendar resource for {$this->params->key} at {$calendarFile}, check file and folder permissions.");
+        }
+
+        $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         if (
             false === file_put_contents(
                 $calendarFile,
@@ -509,8 +535,9 @@ class RegionalData
             self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update national calendar resource {$this->params->key} in path {$calendarFile}.");
         }
 
-        $response     = new \stdClass();
+        $response = new \stdClass();
         $response->success = "Calendar data created or updated for Nation \"{$this->params->key}\"";
+        $response->data = $this->params->payload;
         self::produceResponse(json_encode($response));
     }
 
@@ -528,47 +555,86 @@ class RegionalData
      */
     private function updateWiderRegionCalendar()
     {
-        $response = new \stdClass();
-        $this->params->payload->metadata->wider_region = ucfirst(strtolower($this->params->payload->metadata->wider_region));
-        $widerRegion = $this->params->payload->metadata->wider_region;
-        $widerRegionPath = JsonData::WIDER_REGIONS_FOLDER . '/' . $widerRegion;
-        $i18npath = strtr(JsonData::WIDER_REGIONS_I18N_FOLDER, [
-            '{wider_region}' => $widerRegion
-        ]);
-        if (!file_exists($widerRegionPath)) {
-            mkdir($widerRegionPath, 0755, true);
+        $widerRegionEntry = array_find($this->CalendarsMetadata->wider_regions, function ($item) {
+            return $item->name === $this->params->key;
+        });
+
+        if (null === $widerRegionEntry) {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update unknown wider region calendar resource {$this->params->key}.");
         }
-        if (!file_exists($i18npath)) {
-            mkdir($i18npath, 0755, true);
-        }
-        $translationJSON = new \stdClass();
-        foreach ($this->params->payload->litcal as $CalEvent) {
-            $translationJSON->{ $CalEvent->festivity->event_key } = '';
-        }
-        if (count($this->params->payload->metadata->locales) > 0) {
-            foreach ($this->params->payload->metadata->locales as $iso) {
-                $widerRegionI18nFile = strtr(JsonData::WIDER_REGIONS_I18N_FILE, [
-                    '{wider_region}' => $widerRegion,
-                    '{locale}' => $iso
-                ]);
-                if (!file_exists($widerRegionI18nFile)) {
-                    file_put_contents(
-                        $widerRegionI18nFile,
-                        json_encode($translationJSON, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
-                    );
-                }
+
+        foreach ($this->params->payload->i18n as $locale => $i18nData) {
+            $widerRegionI18nFile = strtr(
+                JsonData::WIDER_REGIONS_I18N_FILE,
+                [
+                    '{wider_region}' => $this->params->key,
+                    '{locale}' => $locale
+                ]
+            );
+
+            if (file_exists($widerRegionI18nFile) && false === is_writable($widerRegionI18nFile)) {
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update wider region calendar i18n resource for {$this->params->key} at {$widerRegionI18nFile}, check file and folder permissions.");
+            }
+
+            // Update wider region calendar i18n data for locale
+            $widerRegionI18nData = json_encode($i18nData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            if (
+                false === file_put_contents(
+                    $widerRegionI18nFile,
+                    $widerRegionI18nData . PHP_EOL
+                )
+            ) {
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update wider region calendar i18n resource {$this->params->key} in path {$widerRegionI18nFile}.");
             }
         }
 
-        $data = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        // We also want to clean up any unneeded locale files, if a locale has been removed
+        $widerRegionI18nFolder = strtr(
+            JsonData::WIDER_REGIONS_I18N_FOLDER,
+            [
+                '{wider_region}' => $this->params->key
+            ]
+        );
+
+        // Get all .json files in the folder
+        $jsonFiles = glob($widerRegionI18nFolder . '/*.json');
+        foreach ($jsonFiles as $file) {
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+            if (false === in_array($filename, $this->params->payload->metadata->locales)) {
+                unlink($file);
+            }
+        }
+
+        unset($this->params->payload->i18n);
+
         $widerRegionFile = strtr(
             JsonData::WIDER_REGIONS_FILE,
             [
-                '{wider_region}' => $widerRegion
+                '{wider_region}' => $this->params->key
             ]
         );
-        file_put_contents($widerRegionFile, $data . PHP_EOL);
-        $response->success = "Calendar data created or updated for Wider Region \"{$widerRegion}\"";
+
+        if (false === file_exists($widerRegionFile)) {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update unknown wider region calendar resource for {$this->params->key} at {$widerRegionFile}, file not found.");
+        }
+
+        if (false === is_writable($widerRegionFile)) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update wider region calendar resource for {$this->params->key} at {$widerRegionFile}, check file and folder permissions.");
+        }
+
+        $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if (
+            false === file_put_contents(
+                $widerRegionFile,
+                $calendarData . PHP_EOL
+            )
+        ) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update wider region calendar resource {$this->params->key} in path {$widerRegionFile}.");
+        }
+
+        $response = new \stdClass();
+        $response->success = "Calendar data created or updated for Wider Region \"{$this->params->key}\"";
+        $response->data = $this->params->payload;
         self::produceResponse(json_encode($response));
     }
 
@@ -599,12 +665,12 @@ class RegionalData
                 JsonData::DIOCESAN_CALENDARS_I18N_FILE,
                 [
                     '{nation}' => $dioceseEntry->nation,
-                    '{diocese}' => $dioceseEntry->calendar_id,
+                    '{diocese}' => $this->params->key,
                     '{locale}' => $locale
                 ]
             );
 
-            if (false === is_writable($DiocesanCalendarI18nFile)) {
+            if (file_exists($DiocesanCalendarI18nFile) && false === is_writable($DiocesanCalendarI18nFile)) {
                 self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendar i18n resource for {$this->params->key} at {$DiocesanCalendarI18nFile}, check file and folder permissions.");
             }
 
@@ -620,12 +686,32 @@ class RegionalData
             }
         }
 
+        // We also want to clean up any unneeded locale files, if a locale has been removed
+        $diocesanCalendarI18nFolder = strtr(
+            JsonData::DIOCESAN_CALENDARS_I18N_FOLDER,
+            [
+                '{nation}' => $dioceseEntry->nation,
+                '{diocese}' => $this->params->key
+            ]
+        );
+
+        // Get all .json files in the folder
+        $jsonFiles = glob($diocesanCalendarI18nFolder . '/*.json');
+        foreach ($jsonFiles as $file) {
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+            if (false === in_array($filename, $this->params->payload->metadata->locales)) {
+                unlink($file);
+            }
+        }
+
+        unset($this->params->payload->i18n);
+
         $DiocesanCalendarFile = strtr(
             JsonData::DIOCESAN_CALENDARS_FILE,
             [
-                '{nation}' => $dioceseEntry[0]->nation,
-                '{diocese}' => $dioceseEntry[0]->calendar_id,
-                '{diocese_name}' => $dioceseEntry[0]->diocese
+                '{nation}' => $dioceseEntry->nation,
+                '{diocese}' => $this->params->key,
+                '{diocese_name}' => $dioceseEntry->diocese
             ]
         );
 
@@ -637,9 +723,6 @@ class RegionalData
             self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendar resource for {$this->params->key} at {$DiocesanCalendarFile}, check file and folder permissions.");
         }
 
-        // Update diocesan calendar data
-        // We no longer need the `i18n` property, so delete it
-        unset($this->params->payload->i18n);
         $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         if (
             false === file_put_contents(
@@ -1153,7 +1236,7 @@ class RegionalData
             default:
                 echo $jsonEncodedResponse;
         }
-        die();
+        //die();
     }
 
     /**

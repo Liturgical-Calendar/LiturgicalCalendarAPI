@@ -294,14 +294,16 @@ class RegionalDataParams
         }
         // Check the request method: cannot DELETE Wider Region calendar data if there are national calendars that depend on it
         if (RegionalData::$Core->getRequestMethod() === RequestMethod::DELETE) {
-            foreach ($this->calendars->national_calendars as $nationalCalendar) {
-                if (in_array($data->key, $nationalCalendar->wider_regions)) {
-                    RegionalData::produceErrorResponse(
-                        StatusCode::BAD_REQUEST,
-                        "Cannot DELETE Wider Region calendar data while there are National calendars that depend on it. "
-                        . "Currently {$data->key} is in use by {$nationalCalendar->calendar_id}"
-                    );
-                }
+            $national_calendars_within_wider_region = array_values(array_filter(
+                $this->calendars->national_calendars,
+                fn ($el) => $el->wider_region === $data->key
+            ));
+            if (count($national_calendars_within_wider_region) > 0) {
+                RegionalData::produceErrorResponse(
+                    StatusCode::BAD_REQUEST,
+                    "Cannot DELETE Wider Region calendar data while there are National calendars that depend on it. "
+                    . "Currently {$data->key} is in use by the National Calendars: " . implode(', ', array_map(fn ($el) => \Locale::getDisplayRegion('-' . $el->calendar_id, 'en'), $national_calendars_within_wider_region))
+                );
             }
         }
         return $data->key;
@@ -327,11 +329,11 @@ class RegionalDataParams
             case 'NATIONALCALENDAR':
                 if (
                     false === property_exists($payload, 'litcal')
-                    || false === property_exists($payload, 'metadata')
                     || false === property_exists($payload, 'settings')
+                    || false === property_exists($payload, 'metadata')
                     || false === property_exists($payload->metadata, 'locales')
                 ) {
-                    $message = "Cannot create or update National calendar data when the payload does not have required properties `litcal`, `metadata` or `settings`. Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
+                    $message = "Cannot create or update National calendar data when the payload does not have required properties `litcal`, `settings`, `metadata` or `metadata.locales` . Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
                     RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                 }
                 break;
@@ -369,8 +371,8 @@ class RegionalDataParams
             case 'WIDERREGIONCALENDAR':
                 if (
                     false === property_exists($payload, 'litcal')
-                    || false === property_exists($payload, 'metadata')
                     || false === property_exists($payload, 'national_calendars')
+                    || false === property_exists($payload, 'metadata')
                     || false === property_exists($payload->metadata, 'wider_region')
                     || false === property_exists($payload->metadata, 'locales')
                 ) {
