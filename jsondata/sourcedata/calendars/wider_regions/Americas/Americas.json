@@ -3,12 +3,7 @@
         {
             "festivity": {
                 "event_key": "LadyGuadalupe",
-                "color": [
-                    "white"
-                ],
-                "grade": 4,
-                "day": 12,
-                "month": 12
+                "grade": 4
             },
             "metadata": {
                 "action": "makePatron",
@@ -41,7 +36,6 @@
         "El Salvador": "SV",
         "Guatemala": "GT",
         "Honduras": "HN",
-        "Latin America": "419",
         "Mexico": "MX",
         "Nicaragua": "NI",
         "Panama": "PA",
@@ -53,28 +47,27 @@
         "locales": [
             "en_CA",
             "en_US",
-            "fr_CA",
-            "pt_BR",
             "es_AR",
-            "es_BZ",
             "es_BO",
             "es_BR",
+            "es_BZ",
             "es_CL",
             "es_CO",
             "es_CR",
             "es_CU",
             "es_DO",
             "es_EC",
-            "es_SV",
             "es_GT",
             "es_HN",
-            "es_419",
             "es_MX",
             "es_NI",
             "es_PA",
-            "es_PY",
             "es_PE",
-            "es_PR"
+            "es_PR",
+            "es_PY",
+            "es_SV",
+            "fr_CA",
+            "pt_BR"
         ],
         "wider_region": "Americas"
     }

@@ -36,26 +36,7 @@
             "$ref": "#/definitions/NationalCalendarMetadata"
         },
         "i18n": {
-            "type": "object",
-            "description": "A JSON object of the form { \"locale\": { \"key\": \"value\" } }, used only in PUT and PATCH requests.",
-            "additionalProperties": false,
-            "propertyNames": {
-                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
-            },
-            "patternProperties": {
-                "": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "propertyNames": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
-                    },
-                    "patternProperties": {
-                        "": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
+            "$ref": "#/definitions/NationalCalendarI18n"
         }
     },
     "required": [
@@ -453,6 +434,28 @@
         "Settings": {
             "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/CalendarSettings",
             "title": "Settings"
+        },
+        "NationalCalendarI18n": {
+            "type": "object",
+            "description": "A JSON object of the form { \"locale\": { \"key\": \"value\" } }, used only in PUT and PATCH requests.",
+            "additionalProperties": false,
+            "propertyNames": {
+                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+            },
+            "patternProperties": {
+                "": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "propertyNames": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                    },
+                    "patternProperties": {
+                        "": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     }
 }

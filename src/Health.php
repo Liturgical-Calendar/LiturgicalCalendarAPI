@@ -278,26 +278,39 @@ class Health implements MessageComponentInterface
      */
     private static function retrieveSchemaForCategory(string $category, ?string $dataPath = null): ?string
     {
+        $versionedPattern = "/\/api\/v[4-9]\//";
+        $versionedReplacement = "/api/dev/";
+        $isVersionedDataPath = preg_match($versionedPattern, $dataPath) !== false;
         switch ($category) {
             case 'universalcalendar':
-                return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
+                if ($isVersionedDataPath) {
+                    $versionedDataPath = preg_replace($versionedPattern, $versionedReplacement, $dataPath);
+                    if (array_key_exists($versionedDataPath, Health::DATA_PATH_TO_SCHEMA)) {
+                        $tempSchemaPath = Health::DATA_PATH_TO_SCHEMA[ $versionedDataPath ];
+                        return preg_replace($versionedPattern, $versionedReplacement, $tempSchemaPath);
+                    }
+                }
+                if (array_key_exists($dataPath, Health::DATA_PATH_TO_SCHEMA)) {
+                    return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
+                }
+                return null;
             case 'nationalcalendar':
-                return LitSchema::NATIONAL;
+                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::NATIONAL) : LitSchema::NATIONAL;
             case 'diocesancalendar':
-                return LitSchema::DIOCESAN;
+                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::DIOCESAN) : LitSchema::DIOCESAN;
             case 'widerregioncalendar':
-                return LitSchema::WIDERREGION;
+                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::WIDERREGION) : LitSchema::WIDERREGION;
             case 'propriumdesanctis':
-                return LitSchema::PROPRIUMDESANCTIS;
+                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS) : LitSchema::PROPRIUMDESANCTIS;
             case 'resourceDataCheck':
                 if (
                     preg_match("/\/missals\/[_A-Z0-9]+$/", $dataPath)
                 ) {
-                    return LitSchema::PROPRIUMDESANCTIS;
+                    return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS) : LitSchema::PROPRIUMDESANCTIS;
                 } elseif (
                     preg_match("/\/events\/(?:nation\/[A-Z]{2}|diocese\/[a-z]{6}_[a-z]{2})(?:\?locale=[a-zA-Z0-9_]+)?$/", $dataPath)
                 ) {
-                    return LitSchema::EVENTS;
+                    return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::EVENTS) : LitSchema::EVENTS;
                 } elseif (
                     preg_match("/\/data\/(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/", $dataPath, $matches)
                 ) {
@@ -317,9 +330,19 @@ class Health implements MessageComponentInterface
                             }
                         }
                     }
-                    return $schema;
+                    return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, $schema) : $schema;
                 }
-                return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
+                if ($isVersionedDataPath) {
+                    $versionedDataPath = preg_replace($versionedPattern, $versionedReplacement, $dataPath);
+                    if (array_key_exists($versionedDataPath, Health::DATA_PATH_TO_SCHEMA)) {
+                        $tempSchemaPath = Health::DATA_PATH_TO_SCHEMA[ $versionedDataPath ];
+                        return preg_replace($versionedPattern, $versionedReplacement, $tempSchemaPath);
+                    }
+                }
+                if (array_key_exists($dataPath, Health::DATA_PATH_TO_SCHEMA)) {
+                    return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
+                }
+                return null;
                 break;
             case 'sourceDataCheck':
                 if (preg_match("/-i18n$/", $dataPath)) {
