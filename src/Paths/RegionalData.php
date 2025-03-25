@@ -315,7 +315,8 @@ class RegionalData
         );
 
         $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        if (false === file_put_contents(
+        if (
+            false === file_put_contents(
                 $diocesanCalendarFile,
                 $calendarData . PHP_EOL
             )
