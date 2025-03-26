@@ -2586,7 +2586,7 @@
         }
       }
     },
-    "/data/national": {
+    "/data/nation": {
       "put": {
         "tags": [
           "Calendar Source Data"
@@ -2760,7 +2760,7 @@
         }
       }
     },
-    "/data/diocesan": {
+    "/data/diocese": {
       "put": {
         "tags": [
           "Calendar Source Data"
@@ -2847,7 +2847,7 @@
         }
       }
     },
-    "/data/national/{key}": {
+    "/data/nation/{key}": {
       "get": {
         "tags": [
           "Calendar Source Data"
@@ -3164,7 +3164,7 @@
         }
       }
     },
-    "/data/diocesan/{key}": {
+    "/data/diocese/{key}": {
       "get": {
         "tags": [
           "Calendar Source Data"
