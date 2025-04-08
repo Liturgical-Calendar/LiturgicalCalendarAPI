@@ -6,13 +6,14 @@
 # Weblate Admin <admin@example.com>, 2024.
 # OpenAI <noreply-mt-openai@weblate.org>, 2024.
 # "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024.
+# Ronaldo Soares Couto <ronaldocouto@gmail.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-01-25 15:28+0000\n"
-"PO-Revision-Date: 2024-12-06 23:24+0000\n"
-"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2025-04-08 21:01+0000\n"
+"Last-Translator: Ronaldo Soares Couto <ronaldocouto@gmail.com>\n"
 "Language-Team: Portuguese <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/pt/>\n"
 "Language: pt\n"
