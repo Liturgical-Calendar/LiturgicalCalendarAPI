@@ -1,0 +1,1180 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Ronaldo Soares Couto <ronaldocouto@gmail.com>, 2025.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-25 15:28+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/Paths/Calendar.php:623
+#, php-format
+msgid ""
+"The name of the diocese could not be derived from the diocese ID \"%s\"."
+msgstr ""
+
+#: src/Paths/Calendar.php:658
+#, php-format
+msgid "The Diocesan calendar \"%s\" was not found in the index file."
+msgstr ""
+
+#: src/Paths/Calendar.php:754
+#, php-format
+msgid ""
+"Only years from 1970 and after are supported. You tried requesting the year "
+"%d."
+msgstr ""
+
+#. translators: Temporale refers to the Proprium de Tempore
+#: src/Paths/Calendar.php:786
+#, php-format
+msgid ""
+"There was an error trying to decode localized JSON data for the Temporale: %s"
+msgstr ""
+
+#. translators: Temporale refers to the Proprium de Tempore
+#: src/Paths/Calendar.php:793
+msgid "There was an error trying to retrieve localized data for the Temporale."
+msgstr ""
+
+#. translators: Temporale refers to the Proprium de Tempore
+#: src/Paths/Calendar.php:826
+#, php-format
+msgid "There was an error trying to decode JSON data for the Temporale: %s"
+msgstr ""
+
+#. translators: Temporale refers to the Proprium de Tempore
+#: src/Paths/Calendar.php:833
+msgid "There was an error trying to retrieve data for the Temporale."
+msgstr ""
+
+#. translators: name of the Roman Missal
+#: src/Paths/Calendar.php:861
+#, php-format
+msgid "Translation data for the sanctorale from %s could not be found."
+msgstr ""
+
+#. translators:
+#.   do not translate 'JSON';
+#.  'Sanctorale' refers to the Proprium de Sanctis;
+#.  1: name of the Roman Missal
+#.  2: error message
+#.
+#: src/Paths/Calendar.php:880
+#, php-format
+msgid ""
+"There was an error trying to decode JSON localization data for the "
+"Sanctorale for the Missal %1$s: %2$s"
+msgstr ""
+
+#. translators: Sanctorale refers to the Proprium de Sanctis; %s = name of the Roman Missal
+#: src/Paths/Calendar.php:889
+#, php-format
+msgid "Data for the Sanctorale from %s could not be found."
+msgstr ""
+
+#. translators: Sanctorale refers to the Proprium de Sanctis;
+#.  1: name of the Roman Missal
+#.  2: error message
+#.
+#: src/Paths/Calendar.php:913
+#, php-format
+msgid ""
+"There was an error trying to decode JSON data for the Sanctorale for the "
+"Missal %1$s: %2$s."
+msgstr ""
+
+#. translators: Sanctorale refers to Proprium de Sanctis
+#: src/Paths/Calendar.php:921
+msgid "Could not find the Sanctorale data"
+msgstr ""
+
+#: src/Paths/Calendar.php:947
+#, php-format
+msgid ""
+"There was an error trying to decode translation data for Memorials based on "
+"Decrees of the Congregation for Divine Worship: %s"
+msgstr ""
+
+#: src/Paths/Calendar.php:953
+msgid ""
+"Could not find translation data for Memorials based on Decrees of the "
+"Congregation for Divine Worship"
+msgstr ""
+
+#: src/Paths/Calendar.php:962
+#, php-format
+msgid ""
+"There was an error trying to decode JSON data for Memorials based on Decrees "
+"of the Congregation for Divine Worship: %s"
+msgstr ""
+
+#. translators: days before Epiphany (not useful in Italian!)
+#. translators: days after Epiphany when Epiphany falls on Jan 6 (not useful in Italian!)
+#: src/Paths/Calendar.php:1112 src/Paths/Calendar.php:1163
+#, php-format
+msgid "%s - Christmas Weekday"
+msgstr ""
+
+#. translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday
+#. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
+#: src/Paths/Calendar.php:1286 src/Enum/LitCommon.php:424
+msgid "or"
+msgstr ""
+
+#. translators: as instituted on the day of the canonization of St Faustina Kowalska by Pope John Paul II in the year 2000
+#: src/Paths/Calendar.php:1290
+msgid "Divine Mercy Sunday"
+msgstr ""
+
+#. translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
+#. translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
+#. translators:
+#.  1: Festivity name,
+#.  2: Festivity date,
+#.  3: Requested calendar year,
+#.  4: Explicatory string for the transferral,
+#.  5: actual date for the transferral,
+#.  6: Decree of the Congregation for Divine Worship
+#.
+#: src/Paths/Calendar.php:1459 src/Paths/Calendar.php:1479
+#: src/Paths/Calendar.php:1529
+#, php-format
+msgid ""
+"The Solemnity '%1$s' falls on %2$s in the year %3$d, the celebration has "
+"been transferred to %4$s (%5$s) as per the %6$s."
+msgstr ""
+
+#: src/Paths/Calendar.php:1463
+msgid "the Saturday preceding Palm Sunday"
+msgstr ""
+
+#: src/Paths/Calendar.php:1471 src/Paths/Calendar.php:1491
+#: src/Paths/Calendar.php:1540 src/Paths/Calendar.php:1569
+#: src/Paths/Calendar.php:2084 src/Paths/Calendar.php:2298
+#: src/Paths/Calendar.php:2366 src/Paths/Calendar.php:2710
+#: src/Paths/Calendar.php:2780 src/Paths/Calendar.php:2819
+#: src/Paths/Calendar.php:2951 src/Paths/Calendar.php:2966
+#: src/Paths/Calendar.php:2983 src/Paths/Calendar.php:3024
+#: src/FestivityCollection.php:920
+msgid "Decree of the Congregation for Divine Worship"
+msgstr ""
+
+#: src/Paths/Calendar.php:1483
+msgid "the Monday following the Second Sunday of Easter"
+msgstr ""
+
+#: src/Paths/Calendar.php:1533
+msgid "the following Monday"
+msgstr ""
+
+#. translators: 1: Festivity name, 2: Coinciding Festivity name, 3: Requested calendar year
+#: src/Paths/Calendar.php:1547
+#, php-format
+msgid ""
+"The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year %3$d. "
+"We should ask the Congregation for Divine Worship what to do about this!"
+msgstr ""
+
+#. translators:
+#.  1: Festivity name,
+#.  2: Coinciding Festivity name,
+#.  3: Requested calendar year,
+#.  4: Decree of the Congregation for Divine Worship
+#.
+#: src/Paths/Calendar.php:1580
+#, php-format
+msgid ""
+"Seeing that the Solemnity '%1$s' coincides with the Solemnity '%2$s' in the "
+"year %3$d, it has been anticipated by one day as per %4$s."
+msgstr ""
+
+#. translators: 1: Festivity name (Christmas), 2: Requested calendar year, 3: Festivity name (Holy Family), 4: New date for Holy Family
+#: src/Paths/Calendar.php:1684
+#, php-format
+msgid ""
+"'%1$s' falls on a Sunday in the year %2$d, therefore the Feast '%3$s' is "
+"celebrated on %4$s rather than on the Sunday after Christmas."
+msgstr ""
+
+#. translators: You can ignore this translation if the Feast has not been inserted by the Episcopal Conference
+#: src/Paths/Calendar.php:1715
+msgid "Our Lord Jesus Christ, The Eternal High Priest"
+msgstr ""
+
+#. translators: 1: National Calendar, 2: Requested calendar year, 3: source of the rule
+#: src/Paths/Calendar.php:1720
+#, php-format
+msgid ""
+"In 2012, Pope Benedict XVI gave faculty to the Episcopal Conferences to "
+"insert the Feast of Our Lord Jesus Christ the Eternal High Priest in their "
+"own liturgical calendars on the Thursday after Pentecost: applicable to the "
+"calendar '%1$s' in the year '%2$d' (%3$s)."
+msgstr ""
+
+#. translators: 1: Festivity name, 2: Superseding Festivity grade, 3: Superseding Festivity name, 4: Requested calendar year
+#: src/Paths/Calendar.php:1772 src/Paths/Calendar.php:1813
+#, php-format
+msgid "'%1$s' is superseded by the %2$s '%3$s' in the year %4$d."
+msgstr ""
+
+#. translators: %s is an ordinal number (first, second...)
+#: src/Paths/Calendar.php:1900
+#, php-format
+msgid "of the %s Week of Advent"
+msgstr ""
+
+#. translators: %s is an ordinal number (first, second...)
+#: src/Paths/Calendar.php:1939
+#, php-format
+msgid "%s Day of the Octave of Christmas"
+msgstr ""
+
+#. translators: %s is an ordinal number (first, second...)
+#: src/Paths/Calendar.php:1982
+#, php-format
+msgid "of the %s Week of Lent"
+msgstr ""
+
+#: src/Paths/Calendar.php:1992
+msgid "after Ash Wednesday"
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity
+#.  2. Name of the festivity
+#.  3. Day of the festivity
+#.  4. Year from which the festivity has been added
+#.  5. Source of the information
+#.  6. Requested calendar year
+#.
+#. translators:
+#.  1. Grade or rank of the festivity being created
+#.  2. Name of the festivity being created
+#.  3. Indication of the mobile date for the festivity being created
+#.  4. Year from which the festivity has been added
+#.  5. Source of the information
+#.  6. Requested calendar year
+#.
+#. translators:
+#.  1. Grade or rank of the festivity
+#.  2. Name of the festivity
+#.  3. Day of the festivity
+#.  4. Year from which the festivity has been added
+#.  5. Source of the information
+#.  6. Requested calendar year
+#.
+#: src/Paths/Calendar.php:2023 src/Paths/Calendar.php:2507
+#: src/Paths/Calendar.php:2791 src/Paths/Calendar.php:3538
+#, php-format
+msgid ""
+"The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
+"applicable to the year %6$d."
+msgstr ""
+
+#: src/Paths/Calendar.php:2069 src/Paths/Calendar.php:2231
+msgid ""
+"Vatican Press conference: Presentation of the Editio Typica Tertia of the "
+"Roman Missal"
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity
+#.  2. Name of the festivity
+#.  3. Requested calendar year
+#.
+#: src/Paths/Calendar.php:2125
+#, php-format
+msgid ""
+"The %1$s '%2$s' either falls between 17 Dec. and 24 Dec., or during the "
+"Octave of Christmas, or on the weekdays of the Lenten season in the year "
+"%3$d, rank reduced to Commemoration."
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity that has been superseded
+#.  2. Name of the festivity that has been superseded
+#.  3. Grade or rank of the festivity that is superseding
+#.  4. Name of the festivity that is superseding
+#.  5. Requested calendar year
+#.
+#: src/Paths/Calendar.php:2153 src/Paths/Calendar.php:2195
+#, php-format
+msgid "The %1$s '%2$s' is superseded by the %3$s '%4$s' in the year %5$d."
+msgstr ""
+
+#: src/Paths/Calendar.php:2225
+msgid "Apostolic Constitution Missale Romanum"
+msgstr ""
+
+#: src/Paths/Calendar.php:2251
+#, php-format
+msgid ""
+"The %1$s '%2$s', added in the %3$s of the Roman Missal since the year %4$d "
+"(%5$s) and usually celebrated on %6$s, is suppressed by the %7$s '%8$s' in "
+"the year %9$d."
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity
+#.  2. Name of the festivity
+#.  3. Day of the festivity
+#.  4. Year from which the festivity has been added
+#.  5. Source of the information
+#.  6. Grade or rank of the superseding festivity
+#.  7. Name of the superseding festivity
+#.  8. Requested calendar year
+#.
+#: src/Paths/Calendar.php:2312
+#, php-format
+msgid ""
+"The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
+"superseded by a %6$s '%7$s' in the year %8$d."
+msgstr ""
+
+#. translators:
+#.  1. Name of the first coinciding Memorial
+#.  2. Name of the second coinciding Memorial
+#.  3. Requested calendar year
+#.  4. Source of the information
+#.
+#: src/Paths/Calendar.php:2361
+#, php-format
+msgid ""
+"The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
+"They are both reduced in rank to optional memorials (%4$s)."
+msgstr ""
+
+#. translators: e.g. 'Monday before Palm Sunday'
+#: src/Paths/Calendar.php:2403
+msgid "before"
+msgstr ""
+
+#. translators: e.g. 'Monday after Pentecost'
+#: src/Paths/Calendar.php:2408
+msgid "after"
+msgstr ""
+
+#. translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to
+#: src/Paths/Calendar.php:2413 src/Paths/Calendar.php:4188
+#, php-format
+msgid ""
+"Cannot create mobile festivity '%1$s': can only be relative to festivity "
+"with key '%2$s' using keywords %3$s"
+msgstr ""
+
+#. translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to
+#: src/Paths/Calendar.php:2430 src/Paths/Calendar.php:4170
+#, php-format
+msgid ""
+"Cannot create mobile festivity '%1$s' relative to festivity with key '%2$s'"
+msgstr ""
+
+#. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created 2. list of properties
+#: src/Paths/Calendar.php:2438 src/Paths/Calendar.php:4159
+#, php-format
+msgid ""
+"Cannot create mobile festivity '%1$s': when the 'strtotime' property is an "
+"object, it must have properties %2$s"
+msgstr ""
+
+#. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created
+#: src/Paths/Calendar.php:2458 src/Paths/Calendar.php:4292
+#, php-format
+msgid ""
+"Cannot create mobile festivity '%1$s': 'strtotime' property must be either "
+"an object or a string! Currently it has type '%2$s'"
+msgstr ""
+
+#. translators: Do not translate 'strtotime'! 1. Name of the mobile festivity being created
+#: src/Paths/Calendar.php:2466
+#, php-format
+msgid "Cannot create mobile festivity '%1$s' without a 'strtotime' property!"
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity
+#.  2. Name of the festivity
+#.  3. New name of the festivity
+#.  4. Year from which the grade has been changed
+#.  5. Requested calendar year
+#.  6. Source of the information
+#.
+#: src/Paths/Calendar.php:2566
+#, php-format
+msgid ""
+"The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
+"applicable to the year %5$d (%6$s)."
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity
+#.  2. Name of the festivity
+#.  3. New grade of the festivity
+#.  4. Year from which the grade has been changed
+#.  5. Requested calendar year
+#.  6. Source of the information
+#.
+#: src/Paths/Calendar.php:2588
+#, php-format
+msgid ""
+"The %1$s '%2$s' has been raised to the rank of %3$s since the year %4$d, "
+"applicable to the year %5$d (%6$s)."
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity
+#.  2. Name of the festivity
+#.  3. New grade of the festivity
+#.  4. Year from which the grade has been changed
+#.  5. Requested calendar year
+#.  6. Source of the information
+#.
+#: src/Paths/Calendar.php:2598
+#, php-format
+msgid ""
+"The %1$s '%2$s' has been lowered to the rank of %3$s since the year %4$d, "
+"applicable to the year %5$d (%6$s)."
+msgstr ""
+
+#. translators:
+#.  1. Name of the festivity
+#.  2. Year in which was declared Doctor
+#.  3. Requested calendar year
+#.  4. Source of the information
+#.
+#: src/Paths/Calendar.php:2647
+#, php-format
+msgid ""
+"'%1$s' has been declared a Doctor of the Church since the year %2$d, "
+"applicable to the year %3$d (%4$s)."
+msgstr ""
+
+#: src/Paths/Calendar.php:2655
+msgid "and Doctor of the Church"
+msgstr ""
+
+#. translators:
+#.  1. Grade or rank of the festivity being created
+#.  2. Name of the festivity being created
+#.  3. Indication of the mobile date for the festivity being created
+#.  4. Year from which the festivity has been added
+#.  5. Source of the information
+#.  6. Grade or rank of superseding festivity
+#.  7. Name of superseding festivity
+#.  8. Requested calendar year
+#.
+#: src/Paths/Calendar.php:2840
+#, php-format
+msgid ""
+"The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
+"superseded by the %6$s '%7$s' in the year %8$d."
+msgstr ""
+
+#. translators:
+#.  1. Requested calendar year
+#.  2. Grade or rank of suppressed festivity
+#.  3. Name of suppressed festivity
+#.  4. Grade or rank of the festivity being created
+#.  5. Name of the festivity being created
+#.  6. Indication of the mobile date for the festivity being created
+#.  7. Year from which the festivity has been added
+#.  8. Source of the information
+#.
+#: src/Paths/Calendar.php:2867
+#, php-format
+msgid ""
+"In the year %1$d, the %2$s '%3$s' has been suppressed by the %4$s '%5$s', "
+"added on %6$s since the year %7$d (%8$s)."
+msgstr ""
+
+#. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
+#: src/Paths/Calendar.php:2948
+#, php-format
+msgid ""
+"The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
+"since the year 2002 (%2$s), applicable to the year %3$d."
+msgstr ""
+
+#. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
+#: src/Paths/Calendar.php:2963
+#, php-format
+msgid ""
+"The optional memorial '%1$s', which would have been superseded this year by "
+"a Sunday or Solemnity were it on Dec. 12, has however been transferred to "
+"Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d."
+msgstr ""
+
+#: src/Paths/Calendar.php:2980
+#, php-format
+msgid ""
+"The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
+"since the year 2002 (%2$s), applicable to the year %3$d. However, it is "
+"superseded by a Sunday, a Solemnity, or a Feast '%4$s' in the year %3$d."
+msgstr ""
+
+#. translators: 1: Festivity name, 2: Source of the information
+#: src/Paths/Calendar.php:3021
+#, php-format
+msgid ""
+"The Feast '%1$s' would have been suppressed this year ( 2009 ) since it "
+"falls on a Sunday, however being the Year of the Apostle Paul, as per the "
+"%2$s it has been reinstated so that local churches can optionally celebrate "
+"the memorial."
+msgstr ""
+
+#: src/Paths/Calendar.php:3056
+#, php-format
+msgid "of the %s Week of Easter"
+msgstr ""
+
+#: src/Paths/Calendar.php:3101 src/Paths/Calendar.php:3142
+#, php-format
+msgid "of the %s Week of Ordinary Time"
+msgstr ""
+
+#: src/Paths/Calendar.php:3168
+msgid "Saturday Memorial of the Blessed Virgin Mary"
+msgstr ""
+
+#: src/Paths/Calendar.php:3191
+#, php-format
+msgid "Error retrieving and decoding Wider Region data from file %s."
+msgstr ""
+
+#: src/Paths/Calendar.php:3236
+#, php-format
+msgid ""
+"Could not find a %1$s property in the %2$s for the National Calendar %3$s."
+msgstr ""
+
+#: src/Paths/Calendar.php:3244
+#, php-format
+msgid "Error retrieving and decoding National Calendar data from file %s."
+msgstr ""
+
+#. translators:
+#.  1. Grade of the festivity
+#.  2. Name of the festivity
+#.  3. Date on which the festivity is usually celebrated
+#.  4. Grade of the superseding festivity
+#.  5. Name of the superseding festivity
+#.  6. Requested calendar year
+#.  7. National or wider region calendar
+#.
+#: src/Paths/Calendar.php:3294
+#, php-format
+msgid ""
+"The %1$s '%2$s', usually celebrated on %3$s, was suppressed by the %4$s "
+"'%5$s' in the year %6$d, however being elevated to a Patronal festivity for "
+"the Calendar %7$s, it has been reinstated."
+msgstr ""
+
+#. translators:
+#.  1. Grade of the festivity
+#.  2. Name of the festivity
+#.  3. Date on which the festivity is usually celebrated
+#.  4. Grade of the superseding festivity
+#.  5. Name of the superseding festivity
+#.  6. Requested calendar year
+#.  7. National or wider region calendar
+#.
+#: src/Paths/Calendar.php:3314
+#, php-format
+msgid ""
+"The %1$s '%2$s', usually celebrated on %3$s, was suppressed by the %4$s "
+"'%5$s' in the year %6$d, and though it would be elevated to a Patronal "
+"festivity for the Calendar %7$s, it has not been reinstated."
+msgstr ""
+
+#. translators:
+#.  1. Name of the first coinciding Memorial
+#.  2. Name of the second coinciding Memorial
+#.  3. Requested calendar year
+#.  4. Source of the information
+#.
+#: src/Paths/Calendar.php:3412
+#, php-format
+msgid ""
+"The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
+"They are both reduced in rank to optional memorials."
+msgstr ""
+
+#. translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year
+#: src/Paths/Calendar.php:3434
+#, php-format
+msgid ""
+"The Feast '%1$s', usually celebrated on %2$s, coincides with another Feast "
+"'%3$s' in the year %4$d! Does something need to be done about this?"
+msgstr ""
+
+#. translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year
+#: src/Paths/Calendar.php:3448
+#, php-format
+msgid ""
+"The Solemnity '%1$s', usually celebrated on %2$s, coincides with the Sunday "
+"or Solemnity '%3$s' in the year %4$d! Does something need to be done about "
+"this?"
+msgstr ""
+
+#: src/Paths/Calendar.php:3492
+msgid ""
+"We should be creating a new festivity, however we do not seem to have the "
+"correct date information in order to proceed"
+msgstr ""
+
+#. translators:
+#.  1. Liturgical grade
+#.  2. Original name of the liturgical event
+#.  3. New name of the liturgical event
+#.  4. ID of the national calendar
+#.  5. Year from which the name has been changed
+#.  6. Requested calendar year
+#.
+#: src/Paths/Calendar.php:3605
+#, php-format
+msgid ""
+"The name of the %1$s '%2$s' has been changed to '%3$s' in the national "
+"calendar '%4$s' since the year %5$d, applicable to the year %6$d."
+msgstr ""
+
+#. translators:
+#.  1. Event key of the liturgical event
+#.  2. New name of the liturgical event
+#.  3. ID of the national calendar
+#.  4. Year from which the name has been changed
+#.  5. Requested calendar year
+#.
+#: src/Paths/Calendar.php:3623
+#, php-format
+msgid ""
+"The name of the celebration '%1$s' has been changed to '%2$s' in the "
+"national calendar '%3$s' since the year %4$d, but could not be applied to "
+"the year %5$d because the celebration was not found."
+msgstr ""
+
+#. translators:
+#.  1. Original liturgical grade
+#.  2. Name of the liturgical event
+#.  3. New liturgical grade
+#.  4. ID of the national calendar
+#.  5. Year from which the grade has been changed
+#.  6. Requested calendar year
+#.
+#: src/Paths/Calendar.php:3644
+#, php-format
+msgid ""
+"The grade of the %1$s '%2$s' has been changed to '%3$s' in the national "
+"calendar '%4$s' since the year %5$d, applicable to the year %6$d."
+msgstr ""
+
+#. translators:
+#.  1. Event key of the liturgical event
+#.  2. New name of the liturgical event
+#.  3. ID of the national calendar
+#.  4. Year from which the name has been changed
+#.  5. Requested calendar year
+#.
+#: src/Paths/Calendar.php:3662
+#, php-format
+msgid ""
+"The grade of the celebration '%1$s' has been changed to '%2$s' in the "
+"national calendar '%3$s' since the year %4$d, but could not be applied to "
+"the year %5$d because the celebration was not found."
+msgstr ""
+
+#. translators:
+#.  1. Liturgical grade
+#.  2. Name of the liturgical event
+#.  3. Original date of the liturgical event
+#.  4. New date of the liturgical event
+#.  5. Year from which the date has been changed
+#.  6. ID of the national calendar
+#.  7. Requested calendar year
+#.
+#: src/Paths/Calendar.php:3694
+#, php-format
+msgid ""
+"The %1$s '%2$s' has been moved from %3$s to %4$s since the year %5$d in the "
+"national calendar '%6$s', applicable to the year %7$d."
+msgstr ""
+
+#. translators:
+#.  1. Name of the liturgical event
+#.  2. New date of the liturgical event
+#.  3. Year from which the date has been changed
+#.  4. ID of the national calendar
+#.  5. Requested calendar year
+#.
+#: src/Paths/Calendar.php:3713
+#, php-format
+msgid ""
+"The liturgical event '%1$s' has been moved to %2$s since the year %3$d in "
+"the national calendar '%4$s', but cannot be applied in the year %5$d simply "
+"because we could not find the data for it from the Roman Missal events."
+msgstr ""
+
+#. translators:
+#.  1. ID of the liturgical event
+#.  2. New date of the liturgical event
+#.  3. Year from which the date has been changed
+#.  4. ID of the national calendar
+#.  5. Requested calendar year
+#.
+#: src/Paths/Calendar.php:3732
+#, php-format
+msgid ""
+"The liturgical event '%1$s' has been moved to %2$s since the year %3$d in "
+"the national calendar '%4$s', but this could not take place in the year %5$d "
+"since the new date %2$s seems to be a Sunday or a festivity of greater rank."
+msgstr ""
+
+#. translators: Name of the Roman Missal
+#: src/Paths/Calendar.php:3767
+#, php-format
+msgid "Found a sanctorale data file for %s"
+msgstr ""
+
+#. translators:
+#.  1. Festivity grade
+#.  2. Festivity name
+#.  3. Festivity date
+#.  4. Edition of the Roman Missal
+#.  5. Superseding festivity grade
+#.  6. Superseding festivity name
+#.  7. Requested calendar year
+#.
+#: src/Paths/Calendar.php:3816
+#, php-format
+msgid ""
+"The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
+"superseded by the %5$s '%6$s' in the year %7$d"
+msgstr ""
+
+#. translators: Name of the Roman Missal
+#: src/Paths/Calendar.php:3831
+#, php-format
+msgid "Could not find a sanctorale data file for %s"
+msgstr ""
+
+#. translators: 1. Festivity grade, 2. Festivity name, 3. New festivity name, 4: Requested calendar year, 5. Old date, 6. New date
+#: src/Paths/Calendar.php:3927
+#, php-format
+msgid ""
+"The %1$s '%2$s' is transferred from %5$s to %6$s as per the %7$s, to make "
+"room for '%3$s': applicable to the year %4$d."
+msgstr ""
+
+#. translators: 1. Festivity grade, 2. Festivity name, 3. Old date, 4. New date, 5. Source of the information, 6. New festivity name, 7. Superseding festivity grade, 8. Superseding festivity name, 9: Requested calendar year
+#: src/Paths/Calendar.php:3950
+#, php-format
+msgid ""
+"The %1$s '%2$s' would have been transferred from %3$s to %4$s as per the "
+"%5$s, to make room for '%6$s', however it is suppressed by the %7$s '%8$s' "
+"in the year %9$d."
+msgstr ""
+
+#. translators: 1: Festivity name, 2: Name of the diocese, 3: Festivity date, 4: Coinciding festivity name, 5: Requested calendar year
+#: src/Paths/Calendar.php:4352
+#, php-format
+msgid ""
+"The Solemnity '%1$s', proper to the calendar of the %2$s and usually "
+"celebrated on %3$s, coincides with the Sunday or Solemnity '%4$s' in the "
+"year %5$d! Does something need to be done about this?"
+msgstr ""
+
+#. translators: 1: Festivity grade, 2: Festivity name, 3: Name of the diocese, 4: Festivity date, 5: Coinciding festivity name, 6: Requested calendar year
+#: src/Paths/Calendar.php:4386
+#, php-format
+msgid ""
+"The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
+"on %4$s, is suppressed by the Sunday or Solemnity %5$s in the year %6$d"
+msgstr ""
+
+#: src/Paths/Calendar.php:4653
+#, php-format
+msgid "Error receiving or parsing info from github about latest release: %s."
+msgstr ""
+
+#. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
+#: src/FestivityCollection.php:60
+msgid "YEAR"
+msgstr ""
+
+#: src/FestivityCollection.php:61
+msgid "Vigil Mass"
+msgstr ""
+
+#: src/FestivityCollection.php:914
+#, php-format
+msgid ""
+"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
+"year %5$d. As per %6$s, the first has precedence, therefore the Vigil Mass "
+"is confirmed as are I Vespers."
+msgstr ""
+
+#: src/FestivityCollection.php:928
+#, php-format
+msgid ""
+"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
+"year %5$d. Since the first Solemnity has precedence, it will have Vespers I "
+"and a vigil Mass, whereas the last Solemnity will not have either Vespers II "
+"or an evening Mass."
+msgstr ""
+
+#: src/FestivityCollection.php:938
+#, php-format
+msgid ""
+"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
+"year %5$d. This last Solemnity takes precedence, therefore it will maintain "
+"Vespers II and an evening Mass, while the first Solemnity will not have a "
+"Vigil Mass or Vespers I."
+msgstr ""
+
+#: src/FestivityCollection.php:1003
+#, php-format
+msgid ""
+"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
+"year %5$d. We should ask the Congregation for Divine Worship what to do "
+"about this!"
+msgstr ""
+
+#. translators: context = liturgical color
+#: src/Enum/LitColor.php:34
+msgid "green"
+msgstr ""
+
+#. translators: context = liturgical color
+#: src/Enum/LitColor.php:39
+msgid "purple"
+msgstr ""
+
+#. translators: context = liturgical color
+#: src/Enum/LitColor.php:44
+msgid "white"
+msgstr ""
+
+#. translators: context = liturgical color
+#: src/Enum/LitColor.php:49
+msgid "red"
+msgstr ""
+
+#. translators: context = liturgical color
+#: src/Enum/LitColor.php:54
+msgid "pink"
+msgstr ""
+
+#: src/Enum/LitCommon.php:71
+msgid "Proper"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: src/Enum/LitCommon.php:73
+msgid "Dedication of a Church"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: src/Enum/LitCommon.php:75
+msgid "Blessed Virgin Mary"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: src/Enum/LitCommon.php:77
+msgid "Martyrs"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: src/Enum/LitCommon.php:79
+msgid "Pastors"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: src/Enum/LitCommon.php:81
+msgid "Doctors"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: src/Enum/LitCommon.php:83
+msgid "Virgins"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: src/Enum/LitCommon.php:85
+msgid "Holy Men and Women"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:88
+msgid "For One Martyr"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:90
+msgid "For Several Martyrs"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:92
+msgid "For Missionary Martyrs"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:94
+msgid "For One Missionary Martyr"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:96
+msgid "For Several Missionary Martyrs"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:98
+msgid "For a Virgin Martyr"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:100
+msgid "For a Holy Woman Martyr"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:102
+msgid "For a Pope"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:104
+msgid "For a Bishop"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:106
+msgid "For One Pastor"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:108
+msgid "For Several Pastors"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:110
+msgid "For Founders of a Church"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:112
+msgid "For One Founder"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:114
+msgid "For Several Founders"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:116
+msgid "For Missionaries"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:118
+msgid "For One Virgin"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:120
+msgid "For Several Virgins"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:122
+msgid "For Several Saints"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:124
+msgid "For One Saint"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:126
+msgid "For an Abbot"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:128
+msgid "For a Monk"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:130
+msgid "For a Nun"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:132
+msgid "For Religious"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:134
+msgid "For Those Who Practiced Works of Mercy"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:136
+msgid "For Educators"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:138
+msgid "For Holy Women"
+msgstr ""
+
+#. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: src/Enum/LitCommon.php:202 src/Enum/LitCommon.php:214
+msgctxt "(SING_FEMM)"
+msgid "of the"
+msgstr ""
+
+#. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: src/Enum/LitCommon.php:205
+msgctxt "(PLUR_FEMM)"
+msgid "of"
+msgstr ""
+
+#. translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: src/Enum/LitCommon.php:211
+msgctxt "(PLUR_MASC)"
+msgid "of"
+msgstr ""
+
+#. translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: src/Enum/LitCommon.php:217
+msgctxt "(SING_MASC)"
+msgid "of the"
+msgstr ""
+
+#: src/Enum/LitCommon.php:407
+msgid "From the Common"
+msgstr ""
+
+#. translators: liturgical rank. Keep lowercase
+#: src/Enum/LitGrade.php:150 src/Enum/LitGrade.php:205
+msgid "weekday"
+msgstr ""
+
+#. translators: liturgical rank 'WEEKDAY' in abbreviated form
+#: src/Enum/LitGrade.php:152
+msgid "w"
+msgstr ""
+
+#. translators: liturgical rank. Keep lowercase
+#: src/Enum/LitGrade.php:157
+msgid "commemoration"
+msgstr ""
+
+#. translators: liturgical rank 'COMMEMORATION' in abbreviated form
+#: src/Enum/LitGrade.php:159
+msgid "m*"
+msgstr ""
+
+#. translators: liturgical rank. Keep lowercsase
+#: src/Enum/LitGrade.php:164
+msgid "optional memorial"
+msgstr ""
+
+#. translators: liturgical rank 'OPTIONAL MEMORIAL' in abbreviated form
+#: src/Enum/LitGrade.php:166
+msgid "m"
+msgstr ""
+
+#. translators: liturgical rank. Keep Capitalized
+#: src/Enum/LitGrade.php:171
+msgid "Memorial"
+msgstr ""
+
+#. translators: liturgical rank 'MEMORIAL' in abbreviated form
+#: src/Enum/LitGrade.php:173
+msgid "M"
+msgstr ""
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: src/Enum/LitGrade.php:178
+msgid "FEAST"
+msgstr ""
+
+#. translators: liturgical rank 'FEAST' in abbreviated form
+#: src/Enum/LitGrade.php:180
+msgid "F"
+msgstr ""
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: src/Enum/LitGrade.php:185
+msgid "FEAST OF THE LORD"
+msgstr ""
+
+#. translators: liturgical rank 'FEAST OF THE LORD' in abbreviated form
+#: src/Enum/LitGrade.php:187
+msgid "F✝"
+msgstr ""
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: src/Enum/LitGrade.php:192
+msgid "SOLEMNITY"
+msgstr ""
+
+#. translators: liturgical rank 'SOLEMNITY' in abbreviated form
+#: src/Enum/LitGrade.php:194
+msgid "S"
+msgstr ""
+
+#. translators: liturgical rank. Keep lowercase
+#: src/Enum/LitGrade.php:199
+msgid "celebration with precedence over solemnities"
+msgstr ""
+
+#. translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form
+#: src/Enum/LitGrade.php:201
+msgid "S✝"
+msgstr ""
+
+#. translators: context = liturgical season
+#: src/Enum/LitSeason.php:25
+msgid "Advent"
+msgstr ""
+
+#. translators: context = liturgical season
+#: src/Enum/LitSeason.php:28
+msgid "Christmas"
+msgstr ""
+
+#. translators: context = liturgical season
+#: src/Enum/LitSeason.php:31
+msgid "Lent"
+msgstr ""
+
+#. translators: context = liturgical season
+#: src/Enum/LitSeason.php:34
+msgid "Easter Triduum"
+msgstr ""
+
+#. translators: context = liturgical season
+#: src/Enum/LitSeason.php:37
+msgid "Easter"
+msgstr ""
+
+#. translators: context = liturgical season
+#: src/Enum/LitSeason.php:40
+msgid "Ordinary Time"
+msgstr ""
