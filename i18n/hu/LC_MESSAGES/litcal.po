@@ -5,15 +5,18 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-03-22 13:48+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2025-04-21 09:40+0000\n"
+"Last-Translator: Gábor <pleineux@gmail.com>\n"
+"Language-Team: Hungarian <https://translate.johnromanodorazio.com/projects/"
+"liturgical-calendar/api-strings/hu/>\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.11\n"
 
 #: src/Paths/Calendar.php:623
 #, php-format
@@ -850,27 +853,27 @@ msgstr ""
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:34
 msgid "green"
-msgstr ""
+msgstr "zöld"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:39
 msgid "purple"
-msgstr ""
+msgstr "viola"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:44
 msgid "white"
-msgstr ""
+msgstr "fehér"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:49
 msgid "red"
-msgstr ""
+msgstr "piros"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:54
 msgid "pink"
-msgstr ""
+msgstr "rózsaszín"
 
 #: src/Enum/LitCommon.php:71
 msgid "Proper"
