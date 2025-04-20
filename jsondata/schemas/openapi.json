@@ -8,7 +8,7 @@
   ],
   "info": {
     "description": "An API which allows to retrieve data about the **Roman Calendar** for any given year, between 1970 and 9999. The data strives for historical accuracy (memorials and feast days are only generated from the year in which they were effectively introduced). The data is based on original sources (Roman Missals, Decrees of the Congregation for Divine Worship, Mysterii Paschalis, etc.), not on data copied or retrieved from online sources which may not be accurate. The API offers multiple locales and multiple calendars, from the **General Roman Calendar** to national or diocesan calendars.",
-    "version": "4.0",
+    "version": "4.5",
     "title": "Liturgical Calendar",
     "contact": {
       "email": "priest@johnromanodorazio.com",
@@ -2586,7 +2586,7 @@
         }
       }
     },
-    "/data/national": {
+    "/data/nation": {
       "put": {
         "tags": [
           "Calendar Source Data"
@@ -2599,22 +2599,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "key": {
-                    "type": "string",
-                    "description": "The id of the national calendar to be created: the uppercase ISO 3166-2 code of the nation.",
-                    "examples": [
-                      "IT",
-                      "US",
-                      "NL"
-                    ]
-                  },
-                  "payload": {
-                    "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
-                  }
-                }
+                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/NationalCalendar.json"
               }
             }
           }
@@ -2701,24 +2686,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "key": {
-                    "type": "string",
-                    "description": "The id of the wider region for whic data is being created: the English name of the wider region.",
-                    "examples": [
-                      "Americas",
-                      "Asia",
-                      "Europe",
-                      "Africa",
-                      "Oceania"
-                    ]
-                  },
-                  "payload": {
-                    "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
-                  }
-                }
+                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/WiderRegionCalendar.json"
               }
             }
           }
@@ -2792,7 +2760,7 @@
         }
       }
     },
-    "/data/diocesan": {
+    "/data/diocese": {
       "put": {
         "tags": [
           "Calendar Source Data"
@@ -2805,22 +2773,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "key": {
-                    "type": "string",
-                    "description": "The id of the diocese for which data is being created: diocese_id as defined in WorldDioceseByNation.json.",
-                    "examples": [
-                      "boston_us",
-                      "romamo_it",
-                      "roermo_nl"
-                    ]
-                  },
-                  "payload": {
-                    "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
-                  }
-                }
+                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/DiocesanCalendar.json"
               }
             }
           }
@@ -2894,7 +2847,7 @@
         }
       }
     },
-    "/data/national/{key}": {
+    "/data/nation/{key}": {
       "get": {
         "tags": [
           "Calendar Source Data"
@@ -2918,7 +2871,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/NationalCalendar.json"
                 }
               }
             }
@@ -2986,7 +2939,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/NationalCalendar.json"
                 }
               }
             }
@@ -3054,7 +3007,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/NationalCalendar.json"
               }
             }
           }
@@ -3211,7 +3164,7 @@
         }
       }
     },
-    "/data/diocesan/{key}": {
+    "/data/diocese/{key}": {
       "get": {
         "tags": [
           "Calendar Source Data"
@@ -3235,7 +3188,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/DiocesanCalendar.json"
                 }
               }
             }
@@ -3303,7 +3256,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/DiocesanCalendar.json"
                 }
               }
             }
@@ -3370,7 +3323,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/DiocesanCalendar.json"
               }
             }
           }
@@ -3550,7 +3503,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/WiderRegionCalendar.json"
                 }
               }
             }
@@ -3618,7 +3571,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/WiderRegionCalendar.json"
                 }
               }
             }
@@ -3685,7 +3638,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NationalDiocesanWiderRegionCalendar"
+                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/WiderRegionCalendar.json"
               }
             }
           }
@@ -5910,19 +5863,6 @@
           }
         },
         "required": [ "year", "expected_value", "assert", "assertion" ]
-      },
-      "NationalDiocesanWiderRegionCalendar": {
-        "oneOf": [
-          {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/NationalCalendar.json"
-          },
-          {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/DiocesanCalendar.json"
-          },
-          {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/WiderRegionCalendar.json"
-          }
-        ]
       }
     },
     "examples": {

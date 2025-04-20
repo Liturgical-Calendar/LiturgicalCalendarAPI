@@ -63,17 +63,17 @@ class RegionalData
                     $this->getI18nData();
                 } else {
                     // Else retrieve the calendar data
-                    $this->getRegionalCalendarData();
+                    $this->getCalendar();
                 }
                 break;
             case RequestMethod::PUT:
-                $this->createRegionalCalendar();
+                $this->createCalendar();
                 break;
             case RequestMethod::PATCH:
-                $this->updateRegionalCalendar();
+                $this->updateCalendar();
                 break;
             case RequestMethod::DELETE:
-                $this->deleteRegionalCalendar();
+                $this->deleteCalendar();
                 break;
             default:
                 self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, "The method " . $_SERVER['REQUEST_METHOD'] . " cannot be handled by this endpoint");
@@ -99,14 +99,14 @@ class RegionalData
         $i18nDataFile = null;
         switch ($this->params->category) {
             case "DIOCESANCALENDAR":
-                $dioceseEntry = array_values(array_filter($this->CalendarsMetadata->diocesan_calendars, function ($el) {
+                $dioceseEntry = array_find($this->CalendarsMetadata->diocesan_calendars, function ($el) {
                     return $el->calendar_id === $this->params->key;
-                }));
-                if (empty($dioceseEntry)) {
+                });
+                if (null === $dioceseEntry) {
                     self::produceErrorResponse(StatusCode::NOT_FOUND, "The requested resource {$this->params->key} was not found in the index");
                 }
                 $i18nDataFile = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FILE, [
-                    '{nation}' => $dioceseEntry[0]->nation,
+                    '{nation}' => $dioceseEntry->nation,
                     '{diocese}' => $this->params->key,
                     '{locale}' => $this->params->i18nRequest
                 ]);
@@ -128,6 +128,8 @@ class RegionalData
                     StatusCode::BAD_REQUEST,
                     "RegionalData::getI18nData: invalid value <{$this->params->category}> for param `category`: valid values are: "
                         . implode(', ', array_values(RegionalDataParams::EXPECTED_CATEGORIES))
+                        . " which are set based on the corresponding path parameters "
+                        . implode(', ', array_keys(RegionalDataParams::EXPECTED_CATEGORIES))
                 );
         }
         if (null !== $i18nDataFile && file_exists($i18nDataFile)) {
@@ -157,22 +159,22 @@ class RegionalData
      * If the resource does not exist, a 404 error will be returned.
      * If the `category` or `locale` parameters are invalid, a 400 error will be returned.
      */
-    private function getRegionalCalendarData(): void
+    private function getCalendar(): void
     {
         $calendarDataFile = null;
         switch ($this->params->category) {
             case "DIOCESANCALENDAR":
-                $dioceseEntry = array_values(array_filter($this->CalendarsMetadata->diocesan_calendars, function ($el) {
+                $dioceseEntry = array_find($this->CalendarsMetadata->diocesan_calendars, function ($el) {
                     return $el->calendar_id === $this->params->key;
-                }));
-                if (empty($dioceseEntry)) {
+                });
+                if (null === $dioceseEntry) {
                     self::produceErrorResponse(StatusCode::NOT_FOUND, "The requested resource {$this->params->key} was not found in the index");
                 }
 
                 $calendarDataFile = strtr(JsonData::DIOCESAN_CALENDARS_FILE, [
-                    '{nation}' => $dioceseEntry[0]->nation,
+                    '{nation}' => $dioceseEntry->nation,
                     '{diocese}' => $this->params->key,
-                    '{diocese_name}' => $dioceseEntry[0]->diocese
+                    '{diocese_name}' => $dioceseEntry->diocese
                 ]);
                 break;
             case "WIDERREGIONCALENDAR":
@@ -212,7 +214,7 @@ class RegionalData
             switch ($this->params->category) {
                 case 'DIOCESANCALENDAR':
                     $CalendarDataI18nFile = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FILE, [
-                        '{nation}' => $dioceseEntry[0]->nation,
+                        '{nation}' => $dioceseEntry->nation,
                         '{diocese}' => $this->params->key,
                         '{locale}' => $this->params->locale
                     ]);
@@ -238,12 +240,160 @@ class RegionalData
                     }
                 }
             } else {
-                self::produceErrorResponse(StatusCode::NOT_FOUND, "RegionalData::getRegionalCalendarData: file $CalendarDataI18nFile does not exist");
+                self::produceErrorResponse(StatusCode::NOT_FOUND, "RegionalData::getCalendar: file $CalendarDataI18nFile does not exist");
             }
             self::produceResponse(json_encode($CalendarData));
         } else {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "RegionalData::getRegionalCalendarData: file $calendarDataFile does not exist");
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "RegionalData::getCalendar: file $calendarDataFile does not exist");
         }
+    }
+
+    /**
+     * Handle PUT requests to create a diocesan calendar data resource.
+     *
+     * The diocesan calendar data resource is created in the `jsondata/sourcedata/calendars/dioceses/` directory.
+     *
+     * This method ensures the necessary directories for storing diocesan calendar data are created.
+     * It processes the internationalization (i18n) data provided in the payload, saving it to the appropriate
+     * locale-specific files within the diocesan calendar directory structure.
+     *
+     * After processing and saving the i18n data, it removes it from the payload and writes the diocesan
+     * calendar data to a JSON file named after the diocese, within a folder named after the diocese identifier,
+     * within a folder named after the nation identifier.
+     *
+     * If the resource to create is not writable or the write was not successful,
+     * a 503 Service Unavailable response is sent.
+     *
+     * On success, a 201 Created response is sent containing a success message.
+     */
+    private function createDiocesanCalendar(): void
+    {
+        $response = new \stdClass();
+        // Ensure we have all the necessary folders in place
+        // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
+        // so we don't have to worry about manually checking and creating each one individually
+        $diocesanCalendarI18nFolder = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FOLDER, [
+            '{nation}' => $this->params->payload->metadata->nation,
+            '{diocese}' => $this->params->payload->metadata->diocese_id
+        ]);
+        if (!file_exists($diocesanCalendarI18nFolder)) {
+            mkdir($diocesanCalendarI18nFolder, 0755, true);
+        }
+
+        foreach ($this->params->payload->i18n as $locale => $litCalEventsI18n) {
+            $diocesanCalendarI18nFile = strtr(
+                JsonData::DIOCESAN_CALENDARS_I18N_FILE,
+                [
+                    '{nation}' => $this->params->payload->metadata->nation,
+                    '{diocese}' => $this->params->payload->metadata->diocese_id,
+                    '{locale}' => $locale
+                ]
+            );
+            if (
+                false === file_put_contents(
+                    $diocesanCalendarI18nFile,
+                    json_encode($litCalEventsI18n, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL
+                )
+            ) {
+                self::produceErrorResponse(
+                    StatusCode::SERVICE_UNAVAILABLE,
+                    "RegionalData::createDiocesanCalendar: failed to write to file $diocesanCalendarI18nFile"
+                );
+            }
+        }
+
+        // We no longer need the i18n data, we can now remove it
+        unset($this->params->payload->i18n);
+
+        $diocesanCalendarFile = strtr(
+            JsonData::DIOCESAN_CALENDARS_FILE,
+            [
+                '{nation}' => $this->params->payload->metadata->nation,
+                '{diocese}' => $this->params->payload->metadata->diocese_id,
+                '{diocese_name}' => $this->params->payload->metadata->diocese_name
+            ]
+        );
+
+        $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if (
+            false === file_put_contents(
+                $diocesanCalendarFile,
+                $calendarData . PHP_EOL
+            )
+        ) {
+            self::produceErrorResponse(
+                StatusCode::SERVICE_UNAVAILABLE,
+                "RegionalData::createDiocesanCalendar: failed to write to file $diocesanCalendarFile"
+            );
+        }
+
+        $response->success = "Calendar data created or updated for Diocese \"{$this->params->payload->metadata->diocese_name}\" (Nation: \"{$this->params->payload->metadata->nation}\")";
+        $response->data = $this->params->payload;
+        self::produceResponse(json_encode($response));
+    }
+
+    /**
+     * Handle PUT requests to create or update a national calendar data resource.
+     *
+     * This method ensures the necessary directories for storing national calendar data are created.
+     * It processes the internationalization (i18n) data provided in the payload, saving it to the appropriate
+     * locale-specific files within the national calendar directory structure.
+     *
+     * After processing and saving the i18n data, it removes it from the payload and writes the national
+     * calendar data to a JSON file named after the nation identifier.
+     *
+     * On successful creation f the national calendar data,
+     * a 201 Created response is sent containing a success message.
+     */
+    private function createNationalCalendar(): void
+    {
+        $response = new \stdClass();
+        // Ensure we have all the necessary folders in place
+        // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
+        // so we don't have to worry about manually checking and creating each one individually
+        $nationalCalendarI18nFolder = strtr(JsonData::NATIONAL_CALENDARS_I18N_FOLDER, [
+            '{nation}' => $this->params->payload->metadata->nation
+        ]);
+        if (!file_exists($nationalCalendarI18nFolder)) {
+            mkdir($nationalCalendarI18nFolder, 0755, true);
+        }
+
+        foreach ($this->params->payload->i18n as $locale => $litCalEventsI18n) {
+            $nationalCalendarI18nFile = strtr(
+                JsonData::NATIONAL_CALENDARS_I18N_FILE,
+                [
+                    '{nation}' => $this->params->payload->metadata->nation,
+                    '{locale}' => $locale
+                ]
+            );
+            file_put_contents($nationalCalendarI18nFile, json_encode($litCalEventsI18n, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL);
+        }
+
+        // We no longer need the i18n data, we can now remove it
+        unset($this->params->payload->i18n);
+
+        $nationalCalendarFile = strtr(
+            JsonData::NATIONAL_CALENDARS_FILE,
+            [
+                '{nation}' => $this->params->payload->metadata->nation
+            ]
+        );
+
+        $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        file_put_contents(
+            $nationalCalendarFile,
+            $calendarData . PHP_EOL
+        );
+        // get the nation name in English from the two letter iso code
+        $nationEnglish = \Locale::getDisplayRegion('-' . $this->params->payload->metadata->nation, 'en');
+        $response->success = "Calendar data created or updated for Nation \"{$nationEnglish}\" (\"{$this->params->payload->metadata->nation}\")";
+        $response->data = $this->params->payload;
+        self::produceResponse(json_encode($response));
+    }
+
+    private function createWiderRegionCalendar(): void
+    {
+        $response = new \stdClass();
     }
 
     /**
@@ -251,90 +401,116 @@ class RegionalData
      *
      * This is a private method and should only be called from {@see handleRequestMethod}.
      *
-     * The resource is created or updated in the `jsondata/sourcedata/` directory.
+     * The resource is created or updated in the `jsondata/sourcedata/calendars/` directory.
      *
-     * If the payload is valid according to the associated schema, the response will be a JSON object
-     * containing a success message.
+     * If the payload is invalid, the response will be a JSON error response with a 422 Unprocessable Content status code.
      *
-     * If the payload is invalid, the response will be a JSON error response with a 422 status code.
-     *
-     * TODO: we are currently only handling creation of diocesan calendar data, this should be expanded
-     *       to handle creation of wider region and national calendar data
+     * If the payload is valid according to the associated schema,
+     * the resource creation will continue according to the calendar type.
      */
-    private function createRegionalCalendar(): void
+    private function createCalendar(): void
     {
-        $response = new \stdClass();
         if (false === $this->params->payload instanceof \stdClass) {
             $payloadType = gettype($this->params->payload);
             self::produceErrorResponse(StatusCode::BAD_REQUEST, "`payload` param expected to be serialized object, instead it was of type `{$payloadType}` after unserialization");
         }
 
-        $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
-        if ($test === true) {
-            // Ensure we have all the necessary folders in place
-            // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
-            // so we don't have to worry about manually checking and creating each one individually
-            $diocesanCalendarI18nFolder = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FOLDER, [
-                '{nation}' => $this->params->payload->metadata->nation,
-                '{diocese}' => $this->params->payload->metadata->diocese_id
-            ]);
-            if (!file_exists($diocesanCalendarI18nFolder)) {
-                mkdir($diocesanCalendarI18nFolder, 0755, true);
-            }
-
-            foreach ($this->params->payload->i18n as $locale => $litCalEventsI18n) {
-                $diocesanCalendarI18nFile = strtr(
-                    JsonData::DIOCESAN_CALENDARS_I18N_FILE,
-                    [
-                        '{nation}' => $this->params->payload->metadata->nation,
-                        '{diocese}' => $this->params->payload->metadata->diocese_id,
-                        '{locale}' => $locale
-                    ]
-                );
-                file_put_contents($diocesanCalendarI18nFile, json_encode($litCalEventsI18n, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL);
-            }
-
-            // We no longer need the i18n data, we can now remove it
-            unset($this->params->payload->i18n);
-
-            $diocesanCalendarFile = strtr(
-                JsonData::DIOCESAN_CALENDARS_FILE,
-                [
-                    '{nation}' => $this->params->payload->metadata->nation,
-                    '{diocese}' => $this->params->payload->metadata->diocese_id,
-                    '{diocese_name}' => $this->params->payload->metadata->diocese_name
-                ]
-            );
-
-            $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            file_put_contents(
-                $diocesanCalendarFile,
-                $calendarData . PHP_EOL
-            );
-
-            $response->success = "Calendar data created or updated for Diocese \"{$this->params->payload->metadata->diocese_name}\" (Nation: \"{$this->params->payload->metadata->nation}\")";
-            $response->data = $this->params->payload;
-            self::produceResponse(json_encode($response));
-        } else {
-            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+        switch ($this->params->category) {
+            case "DIOCESANCALENDAR":
+                $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
+                if (true === $test) {
+                    $this->createDiocesanCalendar();
+                } else {
+                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+                }
+                break;
+            case "NATIONALCALENDAR":
+                $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::NATIONAL);
+                if (true === $test) {
+                    $this->createNationalCalendar();
+                } else {
+                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+                }
+                break;
+            case "WIDERREGIONCALENDAR":
+                $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::WIDERREGION);
+                if (true === $test) {
+                    $this->createWiderRegionCalendar();
+                } else {
+                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+                }
+                break;
+            default:
+                self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "Unknown calendar category \"{$this->params->category}\"");
         }
     }
 
     /**
      * Handle PATCH requests to create or update a national calendar data resource.
      *
-     * It is private as it is called from {@see updateRegionalCalendar}.
+     * It is private as it is called from {@see updateCalendar}.
      *
-     * The resource is created or updated in the `jsondata/sourcedata/nations/` directory.
+     * The resource is updated in the `jsondata/sourcedata/calendars/nations/` directory.
      *
-     * If the payload is valid according to {@see LitSchema::NATIONAL}, the response will be a JSON object
-     * containing a success message.
+     * If the resource to update is not found in the national calendars index, the response will be a JSON error response with a status code of 404 Not Found.
+     * If the resource to update is not writable or the write was not successful, the response will be a JSON error response with a status code of 503 Service Unavailable.
      *
-     * If the payload is invalid, the response will be a JSON error response with a 422 status code.
+     * If the update is successful, the response will be a JSON success response with a status code of 201 Created.
      */
-    private function handleNationalCalendarUpdate()
+    private function updateNationalCalendar()
     {
-        $response     = new \stdClass();
+        $nationEntry = array_find($this->CalendarsMetadata->national_calendars, function ($item) {
+            return $item->calendar_id === $this->params->key;
+        });
+
+        if (null === $nationEntry) {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update unknown national calendar resource {$this->params->key}.");
+        }
+
+        foreach ($this->params->payload->i18n as $locale => $i18nData) {
+            $calendarI18nFile = strtr(
+                JsonData::NATIONAL_CALENDARS_I18N_FILE,
+                [
+                    '{nation}' => $this->params->key,
+                    '{locale}' => $locale
+                ]
+            );
+
+            if (file_exists($calendarI18nFile) && false === is_writable($calendarI18nFile)) {
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update national calendar i18n resource for {$this->params->key} at {$calendarI18nFile}, check file and folder permissions.");
+            }
+
+            // Update national calendar i18n data for locale
+            $calendarI18nData = json_encode($i18nData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            if (
+                false === file_put_contents(
+                    $calendarI18nFile,
+                    $calendarI18nData . PHP_EOL
+                )
+            ) {
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update national calendar i18n resource {$this->params->key} in path {$calendarI18nFile}.");
+            }
+        }
+
+        // We also want to clean up any unneeded locale files, if a locale was removed
+        $calendarI18nFolder = strtr(
+            JsonData::NATIONAL_CALENDARS_I18N_FOLDER,
+            [
+                '{nation}' => $this->params->key
+            ]
+        );
+
+        // Get all .json files in the folder
+        $jsonFiles = glob("{$calendarI18nFolder}/*.json");
+        foreach ($jsonFiles as $jsonFile) {
+            $filename = pathinfo($jsonFile, PATHINFO_FILENAME);
+            if (false === in_array($filename, $this->params->payload->metadata->locales)) {
+                unlink($jsonFile);
+            }
+        }
+
+        unset($this->params->payload->i18n);
+
         $calendarFile = strtr(
             JsonData::NATIONAL_CALENDARS_FILE,
             [
@@ -342,161 +518,160 @@ class RegionalData
             ]
         );
 
-        $calendarI18nFile = strtr(
-            JsonData::NATIONAL_CALENDARS_I18N_FILE,
+        if (false === file_exists($calendarFile)) {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update unknown national calendar resource for {$this->params->key} at {$calendarFile}, file not found.");
+        }
+
+        if (false === is_writable($calendarFile)) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update national calendar resource for {$this->params->key} at {$calendarFile}, check file and folder permissions.");
+        }
+
+        $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if (
+            false === file_put_contents(
+                $calendarFile,
+                $calendarData . PHP_EOL
+            )
+        ) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update national calendar resource {$this->params->key} in path {$calendarFile}.");
+        }
+
+        $response = new \stdClass();
+        $response->success = "Calendar data created or updated for Nation \"{$this->params->key}\"";
+        $response->data = $this->params->payload;
+        self::produceResponse(json_encode($response));
+    }
+
+    /**
+     * Handle PATCH requests to update a wider region calendar data resource.
+     *
+     * It is private as it is called from {@see updateCalendar}.
+     *
+     * The resource is updated in the `jsondata/sourcedata/wider_regions/` directory.
+     *
+     * If the resource to update is not found in the wider region calendars index, the response will be a JSON error response with a status code of 404 Not Found.
+     * If the resource to update is not writable or the write was not successful, the response will be a JSON error response with a status code of 503 Service Unavailable.
+     *
+     * If the update is successful, the response will be a JSON success response with a status code of 201 Created.
+     */
+    private function updateWiderRegionCalendar()
+    {
+        $widerRegionEntry = array_find($this->CalendarsMetadata->wider_regions, function ($item) {
+            return $item->name === $this->params->key;
+        });
+
+        if (null === $widerRegionEntry) {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update unknown wider region calendar resource {$this->params->key}.");
+        }
+
+        foreach ($this->params->payload->i18n as $locale => $i18nData) {
+            $widerRegionI18nFile = strtr(
+                JsonData::WIDER_REGIONS_I18N_FILE,
+                [
+                    '{wider_region}' => $this->params->key,
+                    '{locale}' => $locale
+                ]
+            );
+
+            if (file_exists($widerRegionI18nFile) && false === is_writable($widerRegionI18nFile)) {
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update wider region calendar i18n resource for {$this->params->key} at {$widerRegionI18nFile}, check file and folder permissions.");
+            }
+
+            // Update wider region calendar i18n data for locale
+            $widerRegionI18nData = json_encode($i18nData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            if (
+                false === file_put_contents(
+                    $widerRegionI18nFile,
+                    $widerRegionI18nData . PHP_EOL
+                )
+            ) {
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update wider region calendar i18n resource {$this->params->key} in path {$widerRegionI18nFile}.");
+            }
+        }
+
+        // We also want to clean up any unneeded locale files, if a locale has been removed
+        $widerRegionI18nFolder = strtr(
+            JsonData::WIDER_REGIONS_I18N_FOLDER,
             [
-                '{nation}' => $this->params->key,
-                '{locale}' => $this->params->locale
+                '{wider_region}' => $this->params->key
             ]
         );
 
-        $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::NATIONAL);
-        if ($test === true) {
-            // We need to extract localized name properties from the payload,
-            // and write them to the corresponding locale file,
-            // but only for createNew or setProperty::name actions,
-            // or for the makePatron action.
-            // Make sure &$value is a reference, not a copy, so that the `name` property will be deleted on the original object.
-            $i18nPayload = [];
-            foreach ($this->params->payload->litcal as &$value) {
-                if (
-                    $value->metadata->action === 'createNew'
-                    || ($value->metadata->action === 'setProperty' && $value->metadata->property === 'name')
-                    || $value->metadata->action === 'makePatron'
-                ) {
-                    $i18nPayload[$value->festivity->event_key] = $value->festivity->name;
-                }
-                unset($value->festivity->name);
+        // Get all .json files in the folder
+        $jsonFiles = glob($widerRegionI18nFolder . '/*.json');
+        foreach ($jsonFiles as $file) {
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+            if (false === in_array($filename, $this->params->payload->metadata->locales)) {
+                unlink($file);
             }
-            $data = json_encode(
-                $this->params->payload,
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
-            );
-            $i18nData = json_encode(
-                $i18nPayload,
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
-            );
-            file_put_contents(
-                $calendarFile,
-                $data . PHP_EOL
-            );
-            file_put_contents(
-                $calendarI18nFile,
-                $i18nData . PHP_EOL
-            );
-            $response->success = "Calendar data created or updated for Nation \"{$this->params->key}\"";
-            self::produceResponse(json_encode($response));
-        } else {
-            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
         }
-    }
 
-    /**
-     * Handle PATCH requests to create or update a wider region calendar data resource.
-     *
-     * It is private as it is called from {@see updateRegionalCalendar}.
-     *
-     * The resource is created or updated in the `jsondata/sourcedata/wider_regions/` directory.
-     *
-     * If the payload is valid according to {@see LitSchema::WIDERREGION}, the response will be a JSON object
-     * containing a success message.
-     *
-     * If the payload is invalid, the response will be a JSON error response with a 422 status code.
-     */
-    private function handleWiderRegionCalendarUpdate()
-    {
+        unset($this->params->payload->i18n);
+
+        $widerRegionFile = strtr(
+            JsonData::WIDER_REGIONS_FILE,
+            [
+                '{wider_region}' => $this->params->key
+            ]
+        );
+
+        if (false === file_exists($widerRegionFile)) {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update unknown wider region calendar resource for {$this->params->key} at {$widerRegionFile}, file not found.");
+        }
+
+        if (false === is_writable($widerRegionFile)) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update wider region calendar resource for {$this->params->key} at {$widerRegionFile}, check file and folder permissions.");
+        }
+
+        $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if (
+            false === file_put_contents(
+                $widerRegionFile,
+                $calendarData . PHP_EOL
+            )
+        ) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update wider region calendar resource {$this->params->key} in path {$widerRegionFile}.");
+        }
+
         $response = new \stdClass();
-        $this->params->payload->metadata->wider_region = ucfirst(strtolower($this->params->payload->metadata->wider_region));
-        $widerRegion = $this->params->payload->metadata->wider_region;
-        $widerRegionPath = JsonData::WIDER_REGIONS_FOLDER . '/' . $widerRegion;
-        $i18npath = strtr(JsonData::WIDER_REGIONS_I18N_FOLDER, [
-            '{wider_region}' => $widerRegion
-        ]);
-        if (!file_exists($widerRegionPath)) {
-            mkdir($widerRegionPath, 0755, true);
-        }
-        if (!file_exists($i18npath)) {
-            mkdir($i18npath, 0755, true);
-        }
-        $translationJSON = new \stdClass();
-        foreach ($this->params->payload->litcal as $CalEvent) {
-            $translationJSON->{ $CalEvent->festivity->event_key } = '';
-        }
-        if (count($this->params->payload->metadata->locales) > 0) {
-            foreach ($this->params->payload->metadata->locales as $iso) {
-                $widerRegionI18nFile = strtr(JsonData::WIDER_REGIONS_I18N_FILE, [
-                    '{wider_region}' => $widerRegion,
-                    '{locale}' => $iso
-                ]);
-                if (!file_exists($widerRegionI18nFile)) {
-                    file_put_contents(
-                        $widerRegionI18nFile,
-                        json_encode($translationJSON, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
-                    );
-                }
-            }
-        }
-
-        $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::WIDERREGION);
-        if ($test === true) {
-            $data = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            $widerRegionFile = strtr(
-                JsonData::WIDER_REGIONS_FILE,
-                [
-                    '{wider_region}' => $widerRegion
-                ]
-            );
-            file_put_contents($widerRegionFile, $data . PHP_EOL);
-            $response->success = "Calendar data created or updated for Wider Region \"{$widerRegion}\"";
-            self::produceResponse(json_encode($response));
-        } else {
-            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
-        }
+        $response->success = "Calendar data created or updated for Wider Region \"{$this->params->key}\"";
+        $response->data = $this->params->payload;
+        self::produceResponse(json_encode($response));
     }
 
     /**
-     * Handle PATCH requests to create or update a diocesan calendar data resource.
+     * Handle PATCH requests to update a diocesan calendar data resource.
      *
-     * It is private as it is called from {@see updateRegionalCalendar}.
+     * It is private as it is called from {@see updateCalendar}.
      *
-     * The resource is created or updated in the `jsondata/sourcedata/nations/` directory.
+     * The resource is updated in the `jsondata/sourcedata/calendars/dioceses/` directory.
      *
-     * If the payload is valid according to {@see LitSchema::DIOCESAN}, the response will be a JSON object
-     * containing a success message.
-     *
-     * If the resource to update is not found in the diocesan calendars index or in the `jsondata/sourcedata/nations/{nation}/` directory, the response will be a JSON error response with a status code of 404 Not Found.
-     * If the payload is not an object, the response will be a JSON error response with a status code of 400 Bad Request.
+     * If the resource to update is not found in the diocesan calendars index, the response will be a JSON error response with a status code of 404 Not Found.
      * If the resource to update is not writable or the write was not successful, the response will be a JSON error response with a status code of 503 Service Unavailable.
-     * If the payload is not valid according to {@see LitSchema::DIOCESAN}, the response will be a JSON error response with a status code of 422 Unprocessable Content.
      *
+     * If the update is successful, the response will be a JSON success response with a status code of 201 Created.
      */
-    private function handleDiocesanCalendarUpdate()
+    private function updateDiocesanCalendar()
     {
-        $dioceseEntry = array_values(array_filter($this->CalendarsMetadata->diocesan_calendars, function ($item) {
+        $dioceseEntry = array_find($this->CalendarsMetadata->diocesan_calendars, function ($item) {
             return $item->calendar_id === $this->params->key;
-        }));
+        });
 
-        if ( empty($dioceseEntry) ) {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendar resource {$this->params->key}.");
-        }
-
-        // Validate payload against schema
-        $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
-        if (false === $test) {
-            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+        if (null === $dioceseEntry) {
+            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update unknown diocesan calendar resource {$this->params->key}.");
         }
 
         foreach ($this->params->payload->i18n as $locale => $i18nData) {
             $DiocesanCalendarI18nFile = strtr(
                 JsonData::DIOCESAN_CALENDARS_I18N_FILE,
                 [
-                    '{nation}' => $dioceseEntry[0]->nation,
-                    '{diocese}' => $dioceseEntry[0]->calendar_id,
+                    '{nation}' => $dioceseEntry->nation,
+                    '{diocese}' => $this->params->key,
                     '{locale}' => $locale
                 ]
             );
 
-            if (false === is_writable($DiocesanCalendarI18nFile)) {
+            if (file_exists($DiocesanCalendarI18nFile) && false === is_writable($DiocesanCalendarI18nFile)) {
                 self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendar i18n resource for {$this->params->key} at {$DiocesanCalendarI18nFile}, check file and folder permissions.");
             }
 
@@ -512,12 +687,32 @@ class RegionalData
             }
         }
 
+        // We also want to clean up any unneeded locale files, if a locale has been removed
+        $diocesanCalendarI18nFolder = strtr(
+            JsonData::DIOCESAN_CALENDARS_I18N_FOLDER,
+            [
+                '{nation}' => $dioceseEntry->nation,
+                '{diocese}' => $this->params->key
+            ]
+        );
+
+        // Get all .json files in the folder
+        $jsonFiles = glob($diocesanCalendarI18nFolder . '/*.json');
+        foreach ($jsonFiles as $file) {
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+            if (false === in_array($filename, $this->params->payload->metadata->locales)) {
+                unlink($file);
+            }
+        }
+
+        unset($this->params->payload->i18n);
+
         $DiocesanCalendarFile = strtr(
             JsonData::DIOCESAN_CALENDARS_FILE,
             [
-                '{nation}' => $dioceseEntry[0]->nation,
-                '{diocese}' => $dioceseEntry[0]->calendar_id,
-                '{diocese_name}' => $dioceseEntry[0]->diocese
+                '{nation}' => $dioceseEntry->nation,
+                '{diocese}' => $this->params->key,
+                '{diocese_name}' => $dioceseEntry->diocese
             ]
         );
 
@@ -529,9 +724,6 @@ class RegionalData
             self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendar resource for {$this->params->key} at {$DiocesanCalendarFile}, check file and folder permissions.");
         }
 
-        // Update diocesan calendar data
-        // We no longer need the `i18n` property, so delete it
-        unset($this->params->payload->i18n);
         $calendarData = json_encode($this->params->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         if (
             false === file_put_contents(
@@ -553,24 +745,46 @@ class RegionalData
      *
      * This is a private method and should only be called from {@see handleRequestMethod}.
      *
-     * The resource is created or updated in the `jsondata/sourcedata/` directory.
+     * The resource is updated in the `jsondata/sourcedata/` directory.
      *
-     * If the payload is valid according to the associated schema, the response will be a JSON object
-     * containing a success message.
+     * If the payload is invalid, the response will be a JSON error response with a 422 Unprocessable Content status code.
      *
-     * If the payload is invalid, the response will be a JSON error response with a 422 status code.
+     * If the payload is valid, the update process will continue according to the calendar type.
      */
-    private function updateRegionalCalendar()
+    private function updateCalendar()
     {
+        if (false === $this->params->payload instanceof \stdClass) {
+            $payloadType = gettype($this->params->payload);
+            self::produceErrorResponse(StatusCode::BAD_REQUEST, "`payload` param expected to be serialized object, instead it was of type `{$payloadType}` after unserialization");
+        }
+
         switch ($this->params->category) {
-            case 'NATIONALCALENDAR':
-                $this->handleNationalCalendarUpdate();
+            case "DIOCESANCALENDAR":
+                $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
+                if (true === $test) {
+                    $this->updateDiocesanCalendar();
+                } else {
+                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+                }
                 break;
-            case 'WIDERREGIONCALENDAR':
-                $this->handleWiderRegionCalendarUpdate();
+            case "NATIONALCALENDAR":
+                $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::NATIONAL);
+                if (true === $test) {
+                    $this->updateNationalCalendar();
+                } else {
+                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+                }
                 break;
-            case 'DIOCESANCALENDAR':
-                $this->handleDiocesanCalendarUpdate();
+            case "WIDERREGIONCALENDAR":
+                $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::WIDERREGION);
+                if (true === $test) {
+                    $this->updateWiderRegionCalendar();
+                } else {
+                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
+                }
+                break;
+            default:
+                self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "Unknown calendar category \"{$this->params->category}\"");
         }
     }
 
@@ -581,7 +795,7 @@ class RegionalData
      * - The first element is the path to the JSON file containing the calendar data.
      * - The second element is the path to the folder containing the i18n data for the calendar.
      *
-     * This is a private method and should only be called from {@see deleteRegionalCalendar}.
+     * This is a private method and should only be called from {@see deleteCalendar}.
      *
      * If the calendar for which deletion is requested is a diocesan calendar,
      * but a correponding entry is not found in the `/calendars` metadata index,
@@ -593,25 +807,25 @@ class RegionalData
     {
         switch ($this->params->category) {
             case "DIOCESANCALENDAR":
-                $dioceseEntry = array_values(array_filter($this->CalendarsMetadata->diocesan_calendars, function ($el) {
+                $dioceseEntry = array_find($this->CalendarsMetadata->diocesan_calendars, function ($el) {
                     return $el->calendar_id === $this->params->key;
-                }));
-                if (empty($dioceseEntry)) {
+                });
+                if (null === $dioceseEntry) {
                     self::produceErrorResponse(StatusCode::NOT_FOUND, "The resource requested for deletion {$this->params->key} is not known.");
                 }
                 $calendarDataFile = strtr(
                     JsonData::DIOCESAN_CALENDARS_FILE,
                     [
-                        '{nation}' => $dioceseEntry[0]->nation,
-                        '{diocese}' => $dioceseEntry[0]->calendar_id,
-                        '{diocese_name}' => $dioceseEntry[0]->diocese
+                        '{nation}' => $dioceseEntry->nation,
+                        '{diocese}' => $dioceseEntry->calendar_id,
+                        '{diocese_name}' => $dioceseEntry->diocese
                     ]
                 );
                 $calendarI18nFolder = strtr(
                     JsonData::DIOCESAN_CALENDARS_I18N_FOLDER,
                     [
-                        '{nation}' => $dioceseEntry[0]->nation,
-                        '{diocese}' => $dioceseEntry[0]->calendar_id
+                        '{nation}' => $dioceseEntry->nation,
+                        '{diocese}' => $dioceseEntry->calendar_id
                     ]
                 );
                 break;
@@ -653,14 +867,14 @@ class RegionalData
      *
      * This is a private method and should only be called from {@see handleRequestMethod}.
      *
-     * The resource is deleted from the `jsondata/sourcedata/` directory.
+     * The resource is deleted from the `jsondata/sourcedata/calendars/` directory.
      *
      * If the resource is successfully deleted, the response will be a JSON object
      * containing a success message.
      *
      * If the resource does not exist, a 404 error will be returned.
      */
-    private function deleteRegionalCalendar()
+    private function deleteCalendar()
     {
         $response = new \stdClass();
 
@@ -715,7 +929,7 @@ class RegionalData
 
 
     /**
-     * Function validateDataAgainstSchema
+     * Validate payload data against a schema
      *
      * @param array|object $data Data to validate
      * @param string $schemaUrl  Schema to validate against
@@ -730,6 +944,9 @@ class RegionalData
             return true;
         } catch (InvalidValue | \Exception $e) {
             self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, LitSchema::ERROR_MESSAGES[ $schemaUrl ] . PHP_EOL . $e->getMessage());
+            // the return here is superfluous, because produceErrorResponse terminates the script
+            // it's only here to make intelephense happy
+            return false;
         }
     }
 
@@ -739,8 +956,8 @@ class RegionalData
      * If the request method is POST, it will also retrieve the locale from the payload, if present, and set it on the
      * `$data` object passed as argument.
      *
-     * If the request method is PUT or PATCH, and the payload is not either JSON or YAML encoded, it will produce a
-     * 400 Bad Request error.
+     * If the request method is PUT or PATCH, and the payload is not either JSON or YAML encoded,
+     * it will produce a 400 Bad Request error.
      *
      * @param object $data the object to set the locale and payload on
      *
@@ -830,7 +1047,7 @@ class RegionalData
     /**
      * Validate the request path parts for the RegionalData resource.
      *
-     * Will produce a 400 error response if the request path parts are invalid.
+     * Will produce a 400 Bad Request error response if the request path parts are invalid.
      *
      * @param array $requestPathParts the parts of the request path
      */
@@ -891,31 +1108,59 @@ class RegionalData
         RegionalData::validateRequestPath($requestPathParts);
         $data = RegionalData::setDataFromPath($requestPathParts);
 
-        // In the case of a PUT request, we expect only one PATH parameter, we only retrieve the payload from the request body
-        if (self::$Core->getRequestMethod() === RequestMethod::PUT) {
-            if (
-                !property_exists($data, 'payload')
-                || $data->payload === null
-                || !property_exists($data->payload, 'litcal')
-                || !property_exists($data->payload, 'i18n')
-                || !property_exists($data->payload, 'metadata')
-                || !property_exists($data->payload->metadata, 'diocese_id')
-            ) {
-                self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.metadata`, and `payload.metadata.diocese_id`");
-            } else {
-                $data->key = $data->payload->metadata->diocese_id;
-            }
-        }
-
-        if (self::$Core->getRequestMethod() === RequestMethod::PATCH) {
-            if (
-                !property_exists($data, 'payload')
-                || $data->payload === null
-                || !property_exists($data->payload, 'litcal')
-                || !property_exists($data->payload, 'i18n')
-                || !property_exists($data->payload, 'metadata')
-            ) {
-                self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, and `payload.metadata`");
+        // Validate the payload for PUT and PATCH requests, based on category.
+        // For PUT requests, the key is retrieved from the payload rather than from the path,
+        // whereas for PATCH requests, the key should already have been set from the path.
+        if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH], true)) {
+            switch ($data->category) {
+                case 'DIOCESANCALENDAR':
+                    if (
+                        false === property_exists($data, 'payload')
+                        || false === $data->payload instanceof \stdClass
+                        || false === property_exists($data->payload, 'litcal')
+                        || false === property_exists($data->payload, 'i18n')
+                        || false === property_exists($data->payload, 'metadata')
+                        || false === property_exists($data->payload->metadata, 'diocese_id')
+                    ) {
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.metadata`, and `payload.metadata.diocese_id`, instead payload was: " . json_encode($data->payload));
+                    }
+                    if (RequestMethod::PUT === self::$Core->getRequestMethod()) {
+                        $data->key = $data->payload->metadata->diocese_id;
+                    }
+                    break;
+                case 'NATIONALCALENDAR':
+                    if (
+                        false === property_exists($data, 'payload')
+                        || false === $data->payload instanceof \stdClass
+                        || false === property_exists($data->payload, 'litcal')
+                        || false === property_exists($data->payload, 'i18n')
+                        || false === property_exists($data->payload, 'settings')
+                        || false === property_exists($data->payload, 'metadata')
+                        || false === property_exists($data->payload->metadata, 'nation')
+                    ) {
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.settings`, `payload.metadata`, and `payload.metadata.nation`, instead payload was: " . json_encode($data->payload));
+                    }
+                    if (RequestMethod::PUT === self::$Core->getRequestMethod()) {
+                        $data->key = $data->payload->metadata->nation;
+                    }
+                    break;
+                case 'WIDERREGIONCALENDAR':
+                    if (
+                        false === property_exists($data, 'payload')
+                        || false === $data->payload instanceof \stdClass
+                        || false === property_exists($data->payload, 'litcal')
+                        || false === property_exists($data->payload, 'i18n')
+                        || false === property_exists($data->payload, 'national_calendars')
+                        || false === property_exists($data->payload, 'metadata')
+                        || false === property_exists($data->payload->metadata, 'wider_region')
+                        || false === property_exists($data->payload->metadata, 'locales')
+                    ) {
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.national_calendars`, `payload.metadata`, `payload.metadata.wider_region`, and `payload.metadata.locales`");
+                    }
+                    if (RequestMethod::PUT === self::$Core->getRequestMethod()) {
+                        $data->key = $data->payload->metadata->wider_region;
+                    }
+                    break;
             }
         }
 
@@ -992,7 +1237,7 @@ class RegionalData
             default:
                 echo $jsonEncodedResponse;
         }
-        die();
+        //die();
     }
 
     /**

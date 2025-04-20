@@ -278,33 +278,46 @@ class Health implements MessageComponentInterface
      */
     private static function retrieveSchemaForCategory(string $category, ?string $dataPath = null): ?string
     {
+        $versionedPattern = "/\/api\/v[4-9]\//";
+        $versionedReplacement = "/api/dev/";
+        $isVersionedDataPath = preg_match($versionedPattern, $dataPath) !== false;
         switch ($category) {
             case 'universalcalendar':
-                return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
+                if ($isVersionedDataPath) {
+                    $versionedDataPath = preg_replace($versionedPattern, $versionedReplacement, $dataPath);
+                    if (array_key_exists($versionedDataPath, Health::DATA_PATH_TO_SCHEMA)) {
+                        $tempSchemaPath = Health::DATA_PATH_TO_SCHEMA[ $versionedDataPath ];
+                        return preg_replace($versionedPattern, $versionedReplacement, $tempSchemaPath);
+                    }
+                }
+                if (array_key_exists($dataPath, Health::DATA_PATH_TO_SCHEMA)) {
+                    return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
+                }
+                return null;
             case 'nationalcalendar':
-                return LitSchema::NATIONAL;
+                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::NATIONAL) : LitSchema::NATIONAL;
             case 'diocesancalendar':
-                return LitSchema::DIOCESAN;
+                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::DIOCESAN) : LitSchema::DIOCESAN;
             case 'widerregioncalendar':
-                return LitSchema::WIDERREGION;
+                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::WIDERREGION) : LitSchema::WIDERREGION;
             case 'propriumdesanctis':
-                return LitSchema::PROPRIUMDESANCTIS;
+                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS) : LitSchema::PROPRIUMDESANCTIS;
             case 'resourceDataCheck':
                 if (
                     preg_match("/\/missals\/[_A-Z0-9]+$/", $dataPath)
                 ) {
-                    return LitSchema::PROPRIUMDESANCTIS;
+                    return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS) : LitSchema::PROPRIUMDESANCTIS;
                 } elseif (
                     preg_match("/\/events\/(?:nation\/[A-Z]{2}|diocese\/[a-z]{6}_[a-z]{2})(?:\?locale=[a-zA-Z0-9_]+)?$/", $dataPath)
                 ) {
-                    return LitSchema::EVENTS;
+                    return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::EVENTS) : LitSchema::EVENTS;
                 } elseif (
                     preg_match("/\/data\/(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/", $dataPath, $matches)
                 ) {
                     $schema = LitSchema::DATA;
                     foreach ($matches as $idx => $match) {
                         if ($idx > 0) {
-                            switch ($matches[$idx]) {
+                            switch ($match) {
                                 case 'nation':
                                     $schema = LitSchema::NATIONAL;
                                     break;
@@ -317,9 +330,19 @@ class Health implements MessageComponentInterface
                             }
                         }
                     }
-                    return $schema;
+                    return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, $schema) : $schema;
                 }
-                return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
+                if ($isVersionedDataPath) {
+                    $versionedDataPath = preg_replace($versionedPattern, $versionedReplacement, $dataPath);
+                    if (array_key_exists($versionedDataPath, Health::DATA_PATH_TO_SCHEMA)) {
+                        $tempSchemaPath = Health::DATA_PATH_TO_SCHEMA[ $versionedDataPath ];
+                        return preg_replace($versionedPattern, $versionedReplacement, $tempSchemaPath);
+                    }
+                }
+                if (array_key_exists($dataPath, Health::DATA_PATH_TO_SCHEMA)) {
+                    return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
+                }
+                return null;
                 break;
             case 'sourceDataCheck':
                 if (preg_match("/-i18n$/", $dataPath)) {
@@ -364,12 +387,22 @@ class Health implements MessageComponentInterface
      */
     private function executeValidation(object $validation, ConnectionInterface $to)
     {
+        // First thing is try to determine the schema that we will be validating against,
+        // and the path to the source file or folder that we will be validating against the schema.
+        // Our purpose here is to set the $pathForSchema and $dataPath variables.
+        $pathForSchema      = null;
+        $dataPath           = null;
+        $responseType       = 'JSON';
+
+        // Source data checks validate data directly in the filesystem, not through the API
         if ($validation->category === 'sourceDataCheck') {
-            $pathForSchema      = $validation->validate;
+            $pathForSchema = $validation->validate;
+            // Are we validating a single source file, or are we validating a folder of i18n files?
             if (property_exists($validation, 'sourceFolder')) {
+                // If the 'sourceFolder' property is set, then we are validating a folder of i18n files
                 $dataPath       = rtrim($validation->sourceFolder, '/');
                 $matches = null;
-                if (preg_match("/^(wider\-region|national\-calendar|diocesan\-calendar)\-([A-Z][_a-z]+)\-i18n$/", $validation->validate, $matches)) {
+                if (preg_match("/^(wider\-region|national\-calendar|diocesan\-calendar)\-([A-Za-z_]+)\-i18n$/", $validation->validate, $matches)) {
                     switch ($matches[1]) {
                         case 'wider-region':
                             $dataPath = strtr(
@@ -384,12 +417,14 @@ class Health implements MessageComponentInterface
                             );
                             break;
                         case 'diocesan-calendar':
-                            $diocese = array_values(array_filter(self::$metadata->litcal_metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]));
-                            $nation = $diocese[0]->nation;
+                            $diocese = array_find(self::$metadata->litcal_metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]);
+                            $nation = $diocese->nation;
                             $dataPath = strtr(
                                 JsonData::DIOCESAN_CALENDARS_I18N_FOLDER,
-                                ['{diocese}' => $matches[2]],
-                                ['{nation}' => $nation]
+                                [
+                                    '{diocese}' => $matches[2],
+                                    '{nation}' => $nation
+                                ]
                             );
                             break;
                     }
@@ -399,6 +434,8 @@ class Health implements MessageComponentInterface
                     $dataPath = RomanMissal::$i18nPath["{$region}_{$year}"];
                 }
             } else {
+                // If we are not validating a folder of i18n files, then we are validating a single source file,
+                // and the 'sourceFile' property is required in this case
                 if (property_exists($validation, 'sourceFile')) {
                     $dataPath       = $validation->sourceFile;
                     $matches = null;
@@ -417,14 +454,16 @@ class Health implements MessageComponentInterface
                                 );
                                 break;
                             case 'diocesan-calendar':
-                                $diocese = array_values(array_filter(self::$metadata->litcal_metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]));
-                                $nation = $diocese[0]->nation;
-                                $dioceseName = $diocese[0]->diocese;
+                                $diocese = array_find(self::$metadata->litcal_metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]);
+                                $nation = $diocese->nation;
+                                $dioceseName = $diocese->diocese;
                                 $dataPath = strtr(
                                     JsonData::DIOCESAN_CALENDARS_FILE,
-                                    ['{diocese}' => $matches[2]],
-                                    ['{nation}' => $nation],
-                                    ['{diocese_name}' => $dioceseName]
+                                    [
+                                        '{diocese}' => $matches[2],
+                                        '{nation}' => $nation,
+                                        '{diocese_name}' => $dioceseName
+                                    ]
                                 );
                                 break;
                         }
@@ -436,18 +475,23 @@ class Health implements MessageComponentInterface
                 }
             }
         } else {
+            // If it's not a sourceDataCheck, it's probably a resourceDataCheck
+            // That is to say, an API path
             $pathForSchema      = $validation->sourceFile;
             $dataPath           = $validation->sourceFile;
         }
 
         $schema = Health::retrieveSchemaForCategory($validation->category, $pathForSchema);
 
+        // Now that we have the correct schema to validate against,
+        // we will perform the actual validation either for all files in a folder, or for a single file
         if (property_exists($validation, 'sourceFolder')) {
+            // If the 'sourceFolder' property is set, then we are validating a folder of i18n files
             $files = glob($dataPath . '/*.json');
             if (false === $files || empty($files)) {
                 $message = new \stdClass();
                 $message->type = "error";
-                $message->text = "Data folder $validation->sourceFolder does not exist or does not contain any json files";
+                $message->text = "Data folder $validation->sourceFolder ($dataPath) does not exist or does not contain any json files";
                 $message->classes = ".$validation->validate.file-exists";
                 $this->sendMessage($to, $message);
                 return;
@@ -525,10 +569,11 @@ class Health implements MessageComponentInterface
                 $this->sendMessage($to, $message);
             }
         } else {
+            // If the 'sourceFolder' property is not set, then we are validating a single source file or API path
             $matches = null;
             if (preg_match("/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/", $pathForSchema, $matches)) {
                 $dioceseId   = $matches[1];
-                $dioceseData = array_values(array_filter(self::$metadata->litcal_metadata->diocesan_calendars, fn ($diocesan_calendar) => $diocesan_calendar->calendar_id === $dioceseId))[0];
+                $dioceseData = array_find(self::$metadata->litcal_metadata->diocesan_calendars, fn ($diocesan_calendar) => $diocesan_calendar->calendar_id === $dioceseId);
                 $nation      = $dioceseData->nation;
                 $dioceseName = $dioceseData->diocese;
                 $dataPath    = strtr(JsonData::DIOCESAN_CALENDARS_FILE, [
@@ -543,6 +588,8 @@ class Health implements MessageComponentInterface
                 ]);
             }
 
+            // If we are validating an API path, we check for a 200 OK HTTP response from the API
+            // rather than checking for existence of the file in the filesystem
             if ($validation->category === 'resourceDataCheck') {
                 $headers = get_headers($dataPath);
                 if (!$headers || strpos($headers[0], '200') === false) {
@@ -563,12 +610,32 @@ class Health implements MessageComponentInterface
                     $message->text    = "Unable to verify schema for dataPath {$dataPath} and category {$validation->category} since Data file $dataPath does not exist or is not readable";
                     $message->classes = ".$validation->validate.schema-valid";
                     $this->sendMessage($to, $message);
-
+                    // early exit
                     return;
                 }
             }
 
-            $data = file_get_contents($dataPath);
+            $data = false;
+            if (property_exists($validation, 'responsetype')) {
+                $responseType = $validation->responsetype;
+                //get the index of the responsetype from the ReturnType class
+                $responseTypeIdx = array_search($responseType, ReturnType::$values);
+                //get the corresponding accept mime type
+                $acceptMimeType = AcceptHeader::$values[$responseTypeIdx];
+                $opts = [
+                    "http" => [
+                        "method" => "GET",
+                        "header" => "Accept: $acceptMimeType\r\n"
+                    ]
+                ];
+                $context = stream_context_create($opts);
+                // $dataPath is probably an API path in this case
+                $data    = file_get_contents($dataPath, false, $context);
+            } else {
+                // $dataPath is probably a source file in the filesystem in this case
+                $data    = file_get_contents($dataPath);
+            }
+
             if (false === $data) {
                 $message = new \stdClass();
                 $message->type    = "error";
@@ -594,39 +661,83 @@ class Health implements MessageComponentInterface
                 $message->classes = ".$validation->validate.file-exists";
                 $this->sendMessage($to, $message);
 
-                $jsonData = json_decode($data);
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    $message = new \stdClass();
-                    $message->type    = "success";
-                    $message->text    = "The Data file $dataPath was successfully decoded as JSON";
-                    $message->classes = ".$validation->validate.json-valid";
-                    $this->sendMessage($to, $message);
+                switch ($responseType) {
+                    case 'YML':
+                        try {
+                            $yamlData = json_decode(json_encode(yaml_parse($data)));
+                            if ($yamlData) {
+                                $message = new \stdClass();
+                                $message->type    = "success";
+                                $message->text    = "The Data file $dataPath was successfully decoded as YAML";
+                                $message->classes = ".$validation->validate.json-valid";
+                                $this->sendMessage($to, $message);
 
-                    if (null !== $schema) {
-                        $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
-                        if (gettype($validationResult) === 'boolean' && $validationResult === true) {
+                                if (null !== $schema) {
+                                    $validationResult = $this->validateDataAgainstSchema($yamlData, $schema);
+                                    if (gettype($validationResult) === 'boolean' && $validationResult === true) {
+                                        $message = new \stdClass();
+                                        $message->type    = "success";
+                                        $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
+                                        $message->classes = ".$validation->validate.schema-valid";
+                                        $this->sendMessage($to, $message);
+                                    } elseif (gettype($validationResult === 'object')) {
+                                        $validationResult->classes = ".$validation->validate.schema-valid";
+                                        $this->sendMessage($to, $validationResult);
+                                    }
+                                } else {
+                                    $message = new \stdClass();
+                                    $message->type    = "error";
+                                    $message->text    = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category}";
+                                    $message->classes = ".$validation->validate.schema-valid";
+                                    $this->sendMessage($to, $message);
+                                }
+                            }
+                        } catch (\Exception $ex) {
+                            $message = new \stdClass();
+                            $message->type    = "error";
+                            $message->text    = "There was an error decoding the Data file $dataPath as YAML: " . $ex->getMessage() . " :: Raw data = <<<JSON\n$data\n>>>";
+                            $message->classes = ".$validation->validate.json-valid";
+                            $this->sendMessage($to, $message);
+                        }
+                        break;
+                    case 'JSON':
+                        // no break
+                    default:
+                        $jsonData = json_decode($data);
+                        if (json_last_error() === JSON_ERROR_NONE) {
                             $message = new \stdClass();
                             $message->type    = "success";
-                            $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
-                            $message->classes = ".$validation->validate.schema-valid";
+                            $message->text    = "The Data file $dataPath was successfully decoded as JSON";
+                            $message->classes = ".$validation->validate.json-valid";
                             $this->sendMessage($to, $message);
-                        } elseif (gettype($validationResult === 'object')) {
-                            $validationResult->classes = ".$validation->validate.schema-valid";
-                            $this->sendMessage($to, $validationResult);
+
+                            if (null !== $schema) {
+                                $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
+                                if (gettype($validationResult) === 'boolean' && $validationResult === true) {
+                                    $message = new \stdClass();
+                                    $message->type    = "success";
+                                    $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
+                                    $message->classes = ".$validation->validate.schema-valid";
+                                    $this->sendMessage($to, $message);
+                                } elseif (gettype($validationResult === 'object')) {
+                                    $validationResult->classes = ".$validation->validate.schema-valid";
+                                    $this->sendMessage($to, $validationResult);
+                                }
+                            } else {
+                                $message = new \stdClass();
+                                $message->type    = "error";
+                                $message->text    = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category}";
+                                $message->classes = ".$validation->validate.schema-valid";
+                                $this->sendMessage($to, $message);
+                            }
+                        } else {
+                            $message = new \stdClass();
+                            $message->type    = "error";
+                            $message->text    = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . " :: Raw data = <<<JSON\n$data\n>>>";
+                            $message->classes = ".$validation->validate.json-valid";
+                            $this->sendMessage($to, $message);
                         }
-                    } else {
-                        $message = new \stdClass();
-                        $message->type    = "error";
-                        $message->text    = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category}";
-                        $message->classes = ".$validation->validate.schema-valid";
-                        $this->sendMessage($to, $message);
-                    }
-                } else {
-                    $message = new \stdClass();
-                    $message->type    = "error";
-                    $message->text    = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . " :: Raw data = <<<JSON\n$data\n>>>";
-                    $message->classes = ".$validation->validate.json-valid";
-                    $this->sendMessage($to, $message);
+                        break;
                 }
             }
         }

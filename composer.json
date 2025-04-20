@@ -5,7 +5,7 @@
     "keywords": ["api","rest","restful","liturgy","calendar","liturgical","universal","roman","catholic"],
     "homepage": "https://litcal.johnromanodorazio.com",
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.4",
         "swaggest/json-schema": "~0.12",
         "cboden/ratchet": "~0.4",
         "sabre/vobject": "^4.5.1",

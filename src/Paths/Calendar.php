@@ -38,7 +38,7 @@ use LiturgicalCalendar\Api\Params\CalendarParams;
  */
 class Calendar
 {
-    public const API_VERSION                        = '4.3';
+    public const API_VERSION                        = '4.5';
     public static Core $Core;
 
     private string $CacheDuration                   = "";
@@ -988,19 +988,18 @@ class Calendar
      */
     private function createPropriumDeTemporeFestivityByKey(?string $key = null): Festivity
     {
-        if ($key) {
-            $event = new Festivity(
-                $this->PropriumDeTempore[ $key ][ "name" ],
-                $this->PropriumDeTempore[ $key ][ "date" ],
-                $this->PropriumDeTempore[ $key ][ "color" ],
-                $this->PropriumDeTempore[ $key ][ "type" ],
-                $this->PropriumDeTempore[ $key ][ "grade" ]
-            );
-            $this->Cal->addFestivity($key, $event);
-            return $event;
-        } else {
-            //return error
+        if (null === $key || false === array_key_exists($key, $this->PropriumDeTempore)) {
+            die("createPropriumDeTemporeFestivityByKey requires a key from the Proprium de Tempore, instead got $key");
         }
+        $event = new Festivity(
+            $this->PropriumDeTempore[ $key ][ "name" ],
+            $this->PropriumDeTempore[ $key ][ "date" ],
+            $this->PropriumDeTempore[ $key ][ "color" ],
+            $this->PropriumDeTempore[ $key ][ "type" ],
+            $this->PropriumDeTempore[ $key ][ "grade" ]
+        );
+        $this->Cal->addFestivity($key, $event);
+        return $event;
     }
 
     /**
@@ -2633,6 +2632,7 @@ class Calendar
                 return $row->metadata->action === "makeDoctor";
             }
         );
+
         foreach ($DoctorsDecrees as $row) {
             if ($this->CalendarParams->Year >= $row->metadata->since_year) {
                 $festivity = $this->Cal->getFestivity($row->festivity->event_key);
@@ -2731,6 +2731,7 @@ class Calendar
                     return $row->metadata->action !== "makeDoctor" && $row->festivity->grade === $grade;
                 }
             );
+
             foreach ($MemorialsFromDecrees as $row) {
                 if ($this->CalendarParams->Year >= $row->metadata->since_year) {
                     switch ($row->metadata->action) {
@@ -3367,9 +3368,7 @@ class Calendar
             case LitGrade::SOLEMNITY:
                 return $this->Cal->notInSolemnities($row->festivity->date);
         }
-        //functions should generally have a default return value
-        //however, it would make no sense to give a default return value here
-        //we really need to cover all cases and give a sure return value
+        return true;
     }
 
     /**
@@ -4146,12 +4145,12 @@ class Calendar
      *  - festivity_key (the key of the festivity that this mobile festivity is relative to)
      *
      * If the strtotime object is invalid, or if the festivity that it is relative to does not exist,
-     * an error message will be added to the Messages array and null will be returned.
+     * an error message will be added to the Messages array and false will be returned.
      *
      * @param object $row the row containing data for the mobile festivity from the JSON file
-     * @return ?DateTime the date of the mobile festivity, or null if there was an error
+     * @return DateTime|false the date of the mobile festivity, or false if there was an error
      */
-    private function handleObjectStrtotime(object $row): ?DateTime
+    private function handleObjectStrtotime(object $row): DateTime|false
     {
         if (false === $this->validateStrToTime($row->metadata->strtotime)) {
             $this->Messages[] = sprintf(
@@ -4160,7 +4159,7 @@ class Calendar
                 $row->festivity->name,
                 implode(', ', ['\'day_of_the_week\'', '\'relative_time\'', '\'festivity_key\''])
             );
-            return null;
+            return false;
         }
 
         $festivity = $this->Cal->getFestivity($row->metadata->strtotime->festivity_key);
@@ -4171,17 +4170,15 @@ class Calendar
                 $row->festivity->name,
                 $row->metadata->strtotime->festivity_key
             );
-            return null;
+            return false;
         }
 
         $DATE = clone( $festivity->date );
         switch ($row->metadata->strtotime->relative_time) {
             case 'before':
-                $DATE->modify("previous {$row->metadata->strtotime->day_of_the_week}");
-                return $DATE;
+                return $DATE->modify("previous {$row->metadata->strtotime->day_of_the_week}");
             case 'after':
-                $DATE->modify("next {$row->metadata->strtotime->day_of_the_week}");
-                return $DATE;
+                return $DATE->modify("next {$row->metadata->strtotime->day_of_the_week}");
             default:
                 $this->Messages[] = sprintf(
                     /**translators: 1. Name of the mobile festivity being created, 2. Name of the festivity that it is relative to */
@@ -4204,12 +4201,12 @@ class Calendar
      * absolute date.
      *
      * @param object $row the row containing data for the mobile festivity from the JSON file
-     * @return ?DateTime the date of the mobile festivity, or null if there was an error
+     * @return DateTime the date of the mobile festivity, or false if there was an error
      */
-    private function handleStringStrtotime(object $row): ?DateTime
+    private function handleStringStrtotime(object $row): DateTime|false
     {
         if (false === $this->validateStrToTime($row->metadata->strtotime)) {
-            return null;
+            return false;
         }
 
         if (preg_match('/(before|after)/', $row->metadata->strtotime)) {
@@ -4221,7 +4218,7 @@ class Calendar
                     $row->metadata->strtotime,
                     json_encode($match)
                 );
-                return null;
+                return false;
             }
 
             $festivityDateTS = strtotime($match[2] . ' ' . $this->CalendarParams->Year . ' UTC');
@@ -4231,7 +4228,7 @@ class Calendar
                     'Could not interpret the \'strtotime\' property with value %1$s into a timestamp',
                     $row->metadata->strtotime
                 );
-                return null;
+                return false;
             }
 
             $DATE = new DateTime("@$festivityDateTS");
@@ -4250,7 +4247,7 @@ class Calendar
                     'Could not interpret the \'strtotime\' property with value %1$s into a timestamp',
                     $row->metadata->strtotime
                 );
-                return null;
+                return false;
             }
 
             $DATE = new DateTime("@$festivityDateTS");
@@ -4272,12 +4269,12 @@ class Calendar
      * another festivity. If it does not contain either of these words, it will be interpreted as an
      * absolute date.
      *
-     * If the 'strtotime' property is invalid, an error message will be added to the Messages array and null will be returned.
+     * If the 'strtotime' property is invalid, an error message will be added to the Messages array and false will be returned.
      *
      * @param object $row The row containing data for the mobile festivity from the JSON file
-     * @return ?DateTime The date of the mobile festivity, or null if there was an error
+     * @return DateTime|false The date of the mobile festivity, or false if there was an error
      */
-    private function interpretStrtotime(object $row): ?DateTime
+    private function interpretStrtotime(object $row): DateTime|false
     {
         $strtotime = $row->festivity->strtotime;
         $strtotimeType = gettype($strtotime);
@@ -4293,7 +4290,7 @@ class Calendar
                 $row->festivity->name,
                 gettype($row->festivity->strtotime)
             );
-            return null;
+            return false;
         }
     }
 
@@ -4312,7 +4309,7 @@ class Calendar
      *  - If the festivity has a grade less or equal to FEAST and there is no coincidence with a Solemnity on the same day, the festivity is added to the calendar.
      *  - If the festivity has a grade less or equal to FEAST and there is a coincidence with a Solemnity on the same day, the festivity is suppressed and a message is added to the Messages array.
      */
-    private function applyDiocesanCalendar()
+    private function applyDiocesanCalendar(): void
     {
         foreach ($this->DiocesanData->litcal as $idx => $obj) {
             //if sinceYear is undefined or null or empty, let's go ahead and create the event in any case

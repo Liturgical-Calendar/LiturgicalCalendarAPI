@@ -209,17 +209,17 @@ class Events
     private function loadDiocesanData(): void
     {
         if ($this->EventsParams->DiocesanCalendar !== null) {
-            $DiocesanData = array_values(array_filter($this->EventsParams->calendarsMetadata->diocesan_calendars, function ($el) {
+            $DiocesanData = array_find($this->EventsParams->calendarsMetadata->diocesan_calendars, function ($el) {
                 return $el->calendar_id === $this->EventsParams->DiocesanCalendar;
-            }));
-            if (count($DiocesanData) === 1) {
-                $this->EventsParams->NationalCalendar = $DiocesanData[0]->nation;
+            });
+            if (null !== $DiocesanData) {
+                $this->EventsParams->NationalCalendar = $DiocesanData->nation;
                 $diocesanDataFile = strtr(
                     JsonData::DIOCESAN_CALENDARS_FILE,
                     [
                         '{nation}' => $this->EventsParams->NationalCalendar,
                         '{diocese}' => $this->EventsParams->DiocesanCalendar,
-                        '{diocese_name}' => $DiocesanData[0]->diocese
+                        '{diocese_name}' => $DiocesanData->diocese
                     ]
                 );
                 if (file_exists($diocesanDataFile)) {
@@ -708,6 +708,9 @@ class Events
         } else {
             switch (self::$Core->getResponseContentType()) {
                 case AcceptHeader::YAML:
+                    // We must make sure that any nested stdClass objects are converted to associative arrays
+                    $responseStr = json_encode($responseObj);
+                    $responseObj = json_decode($responseStr, true);
                     echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
                     break;
                 case AcceptHeader::JSON:

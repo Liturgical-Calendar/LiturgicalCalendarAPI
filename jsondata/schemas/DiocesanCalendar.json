@@ -12,62 +12,10 @@
             "title": "Settings"
         },
         "metadata": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "diocese_id": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
-                },
-                "diocese_name": {
-                    "type": "string",
-                    "pattern": "^[a-zA-Z0-9 ()'-]+$"
-                },
-                "nation": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Nation"
-                },
-                "locales": {
-                    "type": "array",
-                    "uniqueItems": true,
-                    "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
-                    }
-                },
-                "timezone": {
-                    "type": "string"
-                },
-                "group": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "diocese_id",
-                "diocese_name",
-                "nation",
-                "locales",
-                "timezone"
-            ]
+            "$ref": "#/definitions/DiocesanCalendarMetadata"
         },
         "i18n": {
-            "type": "object",
-            "description": "A JSON object of the form { \"locale\": { \"key\": \"value\" } }, used only in PUT and PATCH requests.",
-            "additionalProperties": false,
-            "propertyNames": {
-                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
-            },
-            "patternProperties": {
-                "": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "propertyNames": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
-                    },
-                    "patternProperties": {
-                        "": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
+            "$ref": "#/definitions/CalendarI18n"
         }
     },
     "required": [
@@ -153,6 +101,64 @@
                 ]
             },
             "title": "LitCal"
+        },
+        "DiocesanCalendarMetadata": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "diocese_id": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                },
+                "diocese_name": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9 ()'-]+$"
+                },
+                "nation": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Nation"
+                },
+                "locales": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+                    }
+                },
+                "timezone": {
+                    "type": "string"
+                },
+                "group": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "diocese_id",
+                "diocese_name",
+                "nation",
+                "locales",
+                "timezone"
+            ]
+        },
+        "CalendarI18n": {
+            "type": "object",
+            "description": "A JSON object of the form { \"locale\": { \"key\": \"value\" } }, used only in PUT and PATCH requests.",
+            "additionalProperties": false,
+            "propertyNames": {
+                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+            },
+            "patternProperties": {
+                "": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "propertyNames": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                    },
+                    "patternProperties": {
+                        "": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     }
 }
