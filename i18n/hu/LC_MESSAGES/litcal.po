@@ -1,22 +1,21 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Jarek Niewiadomski <jarekn2008@gmail.com>, 2025.
+# Gábor <pleineux@gmail.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-03-22 13:48+0000\n"
-"PO-Revision-Date: 2025-04-25 20:30+0000\n"
-"Last-Translator: Jarek Niewiadomski <jarekn2008@gmail.com>\n"
-"Language-Team: Polish <https://translate.johnromanodorazio.com/projects/"
-"liturgical-calendar/api-strings/pl/>\n"
-"Language: pl\n"
+"PO-Revision-Date: 2025-04-21 09:40+0000\n"
+"Last-Translator: Gábor <pleineux@gmail.com>\n"
+"Language-Team: Hungarian <https://translate.johnromanodorazio.com/projects/"
+"liturgical-calendar/api-strings/hu/>\n"
+"Language: hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
-"|| n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Weblate 5.11\n"
 
 #: src/Paths/Calendar.php:623
@@ -132,7 +131,7 @@ msgstr ""
 #. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
 #: src/Paths/Calendar.php:1285 src/Enum/LitCommon.php:424
 msgid "or"
-msgstr "lub"
+msgstr ""
 
 #. translators: as instituted on the day of the canonization of St Faustina Kowalska by Pope John Paul II in the year 2000
 #: src/Paths/Calendar.php:1289
@@ -815,7 +814,7 @@ msgstr ""
 
 #: src/FestivityCollection.php:61
 msgid "Vigil Mass"
-msgstr "Msza czuwania"
+msgstr ""
 
 #: src/FestivityCollection.php:917
 #, php-format
@@ -854,229 +853,229 @@ msgstr ""
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:34
 msgid "green"
-msgstr "zielony"
+msgstr "zöld"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:39
 msgid "purple"
-msgstr "fioletowy"
+msgstr "viola"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:44
 msgid "white"
-msgstr "biały"
+msgstr "fehér"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:49
 msgid "red"
-msgstr "czerwony"
+msgstr "piros"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:54
 msgid "pink"
-msgstr "różowy"
+msgstr "rózsaszín"
 
 #: src/Enum/LitCommon.php:71
 msgid "Proper"
-msgstr "Właściwy"
+msgstr ""
 
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:73
 msgid "Dedication of a Church"
-msgstr "Poświęcenie kościoła"
+msgstr ""
 
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:75
 msgid "Blessed Virgin Mary"
-msgstr "Najświętsza Maryja Panna"
+msgstr ""
 
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:77
 msgid "Martyrs"
-msgstr "Męczennicy"
+msgstr ""
 
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:79
 msgid "Pastors"
-msgstr "Pastorzy"
+msgstr ""
 
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:81
 msgid "Doctors"
-msgstr "Doktorzy"
+msgstr ""
 
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:83
 msgid "Virgins"
-msgstr "Dziewice"
+msgstr ""
 
 #. translators: context = from the Common of nn
 #: src/Enum/LitCommon.php:85
 msgid "Holy Men and Women"
-msgstr "Święci mężczyźni i kobiety"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:88
 msgid "For One Martyr"
-msgstr "Dla jednego męczennika"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:90
 msgid "For Several Martyrs"
-msgstr "Dla kilku męczenników"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:92
 msgid "For Missionary Martyrs"
-msgstr "Za misjonarzy męczenników"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:94
 msgid "For One Missionary Martyr"
-msgstr "Dla jednego misjonarza męczennika"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:96
 msgid "For Several Missionary Martyrs"
-msgstr "Dla kilku misjonarzy męczenników"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:98
 msgid "For a Virgin Martyr"
-msgstr "Dla Dziewicy Męczennicy"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:100
 msgid "For a Holy Woman Martyr"
-msgstr "Dla świętej kobiety męczennicy"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:102
 msgid "For a Pope"
-msgstr "Za papieża"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:104
 msgid "For a Bishop"
-msgstr "Dla biskupa"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:106
 msgid "For One Pastor"
-msgstr "Dla jednego pastora"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:108
 msgid "For Several Pastors"
-msgstr "Dla kilku pastorów"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:110
 msgid "For Founders of a Church"
-msgstr "Dla założycieli kościoła"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:112
 msgid "For One Founder"
-msgstr "Dla jednego założyciela"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:114
 msgid "For Several Founders"
-msgstr "Dla kilku założycieli"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:116
 msgid "For Missionaries"
-msgstr "Dla misjonarzy"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:118
 msgid "For One Virgin"
-msgstr "Dla jednej dziewicy"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:120
 msgid "For Several Virgins"
-msgstr "Dla kilku dziewic"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:122
 msgid "For Several Saints"
-msgstr "Dla kilku świętych"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:124
 msgid "For One Saint"
-msgstr "Dla jednego świętego"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:126
 msgid "For an Abbot"
-msgstr "Dla opata"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:128
 msgid "For a Monk"
-msgstr "Dla mnicha"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:130
 msgid "For a Nun"
-msgstr "Dla zakonnicy"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:132
 msgid "For Religious"
-msgstr "Dla religijnych"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:134
 msgid "For Those Who Practiced Works of Mercy"
-msgstr "Dla tych, którzy praktykowali uczynki miłosierdzia"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:136
 msgid "For Educators"
-msgstr "Dla nauczycieli"
+msgstr ""
 
 #. translators: context = from the Common of nn: nn
 #: src/Enum/LitCommon.php:138
 msgid "For Holy Women"
-msgstr "Dla świętych kobiet"
+msgstr ""
 
 #. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: src/Enum/LitCommon.php:202 src/Enum/LitCommon.php:214
 msgctxt "(SING_FEMM)"
 msgid "of the"
-msgstr "z"
+msgstr ""
 
 #. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: src/Enum/LitCommon.php:205
 msgctxt "(PLUR_FEMM)"
 msgid "of"
-msgstr "z"
+msgstr ""
 
 #. translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: src/Enum/LitCommon.php:211
 msgctxt "(PLUR_MASC)"
 msgid "of"
-msgstr "z"
+msgstr ""
 
 #. translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty!
 #: src/Enum/LitCommon.php:217
 msgctxt "(SING_MASC)"
 msgid "of the"
-msgstr "z"
+msgstr ""
 
 #: src/Enum/LitCommon.php:407
 msgid "From the Common"
-msgstr "Ze wspólnego"
+msgstr ""
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:150 src/Enum/LitGrade.php:205
 msgid "weekday"
-msgstr "dzień powszedni"
+msgstr ""
 
 #. translators: liturgical rank 'WEEKDAY' in abbreviated form
 #: src/Enum/LitGrade.php:152
@@ -1106,7 +1105,7 @@ msgstr ""
 #. translators: liturgical rank. Keep Capitalized
 #: src/Enum/LitGrade.php:171
 msgid "Memorial"
-msgstr "Upamiętnienie"
+msgstr ""
 
 #. translators: liturgical rank 'MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:173
@@ -1116,7 +1115,7 @@ msgstr ""
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:178
 msgid "FEAST"
-msgstr "ŚWIĘTO"
+msgstr ""
 
 #. translators: liturgical rank 'FEAST' in abbreviated form
 #: src/Enum/LitGrade.php:180
@@ -1126,7 +1125,7 @@ msgstr ""
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:185
 msgid "FEAST OF THE LORD"
-msgstr "ŚWIĘTO PAŃSKIE"
+msgstr ""
 
 #. translators: liturgical rank 'FEAST OF THE LORD' in abbreviated form
 #: src/Enum/LitGrade.php:187
@@ -1136,7 +1135,7 @@ msgstr ""
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:192
 msgid "SOLEMNITY"
-msgstr "NAMASZCZENE"
+msgstr ""
 
 #. translators: liturgical rank 'SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:194
@@ -1146,7 +1145,7 @@ msgstr ""
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:199
 msgid "celebration with precedence over solemnities"
-msgstr "obchody z pierwszeństwem przed uroczystościami"
+msgstr ""
 
 #. translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:201
