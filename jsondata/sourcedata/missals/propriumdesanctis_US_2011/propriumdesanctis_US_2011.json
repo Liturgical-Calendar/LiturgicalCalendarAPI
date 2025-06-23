@@ -5,7 +5,6 @@
         "event_key": "StElizabethSeton",
         "name": "Saint Elizabeth Ann Seton, Religious",
         "grade": 3,
-        "grade_display": null,
         "common": [
             "Proper"
         ],
@@ -27,7 +26,6 @@
         "event_key": "StJohnNeumann",
         "name": "Saint John Neumann, Bishop",
         "grade": 3,
-        "grade_display": null,
         "common": [
             "Proper"
         ],
@@ -49,7 +47,6 @@
         "event_key": "StAndreBessette",
         "name": "Saint André Bessette, Religious",
         "grade": 2,
-        "grade_display": null,
         "common": [
             "Holy Men and Women:For Religious"
         ],
@@ -95,7 +92,6 @@
         "event_key": "StKatharineDrexel",
         "name": "Saint Katharine Drexel, Virgin",
         "grade": 2,
-        "grade_display": null,
         "common": [
             "Virgins:For One Virgin"
         ],
@@ -117,7 +113,6 @@
         "event_key": "StDamienVeuster",
         "name": "Saint Damien de Veuster, Priest",
         "grade": 2,
-        "grade_display": null,
         "common": [
             "Pastors:For Missionaries"
         ],
@@ -139,7 +134,6 @@
         "event_key": "StIsidore",
         "name": "Saint Isidore",
         "grade": 2,
-        "grade_display": null,
         "common": [
             "Holy Men and Women:For One Saint"
         ],
@@ -161,7 +155,6 @@
         "event_key": "JuniperoSerra",
         "name": "Blessed Junípero Serra, Priest",
         "grade": 2,
-        "grade_display": null,
         "common": [
             "Pastors:For One Pastor",
             "Pastors:For Missionaries"
@@ -206,7 +199,6 @@
         "event_key": "KateriTekakwitha",
         "name": "Blessed Kateri Tekakwitha, Virgin",
         "grade": 3,
-        "grade_display": null,
         "common": [
             "Virgins:For One Virgin"
         ],
@@ -228,7 +220,6 @@
         "event_key": "StPeterClaver",
         "name": "Saint Peter Claver, Priest",
         "grade": 3,
-        "grade_display": null,
         "common": [
             "Pastors:For One Pastor",
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
@@ -251,7 +242,6 @@
         "event_key": "MarieDurocher",
         "name": "Blessed Marie Rose Durocher, Virgin",
         "grade": 2,
-        "grade_display": null,
         "common": [
             "Virgins:For One Virgin"
         ],
@@ -273,7 +263,6 @@
         "event_key": "StFrancesXCabrini",
         "name": "Saint Frances Xavier Cabrini, Virgin",
         "grade": 3,
-        "grade_display": null,
         "common": [
             "Virgins:For One Virgin",
             "Holy Men and Women:For Those Who Practiced Works of Mercy"
@@ -296,7 +285,6 @@
         "event_key": "StRoseDuchesne",
         "name": "Saint Rose Philippine Duchesne, Virgin",
         "grade": 2,
-        "grade_display": null,
         "common": [
             "Virgins:For One Virgin"
         ],
@@ -318,7 +306,6 @@
         "event_key": "MiguelPro",
         "name": "Blessed Miguel Agustín Pro, Priest and Martyr",
         "grade": 2,
-        "grade_display": null,
         "common": [
             "Martyrs:For One Martyr",
             "Pastors:For One Pastor"
