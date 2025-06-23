@@ -12,7 +12,7 @@
             "action": "setProperty",
             "since_year": 2016,
             "property": "grade",
-            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_%s.pdf",
+            "url": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_%s.pdf",
             "url_lang_map": {
                 "de": "ge",
                 "en": "en",
@@ -24,14 +24,14 @@
                 "pt": "po"
             },
             "urls_langs": {
-                "de": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_ge.pdf",
-                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_en.pdf",
-                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_sp.pdf",
-                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_fr.pdf",
-                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf",
-                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_la.pdf",
-                "pl": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_pl.pdf",
-                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_po.pdf"
+                "de": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_ge.pdf",
+                "en": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_en.pdf",
+                "es": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_sp.pdf",
+                "fr": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_fr.pdf",
+                "it": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf",
+                "la": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_la.pdf",
+                "pl": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_pl.pdf",
+                "pt": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_po.pdf"
             }
         }
     },
@@ -97,7 +97,7 @@
             "action": "setProperty",
             "property": "name",
             "since_year": 2021,
-            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_%s.html",
+            "url": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_%s.html",
             "url_lang_map": {
                 "de": "ge",
                 "en": "en",
@@ -108,13 +108,13 @@
                 "pt": "po"
             },
             "urls_langs": {
-                "de": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_ge.html",
-                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_en.html",
-                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_sp.html",
-                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_fr.html",
-                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_it.html",
-                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_la.html",
-                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_po.html"
+                "de": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_ge.html",
+                "en": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_en.html",
+                "es": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_sp.html",
+                "fr": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_fr.html",
+                "it": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_it.html",
+                "la": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_la.html",
+                "pt": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210126_decreto-santi_po.html"
             }
         }
     },
@@ -122,7 +122,7 @@
         "decree_id": "StJohnXXIII_Create",
         "decree_date": "2014-05-29",
         "decree_protocol": "Prot. N. 309/14",
-        "description": "The Supreme Pontiff Francis, taking into consideration the universal whishes of the People of God from many and diverse regions of the world, has decreed that the celebrations of Pope Saint John XXIII and Pope Saint John Paul II should be inserted into the General Roman Calendar, to be observed annually with the rank of Optional Memorial, the first on 11 October, the second on 22 October.",
+        "description": "The Supreme Pontiff Francis, taking into consideration the universal wishes of the People of God from many and diverse regions of the world, has decreed that the celebrations of Pope Saint John XXIII and Pope Saint John Paul II should be inserted into the General Roman Calendar, to be observed annually with the rank of Optional Memorial, the first on 11 October, the second on 22 October.",
         "festivity": {
             "event_key": "StJohnXXIII",
             "grade": 2,
@@ -143,7 +143,7 @@
         "metadata": {
             "action": "createNew",
             "since_year": 2014,
-            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_%s.html",
+            "url": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_%s.html",
             "url_lang_map": {
                 "en": "en",
                 "es": "sp",
@@ -153,12 +153,12 @@
                 "pt": "po"
             },
             "urls_langs": {
-                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_en.html",
-                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_sp.html",
-                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_fr.html",
-                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_it.html",
-                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_la.html",
-                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_po.html"
+                "en": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_en.html",
+                "es": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_sp.html",
+                "fr": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_fr.html",
+                "it": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_it.html",
+                "la": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_la.html",
+                "pt": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_po.html"
             }
         }
     },
@@ -187,7 +187,7 @@
         "metadata": {
             "action": "createNew",
             "since_year": 2014,
-            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_%s.html",
+            "url": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_%s.html",
             "url_lang_map": {
                 "en": "en",
                 "es": "sp",
@@ -197,12 +197,12 @@
                 "pt": "po"
             },
             "urls_langs": {
-                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_en.html",
-                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_sp.html",
-                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_fr.html",
-                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_it.html",
-                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_la.html",
-                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_po.html"
+                "en": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_en.html",
+                "es": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_sp.html",
+                "fr": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_fr.html",
+                "it": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_it.html",
+                "la": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_la.html",
+                "pt": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20140529_decreto-calendario-generale-gxxiii-gpii_po.html"
             }
         }
     },
@@ -231,7 +231,7 @@
         "metadata": {
             "action": "createNew",
             "since_year": 2019,
-            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_%s.html",
+            "url": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_%s.html",
             "url_lang_map": {
                 "en": "en",
                 "es": "sp",
@@ -241,12 +241,12 @@
                 "pt": "po"
             },
             "urls_langs": {
-                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_en.html",
-                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_sp.html",
-                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_fr.html",
-                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_it.html",
-                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_la.html",
-                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_po.html"
+                "en": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_en.html",
+                "es": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_sp.html",
+                "fr": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_fr.html",
+                "it": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_it.html",
+                "la": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_la.html",
+                "pt": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20191007_decreto-celebrazione-verginediloreto_po.html"
             }
         }
     },
@@ -275,7 +275,7 @@
         "metadata": {
             "action": "createNew",
             "since_year": 2019,
-            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_%s.html",
+            "url": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_%s.html",
             "url_lang_map": {
                 "de": "ge",
                 "en": "en",
@@ -286,13 +286,13 @@
                 "pt": "po"
             },
             "urls_langs": {
-                "de": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_ge.html",
-                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_en.html",
-                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_sp.html",
-                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_fr.html",
-                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_it.html",
-                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_la.html",
-                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_po.html"
+                "de": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_ge.html",
+                "en": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_en.html",
+                "es": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_sp.html",
+                "fr": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_fr.html",
+                "it": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_it.html",
+                "la": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_la.html",
+                "pt": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20190125_decreto-celebrazione-paolovi_po.html"
             }
         }
     },
@@ -321,7 +321,7 @@
         "metadata": {
             "action": "createNew",
             "since_year": 2020,
-            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_%s.html",
+            "url": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_%s.html",
             "url_lang_map": {
                 "en": "en",
                 "es": "sp",
@@ -331,12 +331,12 @@
                 "pt": "po"
             },
             "urls_langs": {
-                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_en.html",
-                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_sp.html",
-                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_fr.html",
-                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_it.html",
-                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_la.html",
-                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_po.html"
+                "en": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_en.html",
+                "es": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_sp.html",
+                "fr": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_fr.html",
+                "it": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_it.html",
+                "la": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_la.html",
+                "pt": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20200518_decreto-celebrazione-santafaustina_po.html"
             }
         }
     },
@@ -365,7 +365,7 @@
         "metadata": {
             "action": "createNew",
             "since_year": 2021,
-            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_%s.html",
+            "url": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_%s.html",
             "url_lang_map": {
                 "de": "ge",
                 "en": "en",
@@ -376,13 +376,13 @@
                 "pt": "po"
             },
             "urls_langs": {
-                "de": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_ge.html",
-                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_en.html",
-                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_sp.html",
-                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_fr.html",
-                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_it.html",
-                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_la.html",
-                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_po.html"
+                "de": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_ge.html",
+                "en": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_en.html",
+                "es": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_sp.html",
+                "fr": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_fr.html",
+                "it": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_it.html",
+                "la": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_la.html",
+                "pt": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_po.html"
             }
         }
     },
@@ -411,7 +411,7 @@
         "metadata": {
             "action": "createNew",
             "since_year": 2021,
-            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_%s.html",
+            "url": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_%s.html",
             "url_lang_map": {
                 "de": "ge",
                 "en": "en",
@@ -422,13 +422,13 @@
                 "pt": "po"
             },
             "urls_langs": {
-                "de": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_ge.html",
-                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_en.html",
-                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_sp.html",
-                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_fr.html",
-                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_it.html",
-                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_la.html",
-                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_po.html"
+                "de": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_ge.html",
+                "en": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_en.html",
+                "es": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_sp.html",
+                "fr": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_fr.html",
+                "it": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_it.html",
+                "la": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_la.html",
+                "pt": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_po.html"
             }
         }
     },
@@ -457,7 +457,7 @@
         "metadata": {
             "action": "createNew",
             "since_year": 2021,
-            "url": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_%s.html",
+            "url": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_%s.html",
             "url_lang_map": {
                 "de": "ge",
                 "en": "en",
@@ -468,13 +468,13 @@
                 "pt": "po"
             },
             "urls_langs": {
-                "de": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_ge.html",
-                "en": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_en.html",
-                "es": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_sp.html",
-                "fr": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_fr.html",
-                "it": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_it.html",
-                "la": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_la.html",
-                "pt": "http://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_po.html"
+                "de": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_ge.html",
+                "en": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_en.html",
+                "es": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_sp.html",
+                "fr": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_fr.html",
+                "it": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_it.html",
+                "la": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_la.html",
+                "pt": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20210125_decreto-dottori_po.html"
             }
         }
     },
