@@ -83,13 +83,13 @@ class LatinUtils
     ];
 
     public const LATIN_DAYOFTHEWEEK = [
-        "Dominica",     //0=Sunday
+        "Dominica",    //0=Sunday
         "Feria II",    //1=Monday
         "Feria III",   //2=Tuesday
         "Feria IV",    //3=Wednesday
         "Feria V",     //4=Thursday
         "Feria VI",    //5=Friday
-        "Sabbato"    //6=Saturday
+        "Sabbato"      //6=Saturday
     ];
 
     public const LATIN_MONTHS = [
