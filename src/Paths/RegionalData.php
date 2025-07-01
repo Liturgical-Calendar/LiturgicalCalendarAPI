@@ -13,18 +13,10 @@ use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Params\RegionalDataParams;
-use PHP_CodeSniffer\Tokenizers\JS;
-use stdClass;
 
 /**
  * RegionalData
- * PHP version 8.3
  *
- * @package  LitCal
- * @author   John Romano D'Orazio <priest@johnromanodorazio.com>
- * @license  https://www.apache.org/licenses/LICENSE-2.0.txt Apache License 2.0
- * @version  GIT: 3.9
- * @link     https://litcal.johnromanodorazio.com
  */
 class RegionalData
 {
@@ -254,6 +246,8 @@ class RegionalData
     /**
      * Handle PUT requests to create a diocesan calendar data resource.
      *
+     * This is a private method and should only be called from {@see createCalendar}.
+     *
      * The diocesan calendar data resource is created in the `jsondata/sourcedata/calendars/dioceses/` directory.
      *
      * This method ensures the necessary directories for storing diocesan calendar data are created.
@@ -338,6 +332,10 @@ class RegionalData
     /**
      * Handle PUT requests to create or update a national calendar data resource.
      *
+     * This is a private method and should only be called from {@see createCalendar}.
+     *
+     * The national calendar data resource is created in the `jsondata/sourcedata/calendars/nations/` directory.
+     *
      * This method ensures the necessary directories for storing national calendar data are created.
      * It processes the internationalization (i18n) data provided in the payload, saving it to the appropriate
      * locale-specific files within the national calendar directory structure.
@@ -345,7 +343,7 @@ class RegionalData
      * After processing and saving the i18n data, it removes it from the payload and writes the national
      * calendar data to a JSON file named after the nation identifier.
      *
-     * On successful creation f the national calendar data,
+     * On successful creation of the national calendar data,
      * a 201 Created response is sent containing a success message.
      */
     private function createNationalCalendar(): void
@@ -394,9 +392,19 @@ class RegionalData
         self::produceResponse(json_encode($response));
     }
 
+    /**
+     * Handle PUT requests to create a wider region calendar data resource.
+     *
+     * This is a private method and should only be called from {@see createCalendar}.
+     *
+     * The resource is created in the `jsondata/sourcedata/calendars/wider_regions/` directory.
+     * TODO: implement
+     */
     private function createWiderRegionCalendar(): void
     {
         $response = new \stdClass();
+        // implementation here
+        self::produceResponse(json_encode($response));
     }
 
     /**
@@ -1002,6 +1010,7 @@ class RegionalData
 
         if (self::$Core->getRequestMethod() === RequestMethod::POST && $payload !== null) {
             if (property_exists($payload, 'locale')) {
+                /** @phpstan-ignore property.nonObject */
                 $data->locale = $payload->locale;
             }
         }

@@ -7,20 +7,6 @@ use LiturgicalCalendar\Api\Enum\JsonData;
 /**
  * Enum class for the different Roman Missals that are used in the LitCal
  *
- * @property const string EDITIO_TYPICA_1970 "EDITIO_TYPICA_1970"
- * @property const string REIMPRESSIO_EMENDATA_1971 "EDITIO_TYPICA_1971"
- * @property const string EDITIO_TYPICA_SECUNDA_1975 "EDITIO_TYPICA_1975"
- * @property const string EDITIO_TYPICA_TERTIA_2002 "EDITIO_TYPICA_2002"
- * @property const string EDITIO_TYPICA_TERTIA_EMENDATA_2008 "EDITIO_TYPICA_2008"
- * @property const string USA_EDITION_2011 "US_2011"
- * @property const string ITALY_EDITION_1983 "IT_1983"
- * @property const string ITALY_EDITION_2020 "IT_2020"
- * @property const string NETHERLANDS_EDITION_1978 "NL_1978"
- * @property static array $values An array of the Roman Missal values defined in the class constants
- * @property static array $names An associative array of the Roman Missal names, where the key is the value of a Roman Missal constant
- * @property static array $jsonFiles An associative array of the JSON file paths, where the key is the value of a Roman Missal constant
- * @property static array $i18nPath An associative array of the i18n file paths, where the key is the value of a Roman Missal constant
- * @property static array $yearLimits An associative array of the year limits, where the key is the value of a Roman Missal constant and the value is an associative array with the properties 'since_year' and optionally 'until_year'
  * @method static bool isValid($value)
  * @method static bool isLatinMissal($value)
  * @method static string getName($value)
@@ -44,6 +30,13 @@ class RomanMissal
     public const CANADA_EDITION_2011                   = "CA_2011";
     public const CANADA_EDITION_2016                   = "CA_2016";
 
+    /**
+     * The values of the Roman Missal enumeration constants.
+     * This array is used to check if a given missal_id is a valid Roman Missal enumeration constant.
+     * @static
+     * @var array<string>
+     * @see RomanMissal::isValid()
+     */
     public static array $values = [
         "EDITIO_TYPICA_1970",
         "EDITIO_TYPICA_1971",
@@ -58,6 +51,13 @@ class RomanMissal
         "CA_2016"
     ];
 
+    /**
+     * An associative array of the Roman Missal names, where the key is the value of a Roman Missal constant.
+     * This array is used to get the name of a Roman Missal given its id.
+     * @static
+     * @var array<string, string>
+     * @see RomanMissal::getName()
+     */
     public static array $names = [
         self::EDITIO_TYPICA_1970                    => "Editio Typica 1970",
         self::REIMPRESSIO_EMENDATA_1971             => "Reimpressio Emendata 1971",
@@ -72,6 +72,13 @@ class RomanMissal
         self::CANADA_EDITION_2016                   => "2016 Roman Missal issued by the CCCB"
     ];
 
+    /**
+     * An associative array of the JSON file paths, where the key is the value of a Roman Missal constant.
+     * This array is used to get the path to the JSON file containing the sanctorale data for a Roman Missal.
+     * @static
+     * @var array<string, string|false>
+     * @see RomanMissal::getSanctoraleFileName()
+     */
     public static array $jsonFiles = [
         self::EDITIO_TYPICA_1970                    => JsonData::MISSALS_FOLDER . "/propriumdesanctis_1970/propriumdesanctis_1970.json",
         self::REIMPRESSIO_EMENDATA_1971             => false,
@@ -86,6 +93,13 @@ class RomanMissal
         self::CANADA_EDITION_2016                   => false
     ];
 
+    /**
+     * An associative array of the i18n file paths, where the key is the value of a Roman Missal constant.
+     * This array is used to get the path to the i18n directory for the sanctorale of a Roman Missal.
+     * @static
+     * @var array<string, string|false>
+     * @see RomanMissal::getSanctoraleI18nFilePath()
+     */
     public static array $i18nPath = [
         self::EDITIO_TYPICA_1970                    => JsonData::MISSALS_FOLDER . "/propriumdesanctis_1970/i18n/",
         self::REIMPRESSIO_EMENDATA_1971             => false,
@@ -100,6 +114,14 @@ class RomanMissal
         self::CANADA_EDITION_2016                   => false
     ];
 
+    /**
+     * An associative array of the year limits, where the key is the value of a Roman Missal constant
+     * and the value is an associative array with the properties 'since_year' and optionally 'until_year'.
+     * This array is used to get the year limits for a Roman Missal.
+     * @static
+     * @var array<string, array{since_year: int, until_year?: int}>
+     * @see RomanMissal::getYearLimits()
+     */
     public static array $yearLimits = [
         self::EDITIO_TYPICA_1970                    => [ "since_year" => 1970 ],
         self::REIMPRESSIO_EMENDATA_1971             => [ "since_year" => 1971 ],

@@ -2219,7 +2219,7 @@ class Calendar
      */
     private function handleCoincidence(\stdClass $row, string $missal = RomanMissal::EDITIO_TYPICA_1970)
     {
-        $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast($row->date, $this->CalendarParams);
+        $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast($row->date);
         switch ($missal) {
             case RomanMissal::EDITIO_TYPICA_1970:
                 $YEAR = 1970;
@@ -2302,7 +2302,7 @@ class Calendar
             $url = sprintf($url, $lang);
         }
         $decree = '<a href="' . $url . '">' . _("Decree of the Congregation for Divine Worship") . '</a>';
-        $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast($row->festivity->date, $this->CalendarParams);
+        $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast($row->festivity->date);
         $locale = LitLocale::$PRIMARY_LANGUAGE;
         $this->Messages[] = sprintf(
             /**translators:
@@ -3274,7 +3274,7 @@ class Calendar
             // Let's check if it was suppressed by a Solemnity, Feast, Memorial or Sunday,
             // so we can give some feedback and maybe even recreate the festivity if applicable
             if ($this->Cal->inSolemnitiesFeastsOrMemorials($suppressedEvent->date) || self::dateIsSunday($suppressedEvent->date)) {
-                $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast($suppressedEvent->date, $this->CalendarParams);
+                $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast($suppressedEvent->date);
                 // If it was suppressed by a Feast or Memorial, we should be able to create it
                 // so we'll get the required properties back from the suppressed event
                 if ($this->Cal->inFeastsOrMemorials($suppressedEvent->date)) {
@@ -3808,7 +3808,7 @@ class Calendar
                                             $this->CalendarParams->Year
                                         );
                                     } else {
-                                        $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast($currentFeastDate, $this->CalendarParams);
+                                        $coincidingFestivity = $this->Cal->determineSundaySolemnityOrFeast($currentFeastDate);
                                         $this->Messages[] = sprintf(
                                             /**translators:
                                              * 1. Festivity grade

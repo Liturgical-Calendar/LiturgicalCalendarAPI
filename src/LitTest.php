@@ -9,33 +9,47 @@ use Swaggest\JsonSchema\Schema;
  * Class LitTest
  * @package LiturgicalCalendar\Api
  *
- * @property private bool $readyState              Whether the test is ready to be run
- * @property private ?object $testInstructions     The JSON instructions for the test
- * @property private ?object $dataToTest           The data to be tested
- * @property private ?object $Message              The message returned by the test
- * @property private ?string $Test                 The name of the test
- * @property private ?object $testCache            The test cache
- *
  * @method void __construct(string $Test, object $dataToTest)               Initializes the test object with the provided Test and test data.
  * @method bool isReady()                                                   Returns whether the test is ready to be run
  * @method void runTest()                                                   Runs the test
- * @method private string getCalendarType()                                 Returns the type of the calendar
- * @method private string getCalendarName()                                 Returns the name of the calendar
- * @method private void setMessage(string $type, ?string $message)          Sets the message for the test results, whether of type success or error
- * @method private void setError(string $message)                           Sets the error message
- * @method private void setSuccess(?string $message)                        Sets the success message
  * @method object getMessage()                                              Returns the message returned by the test
- * @method private ?object retrieveAssertionForYear(int $year)              Retrieves the assertion for the given year
- * @method private array detectYearsSupported()                             Detects the years supported by the test
  */
 class LitTest
 {
+    /**
+     * @var bool Indicates whether the test is ready to run.
+     * When the server loads a new test, it will attempt to load the test instructions JSON file and validate it against the schema.
+     * If the loading and validation are successful, the readyState is set to true.
+     * All subsequent calls to isReady() will return the value of readyState.
+     */
     private bool $readyState            = false;
+
+    /**
+     * @var object|null The JSON instructions for the test
+     */
     private ?object $testInstructions   = null;
+
+    /**
+     * @var object|null The data to be tested
+     */
     private ?object $dataToTest         = null;
+
+    /**
+     * @var object|null The message to be returned by the test
+     */
     private ?object $Message            = null;
+
+    /**
+     * @var string|null The name of the test
+     */
     private ?string $Test               = null;
 
+    /**
+     * @var object|null The cache for the test instructions and supported years
+     * This is a static property that is shared across all instances of LitTest.
+     * It is used to avoid loading the same test instructions multiple times.
+     * @static
+     */
     private static ?object $testCache   = null;
 
     /**

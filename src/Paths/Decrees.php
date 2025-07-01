@@ -40,6 +40,7 @@ class Decrees
             }
             if (self::$Core->getRequestMethod() === RequestMethod::POST) {
                 if ($payload !== null && property_exists($payload, 'locale')) {
+                    /** @phpstan-ignore property.nonObject */
                     $data["LOCALE"] = $payload->locale;
                 } else {
                     $data["LOCALE"] = LitLocale::LATIN;

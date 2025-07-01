@@ -1,6 +1,8 @@
 parameters:
-    level: 1
+    level: 2
     paths:
         - src
     bootstrapFiles:
         - tools/phpstan-stubs/constants.php
+    universalObjectCratesClasses:
+        - Ratchet\ConnectionInterface

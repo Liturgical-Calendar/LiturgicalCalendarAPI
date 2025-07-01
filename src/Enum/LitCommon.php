@@ -304,7 +304,7 @@ class LitCommon
      * Validate a value (or values) against the list of $values property of this class.
      * If the value contains a comma or colon, it is split into an array and tested with the areValid() method.
      * Otherwise the value is tested directly with the in_array() function.
-     * @param string|array $value The value to be validated.
+     * @param string $value The value to be validated.
      * @return bool True if the value is valid, false otherwise.
      */
     public static function isValid(string $value)

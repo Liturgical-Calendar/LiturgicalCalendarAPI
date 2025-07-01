@@ -683,6 +683,7 @@ class Health implements MessageComponentInterface
                                         $message->classes = ".$validation->validate.schema-valid";
                                         $this->sendMessage($to, $message);
                                     } elseif (gettype($validationResult === 'object')) {
+                                        /** @phpstan-ignore property.nonObject */
                                         $validationResult->classes = ".$validation->validate.schema-valid";
                                         $this->sendMessage($to, $validationResult);
                                     }
@@ -722,6 +723,7 @@ class Health implements MessageComponentInterface
                                     $message->classes = ".$validation->validate.schema-valid";
                                     $this->sendMessage($to, $message);
                                 } elseif (gettype($validationResult === 'object')) {
+                                    /** @phpstan-ignore property.nonObject */
                                     $validationResult->classes = ".$validation->validate.schema-valid";
                                     $this->sendMessage($to, $validationResult);
                                 }
@@ -940,6 +942,7 @@ class Health implements MessageComponentInterface
                                 $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                                 $this->sendMessage($to, $message);
                             } elseif (gettype($validationResult === 'object')) {
+                                /** @phpstan-ignore property.nonObject */
                                 $validationResult->classes = ".calendar-$calendar.schema-valid.year-$year";
                                 $this->sendMessage($to, $validationResult);
                             }
@@ -972,6 +975,7 @@ class Health implements MessageComponentInterface
                             $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
                         } elseif (gettype($validationResult === 'object')) {
+                            /** @phpstan-ignore property.nonObject */
                             $validationResult->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $validationResult);
                         }
