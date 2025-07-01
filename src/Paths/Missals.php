@@ -428,9 +428,11 @@ class Missals
         if (self::$params->IncludeEmpty) {
             $allMissals = RomanMissal::produceMetadata(true);
             foreach ($allMissals as $missal) {
-                if (null === array_find(self::$missalsIndex->litcal_missals, function ($m) use ($missal) {
-                    return $m->missal_id === $missal->missal_id;
-                })) {
+                if (
+                    null === array_find(self::$missalsIndex->litcal_missals, function ($m) use ($missal) {
+                        return $m->missal_id === $missal->missal_id;
+                    })
+                ) {
                     //$missal->api_path = false;
                     self::$missalsIndex->litcal_missals[] = $missal;
                     self::$params->addMissalRegion($missal->region);
