@@ -188,6 +188,8 @@ class Health implements MessageComponentInterface
                 $errorMsg = 'No action specified';
             } elseif (!self::validateMessageProperties($messageReceived)) {
                 $errorMsg = 'Invalid message properties';
+            } else {
+                $errorMsg = 'Unknown error';
             }
             echo sprintf('Invalid message from connection %1$d: %2$s (%3$s)', $from->resourceId, $errorMsg, $msg);
             $message = new \stdClass();
@@ -816,6 +818,7 @@ class Health implements MessageComponentInterface
                     break;
                 default:
                     //we shouldn't ever get any other categories
+                    $req = "/unknown";
             }
         }
         $data = file_get_contents(self::REQPATH . $req, false, $context);
@@ -1025,6 +1028,7 @@ class Health implements MessageComponentInterface
                     break;
                 default:
                     //we shouldn't ever get any other categories
+                    $req = "/unknown";
             }
         }
         $data = file_get_contents(self::REQPATH . $req, false, $context);

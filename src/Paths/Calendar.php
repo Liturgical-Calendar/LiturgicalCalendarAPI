@@ -848,6 +848,8 @@ class Calendar
     {
         $propriumdesanctisFile = RomanMissal::getSanctoraleFileName($missal);
         $propriumdesanctisI18nPath = RomanMissal::getSanctoraleI18nFilePath($missal);
+        $i18nData = null;
+
         // only produce an error if a translation file is expected but not found
         if (
             str_starts_with($missal, 'EDITIO_TYPICA_')
@@ -863,6 +865,7 @@ class Calendar
             );
             self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
         }
+
         if ($propriumdesanctisI18nPath !== false) {
             $locale = LitLocale::$PRIMARY_LANGUAGE;
             $propriumdesanctisI18nFile = $propriumdesanctisI18nPath . $locale . ".json";
@@ -969,7 +972,8 @@ class Calendar
                     if (
                         (
                             $decree->metadata->action === "createNew"
-                            || ($decree->metadata->action === "setProperty" && $decree->metadata->property === "name" )
+                            ||
+                            ($decree->metadata->action === "setProperty" && $decree->metadata->property === "name" )
                         )
                         && $NAME !== null
                     ) {
@@ -2234,6 +2238,9 @@ class Calendar
                 $YEAR = 2008;
                 $DECREE = '';
                 break;
+            default:
+                $YEAR = 0; // Default value, should not be used
+                $DECREE = '';
         }
         /**translators:
          * 1. Grade or rank of the festivity that has been superseded
@@ -3879,6 +3886,9 @@ class Calendar
             );
 
         if (!$this->Cal->inSolemnitiesFeastsOrMemorials($newDate)) {
+            $oldDateStr = '';
+            // If the festivity exists, we can simply move it to the new date
+            // If it does not exist, we should recreate it on the new date
             if ($festivity !== null) {
                 $oldDateStr = $this->CalendarParams->Locale === LitLocale::LATIN_PRIMARY_LANGUAGE
                     ? ( $festivity->date->format('j') . ' ' . LatinUtils::LATIN_MONTHS[ (int)$festivity->date->format('n') ] )
@@ -3888,10 +3898,12 @@ class Calendar
                     );
                 $this->Cal->moveFestivityDate($event_key, $festivity->date);
             } else {
-                //if it was suppressed on the original date because of a higher ranking celebration,
-                //we should recreate it on the new date
-                //except in the case of Saint Vincent Deacon when we're dealing with the Roman Missal USA edition,
-                //since the National Day of Prayer will take over the new date
+                // If it was suppressed on the original date because of a higher ranking celebration,
+                //    we should recreate it on the new date
+                //    except in the case of Saint Vincent Deacon when we're dealing with the Roman Missal USA edition,
+                //    since the National Day of Prayer will take over the new date
+                // TODO: this logic needs to be generalized to allow for other cases,
+                //       and needs to be automated from the national calendar JSON file
                 if ($event_key !== "StVincentDeacon" || $missal !== RomanMissal::USA_EDITION_2011) {
                     if ($this->Cal->isSuppressed($event_key)) {
                         $suppressedEvent = $this->Cal->getSuppressedEventByKey($event_key);
@@ -4646,6 +4658,9 @@ class Calendar
                 if ($infoObj->status === "success") {
                     $response = $this->produceIcal($SerializeableLitCal, $infoObj->obj);
                 } else {
+                    $response = '';
+                    // if we cannot get the latest release info, we return an error
+                    // and we do not produce the iCal file
                     $message = sprintf(
                         _('Error receiving or parsing info from github about latest release: %s.'),
                         $infoObj->message
@@ -4655,8 +4670,8 @@ class Calendar
                 break;
             default:
                 $response = json_encode($SerializeableLitCal);
-                break;
         }
+
         if (false === Router::isLocalhost()) {
             file_put_contents($this->CACHEFILE, $response);
         }

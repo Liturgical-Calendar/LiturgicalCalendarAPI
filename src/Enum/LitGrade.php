@@ -202,7 +202,10 @@ class LitGrade
                 $tags = ['<B><I>','</I></B>'];
                 break;
             default:
+                /**translators: liturgical rank. Keep lowercase  */
                 $grade = $this->locale === LitLocale::LATIN ? 'feria'                 : _("weekday");
+                /**translators: liturgical rank 'WEEKDAY' in abbreviated form */
+                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'f'                 : _("w");
                 $tags = ['',''];
         }
         if ($abbreviate) {

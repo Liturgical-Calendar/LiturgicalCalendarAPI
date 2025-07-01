@@ -6,7 +6,7 @@
  * @author  John Romano D'Orazio <priest@johnromanodorazio.com>
  * @link    https://litcal.johnromanodorazio.com
  * @license Apache 2.0 License
- * @version 3.9
+ * @version 4.5
  * Date Created: 27 December 2017
  */
 

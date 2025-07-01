@@ -20,7 +20,7 @@ use LiturgicalCalendar\Api\Enum\RequestMethod;
  */
 class RegionalDataParams
 {
-    private readonly object $calendars;
+    private readonly ?object $calendars;
 
     /**
      * An array of expected values for the category parameter of requests to the /data API path.
@@ -43,15 +43,18 @@ class RegionalDataParams
 
     public function __construct()
     {
-        $calendarsRoute = API_BASE_PATH . Route::CALENDARS->value;
-        $metadataRaw = file_get_contents($calendarsRoute);
+        $metadataRaw = file_get_contents(API_BASE_PATH . Route::CALENDARS->value);
         if ($metadataRaw) {
             $metadata = json_decode($metadataRaw);
             if (JSON_ERROR_NONE === json_last_error() && property_exists($metadata, 'litcal_metadata')) {
                 //let's remove the Vatican calendar from the list
                 array_shift($metadata->litcal_metadata->national_calendars);
                 $this->calendars = $metadata->litcal_metadata;
+            } else {
+                $this->calendars = null;
             }
+        } else {
+            $this->calendars = null;
         }
 
         // Initialize the list of available locales
@@ -108,6 +111,7 @@ class RegionalDataParams
         }
 
         // We must verify the `key` parameter for any request that is not PUT
+        $currentNation = null;
         if (RegionalData::$Core->getRequestMethod() !== RequestMethod::PUT) {
             if (false === in_array($data->key, $this->calendars->national_calendars_keys)) {
                 $validVals = implode(', ', $this->calendars->national_calendars_keys);

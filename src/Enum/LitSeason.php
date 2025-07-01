@@ -38,6 +38,9 @@ class LitSeason
             case self::ORDINARY_TIME:
                 /**translators: context = liturgical season */
                 return $locale === LitLocale::LATIN ? 'Tempus per Annum'    : _("Ordinary Time");
+            default:
+                /**translators: context = liturgical season: unsupported value */
+                return $locale === LitLocale::LATIN ? 'Tempus Ignotum'     : _("Unknown Season");
         }
     }
 }

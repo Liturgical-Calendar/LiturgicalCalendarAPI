@@ -27,7 +27,7 @@ use LiturgicalCalendar\Api\Enum\JsonData;
  * @method static string getSanctoraleFileName($value)
  * @method static string getSanctoraleI18nFilePath($value)
  * @method static object getYearLimits($value)
- * @method static array produceMetadata()
+ * @method static array produceMetadata($obj = true)
  */
 class RomanMissal
 {

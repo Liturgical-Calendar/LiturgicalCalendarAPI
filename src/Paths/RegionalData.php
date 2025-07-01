@@ -162,6 +162,7 @@ class RegionalData
     private function getCalendar(): void
     {
         $calendarDataFile = null;
+        $dioceseEntry = null;
         switch ($this->params->category) {
             case "DIOCESANCALENDAR":
                 $dioceseEntry = array_find($this->CalendarsMetadata->diocesan_calendars, function ($el) {
@@ -231,8 +232,10 @@ class RegionalData
                         '{locale}' => $this->params->locale
                     ]);
                     break;
+                default:
+                    $CalendarDataI18nFile = null;
             }
-            if (file_exists($CalendarDataI18nFile)) {
+            if (null !== $CalendarDataI18nFile && file_exists($CalendarDataI18nFile)) {
                 $localeData = json_decode(file_get_contents($CalendarDataI18nFile));
                 foreach ($CalendarData->litcal as $idx => $el) {
                     if (property_exists($localeData, $CalendarData->litcal[$idx]->festivity->event_key)) {
@@ -857,6 +860,9 @@ class RegionalData
                     ]
                 );
                 break;
+            default:
+                $calendarDataFile = null;
+                $calendarI18nFolder = null;
         }
 
         return [$calendarDataFile, $calendarI18nFolder];
@@ -877,6 +883,7 @@ class RegionalData
     private function deleteCalendar()
     {
         $response = new \stdClass();
+        $dioceseNationFolder = null;
 
         [$calendarDataFile, $calendarI18nFolder] = $this->getPathsForCalendarDelete();
 
@@ -911,7 +918,7 @@ class RegionalData
             if (false === rmdir($calendarDataFolder)) {
                 self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, data folder could not be removed.");
             }
-            if ($this->params->category === "DIOCESANCALENDAR") {
+            if ($this->params->category === "DIOCESANCALENDAR" && $dioceseNationFolder !== null) {
                 // Check if the parent `nation_id` folder is empty, if it is, remove it too
                 if (count(scandir($dioceseNationFolder)) === 2) { // only . and ..
                     if (false === rmdir($dioceseNationFolder)) {

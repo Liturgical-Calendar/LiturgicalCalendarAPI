@@ -4,7 +4,7 @@ name: Update POTs
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
+  # Triggers the workflow on push or pull request events but only for the given branch
   push:
     branches: [ development ]
     paths: [ '**.php' ]

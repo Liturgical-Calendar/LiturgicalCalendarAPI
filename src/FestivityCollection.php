@@ -32,6 +32,7 @@ class FestivityCollection
     private array $suppressedEvents                      = [];
     private array $reinstatedEvents                      = [];
     private array $T                                     = [];
+    private array $Messages                              = [];
     private \IntlDateFormatter $dayOfTheWeek;
     private CalendarParams $CalendarParams;
     private LitGrade $LitGrade;
