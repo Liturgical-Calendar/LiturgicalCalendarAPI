@@ -1,0 +1,28 @@
+name: CodeSniffer
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the given branch
+  push:
+    branches: [ development ]
+    paths: [ '**.php' ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Composer install
+        uses: php-actions/composer@v6
+
+      - name: PHP Code Sniffer
+        uses: php-actions/phpcs@v1
+        with:
+          php_version: 8.4
+          path: src/
+          standard: phpcs.xml
