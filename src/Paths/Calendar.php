@@ -2882,6 +2882,7 @@ class Calendar
                                  * 8. Source of the information
                                  */
                                 _('In the year %1$d, the %2$s \'%3$s\' has been suppressed by the %4$s \'%5$s\', added on %6$s since the year %7$d (%8$s).'),
+                                $this->CalendarParams->Year,
                                 $this->LitGrade->i18n($coincidingLiturgicalEvent->grade, false),
                                 '<i>' . $coincidingLiturgicalEvent->name . '</i>',
                                 $this->LitGrade->i18n($row->liturgical_event->grade, false),

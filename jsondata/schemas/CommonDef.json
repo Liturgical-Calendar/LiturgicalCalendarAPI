@@ -336,7 +336,7 @@
                 "createNew",
                 "setProperty",
                 "makePatron",
-                "moveLiturgicalEvent"
+                "moveEvent"
             ],
             "title": "NationalCalendarAction"
         },

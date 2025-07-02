@@ -17,7 +17,7 @@
                 "month": 1
             },
             "metadata": {
-                "action": "moveLiturgicalEvent",
+                "action": "moveEvent",
                 "missal": "US_2011",
                 "reason": "National Day of Prayer for the Unborn",
                 "since_year": 1970
@@ -30,7 +30,7 @@
                 "month": 10
             },
             "metadata": {
-                "action": "moveLiturgicalEvent",
+                "action": "moveEvent",
                 "missal": "US_2011",
                 "reason": "Saint John Brebeuf (elevated to memorial)",
                 "since_year": 1970
@@ -69,7 +69,7 @@
                 "month": 7
             },
             "metadata": {
-                "action": "moveLiturgicalEvent",
+                "action": "moveEvent",
                 "missal": "US_2011",
                 "reason": "Blessed Kateri Tekakwitha",
                 "since_year": 1970
@@ -82,7 +82,7 @@
                 "month": 7
             },
             "metadata": {
-                "action": "moveLiturgicalEvent",
+                "action": "moveEvent",
                 "missal": "US_2011",
                 "reason": "Independence Day",
                 "since_year": 1970
