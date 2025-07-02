@@ -9,7 +9,7 @@
             "items": {
                 "oneOf": [
                     {
-                        "$ref": "#/definitions/LitCalMoveFestivity"
+                        "$ref": "#/definitions/LitCalMoveLiturgicalEvent"
                     },
                     {
                         "$ref": "#/definitions/LitCalSetPropertyGrade"
@@ -87,7 +87,7 @@
                         "month",
                         "common"
                     ],
-                    "title": "Festivity"
+                    "title": "LiturgicalEvent"
                 },
                 "metadata": {
                     "$ref": "#/definitions/LitCalMetadataCreateNew"
@@ -138,7 +138,7 @@
                         "grade",
                         "color"
                     ],
-                    "title": "FestivityCreateNewMobile"
+                    "title": "LiturgicalEventCreateNewMobile"
                 },
                 "metadata": {
                     "$ref": "#/definitions/LitCalMetadataCreateNew"
@@ -286,7 +286,7 @@
             ],
             "title": "LitCalSetNameProperty"
         },
-        "LitCalMoveFestivity": {
+        "LitCalMoveLiturgicalEvent": {
             "type": "object",
             "additionalProperties": false,
             "properties": {

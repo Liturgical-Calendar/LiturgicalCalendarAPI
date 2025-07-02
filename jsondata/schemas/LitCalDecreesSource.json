@@ -26,7 +26,7 @@
                     "type": "string"
                 },
                 "liturgical_event": {
-                    "$ref": "#/definitions/Festivity"
+                    "$ref": "#/definitions/LiturgicalEvent"
                 },
                 "metadata": {
                     "$ref": "#/definitions/Metadata"
@@ -45,7 +45,7 @@
                 "metadata"
             ]
         },
-        "Festivity": {
+        "LiturgicalEvent": {
             "type": "object",
             "additionalProperties": false,
             "properties": {

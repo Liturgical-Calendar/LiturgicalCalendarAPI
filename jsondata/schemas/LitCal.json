@@ -123,10 +123,10 @@
             "items": {
                 "anyOf": [
                     {
-                        "$ref": "#/definitions/Festivity"
+                        "$ref": "#/definitions/LiturgicalEvent"
                     },
                     {
-                        "$ref": "#/definitions/FestivityVigil"
+                        "$ref": "#/definitions/LiturgicalEventVigil"
                     }
                 ]
             }
@@ -321,7 +321,7 @@
                 }
             }
         },
-        "FestivityVigil": {
+        "LiturgicalEventVigil": {
             "type": "object",
             "properties": {
                 "event_idx": {
