@@ -138,11 +138,11 @@ msgstr ""
 msgid "Divine Mercy Sunday"
 msgstr ""
 
-#. translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
-#. translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
+#. translators: 1: LiturgicalEvent name, 2: LiturgicalEvent date, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
+#. translators: 1: LiturgicalEvent name, 2: LiturgicalEvent date, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
 #. translators:
-#.  1: Festivity name,
-#.  2: Festivity date,
+#.  1: LiturgicalEvent name,
+#.  2: LiturgicalEvent date,
 #.  3: Requested calendar year,
 #.  4: Explicatory string for the transferral,
 #.  5: actual date for the transferral,
@@ -167,7 +167,7 @@ msgstr ""
 #: src/Paths/Calendar.php:2781 src/Paths/Calendar.php:2820
 #: src/Paths/Calendar.php:2952 src/Paths/Calendar.php:2967
 #: src/Paths/Calendar.php:2984 src/Paths/Calendar.php:3025
-#: src/FestivityCollection.php:923
+#: src/LiturgicalEventCollection.php:923
 msgid "Decree of the Congregation for Divine Worship"
 msgstr ""
 
@@ -179,7 +179,7 @@ msgstr ""
 msgid "the following Monday"
 msgstr ""
 
-#. translators: 1: Festivity name, 2: Coinciding Festivity name, 3: Requested calendar year
+#. translators: 1: LiturgicalEvent name, 2: Coinciding LiturgicalEvent name, 3: Requested calendar year
 #: src/Paths/Calendar.php:1546
 #, php-format
 msgid ""
@@ -188,8 +188,8 @@ msgid ""
 msgstr ""
 
 #. translators:
-#.  1: Festivity name,
-#.  2: Coinciding Festivity name,
+#.  1: LiturgicalEvent name,
+#.  2: Coinciding LiturgicalEvent name,
 #.  3: Requested calendar year,
 #.  4: Decree of the Congregation for Divine Worship
 #.
@@ -200,7 +200,7 @@ msgid ""
 "year %3$d, it has been anticipated by one day as per %4$s."
 msgstr ""
 
-#. translators: 1: Festivity name (Christmas), 2: Requested calendar year, 3: Festivity name (Holy Family), 4: New date for Holy Family
+#. translators: 1: LiturgicalEvent name (Christmas), 2: Requested calendar year, 3: LiturgicalEvent name (Holy Family), 4: New date for Holy Family
 #: src/Paths/Calendar.php:1683
 #, php-format
 msgid ""
@@ -223,7 +223,7 @@ msgid ""
 "calendar '%1$s' in the year '%2$d' (%3$s)."
 msgstr ""
 
-#. translators: 1: Festivity name, 2: Superseding Festivity grade, 3: Superseding Festivity name, 4: Requested calendar year
+#. translators: 1: LiturgicalEvent name, 2: Superseding LiturgicalEvent grade, 3: Superseding LiturgicalEvent name, 4: Requested calendar year
 #: src/Paths/Calendar.php:1771 src/Paths/Calendar.php:1812
 #, php-format
 msgid "'%1$s' is superseded by the %2$s '%3$s' in the year %4$d."
@@ -499,7 +499,7 @@ msgid ""
 "added on %6$s since the year %7$d (%8$s)."
 msgstr ""
 
-#. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
+#. translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year
 #: src/Paths/Calendar.php:2949
 #, php-format
 msgid ""
@@ -507,7 +507,7 @@ msgid ""
 "since the year 2002 (%2$s), applicable to the year %3$d."
 msgstr ""
 
-#. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
+#. translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year
 #: src/Paths/Calendar.php:2964
 #, php-format
 msgid ""
@@ -524,7 +524,7 @@ msgid ""
 "superseded by a Sunday, a Solemnity, or a Feast '%4$s' in the year %3$d."
 msgstr ""
 
-#. translators: 1: Festivity name, 2: Source of the information
+#. translators: 1: LiturgicalEvent name, 2: Source of the information
 #: src/Paths/Calendar.php:3022
 #, php-format
 msgid ""
@@ -611,7 +611,7 @@ msgid ""
 "They are both reduced in rank to optional memorials."
 msgstr ""
 
-#. translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year
+#. translators: 1. LiturgicalEvent name, 2. LiturgicalEvent date, 3. Coinciding festivity name, 4. Requested calendar year
 #: src/Paths/Calendar.php:3433
 #, php-format
 msgid ""
@@ -619,7 +619,7 @@ msgid ""
 "'%3$s' in the year %4$d! Does something need to be done about this?"
 msgstr ""
 
-#. translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year
+#. translators: 1. LiturgicalEvent name, 2. LiturgicalEvent date, 3. Coinciding festivity name, 4. Requested calendar year
 #: src/Paths/Calendar.php:3447
 #, php-format
 msgid ""
@@ -747,9 +747,9 @@ msgid "Found a sanctorale data file for %s"
 msgstr ""
 
 #. translators:
-#.  1. Festivity grade
-#.  2. Festivity name
-#.  3. Festivity date
+#.  1. LiturgicalEvent grade
+#.  2. LiturgicalEvent name
+#.  3. LiturgicalEvent date
 #.  4. Edition of the Roman Missal
 #.  5. Superseding festivity grade
 #.  6. Superseding festivity name
@@ -768,7 +768,7 @@ msgstr ""
 msgid "Could not find a sanctorale data file for %s"
 msgstr ""
 
-#. translators: 1. Festivity grade, 2. Festivity name, 3. New festivity name, 4: Requested calendar year, 5. Old date, 6. New date
+#. translators: 1. LiturgicalEvent grade, 2. LiturgicalEvent name, 3. New festivity name, 4: Requested calendar year, 5. Old date, 6. New date
 #: src/Paths/Calendar.php:3926
 #, php-format
 msgid ""
@@ -776,7 +776,7 @@ msgid ""
 "room for '%3$s': applicable to the year %4$d."
 msgstr ""
 
-#. translators: 1. Festivity grade, 2. Festivity name, 3. Old date, 4. New date, 5. Source of the information, 6. New festivity name, 7. Superseding festivity grade, 8. Superseding festivity name, 9: Requested calendar year
+#. translators: 1. LiturgicalEvent grade, 2. LiturgicalEvent name, 3. Old date, 4. New date, 5. Source of the information, 6. New festivity name, 7. Superseding festivity grade, 8. Superseding festivity name, 9: Requested calendar year
 #: src/Paths/Calendar.php:3949
 #, php-format
 msgid ""
@@ -785,7 +785,7 @@ msgid ""
 "in the year %9$d."
 msgstr ""
 
-#. translators: 1: Festivity name, 2: Name of the diocese, 3: Festivity date, 4: Coinciding festivity name, 5: Requested calendar year
+#. translators: 1: LiturgicalEvent name, 2: Name of the diocese, 3: LiturgicalEvent date, 4: Coinciding festivity name, 5: Requested calendar year
 #: src/Paths/Calendar.php:4349
 #, php-format
 msgid ""
@@ -794,7 +794,7 @@ msgid ""
 "year %5$d! Does something need to be done about this?"
 msgstr ""
 
-#. translators: 1: Festivity grade, 2: Festivity name, 3: Name of the diocese, 4: Festivity date, 5: Coinciding festivity name, 6: Requested calendar year
+#. translators: 1: LiturgicalEvent grade, 2: LiturgicalEvent name, 3: Name of the diocese, 4: LiturgicalEvent date, 5: Coinciding festivity name, 6: Requested calendar year
 #: src/Paths/Calendar.php:4383
 #, php-format
 msgid ""
@@ -808,15 +808,15 @@ msgid "Error receiving or parsing info from github about latest release: %s."
 msgstr ""
 
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
-#: src/FestivityCollection.php:60
+#: src/LiturgicalEventCollection.php:60
 msgid "YEAR"
 msgstr ""
 
-#: src/FestivityCollection.php:61
+#: src/LiturgicalEventCollection.php:61
 msgid "Vigil Mass"
 msgstr ""
 
-#: src/FestivityCollection.php:917
+#: src/LiturgicalEventCollection.php:917
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -824,7 +824,7 @@ msgid ""
 "is confirmed as are I Vespers."
 msgstr ""
 
-#: src/FestivityCollection.php:931
+#: src/LiturgicalEventCollection.php:931
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -833,7 +833,7 @@ msgid ""
 "or an evening Mass."
 msgstr ""
 
-#: src/FestivityCollection.php:941
+#: src/LiturgicalEventCollection.php:941
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -842,7 +842,7 @@ msgid ""
 "Vigil Mass or Vespers I."
 msgstr ""
 
-#: src/FestivityCollection.php:1006
+#: src/LiturgicalEventCollection.php:1006
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "

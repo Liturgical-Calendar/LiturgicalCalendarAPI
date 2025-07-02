@@ -35,10 +35,10 @@ class RegionalDataParams
         "diocese"     => "DIOCESANCALENDAR",
         "widerregion" => "WIDERREGIONCALENDAR"
     ];
-    public ?string $category = null;
-    public ?string $key = null;
-    public ?string $locale = null;
-    public ?object $payload = null;
+    public ?string $category    = null;
+    public ?string $key         = null;
+    public ?string $locale      = null;
+    public ?object $payload     = null;
     public ?string $i18nRequest = null;
 
     public function __construct()
@@ -404,7 +404,7 @@ class RegionalDataParams
      *
      * If the request method is PUT or PATCH, we validate the payload and set the `payload` property.
      *
-     * @param object $data
+     * @param object{category: string, key: string, i18n?: ?string, payload?: object} $data
      *      The parameters to validate and set.
      *
      * @return bool

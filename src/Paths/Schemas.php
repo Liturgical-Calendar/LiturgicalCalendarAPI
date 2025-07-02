@@ -60,7 +60,6 @@ class Schemas
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode($schemaIndex);
                 die();
-                break;
             case 1:
                 if (file_exists('jsondata/schemas/' . $requestPathParts[0])) {
                     header('Content-Type: application/json; charset=utf-8');
@@ -70,7 +69,6 @@ class Schemas
                     header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
                     die("Schema file '{$requestPathParts[0]}' not found");
                 }
-                break;
         }
     }
 }

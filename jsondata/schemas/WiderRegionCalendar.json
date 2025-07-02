@@ -31,7 +31,7 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "festivity": {
+                "liturgical_event": {
                     "$ref": "#/definitions/Festivity"
                 },
                 "metadata": {
@@ -39,7 +39,7 @@
                 }
             },
             "required": [
-                "festivity",
+                "liturgical_event",
                 "metadata"
             ],
             "title": "LitCal"
@@ -77,7 +77,7 @@
                 "event_key",
                 "grade"
             ],
-            "title": "Festivity"
+            "title": "LiturgicalEvent"
         },
         "Metadata": {
             "type": "object",

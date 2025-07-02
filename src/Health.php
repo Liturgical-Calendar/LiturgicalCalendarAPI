@@ -345,7 +345,6 @@ class Health implements MessageComponentInterface
                     return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
                 }
                 return null;
-                break;
             case 'sourceDataCheck':
                 if (preg_match("/-i18n$/", $dataPath)) {
                     return LitSchema::I18N;
@@ -682,8 +681,7 @@ class Health implements MessageComponentInterface
                                         $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
                                         $message->classes = ".$validation->validate.schema-valid";
                                         $this->sendMessage($to, $message);
-                                    } elseif (gettype($validationResult === 'object')) {
-                                        /** @phpstan-ignore property.nonObject */
+                                    } elseif (gettype($validationResult) === 'object') {
                                         $validationResult->classes = ".$validation->validate.schema-valid";
                                         $this->sendMessage($to, $validationResult);
                                     }
@@ -722,8 +720,7 @@ class Health implements MessageComponentInterface
                                     $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
                                     $message->classes = ".$validation->validate.schema-valid";
                                     $this->sendMessage($to, $message);
-                                } elseif (gettype($validationResult === 'object')) {
-                                    /** @phpstan-ignore property.nonObject */
+                                } elseif (gettype($validationResult) === 'object') {
                                     $validationResult->classes = ".$validation->validate.schema-valid";
                                     $this->sendMessage($to, $validationResult);
                                 }
@@ -834,11 +831,11 @@ class Health implements MessageComponentInterface
             switch ($responseType) {
                 case "XML":
                     libxml_use_internal_errors(true);
-                    $xml = new \DOMDocument();
-                    $xml->loadXML($data);
-                    //$xml = simplexml_load_string( $data );
                     $xmlArr = explode("\n", $data);
-                    if ($xml === false) {
+                    $xml = new \DOMDocument();
+                    $loadResult = $xml->loadXML($data);
+                    //$xml = simplexml_load_string( $data );
+                    if ($loadResult === false) {
                         $message = new \stdClass();
                         $message->type = "error";
                         $errors = libxml_get_errors();
@@ -907,10 +904,9 @@ class Health implements MessageComponentInterface
                             $errorStrings = [];
                             foreach ($result as $error) {
                                 $errorLevel = new ICSErrorLevel($error['level']);
-                                //TODO: implement $error['node']->lineIndex and $error['node']->lineString if and when the PR is accepted upstream...
-                                $errorStrings[] = $errorLevel . ": " . $error['message'];// . " at line {$error['node']->lineIndex} ({$error['node']->lineString})"
+                                $errorStrings[] = $errorLevel . ": " . $error['message'] . " at line {$error['node']->lineIndex} ({$error['node']->lineString})";
                             }
-                            $message->text = implode('&#013;', $errorStrings) || "validation encountered " . count($result) . " errors";
+                            $message->text = implode('&#013;', $errorStrings);
                             $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
                         }
@@ -941,8 +937,7 @@ class Health implements MessageComponentInterface
                                 $message->text = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL;
                                 $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                                 $this->sendMessage($to, $message);
-                            } elseif (gettype($validationResult === 'object')) {
-                                /** @phpstan-ignore property.nonObject */
+                            } elseif (gettype($validationResult) === 'object') {
                                 $validationResult->classes = ".calendar-$calendar.schema-valid.year-$year";
                                 $this->sendMessage($to, $validationResult);
                             }
@@ -974,8 +969,7 @@ class Health implements MessageComponentInterface
                             $message->text = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL;
                             $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
-                        } elseif (gettype($validationResult === 'object')) {
-                            /** @phpstan-ignore property.nonObject */
+                        } elseif (gettype($validationResult) === 'object') {
                             $validationResult->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $validationResult);
                         }

@@ -1,7 +1,7 @@
 {
     "litcal": [
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "LadyGuadalupe",
                 "grade": 4
             },

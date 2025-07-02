@@ -1,7 +1,7 @@
 {
     "litcal": [
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StAndreBessette",
                 "day": 7,
                 "month": 1,
@@ -17,20 +17,20 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StRayPenyafort",
                 "day": 8,
                 "month": 1
             },
             "metadata": {
-                "action": "moveFestivity",
+                "action": "moveLiturgicalEvent",
                 "since_year": 2011,
                 "missal": "CA_2011",
                 "reason": "make way for Saint André Bessette on January 7"
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StMargueriteBourgeoys",
                 "day": 12,
                 "month": 1,
@@ -46,7 +46,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StJoseph",
                 "grade": 6
             },
@@ -56,7 +56,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "KateriTekakwitha",
                 "day": 17,
                 "month": 4,
@@ -72,7 +72,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "BlMarieAnneBlondin",
                 "day": 18,
                 "month": 4,
@@ -88,7 +88,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "OurLadyofGoodCounsel",
                 "day": 26,
                 "month": 4,
@@ -104,7 +104,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StMariedelIncarnation",
                 "day": 30,
                 "month": 4,
@@ -120,20 +120,20 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StPiusV",
                 "day": 1,
                 "month": 5
             },
             "metadata": {
-                "action": "moveFestivity",
+                "action": "moveLiturgicalEvent",
                 "since_year": 2016,
                 "missal": "CA_2016",
                 "reason": "make way for Saint Marie de l'Incarnation on April 30"
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "BlMarieLeonieParadis",
                 "day": 4,
                 "month": 5,
@@ -149,7 +149,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StFrancoisdeLaval",
                 "day": 6,
                 "month": 5,
@@ -165,7 +165,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "BlCatherinedeSaintAugustin",
                 "day": 8,
                 "month": 5,
@@ -181,7 +181,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StEugenedeMazenod",
                 "day": 21,
                 "month": 5,
@@ -197,7 +197,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "BlLouisZephirinMoreau",
                 "day": 24,
                 "month": 5,
@@ -213,7 +213,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "BlNykytaBudkaVasylVelychkowsky",
                 "day": 27,
                 "month": 6,
@@ -229,7 +229,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "CanadaDay",
                 "day": 1,
                 "month": 7,
@@ -245,7 +245,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StsJoachimAnne",
                 "grade": 4
             },
@@ -255,7 +255,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "BlFredericJanssoone",
                 "day": 5,
                 "month": 8,
@@ -271,7 +271,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "BlAndreGrasset",
                 "day": 2,
                 "month": 9,
@@ -287,7 +287,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "BlDinaBelanger",
                 "day": 4,
                 "month": 9,
@@ -303,7 +303,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "BlEmilieTavernierGamelin",
                 "day": 24,
                 "month": 9,
@@ -319,33 +319,33 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StsCosmasDamian",
                 "day": 25,
                 "month": 9
             },
             "metadata": {
-                "action": "moveFestivity",
+                "action": "moveLiturgicalEvent",
                 "since_year": 2016,
                 "missal": "CA_2016",
                 "reason": "make way for StsJeanBrebeuf on September 26"
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StsJeanBrebeuf",
                 "day": 26,
                 "month": 9
             },
             "metadata": {
-                "action": "moveFestivity",
+                "action": "moveLiturgicalEvent",
                 "since_year": 2016,
                 "missal": "CA_2016",
                 "reason": "Canada celebrates on September 26 instead of October 19"
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StsJeanBrebeuf",
                 "grade": 4
             },
@@ -355,7 +355,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "LabourDay",
                 "strtotime": "first monday of september",
                 "color": [
@@ -370,7 +370,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "BlMarieRoseDurocher",
                 "day": 6,
                 "month": 10,
@@ -386,7 +386,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StMargueritedYouville",
                 "day": 16,
                 "month": 10,
@@ -402,33 +402,33 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StHedwig",
                 "day": 20,
                 "month": 10
             },
             "metadata": {
-                "action": "moveFestivity",
+                "action": "moveLiturgicalEvent",
                 "since_year": 2016,
                 "missal": "CA_2016",
                 "reason": "make way for Saint Marguerite d'Youville on October 16"
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StMargaretAlacoque",
                 "day": 20,
                 "month": 10
             },
             "metadata": {
-                "action": "moveFestivity",
+                "action": "moveLiturgicalEvent",
                 "since_year": 2016,
                 "missal": "CA_2016",
                 "reason": "make way for Saint Marguerite d'Youville on October 16"
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "DedicationUnknown",
                 "day": 22,
                 "month": 10,
@@ -444,7 +444,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "RemembranceDay",
                 "day": 11,
                 "month": 11,

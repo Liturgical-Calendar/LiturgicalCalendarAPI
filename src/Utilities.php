@@ -298,7 +298,6 @@ class Utilities
             }, $colors);
             return implode(" " . _("or") . " ", $colors);
         }
-        return ""; //should never get here
     }
 
     /**

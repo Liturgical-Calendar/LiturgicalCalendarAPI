@@ -1,7 +1,7 @@
 {
     "litcal": [
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StBenedict",
                 "grade": 4
             },
@@ -17,7 +17,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StsCyrilMethodius",
                 "grade": 4
             },
@@ -34,7 +34,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StBridget",
                 "grade": 4
             },
@@ -54,7 +54,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StCatherineSiena",
                 "grade": 4
             },
@@ -74,7 +74,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StEdithStein",
                 "color": [
                     "white",
@@ -112,7 +112,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StEdithStein",
                 "grade": 4
             },

@@ -10,8 +10,8 @@ use LiturgicalCalendar\Api\Enum\JsonData;
  * @method static bool isValid($value)
  * @method static bool isLatinMissal($value)
  * @method static string getName($value)
- * @method static string getSanctoraleFileName($value)
- * @method static string getSanctoraleI18nFilePath($value)
+ * @method static string|false|null getSanctoraleFileName($value)
+ * @method static string|false|null getSanctoraleI18nFilePath($value)
  * @method static object getYearLimits($value)
  * @method static array produceMetadata($obj = true)
  */
@@ -180,18 +180,18 @@ class RomanMissal
      */
     public static function getSanctoraleFileName(string $missal_id): string|false|null
     {
-        return self::$jsonFiles[ $missal_id ] ?? null;
+        return isset(self::$jsonFiles[ $missal_id ]) ? self::$jsonFiles[ $missal_id ] : null;
     }
 
     /**
      * Gets the path to the i18n directory for the sanctorale of the given Roman Missal.
      *
      * @param string $missal_id the id of the Roman Missal
-     * @return string|false|null the path to the i18n directory, or false if the Roman Missal does not have any i18n data, or null if id not valid
+     * @return string|false|null the path to the i18n directory, or false if the Roman Missal does not have any i18n data, or null if missal_id not valid
      */
     public static function getSanctoraleI18nFilePath(string $missal_id): string|false|null
     {
-        return self::$i18nPath[ $missal_id ] ?? null;
+        return isset(self::$i18nPath[ $missal_id ]) ? self::$i18nPath[ $missal_id ] : null;
     }
 
     /**
@@ -203,7 +203,7 @@ class RomanMissal
      */
     public static function getYearLimits(string $missal_id): ?object
     {
-        return (object) self::$yearLimits[ $missal_id ] ?? null;
+        return isset(self::$yearLimits[ $missal_id ]) ? (object) self::$yearLimits[ $missal_id ] : null;
     }
 
     /**

@@ -1,7 +1,7 @@
 {
     "litcal": [
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "DedicationoftheCathedral",
                 "color": [
                     "white"
@@ -19,7 +19,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StDunstanpatronoftheDiocese",
                 "color": [
                     "white"

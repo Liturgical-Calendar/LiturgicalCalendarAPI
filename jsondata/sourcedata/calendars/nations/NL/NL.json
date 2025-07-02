@@ -1,7 +1,7 @@
 {
     "litcal": [
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StPeterCanisius",
                 "grade": 3
             },
@@ -12,7 +12,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "HLidwina",
                 "color": [
                     "white"
@@ -36,7 +36,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "MartelarenGorcum",
                 "color": [
                     "red"
@@ -60,7 +60,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "Brandsma",
                 "color": [
                     "red"
@@ -78,7 +78,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "VerjaardagWijdingKerken",
                 "color": [
                     "white"
@@ -102,7 +102,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "Verkondigers",
                 "color": [
                     "white"
@@ -126,7 +126,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "Willibrord",
                 "color": [
                     "white"

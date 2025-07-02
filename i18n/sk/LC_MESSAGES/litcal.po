@@ -153,11 +153,11 @@ msgstr "alebo"
 msgid "Divine Mercy Sunday"
 msgstr "Nedeľa Božieho milosrdenstva"
 
-#. translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
-#. translators: 1: Festivity name, 2: Festivity date, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
+#. translators: 1: LiturgicalEvent name, 2: LiturgicalEvent date, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
+#. translators: 1: LiturgicalEvent name, 2: LiturgicalEvent date, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
 #. translators:
-#.  1: Festivity name,
-#.  2: Festivity date,
+#.  1: LiturgicalEvent name,
+#.  2: LiturgicalEvent date,
 #.  3: Requested calendar year,
 #.  4: Explicatory string for the transferral,
 #.  5: actual date for the transferral,
@@ -184,7 +184,7 @@ msgstr "sobota pred Kvetnou nedeľou"
 #: src/Paths/Calendar.php:2781 src/Paths/Calendar.php:2820
 #: src/Paths/Calendar.php:2952 src/Paths/Calendar.php:2967
 #: src/Paths/Calendar.php:2984 src/Paths/Calendar.php:3025
-#: src/FestivityCollection.php:923
+#: src/LiturgicalEventCollection.php:923
 msgid "Decree of the Congregation for Divine Worship"
 msgstr "Dekrét Kongregácie pre Boží kult"
 
@@ -196,7 +196,7 @@ msgstr "pondelok po Druhej veľkonočnej nedeli"
 msgid "the following Monday"
 msgstr "nasledujúci pondelok"
 
-#. translators: 1: Festivity name, 2: Coinciding Festivity name, 3: Requested calendar year
+#. translators: 1: LiturgicalEvent name, 2: Coinciding LiturgicalEvent name, 3: Requested calendar year
 #: src/Paths/Calendar.php:1546
 #, php-format
 msgid ""
@@ -207,8 +207,8 @@ msgstr ""
 "opýtať Kongregácie pre Boží kult, čo s tým robiť!"
 
 #. translators:
-#.  1: Festivity name,
-#.  2: Coinciding Festivity name,
+#.  1: LiturgicalEvent name,
+#.  2: Coinciding LiturgicalEvent name,
 #.  3: Requested calendar year,
 #.  4: Decree of the Congregation for Divine Worship
 #.
@@ -221,7 +221,7 @@ msgstr ""
 "Keďže sa slávnosť '%1$s' zhoduje so slávnosťou '%2$s' v roku %3$d, bola "
 "podľa %4$s presunutá o jeden deň dopredu."
 
-#. translators: 1: Festivity name (Christmas), 2: Requested calendar year, 3: Festivity name (Holy Family), 4: New date for Holy Family
+#. translators: 1: LiturgicalEvent name (Christmas), 2: Requested calendar year, 3: LiturgicalEvent name (Holy Family), 4: New date for Holy Family
 #: src/Paths/Calendar.php:1683
 #, php-format
 msgid ""
@@ -250,7 +250,7 @@ msgstr ""
 "kalendárov na štvrtok po Turícach: platí pre kalendár '%1$s' v roku "
 "'%2$d' (%3$s)."
 
-#. translators: 1: Festivity name, 2: Superseding Festivity grade, 3: Superseding Festivity name, 4: Requested calendar year
+#. translators: 1: LiturgicalEvent name, 2: Superseding LiturgicalEvent grade, 3: Superseding LiturgicalEvent name, 4: Requested calendar year
 #: src/Paths/Calendar.php:1771 src/Paths/Calendar.php:1812
 #, php-format
 msgid "'%1$s' is superseded by the %2$s '%3$s' in the year %4$d."
@@ -558,7 +558,7 @@ msgstr ""
 "V roku %1$d bol %2$s '%3$s' zrušený %4$s '%5$s', pridaný dňa %6$s od roku "
 "%7$d (%8$s)."
 
-#. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
+#. translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year
 #: src/Paths/Calendar.php:2949
 #, php-format
 msgid ""
@@ -568,7 +568,7 @@ msgstr ""
 "Nepovinná spomienka '%1$s' bola presunutá z 12. decembra na 12. augusta od "
 "roku 2002 (%2$s), platná pre rok %3$d."
 
-#. translators: 1: Festivity name, 2: Source of the information, 3: Requested calendar year
+#. translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year
 #: src/Paths/Calendar.php:2964
 #, php-format
 msgid ""
@@ -591,7 +591,7 @@ msgstr ""
 "roku 2002 (%2$s), platná pre rok %3$d. Avšak, v roku %3$d je nahradená "
 "nedeľou, slávnosťou alebo sviatkom '%4$s'."
 
-#. translators: 1: Festivity name, 2: Source of the information
+#. translators: 1: LiturgicalEvent name, 2: Source of the information
 #: src/Paths/Calendar.php:3022
 #, php-format
 msgid ""
@@ -693,7 +693,7 @@ msgstr ""
 "Pamätný deň '%1$s' sa zhoduje s iným pamätným dňom '%2$s' v roku %3$d. Oba "
 "sú znížené na ľubovoľné spomienky."
 
-#. translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year
+#. translators: 1. LiturgicalEvent name, 2. LiturgicalEvent date, 3. Coinciding festivity name, 4. Requested calendar year
 #: src/Paths/Calendar.php:3433
 #, php-format
 msgid ""
@@ -703,7 +703,7 @@ msgstr ""
 "Sviatok '%1$s', zvyčajne oslavovaný %2$s, sa v roku %4$d zhoduje s iným "
 "sviatkom '%3$s'! Treba s tým niečo urobiť?"
 
-#. translators: 1. Festivity name, 2. Festivity date, 3. Coinciding festivity name, 4. Requested calendar year
+#. translators: 1. LiturgicalEvent name, 2. LiturgicalEvent date, 3. Coinciding festivity name, 4. Requested calendar year
 #: src/Paths/Calendar.php:3447
 #, php-format
 msgid ""
@@ -859,9 +859,9 @@ msgid "Found a sanctorale data file for %s"
 msgstr "Našiel som súbor sanctorale pre %s"
 
 #. translators:
-#.  1. Festivity grade
-#.  2. Festivity name
-#.  3. Festivity date
+#.  1. LiturgicalEvent grade
+#.  2. LiturgicalEvent name
+#.  3. LiturgicalEvent date
 #.  4. Edition of the Roman Missal
 #.  5. Superseding festivity grade
 #.  6. Superseding festivity name
@@ -882,7 +882,7 @@ msgstr ""
 msgid "Could not find a sanctorale data file for %s"
 msgstr "Nepodarilo sa nájsť súbor sanctorale pre %s"
 
-#. translators: 1. Festivity grade, 2. Festivity name, 3. New festivity name, 4: Requested calendar year, 5. Old date, 6. New date
+#. translators: 1. LiturgicalEvent grade, 2. LiturgicalEvent name, 3. New festivity name, 4: Requested calendar year, 5. Old date, 6. New date
 #: src/Paths/Calendar.php:3926
 #, php-format
 msgid ""
@@ -892,7 +892,7 @@ msgstr ""
 "%1$s '%2$s' je presunutý z %5$s do %6$s podľa %7$s, aby sa uvoľnilo miesto "
 "pre '%3$s': platné pre rok %4$d."
 
-#. translators: 1. Festivity grade, 2. Festivity name, 3. Old date, 4. New date, 5. Source of the information, 6. New festivity name, 7. Superseding festivity grade, 8. Superseding festivity name, 9: Requested calendar year
+#. translators: 1. LiturgicalEvent grade, 2. LiturgicalEvent name, 3. Old date, 4. New date, 5. Source of the information, 6. New festivity name, 7. Superseding festivity grade, 8. Superseding festivity name, 9: Requested calendar year
 #: src/Paths/Calendar.php:3949
 #, php-format
 msgid ""
@@ -903,7 +903,7 @@ msgstr ""
 "%1$s '%2$s' by bol presunutý z %3$s do %4$s podľa %5$s, aby sa uvoľnilo "
 "miesto pre '%6$s', avšak je potlačený %7$s '%8$s' v roku %9$d."
 
-#. translators: 1: Festivity name, 2: Name of the diocese, 3: Festivity date, 4: Coinciding festivity name, 5: Requested calendar year
+#. translators: 1: LiturgicalEvent name, 2: Name of the diocese, 3: LiturgicalEvent date, 4: Coinciding festivity name, 5: Requested calendar year
 #: src/Paths/Calendar.php:4349
 #, php-format
 msgid ""
@@ -914,7 +914,7 @@ msgstr ""
 "Slávnosť '%1$s', vlastná kalendáru %2$s a zvyčajne slávená %3$s, sa v roku "
 "%5$d zhoduje s nedeľou alebo slávnosťou '%4$s'! Treba s tým niečo urobiť?"
 
-#. translators: 1: Festivity grade, 2: Festivity name, 3: Name of the diocese, 4: Festivity date, 5: Coinciding festivity name, 6: Requested calendar year
+#. translators: 1: LiturgicalEvent grade, 2: LiturgicalEvent name, 3: Name of the diocese, 4: LiturgicalEvent date, 5: Coinciding festivity name, 6: Requested calendar year
 #: src/Paths/Calendar.php:4383
 #, php-format
 msgid ""
@@ -932,15 +932,15 @@ msgstr ""
 "vydaní: %s."
 
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
-#: src/FestivityCollection.php:60
+#: src/LiturgicalEventCollection.php:60
 msgid "YEAR"
 msgstr "ROK"
 
-#: src/FestivityCollection.php:61
+#: src/LiturgicalEventCollection.php:61
 msgid "Vigil Mass"
 msgstr "Omšová vigília"
 
-#: src/FestivityCollection.php:917
+#: src/LiturgicalEventCollection.php:917
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -951,7 +951,7 @@ msgstr ""
 "%6$s má prvá prednosť, preto je Vigília omša potvrdená rovnako ako I. "
 "vešpery."
 
-#: src/FestivityCollection.php:931
+#: src/LiturgicalEventCollection.php:931
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -963,7 +963,7 @@ msgstr ""
 "prvá slávnosť má prednosť, bude mať prvé vešpery a vigilnú omšu, zatiaľ čo "
 "posledná slávnosť nebude mať ani druhé vešpery, ani večernú omšu."
 
-#: src/FestivityCollection.php:941
+#: src/LiturgicalEventCollection.php:941
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -975,7 +975,7 @@ msgstr ""
 "posledná slávnosť má prednosť, preto si zachová Vešpery II a večernú omšu, "
 "zatiaľ čo prvá slávnosť nebude mať vigilnú omšu ani Vešpery I."
 
-#: src/FestivityCollection.php:1006
+#: src/LiturgicalEventCollection.php:1006
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "

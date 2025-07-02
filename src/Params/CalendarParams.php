@@ -215,12 +215,10 @@ class CalendarParams
                 $description = 'Year parameter is of type String, but is not a numeric String with 4 digits';
                 Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
             }
-        } elseif (gettype($value) === 'integer') {
-            $this->Year = $value;
         } else {
-            $description = 'Parameter `year` must be of type Integer or numeric String, instead it was of type ' . gettype($value);
-            Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+            $this->Year = $value;
         }
+
         if ($this->Year < self::YEAR_LOWER_LIMIT || $this->Year > self::YEAR_UPPER_LIMIT) {
             $description = 'Parameter `year` out of bounds, must have a value betwen ' . self::YEAR_LOWER_LIMIT . ' and ' . self::YEAR_UPPER_LIMIT;
             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);

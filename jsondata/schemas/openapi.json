@@ -4700,7 +4700,7 @@
                   },
                   "Type": {
                     "type": "string",
-                    "description": "whether the liturgical event is a fixed or a mobile festivity",
+                    "description": "whether the liturgical event is a fixed or a mobile liturgical event",
                     "enum": [
                       "fixed",
                       "mobile"
@@ -4711,7 +4711,7 @@
                     ]
                   },
                   "Grade": {
-                    "description": "The logical importance of the celebration, represented as a number from 0 to 7, used to calculate precedence compared to other possible events. The importance or precedence value will determine whether one event may suppress another event or have it moved to the next possible open slot according to certain criteria. A general association with liturgical terminology would be as follows * 0 = WEEKDAY * 1 = COMMEMORATION * 2 = OPTIONAL MEMORIAL * 3 = MEMORIAL * 4 = FEAST * 5 = FEAST OF THE LORD * 6 = SOLEMNITY * 7 = event that has precedence over a solemnity However this association is not suitable for displaying the actual *grade* (or *rank*) of the festivity in liturgical terms, because some events have a logical importance that does not correspond with their portrayed grade, for example \"All Souls Day\" is called a \"Commemoration\" and yet it is given the same importance as a solemnity. Thus \"All Souls Day\" will have a grade of 6, but should be displayed as \"Commemoration\" rather than as \"Solemnity\". Therefore the ***displayGrade*** property should be checked first, and if empty then the above indicated association should be valid and can be used",
+                    "description": "The logical importance of the celebration, represented as a number from 0 to 7, used to calculate precedence compared to other possible events. The importance or precedence value will determine whether one event may suppress another event or have it moved to the next possible open slot according to certain criteria. A general association with liturgical terminology would be as follows * 0 = WEEKDAY * 1 = COMMEMORATION * 2 = OPTIONAL MEMORIAL * 3 = MEMORIAL * 4 = FEAST * 5 = FEAST OF THE LORD * 6 = SOLEMNITY * 7 = event that has precedence over a solemnity However this association is not suitable for displaying the actual *grade* (or *rank*) of the liturgical event in liturgical terms, because some events have a logical importance that does not correspond with their portrayed grade, for example \"All Souls Day\" is called a \"Commemoration\" and yet it is given the same importance as a solemnity. Thus \"All Souls Day\" will have a grade of 6, but should be displayed as \"Commemoration\" rather than as \"Solemnity\". Therefore the ***displayGrade*** property should be checked first, and if empty then the above indicated association should be valid and can be used",
                     "type": "integer",
                     "format": "int32",
                     "enum": [

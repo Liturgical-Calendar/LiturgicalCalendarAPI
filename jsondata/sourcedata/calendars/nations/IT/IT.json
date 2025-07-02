@@ -1,7 +1,7 @@
 {
     "litcal": [
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StCatherineSiena",
                 "grade": 4
             },
@@ -13,7 +13,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StFrancisAssisi",
                 "grade": 4
             },
@@ -24,7 +24,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StNicholas",
                 "grade": 3
             },

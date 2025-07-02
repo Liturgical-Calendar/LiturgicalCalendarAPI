@@ -10,7 +10,7 @@ use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitSeason;
 
-class Festivity implements \JsonSerializable
+class LiturgicalEvent implements \JsonSerializable
 {
     public static $eventidx = 0;
 
@@ -74,25 +74,25 @@ class Festivity implements \JsonSerializable
         $this->grade_lcl     = self::$LitGrade->i18n($this->grade, false);
         $this->grade_abbr    = self::$LitGrade->i18n($this->grade, false, true);
         $this->grade_display = $grade === LitGrade::HIGHER_SOLEMNITY ? '' : $displayGrade;
-        //Festivity::debugWrite( "*** Festivity.php *** common vartype = " . gettype( $common ) );
+        //LiturgicalEvent::debugWrite( "*** LiturgicalEvent.php *** common vartype = " . gettype( $common ) );
         if (is_string($common)) {
             $common = [ $common ];
         }
-        //Festivity::debugWrite( "*** Festivity.php *** common vartype is array, value = " . implode( ', ', $common ) );
+        //LiturgicalEvent::debugWrite( "*** LiturgicalEvent.php *** common vartype is array, value = " . implode( ', ', $common ) );
         if (LitCommon::areValid($common)) {
             $this->common = $common;
             $this->common_lcl = self::$LitCommon->c($this->common);
         } else {
-            //Festivity::debugWrite( "*** Festivity.php *** common values have not passed the validity test!" );
+            //LiturgicalEvent::debugWrite( "*** LiturgicalEvent.php *** common values have not passed the validity test!" );
             $this->common = [];
             $this->common_lcl = '';
         }
     }
 
     /**
-     * Set the abbreviation for the grade of this festivity.
+     * Set the abbreviation for the grade of this liturgical event.
      *
-     * @param string $abbreviation The abbreviation for the grade of this festivity.
+     * @param string $abbreviation The abbreviation for the grade of this liturgical event.
      * @return void
      */
     public function setGradeAbbreviation(string $abbreviation): void
@@ -107,23 +107,23 @@ class Festivity implements \JsonSerializable
     */
 
     /**
-     * Compares two Festivity objects based on their date and grade.
+     * Compares two LiturgicalEvent objects based on their date and grade.
      *
-     * If the two Festivity objects have the same date, the comparison is based on their grade.
-     * If the two Festivity objects have the same grade, the comparison result is 0.
-     * If the two Festivity objects have different grades, the object with the higher grade is considered higher.
-     * If the two Festivity objects have different dates, the comparison is based on their date.
-     * If the two Festivity objects have different dates, the object with the later date is considered higher.
+     * If the two LiturgicalEvent objects have the same date, the comparison is based on their grade.
+     * If the two LiturgicalEvent objects have the same grade, the comparison result is 0.
+     * If the two LiturgicalEvent objects have different grades, the object with the higher grade is considered higher.
+     * If the two LiturgicalEvent objects have different dates, the comparison is based on their date.
+     * If the two LiturgicalEvent objects have different dates, the object with the later date is considered higher.
      *
-     * @param Festivity $a The first Festivity object to compare.
-     * @param Festivity $b The second Festivity object to compare.
+     * @param LiturgicalEvent $a The first LiturgicalEvent object to compare.
+     * @param LiturgicalEvent $b The second LiturgicalEvent object to compare.
      *
      * @return int A value indicating the result of the comparison.
      *  -1 if $a is less than $b
      *   0 if $a is equal to $b
      *   1 if $a is greater than $b
      */
-    public static function compDate(Festivity $a, Festivity $b)
+    public static function compDate(LiturgicalEvent $a, LiturgicalEvent $b)
     {
         if ($a->date == $b->date) {
             if ($a->grade == $b->grade) {
@@ -140,34 +140,34 @@ class Festivity implements \JsonSerializable
      * This function is used to output the object as a JSON string.
      * It returns an associative array with the following keys:
      * - event_idx: the index of the event in the array of festivities
-     * - name: the name of the festivity
-     * - date: a PHP timestamp (seconds since the Unix Epoch) for the date of the festivity
-     * - color: the liturgical color of the festivity
-     * - color_lcl: the color of the festivity, translated according to the current locale
-     * - type: the type of the festivity (mobile or fixed)
-     * - grade: the grade of the festivity (0=weekday, 1=commemoration, 2=optional memorial, 3=memorial, 4=feast, 5=feast of the Lord, 6=solemnity, 7=higher solemnity)
-     * - grade_lcl: the grade of the festivity, translated according to the current locale
-     * - grade_abbr: the abbreviated grade of the festivity, translated according to the current locale
+     * - name: the name of the liturgical event
+     * - date: a PHP timestamp (seconds since the Unix Epoch) for the date of the liturgical event
+     * - color: the liturgical color of the liturgical event
+     * - color_lcl: the color of the liturgical event, translated according to the current locale
+     * - type: the type of the liturgical event (mobile or fixed)
+     * - grade: the grade of the liturgical event (0=weekday, 1=commemoration, 2=optional memorial, 3=memorial, 4=feast, 5=feast of the Lord, 6=solemnity, 7=higher solemnity)
+     * - grade_lcl: the grade of the liturgical event, translated according to the current locale
+     * - grade_abbr: the abbreviated grade of the liturgical event, translated according to the current locale
      * - grade_display: a nullable string which, when not null, takes precedence over `grade_lcl` or `grade_abbr` for how the liturgical grade should be displayed
-     * - common: an array of common prayers associated with the festivity
-     * - common_lcl: an array of common prayers associated with the festivity, translated according to the current locale
-     * - day_of_the_week_iso8601: the day of the week of the festivity, in the ISO 8601 format (1 for Monday, 7 for Sunday)
-     * - month: the month of the festivity, in the ISO 8601 format (1 for January, 12 for December)
-     * - day: the day of the month of the festivity
-     * - year: the year of the festivity
-     * - month_short: the short month name for the festivity, translated according to the current locale
-     * - month_long: the long month name for the festivity, translated according to the current locale
-     * - day_of_the_week_short: the short day of the week name for the festivity, translated according to the current locale
-     * - day_of_the_week_long: the long day of the week name for the festivity, translated according to the current locale
-     * - liturgical_year: the liturgical year of the festivity, if applicable
-     * - is_vigil_mass: a boolean indicating whether the festivity is a vigil mass, if applicable
-     * - is_vigil_for: the festivity that the current festivity is a vigil for, if applicable
-     * - has_vigil_mass: a boolean indicating whether the festivity has a vigil mass, if applicable
-     * - has_vesper_i: a boolean indicating whether the festivity has a first vespers, if applicable
-     * - has_vesper_ii: a boolean indicating whether the festivity has a second vespers, if applicable
-     * - psalter_week: the psalter week of the festivity, if applicable
-     * - liturgical_season: the liturgical season of the festivity, if applicable
-     * - liturgical_season_lcl: the liturgical season of the festivity, translated according to the current locale
+     * - common: an array of common prayers associated with the liturgical event
+     * - common_lcl: an array of common prayers associated with the liturgical event, translated according to the current locale
+     * - day_of_the_week_iso8601: the day of the week of the liturgical event, in the ISO 8601 format (1 for Monday, 7 for Sunday)
+     * - month: the month of the liturgical event, in the ISO 8601 format (1 for January, 12 for December)
+     * - day: the day of the month of the liturgical event
+     * - year: the year of the liturgical event
+     * - month_short: the short month name for the liturgical event, translated according to the current locale
+     * - month_long: the long month name for the liturgical event, translated according to the current locale
+     * - day_of_the_week_short: the short day of the week name for the liturgical event, translated according to the current locale
+     * - day_of_the_week_long: the long day of the week name for the liturgical event, translated according to the current locale
+     * - liturgical_year: the liturgical year of the liturgical event, if applicable
+     * - is_vigil_mass: a boolean indicating whether the liturgical event is a vigil mass, if applicable
+     * - is_vigil_for: the liturgical event that the current liturgical event is a vigil for, if applicable
+     * - has_vigil_mass: a boolean indicating whether the liturgical event has a vigil mass, if applicable
+     * - has_vesper_i: a boolean indicating whether the liturgical event has a first vespers, if applicable
+     * - has_vesper_ii: a boolean indicating whether the liturgical event has a second vespers, if applicable
+     * - psalter_week: the psalter week of the liturgical event, if applicable
+     * - liturgical_season: the liturgical season of the liturgical event, if applicable
+     * - liturgical_season_lcl: the liturgical season of the liturgical event, translated according to the current locale
      */
     public function jsonSerialize(): array
     {
@@ -223,7 +223,7 @@ class Festivity implements \JsonSerializable
     }
 
     /**
-     * Sets the locale for this Festivity class, affecting the translations of
+     * Sets the locale for this LiturgicalEvent class, affecting the translations of
      * common liturgical texts and the formatting of dates.
      *
      * @param string $locale A valid locale string.
@@ -245,28 +245,28 @@ class Festivity implements \JsonSerializable
  * The following functions might be somehow useful
  * Leaving them commented for the time being since we aren't actually using them
  *
-    public static function isAdventSeason( Festivity $festivity ) {
-        return $festivity->liturgical_season !== null && $festivity->liturgical_season === LitSeason::ADVENT;
+    public static function isAdventSeason( LiturgicalEvent $litEvent ) {
+        return $litEvent->liturgical_season !== null && $litEvent->liturgical_season === LitSeason::ADVENT;
     }
 
-    public static function isChristmasSeason( Festivity $festivity ) {
-        return $festivity->liturgical_season !== null && $festivity->liturgical_season === LitSeason::CHRISTMAS;
+    public static function isChristmasSeason( LiturgicalEvent $litEvent ) {
+        return $litEvent->liturgical_season !== null && $litEvent->liturgical_season === LitSeason::CHRISTMAS;
     }
 
-    public static function isLentSeason( Festivity $festivity ) {
-        return $festivity->liturgical_season !== null && $festivity->liturgical_season === LitSeason::LENT;
+    public static function isLentSeason( LiturgicalEvent $litEvent ) {
+        return $litEvent->liturgical_season !== null && $litEvent->liturgical_season === LitSeason::LENT;
     }
 
-    public static function isEasterTriduum( Festivity $festivity ) {
-        return $festivity->liturgical_season !== null && $festivity->liturgical_season === LitSeason::EASTER_TRIDUUM;
+    public static function isEasterTriduum( LiturgicalEvent $litEvent ) {
+        return $litEvent->liturgical_season !== null && $litEvent->liturgical_season === LitSeason::EASTER_TRIDUUM;
     }
 
-    public static function isEasterSeason( Festivity $festivity ) {
-        return $festivity->liturgical_season !== null && $festivity->liturgical_season === LitSeason::EASTER;
+    public static function isEasterSeason( LiturgicalEvent $litEvent ) {
+        return $litEvent->liturgical_season !== null && $litEvent->liturgical_season === LitSeason::EASTER;
     }
 
-    public static function isOrdinaryTime( Festivity $festivity ) {
-        return $festivity->liturgical_season !== null && $festivity->liturgical_season === LitSeason::ORDINARY_TIME;
+    public static function isOrdinaryTime( LiturgicalEvent $litEvent ) {
+        return $litEvent->liturgical_season !== null && $litEvent->liturgical_season === LitSeason::ORDINARY_TIME;
     }
  */
 }

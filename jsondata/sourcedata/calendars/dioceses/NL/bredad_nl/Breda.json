@@ -1,7 +1,7 @@
 {
   "litcal": [
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -19,7 +19,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -38,7 +38,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -56,7 +56,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "red"
         ],
@@ -74,7 +74,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "red"
         ],
@@ -93,7 +93,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -112,7 +112,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -130,7 +130,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -149,7 +149,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "red"
         ],
@@ -167,7 +167,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -185,7 +185,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],

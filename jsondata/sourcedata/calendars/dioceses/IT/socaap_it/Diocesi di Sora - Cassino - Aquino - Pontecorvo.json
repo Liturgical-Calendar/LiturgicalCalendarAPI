@@ -1,7 +1,7 @@
 {
     "litcal": [
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "DedicazionedellaChiesaMadrediCassinoinCassino",
                 "color": ["white"],
                 "grade": 6,
@@ -15,7 +15,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "SantaRestituta",
                 "color": [
                     "white"

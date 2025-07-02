@@ -3,7 +3,7 @@
 namespace LiturgicalCalendar\Api\Enum;
 
 /**
- * An enumeration of possible values for the "Common" field of a festivity.
+ * An enumeration of possible values for the "Common" field of a liturgical event.
  * The $values array of a "Common" field must contain only values from the $values array
  *  in the current LiturgicalCalendar\Api\Enum\LitCommon class.
  */
@@ -219,8 +219,8 @@ class LitCommon
     }
 
     /**
-     * List of possible values for the "Common" field of a festivity.
-     * These values are used in the "Common" field of a festivity,
+     * List of possible values for the "Common" field of a liturgical event.
+     * These values are used in the "Common" field of a liturgical event,
      * and are also used as the key in the associative array returned by the
      * {@see i18n()} and {@see getPossessive()} methods.
      * @var string[]

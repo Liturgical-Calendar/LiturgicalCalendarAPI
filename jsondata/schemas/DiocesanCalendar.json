@@ -29,7 +29,7 @@
                 "type": "object",
                 "additionalProperties": false,
                 "properties": {
-                    "festivity": {
+                    "liturgical_event": {
                         "type": "object",
                         "additionalProperties": false,
                         "properties": {
@@ -96,7 +96,7 @@
                     }
                 },
                 "required": [
-                    "festivity",
+                    "liturgical_event",
                     "metadata"
                 ]
             },

@@ -522,11 +522,13 @@ class Core
      *
      * This function acts as a custom error handler that converts warnings into exceptions.
      * It is registered as a warning handler to maintain consistent error handling using exceptions.
+     * Used by {@see readYamlBody()} method to handle warnings from the yaml_parse function.
      *
      * @param int $errno The level of the error raised.
      * @param string $errstr The error message.
      *
      * @throws \Exception Always throws an exception with the error message and level.
+     * @phpstan-ignore method.unused
      */
     private static function warningHandler($errno, $errstr)
     {

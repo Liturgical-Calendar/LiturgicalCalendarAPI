@@ -18,9 +18,9 @@ class MissalsParams
     private static array $MissalYears   = [];
     public const int ERROR_NONE         = 0;
     public const int ERROR              = 1;
-    private static int $last_error      = MissalsParams::ERROR_NONE;
-    private static StatusCode $last_error_status;
-    private static string $last_error_msg;
+    //private static int $last_error      = MissalsParams::ERROR_NONE;
+    //private static StatusCode $last_error_status;
+    //private static string $last_error_msg;
 
     public function __construct(?array $DATA = null)
     {
@@ -93,7 +93,6 @@ class MissalsParams
  *      if (self::$params->last_error() !== MissalsParams::ERROR_NONE) {
  *          self::produceErrorMessage(self::$params->last_error_status(), self::$params->last_error_msg());
  *      }
- */
     private function setLastError(StatusCode $status, string $message): void
     {
         self::$last_error        = self::ERROR;
@@ -118,7 +117,7 @@ class MissalsParams
     {
         return self::$last_error_status;
     }
-
+*/
     public function addMissalRegion(string $region)
     {
         if (false === in_array($region, self::$MissalRegions)) {

@@ -15,7 +15,7 @@ class Metadata
     private static array $widerRegionsNames         = [];
     private static array $locales                   = [];
     private static array $worldDiocesesLatinRite    = [];
-    private static array $messages                  = [];
+    //private static array $messages                  = [];
     private const array FULLY_TRANSLATED_LOCALES = ['en', 'fr', 'it', 'nl', 'la'];
 
     /**
@@ -125,9 +125,9 @@ class Metadata
                             }
                         }
                     }
-                } else {
+                } /* else {
                     Metadata::$messages[] = "Diocesan calendar file not found: $diocesanCalendarFile";
-                }
+                } */
             }
         }
     }

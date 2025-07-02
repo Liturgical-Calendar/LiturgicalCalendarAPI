@@ -49,7 +49,7 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "festivity": {
+                "liturgical_event": {
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
@@ -94,7 +94,7 @@
                 }
             },
             "required": [
-                "festivity",
+                "liturgical_event",
                 "metadata"
             ],
             "title": "LitCalCreateNew"
@@ -103,7 +103,7 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "festivity": {
+                "liturgical_event": {
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
@@ -145,7 +145,7 @@
                 }
             },
             "required": [
-                "festivity",
+                "liturgical_event",
                 "metadata"
             ],
             "title": "LitCalCreateNew"
@@ -175,7 +175,7 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "festivity": {
+                "liturgical_event": {
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
@@ -225,7 +225,7 @@
                 }
             },
             "required": [
-                "festivity",
+                "liturgical_event",
                 "metadata"
             ],
             "title": "LitCalSetGradeProperty"
@@ -234,7 +234,7 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "festivity": {
+                "liturgical_event": {
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
@@ -281,7 +281,7 @@
                 }
             },
             "required": [
-                "festivity",
+                "liturgical_event",
                 "metadata"
             ],
             "title": "LitCalSetNameProperty"
@@ -290,7 +290,7 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "festivity": {
+                "liturgical_event": {
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
@@ -325,7 +325,7 @@
                         },
                         "action": {
                             "type": "string",
-                            "const": "moveFestivity"
+                            "const": "moveEvent"
                         },
                         "missal": {
                             "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/MissalID"
@@ -343,16 +343,16 @@
                 }
             },
             "required": [
-                "festivity",
+                "liturgical_event",
                 "metadata"
             ],
-            "title": "LitCalMoveFestivity"
+            "title": "LitCalMoveLiturgicalEvent"
         },
         "LitCalMakePatron": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "festivity": {
+                "liturgical_event": {
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
@@ -397,7 +397,7 @@
                 }
             },
             "required": [
-                "festivity",
+                "liturgical_event",
                 "metadata"
             ],
             "title": "LitCalMakePatron"

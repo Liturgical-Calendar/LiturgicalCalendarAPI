@@ -9,39 +9,39 @@ enum CalEventAction: string
 {
     /**
      * This `metadata.action` is a combination of `setProperty:name` and `setProperty:grade`,
-     * and requires values for both the `festivity.name` and `festivity.grade` properties.
+     * and requires values for both the `liturgical event.name` and `liturgical_event.grade` properties.
      */
     case MakePatron = 'makePatron';
 
     /**
      * This `metadata.action` requires a value for the `metadata.property` property, of either `name` or `grade`.
-     * In the case of `setProperty:grade`, the `festivity.grade` property is also required.
-     * In the case of `setProperty:name`, the `festivity.name` property is also required.
+     * In the case of `setProperty:grade`, the `liturgical_event.grade` property is also required.
+     * In the case of `setProperty:name`, the `liturgical_event.name` property is also required.
      */
     case SetProperty = 'setProperty';
 
     /**
-     * This `metadata.action` requires values for the `festivity.day` and `festivity.month` properties.
+     * This `metadata.action` requires values for the `liturgical_event.day` and `liturgical_event.month` properties.
      */
-    case MoveFestivity = 'moveFestivity';
+    case MoveEvent = 'moveEvent';
 
     /**
      * This `metadata.action` requires values for the following properties:
      *
-     * For a fixed date festivity:
-     * - `festivity.name`
-     * - `festivity.day`
-     * - `festivity.month`
-     * - `festivity.grade`
-     * - `festivity.color`
-     * - `festivity.common`
+     * For a fixed date liturgical event:
+     * - `liturgical_event.name`
+     * - `liturgical_event.day`
+     * - `liturgical_event.month`
+     * - `liturgical_event.grade`
+     * - `liturgical_event.color`
+     * - `liturgical_event.common`
      *
-     * For a mobile date festivity:
-     * - `festivity.name`
-     * - `festivity.grade`
-     * - `festivity.color`
-     * - `festivity.common`
-     * - `festivity.strtotime`
+     * For a mobile date liturgical event:
+     * - `liturgical_event.name`
+     * - `liturgical_event.grade`
+     * - `liturgical_event.color`
+     * - `liturgical_event.common`
+     * - `liturgical_event.strtotime`
      */
     case CreateNew = 'createNew';
 }

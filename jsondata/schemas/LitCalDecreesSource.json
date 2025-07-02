@@ -25,7 +25,7 @@
                 "description": {
                     "type": "string"
                 },
-                "festivity": {
+                "liturgical_event": {
                     "$ref": "#/definitions/Festivity"
                 },
                 "metadata": {
@@ -41,7 +41,7 @@
                 "decree_date",
                 "decree_protocol",
                 "description",
-                "festivity",
+                "liturgical_event",
                 "metadata"
             ]
         },
@@ -80,7 +80,7 @@
             "required": [
                 "event_key"
             ],
-            "title": "Festivity"
+            "title": "LiturgicalEvent"
         },
         "Metadata": {
             "type": "object",
@@ -137,15 +137,15 @@
                                         "after"
                                     ]
                                 },
-                                "festivity_key": {
+                                "event_key": {
                                     "type": "string",
-                                    "description": "Must be a valid key for a festivity in the Universal Calendar"
+                                    "description": "Must be a valid key for a liturgical_event in the Universal Calendar"
                                 }
                             },
                             "required": [
                                 "day_of_the_week",
                                 "relative_time",
-                                "festivity_key"
+                                "event_key"
                             ]
                         }
                     ]

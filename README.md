@@ -204,7 +204,7 @@ Happy Feast of the Annunciation!
  * update translations
 
 ## [v3.3](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.3) (January 27th 2022)
- * move festivity data from the 2008 Editio Typica Tertia emendata out from the `LitCalAPI.php`, to a JSON file
+ * move liturgical event data from the 2008 Editio Typica Tertia emendata out from the `LitCalAPI.php`, to a JSON file
  * move data for festivities from Decrees of the Congregation of Divine Worship out from the `LitCalAPI.php`, to a JSON file
 
 ## [v3.2](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.2) (January 23rd 2022)

@@ -50,7 +50,7 @@ class RegionalData
         switch (self::$Core->getRequestMethod()) {
             case RequestMethod::GET:
             case RequestMethod::POST:
-                if (property_exists($this->params, 'i18nRequest') && null !== $this->params->i18nRequest) {
+                if (null !== $this->params->i18nRequest) {
                     // If a simple i18n data request was made, retrieve the i18n data
                     $this->getI18nData();
                 } else {
@@ -230,8 +230,8 @@ class RegionalData
             if (null !== $CalendarDataI18nFile && file_exists($CalendarDataI18nFile)) {
                 $localeData = json_decode(file_get_contents($CalendarDataI18nFile));
                 foreach ($CalendarData->litcal as $idx => $el) {
-                    if (property_exists($localeData, $CalendarData->litcal[$idx]->festivity->event_key)) {
-                        $CalendarData->litcal[$idx]->festivity->name = $localeData->{$CalendarData->litcal[$idx]->festivity->event_key};
+                    if (property_exists($localeData, $CalendarData->litcal[$idx]->liturgical_event->event_key)) {
+                        $CalendarData->litcal[$idx]->liturgical_event->name = $localeData->{$CalendarData->litcal[$idx]->liturgical_event->event_key};
                     }
                 }
             } else {
@@ -978,7 +978,7 @@ class RegionalData
      *
      * @return object the object with the locale and payload set
      */
-    private static function retrievePayloadFromPostPutPatchRequest(object $data): ?object
+    private static function retrievePayloadFromPostPutPatchRequest(object $data): object
     {
         $payload = null;
         $required = self::$Core->getRequestMethod() !== RequestMethod::POST;
@@ -1008,9 +1008,8 @@ class RegionalData
                 }
         }
 
-        if (self::$Core->getRequestMethod() === RequestMethod::POST && $payload !== null) {
+        if (self::$Core->getRequestMethod() === RequestMethod::POST && is_object($payload)) {
             if (property_exists($payload, 'locale')) {
-                /** @phpstan-ignore property.nonObject */
                 $data->locale = $payload->locale;
             }
         }
