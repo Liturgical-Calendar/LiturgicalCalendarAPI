@@ -23,7 +23,7 @@
                 "month": 1
             },
             "metadata": {
-                "action": "moveLiturgicalEvent",
+                "action": "moveEvent",
                 "since_year": 2011,
                 "missal": "CA_2011",
                 "reason": "make way for Saint André Bessette on January 7"
@@ -126,7 +126,7 @@
                 "month": 5
             },
             "metadata": {
-                "action": "moveLiturgicalEvent",
+                "action": "moveEvent",
                 "since_year": 2016,
                 "missal": "CA_2016",
                 "reason": "make way for Saint Marie de l'Incarnation on April 30"
@@ -325,7 +325,7 @@
                 "month": 9
             },
             "metadata": {
-                "action": "moveLiturgicalEvent",
+                "action": "moveEvent",
                 "since_year": 2016,
                 "missal": "CA_2016",
                 "reason": "make way for StsJeanBrebeuf on September 26"
@@ -338,7 +338,7 @@
                 "month": 9
             },
             "metadata": {
-                "action": "moveLiturgicalEvent",
+                "action": "moveEvent",
                 "since_year": 2016,
                 "missal": "CA_2016",
                 "reason": "Canada celebrates on September 26 instead of October 19"
@@ -408,7 +408,7 @@
                 "month": 10
             },
             "metadata": {
-                "action": "moveLiturgicalEvent",
+                "action": "moveEvent",
                 "since_year": 2016,
                 "missal": "CA_2016",
                 "reason": "make way for Saint Marguerite d'Youville on October 16"
@@ -421,7 +421,7 @@
                 "month": 10
             },
             "metadata": {
-                "action": "moveLiturgicalEvent",
+                "action": "moveEvent",
                 "since_year": 2016,
                 "missal": "CA_2016",
                 "reason": "make way for Saint Marguerite d'Youville on October 16"
