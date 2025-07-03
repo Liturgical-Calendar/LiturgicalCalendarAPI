@@ -3769,6 +3769,7 @@ class Calendar
     private function applyNationalCalendar(): void
     {
         // Apply any new celebrations that the National Calendar introduces via it's Missals
+        $requiredProps = ['calendar', 'day', 'month','name','color','grade','common','grade_display', 'event_key', 'readings'];
         if ($this->NationalData !== null && property_exists($this->NationalData, "metadata") && property_exists($this->NationalData->metadata, "missals")) {
             $this->Messages[] = "Found Missals for region {$this->NationalData->metadata->nation}: " . implode(', ', $this->NationalData->metadata->missals);
             foreach ($this->NationalData->metadata->missals as $missal) {
@@ -3785,6 +3786,17 @@ class Calendar
                             );
                             $this->loadPropriumDeSanctisData($missal);
                             foreach ($this->tempCal[ $missal ] as $row) {
+                                $rowProps = get_object_vars($row);
+                                $arrayDiffKeys = array_keys(array_diff_key(array_flip($requiredProps), $rowProps));
+                                if (count($arrayDiffKeys) > 0) {
+                                    $this->Messages[] = sprintf(
+                                        /**translators: 1. Name of the Roman Missal, 2. List of missing keys */
+                                        _('The sanctorale data file for %1$s does not contain the required fields to create a liturgical event: missing keys %2$s.'),
+                                        RomanMissal::getName($missal),
+                                        implode(', ', $arrayDiffKeys)
+                                    );
+                                    continue;
+                                }
                                 $currentFeastDate = DateTime::createFromFormat(
                                     '!j-n-Y',
                                     $row->day . '-' . $row->month . '-' . $this->CalendarParams->Year,

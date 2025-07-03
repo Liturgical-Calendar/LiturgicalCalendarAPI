@@ -6,6 +6,7 @@
     },
     "definitions": {
         "PropriumDeSanctis": {
+            "@comment": "TODO: Language edition missals require the grade_display field, should all missals require it? or should we try to define two different schemas?",
             "type": "object",
             "additionalProperties": false,
             "properties": {
