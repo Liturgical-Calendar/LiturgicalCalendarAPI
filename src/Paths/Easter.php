@@ -41,7 +41,7 @@ class Easter
     private static function setLocale(): void
     {
         self::$baseLocale = self::$Locale !== LitLocale::LATIN ? \Locale::getPrimaryLanguage(self::$Locale) : LitLocale::LATIN;
-        $localeArray = [
+        $localeArray      = [
             self::$Locale . '.utf8',
             self::$Locale . '.UTF-8',
             self::$Locale,
@@ -53,7 +53,7 @@ class Easter
             self::$baseLocale
         ];
         setlocale(LC_ALL, $localeArray);
-        self::$dayOfTheWeekDayMonthYear   = \IntlDateFormatter::create(
+        self::$dayOfTheWeekDayMonthYear = \IntlDateFormatter::create(
             self::$Locale,
             \IntlDateFormatter::FULL,
             \IntlDateFormatter::NONE,
@@ -61,7 +61,7 @@ class Easter
             \IntlDateFormatter::GREGORIAN,
             "EEEE d MMMM yyyy"
         );
-        self::$dayMonthYear               = \IntlDateFormatter::create(
+        self::$dayMonthYear             = \IntlDateFormatter::create(
             self::$Locale,
             \IntlDateFormatter::FULL,
             \IntlDateFormatter::NONE,
@@ -69,7 +69,7 @@ class Easter
             \IntlDateFormatter::GREGORIAN,
             "d MMMM yyyy"
         );
-        self::$dayOfTheWeek               = \IntlDateFormatter::create(
+        self::$dayOfTheWeek             = \IntlDateFormatter::create(
             self::$Locale,
             \IntlDateFormatter::FULL,
             \IntlDateFormatter::NONE,
@@ -81,60 +81,60 @@ class Easter
 
     private static function calculateEasterDates(): void
     {
-        self::$EasterDates                  = new \stdClass();
-        self::$EasterDates->litcal_easter   = [];
-        $dateLastCoincidence                = null;
-        $gregDateString                     = "";
-        $julianDateString                   = "";
-        $westernJulianDateString            = "";
+        self::$EasterDates                = new \stdClass();
+        self::$EasterDates->litcal_easter = [];
+        $dateLastCoincidence              = null;
+        $gregDateString                   = "";
+        $julianDateString                 = "";
+        $westernJulianDateString          = "";
 
         for ($i = 1583; $i <= 9999; $i++) {
             self::$EasterDates->litcal_easter[$i - 1583] = new \stdClass();
-            $gregorian_easter                    = Utilities::calcGregEaster($i);
-            $julian_easter                       = Utilities::calcJulianEaster($i);
-            $western_julian_easter               = Utilities::calcJulianEaster($i, true);
-            $same_easter                         = false;
+            $gregorian_easter                            = Utilities::calcGregEaster($i);
+            $julian_easter                               = Utilities::calcJulianEaster($i);
+            $western_julian_easter                       = Utilities::calcJulianEaster($i, true);
+            $same_easter                                 = false;
 
             if ($gregorian_easter->format('l, F jS, Y') === $western_julian_easter->format('l, F jS, Y')) {
-                $same_easter                    = true;
-                $dateLastCoincidence            = $gregorian_easter;
+                $same_easter         = true;
+                $dateLastCoincidence = $gregorian_easter;
             }
 
             switch (strtoupper(self::$baseLocale)) {
                 case LitLocale::LATIN:
-                    $month                      = (int)$gregorian_easter->format('n'); //n      = 1-January to 12-December
-                    $monthLatin                 = LatinUtils::LATIN_MONTHS[$month];
-                    $gregDateString             = 'Dies Domini, ' . $gregorian_easter->format('j') . ' ' . $monthLatin . ' ' . $gregorian_easter->format('Y');
-                    $month                      = (int)$julian_easter->format('n'); //n         = 1-January to 12-December
-                    $monthLatin                 = LatinUtils::LATIN_MONTHS[$month];
-                    $julianDateString           = 'Dies Domini, ' . $julian_easter->format('j') . ' ' . $monthLatin . ' ' . $julian_easter->format('Y');
-                    $month                      = (int)$western_julian_easter->format('n'); //n = 1-January to 12-December
-                    $monthLatin                 = LatinUtils::LATIN_MONTHS[$month];
-                    $westernJulianDateString    = 'Dies Domini, ' . $western_julian_easter->format('j') . ' ' . $monthLatin . ' ' . $western_julian_easter->format('Y');
+                    $month                   = (int)$gregorian_easter->format('n'); //n      = 1-January to 12-December
+                    $monthLatin              = LatinUtils::LATIN_MONTHS[$month];
+                    $gregDateString          = 'Dies Domini, ' . $gregorian_easter->format('j') . ' ' . $monthLatin . ' ' . $gregorian_easter->format('Y');
+                    $month                   = (int)$julian_easter->format('n'); //n         = 1-January to 12-December
+                    $monthLatin              = LatinUtils::LATIN_MONTHS[$month];
+                    $julianDateString        = 'Dies Domini, ' . $julian_easter->format('j') . ' ' . $monthLatin . ' ' . $julian_easter->format('Y');
+                    $month                   = (int)$western_julian_easter->format('n'); //n = 1-January to 12-December
+                    $monthLatin              = LatinUtils::LATIN_MONTHS[$month];
+                    $westernJulianDateString = 'Dies Domini, ' . $western_julian_easter->format('j') . ' ' . $monthLatin . ' ' . $western_julian_easter->format('Y');
                     break;
                 case 'EN':
-                    $gregDateString             = $gregorian_easter->format('l, F jS, Y');
-                    $julianDateString           = 'Sunday' . $julian_easter->format(', F jS, Y');
-                    $westernJulianDateString    = $western_julian_easter->format('l, F jS, Y');
+                    $gregDateString          = $gregorian_easter->format('l, F jS, Y');
+                    $julianDateString        = 'Sunday' . $julian_easter->format(', F jS, Y');
+                    $westernJulianDateString = $western_julian_easter->format('l, F jS, Y');
                     break;
                 default:
-                    $gregDateString             = self::$dayOfTheWeekDayMonthYear->format($gregorian_easter->format('U'));
-                    $julianDateString           = self::$dayOfTheWeek->format($gregorian_easter->format('U'))
+                    $gregDateString          = self::$dayOfTheWeekDayMonthYear->format($gregorian_easter->format('U'));
+                    $julianDateString        = self::$dayOfTheWeek->format($gregorian_easter->format('U'))
                                                     . ', ' . self::$dayMonthYear->format($julian_easter->format('U'));
-                    $westernJulianDateString    = self::$dayOfTheWeekDayMonthYear->format($western_julian_easter->format('U'));
+                    $westernJulianDateString = self::$dayOfTheWeekDayMonthYear->format($western_julian_easter->format('U'));
             }
 
-            self::$EasterDates->litcal_easter[$i - 1583]->gregorianEaster          = (int) $gregorian_easter->format('U');
-            self::$EasterDates->litcal_easter[$i - 1583]->julianEaster             = (int) $julian_easter->format('U');
-            self::$EasterDates->litcal_easter[$i - 1583]->westernJulianEaster      = (int) $western_julian_easter->format('U');
-            self::$EasterDates->litcal_easter[$i - 1583]->coinciding               = $same_easter;
-            self::$EasterDates->litcal_easter[$i - 1583]->gregorianDateString      = $gregDateString;
-            self::$EasterDates->litcal_easter[$i - 1583]->julianDateString         = $julianDateString;
-            self::$EasterDates->litcal_easter[$i - 1583]->westernJulianDateString  = $westernJulianDateString;
+            self::$EasterDates->litcal_easter[$i - 1583]->gregorianEaster         = (int) $gregorian_easter->format('U');
+            self::$EasterDates->litcal_easter[$i - 1583]->julianEaster            = (int) $julian_easter->format('U');
+            self::$EasterDates->litcal_easter[$i - 1583]->westernJulianEaster     = (int) $western_julian_easter->format('U');
+            self::$EasterDates->litcal_easter[$i - 1583]->coinciding              = $same_easter;
+            self::$EasterDates->litcal_easter[$i - 1583]->gregorianDateString     = $gregDateString;
+            self::$EasterDates->litcal_easter[$i - 1583]->julianDateString        = $julianDateString;
+            self::$EasterDates->litcal_easter[$i - 1583]->westernJulianDateString = $westernJulianDateString;
         }
 
-        self::$EasterDates->lastCoincidenceString     = $dateLastCoincidence->format('l, F jS, Y');
-        self::$EasterDates->lastCoincidence           = (int) $dateLastCoincidence->format('U');
+        self::$EasterDates->lastCoincidenceString = $dateLastCoincidence->format('l, F jS, Y');
+        self::$EasterDates->lastCoincidence       = (int) $dateLastCoincidence->format('U');
     }
 
     private static function produceResponse(): void

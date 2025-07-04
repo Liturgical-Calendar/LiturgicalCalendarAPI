@@ -41,7 +41,7 @@ class LiturgicalEvent implements \JsonSerializable
     private string $grade_abbr;
     private string $common_lcl;
 
-    private static string $locale   = LitLocale::LATIN;
+    private static string $locale = LitLocale::LATIN;
     private static LitGrade $LitGrade;
     private static LitCommon $LitCommon;
     private static \IntlDateFormatter $dayOfTheWeekShort;
@@ -58,9 +58,9 @@ class LiturgicalEvent implements \JsonSerializable
         string|array $common = [ '???' ],
         ?string $displayGrade = null
     ) {
-        $this->idx           = self::$eventidx++;
-        $this->name          = $name;
-        $this->date          = $date; //DateTime object
+        $this->idx  = self::$eventidx++;
+        $this->name = $name;
+        $this->date = $date; //DateTime object
         if (is_string($color)) {
             $color = [ $color ];
         }
@@ -80,11 +80,11 @@ class LiturgicalEvent implements \JsonSerializable
         }
         //LiturgicalEvent::debugWrite( "*** LiturgicalEvent.php *** common vartype is array, value = " . implode( ', ', $common ) );
         if (LitCommon::areValid($common)) {
-            $this->common = $common;
+            $this->common     = $common;
             $this->common_lcl = self::$LitCommon->c($this->common);
         } else {
             //LiturgicalEvent::debugWrite( "*** LiturgicalEvent.php *** common values have not passed the validity test!" );
-            $this->common = [];
+            $this->common     = [];
             $this->common_lcl = '';
         }
     }
@@ -195,28 +195,28 @@ class LiturgicalEvent implements \JsonSerializable
             'day_of_the_week_long'    => self::$dayOfTheWeekLong->format($this->date->format('U'))
         ];
         if ($this->liturgical_year !== null) {
-            $returnArr['liturgical_year']    = $this->liturgical_year;
+            $returnArr['liturgical_year'] = $this->liturgical_year;
         }
         if ($this->is_vigil_mass !== null) {
-            $returnArr['is_vigil_mass']       = $this->is_vigil_mass;
+            $returnArr['is_vigil_mass'] = $this->is_vigil_mass;
         }
         if ($this->is_vigil_for !== null) {
-            $returnArr['is_vigil_for']       = $this->is_vigil_for;
+            $returnArr['is_vigil_for'] = $this->is_vigil_for;
         }
         if ($this->has_vigil_mass !== null) {
-            $returnArr['has_vigil_mass']      = $this->has_vigil_mass;
+            $returnArr['has_vigil_mass'] = $this->has_vigil_mass;
         }
         if ($this->has_vesper_i !== null) {
-            $returnArr['has_vesper_i']        = $this->has_vesper_i;
+            $returnArr['has_vesper_i'] = $this->has_vesper_i;
         }
         if ($this->has_vesper_ii !== null) {
-            $returnArr['has_vesper_ii']       = $this->has_vesper_ii;
+            $returnArr['has_vesper_ii'] = $this->has_vesper_ii;
         }
         if ($this->psalter_week !== null) {
-            $returnArr['psalter_week']       = $this->psalter_week;
+            $returnArr['psalter_week'] = $this->psalter_week;
         }
         if ($this->liturgical_season !== null) {
-            $returnArr['liturgical_season']  = $this->liturgical_season;
+            $returnArr['liturgical_season']     = $this->liturgical_season;
             $returnArr['liturgical_season_lcl'] = LitSeason::i18n($this->liturgical_season, self::$locale);
         }
         return $returnArr;
@@ -232,13 +232,13 @@ class LiturgicalEvent implements \JsonSerializable
     public static function setLocale(string $locale): void
     {
         if (LitLocale::isValid($locale)) {
-            self::$locale               = $locale;
-            self::$LitGrade             = new LitGrade($locale);
-            self::$LitCommon            = new LitCommon($locale);
-            self::$dayOfTheWeekShort    = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, "EEE");
-            self::$dayOfTheWeekLong     = \IntlDateFormatter::create($locale, \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, "EEEE");
-            self::$monthShort           = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, "MMM");
-            self::$monthLong            = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, "MMMM");
+            self::$locale            = $locale;
+            self::$LitGrade          = new LitGrade($locale);
+            self::$LitCommon         = new LitCommon($locale);
+            self::$dayOfTheWeekShort = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, "EEE");
+            self::$dayOfTheWeekLong  = \IntlDateFormatter::create($locale, \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, "EEEE");
+            self::$monthShort        = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, "MMM");
+            self::$monthLong         = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, "MMMM");
         }
     }
 /**

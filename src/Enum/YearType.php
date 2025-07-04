@@ -4,8 +4,8 @@ namespace LiturgicalCalendar\Api\Enum;
 
 class YearType
 {
-    public const CIVIL        = "CIVIL";
-    public const LITURGICAL   = "LITURGICAL";
+    public const CIVIL          = "CIVIL";
+    public const LITURGICAL     = "LITURGICAL";
     public static array $values = [ "CIVIL", "LITURGICAL" ];
 
     public static function isValid(string $value)

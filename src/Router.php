@@ -108,7 +108,7 @@ class Router
             define('API_BASE_PATH', Router::determineBasePath());
         }
         $requestPathParts = self::buildRequestPathParts();
-        $route = array_shift($requestPathParts);
+        $route            = array_shift($requestPathParts);
 
         /**
          * N.B. Classes that can be instantiated and that use the Core,

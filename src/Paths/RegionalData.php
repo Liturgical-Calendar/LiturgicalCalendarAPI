@@ -33,8 +33,8 @@ class RegionalData
      */
     public function __construct()
     {
-        self::$Core = new Core();
-        $this->params  = new RegionalDataParams();
+        self::$Core              = new Core();
+        $this->params            = new RegionalDataParams();
         $this->CalendarsMetadata = json_decode(file_get_contents(API_BASE_PATH . Route::CALENDARS->value))->litcal_metadata;
     }
 
@@ -154,7 +154,7 @@ class RegionalData
     private function getCalendar(): void
     {
         $calendarDataFile = null;
-        $dioceseEntry = null;
+        $dioceseEntry     = null;
         switch ($this->params->category) {
             case "DIOCESANCALENDAR":
                 $dioceseEntry = array_find($this->CalendarsMetadata->diocesan_calendars, function ($el) {
@@ -325,7 +325,7 @@ class RegionalData
         }
 
         $response->success = "Calendar data created or updated for Diocese \"{$this->params->payload->metadata->diocese_name}\" (Nation: \"{$this->params->payload->metadata->nation}\")";
-        $response->data = $this->params->payload;
+        $response->data    = $this->params->payload;
         self::produceResponse(json_encode($response));
     }
 
@@ -386,9 +386,9 @@ class RegionalData
             $calendarData . PHP_EOL
         );
         // get the nation name in English from the two letter iso code
-        $nationEnglish = \Locale::getDisplayRegion('-' . $this->params->payload->metadata->nation, 'en');
+        $nationEnglish     = \Locale::getDisplayRegion('-' . $this->params->payload->metadata->nation, 'en');
         $response->success = "Calendar data created or updated for Nation \"{$nationEnglish}\" (\"{$this->params->payload->metadata->nation}\")";
-        $response->data = $this->params->payload;
+        $response->data    = $this->params->payload;
         self::produceResponse(json_encode($response));
     }
 
@@ -547,9 +547,9 @@ class RegionalData
             self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update national calendar resource {$this->params->key} in path {$calendarFile}.");
         }
 
-        $response = new \stdClass();
+        $response          = new \stdClass();
         $response->success = "Calendar data created or updated for Nation \"{$this->params->key}\"";
-        $response->data = $this->params->payload;
+        $response->data    = $this->params->payload;
         self::produceResponse(json_encode($response));
     }
 
@@ -644,9 +644,9 @@ class RegionalData
             self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update wider region calendar resource {$this->params->key} in path {$widerRegionFile}.");
         }
 
-        $response = new \stdClass();
+        $response          = new \stdClass();
         $response->success = "Calendar data created or updated for Wider Region \"{$this->params->key}\"";
-        $response->data = $this->params->payload;
+        $response->data    = $this->params->payload;
         self::produceResponse(json_encode($response));
     }
 
@@ -745,9 +745,9 @@ class RegionalData
             self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update diocesan calendar resource {$this->params->key} in path {$DiocesanCalendarFile}.");
         }
 
-        $response = new \stdClass();
+        $response          = new \stdClass();
         $response->success = "Calendar data created or updated for Diocese \"{$dioceseEntry[0]->diocese}\" (Nation: \"{$dioceseEntry[0]->nation}\")";
-        $response->data = $this->params->payload;
+        $response->data    = $this->params->payload;
         self::produceResponse(json_encode($response));
     }
 
@@ -824,7 +824,7 @@ class RegionalData
                 if (null === $dioceseEntry) {
                     self::produceErrorResponse(StatusCode::NOT_FOUND, "The resource requested for deletion {$this->params->key} is not known.");
                 }
-                $calendarDataFile = strtr(
+                $calendarDataFile   = strtr(
                     JsonData::DIOCESAN_CALENDARS_FILE,
                     [
                         '{nation}' => $dioceseEntry->nation,
@@ -841,7 +841,7 @@ class RegionalData
                 );
                 break;
             case "WIDERREGIONCALENDAR":
-                $calendarDataFile = strtr(
+                $calendarDataFile   = strtr(
                     JsonData::WIDER_REGIONS_FILE,
                     [
                         '{wider_region}' => $this->params->key
@@ -855,7 +855,7 @@ class RegionalData
                 );
                 break;
             case "NATIONALCALENDAR":
-                $calendarDataFile = strtr(
+                $calendarDataFile   = strtr(
                     JsonData::NATIONAL_CALENDARS_FILE,
                     [
                         '{nation}' => $this->params->key
@@ -869,7 +869,7 @@ class RegionalData
                 );
                 break;
             default:
-                $calendarDataFile = null;
+                $calendarDataFile   = null;
                 $calendarI18nFolder = null;
         }
 
@@ -890,7 +890,7 @@ class RegionalData
      */
     private function deleteCalendar()
     {
-        $response = new \stdClass();
+        $response            = new \stdClass();
         $dioceseNationFolder = null;
 
         [$calendarDataFile, $calendarI18nFolder] = $this->getPathsForCalendarDelete();
@@ -980,7 +980,7 @@ class RegionalData
      */
     private static function retrievePayloadFromPostPutPatchRequest(object $data): object
     {
-        $payload = null;
+        $payload  = null;
         $required = self::$Core->getRequestMethod() !== RequestMethod::POST;
         switch (self::$Core->getRequestContentType()) {
             case RequestContentType::JSON:
@@ -1198,9 +1198,9 @@ class RegionalData
     public static function produceErrorResponse(int $statusCode, string $description): void
     {
         header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
-        $message = new \stdClass();
+        $message         = new \stdClass();
         $message->status = "ERROR";
-        $statusMessage = "";
+        $statusMessage   = "";
         switch (self::$Core->getRequestMethod()) {
             case RequestMethod::PUT:
                 $statusMessage = "Resource not Created";
@@ -1214,9 +1214,9 @@ class RegionalData
             default:
                 $statusMessage = "Sorry what was it you wanted to do with this resource?";
         }
-        $message->response = $statusCode === 404 ? "Resource not Found" : $statusMessage;
+        $message->response    = $statusCode === 404 ? "Resource not Found" : $statusMessage;
         $message->description = $description;
-        $response = json_encode($message);
+        $response             = json_encode($message);
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
                 $responseObj = json_decode($response, true);

@@ -4,6 +4,7 @@
         <exclude name="Generic.Files.LineLength"/>
         <exclude name="Squiz.ControlStructures.ControlSignature.SpaceAfterCloseBrace"/>
     </rule>
+    <rule ref="Generic.Formatting.MultipleStatementAlignment"/>
     <file>./</file> <!-- directory you want to analyze -->
     <exclude-pattern>/vendor/</exclude-pattern>
     <exclude-pattern>*Test.php</exclude-pattern>

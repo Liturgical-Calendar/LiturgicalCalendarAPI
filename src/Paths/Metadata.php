@@ -7,14 +7,14 @@ use LiturgicalCalendar\Api\Enum\Route;
 
 class Metadata
 {
-    private static array $nationalCalendars         = [];
-    private static array $nationalCalendarsKeys     = [];
-    private static array $diocesanCalendars         = [];
-    private static array $diocesanGroups            = [];
-    private static array $widerRegions              = [];
-    private static array $widerRegionsNames         = [];
-    private static array $locales                   = [];
-    private static array $worldDiocesesLatinRite    = [];
+    private static array $nationalCalendars      = [];
+    private static array $nationalCalendarsKeys  = [];
+    private static array $diocesanCalendars      = [];
+    private static array $diocesanGroups         = [];
+    private static array $widerRegions           = [];
+    private static array $widerRegionsNames      = [];
+    private static array $locales                = [];
+    private static array $worldDiocesesLatinRite = [];
     //private static array $messages                  = [];
     private const array FULLY_TRANSLATED_LOCALES = ['en', 'fr', 'it', 'nl', 'la'];
 
@@ -36,10 +36,10 @@ class Metadata
         foreach ($directories as $directory) {
             if (file_exists(JsonData::NATIONAL_CALENDARS_FOLDER . "/$directory/$directory.json")) {
                 Metadata::$nationalCalendarsKeys[] = $directory;
-                $nationalCalendarDefinition = file_get_contents(JsonData::NATIONAL_CALENDARS_FOLDER . "/$directory/$directory.json");
-                $nationalCalendarData = json_decode($nationalCalendarDefinition);
+                $nationalCalendarDefinition        = file_get_contents(JsonData::NATIONAL_CALENDARS_FOLDER . "/$directory/$directory.json");
+                $nationalCalendarData              = json_decode($nationalCalendarDefinition);
                 if (JSON_ERROR_NONE === json_last_error()) {
-                    $nationalCalendarArr = [
+                    $nationalCalendarArr           = [
                         "calendar_id" => $directory,
                         "locales" => $nationalCalendarData->metadata->locales,
                         "missals" => $nationalCalendarData->metadata->missals,
@@ -63,7 +63,7 @@ class Metadata
     private static function dioceseIdToName(string $id): ?string
     {
         if (empty(Metadata::$worldDiocesesLatinRite)) {
-            $worldDiocesesFile = JsonData::FOLDER . "/world_dioceses.json";
+            $worldDiocesesFile                = JsonData::FOLDER . "/world_dioceses.json";
             Metadata::$worldDiocesesLatinRite = json_decode(
                 file_get_contents($worldDiocesesFile)
             )->catholic_dioceses_latin_rite;
@@ -87,14 +87,14 @@ class Metadata
     private static function buildDiocesanCalendarData()
     {
         foreach (glob(JsonData::DIOCESAN_CALENDARS_FOLDER . '/*', GLOB_ONLYDIR) as $countryFolder) {
-            $nation = basename($countryFolder);
+            $nation      = basename($countryFolder);
             $directories = array_map('basename', glob($countryFolder . '/*', GLOB_ONLYDIR));
             foreach ($directories as $calendar_id) {
-                $dioceseName = Metadata::dioceseIdToName($calendar_id) ?? $calendar_id;
+                $dioceseName          = Metadata::dioceseIdToName($calendar_id) ?? $calendar_id;
                 $diocesanCalendarFile = JsonData::DIOCESAN_CALENDARS_FOLDER . "/$nation/$calendar_id/$dioceseName.json";
                 if (file_exists($diocesanCalendarFile)) {
                     $diocesanCalendarDefinition = file_get_contents($diocesanCalendarFile);
-                    $diocesanCalendarData = json_decode($diocesanCalendarDefinition);
+                    $diocesanCalendarData       = json_decode($diocesanCalendarDefinition);
                     if (JSON_ERROR_NONE === json_last_error()) {
                         $dioceseArr = [
                             "calendar_id" => $calendar_id,
@@ -104,7 +104,7 @@ class Metadata
                             "timezone" => $diocesanCalendarData->metadata->timezone
                         ];
                         if (property_exists($diocesanCalendarData->metadata, "group")) {
-                            $groupName = $diocesanCalendarData->metadata->group;
+                            $groupName           = $diocesanCalendarData->metadata->group;
                             $dioceseArr["group"] = $groupName;
                             if (!array_key_exists($groupName, Metadata::$diocesanGroups)) {
                                 Metadata::$diocesanGroups[$groupName] = [];
@@ -154,11 +154,11 @@ class Metadata
             $WiderRegionFile = strtr(JsonData::WIDER_REGIONS_FILE, ['{wider_region}' => $directory]);
             if (file_exists($WiderRegionFile)) {
                 Metadata::$widerRegionsNames[] = $directory;
-                $widerRegionI18nFolder = strtr(JsonData::WIDER_REGIONS_I18N_FOLDER, [
+                $widerRegionI18nFolder         = strtr(JsonData::WIDER_REGIONS_I18N_FOLDER, [
                     '{wider_region}' => $directory,
                 ]);
-                $locales = array_map(fn ($filename) => pathinfo($filename, PATHINFO_FILENAME), glob($widerRegionI18nFolder . '/*.json'));
-                Metadata::$widerRegions[] = [
+                $locales                       = array_map(fn ($filename) => pathinfo($filename, PATHINFO_FILENAME), glob($widerRegionI18nFolder . '/*.json'));
+                Metadata::$widerRegions[]      = [
                     'name' => $directory,
                     'locales' => $locales,
                     'api_path' => API_BASE_PATH . Route::DATA_WIDERREGION->value . '/' . $directory . '?locale={language}'
@@ -210,7 +210,7 @@ class Metadata
                 "dioceses" => $group
             ];
         }
-        $nationalCalendars = [
+        $nationalCalendars     = [
             [
                 "calendar_id" => "VA",
                 "locales" => [ "la_VA" ],
@@ -234,7 +234,7 @@ class Metadata
             "VA",
             ...Metadata::$nationalCalendarsKeys
         ];
-        $response = json_encode([
+        $response              = json_encode([
             "litcal_metadata" => [
                 "national_calendars"          => $nationalCalendars,
                 "national_calendars_keys"     => $nationalCalendarsKeys,
@@ -246,7 +246,7 @@ class Metadata
                 "locales"                     => Metadata::$locales
             ]
         ], JSON_PRETTY_PRINT);
-        $responseHash = md5($response);
+        $responseHash          = md5($response);
         header("Etag: \"{$responseHash}\"");
         if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified");

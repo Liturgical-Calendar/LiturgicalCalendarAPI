@@ -15,7 +15,7 @@
         "squizlabs/php_codesniffer": "*",
         "phpstan/phpstan": "^2.1"
     },
-    "license": "MIT",
+    "license": "Apache-2.0",
     "autoload": {
         "psr-4": {
             "LiturgicalCalendar\\Api\\": "src/"
@@ -38,6 +38,7 @@
         ],
         "lint": "phpcs src",
         "lint:fix": "phpcbf src",
-        "analyse": "phpstan analyse -c phpstan.neon"
+        "analyse": "phpstan analyse -c phpstan.neon",
+        "analyze": "phpstan analyse -c phpstan.neon"
     }
 }

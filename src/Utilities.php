@@ -107,7 +107,7 @@ class Utilities
                 self::$LAST_ARRAY_KEY = $key;
                 //self::debugWrite( "value of key <$key> is an array" );
                 if (self::isNotLitCalEventKey($key)) {
-                    $key = self::transformKey($key);
+                    $key        = self::transformKey($key);
                     $new_object = $xml->addChild($key);
                 } else {
                     //self::debugWrite( "key <$key> is a LitCalEvent" );
@@ -156,22 +156,22 @@ class Utilities
     // aka Meeus/Jones/Butcher algorithm
     public static function calcGregEaster($Y): DateTime
     {
-        $a = $Y % 19;
-        $b = floor($Y / 100);
-        $c = $Y % 100;
-        $d = floor($b / 4);
-        $e = $b % 4;
-        $f = floor(($b + 8) / 25);
-        $g = floor(($b - $f + 1) / 3);
-        $h = (19 * $a + $b - $d - $g + 15) % 30;
-        $i = floor($c / 4);
-        $k = $c % 4;
-        $l = (32 + 2 * $e + 2 * $i - $h - $k) % 7;
-        $m = floor(($a + 11 * $h + 22 * $l) / 451);
+        $a     = $Y % 19;
+        $b     = floor($Y / 100);
+        $c     = $Y % 100;
+        $d     = floor($b / 4);
+        $e     = $b % 4;
+        $f     = floor(($b + 8) / 25);
+        $g     = floor(($b - $f + 1) / 3);
+        $h     = (19 * $a + $b - $d - $g + 15) % 30;
+        $i     = floor($c / 4);
+        $k     = $c % 4;
+        $l     = (32 + 2 * $e + 2 * $i - $h - $k) % 7;
+        $m     = floor(($a + 11 * $h + 22 * $l) / 451);
         $month = floor(($h + $l - 7 * $m + 114) / 31);
-        $day = (($h + $l - 7 * $m + 114) % 31) + 1;
+        $day   = (($h + $l - 7 * $m + 114) % 31) + 1;
 
-        $dateObj   = DateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new \DateTimeZone('UTC'));
+        $dateObj = DateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new \DateTimeZone('UTC'));
 
         return $dateObj;
     }
@@ -183,15 +183,15 @@ class Utilities
     //https://web.archive.org/web/20150227133210/http://www.merlyn.demon.co.uk/estralgs.txt
     public static function calcJulianEaster(int $Y, bool $gregCal = false): DateTime
     {
-        $a = $Y % 4;
-        $b = $Y % 7;
-        $c = $Y % 19;
-        $d = (19 * $c + 15) % 30;
-        $e = (2 * $a + 4 * $b - $d + 34) % 7;
+        $a     = $Y % 4;
+        $b     = $Y % 7;
+        $c     = $Y % 19;
+        $d     = (19 * $c + 15) % 30;
+        $e     = (2 * $a + 4 * $b - $d + 34) % 7;
         $month = floor(($d + $e + 114) / 31);
-        $day = ( ($d + $e + 114) % 31 ) + 1;
+        $day   = ( ($d + $e + 114) % 31 ) + 1;
 
-        $dateObj   = DateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new \DateTimeZone('UTC'));
+        $dateObj = DateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new \DateTimeZone('UTC'));
         if ($gregCal) {
             //from February 29th 2100 Julian (March 14th 2100 Gregorian),
             //the difference between the Julian and Gregorian calendars will increase to 14 days
@@ -199,10 +199,10 @@ class Utilities
             $dateDiff = 'P' . floor((intval(substr($Y,0,2)) / .75) - 1.25) . 'D';
             $dateObj->add(new DateInterval($dateDiff));
             */
-            $GregDateDiff = array();
+            $GregDateDiff    = array();
             $GregDateDiff[0] = [DateTime::createFromFormat('!j-n-Y', '4-10-1582'),"P10D"]; //add 10 == GREGORIAN CUTOVER DATE
-            $idx = 0;
-            $cc = 10;
+            $idx             = 0;
+            $cc              = 10;
             for ($cent = 17; $cent <= 99; $cent++) {
                 if ($cent % 4 > 0) {
                     $GregDateDiff[++$idx] = [DateTime::createFromFormat('!j-n-Y', '28-2-' . $cent . '00'),"P" . ++$cc . "D"];
@@ -329,7 +329,7 @@ class Utilities
      */
     public static function getOrdinal(int $num, string $locale, \NumberFormatter $formatter, array $latinOrdinals): string
     {
-        $ordinal = "";
+        $ordinal    = "";
         $baseLocale = \Locale::getPrimaryLanguage($locale);
         switch ($baseLocale) {
             case "la":

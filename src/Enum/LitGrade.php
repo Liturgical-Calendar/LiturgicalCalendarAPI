@@ -41,7 +41,7 @@ class LitGrade
      *       * SOLEMNITY OF THE TITLE OF A CHURCH
      *       * SOLEMNITY OF THE TITLE OR OF THE FOUNDER OR OF THE MAIN PATRON OF AN ORDER OR OF A CONGREGATION
      */
-    public const int SOLEMNITY        = 6;
+    public const int SOLEMNITY = 6;
 
     /**
      * FEASTS OF THE LORD
@@ -51,7 +51,7 @@ class LitGrade
      *    5. FEASTS OF THE LORD LISTED IN THE GENERAL CALENDAR
      *    6. SUNDAYS OF CHRISTMAS AND OF ORDINARY TIME
      */
-    public const int FEAST_LORD       = 5;
+    public const int FEAST_LORD = 5;
 
     /**
      * FEASTS
@@ -69,7 +69,7 @@ class LitGrade
      *       * DAYS OF THE OCTAVE OF CHRISTMAS
      *       * WEEKDAYS OF LENT
      */
-    public const int FEAST            = 4;
+    public const int FEAST = 4;
 
     /**
      * OBLIGATORY MEMORIALS
@@ -81,7 +81,7 @@ class LitGrade
      *        * MEMORIALS OF THE SECONDARY PATRON OF A PLACE, OF A DIOCESE, OF A REGION OR A RELIGIOUS PROVINCE
      *        * OTHER MEMORIALS LISTED IN THE CALENDAR OF EACH DIOCESE, ORDER OR CONGREGATION
      */
-    public const int MEMORIAL         = 3;
+    public const int MEMORIAL = 3;
 
     /**
      * OPTIONAL MEMORIALS
@@ -89,14 +89,14 @@ class LitGrade
      *    12. OPTIONAL MEMORIALS, WHICH CAN HOWEVER BE OBSERVED IN DAYS INDICATED AT N. 9,
      *        ACCORDING TO THE NORMS DESCRIBED IN "PRINCIPLES AND NORMS" FOR THE LITURGY OF THE HOURS AND THE USE OF THE MISSAL
      */
-    public const int MEMORIAL_OPT     = 2;
+    public const int MEMORIAL_OPT = 2;
 
     /**
      * COMMEMORATIONS
      *
      *        SIMILARLY MEMORIALS THAT SHOULD FALL DURING THE WEEKDAYS OF LENT CAN BE OBSERVED AS OPTIONAL MEMORIALS
      */
-    public const int COMMEMORATION    = 1;
+    public const int COMMEMORATION = 1;
 
     /**
      * WEEKDAYS
@@ -108,7 +108,7 @@ class LitGrade
      *       - WEEKDAYS OF THE EASTER SEASON, FROM THE MONDAY AFTER THE OCTAVE OF EASTER UNTIL THE SATURDAY BEFORE PENTECOST
      *       - WEEKDAYS OF ORDINARY TIME
      */
-    public const int WEEKDAY          = 0;
+    public const int WEEKDAY = 0;
 
     public static array $values = [ 0, 1, 2, 3, 4, 5, 6, 7 ];
     private string $locale;
@@ -150,63 +150,63 @@ class LitGrade
                 $grade = $this->locale === LitLocale::LATIN ? 'feria'                 : _("weekday");
                 /**translators: liturgical rank 'WEEKDAY' in abbreviated form */
                 $gradeAbbr = $this->locale === LitLocale::LATIN ? 'f'                 : _("w");
-                $tags = ['<I>','</I>'];
+                $tags      = ['<I>','</I>'];
                 break;
             case self::COMMEMORATION:
                 /**translators: liturgical rank. Keep lowercase  */
                 $grade = $this->locale === LitLocale::LATIN ? 'commemoratio'          : _("commemoration");
                 /**translators: liturgical rank 'COMMEMORATION' in abbreviated form */
                 $gradeAbbr = $this->locale === LitLocale::LATIN ? 'm*'                : _("m*");
-                $tags = ['<I>','</I>'];
+                $tags      = ['<I>','</I>'];
                 break;
             case self::MEMORIAL_OPT:
                 /**translators: liturgical rank. Keep lowercsase  */
                 $grade = $this->locale === LitLocale::LATIN ? 'memoria ad libitum'    : _("optional memorial");
                 /**translators: liturgical rank 'OPTIONAL MEMORIAL' in abbreviated form */
                 $gradeAbbr = $this->locale === LitLocale::LATIN ? 'm'                 : _("m");
-                $tags = ['',''];
+                $tags      = ['',''];
                 break;
             case self::MEMORIAL:
                 /**translators: liturgical rank. Keep Capitalized  */
                 $grade = $this->locale === LitLocale::LATIN ? 'Memoria obligatoria'   : _("Memorial");
                 /**translators: liturgical rank 'MEMORIAL' in abbreviated form */
                 $gradeAbbr = $this->locale === LitLocale::LATIN ? 'M'                 : _("M");
-                $tags = ['',''];
+                $tags      = ['',''];
                 break;
             case self::FEAST:
                 /**translators: liturgical rank. Keep UPPERCASE  */
                 $grade = $this->locale === LitLocale::LATIN ? 'FESTUM'                : _("FEAST");
                 /**translators: liturgical rank 'FEAST' in abbreviated form */
                 $gradeAbbr = $this->locale === LitLocale::LATIN ? 'F'                 : _("F");
-                $tags = ['',''];
+                $tags      = ['',''];
                 break;
             case self::FEAST_LORD:
                 /**translators: liturgical rank. Keep UPPERCASE  */
                 $grade = $this->locale === LitLocale::LATIN ? 'FESTUM DOMINI'         : _("FEAST OF THE LORD");
                 /**translators: liturgical rank 'FEAST OF THE LORD' in abbreviated form */
                 $gradeAbbr = $this->locale === LitLocale::LATIN ? 'F✝'                : _("F✝");
-                $tags = ['<B>','</B>'];
+                $tags      = ['<B>','</B>'];
                 break;
             case self::SOLEMNITY:
                 /**translators: liturgical rank. Keep UPPERCASE  */
                 $grade = $this->locale === LitLocale::LATIN ? 'SOLLEMNITAS'           : _("SOLEMNITY");
                 /**translators: liturgical rank 'SOLEMNITY' in abbreviated form */
                 $gradeAbbr = $this->locale === LitLocale::LATIN ? 'S'                 : _("S");
-                $tags = ['<B>','</B>'];
+                $tags      = ['<B>','</B>'];
                 break;
             case self::HIGHER_SOLEMNITY:
                 /**translators: liturgical rank. Keep lowercase  */
                 $grade = $this->locale === LitLocale::LATIN ? 'celebratio altioris ordinis quam sollemnitatis' : _("celebration with precedence over solemnities");
                 /**translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form */
                 $gradeAbbr = $this->locale === LitLocale::LATIN ? 'S✝'                : _("S✝");
-                $tags = ['<B><I>','</I></B>'];
+                $tags      = ['<B><I>','</I></B>'];
                 break;
             default:
                 /**translators: liturgical rank. Keep lowercase  */
                 $grade = $this->locale === LitLocale::LATIN ? 'feria'                 : _("weekday");
                 /**translators: liturgical rank 'WEEKDAY' in abbreviated form */
                 $gradeAbbr = $this->locale === LitLocale::LATIN ? 'f'                 : _("w");
-                $tags = ['',''];
+                $tags      = ['',''];
         }
         if ($abbreviate) {
             return $html ? $tags[0] . $gradeAbbr . $tags[1] : $gradeAbbr;

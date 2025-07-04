@@ -48,7 +48,7 @@ class Missals
      */
     private static function initPayloadFromRequestBody(): ?object
     {
-        $payload = null;
+        $payload  = null;
         $required = in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH]);
         switch (self::$Core->getRequestContentType()) {
             case RequestContentType::JSON:
@@ -162,7 +162,7 @@ class Missals
     private static function handlePathParams()
     {
         $numPathParts = count(self::$requestPathParts);
-        $missalIDs = [];
+        $missalIDs    = [];
         if ($numPathParts > 1) {
             self::produceErrorResponse(
                 StatusCode::NOT_FOUND,
@@ -233,9 +233,9 @@ class Missals
     public static function produceErrorResponse(int $statusCode, string $description): void
     {
         header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
-        $message = new \stdClass();
+        $message         = new \stdClass();
         $message->status = "ERROR";
-        $statusMessage = "";
+        $statusMessage   = "";
         switch (self::$Core->getRequestMethod()) {
             case RequestMethod::PUT:
                 $statusMessage = "Resource not Created";
@@ -249,9 +249,9 @@ class Missals
             default:
                 $statusMessage = StatusCode::toString($statusCode);
         }
-        $message->response = $statusCode === 404 ? "Resource not Found" : $statusMessage;
+        $message->response    = $statusCode === 404 ? "Resource not Found" : $statusMessage;
         $message->description = $description;
-        $response = json_encode($message);
+        $response             = json_encode($message);
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
                 $responseObj = json_decode($response, true);
@@ -367,13 +367,13 @@ class Missals
      */
     public static function init(array $requestPathParts = [])
     {
-        self::$Core = new Core();
+        self::$Core   = new Core();
         self::$params = new MissalsParams();
         if (count($requestPathParts)) {
             self::$requestPathParts = $requestPathParts;
         }
 
-        self::$missalsIndex = new \stdClass();
+        self::$missalsIndex                 = new \stdClass();
         self::$missalsIndex->litcal_missals = [];
 
         if (false === is_readable('jsondata/sourcedata/missals')) {
@@ -392,28 +392,28 @@ class Missals
             if (file_exists("jsondata/sourcedata/missals/$missalFolderName/$missalFolderName.json")) {
                 $missal = new \stdClass();
                 if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
-                    $missal->missal_id      = "EDITIO_TYPICA_{$matches[1]}";
-                    $missal->region         = "VA";
+                    $missal->missal_id = "EDITIO_TYPICA_{$matches[1]}";
+                    $missal->region    = "VA";
                     if (is_readable("jsondata/sourcedata/missals/$missalFolderName/i18n")) {
-                        $it = new \DirectoryIterator("glob://jsondata/sourcedata/missals/$missalFolderName/i18n/*.json");
+                        $it      = new \DirectoryIterator("glob://jsondata/sourcedata/missals/$missalFolderName/i18n/*.json");
                         $locales = [];
                         foreach ($it as $f) {
                             $locales[] = $f->getBasename('.json');
                         }
-                        $missal->locales      = $locales;
+                        $missal->locales = $locales;
                     } else {
-                        $missal->locales      = null;
+                        $missal->locales = null;
                     }
                     //$missal->year_published = intval($matches[1]);
                 } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
-                    $missal->missal_id      = "{$matches[1]}_{$matches[2]}";
-                    $missal->region         = $matches[1];
+                    $missal->missal_id = "{$matches[1]}_{$matches[2]}";
+                    $missal->region    = $matches[1];
                     //$missal->year_published = intval($matches[2]);
                 }
-                $missal->name           = RomanMissal::getName($missal->missal_id);
-                $missal->year_limits    = RomanMissal::$yearLimits[$missal->missal_id];
-                $missal->year_published = RomanMissal::$yearLimits[$missal->missal_id][ "since_year" ];
-                $missal->api_path       = API_BASE_PATH . "/missals/$missal->missal_id";
+                $missal->name                         = RomanMissal::getName($missal->missal_id);
+                $missal->year_limits                  = RomanMissal::$yearLimits[$missal->missal_id];
+                $missal->year_published               = RomanMissal::$yearLimits[$missal->missal_id][ "since_year" ];
+                $missal->api_path                     = API_BASE_PATH . "/missals/$missal->missal_id";
                 self::$missalsIndex->litcal_missals[] = $missal;
                 self::$params->addMissalRegion($missal->region);
                 self::$params->addMissalYear($missal->year_published);

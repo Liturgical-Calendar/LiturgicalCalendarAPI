@@ -13,7 +13,7 @@ class Tests
 {
     public static Core $Core;
     private static array $requestPathParts = [];
-    private static array $propsToSanitize = [
+    private static array $propsToSanitize  = [
         "description",
         "applies_to",
         "excludes",
@@ -61,13 +61,13 @@ class Tests
         $testsFolder = 'jsondata/tests/';
         if (count(self::$requestPathParts) === 0) {
             try {
-                $response = new \stdClass();
+                $response  = new \stdClass();
                 $testSuite = [];
-                $it = new \DirectoryIterator("glob://{$testsFolder}*Test.json");
+                $it        = new \DirectoryIterator("glob://{$testsFolder}*Test.json");
                 foreach ($it as $f) {
-                    $fileName       = $f->getFilename();
-                    $testContents   = file_get_contents("{$testsFolder}$fileName");
-                    $testSuite[]    = json_decode($testContents, true);
+                    $fileName     = $f->getFilename();
+                    $testContents = file_get_contents("{$testsFolder}$fileName");
+                    $testSuite[]  = json_decode($testContents, true);
                 }
                 $response->litcal_tests = $testSuite;
                 return json_encode($response, JSON_PRETTY_PRINT);
@@ -94,8 +94,8 @@ class Tests
             $testName = self::$requestPathParts[0];
             if (file_exists("{$testsFolder}{$testName}.json")) {
                 if (unlink("{$testsFolder}{$testName}.json")) {
-                    $message = new \stdClass();
-                    $message->status = "OK";
+                    $message           = new \stdClass();
+                    $message->status   = "OK";
                     $message->response = "Resource Deleted";
                     return json_encode($message, JSON_PRETTY_PRINT);
                 } else {
@@ -122,9 +122,9 @@ class Tests
         }
 
         // Validate incoming data against unit test schema
-        $schemaFile = 'jsondata/schemas/LitCalTest.json';
+        $schemaFile     = 'jsondata/schemas/LitCalTest.json';
         $schemaContents = file_get_contents($schemaFile);
-        $jsonSchema = json_decode($schemaContents);
+        $jsonSchema     = json_decode($schemaContents);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The server errored out while attempting to process your request; this a server error, not an error in the request. Please report the incident to the system administrator:" . json_last_error_msg());
@@ -145,8 +145,8 @@ class Tests
             return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.");
         } else {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
-            $message = new \stdClass();
-            $message->status = "OK";
+            $message           = new \stdClass();
+            $message->status   = "OK";
             $message->response = self::$Core->getRequestMethod() === RequestMethod::PUT ? "Resource Created" : "Resource Updated";
             return json_encode($message, JSON_PRETTY_PRINT);
         }
@@ -183,9 +183,9 @@ class Tests
     private static function produceErrorResponse(int $statusCode, string $description): string
     {
         header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
-        $message = new \stdClass();
+        $message         = new \stdClass();
         $message->status = "ERROR";
-        $statusMessage = "";
+        $statusMessage   = "";
         switch (self::$Core->getRequestMethod()) {
             case RequestMethod::PUT:
                 $statusMessage = "Resource not Created";
@@ -199,7 +199,7 @@ class Tests
             default:
                 $statusMessage = "Sorry what was it you wanted to do with this resource?";
         }
-        $message->response = $statusCode === 404 ? "Resource not Found" : $statusMessage;
+        $message->response    = $statusCode === 404 ? "Resource not Found" : $statusMessage;
         $message->description = $description;
         return json_encode($message);
     }
@@ -220,7 +220,7 @@ class Tests
 
     public static function init(array $requestPathParts = []): void
     {
-        self::$Core = new Core();
+        self::$Core             = new Core();
         self::$requestPathParts = $requestPathParts;
     }
 }

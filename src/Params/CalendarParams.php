@@ -27,17 +27,17 @@ class CalendarParams
 {
     private ?object $calendars;
     public int $Year;
-    public string $YearType              = YearType::LITURGICAL;
-    public string $Epiphany              = Epiphany::JAN6;
-    public string $Ascension             = Ascension::THURSDAY;
-    public string $CorpusChristi         = CorpusChristi::THURSDAY;
-    public bool $EternalHighPriest       = false;
-    public ?string $ReturnType           = null;
-    public ?string $Locale               = null;
-    public ?string $NationalCalendar     = null;
-    public ?string $DiocesanCalendar     = null;
+    public string $YearType          = YearType::LITURGICAL;
+    public string $Epiphany          = Epiphany::JAN6;
+    public string $Ascension         = Ascension::THURSDAY;
+    public string $CorpusChristi     = CorpusChristi::THURSDAY;
+    public bool $EternalHighPriest   = false;
+    public ?string $ReturnType       = null;
+    public ?string $Locale           = null;
+    public ?string $NationalCalendar = null;
+    public ?string $DiocesanCalendar = null;
 
-    public const ALLOWED_PARAMS  = [
+    public const ALLOWED_PARAMS = [
         "year",
         "year_type",
         "epiphany",
@@ -54,10 +54,10 @@ class CalendarParams
     //  perhaps we can lower the limit to the year of the Gregorian reform
     //  public const YEAR_LOWER_LIMIT          = 1583;
     // For now we'll just deal with the Liturgical Calendar from the Editio Typica 1970
-    public const YEAR_LOWER_LIMIT          = 1970;
+    public const YEAR_LOWER_LIMIT = 1970;
 
     //The upper limit is determined by the limit of PHP in dealing with DateTime objects
-    public const YEAR_UPPER_LIMIT          = 9999;
+    public const YEAR_UPPER_LIMIT = 9999;
 
     /*private static function debugWrite(string $string)
     {
@@ -124,7 +124,7 @@ class CalendarParams
         $this->Year = (int)date("Y");
 
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+            $value        = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
             $this->Locale = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
         } else {
             $this->Locale = LitLocale::LATIN;
@@ -323,7 +323,7 @@ class CalendarParams
         if (in_array($value, $this->calendars->national_calendars_keys)) {
             $this->NationalCalendar = $value;
         } else {
-            $validVals = implode(', ', $this->calendars->national_calendars_keys);
+            $validVals   = implode(', ', $this->calendars->national_calendars_keys);
             $description = "Invalid National calendar `{$value}`, valid national calendars are: $validVals.";
             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
         }

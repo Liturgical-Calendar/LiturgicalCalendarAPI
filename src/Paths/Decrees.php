@@ -88,9 +88,9 @@ class Decrees
     public static function produceErrorResponse(int $statusCode, string $description): void
     {
         header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
-        $message = new \stdClass();
+        $message         = new \stdClass();
         $message->status = "ERROR";
-        $statusMessage = "";
+        $statusMessage   = "";
         switch (self::$Core->getRequestMethod()) {
             case RequestMethod::PUT:
                 $statusMessage = "Resource not Created";
@@ -104,9 +104,9 @@ class Decrees
             default:
                 $statusMessage = "Resource not found";
         }
-        $message->response = $statusCode === 404 ? "Resource not Found" : $statusMessage;
+        $message->response    = $statusCode === 404 ? "Resource not Found" : $statusMessage;
         $message->description = $description;
-        $response = json_encode($message);
+        $response             = json_encode($message);
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
                 $responseObj = json_decode($response, true);
@@ -143,11 +143,11 @@ class Decrees
         }
         $decreesFile = 'jsondata/sourcedata/decrees/decrees.json';
         if (file_exists($decreesFile)) {
-            $rawData = file_get_contents($decreesFile);
-            self::$decreesIndex = new \stdClass();
+            $rawData                            = file_get_contents($decreesFile);
+            self::$decreesIndex                 = new \stdClass();
             self::$decreesIndex->litcal_decrees = json_decode($rawData);
             foreach (self::$decreesIndex->litcal_decrees as $idx => $decree) {
-                $decreeId = $decree->decree_id;
+                $decreeId                                           = $decree->decree_id;
                 self::$decreesIndex->litcal_decrees[$idx]->api_path = API_BASE_PATH . "/decrees/$decreeId";
             }
         } else {

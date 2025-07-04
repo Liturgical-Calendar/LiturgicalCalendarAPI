@@ -41,9 +41,9 @@ class Events
      */
     public function __construct(array $requestPathParts = [])
     {
-        self::$Core = new Core();
+        self::$Core             = new Core();
         self::$requestPathParts = $requestPathParts;
-        $this->EventsParams = new EventsParams();
+        $this->EventsParams     = new EventsParams();
     }
 
     /**
@@ -214,7 +214,7 @@ class Events
             });
             if (null !== $DiocesanData) {
                 $this->EventsParams->NationalCalendar = $DiocesanData->nation;
-                $diocesanDataFile = strtr(
+                $diocesanDataFile                     = strtr(
                     JsonData::DIOCESAN_CALENDARS_FILE,
                     [
                         '{nation}' => $this->EventsParams->NationalCalendar,
@@ -264,7 +264,7 @@ class Events
                             null === $this->EventsParams->Locale
                             || !in_array($this->EventsParams->Locale, self::$NationalData->metadata->locales)
                         ) {
-                            $this->EventsParams->Locale = self::$NationalData->metadata->locales[0];
+                            $this->EventsParams->Locale     = self::$NationalData->metadata->locales[0];
                             $this->EventsParams->baseLocale = \Locale::getPrimaryLanguage($this->EventsParams->Locale);
                         }
                     }
@@ -330,7 +330,7 @@ class Events
         setlocale(LC_ALL, $localeArray);
         bindtextdomain("litcal", "i18n");
         textdomain("litcal");
-        self::$LitGrade = new LitGrade($this->EventsParams->baseLocale);
+        self::$LitGrade  = new LitGrade($this->EventsParams->baseLocale);
         self::$LitCommon = new LitCommon($this->EventsParams->baseLocale);
     }
 
@@ -382,10 +382,10 @@ class Events
                     die();
                 }
                 foreach ($DATA as $liturgicalEvent) {
-                    $key = $liturgicalEvent[ "event_key" ];
-                    self::$LiturgicalEventCollection[ $key ] = $liturgicalEvent;
-                    self::$LiturgicalEventCollection[ $key ][ "missal" ] = $LatinMissal;
-                    self::$LiturgicalEventCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($liturgicalEvent["grade"], false);
+                    $key                                                     = $liturgicalEvent[ "event_key" ];
+                    self::$LiturgicalEventCollection[ $key ]                 = $liturgicalEvent;
+                    self::$LiturgicalEventCollection[ $key ][ "missal" ]     = $LatinMissal;
+                    self::$LiturgicalEventCollection[ $key ][ "grade_lcl" ]  = self::$LitGrade->i18n($liturgicalEvent["grade"], false);
                     self::$LiturgicalEventCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c($liturgicalEvent["common"]);
                 }
                 // There may or may not be a related translation file; if there is, we get the translated name from here
@@ -452,12 +452,12 @@ class Events
         foreach ($DATA as $row) {
             $key = $row['event_key'];
             if (false === array_key_exists($key, self::$LiturgicalEventCollection)) {
-                self::$LiturgicalEventCollection[ $key ] = $row;
-                self::$LiturgicalEventCollection[ $key ][ "name" ] = $NAME[ $key ];
-                self::$LiturgicalEventCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($row['grade'], false);
-                self::$LiturgicalEventCollection[ $key ][ "common" ] = [];
+                self::$LiturgicalEventCollection[ $key ]                 = $row;
+                self::$LiturgicalEventCollection[ $key ][ "name" ]       = $NAME[ $key ];
+                self::$LiturgicalEventCollection[ $key ][ "grade_lcl" ]  = self::$LitGrade->i18n($row['grade'], false);
+                self::$LiturgicalEventCollection[ $key ][ "common" ]     = [];
                 self::$LiturgicalEventCollection[ $key ][ "common_lcl" ] = "";
-                self::$LiturgicalEventCollection[ $key ][ "calendar" ] = "GENERAL ROMAN";
+                self::$LiturgicalEventCollection[ $key ][ "calendar" ]   = "GENERAL ROMAN";
             }
         }
     }
@@ -505,13 +505,13 @@ class Events
         foreach ($DATA as $idx => $liturgicalEvent) {
             $key = $liturgicalEvent[ "liturgical_event" ][ "event_key" ];
             if (false === array_key_exists($key, self::$LiturgicalEventCollection)) {
-                self::$LiturgicalEventCollection[ $key ] = $liturgicalEvent[ "liturgical_event" ];
+                self::$LiturgicalEventCollection[ $key ]           = $liturgicalEvent[ "liturgical_event" ];
                 self::$LiturgicalEventCollection[ $key ][ "name" ] = $NAME[ $key ];
                 if (array_key_exists("locales", $liturgicalEvent[ "metadata" ])) {
                     $decreeURL = sprintf($liturgicalEvent[ "metadata" ][ "url" ], 'LA');
                     if (array_key_exists($this->EventsParams->baseLocale, $liturgicalEvent[ "metadata" ][ "locales" ])) {
                         $decreeLang = $liturgicalEvent[ "metadata" ][ "locales" ][ $this->EventsParams->baseLocale ];
-                        $decreeURL = sprintf($liturgicalEvent[ "metadata" ][ "url" ], $decreeLang);
+                        $decreeURL  = sprintf($liturgicalEvent[ "metadata" ][ "url" ], $decreeLang);
                     }
                 } else {
                     $decreeURL = $liturgicalEvent[ "metadata" ][ "url" ];
@@ -558,12 +558,12 @@ class Events
             if (self::$WiderRegionData !== null && property_exists(self::$WiderRegionData, "litcal")) {
                 foreach (self::$WiderRegionData->litcal as $row) {
                     if ($row->metadata->action === 'createNew') {
-                        $key = $row->liturgical_event->event_key;
+                        $key                                     = $row->liturgical_event->event_key;
                         self::$LiturgicalEventCollection[ $key ] = [];
                         foreach ($row->liturgical_event as $prop => $value) {
                             self::$LiturgicalEventCollection[ $key ][ $prop ] = $value;
                         }
-                        self::$LiturgicalEventCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($row->liturgical_event->grade, false);
+                        self::$LiturgicalEventCollection[ $key ][ "grade_lcl" ]  = self::$LitGrade->i18n($row->liturgical_event->grade, false);
                         self::$LiturgicalEventCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c($row->liturgical_event->common);
                     }
                 }
@@ -578,17 +578,17 @@ class Events
             $NationalCalendarI18nData = json_decode(file_get_contents($NationalCalendarI18nFile), true);
             foreach (self::$NationalData->litcal as $row) {
                 if ($row->metadata->action === 'createNew') {
-                    $key = $row->liturgical_event->event_key;
-                    self::$LiturgicalEventCollection[ $key ] = (array) $row->liturgical_event;
-                    self::$LiturgicalEventCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($row->liturgical_event->grade, false);
+                    $key                                                     = $row->liturgical_event->event_key;
+                    self::$LiturgicalEventCollection[ $key ]                 = (array) $row->liturgical_event;
+                    self::$LiturgicalEventCollection[ $key ][ "grade_lcl" ]  = self::$LitGrade->i18n($row->liturgical_event->grade, false);
                     self::$LiturgicalEventCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c($row->liturgical_event->common);
-                    self::$LiturgicalEventCollection[ $key ][ "name" ] = $NationalCalendarI18nData[ $key ];
+                    self::$LiturgicalEventCollection[ $key ][ "name" ]       = $NationalCalendarI18nData[ $key ];
                 } elseif ($row->metadata->action === 'setProperty') {
                     if ($row->metadata->property === 'name') {
                         self::$LiturgicalEventCollection[ $row->liturgical_event->event_key ][ "name" ] = $NationalCalendarI18nData[ $row->liturgical_event->event_key ];
                     }
                     if ($row->metadata->property === 'grade') {
-                        self::$LiturgicalEventCollection[ $row->liturgical_event->event_key ][ "grade" ] = $row->liturgical_event->grade;
+                        self::$LiturgicalEventCollection[ $row->liturgical_event->event_key ][ "grade" ]     = $row->liturgical_event->grade;
                         self::$LiturgicalEventCollection[ $row->liturgical_event->event_key ][ "grade_lcl" ] = self::$LitGrade->i18n($row->liturgical_event->grade, false);
                     }
                 }
@@ -603,11 +603,11 @@ class Events
                         }
                         $PropriumDeSanctis = json_decode(file_get_contents($DataFile));
                         foreach ($PropriumDeSanctis as $idx => $liturgicalEvent) {
-                            $key = $liturgicalEvent->event_key;
-                            self::$LiturgicalEventCollection[ $key ] = (array) $liturgicalEvent;
-                            self::$LiturgicalEventCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($liturgicalEvent->grade, false);
+                            $key                                                     = $liturgicalEvent->event_key;
+                            self::$LiturgicalEventCollection[ $key ]                 = (array) $liturgicalEvent;
+                            self::$LiturgicalEventCollection[ $key ][ "grade_lcl" ]  = self::$LitGrade->i18n($liturgicalEvent->grade, false);
                             self::$LiturgicalEventCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c($liturgicalEvent->common);
-                            self::$LiturgicalEventCollection[ $key ][ "missal" ] = $missal;
+                            self::$LiturgicalEventCollection[ $key ][ "missal" ]     = $missal;
                         }
                     }
                 }
@@ -639,12 +639,12 @@ class Events
             $DiocesanCalendarI18nData = json_decode(file_get_contents($DiocesanCalendarI18nFile), true);
 
             foreach (self::$DiocesanData->litcal as $row) {
-                $key = $this->EventsParams->DiocesanCalendar . '_' . $row->liturgical_event->event_key;
-                self::$LiturgicalEventCollection[ $key ] = (array) $row->liturgical_event;
-                self::$LiturgicalEventCollection[ $key ][ "event_key" ] = $key;
-                self::$LiturgicalEventCollection[ $key ][ "grade_lcl" ] = self::$LitGrade->i18n($row->liturgical_event->grade, false);
+                $key                                                     = $this->EventsParams->DiocesanCalendar . '_' . $row->liturgical_event->event_key;
+                self::$LiturgicalEventCollection[ $key ]                 = (array) $row->liturgical_event;
+                self::$LiturgicalEventCollection[ $key ][ "event_key" ]  = $key;
+                self::$LiturgicalEventCollection[ $key ][ "grade_lcl" ]  = self::$LitGrade->i18n($row->liturgical_event->grade, false);
                 self::$LiturgicalEventCollection[ $key ][ "common_lcl" ] = self::$LitCommon->c($row->liturgical_event->common);
-                self::$LiturgicalEventCollection[ $key ][ "name" ] = $DiocesanCalendarI18nData[ $row->liturgical_event->event_key ];
+                self::$LiturgicalEventCollection[ $key ][ "name" ]       = $DiocesanCalendarI18nData[ $row->liturgical_event->event_key ];
             }
         }
     }
@@ -664,11 +664,11 @@ class Events
     private static function produceErrorResponse(int $statusCode, string $description): string
     {
         header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
-        $message = new \stdClass();
-        $message->status = "ERROR";
-        $message->response = StatusCode::toString($statusCode);
+        $message              = new \stdClass();
+        $message->status      = "ERROR";
+        $message->response    = StatusCode::toString($statusCode);
         $message->description = $description;
-        $errResponse = json_encode($message);
+        $errResponse          = json_encode($message);
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
                 $response = json_decode($errResponse, true);
@@ -689,7 +689,7 @@ class Events
      */
     private function produceResponse(): void
     {
-        $responseObj = [
+        $responseObj  = [
             "litcal_events" => array_values(self::$LiturgicalEventCollection),
             "settings" => [
                 "locale" => $this->EventsParams->Locale,
@@ -697,7 +697,7 @@ class Events
                 "diocesan_calendar" => $this->EventsParams->DiocesanCalendar
             ]
         ];
-        $response = json_encode($responseObj);
+        $response     = json_encode($responseObj);
         $responseHash = md5($response);
         header("Etag: \"{$responseHash}\"");
         if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {

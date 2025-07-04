@@ -4,11 +4,11 @@ namespace LiturgicalCalendar\Api\Enum;
 
 class LitColor
 {
-    public const GREEN     = "green";
-    public const PURPLE    = "purple";
-    public const WHITE     = "white";
-    public const RED       = "red";
-    public const PINK      = "pink";
+    public const GREEN          = "green";
+    public const PURPLE         = "purple";
+    public const WHITE          = "white";
+    public const RED            = "red";
+    public const PINK           = "pink";
     public static array $values = [ "green", "purple", "white", "red", "pink" ];
 
     public static function isValid(string $value)

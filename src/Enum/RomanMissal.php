@@ -17,18 +17,18 @@ use LiturgicalCalendar\Api\Enum\JsonData;
  */
 class RomanMissal
 {
-    public const EDITIO_TYPICA_1970                    = "EDITIO_TYPICA_1970";
-    public const REIMPRESSIO_EMENDATA_1971             = "EDITIO_TYPICA_1971";
-    public const EDITIO_TYPICA_SECUNDA_1975            = "EDITIO_TYPICA_1975";
-    public const EDITIO_TYPICA_TERTIA_2002             = "EDITIO_TYPICA_2002";
-    public const EDITIO_TYPICA_TERTIA_EMENDATA_2008    = "EDITIO_TYPICA_2008";
+    public const EDITIO_TYPICA_1970                 = "EDITIO_TYPICA_1970";
+    public const REIMPRESSIO_EMENDATA_1971          = "EDITIO_TYPICA_1971";
+    public const EDITIO_TYPICA_SECUNDA_1975         = "EDITIO_TYPICA_1975";
+    public const EDITIO_TYPICA_TERTIA_2002          = "EDITIO_TYPICA_2002";
+    public const EDITIO_TYPICA_TERTIA_EMENDATA_2008 = "EDITIO_TYPICA_2008";
 
-    public const USA_EDITION_2011                      = "US_2011";
-    public const ITALY_EDITION_1983                    = "IT_1983";
-    public const ITALY_EDITION_2020                    = "IT_2020";
-    public const NETHERLANDS_EDITION_1978              = "NL_1978";
-    public const CANADA_EDITION_2011                   = "CA_2011";
-    public const CANADA_EDITION_2016                   = "CA_2016";
+    public const USA_EDITION_2011         = "US_2011";
+    public const ITALY_EDITION_1983       = "IT_1983";
+    public const ITALY_EDITION_2020       = "IT_2020";
+    public const NETHERLANDS_EDITION_1978 = "NL_1978";
+    public const CANADA_EDITION_2011      = "CA_2011";
+    public const CANADA_EDITION_2016      = "CA_2016";
 
     /**
      * The values of the Roman Missal enumeration constants.
@@ -232,11 +232,11 @@ class RomanMissal
     public static function produceMetadata($obj = true): array
     {
         $reflectionClass = new \ReflectionClass(static::class);
-        $missal_ids = $reflectionClass->getConstants();
-        $metadata = [];
+        $missal_ids      = $reflectionClass->getConstants();
+        $metadata        = [];
         foreach ($missal_ids as $key => $missal_id) {
             $i18n_path = self::getSanctoraleI18nFilePath($missal_id);
-            $locales = [];
+            $locales   = [];
             if ($i18n_path) {
                 $it = new \DirectoryIterator("glob://$i18n_path*.json");
                 foreach ($it as $f) {

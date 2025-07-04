@@ -23,7 +23,7 @@ class LitSchema
     public const DATA              = self::SCHEMA_BASE_PATH . "/LitCalDataPath.json";
     public const SCHEMAS           = self::SCHEMA_BASE_PATH . "/LitCalSchemasPath.json";
 
-    private const ERRMSG           = "Schema validation error: ";
+    private const ERRMSG        = "Schema validation error: ";
     public const ERROR_MESSAGES = [
         LitSchema::DIOCESAN          => self::ERRMSG . "Diocesan Calendar not created / updated",
         LitSchema::NATIONAL          => self::ERRMSG . "National Calendar not created / updated",

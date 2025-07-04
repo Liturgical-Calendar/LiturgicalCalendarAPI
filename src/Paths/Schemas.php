@@ -51,9 +51,9 @@ class Schemas
         $pathParamCount = count($requestPathParts);
         switch ($pathParamCount) {
             case 0:
-                $schemaIndex = new \stdClass();
+                $schemaIndex                 = new \stdClass();
                 $schemaIndex->litcal_schemas = [];
-                $it = new \DirectoryIterator("glob://jsondata/schemas/*.json");
+                $it                          = new \DirectoryIterator("glob://jsondata/schemas/*.json");
                 foreach ($it as $f) {
                     $schemaIndex->litcal_schemas[] = API_BASE_PATH . '/jsondata/schemas/' . $f->getFilename();
                 }

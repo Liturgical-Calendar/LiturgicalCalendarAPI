@@ -22,11 +22,11 @@ class Core
     private array $AllowedAcceptHeaders;
     private array $AllowedRequestMethods;
     private array $AllowedRequestContentTypes;
-    private array $RequestHeaders               = [];
-    private ?string $JsonEncodedRequestHeaders  = null;
-    private ?string $RequestContentType         = null;
-    private ?string $ResponseContentType        = null;
-    private const ONLY_USEFUL_HEADERS = [
+    private array $RequestHeaders              = [];
+    private ?string $JsonEncodedRequestHeaders = null;
+    private ?string $RequestContentType        = null;
+    private ?string $ResponseContentType       = null;
+    private const ONLY_USEFUL_HEADERS          = [
         "Accept", "Accept-Language", "X-Requested-With", "Origin"
     ];
 
@@ -39,18 +39,18 @@ class Core
      */
     public function __construct()
     {
-        $this->AllowedOrigins                   = [ "*" ];
-        $this->AllowedReferers                  = [ "*" ];
-        $this->AllowedAcceptHeaders             = AcceptHeader::$values;
-        $this->AllowedRequestMethods            = RequestMethod::$values;
-        $this->AllowedRequestContentTypes       = RequestContentType::$values;
+        $this->AllowedOrigins             = [ "*" ];
+        $this->AllowedReferers            = [ "*" ];
+        $this->AllowedAcceptHeaders       = AcceptHeader::$values;
+        $this->AllowedRequestMethods      = RequestMethod::$values;
+        $this->AllowedRequestContentTypes = RequestContentType::$values;
 
         foreach (getallheaders() as $header => $value) {
             if (in_array($header, self::ONLY_USEFUL_HEADERS)) {
                 $this->RequestHeaders[$header] = $value;
             }
         }
-        $this->JsonEncodedRequestHeaders       = json_encode($this->RequestHeaders);
+        $this->JsonEncodedRequestHeaders = json_encode($this->RequestHeaders);
         if (isset($_SERVER[ 'CONTENT_TYPE' ])) {
             $this->RequestContentType = $_SERVER[ 'CONTENT_TYPE' ];
         }
@@ -117,7 +117,7 @@ class Core
             )
         ) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 415 Unsupported Media Type", true, 415);
-            $response = new \stdClass();
+            $response        = new \stdClass();
             $response->error = "You seem to be forming a strange kind of request? Allowed Content Types are "
             . implode(' and ', $this->AllowedRequestContentTypes)
             . ', but your Content Type was '
@@ -134,7 +134,7 @@ class Core
     private function sendHeaderNotAcceptable(): void
     {
         header($_SERVER[ "SERVER_PROTOCOL" ] . " 406 Not Acceptable", true, 406);
-        $response = new \stdClass();
+        $response        = new \stdClass();
         $response->error = "You are requesting a content type which this API cannot produce. Allowed Accept headers are "
             . implode(' and ', $this->AllowedAcceptHeaders)
             . ', but you have issued an request with an Accept header of '
@@ -502,7 +502,7 @@ class Core
      */
     public function readJsonBody(bool $required = false, bool $assoc = false): object|array|null
     {
-        $data = null;
+        $data    = null;
         $rawData = file_get_contents('php://input');
         if ("" === $rawData && $required) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
@@ -559,7 +559,7 @@ class Core
                 $data = yaml_parse($rawData);
                 if (false === $data) {
                     header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
-                    $response = new \stdClass();
+                    $response        = new \stdClass();
                     $response->error = "Malformed YAML data received in the request";
                     die(json_encode($response));
                 } else {
@@ -567,12 +567,12 @@ class Core
                 }
             } catch (\Exception $e) {
                 header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
-                $response = new \stdClass();
-                $response->status = "error";
+                $response          = new \stdClass();
+                $response->status  = "error";
                 $response->message = "Malformed YAML data received in the request";
-                $response->error = $e->getMessage();
-                $response->line = $e->getLine();
-                $response->code = $e->getCode();
+                $response->error   = $e->getMessage();
+                $response->line    = $e->getLine();
+                $response->code    = $e->getCode();
                 die(json_encode($response));
             }
         }

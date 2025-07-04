@@ -37,7 +37,7 @@ class MissalsParams
                     case 'locale':
                         $value = \Locale::canonicalize($value);
                         if (LitLocale::isValid($value)) {
-                            $this->Locale = $value;
+                            $this->Locale     = $value;
                             $this->baseLocale = \Locale::getPrimaryLanguage($value);
                         } else {
                             $error = "Locale `$value` set in param `locale` is not supported by this server, supported locales are: la, la_VA, "

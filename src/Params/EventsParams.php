@@ -32,9 +32,9 @@ class EventsParams
     private array $SupportedNationalCalendars = [];
     private array $SupportedDiocesanCalendars = [];
     public readonly object $calendarsMetadata;
-    private static string $lastError          = '';
+    private static string $lastError = '';
 
-    public const ALLOWED_PARAMS  = [
+    public const ALLOWED_PARAMS = [
         "eternal_high_priest",
         "locale",
         "national_calendar",
@@ -45,10 +45,10 @@ class EventsParams
     //  perhaps we can lower the limit to the year of the Gregorian reform
     //  public const YEAR_LOWER_LIMIT          = 1583;
     // For now we'll just deal with the Liturgical Calendar from the Editio Typica 1970
-    public const YEAR_LOWER_LIMIT          = 1970;
+    public const YEAR_LOWER_LIMIT = 1970;
 
     //The upper limit is determined by the limit of PHP in dealing with DateTime objects
-    public const YEAR_UPPER_LIMIT          = 9999;
+    public const YEAR_UPPER_LIMIT = 9999;
 
     /*private static function debugWrite(string $string)
     {
@@ -74,14 +74,14 @@ class EventsParams
         //we need at least a default value for the current year and for the locale
         $this->Year = (int)date("Y");
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+            $value        = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
             $this->Locale = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
         } else {
             $this->Locale = LitLocale::LATIN;
         }
         $this->baseLocale = \Locale::getPrimaryLanguage($this->Locale);
 
-        $this->calendarsMetadata = json_decode(file_get_contents(API_BASE_PATH . Route::CALENDARS->value))->litcal_metadata;
+        $this->calendarsMetadata          = json_decode(file_get_contents(API_BASE_PATH . Route::CALENDARS->value))->litcal_metadata;
         $this->SupportedDiocesanCalendars = $this->calendarsMetadata->diocesan_calendars_keys;
         $this->SupportedNationalCalendars = $this->calendarsMetadata->national_calendars_keys;
 
@@ -111,8 +111,8 @@ class EventsParams
             if (in_array($key, self::ALLOWED_PARAMS)) {
                 switch ($key) {
                     case "locale":
-                        $this->Locale = \Locale::canonicalize($this->Locale);
-                        $this->Locale = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
+                        $this->Locale     = \Locale::canonicalize($this->Locale);
+                        $this->Locale     = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
                         $this->baseLocale = \Locale::getPrimaryLanguage($this->Locale);
                         break;
                     case "national_calendar":

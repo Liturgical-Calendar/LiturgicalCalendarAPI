@@ -30,16 +30,16 @@ class RegionalDataParams
      *      diocese     => DIOCESANCALENDAR
      *      widerregion => WIDERREGIONCALENDAR
      */
-    public const array EXPECTED_CATEGORIES  = [
+    public const array EXPECTED_CATEGORIES = [
         "nation"      => "NATIONALCALENDAR",
         "diocese"     => "DIOCESANCALENDAR",
         "widerregion" => "WIDERREGIONCALENDAR"
     ];
-    public ?string $category    = null;
-    public ?string $key         = null;
-    public ?string $locale      = null;
-    public ?object $payload     = null;
-    public ?string $i18nRequest = null;
+    public ?string $category               = null;
+    public ?string $key                    = null;
+    public ?string $locale                 = null;
+    public ?object $payload                = null;
+    public ?string $i18nRequest            = null;
 
     public function __construct()
     {
@@ -200,7 +200,7 @@ class RegionalDataParams
             // For all requests other than PUT and DELETE, we expect a valid locale parameter
             if (RegionalData::$Core->getRequestMethod() !== RequestMethod::DELETE) {
                 $currentDiocese = array_find($this->calendars->diocesan_calendars, fn ($el) => $el->calendar_id === $data->key);
-                $validLangs = $currentDiocese->locales;
+                $validLangs     = $currentDiocese->locales;
                 if (property_exists($data, 'locale')) {
                     $data->locale = \Locale::canonicalize($data->locale);
                     if (
@@ -260,13 +260,13 @@ class RegionalDataParams
             && RegionalData::$Core->getRequestMethod() !== RequestMethod::PUT
         ) {
             $validVals = implode(', ', $this->calendars->wider_regions_keys);
-            $message = "Invalid value {$data->key} for param `key`, valid values are: {$validVals}";
+            $message   = "Invalid value {$data->key} for param `key`, valid values are: {$validVals}";
             RegionalData::produceErrorResponse(StatusCode::NOT_FOUND, $message);
         }
 
         // The locale parameter can be supplied by the Accept-Language header or by a `locale` property in the payload.
         $currentWiderRegion = array_find($this->calendars->wider_regions, fn ($el) => $el->name === $data->key);
-        $validLangs = $currentWiderRegion->locales;
+        $validLangs         = $currentWiderRegion->locales;
         if (property_exists($data, 'locale')) {
             $data->locale = \Locale::canonicalize($data->locale);
             if (

@@ -9,53 +9,53 @@ namespace LiturgicalCalendar\Api\Enum;
  */
 class LitCommon
 {
-    public const PROPRIO                   = "Proper";
-    public const DEDICATIONIS_ECCLESIAE    = "Dedication of a Church";
-    public const BEATAE_MARIAE_VIRGINIS    = "Blessed Virgin Mary";
-    public const MARTYRUM                  = "Martyrs";
-    public const PASTORUM                  = "Pastors";
-    public const DOCTORUM                  = "Doctors";
-    public const VIRGINUM                  = "Virgins";
-    public const SANCTORUM_ET_SANCTARUM    = "Holy Men and Women";
+    public const PROPRIO                = "Proper";
+    public const DEDICATIONIS_ECCLESIAE = "Dedication of a Church";
+    public const BEATAE_MARIAE_VIRGINIS = "Blessed Virgin Mary";
+    public const MARTYRUM               = "Martyrs";
+    public const PASTORUM               = "Pastors";
+    public const DOCTORUM               = "Doctors";
+    public const VIRGINUM               = "Virgins";
+    public const SANCTORUM_ET_SANCTARUM = "Holy Men and Women";
 
     /** MARTYRUM */
-    public const PRO_UNO_MARTYRE                       = "For One Martyr";
-    public const PRO_PLURIBUS_MARTYRIBUS               = "For Several Martyrs";
-    public const PRO_MISSIONARIIS_MARTYRIBUS           = "For Missionary Martyrs";
-    public const PRO_UNO_MISSIONARIO_MARTYRE           = "For One Missionary Martyr";
-    public const PRO_PLURIBUS_MISSIONARIIS_MARTYRIBUS  = "For Several Missionary Martyrs";
-    public const PRO_VIRGINE_MARTYRE                   = "For a Virgin Martyr";
-    public const PRO_SANCTA_MULIERE_MARTYRE            = "For a Holy Woman Martyr";
+    public const PRO_UNO_MARTYRE                      = "For One Martyr";
+    public const PRO_PLURIBUS_MARTYRIBUS              = "For Several Martyrs";
+    public const PRO_MISSIONARIIS_MARTYRIBUS          = "For Missionary Martyrs";
+    public const PRO_UNO_MISSIONARIO_MARTYRE          = "For One Missionary Martyr";
+    public const PRO_PLURIBUS_MISSIONARIIS_MARTYRIBUS = "For Several Missionary Martyrs";
+    public const PRO_VIRGINE_MARTYRE                  = "For a Virgin Martyr";
+    public const PRO_SANCTA_MULIERE_MARTYRE           = "For a Holy Woman Martyr";
 
     /** PASTORUM */
-    public const PRO_PAPA                              = "For a Pope";
-    public const PRO_EPISCOPO                          = "For a Bishop";
-    public const PRO_UNO_PASTORE                       = "For One Pastor";
-    public const PRO_PLURIBUS_PASTORIBUS               = "For Several Pastors";
-    public const PRO_FUNDATORIBUS_ECCLESIARUM          = "For Founders of a Church";
-    public const PRO_UNO_FUNDATORE                     = "For One Founder";
-    public const PRO_PLURIBUS_FUNDATORIBUS             = "For Several Founders";
-    public const PRO_MISSIONARIIS                      = "For Missionaries";
+    public const PRO_PAPA                     = "For a Pope";
+    public const PRO_EPISCOPO                 = "For a Bishop";
+    public const PRO_UNO_PASTORE              = "For One Pastor";
+    public const PRO_PLURIBUS_PASTORIBUS      = "For Several Pastors";
+    public const PRO_FUNDATORIBUS_ECCLESIARUM = "For Founders of a Church";
+    public const PRO_UNO_FUNDATORE            = "For One Founder";
+    public const PRO_PLURIBUS_FUNDATORIBUS    = "For Several Founders";
+    public const PRO_MISSIONARIIS             = "For Missionaries";
 
     /** VIRGINUM */
-    public const PRO_UNA_VIRGINE                       = "For One Virgin";
-    public const PRO_PLURIBUS_VIRGINIBUS               = "For Several Virgins";
+    public const PRO_UNA_VIRGINE         = "For One Virgin";
+    public const PRO_PLURIBUS_VIRGINIBUS = "For Several Virgins";
 
     /** SANCTORUM_ET_SANCTARUM */
-    public const PRO_PLURIBUS_SANCTIS                  = "For Several Saints";
-    public const PRO_UNO_SANCTO                        = "For One Saint";
-    public const PRO_ABBATE                            = "For an Abbot";
-    public const PRO_MONACHO                           = "For a Monk";
-    public const PRO_MONIALI                           = "For a Nun";
-    public const PRO_RELIGIOSIS                        = "For Religious";
+    public const PRO_PLURIBUS_SANCTIS                        = "For Several Saints";
+    public const PRO_UNO_SANCTO                              = "For One Saint";
+    public const PRO_ABBATE                                  = "For an Abbot";
+    public const PRO_MONACHO                                 = "For a Monk";
+    public const PRO_MONIALI                                 = "For a Nun";
+    public const PRO_RELIGIOSIS                              = "For Religious";
     public const PRO_IIS_QUI_OPERA_MISERICORDIAE_EXERCUERUNT = "For Those Who Practiced Works of Mercy";
-    public const PRO_EDUCATORIBUS                      = "For Educators";
-    public const PRO_SANCTIS_MULIERIBUS                = "For Holy Women";
+    public const PRO_EDUCATORIBUS                            = "For Educators";
+    public const PRO_SANCTIS_MULIERIBUS                      = "For Holy Women";
 
     private string $locale;
     private array $GTXT;
-    public static string $HASH_REQUEST          = "";
-    public static array $REQUEST_PARAMS         = [];
+    public static string $HASH_REQUEST  = "";
+    public static array $REQUEST_PARAMS = [];
 
     /**
      * Construct a new instance of LitCommon.
@@ -67,7 +67,7 @@ class LitCommon
     public function __construct(string $locale)
     {
         $this->locale = $locale;
-        $this->GTXT = [
+        $this->GTXT   = [
             self::PROPRIO                           => _("Proper"),
             /**translators: context = from the Common of nn */
             self::DEDICATIONIS_ECCLESIAE            => _("Dedication of a Church"),
@@ -400,7 +400,7 @@ class LitCommon
                             [$commonGeneral, $commonSpecific] = explode(":", $txt);
                             //LitCommon::debugWrite( "Common has a specific common: GENERAL = $commonGeneral, SPECIFIC = $commonSpecific" );
                         } else {
-                            $commonGeneral = $txt;
+                            $commonGeneral  = $txt;
                             $commonSpecific = "";
                             //LitCommon::debugWrite( "Common does not have a specific common: GENERAL = $commonGeneral, SPECIFIC = $commonSpecific" );
                         }
