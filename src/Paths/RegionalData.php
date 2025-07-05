@@ -431,24 +431,18 @@ class RegionalData
                 $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
                 if (true === $test) {
                     $this->createDiocesanCalendar();
-                } else {
-                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
                 }
                 break;
             case "NATIONALCALENDAR":
                 $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::NATIONAL);
                 if (true === $test) {
                     $this->createNationalCalendar();
-                } else {
-                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
                 }
                 break;
             case "WIDERREGIONCALENDAR":
                 $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::WIDERREGION);
                 if (true === $test) {
                     $this->createWiderRegionCalendar();
-                } else {
-                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
                 }
                 break;
             default:
@@ -774,24 +768,18 @@ class RegionalData
                 $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
                 if (true === $test) {
                     $this->updateDiocesanCalendar();
-                } else {
-                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
                 }
                 break;
             case "NATIONALCALENDAR":
                 $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::NATIONAL);
                 if (true === $test) {
                     $this->updateNationalCalendar();
-                } else {
-                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
                 }
                 break;
             case "WIDERREGIONCALENDAR":
                 $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::WIDERREGION);
                 if (true === $test) {
                     $this->updateWiderRegionCalendar();
-                } else {
-                    self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $test);
                 }
                 break;
             default:

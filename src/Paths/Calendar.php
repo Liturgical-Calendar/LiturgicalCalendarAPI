@@ -2709,8 +2709,8 @@ class Calendar
         } elseif (property_exists($map, 'en')) {
             return $map->en;
         } else {
-            $objIterator = new \ArrayIterator($map);
-            return $objIterator->key();
+            $mapArray = (array)$map;
+            return reset($mapArray);
         }
     }
 
@@ -4582,7 +4582,7 @@ class Calendar
             $ical .= "CLASS:PUBLIC\r\n";
 
             $publishDate = $GitHubReleasesObj->published_at;
-            $icalDate    = \DateTime::createFromFormat('U', $CalEvent['date'], new \DateTimeZone('UTC'));
+            $icalDate    = \DateTime::createFromFormat('U', (string)$CalEvent['date'], new \DateTimeZone('UTC'));
 
             $ical .= "DTSTART;VALUE=DATE:" . $icalDate->format('Ymd') . "\r\n";// . "T" . $icalDate->format( 'His' ) . "Z\r\n";
             //$CalEvent['date']->add( new \DateInterval( 'P1D' ) );

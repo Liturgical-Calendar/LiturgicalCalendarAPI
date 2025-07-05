@@ -139,7 +139,7 @@ class Utilities
                 } else {
                     $key = self::transformKey($key);
                     if (is_bool($value)) {
-                        $boolVal = $value ? 1 : 0;
+                        $boolVal = $value ? '1' : '0';
                         $xml->addChild($key, $boolVal);
                     }
                     elseif (gettype($value) === 'string') {

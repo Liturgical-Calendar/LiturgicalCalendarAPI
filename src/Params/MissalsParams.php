@@ -118,6 +118,12 @@ class MissalsParams
         return self::$last_error_status;
     }
 */
+
+    /**
+     * Adds a region to the list of valid regions for the requested missal.
+     *
+     * @param string $region the region to add
+     */
     public function addMissalRegion(string $region)
     {
         if (false === in_array($region, self::$MissalRegions)) {
@@ -125,13 +131,23 @@ class MissalsParams
         }
     }
 
-    public function addMissalYear(string $year)
+    /**
+     * Adds a year to the list of valid years for the requested missal.
+     *
+     * @param int $year the year to add
+     */
+    public function addMissalYear(int $year)
     {
         if (false === in_array($year, self::$MissalYears)) {
             self::$MissalYears[] = $year;
         }
     }
 
+    /**
+     * Sets the list of available languages for the requested missal.
+     *
+     * @param array $langs an array of locales, e.g. ['en_US', 'es_ES', 'pt_PT']
+     */
     public function setAvailableLangs(array $langs)
     {
         $this->availableLangs = $langs;

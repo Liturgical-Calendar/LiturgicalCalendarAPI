@@ -395,6 +395,7 @@ class LitCommon
                 }
                 if (count($commons) > 0) {
                     //LitCommon::debugWrite( "Common is an array with " . count( $commons ) . " elements" );
+                    /** @var string[] $commons */
                     $commons = array_map(function ($txt) {
                         if (strpos($txt, ":") !== false) {
                             [$commonGeneral, $commonSpecific] = explode(":", $txt);
@@ -407,11 +408,13 @@ class LitCommon
                         $fromTheCommon = $this->locale === LitLocale::LATIN ? "De Commune" : _("From the Common");
                         //LitCommon::debugWrite( "translated intro to common: " . $fromTheCommon );
                         $commonGeneralStringParts = [ $fromTheCommon ];
-                        if ($this->getPossessive($commonGeneral) !== "") {
-                            array_push($commonGeneralStringParts, $this->getPossessive($commonGeneral));
+                        $possessive               = (string) $this->getPossessive($commonGeneral);
+                        $commonGeneralLcl         = (string) $this->i18n($commonGeneral);
+                        if ($possessive !== "") {
+                            array_push($commonGeneralStringParts, $possessive);
                         }
-                        if ($this->i18n($commonGeneral) !== "") {
-                            array_push($commonGeneralStringParts, $this->i18n($commonGeneral));
+                        if ($commonGeneralLcl !== "") {
+                            array_push($commonGeneralStringParts, $commonGeneralLcl);
                         }
                         //LitCommon::debugWrite( "commonGeneralStringParts = " . json_encode( $commonGeneralStringParts ) );
                         $commonGeneralString = implode(" ", $commonGeneralStringParts);
