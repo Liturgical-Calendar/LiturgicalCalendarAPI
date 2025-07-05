@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-04 11:44+0000\n"
+"POT-Creation-Date: 2025-07-05 14:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,409 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#. translators: context = liturgical color
+#: src/Enum/LitColor.php:32
+msgid "green"
+msgstr ""
+
+#. translators: context = liturgical color
+#: src/Enum/LitColor.php:35
+msgid "purple"
+msgstr ""
+
+#. translators: context = liturgical color
+#: src/Enum/LitColor.php:38
+msgid "white"
+msgstr ""
+
+#. translators: context = liturgical color
+#: src/Enum/LitColor.php:41
+msgid "red"
+msgstr ""
+
+#. translators: context = liturgical color
+#: src/Enum/LitColor.php:44
+msgid "pink"
+msgstr ""
+
+#. translators: context = liturgical color: unsupported value
+#: src/Enum/LitColor.php:47
+msgid "unknown"
+msgstr ""
+
+#: src/Enum/LitCommon.php:71
+msgid "Proper"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: src/Enum/LitCommon.php:73
+msgid "Dedication of a Church"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: src/Enum/LitCommon.php:75
+msgid "Blessed Virgin Mary"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: src/Enum/LitCommon.php:77
+msgid "Martyrs"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: src/Enum/LitCommon.php:79
+msgid "Pastors"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: src/Enum/LitCommon.php:81
+msgid "Doctors"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: src/Enum/LitCommon.php:83
+msgid "Virgins"
+msgstr ""
+
+#. translators: context = from the Common of nn
+#: src/Enum/LitCommon.php:85
+msgid "Holy Men and Women"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:88
+msgid "For One Martyr"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:90
+msgid "For Several Martyrs"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:92
+msgid "For Missionary Martyrs"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:94
+msgid "For One Missionary Martyr"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:96
+msgid "For Several Missionary Martyrs"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:98
+msgid "For a Virgin Martyr"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:100
+msgid "For a Holy Woman Martyr"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:102
+msgid "For a Pope"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:104
+msgid "For a Bishop"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:106
+msgid "For One Pastor"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:108
+msgid "For Several Pastors"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:110
+msgid "For Founders of a Church"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:112
+msgid "For One Founder"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:114
+msgid "For Several Founders"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:116
+msgid "For Missionaries"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:118
+msgid "For One Virgin"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:120
+msgid "For Several Virgins"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:122
+msgid "For Several Saints"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:124
+msgid "For One Saint"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:126
+msgid "For an Abbot"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:128
+msgid "For a Monk"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:130
+msgid "For a Nun"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:132
+msgid "For Religious"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:134
+msgid "For Those Who Practiced Works of Mercy"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:136
+msgid "For Educators"
+msgstr ""
+
+#. translators: context = from the Common of nn: nn
+#: src/Enum/LitCommon.php:138
+msgid "For Holy Women"
+msgstr ""
+
+#. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: src/Enum/LitCommon.php:202 src/Enum/LitCommon.php:214
+msgctxt "(SING_FEMM)"
+msgid "of the"
+msgstr ""
+
+#. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: src/Enum/LitCommon.php:205
+msgctxt "(PLUR_FEMM)"
+msgid "of"
+msgstr ""
+
+#. translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: src/Enum/LitCommon.php:211
+msgctxt "(PLUR_MASC)"
+msgid "of"
+msgstr ""
+
+#. translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty!
+#: src/Enum/LitCommon.php:217
+msgctxt "(SING_MASC)"
+msgid "of the"
+msgstr ""
+
+#: src/Enum/LitCommon.php:408
+msgid "From the Common"
+msgstr ""
+
+#. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
+#. translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday
+#: src/Enum/LitCommon.php:427 src/Paths/Calendar.php:1298 src/Utilities.php:294
+#: src/Utilities.php:299
+msgid "or"
+msgstr ""
+
+#. translators: liturgical rank. Keep lowercase
+#: src/Enum/LitGrade.php:150 src/Enum/LitGrade.php:206
+msgid "weekday"
+msgstr ""
+
+#. translators: liturgical rank 'WEEKDAY' in abbreviated form
+#: src/Enum/LitGrade.php:152 src/Enum/LitGrade.php:208
+msgid "w"
+msgstr ""
+
+#. translators: liturgical rank. Keep lowercase
+#: src/Enum/LitGrade.php:157
+msgid "commemoration"
+msgstr ""
+
+#. translators: liturgical rank 'COMMEMORATION' in abbreviated form
+#: src/Enum/LitGrade.php:159
+msgid "m*"
+msgstr ""
+
+#. translators: liturgical rank. Keep lowercsase
+#: src/Enum/LitGrade.php:164
+msgid "optional memorial"
+msgstr ""
+
+#. translators: liturgical rank 'OPTIONAL MEMORIAL' in abbreviated form
+#: src/Enum/LitGrade.php:166
+msgid "m"
+msgstr ""
+
+#. translators: liturgical rank. Keep Capitalized
+#: src/Enum/LitGrade.php:171
+msgid "Memorial"
+msgstr ""
+
+#. translators: liturgical rank 'MEMORIAL' in abbreviated form
+#: src/Enum/LitGrade.php:173
+msgid "M"
+msgstr ""
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: src/Enum/LitGrade.php:178
+msgid "FEAST"
+msgstr ""
+
+#. translators: liturgical rank 'FEAST' in abbreviated form
+#: src/Enum/LitGrade.php:180
+msgid "F"
+msgstr ""
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: src/Enum/LitGrade.php:185
+msgid "FEAST OF THE LORD"
+msgstr ""
+
+#. translators: liturgical rank 'FEAST OF THE LORD' in abbreviated form
+#: src/Enum/LitGrade.php:187
+msgid "F✝"
+msgstr ""
+
+#. translators: liturgical rank. Keep UPPERCASE
+#: src/Enum/LitGrade.php:192
+msgid "SOLEMNITY"
+msgstr ""
+
+#. translators: liturgical rank 'SOLEMNITY' in abbreviated form
+#: src/Enum/LitGrade.php:194
+msgid "S"
+msgstr ""
+
+#. translators: liturgical rank. Keep lowercase
+#: src/Enum/LitGrade.php:199
+msgid "celebration with precedence over solemnities"
+msgstr ""
+
+#. translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form
+#: src/Enum/LitGrade.php:201
+msgid "S✝"
+msgstr ""
+
+#. translators: context = liturgical season
+#: src/Enum/LitSeason.php:25
+msgid "Advent"
+msgstr ""
+
+#. translators: context = liturgical season
+#: src/Enum/LitSeason.php:28
+msgid "Christmas"
+msgstr ""
+
+#. translators: context = liturgical season
+#: src/Enum/LitSeason.php:31
+msgid "Lent"
+msgstr ""
+
+#. translators: context = liturgical season
+#: src/Enum/LitSeason.php:34
+msgid "Easter Triduum"
+msgstr ""
+
+#. translators: context = liturgical season
+#: src/Enum/LitSeason.php:37
+msgid "Easter"
+msgstr ""
+
+#. translators: context = liturgical season
+#: src/Enum/LitSeason.php:40
+msgid "Ordinary Time"
+msgstr ""
+
+#. translators: context = liturgical season: unsupported value
+#: src/Enum/LitSeason.php:43
+msgid "Unknown Season"
+msgstr ""
+
+#. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
+#: src/LiturgicalEventCollection.php:66
+msgid "YEAR"
+msgstr ""
+
+#: src/LiturgicalEventCollection.php:67
+msgid "Vigil Mass"
+msgstr ""
+
+#: src/LiturgicalEventCollection.php:926
+#, php-format
+msgid ""
+"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
+"year %5$d. As per %6$s, the first has precedence, therefore the Vigil Mass "
+"is confirmed as are I Vespers."
+msgstr ""
+
+#: src/LiturgicalEventCollection.php:932 src/Paths/Calendar.php:1483
+#: src/Paths/Calendar.php:1503 src/Paths/Calendar.php:1552
+#: src/Paths/Calendar.php:1581 src/Paths/Calendar.php:2098
+#: src/Paths/Calendar.php:2317 src/Paths/Calendar.php:2385
+#: src/Paths/Calendar.php:2735 src/Paths/Calendar.php:2806
+#: src/Paths/Calendar.php:2845 src/Paths/Calendar.php:2980
+#: src/Paths/Calendar.php:2995 src/Paths/Calendar.php:3012
+#: src/Paths/Calendar.php:3053
+msgid "Decree of the Congregation for Divine Worship"
+msgstr ""
+
+#: src/LiturgicalEventCollection.php:940
+#, php-format
+msgid ""
+"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
+"year %5$d. Since the first Solemnity has precedence, it will have Vespers I "
+"and a vigil Mass, whereas the last Solemnity will not have either Vespers II "
+"or an evening Mass."
+msgstr ""
+
+#: src/LiturgicalEventCollection.php:950
+#, php-format
+msgid ""
+"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
+"year %5$d. This last Solemnity takes precedence, therefore it will maintain "
+"Vespers II and an evening Mass, while the first Solemnity will not have a "
+"Vigil Mass or Vespers I."
+msgstr ""
+
+#: src/LiturgicalEventCollection.php:1015
+#, php-format
+msgid ""
+"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
+"year %5$d. We should ask the Congregation for Divine Worship what to do "
+"about this!"
+msgstr ""
 
 #: src/Paths/Calendar.php:630
 #, php-format
@@ -126,12 +529,6 @@ msgstr ""
 msgid "%s - Christmas Weekday"
 msgstr ""
 
-#. translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday
-#. translators: when there are multiple possible commons, this will be the glue "or from the common of..."
-#: src/Paths/Calendar.php:1298 src/Enum/LitCommon.php:424
-msgid "or"
-msgstr ""
-
 #. translators: as instituted on the day of the canonization of St Faustina Kowalska by Pope John Paul II in the year 2000
 #: src/Paths/Calendar.php:1302
 msgid "Divine Mercy Sunday"
@@ -157,17 +554,6 @@ msgstr ""
 
 #: src/Paths/Calendar.php:1475
 msgid "the Saturday preceding Palm Sunday"
-msgstr ""
-
-#: src/Paths/Calendar.php:1483 src/Paths/Calendar.php:1503
-#: src/Paths/Calendar.php:1552 src/Paths/Calendar.php:1581
-#: src/Paths/Calendar.php:2098 src/Paths/Calendar.php:2317
-#: src/Paths/Calendar.php:2385 src/Paths/Calendar.php:2735
-#: src/Paths/Calendar.php:2806 src/Paths/Calendar.php:2845
-#: src/Paths/Calendar.php:2980 src/Paths/Calendar.php:2995
-#: src/Paths/Calendar.php:3012 src/Paths/Calendar.php:3053
-#: src/LiturgicalEventCollection.php:932
-msgid "Decree of the Congregation for Divine Worship"
 msgstr ""
 
 #: src/Paths/Calendar.php:1495
@@ -802,389 +1188,4 @@ msgstr ""
 #: src/Paths/Calendar.php:4733
 #, php-format
 msgid "Error receiving or parsing info from github about latest release: %s."
-msgstr ""
-
-#. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
-#: src/LiturgicalEventCollection.php:66
-msgid "YEAR"
-msgstr ""
-
-#: src/LiturgicalEventCollection.php:67
-msgid "Vigil Mass"
-msgstr ""
-
-#: src/LiturgicalEventCollection.php:926
-#, php-format
-msgid ""
-"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
-"year %5$d. As per %6$s, the first has precedence, therefore the Vigil Mass "
-"is confirmed as are I Vespers."
-msgstr ""
-
-#: src/LiturgicalEventCollection.php:940
-#, php-format
-msgid ""
-"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
-"year %5$d. Since the first Solemnity has precedence, it will have Vespers I "
-"and a vigil Mass, whereas the last Solemnity will not have either Vespers II "
-"or an evening Mass."
-msgstr ""
-
-#: src/LiturgicalEventCollection.php:950
-#, php-format
-msgid ""
-"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
-"year %5$d. This last Solemnity takes precedence, therefore it will maintain "
-"Vespers II and an evening Mass, while the first Solemnity will not have a "
-"Vigil Mass or Vespers I."
-msgstr ""
-
-#: src/LiturgicalEventCollection.php:1015
-#, php-format
-msgid ""
-"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
-"year %5$d. We should ask the Congregation for Divine Worship what to do "
-"about this!"
-msgstr ""
-
-#. translators: context = liturgical color
-#: src/Enum/LitColor.php:32
-msgid "green"
-msgstr ""
-
-#. translators: context = liturgical color
-#: src/Enum/LitColor.php:35
-msgid "purple"
-msgstr ""
-
-#. translators: context = liturgical color
-#: src/Enum/LitColor.php:38
-msgid "white"
-msgstr ""
-
-#. translators: context = liturgical color
-#: src/Enum/LitColor.php:41
-msgid "red"
-msgstr ""
-
-#. translators: context = liturgical color
-#: src/Enum/LitColor.php:44
-msgid "pink"
-msgstr ""
-
-#. translators: context = liturgical color: unsupported value
-#: src/Enum/LitColor.php:47
-msgid "unknown"
-msgstr ""
-
-#: src/Enum/LitCommon.php:71
-msgid "Proper"
-msgstr ""
-
-#. translators: context = from the Common of nn
-#: src/Enum/LitCommon.php:73
-msgid "Dedication of a Church"
-msgstr ""
-
-#. translators: context = from the Common of nn
-#: src/Enum/LitCommon.php:75
-msgid "Blessed Virgin Mary"
-msgstr ""
-
-#. translators: context = from the Common of nn
-#: src/Enum/LitCommon.php:77
-msgid "Martyrs"
-msgstr ""
-
-#. translators: context = from the Common of nn
-#: src/Enum/LitCommon.php:79
-msgid "Pastors"
-msgstr ""
-
-#. translators: context = from the Common of nn
-#: src/Enum/LitCommon.php:81
-msgid "Doctors"
-msgstr ""
-
-#. translators: context = from the Common of nn
-#: src/Enum/LitCommon.php:83
-msgid "Virgins"
-msgstr ""
-
-#. translators: context = from the Common of nn
-#: src/Enum/LitCommon.php:85
-msgid "Holy Men and Women"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:88
-msgid "For One Martyr"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:90
-msgid "For Several Martyrs"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:92
-msgid "For Missionary Martyrs"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:94
-msgid "For One Missionary Martyr"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:96
-msgid "For Several Missionary Martyrs"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:98
-msgid "For a Virgin Martyr"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:100
-msgid "For a Holy Woman Martyr"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:102
-msgid "For a Pope"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:104
-msgid "For a Bishop"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:106
-msgid "For One Pastor"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:108
-msgid "For Several Pastors"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:110
-msgid "For Founders of a Church"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:112
-msgid "For One Founder"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:114
-msgid "For Several Founders"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:116
-msgid "For Missionaries"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:118
-msgid "For One Virgin"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:120
-msgid "For Several Virgins"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:122
-msgid "For Several Saints"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:124
-msgid "For One Saint"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:126
-msgid "For an Abbot"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:128
-msgid "For a Monk"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:130
-msgid "For a Nun"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:132
-msgid "For Religious"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:134
-msgid "For Those Who Practiced Works of Mercy"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:136
-msgid "For Educators"
-msgstr ""
-
-#. translators: context = from the Common of nn: nn
-#: src/Enum/LitCommon.php:138
-msgid "For Holy Women"
-msgstr ""
-
-#. translators: (singular feminine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: src/Enum/LitCommon.php:202 src/Enum/LitCommon.php:214
-msgctxt "(SING_FEMM)"
-msgid "of the"
-msgstr ""
-
-#. translators: (plural feminine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: src/Enum/LitCommon.php:205
-msgctxt "(PLUR_FEMM)"
-msgid "of"
-msgstr ""
-
-#. translators: (plural masculine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: src/Enum/LitCommon.php:211
-msgctxt "(PLUR_MASC)"
-msgid "of"
-msgstr ""
-
-#. translators: (singular masculine) glue between "From the Common" and the actual common. Latin: leave empty!
-#: src/Enum/LitCommon.php:217
-msgctxt "(SING_MASC)"
-msgid "of the"
-msgstr ""
-
-#: src/Enum/LitCommon.php:407
-msgid "From the Common"
-msgstr ""
-
-#. translators: liturgical rank. Keep lowercase
-#: src/Enum/LitGrade.php:150 src/Enum/LitGrade.php:206
-msgid "weekday"
-msgstr ""
-
-#. translators: liturgical rank 'WEEKDAY' in abbreviated form
-#: src/Enum/LitGrade.php:152 src/Enum/LitGrade.php:208
-msgid "w"
-msgstr ""
-
-#. translators: liturgical rank. Keep lowercase
-#: src/Enum/LitGrade.php:157
-msgid "commemoration"
-msgstr ""
-
-#. translators: liturgical rank 'COMMEMORATION' in abbreviated form
-#: src/Enum/LitGrade.php:159
-msgid "m*"
-msgstr ""
-
-#. translators: liturgical rank. Keep lowercsase
-#: src/Enum/LitGrade.php:164
-msgid "optional memorial"
-msgstr ""
-
-#. translators: liturgical rank 'OPTIONAL MEMORIAL' in abbreviated form
-#: src/Enum/LitGrade.php:166
-msgid "m"
-msgstr ""
-
-#. translators: liturgical rank. Keep Capitalized
-#: src/Enum/LitGrade.php:171
-msgid "Memorial"
-msgstr ""
-
-#. translators: liturgical rank 'MEMORIAL' in abbreviated form
-#: src/Enum/LitGrade.php:173
-msgid "M"
-msgstr ""
-
-#. translators: liturgical rank. Keep UPPERCASE
-#: src/Enum/LitGrade.php:178
-msgid "FEAST"
-msgstr ""
-
-#. translators: liturgical rank 'FEAST' in abbreviated form
-#: src/Enum/LitGrade.php:180
-msgid "F"
-msgstr ""
-
-#. translators: liturgical rank. Keep UPPERCASE
-#: src/Enum/LitGrade.php:185
-msgid "FEAST OF THE LORD"
-msgstr ""
-
-#. translators: liturgical rank 'FEAST OF THE LORD' in abbreviated form
-#: src/Enum/LitGrade.php:187
-msgid "F✝"
-msgstr ""
-
-#. translators: liturgical rank. Keep UPPERCASE
-#: src/Enum/LitGrade.php:192
-msgid "SOLEMNITY"
-msgstr ""
-
-#. translators: liturgical rank 'SOLEMNITY' in abbreviated form
-#: src/Enum/LitGrade.php:194
-msgid "S"
-msgstr ""
-
-#. translators: liturgical rank. Keep lowercase
-#: src/Enum/LitGrade.php:199
-msgid "celebration with precedence over solemnities"
-msgstr ""
-
-#. translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form
-#: src/Enum/LitGrade.php:201
-msgid "S✝"
-msgstr ""
-
-#. translators: context = liturgical season
-#: src/Enum/LitSeason.php:25
-msgid "Advent"
-msgstr ""
-
-#. translators: context = liturgical season
-#: src/Enum/LitSeason.php:28
-msgid "Christmas"
-msgstr ""
-
-#. translators: context = liturgical season
-#: src/Enum/LitSeason.php:31
-msgid "Lent"
-msgstr ""
-
-#. translators: context = liturgical season
-#: src/Enum/LitSeason.php:34
-msgid "Easter Triduum"
-msgstr ""
-
-#. translators: context = liturgical season
-#: src/Enum/LitSeason.php:37
-msgid "Easter"
-msgstr ""
-
-#. translators: context = liturgical season
-#: src/Enum/LitSeason.php:40
-msgid "Ordinary Time"
-msgstr ""
-
-#. translators: context = liturgical season: unsupported value
-#: src/Enum/LitSeason.php:43
-msgid "Unknown Season"
 msgstr ""
