@@ -22,7 +22,6 @@ use LiturgicalCalendar\Api\Enum\RomanMissal;
  * @package LiturgicalCalendar\Api
  * @author  John Romano D'Orazio <priest@johnromanodorazio.com>
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
- * @version 3.9
  * @link    https://litcal.johnromanodorazio.com
  */
 class Health implements MessageComponentInterface
@@ -30,7 +29,7 @@ class Health implements MessageComponentInterface
     /**
      * A collection of connected clients.
      *
-     * @var \SplObjectStorage
+     * @var \SplObjectStorage<ConnectionInterface, null> $clients
      */
     protected \SplObjectStorage $clients;
 
@@ -86,7 +85,7 @@ class Health implements MessageComponentInterface
      *
      * This stores the new connection to send messages to later.
      */
-    public function onOpen(ConnectionInterface $conn)
+    public function onOpen(ConnectionInterface $conn): void
     {
         // Store the new connection to send messages to later
         $this->clients->attach($conn);
@@ -144,7 +143,7 @@ class Health implements MessageComponentInterface
      * @param ConnectionInterface $from The user who sent the message
      * @param string $msg The message that was sent
      */
-    public function onMessage(ConnectionInterface $from, $msg)
+    public function onMessage(ConnectionInterface $from, $msg): void
     {
         echo sprintf('Receiving message from connection %d: %s', $from->resourceId, $msg);
         $messageReceived = json_decode($msg);
@@ -210,7 +209,7 @@ class Health implements MessageComponentInterface
      * @param ConnectionInterface $conn The connection that was closed.
      * @return void
      */
-    public function onClose(ConnectionInterface $conn)
+    public function onClose(ConnectionInterface $conn): void
     {
         // The connection is closed, remove it, as we can no longer send it messages
         $this->clients->detach($conn);
@@ -226,7 +225,7 @@ class Health implements MessageComponentInterface
      * @param ConnectionInterface $conn The connection on which the error occurred
      * @param \Exception $e The exception that was thrown
      */
-    public function onError(ConnectionInterface $conn, \Exception $e)
+    public function onError(ConnectionInterface $conn, \Exception $e): void
     {
         echo "An error has occurred: {$e->getMessage()}\n";
         $conn->close();
@@ -240,7 +239,7 @@ class Health implements MessageComponentInterface
      * @param ConnectionInterface $from The client that sent the original message.
      * @param string|\stdClass $msg The message to send back to the client.
      */
-    private function sendMessage(ConnectionInterface $from, string|\stdClass $msg)
+    private function sendMessage(ConnectionInterface $from, string|\stdClass $msg): void
     {
         if (gettype($msg) !== 'string') {
             $msg = json_encode($msg);
@@ -386,7 +385,7 @@ class Health implements MessageComponentInterface
      *   - schema-valid: a string, the class name to add to the message if the file is valid against the schema
      * @param ConnectionInterface $to The connection to send the validation message to
      */
-    private function executeValidation(object $validation, ConnectionInterface $to)
+    private function executeValidation(object $validation, ConnectionInterface $to): void
     {
         // First thing is try to determine the schema that we will be validating against,
         // and the path to the source file or folder that we will be validating against the schema.
@@ -747,8 +746,8 @@ class Health implements MessageComponentInterface
     /**
      * Takes an array of LIBXML errors and an array of XML lines
      * and returns a string of the errors with line numbers and column numbers.
-     * @param array $errors Array of LIBXML errors
-     * @param array $xml Array of strings, each string is a line in the XML document
+     * @param \LibXMLError[] $errors Array of LIBXML errors
+     * @param string[] $xml Array of strings, each string is a line in the XML document
      * @return string The errors with line numbers and column numbers
      */
     private static function retrieveXmlErrors(array $errors, array $xml): string
@@ -1045,12 +1044,12 @@ class Health implements MessageComponentInterface
     /**
      * Validate data against a specified schema.
      *
-     * @param object|array $data The data to validate.
+     * @param object $data The data to validate.
      * @param string $schemaUrl The URL of the schema to validate against.
      *
      * @return bool|object Returns true if the data is valid, otherwise returns an error object with details.
      */
-    private function validateDataAgainstSchema(object|array $data, string $schemaUrl): bool|object
+    private function validateDataAgainstSchema(object $data, string $schemaUrl): bool|object
     {
         $res = false;
         try {

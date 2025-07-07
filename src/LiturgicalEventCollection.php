@@ -9,34 +9,72 @@ use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Params\CalendarParams;
 
 /**
- * @phpstan-type EventCollectionItem array{event_key: string, name: string, date: int, color: array<int, string>, color_lcl: array<int, string>, type: string, grade: int, grade_lcl: string, grade_abbr: string, grade_display?: string|null, common: array, common_lcl: string, day_of_the_week_iso8601: int, month: int, day: int, year: int, month_short: string, month_long: string, day_of_the_week_short: string, day_of_the_week_long: string, liturgical_year?: ?string, liturgical_season: string, liturgical_season_lcl: string, has_vigil_mass?: bool, has_vesper_i?: bool, has_vesper_ii?: bool, is_vigil_mass?: bool, is_vigil_for?: string, psalter_week: int}
+ * @phpstan-type EventCollectionItem array{
+ *      event_key: string,
+ *      name: string,
+ *      date: int,
+ *      color: string[],
+ *      color_lcl: string[],
+ *      type: string,
+ *      grade: int,
+ *      grade_lcl: string,
+ *      grade_abbr: string,
+ *      grade_display?: string|null,
+ *      common: string[],
+ *      common_lcl: string,
+ *      day_of_the_week_iso8601: int,
+ *      month: int,
+ *      day: int,
+ *      year: int,
+ *      month_short: string,
+ *      month_long: string,
+ *      day_of_the_week_short: string,
+ *      day_of_the_week_long: string,
+ *      liturgical_year?: ?string,
+ *      liturgical_season: string,
+ *      liturgical_season_lcl: string,
+ *      has_vigil_mass?: bool,
+ *      has_vesper_i?: bool,
+ *      has_vesper_ii?: bool,
+ *      is_vigil_mass?: bool,
+ *      is_vigil_for?: string,
+ *      psalter_week: int
+ * }
+ * @phpstan-type EventCollection array<EventCollectionItem>
+ * @phpstan-type SecondaryCollectionItem array{
+ *      event_key: string,
+ *      date: string,
+ *      timezone_type: int,
+ *      timezone: string
+ * }
+ * @phpstan-type SecondaryCollection array<SecondaryCollectionItem>
+ * @phpstan-type LiturgicalEventsMap array<string, LiturgicalEvent>
  */
 
 class LiturgicalEventCollection
 {
-    /** @var EventCollectionItem[] */
-    private array $liturgicalEventsCollection            = [];
-    private array $solemnitiesCollection                 = [];
-    private array $feastsCollection                      = [];
-    private array $memorialsCollection                   = [];
-    private array $weekdaysAdventChristmasLentCollection = [];
-    private array $weekdaysAdventBeforeDec17Collection   = [];
-    private array $weekdaysEpiphanyCollection            = [];
-    private array $solemnitiesLordBVMCollection          = [];
-    private array $sundaysAdventLentEasterCollection     = [];
-    private array $liturgicalEvents                      = [];
-    private array $solemnities                           = [];
-    private array $feasts                                = [];
-    private array $memorials                             = [];
-    private array $weekdaysAdventChristmasLent           = [];
-    private array $weekdaysAdventBeforeDec17             = [];
-    private array $weekdaysEpiphany                      = [];
-    private array $solemnitiesLordBVM                    = [];
-    private array $sundaysAdventLentEaster               = [];
-    private array $suppressedEvents                      = [];
-    private array $reinstatedEvents                      = [];
-    private array $T                                     = [];
-    private array $Messages                              = [];
+    /** @var EventCollection       */ private array $liturgicalEventsCollection            = [];
+    /** @var SecondaryCollection   */ private array $solemnitiesCollection                 = [];
+    /** @var SecondaryCollection   */ private array $feastsCollection                      = [];
+    /** @var SecondaryCollection   */ private array $memorialsCollection                   = [];
+    /** @var SecondaryCollection   */ private array $weekdaysAdventChristmasLentCollection = [];
+    /** @var SecondaryCollection   */ private array $weekdaysAdventBeforeDec17Collection   = [];
+    /** @var SecondaryCollection   */ private array $weekdaysEpiphanyCollection            = [];
+    /** @var SecondaryCollection   */ private array $solemnitiesLordBVMCollection          = [];
+    /** @var SecondaryCollection   */ private array $sundaysAdventLentEasterCollection     = [];
+    /** @var LiturgicalEventsMap   */ private array $liturgicalEvents                      = [];
+    /** @var LiturgicalEventsMap   */ private array $solemnities                           = [];
+    /** @var LiturgicalEventsMap   */ private array $feasts                                = [];
+    /** @var LiturgicalEventsMap   */ private array $memorials                             = [];
+    /** @var LiturgicalEventsMap   */ private array $weekdaysAdventChristmasLent           = [];
+    /** @var LiturgicalEventsMap   */ private array $weekdaysAdventBeforeDec17             = [];
+    /** @var LiturgicalEventsMap   */ private array $weekdaysEpiphany                      = [];
+    /** @var LiturgicalEventsMap   */ private array $solemnitiesLordBVM                    = [];
+    /** @var LiturgicalEventsMap   */ private array $sundaysAdventLentEaster               = [];
+    /** @var LiturgicalEventsMap   */ private array $suppressedEvents                      = [];
+    /** @var LiturgicalEventsMap   */ private array $reinstatedEvents                      = [];
+    /** @var array<string, string> */ private array $T                                     = [];
+    /** @var array<string>         */ private array $Messages                              = [];
     private \IntlDateFormatter $dayOfTheWeek;
     private CalendarParams $CalendarParams;
     private LitGrade $LitGrade;
@@ -151,7 +189,7 @@ class LiturgicalEventCollection
     /**
      * Adds an array of keys to the SolemnitiesLordBVM array.
      * This is used to store the solemnities of the Lord and the BVM.
-     * @param array $keys The keys to add to the array.
+     * @param string[] $keys The keys to add to the array.
      * @return void
      */
     public function addSolemnitiesLordBVM(array $keys): void
@@ -180,7 +218,7 @@ class LiturgicalEventCollection
      * of those whose date matches the given DateTime object.
      *
      * @param DateTime $date The date for which to retrieve liturgical events.
-     * @return array An array of LiturgicalEvent objects occurring on the specified date.
+     * @return array<string, LiturgicalEvent> An array of LiturgicalEvent objects occurring on the specified date.
      */
     public function getCalEventsFromDate(DateTime $date): array
     {
@@ -658,7 +696,7 @@ class LiturgicalEventCollection
 
     /**
      * Retrieves the keys of all suppressed events.
-     * @return array An array of event keys, each representing a suppressed event.
+     * @return string[] An array of event keys, each representing a suppressed event.
      */
     public function getSuppressedKeys(): array
     {
@@ -672,7 +710,7 @@ class LiturgicalEventCollection
      * but have been removed. The keys of the array are the event keys of the
      * suppressed events.
      *
-     * @return array An array of LiturgicalEvent objects, each representing a suppressed event.
+     * @return SecondaryCollection A collection of items containing event_keys and serialized DateTime objects, each item representing a suppressed event.
      */
     public function getSuppressedEvents(): array
     {
@@ -689,7 +727,7 @@ class LiturgicalEventCollection
     /**
      * Retrieves the keys of all reinstated events.
      *
-     * @return array An array of event keys, each representing a reinstated event.
+     * @return string[] An array of event keys, each representing a reinstated event.
      */
     public function getReinstatedKeys(): array
     {
@@ -702,7 +740,7 @@ class LiturgicalEventCollection
      * The array contains LiturgicalEvent objects that were previously suppressed
      * and have been moved back into the collection as reinstated events.
      *
-     * @return array An array of LiturgicalEvent objects, each representing a reinstated event.
+     * @return SecondaryCollection A collection of items containing event_keys and serialized DateTime objects, each item representing a reinstated event.
      */
     public function getReinstatedEvents(): array
     {
@@ -965,7 +1003,7 @@ class LiturgicalEventCollection
      * @param string $key The key of the liturgical event.
      * @param LiturgicalEvent $litEvent The liturgical event object.
      */
-    private function calculateVigilMass(string $key, LiturgicalEvent $litEvent)
+    private function calculateVigilMass(string $key, LiturgicalEvent $litEvent): void
     {
         //Not only will we create new events, we will also add metadata to existing events
         $VigilDate = clone( $litEvent->date );
@@ -1055,7 +1093,7 @@ class LiturgicalEventCollection
     /**
      * Retrieves a collection of all solemnities from the collection.
      *
-     * @return DateTime[] An array of DateTime objects, each representing a date with a Solemnity.
+     * @return LiturgicalEventsMap A map of solemnity keys to their corresponding LiturgicalEvent objects.
      */
     public function getSolemnities(): array
     {
@@ -1068,7 +1106,7 @@ class LiturgicalEventCollection
      * This method is similar to getSolemnities, but it returns an array of arrays, where each inner array contains the key of the
      * event and the properties of the DateTime object as key-value pairs.
      *
-     * @return array An array of arrays, where each inner array contains the key of the event and the properties of the DateTime object as key-value pairs.
+     * @return SecondaryCollection An array of arrays, where each inner array contains the key of the event and the properties of the DateTime object as key-value pairs.
      */
     public function getSolemnitiesCollection(): array
     {
@@ -1089,7 +1127,7 @@ class LiturgicalEventCollection
     /**
      * Retrieves the keys of all solemnities from the collection.
      *
-     * @return array An array of keys, each representing a solemnity in the collection.
+     * @return string[] An array of keys, each representing a solemnity in the collection.
      */
     public function getSolemnitiesKeys(): array
     {
@@ -1099,7 +1137,7 @@ class LiturgicalEventCollection
     /**
      * Retrieves all feasts from the collection.
      *
-     * @return DateTime[] An array of DateTime objects, each representing a date with a Feast.
+     * @return LiturgicalEventsMap A map of event keys to their corresponding LiturgicalEvent objects, each representing a feast.
      */
     public function getFeasts(): array
     {
@@ -1112,7 +1150,7 @@ class LiturgicalEventCollection
      * This method is similar to getFeasts, but it returns an array of arrays, where each inner array contains the key of the
      * event and the properties of the DateTime object as key-value pairs.
      *
-     * @return array An array of arrays, where each inner array contains the key of the event and the properties of the DateTime object as key-value pairs.
+     * @return SecondaryCollection An array of arrays, where each inner array contains the key of the event and the properties of the DateTime object as key-value pairs.
      */
     public function getFeastsCollection(): array
     {
@@ -1133,7 +1171,7 @@ class LiturgicalEventCollection
     /**
      * Retrieves the keys of all feasts from the collection.
      *
-     * @return array An array of keys, each representing a feast in the collection.
+     * @return string[] An array of keys, each representing a feast in the collection.
      */
     public function getFeastsKeys(): array
     {
@@ -1143,7 +1181,7 @@ class LiturgicalEventCollection
     /**
      * Retrieves all memorials from the collection.
      *
-     * @return DateTime[] An array of DateTime objects, each representing a date with a Memorial.
+     * @return LiturgicalEventsMap A map of event keys to their corresponding LiturgicalEvent objects, each representing a memorial.
      */
     public function getMemorials(): array
     {
@@ -1156,7 +1194,7 @@ class LiturgicalEventCollection
      * This method is similar to getMemorials, but it returns an array of arrays, where each inner array contains the key of the
      * event and the properties of the DateTime object as key-value pairs.
      *
-     * @return array An array of arrays, where each inner array contains the key of the event and the properties of the DateTime object as key-value pairs.
+     * @return SecondaryCollection An array of arrays, where each inner array contains the key of the event and the properties of the DateTime object as key-value pairs.
      */
     public function getMemorialsCollection(): array
     {
@@ -1181,7 +1219,7 @@ class LiturgicalEventCollection
      * This method returns an array of arrays, where each inner array contains the key of the
      * event and the properties of the DateTime object as key-value pairs.
      *
-     * @return array An array of arrays, where each inner array contains the key of the event
+     * @return SecondaryCollection An array of arrays, where each inner array contains the key of the event
      * and the properties of the DateTime object as key-value pairs.
      */
     public function getWeekdaysAdventChristmasLentCollection(): array
@@ -1208,7 +1246,7 @@ class LiturgicalEventCollection
      *
      * These are days on which obligatory memorials will suppress the Advent weekday.
      *
-     * @return array An array of arrays, where each inner array contains the key of the event
+     * @return SecondaryCollection An array of arrays, where each inner array contains the key of the event
      * and the properties of the DateTime object as key-value pairs.
      */
     public function getWeekdaysAdventBeforeDec17Collection(): array
@@ -1234,7 +1272,7 @@ class LiturgicalEventCollection
      * This method returns an array of arrays, where each inner array contains the key of the
      * event and the properties of the DateTime object as key-value pairs.
      *
-     * @return array An array of arrays, where each inner array contains the key of the event
+     * @return SecondaryCollection An array of arrays, where each inner array contains the key of the event
      * and the properties of the DateTime object as key-value pairs.
      */
     public function getWeekdaysEpiphanyCollection(): array
@@ -1260,7 +1298,7 @@ class LiturgicalEventCollection
      * This method returns an array of arrays, where each inner array contains the key of the event
      * and the properties of the DateTime object as key-value pairs.
      *
-     * @return array An array of arrays, where each inner array contains the key of the event
+     * @return SecondaryCollection An array of arrays, where each inner array contains the key of the event
      * and the properties of the DateTime object as key-value pairs.
      */
     public function getSolemnitiesLordBVMCollection(): array
@@ -1286,7 +1324,7 @@ class LiturgicalEventCollection
      * This method returns an array of arrays, where each inner array contains the key of the
      * event and the properties of the DateTime object as key-value pairs.
      *
-     * @return array An array of arrays, where each inner array contains the key of the event
+     * @return SecondaryCollection An array of arrays, where each inner array contains the key of the event
      * and the properties of the DateTime object as key-value pairs.
      */
     public function getSundaysAdventLentEasterCollection(): array
@@ -1312,7 +1350,7 @@ class LiturgicalEventCollection
      * This method returns a collection of liturgical events or celebrations,
      * each with properties such as event_key, name, date, etc.
      *
-     * @return EventCollectionItem[]
+     * @return EventCollection
      */
     public function getLiturgicalEventsCollection(): array
     {
@@ -1327,7 +1365,7 @@ class LiturgicalEventCollection
     /**
      * Retrieves the keys of all memorials from the collection.
      *
-     * @return array An array of keys, each representing a memorial in the collection.
+     * @return string[] An array of keys, each representing a memorial in the collection.
      */
     public function getMemorialsKeys(): array
     {
@@ -1339,7 +1377,7 @@ class LiturgicalEventCollection
      *
      * These are days on which obligatory memorials will suppress the Advent weekday.
      *
-     * @return array An array of DateTime objects, each representing a weekday in Advent before December 17th.
+     * @return LiturgicalEventsMap A map of event_keys to LiturgicalEvent objects, each representing a weekday in Advent before December 17th.
      */
     public function getWeekdaysAdventBeforeDec17(): array
     {
@@ -1351,7 +1389,7 @@ class LiturgicalEventCollection
      *
      * These are days on which optional memorials can only be celebrated in partial form.
      *
-     * @return DateTime[] An array of DateTime objects, each representing a weekday in Advent, Christmas, or Lent.
+     * @return LiturgicalEventsMap A map of event_keys to LiturgicalEvent objects, each representing a weekday in the seasons of Advent (on or after December 17th), Christmas, or Lent.
      */
     public function getWeekdaysAdventChristmasLent(): array
     {
@@ -1361,7 +1399,7 @@ class LiturgicalEventCollection
     /**
      * Retrieves all weekdays in the Epiphany season.
      *
-     * @return DateTime[] An array of DateTime objects, each representing a weekday in the Epiphany season.
+     * @return LiturgicalEventsMap A map of event_keys to LiturgicalEvent objects, each representing a weekday in the Epiphany season.
      */
     public function getWeekdaysEpiphany(): array
     {
@@ -1373,7 +1411,7 @@ class LiturgicalEventCollection
      *
      * These are special solemnities that are higher in rank than regular solemnities.
      *
-     * @return array An array of solemnities, each represented by a string key.
+     * @return LiturgicalEventsMap A map of event_keys to LiturgicalEvent objects, each representing a solemnity of the Lord or the Blessed Virgin Mary.
      */
     public function getSolemnitiesLordBVM(): array
     {
@@ -1383,7 +1421,7 @@ class LiturgicalEventCollection
     /**
      * Retrieves all Sundays in the seasons of Advent, Lent, and Easter.
      *
-     * @return DateTime[] An array of DateTime objects, each representing a Sunday in Advent, Lent, or Easter.
+     * @return LiturgicalEventsMap A map of event_keys to LiturgicalEvent objects, each representing a Sunday in the seasons of Advent, Lent, or Easter.
      */
     public function getSundaysAdventLentEaster(): array
     {
@@ -1393,7 +1431,7 @@ class LiturgicalEventCollection
     /**
      * Retrieves all feasts and memorials from the collection.
      *
-     * @return array An associative array of all feasts and memorials, each represented by a string key.
+     * @return LiturgicalEventsMap A map of event_keys to LiturgicalEvent objects, each representing feasts and memorials.
      */
     public function getFeastsAndMemorials(): array
     {
@@ -1412,9 +1450,9 @@ class LiturgicalEventCollection
      * The 'grade' property is the grade of the coinciding event, formatted as a string.
      *
      * @param DateTime $currentFeastDate The date to check for coinciding events.
-     * @return \stdClass An object containing the coinciding event and its grade.
+     * @return object{grade: string, event: LiturgicalEvent} An object containing the coinciding event and its grade.
      */
-    public function determineSundaySolemnityOrFeast(DateTime $currentFeastDate): \stdClass
+    public function determineSundaySolemnityOrFeast(DateTime $currentFeastDate): object
     {
         $coincidingEvent        = new \stdClass();
         $coincidingEvent->grade = '';
@@ -1553,7 +1591,7 @@ class LiturgicalEventCollection
      * current liturgical year, such as liturgical events that occur on or after the First
      * Sunday of Advent.
      */
-    public function purgeDataAdventChristmas()
+    public function purgeDataAdventChristmas(): void
     {
         foreach ($this->liturgicalEvents as $key => $litEvent) {
             if ($litEvent->date > $this->liturgicalEvents[ "Advent1" ]->date) {

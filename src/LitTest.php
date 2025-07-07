@@ -290,7 +290,7 @@ class LitTest
     /**
      * Retrieves an array of all years for which there are assertions. Called in {@see __construct()}.
      *
-     * @return array The years for which there are assertions.
+     * @return int[] The years for which there are assertions.
      */
     private function detectYearsSupported(): array
     {

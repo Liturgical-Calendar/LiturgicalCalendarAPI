@@ -12,17 +12,19 @@ use LiturgicalCalendar\Api\Enum\LitSeason;
 
 class LiturgicalEvent implements \JsonSerializable
 {
-    public static $eventidx = 0;
+    public static int $eventidx = 0;
 
     public int $idx;
 
     /** The following properties are generally passed in the constructor */
     public string $name;
     public DateTime $date;
+    /** @var string[] */
     public array $color = [];
     public string $type;
     public int $grade;
     public ?string $grade_display;
+    /** @var string[] */
     public array $common;  //"Proper" or specified common(s) of saints...
 
     /** The following properties are set externally, but may be optional and therefore may remain null */
@@ -35,7 +37,8 @@ class LiturgicalEvent implements \JsonSerializable
     public ?string $liturgical_year   = null;
     public ?string $liturgical_season = null;
 
-    /** The following properties are set based on properties passed in the constructor or on properties set externally*/
+    /** The following properties are set based on properties passed in the constructor or on properties set externally */
+    /** @var string[] */
     private array $color_lcl;
     public string $grade_lcl;
     private string $grade_abbr;
@@ -49,6 +52,15 @@ class LiturgicalEvent implements \JsonSerializable
     private static \IntlDateFormatter $monthShort;
     private static \IntlDateFormatter $monthLong;
 
+    /**
+     * @param string $name
+     * @param DateTime $date
+     * @param string|string[] $color
+     * @param string $type
+     * @param int $grade
+     * @param string|string[] $common
+     * @param string|null $displayGrade
+     */
     public function __construct(
         string $name,
         DateTime $date,
@@ -168,11 +180,12 @@ class LiturgicalEvent implements \JsonSerializable
      * - psalter_week: the psalter week of the liturgical event, if applicable
      * - liturgical_season: the liturgical season of the liturgical event, if applicable
      * - liturgical_season_lcl: the liturgical season of the liturgical event, translated according to the current locale
+     * @return array{event_idx: int, name: string, date: int, color: array<string>, color_lcl: array<string>, type: string, grade: int, grade_lcl: string, grade_abbr: string, grade_display: ?string, common: array<string>, common_lcl: string, day_of_the_week_iso8601: int, month: int, day: int, year: int, month_short: string, month_long: string, day_of_the_week_short: string, day_of_the_week_long: string, liturgical_year?: ?string, is_vigil_mass?: ?bool, is_vigil_for?: ?string, has_vigil_mass?: ?bool, has_vesper_i?: ?bool, has_vesper_ii?: ?bool, psalter_week?: ?int, liturgical_season?: ?string, liturgical_season_lcl?: ?string}
      */
     public function jsonSerialize(): array
     {
         $returnArr = [
-            'event_idx'                => $this->idx,
+            'event_idx'               => $this->idx,
             'name'                    => $this->name,
             //serialize the DateTime   object as a PHP timestamp (seconds since the Unix Epoch)
             'date'                    => (int) $this->date->format('U'),

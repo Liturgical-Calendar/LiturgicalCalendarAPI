@@ -17,11 +17,17 @@ use LiturgicalCalendar\Api\Enum\RequestContentType;
  */
 class Core
 {
+    /** @var string[] */
     private array $AllowedOrigins;
+    /** @var string[] */
     private array $AllowedReferers;
+    /** @var string[] */
     private array $AllowedAcceptHeaders;
+    /** @var string[] */
     private array $AllowedRequestMethods;
+    /** @var string[] */
     private array $AllowedRequestContentTypes;
+    /** @var string[] */
     private array $RequestHeaders              = [];
     private ?string $JsonEncodedRequestHeaders = null;
     private ?string $RequestContentType        = null;
@@ -66,7 +72,7 @@ class Core
      * Access-Control-Allow-Credentials header to true and caches the result for
      * one day by setting the Access-Control-Max-Age header to 86400 seconds.
      */
-    private function setAllowedOriginHeader()
+    private function setAllowedOriginHeader(): void
     {
         if (count($this->AllowedOrigins) === 1 && $this->AllowedOrigins[ 0 ] === "*") {
             header('Access-Control-Allow-Origin: *');
@@ -85,7 +91,7 @@ class Core
      * if the request method is OPTIONS and the request has the
      * Access-Control-Request-Method and Access-Control-Request-Headers headers
      */
-    private function setAccessControlAllowMethods()
+    private function setAccessControlAllowMethods(): void
     {
         if (isset($_SERVER[ 'REQUEST_METHOD' ])) {
             if (isset($_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_METHOD' ])) {
@@ -106,7 +112,7 @@ class Core
      * }
      * Where the value of "error" will be "You seem to be forming a strange kind of request? Allowed Content Types are [comma separated list of allowed content types], but your Content Type was [Content Type of the request]"
      */
-    private function validateRequestContentType()
+    private function validateRequestContentType(): void
     {
         if (
             isset($_SERVER[ 'CONTENT_TYPE' ])
@@ -159,7 +165,7 @@ class Core
      *
      * @param bool $beLaxAboutIt
      */
-    public function validateAcceptHeader(bool $beLaxAboutIt)
+    public function validateAcceptHeader(bool $beLaxAboutIt): void
     {
         if ($this->hasAcceptHeader()) {
             if ($this->isAllowedAcceptHeader()) {
@@ -190,7 +196,7 @@ class Core
      * resources on the server. The allowed origins are used to determine which
      * Origin headers are permitted in CORS requests.
      *
-     * @param array $origins An array of allowed origin URLs.
+     * @param string[] $origins An array of allowed origin URLs.
      */
     public function setAllowedOrigins(array $origins): void
     {
@@ -204,7 +210,7 @@ class Core
      * resources on the server. The allowed referers are used to determine which
      * Referer headers are permitted in CORS requests.
      *
-     * @param array $referers An array of allowed referer URLs.
+     * @param string[] $referers An array of allowed referer URLs.
      */
     public function setAllowedReferers(array $referers): void
     {
@@ -218,7 +224,7 @@ class Core
      * resources on the server. The allowed accept headers are used to determine which
      * Accept headers are permitted in CORS requests.
      *
-     * @param array $acceptHeaders An array of allowed accept headers.
+     * @param string[] $acceptHeaders An array of allowed accept headers.
      */
     public function setAllowedAcceptHeaders(array $acceptHeaders): void
     {
@@ -232,7 +238,7 @@ class Core
      * resources on the server. The allowed request methods are used to determine which
      * request methods are permitted in CORS requests.
      *
-     * @param array $requestMethods An array of allowed request methods.
+     * @param string[] $requestMethods An array of allowed request methods.
      */
     public function setAllowedRequestMethods(array $requestMethods): void
     {
@@ -246,7 +252,7 @@ class Core
      * resources on the server. The allowed request content types are used to determine which
      * request content types are permitted in CORS requests.
      *
-     * @param array $requestContentTypes An array of allowed request content types.
+     * @param string[] $requestContentTypes An array of allowed request content types.
      */
     public function setAllowedRequestContentTypes(array $requestContentTypes): void
     {
@@ -285,7 +291,7 @@ class Core
     /**
      * Gets the list of allowed Accept headers.
      *
-     * @return array The list of allowed Accept headers.
+     * @return string[] The list of allowed Accept headers.
      */
     public function getAllowedAcceptHeaders(): array
     {
@@ -297,7 +303,7 @@ class Core
      *
      * This function returns an array of content types that are permitted in the request.
      *
-     * @return array The list of allowed request content types.
+     * @return string[] The list of allowed request content types.
      */
     public function getAllowedRequestContentTypes(): array
     {
@@ -405,7 +411,7 @@ class Core
     /**
      * Gets the list of allowed request methods for Cross-Origin Resource Sharing (CORS).
      *
-     * @return array The list of allowed request methods.
+     * @return string[] The list of allowed request methods.
      */
     public function getAllowedRequestMethods(): array
     {
@@ -427,7 +433,7 @@ class Core
      *
      * This function returns the headers of the HTTP request used to call the API.
      *
-     * @return array The headers of the HTTP request used to call the API.
+     * @return string[] The headers of the HTTP request used to call the API.
      */
     public function getRequestHeaders(): array
     {
@@ -463,7 +469,7 @@ class Core
      * resources on the server. The allowed referers are used to determine which
      * Referer headers are permitted in CORS requests.
      *
-     * @return array The list of allowed referer URLs.
+     * @return string[] The list of allowed referer URLs.
      */
     public function getAllowedReferers(): array
     {
@@ -498,7 +504,7 @@ class Core
      * @param bool $required Whether the request body is required or not.
      * @param bool $assoc Whether to return the object as an associative array or a stdClass object.
      *
-     * @return object|array|null The request parameters, either as a stdClass object or an associative array, or null if the request body was not required and is empty.
+     * @return object|array<mixed>|null The request parameters, either as a stdClass object or an associative array, or null if the request body was not required and is empty.
      */
     public function readJsonBody(bool $required = false, bool $assoc = false): object|array|null
     {
@@ -530,7 +536,7 @@ class Core
      * @throws \Exception Always throws an exception with the error message and level.
      * @phpstan-ignore method.unused
      */
-    private static function warningHandler($errno, $errstr)
+    private static function warningHandler($errno, $errstr): void
     {
         throw new \Exception($errstr, $errno);
     }
@@ -545,7 +551,7 @@ class Core
      * @param bool $required Whether the request body is required or not.
      * @param bool $assoc Whether to return the object as an associative array or a stdClass object.
      *
-     * @return object|array|null The request parameters, either as a stdClass object or an associative array, or null if the request body was not required and is empty.
+     * @return object|array<mixed>|null The request parameters, either as a stdClass object or an associative array, or null if the request body was not required and is empty.
      */
     public function readYamlBody(bool $required = false, bool $assoc = false): object|array|null
     {
@@ -585,7 +591,7 @@ class Core
      *
      * This function is expected to be called at the beginning of the API.
      */
-    public function init()
+    public function init(): void
     {
         $this->setAllowedOriginHeader();
         $this->setAccessControlAllowMethods();
