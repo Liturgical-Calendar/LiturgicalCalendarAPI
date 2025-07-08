@@ -98,15 +98,15 @@ class RegionalData
                     self::produceErrorResponse(StatusCode::NOT_FOUND, "The requested resource {$this->params->key} was not found in the index");
                 }
                 $i18nDataFile = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FILE, [
-                    '{nation}' => $dioceseEntry->nation,
+                    '{nation}'  => $dioceseEntry->nation,
                     '{diocese}' => $this->params->key,
-                    '{locale}' => $this->params->i18nRequest
+                    '{locale}'  => $this->params->i18nRequest
                 ]);
                 break;
             case "WIDERREGIONCALENDAR":
                 $i18nDataFile = strtr(JsonData::WIDER_REGIONS_I18N_FILE, [
                     '{wider_region}' => $this->params->key,
-                    '{locale}' => $this->params->i18nRequest
+                    '{locale}'       => $this->params->i18nRequest
                 ]);
                 break;
             case "NATIONALCALENDAR":
@@ -165,8 +165,8 @@ class RegionalData
                 }
 
                 $calendarDataFile = strtr(JsonData::DIOCESAN_CALENDARS_FILE, [
-                    '{nation}' => $dioceseEntry->nation,
-                    '{diocese}' => $this->params->key,
+                    '{nation}'       => $dioceseEntry->nation,
+                    '{diocese}'      => $this->params->key,
                     '{diocese_name}' => $dioceseEntry->diocese
                 ]);
                 break;
@@ -207,15 +207,15 @@ class RegionalData
             switch ($this->params->category) {
                 case 'DIOCESANCALENDAR':
                     $CalendarDataI18nFile = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FILE, [
-                        '{nation}' => $dioceseEntry->nation,
+                        '{nation}'  => $dioceseEntry->nation,
                         '{diocese}' => $this->params->key,
-                        '{locale}' => $this->params->locale
+                        '{locale}'  => $this->params->locale
                     ]);
                     break;
                 case 'WIDERREGIONCALENDAR':
                     $CalendarDataI18nFile = strtr(JsonData::WIDER_REGIONS_I18N_FILE, [
                         '{wider_region}' => $this->params->key,
-                        '{locale}' => $this->params->locale
+                        '{locale}'       => $this->params->locale
                     ]);
                     break;
                 case 'NATIONALCALENDAR':
@@ -270,7 +270,7 @@ class RegionalData
         // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
         // so we don't have to worry about manually checking and creating each one individually
         $diocesanCalendarI18nFolder = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FOLDER, [
-            '{nation}' => $this->params->payload->metadata->nation,
+            '{nation}'  => $this->params->payload->metadata->nation,
             '{diocese}' => $this->params->payload->metadata->diocese_id
         ]);
         if (!file_exists($diocesanCalendarI18nFolder)) {
@@ -281,9 +281,9 @@ class RegionalData
             $diocesanCalendarI18nFile = strtr(
                 JsonData::DIOCESAN_CALENDARS_I18N_FILE,
                 [
-                    '{nation}' => $this->params->payload->metadata->nation,
+                    '{nation}'  => $this->params->payload->metadata->nation,
                     '{diocese}' => $this->params->payload->metadata->diocese_id,
-                    '{locale}' => $locale
+                    '{locale}'  => $locale
                 ]
             );
             if (
@@ -305,8 +305,8 @@ class RegionalData
         $diocesanCalendarFile = strtr(
             JsonData::DIOCESAN_CALENDARS_FILE,
             [
-                '{nation}' => $this->params->payload->metadata->nation,
-                '{diocese}' => $this->params->payload->metadata->diocese_id,
+                '{nation}'       => $this->params->payload->metadata->nation,
+                '{diocese}'      => $this->params->payload->metadata->diocese_id,
                 '{diocese_name}' => $this->params->payload->metadata->diocese_name
             ]
         );
@@ -462,7 +462,7 @@ class RegionalData
      *
      * If the update is successful, the response will be a JSON success response with a status code of 201 Created.
      */
-    private function updateNationalCalendar()
+    private function updateNationalCalendar(): void
     {
         $nationEntry = array_find($this->CalendarsMetadata->national_calendars, function ($item) {
             return $item->calendar_id === $this->params->key;
@@ -559,7 +559,7 @@ class RegionalData
      *
      * If the update is successful, the response will be a JSON success response with a status code of 201 Created.
      */
-    private function updateWiderRegionCalendar()
+    private function updateWiderRegionCalendar(): void
     {
         $widerRegionEntry = array_find($this->CalendarsMetadata->wider_regions, function ($item) {
             return $item->name === $this->params->key;
@@ -574,7 +574,7 @@ class RegionalData
                 JsonData::WIDER_REGIONS_I18N_FILE,
                 [
                     '{wider_region}' => $this->params->key,
-                    '{locale}' => $locale
+                    '{locale}'       => $locale
                 ]
             );
 
@@ -656,7 +656,7 @@ class RegionalData
      *
      * If the update is successful, the response will be a JSON success response with a status code of 201 Created.
      */
-    private function updateDiocesanCalendar()
+    private function updateDiocesanCalendar(): void
     {
         $dioceseEntry = array_find($this->CalendarsMetadata->diocesan_calendars, function ($item) {
             return $item->calendar_id === $this->params->key;
@@ -670,9 +670,9 @@ class RegionalData
             $DiocesanCalendarI18nFile = strtr(
                 JsonData::DIOCESAN_CALENDARS_I18N_FILE,
                 [
-                    '{nation}' => $dioceseEntry->nation,
+                    '{nation}'  => $dioceseEntry->nation,
                     '{diocese}' => $this->params->key,
-                    '{locale}' => $locale
+                    '{locale}'  => $locale
                 ]
             );
 
@@ -696,7 +696,7 @@ class RegionalData
         $diocesanCalendarI18nFolder = strtr(
             JsonData::DIOCESAN_CALENDARS_I18N_FOLDER,
             [
-                '{nation}' => $dioceseEntry->nation,
+                '{nation}'  => $dioceseEntry->nation,
                 '{diocese}' => $this->params->key
             ]
         );
@@ -715,8 +715,8 @@ class RegionalData
         $DiocesanCalendarFile = strtr(
             JsonData::DIOCESAN_CALENDARS_FILE,
             [
-                '{nation}' => $dioceseEntry->nation,
-                '{diocese}' => $this->params->key,
+                '{nation}'       => $dioceseEntry->nation,
+                '{diocese}'      => $this->params->key,
                 '{diocese_name}' => $dioceseEntry->diocese
             ]
         );
@@ -756,7 +756,7 @@ class RegionalData
      *
      * If the payload is valid, the update process will continue according to the calendar type.
      */
-    private function updateCalendar()
+    private function updateCalendar(): void
     {
         if (false === $this->params->payload instanceof \stdClass) {
             $payloadType = gettype($this->params->payload);
@@ -800,7 +800,7 @@ class RegionalData
      * but a correponding entry is not found in the `/calendars` metadata index,
      * a 404 Not Found error response will be produced.
      *
-     * @return array The paths for deleting a regional calendar data resource.
+     * @return string[] The paths for deleting a regional calendar data resource.
      */
     private function getPathsForCalendarDelete(): array
     {
@@ -815,15 +815,15 @@ class RegionalData
                 $calendarDataFile   = strtr(
                     JsonData::DIOCESAN_CALENDARS_FILE,
                     [
-                        '{nation}' => $dioceseEntry->nation,
-                        '{diocese}' => $dioceseEntry->calendar_id,
+                        '{nation}'       => $dioceseEntry->nation,
+                        '{diocese}'      => $dioceseEntry->calendar_id,
                         '{diocese_name}' => $dioceseEntry->diocese
                     ]
                 );
                 $calendarI18nFolder = strtr(
                     JsonData::DIOCESAN_CALENDARS_I18N_FOLDER,
                     [
-                        '{nation}' => $dioceseEntry->nation,
+                        '{nation}'  => $dioceseEntry->nation,
                         '{diocese}' => $dioceseEntry->calendar_id
                     ]
                 );
@@ -876,7 +876,7 @@ class RegionalData
      *
      * If the resource does not exist, a 404 error will be returned.
      */
-    private function deleteCalendar()
+    private function deleteCalendar(): void
     {
         $response            = new \stdClass();
         $dioceseNationFolder = null;
@@ -934,12 +934,12 @@ class RegionalData
     /**
      * Validate payload data against a schema
      *
-     * @param array|object $data Data to validate
+     * @param object $data Data to validate
      * @param string $schemaUrl  Schema to validate against
      *
      * @return boolean
      */
-    private function validateDataAgainstSchema(array|object $data, string $schemaUrl): bool
+    private function validateDataAgainstSchema(object $data, string $schemaUrl): bool
     {
         $schema = Schema::import($schemaUrl);
         try {
@@ -962,11 +962,11 @@ class RegionalData
      * If the request method is PUT or PATCH, and the payload is not either JSON or YAML encoded,
      * it will produce a 400 Bad Request error.
      *
-     * @param array $data the object to set the locale and payload on
+     * @param array{category: string, key?: string, locale?: string, i18n?: string, payload?: object} $params the object on which to set the locale and payload
      *
-     * @return array the associative array with the locale and payload set
+     * @return array{locale: string, payload: object} the associative array with the locale and payload set
      */
-    private static function retrievePayloadFromPostPutPatchRequest(array $data): array
+    private static function retrievePayloadFromPostPutPatchRequest(array $params): array
     {
         $payload  = null;
         $required = self::$Core->getRequestMethod() !== RequestMethod::POST;
@@ -998,15 +998,15 @@ class RegionalData
 
         if (self::$Core->getRequestMethod() === RequestMethod::POST && is_object($payload)) {
             if (property_exists($payload, 'locale')) {
-                $data['locale'] = $payload->locale;
+                $params['locale'] = $payload->locale;
             }
         }
 
         if ($payload !== null) {
-            $data['payload'] = $payload;
+            $params['payload'] = $payload;
         }
 
-        return $data;
+        return $params;
     }
 
     /**
@@ -1052,7 +1052,7 @@ class RegionalData
      *
      * Will produce a 400 Bad Request error response if the request path parts are invalid.
      *
-     * @param array $requestPathParts the parts of the request path
+     * @param string[] $requestPathParts the parts of the request path
      */
     private static function validateRequestPath(array $requestPathParts): void
     {
@@ -1167,9 +1167,7 @@ class RegionalData
             }
         }
 
-        if (false === $this->params->setParams($params)) {
-            self::produceErrorResponse(StatusCode::BAD_REQUEST, "The params do not seem to be correct, must have params `category` and `key` with acceptable values");
-        }
+        $this->params->setParams($params);
     }
 
     /**
@@ -1246,7 +1244,7 @@ class RegionalData
     /**
      * Initializes the RegionalData class.
      *
-     * @param array $requestPathParts the path parameters from the request
+     * @param string[] $requestPathParts the path parameters from the request
      *
      * This method will:
      * - Initialize the instance of the Core class
@@ -1256,7 +1254,7 @@ class RegionalData
      * - It will load the Diocesan Calendars index
      * - It will handle the request method
      */
-    public function init(array $requestPathParts = [])
+    public function init(array $requestPathParts = []): void
     {
         self::$Core->init();
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::GET, RequestMethod::OPTIONS], true)) {

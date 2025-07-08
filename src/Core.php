@@ -33,7 +33,9 @@ class Core
     private ?string $RequestContentType        = null;
     private ?string $ResponseContentType       = null;
     private const ONLY_USEFUL_HEADERS          = [
-        "Accept", "Accept-Language", "X-Requested-With", "Origin"
+        "Accept",
+        "Accept-Language",
+        "X-Requested-With", "Origin"
     ];
 
     /**
@@ -560,7 +562,7 @@ class Core
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 400 Bad Request", true, 400);
             die('{"error":"No YAML data received in the request"}');
         } elseif ("" !== $rawData) {
-            set_error_handler(array('self', 'warningHandler'), E_WARNING);
+            set_error_handler(['self', 'warningHandler'], E_WARNING);
             try {
                 $data = yaml_parse($rawData);
                 if (false === $data) {

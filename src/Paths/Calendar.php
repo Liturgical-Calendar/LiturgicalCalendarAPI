@@ -254,9 +254,7 @@ class Calendar
      *
      * So apparently it is very similar to spellout-ordinal with a few cases using neutral gender.
      */
-    private const COMMON_NEUT_SPELLOUT_ORDINAL = [
-        'da'  //Danish
-    ];
+    private const COMMON_NEUT_SPELLOUT_ORDINAL = [ 'da' ]; //Danish
 
 
     /**
@@ -409,7 +407,7 @@ class Calendar
                 $description = "Expected at least one and at most three path parameters, instead found " . $numPathParts;
                 self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
             } else {
-                if (false === in_array($requestPathParts[0], ['nation','diocese'])) {
+                if (false === in_array($requestPathParts[0], ['nation', 'diocese'])) {
                     $description = "Invalid value `{$requestPathParts[0]}` for path parameter in position 1,"
                         . " the first parameter should have a value of either `nation` or `diocese`";
                     self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
@@ -2267,7 +2265,7 @@ class Calendar
         switch ($missal) {
             case RomanMissal::EDITIO_TYPICA_1970:
                 $YEAR   = 1970;
-                $lang   = in_array(LitLocale::$PRIMARY_LANGUAGE, ["de","en","it","la","pt"]) ? LitLocale::$PRIMARY_LANGUAGE : "en";
+                $lang   = in_array(LitLocale::$PRIMARY_LANGUAGE, ["de", "en", "it", "la", "pt"]) ? LitLocale::$PRIMARY_LANGUAGE : "en";
                 $DECREE = "<a href=\"https://www.vatican.va/content/paul-vi/$lang/apost_constitutions/documents/hf_p-vi_apc_19690403_missale-romanum.html\">"
                     . _('Apostolic Constitution Missale Romanum')
                     . "</a>";
@@ -4898,9 +4896,9 @@ class Calendar
             $DiocesanDataI18nFile = strtr(
                 JsonData::DIOCESAN_CALENDARS_I18N_FILE,
                 [
-                    '{nation}'       => $this->CalendarParams->NationalCalendar,
-                    '{diocese}'      => $this->CalendarParams->DiocesanCalendar,
-                    '{locale}'       => $this->CalendarParams->Locale
+                    '{nation}'  => $this->CalendarParams->NationalCalendar,
+                    '{diocese}' => $this->CalendarParams->DiocesanCalendar,
+                    '{locale}'  => $this->CalendarParams->Locale
                 ]
             );
             $DiocesanDataI18nData = json_decode(file_get_contents($DiocesanDataI18nFile));

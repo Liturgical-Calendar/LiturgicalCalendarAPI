@@ -41,6 +41,21 @@ class Schemas
         }
     }
 
+    /**
+     * Retrieves JSON schema resources based on the provided request path parts.
+     *
+     * This function enforces the origin and request method headers before proceeding.
+     * Depending on the number of path parameters provided, it either returns an index
+     * of available JSON schema files or the contents of a specified schema file.
+     *
+     * @param string[] $requestPathParts An array of path parts derived from the request URI.
+     *                                   If empty, the function returns an index of all schemas.
+     *                                   If containing one element, it attempts to return the
+     *                                   specified schema file's content.
+     *
+     * @return void Outputs the JSON schema index or the contents of a specific schema.
+     *              If the schema file is not found, it responds with a 404 error.
+     */
     public static function retrieve(array $requestPathParts = []): void
     {
         self::enforceOrigin();

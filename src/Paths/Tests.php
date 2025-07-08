@@ -12,8 +12,8 @@ use LiturgicalCalendar\Api\Enum\AcceptHeader;
 class Tests
 {
     public static Core $Core;
-    private static array $requestPathParts = [];
-    private static array $propsToSanitize  = [
+    /** @var string[] */ private static array $requestPathParts = [];
+    /** @var string[] */ private static array $propsToSanitize  = [
         "description",
         "applies_to",
         "excludes",
@@ -218,6 +218,15 @@ class Tests
         }
     }
 
+    /**
+     * Initializes the Tests class.
+     *
+     * This method will:
+     * - Initialize the instance of the Core class
+     * - Set the request path parts
+     *
+     * @param string[] $requestPathParts the path parameters from the request
+     */
     public static function init(array $requestPathParts = []): void
     {
         self::$Core             = new Core();

@@ -63,21 +63,20 @@ class Health implements MessageComponentInterface
      * @var string[] $DATA_PATH_TO_SCHEMA
      */
     public const DATA_PATH_TO_SCHEMA = [
-        "jsondata/sourcedata/missals/propriumdetempore/propriumdetempore.json"              => LitSchema::PROPRIUMDETEMPORE,
-        "jsondata/sourcedata/missals/propriumdesanctis_1970/propriumdesanctis_1970.json"    => LitSchema::PROPRIUMDESANCTIS,
-        "jsondata/sourcedata/missals/propriumdesanctis_2002/propriumdesanctis_2002.json"    => LitSchema::PROPRIUMDESANCTIS,
-        "jsondata/sourcedata/missals/propriumdesanctis_2008/propriumdesanctis_2008.json"    => LitSchema::PROPRIUMDESANCTIS,
-        "jsondata/sourcedata/missals/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json"
-                                                                             => LitSchema::PROPRIUMDESANCTIS,
-        "jsondata/sourcedata/missals/propriumdesanctis_US_2011/propriumdesanctis_US_2011"   => LitSchema::PROPRIUMDESANCTIS,
-        API_BASE_PATH . '/calendars'                                         => LitSchema::METADATA,
-        API_BASE_PATH . '/decrees'                                           => LitSchema::DECREES,
-        API_BASE_PATH . '/events'                                            => LitSchema::EVENTS,
-        API_BASE_PATH . '/tests'                                             => LitSchema::TESTS,
-        API_BASE_PATH . '/easter'                                            => LitSchema::EASTER,
-        API_BASE_PATH . '/missals'                                           => LitSchema::MISSALS,
-        API_BASE_PATH . '/data'                                              => LitSchema::DATA,
-        API_BASE_PATH . '/schemas'                                           => LitSchema::SCHEMAS
+        JsonData::MISSALS_FOLDER . '/propriumdetempore/propriumdetempore.json'                 => LitSchema::PROPRIUMDETEMPORE,
+        JsonData::MISSALS_FOLDER . '/propriumdesanctis_1970/propriumdesanctis_1970.json'       => LitSchema::PROPRIUMDESANCTIS,
+        JsonData::MISSALS_FOLDER . '/propriumdesanctis_2002/propriumdesanctis_2002.json'       => LitSchema::PROPRIUMDESANCTIS,
+        JsonData::MISSALS_FOLDER . '/propriumdesanctis_2008/propriumdesanctis_2008.json'       => LitSchema::PROPRIUMDESANCTIS,
+        JsonData::MISSALS_FOLDER . '/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json' => LitSchema::PROPRIUMDESANCTIS,
+        JsonData::MISSALS_FOLDER . '/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json' => LitSchema::PROPRIUMDESANCTIS,
+        API_BASE_PATH . '/calendars'                                                           => LitSchema::METADATA,
+        API_BASE_PATH . '/decrees'                                                             => LitSchema::DECREES,
+        API_BASE_PATH . '/events'                                                              => LitSchema::EVENTS,
+        API_BASE_PATH . '/tests'                                                               => LitSchema::TESTS,
+        API_BASE_PATH . '/easter'                                                              => LitSchema::EASTER,
+        API_BASE_PATH . '/missals'                                                             => LitSchema::MISSALS,
+        API_BASE_PATH . '/data'                                                                => LitSchema::DATA,
+        API_BASE_PATH . '/schemas'                                                             => LitSchema::SCHEMAS
     ];
 
     /**
@@ -423,7 +422,7 @@ class Health implements MessageComponentInterface
                                 JsonData::DIOCESAN_CALENDARS_I18N_FOLDER,
                                 [
                                     '{diocese}' => $matches[2],
-                                    '{nation}' => $nation
+                                    '{nation}'  => $nation
                                 ]
                             );
                             break;
@@ -460,8 +459,8 @@ class Health implements MessageComponentInterface
                                 $dataPath    = strtr(
                                     JsonData::DIOCESAN_CALENDARS_FILE,
                                     [
-                                        '{diocese}' => $matches[2],
-                                        '{nation}' => $nation,
+                                        '{diocese}'      => $matches[2],
+                                        '{nation}'       => $nation,
                                         '{diocese_name}' => $dioceseName
                                     ]
                                 );

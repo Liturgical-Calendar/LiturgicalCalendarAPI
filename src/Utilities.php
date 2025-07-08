@@ -50,7 +50,7 @@ class Utilities
      * If any key needs a specific case transformation other than the automatic snake_case to PascalCase, add it to this array.
      */
     private const CUSTOM_TRANSFORM_KEYS = [
-        "litcal" => "LitCal",
+        "litcal"        => "LitCal",
         "has_vesper_ii" => "HasVesperII"
     ];
 
@@ -128,7 +128,7 @@ class Utilities
                     if (self::$LAST_ARRAY_KEY === 'messages') {
                         $el = $xml->addChild('Message', htmlspecialchars($value));
                         $el->addAttribute("idx", $key);
-                    } elseif (in_array(self::$LAST_ARRAY_KEY, ['solemnities_keys','feasts_keys','memorials_keys','suppressed_events_keys','reinstated_events_keys'])) {
+                    } elseif (in_array(self::$LAST_ARRAY_KEY, ['solemnities_keys', 'feasts_keys', 'memorials_keys', 'suppressed_events_keys', 'reinstated_events_keys'])) {
                         $el = $xml->addChild('Key', $value);
                         $el->addAttribute("idx", $key);
                     } else {
@@ -199,7 +199,7 @@ class Utilities
             $dateDiff = 'P' . floor((intval(substr($Y,0,2)) / .75) - 1.25) . 'D';
             $dateObj->add(new DateInterval($dateDiff));
             */
-            $GregDateDiff    = array();
+            $GregDateDiff    = [];
             $GregDateDiff[0] = [DateTime::createFromFormat('!j-n-Y', '4-10-1582'),"P10D"]; //add 10 == GREGORIAN CUTOVER DATE
             $idx             = 0;
             $cc              = 10;

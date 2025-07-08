@@ -16,6 +16,7 @@ class Missals
     public static Core $Core;
     public static MissalsParams $params;
     public static object $missalsIndex;
+    /** @var string[] */
     private static array $requestPathParts = [];
 
     /**
@@ -286,7 +287,7 @@ class Missals
      */
     private static function produceResponse(string $jsonEncodedResponse): void
     {
-        if (in_array(self::$Core->getRequestMethod(), ['PUT','PATCH'])) {
+        if (in_array(self::$Core->getRequestMethod(), ['PUT', 'PATCH'])) {
             header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
         }
         switch (self::$Core->getResponseContentType()) {
@@ -318,7 +319,7 @@ class Missals
      * If the Missal was not found, it will produce an error response with a status code
      * of 404, listing the available Missal IDs.
      */
-    public static function handleRequest()
+    public static function handleRequest(): void
     {
         self::$Core->init();
         if (self::$Core->getRequestMethod() === RequestMethod::GET) {
@@ -360,7 +361,7 @@ class Missals
     /**
      * Initializes the Missals class.
      *
-     * @param array $requestPathParts the path parameters from the request
+     * @param string[] $requestPathParts the path parameters from the request
      *
      * This method will:
      * - Create an instance of the Core class
@@ -376,7 +377,7 @@ class Missals
      *
      * @see \LiturgicalCalendar\Api\Paths\Missals::initRequestParams()
      */
-    public static function init(array $requestPathParts = [])
+    public static function init(array $requestPathParts = []): void
     {
         self::$Core   = new Core();
         self::$params = new MissalsParams();

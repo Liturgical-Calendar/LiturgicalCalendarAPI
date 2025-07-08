@@ -237,8 +237,8 @@ class Events
                 $diocesanDataFile                     = strtr(
                     JsonData::DIOCESAN_CALENDARS_FILE,
                     [
-                        '{nation}' => $this->EventsParams->NationalCalendar,
-                        '{diocese}' => $this->EventsParams->DiocesanCalendar,
+                        '{nation}'       => $this->EventsParams->NationalCalendar,
+                        '{diocese}'      => $this->EventsParams->DiocesanCalendar,
                         '{diocese_name}' => $DiocesanData->diocese
                     ]
                 );
@@ -299,7 +299,7 @@ class Events
                             JsonData::WIDER_REGIONS_I18N_FILE,
                             [
                                 '{wider_region}' => self::$NationalData->metadata->wider_region,
-                                '{locale}' => $this->EventsParams->baseLocale
+                                '{locale}'       => $this->EventsParams->baseLocale
                             ]
                         );
                         if (file_exists($widerRegionI18nFile)) {
@@ -651,9 +651,9 @@ class Events
             $DiocesanCalendarI18nFile = strtr(
                 JsonData::DIOCESAN_CALENDARS_I18N_FILE,
                 [
-                    '{nation}' => $this->EventsParams->NationalCalendar,
+                    '{nation}'  => $this->EventsParams->NationalCalendar,
                     '{diocese}' => $this->EventsParams->DiocesanCalendar,
-                    '{locale}' => $this->EventsParams->Locale
+                    '{locale}'  => $this->EventsParams->Locale
                 ]
             );
             $DiocesanCalendarI18nData = json_decode(file_get_contents($DiocesanCalendarI18nFile), true);
@@ -711,8 +711,8 @@ class Events
     {
         $responseObj  = [
             "litcal_events" => array_values(self::$LiturgicalEventCollection),
-            "settings" => [
-                "locale" => $this->EventsParams->Locale,
+            "settings"      => [
+                "locale"            => $this->EventsParams->Locale,
                 "national_calendar" => $this->EventsParams->NationalCalendar,
                 "diocesan_calendar" => $this->EventsParams->DiocesanCalendar
             ]

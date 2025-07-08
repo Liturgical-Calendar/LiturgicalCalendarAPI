@@ -5,6 +5,22 @@
         <exclude name="Squiz.ControlStructures.ControlSignature.SpaceAfterCloseBrace"/>
     </rule>
     <rule ref="Generic.Formatting.MultipleStatementAlignment"/>
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax" />
+    <rule ref="Squiz.Arrays.ArrayDeclaration">
+        <!-- …but suppress bits we don’t want -->
+        <exclude name="Squiz.Arrays.ArrayDeclaration.NoComma"/>
+        <exclude name="Squiz.Arrays.ArrayDeclaration.NoCommaAfterLast"/>
+        <exclude name="Squiz.Arrays.ArrayDeclaration.KeyNotAligned"/>
+        <exclude name="Squiz.Arrays.ArrayDeclaration.ValueNotAligned"/>
+        <exclude name="Squiz.Arrays.ArrayDeclaration.CloseBraceNotAligned"/>
+        <exclude name="Squiz.Arrays.ArrayDeclaration.SingleLineNotAllowed"/>
+    </rule>
+    <!-- Enforce a single 4-space indent for every key/value line -->
+    <rule ref="Generic.Arrays.ArrayIndent">
+        <properties>
+            <property name="indent" value="4"/>
+        </properties>
+    </rule>
     <file>./</file> <!-- directory you want to analyze -->
     <exclude-pattern>/vendor/</exclude-pattern>
     <exclude-pattern>*Test.php</exclude-pattern>

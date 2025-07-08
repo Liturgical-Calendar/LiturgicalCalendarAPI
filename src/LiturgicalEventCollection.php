@@ -1077,7 +1077,7 @@ class LiturgicalEventCollection
      */
     public function sortLiturgicalEvents(): void
     {
-        uasort($this->liturgicalEvents, array( "LiturgicalCalendar\Api\LiturgicalEvent", "compDate" ));
+        uasort($this->liturgicalEvents, [ "LiturgicalCalendar\Api\LiturgicalEvent", "compDate" ]);
     }
 
     /**

@@ -59,17 +59,17 @@ class RomanMissal
      * @see RomanMissal::getName()
      */
     public static array $names = [
-        self::EDITIO_TYPICA_1970                    => "Editio Typica 1970",
-        self::REIMPRESSIO_EMENDATA_1971             => "Reimpressio Emendata 1971",
-        self::EDITIO_TYPICA_SECUNDA_1975            => "Editio Typica Secunda 1975",
-        self::EDITIO_TYPICA_TERTIA_2002             => "Editio Typica Tertia 2002",
-        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008    => "Editio Typica Tertia Emendata 2008",
-        self::USA_EDITION_2011                      => "2011 Roman Missal issued by the USCCB",
-        self::ITALY_EDITION_1983                    => "Messale Romano ed. 1983 pubblicata dalla CEI",
-        self::ITALY_EDITION_2020                    => "Messale Romano ed. 2020 pubblicata dalla CEI",
-        self::NETHERLANDS_EDITION_1978              => "Romeins Missaal ed. 1978 goedgekeurd door de Nederlandse bisschoppenconferentie",
-        self::CANADA_EDITION_2011                   => "2011 Roman Missal issued by the CCCB",
-        self::CANADA_EDITION_2016                   => "2016 Roman Missal issued by the CCCB"
+        self::EDITIO_TYPICA_1970                 => "Editio Typica 1970",
+        self::REIMPRESSIO_EMENDATA_1971          => "Reimpressio Emendata 1971",
+        self::EDITIO_TYPICA_SECUNDA_1975         => "Editio Typica Secunda 1975",
+        self::EDITIO_TYPICA_TERTIA_2002          => "Editio Typica Tertia 2002",
+        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008 => "Editio Typica Tertia Emendata 2008",
+        self::USA_EDITION_2011                   => "2011 Roman Missal issued by the USCCB",
+        self::ITALY_EDITION_1983                 => "Messale Romano ed. 1983 pubblicata dalla CEI",
+        self::ITALY_EDITION_2020                 => "Messale Romano ed. 2020 pubblicata dalla CEI",
+        self::NETHERLANDS_EDITION_1978           => "Romeins Missaal ed. 1978 goedgekeurd door de Nederlandse bisschoppenconferentie",
+        self::CANADA_EDITION_2011                => "2011 Roman Missal issued by the CCCB",
+        self::CANADA_EDITION_2016                => "2016 Roman Missal issued by the CCCB"
     ];
 
     /**
@@ -80,17 +80,17 @@ class RomanMissal
      * @see RomanMissal::getSanctoraleFileName()
      */
     public static array $jsonFiles = [
-        self::EDITIO_TYPICA_1970                    => JsonData::MISSALS_FOLDER . "/propriumdesanctis_1970/propriumdesanctis_1970.json",
-        self::REIMPRESSIO_EMENDATA_1971             => false,
-        self::EDITIO_TYPICA_SECUNDA_1975            => false,
-        self::EDITIO_TYPICA_TERTIA_2002             => JsonData::MISSALS_FOLDER . "/propriumdesanctis_2002/propriumdesanctis_2002.json",
-        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008    => JsonData::MISSALS_FOLDER . "/propriumdesanctis_2008/propriumdesanctis_2008.json",
-        self::USA_EDITION_2011                      => JsonData::MISSALS_FOLDER . "/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json",
-        self::ITALY_EDITION_1983                    => JsonData::MISSALS_FOLDER . "/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json",
-        self::ITALY_EDITION_2020                    => false,
-        self::NETHERLANDS_EDITION_1978              => false,
-        self::CANADA_EDITION_2011                   => false,
-        self::CANADA_EDITION_2016                   => false
+        self::EDITIO_TYPICA_1970                 => JsonData::MISSALS_FOLDER . "/propriumdesanctis_1970/propriumdesanctis_1970.json",
+        self::REIMPRESSIO_EMENDATA_1971          => false,
+        self::EDITIO_TYPICA_SECUNDA_1975         => false,
+        self::EDITIO_TYPICA_TERTIA_2002          => JsonData::MISSALS_FOLDER . "/propriumdesanctis_2002/propriumdesanctis_2002.json",
+        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008 => JsonData::MISSALS_FOLDER . "/propriumdesanctis_2008/propriumdesanctis_2008.json",
+        self::USA_EDITION_2011                   => JsonData::MISSALS_FOLDER . "/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json",
+        self::ITALY_EDITION_1983                 => JsonData::MISSALS_FOLDER . "/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json",
+        self::ITALY_EDITION_2020                 => false,
+        self::NETHERLANDS_EDITION_1978           => false,
+        self::CANADA_EDITION_2011                => false,
+        self::CANADA_EDITION_2016                => false
     ];
 
     /**
@@ -101,17 +101,17 @@ class RomanMissal
      * @see RomanMissal::getSanctoraleI18nFilePath()
      */
     public static array $i18nPath = [
-        self::EDITIO_TYPICA_1970                    => JsonData::MISSALS_FOLDER . "/propriumdesanctis_1970/i18n/",
-        self::REIMPRESSIO_EMENDATA_1971             => false,
-        self::EDITIO_TYPICA_SECUNDA_1975            => false,
-        self::EDITIO_TYPICA_TERTIA_2002             => JsonData::MISSALS_FOLDER . "/propriumdesanctis_2002/i18n/",
-        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008    => JsonData::MISSALS_FOLDER . "/propriumdesanctis_2008/i18n/",
-        self::USA_EDITION_2011                      => false,
-        self::ITALY_EDITION_1983                    => false,
-        self::ITALY_EDITION_2020                    => false,
-        self::NETHERLANDS_EDITION_1978              => false,
-        self::CANADA_EDITION_2011                   => false,
-        self::CANADA_EDITION_2016                   => false
+        self::EDITIO_TYPICA_1970                 => JsonData::MISSALS_FOLDER . "/propriumdesanctis_1970/i18n/",
+        self::REIMPRESSIO_EMENDATA_1971          => false,
+        self::EDITIO_TYPICA_SECUNDA_1975         => false,
+        self::EDITIO_TYPICA_TERTIA_2002          => JsonData::MISSALS_FOLDER . "/propriumdesanctis_2002/i18n/",
+        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008 => JsonData::MISSALS_FOLDER . "/propriumdesanctis_2008/i18n/",
+        self::USA_EDITION_2011                   => false,
+        self::ITALY_EDITION_1983                 => false,
+        self::ITALY_EDITION_2020                 => false,
+        self::NETHERLANDS_EDITION_1978           => false,
+        self::CANADA_EDITION_2011                => false,
+        self::CANADA_EDITION_2016                => false
     ];
 
     /**
@@ -123,19 +123,19 @@ class RomanMissal
      * @see RomanMissal::getYearLimits()
      */
     public static array $yearLimits = [
-        self::EDITIO_TYPICA_1970                    => [ "since_year" => 1970 ],
-        self::REIMPRESSIO_EMENDATA_1971             => [ "since_year" => 1971 ],
-        self::EDITIO_TYPICA_SECUNDA_1975            => [ "since_year" => 1975 ],
-        self::EDITIO_TYPICA_TERTIA_2002             => [ "since_year" => 2002 ],
-        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008    => [ "since_year" => 2008 ],
-        self::USA_EDITION_2011                      => [ "since_year" => 2011 ],
+        self::EDITIO_TYPICA_1970                 => [ "since_year" => 1970 ],
+        self::REIMPRESSIO_EMENDATA_1971          => [ "since_year" => 1971 ],
+        self::EDITIO_TYPICA_SECUNDA_1975         => [ "since_year" => 1975 ],
+        self::EDITIO_TYPICA_TERTIA_2002          => [ "since_year" => 2002 ],
+        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008 => [ "since_year" => 2008 ],
+        self::USA_EDITION_2011                   => [ "since_year" => 2011 ],
         //the festivities applied in the '83 edition were incorporated into the Latin 2002 edition,
         //therefore we no longer need to apply them after the year 2002 since the Latin edition takes precedence
-        self::ITALY_EDITION_1983                    => [ "since_year" => 1983, "until_year" => 2002 ],
-        self::ITALY_EDITION_2020                    => [ "since_year" => 2020 ],
-        self::NETHERLANDS_EDITION_1978              => [ "since_year" => 1979 ],
-        self::CANADA_EDITION_2011                   => [ "since_year" => 2011 ],
-        self::CANADA_EDITION_2016                   => [ "since_year" => 2016 ]
+        self::ITALY_EDITION_1983                 => [ "since_year" => 1983, "until_year" => 2002 ],
+        self::ITALY_EDITION_2020                 => [ "since_year" => 2020 ],
+        self::NETHERLANDS_EDITION_1978           => [ "since_year" => 1979 ],
+        self::CANADA_EDITION_2011                => [ "since_year" => 2011 ],
+        self::CANADA_EDITION_2016                => [ "since_year" => 2016 ]
     ];
 
 
