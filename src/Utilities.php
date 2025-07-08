@@ -96,7 +96,7 @@ class Utilities
 
     /**
      * Recursively convert an associative array to an XML object
-     * @param array $data
+     * @param array<string|int, mixed> $data
      * @param \SimpleXMLElement $xml
      * @return void
      */
@@ -152,8 +152,14 @@ class Utilities
         }
     }
 
-    // https://en.wikipedia.org/wiki/Computus#Anonymous_Gregorian_algorithm
-    // aka Meeus/Jones/Butcher algorithm
+
+    /**
+     * Calculates the Gregorian Easter date for a given year.
+     * @link https://en.wikipedia.org/wiki/Computus#Anonymous_Gregorian_algorithm
+     * aka Meeus/Jones/Butcher algorithm
+     * @param int $Y The year for which to calculate the Easter date.
+     * @return DateTime The date of Easter in the Gregorian calendar for the given year.
+     */
     public static function calcGregEaster($Y): DateTime
     {
         $a     = $Y % 19;
@@ -275,7 +281,7 @@ class Utilities
     /**
      * Converts a string of colors to a string of localized color names.
      *
-     * @param string|array $colors A string of color names separated by commas, or an array of color names.
+     * @param string|string[] $colors A string of color names separated by commas, or an array of color names.
      * @param string $LOCALE The locale to use when localizing the color names.
      * @param bool $html If true, the result will be an HTML string with the color names in bold, italic font with the corresponding color.
      * @return string The localized color names, separated by spaces and the word "or".

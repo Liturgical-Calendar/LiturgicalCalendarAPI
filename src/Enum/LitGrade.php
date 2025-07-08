@@ -110,7 +110,9 @@ class LitGrade
      */
     public const int WEEKDAY = 0;
 
+    /** @var int[] */
     public static array $values = [ 0, 1, 2, 3, 4, 5, 6, 7 ];
+
     private string $locale;
 
     /**

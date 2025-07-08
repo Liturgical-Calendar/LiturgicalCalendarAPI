@@ -10,13 +10,28 @@ class LitSeason
     public const EASTER_TRIDUUM = 'EASTER_TRIDUUM';
     public const EASTER         = 'EASTER';
     public const ORDINARY_TIME  = 'ORDINARY_TIME';
+
+    /** @var string[] */
     public static array $values = [ 'ADVENT', 'CHRISTMAS', 'LENT', 'EASTER_TRIDUUM', 'EASTER', 'ORDINARY_TIME' ];
 
-    public static function isValid(string $value)
+    /**
+     * Check if the given string is a valid liturgical season value.
+     *
+     * @param string $value The value to check.
+     * @return bool True if the value is valid, false otherwise.
+     */
+    public static function isValid(string $value): bool
     {
         return in_array($value, self::$values);
     }
 
+    /**
+     * Translate a liturgical season value into the specified locale.
+     *
+     * @param string $value The liturgical season value to translate.
+     * @param string $locale The locale for the translation.
+     * @return string The translated liturgical season value.
+     */
     public static function i18n(string $value, string $locale): string
     {
         switch ($value) {

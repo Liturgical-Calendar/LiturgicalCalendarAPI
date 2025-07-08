@@ -53,9 +53,11 @@ class LitCommon
     public const PRO_SANCTIS_MULIERIBUS                      = 'For Holy Women';
 
     private string $locale;
+    /** @var array<string, string> */
     private array $GTXT;
-    public static string $HASH_REQUEST  = '';
-    public static array $REQUEST_PARAMS = [];
+
+    // public static string $HASH_REQUEST  = '';
+    // public static array $REQUEST_PARAMS = [];
 
     /**
      * Construct a new instance of LitCommon.
@@ -262,6 +264,7 @@ class LitCommon
         'For Holy Women'
     ];
 
+    /** @var string[] */
     public static array $MARTYRUM = [
         self::PRO_UNO_MARTYRE,
         self::PRO_PLURIBUS_MARTYRIBUS,
@@ -272,6 +275,7 @@ class LitCommon
         self::PRO_SANCTA_MULIERE_MARTYRE
     ];
 
+    /** @var string[] */
     public static array $PASTORUM = [
         self::PRO_PAPA,
         self::PRO_EPISCOPO,
@@ -283,11 +287,13 @@ class LitCommon
         self::PRO_MISSIONARIIS
     ];
 
+    /** @var string[] */
     public static array $VIRGINUM = [
         self::PRO_UNA_VIRGINE,
         self::PRO_PLURIBUS_VIRGINIBUS
     ];
 
+    /** @var string[] */
     public static array $SANCTORUM = [
         self::PRO_PLURIBUS_SANCTIS,
         self::PRO_UNO_SANCTO,
@@ -307,7 +313,7 @@ class LitCommon
      * @param string $value The value to be validated.
      * @return bool True if the value is valid, false otherwise.
      */
-    public static function isValid(string $value)
+    public static function isValid(string $value): bool
     {
         if (strpos($value, ',') || strpos($value, ':')) {
             $values = preg_split('/[,:]/', $value);
@@ -320,10 +326,10 @@ class LitCommon
      * Validate an array of values against the list of $values property of this class.
      * If a value contains a colon, it is split into an array and tested with the areValid() method.
      * Otherwise the value is tested directly with the in_array() function.
-     * @param array $values The values to be validated.
+     * @param array<string> $values The values to be validated.
      * @return bool True if the values are valid, false otherwise.
      */
-    public static function areValid(array $values)
+    public static function areValid(array $values): bool
     {
         $values = array_reduce($values, function ($carry, $key) {
             return strpos($key, ':') ? ( $carry + explode(':', $key) ) : ( [ ...$carry, $key ] );
@@ -337,8 +343,8 @@ class LitCommon
      * If the value is an array, each element of the array is translated.
      * If the value is a string that is not a valid value for this class,
      * it is left unchanged.
-     * @param string|array $value the value to translate
-     * @return string|array the translated value
+     * @param string|array<string> $value The value(s) to translate
+     * @return string|array<string> The translated value(s)
      */
     private function i18n(string|array $value): string|array
     {
@@ -359,8 +365,8 @@ class LitCommon
      * Otherwise returns the possessive form of the given string,
      * according to the rules defined in the possessive() method.
      * If the given string is an array, applies the same rules to each element of the array.
-     * @param string|array $value the string or array of strings to get the possessive of
-     * @return string|array the possessive form of the given string, or an array of such strings
+     * @param string|array<string> $value the string or array of strings to get the possessive of
+     * @return string|array<string> the possessive form of the given string, or an array of such strings
      */
     private function getPossessive(string|array $value): string|array
     {
@@ -372,7 +378,7 @@ class LitCommon
 
     /**
      * Returns a translated human readable string of the Common or the Proper
-     * @param string|array $common the Common or Proper to translate
+     * @param string|array<string> $common the Common or Proper to translate
      * @return string the translated human readable string
      */
     public function c(string|array $common = ''): string

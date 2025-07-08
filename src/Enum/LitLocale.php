@@ -4,19 +4,23 @@ namespace LiturgicalCalendar\Api\Enum;
 
 class LitLocale
 {
-    public const LATIN                        = 'la_VA';
-    public const LATIN_PRIMARY_LANGUAGE       = 'la';
-    public static array $values               = [ 'la', 'la_VA' ];
-    public static string $PRIMARY_LANGUAGE    = 'la';
+    public const LATIN                     = 'la_VA';
+    public const LATIN_PRIMARY_LANGUAGE    = 'la';
+    public static string $PRIMARY_LANGUAGE = 'la';
+
+    /** @var array<string> */
+    public static array $values = [ 'la', 'la_VA' ];
+
+    /** @var array<string>|null */
     public static ?array $AllAvailableLocales = null;
 
     /**
      * Check if the given locale is valid.
      *
-     * @param mixed $value The locale value to validate.
+     * @param string $value The locale value to validate.
      * @return bool True if the locale is valid, false otherwise.
      */
-    public static function isValid($value)
+    public static function isValid($value): bool
     {
         self::init();
         return in_array($value, self::$values) || in_array($value, self::$AllAvailableLocales);
@@ -25,10 +29,10 @@ class LitLocale
     /**
      * Check if the given array of locales is valid.
      *
-     * @param array $values The array of locale values to validate.
+     * @param array<string> $values The array of locale values to validate.
      * @return bool True if all locales are valid, false otherwise.
      */
-    public static function areValid(array $values)
+    public static function areValid(array $values): bool
     {
         foreach ($values as $value) {
             if (!self::isValid($value)) {
@@ -44,7 +48,7 @@ class LitLocale
      * This method loads the list of locales from the ICU data available in PHP.
      * It then filters out the "POSIX" locale, which is not a valid regional locale.
      */
-    public static function init()
+    public static function init(): void
     {
         if (null === self::$AllAvailableLocales) {
             self::$AllAvailableLocales = array_filter(\ResourceBundle::getLocales(''), function ($value) {

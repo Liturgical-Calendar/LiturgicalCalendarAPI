@@ -39,6 +39,7 @@ class ReturnType
     public const VIDEO_OGG  = 'VIDEO_OGG';
     public const VIDEO_WEBM = 'VIDEO_WEBM';
 
+    /** @var string[] */
     public static array $values = [
         'ATTACHMENT',
         'JSON',
@@ -67,7 +68,13 @@ class ReturnType
         'VIDEO_WEBM'
     ];
 
-    public static function isValid($value)
+    /**
+     * Checks if the provided value is a valid return type.
+     *
+     * @param string $value The value to validate.
+     * @return bool True if the value is valid, otherwise false.
+     */
+    public static function isValid(string $value): bool
     {
         return in_array($value, self::$values);
     }

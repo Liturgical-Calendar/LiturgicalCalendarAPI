@@ -5,15 +5,29 @@ namespace LiturgicalCalendar\Api\Enum;
 use LiturgicalCalendar\Api\Enum\JsonData;
 
 /**
- * Enum class for the different Roman Missals that are used in the LitCal
+ * Enum class for the different Roman Missals that are used in the Liturgical Calendar API.
+ * This class provides methods to check if a given missal_id is valid, get the name of a Roman Missal,
+ * get the path to the JSON file containing the sanctorale data for a Roman Missal,
+ * get the path to the i18n directory for the sanctorale of a Roman Missal,
+ * and get the year limits for a Roman Missal.
  *
- * @method static bool isValid($value)
- * @method static bool isLatinMissal($value)
- * @method static string getName($value)
- * @method static string|false|null getSanctoraleFileName($value)
- * @method static string|false|null getSanctoraleI18nFilePath($value)
- * @method static object getYearLimits($value)
- * @method static array produceMetadata($obj = true)
+ * @phpstan-type RomanMissalMetadata array{
+ *     missal_id: string,
+ *     name: string,
+ *     region: string,
+ *     locales: string[],
+ *     year_limits: array{since_year: int, until_year?: int},
+ *     year_published: int
+ * }
+ *
+ * @phpstan-type RomanMissalMetadataObject object{
+ *     missal_id: string,
+ *     name: string,
+ *     region: string,
+ *     locales: string[],
+ *     year_limits: object{since_year: int, until_year?: int},
+ *     year_published: int
+ * }
  */
 class RomanMissal
 {
@@ -218,7 +232,7 @@ class RomanMissal
      *
      * @param bool $obj whether to return an array of metadata objects or an array of associative arrays
      *
-     * @return array an array of metadata objects or associative arrays each describing a Roman Missal,
+     * @return array<RomanMissalMetadataObject|RomanMissalMetadata> an array of metadata objects or associative arrays each describing a Roman Missal,
      *      with the following properties:
      *      - `missal_id`: the value of the enumeration constant for the Roman Missal
      *      - `name`: the name of the Roman Missal

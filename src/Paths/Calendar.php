@@ -712,8 +712,8 @@ class Calendar
      */
     private function cacheFileIsAvailable(): bool
     {
+        //LitCommon::$HASH_REQUEST = $paramsHash;
         $paramsHash              = md5(serialize($this->CalendarParams));
-        LitCommon::$HASH_REQUEST = $paramsHash;
         Utilities::$HASH_REQUEST = $paramsHash;
         $cacheFileName           = $paramsHash . $this->CacheDuration . '.' . strtolower($this->CalendarParams->ReturnType);
         $this->CacheFile         = $this->CachePath . $cacheFileName;

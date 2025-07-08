@@ -30,6 +30,9 @@ class AcceptHeader
     public const VIDEO_OGG  = 'video/ogg';
     public const VIDEO_WEBM = 'video/webm';
 
+    /**
+     * @var string[] An array of valid Accept header values.
+     */
     public static array $values = [
         'application/octet-stream',
         'application/json',
@@ -58,7 +61,12 @@ class AcceptHeader
         'video/webm'
     ];
 
-    public static function isValid($value)
+    /**
+     * Checks if the given Accept header value is valid.
+     * @param string $value The Accept header value to validate.
+     * @return bool True if the value is valid, false otherwise.
+     */
+    public static function isValid(string $value): bool
     {
         return in_array($value, self::$values);
     }
