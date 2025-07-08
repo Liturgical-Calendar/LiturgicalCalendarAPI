@@ -87,31 +87,36 @@ class Missals
      *
      * @param ?object $payload the JSON or YAML encoded object or null if the
      *                          request body was not a JSON or YAML encoded object
-     * @return array the initialized request parameters
+     * @return array{
+     *      locale?: string,
+     *      region?: string,
+     *      year?: int,
+     *      include_empty?: bool
+     * } The initialized request parameters
      */
     private static function initGetPostParams(?object $payload): array
     {
-        $data = [];
+        $params = [];
         if ($payload !== null && property_exists($payload, 'locale')) {
-            $data["locale"] = $payload->locale;
+            $params["locale"] = $payload->locale;
         } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
             if ($locale && LitLocale::isValid($locale)) {
-                $data["locale"] = $locale;
+                $params["locale"] = $locale;
             } else {
-                $data["locale"] = LitLocale::LATIN;
+                $params["locale"] = LitLocale::LATIN;
             }
         }
         if (property_exists($payload, 'region')) {
-            $data["region"] = $payload->region;
+            $params["region"] = $payload->region;
         }
         if (property_exists($payload, 'year')) {
-            $data["year"] = $payload->year;
+            $params["year"] = $payload->year;
         }
         if (property_exists($payload, 'include_empty')) {
-            $data["include_empty"] = $payload->include_empty;
+            $params["include_empty"] = $payload->include_empty;
         }
-        return $data;
+        return $params;
     }
 
 
@@ -127,22 +132,28 @@ class Missals
      *
      * When the request method is GET, the query parameters are expected to have the same structure as the request body in the previous case.
      *
-     * @return array the initialized request parameters
+     * @return array{
+     *      locale?: string,
+     *      region?: string,
+     *      year?: int,
+     *      include_empty?: bool,
+     *      PAYLOAD?: object
+     * } The initialized request parameters
      */
     private static function initRequestParams(): array
     {
-        $data = [];
+        $params = [];
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH])) {
             $payload = self::initPayloadFromRequestBody();
             if (self::$Core->getRequestMethod() === RequestMethod::POST) {
-                $data = self::initGetPostParams($payload);
+                $params = self::initGetPostParams($payload);
             } else {
-                $data["PAYLOAD"] = $payload;
+                $params["PAYLOAD"] = $payload;
             }
         } elseif (self::$Core->getRequestMethod() === RequestMethod::GET) {
-            $data = self::initGetPostParams((object)$_GET);
+            $params = self::initGetPostParams((object)$_GET);
         }
-        return $data;
+        return $params;
     }
 
     /**
@@ -420,7 +431,7 @@ class Missals
             }
         }
         // we only set the request parameters after we have collected the MissalRegions and MissalYears
-        self::$params->setData(self::initRequestParams());
+        self::$params->setParams(self::initRequestParams());
 
         // If an explicit request is made to include all Missals defined in the RomanMissal enum,
         // even if there is no data for them in the jsondata/sourcedata/missals directory,

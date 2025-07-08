@@ -36,11 +36,41 @@ use LiturgicalCalendar\Api\Params\CalendarParams;
  *
  * @package LiturgicalCalendar\Api
  * @phpstan-import-type EventCollectionItem from LiturgicalEventCollection
+ * @phpstan-type PropriumDeTemporeItem array{
+ *      name: string,
+ *      date: DateTime,
+ *      color: string[],
+ *      type: string,
+ *      grade: int
+ * }
+ * @phpstan-type PropriumDeTemporeMap array<string, PropriumDeTemporeItem>
+ * @phpstan-type MissalItem array<string, object>
+ * @phpstan-type TempCalMap array<string, MissalItem>
+ * @phpstan-type CatholicDioceseLatinRiteItem object{
+ *      diocese_name: string,
+ *      diocese_id: string,
+ *      province?: string
+ * }
+ * @phpstan-type CatholicDioceseLatinRiteCountryItem object{
+ *      country_iso: string,
+ *      country_name_english: string,
+ *      dioceses: CatholicDioceseLatinRiteItem[]
+ * }
+ * @phpstan-type CatholicDiocesesLatinRite CatholicDioceseLatinRiteCountryItem[]
+ * @phpstan-type NationalCalendarLiturgicalEventItem object{
+ *      liturgical_event: object,
+ *      metadata: object{
+ *          action: string,
+ *          since_year: int,
+ *          until_year?: int
+ *      }
+ * }
  */
 class Calendar
 {
     public static Core $Core;
-    private array $AllowedReturnTypes;
+    /** @var string[] */ private array $AllowedReturnTypes; // can only be set once, after which it will be read-only
+    /** @var CatholicDiocesesLatinRite */ private array $worldDiocesesLatinRite; // can only be set once, after which it will be read-only
     private CalendarParams $CalendarParams;
     private LitCommon $LitCommon;
     private LitGrade $LitGrade;
@@ -54,18 +84,18 @@ class Calendar
     private string $BaptismLordFmt;
     private string $BaptismLordMod;
 
-    public const API_VERSION                      = '4.5';
-    private string $CachePath                     = "";
-    private string $CacheFile                     = "";
-    private string $CacheDuration                 = "";
-    private static ?array $worldDiocesesLatinRite = null;
-    private ?string $DioceseName                  = null;
-    private ?object $DiocesanData                 = null;
-    private ?object $NationalData                 = null;
-    private ?object $WiderRegionData              = null;
-    private array $PropriumDeTempore              = [];
-    private array $Messages                       = [];
-    private array $tempCal                        = [];
+    public const API_VERSION         = '4.5';
+    private string $CachePath        = "";
+    private string $CacheFile        = "";
+    private string $CacheDuration    = "";
+    private ?string $DioceseName     = null;
+    private ?object $DiocesanData    = null;
+    private ?object $NationalData    = null;
+    private ?object $WiderRegionData = null;
+
+    /** @var PropriumDeTemporeMap      */ private array $PropriumDeTempore = [];
+    /** @var string[]                  */ private array $Messages          = [];
+    /** @var TempCalMap                */ private array $tempCal           = [];
 
 
     /**
@@ -88,7 +118,7 @@ class Calendar
     /**
      * Languages that use spellout-ordinal, without masculine or feminine specifications
      */
-    private static $genericSpelloutOrdinal = [
+    private const GENERIC_SPELLOUT_ORDINAL = [
         'af', //Afrikaans
         'am', //Amharic
         'as', //Assamese
@@ -160,7 +190,7 @@ class Calendar
     /**
      * Languages that use spellout-ordinal-masculine and spellout-ordinal-feminine
      */
-    private static $mascFemSpelloutOrdinal = [
+    private const MASC_FEM_SPELLOUT_ORDINAL = [
         'ar', //Arabic
         'ca', //Catalan
         'es', //Spanish : also supports plural forms, as well as a masculine adjective form (? spellout-ordinal-masculine-adjective)
@@ -174,7 +204,7 @@ class Calendar
     /**
      * Languages that use spellout-ordinal-masculine, spellout-ordinal-feminine, and spellout-ordinal-neuter
      */
-    private static $mascFemNeutSpelloutOrdinal = [
+    private const MASC_FEM_NEUT_SPELLOUT_ORDINAL = [
         'bg', //Bulgarian
         'be', //Belarusian
         'el', //Greek
@@ -185,7 +215,7 @@ class Calendar
     ];
 
     //even though these do not yet support spellout-ordinal, however they do support digits-ordinal
-    /*private static $noSpelloutOrdinal               = [
+    /*private const NO_SPELLOUT_ORDINAL               = [
         'bs', //Bosnian
         'cs', //Czech
         'cy', //Welsh
@@ -224,7 +254,7 @@ class Calendar
      *
      * So apparently it is very similar to spellout-ordinal with a few cases using neutral gender.
      */
-    private static $commonNeutSpelloutOrdinal = [
+    private const COMMON_NEUT_SPELLOUT_ORDINAL = [
         'da'  //Danish
     ];
 
@@ -311,36 +341,36 @@ class Calendar
     private function initParamsFromRequestBodyOrUrl()
     {
         // initialize an empty temporary array
-        $data = [];
+        $params = [];
 
         // Any request with URL parameters (a query string) will populate the $_GET global associative array
         if (!empty($_GET)) {
-            $data = $_GET;
+            $params = $_GET;
         }
 
         // Merge any URL parameters with the data from the request body
         // Body parameters will override URL parameters
         if (self::$Core->getRequestContentType() === RequestContentType::JSON) {
-            $data = array_merge(
-                $data,
+            $params = array_merge(
+                $params,
                 (self::$Core->readJsonBody(false, true) ?? [])
             );
         }
         elseif (self::$Core->getRequestContentType() === RequestContentType::YAML) {
-            $data = array_merge(
-                $data,
+            $params = array_merge(
+                $params,
                 (self::$Core->readYamlBody(false, true) ?? [])
             );
         }
         elseif (self::$Core->getRequestContentType() === RequestContentType::FORMDATA) {
             if (!empty($_POST)) {
-                $data = array_merge(
-                    $data,
+                $params = array_merge(
+                    $params,
                     $_POST
                 );
             }
         }
-        $this->CalendarParams = new CalendarParams($data);
+        $this->CalendarParams = new CalendarParams($params);
     }
 
     /**
@@ -350,7 +380,7 @@ class Calendar
      * 2) (when 1 is a string) a string indicating the national or diocesan calendar to produce
      * 3) (when 1 is a string) an integer indicating the year for which the national or diocesan calendar should be calculated
      *
-     * @param array $requestPathParts an array of path parameters
+     * @param array<string|int> $requestPathParts an array of path parameters
      *
      * @return void
      */
@@ -358,7 +388,7 @@ class Calendar
     {
         $numPathParts = count($requestPathParts);
         if ($numPathParts > 0) {
-            $DATA = [];
+            $params = [];
             if ($numPathParts === 1) {
                 if (
                     false === in_array(gettype($requestPathParts[0]), ['string', 'integer'])
@@ -373,7 +403,7 @@ class Calendar
                 ) {
                     self::produceErrorResponse(StatusCode::BAD_REQUEST, "path parameter expected to represent Year value but did not have type Integer or numeric String");
                 } else {
-                    $DATA["year"] = $requestPathParts[0];
+                    $params["year"] = $requestPathParts[0];
                 }
             } elseif ($numPathParts > 3) {
                 $description = "Expected at least one and at most three path parameters, instead found " . $numPathParts;
@@ -385,9 +415,9 @@ class Calendar
                     self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                 } else {
                     if ($requestPathParts[0] === 'nation') {
-                        $DATA['national_calendar'] = $requestPathParts[1];
+                        $params['national_calendar'] = $requestPathParts[1];
                     } elseif ($requestPathParts[0] === 'diocese') {
-                        $DATA['diocesan_calendar'] = $requestPathParts[1];
+                        $params['diocesan_calendar'] = $requestPathParts[1];
                     }
                 }
                 if ($numPathParts === 3) {
@@ -404,12 +434,12 @@ class Calendar
                     ) {
                         self::produceErrorResponse(StatusCode::BAD_REQUEST, "path parameter expected to represent Year value but did not have type Integer or numeric String");
                     } else {
-                        $DATA["year"] = $requestPathParts[2];
+                        $params["year"] = $requestPathParts[2];
                     }
                 }
             }
-            if (count($DATA)) {
-                $this->CalendarParams->setData($DATA);
+            if (count($params)) {
+                $this->CalendarParams->setParams($params);
             }
         }
     }
@@ -427,7 +457,7 @@ class Calendar
      * If the request did provide a *return_type* parameter, and the value of that parameter is in the list of content types
      * that the API can produce, it will use that.
      */
-    private function initReturnType()
+    private function initReturnType(): void
     {
         if ($this->CalendarParams->ReturnType !== null) {
             if (false === in_array($this->CalendarParams->ReturnType, $this->AllowedReturnTypes)) {
@@ -471,11 +501,11 @@ class Calendar
      * Initialize the CalendarParams object from the request body and URL query parameters
      * and the request path, and set the return type of the response.
      *
-     * @param array $requestPathParts the parts of the request path
+     * @param array<string|int> $requestPathParts the parts of the request path
      *
      * @return void
      */
-    private function initParameterData(array $requestPathParts = [])
+    private function initParameterData(array $requestPathParts = []): void
     {
         $this->initParamsFromRequestBodyOrUrl();
         $this->initParamsFromRequestPath($requestPathParts);
@@ -588,20 +618,20 @@ class Calendar
      * If the diocese ID is not found, returns null.
      *
      * @param string $id The diocese ID.
-     * @return array|null The diocese name and nation, or null if not found.
+     * @return array{diocese_name: string, nation: string}|null The diocese name and nation, or null if not found.
      */
-    private static function dioceseIdToName(string $id): ?array
+    private function dioceseIdToName(string $id): ?array
     {
-        if (empty(Calendar::$worldDiocesesLatinRite)) {
-            $worldDiocesesFile                = JsonData::FOLDER . "/world_dioceses.json";
-            Calendar::$worldDiocesesLatinRite = json_decode(
+        if (empty($this->worldDiocesesLatinRite)) {
+            $worldDiocesesFile            = JsonData::FOLDER . "/world_dioceses.json";
+            $this->worldDiocesesLatinRite = json_decode(
                 file_get_contents($worldDiocesesFile)
             )->catholic_dioceses_latin_rite;
         }
         $dioceseName = null;
         $nation      = null;
         // Search for the diocese by its ID in the worldDioceseLatinRite data
-        foreach (Calendar::$worldDiocesesLatinRite as $country) {
+        foreach ($this->worldDiocesesLatinRite as $country) {
             foreach ($country->dioceses as $diocese) {
                 if ($diocese->diocese_id === $id) {
                     $dioceseName = $diocese->diocese_name;
@@ -726,15 +756,15 @@ class Calendar
         );
         //follow rules as indicated here:
         // https://www.saxonica.com/html/documentation11/extensibility/localizing/ICU-numbering-dates/ICU-numbering.html
-        if (in_array($baseLocale, self::$genericSpelloutOrdinal)) {
+        if (in_array($baseLocale, self::GENERIC_SPELLOUT_ORDINAL)) {
             $this->formatter->setTextAttribute(\NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal");
             //feminine version will be the same as masculine
             $this->formatterFem = $this->formatter;
-        } elseif (in_array($baseLocale, self::$mascFemSpelloutOrdinal) || in_array($baseLocale, self::$mascFemNeutSpelloutOrdinal)) {
+        } elseif (in_array($baseLocale, self::MASC_FEM_SPELLOUT_ORDINAL) || in_array($baseLocale, self::MASC_FEM_NEUT_SPELLOUT_ORDINAL)) {
             $this->formatter->setTextAttribute(\NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal-masculine");
             $this->formatterFem = new \NumberFormatter($baseLocale, \NumberFormatter::SPELLOUT);
             $this->formatterFem->setTextAttribute(\NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal-feminine");
-        } elseif (in_array($baseLocale, self::$commonNeutSpelloutOrdinal)) {
+        } elseif (in_array($baseLocale, self::COMMON_NEUT_SPELLOUT_ORDINAL)) {
             $this->formatter->setTextAttribute(\NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal-common");
             //feminine version will be the same as masculine
             $this->formatterFem = $this->formatter;
@@ -774,7 +804,7 @@ class Calendar
      * If the file does not exist, or if there is an error decoding the
      * JSON data, a 503 Service Unavailable error is thrown.
      *
-     * @return array|null The loaded data, or null if there was an error.
+     * @return array<string, string>|null The loaded data, or null if there was an error.
      */
     private function loadPropriumDeTemporeI18nData(): ?array
     {
@@ -2016,14 +2046,15 @@ class Calendar
     /**
      * Adds a message to the API response indicating that a given memorial has been added to the calendar
      *
-     * @param object $row a JSON object representing data for the liturgical event in question, with the following properties:
-     *                    - grade: the grade of the liturgical event (e.g. 'memorial', 'feast', etc.)
-     *                    - name: the name of the liturgical event
-     *                    - date: the date of the liturgical event (DateTime object)
-     *                    - year_since: the year from which the liturgical event has been added
-     *                    - decree: the decree or source of the information
+     * @param object{
+     *      grade: int,
+     *      name: string,
+     *      date: DateTime,
+     *      since_year: int,
+     *      decree: string
+     * } $row A JSON object representing data for the liturgical event in question
      */
-    private function addMissalMemorialMessage(object $row)
+    private function addMissalMemorialMessage(object $row): void
     {
         $locale = LitLocale::$PRIMARY_LANGUAGE;
         /**translators:
@@ -2045,7 +2076,7 @@ class Calendar
                     ? $row->date->format('F jS')
                     : $this->dayAndMonth->format($row->date->format('U'))
                 ),
-            $row->year_since,
+            $row->since_year,
             $row->decree,
             $this->CalendarParams->Year
         );
@@ -2078,13 +2109,13 @@ class Calendar
                 $this->reduceMemorialsInAdventLentToCommemoration($row->date, $row);
 
                 if ($missal === RomanMissal::EDITIO_TYPICA_TERTIA_2002) {
-                    $row->year_since = 2002;
+                    $row->since_year = 2002;
                     $row->decree     = '<a href="https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2002/03/22/0150/00449.html">'
                         . _('Vatican Press conference: Presentation of the Editio Typica Tertia of the Roman Missal')
                         . '</a>';
                     $this->addMissalMemorialMessage($row);
                 } elseif ($missal === RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008) {
-                    $row->year_since = 2008;
+                    $row->since_year = 2008;
                     switch ($row->event_key) {
                         case "StPioPietrelcina":
                             $row->decree = RomanMissal::getName($missal);
@@ -2125,7 +2156,7 @@ class Calendar
      * @param DateTime $currentFeastDate the date of the liturgical event to be checked
      * @param \stdClass $row the row of data comprising the event_key and grade of the memorial
      */
-    private function reduceMemorialsInAdventLentToCommemoration(DateTime $currentFeastDate, \stdClass $row)
+    private function reduceMemorialsInAdventLentToCommemoration(DateTime $currentFeastDate, \stdClass $row): void
     {
         //If a fixed date optional memorial falls between 17 Dec. to 24 Dec., the Octave of Christmas or weekdays of the Lenten season,
         //it is reduced in rank to a Commemoration ( only the collect can be used )
@@ -2153,7 +2184,7 @@ class Calendar
      *
      * @param string $event_key the event_key of the liturgical event that may be overriding a weekday of Epiphany
      */
-    private function removeWeekdaysEpiphanyOverridenByMemorials(string $event_key)
+    private function removeWeekdaysEpiphanyOverridenByMemorials(string $event_key): void
     {
         $litEvent = $this->Cal->getLiturgicalEvent($event_key);
         if ($this->Cal->inWeekdaysEpiphany($litEvent->date)) {
@@ -2187,7 +2218,7 @@ class Calendar
      *
      * @param string $event_key the event_key of the liturgical event that may be overriding a weekday of Advent
      */
-    private function removeWeekdaysAdventOverridenByMemorials(string $event_key)
+    private function removeWeekdaysAdventOverridenByMemorials(string $event_key): void
     {
         $litEvent = $this->Cal->getLiturgicalEvent($event_key);
         $Dec17    = \DateTime::createFromFormat(
@@ -2230,7 +2261,7 @@ class Calendar
      * @param \stdClass $row the liturgical event that may be coinciding with a Sunday Solemnity or Feast
      * @param string $missal the edition of the Roman Missal to check against
      */
-    private function handleCoincidence(\stdClass $row, string $missal = RomanMissal::EDITIO_TYPICA_1970)
+    private function handleCoincidence(\stdClass $row, string $missal = RomanMissal::EDITIO_TYPICA_1970): void
     {
         $coincidingLiturgicalEvent = $this->Cal->determineSundaySolemnityOrFeast($row->date);
         switch ($missal) {
@@ -2961,7 +2992,7 @@ class Calendar
      * Our Lady of Guadalupe was granted as a Feast day for all dioceses and territories of the Americas
      * source: https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_lt.html
      */
-    private function handleSaintJaneFrancesDeChantal()
+    private function handleSaintJaneFrancesDeChantal(): void
     {
         $StJaneFrancesNewDate = DateTime::createFromFormat('!j-n-Y', '12-8-' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
 
@@ -3589,7 +3620,7 @@ class Calendar
      * the JSON file. If the row describes a change that is outside the
      * applicable year, the row is skipped.
      *
-     * @param array $rows The array of rows from the national calendar JSON file
+     * @param array<NationalCalendarLiturgicalEventItem> $rows The array of rows from the national calendar JSON file
      */
     private function handleNationalCalendarRows(array $rows): void
     {
@@ -3904,7 +3935,7 @@ class Calendar
      * @param string $inFavorOf The name of the liturgical event that is taking over the original date
      * @param string $missal The Roman Missal edition to use
      */
-    private function moveLiturgicalEventDate(string $event_key, DateTime $newDate, string $inFavorOf, $missal)
+    private function moveLiturgicalEventDate(string $event_key, DateTime $newDate, string $inFavorOf, $missal): void
     {
         $litEvent   = $this->Cal->getLiturgicalEvent($event_key);
         $locale     = LitLocale::$PRIMARY_LANGUAGE;
@@ -4630,7 +4661,7 @@ class Calendar
      * the Liturgical Calendar. If the file does not exist or is stale, the function will re-calculate the Liturgical
      * Calendar and cache the response.
      */
-    private function generateResponse()
+    private function generateResponse(): void
     {
         $SerializeableLitCal                                = new \stdClass();
         $SerializeableLitCal->litcal                        = $this->Cal->getLiturgicalEventsCollection();
@@ -4834,10 +4865,13 @@ class Calendar
      * The allowed return types are used to determine which types of responses
      * can be returned by the API.
      *
-     * @param array $returnTypes The return types to allow.
+     * @param array<string> $returnTypes The return types to allow.
      */
-    public function setAllowedReturnTypes(array $returnTypes): void
+    public function setAllowedReturnTypes(array $returnTypes = [ReturnType::JSON]): void
     {
+        if (false === empty($this->AllowedReturnTypes)) {
+            return; //if we already have the allowed return types, do not change them
+        }
         $this->AllowedReturnTypes = array_values(array_intersect(ReturnType::$values, $returnTypes));
     }
 
@@ -4913,8 +4947,9 @@ class Calendar
      * The LitCalEngine will only work once you call the public init() method.
      * Do not change the order of the methods that follow,
      * each one can depend on the one before it in order to function correctly!
+     * @param array<string|int> $requestPathParts
      */
-    public function init(array $requestPathParts = [])
+    public function init(array $requestPathParts = []): void
     {
         self::$Core->init();
         if (self::$Core->getRequestMethod() === RequestMethod::OPTIONS) {

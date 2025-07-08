@@ -8,8 +8,8 @@ use LiturgicalCalendar\Api\Enum\LitLocale;
 
 class Easter
 {
-    private static $Locale                                       = LitLocale::LATIN;
-    private static $baseLocale                                   = null;
+    private static string $Locale                                = LitLocale::LATIN;
+    private static ?string $baseLocale                           = null;
     private static ?\IntlDateFormatter $dayOfTheWeekDayMonthYear = null;
     private static ?\IntlDateFormatter $dayMonthYear             = null;
     private static ?\IntlDateFormatter $dayOfTheWeek             = null;

@@ -2,8 +2,6 @@
 
 namespace LiturgicalCalendar\Api;
 
-use LiturgicalCalendar\Api\Enum\LitColor;
-
 class LatinUtils
 {
     public const LATIN_ORDINAL = [

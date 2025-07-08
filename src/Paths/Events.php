@@ -11,23 +11,41 @@ use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\ParamError;
 use LiturgicalCalendar\Api\Params\EventsParams;
 
+/**
+ * @phpstan-type LiturgicalEventItem array{
+ *      event_key: string,
+ *      missal: string,
+ *      grade_lcl: string,
+ *      common_lcl: string,
+ *      name: string,
+ *      common: string[],
+ *      calendar: string,
+ *      decree?: string,
+ *      grade: int
+ * }
+ * @phpstan-type LiturgicalEventCollectionItem array<string, mixed>
+ */
 class Events
 {
     public static Core $Core;
+    /** @var array<string, LiturgicalEventCollectionItem> */
     private static array $LiturgicalEventCollection = [];
-    private static array $LatinMissals              = [];
-    private static ?object $WiderRegionData         = null;
-    private static ?object $NationalData            = null;
-    private static ?object $DiocesanData            = null;
-    private static ?LitGrade $LitGrade              = null;
-    private static ?LitCommon $LitCommon            = null;
-    private static array $requestPathParts          = [];
+    /** @var string[] */
+    private static array $LatinMissals = [];
+    /** @var string[] */
+    private static array $requestPathParts  = [];
+    private static ?object $WiderRegionData = null;
+    private static ?object $NationalData    = null;
+    private static ?object $DiocesanData    = null;
+    private static ?LitGrade $LitGrade      = null;
+    private static ?LitCommon $LitCommon    = null;
     private EventsParams $EventsParams;
 
     /**
-     * @param array $requestPathParts the path parameters from the request
+     * @param string[] $requestPathParts the path parameters from the request
      *
      * Initializes the Events class.
      *
@@ -74,27 +92,26 @@ class Events
      */
     private function validateRequestPathParams(): void
     {
-        $data = null;
-        if (false === in_array(self::$requestPathParts[0], ['nation','diocese'])) {
+        $params = null;
+        if (false === in_array(self::$requestPathParts[0], ['nation', 'diocese'])) {
             echo self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "unknown resource path: " . self::$requestPathParts[0]);
             die();
         }
         if (count(self::$requestPathParts) === 2) {
             if (self::$requestPathParts[0] === "nation") {
-                $data = [ "national_calendar" => self::$requestPathParts[1] ];
-                if (false === $this->EventsParams->setData($data)) {
-                    echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
-                    die();
-                }
-            } elseif (self::$requestPathParts[0] === "diocese") {
-                $data = [ "diocesan_calendar" => self::$requestPathParts[1] ];
-                if (false === $this->EventsParams->setData($data)) {
+                $params = [ "national_calendar" => self::$requestPathParts[1] ];
+                $this->EventsParams->setParams($params);
+                if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
                     echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
                     die();
                 }
             } else {
-                echo self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "unknown resource path: " . self::$requestPathParts[0]);
-                die();
+                $params = [ "diocesan_calendar" => self::$requestPathParts[1] ];
+                $this->EventsParams->setParams($params);
+                if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
+                    echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
+                    die();
+                }
             }
         } else {
             $description = "wrong number of path parameters, needed two but got " . count(self::$requestPathParts) . ": [" . implode(',', self::$requestPathParts) . "]";
@@ -119,13 +136,14 @@ class Events
         if (self::$Core->getRequestContentType() === RequestContentType::JSON) {
             $json = file_get_contents('php://input');
             if (false !== $json && "" !== $json) {
-                $data = json_decode($json, true);
+                $params = json_decode($json, true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     $description = "Malformed JSON data received in the request: <$json>, " . json_last_error_msg();
                     echo self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                     die();
                 } else {
-                    if (false === $this->EventsParams->setData($data)) {
+                    $this->EventsParams->setParams($params);
+                    if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
                         echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
                         die();
                     }
@@ -133,7 +151,8 @@ class Events
             }
         } elseif (self::$Core->getRequestContentType() === RequestContentType::FORMDATA) {
             if (count($_POST)) {
-                if (false === $this->EventsParams->setData($_POST)) {
+                $this->EventsParams->setParams($_POST);
+                if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
                     echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
                     die();
                 }
@@ -154,7 +173,8 @@ class Events
     private function validateGetParams(): void
     {
         if (count($_GET)) {
-            if (false === $this->EventsParams->setData($_GET)) {
+            $this->EventsParams->setParams($_GET);
+            if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
                 echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
                 die();
             }
@@ -722,7 +742,7 @@ class Events
     /**
      * Initializes the Events class and processes the request.
      *
-     * @param array $requestPathParts The path parameters from the request.
+     * @param string[] $requestPathParts The path parameters from the request.
      *
      * This method performs the following actions:
      * - Initializes the Core component and validates the Accept header.
@@ -736,7 +756,7 @@ class Events
      *   and Diocesan calendars.
      * - Produces and sends the response to the client.
      */
-    public function init(array $requestPathParts = [])
+    public function init(array $requestPathParts = []): void
     {
         self::$Core->init();
         self::$Core->validateAcceptHeader(true);

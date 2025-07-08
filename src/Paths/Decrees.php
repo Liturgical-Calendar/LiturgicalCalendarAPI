@@ -9,12 +9,13 @@ use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\StatusCode;
+use LiturgicalCalendar\Api\Enum\JsonData;
 
 class Decrees
 {
     public static Core $Core;
     public static object $decreesIndex;
-    private static array $requestPathParts = [];
+    /** @var array<string|int> */ private static array $requestPathParts = [];
 
     /*
     private static function initRequestParams(): array
@@ -60,7 +61,7 @@ class Decrees
     }
     */
 
-    private static function handlePathParams()
+    private static function handlePathParams(): void
     {
         $numPathParts = count(self::$requestPathParts);
         if ($numPathParts > 0) {
@@ -136,12 +137,24 @@ class Decrees
         die();
     }
 
-    public static function init(array $requestPathParts = [])
+    /**
+     * Initializes the Decrees class.
+     *
+     * This method performs the following actions:
+     * - Sets the request path parts if provided.
+     * - Loads the decrees data from the decrees file and initializes the decrees index.
+     * - Appends API path to each decree in the decrees index.
+     * - Initializes the Core component.
+     *
+     * @param array<string|int> $requestPathParts The path parameters from the request.
+     *
+     */
+    public static function init(array $requestPathParts = []): void
     {
         if (count($requestPathParts)) {
             self::$requestPathParts = $requestPathParts;
         }
-        $decreesFile = 'jsondata/sourcedata/decrees/decrees.json';
+        $decreesFile = JsonData::DECREES_FILE;
         if (file_exists($decreesFile)) {
             $rawData                            = file_get_contents($decreesFile);
             self::$decreesIndex                 = new \stdClass();
@@ -157,7 +170,7 @@ class Decrees
         self::$Core = new Core();
     }
 
-    public static function handleRequest()
+    public static function handleRequest(): void
     {
         self::$Core->init();
         if (self::$Core->getRequestMethod() === RequestMethod::GET) {

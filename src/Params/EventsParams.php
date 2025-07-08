@@ -4,6 +4,7 @@ namespace LiturgicalCalendar\Api\Params;
 
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\Route;
+use LiturgicalCalendar\Api\Enum\ParamError;
 
 /**
  * This class encapsulates the parameters that can be passed to the Events endpoint.
@@ -19,9 +20,9 @@ use LiturgicalCalendar\Api\Enum\Route;
  * as well as to check if the parameters are valid.
  *
  * @package LiturgicalCalendar\Api\Params
- * @author John Roman Odron
+ * @author John Romano D'Orazio <priest@johnromanodorazio.com>
  */
-class EventsParams
+class EventsParams implements ParamsInterface
 {
     public int $Year;
     public bool $EternalHighPriest            = false;
@@ -29,10 +30,11 @@ class EventsParams
     public ?string $baseLocale                = null;
     public ?string $NationalCalendar          = null;
     public ?string $DiocesanCalendar          = null;
-    private array $SupportedNationalCalendars = [];
-    private array $SupportedDiocesanCalendars = [];
+    public static ParamError $lastErrorStatus = ParamError::NONE;
+    private static string $lastErrorMessage   = '';
     public readonly object $calendarsMetadata;
-    private static string $lastError = '';
+    /** @var string[] */ private array $SupportedNationalCalendars = [];
+    /** @var string[] */ private array $SupportedDiocesanCalendars = [];
 
     public const ALLOWED_PARAMS = [
         "eternal_high_priest",
@@ -58,7 +60,12 @@ class EventsParams
     /**
      * Constructor for EventsParams
      *
-     * @param array $DATA
+     * @param array{
+     *      locale?: string,
+     *      national_calendar?: string,
+     *      diocesan_calendar?: string,
+     *      eternal_high_priest?: bool
+     * } $params An associative array of parameter keys to values.
      *
      * The constructor sets a default value for the Year parameter, defaulting to current year
      * and for the Locale parameter, defaulting to latin.
@@ -66,10 +73,9 @@ class EventsParams
      * It also sets the SupportedDiocesanCalendars and SupportedNationalCalendars properties
      * by reading the data from the calendars metadata.
      *
-     * If the $DATA array is not empty, it calls the setData method
-     * to apply the values from $DATA to the corresponding properties.
+     * Calls the setParams method to apply the values from $params to the corresponding properties.
      */
-    public function __construct(array $DATA = [])
+    public function __construct(array $params = [])
     {
         //we need at least a default value for the current year and for the locale
         $this->Year = (int)date("Y");
@@ -85,29 +91,35 @@ class EventsParams
         $this->SupportedDiocesanCalendars = $this->calendarsMetadata->diocesan_calendars_keys;
         $this->SupportedNationalCalendars = $this->calendarsMetadata->national_calendars_keys;
 
-
-        if (count($DATA)) {
-            $this->setData($DATA);
-        }
+        $this->setParams($params);
     }
 
     /**
      * Set the parameters for the Events class using the provided associative array of values.
      *
      * The array keys should be one of the following:
-     * - year: the year for which to retrieve the events
      * - locale: the language in which to retrieve the events
      * - national_calendar: the national calendar to use for the calculation
      * - diocesan_calendar: the diocesan calendar to use for the calculation
      * - eternal_high_priest: whether to include the eternal high priest in the events
      *
      * All parameters are optional, and default values will be used if they are not provided.
-     * @param array $DATA an associative array of values to use for the calculation
-     * @return bool true if the parameters were successfully set, or false if an error occurred
+     * @param array{
+     *      locale?: string,
+     *      national_calendar?: string,
+     *      diocesan_calendar?: string,
+     *      eternal_high_priest?: bool
+     * } $params An associative array of parameter keys to values.
      */
-    public function setData(array $DATA): bool
+    public function setParams(array $params = []): void
     {
-        foreach ($DATA as $key => $value) {
+        self::$lastErrorStatus  = ParamError::NONE;
+        self::$lastErrorMessage = '';
+        if (count($params) === 0) {
+            // If no parameters are provided, we can just return
+            return;
+        }
+        foreach ($params as $key => $value) {
             if (in_array($key, self::ALLOWED_PARAMS)) {
                 switch ($key) {
                     case "locale":
@@ -117,17 +129,17 @@ class EventsParams
                         break;
                     case "national_calendar":
                         if (false === in_array(strtoupper($value), $this->SupportedNationalCalendars)) {
-                            self::$lastError = "uknown value `$value` for nation parameter, supported national calendars are: ["
+                            self::$lastErrorStatus  = ParamError::INVALID_REGION;
+                            self::$lastErrorMessage = "unknown value `$value` for nation parameter, supported national calendars are: ["
                                 . implode(',', $this->SupportedNationalCalendars) . "]";
-                            return false;
                         }
                         $this->NationalCalendar =  strtoupper($value);
                         break;
                     case "diocesan_calendar":
                         if (false === in_array($value, $this->SupportedDiocesanCalendars)) {
-                            self::$lastError = "uknown value `$value` for diocese parameter, supported diocesan calendars are: ["
+                            self::$lastErrorStatus  = ParamError::INVALID_REGION;
+                            self::$lastErrorMessage = "unknown value `$value` for diocese parameter, supported diocesan calendars are: ["
                                 . implode(',', $this->SupportedDiocesanCalendars) . "]";
-                            return false;
                         }
                         $this->DiocesanCalendar = $value;
                         break;
@@ -137,7 +149,6 @@ class EventsParams
                 }
             }
         }
-        return true;
     }
 
     /**
@@ -147,6 +158,6 @@ class EventsParams
      */
     public static function getLastErrorMessage(): string
     {
-        return self::$lastError;
+        return self::$lastErrorMessage;
     }
 }

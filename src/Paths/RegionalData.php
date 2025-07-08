@@ -962,11 +962,11 @@ class RegionalData
      * If the request method is PUT or PATCH, and the payload is not either JSON or YAML encoded,
      * it will produce a 400 Bad Request error.
      *
-     * @param object $data the object to set the locale and payload on
+     * @param array $data the object to set the locale and payload on
      *
-     * @return object the object with the locale and payload set
+     * @return array the associative array with the locale and payload set
      */
-    private static function retrievePayloadFromPostPutPatchRequest(object $data): object
+    private static function retrievePayloadFromPostPutPatchRequest(array $data): array
     {
         $payload  = null;
         $required = self::$Core->getRequestMethod() !== RequestMethod::POST;
@@ -998,12 +998,12 @@ class RegionalData
 
         if (self::$Core->getRequestMethod() === RequestMethod::POST && is_object($payload)) {
             if (property_exists($payload, 'locale')) {
-                $data->locale = $payload->locale;
+                $data['locale'] = $payload->locale;
             }
         }
 
         if ($payload !== null) {
-            $data->payload = $payload;
+            $data['payload'] = $payload;
         }
 
         return $data;
@@ -1012,29 +1012,29 @@ class RegionalData
     /**
      * Set the category, key (if applicable), and locale (if applicable) based on the request path parts and method.
      *
-     * @param array $requestPathParts the parts of the request path
+     * @param string[] $requestPathParts the parts of the request path
      *
-     * @return object the object with the category, key, and locale set
+     * @return array{category: string, key?: string, locale?: string, i18n?: string, payload?: object} an associative array with the category, key, and locale set
      */
-    private static function setDataFromPath(array $requestPathParts): object
+    private static function setParamsFromPath(array $requestPathParts): array
     {
-        $data = new \stdClass();
-
-        $data->category = RegionalDataParams::EXPECTED_CATEGORIES[$requestPathParts[0]];
+        $params = [
+            'category' => RegionalDataParams::EXPECTED_CATEGORIES[$requestPathParts[0]]
+        ];
 
         if (self::$Core->getRequestMethod() !== RequestMethod::PUT) {
-            $data->key = $requestPathParts[1];
+            $params['key'] = $requestPathParts[1];
         }
 
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::GET, RequestMethod::POST], true)) {
             // For GET and POST request, there may be an optional third path parameter (= locale),
             // which will determine whether we are requesting calendar data or i18n data
             if (isset($requestPathParts[2])) {
-                $data->i18n = $requestPathParts[2];
+                $params['i18n'] = $requestPathParts[2];
             }
             // For GET requests, we attempt to retrieve the locale from the query string if present
             if (self::$Core->getRequestMethod() === RequestMethod::GET && isset($_GET['locale'])) {
-                $data->locale = \Locale::canonicalize($_GET['locale']);
+                $params['locale'] = \Locale::canonicalize($_GET['locale']);
             }
         }
 
@@ -1042,9 +1042,9 @@ class RegionalData
         // For POST requests, there might be a payload
         // So in all these cases, we attempt to retrieve the payload from the request body if present
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH], true)) {
-            $data = RegionalData::retrievePayloadFromPostPutPatchRequest($data);
+            $params = RegionalData::retrievePayloadFromPostPutPatchRequest($params);
         }
-        return $data;
+        return $params;
     }
 
     /**
@@ -1104,70 +1104,70 @@ class RegionalData
      *
      * If the request parameters are invalid, it will produce an error response with a status code of 400.
      *
-     * @param array $requestPathParts the parts of the request path
+     * @param string[] $requestPathParts the parts of the request path
      */
     private function handleRequestParams(array $requestPathParts = []): void
     {
         RegionalData::validateRequestPath($requestPathParts);
-        $data = RegionalData::setDataFromPath($requestPathParts);
+        $params = RegionalData::setParamsFromPath($requestPathParts);
 
         // Validate the payload for PUT and PATCH requests, based on category.
         // For PUT requests, the key is retrieved from the payload rather than from the path,
         // whereas for PATCH requests, the key should already have been set from the path.
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH], true)) {
-            switch ($data->category) {
+            switch ($params['category']) {
                 case 'DIOCESANCALENDAR':
                     if (
-                        false === property_exists($data, 'payload')
-                        || false === $data->payload instanceof \stdClass
-                        || false === property_exists($data->payload, 'litcal')
-                        || false === property_exists($data->payload, 'i18n')
-                        || false === property_exists($data->payload, 'metadata')
-                        || false === property_exists($data->payload->metadata, 'diocese_id')
+                        false === array_key_exists('payload', $params)
+                        || false === $params['payload'] instanceof \stdClass
+                        || false === property_exists($params['payload'], 'litcal')
+                        || false === property_exists($params['payload'], 'i18n')
+                        || false === property_exists($params['payload'], 'metadata')
+                        || false === property_exists($params['payload']->metadata, 'diocese_id')
                     ) {
-                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.metadata`, and `payload.metadata.diocese_id`, instead payload was: " . json_encode($data->payload));
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.metadata`, and `payload.metadata.diocese_id`, instead payload was: " . json_encode($params['payload']));
                     }
                     if (RequestMethod::PUT === self::$Core->getRequestMethod()) {
-                        $data->key = $data->payload->metadata->diocese_id;
+                        $params['key'] = $params['payload']->metadata->diocese_id;
                     }
                     break;
                 case 'NATIONALCALENDAR':
                     if (
-                        false === property_exists($data, 'payload')
-                        || false === $data->payload instanceof \stdClass
-                        || false === property_exists($data->payload, 'litcal')
-                        || false === property_exists($data->payload, 'i18n')
-                        || false === property_exists($data->payload, 'settings')
-                        || false === property_exists($data->payload, 'metadata')
-                        || false === property_exists($data->payload->metadata, 'nation')
+                        false === array_key_exists('payload', $params)
+                        || false === $params['payload'] instanceof \stdClass
+                        || false === property_exists($params['payload'], 'litcal')
+                        || false === property_exists($params['payload'], 'i18n')
+                        || false === property_exists($params['payload'], 'settings')
+                        || false === property_exists($params['payload'], 'metadata')
+                        || false === property_exists($params['payload']->metadata, 'nation')
                     ) {
-                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.settings`, `payload.metadata`, and `payload.metadata.nation`, instead payload was: " . json_encode($data->payload));
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.settings`, `payload.metadata`, and `payload.metadata.nation`, instead payload was: " . json_encode($params['payload']));
                     }
                     if (RequestMethod::PUT === self::$Core->getRequestMethod()) {
-                        $data->key = $data->payload->metadata->nation;
+                        $params['key'] = $params['payload']->metadata->nation;
                     }
                     break;
                 case 'WIDERREGIONCALENDAR':
                     if (
-                        false === property_exists($data, 'payload')
-                        || false === $data->payload instanceof \stdClass
-                        || false === property_exists($data->payload, 'litcal')
-                        || false === property_exists($data->payload, 'i18n')
-                        || false === property_exists($data->payload, 'national_calendars')
-                        || false === property_exists($data->payload, 'metadata')
-                        || false === property_exists($data->payload->metadata, 'wider_region')
-                        || false === property_exists($data->payload->metadata, 'locales')
+                        false === array_key_exists('payload', $params)
+                        || false === $params['payload'] instanceof \stdClass
+                        || false === property_exists($params['payload'], 'litcal')
+                        || false === property_exists($params['payload'], 'i18n')
+                        || false === property_exists($params['payload'], 'national_calendars')
+                        || false === property_exists($params['payload'], 'metadata')
+                        || false === property_exists($params['payload']->metadata, 'wider_region')
+                        || false === property_exists($params['payload']->metadata, 'locales')
                     ) {
                         self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.national_calendars`, `payload.metadata`, `payload.metadata.wider_region`, and `payload.metadata.locales`");
                     }
                     if (RequestMethod::PUT === self::$Core->getRequestMethod()) {
-                        $data->key = $data->payload->metadata->wider_region;
+                        $params['key'] = $params['payload']->metadata->wider_region;
                     }
                     break;
             }
         }
 
-        if (false === $this->params->setData($data)) {
+        if (false === $this->params->setParams($params)) {
             self::produceErrorResponse(StatusCode::BAD_REQUEST, "The params do not seem to be correct, must have params `category` and `key` with acceptable values");
         }
     }

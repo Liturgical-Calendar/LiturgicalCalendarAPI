@@ -2,13 +2,10 @@
 
 /**
  * Output requested JSON schema resource
- * PHP version 8.3
  *
- * @package   LitCal
  * @author    John Romano D'Orazio <priest@johnromanodorazio.com>
  * @copyright 2024 John Romano D'Orazio
  * @license   https://www.apache.org/licenses/LICENSE-2.0.txt Apache License 2.0
- * @version   GIT: 3.9
  * @link      https://litcal.johnromanodorazio.com
  */
 
