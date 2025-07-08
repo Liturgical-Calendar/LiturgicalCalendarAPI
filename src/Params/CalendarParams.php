@@ -50,16 +50,16 @@ class CalendarParams implements ParamsInterface
     public ?string $DiocesanCalendar = null;
 
     public const ALLOWED_PARAMS = [
-        "year",
-        "year_type",
-        "epiphany",
-        "ascension",
-        "corpus_christi",
-        "eternal_high_priest",
-        "locale",
-        "return_type",
-        "national_calendar",
-        "diocesan_calendar"
+        'year',
+        'year_type',
+        'epiphany',
+        'ascension',
+        'corpus_christi',
+        'eternal_high_priest',
+        'locale',
+        'return_type',
+        'national_calendar',
+        'diocesan_calendar'
     ];
 
     // If we can get more data from 1582 (year of the Gregorian reform) to 1969
@@ -127,13 +127,13 @@ class CalendarParams implements ParamsInterface
             if (JSON_ERROR_NONE === json_last_error() && property_exists($metadata, 'litcal_metadata')) {
                 $this->calendars = $metadata->litcal_metadata;
             } else {
-                Calendar::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The API was unable to initialize calendars metadata: " . json_last_error_msg());
+                Calendar::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'The API was unable to initialize calendars metadata: ' . json_last_error_msg());
             }
         } else {
             Calendar::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The API was unable to load calendars metadata from {$calendarsRoute}");
         }
 
-        $this->Year = (int)date("Y");
+        $this->Year = (int)date('Y');
 
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $value        = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
@@ -176,34 +176,34 @@ class CalendarParams implements ParamsInterface
                     $value = CalendarParams::validateStringValue($key, $value);
                 }
                 switch ($key) {
-                    case "year":
+                    case 'year':
                         $this->validateYearParam($value);
                         break;
-                    case "epiphany":
+                    case 'epiphany':
                         $this->validateEpiphanyParam($value);
                         break;
-                    case "ascension":
+                    case 'ascension':
                         $this->validateAscensionParam($value);
                         break;
-                    case "corpus_christi":
+                    case 'corpus_christi':
                         $this->validateCorpusChristiParam($value);
                         break;
-                    case "locale":
+                    case 'locale':
                         $this->validateLocaleParam($value);
                         break;
-                    case "return_type":
+                    case 'return_type':
                         $this->validateReturnTypeParam($value);
                         break;
-                    case "national_calendar":
+                    case 'national_calendar':
                         $this->validateNationalCalendarParam($value);
                         break;
-                    case "diocesan_calendar":
+                    case 'diocesan_calendar':
                         $this->validateDiocesanCalendarParam($value);
                         break;
-                    case "year_type":
+                    case 'year_type':
                         $this->validateYearTypeParam($value);
                         break;
-                    case "eternal_high_priest":
+                    case 'eternal_high_priest':
                         $this->validateEternalHighPriestParam($value);
                         break;
                 }
@@ -392,7 +392,7 @@ class CalendarParams implements ParamsInterface
         if (gettype($value) !== 'boolean') {
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
             if (null === $value) {
-                $description = "Invalid value for parameter `eternal_high_priest`, valid values are boolean `true` and `false`";
+                $description = 'Invalid value for parameter `eternal_high_priest`, valid values are boolean `true` and `false`';
                 Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
             }
         }

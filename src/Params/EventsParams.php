@@ -37,10 +37,10 @@ class EventsParams implements ParamsInterface
     /** @var string[] */ private array $SupportedDiocesanCalendars = [];
 
     public const ALLOWED_PARAMS = [
-        "eternal_high_priest",
-        "locale",
-        "national_calendar",
-        "diocesan_calendar"
+        'eternal_high_priest',
+        'locale',
+        'national_calendar',
+        'diocesan_calendar'
     ];
 
     // If we can get more data from 1582 (year of the Gregorian reform) to 1969
@@ -78,7 +78,7 @@ class EventsParams implements ParamsInterface
     public function __construct(array $params = [])
     {
         //we need at least a default value for the current year and for the locale
-        $this->Year = (int)date("Y");
+        $this->Year = (int)date('Y');
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $value        = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
             $this->Locale = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
@@ -122,28 +122,28 @@ class EventsParams implements ParamsInterface
         foreach ($params as $key => $value) {
             if (in_array($key, self::ALLOWED_PARAMS)) {
                 switch ($key) {
-                    case "locale":
+                    case 'locale':
                         $this->Locale     = \Locale::canonicalize($this->Locale);
                         $this->Locale     = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
                         $this->baseLocale = \Locale::getPrimaryLanguage($this->Locale);
                         break;
-                    case "national_calendar":
+                    case 'national_calendar':
                         if (false === in_array(strtoupper($value), $this->SupportedNationalCalendars)) {
                             self::$lastErrorStatus  = ParamError::INVALID_REGION;
                             self::$lastErrorMessage = "unknown value `$value` for nation parameter, supported national calendars are: ["
-                                . implode(',', $this->SupportedNationalCalendars) . "]";
+                                . implode(',', $this->SupportedNationalCalendars) . ']';
                         }
                         $this->NationalCalendar =  strtoupper($value);
                         break;
-                    case "diocesan_calendar":
+                    case 'diocesan_calendar':
                         if (false === in_array($value, $this->SupportedDiocesanCalendars)) {
                             self::$lastErrorStatus  = ParamError::INVALID_REGION;
                             self::$lastErrorMessage = "unknown value `$value` for diocese parameter, supported diocesan calendars are: ["
-                                . implode(',', $this->SupportedDiocesanCalendars) . "]";
+                                . implode(',', $this->SupportedDiocesanCalendars) . ']';
                         }
                         $this->DiocesanCalendar = $value;
                         break;
-                    case "eternal_high_priest":
+                    case 'eternal_high_priest':
                         $this->EternalHighPriest = filter_var($value, FILTER_VALIDATE_BOOLEAN);
                         break;
                 }

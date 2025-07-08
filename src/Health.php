@@ -48,9 +48,9 @@ class Health implements MessageComponentInterface
      * @var array<string, string[]> $ACTION_PROPERTIES
      */
     private const ACTION_PROPERTIES = [
-        "executeValidation" => ["validate", "sourceFile", "category"],
-        "validateCalendar"  => ["calendar", "year", "category", "responsetype"],
-        "executeUnitTest"   => ["calendar", "year", "category", "test"]
+        'executeValidation' => ['validate', 'sourceFile', 'category'],
+        'validateCalendar'  => ['calendar', 'year', 'category', 'responsetype'],
+        'executeUnitTest'   => ['calendar', 'year', 'category', 'test']
     ];
 
     private static ?object $metadata = null;
@@ -95,7 +95,7 @@ class Health implements MessageComponentInterface
             if (JSON_ERROR_NONE === json_last_error()) {
                 echo "Loaded metadata\n";
             } else {
-                echo "Error loading metadata: " . json_last_error_msg() . "\n";
+                echo 'Error loading metadata: ' . json_last_error_msg() . "\n";
             }
         } else {
             if (property_exists(self::$metadata, 'litcal_metadata') && property_exists(self::$metadata->litcal_metadata, 'diocesan_calendars')) {
@@ -175,7 +175,7 @@ class Health implements MessageComponentInterface
                     break;
                 default:
                     $message       = new \stdClass();
-                    $message->type = "echobot";
+                    $message->type = 'echobot';
                     $message->text = $msg;
                     $this->sendMessage($from, $message);
             }
@@ -191,7 +191,7 @@ class Health implements MessageComponentInterface
             }
             echo sprintf('Invalid message from connection %1$d: %2$s (%3$s)', $from->resourceId, $errorMsg, $msg);
             $message           = new \stdClass();
-            $message->type     = "echobot";
+            $message->type     = 'echobot';
             $message->errorMsg = $errorMsg;
             $message->text     = sprintf('Invalid message from connection %d: %s', $from->resourceId, $msg);
             $this->sendMessage($from, $message);
@@ -278,8 +278,8 @@ class Health implements MessageComponentInterface
      */
     private static function retrieveSchemaForCategory(string $category, ?string $dataPath = null): ?string
     {
-        $versionedPattern     = "/\/api\/v[4-9]\//";
-        $versionedReplacement = "/api/dev/";
+        $versionedPattern     = '/\/api\/v[4-9]\//';
+        $versionedReplacement = '/api/dev/';
         $isVersionedDataPath  = preg_match($versionedPattern, $dataPath) !== false;
         switch ($category) {
             case 'universalcalendar':
@@ -304,15 +304,15 @@ class Health implements MessageComponentInterface
                 return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS) : LitSchema::PROPRIUMDESANCTIS;
             case 'resourceDataCheck':
                 if (
-                    preg_match("/\/missals\/[_A-Z0-9]+$/", $dataPath)
+                    preg_match('/\/missals\/[_A-Z0-9]+$/', $dataPath)
                 ) {
                     return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS) : LitSchema::PROPRIUMDESANCTIS;
                 } elseif (
-                    preg_match("/\/events\/(?:nation\/[A-Z]{2}|diocese\/[a-z]{6}_[a-z]{2})(?:\?locale=[a-zA-Z0-9_]+)?$/", $dataPath)
+                    preg_match('/\/events\/(?:nation\/[A-Z]{2}|diocese\/[a-z]{6}_[a-z]{2})(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath)
                 ) {
                     return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::EVENTS) : LitSchema::EVENTS;
                 } elseif (
-                    preg_match("/\/data\/(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/", $dataPath, $matches)
+                    preg_match('/\/data\/(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath, $matches)
                 ) {
                     $schema = LitSchema::DATA;
                     foreach ($matches as $idx => $match) {
@@ -344,28 +344,28 @@ class Health implements MessageComponentInterface
                 }
                 return null;
             case 'sourceDataCheck':
-                if (preg_match("/-i18n$/", $dataPath)) {
+                if (preg_match('/-i18n$/', $dataPath)) {
                     return LitSchema::I18N;
                 }
-                if (preg_match("/^memorials-from-decrees$/", $dataPath)) {
+                if (preg_match('/^memorials-from-decrees$/', $dataPath)) {
                     return LitSchema::DECREES_SRC;
                 }
-                if (preg_match("/^proprium-de-sanctis(?:-[A-Z]{2})?-(?:1|2)(?:9|0)(?:7|8|9|0|1|2)[0-9]$/", $dataPath)) {
+                if (preg_match('/^proprium-de-sanctis(?:-[A-Z]{2})?-(?:1|2)(?:9|0)(?:7|8|9|0|1|2)[0-9]$/', $dataPath)) {
                     return LitSchema::PROPRIUMDESANCTIS;
                 }
-                if (preg_match("/^proprium-de-tempore$/", $dataPath)) {
+                if (preg_match('/^proprium-de-tempore$/', $dataPath)) {
                     return LitSchema::PROPRIUMDETEMPORE;
                 }
-                if (preg_match("/^wider-region-[A-Z][a-z]+$/", $dataPath)) {
+                if (preg_match('/^wider-region-[A-Z][a-z]+$/', $dataPath)) {
                     return LitSchema::WIDERREGION;
                 }
-                if (preg_match("/^national-calendar-[A-Z]{2}$/", $dataPath)) {
+                if (preg_match('/^national-calendar-[A-Z]{2}$/', $dataPath)) {
                     return LitSchema::NATIONAL;
                 }
-                if (preg_match("/^diocesan-calendar-[a-z]{6}_[a-z]{2}$/", $dataPath)) {
+                if (preg_match('/^diocesan-calendar-[a-z]{6}_[a-z]{2}$/', $dataPath)) {
                     return LitSchema::DIOCESAN;
                 }
-                if (preg_match("/^tests-[a-zA-Z0-9_]+$/", $dataPath)) {
+                if (preg_match('/^tests-[a-zA-Z0-9_]+$/', $dataPath)) {
                     return LitSchema::TEST_SRC;
                 }
                 return null;
@@ -401,7 +401,7 @@ class Health implements MessageComponentInterface
                 // If the 'sourceFolder' property is set, then we are validating a folder of i18n files
                 $dataPath = rtrim($validation->sourceFolder, '/');
                 $matches  = null;
-                if (preg_match("/^(wider\-region|national\-calendar|diocesan\-calendar)\-([A-Za-z_]+)\-i18n$/", $validation->validate, $matches)) {
+                if (preg_match('/^(wider\-region|national\-calendar|diocesan\-calendar)\-([A-Za-z_]+)\-i18n$/', $validation->validate, $matches)) {
                     switch ($matches[1]) {
                         case 'wider-region':
                             $dataPath = strtr(
@@ -427,7 +427,7 @@ class Health implements MessageComponentInterface
                             );
                             break;
                     }
-                } elseif (preg_match("/^proprium\-de\-sanctis(?:\-([A-Z]{2}))?\-([1-2][0-9]{3})\-i18n$/", $validation->validate, $matches)) {
+                } elseif (preg_match('/^proprium\-de\-sanctis(?:\-([A-Z]{2}))?\-([1-2][0-9]{3})\-i18n$/', $validation->validate, $matches)) {
                     $region   = $matches[1] !== '' ? $matches[1] : 'EDITIO_TYPICA';
                     $year     = $matches[2];
                     $dataPath = RomanMissal::$i18nPath["{$region}_{$year}"];
@@ -438,7 +438,7 @@ class Health implements MessageComponentInterface
                 if (property_exists($validation, 'sourceFile')) {
                     $dataPath = $validation->sourceFile;
                     $matches  = null;
-                    if (preg_match("/^(wider-region|national-calendar|diocesan-calendar)-([A-Z][a-z]+)$/", $validation->validate, $matches)) {
+                    if (preg_match('/^(wider-region|national-calendar|diocesan-calendar)-([A-Z][a-z]+)$/', $validation->validate, $matches)) {
                         switch ($matches[1]) {
                             case 'wider-region':
                                 $dataPath = strtr(
@@ -466,7 +466,7 @@ class Health implements MessageComponentInterface
                                 );
                                 break;
                         }
-                    } elseif (preg_match("/^proprium\-de\-sanctis(?:\-([A-Z]{2}))?\-([1-2][0-9]{3})$/", $validation->validate, $matches)) {
+                    } elseif (preg_match('/^proprium\-de\-sanctis(?:\-([A-Z]{2}))?\-([1-2][0-9]{3})$/', $validation->validate, $matches)) {
                         $region   = $matches[1] !== '' ? $matches[1] : 'EDITIO_TYPICA';
                         $year     = $matches[2];
                         $dataPath = RomanMissal::$jsonFiles["{$region}_{$year}"];
@@ -489,7 +489,7 @@ class Health implements MessageComponentInterface
             $files = glob($dataPath . '/*.json');
             if (false === $files || empty($files)) {
                 $message          = new \stdClass();
-                $message->type    = "error";
+                $message->type    = 'error';
                 $message->text    = "Data folder $validation->sourceFolder ($dataPath) does not exist or does not contain any json files";
                 $message->classes = ".$validation->validate.file-exists";
                 $this->sendMessage($to, $message);
@@ -501,11 +501,11 @@ class Health implements MessageComponentInterface
             foreach ($files as $file) {
                 $filename = pathinfo($file, PATHINFO_BASENAME);
 
-                $matchI8nFile = preg_match("/(?:[a-z]{2,3}(?:_[A-Z][a-z]{3})?(?:_[A-Z]{2})?|(?:ar|en|eo)_001|(?:en_150|es_419))\.json$/", $filename);
+                $matchI8nFile = preg_match('/(?:[a-z]{2,3}(?:_[A-Z][a-z]{3})?(?:_[A-Z]{2})?|(?:ar|en|eo)_001|(?:en_150|es_419))\.json$/', $filename);
                 if (false === $matchI8nFile || 0 === $matchI8nFile) {
                     $fileExistsAndIsReadable = false;
                     $message                 = new \stdClass();
-                    $message->type           = "error";
+                    $message->type           = 'error';
                     $message->text           = "Data folder $validation->sourceFolder contains an invalid i18n json filename $filename";
                     $message->classes        = ".$validation->validate.file-exists";
                     $this->sendMessage($to, $message);
@@ -514,7 +514,7 @@ class Health implements MessageComponentInterface
                     if (false === $fileData) {
                         $fileExistsAndIsReadable = false;
                         $message                 = new \stdClass();
-                        $message->type           = "error";
+                        $message->type           = 'error';
                         $message->text           = "Data folder $validation->sourceFolder contains an unreadable i18n json file $filename";
                         $message->classes        = ".$validation->validate.file-exists";
                         $this->sendMessage($to, $message);
@@ -523,7 +523,7 @@ class Health implements MessageComponentInterface
                         if (json_last_error() !== JSON_ERROR_NONE) {
                             $jsonDecodable    = false;
                             $message          = new \stdClass();
-                            $message->type    = "error";
+                            $message->type    = 'error';
                             $message->text    = "The i18n json file $filename was not successfully decoded as JSON: " . json_last_error_msg();
                             $message->classes = ".$validation->validate.json-valid";
                             $this->sendMessage($to, $message);
@@ -537,7 +537,7 @@ class Health implements MessageComponentInterface
                                 }
                             } else {
                                 $message          = new \stdClass();
-                                $message->type    = "error";
+                                $message->type    = 'error';
                                 $message->text    = "Unable to detect a schema for {$validation->validate} and category {$validation->category}";
                                 $message->classes = ".$validation->validate.schema-valid";
                                 $this->sendMessage($to, $message);
@@ -548,21 +548,21 @@ class Health implements MessageComponentInterface
             }
             if ($fileExistsAndIsReadable) {
                 $message          = new \stdClass();
-                $message->type    = "success";
+                $message->type    = 'success';
                 $message->text    = "The Data folder $validation->sourceFolder exists and contains valid i18n json files";
                 $message->classes = ".$validation->validate.file-exists";
                 $this->sendMessage($to, $message);
             }
             if ($jsonDecodable) {
                 $message          = new \stdClass();
-                $message->type    = "success";
+                $message->type    = 'success';
                 $message->text    = "The i18n json files in Data folder $validation->sourceFolder were successfully decoded as JSON";
                 $message->classes = ".$validation->validate.json-valid";
                 $this->sendMessage($to, $message);
             }
             if ($schemaValidated) {
                 $message          = new \stdClass();
-                $message->type    = "success";
+                $message->type    = 'success';
                 $message->text    = "The i18n json files in Data folder $validation->sourceFolder were successfully validated against the Schema $schema";
                 $message->classes = ".$validation->validate.schema-valid";
                 $this->sendMessage($to, $message);
@@ -570,7 +570,7 @@ class Health implements MessageComponentInterface
         } else {
             // If the 'sourceFolder' property is not set, then we are validating a single source file or API path
             $matches = null;
-            if (preg_match("/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/", $pathForSchema, $matches)) {
+            if (preg_match('/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/', $pathForSchema, $matches)) {
                 $dioceseId   = $matches[1];
                 $dioceseData = array_find(self::$metadata->litcal_metadata->diocesan_calendars, fn ($diocesan_calendar) => $diocesan_calendar->calendar_id === $dioceseId);
                 $nation      = $dioceseData->nation;
@@ -580,7 +580,7 @@ class Health implements MessageComponentInterface
                     '{diocese}'      => $dioceseId,
                     '{diocese_name}' => $dioceseName
                 ]);
-            } elseif (preg_match("/^national-calendar-([A-Z]{2})$/", $pathForSchema, $matches)) {
+            } elseif (preg_match('/^national-calendar-([A-Z]{2})$/', $pathForSchema, $matches)) {
                 $nation   = $matches[1];
                 $dataPath = strtr(JsonData::NATIONAL_CALENDARS_FILE, [
                     '{nation}' => $nation
@@ -593,19 +593,19 @@ class Health implements MessageComponentInterface
                 $headers = get_headers($dataPath);
                 if (!$headers || strpos($headers[0], '200') === false) {
                     $message          = new \stdClass();
-                    $message->type    = "error";
+                    $message->type    = 'error';
                     $message->text    = "URL $dataPath is giving an error: " . $headers[0];
                     $message->classes = ".$validation->validate.file-exists";
                     $this->sendMessage($to, $message);
 
                     $message          = new \stdClass();
-                    $message->type    = "error";
+                    $message->type    = 'error';
                     $message->text    = "Could not decode the Data file $dataPath as JSON because it is not readable";
                     $message->classes = ".$validation->validate.json-valid";
                     $this->sendMessage($to, $message);
 
                     $message          = new \stdClass();
-                    $message->type    = "error";
+                    $message->type    = 'error';
                     $message->text    = "Unable to verify schema for dataPath {$dataPath} and category {$validation->category} since Data file $dataPath does not exist or is not readable";
                     $message->classes = ".$validation->validate.schema-valid";
                     $this->sendMessage($to, $message);
@@ -622,9 +622,9 @@ class Health implements MessageComponentInterface
                 //get the corresponding accept mime type
                 $acceptMimeType = AcceptHeader::$values[$responseTypeIdx];
                 $opts           = [
-                    "http" => [
-                        "method" => "GET",
-                        "header" => "Accept: $acceptMimeType\r\n"
+                    'http' => [
+                        'method' => 'GET',
+                        'header' => "Accept: $acceptMimeType\r\n"
                     ]
                 ];
                 $context        = stream_context_create($opts);
@@ -637,25 +637,25 @@ class Health implements MessageComponentInterface
 
             if (false === $data) {
                 $message          = new \stdClass();
-                $message->type    = "error";
+                $message->type    = 'error';
                 $message->text    = "Data file $dataPath is not readable";
                 $message->classes = ".$validation->validate.file-exists";
                 $this->sendMessage($to, $message);
 
                 $message          = new \stdClass();
-                $message->type    = "error";
+                $message->type    = 'error';
                 $message->text    = "Could not decode the Data file $dataPath as JSON because it is not readable";
                 $message->classes = ".$validation->validate.json-valid";
                 $this->sendMessage($to, $message);
 
                 $message          = new \stdClass();
-                $message->type    = "error";
+                $message->type    = 'error';
                 $message->text    = "Unable to verify schema for dataPath {$dataPath} and category {$validation->category} since Data file $dataPath does not exist or is not readable";
                 $message->classes = ".$validation->validate.schema-valid";
                 $this->sendMessage($to, $message);
             } else {
                 $message          = new \stdClass();
-                $message->type    = "success";
+                $message->type    = 'success';
                 $message->text    = "The Data file $dataPath exists";
                 $message->classes = ".$validation->validate.file-exists";
                 $this->sendMessage($to, $message);
@@ -666,7 +666,7 @@ class Health implements MessageComponentInterface
                             $yamlData = json_decode(json_encode(yaml_parse($data)));
                             if ($yamlData) {
                                 $message          = new \stdClass();
-                                $message->type    = "success";
+                                $message->type    = 'success';
                                 $message->text    = "The Data file $dataPath was successfully decoded as YAML";
                                 $message->classes = ".$validation->validate.json-valid";
                                 $this->sendMessage($to, $message);
@@ -675,7 +675,7 @@ class Health implements MessageComponentInterface
                                     $validationResult = $this->validateDataAgainstSchema($yamlData, $schema);
                                     if (gettype($validationResult) === 'boolean' && $validationResult === true) {
                                         $message          = new \stdClass();
-                                        $message->type    = "success";
+                                        $message->type    = 'success';
                                         $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
                                         $message->classes = ".$validation->validate.schema-valid";
                                         $this->sendMessage($to, $message);
@@ -685,7 +685,7 @@ class Health implements MessageComponentInterface
                                     }
                                 } else {
                                     $message          = new \stdClass();
-                                    $message->type    = "error";
+                                    $message->type    = 'error';
                                     $message->text    = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category}";
                                     $message->classes = ".$validation->validate.schema-valid";
                                     $this->sendMessage($to, $message);
@@ -693,7 +693,7 @@ class Health implements MessageComponentInterface
                             }
                         } catch (\Exception $ex) {
                             $message          = new \stdClass();
-                            $message->type    = "error";
+                            $message->type    = 'error';
                             $message->text    = "There was an error decoding the Data file $dataPath as YAML: " . $ex->getMessage() . " :: Raw data = <<<JSON\n$data\n>>>";
                             $message->classes = ".$validation->validate.json-valid";
                             $this->sendMessage($to, $message);
@@ -705,7 +705,7 @@ class Health implements MessageComponentInterface
                         $jsonData = json_decode($data);
                         if (json_last_error() === JSON_ERROR_NONE) {
                             $message          = new \stdClass();
-                            $message->type    = "success";
+                            $message->type    = 'success';
                             $message->text    = "The Data file $dataPath was successfully decoded as JSON";
                             $message->classes = ".$validation->validate.json-valid";
                             $this->sendMessage($to, $message);
@@ -714,7 +714,7 @@ class Health implements MessageComponentInterface
                                 $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
                                 if (gettype($validationResult) === 'boolean' && $validationResult === true) {
                                     $message          = new \stdClass();
-                                    $message->type    = "success";
+                                    $message->type    = 'success';
                                     $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
                                     $message->classes = ".$validation->validate.schema-valid";
                                     $this->sendMessage($to, $message);
@@ -724,14 +724,14 @@ class Health implements MessageComponentInterface
                                 }
                             } else {
                                 $message          = new \stdClass();
-                                $message->type    = "error";
+                                $message->type    = 'error';
                                 $message->text    = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category}";
                                 $message->classes = ".$validation->validate.schema-valid";
                                 $this->sendMessage($to, $message);
                             }
                         } else {
                             $message          = new \stdClass();
-                            $message->type    = "error";
+                            $message->type    = 'error';
                             $message->text    = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . " :: Raw data = <<<JSON\n$data\n>>>";
                             $message->classes = ".$validation->validate.json-valid";
                             $this->sendMessage($to, $message);
@@ -753,7 +753,7 @@ class Health implements MessageComponentInterface
     {
         $return = [];
         foreach ($errors as $error) {
-            $errorStr = "";
+            $errorStr = '';
             switch ($error->level) {
                 case LIBXML_ERR_WARNING:
                     $errorStr .= "Warning $error->code: ";
@@ -767,7 +767,7 @@ class Health implements MessageComponentInterface
             }
             $errorStr .= htmlspecialchars(trim($error->message))
                       . " (Line: $error->line, Column: $error->column, Src: "
-                      . htmlspecialchars(trim($xml[$error->line - 1])) . ")";
+                      . htmlspecialchars(trim($xml[$error->line - 1])) . ')';
             if ($error->file) {
                 $errorStr .= " in file: $error->file";
             }
@@ -797,9 +797,9 @@ class Health implements MessageComponentInterface
         //get the corresponding accept mime type
         $acceptMimeType = AcceptHeader::$values[$responseTypeIdx];
         $opts           = [
-            "http" => [
-                "method" => "GET",
-                "header" => "Accept: $acceptMimeType\r\n"
+            'http' => [
+                'method' => 'GET',
+                'header' => "Accept: $acceptMimeType\r\n"
             ]
         ];
         $context        = stream_context_create($opts);
@@ -815,19 +815,19 @@ class Health implements MessageComponentInterface
                     break;
                 default:
                     //we shouldn't ever get any other categories
-                    $req = "/unknown";
+                    $req = '/unknown';
             }
         }
         $data = file_get_contents(self::REQPATH . $req, false, $context);
         if ($data !== false) {
             $message          = new \stdClass();
-            $message->type    = "success";
+            $message->type    = 'success';
             $message->text    = "The $category of $calendar for the year $year exists";
             $message->classes = ".calendar-$calendar.file-exists.year-$year";
             $this->sendMessage($to, $message);
 
             switch ($responseType) {
-                case "XML":
+                case 'XML':
                     libxml_use_internal_errors(true);
                     $xmlArr     = explode("\n", $data);
                     $xml        = new \DOMDocument();
@@ -835,18 +835,18 @@ class Health implements MessageComponentInterface
                     //$xml = simplexml_load_string( $data );
                     if ($loadResult === false) {
                         $message       = new \stdClass();
-                        $message->type = "error";
+                        $message->type = 'error';
                         $errors        = libxml_get_errors();
                         $errorString   = self::retrieveXmlErrors($errors, $xmlArr);
                         libxml_clear_errors();
                         $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                        . self::REQPATH . $req . " as XML: " . $errorString;
+                                        . self::REQPATH . $req . ' as XML: ' . $errorString;
                         $message->classes      = ".calendar-$calendar.json-valid.year-$year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
                     } else {
                         $message          = new \stdClass();
-                        $message->type    = "success";
+                        $message->type    = 'success';
                         $message->text    = "The $category of $calendar for the year $year was successfully decoded as XML";
                         $message->classes = ".calendar-$calendar.json-valid.year-$year";
                         $this->sendMessage($to, $message);
@@ -854,10 +854,10 @@ class Health implements MessageComponentInterface
                         $validationResult = $xml->schemaValidate('jsondata/schemas/LiturgicalCalendar.xsd');
                         if ($validationResult) {
                             $message          = new \stdClass();
-                            $message->type    = "success";
+                            $message->type    = 'success';
                             $message->text    = sprintf(
                                 "The $category of $calendar for the year $year was successfully validated against the Schema %s",
-                                "jsondata/schemas/LiturgicalCalendar.xsd"
+                                'jsondata/schemas/LiturgicalCalendar.xsd'
                             );
                             $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
@@ -866,14 +866,14 @@ class Health implements MessageComponentInterface
                             $errorString = self::retrieveXmlErrors($errors, $xmlArr);
                             libxml_clear_errors();
                             $message          = new \stdClass();
-                            $message->type    = "error";
+                            $message->type    = 'error';
                             $message->text    = $errorString;
                             $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
                         }
                     }
                     break;
-                case "ICS":
+                case 'ICS':
                     try {
                         $vcalendar = VObject\Reader::read($data);
                     } catch (VObject\ParseException $ex) {
@@ -881,7 +881,7 @@ class Health implements MessageComponentInterface
                     }
                     if ($vcalendar instanceof VObject\Document) {
                         $message          = new \stdClass();
-                        $message->type    = "success";
+                        $message->type    = 'success';
                         $message->text    = "The $category of $calendar for the year $year was successfully decoded as ICS";
                         $message->classes = ".calendar-$calendar.json-valid.year-$year";
                         $this->sendMessage($to, $message);
@@ -889,20 +889,20 @@ class Health implements MessageComponentInterface
                         $result = $vcalendar->validate();
                         if (count($result) === 0) {
                             $message          = new \stdClass();
-                            $message->type    = "success";
+                            $message->type    = 'success';
                             $message->text    = sprintf(
                                 "The $category of $calendar for the year $year was successfully validated according the iCalendar Schema %s",
-                                "https://tools.ietf.org/html/rfc5545"
+                                'https://tools.ietf.org/html/rfc5545'
                             );
                             $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
                         } else {
                             $message       = new \stdClass();
-                            $message->type = "error";
+                            $message->type = 'error';
                             $errorStrings  = [];
                             foreach ($result as $error) {
                                 $errorLevel     = new ICSErrorLevel($error['level']);
-                                $errorStrings[] = $errorLevel . ": " . $error['message'] . " at line {$error['node']->lineIndex} ({$error['node']->lineString})";
+                                $errorStrings[] = $errorLevel . ': ' . $error['message'] . " at line {$error['node']->lineIndex} ({$error['node']->lineString})";
                             }
                             $message->text    = implode('&#013;', $errorStrings);
                             $message->classes = ".calendar-$calendar.schema-valid.year-$year";
@@ -910,20 +910,20 @@ class Health implements MessageComponentInterface
                         }
                     } else {
                         $message               = new \stdClass();
-                        $message->type         = "error";
+                        $message->type         = 'error';
                         $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                        . self::REQPATH . $req . " as ICS: parsing resulted in type " . gettype($vcalendar) . " | " . $vcalendar;
+                                        . self::REQPATH . $req . ' as ICS: parsing resulted in type ' . gettype($vcalendar) . ' | ' . $vcalendar;
                         $message->classes      = ".calendar-$calendar.json-valid.year-$year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
                     }
                     break;
-                case "YML":
+                case 'YML':
                     try {
                         $yamlData = json_decode(json_encode(yaml_parse($data)));
                         if ($yamlData) {
                             $message          = new \stdClass();
-                            $message->type    = "success";
+                            $message->type    = 'success';
                             $message->text    = "The $category of $calendar for the year $year was successfully decoded as YAML";
                             $message->classes = ".calendar-$calendar.json-valid.year-$year";
                             $this->sendMessage($to, $message);
@@ -931,7 +931,7 @@ class Health implements MessageComponentInterface
                             $validationResult = $this->validateDataAgainstSchema($yamlData, LitSchema::LITCAL);
                             if (gettype($validationResult) === 'boolean' && $validationResult === true) {
                                 $message          = new \stdClass();
-                                $message->type    = "success";
+                                $message->type    = 'success';
                                 $message->text    = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL;
                                 $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                                 $this->sendMessage($to, $message);
@@ -942,20 +942,20 @@ class Health implements MessageComponentInterface
                         }
                     } catch (\Exception $ex) {
                         $message               = new \stdClass();
-                        $message->type         = "error";
+                        $message->type         = 'error';
                         $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                        . self::REQPATH . $req . " as YAML: " . $ex->getMessage();
+                                        . self::REQPATH . $req . ' as YAML: ' . $ex->getMessage();
                         $message->classes      = ".calendar-$calendar.json-valid.year-$year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
                     }
                     break;
-                case "JSON":
+                case 'JSON':
                 default:
                     $jsonData = json_decode($data);
                     if (json_last_error() === JSON_ERROR_NONE) {
                         $message          = new \stdClass();
-                        $message->type    = "success";
+                        $message->type    = 'success';
                         $message->text    = "The $category of $calendar for the year $year was successfully decoded as JSON";
                         $message->classes = ".calendar-$calendar.json-valid.year-$year";
                         $this->sendMessage($to, $message);
@@ -963,7 +963,7 @@ class Health implements MessageComponentInterface
                         $validationResult = $this->validateDataAgainstSchema($jsonData, LitSchema::LITCAL);
                         if (gettype($validationResult) === 'boolean' && $validationResult === true) {
                             $message          = new \stdClass();
-                            $message->type    = "success";
+                            $message->type    = 'success';
                             $message->text    = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL;
                             $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
@@ -973,9 +973,9 @@ class Health implements MessageComponentInterface
                         }
                     } else {
                         $message               = new \stdClass();
-                        $message->type         = "error";
+                        $message->type         = 'error';
                         $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                        . self::REQPATH . $req . " as JSON: " . json_last_error_msg();
+                                        . self::REQPATH . $req . ' as JSON: ' . json_last_error_msg();
                         $message->classes      = ".calendar-$calendar.json-valid.year-$year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
@@ -983,7 +983,7 @@ class Health implements MessageComponentInterface
             }
         } else {
             $message          = new \stdClass();
-            $message->type    = "error";
+            $message->type    = 'error';
             $message->text    = "The $category of $calendar for the year $year does not exist at the URL " . self::REQPATH . $req;
             $message->classes = ".calendar-$calendar.file-exists.year-$year";
             $this->sendMessage($to, $message);
@@ -1002,13 +1002,13 @@ class Health implements MessageComponentInterface
     private function executeUnitTest(string $test, string $calendar, int $year, string $category, ConnectionInterface $to): void
     {
         //get the index of the responsetype from the ReturnType class
-        $responseTypeIdx = array_search("JSON", ReturnType::$values);
+        $responseTypeIdx = array_search('JSON', ReturnType::$values);
         //get the corresponding accept mime type
         $acceptMimeType = AcceptHeader::$values[$responseTypeIdx];
         $opts           = [
-            "http" => [
-                "method" => "GET",
-                "header" => "Accept: $acceptMimeType\r\n"
+            'http' => [
+                'method' => 'GET',
+                'header' => "Accept: $acceptMimeType\r\n"
             ]
         ];
         $context        = stream_context_create($opts);
@@ -1024,7 +1024,7 @@ class Health implements MessageComponentInterface
                     break;
                 default:
                     //we shouldn't ever get any other categories
-                    $req = "/unknown";
+                    $req = '/unknown';
             }
         }
         $data = file_get_contents(self::REQPATH . $req, false, $context);
@@ -1057,7 +1057,7 @@ class Health implements MessageComponentInterface
             $res = true;
         } catch (InvalidValue | \Exception $e) {
             $message       = new \stdClass();
-            $message->type = "error";
+            $message->type = 'error';
             $message->text = LitSchema::ERROR_MESSAGES[ $schemaUrl ] . PHP_EOL . $e->getMessage();
             return $message;
         }

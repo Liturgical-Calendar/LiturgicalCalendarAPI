@@ -50,8 +50,8 @@ class Utilities
      * If any key needs a specific case transformation other than the automatic snake_case to PascalCase, add it to this array.
      */
     private const CUSTOM_TRANSFORM_KEYS = [
-        "litcal"        => "LitCal",
-        "has_vesper_ii" => "HasVesperII"
+        'litcal'        => 'LitCal',
+        'has_vesper_ii' => 'HasVesperII'
     ];
 
     /**
@@ -111,9 +111,9 @@ class Utilities
                     $new_object = $xml->addChild($key);
                 } else {
                     //self::debugWrite( "key <$key> is a LitCalEvent" );
-                    $new_object = $xml->addChild("LitCalEvent");
+                    $new_object = $xml->addChild('LitCalEvent');
                     if (is_numeric($key)) {
-                        $new_object->addAttribute("idx", $key);
+                        $new_object->addAttribute('idx', $key);
                     }
                 }
                 //self::debugWrite( "proceeding to convert array value of <$key> to xml sequence..." );
@@ -127,14 +127,14 @@ class Utilities
                 if (is_numeric($key)) {
                     if (self::$LAST_ARRAY_KEY === 'messages') {
                         $el = $xml->addChild('Message', htmlspecialchars($value));
-                        $el->addAttribute("idx", $key);
+                        $el->addAttribute('idx', $key);
                     } elseif (in_array(self::$LAST_ARRAY_KEY, ['solemnities_keys', 'feasts_keys', 'memorials_keys', 'suppressed_events_keys', 'reinstated_events_keys'])) {
                         $el = $xml->addChild('Key', $value);
-                        $el->addAttribute("idx", $key);
+                        $el->addAttribute('idx', $key);
                     } else {
                         // color, color_lcl, and common array items will be converted to Option elements
                         $el = $xml->addChild('Option', $value);
-                        $el->addAttribute("idx", $key);
+                        $el->addAttribute('idx', $key);
                     }
                 } else {
                     $key = self::transformKey($key);
@@ -200,12 +200,12 @@ class Utilities
             $dateObj->add(new DateInterval($dateDiff));
             */
             $GregDateDiff    = [];
-            $GregDateDiff[0] = [DateTime::createFromFormat('!j-n-Y', '4-10-1582'),"P10D"]; //add 10 == GREGORIAN CUTOVER DATE
+            $GregDateDiff[0] = [DateTime::createFromFormat('!j-n-Y', '4-10-1582'),'P10D']; //add 10 == GREGORIAN CUTOVER DATE
             $idx             = 0;
             $cc              = 10;
             for ($cent = 17; $cent <= 99; $cent++) {
                 if ($cent % 4 > 0) {
-                    $GregDateDiff[++$idx] = [DateTime::createFromFormat('!j-n-Y', '28-2-' . $cent . '00'),"P" . ++$cc . "D"];
+                    $GregDateDiff[++$idx] = [DateTime::createFromFormat('!j-n-Y', '28-2-' . $cent . '00'),'P' . ++$cc . 'D'];
                 }
             }
 
@@ -249,25 +249,25 @@ class Utilities
      */
     public static function colorToHex(string $color): string
     {
-        $hex = "#";
+        $hex = '#';
         switch ($color) {
-            case "red":
-                $hex .= "FF0000";
+            case 'red':
+                $hex .= 'FF0000';
                 break;
-            case "green":
-                $hex .= "00AA00";
+            case 'green':
+                $hex .= '00AA00';
                 break;
-            case "white":
-                $hex .= "AAAAAA";
+            case 'white':
+                $hex .= 'AAAAAA';
                 break;
-            case "purple":
-                $hex .= "AA00AA";
+            case 'purple':
+                $hex .= 'AA00AA';
                 break;
-            case "pink":
-                $hex .= "FFAAAA";
+            case 'pink':
+                $hex .= 'FFAAAA';
                 break;
             default:
-                $hex .= "000000";
+                $hex .= '000000';
         }
         return $hex;
     }
@@ -283,7 +283,7 @@ class Utilities
     public static function parseColorString(string|array $colors, string $LOCALE, bool $html = false): string
     {
         if (is_string($colors)) {
-            $colors = explode(",", $colors);
+            $colors = explode(',', $colors);
         }
         if ($html === true) {
             $colors = array_map(function ($txt) use ($LOCALE) {
@@ -291,12 +291,12 @@ class Utilities
                     . LitColor::i18n($txt, $LOCALE)
                     . '</FONT></SPAN></I></B>';
             }, $colors);
-            return implode(' <I><FONT FACE="Calibri">' . _("or") . "</FONT></I> ", $colors);
+            return implode(' <I><FONT FACE="Calibri">' . _('or') . '</FONT></I> ', $colors);
         } else {
             $colors = array_map(function ($txt) use ($LOCALE) {
                 return LitColor::i18n($txt, $LOCALE);
             }, $colors);
-            return implode(" " . _("or") . " ", $colors);
+            return implode(' ' . _('or') . ' ', $colors);
         }
     }
 
@@ -329,13 +329,13 @@ class Utilities
      */
     public static function getOrdinal(int $num, string $locale, \NumberFormatter $formatter, array $latinOrdinals): string
     {
-        $ordinal    = "";
+        $ordinal    = '';
         $baseLocale = \Locale::getPrimaryLanguage($locale);
         switch ($baseLocale) {
-            case "la":
+            case 'la':
                 $ordinal = $latinOrdinals[$num];
                 break;
-            case "en":
+            case 'en':
                 $ordinal = $num . self::ordSuffix($num);
                 break;
             default:

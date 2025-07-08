@@ -64,7 +64,7 @@ class Missals
             default:
                 if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
                     // the payload MUST be in the body of the request, either JSON encoded or YAML encoded
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Expected payload in body of request, either JSON or YAML encoded");
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, 'Expected payload in body of request, either JSON or YAML encoded');
                 }
         }
         return $payload;
@@ -99,23 +99,23 @@ class Missals
     {
         $params = [];
         if ($payload !== null && property_exists($payload, 'locale')) {
-            $params["locale"] = $payload->locale;
+            $params['locale'] = $payload->locale;
         } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
             if ($locale && LitLocale::isValid($locale)) {
-                $params["locale"] = $locale;
+                $params['locale'] = $locale;
             } else {
-                $params["locale"] = LitLocale::LATIN;
+                $params['locale'] = LitLocale::LATIN;
             }
         }
         if (property_exists($payload, 'region')) {
-            $params["region"] = $payload->region;
+            $params['region'] = $payload->region;
         }
         if (property_exists($payload, 'year')) {
-            $params["year"] = $payload->year;
+            $params['year'] = $payload->year;
         }
         if (property_exists($payload, 'include_empty')) {
-            $params["include_empty"] = $payload->include_empty;
+            $params['include_empty'] = $payload->include_empty;
         }
         return $params;
     }
@@ -149,7 +149,7 @@ class Missals
             if (self::$Core->getRequestMethod() === RequestMethod::POST) {
                 $params = self::initGetPostParams($payload);
             } else {
-                $params["PAYLOAD"] = $payload;
+                $params['PAYLOAD'] = $payload;
             }
         } elseif (self::$Core->getRequestMethod() === RequestMethod::GET) {
             $params = self::initGetPostParams((object)$_GET);
@@ -188,7 +188,7 @@ class Missals
                     if ($missalData) {
                         if (property_exists($missal, 'locales') && self::$params->baseLocale !== null) {
                             if (in_array(self::$params->baseLocale, $missal->locales)) {
-                                $i18nFile = RomanMissal::$i18nPath[$missal->missal_id] . self::$params->baseLocale . ".json";
+                                $i18nFile = RomanMissal::$i18nPath[$missal->missal_id] . self::$params->baseLocale . '.json';
                                 $i18nData = file_get_contents($i18nFile);
                                 if ($i18nData) {
                                     $i18nObj = json_decode($i18nData);
@@ -244,24 +244,24 @@ class Missals
      */
     public static function produceErrorResponse(int $statusCode, string $description): void
     {
-        header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
+        header($_SERVER[ 'SERVER_PROTOCOL' ] . StatusCode::toString($statusCode), true, $statusCode);
         $message         = new \stdClass();
-        $message->status = "ERROR";
-        $statusMessage   = "";
+        $message->status = 'ERROR';
+        $statusMessage   = '';
         switch (self::$Core->getRequestMethod()) {
             case RequestMethod::PUT:
-                $statusMessage = "Resource not Created";
+                $statusMessage = 'Resource not Created';
                 break;
             case RequestMethod::PATCH:
-                $statusMessage = "Resource not Updated";
+                $statusMessage = 'Resource not Updated';
                 break;
             case RequestMethod::DELETE:
-                $statusMessage = "Resource not Deleted";
+                $statusMessage = 'Resource not Deleted';
                 break;
             default:
                 $statusMessage = StatusCode::toString($statusCode);
         }
-        $message->response    = $statusCode === 404 ? "Resource not Found" : $statusMessage;
+        $message->response    = $statusCode === 404 ? 'Resource not Found' : $statusMessage;
         $message->description = $description;
         $response             = json_encode($message);
         switch (self::$Core->getResponseContentType()) {
@@ -288,7 +288,7 @@ class Missals
     private static function produceResponse(string $jsonEncodedResponse): void
     {
         if (in_array(self::$Core->getRequestMethod(), ['PUT', 'PATCH'])) {
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
+            header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 201 Created', true, 201);
         }
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
@@ -330,9 +330,9 @@ class Missals
         self::$Core->setResponseContentTypeHeader();
         if (count(self::$requestPathParts) === 0) {
             if (null !== self::$params->Locale) {
-                header("X-Litcal-Missals-Locale: " . self::$params->Locale, false);
+                header('X-Litcal-Missals-Locale: ' . self::$params->Locale, false);
             } else {
-                header("X-Litcal-Missals-Locale: none", false);
+                header('X-Litcal-Missals-Locale: none', false);
             }
             if (null === self::$params->Region && null === self::$params->Year) {
                 self::produceResponse(json_encode(self::$missalsIndex));
@@ -343,14 +343,14 @@ class Missals
                         $filteredResults->litcal_missals,
                         fn ($missal) => $missal->region === self::$params->Region
                     ));
-                    header("X-Litcal-Missals-Region: " . self::$params->Region, false);
+                    header('X-Litcal-Missals-Region: ' . self::$params->Region, false);
                 }
                 if (null !== self::$params->Year) {
                     $filteredResults->litcal_missals = array_values(array_filter(
                         $filteredResults->litcal_missals,
                         fn ($missal) => $missal->year_published === self::$params->Year
                     ));
-                    header("X-Litcal-Missals-Year: " . self::$params->Year, false);
+                    header('X-Litcal-Missals-Year: ' . self::$params->Year, false);
                 }
                 self::produceResponse(json_encode($filteredResults));
             }
@@ -405,7 +405,7 @@ class Missals
                 $missal = new \stdClass();
                 if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
                     $missal->missal_id = "EDITIO_TYPICA_{$matches[1]}";
-                    $missal->region    = "VA";
+                    $missal->region    = 'VA';
                     if (is_readable("jsondata/sourcedata/missals/$missalFolderName/i18n")) {
                         $it      = new \DirectoryIterator("glob://jsondata/sourcedata/missals/$missalFolderName/i18n/*.json");
                         $locales = [];
@@ -424,7 +424,7 @@ class Missals
                 }
                 $missal->name                         = RomanMissal::getName($missal->missal_id);
                 $missal->year_limits                  = RomanMissal::$yearLimits[$missal->missal_id];
-                $missal->year_published               = RomanMissal::$yearLimits[$missal->missal_id][ "since_year" ];
+                $missal->year_published               = RomanMissal::$yearLimits[$missal->missal_id][ 'since_year' ];
                 $missal->api_path                     = API_BASE_PATH . "/missals/$missal->missal_id";
                 self::$missalsIndex->litcal_missals[] = $missal;
                 self::$params->addMissalRegion($missal->region);

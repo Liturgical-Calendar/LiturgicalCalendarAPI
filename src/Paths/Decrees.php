@@ -75,9 +75,9 @@ class Decrees
                         $decreeIds[] = $decree->decree_id;
                     }
 
-                    $error = "No Decree of the Congregation for Divine Worship found corresponding to "
+                    $error = 'No Decree of the Congregation for Divine Worship found corresponding to '
                         . self::$requestPathParts[0]
-                        . ", valid values are found in the `decree_id` properties of the `litcal_decrees` collection: " . implode(', ', $decreeIds);
+                        . ', valid values are found in the `decree_id` properties of the `litcal_decrees` collection: ' . implode(', ', $decreeIds);
                     self::produceErrorResponse(StatusCode::NOT_FOUND, $error);
                     break;
                 default:
@@ -88,24 +88,24 @@ class Decrees
 
     public static function produceErrorResponse(int $statusCode, string $description): void
     {
-        header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
+        header($_SERVER[ 'SERVER_PROTOCOL' ] . StatusCode::toString($statusCode), true, $statusCode);
         $message         = new \stdClass();
-        $message->status = "ERROR";
-        $statusMessage   = "";
+        $message->status = 'ERROR';
+        $statusMessage   = '';
         switch (self::$Core->getRequestMethod()) {
             case RequestMethod::PUT:
-                $statusMessage = "Resource not Created";
+                $statusMessage = 'Resource not Created';
                 break;
             case RequestMethod::PATCH:
-                $statusMessage = "Resource not Updated";
+                $statusMessage = 'Resource not Updated';
                 break;
             case RequestMethod::DELETE:
-                $statusMessage = "Resource not Deleted";
+                $statusMessage = 'Resource not Deleted';
                 break;
             default:
-                $statusMessage = "Resource not found";
+                $statusMessage = 'Resource not found';
         }
-        $message->response    = $statusCode === 404 ? "Resource not Found" : $statusMessage;
+        $message->response    = $statusCode === 404 ? 'Resource not Found' : $statusMessage;
         $message->description = $description;
         $response             = json_encode($message);
         switch (self::$Core->getResponseContentType()) {
@@ -123,7 +123,7 @@ class Decrees
     private static function produceResponse(string $jsonEncodedResponse): void
     {
         if (in_array(self::$Core->getRequestMethod(), ['PUT', 'PATCH'])) {
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
+            header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 201 Created', true, 201);
         }
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
@@ -164,7 +164,7 @@ class Decrees
                 self::$decreesIndex->litcal_decrees[$idx]->api_path = API_BASE_PATH . "/decrees/$decreeId";
             }
         } else {
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
+            header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 404 Not Found', true, 404);
             die('Decrees file not found');
         }
         self::$Core = new Core();

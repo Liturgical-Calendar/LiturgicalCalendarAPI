@@ -26,9 +26,9 @@ class RegionalDataParams implements ParamsInterface
      * An array of expected values for the category parameter of requests to the /data API path.
      */
     public const array EXPECTED_CATEGORIES = [
-        "nation"      => "NATIONALCALENDAR",
-        "diocese"     => "DIOCESANCALENDAR",
-        "widerregion" => "WIDERREGIONCALENDAR"
+        'nation'      => 'NATIONALCALENDAR',
+        'diocese'     => 'DIOCESANCALENDAR',
+        'widerregion' => 'WIDERREGIONCALENDAR'
     ];
     public ?string $category               = null;
     public ?string $key                    = null;
@@ -94,7 +94,7 @@ class RegionalDataParams implements ParamsInterface
             if (in_array($params['key'], $this->calendars->national_calendars_keys)) {
                 RegionalData::produceErrorResponse(
                     StatusCode::BAD_REQUEST,
-                    "Cannot PUT National Calendar data if it already exists."
+                    'Cannot PUT National Calendar data if it already exists.'
                 );
             }
 
@@ -102,7 +102,7 @@ class RegionalDataParams implements ParamsInterface
             if (false === in_array($params['key'], $uniqueRegions)) {
                 RegionalData::produceErrorResponse(
                     StatusCode::BAD_REQUEST,
-                    "Cannot PUT National Calendar data for an invalid nation. Valid nations are: " . implode(', ', $uniqueRegions) . "."
+                    'Cannot PUT National Calendar data for an invalid nation. Valid nations are: ' . implode(', ', $uniqueRegions) . '.'
                 );
             }
         } elseif (RegionalData::$Core->getRequestMethod() === RequestMethod::DELETE) {
@@ -111,7 +111,7 @@ class RegionalDataParams implements ParamsInterface
                 if ($diocesanCalendar->nation === $params['key']) {
                     RegionalData::produceErrorResponse(
                         StatusCode::BAD_REQUEST,
-                        "Cannot DELETE National Calendar data while there are Diocesan calendars that depend on it."
+                        'Cannot DELETE National Calendar data while there are Diocesan calendars that depend on it.'
                         . " Currently, {$params['key']} is in use by Diocesan calendar {$diocesanCalendar->calendar_id}."
                     );
                 }
@@ -169,7 +169,7 @@ class RegionalDataParams implements ParamsInterface
                     RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                 }
             } else {
-                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "`locale` param or `Accept-Language` header required for Wider Region calendar data");
+                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, '`locale` param or `Accept-Language` header required for Wider Region calendar data');
             }
         }
 
@@ -237,7 +237,7 @@ class RegionalDataParams implements ParamsInterface
                         RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                     }
                 } else {
-                    RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "`locale` param or `Accept-Language` header required for Diocesan calendar data when request method is GET, POST, or PATCH");
+                    RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, '`locale` param or `Accept-Language` header required for Diocesan calendar data when request method is GET, POST, or PATCH');
                 }
             }
         }
@@ -306,7 +306,7 @@ class RegionalDataParams implements ParamsInterface
                 RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
             }
         } else {
-            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "`locale` param or `Accept-Language` header required for Wider Region calendar data");
+            RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, '`locale` param or `Accept-Language` header required for Wider Region calendar data');
         }
         // Check the request method: cannot DELETE Wider Region calendar data if there are national calendars that depend on it
         if (RegionalData::$Core->getRequestMethod() === RequestMethod::DELETE) {
@@ -317,7 +317,7 @@ class RegionalDataParams implements ParamsInterface
             if (count($national_calendars_within_wider_region) > 0) {
                 RegionalData::produceErrorResponse(
                     StatusCode::BAD_REQUEST,
-                    "Cannot DELETE Wider Region calendar data while there are National calendars that depend on it. "
+                    'Cannot DELETE Wider Region calendar data while there are National calendars that depend on it. '
                     . "Currently {$params['key']} is in use by the National Calendars: " . implode(', ', array_map(fn ($el) => \Locale::getDisplayRegion('-' . $el->calendar_id, 'en'), $national_calendars_within_wider_region))
                 );
             }
@@ -429,7 +429,7 @@ class RegionalDataParams implements ParamsInterface
         if (false === array_key_exists('category', $params) || false === array_key_exists('key', $params)) {
             RegionalData::produceErrorResponse(
                 StatusCode::BAD_REQUEST,
-                "Expected params `category` and `key` but either one or both not present."
+                'Expected params `category` and `key` but either one or both not present.'
             );
         }
 
@@ -463,7 +463,7 @@ class RegionalDataParams implements ParamsInterface
 
         if (in_array(RegionalData::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH], true)) {
             if (false === array_key_exists('payload', $params) || false === $params['payload'] instanceof \stdClass) {
-                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, "Cannot create or update Calendar data without a payload");
+                RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, 'Cannot create or update Calendar data without a payload');
             }
 
             if ($this->validatePayload($params['payload'])) {

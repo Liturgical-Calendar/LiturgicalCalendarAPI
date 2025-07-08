@@ -19,6 +19,7 @@ use LiturgicalCalendar\Api\Paths\Schemas;
 
 class Router
 {
+    /** @var array<string> */
     public static array $allowedOrigins = [];
 
     /**
@@ -33,7 +34,7 @@ class Router
      * the function will use the array from the file.
      *
      * @param string|null $originsFile The path to the file that defines the allowed origins.
-     * @param array|null $origins The array of allowed origins.
+     * @param array<string>|null $origins The array of allowed origins.
      * @return void
      */
     public static function setAllowedOrigins(?string $originsFile = null, ?array $origins = null): void
@@ -58,7 +59,7 @@ class Router
     }
 
     /**
-     * @return array an array of strings where each string is a path segment of the request path
+     * @return string[] an array of strings where each string is a path segment of the request path
      *
      * Takes the REQUEST_URI and SCRIPT_NAME and parses out the request path segments
      * by removing the API base path and any trailing slashes.

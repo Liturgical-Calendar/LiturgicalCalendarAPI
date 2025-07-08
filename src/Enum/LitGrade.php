@@ -147,65 +147,65 @@ class LitGrade
         switch ($value) {
             case self::WEEKDAY:
                 /**translators: liturgical rank. Keep lowercase  */
-                $grade = $this->locale === LitLocale::LATIN ? 'feria'                 : _("weekday");
+                $grade = $this->locale === LitLocale::LATIN ? 'feria'                 : _('weekday');
                 /**translators: liturgical rank 'WEEKDAY' in abbreviated form */
-                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'f'                 : _("w");
+                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'f'                 : _('w');
                 $tags      = ['<I>','</I>'];
                 break;
             case self::COMMEMORATION:
                 /**translators: liturgical rank. Keep lowercase  */
-                $grade = $this->locale === LitLocale::LATIN ? 'commemoratio'          : _("commemoration");
+                $grade = $this->locale === LitLocale::LATIN ? 'commemoratio'          : _('commemoration');
                 /**translators: liturgical rank 'COMMEMORATION' in abbreviated form */
-                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'm*'                : _("m*");
+                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'm*'                : _('m*');
                 $tags      = ['<I>','</I>'];
                 break;
             case self::MEMORIAL_OPT:
                 /**translators: liturgical rank. Keep lowercsase  */
-                $grade = $this->locale === LitLocale::LATIN ? 'memoria ad libitum'    : _("optional memorial");
+                $grade = $this->locale === LitLocale::LATIN ? 'memoria ad libitum'    : _('optional memorial');
                 /**translators: liturgical rank 'OPTIONAL MEMORIAL' in abbreviated form */
-                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'm'                 : _("m");
+                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'm'                 : _('m');
                 $tags      = ['',''];
                 break;
             case self::MEMORIAL:
                 /**translators: liturgical rank. Keep Capitalized  */
-                $grade = $this->locale === LitLocale::LATIN ? 'Memoria obligatoria'   : _("Memorial");
+                $grade = $this->locale === LitLocale::LATIN ? 'Memoria obligatoria'   : _('Memorial');
                 /**translators: liturgical rank 'MEMORIAL' in abbreviated form */
-                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'M'                 : _("M");
+                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'M'                 : _('M');
                 $tags      = ['',''];
                 break;
             case self::FEAST:
                 /**translators: liturgical rank. Keep UPPERCASE  */
-                $grade = $this->locale === LitLocale::LATIN ? 'FESTUM'                : _("FEAST");
+                $grade = $this->locale === LitLocale::LATIN ? 'FESTUM'                : _('FEAST');
                 /**translators: liturgical rank 'FEAST' in abbreviated form */
-                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'F'                 : _("F");
+                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'F'                 : _('F');
                 $tags      = ['',''];
                 break;
             case self::FEAST_LORD:
                 /**translators: liturgical rank. Keep UPPERCASE  */
-                $grade = $this->locale === LitLocale::LATIN ? 'FESTUM DOMINI'         : _("FEAST OF THE LORD");
+                $grade = $this->locale === LitLocale::LATIN ? 'FESTUM DOMINI'         : _('FEAST OF THE LORD');
                 /**translators: liturgical rank 'FEAST OF THE LORD' in abbreviated form */
-                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'F✝'                : _("F✝");
+                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'F✝'                : _('F✝');
                 $tags      = ['<B>','</B>'];
                 break;
             case self::SOLEMNITY:
                 /**translators: liturgical rank. Keep UPPERCASE  */
-                $grade = $this->locale === LitLocale::LATIN ? 'SOLLEMNITAS'           : _("SOLEMNITY");
+                $grade = $this->locale === LitLocale::LATIN ? 'SOLLEMNITAS'           : _('SOLEMNITY');
                 /**translators: liturgical rank 'SOLEMNITY' in abbreviated form */
-                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'S'                 : _("S");
+                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'S'                 : _('S');
                 $tags      = ['<B>','</B>'];
                 break;
             case self::HIGHER_SOLEMNITY:
                 /**translators: liturgical rank. Keep lowercase  */
-                $grade = $this->locale === LitLocale::LATIN ? 'celebratio altioris ordinis quam sollemnitatis' : _("celebration with precedence over solemnities");
+                $grade = $this->locale === LitLocale::LATIN ? 'celebratio altioris ordinis quam sollemnitatis' : _('celebration with precedence over solemnities');
                 /**translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form */
-                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'S✝'                : _("S✝");
+                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'S✝'                : _('S✝');
                 $tags      = ['<B><I>','</I></B>'];
                 break;
             default:
                 /**translators: liturgical rank. Keep lowercase  */
-                $grade = $this->locale === LitLocale::LATIN ? 'feria'                 : _("weekday");
+                $grade = $this->locale === LitLocale::LATIN ? 'feria'                 : _('weekday');
                 /**translators: liturgical rank 'WEEKDAY' in abbreviated form */
-                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'f'                 : _("w");
+                $gradeAbbr = $this->locale === LitLocale::LATIN ? 'f'                 : _('w');
                 $tags      = ['',''];
         }
         if ($abbreviate) {

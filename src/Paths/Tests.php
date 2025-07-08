@@ -14,16 +14,16 @@ class Tests
     public static Core $Core;
     /** @var string[] */ private static array $requestPathParts = [];
     /** @var string[] */ private static array $propsToSanitize  = [
-        "description",
-        "applies_to",
-        "excludes",
-        "assertions",
-        "national_calendar",
-        "diocesan_calendar",
-        "national_calendars",
-        "diocesan_calendars",
-        "assertion",
-        "comment"
+        'description',
+        'applies_to',
+        'excludes',
+        'assertions',
+        'national_calendar',
+        'diocesan_calendar',
+        'national_calendars',
+        'diocesan_calendars',
+        'assertion',
+        'comment'
     ];
 
     private static function sanitizeString(string $str): string
@@ -72,10 +72,10 @@ class Tests
                 $response->litcal_tests = $testSuite;
                 return json_encode($response, JSON_PRETTY_PRINT);
             } catch (\UnexpectedValueException $e) {
-                return self::produceErrorResponse(StatusCode::NOT_FOUND, "Tests folder path cannot be opened: " . $e->getMessage());
+                return self::produceErrorResponse(StatusCode::NOT_FOUND, 'Tests folder path cannot be opened: ' . $e->getMessage());
             }
         } elseif (count(self::$requestPathParts) > 1) {
-            return self::produceErrorResponse(StatusCode::BAD_REQUEST, "Too many path parameters, only one is expected");
+            return self::produceErrorResponse(StatusCode::BAD_REQUEST, 'Too many path parameters, only one is expected');
         } else {
             $testFile = array_shift(self::$requestPathParts);
             if (file_exists("{$testsFolder}{$testFile}.json")) {
@@ -95,8 +95,8 @@ class Tests
             if (file_exists("{$testsFolder}{$testName}.json")) {
                 if (unlink("{$testsFolder}{$testName}.json")) {
                     $message           = new \stdClass();
-                    $message->status   = "OK";
-                    $message->response = "Resource Deleted";
+                    $message->status   = 'OK';
+                    $message->response = 'Resource Deleted';
                     return json_encode($message, JSON_PRETTY_PRINT);
                 } else {
                     return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "For some reason the server did not succeed in deleting the Test $testName");
@@ -105,20 +105,20 @@ class Tests
                 return self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find test to delete {$testName}");
             }
         } else {
-            return self::produceErrorResponse(StatusCode::BAD_REQUEST, "Cannot process a DELETE request without one and only one path parameter containing the name of the Test to delete");
+            return self::produceErrorResponse(StatusCode::BAD_REQUEST, 'Cannot process a DELETE request without one and only one path parameter containing the name of the Test to delete');
         }
     }
 
     private static function handlePutRequest(): string
     {
         if (count(self::$requestPathParts)) {
-            return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "Path parameters not acceptable, please use the base path `/tests` for PUT or PATCH requests");
+            return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'Path parameters not acceptable, please use the base path `/tests` for PUT or PATCH requests');
         }
         $json = file_get_contents('php://input');
         $data = json_decode($json);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "The Unit Test you are attempting to create was not valid JSON:" . json_last_error_msg());
+            return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'The Unit Test you are attempting to create was not valid JSON:' . json_last_error_msg());
         }
 
         // Validate incoming data against unit test schema
@@ -127,14 +127,14 @@ class Tests
         $jsonSchema     = json_decode($schemaContents);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The server errored out while attempting to process your request; this a server error, not an error in the request. Please report the incident to the system administrator:" . json_last_error_msg());
+            return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'The server errored out while attempting to process your request; this a server error, not an error in the request. Please report the incident to the system administrator:' . json_last_error_msg());
         }
 
         try {
             $schema = Schema::import($jsonSchema);
             $schema->in($data);
         } catch (InvalidValue | \Exception $e) {
-            return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "The Unit Test you are attempting to create was incorrectly validated against schema " . $schemaFile . ": " . $e->getMessage());
+            return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'The Unit Test you are attempting to create was incorrectly validated against schema ' . $schemaFile . ': ' . $e->getMessage());
         }
 
         // Sanitize data to avoid any possibility of script injection
@@ -142,12 +142,12 @@ class Tests
 
         $bytesWritten = file_put_contents('jsondata/tests/' . $data->name . '.json', json_encode($data, JSON_PRETTY_PRINT));
         if (false === $bytesWritten) {
-            return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.");
+            return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.');
         } else {
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
+            header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 201 Created', true, 201);
             $message           = new \stdClass();
-            $message->status   = "OK";
-            $message->response = self::$Core->getRequestMethod() === RequestMethod::PUT ? "Resource Created" : "Resource Updated";
+            $message->status   = 'OK';
+            $message->response = self::$Core->getRequestMethod() === RequestMethod::PUT ? 'Resource Created' : 'Resource Updated';
             return json_encode($message, JSON_PRETTY_PRINT);
         }
     }
@@ -175,31 +175,31 @@ class Tests
                 // nothing to do here, should be handled by Core
                 break;
             default:
-                $response = self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, "The method " . $_SERVER['REQUEST_METHOD'] . " cannot be handled by this endpoint");
+                $response = self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, 'The method ' . $_SERVER['REQUEST_METHOD'] . ' cannot be handled by this endpoint');
         }
         self::produceResponse($response);
     }
 
     private static function produceErrorResponse(int $statusCode, string $description): string
     {
-        header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
+        header($_SERVER[ 'SERVER_PROTOCOL' ] . StatusCode::toString($statusCode), true, $statusCode);
         $message         = new \stdClass();
-        $message->status = "ERROR";
-        $statusMessage   = "";
+        $message->status = 'ERROR';
+        $statusMessage   = '';
         switch (self::$Core->getRequestMethod()) {
             case RequestMethod::PUT:
-                $statusMessage = "Resource not Created";
+                $statusMessage = 'Resource not Created';
                 break;
             case RequestMethod::PATCH:
-                $statusMessage = "Resource not Updated";
+                $statusMessage = 'Resource not Updated';
                 break;
             case RequestMethod::DELETE:
-                $statusMessage = "Resource not Deleted";
+                $statusMessage = 'Resource not Deleted';
                 break;
             default:
-                $statusMessage = "Sorry what was it you wanted to do with this resource?";
+                $statusMessage = 'Sorry what was it you wanted to do with this resource?';
         }
-        $message->response    = $statusCode === 404 ? "Resource not Found" : $statusMessage;
+        $message->response    = $statusCode === 404 ? 'Resource not Found' : $statusMessage;
         $message->description = $description;
         return json_encode($message);
     }

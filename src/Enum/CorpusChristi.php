@@ -4,9 +4,9 @@ namespace LiturgicalCalendar\Api\Enum;
 
 class CorpusChristi
 {
-    public const THURSDAY       = "THURSDAY";
-    public const SUNDAY         = "SUNDAY";
-    public static array $values = [ "THURSDAY", "SUNDAY" ];
+    public const THURSDAY       = 'THURSDAY';
+    public const SUNDAY         = 'SUNDAY';
+    public static array $values = [ 'THURSDAY', 'SUNDAY' ];
 
     public static function isValid($value)
     {

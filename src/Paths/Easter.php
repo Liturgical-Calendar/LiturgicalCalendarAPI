@@ -14,19 +14,19 @@ class Easter
     private static ?\IntlDateFormatter $dayMonthYear             = null;
     private static ?\IntlDateFormatter $dayOfTheWeek             = null;
     private static ?object $EasterDates                          = null;
-    private const ALLOWED_METHODS                                = [ "GET", "OPTIONS" ];
+    private const ALLOWED_METHODS                                = [ 'GET', 'OPTIONS' ];
 
     private static function enforceAllowedMethods(): void
     {
         if (!in_array($_SERVER['REQUEST_METHOD'], self::ALLOWED_METHODS)) {
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 405 Method Not Allowed", true, 405);
+            header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 405 Method Not Allowed', true, 405);
             die();
         }
     }
 
     private static function handleRequestParams(): void
     {
-        self::$Locale = isset($_GET["locale"]) && LitLocale::isValid($_GET["locale"]) ? $_GET["locale"] : LitLocale::LATIN;
+        self::$Locale = isset($_GET['locale']) && LitLocale::isValid($_GET['locale']) ? $_GET['locale'] : LitLocale::LATIN;
     }
 
     private static function serveCachedFileIfExists(): void
@@ -59,7 +59,7 @@ class Easter
             \IntlDateFormatter::NONE,
             'UTC',
             \IntlDateFormatter::GREGORIAN,
-            "EEEE d MMMM yyyy"
+            'EEEE d MMMM yyyy'
         );
         self::$dayMonthYear             = \IntlDateFormatter::create(
             self::$Locale,
@@ -67,7 +67,7 @@ class Easter
             \IntlDateFormatter::NONE,
             'UTC',
             \IntlDateFormatter::GREGORIAN,
-            "d MMMM yyyy"
+            'd MMMM yyyy'
         );
         self::$dayOfTheWeek             = \IntlDateFormatter::create(
             self::$Locale,
@@ -75,7 +75,7 @@ class Easter
             \IntlDateFormatter::NONE,
             'UTC',
             \IntlDateFormatter::GREGORIAN,
-            "EEEE"
+            'EEEE'
         );
     }
 
@@ -84,9 +84,9 @@ class Easter
         self::$EasterDates                = new \stdClass();
         self::$EasterDates->litcal_easter = [];
         $dateLastCoincidence              = null;
-        $gregDateString                   = "";
-        $julianDateString                 = "";
-        $westernJulianDateString          = "";
+        $gregDateString                   = '';
+        $julianDateString                 = '';
+        $westernJulianDateString          = '';
 
         for ($i = 1583; $i <= 9999; $i++) {
             self::$EasterDates->litcal_easter[$i - 1583] = new \stdClass();

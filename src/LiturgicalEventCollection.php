@@ -79,8 +79,8 @@ class LiturgicalEventCollection
     private CalendarParams $CalendarParams;
     private LitGrade $LitGrade;
 
-    public const SUNDAY_CYCLE  = [ "A", "B", "C" ];
-    public const WEEKDAY_CYCLE = [ "I", "II" ];
+    public const SUNDAY_CYCLE  = [ 'A', 'B', 'C' ];
+    public const WEEKDAY_CYCLE = [ 'I', 'II' ];
 
     public function __construct(CalendarParams $CalendarParams)
     {
@@ -91,18 +91,18 @@ class LiturgicalEventCollection
             \IntlDateFormatter::NONE,
             'UTC',
             \IntlDateFormatter::GREGORIAN,
-            "EEEE"
+            'EEEE'
         );
         if ($this->CalendarParams->Locale === LitLocale::LATIN) {
             $this->T = [
-                "YEAR"       => "ANNUM",
-                "Vigil Mass" => "Missa in Vigilia"
+                'YEAR'       => 'ANNUM',
+                'Vigil Mass' => 'Missa in Vigilia'
             ];
         } else {
             $this->T = [
                 /**translators: in reference to the cycle of liturgical years (A, B, C; I, II) */
-                "YEAR"       => _("YEAR"),
-                "Vigil Mass" => _("Vigil Mass")
+                'YEAR'       => _('YEAR'),
+                'Vigil Mass' => _('Vigil Mass')
             ];
         }
         $this->LitGrade = new LitGrade($this->CalendarParams->Locale);
@@ -146,7 +146,7 @@ class LiturgicalEventCollection
     {
         $this->liturgicalEvents[ $key ] = $litEvent;
         if ($litEvent->grade === LitGrade::HIGHER_SOLEMNITY) {
-            $this->liturgicalEvents[ $key ]->grade_display = "";
+            $this->liturgicalEvents[ $key ]->grade_display = '';
         }
 
         // phpcs:disable Generic.Formatting.MultipleStatementAlignment
@@ -161,17 +161,17 @@ class LiturgicalEventCollection
         }
 
         // Weekday of Advent from 17 to 24 Dec.
-        if (str_starts_with($key, "AdventWeekday")) {
+        if (str_starts_with($key, 'AdventWeekday')) {
             if ($litEvent->date->format('j') >= 17 && $litEvent->date->format('j') <= 24) {
                 $this->weekdaysAdventChristmasLent[ $key ] = $litEvent->date;
             } else {
                 $this->weekdaysAdventBeforeDec17[ $key ]   = $litEvent->date;
             }
-        } elseif (str_starts_with($key, "ChristmasWeekday")) {
+        } elseif (str_starts_with($key, 'ChristmasWeekday')) {
             $this->weekdaysAdventChristmasLent[ $key ]     = $litEvent->date;
-        } elseif (str_starts_with($key, "LentWeekday")) {
+        } elseif (str_starts_with($key, 'LentWeekday')) {
             $this->weekdaysAdventChristmasLent[ $key ]     = $litEvent->date;
-        } elseif (str_starts_with($key, "DayBeforeEpiphany") || str_starts_with($key, "DayAfterEpiphany")) {
+        } elseif (str_starts_with($key, 'DayBeforeEpiphany') || str_starts_with($key, 'DayAfterEpiphany')) {
             $this->weekdaysEpiphany[ $key ]                = $litEvent->date;
         }
         //Sundays of Advent, Lent, Easter
@@ -591,7 +591,7 @@ class LiturgicalEventCollection
      */
     public function setProperty(string $key, string $property, string|int|bool $value): bool
     {
-        $reflect = new \ReflectionClass(new LiturgicalEvent("test", new DateTime('NOW')));
+        $reflect = new \ReflectionClass(new LiturgicalEvent('test', new DateTime('NOW')));
         if (array_key_exists($key, $this->liturgicalEvents)) {
             $oldValue = $this->liturgicalEvents[ $key ]->{$property};
             if ($reflect->hasProperty($property)) {
@@ -606,7 +606,7 @@ class LiturgicalEventCollection
                 ) {
                     $this->liturgicalEvents[ $key ]->{$property} = $value;
                 }
-                if ($property === "grade") {
+                if ($property === 'grade') {
                     $this->handleGradeProperty($key, $value, $oldValue);
                     // Consequentially, we also need to update the grade_lcl and grade_abbr properties
                     $this->liturgicalEvents[ $key ]->grade_lcl = $this->LitGrade->i18n($value, false);
@@ -717,7 +717,7 @@ class LiturgicalEventCollection
         $suppressedEvents = [];
         foreach ($this->suppressedEvents as $key => $event) {
             $suppressedEvents[] = [
-                "event_key" => $key,
+                'event_key' => $key,
                 ...json_decode(json_encode($event->date), true)
             ];
         }
@@ -747,7 +747,7 @@ class LiturgicalEventCollection
         $reinstatedEvents = [];
         foreach ($this->reinstatedEvents as $key => $event) {
             $reinstatedEvents[] = [
-                "event_key" => $key,
+                'event_key' => $key,
                 ...json_decode(json_encode($event->date), true)
             ];
         }
@@ -766,9 +766,9 @@ class LiturgicalEventCollection
     public function inOrdinaryTime(DateTime $date): bool
     {
         return (
-            ( $date > $this->liturgicalEvents[ "BaptismLord" ]->date && $date < $this->liturgicalEvents[ "AshWednesday" ]->date )
+            ( $date > $this->liturgicalEvents[ 'BaptismLord' ]->date && $date < $this->liturgicalEvents[ 'AshWednesday' ]->date )
             ||
-            ( $date > $this->liturgicalEvents[ "Pentecost" ]->date && $date < $this->liturgicalEvents[ "Advent1" ]->date )
+            ( $date > $this->liturgicalEvents[ 'Pentecost' ]->date && $date < $this->liturgicalEvents[ 'Advent1' ]->date )
         );
     }
 
@@ -796,15 +796,15 @@ class LiturgicalEventCollection
     {
         // DEFINE LITURGICAL SEASONS
         foreach ($this->liturgicalEvents as $key => $litEvent) {
-            if ($litEvent->date >= $this->liturgicalEvents[ "Advent1" ]->date && $litEvent->date < $this->liturgicalEvents[ "Christmas" ]->date) {
+            if ($litEvent->date >= $this->liturgicalEvents[ 'Advent1' ]->date && $litEvent->date < $this->liturgicalEvents[ 'Christmas' ]->date) {
                 $this->liturgicalEvents[ $key ]->liturgical_season = LitSeason::ADVENT;
-            } elseif ($litEvent->date >= $this->liturgicalEvents[ "Christmas" ]->date || $litEvent->date <= $this->liturgicalEvents[ "BaptismLord" ]->date) {
+            } elseif ($litEvent->date >= $this->liturgicalEvents[ 'Christmas' ]->date || $litEvent->date <= $this->liturgicalEvents[ 'BaptismLord' ]->date) {
                 $this->liturgicalEvents[ $key ]->liturgical_season = LitSeason::CHRISTMAS;
-            } elseif ($litEvent->date >= $this->liturgicalEvents[ "AshWednesday" ]->date && $litEvent->date < $this->liturgicalEvents[ "HolyThurs" ]->date) {
+            } elseif ($litEvent->date >= $this->liturgicalEvents[ 'AshWednesday' ]->date && $litEvent->date < $this->liturgicalEvents[ 'HolyThurs' ]->date) {
                 $this->liturgicalEvents[ $key ]->liturgical_season = LitSeason::LENT;
-            } elseif ($litEvent->date >= $this->liturgicalEvents[ "HolyThurs" ]->date && $litEvent->date < $this->liturgicalEvents[ "Easter" ]->date) {
+            } elseif ($litEvent->date >= $this->liturgicalEvents[ 'HolyThurs' ]->date && $litEvent->date < $this->liturgicalEvents[ 'Easter' ]->date) {
                 $this->liturgicalEvents[ $key ]->liturgical_season = LitSeason::EASTER_TRIDUUM;
-            } elseif ($litEvent->date >= $this->liturgicalEvents[ "Easter" ]->date && $litEvent->date <= $this->liturgicalEvents[ "Pentecost" ]->date) {
+            } elseif ($litEvent->date >= $this->liturgicalEvents[ 'Easter' ]->date && $litEvent->date <= $this->liturgicalEvents[ 'Pentecost' ]->date) {
                 $this->liturgicalEvents[ $key ]->liturgical_season = LitSeason::EASTER;
             } else {
                 $this->liturgicalEvents[ $key ]->liturgical_season = LitSeason::ORDINARY_TIME;
@@ -814,17 +814,17 @@ class LiturgicalEventCollection
         // DEFINE YEAR CYCLES (except for Holy Week and Easter Octave) and VIGIL MASSES
         // This has to be a separate cycle, because in order to correctly create Vigil Masses, we need to have already set the liturgical seasons
         foreach ($this->liturgicalEvents as $key => $litEvent) {
-            if ($litEvent->date <= $this->liturgicalEvents[ "PalmSun" ]->date || $litEvent->date >= $this->liturgicalEvents[ "Easter2" ]->date) {
+            if ($litEvent->date <= $this->liturgicalEvents[ 'PalmSun' ]->date || $litEvent->date >= $this->liturgicalEvents[ 'Easter2' ]->date) {
                 if (self::dateIsNotSunday($litEvent->date) && (int)$litEvent->grade === LitGrade::WEEKDAY) {
                     if ($this->inOrdinaryTime($litEvent->date)) {
-                        $this->liturgicalEvents[ $key ]->liturgical_year = $this->T[ "YEAR" ] . " " . ( self::WEEKDAY_CYCLE[ ( $this->CalendarParams->Year - 1 ) % 2 ] );
+                        $this->liturgicalEvents[ $key ]->liturgical_year = $this->T[ 'YEAR' ] . ' ' . ( self::WEEKDAY_CYCLE[ ( $this->CalendarParams->Year - 1 ) % 2 ] );
                     }
                 } elseif (self::dateIsSunday($litEvent->date) || (int)$litEvent->grade > LitGrade::FEAST) {
                     //if we're dealing with a Sunday or a Solemnity or a Feast of the Lord, then we calculate the Sunday/Festive Cycle
-                    if ($litEvent->date < $this->liturgicalEvents[ "Advent1" ]->date) {
-                        $this->liturgicalEvents[ $key ]->liturgical_year = $this->T[ "YEAR" ] . " " . ( self::SUNDAY_CYCLE[ ( $this->CalendarParams->Year - 1 ) % 3 ] );
-                    } elseif ($litEvent->date >= $this->liturgicalEvents[ "Advent1" ]->date) {
-                        $this->liturgicalEvents[ $key ]->liturgical_year = $this->T[ "YEAR" ] . " " . ( self::SUNDAY_CYCLE[ $this->CalendarParams->Year % 3 ] );
+                    if ($litEvent->date < $this->liturgicalEvents[ 'Advent1' ]->date) {
+                        $this->liturgicalEvents[ $key ]->liturgical_year = $this->T[ 'YEAR' ] . ' ' . ( self::SUNDAY_CYCLE[ ( $this->CalendarParams->Year - 1 ) % 3 ] );
+                    } elseif ($litEvent->date >= $this->liturgicalEvents[ 'Advent1' ]->date) {
+                        $this->liturgicalEvents[ $key ]->liturgical_year = $this->T[ 'YEAR' ] . ' ' . ( self::SUNDAY_CYCLE[ $this->CalendarParams->Year % 3 ] );
                     }
 
                     // DEFINE VIGIL MASSES within the same cycle, to avoid having to create/run yet another cycle
@@ -851,14 +851,14 @@ class LiturgicalEventCollection
             return (
                 false === ( $key === 'AllSouls' )
                 && false === ( $key === 'AshWednesday' )
-                && false === ( $litEvent->date > $this->liturgicalEvents[ "PalmSun" ]->date && $litEvent->date < $this->liturgicalEvents[ "Easter" ]->date )
-                && false === ( $litEvent->date > $this->liturgicalEvents[ "Easter" ]->date && $litEvent->date < $this->liturgicalEvents[ "Easter2" ]->date )
+                && false === ( $litEvent->date > $this->liturgicalEvents[ 'PalmSun' ]->date && $litEvent->date < $this->liturgicalEvents[ 'Easter' ]->date )
+                && false === ( $litEvent->date > $this->liturgicalEvents[ 'Easter' ]->date && $litEvent->date < $this->liturgicalEvents[ 'Easter2' ]->date )
             );
         }
         else {
             return (
-                false === ( $litEvent->event->date > $this->liturgicalEvents[ "PalmSun" ]->date && $litEvent->event->date < $this->liturgicalEvents[ "Easter" ]->date )
-                && false === ( $litEvent->event->date > $this->liturgicalEvents[ "Easter" ]->date && $litEvent->event->date < $this->liturgicalEvents[ "Easter2" ]->date )
+                false === ( $litEvent->event->date > $this->liturgicalEvents[ 'PalmSun' ]->date && $litEvent->event->date < $this->liturgicalEvents[ 'Easter' ]->date )
+                && false === ( $litEvent->event->date > $this->liturgicalEvents[ 'Easter' ]->date && $litEvent->event->date < $this->liturgicalEvents[ 'Easter2' ]->date )
             );
         }
     }
@@ -877,8 +877,8 @@ class LiturgicalEventCollection
      */
     private function createVigilMass(string $key, LiturgicalEvent $litEvent, DateTime $VigilDate): void
     {
-        $this->liturgicalEvents[ $key . "_vigil" ] = new LiturgicalEvent(
-            $litEvent->name . " " . $this->T[ "Vigil Mass" ],
+        $this->liturgicalEvents[ $key . '_vigil' ] = new LiturgicalEvent(
+            $litEvent->name . ' ' . $this->T[ 'Vigil Mass' ],
             $VigilDate,
             $litEvent->color,
             $litEvent->type,
@@ -890,10 +890,10 @@ class LiturgicalEventCollection
         $this->liturgicalEvents[ $key ]->has_vigil_mass               = true;
         $this->liturgicalEvents[ $key ]->has_vesper_i                 = true;
         $this->liturgicalEvents[ $key ]->has_vesper_ii                = true;
-        $this->liturgicalEvents[ $key . "_vigil" ]->is_vigil_mass     = true;
-        $this->liturgicalEvents[ $key . "_vigil" ]->is_vigil_for      = $key;
-        $this->liturgicalEvents[ $key . "_vigil" ]->liturgical_year   = $this->liturgicalEvents[ $key ]->liturgical_year;
-        $this->liturgicalEvents[ $key . "_vigil" ]->liturgical_season = $this->liturgicalEvents[ $key ]->liturgical_season;
+        $this->liturgicalEvents[ $key . '_vigil' ]->is_vigil_mass     = true;
+        $this->liturgicalEvents[ $key . '_vigil' ]->is_vigil_for      = $key;
+        $this->liturgicalEvents[ $key . '_vigil' ]->liturgical_year   = $this->liturgicalEvents[ $key ]->liturgical_year;
+        $this->liturgicalEvents[ $key . '_vigil' ]->liturgical_season = $this->liturgicalEvents[ $key ]->liturgical_season;
     }
 
     /**
@@ -955,7 +955,7 @@ class LiturgicalEventCollection
      */
     private function handleVigilLiturgicalEventCoincidence(string $key, LiturgicalEvent $litEvent, string $litEventGrade, \stdClass $coincidingEvent, bool|string $vigilTakesPrecedence): void
     {
-        if (gettype($vigilTakesPrecedence) === "string" && $vigilTakesPrecedence === "YEAR2022") {
+        if (gettype($vigilTakesPrecedence) === 'string' && $vigilTakesPrecedence === 'YEAR2022') {
             $litEvent->has_vigil_mass              = true;
             $litEvent->has_vesper_i                = true;
             $coincidingEvent->event->has_vesper_ii = false;
@@ -967,7 +967,7 @@ class LiturgicalEventCollection
                 $coincidingEvent->grade,
                 $coincidingEvent->event->name,
                 $this->CalendarParams->Year,
-                '<a href="http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html">' . _("Decree of the Congregation for Divine Worship") . '</a>'
+                '<a href="http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html">' . _('Decree of the Congregation for Divine Worship') . '</a>'
             );
         } else {
             $litEvent->has_vigil_mass              = $vigilTakesPrecedence;
@@ -983,7 +983,7 @@ class LiturgicalEventCollection
                     $this->CalendarParams->Year
                 );
             } else {
-                unset($this->liturgicalEvents[ $key . "_vigil" ]);
+                unset($this->liturgicalEvents[ $key . '_vigil' ]);
                 $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                     _('The Vigil Mass for the %1$s \'%2$s\' coincides with the %3$s \'%4$s\' in the year %5$d. This last Solemnity takes precedence, therefore it will maintain Vespers II and an evening Mass, while the first Solemnity will not have a Vigil Mass or Vespers I.'),
                     $litEventGrade,
@@ -1047,7 +1047,7 @@ class LiturgicalEventCollection
                         } elseif ($this->vigilTakesPrecedenceOverCoincidingLiturgicalEvent($key, $litEvent, $coincidingEvent)) {
                             $this->handleVigilLiturgicalEventCoincidence($key, $litEvent, $litEventGrade, $coincidingEvent, true);
                         } elseif ($this->CalendarParams->Year === 2022 && ( $key === 'SacredHeart' || $key === 'Lent3' || $key === 'Assumption' )) {
-                            $this->handleVigilLiturgicalEventCoincidence($key, $litEvent, $litEventGrade, $coincidingEvent, "YEAR2022");
+                            $this->handleVigilLiturgicalEventCoincidence($key, $litEvent, $litEventGrade, $coincidingEvent, 'YEAR2022');
                         } else {
                             $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                                 _('The Vigil Mass for the %1$s \'%2$s\' coincides with the %3$s \'%4$s\' in the year %5$d. We should ask the Congregation for Divine Worship what to do about this!'),
@@ -1077,7 +1077,7 @@ class LiturgicalEventCollection
      */
     public function sortLiturgicalEvents(): void
     {
-        uasort($this->liturgicalEvents, [ "LiturgicalCalendar\Api\LiturgicalEvent", "compDate" ]);
+        uasort($this->liturgicalEvents, [ 'LiturgicalCalendar\Api\LiturgicalEvent', 'compDate' ]);
     }
 
     /**
@@ -1114,7 +1114,7 @@ class LiturgicalEventCollection
             $solemnitiesCollection = [];
             foreach ($this->solemnities as $key => $solemnity) {
                 $solemnitiesCollection[] = [
-                    "event_key" => $key,
+                    'event_key' => $key,
                     ...json_decode(json_encode($solemnity), true)
                 ];
             }
@@ -1158,7 +1158,7 @@ class LiturgicalEventCollection
             $feastsCollection = [];
             foreach ($this->feasts as $key => $feast) {
                 $feastsCollection[] = [
-                    "event_key" => $key,
+                    'event_key' => $key,
                     ...json_decode(json_encode($feast), true)
                 ];
             }
@@ -1202,7 +1202,7 @@ class LiturgicalEventCollection
             $memorialsCollection = [];
             foreach ($this->memorials as $key => $memorial) {
                 $memorialsCollection[] = [
-                    "event_key" => $key,
+                    'event_key' => $key,
                     ...json_decode(json_encode($memorial), true)
                 ];
             }
@@ -1228,7 +1228,7 @@ class LiturgicalEventCollection
             $weekdaysAdventChristmasLentCollection = [];
             foreach ($this->weekdaysAdventChristmasLent as $key => $weekday) {
                 $weekdaysAdventChristmasLentCollection[] = [
-                    "event_key" => $key,
+                    'event_key' => $key,
                     ...json_decode(json_encode($weekday), true)
                 ];
             }
@@ -1255,7 +1255,7 @@ class LiturgicalEventCollection
             $weekdaysAdventBeforeDec17Collection = [];
             foreach ($this->weekdaysAdventBeforeDec17 as $key => $weekday) {
                 $weekdaysAdventBeforeDec17Collection[] = [
-                    "event_key" => $key,
+                    'event_key' => $key,
                     ...json_decode(json_encode($weekday), true)
                 ];
             }
@@ -1281,7 +1281,7 @@ class LiturgicalEventCollection
             $weekdaysEpiphanyCollection = [];
             foreach ($this->weekdaysEpiphany as $key => $weekday) {
                 $weekdaysEpiphanyCollection[] = [
-                    "event_key" => $key,
+                    'event_key' => $key,
                     ...json_decode(json_encode($weekday), true)
                 ];
             }
@@ -1307,7 +1307,7 @@ class LiturgicalEventCollection
             $solemnitiesLordBVMCollection = [];
             foreach ($this->solemnitiesLordBVM as $key => $solemnity) {
                 $solemnitiesLordBVMCollection[] = [
-                    "event_key" => $key,
+                    'event_key' => $key,
                     ...json_decode(json_encode($solemnity), true)
                 ];
             }
@@ -1333,7 +1333,7 @@ class LiturgicalEventCollection
             $sundaysAdventLentEasterCollection = [];
             foreach ($this->sundaysAdventLentEaster as $key => $sunday) {
                 $sundaysAdventLentEasterCollection[] = [
-                    "event_key" => $key,
+                    'event_key' => $key,
                     ...json_decode(json_encode($sunday), true)
                 ];
             }
@@ -1555,12 +1555,12 @@ class LiturgicalEventCollection
     public function purgeDataBeforeAdvent(): void
     {
         foreach ($this->liturgicalEvents as $key => $litEvent) {
-            if ($litEvent->date < $this->liturgicalEvents[ "Advent1" ]->date) {
+            if ($litEvent->date < $this->liturgicalEvents[ 'Advent1' ]->date) {
                 //remove all except the Vigil Mass for the first Sunday of Advent
                 if (
                     ( null === $litEvent->is_vigil_mass )
                     ||
-                    ( $litEvent->is_vigil_mass && $litEvent->is_vigil_for !== "Advent1" )
+                    ( $litEvent->is_vigil_mass && $litEvent->is_vigil_for !== 'Advent1' )
                 ) {
                     unset($this->liturgicalEvents[ $key ]);
                     // make sure it isn't still contained in another collection
@@ -1576,7 +1576,7 @@ class LiturgicalEventCollection
             }
         }
         foreach ($this->suppressedEvents as $key => $litEvent) {
-            if ($litEvent->date < $this->liturgicalEvents[ "Advent1" ]->date) {
+            if ($litEvent->date < $this->liturgicalEvents[ 'Advent1' ]->date) {
                 unset($this->suppressedEvents[ $key ]);
             }
         }
@@ -1594,7 +1594,7 @@ class LiturgicalEventCollection
     public function purgeDataAdventChristmas(): void
     {
         foreach ($this->liturgicalEvents as $key => $litEvent) {
-            if ($litEvent->date > $this->liturgicalEvents[ "Advent1" ]->date) {
+            if ($litEvent->date > $this->liturgicalEvents[ 'Advent1' ]->date) {
                 unset($this->liturgicalEvents[ $key ]);
                 // make sure it isn't still contained in another collection
                 unset($this->solemnities[ $key ]);
@@ -1612,19 +1612,19 @@ class LiturgicalEventCollection
                 &&
                 $litEvent->is_vigil_mass
                 &&
-                $litEvent->is_vigil_for === "Advent1"
+                $litEvent->is_vigil_for === 'Advent1'
             ) {
                 unset($this->liturgicalEvents[ $key ]);
             }
         }
         foreach ($this->suppressedEvents as $key => $litEvent) {
-            if ($litEvent->date > $this->liturgicalEvents[ "Advent1" ]->date) {
+            if ($litEvent->date > $this->liturgicalEvents[ 'Advent1' ]->date) {
                 unset($this->suppressedEvents[ $key ]);
             }
         }
         //lastly remove First Sunday of Advent
-        unset($this->liturgicalEvents[ "Advent1" ]);
-        unset($this->solemnities[ "Advent1" ]);
+        unset($this->liturgicalEvents[ 'Advent1' ]);
+        unset($this->solemnities[ 'Advent1' ]);
     }
 
     /**
@@ -1676,7 +1676,7 @@ class LiturgicalEventCollection
     private function add(string $key, LiturgicalEvent $litEvent): void
     {
         $litEventAssocArr = [
-            "event_key" => $key,
+            'event_key' => $key,
             ...json_decode(json_encode($litEvent), true)
         ];
         ksort($litEventAssocArr);

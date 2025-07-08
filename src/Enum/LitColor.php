@@ -4,12 +4,12 @@ namespace LiturgicalCalendar\Api\Enum;
 
 class LitColor
 {
-    public const GREEN          = "green";
-    public const PURPLE         = "purple";
-    public const WHITE          = "white";
-    public const RED            = "red";
-    public const PINK           = "pink";
-    public static array $values = [ "green", "purple", "white", "red", "pink" ];
+    public const GREEN          = 'green';
+    public const PURPLE         = 'purple';
+    public const WHITE          = 'white';
+    public const RED            = 'red';
+    public const PINK           = 'pink';
+    public static array $values = [ 'green', 'purple', 'white', 'red', 'pink' ];
 
     public static function isValid(string $value)
     {
@@ -29,22 +29,22 @@ class LitColor
         switch ($value) {
             case self::GREEN:
                 /**translators: context = liturgical color */
-                return $locale === LitLocale::LATIN ? 'viridis'     : _("green");
+                return $locale === LitLocale::LATIN ? 'viridis'     : _('green');
             case self::PURPLE:
                 /**translators: context = liturgical color */
-                return $locale === LitLocale::LATIN ? 'purpura'     : _("purple");
+                return $locale === LitLocale::LATIN ? 'purpura'     : _('purple');
             case self::WHITE:
                 /**translators: context = liturgical color */
-                return $locale === LitLocale::LATIN ? 'albus'       : _("white");
+                return $locale === LitLocale::LATIN ? 'albus'       : _('white');
             case self::RED:
                 /**translators: context = liturgical color */
-                return $locale === LitLocale::LATIN ? 'ruber'       : _("red");
+                return $locale === LitLocale::LATIN ? 'ruber'       : _('red');
             case self::PINK:
                 /**translators: context = liturgical color */
-                return $locale === LitLocale::LATIN ? 'rosea'       : _("pink");
+                return $locale === LitLocale::LATIN ? 'rosea'       : _('pink');
             default:
                 /**translators: context = liturgical color: unsupported value */
-                return $locale === LitLocale::LATIN ? 'ignotus'     : _("unknown");
+                return $locale === LitLocale::LATIN ? 'ignotus'     : _('unknown');
         }
     }
 }

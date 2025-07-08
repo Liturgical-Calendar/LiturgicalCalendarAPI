@@ -68,7 +68,7 @@ class RegionalData
                 $this->deleteCalendar();
                 break;
             default:
-                self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, "The method " . $_SERVER['REQUEST_METHOD'] . " cannot be handled by this endpoint");
+                self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, 'The method ' . $_SERVER['REQUEST_METHOD'] . ' cannot be handled by this endpoint');
         }
     }
 
@@ -90,7 +90,7 @@ class RegionalData
     {
         $i18nDataFile = null;
         switch ($this->params->category) {
-            case "DIOCESANCALENDAR":
+            case 'DIOCESANCALENDAR':
                 $dioceseEntry = array_find($this->CalendarsMetadata->diocesan_calendars, function ($el) {
                     return $el->calendar_id === $this->params->key;
                 });
@@ -103,13 +103,13 @@ class RegionalData
                     '{locale}'  => $this->params->i18nRequest
                 ]);
                 break;
-            case "WIDERREGIONCALENDAR":
+            case 'WIDERREGIONCALENDAR':
                 $i18nDataFile = strtr(JsonData::WIDER_REGIONS_I18N_FILE, [
                     '{wider_region}' => $this->params->key,
                     '{locale}'       => $this->params->i18nRequest
                 ]);
                 break;
-            case "NATIONALCALENDAR":
+            case 'NATIONALCALENDAR':
                 $i18nDataFile = strtr(JsonData::NATIONAL_CALENDARS_I18N_FILE, [
                     '{nation}' => $this->params->key,
                     '{locale}' => $this->params->i18nRequest
@@ -120,7 +120,7 @@ class RegionalData
                     StatusCode::BAD_REQUEST,
                     "RegionalData::getI18nData: invalid value <{$this->params->category}> for param `category`: valid values are: "
                         . implode(', ', array_values(RegionalDataParams::EXPECTED_CATEGORIES))
-                        . " which are set based on the corresponding path parameters "
+                        . ' which are set based on the corresponding path parameters '
                         . implode(', ', array_keys(RegionalDataParams::EXPECTED_CATEGORIES))
                 );
         }
@@ -156,7 +156,7 @@ class RegionalData
         $calendarDataFile = null;
         $dioceseEntry     = null;
         switch ($this->params->category) {
-            case "DIOCESANCALENDAR":
+            case 'DIOCESANCALENDAR':
                 $dioceseEntry = array_find($this->CalendarsMetadata->diocesan_calendars, function ($el) {
                     return $el->calendar_id === $this->params->key;
                 });
@@ -170,12 +170,12 @@ class RegionalData
                     '{diocese_name}' => $dioceseEntry->diocese
                 ]);
                 break;
-            case "WIDERREGIONCALENDAR":
+            case 'WIDERREGIONCALENDAR':
                 $calendarDataFile = strtr(JsonData::WIDER_REGIONS_FILE, [
                     '{wider_region}' => $this->params->key
                 ]);
                 break;
-            case "NATIONALCALENDAR":
+            case 'NATIONALCALENDAR':
                 $calendarDataFile = strtr(JsonData::NATIONAL_CALENDARS_FILE, [
                     '{nation}' => $this->params->key
                 ]);
@@ -427,19 +427,19 @@ class RegionalData
         }
 
         switch ($this->params->category) {
-            case "DIOCESANCALENDAR":
+            case 'DIOCESANCALENDAR':
                 $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
                 if (true === $test) {
                     $this->createDiocesanCalendar();
                 }
                 break;
-            case "NATIONALCALENDAR":
+            case 'NATIONALCALENDAR':
                 $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::NATIONAL);
                 if (true === $test) {
                     $this->createNationalCalendar();
                 }
                 break;
-            case "WIDERREGIONCALENDAR":
+            case 'WIDERREGIONCALENDAR':
                 $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::WIDERREGION);
                 if (true === $test) {
                     $this->createWiderRegionCalendar();
@@ -764,19 +764,19 @@ class RegionalData
         }
 
         switch ($this->params->category) {
-            case "DIOCESANCALENDAR":
+            case 'DIOCESANCALENDAR':
                 $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::DIOCESAN);
                 if (true === $test) {
                     $this->updateDiocesanCalendar();
                 }
                 break;
-            case "NATIONALCALENDAR":
+            case 'NATIONALCALENDAR':
                 $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::NATIONAL);
                 if (true === $test) {
                     $this->updateNationalCalendar();
                 }
                 break;
-            case "WIDERREGIONCALENDAR":
+            case 'WIDERREGIONCALENDAR':
                 $test = $this->validateDataAgainstSchema($this->params->payload, LitSchema::WIDERREGION);
                 if (true === $test) {
                     $this->updateWiderRegionCalendar();
@@ -805,7 +805,7 @@ class RegionalData
     private function getPathsForCalendarDelete(): array
     {
         switch ($this->params->category) {
-            case "DIOCESANCALENDAR":
+            case 'DIOCESANCALENDAR':
                 $dioceseEntry = array_find($this->CalendarsMetadata->diocesan_calendars, function ($el) {
                     return $el->calendar_id === $this->params->key;
                 });
@@ -828,7 +828,7 @@ class RegionalData
                     ]
                 );
                 break;
-            case "WIDERREGIONCALENDAR":
+            case 'WIDERREGIONCALENDAR':
                 $calendarDataFile   = strtr(
                     JsonData::WIDER_REGIONS_FILE,
                     [
@@ -842,7 +842,7 @@ class RegionalData
                     ]
                 );
                 break;
-            case "NATIONALCALENDAR":
+            case 'NATIONALCALENDAR':
                 $calendarDataFile   = strtr(
                     JsonData::NATIONAL_CALENDARS_FILE,
                     [
@@ -893,14 +893,14 @@ class RegionalData
 
             // And in the case of a diocesan calendar, if the parent `nation_id` folder is empty, remove it as well
             // so let's get a reference to the parent folder to check later
-            if ($this->params->category === "DIOCESANCALENDAR") {
+            if ($this->params->category === 'DIOCESANCALENDAR') {
                 $dioceseNationFolder = dirname($calendarDataFolder);
             }
 
             if (false === unlink($calendarDataFile)) {
                 self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully.");
             };
-            foreach (glob($calendarI18nFolder . "/*.json") as $file) {
+            foreach (glob($calendarI18nFolder . '/*.json') as $file) {
                 if (false === is_writable($file)) {
                     self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, check i18n file and folder permissions.");
                 }
@@ -914,7 +914,7 @@ class RegionalData
             if (false === rmdir($calendarDataFolder)) {
                 self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, data folder could not be removed.");
             }
-            if ($this->params->category === "DIOCESANCALENDAR" && $dioceseNationFolder !== null) {
+            if ($this->params->category === 'DIOCESANCALENDAR' && $dioceseNationFolder !== null) {
                 // Check if the parent `nation_id` folder is empty, if it is, remove it too
                 if (count(scandir($dioceseNationFolder)) === 2) { // only . and ..
                     if (false === rmdir($dioceseNationFolder)) {
@@ -981,7 +981,7 @@ class RegionalData
                 if ($required && count($_REQUEST) === 0) {
                     self::produceErrorResponse(
                         StatusCode::BAD_REQUEST,
-                        "Expected non empty payload in body of request, either JSON encoded or YAML encoded or form encoded."
+                        'Expected non empty payload in body of request, either JSON encoded or YAML encoded or form encoded.'
                     );
                 }
                 $payload = (object)$_REQUEST;
@@ -991,7 +991,7 @@ class RegionalData
                     // the payload MUST be in the body of the request, either JSON encoded or YAML encoded or form encoded
                     self::produceErrorResponse(
                         StatusCode::BAD_REQUEST,
-                        "Expected non empty payload in body of request, either JSON encoded or YAML encoded or form encoded."
+                        'Expected non empty payload in body of request, either JSON encoded or YAML encoded or form encoded.'
                     );
                 }
         }
@@ -1062,7 +1062,7 @@ class RegionalData
             if (count($requestPathParts) < 2 || count($requestPathParts) > 3) {
                 self::produceErrorResponse(
                     StatusCode::BAD_REQUEST,
-                    "Expected at least two and at most three path params for GET and POST requests, received " . count($requestPathParts)
+                    'Expected at least two and at most three path params for GET and POST requests, received ' . count($requestPathParts)
                 );
             }
         }
@@ -1071,7 +1071,7 @@ class RegionalData
             if (count($requestPathParts) !== 1) {
                 self::produceErrorResponse(
                     StatusCode::BAD_REQUEST,
-                    "Expected one path param for PUT requests, received " . count($requestPathParts)
+                    'Expected one path param for PUT requests, received ' . count($requestPathParts)
                 );
             }
         }
@@ -1079,7 +1079,7 @@ class RegionalData
         elseif (count($requestPathParts) !== 2) {
             self::produceErrorResponse(
                 StatusCode::BAD_REQUEST,
-                "Expected two and exactly two path params for PATCH and DELETE requests, received " . count($requestPathParts)
+                'Expected two and exactly two path params for PATCH and DELETE requests, received ' . count($requestPathParts)
             );
         }
 
@@ -1125,7 +1125,7 @@ class RegionalData
                         || false === property_exists($params['payload'], 'metadata')
                         || false === property_exists($params['payload']->metadata, 'diocese_id')
                     ) {
-                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.metadata`, and `payload.metadata.diocese_id`, instead payload was: " . json_encode($params['payload']));
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, 'Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.metadata`, and `payload.metadata.diocese_id`, instead payload was: ' . json_encode($params['payload']));
                     }
                     if (RequestMethod::PUT === self::$Core->getRequestMethod()) {
                         $params['key'] = $params['payload']->metadata->diocese_id;
@@ -1141,7 +1141,7 @@ class RegionalData
                         || false === property_exists($params['payload'], 'metadata')
                         || false === property_exists($params['payload']->metadata, 'nation')
                     ) {
-                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.settings`, `payload.metadata`, and `payload.metadata.nation`, instead payload was: " . json_encode($params['payload']));
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, 'Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.settings`, `payload.metadata`, and `payload.metadata.nation`, instead payload was: ' . json_encode($params['payload']));
                     }
                     if (RequestMethod::PUT === self::$Core->getRequestMethod()) {
                         $params['key'] = $params['payload']->metadata->nation;
@@ -1158,7 +1158,7 @@ class RegionalData
                         || false === property_exists($params['payload']->metadata, 'wider_region')
                         || false === property_exists($params['payload']->metadata, 'locales')
                     ) {
-                        self::produceErrorResponse(StatusCode::BAD_REQUEST, "Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.national_calendars`, `payload.metadata`, `payload.metadata.wider_region`, and `payload.metadata.locales`");
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, 'Invalid payload in request. Must receive non empty payload in body of request, in JSON or YAML or form encoded format, with properties `payload`, `payload.litcal`, `payload.i18n`, `payload.national_calendars`, `payload.metadata`, `payload.metadata.wider_region`, and `payload.metadata.locales`');
                     }
                     if (RequestMethod::PUT === self::$Core->getRequestMethod()) {
                         $params['key'] = $params['payload']->metadata->wider_region;
@@ -1183,24 +1183,24 @@ class RegionalData
      */
     public static function produceErrorResponse(int $statusCode, string $description): void
     {
-        header($_SERVER[ "SERVER_PROTOCOL" ] . StatusCode::toString($statusCode), true, $statusCode);
+        header($_SERVER[ 'SERVER_PROTOCOL' ] . StatusCode::toString($statusCode), true, $statusCode);
         $message         = new \stdClass();
-        $message->status = "ERROR";
-        $statusMessage   = "";
+        $message->status = 'ERROR';
+        $statusMessage   = '';
         switch (self::$Core->getRequestMethod()) {
             case RequestMethod::PUT:
-                $statusMessage = "Resource not Created";
+                $statusMessage = 'Resource not Created';
                 break;
             case RequestMethod::PATCH:
-                $statusMessage = "Resource not Updated";
+                $statusMessage = 'Resource not Updated';
                 break;
             case RequestMethod::DELETE:
-                $statusMessage = "Resource not Deleted";
+                $statusMessage = 'Resource not Deleted';
                 break;
             default:
-                $statusMessage = "Sorry what was it you wanted to do with this resource?";
+                $statusMessage = 'Sorry what was it you wanted to do with this resource?';
         }
-        $message->response    = $statusCode === 404 ? "Resource not Found" : $statusMessage;
+        $message->response    = $statusCode === 404 ? 'Resource not Found' : $statusMessage;
         $message->description = $description;
         $response             = json_encode($message);
         switch (self::$Core->getResponseContentType()) {
@@ -1227,7 +1227,7 @@ class RegionalData
     private static function produceResponse(string $jsonEncodedResponse): void
     {
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH], true)) {
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 201 Created", true, 201);
+            header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 201 Created', true, 201);
         }
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:

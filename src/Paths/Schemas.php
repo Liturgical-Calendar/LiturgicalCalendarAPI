@@ -32,7 +32,7 @@ class Schemas
         // Access-Control headers are received during OPTIONS requests
         if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
             if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
-                header("Access-Control-Allow-Methods: GET, OPTIONS");
+                header('Access-Control-Allow-Methods: GET, OPTIONS');
             }
             if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
                 header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
@@ -65,7 +65,7 @@ class Schemas
             case 0:
                 $schemaIndex                 = new \stdClass();
                 $schemaIndex->litcal_schemas = [];
-                $it                          = new \DirectoryIterator("glob://jsondata/schemas/*.json");
+                $it                          = new \DirectoryIterator('glob://jsondata/schemas/*.json');
                 foreach ($it as $f) {
                     $schemaIndex->litcal_schemas[] = API_BASE_PATH . '/jsondata/schemas/' . $f->getFilename();
                 }
@@ -78,7 +78,7 @@ class Schemas
                     echo file_get_contents('jsondata/schemas/' . $requestPathParts[0]);
                     die();
                 } else {
-                    header($_SERVER[ "SERVER_PROTOCOL" ] . " 404 Not Found", true, 404);
+                    header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 404 Not Found', true, 404);
                     die("Schema file '{$requestPathParts[0]}' not found");
                 }
         }

@@ -72,12 +72,12 @@ class Metadata
                 $nationalCalendarData              = json_decode($nationalCalendarDefinition);
                 if (JSON_ERROR_NONE === json_last_error()) {
                     $nationalCalendarArr           = [
-                        "calendar_id"  => $directory,
-                        "locales"      => $nationalCalendarData->metadata->locales,
-                        "missals"      => $nationalCalendarData->metadata->missals,
-                        "wider_region" => $nationalCalendarData->metadata->wider_region,
-                        "dioceses"     => [],
-                        "settings"     => $nationalCalendarData->settings
+                        'calendar_id'  => $directory,
+                        'locales'      => $nationalCalendarData->metadata->locales,
+                        'missals'      => $nationalCalendarData->metadata->missals,
+                        'wider_region' => $nationalCalendarData->metadata->wider_region,
+                        'dioceses'     => [],
+                        'settings'     => $nationalCalendarData->settings
                     ];
                     Metadata::$nationalCalendars[] = $nationalCalendarArr;
                 }
@@ -95,7 +95,7 @@ class Metadata
     private static function dioceseIdToName(string $id): ?string
     {
         if (empty(Metadata::$worldDiocesesLatinRite)) {
-            $worldDiocesesFile                = JsonData::FOLDER . "/world_dioceses.json";
+            $worldDiocesesFile                = JsonData::FOLDER . '/world_dioceses.json';
             Metadata::$worldDiocesesLatinRite = json_decode(
                 file_get_contents($worldDiocesesFile)
             )->catholic_dioceses_latin_rite;
@@ -107,7 +107,7 @@ class Metadata
                 if ($diocese->diocese_id === $id) {
                     $dioceseName = $diocese->diocese_name;
                     if (property_exists($diocese, 'province')) {
-                        $dioceseName .= " (" . $diocese->province . ")";
+                        $dioceseName .= ' (' . $diocese->province . ')';
                     }
                     break 2; // Break out of both loops
                 }
@@ -135,15 +135,15 @@ class Metadata
                     $diocesanCalendarData       = json_decode($diocesanCalendarDefinition);
                     if (JSON_ERROR_NONE === json_last_error()) {
                         $dioceseArr = [
-                            "calendar_id" => $calendar_id,
-                            "diocese"     => $dioceseName,
-                            "nation"      => $nation,
-                            "locales"     => $diocesanCalendarData->metadata->locales,
-                            "timezone"    => $diocesanCalendarData->metadata->timezone
+                            'calendar_id' => $calendar_id,
+                            'diocese'     => $dioceseName,
+                            'nation'      => $nation,
+                            'locales'     => $diocesanCalendarData->metadata->locales,
+                            'timezone'    => $diocesanCalendarData->metadata->timezone
                         ];
-                        if (property_exists($diocesanCalendarData->metadata, "group")) {
+                        if (property_exists($diocesanCalendarData->metadata, 'group')) {
                             $groupName           = $diocesanCalendarData->metadata->group;
-                            $dioceseArr["group"] = $groupName;
+                            $dioceseArr['group'] = $groupName;
                             if (!array_key_exists($groupName, Metadata::$diocesanGroups)) {
                                 Metadata::$diocesanGroups[$groupName] = [];
                             }
@@ -242,50 +242,50 @@ class Metadata
         $diocesanGroups = [];
         foreach (Metadata::$diocesanGroups as $key => $group) {
             $diocesanGroups[] = [
-                "group_name" => $key,
-                "dioceses"   => $group
+                'group_name' => $key,
+                'dioceses'   => $group
             ];
         }
         $nationalCalendars     = [
             [
-                "calendar_id" => "VA",
-                "locales"     => [ "la_VA" ],
-                "missals"     => [
-                    "EDITIO_TYPICA_1970",
-                    "EDITIO_TYPICA_1971",
-                    "EDITIO_TYPICA_1975",
-                    "EDITIO_TYPICA_2002",
-                    "EDITIO_TYPICA_2008"
+                'calendar_id' => 'VA',
+                'locales'     => [ 'la_VA' ],
+                'missals'     => [
+                    'EDITIO_TYPICA_1970',
+                    'EDITIO_TYPICA_1971',
+                    'EDITIO_TYPICA_1975',
+                    'EDITIO_TYPICA_2002',
+                    'EDITIO_TYPICA_2008'
                 ],
-                "settings"    => [
-                    "epiphany"            => "JAN6",
-                    "ascension"           => "THURSDAY",
-                    "corpus_christi"      => "THURSDAY",
-                    "eternal_high_priest" => false
+                'settings'    => [
+                    'epiphany'            => 'JAN6',
+                    'ascension'           => 'THURSDAY',
+                    'corpus_christi'      => 'THURSDAY',
+                    'eternal_high_priest' => false
                 ]
             ],
             ...Metadata::$nationalCalendars
         ];
         $nationalCalendarsKeys = [
-            "VA",
+            'VA',
             ...Metadata::$nationalCalendarsKeys
         ];
         $response              = json_encode([
-            "litcal_metadata" => [
-                "national_calendars"      => $nationalCalendars,
-                "national_calendars_keys" => $nationalCalendarsKeys,
-                "diocesan_calendars"      => array_values(Metadata::$diocesanCalendars),
-                "diocesan_calendars_keys" => array_column(Metadata::$diocesanCalendars, 'calendar_id'),
-                "diocesan_groups"         => $diocesanGroups,
-                "wider_regions"           => Metadata::$widerRegions,
-                "wider_regions_keys"      => Metadata::$widerRegionsNames,
-                "locales"                 => Metadata::$locales
+            'litcal_metadata' => [
+                'national_calendars'      => $nationalCalendars,
+                'national_calendars_keys' => $nationalCalendarsKeys,
+                'diocesan_calendars'      => array_values(Metadata::$diocesanCalendars),
+                'diocesan_calendars_keys' => array_column(Metadata::$diocesanCalendars, 'calendar_id'),
+                'diocesan_groups'         => $diocesanGroups,
+                'wider_regions'           => Metadata::$widerRegions,
+                'wider_regions_keys'      => Metadata::$widerRegionsNames,
+                'locales'                 => Metadata::$locales
             ]
         ], JSON_PRETTY_PRINT);
         $responseHash          = md5($response);
         header("Etag: \"{$responseHash}\"");
         if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
-            header($_SERVER[ "SERVER_PROTOCOL" ] . " 304 Not Modified");
+            header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 304 Not Modified');
             header('Content-Length: 0');
         } else {
             echo $response;
@@ -304,7 +304,7 @@ class Metadata
     {
         if (isset($_SERVER[ 'REQUEST_METHOD' ])) {
             if (isset($_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_METHOD' ])) {
-                header("Access-Control-Allow-Methods: OPTIONS,GET,POST");
+                header('Access-Control-Allow-Methods: OPTIONS,GET,POST');
             }
             if (isset($_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' ])) {
                 header("Access-Control-Allow-Headers: {$_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' ]}");
