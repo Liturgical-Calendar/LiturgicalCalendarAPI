@@ -317,7 +317,7 @@ class LitCommon
     {
         if (strpos($value, ',') || strpos($value, ':')) {
             $values = preg_split('/[,:]/', $value);
-            return self::areValid($values);
+            return is_array($values) && self::areValid($values);
         }
         return in_array($value, self::$values);
     }
@@ -349,14 +349,23 @@ class LitCommon
     private function i18n(string|array $value): string|array
     {
         if (is_array($value) && self::areValid($value)) {
-            return array_map([$this, 'i18n'], $value);
-        } elseif (self::isValid($value)) {
-            if ($this->locale === LitLocale::LATIN) {
-                return self::LATIN[ $value ];
-            } else {
-                return $this->GTXT[ $value ];
-            }
+            /** @var array<string> $value */
+            return array_map(
+                function (string $v): string {
+                    /** @var string $translated */
+                    $translated = $this->i18n($v);
+                    return $translated;
+                },
+                $value
+            );
         }
+
+        if (is_string($value) && self::isValid($value)) {
+            return $this->locale === LitLocale::LATIN
+                ? self::LATIN[$value]
+                : $this->GTXT[$value];
+        }
+        /** @var string|array<string> $value */
         return $value;
     }
 
@@ -371,9 +380,20 @@ class LitCommon
     private function getPossessive(string|array $value): string|array
     {
         if (is_array($value)) {
-            return array_map([$this, 'getPossessive'], $value);
+            /** @var array<string> $value */
+            return array_map(
+                function (string $v): string {
+                    /** @var string $possessive */
+                    $possessive = $this->getPossessive($v);
+                    return $possessive;
+                },
+                $value
+            );
         }
-        return $this->locale === LitLocale::LATIN ? '' : self::possessive($value);
+
+        return $this->locale === LitLocale::LATIN
+            ? ''
+            : self::possessive($value);
     }
 
     /**
@@ -411,21 +431,32 @@ class LitCommon
                             $commonSpecific = '';
                             //LitCommon::debugWrite( "Common does not have a specific common: GENERAL = $commonGeneral, SPECIFIC = $commonSpecific" );
                         }
+
                         $fromTheCommon = $this->locale === LitLocale::LATIN ? 'De Commune' : _('From the Common');
                         //LitCommon::debugWrite( "translated intro to common: " . $fromTheCommon );
+
                         $commonGeneralStringParts = [ $fromTheCommon ];
-                        $possessive               = (string) $this->getPossessive($commonGeneral);
-                        $commonGeneralLcl         = (string) $this->i18n($commonGeneral);
+
+                        /** @var string $possessive */
+                        $possessive = $this->getPossessive($commonGeneral);
+
+                        /** @var string $commonGeneralLcl */
+                        $commonGeneralLcl = $this->i18n($commonGeneral);
+
                         if ($possessive !== '') {
                             array_push($commonGeneralStringParts, $possessive);
                         }
+
                         if ($commonGeneralLcl !== '') {
                             array_push($commonGeneralStringParts, $commonGeneralLcl);
                         }
                         //LitCommon::debugWrite( "commonGeneralStringParts = " . json_encode( $commonGeneralStringParts ) );
+
                         $commonGeneralString = implode(' ', $commonGeneralStringParts);
                         //LitCommon::debugWrite( "commonGeneralString = " . $commonGeneralString );
-                        $commonSpecificLcl = $commonSpecific != '' ? ': ' . $this->i18n($commonSpecific) : '';
+                        /** @var string $commonSpecificTranslated */
+                        $commonSpecificTranslated = $this->i18n($commonSpecific);
+                        $commonSpecificLcl        = $commonSpecific != '' ? ': ' . $commonSpecificTranslated : '';
                         //LitCommon::debugWrite( "commonSpecificLcl = " . $commonSpecificLcl );
                         return $commonGeneralString . $commonSpecificLcl;
                     }, $commons);

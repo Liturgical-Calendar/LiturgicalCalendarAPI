@@ -43,7 +43,7 @@ class Utilities
      * This way the items can be transformed to an appropriate XML element.
      * @var string
      */
-    private static string $LAST_ARRAY_KEY = '';
+    private static string|int $LAST_ARRAY_KEY = '';
 
     /**
      * All snake_case keys are automatically transformed to their PascalCase equivalent.
@@ -66,10 +66,10 @@ class Utilities
      * LitCalEvent keys are keys in the LitCal array that are associated with a LitCalEvent array.
      * This function is used to determine if a key is a 'special' key in the LitCal array,
      * such as 'metadata', 'settings', 'litcal', etc.
-     * @param string $key
+     * @param string|int $key
      * @return bool
      */
-    private static function isNotLitCalEventKey(string $key): bool
+    private static function isNotLitCalEventKey(string|int $key): bool
     {
         return in_array($key, self::NON_EVENT_KEYS);
     }

@@ -1,20 +1,48 @@
 <?php
 
-namespace LiturgicalCalendar\Api;
+namespace LiturgicalCalendar\Api\Test;
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
+use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\LitEventTestAssertion;
+use LiturgicalCalendar\Api\Test\TestsMap;
 
 /**
- * Class LitTest
- * @package LiturgicalCalendar\Api
- *
- * @method void __construct(string $Test, object $dataToTest)               Initializes the test object with the provided Test and test data.
- * @method bool isReady()                                                   Returns whether the test is ready to be run
- * @method void runTest()                                                   Runs the test
- * @method object getMessage()                                              Returns the message returned by the test
+ * @phpstan-type LiturgicalEvent object{
+ *      event_key:string,
+ *      event_idx:int,
+ *      name:string,
+ *      year:int,
+ *      month:int,
+ *      month_short:string,
+ *      month_long:string,
+ *      day:int,
+ *      type:string,
+ *      grade:int,
+ *      grade_display:string|null,
+ *      grade_abbr:string|null,
+ *      grade_lcl:string|null,
+ *      date:int,
+ *      color:string[],
+ *      color_lcl:string[],
+ *      common:string[],
+ *      common_lcl:string,
+ *      day_of_the_week_iso8601:int,
+ *      day_of_the_week_long:string,
+ *      day_of_the_week_short:string,
+ *      liturgical_season:string,
+ *      liturgical_season_lcl:string,
+ *      liturgical_year:string,
+ *      psalter_week:int,
+ *      is_vigil_for?:bool,
+ *      is_vigil_mass?:bool,
+ *      has_vigil_mass?:bool,
+ *      has_vesper_i?:bool,
+ *      has_vesper_ii?:bool
+ * }
  */
-class LitTest
+class LitTestRunner
 {
     /**
      * @var bool Indicates whether the test is ready to run.
@@ -22,35 +50,30 @@ class LitTest
      * If the loading and validation are successful, the readyState is set to true.
      * All subsequent calls to isReady() will return the value of readyState.
      */
-    private bool $readyState            = false;
+    private bool $readyState = false;
 
     /**
-     * @var object|null The JSON instructions for the test
+     * @var object{settings:object{year:int,national_calendar?:string,diocesan_calendar?:string},litcal:array<LiturgicalEvent>} The data to be tested
      */
-    private ?object $testInstructions   = null;
+    private object $dataToTest;
 
     /**
-     * @var object|null The data to be tested
+     * @var \stdClass|null The message to be returned by the test
      */
-    private ?object $dataToTest         = null;
-
-    /**
-     * @var object|null The message to be returned by the test
-     */
-    private ?object $Message            = null;
+    private ?\stdClass $Message = null;
 
     /**
      * @var string|null The name of the test
      */
-    private ?string $Test               = null;
+    private ?string $Test = null;
 
     /**
-     * @var object|null The cache for the test instructions and supported years
-     * This is a static property that is shared across all instances of LitTest.
+     * @var TestsMap|null The cache for the test instructions and supported years
+     * This is a static property that is shared across all instances of LitTestRunner.
      * It is used to avoid loading the same test instructions multiple times.
      * @static
      */
-    private static ?object $testCache   = null;
+    private static ?TestsMap $testCache = null;
 
     /**
      * Initializes the test object with the provided Test and test data.
@@ -59,34 +82,36 @@ class LitTest
      * Updates the ready state based on successful initialization.
      *
      * @param string $Test The name of the test.
-     * @param object $testData The test data object.
+     * @param object{settings:object{year:int,national_calendar?:string,diocesan_calendar?:string},litcal:LiturgicalEvent[]} $testData The test data object.
      */
     public function __construct(string $Test, object $testData)
     {
-        $this->Test = $Test;
+        $this->Test       = $Test;
         $this->dataToTest = $testData;
         if (self::$testCache === null) {
-            self::$testCache = new \stdClass();
+            self::$testCache = new TestsMap();
         }
-        if (false === property_exists(self::$testCache, $Test)) {
-            $testPath = "jsondata/tests/{$Test}.json";
+        if (false === self::$testCache->has($Test)) {
+            $testPath = JsonData::TESTS_FOLDER . "/{$Test}.json";
             if (file_exists($testPath)) {
-                $testInstructions = file_get_contents($testPath);
-                if ($testInstructions) {
-                    $this->testInstructions = json_decode($testInstructions);
+                $testInstructionsRaw = file_get_contents($testPath);
+                if ($testInstructionsRaw) {
+                    $testInstructions = json_decode($testInstructionsRaw);
                     if (JSON_ERROR_NONE === json_last_error()) {
-                        $schemaFile = 'jsondata/schemas/LitCalTest.json';
+                        $schemaFile     = JsonData::SCHEMAS_FOLDER . '/LitCalTest.json';
                         $schemaContents = file_get_contents($schemaFile);
-                        $jsonSchema = json_decode($schemaContents);
-                        try {
-                            $schema = Schema::import($jsonSchema);
-                            $schema->in($this->testInstructions);
-                            self::$testCache->{$Test} = new \stdClass();
-                            self::$testCache->{$Test}->testInstructions = $this->testInstructions;
-                            self::$testCache->{$Test}->yearsSupported = $this->detectYearsSupported();
-                            $this->readyState = true;
-                        } catch (InvalidValue | \Exception $e) {
-                            $this->setError("Cannot proceed with {$Test}, the Test instructions were incorrectly validated against schema " . $schemaFile . ": " . $e->getMessage());
+                        if (false === $schemaContents) {
+                            $this->setError("Test runner could not read schema file {$schemaFile}");
+                        } else {
+                            $jsonSchema = json_decode($schemaContents);
+                            try {
+                                $schema = Schema::import($jsonSchema);
+                                $schema->in($testInstructions);
+                                self::$testCache->add($Test, $testInstructions);
+                                $this->readyState = true;
+                            } catch (InvalidValue | \Exception $e) {
+                                $this->setError("Cannot proceed with {$Test}, the Test instructions were incorrectly validated against schema " . $schemaFile . ': ' . $e->getMessage());
+                            }
                         }
                     } else {
                         $this->setError("Test server could not decode Test instructions JSON data for {$Test}");
@@ -96,11 +121,7 @@ class LitTest
                 $this->setError("Test server could not read Test instructions for {$Test}");
             }
         } else {
-            $this->readyState = (
-                property_exists(self::$testCache->{$Test}, 'testInstructions')
-                &&
-                property_exists(self::$testCache->{$Test}, 'yearsSupported')
-            );
+            $this->readyState = self::$testCache->isReady($Test);
         }
     }
 
@@ -142,20 +163,20 @@ class LitTest
     public function runTest(): void
     {
         if ($this->readyState) {
-            $assertion = $this->retrieveAssertionForYear($this->dataToTest->settings->year);
+            $assertion = self::$testCache->retrieveAssertionForYear($this->Test, $this->dataToTest->settings->year);
             if (is_null($assertion)) {
-                $this->setError("Out of bounds error: {$this->Test} only supports calendar years [ " . implode(', ', self::$testCache->{$this->Test}->yearsSupported) . " ]");
+                $this->setError("Out of bounds error: {$this->Test} only supports calendar years [ " . implode(', ', self::$testCache->getYearsSupported($this->Test)) . ' ]');
                 return;
             }
 
-            $calendarType = $this->getCalendarType();
-            $calendarName = $this->getCalendarName();
-            $messageIfError = "{$this->Test} Assertion '{$assertion->assertion}' failed for Year " . $this->dataToTest->settings->year . " in {$calendarType}{$calendarName}.";
-            $eventKey = self::$testCache->{$this->Test}->testInstructions->event_key;
+            $calendarType     = $this->getCalendarType();
+            $calendarName     = $this->getCalendarName();
+            $messageIfError   = "{$this->Test} Assertion '{$assertion->assertion}' failed for Year " . $this->dataToTest->settings->year . " in {$calendarType}{$calendarName}.";
+            $eventKey         = self::$testCache->get($this->Test)->event_key;
             $eventBeingTested = array_find($this->dataToTest->litcal, fn ($item) => $item->event_key === $eventKey);
 
             switch ($assertion->assert) {
-                case 'eventNotExists':
+                case LitEventTestAssertion::EVENT_NOT_EXISTS:
                     $errorMessage = is_null($assertion->expected_value)
                         ? " The event {$eventKey} should not exist, instead the event has a timestamp of {$eventBeingTested->date}"
                         : " What is going on here? We expected the event not to exist, and in fact it doesn't. We should never get here!";
@@ -166,10 +187,10 @@ class LitTest
                         $this->setError($messageIfError . $errorMessage);
                     }
                     break;
-                case 'eventExists AND hasExpectedTimestamp':
+                case LitEventTestAssertion::EVENT_EXISTS_AND_HAS_EXPECTED_TIMESTAMP:
                     $firstErrorMessage = " The event {$eventKey} should exist, instead it was not found";
                     if (null !== $eventBeingTested) {
-                        $actualValue = $eventBeingTested->date;
+                        $actualValue        = $eventBeingTested->date;
                         $secondErrorMessage = " The event {$eventKey} was expected to have timestamp {$assertion->expected_value}, instead it had timestamp {$actualValue}";
                         if ($actualValue === $assertion->expected_value) {
                             $this->setSuccess("expected_value = {$assertion->expected_value}, actualValue = {$actualValue}");
@@ -219,10 +240,10 @@ class LitTest
      */
     private function setMessage(string $type, ?string $text = null): void
     {
-        $this->Message = new \stdClass();
-        $this->Message->type = $type;
+        $this->Message          = new \stdClass();
+        $this->Message->type    = $type;
         $this->Message->classes = ".$this->Test.year-{$this->dataToTest->settings->year}.test-valid";
-        $this->Message->test = $this->Test;
+        $this->Message->test    = $this->Test;
         if ($type === 'success') {
             if (is_null($text)) {
                 $this->Message->text = "$this->Test passed for the Calendar {$this->getCalendarName()} for the year {$this->dataToTest->settings->year}";
@@ -230,7 +251,7 @@ class LitTest
                 $this->Message->text = "$this->Test passed for the Calendar {$this->getCalendarName()} for the year {$this->dataToTest->settings->year}: " . $text;
             }
         } else {
-            $this->Message->text = $text;
+            $this->Message->text     = $text;
             $this->Message->jsonData = $this->dataToTest;
         }
     }
@@ -260,44 +281,13 @@ class LitTest
      * If the test has not been run yet, sets the message to an error message
      * and returns it.
      *
-     * @return object The message object.
+     * @return \stdClass The message object.
      */
-    public function getMessage(): object
+    public function getMessage(): \stdClass
     {
         if (is_null($this->Message)) {
             $this->setError('An unknown error occurred while trying to run the test');
         }
         return $this->Message;
-    }
-
-    /**
-     * Retrieves the assertion for a given year, if it exists. Called in {@see runTest()}.
-     *
-     * @param int $year The year for which to retrieve the assertion.
-     * @return object|null The assertion, or null if no assertion exists for the given year.
-     */
-    private function retrieveAssertionForYear(int $year): ?object
-    {
-        $assertions = self::$testCache->{$this->Test}->testInstructions->assertions;
-        foreach ($assertions as $assertion) {
-            if ($assertion->year === $year) {
-                return $assertion;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Retrieves an array of all years for which there are assertions. Called in {@see __construct()}.
-     *
-     * @return int[] The years for which there are assertions.
-     */
-    private function detectYearsSupported(): array
-    {
-        $years = [];
-        foreach ($this->testInstructions->assertions as $assertion) {
-            $years[] = $assertion->year;
-        }
-        return $years;
     }
 }

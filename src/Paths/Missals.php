@@ -10,6 +10,8 @@ use LiturgicalCalendar\Api\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
+use LiturgicalCalendar\Api\Enum\JsonData;
+use PHP_CodeSniffer\Reports\Json;
 
 class Missals
 {
@@ -388,12 +390,12 @@ class Missals
         self::$missalsIndex                 = new \stdClass();
         self::$missalsIndex->litcal_missals = [];
 
-        if (false === is_readable('jsondata/sourcedata/missals')) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Unable to read the jsondata/sourcedata/missals directory');
+        if (false === is_readable(JsonData::MISSALS_FOLDER)) {
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Unable to read the ' . JsonData::MISSALS_FOLDER . ' directory');
         }
-        $missalFolderPaths = glob('jsondata/sourcedata/missals/propriumdesanctis*', GLOB_ONLYDIR);
+        $missalFolderPaths = glob(JsonData::MISSALS_FOLDER . '/propriumdesanctis*', GLOB_ONLYDIR);
         if (false === $missalFolderPaths) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Unable to read the jsondata/sourcedata/missals directory contents');
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Unable to read the ' . JsonData::MISSALS_FOLDER . ' directory contents');
         }
         if (count($missalFolderPaths) === 0) {
             self::produceErrorResponse(StatusCode::NOT_FOUND, 'No Missals found');
@@ -401,13 +403,13 @@ class Missals
 
         $missalFolderNames = array_map('basename', $missalFolderPaths);
         foreach ($missalFolderNames as $missalFolderName) {
-            if (file_exists("jsondata/sourcedata/missals/$missalFolderName/$missalFolderName.json")) {
+            if (file_exists(JsonData::MISSALS_FOLDER . "/$missalFolderName/$missalFolderName.json")) {
                 $missal = new \stdClass();
                 if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
                     $missal->missal_id = "EDITIO_TYPICA_{$matches[1]}";
                     $missal->region    = 'VA';
-                    if (is_readable("jsondata/sourcedata/missals/$missalFolderName/i18n")) {
-                        $it      = new \DirectoryIterator("glob://jsondata/sourcedata/missals/$missalFolderName/i18n/*.json");
+                    if (is_readable(JsonData::MISSALS_FOLDER . "/$missalFolderName/i18n")) {
+                        $it      = new \DirectoryIterator('glob://' . JsonData::MISSALS_FOLDER . "/$missalFolderName/i18n/*.json");
                         $locales = [];
                         foreach ($it as $f) {
                             $locales[] = $f->getBasename('.json');
@@ -435,7 +437,7 @@ class Missals
         self::$params->setParams(self::initRequestParams());
 
         // If an explicit request is made to include all Missals defined in the RomanMissal enum,
-        // even if there is no data for them in the jsondata/sourcedata/missals directory,
+        // even if there is no data for them in the JsonData::MISSALS_FOLDER directory,
         // we add them to the response.
         if (self::$params->IncludeEmpty) {
             $allMissals = RomanMissal::produceMetadata(true);

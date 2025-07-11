@@ -28,15 +28,15 @@ class Core
     /** @var string[] */
     private array $AllowedRequestContentTypes;
     /** @var string[] */
-    private array $RequestHeaders              = [];
-    private ?string $JsonEncodedRequestHeaders = null;
-    private ?string $RequestContentType        = null;
-    private ?string $ResponseContentType       = null;
-    private const ONLY_USEFUL_HEADERS          = [
+    private array $RequestHeaders        = [];
+    private ?string $RequestContentType  = null;
+    private ?string $ResponseContentType = null;
+    private const ONLY_USEFUL_HEADERS    = [
         'Accept',
         'Accept-Language',
         'X-Requested-With', 'Origin'
     ];
+    private readonly string|false $JsonEncodedRequestHeaders;
 
     /**
      * Initializes the Core object with default values for AllowedOrigins, AllowedReferers, AllowedAcceptHeaders,
@@ -449,7 +449,7 @@ class Core
      *
      * @return string The headers of the HTTP request used to call the API, encoded as a JSON string.
      */
-    public function getJsonEncodedRequestHeaders(): string
+    public function getJsonEncodedRequestHeaders(): string|false
     {
         return $this->JsonEncodedRequestHeaders;
     }
@@ -512,10 +512,11 @@ class Core
     {
         $data    = null;
         $rawData = file_get_contents('php://input');
-        if ('' === $rawData && $required) {
+        if ((false === $rawData || '' === $rawData) && $required) {
             header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 400 Bad Request', true, 400);
             die('{"error":"No JSON data received in the request"}');
-        } elseif ('' !== $rawData) {
+        }
+        if (false !== $rawData) {
             $data = json_decode($rawData, $assoc);
             if (json_last_error() !== JSON_ERROR_NONE) {
                 header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 400 Bad Request', true, 400);
@@ -535,12 +536,11 @@ class Core
      * @param int $errno The level of the error raised.
      * @param string $errstr The error message.
      *
-     * @throws \Exception Always throws an exception with the error message and level.
-     * @phpstan-ignore method.unused
+     * @throws \ErrorException Always throws an exception with the error message and level.
      */
-    private static function warningHandler($errno, $errstr): void
+    private static function warningHandler(int $errno, string $errstr, string $errfile, int $errline): never
     {
-        throw new \Exception($errstr, $errno);
+        throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
     }
 
     /**
@@ -561,8 +561,9 @@ class Core
         if ('' === $rawData && $required) {
             header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 400 Bad Request', true, 400);
             die('{"error":"No YAML data received in the request"}');
-        } elseif ('' !== $rawData) {
-            set_error_handler(['self', 'warningHandler'], E_WARNING);
+        }
+        if (false !== $rawData) {
+            set_error_handler([self::class, 'warningHandler'], E_WARNING);
             try {
                 $data = yaml_parse($rawData);
                 if (false === $data) {
@@ -571,9 +572,18 @@ class Core
                     $response->error = 'Malformed YAML data received in the request';
                     die(json_encode($response));
                 } else {
-                    return $assoc ? $data : json_decode(json_encode($data));
+                    if ($assoc) {
+                        return $data;
+                    } else {
+                        $jsonData = json_encode($data);
+                        if (false === $jsonData || json_last_error() !== JSON_ERROR_NONE) {
+                            header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 400 Bad Request', true, 400);
+                            die('{"error":"Malformed YAML data received in the request: <' . $rawData . '>, ' . json_last_error_msg() . '"}');
+                        }
+                        return json_decode($jsonData);
+                    }
                 }
-            } catch (\Exception $e) {
+            } catch (\ErrorException $e) {
                 header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 400 Bad Request', true, 400);
                 $response          = new \stdClass();
                 $response->status  = 'error';
@@ -582,6 +592,8 @@ class Core
                 $response->line    = $e->getLine();
                 $response->code    = $e->getCode();
                 die(json_encode($response));
+            } finally {
+                restore_error_handler();
             }
         }
         return null;

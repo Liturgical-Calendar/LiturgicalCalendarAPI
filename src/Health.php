@@ -14,6 +14,7 @@ use LiturgicalCalendar\Api\Enum\ReturnType;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
+use LiturgicalCalendar\Api\Test\LitTestRunner;
 
 /**
  * This class provides a WebSocket-based interface for executing various tests
@@ -23,6 +24,14 @@ use LiturgicalCalendar\Api\Enum\RomanMissal;
  * @author  John Romano D'Orazio <priest@johnromanodorazio.com>
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link    https://litcal.johnromanodorazio.com
+ * @phpstan-type DiocesanCalendarCollectionItem object{
+ *      calendar_id: string,
+ *      diocese: string,
+ *      nation: string,
+ *      locales: array<string>,
+ *      timezone: string,
+ *      group?: string
+ * }
  */
 class Health implements MessageComponentInterface
 {
@@ -53,6 +62,11 @@ class Health implements MessageComponentInterface
         'executeUnitTest'   => ['calendar', 'year', 'category', 'test']
     ];
 
+    /** @var null|object{
+     *      litcal_metadata: object{
+     *          diocesan_calendars: DiocesanCalendarCollectionItem[]
+     *      }
+     * } $metadata */
     private static ?object $metadata = null;
 
     /**
@@ -91,11 +105,17 @@ class Health implements MessageComponentInterface
         echo "New connection! ({$conn->resourceId})\n";
 
         if (null === self::$metadata) {
-            self::$metadata = json_decode(file_get_contents(API_BASE_PATH . '/calendars'));
+            $rawData = file_get_contents(API_BASE_PATH . '/calendars');
+            if ($rawData === false) {
+                echo 'Error reading metadata: could not read data from ' . API_BASE_PATH . "/calendars\n";
+                return;
+            }
+            self::$metadata = json_decode($rawData);
             if (JSON_ERROR_NONE === json_last_error()) {
                 echo "Loaded metadata\n";
             } else {
                 echo 'Error loading metadata: ' . json_last_error_msg() . "\n";
+                return;
             }
         } else {
             if (property_exists(self::$metadata, 'litcal_metadata') && property_exists(self::$metadata->litcal_metadata, 'diocesan_calendars')) {
@@ -115,7 +135,7 @@ class Health implements MessageComponentInterface
      * specified action. If any expected property is missing from the message
      * object, the function returns false, indicating the message is invalid.
      *
-     * @param object $message The message object to validate.
+     * @param object{action:string} $message The message object to validate.
      * @return bool True if all required properties are present, false otherwise.
      */
     private static function validateMessageProperties(object $message): bool
@@ -246,6 +266,7 @@ class Health implements MessageComponentInterface
         foreach ($this->clients as $client) {
             if ($from === $client) {
                 // The message from sender will be echoed back only to the sender, not to other clients
+                /** @var string $msg */
                 $client->send($msg);
             }
         }
@@ -376,7 +397,7 @@ class Health implements MessageComponentInterface
     /**
      * Validate a data file by checking that it exists and that it is valid JSON that conforms to a specific schema.
      *
-     * @param object $validation The validation object. It should have the following properties:
+     * @param object{category:string,sourceFolder?:string,sourceFile?:string,validate:string} $validation The validation object. It should have the following properties:
      * - sourceFile: a string, the path to the data file
      * - validate: an object with the following properties:
      *   - file-exists: a string, the class name to add to the message if the file exists
@@ -476,8 +497,10 @@ class Health implements MessageComponentInterface
         } else {
             // If it's not a sourceDataCheck, it's probably a resourceDataCheck
             // That is to say, an API path
-            $pathForSchema = $validation->sourceFile;
-            $dataPath      = $validation->sourceFile;
+            if (property_exists($validation, 'sourceFile')) {
+                $pathForSchema = $validation->sourceFile;
+                $dataPath      = $validation->sourceFile;
+            }
         }
 
         $schema = Health::retrieveSchemaForCategory($validation->category, $pathForSchema);
@@ -530,7 +553,7 @@ class Health implements MessageComponentInterface
                         } else {
                             if (null !== $schema) {
                                 $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
-                                if (gettype($validationResult) === 'object') {
+                                if ($validationResult instanceof \stdClass) {
                                     $schemaValidated           = false;
                                     $validationResult->classes = ".$validation->validate.schema-valid";
                                     $this->sendMessage($to, $validationResult);
@@ -590,7 +613,9 @@ class Health implements MessageComponentInterface
             // If we are validating an API path, we check for a 200 OK HTTP response from the API
             // rather than checking for existence of the file in the filesystem
             if ($validation->category === 'resourceDataCheck') {
+                assert(is_string($dataPath), 'Data path should be a string for resourceDataCheck category');
                 $headers = get_headers($dataPath);
+                assert(is_array($headers), 'Headers should be an array for resourceDataCheck category');
                 if (!$headers || strpos($headers[0], '200') === false) {
                     $message          = new \stdClass();
                     $message->type    = 'error';
@@ -629,9 +654,11 @@ class Health implements MessageComponentInterface
                 ];
                 $context        = stream_context_create($opts);
                 // $dataPath is probably an API path in this case
+                assert(is_string($dataPath), 'Data path should be a string for resourceDataCheck category');
                 $data = file_get_contents($dataPath, false, $context);
             } else {
                 // $dataPath is probably a source file in the filesystem in this case
+                assert(is_string($dataPath), 'Data path should be a string for sourceDataCheck category');
                 $data = file_get_contents($dataPath);
             }
 
@@ -663,7 +690,15 @@ class Health implements MessageComponentInterface
                 switch ($responseType) {
                     case 'YML':
                         try {
-                            $yamlData = json_decode(json_encode(yaml_parse($data)));
+                            $yamlParsed = yaml_parse($data);
+                            if (false === $yamlParsed) {
+                                throw new \Exception('YAML parsing failed');
+                            }
+                            $jsonEncoded = json_encode($yamlParsed);
+                            if (false === $jsonEncoded) {
+                                throw new \Exception('YAML parsing resulted in invalid JSON: ' . json_last_error_msg());
+                            }
+                            $yamlData = json_decode($jsonEncoded);
                             if ($yamlData) {
                                 $message          = new \stdClass();
                                 $message->type    = 'success';
@@ -679,7 +714,7 @@ class Health implements MessageComponentInterface
                                         $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
                                         $message->classes = ".$validation->validate.schema-valid";
                                         $this->sendMessage($to, $message);
-                                    } elseif (gettype($validationResult) === 'object') {
+                                    } elseif ($validationResult instanceof \stdClass) {
                                         $validationResult->classes = ".$validation->validate.schema-valid";
                                         $this->sendMessage($to, $validationResult);
                                     }
@@ -718,7 +753,7 @@ class Health implements MessageComponentInterface
                                     $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
                                     $message->classes = ".$validation->validate.schema-valid";
                                     $this->sendMessage($to, $message);
-                                } elseif (gettype($validationResult) === 'object') {
+                                } elseif ($validationResult instanceof \stdClass) {
                                     $validationResult->classes = ".$validation->validate.schema-valid";
                                     $this->sendMessage($to, $validationResult);
                                 }
@@ -851,13 +886,13 @@ class Health implements MessageComponentInterface
                         $message->classes = ".calendar-$calendar.json-valid.year-$year";
                         $this->sendMessage($to, $message);
 
-                        $validationResult = $xml->schemaValidate('jsondata/schemas/LiturgicalCalendar.xsd');
+                        $validationResult = $xml->schemaValidate(JsonData::SCHEMAS_FOLDER . '/LiturgicalCalendar.xsd');
                         if ($validationResult) {
                             $message          = new \stdClass();
                             $message->type    = 'success';
                             $message->text    = sprintf(
                                 "The $category of $calendar for the year $year was successfully validated against the Schema %s",
-                                'jsondata/schemas/LiturgicalCalendar.xsd'
+                                JsonData::SCHEMAS_FOLDER . '/LiturgicalCalendar.xsd'
                             );
                             $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
@@ -920,7 +955,21 @@ class Health implements MessageComponentInterface
                     break;
                 case 'YML':
                     try {
-                        $yamlData = json_decode(json_encode(yaml_parse($data)));
+                        /**
+                         * TODO: perhaps we need to register a custom Exception handler, since yaml_parse() throws a warning instead of an exception
+                         *       and we need to catch that warning as an exception {@see LiturgicalCalendar\Api\Core::warningHandler()}
+                         */
+                        $yamlParsed = yaml_parse($data);
+                        if (false === $yamlParsed) {
+                            throw new \Exception('YAML parsing failed');
+                        }
+
+                        $jsonEncoded = json_encode($yamlParsed);
+                        if (false === $jsonEncoded) {
+                            throw new \Exception('YAML parsing resulted in invalid JSON: ' . json_last_error_msg());
+                        }
+
+                        $yamlData = json_decode($jsonEncoded);
                         if ($yamlData) {
                             $message          = new \stdClass();
                             $message->type    = 'success';
@@ -935,7 +984,7 @@ class Health implements MessageComponentInterface
                                 $message->text    = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL;
                                 $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                                 $this->sendMessage($to, $message);
-                            } elseif (gettype($validationResult) === 'object') {
+                            } elseif ($validationResult instanceof \stdClass) {
                                 $validationResult->classes = ".calendar-$calendar.schema-valid.year-$year";
                                 $this->sendMessage($to, $validationResult);
                             }
@@ -967,7 +1016,7 @@ class Health implements MessageComponentInterface
                             $message->text    = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL;
                             $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
-                        } elseif (gettype($validationResult) === 'object') {
+                        } elseif ($validationResult instanceof \stdClass) {
                             $validationResult->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $validationResult);
                         }
@@ -1030,9 +1079,10 @@ class Health implements MessageComponentInterface
         $data = file_get_contents(self::REQPATH . $req, false, $context);
         // We don't really need to check whether file_get_contents succeeded
         //  because this check already takes place in the validateCalendar test phase
+        assert(is_string($data), 'Data should be a string for executeUnitTest method');
         $jsonData = json_decode($data);
         if (json_last_error() === JSON_ERROR_NONE) {
-            $UnitTest = new LitTest($test, $jsonData);
+            $UnitTest = new LitTestRunner($test, $jsonData);
             if ($UnitTest->isReady()) {
                 $UnitTest->runTest();
             }
@@ -1043,12 +1093,12 @@ class Health implements MessageComponentInterface
     /**
      * Validate data against a specified schema.
      *
-     * @param object $data The data to validate.
+     * @param object|array $data The data to validate.
      * @param string $schemaUrl The URL of the schema to validate against.
      *
-     * @return bool|object Returns true if the data is valid, otherwise returns an error object with details.
+     * @return bool|\stdClass Returns true if the data is valid, otherwise returns an error object with details.
      */
-    private function validateDataAgainstSchema(object $data, string $schemaUrl): bool|object
+    private function validateDataAgainstSchema(object|array $data, string $schemaUrl): bool|\stdClass
     {
         $res = false;
         try {

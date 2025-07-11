@@ -449,8 +449,8 @@ class Events
      */
     private function processPropriumDeTemporeData(): void
     {
-        $DataFile = 'jsondata/sourcedata/missals/propriumdetempore/propriumdetempore.json';
-        $I18nFile = 'jsondata/sourcedata/missals/propriumdetempore/i18n/' . $this->EventsParams->baseLocale . '.json';
+        $DataFile = JsonData::MISSALS_FOLDER . '/propriumdetempore/propriumdetempore.json';
+        $I18nFile = JsonData::MISSALS_FOLDER . '/propriumdetempore/i18n/' . $this->EventsParams->baseLocale . '.json';
         if (!file_exists($DataFile) || !file_exists($I18nFile)) {
             echo self::produceErrorResponse(
                 StatusCode::NOT_FOUND,
@@ -505,8 +505,8 @@ class Events
      */
     private function processMemorialsFromDecreesData(): void
     {
-        $DataFile = 'jsondata/sourcedata/decrees/decrees.json';
-        $I18nFile = 'jsondata/sourcedata/decrees/i18n/' . $this->EventsParams->baseLocale . '.json';
+        $DataFile = JsonData::DECREES_FILE;
+        $I18nFile = JsonData::DECREES_I18N_FOLDER . '/' . $this->EventsParams->baseLocale . '.json';
         if (!file_exists($DataFile) || !file_exists($I18nFile)) {
             echo self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DataFile or resource file $I18nFile");
             die();

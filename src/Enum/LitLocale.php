@@ -51,7 +51,11 @@ class LitLocale
     public static function init(): void
     {
         if (null === self::$AllAvailableLocales) {
-            self::$AllAvailableLocales = array_filter(\ResourceBundle::getLocales(''), function ($value) {
+            $getLocales = \ResourceBundle::getLocales('');
+            if ($getLocales === false) {
+                throw new \RuntimeException('Failed to retrieve locales from ResourceBundle.');
+            }
+            self::$AllAvailableLocales = array_filter($getLocales, function ($value) {
                 return strpos($value, 'POSIX') === false;
             });
         }

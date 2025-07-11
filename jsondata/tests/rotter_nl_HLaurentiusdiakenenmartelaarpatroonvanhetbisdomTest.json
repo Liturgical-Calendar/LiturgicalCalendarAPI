@@ -1,7 +1,11 @@
 {
     "name": "rotter_nl_HLaurentiusdiakenenmartelaarpatroonvanhetbisdomTest",
-    "test_type": "exactCorrespondence",
+    "event_key": "rotter_nl_HLaurentiusdiakenenmartelaarpatroonvanhetbisdom",
     "description": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10",
+    "test_type": "exactCorrespondence",
+    "applies_to": {
+        "diocesan_calendar": "rotter_nl"
+    },
     "assertions": [
         {
             "year": 1999,
@@ -199,9 +203,5 @@
             "assert": "eventExists AND hasExpectedTimestamp",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         }
-    ],
-    "event_key": "rotter_nl_HLaurentiusdiakenenmartelaarpatroonvanhetbisdom",
-    "applies_to": {
-        "diocesan_calendar": "rotter_nl"
-    }
+    ]
 }

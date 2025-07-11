@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Core;
 use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\AcceptHeader;
+use LiturgicalCalendar\Api\Enum\JsonData;
 
 class Tests
 {
@@ -58,7 +59,7 @@ class Tests
 
     private static function handleGetRequest(): string
     {
-        $testsFolder = 'jsondata/tests/';
+        $testsFolder = JsonData::TESTS_FOLDER . '/';
         if (count(self::$requestPathParts) === 0) {
             try {
                 $response  = new \stdClass();
@@ -89,7 +90,7 @@ class Tests
 
     private static function handleDeleteRequest(): string
     {
-        $testsFolder = 'jsondata/tests/';
+        $testsFolder = JsonData::TESTS_FOLDER . '/';
         if (count(self::$requestPathParts) === 1) {
             $testName = self::$requestPathParts[0];
             if (file_exists("{$testsFolder}{$testName}.json")) {
@@ -122,7 +123,7 @@ class Tests
         }
 
         // Validate incoming data against unit test schema
-        $schemaFile     = 'jsondata/schemas/LitCalTest.json';
+        $schemaFile     = JsonData::SCHEMAS_FOLDER . '/LitCalTest.json';
         $schemaContents = file_get_contents($schemaFile);
         $jsonSchema     = json_decode($schemaContents);
 
@@ -140,7 +141,7 @@ class Tests
         // Sanitize data to avoid any possibility of script injection
         self::sanitizeObjectValues($data);
 
-        $bytesWritten = file_put_contents('jsondata/tests/' . $data->name . '.json', json_encode($data, JSON_PRETTY_PRINT));
+        $bytesWritten = file_put_contents(JsonData::TESTS_FOLDER . '/' . $data->name . '.json', json_encode($data, JSON_PRETTY_PRINT));
         if (false === $bytesWritten) {
             return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.');
         } else {

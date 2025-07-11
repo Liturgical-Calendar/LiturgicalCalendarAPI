@@ -12,6 +12,7 @@
 namespace LiturgicalCalendar\Api\Paths;
 
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Enum\JsonData;
 
 class Schemas
 {
@@ -65,17 +66,17 @@ class Schemas
             case 0:
                 $schemaIndex                 = new \stdClass();
                 $schemaIndex->litcal_schemas = [];
-                $it                          = new \DirectoryIterator('glob://jsondata/schemas/*.json');
+                $it                          = new \DirectoryIterator('glob://' . JsonData::SCHEMAS_FOLDER . '/*.json');
                 foreach ($it as $f) {
-                    $schemaIndex->litcal_schemas[] = API_BASE_PATH . '/jsondata/schemas/' . $f->getFilename();
+                    $schemaIndex->litcal_schemas[] = API_BASE_PATH . '/' . JsonData::SCHEMAS_FOLDER . '/' . $f->getFilename();
                 }
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode($schemaIndex);
                 die();
             case 1:
-                if (file_exists('jsondata/schemas/' . $requestPathParts[0])) {
+                if (file_exists(JsonData::SCHEMAS_FOLDER . '/' . $requestPathParts[0])) {
                     header('Content-Type: application/json; charset=utf-8');
-                    echo file_get_contents('jsondata/schemas/' . $requestPathParts[0]);
+                    echo file_get_contents(JsonData::SCHEMAS_FOLDER . '/' . $requestPathParts[0]);
                     die();
                 } else {
                     header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 404 Not Found', true, 404);

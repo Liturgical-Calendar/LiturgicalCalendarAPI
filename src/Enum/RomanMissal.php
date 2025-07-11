@@ -25,7 +25,7 @@ use LiturgicalCalendar\Api\Enum\JsonData;
  *     name: string,
  *     region: string,
  *     locales: string[],
- *     year_limits: object{since_year: int, until_year?: int},
+ *     year_limits: object{since_year:int,until_year?:int},
  *     year_published: int
  * }
  */
@@ -257,12 +257,14 @@ class RomanMissal
                     $locales[] = $f->getBasename('.json');
                 }
             }
+
             $region = null;
             if (str_starts_with($missal_id, 'EDITIO_TYPICA_')) {
                 $region = 'VA';
             } else {
                 $region = explode('_', $missal_id)[0];
             }
+
             $metadata[$key] = [
                 'missal_id'      => $missal_id,
                 'name'           => self::getName($missal_id),
@@ -273,8 +275,13 @@ class RomanMissal
                 'year_limits'    => self::$yearLimits[ $missal_id ],
                 'year_published' => self::$yearLimits[ $missal_id ][ 'since_year' ]
             ];
+
             if ($obj) {
-                $metadata[$key] = json_decode(json_encode($metadata[$key]));
+                $json = json_encode($metadata[$key]);
+                if ($json === false) {
+                    throw new \RuntimeException('Failed to encode metadata to JSON: ' . json_last_error_msg());
+                }
+                $metadata[$key] = json_decode($json);
             }
         }
         return $metadata;

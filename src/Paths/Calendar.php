@@ -2316,7 +2316,7 @@ class Calendar
         );
 
         // Add the celebration to LiturgicalEventCollection::suppressedEvents
-        $suppressedEvent = new LiturgicalEvent(
+        $suppressedEvent            = new LiturgicalEvent(
             $row->name,
             $row->date,
             $row->color,
@@ -2324,7 +2324,8 @@ class Calendar
             $row->grade,
             $row->common
         );
-        $this->Cal->addSuppressedEvent($row->event_key, $suppressedEvent);
+        $suppressedEvent->event_key = $row->event_key;
+        $this->Cal->addSuppressedEvent($suppressedEvent);
     }
 
     /**
@@ -4684,12 +4685,12 @@ class Calendar
         $SerializeableLitCal->metadata->timestamp              = time();
         $SerializeableLitCal->metadata->date_time              = date(DATE_ATOM);
         $SerializeableLitCal->metadata->request_headers        = self::$Core->getRequestHeaders();
-        $SerializeableLitCal->metadata->solemnities            = $this->Cal->getSolemnitiesCollection();
-        $SerializeableLitCal->metadata->solemnities_keys       = array_column($this->Cal->getSolemnitiesCollection(), 'event_key');
-        $SerializeableLitCal->metadata->feasts                 = $this->Cal->getFeastsCollection();
-        $SerializeableLitCal->metadata->feasts_keys            = array_column($this->Cal->getFeastsCollection(), 'event_key');
-        $SerializeableLitCal->metadata->memorials              = $this->Cal->getMemorialsCollection();
-        $SerializeableLitCal->metadata->memorials_keys         = array_column($this->Cal->getMemorialsCollection(), 'event_key');
+        $SerializeableLitCal->metadata->solemnities            = $this->Cal->getSolemnities();
+        $SerializeableLitCal->metadata->solemnities_keys       = $this->Cal->getSolemnitiesKeys();
+        $SerializeableLitCal->metadata->feasts                 = $this->Cal->getFeasts();
+        $SerializeableLitCal->metadata->feasts_keys            = $this->Cal->getFeastsKeys();
+        $SerializeableLitCal->metadata->memorials              = $this->Cal->getMemorials();
+        $SerializeableLitCal->metadata->memorials_keys         = $this->Cal->getMemorialsKeys();
         $SerializeableLitCal->metadata->suppressed_events      = $this->Cal->getSuppressedEvents();
         $SerializeableLitCal->metadata->suppressed_events_keys = $this->Cal->getSuppressedKeys();
         $SerializeableLitCal->metadata->reinstated_events      = $this->Cal->getReinstatedEvents();
@@ -5038,7 +5039,7 @@ class Calendar
 
                 // Now we have to combine the two.
                 // The backup (which represents the main portion) should be appended to the calendar that was just generated
-                $this->Cal->mergeLiturgicalEventCollection($CalBackup);
+                $this->Cal->merge($CalBackup);
 
                 // Reset the year back to the original request before outputting results
                 $this->CalendarParams->Year++;
