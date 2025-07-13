@@ -15,11 +15,61 @@ use LiturgicalCalendar\Api\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Params\RegionalDataParams;
 
 /**
- * RegionalData
+ * Handles the `/data` path of the API
  *
+ * This is the path that handles source data for national and diocesan calendars.
+ * The source data for these calendars can be created (PUT), or updated (PATCH),
+ * or retrieved (GET), or deleted (DELETE).
+ *
+ * @phpstan-type NationalCalendarSettings object{
+ *      epiphany: string,
+ *      ascension: string,
+ *      corpus_christi: string,
+ *      eternal_high_priest: bool
+ * }
+ * @phpstan-type DiocesanCalendarSettings object{
+ *      epiphany?: string,
+ *      ascension?: string,
+ *      corpus_christi?: string,
+ *      eternal_high_priest?: bool
+ * }
+ * @phpstan-type NationalCalendarMetadataItem object{
+ *      calendar_id: string,
+ *      locales: array<string>,
+ *      missals: array<string>,
+ *      wider_region: string,
+ *      dioceses: array<string>,
+ *      settings: NationalCalendarSettings
+ * }
+ * @phpstan-type DiocesanCalendarMetadataItem object{
+ *      calendar_id: string,
+ *      diocese: string,
+ *      nation: string,
+ *      locales: array<string>,
+ *      timezone: string,
+ *      group?: string,
+ *      settings?: DiocesanCalendarSettings
+ * }
+ * @phpstan-type WiderRegionMetadataItem object{
+ *      name: string,
+ *      locales: array<string>,
+ *      api_path: string
+ * }
+ *
+ * @phpstan-type CalendarsMetadata object{
+ *      national_calendars: array<NationalCalendarMetadataItem>,
+ *      national_calendars_keys: string[],
+ *      diocesan_calendars: array<DiocesanCalendarMetadataItem>,
+ *      diocesan_calendars_keys: string[],
+ *      diocesan_groups: string[],
+ *      wider_regions: array<WiderRegionMetadataItem>,
+ *      wider_regions_keys: string[],
+ *      locales: string[]
+ * }
  */
 class RegionalData
 {
+    /** @var CalendarsMetadata */
     private readonly ?object $CalendarsMetadata;
     private RegionalDataParams $params;
     public static Core $Core;
@@ -35,7 +85,13 @@ class RegionalData
     {
         self::$Core              = new Core();
         $this->params            = new RegionalDataParams();
-        $this->CalendarsMetadata = json_decode(file_get_contents(API_BASE_PATH . Route::CALENDARS->value))->litcal_metadata;
+        $rawMetadata             = file_get_contents(API_BASE_PATH . Route::CALENDARS->value);
+        $metadataObj             = $rawMetadata
+                                    ? json_decode($rawMetadata)
+                                    : null;
+        $this->CalendarsMetadata = $metadataObj
+                                    ? $metadataObj->litcal_metadata
+                                    : null;
     }
 
     /**
@@ -248,7 +304,7 @@ class RegionalData
      *
      * This is a private method and should only be called from {@see createCalendar}.
      *
-     * The diocesan calendar data resource is created in the `jsondata/sourcedata/calendars/dioceses/` directory.
+     * The diocesan calendar data resource is created in the `JsonData::DIOCESAN_CALENDARS_FOLDER` directory.
      *
      * This method ensures the necessary directories for storing diocesan calendar data are created.
      * It processes the internationalization (i18n) data provided in the payload, saving it to the appropriate
@@ -962,9 +1018,9 @@ class RegionalData
      * If the request method is PUT or PATCH, and the payload is not either JSON or YAML encoded,
      * it will produce a 400 Bad Request error.
      *
-     * @param array{category: string, key?: string, locale?: string, i18n?: string, payload?: object} $params the object on which to set the locale and payload
+     * @param array{category:string,key?:string,locale?:string,i18n?:string,payload?:object} $params the object on which to set the locale and payload
      *
-     * @return array{locale: string, payload: object} the associative array with the locale and payload set
+     * @return array{locale:string,payload:object} the associative array with the locale and payload set
      */
     private static function retrievePayloadFromPostPutPatchRequest(array $params): array
     {
@@ -1014,7 +1070,7 @@ class RegionalData
      *
      * @param string[] $requestPathParts the parts of the request path
      *
-     * @return array{category: string, key?: string, locale?: string, i18n?: string, payload?: object} an associative array with the category, key, and locale set
+     * @return array{category:string,key?:string,locale?:string,i18n?:string,payload?:object} an associative array with the category, key, and locale set
      */
     private static function setParamsFromPath(array $requestPathParts): array
     {

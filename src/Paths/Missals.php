@@ -289,7 +289,7 @@ class Missals
      */
     private static function produceResponse(string $jsonEncodedResponse): void
     {
-        if (in_array(self::$Core->getRequestMethod(), ['PUT', 'PATCH'])) {
+        if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
             header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 201 Created', true, 201);
         }
         switch (self::$Core->getResponseContentType()) {

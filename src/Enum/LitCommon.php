@@ -53,7 +53,7 @@ class LitCommon
     public const PRO_SANCTIS_MULIERIBUS                      = 'For Holy Women';
 
     private string $locale;
-    /** @var array<string, string> */
+    /** @var array<string,string> */
     private array $GTXT;
 
     // public static string $HASH_REQUEST  = '';

@@ -16,7 +16,7 @@ class AbstractEventKeyDateMap extends AbstractLiturgicalEventMap implements \Jso
      * When json encoding an AbstractLiturgicalEventMap object, serialize it as an array of arrays with keys
      * "event_key" and "date"
      *
-     * @return array<array{event_key: string, date: DateTime}>
+     * @return array<array{event_key:string,date:string,timezone:string,timezone_type:int}>
      */
     public function jsonSerialize(): array
     {
@@ -24,7 +24,7 @@ class AbstractEventKeyDateMap extends AbstractLiturgicalEventMap implements \Jso
         foreach ($this->eventMap as $event) {
             $serializedEvents[] = [
                 'event_key' => $event->event_key,
-                ...json_decode(json_encode($event->date), true)
+                ...$event->date->jsonSerialize()
             ];
         }
         return $serializedEvents;

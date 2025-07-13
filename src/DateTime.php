@@ -11,7 +11,7 @@ class DateTime extends \DateTime implements \JsonSerializable
      * containing the ISO-8601 formatted date and time, and keys for the timezone
      *
      * @see https://www.php.net/manual/en/class.datetime.php
-     * @return array{date: string, timezone: string, timezone_type: int}
+     * @return array{date:string,timezone:string,timezone_type:int}
      */
     public function jsonSerialize(): array
     {
@@ -25,7 +25,7 @@ class DateTime extends \DateTime implements \JsonSerializable
             throw new \RuntimeException('Failed to encode timezone to JSON: ' . json_last_error_msg());
         }
 
-        /** @var array{timezone: string, timezone_type: int} */
+        /** @var array{timezone:string,timezone_type:int} */
         $tz = json_decode($tzJson, true);
         return [
             'date' => $this->format('c'), //serialize the DateTime object as a PHP timestamp

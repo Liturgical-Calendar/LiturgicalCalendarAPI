@@ -6,8 +6,8 @@ use LiturgicalCalendar\Api\Test\TestItem;
 
 class TestsMap
 {
-    /** @var array<string, TestItem> */ private array $testInstructions = [];
-    /** @var array<string, int[]>    */ private array $yearsSupported   = [];
+    /** @var array<string,TestItem> */ private array $testInstructions = [];
+    /** @var array<string,int[]>    */ private array $yearsSupported   = [];
 
     /**
      * Adds a test to the map.

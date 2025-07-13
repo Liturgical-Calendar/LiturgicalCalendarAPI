@@ -12,21 +12,21 @@ use LiturgicalCalendar\Api\Enum\JsonData;
  * and get the year limits for a Roman Missal.
  *
  * @phpstan-type RomanMissalMetadata array{
- *     missal_id: string,
- *     name: string,
- *     region: string,
- *     locales: string[],
- *     year_limits: array{since_year: int, until_year?: int},
- *     year_published: int
+ *     missal_id:string,
+ *     name:string,
+ *     region:string,
+ *     locales:string[],
+ *     year_limits:array{since_year:int,until_year?:int},
+ *     year_published:int
  * }
  *
  * @phpstan-type RomanMissalMetadataObject object{
- *     missal_id: string,
- *     name: string,
- *     region: string,
- *     locales: string[],
- *     year_limits: object{since_year:int,until_year?:int},
- *     year_published: int
+ *     missal_id:string,
+ *     name:string,
+ *     region:string,
+ *     locales:string[],
+ *     year_limits:object{since_year:int,until_year?:int},
+ *     year_published:int
  * }
  */
 class RomanMissal
@@ -69,7 +69,7 @@ class RomanMissal
      * An associative array of the Roman Missal names, where the key is the value of a Roman Missal constant.
      * This array is used to get the name of a Roman Missal given its id.
      * @static
-     * @var array<string, string>
+     * @var array<string,string>
      * @see RomanMissal::getName()
      */
     public static array $names = [
@@ -90,7 +90,7 @@ class RomanMissal
      * An associative array of the JSON file paths, where the key is the value of a Roman Missal constant.
      * This array is used to get the path to the JSON file containing the sanctorale data for a Roman Missal.
      * @static
-     * @var array<string, string|false>
+     * @var array<string,string|false>
      * @see RomanMissal::getSanctoraleFileName()
      */
     public static array $jsonFiles = [
@@ -111,7 +111,7 @@ class RomanMissal
      * An associative array of the i18n file paths, where the key is the value of a Roman Missal constant.
      * This array is used to get the path to the i18n directory for the sanctorale of a Roman Missal.
      * @static
-     * @var array<string, string|false>
+     * @var array<string,string|false>
      * @see RomanMissal::getSanctoraleI18nFilePath()
      */
     public static array $i18nPath = [
@@ -133,7 +133,7 @@ class RomanMissal
      * and the value is an associative array with the properties 'since_year' and optionally 'until_year'.
      * This array is used to get the year limits for a Roman Missal.
      * @static
-     * @var array<string, array{since_year: int, until_year?: int}>
+     * @var array<string,array{since_year:int,until_year?:int}>
      * @see RomanMissal::getYearLimits()
      */
     public static array $yearLimits = [

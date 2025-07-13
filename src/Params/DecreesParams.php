@@ -23,7 +23,7 @@ class DecreesParams implements ParamsInterface
      *
      * Initializes the DecreesParams object and sets its parameters.
      *
-     * @param array{locale?: string} $params An associative array of parameter keys to values, where
+     * @param array{locale?:string} $params An associative array of parameter keys to values, where
      *                      'locale' is the key to set the language in which the Decrees should be retrieved.
      */
     public function __construct(array $params = [])
@@ -38,7 +38,7 @@ class DecreesParams implements ParamsInterface
      * - locale: the language in which the decrees should be retrieved.
      *
      * All parameters are optional, and default values will be used if they are not provided.
-     * @param array{locale?: string} $params an associative array of parameter keys to values
+     * @param array{locale?:string} $params an associative array of parameter keys to values
      */
     public function setParams(array $params = []): void
     {

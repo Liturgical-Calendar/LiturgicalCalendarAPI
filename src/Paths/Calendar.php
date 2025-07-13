@@ -43,9 +43,9 @@ use LiturgicalCalendar\Api\Params\CalendarParams;
  *      type: string,
  *      grade: int
  * }
- * @phpstan-type PropriumDeTemporeMap array<string, PropriumDeTemporeItem>
- * @phpstan-type MissalItem array<string, object>
- * @phpstan-type TempCalMap array<string, MissalItem>
+ * @phpstan-type PropriumDeTemporeMap array<string,PropriumDeTemporeItem>
+ * @phpstan-type MissalItem array<string,object>
+ * @phpstan-type TempCalMap array<string,MissalItem>
  * @phpstan-type CatholicDioceseLatinRiteItem object{
  *      diocese_name: string,
  *      diocese_id: string,
@@ -69,8 +69,8 @@ use LiturgicalCalendar\Api\Params\CalendarParams;
 class Calendar
 {
     public static Core $Core;
-    /** @var string[] */ private array $AllowedReturnTypes; // can only be set once, after which it will be read-only
-    /** @var CatholicDiocesesLatinRite */ private array $worldDiocesesLatinRite; // can only be set once, after which it will be read-only
+    /** @var ReturnType[] */ private readonly array $AllowedReturnTypes; // can only be set once, after which it will be read-only
+    /** @var CatholicDiocesesLatinRite */ private readonly array $worldDiocesesLatinRite; // can only be set once, after which it will be read-only
     private CalendarParams $CalendarParams;
     private LitCommon $LitCommon;
     private LitGrade $LitGrade;
@@ -460,9 +460,9 @@ class Calendar
         if ($this->CalendarParams->ReturnType !== null) {
             if (false === in_array($this->CalendarParams->ReturnType, $this->AllowedReturnTypes)) {
                 $description = 'You are requesting a content type which this API cannot produce. Allowed content types are '
-                    . implode(' and ', $this->AllowedReturnTypes)
+                    . implode(' and ', array_column($this->AllowedReturnTypes, 'value'))
                     . ', but you have issued a parameter requesting a Content Type of '
-                    . strtoupper($this->CalendarParams->ReturnType);
+                    . $this->CalendarParams->ReturnType->value;
                 self::produceErrorResponse(StatusCode::NOT_ACCEPTABLE, $description);
             }
             self::$Core->setResponseContentType(
@@ -472,7 +472,8 @@ class Calendar
             if (self::$Core->hasAcceptHeader()) {
                 if (self::$Core->isAllowedAcceptHeader()) {
                     $this->CalendarParams->ReturnType = $this->AllowedReturnTypes[ self::$Core->getIdxAcceptHeaderInAllowed() ];
-                    self::$Core->setResponseContentType(self::$Core->getAcceptHeader());
+                    $acceptHeader                     = AcceptHeader::from(self::$Core->getAcceptHeader());
+                    self::$Core->setResponseContentType($acceptHeader);
                 } else {
                     //Requests from browser windows using the address bar will probably have an Accept header of text/html
                     //In order to not be too drastic, let's treat text/html as though it were application/json
@@ -482,7 +483,7 @@ class Calendar
                         self::$Core->setResponseContentType(AcceptHeader::JSON);
                     } else {
                         $description = 'You are requesting a content type which this API cannot produce. Allowed Accept headers are '
-                            . implode(' and ', self::$Core->getAllowedAcceptHeaders())
+                            . implode(' and ', array_column(self::$Core->getAllowedAcceptHeaders(), 'value'))
                             . ', but you have issued an request with an Accept header of '
                             . self::$Core->getAcceptHeader();
                         self::produceErrorResponse(StatusCode::NOT_ACCEPTABLE, $description);
@@ -521,10 +522,11 @@ class Calendar
     {
         if ($this->CalendarParams->NationalCalendar !== null) {
             if ($this->CalendarParams->NationalCalendar === 'VA') {
-                $this->CalendarParams->Epiphany      = Epiphany::JAN6;
-                $this->CalendarParams->Ascension     = Ascension::THURSDAY;
-                $this->CalendarParams->CorpusChristi = CorpusChristi::THURSDAY;
-                $this->CalendarParams->Locale        = LitLocale::LATIN;
+                $this->CalendarParams->Epiphany          = Epiphany::JAN6;
+                $this->CalendarParams->Ascension         = Ascension::THURSDAY;
+                $this->CalendarParams->CorpusChristi     = CorpusChristi::THURSDAY;
+                $this->CalendarParams->Locale            = LitLocale::LATIN;
+                $this->CalendarParams->EternalHighPriest = false;
             } else {
                 if (property_exists($this->NationalData, 'settings')) {
                     // phpcs:disable Generic.Formatting.MultipleStatementAlignment
@@ -532,19 +534,19 @@ class Calendar
                         property_exists($this->NationalData->settings, 'epiphany')
                         && Epiphany::isValid($this->NationalData->settings->epiphany)
                     ) {
-                        $this->CalendarParams->Epiphany          = $this->NationalData->settings->epiphany;
+                        $this->CalendarParams->Epiphany          = Epiphany::from($this->NationalData->settings->epiphany);
                     }
                     if (
                         property_exists($this->NationalData->settings, 'ascension')
                         && Ascension::isValid($this->NationalData->settings->ascension)
                     ) {
-                        $this->CalendarParams->Ascension         = $this->NationalData->settings->ascension;
+                        $this->CalendarParams->Ascension         = Ascension::from($this->NationalData->settings->ascension);
                     }
                     if (
                         property_exists($this->NationalData->settings, 'corpus_christi')
                         && CorpusChristi::isValid($this->NationalData->settings->corpus_christi)
                     ) {
-                        $this->CalendarParams->CorpusChristi     = $this->NationalData->settings->corpus_christi;
+                        $this->CalendarParams->CorpusChristi     = CorpusChristi::from($this->NationalData->settings->corpus_christi);
                     }
                     if (
                         property_exists($this->NationalData->settings, 'eternal_high_priest')
@@ -573,17 +575,17 @@ class Calendar
                     switch ($key) {
                         case 'epiphany':
                             if (Epiphany::isValid($value)) {
-                                $this->CalendarParams->Epiphany        = $value;
+                                $this->CalendarParams->Epiphany      = Epiphany::from($value);
                             }
                             break;
                         case 'ascension':
                             if (Ascension::isValid($value)) {
-                                $this->CalendarParams->Ascension       = $value;
+                                $this->CalendarParams->Ascension     = Ascension::from($value);
                             }
                             break;
                         case 'corpus_christi':
                             if (CorpusChristi::isValid($value)) {
-                                $this->CalendarParams->CorpusChristi   = $value;
+                                $this->CalendarParams->CorpusChristi = CorpusChristi::from($value);
                             }
                             break;
                     }
@@ -616,7 +618,7 @@ class Calendar
      * If the diocese ID is not found, returns null.
      *
      * @param string $id The diocese ID.
-     * @return array{diocese_name: string, nation: string}|null The diocese name and nation, or null if not found.
+     * @return array{diocese_name:string,nation:string}|null The diocese name and nation, or null if not found.
      */
     private function dioceseIdToName(string $id): ?array
     {
@@ -715,7 +717,7 @@ class Calendar
         //LitCommon::$HASH_REQUEST = $paramsHash;
         $paramsHash              = md5(serialize($this->CalendarParams));
         Utilities::$HASH_REQUEST = $paramsHash;
-        $cacheFileName           = $paramsHash . $this->CacheDuration . '.' . strtolower($this->CalendarParams->ReturnType);
+        $cacheFileName           = $paramsHash . $this->CacheDuration . '.' . strtolower($this->CalendarParams->ReturnType->value);
         $this->CacheFile         = $this->CachePath . $cacheFileName;
         return file_exists($this->CacheFile);
     }
@@ -802,7 +804,7 @@ class Calendar
      * If the file does not exist, or if there is an error decoding the
      * JSON data, a 503 Service Unavailable error is thrown.
      *
-     * @return array<string, string>|null The loaded data, or null if there was an error.
+     * @return array<string,string>|null The loaded data, or null if there was an error.
      */
     private function loadPropriumDeTemporeI18nData(): ?array
     {
@@ -4563,66 +4565,67 @@ class Calendar
         $ical .= "X-WR-TIMEZONE:Europe/Vatican\r\n"; //perhaps allow this to be set through a GET or POST?
         $ical .= "X-PUBLISHED-TTL:PT1D\r\n";
 
-        /** @var EventCollectionItem $CalEvent */
-        foreach ($SerializeableLitCal->litcal as $CalEvent) {
+        /** @var LiturgicalEvent $liturgicalEvent */
+        foreach ($SerializeableLitCal->litcal as $liturgicalEvent) {
+            assert($liturgicalEvent instanceof LiturgicalEvent, 'liturgicalEvent is not an instance of LiturgicalEvent');
             $displayGrade     = '';
             $displayGradeHTML = '';
-            if ($CalEvent['grade_display'] !== null) {
-                $displayGrade = $CalEvent['grade_display'];
+            assert(property_exists($liturgicalEvent, 'grade_display'), 'liturgicalEvent does not have a grade_display property');
+            if (property_exists($liturgicalEvent, 'grade_display') && $liturgicalEvent->grade_display !== null) {
+                $displayGrade = $liturgicalEvent->grade_display;
             }
-            if ($CalEvent['event_key'] === 'DedicationLateran' || $CalEvent['event_key'] === 'DedicationLateran_vigil') {
+            if (property_exists($liturgicalEvent, 'event_key') && ($liturgicalEvent->event_key === 'DedicationLateran' || $liturgicalEvent->event_key === 'DedicationLateran_vigil')) {
                 $displayGradeHTML = $this->LitGrade->i18n(LitGrade::FEAST, true);
-            } elseif ($CalEvent['grade_display'] === null) {
-                $displayGradeHTML = $this->LitGrade->i18n((int)$CalEvent['grade'], true);
+            } elseif ($liturgicalEvent->grade_display === null) {
+                $displayGradeHTML = $this->LitGrade->i18n((int)$liturgicalEvent->grade, true);
             } else {
-                if ($CalEvent['grade_display'] === '') {
+                if ($liturgicalEvent->grade_display === '') {
                     $displayGradeHTML = '';
-                } elseif ((int)$CalEvent['grade'] >= LitGrade::FEAST) {
-                    $displayGradeHTML = '<B>' . $CalEvent['grade_display'] . '</B>';
+                } elseif ((int)$liturgicalEvent->grade >= LitGrade::FEAST) {
+                    $displayGradeHTML = '<B>' . $liturgicalEvent->grade_display . '</B>';
                 } else {
-                    $displayGradeHTML = $CalEvent['grade_display'];
+                    $displayGradeHTML = $liturgicalEvent->grade_display;
                 }
             }
 
-            $description  = $this->LitCommon->c($CalEvent['common']);
+            $description  = $this->LitCommon->c($liturgicalEvent->common);
             $description .=  '\n' . $displayGrade;
-            $description .= (is_array($CalEvent['color']) && count($CalEvent['color']) > 0)
-                ? '\n' . Utilities::parseColorString($CalEvent['color'], $this->CalendarParams->Locale, false)
+            $description .= (is_array($liturgicalEvent->color) && count($liturgicalEvent->color) > 0)
+                ? '\n' . Utilities::parseColorString($liturgicalEvent->color, $this->CalendarParams->Locale, false)
                 : '';
             $description .= (
-                    isset($CalEvent['liturgical_year']) // no need to check for null value, isset will fail for a null value
-                    && $CalEvent['liturgical_year'] !== ''
+                    isset($liturgicalEvent->liturgical_year) // no need to check for null value, isset will fail for a null value
+                    && $liturgicalEvent->liturgical_year !== ''
                 )
-                ? '\n' . $CalEvent['liturgical_year']
+                ? '\n' . $liturgicalEvent->liturgical_year
                 : '';
 
-            $htmlDescription  = '<P DIR=LTR>' . $this->LitCommon->c($CalEvent['common']);
+            $htmlDescription  = '<P DIR=LTR>' . $this->LitCommon->c($liturgicalEvent->common);
             $htmlDescription .=  '<BR>' . $displayGradeHTML;
-            $htmlDescription .= (is_array($CalEvent['color']) && count($CalEvent['color']) > 0)
-                ? '<BR>' . Utilities::parseColorString($CalEvent['color'], $this->CalendarParams->Locale, true)
+            $htmlDescription .= (is_array($liturgicalEvent->color) && count($liturgicalEvent->color) > 0)
+                ? '<BR>' . Utilities::parseColorString($liturgicalEvent->color, $this->CalendarParams->Locale, true)
                 : '';
             $htmlDescription .= (
-                    isset($CalEvent['liturgical_year']) // no need to check for null value, isset will fail for a null value
-                    && $CalEvent['liturgical_year'] != ''
+                    isset($liturgicalEvent->liturgical_year) // no need to check for null value, isset will fail for a null value
+                    && $liturgicalEvent->liturgical_year != ''
                 )
-                ? '<BR>' . $CalEvent['liturgical_year'] . '</P>'
+                ? '<BR>' . $liturgicalEvent->liturgical_year . '</P>'
                 : '</P>';
 
             $ical .= "BEGIN:VEVENT\r\n";
             $ical .= "CLASS:PUBLIC\r\n";
 
             $publishDate = $GitHubReleasesObj->published_at;
-            $icalDate    = \DateTime::createFromFormat('U', (string)$CalEvent['date'], new \DateTimeZone('UTC'));
 
-            $ical .= 'DTSTART;VALUE=DATE:' . $icalDate->format('Ymd') . "\r\n";// . "T" . $icalDate->format( 'His' ) . "Z\r\n";
-            //$CalEvent['date']->add( new \DateInterval( 'P1D' ) );
-            //$ical .= "DTEND:" . $icalDate->format( 'Ymd' ) . "T" . $icalDate->format( 'His' ) . "Z\r\n";
+            $ical .= 'DTSTART;VALUE=DATE:' . $liturgicalEvent->date->format('Ymd') . "\r\n";// . "T" . $liturgicalEvent->date->format( 'His' ) . "Z\r\n";
+            //$liturgicalEvent->date->add( new \DateInterval( 'P1D' ) );
+            //$ical .= "DTEND:" . $liturgicalEvent->date->format( 'Ymd' ) . "T" . $liturgicalEvent->date->format( 'His' ) . "Z\r\n";
             $ical .= 'DTSTAMP:' . date('Ymd') . 'T' . date('His') . "Z\r\n";
             /** The event created in the calendar is specific to this year, next year it may be different.
              *  So UID must take into account the year
              *  Next year's event should not cancel this year's event, they are different events
              **/
-            $ical .= 'UID:' . md5('LITCAL-' . $CalEvent['event_key'] . '-' . $icalDate->format('Y')) . "\r\n";
+            $ical .= 'UID:' . md5('LITCAL-' . $liturgicalEvent->event_key . '-' . $liturgicalEvent->date->format('Y')) . "\r\n";
             $ical .= 'CREATED:' . str_replace(':', '', str_replace('-', '', $publishDate)) . "\r\n";
 
             $desc  = 'DESCRIPTION:' . str_replace(',', '\,', $description);
@@ -4630,7 +4633,7 @@ class Calendar
             $ical .= 'LAST-MODIFIED:' . str_replace(':', '', str_replace('-', '', $publishDate)) . "\r\n";
 
             $summaryLang = ';LANGUAGE=' . strtolower(preg_replace('/_/', '-', $this->CalendarParams->Locale));
-            $summary     = 'SUMMARY' . $summaryLang . ':' . str_replace(',', '\,', str_replace("\r\n", ' ', $CalEvent['name']));
+            $summary     = 'SUMMARY' . $summaryLang . ':' . str_replace(',', '\,', str_replace("\r\n", ' ', $liturgicalEvent->name));
 
             $ical .= strlen($summary) > 75 ? rtrim(chunk_split($summary, 75, "\r\n\t")) . "\r\n" : $summary . "\r\n";
             $ical .= "TRANSP:TRANSPARENT\r\n";
@@ -4864,14 +4867,17 @@ class Calendar
      * The allowed return types are used to determine which types of responses
      * can be returned by the API.
      *
-     * @param array<string> $returnTypes The return types to allow.
+     * @param array<ReturnType> $returnTypes The return types to allow.
      */
     public function setAllowedReturnTypes(array $returnTypes = [ReturnType::JSON]): void
     {
         if (false === empty($this->AllowedReturnTypes)) {
             return; //if we already have the allowed return types, do not change them
         }
-        $this->AllowedReturnTypes = array_values(array_intersect(ReturnType::$values, $returnTypes));
+        $this->AllowedReturnTypes = array_values(array_filter(
+            ReturnType::cases(),
+            fn (ReturnType $returnType) => in_array($returnType, $returnTypes)
+        ));
     }
 
 

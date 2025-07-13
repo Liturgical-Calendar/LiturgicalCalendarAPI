@@ -4,45 +4,17 @@ namespace LiturgicalCalendar\Api\Paths;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\Route;
+use NationalCalendarMetadata;
+use DiocesanCalendarMetadata;
+use DiocesanGroup;
+use WiderRegionMetadata;
 
-/**
- * @phpstan-type CalendarSettings array{
- *      epiphany: string,
- *      ascension: string,
- *      corpus_christi: string,
- *      eternal_high_priest: bool
- * }
- * @phpstan-type NationalCalendarMetadata array{
- *      calendar_id: string,
- *      locales: array<string>,
- *      missals: array<string>,
- *      wider_region: string,
- *      dioceses: array<string>,
- *      settings: CalendarSettings
- * }
- * @phpstan-type DiocesanCalendarMetadata array{
- *      calendar_id: string,
- *      diocese: string,
- *      nation: string,
- *      locales: array<string>,
- *      timezone: string,
- *      group?: string,
- *      settings?: CalendarSettings
- * }
- * @phpstan-type WiderRegionMetadata array{
- *      name: string,
- *      locales: array<string>,
- *      api_path: string
- * }
- * @phpstan-type DiocesanGroup string[]
- * @phpstan-import-type CatholicDiocesesLatinRite from Calendar
- */
 class Metadata
 {
     /** @var array<NationalCalendarMetadata> */ private static array $nationalCalendars      = [];
     /** @var array<string>                   */ private static array $nationalCalendarsKeys  = [];
     /** @var array<DiocesanCalendarMetadata> */ private static array $diocesanCalendars      = [];
-    /** @var array<string, DiocesanGroup>    */ private static array $diocesanGroups         = [];
+    /** @var array<string,DiocesanGroup>     */ private static array $diocesanGroups         = [];
     /** @var array<WiderRegionMetadata>      */ private static array $widerRegions           = [];
     /** @var array<string>                   */ private static array $widerRegionsNames      = [];
     /** @var array<string>                   */ private static array $locales                = [];
@@ -66,9 +38,10 @@ class Metadata
     {
         $directories = array_map('basename', glob(JsonData::NATIONAL_CALENDARS_FOLDER . '/*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
-            if (file_exists(JsonData::NATIONAL_CALENDARS_FOLDER . "/$directory/$directory.json")) {
+            $nationalCalendarDataFile = JsonData::NATIONAL_CALENDARS_FOLDER . "/$directory/$directory.json";
+            if (file_exists($nationalCalendarDataFile)) {
                 Metadata::$nationalCalendarsKeys[] = $directory;
-                $nationalCalendarDefinition        = file_get_contents(JsonData::NATIONAL_CALENDARS_FOLDER . "/$directory/$directory.json");
+                $nationalCalendarDefinition        = file_get_contents($nationalCalendarDataFile);
                 $nationalCalendarData              = json_decode($nationalCalendarDefinition);
                 if (JSON_ERROR_NONE === json_last_error()) {
                     $nationalCalendarArr           = [

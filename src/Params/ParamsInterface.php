@@ -16,7 +16,7 @@ interface ParamsInterface
      * This method takes an associative array of parameters and sets them in the class implementing the method.
      * The keys of the array should corresponde to properties of the class.
      *
-     * @param array<string, mixed> $params An associative array of parameter keys to values.
+     * @param array<string,mixed> $params An associative array of parameter keys to values.
      */
     public function setParams(array $params = []): void;
 }

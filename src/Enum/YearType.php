@@ -2,22 +2,10 @@
 
 namespace LiturgicalCalendar\Api\Enum;
 
-class YearType
+enum YearType: string
 {
-    public const CIVIL      = 'CIVIL';
-    public const LITURGICAL = 'LITURGICAL';
+    use EnumToArrayTrait;
 
-    /** @var string[] */
-    public static array $values = [ 'CIVIL', 'LITURGICAL' ];
-
-    /**
-     * Check if the given year type is valid.
-     *
-     * @param string $value The year type to check.
-     * @return bool True if the year type is valid, otherwise false.
-     */
-    public static function isValid(string $value): bool
-    {
-        return in_array($value, self::$values);
-    }
+    case CIVIL      = 'CIVIL';
+    case LITURGICAL = 'LITURGICAL';
 }

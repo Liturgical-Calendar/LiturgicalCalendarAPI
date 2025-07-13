@@ -41,7 +41,7 @@ class Utilities
      * Used to keep track of the current array type
      * when processing items of the array.
      * This way the items can be transformed to an appropriate XML element.
-     * @var string
+     * @var string|int
      */
     private static string|int $LAST_ARRAY_KEY = '';
 
@@ -85,6 +85,12 @@ class Utilities
         return array_key_exists($key, self::CUSTOM_TRANSFORM_KEYS);
     }
 
+    /**
+     * Returns the PascalCase representation of a given snake_case key.
+     * If the key is present in the CUSTOM_TRANSFORM_KEYS array, its value is returned instead.
+     * @param string $key
+     * @return string
+     */
     private static function transformKey(string $key): string
     {
         if (self::isCustomTransformKey($key)) {
@@ -96,7 +102,7 @@ class Utilities
 
     /**
      * Recursively convert an associative array to an XML object
-     * @param array<string|int, mixed> $data
+     * @param array<string|int,mixed> $data
      * @param \SimpleXMLElement $xml
      * @return void
      */
@@ -107,13 +113,16 @@ class Utilities
                 self::$LAST_ARRAY_KEY = $key;
                 //self::debugWrite( "value of key <$key> is an array" );
                 if (self::isNotLitCalEventKey($key)) {
-                    $key        = self::transformKey($key);
+                    // the key will always be a string in this case,
+                    // but we pass it explicitly as a string to the transformKey function
+                    // which expects a string, to make phpstan happy
+                    $key        = self::transformKey($key . '');
                     $new_object = $xml->addChild($key);
                 } else {
                     //self::debugWrite( "key <$key> is a LitCalEvent" );
                     $new_object = $xml->addChild('LitCalEvent');
                     if (is_numeric($key)) {
-                        $new_object->addAttribute('idx', $key);
+                        $new_object->addAttribute('idx', $key . '');
                     }
                 }
                 //self::debugWrite( "proceeding to convert array value of <$key> to xml sequence..." );
@@ -127,14 +136,14 @@ class Utilities
                 if (is_numeric($key)) {
                     if (self::$LAST_ARRAY_KEY === 'messages') {
                         $el = $xml->addChild('Message', htmlspecialchars($value));
-                        $el->addAttribute('idx', $key);
+                        $el->addAttribute('idx', $key . '');
                     } elseif (in_array(self::$LAST_ARRAY_KEY, ['solemnities_keys', 'feasts_keys', 'memorials_keys', 'suppressed_events_keys', 'reinstated_events_keys'])) {
                         $el = $xml->addChild('Key', $value);
-                        $el->addAttribute('idx', $key);
+                        $el->addAttribute('idx', $key . '');
                     } else {
                         // color, color_lcl, and common array items will be converted to Option elements
                         $el = $xml->addChild('Option', $value);
-                        $el->addAttribute('idx', $key);
+                        $el->addAttribute('idx', $key . '');
                     }
                 } else {
                     $key = self::transformKey($key);
@@ -178,15 +187,24 @@ class Utilities
         $day   = (($h + $l - 7 * $m + 114) % 31) + 1;
 
         $dateObj = DateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new \DateTimeZone('UTC'));
-
+        if ($dateObj === false) {
+            throw new \Exception('Failed to create DateTime object');
+        }
         return $dateObj;
     }
 
 
-    //https://en.wikipedia.org/wiki/Computus#Meeus.27_Julian_algorithm
-    //Meeus' Julian algorithm
-    //Also many javascript examples can be found here:
-    //https://web.archive.org/web/20150227133210/http://www.merlyn.demon.co.uk/estralgs.txt
+    /**
+     * Meeus' Julian algorithm
+     *
+     * See {@link https://en.wikipedia.org/wiki/Computus#Meeus.27_Julian_algorithm}.
+     * Also many javascript examples can be found here: {@link https://web.archive.org/web/20150227133210/http://www.merlyn.demon.co.uk/estralgs.txt}
+     *
+     * @param int $Y The year for which to calculate the Easter date.
+     * @param bool $gregCal If true, the resulting date is adjusted to the Gregorian calendar.
+     * @return DateTime The date of Easter in the Julian calendar for the given year.
+     * @throws \Exception
+     */
     public static function calcJulianEaster(int $Y, bool $gregCal = false): DateTime
     {
         $a     = $Y % 4;
@@ -198,6 +216,9 @@ class Utilities
         $day   = ( ($d + $e + 114) % 31 ) + 1;
 
         $dateObj = DateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new \DateTimeZone('UTC'));
+        if ($dateObj === false) {
+            throw new \Exception(__METHOD__ . 'Failed to create DateTime object, on line' . __LINE__);
+        }
         if ($gregCal) {
             //from February 29th 2100 Julian (March 14th 2100 Gregorian),
             //the difference between the Julian and Gregorian calendars will increase to 14 days
@@ -205,19 +226,28 @@ class Utilities
             $dateDiff = 'P' . floor((intval(substr($Y,0,2)) / .75) - 1.25) . 'D';
             $dateObj->add(new DateInterval($dateDiff));
             */
-            $GregDateDiff    = [];
-            $GregDateDiff[0] = [DateTime::createFromFormat('!j-n-Y', '4-10-1582'),'P10D']; //add 10 == GREGORIAN CUTOVER DATE
+            $GregDateDiff = [];
+            $gregDateObj  = DateTime::createFromFormat('!j-n-Y', '4-10-1582', new \DateTimeZone('UTC'));
+            if ($gregDateObj === false) {
+                throw new \Exception(__METHOD__ . 'Failed to create DateTime object, on line' . __LINE__);
+            }
+            $GregDateDiff[0] = [$gregDateObj, 'P10D']; //add 10 = GREGORIAN CUTOVER DATE
             $idx             = 0;
             $cc              = 10;
             for ($cent = 17; $cent <= 99; $cent++) {
                 if ($cent % 4 > 0) {
-                    $GregDateDiff[++$idx] = [DateTime::createFromFormat('!j-n-Y', '28-2-' . $cent . '00'),'P' . ++$cc . 'D'];
+                    $gregDateObj = DateTime::createFromFormat('!j-n-Y', '28-2-' . $cent . '00', new \DateTimeZone('UTC'));
+                    if ($gregDateObj === false) {
+                        throw new \Exception(__METHOD__ . 'Failed to create DateTime object, on line' . __LINE__);
+                    }
+                    $GregDateDiff[++$idx] = [$gregDateObj, 'P' . ++$cc . 'D'];
                 }
             }
 
             for ($i = count($GregDateDiff); $i > 0; $i--) {
                 if ($dateObj > $GregDateDiff[$i - 1][0]) {
-                    $dateObj->add(new \DateInterval($GregDateDiff[$i - 1][1]));
+                    $dateInterval = new \DateInterval($GregDateDiff[$i - 1][1]);
+                    $dateObj->add($dateInterval);
                     break;
                 }
             }
@@ -346,6 +376,9 @@ class Utilities
                 break;
             default:
                 $ordinal = $formatter->format($num);
+        }
+        if (false === $ordinal) {
+            throw new \Exception('Unable to get ordinal for ' . $num . ' in locale ' . $locale);
         }
         return $ordinal;
     }

@@ -62,8 +62,8 @@ class LiturgicalEventCollection
     /** @var ReinstatedEventsMap<string, LiturgicalEvent> */
     private ReinstatedEventsMap $reinstatedEvents;
 
-    /** @var array<string, string> Translation map */
-    private array $T;
+    /** @var array<string,string> Translation map */
+    private readonly array $T;
     /** @var array<string> */
     private array $Messages;
 
@@ -99,8 +99,7 @@ class LiturgicalEventCollection
             ];
         }
 
-        $this->LitGrade = new LitGrade($this->CalendarParams->Locale);
-
+        $this->LitGrade                  = new LitGrade($this->CalendarParams->Locale);
         $this->liturgicalEvents          = new LiturgicalEventsMap();
         $this->solemnitiesLordBVM        = new SolemnitiesLordBVMMap();
         $this->solemnities               = new SolemnitiesMap();
@@ -242,7 +241,7 @@ class LiturgicalEventCollection
      * whose date matches the given DateTime object.
      *
      * @param DateTime $date The date for which to retrieve events.
-     * @return array<string, LiturgicalEvent> An array of events occurring on the specified date.
+     * @return array<string,LiturgicalEvent> An array of events occurring on the specified date.
      */
     public function getCalEventsFromDate(DateTime $date): array
     {

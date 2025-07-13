@@ -26,12 +26,12 @@ use LiturgicalCalendar\Api\Params\EventsParams;
  *      decree?: string,
  *      grade: int
  * }
- * @phpstan-type LiturgicalEventCollectionItem array<string, mixed>
+ * @phpstan-type LiturgicalEventCollectionItem array<string,mixed>
  */
 class Events
 {
     public static Core $Core;
-    /** @var array<string, LiturgicalEventCollectionItem> */
+    /** @var array<string,LiturgicalEventCollectionItem> */
     private static array $LiturgicalEventCollection = [];
     /** @var string[] */
     private static array $LatinMissals = [];
@@ -211,9 +211,9 @@ class Events
                 break;
             default:
                 $description = 'You seem to be forming a strange kind of request? Allowed Request Methods are '
-                    . implode(' and ', self::$Core->getAllowedRequestMethods())
+                    . implode(' and ', array_column(self::$Core->getAllowedRequestMethods(), 'value'))
                     . ', but your Request Method was '
-                    . self::$Core->getRequestMethod();
+                    . self::$Core->getRequestMethod()->value;
                 echo self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, $description);
                 die();
         }

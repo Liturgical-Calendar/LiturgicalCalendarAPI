@@ -39,15 +39,15 @@ class CalendarParams implements ParamsInterface
 {
     private ?object $calendars;
     public int $Year;
-    public string $YearType          = YearType::LITURGICAL;
-    public string $Epiphany          = Epiphany::JAN6;
-    public string $Ascension         = Ascension::THURSDAY;
-    public string $CorpusChristi     = CorpusChristi::THURSDAY;
-    public bool $EternalHighPriest   = false;
-    public ?string $ReturnType       = null;
-    public ?string $Locale           = null;
-    public ?string $NationalCalendar = null;
-    public ?string $DiocesanCalendar = null;
+    public YearType $YearType           = YearType::LITURGICAL;
+    public Epiphany $Epiphany           = Epiphany::JAN6;
+    public Ascension $Ascension         = Ascension::THURSDAY;
+    public CorpusChristi $CorpusChristi = CorpusChristi::THURSDAY;
+    public bool $EternalHighPriest      = false;
+    public ?ReturnType $ReturnType      = null;
+    public ?string $Locale              = null;
+    public ?string $NationalCalendar    = null;
+    public ?string $DiocesanCalendar    = null;
 
     public const ALLOWED_PARAMS = [
         'year',
@@ -181,18 +181,22 @@ class CalendarParams implements ParamsInterface
                         break;
                     case 'epiphany':
                         $this->validateEpiphanyParam($value);
+                        $this->Epiphany = Epiphany::from($value);
                         break;
                     case 'ascension':
                         $this->validateAscensionParam($value);
+                        $this->Ascension = Ascension::from($value);
                         break;
                     case 'corpus_christi':
                         $this->validateCorpusChristiParam($value);
+                        $this->CorpusChristi = CorpusChristi::from($value);
                         break;
                     case 'locale':
                         $this->validateLocaleParam($value);
                         break;
                     case 'return_type':
                         $this->validateReturnTypeParam($value);
+                        $this->ReturnType = ReturnType::from($value);
                         break;
                     case 'national_calendar':
                         $this->validateNationalCalendarParam($value);
@@ -202,6 +206,7 @@ class CalendarParams implements ParamsInterface
                         break;
                     case 'year_type':
                         $this->validateYearTypeParam($value);
+                        $this->YearType = YearType::from($value);
                         break;
                     case 'eternal_high_priest':
                         $this->validateEternalHighPriestParam($value);
@@ -244,16 +249,14 @@ class CalendarParams implements ParamsInterface
     /**
      * Validate the epiphany parameter.
      *
-     * @param string $value a string indicating whether Epiphany should be calculated on Jan 6th or on the Sunday between Jan 2nd and Jan 8th {@see Epiphany::$values}
+     * @param string $value a string indicating whether Epiphany should be calculated on Jan 6th or on the Sunday between Jan 2nd and Jan 8th.
      *
-     * Produces a 400 Bad Request error if the value is not one of the valid values
+     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see Epiphany::values()}.
      */
     private function validateEpiphanyParam(string $value): void
     {
-        if (Epiphany::isValid(strtoupper($value))) {
-            $this->Epiphany = strtoupper($value);
-        } else {
-            $description = "Invalid value `{$value}` for parameter `epiphany`, valid values are: " . implode(', ', Epiphany::$values);
+        if (false === Epiphany::isValid($value)) {
+            $description = "Invalid value `{$value}` for parameter `epiphany`, valid values are: " . implode(', ', Epiphany::values());
             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
         }
     }
@@ -261,16 +264,14 @@ class CalendarParams implements ParamsInterface
     /**
      * Validate the ascension parameter.
      *
-     * @param string $value one of the values in {@see Ascension::$values}
+     * @param string $value a string indicating whether Ascension should be calculated on a Thursday or on a Sunday.
      *
-     * Produces a 400 Bad Request error if the value is not one of the valid values
+     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see Ascension::values()}.
      */
     private function validateAscensionParam(string $value): void
     {
-        if (Ascension::isValid(strtoupper($value))) {
-            $this->Ascension = strtoupper($value);
-        } else {
-            $description = "Invalid value `{$value}` for parameter `ascension`, valid values are: " . implode(', ', Ascension::$values);
+        if (false === Ascension::isValid($value)) {
+            $description = "Invalid value `{$value}` for parameter `ascension`, valid values are: " . implode(', ', Ascension::values());
             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
         }
     }
@@ -278,16 +279,14 @@ class CalendarParams implements ParamsInterface
     /**
      * Validate the corpus_christi parameter.
      *
-     * @param string $value one of the values in {@see CorpusChristi::$values}
+     * @param string $value a string indicating whether Corpus Christi should be calculated on a Sunday or on a Thursday.
      *
-     * Produces a 400 Bad Request error if the value is not one of the valid values
+     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see CorpusChristi::values()}.
      */
     private function validateCorpusChristiParam(string $value): void
     {
-        if (CorpusChristi::isValid(strtoupper($value))) {
-            $this->CorpusChristi = strtoupper($value);
-        } else {
-            $description = "Invalid value `{$value}` for parameter `corpus_christi`, valid values are: " . implode(', ', CorpusChristi::$values);
+        if (false === CorpusChristi::isValid($value)) {
+            $description = "Invalid value `{$value}` for parameter `corpus_christi`, valid values are: " . implode(', ', CorpusChristi::values());
             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
         }
     }
@@ -313,16 +312,14 @@ class CalendarParams implements ParamsInterface
     /**
      * Validate the return_type parameter.
      *
-     * @param string $value one of the values in {@see ReturnType::$values}
+     * @param string $value a string indicating the desired MIME type of the Response.
      *
-     * Produces a 400 Bad Request error if the value is not one of the valid values
+     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see ReturnType::values()}.
      */
     private function validateReturnTypeParam(string $value): void
     {
-        if (ReturnType::isValid(strtoupper($value))) {
-            $this->ReturnType = strtoupper($value);
-        } else {
-            $description = "Invalid value `{$value}` for parameter `return_type`, valid values are: " . implode(', ', ReturnType::$values);
+        if (false === ReturnType::isValid($value)) {
+            $description = "Invalid value `{$value}` for parameter `return_type`, valid values are: " . implode(', ', ReturnType::values());
             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
         }
     }
@@ -366,16 +363,14 @@ class CalendarParams implements ParamsInterface
     /**
      * Validate the year_type parameter.
      *
-     * @param string $value one of the values in {@see YearType::$values}
+     * @param string $value a string indicating whether the calendar should be calculated for a civil or liturgical year.
      *
-     * Produces a 400 Bad Request error if the value is not one of the valid values
+     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see YearType::values()}.
      */
     private function validateYearTypeParam(string $value): void
     {
-        if (YearType::isValid(strtoupper($value))) {
-            $this->YearType = strtoupper($value);
-        } else {
-            $description = "Invalid value `{$value}` for parameter `year_type`, valid values are: " . implode(', ', YearType::$values);
+        if (false === YearType::isValid($value)) {
+            $description = "Invalid value `{$value}` for parameter `year_type`, valid values are: " . implode(', ', YearType::values());
             Calendar::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
         }
     }

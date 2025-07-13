@@ -14,7 +14,7 @@ use LiturgicalCalendar\Api\DateTime;
 abstract class AbstractLiturgicalEventMap implements \IteratorAggregate
 {
     /**
-     * @var array<string, LiturgicalEvent> Map of event keys to LiturgicalEvent objects.
+     * @var array<string,LiturgicalEvent> Map of event keys to LiturgicalEvent objects.
      */
     protected array $eventMap = [];
 
@@ -130,7 +130,7 @@ abstract class AbstractLiturgicalEventMap implements \IteratorAggregate
     /**
      * Retrieves all LiturgicalEvent objects in the map.
      *
-     * @return array<string, LiturgicalEvent> An array of LiturgicalEvent objects.
+     * @return array<string,LiturgicalEvent> An array of LiturgicalEvent objects.
      */
     public function getEvents(): array
     {
@@ -144,7 +144,7 @@ abstract class AbstractLiturgicalEventMap implements \IteratorAggregate
      * whose date matches the given DateTime object.
      *
      * @param DateTime $date The date for which to retrieve events.
-     * @return array<string, LiturgicalEvent> An array of events occurring on the specified date.
+     * @return array<string,LiturgicalEvent> An array of events occurring on the specified date.
      */
     public function getEventsByDate(DateTime $date): array
     {

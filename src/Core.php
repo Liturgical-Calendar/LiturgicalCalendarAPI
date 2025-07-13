@@ -21,17 +21,17 @@ class Core
     private array $AllowedOrigins;
     /** @var string[] */
     private array $AllowedReferers;
-    /** @var string[] */
+    /** @var AcceptHeader[] */
     private array $AllowedAcceptHeaders;
-    /** @var string[] */
+    /** @var RequestMethod[] */
     private array $AllowedRequestMethods;
-    /** @var string[] */
+    /** @var RequestContentType[] */
     private array $AllowedRequestContentTypes;
     /** @var string[] */
-    private array $RequestHeaders        = [];
-    private ?string $RequestContentType  = null;
-    private ?string $ResponseContentType = null;
-    private const ONLY_USEFUL_HEADERS    = [
+    private array $RequestHeaders                   = [];
+    private ?RequestContentType $RequestContentType = null;
+    private ?AcceptHeader $ResponseContentType      = null;
+    private const ONLY_USEFUL_HEADERS               = [
         'Accept',
         'Accept-Language',
         'X-Requested-With', 'Origin'
@@ -49,9 +49,9 @@ class Core
     {
         $this->AllowedOrigins             = [ '*' ];
         $this->AllowedReferers            = [ '*' ];
-        $this->AllowedAcceptHeaders       = AcceptHeader::$values;
-        $this->AllowedRequestMethods      = RequestMethod::$values;
-        $this->AllowedRequestContentTypes = RequestContentType::$values;
+        $this->AllowedAcceptHeaders       = AcceptHeader::cases();
+        $this->AllowedRequestMethods      = RequestMethod::cases();
+        $this->AllowedRequestContentTypes = RequestContentType::cases();
 
         foreach (getallheaders() as $header => $value) {
             if (in_array($header, self::ONLY_USEFUL_HEADERS)) {
@@ -59,8 +59,11 @@ class Core
             }
         }
         $this->JsonEncodedRequestHeaders = json_encode($this->RequestHeaders);
-        if (isset($_SERVER[ 'CONTENT_TYPE' ])) {
-            $this->RequestContentType = $_SERVER[ 'CONTENT_TYPE' ];
+        if (
+            isset($_SERVER[ 'CONTENT_TYPE' ])
+            && in_array($_SERVER[ 'CONTENT_TYPE' ], array_column($this->AllowedRequestContentTypes, 'value'))
+        ) {
+            $this->RequestContentType = RequestContentType::from($_SERVER[ 'CONTENT_TYPE' ]);
         }
     }
 
@@ -97,7 +100,7 @@ class Core
     {
         if (isset($_SERVER[ 'REQUEST_METHOD' ])) {
             if (isset($_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_METHOD' ])) {
-                header('Access-Control-Allow-Methods: ' . implode(',', $this->AllowedRequestMethods));
+                header('Access-Control-Allow-Methods: ' . implode(',', array_column($this->AllowedRequestMethods, 'value')));
             }
             if (isset($_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' ])) {
                 header("Access-Control-Allow-Headers: {$_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' ]}");
@@ -116,18 +119,19 @@ class Core
      */
     private function validateRequestContentType(): void
     {
+        $allowedRequestContentTypeValues = array_column($this->AllowedRequestContentTypes, 'value');
         if (
             isset($_SERVER[ 'CONTENT_TYPE' ])
             && $_SERVER[ 'CONTENT_TYPE' ] !== ''
             && !in_array(
                 explode(';', $_SERVER[ 'CONTENT_TYPE' ])[ 0 ],
-                $this->AllowedRequestContentTypes
+                $allowedRequestContentTypeValues
             )
         ) {
             header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 415 Unsupported Media Type', true, 415);
             $response        = new \stdClass();
             $response->error = 'You seem to be forming a strange kind of request? Allowed Content Types are '
-            . implode(' and ', $this->AllowedRequestContentTypes)
+            . implode(' and ', $allowedRequestContentTypeValues)
             . ', but your Content Type was '
             . $_SERVER[ 'CONTENT_TYPE' ];
             die(json_encode($response));
@@ -144,8 +148,8 @@ class Core
         header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 406 Not Acceptable', true, 406);
         $response        = new \stdClass();
         $response->error = 'You are requesting a content type which this API cannot produce. Allowed Accept headers are '
-            . implode(' and ', $this->AllowedAcceptHeaders)
-            . ', but you have issued an request with an Accept header of '
+            . implode(' and ', array_column($this->AllowedAcceptHeaders, 'value'))
+            . ', but you have issued a request with an Accept header of '
             . $this->RequestHeaders[ 'Accept' ];
         die(json_encode($response));
     }
@@ -170,13 +174,15 @@ class Core
     public function validateAcceptHeader(bool $beLaxAboutIt): void
     {
         if ($this->hasAcceptHeader()) {
+            $receivedAcceptHeader = $this->getAcceptHeader();
+            $acceptHeaders        = explode(',', $receivedAcceptHeader);
+            $firstAcceptHeader    = $acceptHeaders[ 0 ];
             if ($this->isAllowedAcceptHeader()) {
-                $this->ResponseContentType = explode(',', $this->RequestHeaders[ 'Accept' ])[0];
+                $this->ResponseContentType = AcceptHeader::from($firstAcceptHeader);
             } else {
                 if ($beLaxAboutIt) {
                     //Requests from browser windows using the address bar will probably have an Accept header of text/html
                     //In order to not be too drastic, let's treat text/html as though it were application/json for GET and POST requests only
-                    $acceptHeaders = explode(',', $this->RequestHeaders[ 'Accept' ]);
                     if (in_array('text/html', $acceptHeaders) || in_array('text/plain', $acceptHeaders) || in_array('*/*', $acceptHeaders)) {
                         $this->ResponseContentType = AcceptHeader::JSON;
                     } else {
@@ -226,11 +232,14 @@ class Core
      * resources on the server. The allowed accept headers are used to determine which
      * Accept headers are permitted in CORS requests.
      *
-     * @param string[] $acceptHeaders An array of allowed accept headers.
+     * @param AcceptHeader[] $acceptHeaders An array of allowed accept headers.
      */
     public function setAllowedAcceptHeaders(array $acceptHeaders): void
     {
-        $this->AllowedAcceptHeaders = array_values(array_intersect(AcceptHeader::$values, $acceptHeaders));
+        $this->AllowedAcceptHeaders = array_values(array_filter(
+            AcceptHeader::cases(),
+            fn(AcceptHeader $case) => in_array($case, $acceptHeaders, true)
+        ));
     }
 
     /**
@@ -240,11 +249,14 @@ class Core
      * resources on the server. The allowed request methods are used to determine which
      * request methods are permitted in CORS requests.
      *
-     * @param string[] $requestMethods An array of allowed request methods.
+     * @param RequestMethod[] $requestMethods An array of allowed request methods.
      */
     public function setAllowedRequestMethods(array $requestMethods): void
     {
-        $this->AllowedRequestMethods = array_values(array_intersect(RequestMethod::$values, $requestMethods));
+        $this->AllowedRequestMethods = array_values(array_filter(
+            RequestMethod::cases(),
+            fn(RequestMethod $case) => in_array($case, $requestMethods, true)
+        ));
     }
 
     /**
@@ -254,19 +266,22 @@ class Core
      * resources on the server. The allowed request content types are used to determine which
      * request content types are permitted in CORS requests.
      *
-     * @param string[] $requestContentTypes An array of allowed request content types.
+     * @param RequestContentType[] $requestContentTypes An array of allowed request content types.
      */
     public function setAllowedRequestContentTypes(array $requestContentTypes): void
     {
-        $this->AllowedRequestContentTypes = array_values(array_intersect(RequestContentType::$values, $requestContentTypes));
+        $this->AllowedRequestContentTypes = array_values(array_filter(
+            RequestContentType::cases(),
+            fn(RequestContentType $case) => in_array($case, $requestContentTypes, true)
+        ));
     }
 
     /**
      * Get the response content type.
      *
-     * @return ?string The response content type.
+     * @return ?AcceptHeader The response content type.
      */
-    public function getResponseContentType(): ?string
+    public function getResponseContentType(): ?AcceptHeader
     {
         return $this->ResponseContentType;
     }
@@ -274,9 +289,9 @@ class Core
     /**
      * Set the response content type.
      *
-     * @param string $responseContentType The response content type.
+     * @param AcceptHeader $responseContentType The response content type.
      */
-    public function setResponseContentType(string $responseContentType): void
+    public function setResponseContentType(AcceptHeader $responseContentType): void
     {
         $this->ResponseContentType = $responseContentType;
     }
@@ -286,14 +301,17 @@ class Core
      */
     public function setResponseContentTypeHeader(): void
     {
+        if (null === $this->ResponseContentType) {
+            die(__METHOD__ . ': Cannot set the Content Type header for the response, ResponseContentType is null, on line ' . __LINE__);
+        }
         header('Cache-Control: must-revalidate, max-age=259200'); //cache for 1 month
-        header("Content-Type: {$this->ResponseContentType}; charset=utf-8");
+        header("Content-Type: {$this->ResponseContentType->value}; charset=utf-8");
     }
 
     /**
      * Gets the list of allowed Accept headers.
      *
-     * @return string[] The list of allowed Accept headers.
+     * @return AcceptHeader[] The list of allowed Accept headers.
      */
     public function getAllowedAcceptHeaders(): array
     {
@@ -305,7 +323,7 @@ class Core
      *
      * This function returns an array of content types that are permitted in the request.
      *
-     * @return string[] The list of allowed request content types.
+     * @return RequestContentType[] The list of allowed request content types.
      */
     public function getAllowedRequestContentTypes(): array
     {
@@ -332,7 +350,8 @@ class Core
      */
     public function getIdxAcceptHeaderInAllowed(): int|string|false
     {
-        return array_search($this->RequestHeaders[ 'Accept' ], $this->AllowedAcceptHeaders);
+        $allowedAcceptHeaderValues = array_column($this->AllowedAcceptHeaders, 'value');
+        return array_search($this->RequestHeaders[ 'Accept' ], $allowedAcceptHeaderValues, true);
     }
 
     /**
@@ -383,7 +402,9 @@ class Core
      */
     public function isAllowedAcceptHeader(): bool
     {
-        return in_array(explode(',', $this->RequestHeaders[ 'Accept' ])[0], $this->AllowedAcceptHeaders);
+        $allowedAcceptHeaderValues = array_column($this->AllowedAcceptHeaders, 'value');
+        $firstAcceptHeader         = explode(',', $this->RequestHeaders[ 'Accept' ])[0];
+        return in_array($firstAcceptHeader, $allowedAcceptHeaderValues);
     }
 
     /**
@@ -413,7 +434,7 @@ class Core
     /**
      * Gets the list of allowed request methods for Cross-Origin Resource Sharing (CORS).
      *
-     * @return string[] The list of allowed request methods.
+     * @return RequestMethod[] The list of allowed request methods.
      */
     public function getAllowedRequestMethods(): array
     {
@@ -423,11 +444,11 @@ class Core
     /**
      * Retrieves the HTTP request method used to call the API.
      *
-     * @return string The HTTP request method used to call the API.
+     * @return RequestMethod The HTTP request method used to call the API.
      */
-    public function getRequestMethod(): string
+    public function getRequestMethod(): RequestMethod
     {
-        return strtoupper($_SERVER[ 'REQUEST_METHOD' ]);
+        return RequestMethod::from(strtoupper($_SERVER[ 'REQUEST_METHOD' ]));
     }
 
     /**
@@ -457,9 +478,9 @@ class Core
     /**
      * Returns the value of the Content-Type header in the request, or null if no Content-Type header was provided.
      *
-     * @return ?string The value of the Content-Type header in the request, or null if no Content-Type header was provided.
+     * @return ?RequestContentType The value of the Content-Type header in the request, or null if no Content-Type header was provided.
      */
-    public function getRequestContentType(): ?string
+    public function getRequestContentType(): ?RequestContentType
     {
         return $this->RequestContentType;
     }

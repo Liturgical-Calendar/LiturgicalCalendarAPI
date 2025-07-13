@@ -54,7 +54,7 @@ class Health implements MessageComponentInterface
      * Each key is an action name. The value is an array of strings that represent the names of the
      * parameters that the action requires.
      *
-     * @var array<string, string[]> $ACTION_PROPERTIES
+     * @var array<string,string[]> $ACTION_PROPERTIES
      */
     private const ACTION_PROPERTIES = [
         'executeValidation' => ['validate', 'sourceFile', 'category'],
@@ -643,9 +643,9 @@ class Health implements MessageComponentInterface
             if (property_exists($validation, 'responsetype')) {
                 $responseType = $validation->responsetype;
                 //get the index of the responsetype from the ReturnType class
-                $responseTypeIdx = array_search($responseType, ReturnType::$values);
+                $responseTypeIdx = array_search($responseType, ReturnType::values());
                 //get the corresponding accept mime type
-                $acceptMimeType = AcceptHeader::$values[$responseTypeIdx];
+                $acceptMimeType = AcceptHeader::values()[$responseTypeIdx];
                 $opts           = [
                     'http' => [
                         'method' => 'GET',
@@ -828,9 +828,9 @@ class Health implements MessageComponentInterface
     private function validateCalendar(string $calendar, int $year, string $category, string $responseType, ConnectionInterface $to): void
     {
         //get the index of the responsetype from the ReturnType class
-        $responseTypeIdx = array_search($responseType, ReturnType::$values);
+        $responseTypeIdx = array_search($responseType, ReturnType::values());
         //get the corresponding accept mime type
-        $acceptMimeType = AcceptHeader::$values[$responseTypeIdx];
+        $acceptMimeType = AcceptHeader::values()[$responseTypeIdx];
         $opts           = [
             'http' => [
                 'method' => 'GET',
@@ -1051,9 +1051,9 @@ class Health implements MessageComponentInterface
     private function executeUnitTest(string $test, string $calendar, int $year, string $category, ConnectionInterface $to): void
     {
         //get the index of the responsetype from the ReturnType class
-        $responseTypeIdx = array_search('JSON', ReturnType::$values);
+        $responseTypeIdx = array_search(ReturnType::JSON, ReturnType::cases());
         //get the corresponding accept mime type
-        $acceptMimeType = AcceptHeader::$values[$responseTypeIdx];
+        $acceptMimeType = AcceptHeader::values()[$responseTypeIdx];
         $opts           = [
             'http' => [
                 'method' => 'GET',
@@ -1093,12 +1093,12 @@ class Health implements MessageComponentInterface
     /**
      * Validate data against a specified schema.
      *
-     * @param object|array $data The data to validate.
+     * @param mixed $data The data to validate.
      * @param string $schemaUrl The URL of the schema to validate against.
      *
      * @return bool|\stdClass Returns true if the data is valid, otherwise returns an error object with details.
      */
-    private function validateDataAgainstSchema(object|array $data, string $schemaUrl): bool|\stdClass
+    private function validateDataAgainstSchema(mixed $data, string $schemaUrl): bool|\stdClass
     {
         $res = false;
         try {

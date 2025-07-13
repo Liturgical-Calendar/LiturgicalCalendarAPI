@@ -355,7 +355,7 @@ class RegionalDataParams implements ParamsInterface
                 break;
             case 'DIOCESANCALENDAR':
                 switch (RegionalData::$Core->getRequestMethod()) {
-                    case 'PUT':
+                    case RequestMethod::PUT:
                         if (
                             false === property_exists($payload, 'litcal')
                             || false === property_exists($payload, 'i18n')
@@ -370,7 +370,7 @@ class RegionalDataParams implements ParamsInterface
                             RegionalData::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                         }
                         break;
-                    case 'PATCH':
+                    case RequestMethod::PATCH:
                         if (
                             false === property_exists($payload, 'litcal')
                             || false === property_exists($payload, 'i18n')
