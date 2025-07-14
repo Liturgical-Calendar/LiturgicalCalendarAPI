@@ -3,15 +3,12 @@
 namespace LiturgicalCalendar\Api\Paths;
 
 use LiturgicalCalendar\Api\Core;
-use LiturgicalCalendar\Api\Params\DecreesParams;
 use LiturgicalCalendar\Api\Enum\AcceptHeader;
-use LiturgicalCalendar\Api\Enum\LitLocale;
-use LiturgicalCalendar\Api\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\JsonData;
 
-class Decrees
+class DecreesPath
 {
     public static Core $Core;
     public static object $decreesIndex;

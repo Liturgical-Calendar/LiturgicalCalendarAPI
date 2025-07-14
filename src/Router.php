@@ -7,15 +7,15 @@ use LiturgicalCalendar\Api\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\ReturnType;
 use LiturgicalCalendar\Api\Enum\CacheDuration;
-use LiturgicalCalendar\Api\Paths\Calendar;
-use LiturgicalCalendar\Api\Paths\Easter;
-use LiturgicalCalendar\Api\Paths\Events;
-use LiturgicalCalendar\Api\Paths\Metadata;
-use LiturgicalCalendar\Api\Paths\Tests;
-use LiturgicalCalendar\Api\Paths\RegionalData;
-use LiturgicalCalendar\Api\Paths\Missals;
-use LiturgicalCalendar\Api\Paths\Decrees;
-use LiturgicalCalendar\Api\Paths\Schemas;
+use LiturgicalCalendar\Api\Paths\CalendarPath;
+use LiturgicalCalendar\Api\Paths\EasterPath;
+use LiturgicalCalendar\Api\Paths\EventsPath;
+use LiturgicalCalendar\Api\Paths\MetadataPath;
+use LiturgicalCalendar\Api\Paths\TestsPath;
+use LiturgicalCalendar\Api\Paths\RegionalDataPath;
+use LiturgicalCalendar\Api\Paths\MissalsPath;
+use LiturgicalCalendar\Api\Paths\DecreesPath;
+use LiturgicalCalendar\Api\Paths\SchemasPath;
 
 class Router
 {
@@ -119,26 +119,26 @@ class Router
         switch ($route) {
             case '':
             case 'calendar':
-                $LitCalEngine = new Calendar();
-                // Calendar::$Core will not exist until the Calendar class is instantiated!
-                Calendar::$Core->setAllowedRequestMethods([
+                $LitCalEngine = new CalendarPath();
+                // CalendarPath::$Core will not exist until the Calendar class is instantiated!
+                CalendarPath::$Core->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST,
                     RequestMethod::OPTIONS
                 ]);
-                Calendar::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
-                Calendar::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS, AcceptHeader::YAML ]);
+                CalendarPath::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
+                CalendarPath::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS, AcceptHeader::YAML ]);
                 $LitCalEngine->setAllowedReturnTypes([ ReturnType::JSON, ReturnType::XML, ReturnType::ICS, ReturnType::YAML ]);
                 $LitCalEngine->setCacheDuration(CacheDuration::MONTH);
                 $LitCalEngine->init($requestPathParts);
                 break;
             case 'metadata':
             case 'calendars':
-                Metadata::init();
+                MetadataPath::init();
                 break;
             case 'tests':
-                Tests::init($requestPathParts);
-                Tests::$Core->setAllowedRequestMethods([
+                TestsPath::init($requestPathParts);
+                TestsPath::$Core->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST,
                     RequestMethod::PUT,
@@ -147,18 +147,18 @@ class Router
                     RequestMethod::OPTIONS
                 ]);
                 if (
-                    in_array(Tests::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
+                    in_array(TestsPath::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
                     && false === Router::isLocalhost()
                 ) {
-                    Tests::$Core->setAllowedOrigins(self::$allowedOrigins);
+                    TestsPath::$Core->setAllowedOrigins(self::$allowedOrigins);
                 }
-                Tests::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML ]);
-                Tests::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
-                Tests::handleRequest();
+                TestsPath::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML ]);
+                TestsPath::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                TestsPath::handleRequest();
                 break;
             case 'events':
-                $Events = new Events();
-                Events::$Core->setAllowedRequestMethods([
+                $Events = new EventsPath();
+                EventsPath::$Core->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST,
                     RequestMethod::OPTIONS
@@ -168,22 +168,22 @@ class Router
                         in_array($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'], [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
                         && false === Router::isLocalhost()
                     ) {
-                        Events::$Core->setAllowedOrigins(self::$allowedOrigins);
+                        EventsPath::$Core->setAllowedOrigins(self::$allowedOrigins);
                     }
                 }
                 if (
-                    in_array(Events::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
+                    in_array(EventsPath::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
                     && false === Router::isLocalhost()
                 ) {
-                    Events::$Core->setAllowedOrigins(self::$allowedOrigins);
+                    EventsPath::$Core->setAllowedOrigins(self::$allowedOrigins);
                 }
-                Events::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
-                Events::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                EventsPath::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
+                EventsPath::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 $Events->init($requestPathParts);
                 break;
             case 'data':
-                $RegionalData = new RegionalData();
-                RegionalData::$Core->setAllowedRequestMethods([
+                $RegionalData = new RegionalDataPath();
+                RegionalDataPath::$Core->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST,
                     RequestMethod::PUT,
@@ -196,29 +196,29 @@ class Router
                         in_array($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'], [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
                         && false === Router::isLocalhost()
                     ) {
-                        RegionalData::$Core->setAllowedOrigins(self::$allowedOrigins);
+                        RegionalDataPath::$Core->setAllowedOrigins(self::$allowedOrigins);
                     }
                 }
                 if (
-                    in_array(RegionalData::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
+                    in_array(RegionalDataPath::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
                     && false === Router::isLocalhost()
                 ) {
-                    RegionalData::$Core->setAllowedOrigins(self::$allowedOrigins);
+                    RegionalDataPath::$Core->setAllowedOrigins(self::$allowedOrigins);
                 }
-                RegionalData::$Core->setAllowedRequestContentTypes([
+                RegionalDataPath::$Core->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
                 ]);
-                RegionalData::$Core->setAllowedAcceptHeaders([
+                RegionalDataPath::$Core->setAllowedAcceptHeaders([
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
                 $RegionalData->init($requestPathParts);
                 break;
             case 'missals':
-                Missals::init($requestPathParts);
-                Missals::$Core->setAllowedRequestMethods([
+                MissalsPath::init($requestPathParts);
+                MissalsPath::$Core->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST,
                     RequestMethod::PUT,
@@ -231,28 +231,28 @@ class Router
                         in_array($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'], [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
                         && false === Router::isLocalhost()
                     ) {
-                        Missals::$Core->setAllowedOrigins(self::$allowedOrigins);
+                        MissalsPath::$Core->setAllowedOrigins(self::$allowedOrigins);
                     }
                 }
                 if (
-                    in_array(Missals::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
+                    in_array(MissalsPath::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
                     && false === Router::isLocalhost()
                 ) {
-                    Missals::$Core->setAllowedOrigins(self::$allowedOrigins);
+                    MissalsPath::$Core->setAllowedOrigins(self::$allowedOrigins);
                 }
-                Missals::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
-                Missals::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
-                Missals::handleRequest();
+                MissalsPath::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
+                MissalsPath::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                MissalsPath::handleRequest();
                 break;
             case 'easter':
-                Easter::init();
+                EasterPath::init();
                 break;
             case 'schemas':
-                Schemas::retrieve($requestPathParts);
+                SchemasPath::retrieve($requestPathParts);
                 break;
             case 'decrees':
-                Decrees::init($requestPathParts);
-                Decrees::$Core->setAllowedRequestMethods([
+                DecreesPath::init($requestPathParts);
+                DecreesPath::$Core->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST,
                     RequestMethod::PUT,
@@ -265,18 +265,18 @@ class Router
                         in_array($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'], [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
                         && false === Router::isLocalhost()
                     ) {
-                        Decrees::$Core->setAllowedOrigins(self::$allowedOrigins);
+                        DecreesPath::$Core->setAllowedOrigins(self::$allowedOrigins);
                     }
                 }
                 if (
-                    in_array(Decrees::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
+                    in_array(DecreesPath::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
                     && false === Router::isLocalhost()
                 ) {
-                    Decrees::$Core->setAllowedOrigins(self::$allowedOrigins);
+                    DecreesPath::$Core->setAllowedOrigins(self::$allowedOrigins);
                 }
-                Decrees::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
-                Decrees::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
-                Decrees::handleRequest();
+                DecreesPath::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
+                DecreesPath::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                DecreesPath::handleRequest();
                 break;
             default:
                 http_response_code(404);

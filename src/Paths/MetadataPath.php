@@ -2,24 +2,23 @@
 
 namespace LiturgicalCalendar\Api\Paths;
 
+use LiturgicalCalendar\Api\Enum\Ascension;
+use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\Route;
-use NationalCalendarMetadata;
-use DiocesanCalendarMetadata;
-use DiocesanGroup;
-use WiderRegionMetadata;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Models\Metadata\DiocesanGroup;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
 
-class Metadata
+class MetadataPath
 {
-    /** @var array<NationalCalendarMetadata> */ private static array $nationalCalendars      = [];
-    /** @var array<string>                   */ private static array $nationalCalendarsKeys  = [];
-    /** @var array<DiocesanCalendarMetadata> */ private static array $diocesanCalendars      = [];
-    /** @var array<string,DiocesanGroup>     */ private static array $diocesanGroups         = [];
-    /** @var array<WiderRegionMetadata>      */ private static array $widerRegions           = [];
-    /** @var array<string>                   */ private static array $widerRegionsNames      = [];
-    /** @var array<string>                   */ private static array $locales                = [];
-    /** @var CatholicDiocesesLatinRite       */ private static array $worldDiocesesLatinRite = [];
-    //private static array $messages             = [];
+    private static MetadataCalendars $metadataCalendars;
+
+    /** @var CatholicDiocesesLatinRite */
+    private static array $worldDiocesesLatinRite = [];
+
     private const array FULLY_TRANSLATED_LOCALES = ['en', 'fr', 'it', 'nl', 'la'];
 
     /**
@@ -30,7 +29,7 @@ class Metadata
      * The JSON file must contain a "metadata" section with a "region" attribute.
      * The folder name is used as the National calendar identifier.
      * The JSON file is used to retrieve the supported locales for the National calendar.
-     * The supported locales are stored in the Metadata::$baseNationalCalendars array.
+     * The supported locales are stored in the MetadataPath::$baseNationalCalendars array.
      *
      * @return void
      */
@@ -40,19 +39,13 @@ class Metadata
         foreach ($directories as $directory) {
             $nationalCalendarDataFile = JsonData::NATIONAL_CALENDARS_FOLDER . "/$directory/$directory.json";
             if (file_exists($nationalCalendarDataFile)) {
-                Metadata::$nationalCalendarsKeys[] = $directory;
-                $nationalCalendarDefinition        = file_get_contents($nationalCalendarDataFile);
-                $nationalCalendarData              = json_decode($nationalCalendarDefinition);
+                $nationalCalendarDefinition = file_get_contents($nationalCalendarDataFile);
+                $nationalCalendarData       = json_decode($nationalCalendarDefinition);
                 if (JSON_ERROR_NONE === json_last_error()) {
-                    $nationalCalendarArr           = [
-                        'calendar_id'  => $directory,
-                        'locales'      => $nationalCalendarData->metadata->locales,
-                        'missals'      => $nationalCalendarData->metadata->missals,
-                        'wider_region' => $nationalCalendarData->metadata->wider_region,
-                        'dioceses'     => [],
-                        'settings'     => $nationalCalendarData->settings
-                    ];
-                    Metadata::$nationalCalendars[] = $nationalCalendarArr;
+                    $nationalCalendarData->metadata->settings = $nationalCalendarData->settings;
+                    $nationalCalendarData->metadata->dioceses = [];
+                    $nationalCalendarArr                      = MetadataNationalCalendarItem::fromObject($nationalCalendarData->metadata);
+                    self::$metadataCalendars->pushNationalCalendarMetadata($nationalCalendarArr);
                 }
             }
         }
@@ -67,15 +60,15 @@ class Metadata
      */
     private static function dioceseIdToName(string $id): ?string
     {
-        if (empty(Metadata::$worldDiocesesLatinRite)) {
-            $worldDiocesesFile                = JsonData::FOLDER . '/world_dioceses.json';
-            Metadata::$worldDiocesesLatinRite = json_decode(
+        if (empty(MetadataPath::$worldDiocesesLatinRite)) {
+            $worldDiocesesFile                    = JsonData::FOLDER . '/world_dioceses.json';
+            MetadataPath::$worldDiocesesLatinRite = json_decode(
                 file_get_contents($worldDiocesesFile)
             )->catholic_dioceses_latin_rite;
         }
         $dioceseName = null;
         // Search for the diocese by its ID in the worldDioceseLatinRite data
-        foreach (Metadata::$worldDiocesesLatinRite as $country) {
+        foreach (MetadataPath::$worldDiocesesLatinRite as $country) {
             foreach ($country->dioceses as $diocese) {
                 if ($diocese->diocese_id === $id) {
                     $dioceseName = $diocese->diocese_name;
@@ -101,44 +94,20 @@ class Metadata
             /** @var string[] $directories */
             $directories = array_map('basename', glob($countryFolder . '/*', GLOB_ONLYDIR));
             foreach ($directories as $calendar_id) {
-                $dioceseName          = Metadata::dioceseIdToName($calendar_id) ?? $calendar_id;
+                $dioceseName          = MetadataPath::dioceseIdToName($calendar_id) ?? $calendar_id;
                 $diocesanCalendarFile = JsonData::DIOCESAN_CALENDARS_FOLDER . "/$nation/$calendar_id/$dioceseName.json";
-                if (file_exists($diocesanCalendarFile)) {
+                if (file_exists($diocesanCalendarFile) && is_readable($diocesanCalendarFile)) {
                     $diocesanCalendarDefinition = file_get_contents($diocesanCalendarFile);
                     $diocesanCalendarData       = json_decode($diocesanCalendarDefinition);
                     if (JSON_ERROR_NONE === json_last_error()) {
-                        $dioceseArr = [
-                            'calendar_id' => $calendar_id,
-                            'diocese'     => $dioceseName,
-                            'nation'      => $nation,
-                            'locales'     => $diocesanCalendarData->metadata->locales,
-                            'timezone'    => $diocesanCalendarData->metadata->timezone
-                        ];
-                        if (property_exists($diocesanCalendarData->metadata, 'group')) {
-                            $groupName           = $diocesanCalendarData->metadata->group;
-                            $dioceseArr['group'] = $groupName;
-                            if (!array_key_exists($groupName, Metadata::$diocesanGroups)) {
-                                Metadata::$diocesanGroups[$groupName] = [];
-                            }
-                            // Push the name of the diocese to the group that it belongs to
-                            Metadata::$diocesanGroups[$groupName][] = $calendar_id;
-                        }
+                        $diocesanCalendarData->metadata->diocese = $dioceseName;
                         if (property_exists($diocesanCalendarData, 'settings')) {
-                            $dioceseArr['settings'] = $diocesanCalendarData->settings;
+                            $diocesanCalendarData->metadata->settings = $diocesanCalendarData->settings;
                         }
-                        Metadata::$diocesanCalendars[] = $dioceseArr;
-
-                        // We also add the diocese to the `dioceses` array of the related national calendar
-                        foreach (Metadata::$nationalCalendars as &$nationalCalendar) {
-                            if ($nationalCalendar['calendar_id'] === $nation) {
-                                $nationalCalendar['dioceses'][] = $calendar_id;
-                                break;
-                            }
-                        }
+                        $metadataDiocesanCalendarItem = MetadataDiocesanCalendarItem::fromObject($diocesanCalendarData->metadata);
+                        self::$metadataCalendars->pushDiocesanCalendarMetadata($metadataDiocesanCalendarItem);
                     }
-                } /* else {
-                    Metadata::$messages[] = "Diocesan calendar file not found: $diocesanCalendarFile";
-                } */
+                }
             }
         }
     }
@@ -149,12 +118,9 @@ class Metadata
      * their supported locales and their data files.
      *
      * Each Wider region is identified by a folder name and a JSON file of the same name within that folder.
-     * Wider region identifiers are added to the Metadata::$widerRegionsNames array.
+     * Wider region identifiers are added to the MetadataPath::$widerRegionsNames array.
      * Supported locales are retrieved by scanning the `i18n` subfolder for each Wider region,
      * based on the JSON files present.
-     * The data for each wider region (name, locales, and api_path) is stored in the Metadata::$widerRegions array.
-     * @see Metadata::$widerRegions
-     * @see Metadata::$widerRegionsNames
      *
      * @return void
      */
@@ -164,20 +130,20 @@ class Metadata
         foreach ($directories as $directory) {
             $WiderRegionFile = strtr(JsonData::WIDER_REGIONS_FILE, ['{wider_region}' => $directory]);
             if (file_exists($WiderRegionFile)) {
-                Metadata::$widerRegionsNames[] = $directory;
-                $widerRegionI18nFolder         = strtr(JsonData::WIDER_REGIONS_I18N_FOLDER, [ '{wider_region}' => $directory ]);
-                $locales                       = array_map(fn ($filename) => pathinfo($filename, PATHINFO_FILENAME), glob($widerRegionI18nFolder . '/*.json'));
-                Metadata::$widerRegions[]      = [
+                $widerRegionI18nFolder   = strtr(JsonData::WIDER_REGIONS_I18N_FOLDER, [ '{wider_region}' => $directory ]);
+                $locales                 = array_map(fn ($filename) => pathinfo($filename, PATHINFO_FILENAME), glob($widerRegionI18nFolder . '/*.json'));
+                $metadataWiderRegionItem = MetadataWiderRegionItem::fromArray([
                     'name'     => $directory,
                     'locales'  => $locales,
                     'api_path' => API_BASE_PATH . Route::DATA_WIDERREGION->value . '/' . $directory . '?locale={language}'
-                ];
+                ]);
+                self::$metadataCalendars->pushWiderRegionMetadata($metadataWiderRegionItem);
             }
         }
     }
 
     /**
-     * Populates the Metadata::$locales array with the list of supported locales.
+     * Populates the MetadataPath::$locales array with the list of supported locales.
      *
      * It does this by scanning the i18n/ folder and retrieving the folder names
      * of all its subfolders. The result is an array of strings, where each string
@@ -185,13 +151,13 @@ class Metadata
      * containing the language code (optionally followed by an underscore and the
      * region code; for now none of the locales have regional identifiers).
      */
-    private static function getLocales(): void
+    private static function buildLocales(): void
     {
         // Since we can't actually request the General Roman Calendar for locales that are not fully translated,
         // we remove those locales from the list of supported locales
-        Metadata::$locales = array_values(array_intersect(
+        self::$metadataCalendars->locales = array_values(array_intersect(
             array_merge(['en'], array_map('basename', glob('i18n/*', GLOB_ONLYDIR))),
-            Metadata::FULLY_TRANSLATED_LOCALES
+            MetadataPath::FULLY_TRANSLATED_LOCALES
         ));
     }
 
@@ -203,59 +169,40 @@ class Metadata
      */
     private static function buildIndex(): int
     {
-        Metadata::buildNationalCalendarData();
-        Metadata::buildDiocesanCalendarData();
-        Metadata::buildWiderRegionData();
-        Metadata::getLocales();
+        self::$metadataCalendars = new MetadataCalendars();
+        MetadataPath::buildNationalCalendarData();
+        MetadataPath::buildDiocesanCalendarData();
+        MetadataPath::buildWiderRegionData();
+        MetadataPath::buildLocales();
         return 200;
     }
 
     public static function response(): void
     {
-        $diocesanGroups = [];
-        foreach (Metadata::$diocesanGroups as $key => $group) {
-            $diocesanGroups[] = [
-                'group_name' => $key,
-                'dioceses'   => $group
-            ];
-        }
-        $nationalCalendars     = [
-            [
-                'calendar_id' => 'VA',
-                'locales'     => [ 'la_VA' ],
-                'missals'     => [
-                    'EDITIO_TYPICA_1970',
-                    'EDITIO_TYPICA_1971',
-                    'EDITIO_TYPICA_1975',
-                    'EDITIO_TYPICA_2002',
-                    'EDITIO_TYPICA_2008'
-                ],
-                'settings'    => [
-                    'epiphany'            => 'JAN6',
-                    'ascension'           => 'THURSDAY',
-                    'corpus_christi'      => 'THURSDAY',
-                    'eternal_high_priest' => false
-                ]
+        // We add the General Roman Calendar as used in the Vatican to the list of "national" calendars
+        $metadataNationalCalendarItem = MetadataNationalCalendarItem::fromArray([
+            'calendar_id' => 'VA',
+            'locales'     => [ 'la_VA' ],
+            'missals'     => [
+                'EDITIO_TYPICA_1970',
+                'EDITIO_TYPICA_1971',
+                'EDITIO_TYPICA_1975',
+                'EDITIO_TYPICA_2002',
+                'EDITIO_TYPICA_2008'
             ],
-            ...Metadata::$nationalCalendars
-        ];
-        $nationalCalendarsKeys = [
-            'VA',
-            ...Metadata::$nationalCalendarsKeys
-        ];
-        $response              = json_encode([
-            'litcal_metadata' => [
-                'national_calendars'      => $nationalCalendars,
-                'national_calendars_keys' => $nationalCalendarsKeys,
-                'diocesan_calendars'      => array_values(Metadata::$diocesanCalendars),
-                'diocesan_calendars_keys' => array_column(Metadata::$diocesanCalendars, 'calendar_id'),
-                'diocesan_groups'         => $diocesanGroups,
-                'wider_regions'           => Metadata::$widerRegions,
-                'wider_regions_keys'      => Metadata::$widerRegionsNames,
-                'locales'                 => Metadata::$locales
+            'settings'    => [
+                'epiphany'            => Epiphany::JAN6->value,
+                'ascension'           => Ascension::THURSDAY->value,
+                'corpus_christi'      => Ascension::THURSDAY->value,
+                'eternal_high_priest' => false
             ]
+        ]);
+
+        $response     = json_encode([
+            'litcal_metadata' => self::$metadataCalendars
         ], JSON_PRETTY_PRINT);
-        $responseHash          = md5($response);
+        $responseHash = md5($response);
+
         header("Etag: \"{$responseHash}\"");
         if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
             header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 304 Not Modified');
@@ -298,10 +245,10 @@ class Metadata
         header('Cache-Control: must-revalidate, max-age=259200');
         header('Content-Type: application/json');
 
-        $indexResult = Metadata::buildIndex();
+        $indexResult = MetadataPath::buildIndex();
 
         if (200 === $indexResult) {
-            Metadata::response();
+            MetadataPath::response();
         } else {
             http_response_code($indexResult);
         }

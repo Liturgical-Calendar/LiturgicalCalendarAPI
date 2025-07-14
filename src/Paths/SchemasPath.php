@@ -14,7 +14,7 @@ namespace LiturgicalCalendar\Api\Paths;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Enum\JsonData;
 
-class Schemas
+class SchemasPath
 {
     private static function enforceOrigin(): void
     {

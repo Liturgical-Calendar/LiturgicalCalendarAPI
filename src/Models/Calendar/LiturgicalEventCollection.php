@@ -1,6 +1,6 @@
 <?php
 
-namespace LiturgicalCalendar\Api;
+namespace LiturgicalCalendar\Api\Models\Calendar;
 
 use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitGrade;

@@ -1,18 +1,26 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Models;
+namespace LiturgicalCalendar\Api\Models\Metadata;
 
-class MetadataNationalCalendarItem implements \JsonSerializable
+use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
+
+class MetadataNationalCalendarItem extends AbstractJsonRepresentation
 {
-    public readonly string $calendar_id;
+    public string $calendar_id;
+
     /** @var array<string> */
-    public readonly array $locales;
+    public array $locales;
+
     /** @var array<string> */
-    public readonly array $missals;
-    public readonly ?string $wider_region;
+    public array $missals;
+
+    public ?string $wider_region;
+
     /** @var array<string>|null */
-    public readonly ?array $dioceses;
-    public readonly MetadataNationalCalendarSettings $settings;
+    public ?array $dioceses;
+
+    public MetadataNationalCalendarSettings $settings;
+
 
     /**
      * Constructor for NationalCalendarMetadataItem.
@@ -28,16 +36,16 @@ class MetadataNationalCalendarItem implements \JsonSerializable
         string $calendar_id,
         array $locales,
         array $missals,
+        MetadataNationalCalendarSettings $settings,
         ?string $wider_region = null,
-        ?array $dioceses = null,
-        MetadataNationalCalendarSettings $settings
+        ?array $dioceses = null
     ) {
         $this->calendar_id  = $calendar_id;
         $this->locales      = $locales;
         $this->missals      = $missals;
+        $this->settings     = $settings;
         $this->wider_region = $wider_region;
         $this->dioceses     = $dioceses;
-        $this->settings     = $settings;
     }
 
     /**
@@ -92,17 +100,17 @@ class MetadataNationalCalendarItem implements \JsonSerializable
      *      wider_region?: string,
      *      dioceses?: array<string>
      * } $data
-     * @return self
+     * @return static
      */
-    public static function fromArray(array $data): self
+    protected static function fromArrayInternal(array $data): static
     {
-        return new self(
-            $data['calendar_id'],
+        return new static(
+            $data['calendar_id'] ?? $data['nation'], // in the calendar source file, the calendar_id is called nation
             $data['locales'],
             $data['missals'],
+            MetadataNationalCalendarSettings::fromArray($data['settings']),
             $data['wider_region'] ?? null,
-            $data['dioceses'] ?? null,
-            MetadataNationalCalendarSettings::fromArray($data['settings'])
+            $data['dioceses'] ?? null
         );
     }
 
@@ -120,17 +128,17 @@ class MetadataNationalCalendarItem implements \JsonSerializable
      * - dioceses (array<string>|null): The dioceses that use the National Calendar, if applicable.
      *
      * @param \stdClass $data
-     * @return self
+     * @return static
      */
-    public static function fromObject(\stdClass $data): self
+    protected static function fromObjectInternal(\stdClass $data): static
     {
-        return new self(
-            $data->calendar_id,
+        return new static(
+            $data->calendar_id ?? $data->nation, // in the calendar source file, the calendar_id is called nation
             $data->locales,
             $data->missals,
+            MetadataNationalCalendarSettings::fromObject($data->settings),
             $data->wider_region ?? null,
-            $data->dioceses ?? null,
-            MetadataNationalCalendarSettings::fromObject($data->settings)
+            $data->dioceses ?? null
         );
     }
 }

@@ -4,8 +4,8 @@ namespace LiturgicalCalendar\Api\Paths;
 
 use LiturgicalCalendar\Api\Core;
 use LiturgicalCalendar\Api\DateTime;
-use LiturgicalCalendar\Api\LiturgicalEvent;
-use LiturgicalCalendar\Api\LiturgicalEventCollection;
+use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
+use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
 use LiturgicalCalendar\Api\LatinUtils;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
@@ -66,7 +66,7 @@ use LiturgicalCalendar\Api\Params\CalendarParams;
  *      }
  * }
  */
-class Calendar
+class CalendarPath
 {
     public static Core $Core;
     /** @var ReturnType[] */ private readonly array $AllowedReturnTypes; // can only be set once, after which it will be read-only
@@ -654,7 +654,7 @@ class Calendar
     private function loadDiocesanCalendarData(): void
     {
         if ($this->CalendarParams->DiocesanCalendar !== null) {
-            $idTransform = Calendar::dioceseIdToName($this->CalendarParams->DiocesanCalendar);
+            $idTransform = CalendarPath::dioceseIdToName($this->CalendarParams->DiocesanCalendar);
             if (null === $idTransform) {
                 $this->Messages[] = sprintf(
                     _('The name of the diocese could not be derived from the diocese ID "%s".'),

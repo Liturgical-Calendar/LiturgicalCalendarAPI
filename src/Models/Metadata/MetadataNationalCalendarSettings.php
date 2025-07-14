@@ -1,17 +1,18 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Models;
+namespace LiturgicalCalendar\Api\Models\Metadata;
 
 use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
 use LiturgicalCalendar\Api\Enum\Epiphany;
+use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
 
-class MetadataNationalCalendarSettings implements \JsonSerializable
+class MetadataNationalCalendarSettings extends AbstractJsonRepresentation
 {
-    public readonly Epiphany $epiphany;
-    public readonly Ascension $ascension;
-    public readonly CorpusChristi $corpus_christi;
-    public readonly bool $eternal_high_priest;
+    public Epiphany $epiphany;
+    public Ascension $ascension;
+    public CorpusChristi $corpus_christi;
+    public bool $eternal_high_priest;
 
     public function __construct(
         string $epiphany,
@@ -55,11 +56,11 @@ class MetadataNationalCalendarSettings implements \JsonSerializable
      * - eternal_high_priest (bool): whether the Eternal High Priest is celebrated
      *
      * @param array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool} $data
-     * @return self
+     * @return static
      */
-    public static function fromArray(array $data): self
+    protected static function fromArrayInternal(array $data): static
     {
-        return new self(
+        return new static(
             $data['epiphany'],
             $data['ascension'],
             $data['corpus_christi'],
@@ -77,11 +78,11 @@ class MetadataNationalCalendarSettings implements \JsonSerializable
      * - eternal_high_priest (bool): whether the Eternal High Priest is celebrated
      *
      * @param \stdClass $data
-     * @return self
+     * @return static
      */
-    public static function fromObject(\stdClass $data): self
+    protected static function fromObjectInternal(\stdClass $data): static
     {
-        return new self(
+        return new static(
             $data->epiphany,
             $data->ascension,
             $data->corpus_christi,

@@ -28,7 +28,7 @@ use LiturgicalCalendar\Api\Params\EventsParams;
  * }
  * @phpstan-type LiturgicalEventCollectionItem array<string,mixed>
  */
-class Events
+class EventsPath
 {
     public static Core $Core;
     /** @var array<string,LiturgicalEventCollectionItem> */

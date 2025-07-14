@@ -67,7 +67,7 @@ use LiturgicalCalendar\Api\Params\RegionalDataParams;
  *      locales: string[]
  * }
  */
-class RegionalData
+class RegionalDataPath
 {
     /** @var CalendarsMetadata */
     private readonly ?object $CalendarsMetadata;
@@ -1098,7 +1098,7 @@ class RegionalData
         // For POST requests, there might be a payload
         // So in all these cases, we attempt to retrieve the payload from the request body if present
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH], true)) {
-            $params = RegionalData::retrievePayloadFromPostPutPatchRequest($params);
+            $params = RegionalDataPath::retrievePayloadFromPostPutPatchRequest($params);
         }
         return $params;
     }
@@ -1164,8 +1164,8 @@ class RegionalData
      */
     private function handleRequestParams(array $requestPathParts = []): void
     {
-        RegionalData::validateRequestPath($requestPathParts);
-        $params = RegionalData::setParamsFromPath($requestPathParts);
+        RegionalDataPath::validateRequestPath($requestPathParts);
+        $params = RegionalDataPath::setParamsFromPath($requestPathParts);
 
         // Validate the payload for PUT and PATCH requests, based on category.
         // For PUT requests, the key is retrieved from the payload rather than from the path,

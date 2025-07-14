@@ -11,9 +11,8 @@ use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Enum\JsonData;
-use PHP_CodeSniffer\Reports\Json;
 
-class Missals
+class MissalsPath
 {
     public static Core $Core;
     public static MissalsParams $params;

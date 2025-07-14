@@ -10,7 +10,7 @@ use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\JsonData;
 
-class Tests
+class TestsPath
 {
     public static Core $Core;
     /** @var string[] */ private static array $requestPathParts = [];

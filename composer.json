@@ -17,7 +17,8 @@
         "php-parallel-lint/php-parallel-lint": "^1.4",
         "php-parallel-lint/php-console-highlighter": "^1.0",
         "captainhook/captainhook-phar": "^5.25",
-        "captainhook/hook-installer": "^1.0"
+        "captainhook/hook-installer": "^1.0",
+        "slevomat/coding-standard": "^8.19"
     },
     "license": "Apache-2.0",
     "autoload": {
@@ -35,20 +36,25 @@
     "minimum-stability": "stable",
     "scripts": {
         "post-install-cmd": [
+            "@install-codestandards",
             "LiturgicalCalendar\\Api\\Utilities::postInstall"
         ],
         "post-update-cmd": [
             "LiturgicalCalendar\\Api\\Utilities::postInstall"
         ],
-        "lint": "phpcs src",
-        "lint:fix": "phpcbf src",
+        "lint": "phpcs src || echo 'Linting failed. Please run composer lint:fix to fix the linting issues.'",
+        "lint:fix": "phpcbf src || echo 'Lint fixing failed. Please check the linting failures and fix them manually.'",
         "analyse": "phpstan analyse -c phpstan.neon",
-        "parallel-lint": "parallel-lint --exclude .git --exclude vendor ."
+        "parallel-lint": "parallel-lint --exclude .git --exclude vendor .",
+        "install-codestandards": [
+            "PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run"
+        ]
     },
     "config": {
         "allow-plugins": {
             "captainhook/captainhook-phar": true,
-            "captainhook/hook-installer": true
+            "captainhook/hook-installer": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     }
 }

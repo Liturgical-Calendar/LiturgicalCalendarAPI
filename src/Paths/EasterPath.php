@@ -6,7 +6,7 @@ use LiturgicalCalendar\Api\Utilities;
 use LiturgicalCalendar\Api\LatinUtils;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 
-class Easter
+class EasterPath
 {
     private static string $Locale                                = LitLocale::LATIN;
     private static ?string $baseLocale                           = null;

@@ -1,17 +1,25 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Models;
+namespace LiturgicalCalendar\Api\Models\Metadata;
 
-class MetadataDiocesanCalendarItem implements \JsonSerializable
+use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
+
+class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
 {
-    public readonly string $calendar_id;
-    public readonly string $diocese;
-    public readonly string $nation;
+    public string $calendar_id;
+
+    public string $diocese;
+
+    public string $nation;
+
     /** @var string[] */
-    public readonly array $locales;
-    public readonly string $timezone;
-    public readonly ?string $group;
-    public readonly ?MetadataDiocesanCalendarSettings $settings;
+    public array $locales;
+
+    public string $timezone;
+
+    public ?string $group;
+
+    public ?MetadataDiocesanCalendarSettings $settings;
 
     /**
      * Constructor for DiocesanCalendarMetadataItem.
@@ -98,12 +106,15 @@ class MetadataDiocesanCalendarItem implements \JsonSerializable
      *      group?: string,
      *      settings?: array<string>
      * } $data
-     * @return self
+     * @return static
      */
-    public static function fromArray(array $data): self
+    protected static function fromArrayInternal(array $data): static
     {
-        return new self(
-            $data['calendar_id'],
+        if (array_key_exists('settings', $data)) {
+            $data['settings'] = MetadataDiocesanCalendarSettings::fromArray($data['settings']);
+        }
+        return new static(
+            $data['calendar_id'] ?? $data['diocese_id'], // in the calendar source file, the calendar_id is called diocese_id
             $data['diocese'],
             $data['nation'],
             $data['locales'],
@@ -128,12 +139,15 @@ class MetadataDiocesanCalendarItem implements \JsonSerializable
      * - settings (array<string>|null): The settings for the Diocesan Calendar, if applicable.
      *
      * @param \stdClass $data
-     * @return self
+     * @return static
      */
-    public static function fromObject(\stdClass $data): self
+    protected static function fromObjectInternal(\stdClass $data): static
     {
-        return new self(
-            $data->calendar_id,
+        if (property_exists($data, 'settings')) {
+            $data->settings = MetadataDiocesanCalendarSettings::fromObject($data->settings);
+        }
+        return new static(
+            $data->calendar_id ?? $data->diocese_id, // in the calendar source file, the calendar_id is called diocese_id
             $data->diocese,
             $data->nation,
             $data->locales,

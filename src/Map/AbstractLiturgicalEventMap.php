@@ -2,7 +2,7 @@
 
 namespace LiturgicalCalendar\Api\Map;
 
-use LiturgicalCalendar\Api\LiturgicalEvent;
+use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\DateTime;
 
 /**

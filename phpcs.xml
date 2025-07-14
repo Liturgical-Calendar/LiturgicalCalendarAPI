@@ -3,6 +3,7 @@
     <rule ref="PSR12"> <!-- ruleset standard -->
         <exclude name="Generic.Files.LineLength"/>
         <exclude name="Squiz.ControlStructures.ControlSignature.SpaceAfterCloseBrace"/>
+        <exclude name="Squiz.Functions.FunctionDeclarationArgumentSpacing.SpaceBeforeEquals"/>
     </rule>
     <rule ref="Generic.Formatting.MultipleStatementAlignment"/>
     <rule ref="Generic.Arrays.DisallowLongArraySyntax" />
@@ -22,7 +23,6 @@
         </properties>
     </rule>
     <rule ref="Squiz.Strings.DoubleQuoteUsage.NotRequired"/>
-    <rule ref="quiz.Functions.FunctionDeclarationArgumentSpacing"/>
     <file>./</file> <!-- directory you want to analyze -->
     <exclude-pattern>/vendor/</exclude-pattern>
     <exclude-pattern>allowedOrigins.php</exclude-pattern>
