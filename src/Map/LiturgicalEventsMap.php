@@ -4,7 +4,7 @@ namespace LiturgicalCalendar\Api\Map;
 
 use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitGrade;
-use LiturgicalCalendar\Api\LiturgicalEvent;
+use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 
 /**
  * A map of liturgical events.

@@ -44,6 +44,11 @@ abstract class AbstractJsonRepresentation implements \JsonSerializable
         return $obj;
     }
 
+    /**
+     * Creates an instance of a class that implements AbstractJsonRepresentation from an array.
+     *
+     * @param array<string,mixed> $data
+     */
     abstract protected static function fromArrayInternal(array $data): static;
 
     /**
@@ -64,6 +69,11 @@ abstract class AbstractJsonRepresentation implements \JsonSerializable
         return $obj;
     }
 
+    /**
+     * Creates an instance of a class that implements AbstractJsonRepresentation from a stdClass object.
+     *
+     * @param \stdClass $data
+     */
     abstract protected static function fromObjectInternal(\stdClass $data): static;
 
     /**
