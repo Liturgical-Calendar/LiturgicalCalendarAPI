@@ -18,5 +18,5 @@ interface ParamsInterface
      *
      * @param array<string,mixed> $params An associative array of parameter keys to values.
      */
-    public function setParams(array $params = []): void;
+    public function setParams(array $params): void;
 }

@@ -183,7 +183,7 @@ class RomanMissal
      */
     public static function getName(string $missal_id): ?string
     {
-        return self::$names[ $missal_id ] ?? null;
+        return self::$names[$missal_id] ?? null;
     }
 
     /**
@@ -194,7 +194,7 @@ class RomanMissal
      */
     public static function getSanctoraleFileName(string $missal_id): string|false|null
     {
-        return isset(self::$jsonFiles[ $missal_id ]) ? self::$jsonFiles[ $missal_id ] : null;
+        return isset(self::$jsonFiles[$missal_id]) ? self::$jsonFiles[$missal_id] : null;
     }
 
     /**
@@ -205,7 +205,7 @@ class RomanMissal
      */
     public static function getSanctoraleI18nFilePath(string $missal_id): string|false|null
     {
-        return isset(self::$i18nPath[ $missal_id ]) ? self::$i18nPath[ $missal_id ] : null;
+        return isset(self::$i18nPath[$missal_id]) ? self::$i18nPath[$missal_id] : null;
     }
 
     /**
@@ -217,7 +217,7 @@ class RomanMissal
      */
     public static function getYearLimits(string $missal_id): ?object
     {
-        return isset(self::$yearLimits[ $missal_id ]) ? (object) self::$yearLimits[ $missal_id ] : null;
+        return isset(self::$yearLimits[$missal_id]) ? (object) self::$yearLimits[$missal_id] : null;
     }
 
     /**
@@ -272,8 +272,8 @@ class RomanMissal
                 //"data_path"      => self::getSanctoraleFileName($missal_id),
                 //"i18n_path"      => self::getSanctoraleI18nFilePath($missal_id),
                 'locales'        => $locales,
-                'year_limits'    => self::$yearLimits[ $missal_id ],
-                'year_published' => self::$yearLimits[ $missal_id ][ 'since_year' ]
+                'year_limits'    => self::$yearLimits[$missal_id],
+                'year_published' => self::$yearLimits[$missal_id]['since_year']
             ];
 
             if ($obj) {

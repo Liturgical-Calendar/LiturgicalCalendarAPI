@@ -7,7 +7,7 @@ use LiturgicalCalendar\Api\Enum\CorpusChristi;
 use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
 
-class MetadataNationalCalendarSettings extends AbstractJsonRepresentation
+final class MetadataNationalCalendarSettings extends AbstractJsonRepresentation
 {
     public Epiphany $epiphany;
     public Ascension $ascension;
@@ -29,12 +29,7 @@ class MetadataNationalCalendarSettings extends AbstractJsonRepresentation
     /**
      * @inheritDoc
      *
-     * @return array{
-     *      epiphany: string,
-     *      ascension: string,
-     *      corpus_christi: string,
-     *      eternal_high_priest: bool
-     * }
+     * @return array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool}
      */
     public function jsonSerialize(): array
     {

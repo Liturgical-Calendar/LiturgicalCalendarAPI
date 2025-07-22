@@ -57,6 +57,9 @@
                             },
                             "name": {
                                 "type": "string"
+                            },
+                            "strtotime": {
+                                "type": "string"
                             }
                         },
                         "required": [
@@ -80,9 +83,6 @@
                             "until_year": {
                                 "type": "integer",
                                 "maximum": 9999
-                            },
-                            "strtotime": {
-                                "type": "string"
                             },
                             "url": {
                                 "type": "string",

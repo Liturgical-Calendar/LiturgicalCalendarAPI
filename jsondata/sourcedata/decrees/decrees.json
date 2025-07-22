@@ -53,6 +53,11 @@
                 "second_reading": "",
                 "alleluia_verse": "",
                 "gospel": ""
+            },
+            "strtotime": {
+                "day_of_the_week": "Monday",
+                "relative_time": "after",
+                "event_key": "Pentecost"
             }
         },
         "metadata": {
@@ -76,11 +81,6 @@
                 "de": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2018/03/03/0168/00350.html#tedeD",
                 "es": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2018/03/03/0168/00350.html#spagnD",
                 "pt": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2018/03/03/0168/00350.html#portD"
-            },
-            "strtotime": {
-                "day_of_the_week": "Monday",
-                "relative_time": "after",
-                "event_key": "Pentecost"
             }
         }
     },

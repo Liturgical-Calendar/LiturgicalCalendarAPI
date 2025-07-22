@@ -12,7 +12,7 @@ use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Enum\JsonData;
 
-class MissalsPath
+final class MissalsPath
 {
     public static Core $Core;
     public static MissalsParams $params;
@@ -245,7 +245,7 @@ class MissalsPath
      */
     public static function produceErrorResponse(int $statusCode, string $description): void
     {
-        header($_SERVER[ 'SERVER_PROTOCOL' ] . StatusCode::toString($statusCode), true, $statusCode);
+        header($_SERVER['SERVER_PROTOCOL'] . StatusCode::toString($statusCode), true, $statusCode);
         $message         = new \stdClass();
         $message->status = 'ERROR';
         $statusMessage   = '';
@@ -289,7 +289,7 @@ class MissalsPath
     private static function produceResponse(string $jsonEncodedResponse): void
     {
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
-            header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 201 Created', true, 201);
+            header($_SERVER['SERVER_PROTOCOL'] . ' 201 Created', true, 201);
         }
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
@@ -425,7 +425,7 @@ class MissalsPath
                 }
                 $missal->name                         = RomanMissal::getName($missal->missal_id);
                 $missal->year_limits                  = RomanMissal::$yearLimits[$missal->missal_id];
-                $missal->year_published               = RomanMissal::$yearLimits[$missal->missal_id][ 'since_year' ];
+                $missal->year_published               = RomanMissal::$yearLimits[$missal->missal_id]['since_year'];
                 $missal->api_path                     = API_BASE_PATH . "/missals/$missal->missal_id";
                 self::$missalsIndex->litcal_missals[] = $missal;
                 self::$params->addMissalRegion($missal->region);

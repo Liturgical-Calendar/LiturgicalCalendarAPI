@@ -6,7 +6,7 @@ use LiturgicalCalendar\Api\Utilities;
 use LiturgicalCalendar\Api\LatinUtils;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 
-class EasterPath
+final class EasterPath
 {
     private static string $Locale                                = LitLocale::LATIN;
     private static ?string $baseLocale                           = null;
@@ -19,7 +19,7 @@ class EasterPath
     private static function enforceAllowedMethods(): void
     {
         if (!in_array($_SERVER['REQUEST_METHOD'], self::ALLOWED_METHODS)) {
-            header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 405 Method Not Allowed', true, 405);
+            header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed', true, 405);
             die();
         }
     }

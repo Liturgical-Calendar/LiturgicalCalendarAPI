@@ -5,6 +5,7 @@ namespace LiturgicalCalendar\Api\Params;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\ParamError;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 
 /**
  * This class encapsulates the parameters that can be passed to the Events endpoint.
@@ -32,9 +33,8 @@ class EventsParams implements ParamsInterface
     public ?string $DiocesanCalendar          = null;
     public static ParamError $lastErrorStatus = ParamError::NONE;
     private static string $lastErrorMessage   = '';
-    public readonly object $calendarsMetadata;
-    /** @var string[] */ private array $SupportedNationalCalendars = [];
-    /** @var string[] */ private array $SupportedDiocesanCalendars = [];
+
+    public readonly ?MetadataCalendars $calendarsMetadata;
 
     public const ALLOWED_PARAMS = [
         'eternal_high_priest',
@@ -70,26 +70,37 @@ class EventsParams implements ParamsInterface
      * The constructor sets a default value for the Year parameter, defaulting to current year
      * and for the Locale parameter, defaulting to latin.
      *
-     * It also sets the SupportedDiocesanCalendars and SupportedNationalCalendars properties
-     * by reading the data from the calendars metadata.
-     *
      * Calls the setParams method to apply the values from $params to the corresponding properties.
      */
     public function __construct(array $params = [])
     {
+        $calendarsMetadataRaw = file_get_contents(API_BASE_PATH . Route::CALENDARS->value);
+        if ($calendarsMetadataRaw === false) {
+            self::$lastErrorStatus   = ParamError::UNKNOWN_ERROR;
+            self::$lastErrorMessage  = 'Could not read calendars metadata.';
+            $this->calendarsMetadata = null;
+            return;
+        }
+
+        $calendarsMetadataObj = json_decode($calendarsMetadataRaw);
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            self::$lastErrorStatus   = ParamError::UNKNOWN_ERROR;
+            self::$lastErrorMessage  = 'Could not decode calendars metadata: ' . json_last_error_msg();
+            $this->calendarsMetadata = null;
+            return;
+        }
+
+        $this->calendarsMetadata = MetadataCalendars::fromObject($calendarsMetadataObj->litcal_metadata);
+
         //we need at least a default value for the current year and for the locale
         $this->Year = (int)date('Y');
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $value        = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-            $this->Locale = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
+            $this->Locale = $value && LitLocale::isValid($value) ? $value : LitLocale::LATIN;
         } else {
             $this->Locale = LitLocale::LATIN;
         }
         $this->baseLocale = \Locale::getPrimaryLanguage($this->Locale);
-
-        $this->calendarsMetadata          = json_decode(file_get_contents(API_BASE_PATH . Route::CALENDARS->value))->litcal_metadata;
-        $this->SupportedDiocesanCalendars = $this->calendarsMetadata->diocesan_calendars_keys;
-        $this->SupportedNationalCalendars = $this->calendarsMetadata->national_calendars_keys;
 
         $this->setParams($params);
     }
@@ -128,18 +139,18 @@ class EventsParams implements ParamsInterface
                         $this->baseLocale = \Locale::getPrimaryLanguage($this->Locale);
                         break;
                     case 'national_calendar':
-                        if (false === in_array(strtoupper($value), $this->SupportedNationalCalendars)) {
+                        if (false === $this->isValidNationalCalendar($value)) {
                             self::$lastErrorStatus  = ParamError::INVALID_REGION;
                             self::$lastErrorMessage = "unknown value `$value` for nation parameter, supported national calendars are: ["
-                                . implode(',', $this->SupportedNationalCalendars) . ']';
+                                . implode(',', $this->calendarsMetadata->national_calendars_keys) . ']';
                         }
                         $this->NationalCalendar =  strtoupper($value);
                         break;
                     case 'diocesan_calendar':
-                        if (false === in_array($value, $this->SupportedDiocesanCalendars)) {
+                        if (false === $this->isValidDiocesanCalendar($value)) {
                             self::$lastErrorStatus  = ParamError::INVALID_REGION;
                             self::$lastErrorMessage = "unknown value `$value` for diocese parameter, supported diocesan calendars are: ["
-                                . implode(',', $this->SupportedDiocesanCalendars) . ']';
+                                . implode(',', $this->calendarsMetadata->diocesan_calendars_keys) . ']';
                         }
                         $this->DiocesanCalendar = $value;
                         break;
@@ -159,5 +170,15 @@ class EventsParams implements ParamsInterface
     public static function getLastErrorMessage(): string
     {
         return self::$lastErrorMessage;
+    }
+
+    private function isValidNationalCalendar(string $calendar): bool
+    {
+        return in_array($calendar, $this->calendarsMetadata->national_calendars_keys);
+    }
+
+    private function isValidDiocesanCalendar(string $calendar): bool
+    {
+        return in_array($calendar, $this->calendarsMetadata->diocesan_calendars_keys);
     }
 }

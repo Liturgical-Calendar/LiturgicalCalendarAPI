@@ -4,7 +4,7 @@ namespace LiturgicalCalendar\Api\Models\Metadata;
 
 use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
 
-class MetadataNationalCalendarItem extends AbstractJsonRepresentation
+final class MetadataNationalCalendarItem extends AbstractJsonRepresentation
 {
     public string $calendar_id;
 
@@ -60,7 +60,7 @@ class MetadataNationalCalendarItem extends AbstractJsonRepresentation
      * - wider_region: The wider region to which the National Calendar belongs, if applicable.
      * - dioceses: The dioceses that use the National Calendar, if applicable.
      *
-     * @return array{calendar_id:string,locales:array<string>,missals:array<string>,settings:array<string>,wider_region?:string,dioceses?:array<string>} The associative array containing the National Calendar's metadata.
+     * @return array{calendar_id:string,locales:array<string>,missals:array<string>,settings:array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool},wider_region?:string,dioceses?:array<string>} The associative array containing the National Calendar's metadata.
      */
     public function jsonSerialize(): array
     {

@@ -11,7 +11,10 @@ use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
 use LiturgicalCalendar\Api\Enum\ParamError;
+use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
 use LiturgicalCalendar\Api\Params\EventsParams;
 
 /**
@@ -28,7 +31,7 @@ use LiturgicalCalendar\Api\Params\EventsParams;
  * }
  * @phpstan-type LiturgicalEventCollectionItem array<string,mixed>
  */
-class EventsPath
+final class EventsPath
 {
     public static Core $Core;
     /** @var array<string,LiturgicalEventCollectionItem> */
@@ -40,7 +43,6 @@ class EventsPath
     private static ?object $WiderRegionData = null;
     private static ?object $NationalData    = null;
     private static ?object $DiocesanData    = null;
-    private static ?LitGrade $LitGrade      = null;
     private static ?LitCommon $LitCommon    = null;
     private EventsParams $EventsParams;
 
@@ -62,6 +64,10 @@ class EventsPath
         self::$Core             = new Core();
         self::$requestPathParts = $requestPathParts;
         $this->EventsParams     = new EventsParams();
+        if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
+            echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
+            die();
+        }
     }
 
     /**
@@ -350,8 +356,6 @@ class EventsPath
         setlocale(LC_ALL, $localeArray);
         bindtextdomain('litcal', 'i18n');
         textdomain('litcal');
-        self::$LitGrade  = new LitGrade($this->EventsParams->baseLocale);
-        self::$LitCommon = new LitCommon($this->EventsParams->baseLocale);
     }
 
     /**
@@ -402,11 +406,14 @@ class EventsPath
                     die();
                 }
                 foreach ($DATA as $liturgicalEvent) {
-                    $key                                                     = $liturgicalEvent[ 'event_key' ];
-                    self::$LiturgicalEventCollection[ $key ]                 = $liturgicalEvent;
-                    self::$LiturgicalEventCollection[ $key ][ 'missal' ]     = $LatinMissal;
-                    self::$LiturgicalEventCollection[ $key ][ 'grade_lcl' ]  = self::$LitGrade->i18n($liturgicalEvent['grade'], false);
-                    self::$LiturgicalEventCollection[ $key ][ 'common_lcl' ] = self::$LitCommon->c($liturgicalEvent['common']);
+                    $key                                   = $liturgicalEvent['event_key'];
+                    $grade                                 = LitGrade::from($liturgicalEvent['grade']);
+                    $liturgicalEvent['grade']              = $grade;
+                    $liturgicalEvent['grade_lcl']          = LitGrade::i18n($grade, $this->EventsParams->baseLocale, false);
+                    $liturgicalEvent['missal']             = $LatinMissal;
+                    $commons                               = new LitCommons($liturgicalEvent['common']);
+                    $liturgicalEvent['common_lcl']         = $commons->fullTranslate($this->EventsParams->baseLocale);
+                    self::$LiturgicalEventCollection[$key] = $liturgicalEvent;
                 }
                 // There may or may not be a related translation file; if there is, we get the translated name from here
                 $I18nPath = RomanMissal::getSanctoraleI18nFilePath($LatinMissal);
@@ -422,9 +429,9 @@ class EventsPath
                         die();
                     }
                     foreach ($DATA as $liturgicalEvent) {
-                        $key = $liturgicalEvent[ 'event_key' ];
+                        $key = $liturgicalEvent['event_key'];
                         if (array_key_exists($key, $NAME)) {
-                            self::$LiturgicalEventCollection[ $key ][ 'name' ] = $NAME[ $key ];
+                            self::$LiturgicalEventCollection[$key]['name'] = $NAME[$key];
                         }
                     }
                 }
@@ -472,12 +479,13 @@ class EventsPath
         foreach ($DATA as $row) {
             $key = $row['event_key'];
             if (false === array_key_exists($key, self::$LiturgicalEventCollection)) {
-                self::$LiturgicalEventCollection[ $key ]                 = $row;
-                self::$LiturgicalEventCollection[ $key ][ 'name' ]       = $NAME[ $key ];
-                self::$LiturgicalEventCollection[ $key ][ 'grade_lcl' ]  = self::$LitGrade->i18n($row['grade'], false);
-                self::$LiturgicalEventCollection[ $key ][ 'common' ]     = [];
-                self::$LiturgicalEventCollection[ $key ][ 'common_lcl' ] = '';
-                self::$LiturgicalEventCollection[ $key ][ 'calendar' ]   = 'GENERAL ROMAN';
+                $grade                                               = LitGrade::from($row['grade']);
+                self::$LiturgicalEventCollection[$key]               = $row;
+                self::$LiturgicalEventCollection[$key]['name']       = $NAME[$key];
+                self::$LiturgicalEventCollection[$key]['grade_lcl']  = LitGrade::i18n($grade, $this->EventsParams->baseLocale, false);
+                self::$LiturgicalEventCollection[$key]['common']     = [];
+                self::$LiturgicalEventCollection[$key]['common_lcl'] = '';
+                self::$LiturgicalEventCollection[$key]['calendar']   = 'GENERAL ROMAN';
             }
         }
     }
@@ -517,40 +525,114 @@ class EventsPath
             echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
             die();
         }
+
         $NAME = json_decode(file_get_contents($I18nFile), true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
             die();
         }
-        foreach ($DATA as $idx => $liturgicalEvent) {
-            $key = $liturgicalEvent[ 'liturgical_event' ][ 'event_key' ];
+
+        foreach ($DATA as $liturgicalEventData) {
+            $liturgicalEvent         = $liturgicalEventData['liturgical_event'];
+            $liturgicalEventMetadata = $liturgicalEventData['metadata'];
+            $key                     = $liturgicalEvent['event_key'];
             if (false === array_key_exists($key, self::$LiturgicalEventCollection)) {
-                self::$LiturgicalEventCollection[ $key ]           = $liturgicalEvent[ 'liturgical_event' ];
-                self::$LiturgicalEventCollection[ $key ][ 'name' ] = $NAME[ $key ];
-                if (array_key_exists('locales', $liturgicalEvent[ 'metadata' ])) {
-                    $decreeURL = sprintf($liturgicalEvent[ 'metadata' ][ 'url' ], 'LA');
-                    if (array_key_exists($this->EventsParams->baseLocale, $liturgicalEvent[ 'metadata' ][ 'locales' ])) {
-                        $decreeLang = $liturgicalEvent[ 'metadata' ][ 'locales' ][ $this->EventsParams->baseLocale ];
-                        $decreeURL  = sprintf($liturgicalEvent[ 'metadata' ][ 'url' ], $decreeLang);
+                $liturgicalEvent['name'] = $NAME[$key];
+                if (array_key_exists('locales', $liturgicalEventMetadata)) {
+                    $decreeURL = sprintf($liturgicalEventMetadata['url'], 'LA');
+                    if (array_key_exists($this->EventsParams->baseLocale, $liturgicalEventMetadata['locales'])) {
+                        $decreeLang = $liturgicalEvent['metadata']['locales'][$this->EventsParams->baseLocale];
+                        $decreeURL  = sprintf($liturgicalEvent['metadata']['url'], $decreeLang);
                     }
                 } else {
-                    $decreeURL = $liturgicalEvent[ 'metadata' ][ 'url' ];
+                    $decreeURL = $liturgicalEventMetadata['url'];
                 }
-                self::$LiturgicalEventCollection[ $key ][ 'decree' ] = $decreeURL;
-            } elseif ($liturgicalEvent[ 'metadata' ][ 'action' ] === 'setProperty') {
-                if ($liturgicalEvent[ 'metadata' ][ 'property' ] === 'name') {
-                    self::$LiturgicalEventCollection[ $key ][ 'name' ] = $NAME[ $key ];
-                } elseif ($liturgicalEvent[ 'metadata' ][ 'property' ] === 'grade') {
-                    self::$LiturgicalEventCollection[ $key ][ 'grade' ] = $liturgicalEvent[ 'liturgical_event' ][ 'grade' ];
+                $liturgicalEvent['decree']             = $decreeURL;
+                self::$LiturgicalEventCollection[$key] = $liturgicalEvent;
+            } elseif ($liturgicalEventMetadata['action'] === 'setProperty') {
+                if ($liturgicalEventMetadata['property'] === 'name') {
+                    self::$LiturgicalEventCollection[$key]['name'] = $NAME[$key];
+                } elseif ($liturgicalEventMetadata['property'] === 'grade') {
+                    self::$LiturgicalEventCollection[$key]['grade'] = $liturgicalEvent['grade'];
                 }
-            } elseif ($liturgicalEvent[ 'metadata' ][ 'action' ] === 'makeDoctor') {
-                self::$LiturgicalEventCollection[ $key ][ 'name' ] = $NAME[ $key ];
+            } elseif ($liturgicalEventMetadata['action'] === 'makeDoctor') {
+                self::$LiturgicalEventCollection[$key]['name'] = $NAME[$key];
             }
-            self::$LiturgicalEventCollection[ $key ][ 'grade_lcl' ] = self::$LitGrade->i18n(self::$LiturgicalEventCollection[ $key ][ 'grade' ], false);
-            if (array_key_exists('common', self::$LiturgicalEventCollection[ $key ])) {
-                self::$LiturgicalEventCollection[ $key ][ 'common_lcl' ] = self::$LitCommon->c(self::$LiturgicalEventCollection[ $key ][ 'common' ]);
+
+            $grade = self::$LiturgicalEventCollection[$key]['grade'] instanceof LitGrade
+                    ? self::$LiturgicalEventCollection[$key]['grade']
+                    : LitGrade::from(self::$LiturgicalEventCollection[$key]['grade']);
+
+            self::$LiturgicalEventCollection[$key]['grade']     = $grade;
+            self::$LiturgicalEventCollection[$key]['grade_lcl'] = LitGrade::i18n($grade, $this->EventsParams->baseLocale, false);
+            if (array_key_exists('common', self::$LiturgicalEventCollection[$key])) {
+                $common    = new LitCommons(self::$LiturgicalEventCollection[$key]['common']);
+                $commonLcl = $common->fullTranslate($this->EventsParams->baseLocale);
+
+                self::$LiturgicalEventCollection[$key]['common']     = $common;
+                self::$LiturgicalEventCollection[$key]['common_lcl'] = $commonLcl;
             }
         }
+    }
+
+    private static function transformCommons(array|LitCommons $common): LitCommons|array
+    {
+        if ($common instanceof LitCommons) {
+            return $common;
+        }
+
+        if (count($common) === 0) {
+            return new LitCommons(LitCommon::NONE);
+        }
+
+        $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $common)));
+
+        if (count($valueTypes) > 1) {
+            throw new \InvalidArgumentException('Incoherent liturgical common value types provided: found multiple types ' . implode(', ', $valueTypes));
+        }
+
+        if ($valueTypes[0] === 'string') {
+            try {
+                $commons = new LitCommons($common);
+                return $commons;
+            } catch (\ValueError $e) {
+                $commons = array_map(fn(string $value) => LitMassVariousNeeds::from($value), $common);
+                return $commons;
+            }
+        } elseif ($common[0] instanceof LitCommon) {
+            return new LitCommons($common);
+        } elseif ($common[0] instanceof LitMassVariousNeeds) {
+            return $common;
+        } else {
+            throw new \InvalidArgumentException('Invalid liturgical common value types provided. Expected type string or LitCommon or LitMassVariousNeeds, found ' . $valueTypes[0]);
+        }
+    }
+
+    private static function localizeCommons(array|LitCommons $commons, string $locale): string
+    {
+        if ($commons instanceof LitCommons) {
+            return $commons->fullTranslate($locale);
+        }
+
+        if ($commons instanceof LitMassVariousNeeds) {
+            return $commons->fullTranslate($locale === LitLocale::LATIN || $locale === LitLocale::LATIN_PRIMARY_LANGUAGE);
+        }
+
+        $litMassVariousNeedsArray = false;
+        if (is_array($commons)) {
+            $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $commons)));
+            if (count($valueTypes) > 1) {
+                throw new \InvalidArgumentException('Incoherent liturgical common value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
+            }
+            $litMassVariousNeedsArray = $commons[0] instanceof LitMassVariousNeeds;
+        }
+
+        if ($litMassVariousNeedsArray) {
+            /** @var LitMassVariousNeeds[] $commons */
+            $commonsLcl = array_map(fn(LitMassVariousNeeds $item) => $item->fullTranslate($locale === LitLocale::LATIN || $locale === LitLocale::LATIN_PRIMARY_LANGUAGE), $commons);
+            return implode('; ' . _('or') . ' ', $commonsLcl);
+        }
+        return '???';
     }
 
     /**
@@ -578,16 +660,26 @@ class EventsPath
             if (self::$WiderRegionData !== null && property_exists(self::$WiderRegionData, 'litcal')) {
                 foreach (self::$WiderRegionData->litcal as $row) {
                     if ($row->metadata->action === 'createNew') {
-                        $key                                     = $row->liturgical_event->event_key;
-                        self::$LiturgicalEventCollection[ $key ] = [];
+                        $key = $row->liturgical_event->event_key;
+
+                        self::$LiturgicalEventCollection[$key] = [];
                         foreach ($row->liturgical_event as $prop => $value) {
-                            self::$LiturgicalEventCollection[ $key ][ $prop ] = $value;
+                            if ($prop === 'grade') {
+                                $value = LitGrade::from($value);
+                            } elseif ($prop === 'common') {
+                                $value = self::transformCommons($value);
+                            }
+                            self::$LiturgicalEventCollection[$key][$prop] = $value;
                         }
-                        self::$LiturgicalEventCollection[ $key ][ 'grade_lcl' ]  = self::$LitGrade->i18n($row->liturgical_event->grade, false);
-                        self::$LiturgicalEventCollection[ $key ][ 'common_lcl' ] = self::$LitCommon->c($row->liturgical_event->common);
+                        $grade  = self::$LiturgicalEventCollection[$key]['grade'];
+                        $common = self::$LiturgicalEventCollection[$key]['common'];
+
+                        self::$LiturgicalEventCollection[$key]['grade_lcl']  = LitGrade::i18n($grade, $this->EventsParams->baseLocale, false);
+                        self::$LiturgicalEventCollection[$key]['common_lcl'] = self::localizeCommons($common, $this->EventsParams->baseLocale);
                     }
                 }
             }
+
             $NationalCalendarI18nFile = strtr(
                 JsonData::NATIONAL_CALENDARS_I18N_FILE,
                 [
@@ -595,39 +687,67 @@ class EventsPath
                     '{locale}' => $this->EventsParams->Locale
                 ]
             );
+
             $NationalCalendarI18nData = json_decode(file_get_contents($NationalCalendarI18nFile), true);
             foreach (self::$NationalData->litcal as $row) {
+                $key = $row->liturgical_event->event_key;
                 if ($row->metadata->action === 'createNew') {
-                    $key                                                     = $row->liturgical_event->event_key;
-                    self::$LiturgicalEventCollection[ $key ]                 = (array) $row->liturgical_event;
-                    self::$LiturgicalEventCollection[ $key ][ 'grade_lcl' ]  = self::$LitGrade->i18n($row->liturgical_event->grade, false);
-                    self::$LiturgicalEventCollection[ $key ][ 'common_lcl' ] = self::$LitCommon->c($row->liturgical_event->common);
-                    self::$LiturgicalEventCollection[ $key ][ 'name' ]       = $NationalCalendarI18nData[ $key ];
+                    self::$LiturgicalEventCollection[$key] = [];
+                    foreach ($row->liturgical_event as $prop => $value) {
+                        if ($prop === 'grade') {
+                            $value = LitGrade::from($value);
+                        } elseif ($prop === 'common') {
+                            $value = self::transformCommons($value);
+                        }
+                        self::$LiturgicalEventCollection[$key][$prop] = $value;
+                    }
+                    $grade  = self::$LiturgicalEventCollection[$key]['grade'];
+                    $common = self::$LiturgicalEventCollection[$key]['common'];
+
+                    self::$LiturgicalEventCollection[$key]['grade_lcl']  = LitGrade::i18n($grade, $this->EventsParams->baseLocale, false);
+                    self::$LiturgicalEventCollection[$key]['common_lcl'] = self::localizeCommons($common, $this->EventsParams->baseLocale);
+                    self::$LiturgicalEventCollection[$key]['name']       = $NationalCalendarI18nData[$key];
                 } elseif ($row->metadata->action === 'setProperty') {
                     if ($row->metadata->property === 'name') {
-                        self::$LiturgicalEventCollection[ $row->liturgical_event->event_key ][ 'name' ] = $NationalCalendarI18nData[ $row->liturgical_event->event_key ];
+                        self::$LiturgicalEventCollection[$key]['name'] = $NationalCalendarI18nData[$key];
                     }
                     if ($row->metadata->property === 'grade') {
-                        self::$LiturgicalEventCollection[ $row->liturgical_event->event_key ][ 'grade' ]     = $row->liturgical_event->grade;
-                        self::$LiturgicalEventCollection[ $row->liturgical_event->event_key ][ 'grade_lcl' ] = self::$LitGrade->i18n($row->liturgical_event->grade, false);
+                        $grade = LitGrade::from($row->liturgical_event->grade);
+
+                        self::$LiturgicalEventCollection[$key]['grade']     = $grade;
+                        self::$LiturgicalEventCollection[$key]['grade_lcl'] = LitGrade::i18n($grade, $this->EventsParams->baseLocale, false);
                     }
                 }
             }
+
             if (property_exists(self::$NationalData, 'metadata') && property_exists(self::$NationalData->metadata, 'missals')) {
                 foreach (self::$NationalData->metadata->missals as $missal) {
                     $DataFile = RomanMissal::getSanctoraleFileName($missal);
                     if ($DataFile !== false) {
-                        if (!file_exists($DataFile)) {
-                            echo self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DataFile");
+                        if (!file_exists($DataFile) || !is_readable($DataFile)) {
+                            echo self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DataFile or it is not readable");
                             die();
                         }
-                        $PropriumDeSanctis = json_decode(file_get_contents($DataFile));
-                        foreach ($PropriumDeSanctis as $idx => $liturgicalEvent) {
-                            $key                                                     = $liturgicalEvent->event_key;
-                            self::$LiturgicalEventCollection[ $key ]                 = (array) $liturgicalEvent;
-                            self::$LiturgicalEventCollection[ $key ][ 'grade_lcl' ]  = self::$LitGrade->i18n($liturgicalEvent->grade, false);
-                            self::$LiturgicalEventCollection[ $key ][ 'common_lcl' ] = self::$LitCommon->c($liturgicalEvent->common);
-                            self::$LiturgicalEventCollection[ $key ][ 'missal' ]     = $missal;
+                        $PropriumDeSanctisRaw = file_get_contents($DataFile);
+                        if (false === $PropriumDeSanctisRaw) {
+                            echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not read resource file $DataFile");
+                            die();
+                        }
+                        $PropriumDeSanctis = json_decode($PropriumDeSanctisRaw);
+                        if (JSON_ERROR_NONE !== json_last_error() || null === $PropriumDeSanctis) {
+                            echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
+                            die();
+                        }
+                        foreach ($PropriumDeSanctis as $liturgicalEvent) {
+                            $key     = $liturgicalEvent->event_key;
+                            $grade   = LitGrade::from($liturgicalEvent->grade);
+                            $commons = self::transformCommons($liturgicalEvent->common);
+
+                            self::$LiturgicalEventCollection[$key]               = (array) $liturgicalEvent;
+                            self::$LiturgicalEventCollection[$key]['grade']      = $grade;
+                            self::$LiturgicalEventCollection[$key]['grade_lcl']  = LitGrade::i18n($grade, $this->EventsParams->baseLocale, false);
+                            self::$LiturgicalEventCollection[$key]['common_lcl'] = self::localizeCommons($commons, $this->EventsParams->baseLocale);
+                            self::$LiturgicalEventCollection[$key]['missal']     = $missal;
                         }
                     }
                 }
@@ -656,15 +776,32 @@ class EventsPath
                     '{locale}'  => $this->EventsParams->Locale
                 ]
             );
-            $DiocesanCalendarI18nData = json_decode(file_get_contents($DiocesanCalendarI18nFile), true);
+            if (false === file_exists($DiocesanCalendarI18nFile) || false === is_readable($DiocesanCalendarI18nFile)) {
+                echo self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DiocesanCalendarI18nFile or it is not readable");
+                die();
+            }
+            $DiocesanCalendarI18nDataRaw = file_get_contents($DiocesanCalendarI18nFile);
+            if (false === $DiocesanCalendarI18nDataRaw) {
+                echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not read resource file $DiocesanCalendarI18nFile");
+                die();
+            }
+            $DiocesanCalendarI18nData = json_decode($DiocesanCalendarI18nDataRaw, true);
+            if (JSON_ERROR_NONE !== json_last_error() || null === $DiocesanCalendarI18nData) {
+                echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
+                die();
+            }
 
             foreach (self::$DiocesanData->litcal as $row) {
-                $key                                                     = $this->EventsParams->DiocesanCalendar . '_' . $row->liturgical_event->event_key;
-                self::$LiturgicalEventCollection[ $key ]                 = (array) $row->liturgical_event;
-                self::$LiturgicalEventCollection[ $key ][ 'event_key' ]  = $key;
-                self::$LiturgicalEventCollection[ $key ][ 'grade_lcl' ]  = self::$LitGrade->i18n($row->liturgical_event->grade, false);
-                self::$LiturgicalEventCollection[ $key ][ 'common_lcl' ] = self::$LitCommon->c($row->liturgical_event->common);
-                self::$LiturgicalEventCollection[ $key ][ 'name' ]       = $DiocesanCalendarI18nData[ $row->liturgical_event->event_key ];
+                $key    = $this->EventsParams->DiocesanCalendar . '_' . $row->liturgical_event->event_key;
+                $grade  = LitGrade::from($row->liturgical_event->grade);
+                $common = new LitCommons($row->liturgical_event->common);
+
+                self::$LiturgicalEventCollection[$key]               = (array) $row->liturgical_event;
+                self::$LiturgicalEventCollection[$key]['event_key']  = $key;
+                self::$LiturgicalEventCollection[$key]['grade']      = $grade;
+                self::$LiturgicalEventCollection[$key]['grade_lcl']  = LitGrade::i18n($grade, $this->EventsParams->baseLocale, false);
+                self::$LiturgicalEventCollection[$key]['common_lcl'] = $common->fullTranslate($this->EventsParams->baseLocale);
+                self::$LiturgicalEventCollection[$key]['name']       = $DiocesanCalendarI18nData[$row->liturgical_event->event_key];
             }
         }
     }
@@ -683,7 +820,7 @@ class EventsPath
      */
     private static function produceErrorResponse(int $statusCode, string $description): string
     {
-        header($_SERVER[ 'SERVER_PROTOCOL' ] . StatusCode::toString($statusCode), true, $statusCode);
+        header($_SERVER['SERVER_PROTOCOL'] . StatusCode::toString($statusCode), true, $statusCode);
         $message              = new \stdClass();
         $message->status      = 'ERROR';
         $message->response    = StatusCode::toString($statusCode);
@@ -721,7 +858,7 @@ class EventsPath
         $responseHash = md5($response);
         header("Etag: \"{$responseHash}\"");
         if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
-            header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 304 Not Modified');
+            header($_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified');
             header('Content-Length: 0');
         } else {
             switch (self::$Core->getResponseContentType()) {

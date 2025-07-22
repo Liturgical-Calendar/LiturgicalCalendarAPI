@@ -34,6 +34,6 @@ class StatusCode
      */
     public static function toString(int $code): string
     {
-        return StatusCode::STATUS_CODES[ $code ];
+        return StatusCode::STATUS_CODES[$code];
     }
 }

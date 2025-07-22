@@ -23,6 +23,7 @@
         </properties>
     </rule>
     <rule ref="Squiz.Strings.DoubleQuoteUsage.NotRequired"/>
+    <rule ref="Squiz.Arrays.ArrayBracketSpacing"/>
     <file>./</file> <!-- directory you want to analyze -->
     <exclude-pattern>/vendor/</exclude-pattern>
     <exclude-pattern>allowedOrigins.php</exclude-pattern>

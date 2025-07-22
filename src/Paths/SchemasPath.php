@@ -14,7 +14,7 @@ namespace LiturgicalCalendar\Api\Paths;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Enum\JsonData;
 
-class SchemasPath
+final class SchemasPath
 {
     private static function enforceOrigin(): void
     {
@@ -79,7 +79,7 @@ class SchemasPath
                     echo file_get_contents(JsonData::SCHEMAS_FOLDER . '/' . $requestPathParts[0]);
                     die();
                 } else {
-                    header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 404 Not Found', true, 404);
+                    header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found', true, 404);
                     die("Schema file '{$requestPathParts[0]}' not found");
                 }
         }

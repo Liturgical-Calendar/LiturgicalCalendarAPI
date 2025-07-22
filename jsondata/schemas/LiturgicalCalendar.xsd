@@ -225,17 +225,45 @@
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
+              <xs:element name="SolemnitiesLordBVM">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="LitCalEvent" type="cl:LitCalEventType" minOccurs="10" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="SolemnitiesLordBVMKeys">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Key" type="cl:KeyType" minOccurs="10" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
               <xs:element name="Solemnities">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="LitCalEvent" type="cl:LitCalEventType" minOccurs="70" maxOccurs="unbounded" />
+                    <xs:element name="LitCalEvent" type="cl:LitCalEventType" minOccurs="40" maxOccurs="unbounded" />
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
               <xs:element name="SolemnitiesKeys">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="Key" type="cl:KeyType" minOccurs="70" maxOccurs="unbounded" />
+                    <xs:element name="Key" type="cl:KeyType" minOccurs="40" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="FeastsLord">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="LitCalEvent" type="cl:LitCalEventType" minOccurs="30" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="FeastsLordKeys">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Key" type="cl:KeyType" minOccurs="30" maxOccurs="unbounded" />
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>

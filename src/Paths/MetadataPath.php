@@ -12,7 +12,7 @@ use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
 
-class MetadataPath
+final class MetadataPath
 {
     private static MetadataCalendars $metadataCalendars;
 
@@ -44,8 +44,8 @@ class MetadataPath
                 if (JSON_ERROR_NONE === json_last_error()) {
                     $nationalCalendarData->metadata->settings = $nationalCalendarData->settings;
                     $nationalCalendarData->metadata->dioceses = [];
-                    $nationalCalendarArr                      = MetadataNationalCalendarItem::fromObject($nationalCalendarData->metadata);
-                    self::$metadataCalendars->pushNationalCalendarMetadata($nationalCalendarArr);
+                    $metadataNationalCalendarItem             = MetadataNationalCalendarItem::fromObject($nationalCalendarData->metadata);
+                    self::$metadataCalendars->pushNationalCalendarMetadata($metadataNationalCalendarItem);
                 }
             }
         }
@@ -205,7 +205,7 @@ class MetadataPath
 
         header("Etag: \"{$responseHash}\"");
         if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
-            header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 304 Not Modified');
+            header($_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified');
             header('Content-Length: 0');
         } else {
             echo $response;
@@ -222,11 +222,11 @@ class MetadataPath
      */
     public static function init()
     {
-        if (isset($_SERVER[ 'REQUEST_METHOD' ])) {
-            if (isset($_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_METHOD' ])) {
+        if (isset($_SERVER['REQUEST_METHOD'])) {
+            if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
                 header('Access-Control-Allow-Methods: OPTIONS,GET,POST');
             }
-            if (isset($_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' ])) {
+            if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
                 header("Access-Control-Allow-Headers: {$_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' ]}");
             }
         }

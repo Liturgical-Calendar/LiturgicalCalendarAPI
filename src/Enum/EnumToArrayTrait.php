@@ -59,4 +59,17 @@ trait EnumToArrayTrait
     {
         return in_array($value, self::values());
     }
+
+    /**
+     * Checks if all of the given values are valid enum values.
+     *
+     * @param array<string> $values The array of values to check.
+     * @return bool True if all of the values are valid, otherwise false.
+     */
+    public static function areValid(array $values): bool
+    {
+        return array_reduce($values, function ($carry, $value) {
+            return $carry && self::isValid($value);
+        }, true);
+    }
 }

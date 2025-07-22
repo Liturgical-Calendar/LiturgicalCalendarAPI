@@ -10,7 +10,7 @@ use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\JsonData;
 
-class TestsPath
+final class TestsPath
 {
     public static Core $Core;
     /** @var string[] */ private static array $requestPathParts = [];
@@ -56,13 +56,13 @@ class TestsPath
                 } elseif (is_array($value)) {
                     foreach ($value as $idx => $item) {
                         if (is_object($item)) {
-                            self::sanitizeObjectValues($data->{$prop}[ $idx ]);
+                            self::sanitizeObjectValues($data->{$prop}[$idx]);
                         } elseif (is_array($item)) {
                             foreach ($item as $idx2 => $item2) {
-                                $data->{$prop}[ $idx ][ $idx2 ] = self::sanitizeString($item2);
+                                $data->{$prop}[$idx][$idx2] = self::sanitizeString($item2);
                             }
                         } elseif (is_string($item)) {
-                            $data->{$prop}[ $idx ] = self::sanitizeString($item);
+                            $data->{$prop}[$idx] = self::sanitizeString($item);
                         }
                     }
                 } elseif (is_string($value)) {
@@ -213,7 +213,7 @@ class TestsPath
         if (false === $bytesWritten) {
             return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.');
         } else {
-            header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 201 Created', true, 201);
+            header($_SERVER['SERVER_PROTOCOL'] . ' 201 Created', true, 201);
             $message           = new \stdClass();
             $message->status   = 'OK';
             $message->response = self::$Core->getRequestMethod() === RequestMethod::PUT ? 'Resource Created' : 'Resource Updated';
@@ -279,7 +279,7 @@ class TestsPath
      */
     private static function produceErrorResponse(int $statusCode, string $description): string
     {
-        header($_SERVER[ 'SERVER_PROTOCOL' ] . StatusCode::toString($statusCode), true, $statusCode);
+        header($_SERVER['SERVER_PROTOCOL'] . StatusCode::toString($statusCode), true, $statusCode);
         $message         = new \stdClass();
         $message->status = 'ERROR';
         $statusMessage   = '';

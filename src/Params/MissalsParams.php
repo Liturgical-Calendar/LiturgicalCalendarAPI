@@ -4,7 +4,7 @@ namespace LiturgicalCalendar\Api\Params;
 
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\StatusCode;
-use LiturgicalCalendar\Api\Paths\Missals;
+use LiturgicalCalendar\Api\Paths\MissalsPath;
 
 /**
  * Class MissalsParams
@@ -79,13 +79,13 @@ class MissalsParams implements ParamsInterface
                         $error = "Locale `$value` set in param `locale` is not supported by this server, supported locales are: la, la_VA, "
                             . implode(', ', LitLocale::$AllAvailableLocales);
                         //$this->setLastError(StatusCode::BAD_REQUEST, $error);
-                        Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
+                        MissalsPath::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
                     }
                     if (count($this->availableLangs) && false === in_array($this->baseLocale, $this->availableLangs)) {
                         $message = "Locale `$value` ({$this->baseLocale}) set in param `locale` is not a valid locale for the requested Missal, valid locales are: "
                                 . implode(', ', $this->availableLangs);
                         //$this->setLastError(StatusCode::BAD_REQUEST, $message);
-                        Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+                        MissalsPath::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                     }
                     break;
                 case 'year':
@@ -98,7 +98,7 @@ class MissalsParams implements ParamsInterface
                         $message = "Invalid value `$value` for param `year`, valid values are: "
                             . implode(', ', self::$MissalYears);
                         //$this->setLastError(StatusCode::BAD_REQUEST, $message);
-                        Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+                        MissalsPath::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                     }
                     break;
                 case 'region':
@@ -108,7 +108,7 @@ class MissalsParams implements ParamsInterface
                         $message = "Invalid value `$value` for param `region`, valid values are: "
                             . implode(', ', self::$MissalRegions);
                         //$this->setLastError(StatusCode::BAD_REQUEST, $message);
-                        Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
+                        MissalsPath::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                     }
                     break;
                 case 'include_empty':

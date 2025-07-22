@@ -307,12 +307,12 @@ class Health implements MessageComponentInterface
                 if ($isVersionedDataPath) {
                     $versionedDataPath = preg_replace($versionedPattern, $versionedReplacement, $dataPath);
                     if (array_key_exists($versionedDataPath, Health::DATA_PATH_TO_SCHEMA)) {
-                        $tempSchemaPath = Health::DATA_PATH_TO_SCHEMA[ $versionedDataPath ];
+                        $tempSchemaPath = Health::DATA_PATH_TO_SCHEMA[$versionedDataPath];
                         return preg_replace($versionedPattern, $versionedReplacement, $tempSchemaPath);
                     }
                 }
                 if (array_key_exists($dataPath, Health::DATA_PATH_TO_SCHEMA)) {
-                    return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
+                    return Health::DATA_PATH_TO_SCHEMA[$dataPath];
                 }
                 return null;
             case 'nationalcalendar':
@@ -356,12 +356,12 @@ class Health implements MessageComponentInterface
                 if ($isVersionedDataPath) {
                     $versionedDataPath = preg_replace($versionedPattern, $versionedReplacement, $dataPath);
                     if (array_key_exists($versionedDataPath, Health::DATA_PATH_TO_SCHEMA)) {
-                        $tempSchemaPath = Health::DATA_PATH_TO_SCHEMA[ $versionedDataPath ];
+                        $tempSchemaPath = Health::DATA_PATH_TO_SCHEMA[$versionedDataPath];
                         return preg_replace($versionedPattern, $versionedReplacement, $tempSchemaPath);
                     }
                 }
                 if (array_key_exists($dataPath, Health::DATA_PATH_TO_SCHEMA)) {
-                    return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
+                    return Health::DATA_PATH_TO_SCHEMA[$dataPath];
                 }
                 return null;
             case 'sourceDataCheck':
@@ -1108,7 +1108,7 @@ class Health implements MessageComponentInterface
         } catch (InvalidValue | \Exception $e) {
             $message       = new \stdClass();
             $message->type = 'error';
-            $message->text = LitSchema::ERROR_MESSAGES[ $schemaUrl ] . PHP_EOL . $e->getMessage();
+            $message->text = LitSchema::ERROR_MESSAGES[$schemaUrl] . PHP_EOL . $e->getMessage();
             return $message;
         }
         return $res;

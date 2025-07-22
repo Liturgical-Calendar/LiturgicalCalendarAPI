@@ -4,13 +4,18 @@ namespace LiturgicalCalendar\Api\Models\Calendar;
 
 use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitColor;
-use LiturgicalCalendar\Api\Enum\LitFeastType;
+use LiturgicalCalendar\Api\Enum\LitEventType;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitSeason;
+use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
+use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
+use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewFixed as DiocesanLitCalItemCreateNewFixed;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewMobile as DiocesanLitCalItemCreateNewMobile;
 
-class LiturgicalEvent implements \JsonSerializable
+final class LiturgicalEvent implements \JsonSerializable
 {
     public int $event_idx;
 
@@ -18,23 +23,23 @@ class LiturgicalEvent implements \JsonSerializable
     public string $event_key;
     public string $name;
     public DateTime $date;
-    /** @var string[] */
+    /** @var LitColor[] */
     public array $color = [];
-    public string $type;
-    public int $grade;
+    public LitEventType $type;
+    public LitGrade $grade;
     public ?string $grade_display;
-    /** @var string[] */
-    public array $common;  //"Proper" or specified common(s) of saints...
+    /** @var LitCommons|LitMassVariousNeeds[] */
+    public LitCommons|array $common;  //["Proper"] or one or more Commons
 
     /** The following properties are set externally, but may be optional and therefore may remain null */
-    public ?int $psalter_week         = null;
-    public ?bool $is_vigil_mass       = null;
-    public ?bool $has_vigil_mass      = null;
-    public ?bool $has_vesper_i        = null;
-    public ?bool $has_vesper_ii       = null;
-    public ?string $is_vigil_for      = null;
-    public ?string $liturgical_year   = null;
-    public ?string $liturgical_season = null;
+    public ?int $psalter_week            = null;
+    public ?bool $is_vigil_mass          = null;
+    public ?bool $has_vigil_mass         = null;
+    public ?bool $has_vesper_i           = null;
+    public ?bool $has_vesper_ii          = null;
+    public ?string $is_vigil_for         = null;
+    public ?string $liturgical_year      = null;
+    public ?LitSeason $liturgical_season = null;
 
     /** The following properties are set based on properties passed in the constructor or on other properties */
     private string $grade_lcl;
@@ -44,8 +49,6 @@ class LiturgicalEvent implements \JsonSerializable
     private string $common_lcl;
 
     private static string $locale = LitLocale::LATIN;
-    private static LitGrade $LitGrade;
-    private static LitCommon $LitCommon;
     private static \IntlDateFormatter $dayOfTheWeekShort;
     private static \IntlDateFormatter $dayOfTheWeekLong;
     private static \IntlDateFormatter $monthShort;
@@ -55,50 +58,56 @@ class LiturgicalEvent implements \JsonSerializable
     /**
      * @param string $name
      * @param DateTime $date
-     * @param string|string[] $color
-     * @param string $type
-     * @param int $grade
-     * @param string|string[] $common
+     * @param LitColor|LitColor[] $color
+     * @param LitEventType $type
+     * @param LitGrade $grade
+     * @param LitCommons|LitCommon|LitCommon[]|LitMassVariousNeeds|LitMassVariousNeeds[] $common
      * @param string|null $displayGrade
      */
     public function __construct(
         string $name,
         DateTime $date,
-        string|array $color = [ '???' ],
-        string $type = '???',
-        int $grade = LitGrade::WEEKDAY,
-        string|array $common = [ '???' ],
+        LitColor|array $color = LitColor::GREEN,
+        LitEventType $type = LitEventType::FIXED,
+        LitGrade $grade = LitGrade::WEEKDAY,
+        LitCommons|LitCommon|LitMassVariousNeeds|array $common = LitCommon::NONE,
         ?string $displayGrade = null
     ) {
-        $this->event_idx = self::$internal_index++;
-        $this->name      = $name;
-        $this->date      = $date; //DateTime object
-        if (is_string($color)) {
-            $color = [ $color ];
+        $litMassVariousNeedsArray = false;
+        if (is_array($common)) {
+            $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $common)));
+            if (count($valueTypes) > 1) {
+                throw new \InvalidArgumentException('Incoherent liturgical common value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
+            }
+            $litMassVariousNeedsArray = $common[0] instanceof LitMassVariousNeeds;
         }
-        if (LitColor::areValid($color)) {
-            $this->color = $color;
-        }
+        $this->event_idx     = self::$internal_index++;
+        $this->name          = $name;
+        $this->date          = $date; //DateTime object
+        $this->color         = is_array($color) ? $color : [$color];
         $this->color_lcl     = array_map(fn($item) => LitColor::i18n($item, self::$locale), $this->color);
-        $_type               = strtolower($type);
-        $this->type          = LitFeastType::isValid($_type) ? $_type : '???';
-        $this->grade         = $grade >= LitGrade::WEEKDAY && $grade <= LitGrade::HIGHER_SOLEMNITY ? $grade : -1;
-        $this->grade_lcl     = self::$LitGrade->i18n($this->grade, false);
-        $this->grade_abbr    = self::$LitGrade->i18n($this->grade, false, true);
-        $this->grade_display = $grade === LitGrade::HIGHER_SOLEMNITY ? '' : $displayGrade;
-        //LiturgicalEvent::debugWrite( "*** LiturgicalEvent.php *** common vartype = " . gettype( $common ) );
-        if (is_string($common)) {
-            $common = [ $common ];
-        }
-        //LiturgicalEvent::debugWrite( "*** LiturgicalEvent.php *** common vartype is array, value = " . implode( ', ', $common ) );
-        if (LitCommon::areValid($common)) {
-            $this->common     = $common;
-            $this->common_lcl = self::$LitCommon->c($this->common);
+        $this->type          = $type;
+        $this->grade         = $grade;
+        $this->grade_lcl     = LitGrade::i18n($this->grade, self::$locale, false, false);
+        $this->grade_abbr    = LitGrade::i18n($this->grade, self::$locale, false, true);
+        $this->grade_display = $this->grade === LitGrade::HIGHER_SOLEMNITY ? '' : $displayGrade;
+        $commons             = $common instanceof LitCommons || $common instanceof LitMassVariousNeeds || $litMassVariousNeedsArray ? $common : new LitCommons($common);
+        $this->common        = $commons;
+        if ($commons instanceof LitCommons) {
+            /** @var LitCommons $commons */
+            $this->common_lcl = $commons->fullTranslate(self::$locale);
+        } elseif ($commons instanceof LitMassVariousNeeds) {
+            /** @var LitMassVariousNeeds $commons */
+            $this->common_lcl = $commons->fullTranslate(self::$locale === LitLocale::LATIN || self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE);
+        } elseif ($litMassVariousNeedsArray) {
+            /** @var LitMassVariousNeeds[] $commons */
+            $commonsLcl       = array_map(fn($item) => $item->fullTranslate(self::$locale === LitLocale::LATIN || self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE), $commons);
+            $this->common_lcl = implode('; ' . _('or') . ' ', $commonsLcl);
         } else {
-            //LiturgicalEvent::debugWrite( "*** LiturgicalEvent.php *** common values have not passed the validity test!" );
-            $this->common     = [];
-            $this->common_lcl = '';
+            $this->common_lcl = '???';
         }
+        //LiturgicalEvent::debugWrite( "*** LiturgicalEvent.php *** common vartype = " . gettype( $common ) );
+        //LiturgicalEvent::debugWrite( "*** LiturgicalEvent.php *** common vartype is array, value = " . implode( ', ', $common ) );
     }
 
     /**
@@ -167,10 +176,10 @@ class LiturgicalEvent implements \JsonSerializable
      *      event_idx: int,
      *      name: string,
      *      date: int,
-     *      color: array<string>,
+     *      color: array<'green'|'pink'|'purple'|'red'|'white'>,
      *      color_lcl: array<string>,
-     *      type: string,
-     *      grade: int,
+     *      type: 'fixed'|'mobile',
+     *      grade: -1|0|1|2|3|4|5|6|7,
      *      grade_lcl: string,
      *      grade_abbr: string,
      *      grade_display: ?string,
@@ -203,14 +212,16 @@ class LiturgicalEvent implements \JsonSerializable
             'name'                    => $this->name,
             //serialize the DateTime   object as a PHP timestamp (seconds since the Unix Epoch)
             'date'                    => (int) $this->date->format('U'),
-            'color'                   => $this->color,
+            'color'                   => array_map(fn ($color) => $color->value, $this->color),
             'color_lcl'               => $this->color_lcl,
-            'type'                    => $this->type,
-            'grade'                   => $this->grade,
+            'type'                    => $this->type->value,
+            'grade'                   => $this->grade->value,
             'grade_lcl'               => $this->grade_lcl,
             'grade_abbr'              => $this->grade_abbr,
             'grade_display'           => $this->grade_display,
-            'common'                  => $this->common,
+            'common'                  => $this->common instanceof LitCommons
+                                        ? $this->common->jsonSerialize()
+                                        : array_map(fn (LitMassVariousNeeds $litMassVariousNeeds) => $litMassVariousNeeds->value, $this->common),
             'common_lcl'              => $this->common_lcl,
             'day_of_the_week_iso8601' => (int) $this->date->format('N'), //1 for Monday, 7 for Sunday
             'month'                   => (int) $this->date->format('n'), //1 for January, 12 for December
@@ -251,7 +262,7 @@ class LiturgicalEvent implements \JsonSerializable
         }
 
         if ($this->liturgical_season !== null) {
-            $returnArr['liturgical_season']     = $this->liturgical_season;
+            $returnArr['liturgical_season']     = $this->liturgical_season->value;
             $returnArr['liturgical_season_lcl'] = LitSeason::i18n($this->liturgical_season, self::$locale);
         }
 
@@ -269,8 +280,6 @@ class LiturgicalEvent implements \JsonSerializable
     {
         if (LitLocale::isValid($locale)) {
             self::$locale            = $locale;
-            self::$LitGrade          = new LitGrade($locale);
-            self::$LitCommon         = new LitCommon($locale);
             self::$dayOfTheWeekShort = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, 'EEE');
             self::$dayOfTheWeekLong  = \IntlDateFormatter::create($locale, \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, 'EEEE');
             self::$monthShort        = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, 'MMM');
@@ -278,21 +287,278 @@ class LiturgicalEvent implements \JsonSerializable
         }
     }
 
-    public static function fromObject(object $obj): LiturgicalEvent
+    /**
+     * Creates a new LiturgicalEvent object from an object containing the required properties.
+     *
+     * The provided object must have the following properties:
+     * - name: The name of the liturgical event, as a string.
+     * - date: The date of the liturgical event, as a DateTime object or as an integer representing the Unix timestamp.
+     * - grade: The grade of the liturgical event, as a LitGrade object or as an integer.
+     *
+     * Optional properties are:
+     * - color: The liturgical color of the liturgical event, as an array of strings or LitColor cases, or as a single string or single LitColor case.
+     *   If not provided, defaults to LitColor::GREEN.
+     * - common: The liturgical common of the liturgical event, as an array of strings or LitCommon cases, or as a single string or single LitCommon case.
+     *   If not provided, defaults to LitCommon::NONE.
+     * - type: The type of the liturgical event, as a LitEventType object or as a string.
+     *   If not provided, defaults to LitEventType::FIXED.
+     * - grade_display: The grade display of the liturgical event, as a string. If not provided, defaults to null.
+     *
+     * @param \stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile $obj
+     * @return LiturgicalEvent A new LiturgicalEvent object.
+     * @throws \InvalidArgumentException If the provided object does not contain the required properties or if the properties have invalid types.
+     */
+    public static function fromObject(\stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile $obj): LiturgicalEvent
     {
-        if (!isset($obj->name) || !isset($obj->date) || !isset($obj->type) || !isset($obj->grade)) {
+        $requiredProps = ['name', 'date', 'grade'];
+        $rowProps      = get_object_vars($obj);
+        $arrayDiffKeys = array_keys(array_diff_key(array_flip($requiredProps), $rowProps));
+
+        if (count($arrayDiffKeys) > 0) {
+            throw new \InvalidArgumentException('Invalid object provided to create LiturgicalEvent, missing required keys: ' . implode(', ', $arrayDiffKeys));
+        }
+
+        if (!isset($obj->name) || !isset($obj->date) || !isset($obj->grade)) {
             throw new \InvalidArgumentException('Invalid object provided to create LiturgicalEvent');
         }
-        $name         = $obj->name ?? '???';
-        $date         = new DateTime()->setTimestamp((int) $obj->date);
-        $color        = $obj->color ?? [ '???' ];
-        $type         = $obj->type ?? '???';
-        $grade        = $obj->grade ?? LitGrade::WEEKDAY;
-        $common       = $obj->common ?? [ '???' ];
-        $displayGrade = $obj->grade_display ?? null;
 
-        return new self($name, $date, $color, $type, $grade, $common, $displayGrade);
+        if (false === is_string($obj->name)) {
+            throw new \InvalidArgumentException('Invalid name provided to create LiturgicalEvent');
+        }
+
+        if (false === $obj->date instanceof DateTime && false === is_int($obj->date)) {
+            throw new \InvalidArgumentException('Invalid date provided to create LiturgicalEvent');
+        }
+
+        if (false === $obj->grade instanceof LitGrade && false === is_int($obj->grade)) {
+            throw new \InvalidArgumentException('Invalid grade provided to create LiturgicalEvent');
+        }
+
+        if ($obj instanceof \stdClass) {
+            if (is_int($obj->date)) {
+                $obj->date = new DateTime()->setTimestamp($obj->date)->setTimezone(new \DateTimeZone('UTC'));
+            }
+
+            if (property_exists($obj, 'color')) {
+                if (is_array($obj->color)) {
+                    $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $obj->color)));
+                    if (count($valueTypes) > 1) {
+                        throw new \InvalidArgumentException('Incoherent color value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
+                    }
+                    if ($valueTypes[0] === 'string') {
+                        $obj->color = array_map(fn($value) => LitColor::from($value), $obj->color);
+                    } elseif (false === $obj->color[0] instanceof LitColor) {
+                        throw new \InvalidArgumentException('Invalid color value types provided to create LiturgicalEvent. Expected type string or LitColor, found ' . $valueTypes[0]);
+                    }
+                } elseif (false === $obj->color instanceof LitColor && false === is_string($obj->color)) {
+                    throw new \InvalidArgumentException('Invalid color value type provided to create LiturgicalEvent');
+                } elseif (is_string($obj->color)) {
+                    $obj->color = LitColor::from($obj->color);
+                }
+            } else {
+                $obj->color = LitColor::GREEN;
+            }
+
+            if (property_exists($obj, 'type')) {
+                if (false === $obj->type instanceof LitEventType && false === is_string($obj->type)) {
+                    throw new \InvalidArgumentException('Invalid type provided to create LiturgicalEvent');
+                }
+                if (is_string($obj->type)) {
+                    $obj->type = LitEventType::from($obj->type);
+                }
+            } else {
+                $obj->type = LitEventType::FIXED;
+            }
+
+            if (is_int($obj->grade)) {
+                $obj->grade = LitGrade::tryFrom($obj->grade) ?? LitGrade::WEEKDAY;
+            }
+
+            if (property_exists($obj, 'common')) {
+                if (is_string($obj->common)) {
+                    try {
+                        $obj->common = new LitCommons($obj->common);
+                    } catch (\ValueError $e) {
+                        $obj->common = LitMassVariousNeeds::from($obj->common);
+                    }
+                } elseif (is_array($obj->common)) {
+                    if (count($obj->common) === 0) {
+                        $obj->common = new LitCommons(LitCommon::NONE);
+                    } else {
+                        $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $obj->common)));
+
+                        if (count($valueTypes) > 1) {
+                            throw new \InvalidArgumentException('Incoherent liturgical common value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
+                        }
+
+                        if ($valueTypes[0] === 'string') {
+                            try {
+                                $obj->common = new LitCommons($obj->common);
+                            } catch (\ValueError $e) {
+                                $obj->common = array_map(fn(string $value) => LitMassVariousNeeds::from($value), $obj->common);
+                            }
+                        } elseif (
+                            false === $obj->common[0] instanceof LitCommon
+                            && false === $obj->common[0] instanceof LitMassVariousNeeds
+                        ) {
+                            throw new \InvalidArgumentException('Invalid liturgical common value types provided to create LiturgicalEvent. Expected type string or LitCommon or LitMassVariousNeeds, found ' . $valueTypes[0]);
+                        }
+                    }
+                } elseif (
+                    false === $obj->common instanceof LitMassVariousNeeds
+                    && false === $obj->common instanceof LitCommon
+                    && false === $obj->common instanceof LitCommons
+                ) {
+                    throw new \InvalidArgumentException('Invalid liturgical common value type provided to create LiturgicalEvent. Expected type string or LitCommon or LitMassVariousNeeds, found ' . gettype($obj->common));
+                }
+            } else {
+                $obj->common = new LitCommons(LitCommon::NONE);
+            }
+        }
+
+
+        return new self(
+            $obj->name,
+            $obj->date,
+            $obj->color,
+            $obj->type,
+            $obj->grade,
+            $obj->common,
+            $obj->grade_display ?? null
+        );
     }
+
+    /**
+     * Create a new LiturgicalEvent object from an associative array.
+     *
+     * The array must contain the following keys:
+     * - name: The name of the liturgical event, as a string.
+     * - date: The date of the liturgical event, as a DateTime object or as an integer representing the Unix timestamp.
+     * - grade: The grade of the liturgical event, as a LitGrade object or as an integer.
+     *
+     * Optional keys are:
+     * - color: The liturgical color of the liturgical event, as an array of strings or LitColor cases, or as a single string or single LitColor case.
+     *   If not provided, defaults to LitColor::GREEN.
+     * - type: The type of the liturgical event, as a LitEventType object or as a string.
+     *   If not provided, defaults to LitEventType::FIXED.
+     * - common: The liturgical common of the liturgical event, as an array of strings or LitCommon cases, or as a single string or single LitCommon case.
+     *   If not provided, defaults to LitCommon::NONE.
+     * - grade_display: The grade display of the liturgical event, as a string. If not provided, defaults to null.
+     *
+     * @param array{
+     *     name: string,
+     *     date: DateTime|integer,
+     *     grade: LitGrade|integer,
+     *     color?: LitColor|LitColor[]|string|string[],
+     *     type?: LitEventType|string,
+     *     common?: LitCommon|LitCommon[]|string|string[],
+     *     grade_display?: string
+     * } $arr The associative array containing the required properties.
+     * @return LiturgicalEvent A new LiturgicalEvent object.
+     * @throws \InvalidArgumentException If the provided array does not contain the required properties or if the properties have invalid types.
+     */
+    public static function fromArray(array $arr): LiturgicalEvent
+    {
+        if (!isset($arr['name']) || !isset($arr['date']) || !isset($arr['grade'])) {
+            throw new \InvalidArgumentException('Invalid array provided to create LiturgicalEvent');
+        }
+
+        if (false === is_string($arr['name'])) {
+            throw new \InvalidArgumentException('Invalid name provided to create LiturgicalEvent');
+        }
+
+        if (false === $arr['date'] instanceof DateTime && false === is_int($arr['date'])) {
+            throw new \InvalidArgumentException('Invalid date provided to create LiturgicalEvent');
+        }
+
+        if (false === $arr['grade'] instanceof LitGrade && false === is_int($arr['grade'])) {
+            throw new \InvalidArgumentException('Invalid grade provided to create LiturgicalEvent');
+        }
+
+        if (is_int($arr['date'])) {
+            $arr['date'] = new DateTime()->setTimestamp($arr['date'])->setTimezone(new \DateTimeZone('UTC'));
+        }
+
+        $colors = LitColor::GREEN;
+        if (array_key_exists('color', $arr)) {
+            if (is_array($arr['color'])) {
+                $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $arr['color'])));
+                if (count($valueTypes) > 1) {
+                    throw new \InvalidArgumentException('Incoherent color value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
+                }
+                if ($valueTypes[0] === 'string') {
+                    /** @var string[] */
+                    $colorStrArr = $arr['color'];
+                    /** @var LitColor[] */
+                    $colors = array_map(
+                        static function (string $value): LitColor {
+                            return LitColor::from($value);
+                        },
+                        $colorStrArr
+                    );
+                } elseif (false === $arr['color'][0] instanceof LitColor) {
+                    throw new \InvalidArgumentException('Invalid color value types provided to create LiturgicalEvent. Expected type string or LitColor, found ' . $valueTypes[0]);
+                }
+            } elseif (false === $arr['color'] instanceof LitColor && false === is_string($arr['color'])) {
+                throw new \InvalidArgumentException('Invalid color value type provided to create LiturgicalEvent');
+            } elseif (is_string($arr['color'])) {
+                $colors = LitColor::from($arr['color']);
+            }
+        }
+
+        if (array_key_exists('type', $arr)) {
+            if (false === $arr['type'] instanceof LitEventType && false === is_string($arr['type'])) {
+                throw new \InvalidArgumentException('Invalid type provided to create LiturgicalEvent');
+            }
+            if (is_string($arr['type'])) {
+                $arr['type'] = LitEventType::from($arr['type']);
+            }
+        } else {
+            $arr['type'] = LitEventType::FIXED;
+        }
+
+        if (is_int($arr['grade'])) {
+            $arr['grade'] = LitGrade::tryFrom($arr['grade']) ?? LitGrade::WEEKDAY;
+        }
+
+        $commons = LitCommon::NONE;
+        if (array_key_exists('common', $arr)) {
+            if (is_array($arr['common'])) {
+                $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $arr['common'])));
+                if (count($valueTypes) > 1) {
+                    throw new \InvalidArgumentException('Incoherent liturgical common value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
+                }
+                if ($valueTypes[0] === 'string') {
+                    /** @var string[] */
+                    $commonsStrArr = $arr['common'];
+                    /** @var LitCommon[] */
+                    $commons = array_map(
+                        static function (string $value): LitCommon {
+                            return LitCommon::from($value);
+                        },
+                        $commonsStrArr
+                    );
+                } elseif (false === $arr['common'][0] instanceof LitCommon) {
+                    throw new \InvalidArgumentException('Invalid liturgical common value types provided to create LiturgicalEvent. Expected type string or LitCommon, found ' . $valueTypes[0]);
+                }
+            } elseif (false === $arr['common'] instanceof LitCommon && false === is_string($arr['common'])) {
+                throw new \InvalidArgumentException('Invalid liturgical common value type provided to create LiturgicalEvent. Expected type string or LitCommon, found ' . gettype($arr['common']));
+            } elseif (is_string($arr['common'])) {
+                $commons = LitCommon::from($arr['common']);
+            }
+        }
+
+        return new self(
+            $arr['name'],
+            $arr['date'],
+            $colors,
+            $arr['type'],
+            $arr['grade'],
+            $commons,
+            $arr['grade_display'] ?? null
+        );
+    }
+
 /**
  * The following functions might be somehow useful
  * Leaving them commented for the time being since we aren't actually using them

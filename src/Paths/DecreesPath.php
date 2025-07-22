@@ -8,7 +8,7 @@ use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\JsonData;
 
-class DecreesPath
+final class DecreesPath
 {
     public static Core $Core;
     public static object $decreesIndex;
@@ -85,7 +85,7 @@ class DecreesPath
 
     public static function produceErrorResponse(int $statusCode, string $description): void
     {
-        header($_SERVER[ 'SERVER_PROTOCOL' ] . StatusCode::toString($statusCode), true, $statusCode);
+        header($_SERVER['SERVER_PROTOCOL'] . StatusCode::toString($statusCode), true, $statusCode);
         $message         = new \stdClass();
         $message->status = 'ERROR';
         $statusMessage   = '';
@@ -120,7 +120,7 @@ class DecreesPath
     private static function produceResponse(string $jsonEncodedResponse): void
     {
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
-            header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 201 Created', true, 201);
+            header($_SERVER['SERVER_PROTOCOL'] . ' 201 Created', true, 201);
         }
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
@@ -161,7 +161,7 @@ class DecreesPath
                 self::$decreesIndex->litcal_decrees[$idx]->api_path = API_BASE_PATH . "/decrees/$decreeId";
             }
         } else {
-            header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 404 Not Found', true, 404);
+            header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found', true, 404);
             die('Decrees file not found');
         }
         self::$Core = new Core();

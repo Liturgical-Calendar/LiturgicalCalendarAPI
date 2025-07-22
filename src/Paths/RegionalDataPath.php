@@ -67,7 +67,7 @@ use LiturgicalCalendar\Api\Params\RegionalDataParams;
  *      locales: string[]
  * }
  */
-class RegionalDataPath
+final class RegionalDataPath
 {
     /** @var CalendarsMetadata */
     private readonly ?object $CalendarsMetadata;
@@ -1002,7 +1002,7 @@ class RegionalDataPath
             $schema->in($data);
             return true;
         } catch (InvalidValue | \Exception $e) {
-            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, LitSchema::ERROR_MESSAGES[ $schemaUrl ] . PHP_EOL . $e->getMessage());
+            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, LitSchema::ERROR_MESSAGES[$schemaUrl] . PHP_EOL . $e->getMessage());
             // the return here is superfluous, because produceErrorResponse terminates the script
             // it's only here to make intelephense happy
             return false;
@@ -1239,7 +1239,7 @@ class RegionalDataPath
      */
     public static function produceErrorResponse(int $statusCode, string $description): void
     {
-        header($_SERVER[ 'SERVER_PROTOCOL' ] . StatusCode::toString($statusCode), true, $statusCode);
+        header($_SERVER['SERVER_PROTOCOL'] . StatusCode::toString($statusCode), true, $statusCode);
         $message         = new \stdClass();
         $message->status = 'ERROR';
         $statusMessage   = '';
@@ -1283,7 +1283,7 @@ class RegionalDataPath
     private static function produceResponse(string $jsonEncodedResponse): void
     {
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH], true)) {
-            header($_SERVER[ 'SERVER_PROTOCOL' ] . ' 201 Created', true, 201);
+            header($_SERVER['SERVER_PROTOCOL'] . ' 201 Created', true, 201);
         }
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:

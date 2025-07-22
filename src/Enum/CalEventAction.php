@@ -9,7 +9,7 @@ enum CalEventAction: string
 {
     /**
      * This `metadata.action` is a combination of `setProperty:name` and `setProperty:grade`,
-     * and requires values for both the `liturgical event.name` and `liturgical_event.grade` properties.
+     * and requires values for both the `liturgical_event.name` and `liturgical_event.grade` properties.
      */
     case MakePatron = 'makePatron';
 

@@ -4,7 +4,7 @@ namespace LiturgicalCalendar\Api\Models\Metadata;
 
 use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
 
-class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
+final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
 {
     public string $calendar_id;
 
@@ -63,7 +63,7 @@ class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
      * - group: The group name for the Diocesan Calendar, if applicable.
      * - settings: The settings for the Diocesan Calendar, if applicable.
      *
-     * @return array{calendar_id:string,diocese:string,nation:string,locales:array<string>,timezone:string,group?:string,settings?:array<string>} The associative array containing the Diocesan Calendar's metadata.
+     * @return array{calendar_id:string,diocese:string,nation:string,locales:array<string>,timezone:string,group?:string,settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool}} The associative array containing the Diocesan Calendar's metadata.
      */
     public function jsonSerialize(): array
     {
@@ -78,7 +78,7 @@ class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
             $retArr['group'] = $this->group;
         }
         if (null !== $this->settings) {
-            $retArr['settings'] = $this->settings;
+            $retArr['settings'] = $this->settings->jsonSerialize();
         }
         return $retArr;
     }

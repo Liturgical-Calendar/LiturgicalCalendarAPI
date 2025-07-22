@@ -17,7 +17,7 @@ class ICSErrorLevel
 
     public function __construct(int $errorLevel)
     {
-        $this->errorString = static::ERROR_STRING[ $errorLevel ];
+        $this->errorString = static::ERROR_STRING[$errorLevel];
     }
 
     public function __toString()

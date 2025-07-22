@@ -4,7 +4,7 @@ namespace LiturgicalCalendar\Api\Models\Metadata;
 
 use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
 
-class MetadataCalendars extends AbstractJsonRepresentation
+final class MetadataCalendars extends AbstractJsonRepresentation
 {
     /** @var MetadataNationalCalendarItem[] */
     public array $national_calendars;
@@ -76,27 +76,30 @@ class MetadataCalendars extends AbstractJsonRepresentation
      * - locales: The locales supported by the national calendars.
      *
      * @return array{
-     *      national_calendars:list<array{
+     *      national_calendars:array<array{
      *          calendar_id:string,
      *          locales:array<string>,
      *          missals:array<string>,
-     *          settings:array<string>,
+     *          settings:array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool},
      *          wider_region?:string,
      *          dioceses?:array<string>
      *      }>,
      *      national_calendars_keys:string[],
-     *      diocesan_calendars:list<array{
+     *      diocesan_calendars:array<array{
      *          calendar_id:string,
      *          diocese:string,
      *          nation:string,
      *          locales:array<string>,
      *          timezone:string,
      *          group?:string,
-     *          settings?:array<string>
+     *          settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool}
      *      }>,
      *      diocesan_calendars_keys:string[],
-     *      diocesan_groups:array<string>,
-     *      wider_regions:list<array{
+     *      diocesan_groups:array<array{
+     *          group_name:string,
+     *          dioceses:array<string>
+     *      }>,
+     *      wider_regions:array<array{
      *          name:string,
      *          locales:array<string>,
      *          api_path:string
@@ -134,30 +137,30 @@ class MetadataCalendars extends AbstractJsonRepresentation
      * - locales (string[]): An array of strings that are the locales supported by this set of calendars.
      *
      * @param array{
-     *      national_calendars:list<array{
+     *      national_calendars:array<array{
      *          calendar_id:string,
      *          locales:array<string>,
      *          missals:array<string>,
-     *          settings:array<string>,
+     *          settings:array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest?:bool},
      *          wider_region?:string,
      *          dioceses?:array<string>
      *      }>,
      *      national_calendars_keys:string[],
-     *      diocesan_calendars:list<array{
+     *      diocesan_calendars:array<array{
      *          calendar_id:string,
      *          diocese:string,
      *          nation:string,
      *          locales:array<string>,
      *          timezone:string,
      *          group?:string,
-     *          settings?:array<string>
+     *          settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool}
      *      }>,
      *      diocesan_calendars_keys:string[],
-     *      diocesan_groups:list<array{
-     *          name:string,
-     *          locales:array<string>
+     *      diocesan_groups:array<array{
+     *          group_name:string,
+     *          dioceses:array<string>
      *      }>,
-     *      wider_regions:list<array{
+     *      wider_regions:array<array{
      *          name:string,
      *          locales:array<string>,
      *          api_path:string
@@ -201,13 +204,13 @@ class MetadataCalendars extends AbstractJsonRepresentation
     {
         return new static(
             array_map([MetadataNationalCalendarItem::class, 'fromObject'], $data->national_calendars),
-            $data['national_calendars_keys'],
+            $data->national_calendars_keys,
             array_map([MetadataDiocesanCalendarItem::class, 'fromObject'], $data->diocesan_calendars),
-            $data['diocesan_calendars_keys'],
+            $data->diocesan_calendars_keys,
             array_map([MetadataDiocesanGroupItem::class, 'fromObject'], $data->diocesan_groups),
             array_map([MetadataWiderRegionItem::class, 'fromObject'], $data->wider_regions),
-            $data['wider_regions_keys'],
-            $data['locales']
+            $data->wider_regions_keys,
+            $data->locales
         );
     }
 
@@ -244,7 +247,7 @@ class MetadataCalendars extends AbstractJsonRepresentation
     {
         $this->diocesan_calendars[]      = $metadata;
         $this->diocesan_calendars_keys[] = $metadata->calendar_id;
-        if (property_exists($metadata, 'group') && $metadata->group !== null) {
+        if ($metadata->group !== null) {
             $diocesanGroup = array_find($this->diocesan_groups, fn ($el) => $el->group_name === $metadata->group);
             if ($diocesanGroup === null) {
                 $this->diocesan_groups[] = new MetadataDiocesanGroupItem($metadata->group, [$metadata->calendar_id]);

@@ -75,38 +75,6 @@
                 },
                 "day": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Day"
-                }
-            },
-            "required": [
-                "event_key"
-            ],
-            "title": "LiturgicalEvent"
-        },
-        "Metadata": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "action": {
-                    "$ref": "#/definitions/MemorialFromDecreesAction"
-                },
-                "property": {
-                    "type": "string",
-                    "enum": [
-                        "name",
-                        "grade"
-                    ]
-                },
-                "url": {
-                    "$ref": "#/definitions/DecreeURL"
-                },
-                "url_lang_map": {
-                    "$ref": "#/definitions/DecreeLangs"
-                },
-                "urls_langs": {
-                    "$ref": "#/definitions/DecreeURLS"
-                },
-                "since_year": {
-                    "type": "integer"
                 },
                 "strtotime": {
                     "oneOf": [
@@ -149,6 +117,38 @@
                             ]
                         }
                     ]
+                }
+            },
+            "required": [
+                "event_key"
+            ],
+            "title": "LiturgicalEvent"
+        },
+        "Metadata": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "action": {
+                    "$ref": "#/definitions/MemorialFromDecreesAction"
+                },
+                "property": {
+                    "type": "string",
+                    "enum": [
+                        "name",
+                        "grade"
+                    ]
+                },
+                "url": {
+                    "$ref": "#/definitions/DecreeURL"
+                },
+                "url_lang_map": {
+                    "$ref": "#/definitions/DecreeLangs"
+                },
+                "urls_langs": {
+                    "$ref": "#/definitions/DecreeURLS"
+                },
+                "since_year": {
+                    "type": "integer"
                 }
             },
             "required": [

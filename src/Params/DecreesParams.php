@@ -4,7 +4,7 @@ namespace LiturgicalCalendar\Api\Params;
 
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\StatusCode;
-use LiturgicalCalendar\Api\Paths\Decrees;
+use LiturgicalCalendar\Api\Paths\DecreesPath;
 
 /**
  * Class DecreesParams
@@ -55,7 +55,7 @@ class DecreesParams implements ParamsInterface
                     } else {
                         $error = "Invalid value `$value` for param `locale`, valid values are: la, la_VA, "
                             . implode(', ', LitLocale::$AllAvailableLocales);
-                        Decrees::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
+                        DecreesPath::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
                     }
                     break;
             }

@@ -4,7 +4,7 @@ namespace LiturgicalCalendar\Api\Models\Metadata;
 
 use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
 
-class MetadataDiocesanGroupItem extends AbstractJsonRepresentation
+final class MetadataDiocesanGroupItem extends AbstractJsonRepresentation
 {
     public string $group_name;
 

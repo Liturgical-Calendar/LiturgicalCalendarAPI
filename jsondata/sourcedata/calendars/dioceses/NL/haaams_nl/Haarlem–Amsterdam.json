@@ -104,12 +104,12 @@
         ],
         "day": 1,
         "month": 1,
-        "event_key": "OnzeLieveVrouwterNood"
+        "event_key": "OnzeLieveVrouwterNood",
+        "strtotime": "last saturday of May"
       },
       "metadata": {
         "since_year": 2020,
-        "form_rownum": 3,
-        "strtotime": "last saturday of May"
+        "form_rownum": 3
       }
     },
     {
@@ -123,12 +123,12 @@
         ],
         "day": 1,
         "month": 1,
-        "event_key": "MirakelvanhetHSacramentteAmsterdam"
+        "event_key": "MirakelvanhetHSacramentteAmsterdam",
+        "strtotime": "wednesday after March 12"
       },
       "metadata": {
         "since_year": 1979,
-        "form_rownum": 0,
-        "strtotime": "wednesday after March 12"
+        "form_rownum": 0
       }
     },
     {

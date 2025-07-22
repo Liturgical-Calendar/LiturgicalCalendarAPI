@@ -187,7 +187,7 @@ abstract class AbstractLiturgicalEventMap implements \IteratorAggregate
     public function moveEventDateByKey(string $key, DateTime $date): void
     {
         if (array_key_exists($key, $this->eventMap)) {
-            $this->eventMap[ $key ]->date = $date;
+            $this->eventMap[$key]->date = $date;
         }
     }
 

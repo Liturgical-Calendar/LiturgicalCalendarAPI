@@ -57,10 +57,28 @@
                     },
                     "additionalProperties": false
                 },
+                "solemnities_lord_bvm": {
+                    "$ref": "#/definitions/DateTimeObjectCollection"
+                },
+                "solemnities_lord_bvm_keys": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                    }
+                },
                 "solemnities": {
                     "$ref": "#/definitions/DateTimeObjectCollection"
                 },
                 "solemnities_keys": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                    }
+                },
+                "feasts_lord": {
+                    "$ref": "#/definitions/DateTimeObjectCollection"
+                },
+                "feasts_lord_keys": {
                     "type": "array",
                     "items": {
                         "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
@@ -109,8 +127,12 @@
             "required": [
                 "version",
                 "request_headers",
+                "solemnities_lord_bvm",
+                "solemnities_lord_bvm_keys",
                 "solemnities",
                 "solemnities_keys",
+                "feasts_lord",
+                "feasts_lord_keys",
                 "feasts",
                 "feasts_keys",
                 "memorials",

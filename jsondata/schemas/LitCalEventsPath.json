@@ -140,7 +140,46 @@
                   "description": "When a liturgical event is defined ex-novo by a decree of the Congregation of Divine Worship rather than by a Roman Missal, this property will be present with a reference to the decree"
                 },
                 "strtotime": {
-                  "type": "string"
+                  "oneOf": [
+                    {
+                        "type": "string",
+                        "description": "supports PHP strtotime string format"
+                    },
+                    {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "day_of_the_week": {
+                              "type": "string",
+                              "enum": [
+                                  "Sunday",
+                                  "Monday",
+                                  "Tuesday",
+                                  "Wednesday",
+                                  "Thursday",
+                                  "Friday",
+                                  "Saturday"
+                              ]
+                          },
+                          "relative_time": {
+                              "type": "string",
+                              "enum": [
+                                  "before",
+                                  "after"
+                              ]
+                          },
+                          "event_key": {
+                              "type": "string",
+                              "description": "Must be a valid key for a liturgical_event in the Universal Calendar"
+                          }
+                      },
+                      "required": [
+                          "day_of_the_week",
+                          "relative_time",
+                          "event_key"
+                      ]
+                    }
+                  ]
                 }
               },
               "additionalProperties": false,

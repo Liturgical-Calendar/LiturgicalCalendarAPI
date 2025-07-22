@@ -21,8 +21,12 @@ class Utilities
         'settings',
         'messages',
         'metadata',
+        'solemnities_lord_bvm',
+        'solemnities_lord_bvm_keys',
         'solemnities',
         'solemnities_keys',
+        'feasts_lord',
+        'feasts_lord_keys',
         'feasts',
         'feasts_keys',
         'memorials',
@@ -35,6 +39,17 @@ class Utilities
         'color',
         'color_lcl',
         'common'
+    ];
+
+    // EVENT_KEY_ELS are keys whose value is an array of LitCalEvents, and should become <Key> elements rather than <Option> elements
+    private const EVENT_KEY_ELS = [
+        'solemnities_lord_bvm_keys',
+        'solemnities_keys',
+        'feasts_lord_keys',
+        'feasts_keys',
+        'memorials_keys',
+        'suppressed_events_keys',
+        'reinstated_events_keys'
     ];
 
     /**
@@ -50,8 +65,10 @@ class Utilities
      * If any key needs a specific case transformation other than the automatic snake_case to PascalCase, add it to this array.
      */
     private const CUSTOM_TRANSFORM_KEYS = [
-        'litcal'        => 'LitCal',
-        'has_vesper_ii' => 'HasVesperII'
+        'litcal'                    => 'LitCal',
+        'has_vesper_ii'             => 'HasVesperII',
+        'solemnities_lord_bvm'      => 'SolemnitiesLordBVM',
+        'solemnities_lord_bvm_keys' => 'SolemnitiesLordBVMKeys'
     ];
 
     /**
@@ -137,7 +154,7 @@ class Utilities
                     if (self::$LAST_ARRAY_KEY === 'messages') {
                         $el = $xml->addChild('Message', htmlspecialchars($value));
                         $el->addAttribute('idx', $key . '');
-                    } elseif (in_array(self::$LAST_ARRAY_KEY, ['solemnities_keys', 'feasts_keys', 'memorials_keys', 'suppressed_events_keys', 'reinstated_events_keys'])) {
+                    } elseif (in_array(self::$LAST_ARRAY_KEY, self::EVENT_KEY_ELS, true)) {
                         $el = $xml->addChild('Key', $value);
                         $el->addAttribute('idx', $key . '');
                     } else {
@@ -309,30 +326,27 @@ class Utilities
     }
 
     /**
-     * Converts a string of colors to a string of localized color names.
+     * Converts an array of LitColor items to a string of localized color names.
      *
-     * @param string|string[] $colors A string of color names separated by commas, or an array of color names.
+     * @param LitColor[] $colors An array of LitColor.
      * @param string $LOCALE The locale to use when localizing the color names.
      * @param bool $html If true, the result will be an HTML string with the color names in bold, italic font with the corresponding color.
      * @return string The localized color names, separated by spaces and the word "or".
      */
-    public static function parseColorString(string|array $colors, string $LOCALE, bool $html = false): string
+    public static function parseColorToString(array $colors, string $LOCALE, bool $html = false): string
     {
-        if (is_string($colors)) {
-            $colors = explode(',', $colors);
-        }
         if ($html === true) {
-            $colors = array_map(function ($txt) use ($LOCALE) {
-                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::colorToHex($txt) . '">'
-                    . LitColor::i18n($txt, $LOCALE)
+            $colorStrings = array_map(function (LitColor $litColor) use ($LOCALE) {
+                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::colorToHex($litColor->value) . '">'
+                    . LitColor::i18n($litColor, $LOCALE)
                     . '</FONT></SPAN></I></B>';
             }, $colors);
-            return implode(' <I><FONT FACE="Calibri">' . _('or') . '</FONT></I> ', $colors);
+            return implode(' <I><FONT FACE="Calibri">' . _('or') . '</FONT></I> ', $colorStrings);
         } else {
-            $colors = array_map(function ($txt) use ($LOCALE) {
+            $colorStrings = array_map(function (LitColor $txt) use ($LOCALE) {
                 return LitColor::i18n($txt, $LOCALE);
             }, $colors);
-            return implode(' ' . _('or') . ' ', $colors);
+            return implode(' ' . _('or') . ' ', $colorStrings);
         }
     }
 
