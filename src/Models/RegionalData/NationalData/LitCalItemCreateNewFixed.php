@@ -119,7 +119,7 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
             $data->month,
             array_map(fn($color) => LitColor::from($color), $data->color),
             LitGrade::from($data->grade),
-            new LitCommons($data->common)
+            LitCommons::create($data->common)
         );
     }
 
@@ -146,7 +146,7 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
             $data['month'],
             array_map(fn($color) => LitColor::from($color), $data['color']),
             LitGrade::from($data['grade']),
-            new LitCommons($data['common'])
+            LitCommons::create($data['common'])
         );
     }
 }

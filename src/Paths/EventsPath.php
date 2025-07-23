@@ -411,7 +411,7 @@ final class EventsPath
                     $liturgicalEvent['grade']              = $grade;
                     $liturgicalEvent['grade_lcl']          = LitGrade::i18n($grade, $this->EventsParams->baseLocale, false);
                     $liturgicalEvent['missal']             = $LatinMissal;
-                    $commons                               = new LitCommons($liturgicalEvent['common']);
+                    $commons                               = LitCommons::create($liturgicalEvent['common']);
                     $liturgicalEvent['common_lcl']         = $commons->fullTranslate($this->EventsParams->baseLocale);
                     self::$LiturgicalEventCollection[$key] = $liturgicalEvent;
                 }
@@ -566,7 +566,7 @@ final class EventsPath
             self::$LiturgicalEventCollection[$key]['grade']     = $grade;
             self::$LiturgicalEventCollection[$key]['grade_lcl'] = LitGrade::i18n($grade, $this->EventsParams->baseLocale, false);
             if (array_key_exists('common', self::$LiturgicalEventCollection[$key])) {
-                $common    = new LitCommons(self::$LiturgicalEventCollection[$key]['common']);
+                $common    = LitCommons::create(self::$LiturgicalEventCollection[$key]['common']);
                 $commonLcl = $common->fullTranslate($this->EventsParams->baseLocale);
 
                 self::$LiturgicalEventCollection[$key]['common']     = $common;
@@ -575,47 +575,56 @@ final class EventsPath
         }
     }
 
+    /**
+     * @param LitCalMassVariousNeeds[]|LitCommon[]|LitCommons|string[] $common
+     */
     private static function transformCommons(array|LitCommons $common): LitCommons|array
     {
         if ($common instanceof LitCommons) {
             return $common;
         }
 
+        if ($common instanceof LitCommon) {
+            /** @var LitCommons $commons */
+            return LitCommons::create([$common]);
+        }
+
+        if (false === is_array($common)) {
+            throw new \InvalidArgumentException('Invalid common provided to create LiturgicalEvent: expected an array of string, of LitCommon cases, or of LitMassVariousNeeds cases');
+        }
+
         if (count($common) === 0) {
-            return new LitCommons(LitCommon::NONE);
+            return LitCommons::create([LitCommon::NONE]);
         }
 
         $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $common)));
 
         if (count($valueTypes) > 1) {
-            throw new \InvalidArgumentException('Incoherent liturgical common value types provided: found multiple types ' . implode(', ', $valueTypes));
+            throw new \InvalidArgumentException('Incoherent liturgical common value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
         }
 
         if ($valueTypes[0] === 'string') {
-            try {
-                $commons = new LitCommons($common);
-                return $commons;
-            } catch (\ValueError $e) {
-                $commons = array_map(fn(string $value) => LitMassVariousNeeds::from($value), $common);
-                return $commons;
-            }
-        } elseif ($common[0] instanceof LitCommon) {
-            return new LitCommons($common);
-        } elseif ($common[0] instanceof LitMassVariousNeeds) {
-            return $common;
-        } else {
-            throw new \InvalidArgumentException('Invalid liturgical common value types provided. Expected type string or LitCommon or LitMassVariousNeeds, found ' . $valueTypes[0]);
+            return LitCommons::create($common) ?? array_values(array_map(fn(string $value) => LitMassVariousNeeds::from($value), $common));
         }
+
+        if ($common[0] instanceof LitCommon) {
+            return LitCommons::create($common);
+        }
+
+        if ($common[0] instanceof LitMassVariousNeeds) {
+            return $common;
+        }
+
+        throw new \InvalidArgumentException('Invalid common value type provided to create LiturgicalEvent: expected an array of string, of LitCommon cases, or of LitMassVariousNeeds cases');
     }
 
+    /**
+     * @param LitMassVariousNeeds[]|LitCommons $commons
+     */
     private static function localizeCommons(array|LitCommons $commons, string $locale): string
     {
         if ($commons instanceof LitCommons) {
             return $commons->fullTranslate($locale);
-        }
-
-        if ($commons instanceof LitMassVariousNeeds) {
-            return $commons->fullTranslate($locale === LitLocale::LATIN || $locale === LitLocale::LATIN_PRIMARY_LANGUAGE);
         }
 
         $litMassVariousNeedsArray = false;
@@ -794,7 +803,7 @@ final class EventsPath
             foreach (self::$DiocesanData->litcal as $row) {
                 $key    = $this->EventsParams->DiocesanCalendar . '_' . $row->liturgical_event->event_key;
                 $grade  = LitGrade::from($row->liturgical_event->grade);
-                $common = new LitCommons($row->liturgical_event->common);
+                $common = LitCommons::create($row->liturgical_event->common);
 
                 self::$LiturgicalEventCollection[$key]               = (array) $row->liturgical_event;
                 self::$LiturgicalEventCollection[$key]['event_key']  = $key;

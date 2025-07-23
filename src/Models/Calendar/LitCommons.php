@@ -4,7 +4,7 @@ namespace LiturgicalCalendar\Api\Models\Calendar;
 
 use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitLocale;
-use ValueError;
+use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
 
 final class LitCommons implements \JsonSerializable
 {
@@ -14,99 +14,123 @@ final class LitCommons implements \JsonSerializable
     /**
      * LitCommons collection constructor.
      *
-     * @param array<LitCommon|string>|LitCommon|string $litCommons
+     * @param LitCommonItem[] $litCommonItems
      */
-    public function __construct(array|string|LitCommon $litCommons)
+    public function __construct(array $litCommonItems)
     {
-        if (is_array($litCommons)) {
-            if (count($litCommons) === 0) {
-                $this->commons[] = new LitCommonItem(LitCommon::NONE);
-                return;
+        foreach ($litCommonItems as $litCommonItem) {
+            if ($this->hasNoneOrProper()) {
+                throw new \ValueError('`common` array cannot contain any other values when either `Proper` or `None` (empty string) is set');
             }
-
-            if (count($litCommons) === 1) {
-                if ($litCommons[0] === LitCommon::NONE || $litCommons[0] === LitCommon::NONE->value) {
-                    $this->commons[] = new LitCommonItem(LitCommon::NONE);
-                    return;
-                }
-
-                if ($litCommons[0] === LitCommon::PROPRIO || $litCommons[0] === LitCommon::PROPRIO->value) {
-                    $this->commons[] = new LitCommonItem(LitCommon::PROPRIO);
-                    return;
-                }
-            }
-
-            $valueTypes = array_values(array_unique(array_map('gettype', $litCommons)));
-            if (count($valueTypes) !== 1) {
-                throw new ValueError('`common` array must contain values of the same type, instead you passed types ' . implode(', ', $valueTypes));
-            }
-
-            if ($valueTypes[0] !== 'string' && false === $litCommons[0] instanceof LitCommon) {
-                throw new ValueError('`common` array must contain values of type LitCommon or string, instead you passed types ' . implode(', ', array_map('gettype', $litCommons)));
-            }
-
-            foreach ($litCommons as $litCommon) {
-                if ($this->hasNoneOrProper()) {
-                    throw new ValueError('`common` array cannot contain any other values when either `Proper` or `None` (empty string) is set');
-                }
-                if ($litCommon instanceof LitCommon) {
-                    $this->commons[] = new LitCommonItem($litCommon);
-                } else {
-                    $this->splitGeneralSpecific($litCommon);
-                }
-            }
-        } else {
-            if ($litCommons === LitCommon::NONE || $litCommons === LitCommon::NONE->value) {
-                $this->commons[] = new LitCommonItem(LitCommon::NONE);
-                return;
-            }
-            if ($litCommons === LitCommon::PROPRIO || $litCommons === LitCommon::PROPRIO->value) {
-                $this->commons[] = new LitCommonItem(LitCommon::PROPRIO);
-                return;
-            }
-            if (is_string($litCommons)) {
-                $this->splitGeneralSpecific($litCommons);
-            } elseif ($litCommons instanceof LitCommon) {
-                $this->commons[] = new LitCommonItem($litCommons);
-            } else {
-                throw new ValueError('`common` must be of type LitCommon or string, instead you passed value of type ' . gettype($litCommons));
-            }
+            $this->commons[] = $litCommonItem;
         }
     }
 
     /**
-     * Split a single "Common" value into general and specific values, and add to the array of commons.
+     * Creates a new LitCommons collection.
      *
-     * If the value is a string containing a colon (:), it is split into separate general and specific values,
-     * and those values are used to create a new LitCommonItem object.
+     * When we read liturgical event data from a JSON file,
+     * we will always have an array of strings.
      *
-     * If the value is an empty string, or contains only whitespace, or contains the string "Proper",
-     * or if the array of commons is not empty and already contains either "Proper" or an empty string,
-     * a ValueError is thrown.
+     * When we generate a LiturgicalEvent directly in our calendar calculation,
+     * without reading from a JSON file, we will have a LitCommon enum case or an array of LitCommon enum cases.
+     * We should never have a LitMassVariousNeeds enum case when generating a LiturgicalEvent directly in our calendar calculation.
      *
-     * If the value does not contain a colon (:), it is taken as a single general value,
-     * and a new LitCommonItem object is created with that value.
-     *
-     * @param string $litCommon The value to split and add.
+     * @throws \ValueError
+     * @param array<string|LitCommon|LitMassVariousNeeds> $litCommons
      */
-    private function splitGeneralSpecific(string $litCommon): void
+    public static function create(array $litCommons): ?static
+    {
+        if (count($litCommons) === 0) {
+            return new static([new LitCommonItem(LitCommon::NONE)]);
+        }
+
+        if (count($litCommons) === 1) {
+            if ($litCommons[0] === LitCommon::NONE || $litCommons[0] === LitCommon::NONE->value) {
+                return new static([new LitCommonItem(LitCommon::NONE)]);
+            }
+
+            if ($litCommons[0] === LitCommon::PROPRIO || $litCommons[0] === LitCommon::PROPRIO->value) {
+                return new static([new LitCommonItem(LitCommon::PROPRIO)]);
+            }
+        }
+
+        $valueTypes = array_values(array_unique(array_map('gettype', $litCommons)));
+        if (count($valueTypes) !== 1) {
+            throw new \ValueError('`common` array must contain values of the same type, instead you passed types ' . implode(', ', $valueTypes));
+        }
+
+        if ($litCommons[0] instanceof LitMassVariousNeeds) {
+            return null;
+        }
+
+        if ($litCommons[0] instanceof LitCommon) {
+            /**
+             * @var LitCommon[] $litCommons
+             */
+            $commons = array_values(array_map(fn(LitCommon $litCommon) => new LitCommonItem($litCommon), $litCommons));
+            return new static($commons);
+        }
+
+        if ($valueTypes[0] === 'string') {
+            /**
+             * @var string[] $litCommons
+             */
+            // We try to cast the values to LitCommonItems, and if that fails,
+            // we may be dealing with LitMassVariousNeeds cases so we return null
+            // to allow for a null coalescent operation
+            $commons = [];
+            foreach ($litCommons as $litCommon) {
+                $litCommonItem = self::splitGeneralSpecific($litCommon);
+                if ($litCommonItem === null) {
+                    return null;
+                }
+                $commons[] = $litCommonItem;
+            }
+            return new static($commons);
+        } else {
+            throw new \ValueError('`common` array must contain values of type string or LitCommon, instead you passed types ' . implode(', ', $valueTypes));
+        }
+    }
+
+
+    /**
+     * Attempt to cast a string value to a LitCommon case or cases, and return a new LitCommonItem object.
+     *
+     * If the string contains a colon (:), it is split on the colon,
+     * and attempts are made to cast the resulting values to General and Specific LitCommon cases.
+     * If the casts succeed, a new LitCommonItem object is created with those values and returned.
+     *
+     * If the value does not contain a colon (:), it is taken as a General LitCommon value,
+     * and an attempt to cast it to a LitCommon case is made.
+     * If the cast succeeds, a new LitCommonItem object is created with that value and returned.
+     *
+     * If any cast fails, we return null.
+     *
+     * @param string $litCommon The value to split and cast.
+     * @return LitCommonItem|null
+     */
+    private static function splitGeneralSpecific(string $litCommon): ?LitCommonItem
     {
         if (strpos($litCommon, ':') !== false) {
             /**
              * @var string $litCommonGeneral
              * @var string $litCommonSpecific
              */
-            [$litCommonGeneral, $litCommonSpecific] = array_map('trim', explode(':', $litCommon));
+            [$litCommonGeneral, $litCommonSpecific] = explode(':', $litCommon);
 
-            if ($this->isNotEmpty() && $this->isNoneOrProperValue($litCommonGeneral)) {
-                throw new ValueError('`common` array cannot contain any other values when either `Proper` or `None` (empty string) is set');
+            $commonGeneral  = LitCommon::tryFrom($litCommonGeneral);
+            $commonSpecific = LitCommon::tryFrom($litCommonSpecific);
+            if ($commonGeneral === null || $commonSpecific === null) {
+                return null;
             }
-            $this->commons[] = new LitCommonItem(LitCommon::from($litCommonGeneral), LitCommon::from($litCommonSpecific));
+            return new LitCommonItem($commonGeneral, $commonSpecific);
         } else {
-            if ($this->isNotEmpty() && $this->isNoneOrProperValue($litCommon)) {
-                throw new ValueError('`common` array cannot contain any other values when either `Proper` or `None` (empty string) is set');
+            $commonGeneral = LitCommon::tryFrom($litCommon);
+            if ($commonGeneral === null) {
+                return null;
             }
-            $this->commons[] = new LitCommonItem(LitCommon::from($litCommon));
+            return new LitCommonItem($commonGeneral);
         }
     }
 
@@ -118,26 +142,6 @@ final class LitCommons implements \JsonSerializable
     private function hasNoneOrProper(): bool
     {
         return $this->has(LitCommon::PROPRIO) || $this->has(LitCommon::NONE);
-    }
-
-    /**
-     * Checks if the given liturgical common value is either 'Proper' or 'None'.
-     *
-     * @param string $litCommon The liturgical common value to check.
-     * @return bool True if the value is 'Proper' or 'None', false otherwise.
-     */
-    private function isNoneOrProperValue(string $litCommon): bool
-    {
-        return $litCommon === LitCommon::PROPRIO->value || $litCommon === LitCommon::NONE->value;
-    }
-
-    /**
-     * Determines if the array of LitCommonItem is not empty.
-     * @return bool true if the array is not empty, false otherwise.
-     */
-    private function isNotEmpty(): bool
-    {
-        return count($this->commons) > 0;
     }
 
     /**
@@ -243,7 +247,7 @@ final class LitCommons implements \JsonSerializable
      */
     public static function i18n(LitCommon $litCommon, string $locale): string
     {
-        return $locale === LitLocale::LATIN
+        return $locale === LitLocale::LATIN || $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
             ? LitCommon::LATIN[$litCommon->name]
             : $litCommon->translate();
     }
@@ -261,7 +265,7 @@ final class LitCommons implements \JsonSerializable
      */
     private static function getPossessive(LitCommon $litCommon, $locale): string
     {
-        return $locale === LitLocale::LATIN
+        return $locale === LitLocale::LATIN || $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
             ? ''
             : $litCommon->possessive();
     }
