@@ -392,6 +392,8 @@ final class LiturgicalEvent implements \JsonSerializable
                 // We ensure a default value
                 $commons = LitCommons::create([]);
             }
+        } else {
+            $commons = $obj->common;
         }
 
         return new self(
