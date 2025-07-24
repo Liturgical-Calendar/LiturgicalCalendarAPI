@@ -396,6 +396,18 @@ final class LiturgicalEvent implements \JsonSerializable
             $commons = $obj->common;
         }
 
+        if (false === isset($obj->date)) {
+            throw new \Exception('Invalid object provided to create LiturgicalEvent: missing date. ' . var_export($obj, true));
+        }
+
+        if (false === $obj->date instanceof DateTime) {
+            throw new \Exception('Invalid object provided to create LiturgicalEvent: date is not an instance of DateTime. ' . var_export($obj, true));
+        }
+
+        if (false === $obj->grade instanceof LitGrade) {
+            throw new \Exception('Invalid object provided to create LiturgicalEvent: grade is not an instance of LitGrade');
+        }
+
         return new self(
             $obj->name,
             $obj->date,
@@ -518,21 +530,13 @@ final class LiturgicalEvent implements \JsonSerializable
     }
 
     /**
-     * @param LitCalMassVariousNeeds[]|LitCommon[]|LitCommons|string[] $common
+     * @param array<LitMassVariousNeeds|LitCommon|string>|LitCommons $common
+     * @return LitCommons|array<LitMassVariousNeeds>
      */
     private static function transformCommons(array|LitCommons $common): LitCommons|array
     {
         if ($common instanceof LitCommons) {
             return $common;
-        }
-
-        if ($common instanceof LitCommon) {
-            /** @var LitCommons $commons */
-            return LitCommons::create([$common]);
-        }
-
-        if (false === is_array($common)) {
-            throw new \InvalidArgumentException('Invalid common provided to create LiturgicalEvent: expected an array of string, of LitCommon cases, or of LitMassVariousNeeds cases');
         }
 
         if (count($common) === 0) {

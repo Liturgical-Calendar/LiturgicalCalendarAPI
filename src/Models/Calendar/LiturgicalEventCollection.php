@@ -1421,15 +1421,9 @@ final class LiturgicalEventCollection
             $coincidingEvent->grade_lcl = LitGrade::i18n($coincidingEvent->event->grade, $this->CalendarParams->Locale, false);
         } else {
             // DEBUG START
-            $isSunday          = self::dateIsSunday($currentLitEventDate);
-            $isSolemnity       = $this->inSolemnities($currentLitEventDate);
-            $isFeastLord       = $this->inFeastsLord($currentLitEventDate);
-            $isFeastOrMemorial = $this->inFeastsOrMemorials($currentLitEventDate);
-            $msg               = 'Is Sunday? ' . ($isSunday ? 'yes' : 'no')
-                                . ",\nIs Solemnity? " . ($isSolemnity ? 'yes' : 'no')
-                                . ",\nIs Feast of the Lord? " . ($isFeastLord ? 'yes' : 'no')
-                                . ",\nIs Feast or Memorial? " . ($isFeastOrMemorial ? 'yes' : 'no');
-            $msg              .= "\n" . print_r($this->getCalEventsFromDate($currentLitEventDate), true);
+            $isSunday = self::dateIsSunday($currentLitEventDate);
+            $msg      = 'Is Sunday? ' . ($isSunday ? 'yes' : 'no');
+            $msg     .= "\n" . print_r($this->getCalEventsFromDate($currentLitEventDate), true);
             throw new \Exception('No liturgical event found for ' . $currentLitEventDate->format('Y-m-d') . ', coinciding event key: ' . $key . ".\n" . $msg);
             // DEBUG END
         }

@@ -7,26 +7,27 @@ use LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarSettings;
 use LiturgicalCalendar\Api\Models\RegionalData\LitCalItemCollection;
 use LiturgicalCalendar\Api\Models\RegionalData\Translations;
 
-class NationalData extends AbstractJsonSrcData
+final class NationalData extends AbstractJsonSrcData
 {
-    public readonly Translations $i18n;
-
     public readonly LitCalItemCollection $litcal;
 
     public readonly MetadataNationalCalendarSettings $settings;
 
-    public readonly LitCalItemMetadata $metadata;
+    public readonly NationalMetadata $metadata;
+
+    public Translations $i18n;
 
     private const ALLOWED_PROPS = ['i18n', 'litcal', 'metadata', 'settings'];
 
-    public function __construct(LitCalItemCollection $litcal, MetadataNationalCalendarSettings $settings, LitCalItemMetadata $metadata, ?\stdClass $i18n)
+    private function __construct(LitCalItemCollection $litcal, MetadataNationalCalendarSettings $settings, NationalMetadata $metadata, ?\stdClass $i18n)
     {
         $this->litcal   = $litcal;
         $this->settings = $settings;
         $this->metadata = $metadata;
 
         if (null !== $i18n) {
-            $this->loadTranslations($i18n);
+            $this->validateTranslations($i18n);
+            $this->i18n = Translations::fromObject($i18n);
         }
     }
 
@@ -46,14 +47,32 @@ class NationalData extends AbstractJsonSrcData
      */
     public function loadTranslations(\stdClass $i18n): void
     {
+        $this->validateTranslations($i18n);
+        $this->unlock();
+        $this->i18n = Translations::fromObject($i18n);
+        $this->lock();
+    }
+
+    /**
+     * Validates the i18n parameter to ensure its keys match the metadata locales.
+     *
+     * This function extracts the keys from the provided i18n object, sorts them,
+     * and compares them to the sorted values of the metadata.locales. If they do
+     * not match, a ValueError is thrown.
+     *
+     * @param \stdClass $i18n The translations object whose keys need to be validated.
+     *
+     * @throws \ValueError If the keys of the i18n parameter do not match the values
+     *                     of metadata.locales.
+     */
+    private function validateTranslations(\stdClass $i18n): void
+    {
         /** @var string[] $i18nProps */
         $i18nProps = array_keys(get_object_vars($i18n));
         sort($i18nProps);
         if (implode(',', $i18nProps) !== implode(',', $this->metadata->locales)) {
             throw new \ValueError('keys of i18n parameter must be the same as the values of metadata.locales');
         }
-
-        $this->i18n = Translations::fromObject($i18n);
     }
 
     /**
@@ -125,7 +144,7 @@ class NationalData extends AbstractJsonSrcData
         return new static(
             LitCalItemCollection::fromArray($data['litcal']),
             MetadataNationalCalendarSettings::fromarray($data['settings']),
-            LitCalItemMetadata::fromArray($data['metadata']),
+            NationalMetadata::fromArray($data['metadata']),
             $data['i18n'] ?? null
         );
     }
@@ -147,11 +166,16 @@ class NationalData extends AbstractJsonSrcData
         return new static(
             LitCalItemCollection::fromArray($data->litcal),
             MetadataNationalCalendarSettings::fromObject($data->settings),
-            LitCalItemMetadata::fromObject($data->metadata),
+            NationalMetadata::fromObject($data->metadata),
             $data->i18n ?? null
         );
     }
 
+    /**
+     * Determines if the national calendar has a wider region.
+     *
+     * @return bool true if the national calendar has a wider region, false otherwise.
+     */
     public function hasWiderRegion(): bool
     {
         return property_exists($this->metadata, 'wider_region');

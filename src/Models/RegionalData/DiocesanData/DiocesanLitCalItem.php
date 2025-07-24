@@ -9,7 +9,7 @@ final class DiocesanLitCalItem extends AbstractJsonSrcData
     public readonly LitCalItemCreateNewFixed|LitCalItemCreateNewMobile $liturgical_event;
     public readonly DiocesanLitCalItemMetadata $metadata;
 
-    public function __construct(\stdClass $liturgical_event, \stdClass $metadata)
+    private function __construct(\stdClass $liturgical_event, \stdClass $metadata)
     {
         if (false === property_exists($liturgical_event, 'event_key')) {
             throw new \ValueError('litcalItem.liturgical_event must have an `event_key` property');
@@ -37,8 +37,21 @@ final class DiocesanLitCalItem extends AbstractJsonSrcData
         if (false === array_key_exists('liturgical_event', $data) || false === array_key_exists('metadata', $data)) {
             throw new \ValueError('`liturgical_event` and `metadata` parameters are required');
         }
-        $liturgicalEvent = json_decode(json_encode($data['liturgical_event']));
-        $metadata        = json_decode(json_encode($data['metadata']));
+        $liturgicalEvent = json_encode($data['liturgical_event']);
+        $metadata        = json_encode($data['metadata']);
+        if (false === $liturgicalEvent || false === $metadata) {
+            throw new \ValueError('`liturgical_event` or `metadata` parameter could not be re-encoded to JSON');
+        }
+        /** @var \stdClass */
+        $liturgicalEvent = json_decode($liturgicalEvent);
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new \ValueError('`liturgical_event` parameter could not be re-encoded to JSON: ' . json_last_error_msg());
+        }
+        /** @var \stdClass */
+        $metadata = json_decode($metadata);
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new \ValueError('`metadata` parameter could not be re-encoded to JSON: ' . json_last_error_msg());
+        }
         return new static($liturgicalEvent, $metadata);
     }
 

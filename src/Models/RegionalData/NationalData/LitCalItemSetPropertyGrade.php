@@ -9,7 +9,7 @@ final class LitCalItemSetPropertyGrade extends LiturgicalEventData
 {
     public readonly LitGrade $grade;
 
-    public function __construct(string $event_key, LitGrade $grade)
+    private function __construct(string $event_key, LitGrade $grade)
     {
         parent::__construct($event_key);
         $this->grade = $grade;

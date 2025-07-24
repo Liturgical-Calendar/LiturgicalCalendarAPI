@@ -397,6 +397,84 @@ class Utilities
         return $ordinal;
     }
 
+    private static function rawContentsFromFile(string $filename, bool $associative): string
+    {
+        if (false === file_exists($filename)) {
+            throw new \Exception('File ' . $filename . ' does not exist');
+        }
+
+        if (false === is_readable($filename)) {
+            throw new \Exception('File ' . $filename . ' is not readable');
+        }
+
+        $rawContents = file_get_contents($filename);
+        if (false === $rawContents) {
+            throw new \Exception('Unable to read file ' . $filename);
+        }
+
+        return $rawContents;
+    }
+
+    /**
+     * @param string $filename
+     * @return array
+     * @throws \Exception
+     */
+    public static function jsonFileToArray(string $filename): array
+    {
+        $rawContents = self::rawContentsFromFile($filename, true);
+        $jsonArr     = json_decode($rawContents, true);
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new \Exception('Unable to decode JSON from file ' . $filename . ' as an array: ' . json_last_error_msg());
+        }
+
+        /** @var array $jsonArr */
+        return $jsonArr;
+    }
+
+    /**
+     * Reads a JSON file and converts its contents to an object.
+     *
+     * @param string $filename The path to the JSON file.
+     * @return \stdClass|\stdClass[] The decoded JSON data as an object.
+     * @throws \Exception If the file does not exist, is not readable, or contains invalid JSON.
+     */
+    public static function jsonFileToObject(string $filename): \stdClass|array
+    {
+        $rawContents = self::rawContentsFromFile($filename, true);
+        $jsonObj     = json_decode($rawContents, false);
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new \Exception('Unable to decode JSON from file ' . $filename . ' as an object: ' . json_last_error_msg());
+        }
+
+        /** @var \stdClass|\stdClass[] $jsonArr */
+        return $jsonObj;
+    }
+
+    /**
+     * Converts an object to an array.
+     *
+     * The object should contain public properties.
+     *
+     * @param \stdClass $object The object to convert.
+     * @return array The array representation of the object.
+     * @throws \Exception If unable to encode or decode the object.
+     */
+    public static function objectToArray(\stdClass $object): array
+    {
+        $encoded = json_encode($object);
+        if (false === $encoded) {
+            throw new \Exception('Unable to encode object to array');
+        }
+        $decoded = json_decode($encoded, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception('Unable to decode json to array');
+        }
+        return $decoded;
+    }
+
     /**
      * Function called after a successful installation of the Catholic Liturgical Calendar API.
      * It prints a message of thanksgiving to God and a prayer for the Pope.

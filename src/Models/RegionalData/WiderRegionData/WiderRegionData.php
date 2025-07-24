@@ -10,6 +10,9 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemMakePatron
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropertyName;
 use LiturgicalCalendar\Api\Models\RegionalData\Translations;
 
+/**
+ * @phpstan-import-type LiturgicalEventItem from \LiturgicalCalendar\Api\Paths\EventsPath
+ */
 final class WiderRegionData extends AbstractJsonSrcData
 {
     public readonly LitCalItemCollection $litcal;
@@ -19,19 +22,50 @@ final class WiderRegionData extends AbstractJsonSrcData
 
     public readonly WiderRegionMetadata $metadata;
 
-    public readonly ?Translations $i18n;
+    public Translations $i18n;
 
-    public function __construct(LitCalItemCollection $litcal, array $national_calendars, WiderRegionMetadata $metadata, ?\stdClass $i18n = null)
+    /**
+     * Constructs a WiderRegionData object.
+     *
+     * @param LitCalItemCollection $litcal The collection of liturgical calendar items.
+     * @param array<string,string> $national_calendars An associative array mapping national calendar identifiers to their respective names.
+     * @param WiderRegionMetadata $metadata The metadata containing locales and the wider region identifier.
+     * @param \stdClass|null $i18n Optional translations object. If provided, it will be validated and set.
+     */
+    private function __construct(LitCalItemCollection $litcal, array $national_calendars, WiderRegionMetadata $metadata, ?\stdClass $i18n = null)
     {
         $this->litcal             = $litcal;
         $this->national_calendars = $national_calendars;
         $this->metadata           = $metadata;
+
         if (null !== $i18n) {
-            $this->loadTranslations($i18n);
+            $this->validateTranslations($i18n);
+            $this->i18n = Translations::fromObject($i18n);
         }
     }
 
 
+    /**
+     * Creates an instance from an associative array.
+     *
+     * Validates the structure of the provided array to ensure that it contains
+     * the required keys: 'litcal', 'national_calendars', and 'metadata'. Each
+     * of these keys must map to a non-empty array. If any key is missing or
+     * does not meet the criteria, an appropriate error is thrown.
+     *
+     * @param array{litcal:LiturgicalEventItem[],national_calendars:array<string,string>,metadata:array{locales:string[],wider_region:string},i18n?:\stdClass} $data The associative array containing the data for the
+     *                     WiderRegionData instance. It must include:
+     *                     - 'litcal': An array representing liturgical calendar items.
+     *                     - 'national_calendars': An associative array mapping national calendar identifiers to their names.
+     *                     - 'metadata': An array containing metadata information.
+     *                     - 'i18n' (optional): A translations object.
+     *
+     * @return static A new instance of WiderRegionData initialized with the
+     *                provided data.
+     *
+     * @throws \ValueError If any of the required keys ('litcal', 'national_calendars', 'metadata') are not present.
+     * @throws \TypeError If 'litcal', 'national_calendars', or 'metadata' are not arrays or are empty.
+     */
     protected static function fromArrayInternal(array $data): static
     {
         if (!isset($data['litcal']) || !isset($data['national_calendars']) || !isset($data['metadata'])) {
@@ -58,6 +92,21 @@ final class WiderRegionData extends AbstractJsonSrcData
         );
     }
 
+    /**
+     * Creates an instance of WiderRegionData from an object.
+     *
+     * The object should have the following properties:
+     * - litcal (array): The liturgical calendar items.
+     * - national_calendars (array): The national calendars, where the key is the identifier and the value is the name.
+     * - metadata (object): The metadata for the wider region, with locales and wider_region properties.
+     * - i18n (object|null): The translations for the wider region. If not provided, it will default to null.
+     *
+     * @param \stdClass $data The object containing the properties of the wider region.
+     * @return static A new instance of WiderRegionData initialized with the provided data.
+     *
+     * @throws \ValueError If any of the required keys ('litcal', 'national_calendars', 'metadata') are not present.
+     * @throws \TypeError If 'litcal', 'national_calendars', or 'metadata' are not of the expected type or are empty.
+     */
     protected static function fromObjectInternal(\stdClass $data): static
     {
         if (!isset($data->litcal) || !isset($data->national_calendars) || !isset($data->metadata)) {
@@ -73,7 +122,7 @@ final class WiderRegionData extends AbstractJsonSrcData
         }
 
         $nationalCalendarsArray = (array) $data->national_calendars;
-        if (false === is_array($nationalCalendarsArray) || 0 === count($nationalCalendarsArray)) {
+        if (0 === count($nationalCalendarsArray)) {
             throw new \TypeError('national_calendars parameter must be an array and must not be empty: ' . json_encode($data->national_calendars));
         }
 
@@ -89,7 +138,41 @@ final class WiderRegionData extends AbstractJsonSrcData
         );
     }
 
+    /**
+     * Applies translations to the collection of liturgical items.
+     *
+     * Validates the i18n parameter to ensure that the keys are the same as the
+     * values of metadata.locales, and then sets the $this->i18n property
+     * to a Translations object constructed from the validated i18n parameter.
+     *
+     * @param \stdClass $i18n The object containing the translations to apply.
+     *                        The keys of the object must be the same as the
+     *                        values of metadata.locales.
+     *
+     * @throws \ValueError If the keys of the i18n parameter are not the same as
+     *                    the values of metadata.locales.
+     */
     public function loadTranslations(\stdClass $i18n): void
+    {
+        $this->validateTranslations($i18n);
+        $this->unlock();
+        $this->i18n = Translations::fromObject($i18n);
+        $this->lock();
+    }
+
+    /**
+     * Validates the i18n parameter to ensure its keys match the metadata locales.
+     *
+     * This function extracts the keys from the provided i18n object, sorts them,
+     * and compares them to the sorted values of the metadata.locales. If they do
+     * not match, a ValueError is thrown.
+     *
+     * @param \stdClass $i18n The translations object whose keys need to be validated.
+     *
+     * @throws \ValueError If the keys of the i18n parameter do not match the values
+     *                     of metadata.locales.
+     */
+    private function validateTranslations(\stdClass $i18n): void
     {
         /** @var string[] $i18nProps */
         $i18nProps = array_keys(get_object_vars($i18n));
@@ -97,8 +180,6 @@ final class WiderRegionData extends AbstractJsonSrcData
         if (implode(',', $i18nProps) !== implode(',', $this->metadata->locales)) {
             throw new \ValueError('keys of i18n parameter must be the same as the values of metadata.locales');
         }
-
-        $this->i18n = Translations::fromObject($i18n);
     }
 
     /**
@@ -109,7 +190,7 @@ final class WiderRegionData extends AbstractJsonSrcData
      *
      * @param string $locale The locale to use for retrieving translations.
      *
-     * @throws ValueError if a translation is not available for a given event key.
+     * @throws \ValueError if a translation is not available for a given event key.
      */
     public function applyTranslations(string $locale): void
     {

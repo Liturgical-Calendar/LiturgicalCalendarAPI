@@ -5,7 +5,7 @@ namespace LiturgicalCalendar\Api\Models\RegionalData\NationalData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 
-final class LitCalItemMetadata extends AbstractJsonSrcData
+final class NationalMetadata extends AbstractJsonSrcData
 {
     public readonly string $nation;
 
@@ -18,7 +18,7 @@ final class LitCalItemMetadata extends AbstractJsonSrcData
     public readonly array $missals;
 
     /**
-     * Constructs a new instance of LitCalItemMetadata.
+     * Constructs a new instance of NationalMetadata.
      *
      * @param string $nation A two-letter country ISO code (capital letters).
      * @param string[] $locales An array of valid locale codes, must not be empty.
@@ -27,7 +27,7 @@ final class LitCalItemMetadata extends AbstractJsonSrcData
      *
      * @throws \ValueError If any parameter does not meet the specified criteria.
      */
-    public function __construct(string $nation, array $locales, string $wider_region, array $missals)
+    private function __construct(string $nation, array $locales, string $wider_region, array $missals)
     {
 
         if (preg_match('/^[A-Z]{2}$/', $nation) !== 1) {

@@ -4,8 +4,15 @@ namespace LiturgicalCalendar\Api\Models\RegionalData\DiocesanData;
 
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 
-class DiocesanLitCalItemCollection extends AbstractJsonSrcData implements \IteratorAggregate
+/**
+ * Represents a collection of liturgical calendar items.
+ *
+ * @implements \IteratorAggregate<DiocesanLitCalItem>
+ * @phpstan-import-type LiturgicalEventItem from \LiturgicalCalendar\Api\Paths\EventsPath
+ */
+final class DiocesanLitCalItemCollection extends AbstractJsonSrcData implements \IteratorAggregate
 {
+    /** @var array<DiocesanLitCalItem> */
     public readonly array $litcalItems;
 
     /**
@@ -16,7 +23,7 @@ class DiocesanLitCalItemCollection extends AbstractJsonSrcData implements \Itera
      *
      * @param array<DiocesanLitCalItem> $litcalItems An array of liturgical calendar items.
      */
-    public function __construct(array $litcalItems)
+    private function __construct(array $litcalItems)
     {
         $this->litcalItems = $litcalItems;
     }
@@ -30,15 +37,29 @@ class DiocesanLitCalItemCollection extends AbstractJsonSrcData implements \Itera
     }
 
 
+    /**
+     * Creates an instance of DiocesanLitCalItemCollection from an associative array.
+     *
+     * The array must not be empty.
+     * The elements of the array can be either associative arrays or objects.
+     * If the elements are associative arrays, they must have the same keys as the properties of DiocesanLitCalItem.
+     * If the elements are objects, they must have the same properties as DiocesanLitCalItem.
+     *
+     * @param array<LiturgicalEventItem|\stdClass> $data The associative array containing the properties of the class.
+     * @return static The newly created instance.
+     * @throws \TypeError if the array is empty.
+     */
     protected static function fromArrayInternal(array $data): static
     {
-        if (false === is_array($data) || 0 === count($data)) {
+        if (0 === count($data)) {
             throw new \TypeError('litcal parameter must be an array and must not be empty');
         }
-        if ($data[0] instanceof \stdClass) {
-            $items = array_map(fn ($litcalItem) => DiocesanLitCalItem::fromObject($litcalItem), $data);
+        if (reset($data) instanceof \stdClass) {
+            /** @var array<\stdClass> $data */
+            $items = array_values(array_map(fn (\stdClass $litcalItem): DiocesanLitCalItem => DiocesanLitCalItem::fromObject($litcalItem), $data));
         } else {
-            $items = array_map(fn ($litcalItem) => DiocesanLitCalItem::fromArray($litcalItem), $data);
+            /** @var array<LiturgicalEventItem> $data */
+            $items = array_values(array_map(fn (array $litcalItem): DiocesanLitCalItem => DiocesanLitCalItem::fromArray($litcalItem), $data));
         }
         return new static($items);
     }

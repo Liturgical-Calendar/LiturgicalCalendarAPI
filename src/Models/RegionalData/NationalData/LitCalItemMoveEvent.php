@@ -9,7 +9,7 @@ final class LitCalItemMoveEvent extends LiturgicalEventData
     public readonly int $day;
     public readonly int $month;
 
-    public function __construct(string $event_key, int $day, int $month)
+    private function __construct(string $event_key, int $day, int $month)
     {
 
         parent::__construct($event_key);

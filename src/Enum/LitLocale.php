@@ -8,11 +8,11 @@ class LitLocale
     public const LATIN_PRIMARY_LANGUAGE    = 'la';
     public static string $PRIMARY_LANGUAGE = 'la';
 
-    /** @var array<string> */
+    /** @var string[] */
     public static array $values = [ 'la', 'la_VA' ];
 
-    /** @var array<string>|null */
-    public static ?array $AllAvailableLocales = null;
+    /** @var string[] */
+    public static array $AllAvailableLocales = [];
 
     /**
      * Check if the given locale is valid.
@@ -43,6 +43,22 @@ class LitLocale
     }
 
     /**
+     * Get the list of locales supported by the API.
+     *
+     * This method returns an array of all supported locales, which are the
+     * locales that are valid for use in the API. The list of supported locales
+     * includes both the set of locales that are built-in to the API, plus any
+     * additional locales that are available in the ICU data installed on the
+     * server.
+     *
+     * @return string[] The list of supported locales.
+     */
+    public static function getSupportedLocales(): array
+    {
+        return self::$values + self::$AllAvailableLocales;
+    }
+
+    /**
      * Initializes the list of available locales.
      *
      * This method loads the list of locales from the ICU data available in PHP.
@@ -50,7 +66,7 @@ class LitLocale
      */
     public static function init(): void
     {
-        if (null === self::$AllAvailableLocales) {
+        if (empty(self::$AllAvailableLocales)) {
             $getLocales = \ResourceBundle::getLocales('');
             if ($getLocales === false) {
                 throw new \RuntimeException('Failed to retrieve locales from ResourceBundle.');

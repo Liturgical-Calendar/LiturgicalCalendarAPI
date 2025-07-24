@@ -2,20 +2,26 @@
 
 namespace LiturgicalCalendar\Api\Models\RegionalData;
 
-final class TranslationMap implements \IteratorAggregate, \ArrayAccess, \Countable
+use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
+
+/**
+ * @implements \IteratorAggregate<string, string>
+ * @implements \ArrayAccess<string, string>
+ */
+final class TranslationMap extends AbstractJsonSrcData implements \IteratorAggregate, \ArrayAccess, \Countable
 {
     /** @var array<string, string> */
-    private readonly array $translations;
+    private array $translations;
 
     /** @var array<string> */
-    private readonly array $keys;
+    private array $keys;
 
     /**
      * Constructor.
      *
      * @param array<string, string> $translations The translations data in the format [key => translation].
      */
-    public function __construct(array $translations = [])
+    private function __construct(array $translations = [])
     {
         $this->translations = $translations;
 
@@ -53,26 +59,21 @@ final class TranslationMap implements \IteratorAggregate, \ArrayAccess, \Countab
      * If the offset is not provided or is null, the value will be appended to the end of the translations array.
      * If the offset is provided, the value will be set at that offset.
      *
-     * @param mixed $offset The offset to set the value to. Can be null.
+     * @param string $offset The offset to set the value to. Can be null.
      * @param string $value The value to set.
      */
     public function offsetSet($offset, $value): void
     {
-        if (is_null($offset)) {
-            $this->translations[] = $value;
-            $this->keys[]         = array_key_last($this->translations);
-        } else {
-            $this->translations[$offset] = $value;
-            if (!in_array($offset, $this->keys)) {
-                $this->keys[] = $offset;
-            }
+        $this->translations[$offset] = $value;
+        if (!in_array($offset, $this->keys)) {
+            $this->keys[] = $offset;
         }
     }
 
     /**
      * Checks if a translation exists at the given offset.
      *
-     * @param mixed $offset The offset to check.
+     * @param string $offset The offset to check.
      * @return bool True if the translation exists, false otherwise.
      */
     public function offsetExists($offset): bool
@@ -86,7 +87,7 @@ final class TranslationMap implements \IteratorAggregate, \ArrayAccess, \Countab
      * This will remove the translation entry and its corresponding key from the
      * translations and keys arrays.
      *
-     * @param mixed $offset The offset of the translation to unset.
+     * @param string $offset The offset of the translation to unset.
      */
     public function offsetUnset($offset): void
     {
@@ -98,7 +99,7 @@ final class TranslationMap implements \IteratorAggregate, \ArrayAccess, \Countab
     /**
      * Retrieves the translation value at the given offset.
      *
-     * @param mixed $offset The offset to retrieve the translation value from.
+     * @param string $offset The offset to retrieve the translation value from.
      * @return string|null The translation value at the given offset. Null if the offset does not exist.
      */
     public function offsetGet($offset): ?string
@@ -112,8 +113,19 @@ final class TranslationMap implements \IteratorAggregate, \ArrayAccess, \Countab
      * @param \stdClass $i18nData The object to create the instance from.
      * @return static A new instance of this class.
      */
-    public static function fromObject(\stdClass $i18nData): static
+    public static function fromObjectInternal(\stdClass $i18nData): static
     {
         return new static((array)$i18nData);
+    }
+
+    /**
+     * Create a new instance from an array.
+     *
+     * @param array<string,string> $i18nData The array to create the instance from.
+     * @return static A new instance of this class.
+     */
+    public static function fromArrayInternal(array $i18nData): static
+    {
+        return new static($i18nData);
     }
 }

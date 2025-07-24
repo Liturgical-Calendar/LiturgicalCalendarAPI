@@ -7,7 +7,11 @@ use LiturgicalCalendar\Api\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Utilities;
 
+/**
+ * @property object{litcal_decrees: array<object{decree_id:string,api_path:string}>} $decreesIndex
+ */
 final class DecreesPath
 {
     public static Core $Core;
@@ -67,7 +71,11 @@ final class DecreesPath
                     $decreeIds = [];
                     foreach (self::$decreesIndex->litcal_decrees as $idx => $decree) {
                         if ($decree->decree_id === self::$requestPathParts[0]) {
-                            self::produceResponse(json_encode(self::$decreesIndex->litcal_decrees[$idx]));
+                            $response = json_encode(self::$decreesIndex->litcal_decrees[$idx]);
+                            if ($response === false) {
+                                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Failed to encode decree to JSON');
+                            }
+                            self::produceResponse($response);
                         }
                         $decreeIds[] = $decree->decree_id;
                     }
@@ -105,6 +113,9 @@ final class DecreesPath
         $message->response    = $statusCode === 404 ? 'Resource not Found' : $statusMessage;
         $message->description = $description;
         $response             = json_encode($message);
+        if ($response === false) {
+            $response = '{"status":"ERROR","response":"Internal Server Error","description":"Failed to encode error message to JSON"}';
+        }
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
                 $responseObj = json_decode($response, true);
@@ -151,20 +162,10 @@ final class DecreesPath
         if (count($requestPathParts)) {
             self::$requestPathParts = $requestPathParts;
         }
-        $decreesFile = JsonData::DECREES_FILE;
-        if (file_exists($decreesFile)) {
-            $rawData                            = file_get_contents($decreesFile);
-            self::$decreesIndex                 = new \stdClass();
-            self::$decreesIndex->litcal_decrees = json_decode($rawData);
-            foreach (self::$decreesIndex->litcal_decrees as $idx => $decree) {
-                $decreeId                                           = $decree->decree_id;
-                self::$decreesIndex->litcal_decrees[$idx]->api_path = API_BASE_PATH . "/decrees/$decreeId";
-            }
-        } else {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found', true, 404);
-            die('Decrees file not found');
-        }
-        self::$Core = new Core();
+        self::$decreesIndex                 = new \stdClass();
+        $decreesFile                        = JsonData::DECREES_FILE;
+        self::$decreesIndex->litcal_decrees = Utilities::jsonFileToObject($decreesFile);
+        self::$Core                         = new Core();
     }
 
     public static function handleRequest(): void
@@ -177,7 +178,11 @@ final class DecreesPath
         }
         self::$Core->setResponseContentTypeHeader();
         if (count(self::$requestPathParts) === 0) {
-            self::produceResponse(json_encode(self::$decreesIndex));
+            $response = json_encode(self::$decreesIndex);
+            if ($response === false) {
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Failed to encode decrees index to JSON');
+            }
+            self::produceResponse($response);
         }
         self::handlePathParams();
     }

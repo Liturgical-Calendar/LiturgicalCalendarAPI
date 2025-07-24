@@ -14,32 +14,13 @@ final class LitCalItemMakePatronMetadata extends LiturgicalEventMetadata
 
     public readonly ?UrlLangMap $url_lang_map;
 
-    public function __construct(\stdClass $metadata)
+    private function __construct(int $since_year, ?int $until_year, ?string $url, ?UrlLangMap $url_lang_map)
     {
-        if (false === property_exists($metadata, 'since_year')) {
-            throw new \ValueError('`metadata.since_year` parameter is required');
-        }
+        parent::__construct($since_year, $until_year ?? null);
 
-        parent::__construct($metadata->since_year, $metadata->until_year ?? null);
-
-        $this->action = CalEventAction::MakePatron;
-
-        if (property_exists($metadata, 'url')) {
-            if (false === is_string($metadata->url)) {
-                throw new \ValueError('`metadata.url` parameter must be a string');
-            }
-            $url       = filter_var($metadata->url, FILTER_SANITIZE_URL);
-            $url       = htmlspecialchars($url, ENT_QUOTES);
-            $this->url = $url;
-        } else {
-            $this->url = null;
-        }
-
-        if (property_exists($metadata, 'url_lang_map')) {
-            $this->url_lang_map = UrlLangMap::fromObject($metadata->url_lang_map);
-        } else {
-            $this->url_lang_map = null;
-        }
+        $this->action       = CalEventAction::MakePatron;
+        $this->url          = $url;
+        $this->url_lang_map = $url_lang_map;
     }
 
     /**
@@ -62,5 +43,87 @@ final class LitCalItemMakePatronMetadata extends LiturgicalEventMetadata
             $url = $this->url;
         }
         return '<a href="' . $url . '" target="_blank">' . _('Decree of the Congregation for Divine Worship') . '</a>';
+    }
+
+    /**
+     * Creates a new instance from an associative array.
+     *
+     * @param \stdClass $data The data to use to create the new instance.
+     *
+     * @throws \ValueError If `metadata.since_year` parameter is missing.
+     * @throws \ValueError If `data.url` parameter is not a string or is not a valid url.
+     */
+    protected static function fromObjectInternal(\stdClass $data): static
+    {
+        if (false === property_exists($data, 'since_year')) {
+            throw new \ValueError('`metadata.since_year` parameter is required');
+        }
+
+        $url = null;
+        if (property_exists($data, 'url')) {
+            if (false === is_string($data->url)) {
+                throw new \ValueError('`metadata.url` parameter must be a string');
+            }
+            $url = filter_var($data->url, FILTER_SANITIZE_URL);
+            if (false === $url) {
+                throw new \ValueError('`metadata.url` parameter is not a valid URL');
+            }
+            $url = htmlspecialchars($url, ENT_QUOTES);
+        }
+
+        $url_lang_map = null;
+        if (property_exists($data, 'url_lang_map')) {
+            $url_lang_map = UrlLangMap::fromObject($data->url_lang_map);
+        }
+
+        return new static(
+            $data->since_year,
+            $data->until_year ?? null,
+            $url,
+            $url_lang_map
+        );
+    }
+
+    /**
+     * Creates a new instance from an associative array.
+     *
+     * @param array{since_year:int,url?:string,url_lang_map?:array<string,string>,until_year?:int} $data The data to use to create the new instance.
+     *                      Must have the following key:
+     *                          - `since_year`: The year since when the liturgical event was added.
+     *                      May have the following keys:
+     *                          - `url`: The URL of the decree document.
+     *                          - `url_lang_map`: The language map for the decree URL.
+     *                          - `until_year`: The year until when the liturgical event was added.
+     * @return static A new instance.
+     */
+    protected static function fromArrayInternal(array $data): static
+    {
+        if (false === array_key_exists('since_year', $data)) {
+            throw new \ValueError('`metadata.since_year` parameter is required');
+        }
+
+        $url = null;
+        if (array_key_exists('url', $data)) {
+            if (false === is_string($data['url'])) {
+                throw new \ValueError('`metadata.url` parameter must be a string');
+            }
+            $url = filter_var($data['url'], FILTER_SANITIZE_URL);
+            if (false === $url) {
+                throw new \ValueError('`metadata.url` parameter is not a valid URL');
+            }
+            $url = htmlspecialchars($url, ENT_QUOTES);
+        }
+
+        $url_lang_map = null;
+        if (array_key_exists('url_lang_map', $data)) {
+            $url_lang_map = UrlLangMap::fromArray($data['url_lang_map']);
+        }
+
+        return new static(
+            $data['since_year'],
+            $data['until_year'] ?? null,
+            $url,
+            $url_lang_map
+        );
     }
 }

@@ -11,6 +11,7 @@ use LiturgicalCalendar\Api\Models\Metadata\DiocesanGroup;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
+use LiturgicalCalendar\Api\Utilities;
 
 final class MetadataPath
 {
@@ -37,17 +38,12 @@ final class MetadataPath
     {
         $directories = array_map('basename', glob(JsonData::NATIONAL_CALENDARS_FOLDER . '/*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
-            $nationalCalendarDataFile = JsonData::NATIONAL_CALENDARS_FOLDER . "/$directory/$directory.json";
-            if (file_exists($nationalCalendarDataFile)) {
-                $nationalCalendarDefinition = file_get_contents($nationalCalendarDataFile);
-                $nationalCalendarData       = json_decode($nationalCalendarDefinition);
-                if (JSON_ERROR_NONE === json_last_error()) {
-                    $nationalCalendarData->metadata->settings = $nationalCalendarData->settings;
-                    $nationalCalendarData->metadata->dioceses = [];
-                    $metadataNationalCalendarItem             = MetadataNationalCalendarItem::fromObject($nationalCalendarData->metadata);
-                    self::$metadataCalendars->pushNationalCalendarMetadata($metadataNationalCalendarItem);
-                }
-            }
+            $nationalCalendarDataFile                 = JsonData::NATIONAL_CALENDARS_FOLDER . "/$directory/$directory.json";
+            $nationalCalendarData                     = Utilities::jsonFileToObject($nationalCalendarDataFile);
+            $nationalCalendarData->metadata->settings = $nationalCalendarData->settings;
+            $nationalCalendarData->metadata->dioceses = [];
+            $metadataNationalCalendarItem             = MetadataNationalCalendarItem::fromObject($nationalCalendarData->metadata);
+            self::$metadataCalendars->pushNationalCalendarMetadata($metadataNationalCalendarItem);
         }
     }
 
@@ -62,9 +58,8 @@ final class MetadataPath
     {
         if (empty(MetadataPath::$worldDiocesesLatinRite)) {
             $worldDiocesesFile                    = JsonData::FOLDER . '/world_dioceses.json';
-            MetadataPath::$worldDiocesesLatinRite = json_decode(
-                file_get_contents($worldDiocesesFile)
-            )->catholic_dioceses_latin_rite;
+            $worldDiocesesData                    = Utilities::jsonFileToObject($worldDiocesesFile);
+            MetadataPath::$worldDiocesesLatinRite = $worldDiocesesData->catholic_dioceses_latin_rite;
         }
         $dioceseName = null;
         // Search for the diocese by its ID in the worldDioceseLatinRite data
@@ -96,18 +91,14 @@ final class MetadataPath
             foreach ($directories as $calendar_id) {
                 $dioceseName          = MetadataPath::dioceseIdToName($calendar_id) ?? $calendar_id;
                 $diocesanCalendarFile = JsonData::DIOCESAN_CALENDARS_FOLDER . "/$nation/$calendar_id/$dioceseName.json";
-                if (file_exists($diocesanCalendarFile) && is_readable($diocesanCalendarFile)) {
-                    $diocesanCalendarDefinition = file_get_contents($diocesanCalendarFile);
-                    $diocesanCalendarData       = json_decode($diocesanCalendarDefinition);
-                    if (JSON_ERROR_NONE === json_last_error()) {
-                        $diocesanCalendarData->metadata->diocese = $dioceseName;
-                        if (property_exists($diocesanCalendarData, 'settings')) {
-                            $diocesanCalendarData->metadata->settings = $diocesanCalendarData->settings;
-                        }
-                        $metadataDiocesanCalendarItem = MetadataDiocesanCalendarItem::fromObject($diocesanCalendarData->metadata);
-                        self::$metadataCalendars->pushDiocesanCalendarMetadata($metadataDiocesanCalendarItem);
-                    }
+                $diocesanCalendarData = Utilities::jsonFileToObject($diocesanCalendarFile);
+
+                $diocesanCalendarData->metadata->diocese = $dioceseName;
+                if (property_exists($diocesanCalendarData, 'settings')) {
+                    $diocesanCalendarData->metadata->settings = $diocesanCalendarData->settings;
                 }
+                $metadataDiocesanCalendarItem = MetadataDiocesanCalendarItem::fromObject($diocesanCalendarData->metadata);
+                self::$metadataCalendars->pushDiocesanCalendarMetadata($metadataDiocesanCalendarItem);
             }
         }
     }
@@ -128,10 +119,20 @@ final class MetadataPath
     {
         $directories = array_map('basename', glob(JsonData::WIDER_REGIONS_FOLDER . '/*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
-            $WiderRegionFile = strtr(JsonData::WIDER_REGIONS_FILE, ['{wider_region}' => $directory]);
+            $WiderRegionFile = strtr(
+                JsonData::WIDER_REGIONS_FILE,
+                ['{wider_region}' => $directory]
+            );
+
             if (file_exists($WiderRegionFile)) {
-                $widerRegionI18nFolder   = strtr(JsonData::WIDER_REGIONS_I18N_FOLDER, [ '{wider_region}' => $directory ]);
-                $locales                 = array_map(fn ($filename) => pathinfo($filename, PATHINFO_FILENAME), glob($widerRegionI18nFolder . '/*.json'));
+                $widerRegionI18nFolder   = strtr(
+                    JsonData::WIDER_REGIONS_I18N_FOLDER,
+                    [ '{wider_region}' => $directory ]
+                );
+                $locales                 = array_map(
+                    fn ($filename) => pathinfo($filename, PATHINFO_FILENAME),
+                    glob($widerRegionI18nFolder . '/*.json')
+                );
                 $metadataWiderRegionItem = MetadataWiderRegionItem::fromArray([
                     'name'     => $directory,
                     'locales'  => $locales,

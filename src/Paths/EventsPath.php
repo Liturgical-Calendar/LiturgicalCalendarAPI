@@ -16,6 +16,7 @@ use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
 use LiturgicalCalendar\Api\Enum\ParamError;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
 use LiturgicalCalendar\Api\Params\EventsParams;
+use LiturgicalCalendar\Api\Utilities;
 
 /**
  * @phpstan-type LiturgicalEventItem array{
@@ -43,7 +44,6 @@ final class EventsPath
     private static ?object $WiderRegionData = null;
     private static ?object $NationalData    = null;
     private static ?object $DiocesanData    = null;
-    private static ?LitCommon $LitCommon    = null;
     private EventsParams $EventsParams;
 
     /**
@@ -240,7 +240,8 @@ final class EventsPath
             });
             if (null !== $DiocesanData) {
                 $this->EventsParams->NationalCalendar = $DiocesanData->nation;
-                $diocesanDataFile                     = strtr(
+
+                $diocesanDataFile = strtr(
                     JsonData::DIOCESAN_CALENDARS_FILE,
                     [
                         '{nation}'       => $this->EventsParams->NationalCalendar,
@@ -248,12 +249,8 @@ final class EventsPath
                         '{diocese_name}' => $DiocesanData->diocese
                     ]
                 );
-                if (file_exists($diocesanDataFile)) {
-                    self::$DiocesanData = json_decode(file_get_contents($diocesanDataFile));
-                } else {
-                    echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "no data file found for diocese {$this->EventsParams->DiocesanCalendar}");
-                    die();
-                }
+
+                self::$DiocesanData = Utilities::jsonFileToObject($diocesanDataFile);
             } else {
                 $description = "unknown diocese `{$this->EventsParams->DiocesanCalendar}`, supported values are: ["
                     . implode(',', $this->EventsParams->calendarsMetadata->diocesan_calendars) . ']';
@@ -282,46 +279,42 @@ final class EventsPath
                     '{nation}' => $this->EventsParams->NationalCalendar
                 ]
             );
-            if (file_exists($nationalDataFile)) {
-                self::$NationalData = json_decode(file_get_contents($nationalDataFile));
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    if (property_exists(self::$NationalData, 'metadata') && property_exists(self::$NationalData->metadata, 'locales')) {
-                        if (
-                            null === $this->EventsParams->Locale
-                            || !in_array($this->EventsParams->Locale, self::$NationalData->metadata->locales)
-                        ) {
-                            $this->EventsParams->Locale     = self::$NationalData->metadata->locales[0];
-                            $this->EventsParams->baseLocale = \Locale::getPrimaryLanguage($this->EventsParams->Locale);
-                        }
-                    }
-                    if (property_exists(self::$NationalData, 'metadata') && property_exists(self::$NationalData->metadata, 'wider_region')) {
-                        $widerRegionDataFile = strtr(
-                            JsonData::WIDER_REGIONS_FILE,
-                            [
-                                '{wider_region}' => self::$NationalData->metadata->wider_region
-                            ]
-                        );
-                        $widerRegionI18nFile = strtr(
-                            JsonData::WIDER_REGIONS_I18N_FILE,
-                            [
-                                '{wider_region}' => self::$NationalData->metadata->wider_region,
-                                '{locale}'       => $this->EventsParams->baseLocale
-                            ]
-                        );
-                        if (file_exists($widerRegionI18nFile)) {
-                            $widerRegionI18nData = json_decode(file_get_contents($widerRegionI18nFile));
-                            if (json_last_error() === JSON_ERROR_NONE && file_exists($widerRegionDataFile)) {
-                                self::$WiderRegionData = json_decode(file_get_contents($widerRegionDataFile));
-                                if (json_last_error() === JSON_ERROR_NONE && property_exists(self::$WiderRegionData, 'litcal')) {
-                                    foreach (self::$WiderRegionData->litcal as $idx => $value) {
-                                        $event_key = $value->liturgical_event->event_key;
-                                        if (property_exists($widerRegionI18nData, $event_key)) {
-                                            self::$WiderRegionData->litcal[$idx]->liturgical_event->name = $widerRegionI18nData->{$event_key};
-                                        }
-                                    }
-                                }
-                            }
-                        }
+
+            self::$NationalData = Utilities::jsonFileToObject($nationalDataFile);
+
+            if (property_exists(self::$NationalData, 'metadata') && property_exists(self::$NationalData->metadata, 'locales')) {
+                if (
+                    null === $this->EventsParams->Locale
+                    || !in_array($this->EventsParams->Locale, self::$NationalData->metadata->locales)
+                ) {
+                    $this->EventsParams->Locale     = self::$NationalData->metadata->locales[0];
+                    $this->EventsParams->baseLocale = \Locale::getPrimaryLanguage($this->EventsParams->Locale);
+                }
+            }
+
+            if (property_exists(self::$NationalData, 'metadata') && property_exists(self::$NationalData->metadata, 'wider_region')) {
+                $widerRegionDataFile = strtr(
+                    JsonData::WIDER_REGIONS_FILE,
+                    [
+                        '{wider_region}' => self::$NationalData->metadata->wider_region
+                    ]
+                );
+
+                $widerRegionI18nFile = strtr(
+                    JsonData::WIDER_REGIONS_I18N_FILE,
+                    [
+                        '{wider_region}' => self::$NationalData->metadata->wider_region,
+                        '{locale}'       => $this->EventsParams->Locale
+                    ]
+                );
+
+                $widerRegionI18nData   = Utilities::jsonFileToArray($widerRegionI18nFile);
+                self::$WiderRegionData = Utilities::jsonFileToObject($widerRegionDataFile);
+
+                foreach (self::$WiderRegionData->litcal as $idx => $value) {
+                    $event_key = $value->liturgical_event->event_key;
+                    if (array_key_exists($event_key, $widerRegionI18nData)) {
+                        self::$WiderRegionData->litcal[$idx]->liturgical_event->name = $widerRegionI18nData[$event_key];
                     }
                 }
             }
@@ -394,19 +387,24 @@ final class EventsPath
     private function processMissalData(): void
     {
         foreach (self::$LatinMissals as $LatinMissal) {
-            $DataFile = RomanMissal::getSanctoraleFileName($LatinMissal);
-            if ($DataFile !== false) {
-                if (!file_exists($DataFile)) {
-                    echo self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource $DataFile");
-                    die();
+            $MissalDataFile = RomanMissal::getSanctoraleFileName($LatinMissal);
+            if ($MissalDataFile !== false) {
+                $MissalData = Utilities::jsonFileToArray($MissalDataFile);
+
+                // There may or may not be a related translation file.
+                // If there is, we get the translated name for each liturgical event from here
+                $names    = null;
+                $I18nPath = RomanMissal::getSanctoraleI18nFilePath($LatinMissal);
+                if ($I18nPath !== false) {
+                    $I18nFile = $I18nPath . '/' . $this->EventsParams->baseLocale . '.json';
+                    $names    = Utilities::jsonFileToArray($I18nFile);
                 }
-                $DATA = json_decode(file_get_contents($DataFile), true);
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
-                    die();
-                }
-                foreach ($DATA as $liturgicalEvent) {
-                    $key                                   = $liturgicalEvent['event_key'];
+
+                foreach ($MissalData as $liturgicalEvent) {
+                    $key = $liturgicalEvent['event_key'];
+                    if ($names !== null && array_key_exists($key, $names)) {
+                        $liturgicalEvent['name'] = $names[$key];
+                    }
                     $grade                                 = LitGrade::from($liturgicalEvent['grade']);
                     $liturgicalEvent['grade']              = $grade;
                     $liturgicalEvent['grade_lcl']          = LitGrade::i18n($grade, $this->EventsParams->baseLocale, false);
@@ -414,26 +412,6 @@ final class EventsPath
                     $commons                               = LitCommons::create($liturgicalEvent['common']);
                     $liturgicalEvent['common_lcl']         = $commons->fullTranslate($this->EventsParams->baseLocale);
                     self::$LiturgicalEventCollection[$key] = $liturgicalEvent;
-                }
-                // There may or may not be a related translation file; if there is, we get the translated name from here
-                $I18nPath = RomanMissal::getSanctoraleI18nFilePath($LatinMissal);
-                if ($I18nPath !== false) {
-                    $I18nFile = $I18nPath . '/' . $this->EventsParams->baseLocale . '.json';
-                    if (false === file_exists($I18nFile)) {
-                        echo self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource $I18nPath");
-                        die();
-                    }
-                    $NAME = json_decode(file_get_contents($I18nFile), true);
-                    if (json_last_error() !== JSON_ERROR_NONE) {
-                        echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
-                        die();
-                    }
-                    foreach ($DATA as $liturgicalEvent) {
-                        $key = $liturgicalEvent['event_key'];
-                        if (array_key_exists($key, $NAME)) {
-                            self::$LiturgicalEventCollection[$key]['name'] = $NAME[$key];
-                        }
-                    }
                 }
             }
         }
@@ -456,36 +434,21 @@ final class EventsPath
      */
     private function processPropriumDeTemporeData(): void
     {
-        $DataFile = JsonData::MISSALS_FOLDER . '/propriumdetempore/propriumdetempore.json';
-        $I18nFile = JsonData::MISSALS_FOLDER . '/propriumdetempore/i18n/' . $this->EventsParams->baseLocale . '.json';
-        if (!file_exists($DataFile) || !file_exists($I18nFile)) {
-            echo self::produceErrorResponse(
-                StatusCode::NOT_FOUND,
-                'Could not find either the resource file ' . $DataFile . ' or the resource file ' . $I18nFile
-            );
-            die();
-        }
-        $DATA = json_decode(file_get_contents($DataFile), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
-            die();
-        }
-        $NAME = json_decode(file_get_contents($I18nFile), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
-            die();
-        }
+        $DataFile          = JsonData::MISSALS_FOLDER . '/propriumdetempore/propriumdetempore.json';
+        $I18nFile          = JsonData::MISSALS_FOLDER . '/propriumdetempore/i18n/' . $this->EventsParams->baseLocale . '.json';
+        $PropriumDeSanctis = Utilities::jsonFileToArray($DataFile);
+        $names             = Utilities::jsonFileToArray($I18nFile);
 
-        foreach ($DATA as $row) {
-            $key = $row['event_key'];
+        foreach ($PropriumDeSanctis as $liturgicalEvent) {
+            $key = $liturgicalEvent['event_key'];
             if (false === array_key_exists($key, self::$LiturgicalEventCollection)) {
-                $grade                                               = LitGrade::from($row['grade']);
-                self::$LiturgicalEventCollection[$key]               = $row;
-                self::$LiturgicalEventCollection[$key]['name']       = $NAME[$key];
-                self::$LiturgicalEventCollection[$key]['grade_lcl']  = LitGrade::i18n($grade, $this->EventsParams->baseLocale, false);
-                self::$LiturgicalEventCollection[$key]['common']     = [];
-                self::$LiturgicalEventCollection[$key]['common_lcl'] = '';
-                self::$LiturgicalEventCollection[$key]['calendar']   = 'GENERAL ROMAN';
+                $grade                                 = LitGrade::from($liturgicalEvent['grade']);
+                $liturgicalEvent['name']               = $names[$key];
+                $liturgicalEvent['grade_lcl']          = LitGrade::i18n($grade, $this->EventsParams->baseLocale, false);
+                $liturgicalEvent['common']             = [];
+                $liturgicalEvent['common_lcl']         = '';
+                $liturgicalEvent['calendar']           = 'GENERAL ROMAN';
+                self::$LiturgicalEventCollection[$key] = $liturgicalEvent;
             }
         }
     }
@@ -513,31 +476,17 @@ final class EventsPath
      */
     private function processMemorialsFromDecreesData(): void
     {
-        $DataFile = JsonData::DECREES_FILE;
-        $I18nFile = JsonData::DECREES_I18N_FOLDER . '/' . $this->EventsParams->baseLocale . '.json';
-        if (!file_exists($DataFile) || !file_exists($I18nFile)) {
-            echo self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DataFile or resource file $I18nFile");
-            die();
-        }
+        $decreesFile = JsonData::DECREES_FILE;
+        $I18nFile    = JsonData::DECREES_I18N_FOLDER . '/' . $this->EventsParams->baseLocale . '.json';
+        $decrees     = Utilities::jsonFileToArray($decreesFile);
+        $names       = Utilities::jsonFileToArray($I18nFile);
 
-        $DATA = json_decode(file_get_contents($DataFile), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
-            die();
-        }
-
-        $NAME = json_decode(file_get_contents($I18nFile), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
-            die();
-        }
-
-        foreach ($DATA as $liturgicalEventData) {
+        foreach ($decrees as $liturgicalEventData) {
             $liturgicalEvent         = $liturgicalEventData['liturgical_event'];
             $liturgicalEventMetadata = $liturgicalEventData['metadata'];
             $key                     = $liturgicalEvent['event_key'];
             if (false === array_key_exists($key, self::$LiturgicalEventCollection)) {
-                $liturgicalEvent['name'] = $NAME[$key];
+                $liturgicalEvent['name'] = $names[$key];
                 if (array_key_exists('locales', $liturgicalEventMetadata)) {
                     $decreeURL = sprintf($liturgicalEventMetadata['url'], 'LA');
                     if (array_key_exists($this->EventsParams->baseLocale, $liturgicalEventMetadata['locales'])) {
@@ -551,12 +500,12 @@ final class EventsPath
                 self::$LiturgicalEventCollection[$key] = $liturgicalEvent;
             } elseif ($liturgicalEventMetadata['action'] === 'setProperty') {
                 if ($liturgicalEventMetadata['property'] === 'name') {
-                    self::$LiturgicalEventCollection[$key]['name'] = $NAME[$key];
+                    self::$LiturgicalEventCollection[$key]['name'] = $names[$key];
                 } elseif ($liturgicalEventMetadata['property'] === 'grade') {
                     self::$LiturgicalEventCollection[$key]['grade'] = $liturgicalEvent['grade'];
                 }
             } elseif ($liturgicalEventMetadata['action'] === 'makeDoctor') {
-                self::$LiturgicalEventCollection[$key]['name'] = $NAME[$key];
+                self::$LiturgicalEventCollection[$key]['name'] = $names[$key];
             }
 
             $grade = self::$LiturgicalEventCollection[$key]['grade'] instanceof LitGrade
@@ -697,7 +646,8 @@ final class EventsPath
                 ]
             );
 
-            $NationalCalendarI18nData = json_decode(file_get_contents($NationalCalendarI18nFile), true);
+            $NationalCalendarI18nData = Utilities::jsonFileToArray($NationalCalendarI18nFile);
+
             foreach (self::$NationalData->litcal as $row) {
                 $key = $row->liturgical_event->event_key;
                 if ($row->metadata->action === 'createNew') {
@@ -731,22 +681,18 @@ final class EventsPath
 
             if (property_exists(self::$NationalData, 'metadata') && property_exists(self::$NationalData->metadata, 'missals')) {
                 foreach (self::$NationalData->metadata->missals as $missal) {
-                    $DataFile = RomanMissal::getSanctoraleFileName($missal);
-                    if ($DataFile !== false) {
-                        if (!file_exists($DataFile) || !is_readable($DataFile)) {
-                            echo self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DataFile or it is not readable");
-                            die();
+                    $missalDataFile = RomanMissal::getSanctoraleFileName($missal);
+                    if ($missalDataFile !== false) {
+                        // There may or may not be a related translation file.
+                        // If there is, we get the translated name for each liturgical event from here
+                        $names    = null;
+                        $I18nPath = RomanMissal::getSanctoraleI18nFilePath($missal);
+                        if ($I18nPath !== false) {
+                            $I18nFile = $I18nPath . '/' . $this->EventsParams->baseLocale . '.json';
+                            $names    = Utilities::jsonFileToArray($I18nFile);
                         }
-                        $PropriumDeSanctisRaw = file_get_contents($DataFile);
-                        if (false === $PropriumDeSanctisRaw) {
-                            echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not read resource file $DataFile");
-                            die();
-                        }
-                        $PropriumDeSanctis = json_decode($PropriumDeSanctisRaw);
-                        if (JSON_ERROR_NONE !== json_last_error() || null === $PropriumDeSanctis) {
-                            echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
-                            die();
-                        }
+
+                        $PropriumDeSanctis = Utilities::jsonFileToObject($missalDataFile);
                         foreach ($PropriumDeSanctis as $liturgicalEvent) {
                             $key     = $liturgicalEvent->event_key;
                             $grade   = LitGrade::from($liturgicalEvent->grade);
@@ -757,6 +703,9 @@ final class EventsPath
                             self::$LiturgicalEventCollection[$key]['grade_lcl']  = LitGrade::i18n($grade, $this->EventsParams->baseLocale, false);
                             self::$LiturgicalEventCollection[$key]['common_lcl'] = self::localizeCommons($commons, $this->EventsParams->baseLocale);
                             self::$LiturgicalEventCollection[$key]['missal']     = $missal;
+                            if ($names !== null && array_key_exists($key, $names)) {
+                                self::$LiturgicalEventCollection[$key]['name'] = $names[$key];
+                            }
                         }
                     }
                 }
@@ -785,20 +734,8 @@ final class EventsPath
                     '{locale}'  => $this->EventsParams->Locale
                 ]
             );
-            if (false === file_exists($DiocesanCalendarI18nFile) || false === is_readable($DiocesanCalendarI18nFile)) {
-                echo self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find resource file $DiocesanCalendarI18nFile or it is not readable");
-                die();
-            }
-            $DiocesanCalendarI18nDataRaw = file_get_contents($DiocesanCalendarI18nFile);
-            if (false === $DiocesanCalendarI18nDataRaw) {
-                echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not read resource file $DiocesanCalendarI18nFile");
-                die();
-            }
-            $DiocesanCalendarI18nData = json_decode($DiocesanCalendarI18nDataRaw, true);
-            if (JSON_ERROR_NONE !== json_last_error() || null === $DiocesanCalendarI18nData) {
-                echo self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, json_last_error_msg());
-                die();
-            }
+
+            $DiocesanCalendarI18nData = Utilities::jsonFileToArray($DiocesanCalendarI18nFile);
 
             foreach (self::$DiocesanData->litcal as $row) {
                 $key    = $this->EventsParams->DiocesanCalendar . '_' . $row->liturgical_event->event_key;

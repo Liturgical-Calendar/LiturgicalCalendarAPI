@@ -16,7 +16,7 @@ final class WiderRegionMetadata extends AbstractJsonRepresentation
      * @param string[] $locales The locales supported by the Wider region.
      * @param string $wider_region The identifier of the Wider region.
      */
-    public function __construct(array $locales, string $wider_region)
+    private function __construct(array $locales, string $wider_region)
     {
         $this->locales      = $locales;
         $this->wider_region = $wider_region;

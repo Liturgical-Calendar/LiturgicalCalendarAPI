@@ -23,7 +23,7 @@ final class LitCalItem extends AbstractJsonSrcData
     public readonly LiturgicalEventData $liturgical_event;
     public readonly LiturgicalEventMetadata $metadata;
 
-    public function __construct(\stdClass $liturgical_event, \stdClass $metadata)
+    private function __construct(\stdClass $liturgical_event, \stdClass $metadata)
     {
         // Cases in which we would need a `name` property: createNew, makePatron, and setProperty.name
         // We no longer use the `name` property, because we have translated strings in the i18n data
@@ -42,7 +42,7 @@ final class LitCalItem extends AbstractJsonSrcData
         switch ($metadata->action) {
             case CalEventAction::MoveEvent->value:
                 $this->liturgical_event = LitCalItemMoveEvent::fromObject($liturgical_event);
-                $this->metadata         = new LitCalItemMoveEventMetadata($metadata);
+                $this->metadata         = LitCalItemMoveEventMetadata::fromObject($metadata);
                 break;
             case CalEventAction::CreateNew->value:
                 if (property_exists($liturgical_event, 'day') && property_exists($liturgical_event, 'month')) {
@@ -52,7 +52,7 @@ final class LitCalItem extends AbstractJsonSrcData
                 } else {
                     throw new \ValueError('when metadata.action is `createNew`, `liturgical_event` must have either `day` and `month` properties or `strtotime` property');
                 }
-                $this->metadata = new LitCalItemCreateNewMetadata($metadata->since_year, $metadata->until_year ?? null);
+                $this->metadata = LitCalItemCreateNewMetadata::fromObject($metadata);
                 break;
             case CalEventAction::SetProperty->value:
                 if (false === property_exists($metadata, 'property')) {
@@ -61,11 +61,11 @@ final class LitCalItem extends AbstractJsonSrcData
                 switch ($metadata->property) {
                     case 'name':
                         $this->liturgical_event = LitCalItemSetPropertyName::fromObject($liturgical_event);
-                        $this->metadata         = new LitCalItemSetPropertyNameMetadata($metadata);
+                        $this->metadata         = LitCalItemSetPropertyNameMetadata::fromObject($metadata);
                         break;
                     case 'grade':
                         $this->liturgical_event = LitCalItemSetPropertyGrade::fromObject($liturgical_event);
-                        $this->metadata         = new LitCalItemSetPropertyGradeMetadata($metadata);
+                        $this->metadata         = LitCalItemSetPropertyGradeMetadata::fromObject($metadata);
                         break;
                     default:
                         throw new \ValueError('when metadata.action is `setProperty`, the metadata `property` property must be either `name` or `grade`');
@@ -73,13 +73,30 @@ final class LitCalItem extends AbstractJsonSrcData
                 break;
             case CalEventAction::MakePatron->value:
                 $this->liturgical_event = LitCalItemMakePatron::fromObject($liturgical_event);
-                $this->metadata         = new LitCalItemMakePatronMetadata($metadata);
+                $this->metadata         = LitCalItemMakePatronMetadata::fromObject($metadata);
                 break;
             default:
                 throw new \ValueError('metadata.action must be one of `moveFestivity`, `createNew`, `setProperty` or `makePatron`');
         }
     }
 
+    /**
+     * Creates a new instance of LitCalItem from an associative array.
+     *
+     * The associative array must have the following keys:
+     * - `liturgical_event`: The data for the liturgical event.
+     * - `metadata`: The metadata for the liturgical event.
+     *
+     * The `metadata` key must have an `action` key with a valid value of one of the following:
+     * - `moveFestivity`
+     * - `createNew`
+     * - `setProperty`
+     * - `makePatron`
+     *
+     * @param \stdClass $data The associative array containing the data for the liturgical event.
+     * @return static A new instance of LitCalItem.
+     * @throws \ValueError If the required properties are not present in the associative array or if the properties have invalid types.
+     */
     protected static function fromObjectInternal(\stdClass $data): static
     {
         if (false === property_exists($data, 'liturgical_event') || false === property_exists($data, 'metadata')) {
@@ -93,6 +110,29 @@ final class LitCalItem extends AbstractJsonSrcData
         return new static($data->liturgical_event, $data->metadata);
     }
 
+    /**
+     * Creates a new instance from an array.
+     *
+     * @param array{liturgical_event:array{event_key:string,name:string,grade:int,color:string[],common:string[],day?:int,month?:int,strtotime?:string},metadata:array{action:string,since_year:int|null,until_year?:int|null,url?:string|null,reason?:string|null,property?:string|null,url_lang_map?:array<string,string>}} $data The data to use to create the new instance.
+     *                      Must have the following keys:
+     *                          - `liturgical_event`: The liturgical event data. Must have the following keys:
+     *                              -> `event_key`: The event key.
+     *                              -> `name`: The name of the liturgical event.
+     *                              -> `grade`: The grade of the liturgical event.
+     *                              -> `color`: The color of the liturgical event.
+     *                              -> `common`: The common of the liturgical event.
+     *                              May have either `day` and `month`, or `strtotime`.
+     *                          - `metadata`: The metadata for the liturgical event. Must have the following keys:
+     *                                  -> `action`: The action to take for the liturgical event.
+     *                                  -> `since_year`: The year since when the liturgical event was added.
+     *                              May have the following keys:
+     *                                  -> `url_lang_map`: The URL of the document that introduces the liturgical event for each language.
+     *                                  -> `property`: The property to set for the liturgical event.
+     *                                  -> `until_year`: The year until when the liturgical event was added.
+     *                                  -> `url`: The URL of the document that introduces the liturgical event.
+     *                                  -> `reason`: The reason why the liturgical event was introduced.
+     * @return static A new instance.
+     */
     protected static function fromArrayInternal(array $data): static
     {
         if (false === array_key_exists('liturgical_event', $data) || false === array_key_exists('metadata', $data)) {
@@ -102,8 +142,21 @@ final class LitCalItem extends AbstractJsonSrcData
         if (false === array_key_exists('action', $data['metadata'])) {
             throw new \ValueError('metadata must have an `action` property');
         }
-        $liturgicalEvent = json_decode(json_encode($data['liturgical_event']));
-        $metadata        = json_decode(json_encode($data['metadata']));
+        $liturgicalEvent = json_encode($data['liturgical_event']);
+        $metadata        = json_encode($data['metadata']);
+        if (false === $liturgicalEvent || false === $metadata) {
+            throw new \ValueError('`liturgical_event` or `metadata` parameter could not be re-encoded to JSON');
+        }
+        /** @var \stdClass */
+        $liturgicalEvent = json_decode($liturgicalEvent);
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new \ValueError('`liturgical_event` parameter could not be re-encoded to JSON: ' . json_last_error_msg());
+        }
+        /** @var \stdClass */
+        $metadata = json_decode($metadata);
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new \ValueError('`metadata` parameter could not be re-encoded to JSON: ' . json_last_error_msg());
+        }
         return new static($liturgicalEvent, $metadata);
     }
 

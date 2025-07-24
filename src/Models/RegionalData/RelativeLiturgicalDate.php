@@ -23,7 +23,7 @@ final class RelativeLiturgicalDate extends AbstractJsonSrcData
      * @param DateRelation $relative_time whether the event is before or after the relative event (e.g. 'before' or 'after')
      * @param string $event_key the key of the event to which the relative date is relative (e.g. 'Pentecost')
      */
-    public function __construct(string $day_of_the_week, DateRelation $relative_time, string $event_key)
+    private function __construct(string $day_of_the_week, DateRelation $relative_time, string $event_key)
     {
         $this->day_of_the_week = $day_of_the_week;
         $this->relative_time   = $relative_time;

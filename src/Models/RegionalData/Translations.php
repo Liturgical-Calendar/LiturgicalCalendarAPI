@@ -2,13 +2,21 @@
 
 namespace LiturgicalCalendar\Api\Models\RegionalData;
 
-final class Translations implements \IteratorAggregate, \Countable, \ArrayAccess
-{
-    /** @var array<string, TranslationMap> */
-    private readonly array $i18nData;
+use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 
-    /** @var array<string> */
-    private readonly array $keys;
+/**
+ * A class representing a collection of translations for different locales.
+ *
+ * @implements \IteratorAggregate<string,TranslationMap>
+ * @implements \ArrayAccess<string,TranslationMap>
+ */
+final class Translations extends AbstractJsonSrcData implements \IteratorAggregate, \Countable, \ArrayAccess
+{
+    /** @var array<string,TranslationMap> */
+    private array $i18nData;
+
+    /** @var string[] */
+    private array $keys;
 
     /**
      * Constructor for the Translations class.
@@ -16,13 +24,13 @@ final class Translations implements \IteratorAggregate, \Countable, \ArrayAccess
      * Initializes the object with the provided i18nData, mapping each element
      * to a TranslationMap object and storing the keys.
      *
-     * @param array<string, array<string, string>> $i18nData The i18n data to initialize the translations with,
+     * @param array<string,array<string,string>> $i18nData The i18n data to initialize the translations with,
      * where each key corresponds to a locale and each value is an array of translations.
      */
-    public function __construct(array $i18nData)
+    private function __construct(array $i18nData)
     {
         $this->keys     = array_keys($i18nData);
-        $this->i18nData = array_map(fn ($translations) => new TranslationMap($translations), $i18nData);
+        $this->i18nData = array_map(fn (array $translations) => TranslationMap::fromArray($translations), $i18nData);
     }
 
     /**
@@ -53,18 +61,13 @@ final class Translations implements \IteratorAggregate, \Countable, \ArrayAccess
      * If the offset is provided, the value will be set at that offset.
      *
      * @param mixed $offset The offset to set the value to. Can be null.
-     * @param string $value The value to set.
+     * @param TranslationMap $value The value to set.
      */
     public function offsetSet($offset, $value): void
     {
-        if (is_null($offset)) {
-            $this->i18nData[] = $value;
-            $this->keys[]     = array_key_last($this->i18nData);
-        } else {
-            $this->i18nData[$offset] = $value;
-            if (!in_array($offset, $this->keys)) {
-                $this->keys[] = $offset;
-            }
+        $this->i18nData[$offset] = $value;
+        if (!in_array($offset, $this->keys)) {
+            $this->keys[] = $offset;
         }
     }
 
@@ -98,19 +101,61 @@ final class Translations implements \IteratorAggregate, \Countable, \ArrayAccess
      * Retrieves the translation value at the given offset.
      *
      * @param mixed $offset The offset to retrieve the translation value from.
-     * @return string|null The translation value at the given offset. Null if the offset does not exist.
+     * @return TranslationMap|null The translation value at the given offset. Null if the offset does not exist.
      */
-    public function offsetGet($offset): ?string
+    public function offsetGet($offset): ?TranslationMap
     {
         return isset($this->i18nData[$offset]) ? $this->i18nData[$offset] : null;
     }
 
-    public static function fromObject(\stdClass $i18nData): static
+    /**
+     * Creates an instance of this class from an object.
+     *
+     * The object should have the same structure as the i18nData property.
+     *
+     * @param \stdClass $i18nData The object to create the instance from.
+     * @return static A new instance of this class.
+     */
+    protected static function fromObjectInternal(\stdClass $i18nData): static
     {
-        $i18nDataArray = json_decode(json_encode($i18nData), true);
-        return new static($i18nDataArray);
+        return new static(get_object_vars($i18nData));
     }
 
+    /**
+     * Creates an instance of this class from an associative array.
+     *
+     * The array should have the following structure:
+     * <code>
+     * [
+     *     'locale_1' => [
+     *         'event_key_1' => 'translation_1',
+     *         'event_key_2' => 'translation_2',
+     *         ...
+     *     ],
+     *     'locale_2' => [
+     *         'event_key_1' => 'translation_1',
+     *         'event_key_2' => 'translation_2',
+     *         ...
+     *     ],
+     *     ...
+     * ]
+     * </code>
+     *
+     * @param array<string,array<string,string>> $i18nData The associative array to create the instance from.
+     * @return static A new instance of this class.
+     */
+    protected static function fromArrayInternal(array $i18nData): static
+    {
+        return new static($i18nData);
+    }
+
+    /**
+     * Retrieves the translation for a specific event key in the given locale.
+     *
+     * @param string $event_key The key of the event to retrieve the translation for.
+     * @param string $locale The locale to retrieve the translation in.
+     * @return string|null The translated string for the given event key and locale, or null if not found.
+     */
     public function getTranslation(string $event_key, string $locale): ?string
     {
         return $this->i18nData[$locale]->offsetGet($event_key);

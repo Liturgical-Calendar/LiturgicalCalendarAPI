@@ -7,6 +7,9 @@ use LiturgicalCalendar\Api\Enum\CorpusChristi;
 use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
 
+/**
+ * @implements \IteratorAggregate<string,Epiphany|Ascension|CorpusChristi>
+ */
 final class MetadataDiocesanCalendarSettings extends AbstractJsonRepresentation implements \IteratorAggregate
 {
     public readonly ?Epiphany $epiphany;
@@ -53,9 +56,9 @@ final class MetadataDiocesanCalendarSettings extends AbstractJsonRepresentation 
     protected static function fromArrayInternal(array $data): static
     {
         return new static(
-            Epiphany::tryFrom($data['epiphany']) ?? null,
-            Ascension::tryFrom($data['ascension']) ?? null,
-            CorpusChristi::tryFrom($data['corpus_christi']) ?? null
+            array_key_exists('epiphany', $data) ? Epiphany::tryFrom($data['epiphany']) : null,
+            array_key_exists('ascension', $data) ? Ascension::tryFrom($data['ascension']) : null,
+            array_key_exists('corpus_christi', $data) ? CorpusChristi::tryFrom($data['corpus_christi']) : null
         );
     }
 
@@ -73,9 +76,9 @@ final class MetadataDiocesanCalendarSettings extends AbstractJsonRepresentation 
     protected static function fromObjectInternal(\stdClass $data): static
     {
         return new static(
-            Epiphany::tryFrom($data->epiphany) ?? null,
-            Ascension::tryFrom($data->ascension) ?? null,
-            CorpusChristi::tryFrom($data->corpus_christi) ?? null
+            property_exists($data, 'epiphany') ? Epiphany::tryFrom($data->epiphany) : null,
+            property_exists($data, 'ascension') ? Ascension::tryFrom($data->ascension) : null,
+            property_exists($data, 'corpus_christi') ? CorpusChristi::tryFrom($data->corpus_christi) : null
         );
     }
 
@@ -88,10 +91,12 @@ final class MetadataDiocesanCalendarSettings extends AbstractJsonRepresentation 
      * - ascension (Ascension|null): when Ascension is celebrated
      * - corpus_christi (CorpusChristi|null): when Corpus Christi is celebrated
      *
-     * @return \Traversable<string, Epiphany|Ascension|CorpusChristi|null> An iterator for the diocesan calendar settings.
+     * @return \Traversable<string,Epiphany|Ascension|CorpusChristi> An iterator for the diocesan calendar settings.
      */
     public function getIterator(): \Traversable
     {
-        return new \ArrayIterator($this);
+        /** @var array<string,Epiphany|Ascension|CorpusChristi> */
+        $nonNull = array_filter(get_object_vars($this), fn (Epiphany|Ascension|CorpusChristi|null $value) => $value !== null);
+        return new \ArrayIterator($nonNull);
     }
 }

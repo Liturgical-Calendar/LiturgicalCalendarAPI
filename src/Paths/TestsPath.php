@@ -98,11 +98,7 @@ final class TestsPath
                     $testSuite[] = json_decode($testContents, true);
                 }
                 $response->litcal_tests = $testSuite;
-                $responseJsonStr        = json_encode($response, JSON_PRETTY_PRINT);
-                if ($responseJsonStr === false) {
-                    return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'The Unit Tests you are attempting to retrieve could not be processed as valid JSON: ' . json_last_error_msg());
-                }
-                return $responseJsonStr;
+                return json_encode($response, JSON_PRETTY_PRINT);
             } catch (\UnexpectedValueException $e) {
                 return self::produceErrorResponse(StatusCode::NOT_FOUND, 'Tests folder path cannot be opened: ' . $e->getMessage());
             }
@@ -143,11 +139,7 @@ final class TestsPath
                     $message           = new \stdClass();
                     $message->status   = 'OK';
                     $message->response = 'Resource Deleted';
-                    $messageJsonStr    = json_encode($message, JSON_PRETTY_PRINT);
-                    if ($messageJsonStr === false) {
-                        return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'The response that the API is attempting to send could not be processed as valid JSON: ' . json_last_error_msg());
-                    }
-                    return $messageJsonStr;
+                    return json_encode($message, JSON_PRETTY_PRINT);
                 } else {
                     return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "For some reason the server did not succeed in deleting the Test $testName");
                 }
@@ -217,11 +209,7 @@ final class TestsPath
             $message           = new \stdClass();
             $message->status   = 'OK';
             $message->response = self::$Core->getRequestMethod() === RequestMethod::PUT ? 'Resource Created' : 'Resource Updated';
-            $messageJsonStr    = json_encode($message, JSON_PRETTY_PRINT);
-            if ($messageJsonStr === false) {
-                return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'The response that the API is attempting to send could not be processed as valid JSON: ' . json_last_error_msg());
-            }
-            return $messageJsonStr;
+            return json_encode($message, JSON_PRETTY_PRINT);
         }
     }
 
@@ -298,11 +286,7 @@ final class TestsPath
         }
         $message->response    = $statusCode === 404 ? 'Resource not Found' : $statusMessage;
         $message->description = $description;
-        $messageJsonStr       = json_encode($message, JSON_PRETTY_PRINT);
-        if ($messageJsonStr === false) {
-            return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'The response that the API is attempting to send could not be processed as valid JSON: ' . json_last_error_msg());
-        }
-        return $messageJsonStr;
+        return json_encode($message, JSON_PRETTY_PRINT);
     }
 
     /**

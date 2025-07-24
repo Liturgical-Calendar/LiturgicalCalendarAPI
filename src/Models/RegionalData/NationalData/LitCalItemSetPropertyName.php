@@ -6,7 +6,7 @@ use LiturgicalCalendar\Api\Models\RegionalData\LiturgicalEventData;
 
 final class LitCalItemSetPropertyName extends LiturgicalEventData
 {
-    public function __construct(string $event_key, string $name)
+    private function __construct(string $event_key, string $name)
     {
         parent::__construct($event_key);
         $this->name = $name;

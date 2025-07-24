@@ -6,6 +6,9 @@ use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarSettings;
 use LiturgicalCalendar\Api\Models\RegionalData\Translations;
 
+/**
+ * @phpstan-import-type LiturgicalEventItem from \LiturgicalCalendar\Api\Paths\EventsPath
+ */
 final class DiocesanData extends AbstractJsonSrcData
 {
     public readonly DiocesanLitCalItemCollection $litcal;
@@ -14,9 +17,9 @@ final class DiocesanData extends AbstractJsonSrcData
 
     public readonly ?MetadataDiocesanCalendarSettings $settings;
 
-    public readonly ?Translations $i18n;
+    public Translations $i18n;
 
-    public function __construct(
+    private function __construct(
         DiocesanLitCalItemCollection $litcal,
         DiocesanMetadata $metadata,
         ?MetadataDiocesanCalendarSettings $settings = null,
@@ -25,8 +28,10 @@ final class DiocesanData extends AbstractJsonSrcData
         $this->litcal   = $litcal;
         $this->metadata = $metadata;
         $this->settings = $settings;
+
         if (null !== $i18n) {
-            $this->loadTranslations($i18n);
+            $this->validateTranslations($i18n);
+            $this->i18n = Translations::fromObject($i18n);
         }
     }
 
@@ -46,14 +51,32 @@ final class DiocesanData extends AbstractJsonSrcData
      */
     public function loadTranslations(\stdClass $i18n): void
     {
+        $this->validateTranslations($i18n);
+        $this->unlock();
+        $this->i18n = Translations::fromObject($i18n);
+        $this->lock();
+    }
+
+    /**
+     * Validates the i18n parameter to ensure its keys match the metadata locales.
+     *
+     * This function extracts the keys from the provided i18n object, sorts them,
+     * and compares them to the sorted values of the metadata.locales. If they do
+     * not match, a ValueError is thrown.
+     *
+     * @param \stdClass $i18n The translations object whose keys need to be validated.
+     *
+     * @throws \ValueError If the keys of the i18n parameter do not match the values
+     *                     of metadata.locales.
+     */
+    private function validateTranslations(\stdClass $i18n): void
+    {
         /** @var string[] $i18nProps */
         $i18nProps = array_keys(get_object_vars($i18n));
         sort($i18nProps);
         if (implode(',', $i18nProps) !== implode(',', $this->metadata->locales)) {
             throw new \ValueError('keys of i18n parameter must be the same as the values of metadata.locales');
         }
-
-        $this->i18n = Translations::fromObject($i18n);
     }
 
     /**
@@ -64,7 +87,7 @@ final class DiocesanData extends AbstractJsonSrcData
      *
      * @param string $locale The locale to use for retrieving translations.
      *
-     * @throws ValueError if a translation is not available for a given event key.
+     * @throws \ValueError if a translation is not available for a given event key.
      */
     public function applyTranslations(string $locale): void
     {
@@ -103,16 +126,18 @@ final class DiocesanData extends AbstractJsonSrcData
      * - settings (array|null): The settings for the diocesan calendar.
      * - i18n (array|null): The translations for the diocesan calendar.
      *
-     * @param array{litcal:array,metadata:array,settings:array|null,i18n:array|null} $data
+     * @param array{litcal:LiturgicalEventItem[],metadata:array{diocese_id:string,diocese_name:string,nation:string,locales:string[],timezone:string,group?:string},settings:array<string,string>|null,i18n:array<string,string>|null} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
     {
+        /** @var \stdClass|null $i18n */
+        $i18n = is_null($data['i18n']) ? null : (object) $data['i18n'];
         return new static(
             DiocesanLitCalItemCollection::fromArray($data['litcal']),
             DiocesanMetadata::fromArray($data['metadata']),
             null !== $data['settings'] ? MetadataDiocesanCalendarSettings::fromArray($data['settings']) : null,
-            $data['i18n'] ?? null
+            $i18n
         );
     }
 
@@ -133,7 +158,7 @@ final class DiocesanData extends AbstractJsonSrcData
         return new static(
             DiocesanLitCalItemCollection::fromArray($data->litcal),
             DiocesanMetadata::fromObject($data->metadata),
-            property_exists($data, 'settings') && is_object($data->settings) ? MetadataDiocesanCalendarSettings::fromObject($data->settings) : null,
+            property_exists($data, 'settings') && $data->settings instanceof \stdClass ? MetadataDiocesanCalendarSettings::fromObject($data->settings) : null,
             $data->i18n ?? null
         );
     }

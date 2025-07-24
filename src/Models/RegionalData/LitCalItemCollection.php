@@ -4,8 +4,17 @@ namespace LiturgicalCalendar\Api\Models\RegionalData;
 
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 
-class LitCalItemCollection extends AbstractJsonSrcData implements \IteratorAggregate
+/**
+ * Represents a collection of liturgical calendar items.
+ *
+ * This class extends AbstractJsonSrcData and implements IteratorAggregate to provide iteration over the items in the collection.
+ *
+ * @implements \IteratorAggregate<LitCalItem>
+ * @phpstan-import-type LiturgicalEventItem from \LiturgicalCalendar\Api\Paths\EventsPath
+ */
+final class LitCalItemCollection extends AbstractJsonSrcData implements \IteratorAggregate
 {
+    /** @var array<LitCalItem> */
     public readonly array $litcalItems;
 
     /**
@@ -16,7 +25,7 @@ class LitCalItemCollection extends AbstractJsonSrcData implements \IteratorAggre
      *
      * @param array<LitCalItem> $litcalItems An array of liturgical calendar items.
      */
-    public function __construct(array $litcalItems)
+    private function __construct(array $litcalItems)
     {
         $this->litcalItems = $litcalItems;
     }
@@ -32,13 +41,15 @@ class LitCalItemCollection extends AbstractJsonSrcData implements \IteratorAggre
 
     protected static function fromArrayInternal(array $data): static
     {
-        if (false === is_array($data) || 0 === count($data)) {
+        if (0 === count($data)) {
             throw new \TypeError('litcal parameter must be an array and must not be empty');
         }
-        if ($data[0] instanceof \stdClass) {
-            $items = array_map(fn ($litcalItem) => LitCalItem::fromObject($litcalItem), $data);
+        if (reset($data) instanceof \stdClass) {
+            /** @var array<\stdClass> $data */
+            $items = array_values(array_map(fn (\stdClass $litcalItem): LitCalItem => LitCalItem::fromObject($litcalItem), $data));
         } else {
-            $items = array_map(fn ($litcalItem) => LitCalItem::fromArray($litcalItem), $data);
+            /** @var array<LiturgicalEventItem> $data */
+            $items = array_values(array_map(fn (array $litcalItem): LitCalItem => LitCalItem::fromArray($litcalItem), $data));
         }
         return new static($items);
     }

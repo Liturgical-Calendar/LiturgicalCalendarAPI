@@ -4,10 +4,16 @@ namespace LiturgicalCalendar\Api\Models\RegionalData;
 
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 
+/**
+ * Represents a map from ISO 639-1 language codes to custom Vatican website language codes
+ * as used in the Vatican URLs.
+ *
+ * @implements \ArrayAccess<string,string>
+ */
 final class UrlLangMap extends AbstractJsonSrcData implements \ArrayAccess
 {
-    /** @var array<string, string> */
-    public readonly array $url_lang_map;
+    /** @var array<string,string> */
+    public array $url_lang_map;
 
     /**
      * A locale code mapping for dealing with Vatican URLs that use non standard
@@ -16,9 +22,9 @@ final class UrlLangMap extends AbstractJsonSrcData implements \ArrayAccess
      * The keys are the ISO 639-1 language codes and the values are the custom Vatican website language codes
      * as used in the Vatican URLs.
      *
-     * @param array<string, string> $url_lang_map The ISO 639-1 language code to custom Vatican website language code map
+     * @param array<string,string> $url_lang_map The ISO 639-1 language code to custom Vatican website language code map
      */
-    public function __construct(array $url_lang_map)
+    private function __construct(array $url_lang_map)
     {
         $this->url_lang_map = $url_lang_map;
     }
@@ -79,7 +85,8 @@ final class UrlLangMap extends AbstractJsonSrcData implements \ArrayAccess
         } elseif (array_key_exists('en', $this->url_lang_map)) {
             return $this->url_lang_map['en'];
         } else {
-            return reset($this->url_lang_map);
+            $firstLang = reset($this->url_lang_map);
+            return is_string($firstLang) ? $firstLang : $baseLocale;
         }
     }
 }

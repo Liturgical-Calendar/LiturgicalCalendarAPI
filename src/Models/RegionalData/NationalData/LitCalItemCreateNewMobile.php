@@ -19,7 +19,6 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
 
     public private(set) LitGrade $grade;
 
-    /** @var LitCommons */
     public readonly LitCommons $common;
 
     public readonly LitEventType $type;
@@ -29,16 +28,16 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
     /**
      * @param string $event_key The key of the liturgical event.
      * @param string|RelativeLiturgicalDate $strtotime A strtotime string or an object representing a RelativeLiturgicalDate.
-     * @param array $color An array of LitColor enum cases.
+     * @param LitColor[] $color An array of LitColor enum cases.
      * @param LitGrade $grade The liturgical grade of the event.
      * @param LitCommons $common The liturgical commons of the event.
      *
-     * @throws ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
+     * @throws \ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
      */
-    public function __construct(string $event_key, string|RelativeLiturgicalDate $strtotime, array $color, LitGrade $grade, LitCommons $common)
+    private function __construct(string $event_key, string|RelativeLiturgicalDate $strtotime, array $color, LitGrade $grade, LitCommons $common)
     {
 
-        if (false === is_array($color) || 0 === count($color)) {
+        if (0 === count($color)) {
             throw new \ValueError('`$color` must be an array with at least one element');
         }
 
@@ -127,7 +126,7 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
      * - grade (integer): The liturgical grade of the event.
      * - common (array): The liturgical common of the event, as an array of strings.
      *
-     * @param array<string, mixed> $data The associative array containing the properties of the class.
+     * @param array{event_key:string,strtotime:string|array{day_of_the_week:string,relative_time:string,event_key:string},color:string[],grade:int,common:string[]} $data The associative array containing the properties of the class.
      * @return static The newly created instance.
      * @throws \ValueError if the required keys are not present in the array or have invalid values.
      */

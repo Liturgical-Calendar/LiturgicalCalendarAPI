@@ -4,8 +4,6 @@ namespace LiturgicalCalendar\Api\Paths;
 
 use LiturgicalCalendar\Api\Core;
 use LiturgicalCalendar\Api\DateTime;
-use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
-use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
 use LiturgicalCalendar\Api\LatinUtils;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
@@ -28,17 +26,19 @@ use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\YearType;
 use LiturgicalCalendar\Api\Enum\JsonData;
-use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
+use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
+use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
 use LiturgicalCalendar\Api\Models\RegionalData\LitCalItem;
 use LiturgicalCalendar\Api\Models\RegionalData\LitCalItemCollection;
+use LiturgicalCalendar\Api\Models\RegionalData\RelativeLiturgicalDate;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewFixed as DiocesanLitCalItemCreateNewFixed;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewMobile as DiocesanLitCalItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemMakePatronMetadata;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemMoveEventMetadata;
-use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
-use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewFixed as DiocesanLitCalItemCreateNewFixed;
-use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewMobile as DiocesanLitCalItemCreateNewMobile;
-use LiturgicalCalendar\Api\Models\RegionalData\RelativeLiturgicalDate;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 use LiturgicalCalendar\Api\Params\CalendarParams;
 
@@ -580,38 +580,33 @@ final class CalendarPath
 
         if ($this->DiocesanData->hasSettings()) {
             foreach ($this->DiocesanData->settings as $key => $value) {
-                // phpcs:disable Generic.Formatting.MultipleStatementAlignment
                 switch ($key) {
                     case 'epiphany':
-                        $this->CalendarParams->Epiphany      = $value;
+                        /** @var Epiphany $value */
+                        $this->CalendarParams->Epiphany = $value;
                         break;
                     case 'ascension':
-                        $this->CalendarParams->Ascension     = $value;
+                        /** @var Ascension $value */
+                        $this->CalendarParams->Ascension = $value;
                         break;
                     case 'corpus_christi':
+                        /** @var CorpusChristi $value */
                         $this->CalendarParams->CorpusChristi = $value;
                         break;
                 }
-                // phpcs:enable Generic.Formatting.MultipleStatementAlignment
             }
         }
-        if (
-            property_exists($this->DiocesanData->metadata, 'locales')
-            && LitLocale::areValid($this->DiocesanData->metadata->locales)
-        ) {
-            // phpcs:disable Generic.Formatting.MultipleStatementAlignment
-            if (count($this->DiocesanData->metadata->locales) === 1) {
-                $this->CalendarParams->Locale      = $this->DiocesanData->metadata->locales[0];
-            } else {
-                // If multiple locales are available for the diocesan calendar,
-                // the desired locale should be set in the Accept-Language header.
-                // We should however check that this is an available locale for the current Diocesan Calendar,
-                // and if not use the first valid value.
-                if (false === in_array($this->CalendarParams->Locale, $this->DiocesanData->metadata->locales)) {
-                    $this->CalendarParams->Locale  = $this->DiocesanData->metadata->locales[0];
-                }
+
+        if (count($this->DiocesanData->metadata->locales) === 1) {
+            $this->CalendarParams->Locale = $this->DiocesanData->metadata->locales[0];
+        } else {
+            // If multiple locales are available for the diocesan calendar,
+            // the desired locale should be set in the Accept-Language header.
+            // We should however check that this is an available locale for the current Diocesan Calendar,
+            // and if not use the first valid value.
+            if (false === in_array($this->CalendarParams->Locale, $this->DiocesanData->metadata->locales)) {
+                $this->CalendarParams->Locale = $this->DiocesanData->metadata->locales[0];
             }
-            // phpcs:enable Generic.Formatting.MultipleStatementAlignment
         }
     }
 
@@ -684,40 +679,9 @@ final class CalendarPath
                 ]
             );
 
-            if (!file_exists($diocesanDataFile) || !is_readable($diocesanDataFile)) {
-                throw new \Exception(sprintf('Diocesan calendar data file %s does not exist or is not readable.', $diocesanDataFile));
-            }
-
-            $diocesanDataRaw = file_get_contents($diocesanDataFile);
-            if ($diocesanDataRaw === false) {
-                throw new \Exception(sprintf('Diocesan calendar data file %s could not be read.', $diocesanDataFile));
-            }
-
-            $diocesanDataJson = json_decode($diocesanDataRaw);
-            if (JSON_ERROR_NONE !== json_last_error()) {
-                throw new \Exception(sprintf('Diocesan calendar data file %s is not valid JSON: ' . json_last_error_msg(), $diocesanDataFile));
-            }
+            $diocesanDataJson = Utilities::jsonFileToObject($diocesanDataFile);
 
             $this->DiocesanData = DiocesanData::fromObject($diocesanDataJson);
-
-            if (
-                property_exists($this->DiocesanData->metadata, 'locales')
-                && LitLocale::areValid($this->DiocesanData->metadata->locales)
-            ) {
-                // phpcs:disable Generic.Formatting.MultipleStatementAlignment
-                if (count($this->DiocesanData->metadata->locales) === 1) {
-                    $this->CalendarParams->Locale      = $this->DiocesanData->metadata->locales[0];
-                } else {
-                    // If multiple locales are available for the national calendar,
-                    // the desired locale should be set in the Accept-Language header.
-                    // We should however check that this is an available locale for the current Diocesan Calendar,
-                    // and if not use the first valid value.
-                    if (false === in_array($this->CalendarParams->Locale, $this->DiocesanData->metadata->locales)) {
-                        $this->CalendarParams->Locale  = $this->DiocesanData->metadata->locales[0];
-                    }
-                }
-                // phpcs:enable Generic.Formatting.MultipleStatementAlignment
-            }
         }
     }
 
@@ -823,34 +787,16 @@ final class CalendarPath
      * If the file does not exist, or if there is an error decoding the
      * JSON data, a 503 Service Unavailable error is thrown.
      *
-     * @return array<string,string>|null The loaded data, or null if there was an error.
+     * @return array<string,string> The loaded data, or null if there was an error.
      */
-    private function loadPropriumDeTemporeI18nData(): ?array
+    private function loadPropriumDeTemporeI18nData(): array
     {
         $locale                    = LitLocale::$PRIMARY_LANGUAGE;
         $propriumDeTemporeI18nFile = strtr(
             JsonData::MISSALS_I18N_FILE,
             ['{missal_folder}' => 'propriumdetempore', '{locale}' => $locale]
         );
-        if (file_exists($propriumDeTemporeI18nFile)) {
-            $rawData               = file_get_contents($propriumDeTemporeI18nFile);
-            $PropriumDeTemporeI18n = json_decode($rawData, true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                return $PropriumDeTemporeI18n;
-            } else {
-                $message = sprintf(
-                    /**translators: Temporale refers to the Proprium de Tempore */
-                    _('There was an error trying to decode localized JSON data for the Temporale: %s'),
-                    json_last_error_msg()
-                );
-                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
-            }
-        } else {
-            /**translators: Temporale refers to the Proprium de Tempore */
-            $message = _('There was an error trying to retrieve localized data for the Temporale.');
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
-        }
-        return null;
+        return Utilities::jsonFileToArray($propriumDeTemporeI18nFile);
     }
 
     /**
@@ -862,33 +808,16 @@ final class CalendarPath
             JsonData::MISSALS_FILE,
             ['{missal_folder}' => 'propriumdetempore']
         );
-        if (file_exists($propriumDeTemporeFile)) {
-            $rawData           = file_get_contents($propriumDeTemporeFile);
-            $PropriumDeTempore = json_decode($rawData, true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $PropriumDeTemporeI18n = $this->loadPropriumDeTemporeI18nData();
-                if (null !== $PropriumDeTemporeI18n) {
-                    foreach ($PropriumDeTempore as $event) {
-                        $key = $event['event_key'];
-                        unset($event['event_key']);
-                        $this->PropriumDeTempore[$key] = [
-                            'name' => $PropriumDeTemporeI18n[$key],
-                            ...$event
-                        ];
-                    }
-                }
-            } else {
-                $message = sprintf(
-                    /**translators: Temporale refers to the Proprium de Tempore */
-                    _('There was an error trying to decode JSON data for the Temporale: %s'),
-                    json_last_error_msg()
-                );
-                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
-            }
-        } else {
-            /**translators: Temporale refers to the Proprium de Tempore */
-            $message = _('There was an error trying to retrieve data for the Temporale.');
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
+        $PropriumDeTempore     = Utilities::jsonFileToArray($propriumDeTemporeFile);
+        $PropriumDeTemporeI18n = $this->loadPropriumDeTemporeI18nData();
+        /** @var array{event_key:string,date:string,color:string[],type:string,grade:int} $event */
+        foreach ($PropriumDeTempore as $event) {
+            $key = $event['event_key'];
+            unset($event['event_key']);
+            $this->PropriumDeTempore[$key] = [
+                'name' => $PropriumDeTemporeI18n[$key],
+                ...$event
+            ];
         }
     }
 
@@ -910,15 +839,10 @@ final class CalendarPath
         // For Latin edition Missals, we must ensure that translation data is available
         if (
             str_starts_with($missal, 'EDITIO_TYPICA_')
-            && (
-                false === is_string($propriumdesanctisI18nPath)
-                || false === file_exists($propriumdesanctisI18nPath)
-                || false === is_readable($propriumdesanctisI18nPath)
-            )
+            && false === is_string($propriumdesanctisI18nPath)
         ) {
             $message = sprintf(
-                /**translators: name of the Roman Missal */
-                _('Translation data for the sanctorale from %s could not be found.'),
+                'RomanMissal enum did not give the file with Translation data for the sanctorale from %s.',
                 RomanMissal::getName($missal)
             );
             self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
@@ -927,72 +851,16 @@ final class CalendarPath
         if ($propriumdesanctisI18nPath !== false) {
             $locale                    = LitLocale::$PRIMARY_LANGUAGE;
             $propriumdesanctisI18nFile = $propriumdesanctisI18nPath . $locale . '.json';
-            if (file_exists($propriumdesanctisI18nFile) && is_readable($propriumdesanctisI18nFile)) {
-                $rawData = file_get_contents($propriumdesanctisI18nFile);
-                if (false === $rawData) {
-                    self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, sprintf('Could not read file %s', $propriumdesanctisI18nFile));
-                }
-
-                $i18nData = json_decode($rawData, true);
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    $message = sprintf(
-                        /**translators:
-                         *  do not translate 'JSON';
-                         * 'Sanctorale' refers to the Proprium de Sanctis;
-                         * 1: name of the Roman Missal
-                         * 2: error message
-                         */
-                        _('There was an error trying to decode JSON localization data for the Sanctorale for the Missal %1$s: %2$s'),
-                        RomanMissal::getName($missal),
-                        json_last_error_msg()
-                    );
-                    self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
-                }
-            } else {
-                $localeDisplayName = LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE
-                                        ? 'Latine'
-                                        : \Locale::getDisplayLanguage(LitLocale::$PRIMARY_LANGUAGE, LitLocale::$PRIMARY_LANGUAGE);
-                $message           = sprintf(
-                    /**translators: Sanctorale refers to the Proprium de Sanctis; %s = name of the Roman Missal */
-                    _('Data for the Sanctorale from %1$s could not be found or could not be read for the language "%2$s".'),
-                    RomanMissal::getName($missal),
-                    $localeDisplayName
-                );
-                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
-            }
+            $i18nData                  = Utilities::jsonFileToArray($propriumdesanctisI18nFile);
         }
 
-        if (file_exists($propriumdesanctisFile) && is_readable($propriumdesanctisFile)) {
-            $rawData = file_get_contents($propriumdesanctisFile);
-            if (false === $rawData) {
-                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, sprintf('Could not read file %s', $propriumdesanctisFile));
+        $PropriumDeSanctis      = Utilities::jsonFileToObject($propriumdesanctisFile);
+        $this->tempCal[$missal] = [];
+        foreach ($PropriumDeSanctis as $row) {
+            if ($propriumdesanctisI18nPath !== false && $i18nData !== null) {
+                $row->name = $i18nData[$row->event_key];
             }
-
-            $PropriumDeSanctis = json_decode($rawData);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $this->tempCal[$missal] = [];
-                foreach ($PropriumDeSanctis as $row) {
-                    if ($propriumdesanctisI18nPath !== false && $i18nData !== null) {
-                        $row->name = $i18nData[$row->event_key];
-                    }
-                    $this->tempCal[$missal][$row->event_key] = $row;
-                }
-            } else {
-                $message = sprintf(
-                    /**translators: Sanctorale refers to the Proprium de Sanctis;
-                     * 1: name of the Roman Missal
-                     * 2: error message
-                     */
-                    _('There was an error trying to decode JSON data for the Sanctorale for the Missal %1$s: %2$s.'),
-                    RomanMissal::getName($missal),
-                    json_last_error_msg()
-                );
-                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
-            }
-        } else {
-            /**translators: Sanctorale refers to Proprium de Sanctis */
-            $message = _('Could not find the Sanctorale data');
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
+            $this->tempCal[$missal][$row->event_key] = $row;
         }
     }
 
@@ -1010,48 +878,19 @@ final class CalendarPath
             JsonData::DECREES_I18N_FILE,
             ['{locale}' => $locale]
         );
-        $NAME            = null;
 
-        if (file_exists($decreesI18nFile)) {
-            $rawData = file_get_contents($decreesI18nFile);
-            $NAME    = json_decode($rawData, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                $message = sprintf(
-                    _('There was an error trying to decode translation data for Memorials based on Decrees of the Congregation for Divine Worship: %s'),
-                    json_last_error_msg()
-                );
-                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
-            }
-        } else {
-            $message = _('Could not find translation data for Memorials based on Decrees of the Congregation for Divine Worship');
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
-        }
+        $names   = Utilities::jsonFileToArray($decreesI18nFile);
+        $decrees = Utilities::jsonFileToObject(JsonData::DECREES_FILE);
 
-        if (file_exists(JsonData::DECREES_FILE)) {
-            $decreesRawData = file_get_contents(JsonData::DECREES_FILE);
-            $decrees        = json_decode($decreesRawData);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                $message = sprintf(
-                    _('There was an error trying to decode JSON data for Memorials based on Decrees of the Congregation for Divine Worship: %s'),
-                    json_last_error_msg()
-                );
-                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
-            } else {
-                $this->tempCal['MEMORIALS_FROM_DECREES'] = [];
-                foreach ($decrees as $decree) {
-                    if (
-                        (
-                            $decree->metadata->action === 'createNew'
-                            ||
-                            ($decree->metadata->action === 'setProperty' && $decree->metadata->property === 'name' )
-                        )
-                        && $NAME !== null
-                    ) {
-                        $decree->liturgical_event->name = $NAME[$decree->liturgical_event->event_key];
-                    }
-                    $this->tempCal['MEMORIALS_FROM_DECREES'][$decree->liturgical_event->event_key] = $decree;
-                }
+        $this->tempCal['MEMORIALS_FROM_DECREES'] = [];
+        foreach ($decrees as $decree) {
+            if (
+                $decree->metadata->action === 'createNew'
+                || ($decree->metadata->action === 'setProperty' && $decree->metadata->property === 'name' )
+            ) {
+                $decree->liturgical_event->name = $names[$decree->liturgical_event->event_key];
             }
+            $this->tempCal['MEMORIALS_FROM_DECREES'][$decree->liturgical_event->event_key] = $decree;
         }
     }
 
@@ -3262,20 +3101,7 @@ final class CalendarPath
             ['{wider_region}' => $this->NationalData->metadata->wider_region]
         );
 
-        if (!file_exists($widerRegionDataFile) || !is_readable($widerRegionDataFile)) {
-            throw new \Exception(sprintf('Error: Wider Region data file %s does not exist or is not readable.', $widerRegionDataFile));
-        }
-
-        $widerRegionDataRaw = file_get_contents($widerRegionDataFile);
-        if (false === $widerRegionDataRaw) {
-            throw new \Exception(sprintf('Error retrieving Wider Region data from file %s.', $widerRegionDataFile));
-        }
-
-        $widerRegionDataJson = json_decode($widerRegionDataRaw);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception(sprintf('Error decoding Wider Region data from file %s: ' . json_last_error_msg(), $widerRegionDataFile));
-        }
-
+        $widerRegionDataJson   = Utilities::jsonFileToObject($widerRegionDataFile);
         $this->WiderRegionData = WiderRegionData::fromObject($widerRegionDataJson);
     }
 
@@ -3299,21 +3125,7 @@ final class CalendarPath
             [ '{nation}' => $this->CalendarParams->NationalCalendar ]
         );
 
-        if (false === file_exists($NationalDataFile) || false === is_readable($NationalDataFile)) {
-            throw new \Exception(sprintf('National calendar data file %s does not exist or is not readable.', $NationalDataFile));
-        }
-
-        $nationalDataRaw = file_get_contents($NationalDataFile);
-
-        if (false === $nationalDataRaw) {
-            throw new \Exception(sprintf('National calendar data file %s could not be read.', $NationalDataFile));
-        }
-
-        $nationalDataJson = json_decode($nationalDataRaw);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception(sprintf('National calendar data file %s does not contain valid JSON: %s', $NationalDataFile, json_last_error_msg()));
-        }
-
+        $nationalDataJson   = Utilities::jsonFileToObject($NationalDataFile);
         $this->NationalData = NationalData::fromObject($nationalDataJson);
 
         if (count($this->NationalData->metadata->locales) === 1) {
@@ -4512,8 +4324,16 @@ final class CalendarPath
         $returnObj          = new \stdClass();
         $ghReleaseCacheFile = $this->CachePath . 'GHRelease' . $this->CacheDuration . '.json';
 
-        if (file_exists($ghReleaseCacheFile)) {
-            $ghReleaseJsonStr  = file_get_contents($ghReleaseCacheFile);
+        if (file_exists($ghReleaseCacheFile) && is_readable($ghReleaseCacheFile)) {
+            $ghReleaseJsonStr = file_get_contents($ghReleaseCacheFile);
+            if (false === $ghReleaseJsonStr) {
+                $message = sprintf(
+                    'Could not read cache file: %s.',
+                    $ghReleaseCacheFile
+                );
+                header('Content-Type: text/html; charset=utf-8');
+                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
+            }
             $GitHubReleasesObj = json_decode($ghReleaseJsonStr);
         } else {
             // We always create a cache of the Github Release, even for localhost development,
@@ -4556,6 +4376,7 @@ final class CalendarPath
             $returnObj->status  = 'error';
             $returnObj->message = json_last_error_msg();
         } else {
+            /** @var \stdClass $GitHubReleasesObj */
             $returnObj->status = 'success';
             $returnObj->obj    = $GitHubReleasesObj;
         }
@@ -4754,11 +4575,6 @@ final class CalendarPath
                 $response = json_encode($SerializeableLitCal);
                 break;
             case ReturnType::XML:
-                // first convert the Object to an Array
-                $jsonStr = json_encode($SerializeableLitCal);
-                $jsonObj = json_decode($jsonStr, true);
-
-                // then create an XML representation from the Array
                 $ns             = 'http://www.bibleget.io/catholicliturgy';
                 $schemaLocation = API_BASE_PATH . '/' . JsonData::SCHEMAS_FOLDER . '/LiturgicalCalendar.xsd';
                 $xml            = new \SimpleXMLElement(
@@ -4766,8 +4582,14 @@ final class CalendarPath
                     . " xsi:schemaLocation=\"$ns $schemaLocation\""
                     . " xmlns=\"$ns\"/>"
                 );
-                Utilities::convertArray2XML($jsonObj, $xml);
+
+                $jsonArr = Utilities::objectToArray($SerializeableLitCal);
+                Utilities::convertArray2XML($jsonArr, $xml);
                 $rawXML = $xml->asXML(); //this gives us non pretty XML, basically a single long string
+                if (false === $rawXML) {
+                    $message = _('Error converting Liturgical Calendar to XML.');
+                    self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
+                }
 
                 // finally let's pretty print the XML to make the cached file more readable
                 $dom                     = new \DOMDocument();
@@ -4779,12 +4601,8 @@ final class CalendarPath
                 $response = $dom->saveXML();
                 break;
             case ReturnType::YAML:
-                // first convert the Object to an Array
-                $jsonStr = json_encode($SerializeableLitCal);
-                $jsonObj = json_decode($jsonStr, true);
-
-                // then create a YAML representation from the Array
-                $response = yaml_emit($jsonObj, YAML_UTF8_ENCODING);
+                $jsonArr  = Utilities::objectToArray($SerializeableLitCal);
+                $response = yaml_emit($jsonArr, YAML_UTF8_ENCODING);
                 break;
             case ReturnType::ICS:
                 $infoObj = $this->getGithubReleaseInfo();
@@ -4805,9 +4623,20 @@ final class CalendarPath
                 $response = json_encode($SerializeableLitCal);
         }
 
+        if (false === $response) {
+            $message = _('Error serializing Liturgical Calendar.');
+            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $message);
+        }
+
+        /**
+         * at this point we are sure that the response is not null, and is not false
+         * @var string $response
+         */
+
         if (false === Router::isLocalhost()) {
             file_put_contents($this->CacheFile, $response);
         }
+
         $responseHash = md5($response);
 
         $this->endTime = hrtime(true);
@@ -4939,20 +4768,7 @@ final class CalendarPath
                 ]
             );
 
-            if (false === file_exists($DiocesanDataI18nFile) || false === is_readable($DiocesanDataI18nFile)) {
-                throw new \Exception(sprintf('Diocesan calendar data file %s does not exist or is not readable.', $DiocesanDataI18nFile));
-            }
-
-            $DiocesanDataI18nFileRaw = file_get_contents($DiocesanDataI18nFile);
-            if (false === $DiocesanDataI18nFileRaw) {
-                throw new \Exception(sprintf('Diocesan calendar data file %s could not be read.', $DiocesanDataI18nFile));
-            }
-
-            $DiocesanDataI18nJson = json_decode($DiocesanDataI18nFileRaw, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \Exception(sprintf('Diocesan calendar data file %s does not contain valid JSON: %s', $DiocesanDataI18nFile, json_last_error_msg()));
-            }
-
+            $DiocesanDataI18nJson = Utilities::jsonFileToArray($DiocesanDataI18nFile);
             $this->DiocesanData->setNames($DiocesanDataI18nJson);
         }
 
@@ -4965,20 +4781,7 @@ final class CalendarPath
                 ]
             );
 
-            if (false === file_exists($NationalDataI18nFile) || false === is_readable($NationalDataI18nFile)) {
-                throw new \Exception(sprintf('National calendar data file %s does not exist or is not readable.', $NationalDataI18nFile));
-            }
-
-            $NationalDataI18nFileRaw = file_get_contents($NationalDataI18nFile);
-            if (false === $NationalDataI18nFileRaw) {
-                throw new \Exception(sprintf('National calendar data file %s could not be read.', $NationalDataI18nFile));
-            }
-
-            $NationalDataI18nJson = json_decode($NationalDataI18nFileRaw, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \Exception(sprintf('National calendar data file %s does not contain valid JSON: %s', $NationalDataI18nFile, json_last_error_msg()));
-            }
-
+            $NationalDataI18nJson = Utilities::jsonFileToArray($NationalDataI18nFile);
             $this->NationalData->setNames($NationalDataI18nJson);
         }
 
@@ -4991,20 +4794,7 @@ final class CalendarPath
                 ]
             );
 
-            if (false === file_exists($WiderRegionDataI18nFile) || false === is_readable($WiderRegionDataI18nFile)) {
-                throw new \Exception(sprintf('Wider region data file %s does not exist or is not readable.', $WiderRegionDataI18nFile));
-            }
-
-            $WiderRegionDataI18nFileRaw = file_get_contents($WiderRegionDataI18nFile);
-            if (false === $WiderRegionDataI18nFileRaw) {
-                throw new \Exception(sprintf('Wider region data file %s could not be read.', $WiderRegionDataI18nFile));
-            }
-
-            $WiderRegionDataI18nJson = json_decode($WiderRegionDataI18nFileRaw, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \Exception(sprintf('Wider region data file %s does not contain valid JSON: %s', $WiderRegionDataI18nFile, json_last_error_msg()));
-            }
-
+            $WiderRegionDataI18nJson = Utilities::jsonFileToArray($WiderRegionDataI18nFile);
             $this->WiderRegionData->setNames($WiderRegionDataI18nJson);
         }
     }

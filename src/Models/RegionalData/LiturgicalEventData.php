@@ -11,7 +11,7 @@ abstract class LiturgicalEventData extends AbstractJsonSrcData
 
     public string $name;
 
-    public function __construct(string $event_key)
+    protected function __construct(string $event_key)
     {
         $this->event_key = $event_key;
     }

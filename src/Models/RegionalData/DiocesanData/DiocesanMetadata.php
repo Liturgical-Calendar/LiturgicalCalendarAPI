@@ -2,6 +2,7 @@
 
 namespace LiturgicalCalendar\Api\Models\RegionalData\DiocesanData;
 
+use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 
 final class DiocesanMetadata extends AbstractJsonSrcData
@@ -24,7 +25,7 @@ final class DiocesanMetadata extends AbstractJsonSrcData
      * @param array<string> $locales The locales supported by the diocese.
      * @param string $timezone The timezone for the diocese.
      */
-    public function __construct(string $nation, string $diocese_id, string $diocese_name, array $locales, string $timezone)
+    private function __construct(string $nation, string $diocese_id, string $diocese_name, array $locales, string $timezone)
     {
         $this->nation       = $nation;
         $this->diocese_id   = $diocese_id;
@@ -58,18 +59,27 @@ final class DiocesanMetadata extends AbstractJsonSrcData
         if (!isset($data['locales']) || 0 === count($data['locales'])) {
             throw new \TypeError('locales parameter must be an array and must not be empty');
         }
+
         if (false === isset($data['nation']) || false === is_string($data['nation'])) {
             throw new \TypeError('nation parameter must set and must be of type string');
         }
+
         if (false === isset($data['diocese_id']) || false === is_string($data['diocese_id'])) {
             throw new \TypeError('diocese_id parameter must be set and must be of type string');
         }
+
         if (false === isset($data['diocese_name']) || false === is_string($data['diocese_name'])) {
             throw new \TypeError('diocese_name parameter must be set and must be of type string');
         }
+
         if (false === isset($data['timezone']) || false === is_string($data['timezone'])) {
             throw new \TypeError('timezone parameter must be set and must be of type string');
         }
+
+        if (false === LitLocale::areValid($data['locales'])) {
+            throw new \TypeError('locales parameter must contain valid locale strings supported by the current server: ' . implode(', ', LitLocale::getSupportedLocales()));
+        }
+
         return new static(
             $data['nation'],
             $data['diocese_id'],
@@ -97,18 +107,27 @@ final class DiocesanMetadata extends AbstractJsonSrcData
         if (!isset($data->locales) || 0 === count($data->locales)) {
             throw new \TypeError('locales parameter must be an array and must not be empty');
         }
+
         if (false === isset($data->nation) || false === is_string($data->nation)) {
             throw new \TypeError('nation parameter must set and must be of type string');
         }
+
         if (false === isset($data->diocese_id) || false === is_string($data->diocese_id)) {
             throw new \TypeError('diocese_id parameter must be set and must be of type string');
         }
+
         if (false === isset($data->diocese_name) || false === is_string($data->diocese_name)) {
             throw new \TypeError('diocese_name parameter must be set and must be of type string');
         }
+
         if (false === isset($data->timezone) || false === is_string($data->timezone)) {
             throw new \TypeError('timezone parameter must be set and must be of type string');
         }
+
+        if (false === LitLocale::areValid($data->locales)) {
+            throw new \TypeError('locales parameter must contain valid locale strings supported by the current server: ' . implode(', ', LitLocale::getSupportedLocales()));
+        }
+
         return new static(
             $data->nation,
             $data->diocese_id,
