@@ -3,7 +3,7 @@
 namespace LiturgicalCalendar\Api\Models\RegionalData\NationalData;
 
 use LiturgicalCalendar\Api\Enum\CalEventAction;
-use LiturgicalCalendar\Api\Models\RegionalData\LiturgicalEventMetadata;
+use LiturgicalCalendar\Api\Models\LiturgicalEventMetadata;
 
 final class LitCalItemSetPropertyNameMetadata extends LiturgicalEventMetadata
 {
@@ -22,14 +22,11 @@ final class LitCalItemSetPropertyNameMetadata extends LiturgicalEventMetadata
     /**
      * Create a new instance of the class from an object containing the required properties.
      *
-     * @param \stdClass $data
-     *     The object containing the required properties.
+     * @param \stdClass $data The object containing the required properties.
      *
-     * @return static
-     *     A new instance of the class.
+     * @return static A new instance of the class.
      *
-     * @throws \ValueError
-     *     If the object does not contain the required properties.
+     * @throws \ValueError If the object does not contain the required properties.
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {

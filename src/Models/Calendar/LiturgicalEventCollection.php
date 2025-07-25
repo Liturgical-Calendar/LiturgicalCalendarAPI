@@ -27,6 +27,9 @@ use LiturgicalCalendar\Api\Map\WeekdaysEpiphanyMap;
 use LiturgicalCalendar\Api\Map\SuppressedEventsMap;
 use LiturgicalCalendar\Api\Map\ReinstatedEventsMap;
 
+/**
+ * Represents the collections of liturgical events that will be output in a final liturgical calendar.
+ */
 final class LiturgicalEventCollection
 {
     /** @var LiturgicalEventsMap<string, LiturgicalEvent> */
@@ -184,7 +187,7 @@ final class LiturgicalEventCollection
      */
     public static function dateIsSunday(DateTime $dt): bool
     {
-        return (int)$dt->format('N') === 7;
+        return (int) $dt->format('N') === 7;
     }
 
     /**
@@ -195,7 +198,7 @@ final class LiturgicalEventCollection
      */
     public static function dateIsNotSunday(DateTime $dt): bool
     {
-        return (int)$dt->format('N') !== 7;
+        return (int) $dt->format('N') !== 7;
     }
 
     /**
@@ -780,7 +783,7 @@ final class LiturgicalEventCollection
                 );
 
                 if (
-                    ($namedTypeCondition || $unionTypeCondition)
+                    ( $namedTypeCondition || $unionTypeCondition )
                     && $litEvent->{$property} !== $newValue
                 ) {
                     $litEvent->{$property} = $newValue;
@@ -1422,7 +1425,7 @@ final class LiturgicalEventCollection
         } else {
             // DEBUG START
             $isSunday = self::dateIsSunday($currentLitEventDate);
-            $msg      = 'Is Sunday? ' . ($isSunday ? 'yes' : 'no');
+            $msg      = 'Is Sunday? ' . ( $isSunday ? 'yes' : 'no' );
             $msg     .= "\n" . print_r($this->getCalEventsFromDate($currentLitEventDate), true);
             throw new \Exception('No liturgical event found for ' . $currentLitEventDate->format('Y-m-d') . ', coinciding event key: ' . $key . ".\n" . $msg);
             // DEBUG END

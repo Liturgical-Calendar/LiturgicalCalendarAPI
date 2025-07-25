@@ -3,7 +3,7 @@
 namespace LiturgicalCalendar\Api\Models\RegionalData\NationalData;
 
 use LiturgicalCalendar\Api\Enum\CalEventAction;
-use LiturgicalCalendar\Api\Models\RegionalData\LiturgicalEventMetadata;
+use LiturgicalCalendar\Api\Models\LiturgicalEventMetadata;
 use LiturgicalCalendar\Api\Models\RegionalData\UrlLangMap;
 
 final class LitCalItemMakePatronMetadata extends LiturgicalEventMetadata
@@ -52,6 +52,7 @@ final class LitCalItemMakePatronMetadata extends LiturgicalEventMetadata
      *
      * @throws \ValueError If `metadata.since_year` parameter is missing.
      * @throws \ValueError If `data.url` parameter is not a string or is not a valid url.
+     * @return static The new instance(s).
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {

@@ -27,6 +27,25 @@ final class WiderRegionMetadata extends AbstractJsonRepresentation
         return get_object_vars($this);
     }
 
+    /**
+     * Creates an instance of WiderRegionMetadata from an associative array.
+     *
+     * Validates the structure of the provided array to ensure that it contains
+     * the required keys: 'locales' and 'wider_region'. Each of these keys must
+     * map to a non-empty array and a string, respectively. If any key is missing
+     * or does not meet the criteria, an appropriate error is thrown.
+     *
+     * @param array{locales:string[],wider_region:string} $data The associative array containing the data for the
+     *                     WiderRegionMetadata instance. It must include:
+     *                     - 'locales': An array of locales supported by the Wider region.
+     *                     - 'wider_region': A string representing the identifier of the Wider region.
+     *
+     * @return static A new instance of WiderRegionMetadata initialized with the
+     *                provided data.
+     *
+     * @throws \ValueError If any of the required keys ('locales', 'wider_region') are not present.
+     * @throws \TypeError If 'locales' is not an array or is empty, or if 'wider_region' is not a string.
+     */
     protected static function fromArrayInternal(array $data): static
     {
         if (!isset($data['locales']) || !isset($data['wider_region'])) {
@@ -47,6 +66,26 @@ final class WiderRegionMetadata extends AbstractJsonRepresentation
         );
     }
 
+    /**
+     * Creates an instance of WiderRegionMetadata from a stdClass object.
+     *
+     * Validates the structure of the provided object to ensure that it contains
+     * the required properties: 'locales' and 'wider_region'. Each of these
+     * properties must map to a non-empty array and a string, respectively. If
+     * any property is missing or does not meet the criteria, an appropriate
+     * error is thrown.
+     *
+     * @param \stdClass $data The object containing the data for the
+     *                     WiderRegionMetadata instance. It must include:
+     *                     - 'locales': An array of locales supported by the Wider region.
+     *                     - 'wider_region': A string representing the identifier of the Wider region.
+     *
+     * @return static A new instance of WiderRegionMetadata initialized with the
+     *                provided data.
+     *
+     * @throws \ValueError If any of the required properties ('locales', 'wider_region') are not present.
+     * @throws \TypeError If 'locales' is not an array or is empty, or if 'wider_region' is not a string.
+     */
     protected static function fromObjectInternal(\stdClass $data): static
     {
         if (!isset($data->locales) || !isset($data->wider_region)) {

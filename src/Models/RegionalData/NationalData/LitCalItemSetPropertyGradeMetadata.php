@@ -3,8 +3,7 @@
 namespace LiturgicalCalendar\Api\Models\RegionalData\NationalData;
 
 use LiturgicalCalendar\Api\Enum\CalEventAction;
-use LiturgicalCalendar\Api\Models\RegionalData\LiturgicalEventMetadata;
-use stdClass;
+use LiturgicalCalendar\Api\Models\LiturgicalEventMetadata;
 
 final class LitCalItemSetPropertyGradeMetadata extends LiturgicalEventMetadata
 {
@@ -37,7 +36,7 @@ final class LitCalItemSetPropertyGradeMetadata extends LiturgicalEventMetadata
      * @return static The newly created instance.
      * @throws \ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
      */
-    protected static function fromObjectInternal(stdClass $data): static
+    protected static function fromObjectInternal(\stdClass $data): static
     {
         if (false === property_exists($data, 'since_year') || false === property_exists($data, 'property') || $data->property !== 'grade') {
             throw new \ValueError('`since_year` and `property` parameters are required for an `action` of `setProperty`, and `property` must have a value of `grade`');

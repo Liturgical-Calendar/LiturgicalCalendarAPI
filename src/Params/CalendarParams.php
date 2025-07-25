@@ -123,7 +123,7 @@ class CalendarParams implements ParamsInterface
 
         if (Router::isLocalhost()) {
             $concurrentServiceWorkers = getenv('PHP_CLI_SERVER_WORKERS');
-            if ((int)$concurrentServiceWorkers < 2) {
+            if ((int) $concurrentServiceWorkers < 2) {
                 $server_name = $_SERVER['SERVER_NAME'] ?? $_SERVER['SERVER_ADDR'];
                 CalendarPath::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The API will be unable to load calendars metadata from {$calendarsRoute}, because there are not enough concurrent service workers. Perhaps set the `PHP_CLI_SERVER_WORKERS` environment variable to a value greater than 1? E.g. `PHP_CLI_SERVER_WORKERS=2 php -S $server_name`.");
             }
@@ -141,7 +141,7 @@ class CalendarParams implements ParamsInterface
             CalendarPath::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The API was unable to load calendars metadata from {$calendarsRoute}");
         }
 
-        $this->Year = (int)date('Y');
+        $this->Year = (int) date('Y');
 
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $value        = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
@@ -249,7 +249,7 @@ class CalendarParams implements ParamsInterface
     {
         if (gettype($value) === 'string') {
             if (is_numeric($value) && ctype_digit($value) && strlen($value) === 4) {
-                $this->Year = (int)$value;
+                $this->Year = (int) $value;
             } else {
                 $description = 'Year parameter is of type String, but is not a numeric String with 4 digits';
                 CalendarPath::produceErrorResponse(StatusCode::BAD_REQUEST, $description);

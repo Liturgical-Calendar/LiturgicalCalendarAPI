@@ -120,7 +120,8 @@
                 }
             },
             "required": [
-                "event_key"
+                "event_key",
+                "calendar"
             ],
             "title": "LiturgicalEvent"
         },

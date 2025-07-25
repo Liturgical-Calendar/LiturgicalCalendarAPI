@@ -72,6 +72,6 @@ final class LitCommonItem implements \JsonSerializable
      */
     public function jsonSerialize(): string
     {
-        return $this->commonGeneral->value . ($this->commonSpecific !== null ? ':' . $this->commonSpecific->value : '');
+        return $this->commonGeneral->value . ( $this->commonSpecific !== null ? ':' . $this->commonSpecific->value : '' );
     }
 }

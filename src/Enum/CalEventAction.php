@@ -44,4 +44,9 @@ enum CalEventAction: string
      * - `liturgical_event.strtotime`
      */
     case CreateNew = 'createNew';
+
+    /**
+     * This `metadata.action` is only used for Decrees of the Congregation for Divine Worship.
+     */
+    case MakeDoctor = 'makeDoctor';
 }

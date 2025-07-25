@@ -1,16 +1,15 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Models\RegionalData\NationalData;
+namespace LiturgicalCalendar\Api\Models\Decrees;
 
 use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitColor;
 use LiturgicalCalendar\Api\Enum\LitEventType;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
-use LiturgicalCalendar\Api\Models\LiturgicalEventData;
 use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
 
-final class LitCalItemCreateNewMobile extends LiturgicalEventData
+final class DecreeItemCreateNewMobile extends DecreeEventData
 {
     public readonly string|RelativeLiturgicalDate $strtotime;
 
@@ -27,6 +26,8 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
 
     /**
      * @param string $event_key The key of the liturgical event.
+     * @param string $name The name of the liturgical event.
+     * @param string $calendar The calendar of the liturgical event.
      * @param string|RelativeLiturgicalDate $strtotime A strtotime string or an object representing a RelativeLiturgicalDate.
      * @param LitColor[] $color An array of LitColor enum cases.
      * @param LitGrade $grade The liturgical grade of the event.
@@ -34,7 +35,7 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
      *
      * @throws \ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
      */
-    private function __construct(string $event_key, string|RelativeLiturgicalDate $strtotime, array $color, LitGrade $grade, LitCommons $common)
+    private function __construct(string $event_key, string $name, string $calendar, string|RelativeLiturgicalDate $strtotime, array $color, LitGrade $grade, LitCommons $common)
     {
 
         if (0 === count($color)) {
@@ -47,7 +48,8 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
             }
         }
 
-        parent::__construct($event_key);
+        parent::__construct($event_key, $calendar);
+        $this->name      = $name;
         $this->strtotime = $strtotime;
         $this->color     = $color;
         $this->grade     = $grade;
@@ -86,6 +88,7 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
      *
      * The stdClass object must have the following properties:
      * - event_key (string): the key of the event
+     * - calendar (string): the calendar of the event
      * - strtotime (string|object): the strtotime string or an object containing the properties of a RelativeLiturgicalDate
      * - color (array): the liturgical color(s) of the event, as an array of strings
      * - grade (integer): the liturgical grade of the event
@@ -97,6 +100,18 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
+        $required_properties = ['event_key', 'name', 'calendar', 'strtotime', 'color', 'grade', 'common'];
+        $current_properties  = array_keys(get_object_vars($data));
+        $missing_properties  = array_diff($required_properties, $current_properties);
+
+        if (!empty($missing_properties)) {
+            throw new \ValueError(sprintf(
+                'The following properties are required: %s. Found properties: %s',
+                implode(', ', $missing_properties),
+                implode(', ', $current_properties)
+            ));
+        }
+
         /** @var string|RelativeLiturgicalDate $strToTime */
         $strToTime = '';
         if (is_string($data->strtotime)) {
@@ -107,8 +122,11 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
         } elseif ($data->strtotime instanceof \stdClass) {
             $strToTime = RelativeLiturgicalDate::fromObject($data->strtotime);
         }
+
         return new static(
             $data->event_key,
+            $data->name,
+            $data->calendar,
             $strToTime,
             array_map(fn($color) => LitColor::from($color), $data->color),
             LitGrade::from($data->grade),
@@ -121,17 +139,31 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
      *
      * The array must have the following keys:
      * - event_key (string): The key of the event.
+     * - name (string): The name of the event.
+     * - calendar (string): The calendar of the event.
      * - strtotime (string|array): The strtotime string or an array representing a RelativeLiturgicalDate.
      * - color (array): The liturgical color(s) of the event, as an array of strings.
      * - grade (integer): The liturgical grade of the event.
      * - common (array): The liturgical common of the event, as an array of strings.
      *
-     * @param array{event_key:string,strtotime:string|array{day_of_the_week:string,relative_time:string,event_key:string},color:string[],grade:int,common:string[]} $data The associative array containing the properties of the class.
+     * @param array{event_key:string,name:string,calendar:string,strtotime:string|array{day_of_the_week:string,relative_time:string,event_key:string},color:string[],grade:int,common:string[]} $data The associative array containing the properties of the class.
      * @return static The newly created instance.
      * @throws \ValueError if the required keys are not present in the array or have invalid values.
      */
     protected static function fromArrayInternal(array $data): static
     {
+        $required_properties = ['event_key', 'name', 'calendar', 'strtotime', 'color', 'grade', 'common'];
+        $current_properties  = array_keys($data);
+        $missing_properties  = array_diff($required_properties, $current_properties);
+
+        if (!empty($missing_properties)) {
+            throw new \ValueError(sprintf(
+                'The following properties are required: %s. Found properties: %s',
+                implode(', ', $missing_properties),
+                implode(', ', $current_properties)
+            ));
+        }
+
         /** @var string|RelativeLiturgicalDate $strToTime */
         $strToTime = '';
         if (is_string($data['strtotime'])) {
@@ -142,8 +174,11 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
         } elseif (is_array($data['strtotime'])) {
             $strToTime = RelativeLiturgicalDate::fromArray($data['strtotime']);
         }
+
         return new static(
             $data['event_key'],
+            $data['name'],
+            $data['calendar'],
             $strToTime,
             array_map(fn($color) => LitColor::from($color), $data['color']),
             LitGrade::from($data['grade']),

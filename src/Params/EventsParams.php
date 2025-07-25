@@ -93,7 +93,7 @@ class EventsParams implements ParamsInterface
         $this->calendarsMetadata = MetadataCalendars::fromObject($calendarsMetadataObj->litcal_metadata);
 
         //we need at least a default value for the current year and for the locale
-        $this->Year = (int)date('Y');
+        $this->Year = (int) date('Y');
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $value        = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
             $this->Locale = $value && LitLocale::isValid($value) ? $value : LitLocale::LATIN;

@@ -10,6 +10,8 @@ use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
+use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewFixed;
+use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewMobile;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewFixed as DiocesanLitCalItemCreateNewFixed;
@@ -93,7 +95,7 @@ final class LiturgicalEvent implements \JsonSerializable
         $this->grade_display = $this->grade === LitGrade::HIGHER_SOLEMNITY ? '' : $displayGrade;
         $commons             = $common instanceof LitCommons || $common instanceof LitMassVariousNeeds || $litMassVariousNeedsArray
                                 ? $common
-                                : (is_array($common) ? LitCommons::create($common) : LitCommons::create([$common]));
+                                : ( is_array($common) ? LitCommons::create($common) : LitCommons::create([$common]) );
         if ($commons instanceof LitCommons) {
             /** @var LitCommons $commons */
             $this->common_lcl = $commons->fullTranslate(self::$locale);
@@ -309,11 +311,11 @@ final class LiturgicalEvent implements \JsonSerializable
      *   If not provided, defaults to LitEventType::FIXED.
      * - grade_display: The grade display of the liturgical event, as a string. If not provided, defaults to null.
      *
-     * @param \stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile $obj
+     * @param \stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile|DecreeItemCreateNewFixed|DecreeItemCreateNewMobile $obj
      * @return LiturgicalEvent A new LiturgicalEvent object.
      * @throws \InvalidArgumentException If the provided object does not contain the required properties or if the properties have invalid types.
      */
-    public static function fromObject(\stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile $obj): LiturgicalEvent
+    public static function fromObject(\stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile|DecreeItemCreateNewFixed|DecreeItemCreateNewMobile $obj): LiturgicalEvent
     {
         $requiredProps = ['name', 'date', 'grade'];
         $rowProps      = get_object_vars($obj);
@@ -442,7 +444,7 @@ final class LiturgicalEvent implements \JsonSerializable
      *     grade: LitGrade|integer,
      *     color?: LitColor|LitColor[]|string|string[],
      *     type?: LitEventType|string,
-     *     common?: LitCommon|LitCommon[]|string|string[],
+     *     common?: LitCommons|LitCommon[]|LitMassVariousNeeds[]|string[],
      *     grade_display?: string
      * } $arr The associative array containing the required properties.
      * @return LiturgicalEvent A new LiturgicalEvent object.
@@ -530,10 +532,10 @@ final class LiturgicalEvent implements \JsonSerializable
     }
 
     /**
-     * @param array<LitMassVariousNeeds|LitCommon|string>|LitCommons $common
+     * @param LitCommons|array<LitMassVariousNeeds|LitCommon|string> $common
      * @return LitCommons|array<LitMassVariousNeeds>
      */
-    private static function transformCommons(array|LitCommons $common): LitCommons|array
+    private static function transformCommons(LitCommons|array $common): LitCommons|array
     {
         if ($common instanceof LitCommons) {
             return $common;
@@ -550,7 +552,12 @@ final class LiturgicalEvent implements \JsonSerializable
         }
 
         if ($valueTypes[0] === 'string') {
-            return LitCommons::create($common) ?? array_values(array_map(fn(string $value) => LitMassVariousNeeds::from($value), $common));
+            /** @var string[] $common */
+            return LitCommons::create($common)
+                    ?? array_values(array_map(
+                        fn(string $value): LitMassVariousNeeds => LitMassVariousNeeds::from($value),
+                        $common
+                    ));
         }
 
         if ($common[0] instanceof LitCommon) {
@@ -558,6 +565,7 @@ final class LiturgicalEvent implements \JsonSerializable
         }
 
         if ($common[0] instanceof LitMassVariousNeeds) {
+            /** @var LitMassVariousNeeds[] $common */
             return $common;
         }
 

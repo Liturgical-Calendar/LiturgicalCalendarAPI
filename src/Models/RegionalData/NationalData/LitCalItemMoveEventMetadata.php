@@ -3,7 +3,7 @@
 namespace LiturgicalCalendar\Api\Models\RegionalData\NationalData;
 
 use LiturgicalCalendar\Api\Enum\CalEventAction;
-use LiturgicalCalendar\Api\Models\RegionalData\LiturgicalEventMetadata;
+use LiturgicalCalendar\Api\Models\LiturgicalEventMetadata;
 use stdClass;
 
 final class LitCalItemMoveEventMetadata extends LiturgicalEventMetadata

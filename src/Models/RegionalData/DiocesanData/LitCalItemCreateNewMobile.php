@@ -7,8 +7,8 @@ use LiturgicalCalendar\Api\Enum\LitColor;
 use LiturgicalCalendar\Api\Enum\LitEventType;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
-use LiturgicalCalendar\Api\Models\RegionalData\LiturgicalEventData;
-use LiturgicalCalendar\Api\Models\RegionalData\RelativeLiturgicalDate;
+use LiturgicalCalendar\Api\Models\LiturgicalEventData;
+use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
 
 final class LitCalItemCreateNewMobile extends LiturgicalEventData
 {

@@ -3,8 +3,7 @@
 namespace LiturgicalCalendar\Api\Models\RegionalData\NationalData;
 
 use LiturgicalCalendar\Api\Enum\CalEventAction;
-use LiturgicalCalendar\Api\Models\RegionalData\LiturgicalEventMetadata;
-use stdClass;
+use LiturgicalCalendar\Api\Models\LiturgicalEventMetadata;
 
 final class LitCalItemCreateNewMetadata extends LiturgicalEventMetadata
 {
@@ -19,14 +18,14 @@ final class LitCalItemCreateNewMetadata extends LiturgicalEventMetadata
     /**
      * Creates an instance from a StdClass object.
      *
-     * @param stdClass $data The StdClass object to create an instance from.
+     * @param \stdClass $data The StdClass object to create an instance from.
      * It must have the following properties:
      * - since_year (int): The year since when the liturgical event was added.
      * - until_year (int|null): The year until when the liturgical event was added.
      *
      * @return static A new instance created from the given data.
      */
-    protected static function fromObjectInternal(stdClass $data): static
+    protected static function fromObjectInternal(\stdClass $data): static
     {
         return new static(
             $data->since_year,

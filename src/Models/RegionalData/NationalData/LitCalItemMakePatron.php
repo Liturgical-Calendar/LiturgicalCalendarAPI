@@ -3,7 +3,7 @@
 namespace LiturgicalCalendar\Api\Models\RegionalData\NationalData;
 
 use LiturgicalCalendar\Api\Enum\LitGrade;
-use LiturgicalCalendar\Api\Models\RegionalData\LiturgicalEventData;
+use LiturgicalCalendar\Api\Models\LiturgicalEventData;
 
 final class LitCalItemMakePatron extends LiturgicalEventData
 {

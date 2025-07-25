@@ -1,6 +1,6 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Models\RegionalData;
+namespace LiturgicalCalendar\Api\Models;
 
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 

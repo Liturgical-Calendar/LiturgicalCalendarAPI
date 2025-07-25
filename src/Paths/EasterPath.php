@@ -102,13 +102,13 @@ final class EasterPath
 
             switch (strtoupper(self::$baseLocale)) {
                 case LitLocale::LATIN:
-                    $month                   = (int)$gregorian_easter->format('n'); //n      = 1-January to 12-December
+                    $month                   = (int) $gregorian_easter->format('n'); //n      = 1-January to 12-December
                     $monthLatin              = LatinUtils::LATIN_MONTHS[$month];
                     $gregDateString          = 'Dies Domini, ' . $gregorian_easter->format('j') . ' ' . $monthLatin . ' ' . $gregorian_easter->format('Y');
-                    $month                   = (int)$julian_easter->format('n'); //n         = 1-January to 12-December
+                    $month                   = (int) $julian_easter->format('n'); //n         = 1-January to 12-December
                     $monthLatin              = LatinUtils::LATIN_MONTHS[$month];
                     $julianDateString        = 'Dies Domini, ' . $julian_easter->format('j') . ' ' . $monthLatin . ' ' . $julian_easter->format('Y');
-                    $month                   = (int)$western_julian_easter->format('n'); //n = 1-January to 12-December
+                    $month                   = (int) $western_julian_easter->format('n'); //n = 1-January to 12-December
                     $monthLatin              = LatinUtils::LATIN_MONTHS[$month];
                     $westernJulianDateString = 'Dies Domini, ' . $western_julian_easter->format('j') . ' ' . $monthLatin . ' ' . $western_julian_easter->format('Y');
                     break;

@@ -1,8 +1,10 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Models\RegionalData;
+namespace LiturgicalCalendar\Api\Models;
 
 use LiturgicalCalendar\Api\Enum\DateRelation;
+use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\LatinUtils;
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 
 final class RelativeLiturgicalDate extends AbstractJsonSrcData
@@ -65,7 +67,7 @@ final class RelativeLiturgicalDate extends AbstractJsonSrcData
      * - relative_time (string): whether the event is before or after the relative event (e.g. 'before' or 'after')
      * - event_key (string): the key of the relative event (e.g. 'Pentecost')
      *
-     * @param array<string,string> $data
+     * @param array{day_of_the_week:string,relative_time:string,event_key:string} $data
      * @return static
      * @throws \ValueError if the keys of the data parameter do not match the expected keys.
      */
@@ -82,5 +84,32 @@ final class RelativeLiturgicalDate extends AbstractJsonSrcData
         $dateRelation = DateRelation::from($data['relative_time']);
 
         return new static($data['day_of_the_week'], $dateRelation, $data['event_key']);
+    }
+
+    public function __toString(): string
+    {
+        /*
+        $dayOfTheWeekFmt = \IntlDateFormatter::create(
+            LitLocale::$PRIMARY_LANGUAGE,
+            \IntlDateFormatter::FULL,
+            \IntlDateFormatter::NONE,
+            'UTC',
+            \IntlDateFormatter::GREGORIAN,
+            'EEEE'
+        );
+        */
+        //$relString = $this->relative_time === DateRelation::Before
+        //    /**translators: e.g. 'Monday before PalmSunday' */
+        //    ? _('before')
+        //    /**translators: e.g. 'Monday after Pentecost' */
+        //    : _('after');
+
+        /*
+        $dayOfTheWeek = LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE
+            ? LatinUtils::LATIN_DAYOFTHEWEEK[$liturgicalEvent->date->format('w')]
+            : ucfirst($dayOfTheWeekFmt->format($liturgicalEvent->date->format('U')));
+        */
+        //return sprintf('%s %s %s', $dayOfTheWeek, $relString, $litEvent->name);
+        return sprintf('%s %s %s', $this->day_of_the_week, $this->relative_time->value, $this->event_key);
     }
 }

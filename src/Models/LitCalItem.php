@@ -1,11 +1,8 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Models\RegionalData;
+namespace LiturgicalCalendar\Api\Models;
 
 use LiturgicalCalendar\Api\Enum\CalEventAction;
-use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
-use LiturgicalCalendar\Api\Models\RegionalData\LiturgicalEventData;
-use LiturgicalCalendar\Api\Models\RegionalData\LiturgicalEventMetadata;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMetadata;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile;
@@ -32,7 +29,7 @@ final class LitCalItem extends AbstractJsonSrcData
         if (
             in_array($metadata->action, ['createNew', 'makePatron'])
             ||
-            ($metadata->action === CalEventAction::SetProperty->value && $metadata->property === 'name')
+            ( $metadata->action === CalEventAction::SetProperty->value && $metadata->property === 'name' )
         ) {
             if (false === property_exists($liturgical_event, 'event_key')) {
                 throw new \ValueError('litcalItem.liturgical_event must have an `event_key` property');

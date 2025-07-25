@@ -115,7 +115,7 @@ final class TranslationMap extends AbstractJsonSrcData implements \IteratorAggre
      */
     public static function fromObjectInternal(\stdClass $i18nData): static
     {
-        return new static((array)$i18nData);
+        return new static((array) $i18nData);
     }
 
     /**

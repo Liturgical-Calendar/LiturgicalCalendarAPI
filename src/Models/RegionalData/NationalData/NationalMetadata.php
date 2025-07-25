@@ -70,11 +70,37 @@ final class NationalMetadata extends AbstractJsonSrcData
     }
 
 
+    /**
+     * Creates an instance of NationalMetadata from an associative array.
+     *
+     * The array must have the following keys:
+     * - nation (string): A two-letter country ISO code (capital letters).
+     * - locales (array<string>): An array of valid locale codes.
+     * - wider_region (string): One of 'Americas', 'Europe', 'Asia', 'Africa', 'Oceania', 'Middle East', or 'Antarctica'.
+     * - missals (array<string>): An array of valid Roman Missal identifiers.
+     *
+     * @param array{nation:string,locales:array<string>,wider_region:string,missals:array<string>} $data
+     * @return static
+     * @throws \ValueError If any parameter does not meet the specified criteria.
+     */
     protected static function fromArrayInternal(array $data): static
     {
         return new static($data['nation'], $data['locales'], $data['wider_region'], $data['missals']);
     }
 
+    /**
+     * Creates an instance of NationalMetadata from a stdClass object.
+     *
+     * The object must have the following properties:
+     * - nation (string): A two-letter country ISO code (capital letters).
+     * - locales (array<string>): An array of valid locale codes.
+     * - wider_region (string): One of 'Americas', 'Europe', 'Asia', 'Africa', 'Oceania', 'Middle East', or 'Antarctica'.
+     * - missals (array<string>): An array of valid Roman Missal identifiers.
+     *
+     * @param \stdClass $data The object containing the properties of NationalMetadata.
+     * @return static A new instance of NationalMetadata initialized with the provided data.
+     * @throws \ValueError If any property does not meet the specified criteria.
+     */
     protected static function fromObjectInternal(\stdClass $data): static
     {
         return new static($data->nation, $data->locales, $data->wider_region, $data->missals);

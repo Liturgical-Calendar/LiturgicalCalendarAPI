@@ -2,7 +2,7 @@
 
 namespace LiturgicalCalendar\Api\Models\RegionalData\DiocesanData;
 
-use LiturgicalCalendar\Api\Models\RegionalData\LiturgicalEventMetadata;
+use LiturgicalCalendar\Api\Models\LiturgicalEventMetadata;
 
 final class DiocesanLitCalItemMetadata extends LiturgicalEventMetadata
 {

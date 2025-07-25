@@ -6,7 +6,8 @@
         "description": "By the express wish of the Holy Father, Pope Francis, the Congregation for Divine Worship and the Discipline of the Sacraments published a new Decree on the Solemnity of the Most Sacred Heart of Jesus, 3 June 2016, in which the celebration of Saint Mary Magdalene was elevated and inscribed in the General Roman Calendar with the rank of Feast.",
         "liturgical_event": {
             "event_key": "StMaryMagdalene",
-            "grade": 4
+            "grade": 4,
+            "calendar":"GENERAL ROMAN"
         },
         "metadata": {
             "action": "setProperty",
@@ -91,7 +92,8 @@
         "description": "The Supreme Pontiff Pope FRANCIS, considering the important evangelical witness offered by Martha, Mary and Lazarus in welcoming the Lord Jesus into their home, in listening to him attentively, in believing that he is the resurrection and the life, and accepting the proposal of this Dicastery, has decreed that 29 July be designated in the General Roman Calendar as the Memorial of Saints Martha, Mary and Lazarus.",
         "liturgical_event": {
             "event_key": "StMartha",
-            "grade": 3
+            "grade": 3,
+            "calendar":"GENERAL ROMAN"
         },
         "metadata": {
             "action": "setProperty",
@@ -485,7 +487,8 @@
         "description": "Fulfilling the wishes of many Brothers in the Episcopate and of a great number of the faithful throughout the world, after consulting the Congregation for the Causes of Saints and hearing the opinion of the Congregation for the Doctrine of the Faith regarding her eminent doctrine, with certain knowledge and after lengthy reflection, with the fullness of Our apostolic authority We declare Saint Thérèse of the Child Jesus and the Holy Face, virgin, to be a Doctor of the Universal Church.",
         "liturgical_event": {
             "event_key": "StThereseChildJesus",
-            "common": ["Proper"]
+            "common": ["Proper"],
+            "calendar": "GENERAL ROMAN"
         },
         "metadata": {
             "action": "makeDoctor",
@@ -518,7 +521,8 @@
         "description": "Dopo aver avuto il parere della Congregazione delle Cause dei Santi, con la mia Autorità Apostolica lo DICHIARO Sant'Ireneo di Lione Dottore della Chiesa con il titolo di Doctor unitatis.",
         "liturgical_event": {
             "event_key": "StIrenaeus",
-            "common": ["Proper"]
+            "common": ["Proper"],
+            "calendar": "GENERAL ROMAN"
         },
         "metadata": {
             "action": "makeDoctor",

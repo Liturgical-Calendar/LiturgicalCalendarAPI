@@ -39,6 +39,9 @@ abstract class AbstractJsonRepresentation implements \JsonSerializable
      */
     public static function fromArray(array $data): static
     {
+        if (reset($data) instanceof \stdClass) {
+            throw new \InvalidArgumentException('Please use fromObject instead.');
+        }
         $obj = static::fromArrayInternal($data);
         $obj->lock();
         return $obj;
@@ -73,6 +76,7 @@ abstract class AbstractJsonRepresentation implements \JsonSerializable
      * Creates an instance of a class that implements AbstractJsonRepresentation from a stdClass object.
      *
      * @param \stdClass $data
+     * @return static
      */
     abstract protected static function fromObjectInternal(\stdClass $data): static;
 

@@ -1,19 +1,22 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Models\RegionalData;
+namespace LiturgicalCalendar\Api\Models\Decrees;
 
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
-use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewMobile;
 
-abstract class LiturgicalEventData extends AbstractJsonSrcData
+abstract class DecreeEventData extends AbstractJsonSrcData
 {
     public readonly string $event_key;
 
-    public string $name;
+    public ?string $name;
 
-    protected function __construct(string $event_key)
+    public string $calendar = 'GENERAL ROMAN';
+
+    protected function __construct(string $event_key, string $calendar)
     {
         $this->event_key = $event_key;
+        $this->calendar  = $calendar;
     }
 
     /**
@@ -21,7 +24,7 @@ abstract class LiturgicalEventData extends AbstractJsonSrcData
      */
     public function isMobile(): bool
     {
-        return $this instanceof LitCalItemCreateNewMobile;
+        return $this instanceof DecreeItemCreateNewMobile;
     }
 
     /**

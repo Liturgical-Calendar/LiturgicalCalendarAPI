@@ -2,7 +2,7 @@
 
 namespace LiturgicalCalendar\Api\Models\RegionalData\NationalData;
 
-use LiturgicalCalendar\Api\Models\RegionalData\LiturgicalEventData;
+use LiturgicalCalendar\Api\Models\LiturgicalEventData;
 
 final class LitCalItemMoveEvent extends LiturgicalEventData
 {
@@ -17,6 +17,18 @@ final class LitCalItemMoveEvent extends LiturgicalEventData
         $this->day   = $day;
     }
 
+    /**
+     * Creates an instance of LitCalItemMoveEvent from an associative array.
+     *
+     * The array must have the following keys:
+     * - event_key (string): the key of the event
+     * - day (int): the day of the event
+     * - month (int): the month of the event
+     *
+     * @param array{event_key:string,day:int,month:int} $data The associative array containing the properties of the class.
+     * @return static The newly created instance.
+     * @throws \ValueError if the keys of the data parameter do not match the expected keys.
+     */
     protected static function fromArrayInternal(array $data): static
     {
         if (false === array_key_exists('event_key', $data) || false === array_key_exists('day', $data) || false === array_key_exists('month', $data)) {
@@ -34,6 +46,18 @@ final class LitCalItemMoveEvent extends LiturgicalEventData
         return new static($data['event_key'], $data['day'], $data['month']);
     }
 
+    /**
+     * Creates an instance of LitCalItemMoveEvent from an object containing the required properties.
+     *
+     * The stdClass object must have the following properties:
+     * - event_key (string): the key of the event
+     * - day (int): the day of the event
+     * - month (int): the month of the event
+     *
+     * @param \stdClass $data The stdClass object containing the properties of the class.
+     * @return static The newly created instance(s).
+     * @throws \ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
+     */
     protected static function fromObjectInternal(\stdClass $data): static
     {
         if (false === property_exists($data, 'event_key') || false === property_exists($data, 'day') || false === property_exists($data, 'month')) {

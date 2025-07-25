@@ -16,7 +16,7 @@ final class LitCommons implements \JsonSerializable
      *
      * @param LitCommonItem[] $litCommonItems
      */
-    public function __construct(array $litCommonItems)
+    private function __construct(array $litCommonItems)
     {
         foreach ($litCommonItems as $litCommonItem) {
             if ($this->hasNoneOrProper()) {
@@ -231,7 +231,7 @@ final class LitCommons implements \JsonSerializable
     {
         if (
             count($this->commons) === 0
-            || (count($this->commons) === 1 && $this->commons[0]->commonGeneral === LitCommon::NONE)
+            || ( count($this->commons) === 1 && $this->commons[0]->commonGeneral === LitCommon::NONE )
         ) {
             return [];
         }

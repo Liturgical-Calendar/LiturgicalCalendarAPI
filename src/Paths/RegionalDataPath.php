@@ -1040,7 +1040,7 @@ final class RegionalDataPath
                         'Expected non empty payload in body of request, either JSON encoded or YAML encoded or form encoded.'
                     );
                 }
-                $payload = (object)$_REQUEST;
+                $payload = (object) $_REQUEST;
                 break;
             default:
                 if ($required) {

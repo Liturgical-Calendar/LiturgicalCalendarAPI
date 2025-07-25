@@ -4,7 +4,7 @@ namespace LiturgicalCalendar\Api\Models\RegionalData\NationalData;
 
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarSettings;
-use LiturgicalCalendar\Api\Models\RegionalData\LitCalItemCollection;
+use LiturgicalCalendar\Api\Models\LitCalItemCollection;
 use LiturgicalCalendar\Api\Models\RegionalData\Translations;
 
 final class NationalData extends AbstractJsonSrcData
@@ -126,11 +126,11 @@ final class NationalData extends AbstractJsonSrcData
      *
      * The array must have the following keys:
      * - litcal (array): The liturgical calendar items.
-     * - settings (\stdClass): The settings for the national calendar.
-     * - metadata (\stdClass): The metadata for the national calendar.
-     * - i18n (\stdClass|null): The translations for the national calendar.
+     * - settings (array): The settings for the national calendar.
+     * - metadata (array): The metadata for the national calendar.
+     * - i18n (array|unset): The translations for the national calendar.
      *
-     * @param array<string, mixed> $data
+     * @param array{litcal:array{event_key:string,day:int,month:int,color:string[],grade:int,common:string[]},settings:array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool},metadata:array{nation:string,wider_region:string,locales:string[],missals:string[]},i18n?:array<string,string>} $data
      * @return static
      * @throws \ValueError if the keys of the data parameter do not match the expected keys.
      */
@@ -143,9 +143,9 @@ final class NationalData extends AbstractJsonSrcData
         }
         return new static(
             LitCalItemCollection::fromArray($data['litcal']),
-            MetadataNationalCalendarSettings::fromarray($data['settings']),
+            MetadataNationalCalendarSettings::fromArray($data['settings']),
             NationalMetadata::fromArray($data['metadata']),
-            $data['i18n'] ?? null
+            array_key_exists('i18n', $data) ? (object) $data['i18n'] : null
         );
     }
 
@@ -156,7 +156,7 @@ final class NationalData extends AbstractJsonSrcData
      * - litcal (array): The liturgical calendar items.
      * - settings (\stdClass): The settings for the national calendar.
      * - metadata (\stdClass): The metadata for the national calendar.
-     * - i18n (\stdClass|null): The translations for the national calendar.
+     * - i18n (\stdClass|unset): The translations for the national calendar.
      *
      * @param \stdClass $data The stdClass object containing the properties of the national calendar.
      * @return static
@@ -167,7 +167,7 @@ final class NationalData extends AbstractJsonSrcData
             LitCalItemCollection::fromArray($data->litcal),
             MetadataNationalCalendarSettings::fromObject($data->settings),
             NationalMetadata::fromObject($data->metadata),
-            $data->i18n ?? null
+            property_exists($data, 'i18n') ? $data->i18n : null
         );
     }
 

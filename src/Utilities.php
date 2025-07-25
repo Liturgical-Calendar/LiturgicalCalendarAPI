@@ -193,15 +193,15 @@ class Utilities
         $c     = $Y % 100;
         $d     = floor($b / 4);
         $e     = $b % 4;
-        $f     = floor(($b + 8) / 25);
-        $g     = floor(($b - $f + 1) / 3);
-        $h     = (19 * $a + $b - $d - $g + 15) % 30;
+        $f     = floor(( $b + 8 ) / 25);
+        $g     = floor(( $b - $f + 1 ) / 3);
+        $h     = ( 19 * $a + $b - $d - $g + 15 ) % 30;
         $i     = floor($c / 4);
         $k     = $c % 4;
-        $l     = (32 + 2 * $e + 2 * $i - $h - $k) % 7;
-        $m     = floor(($a + 11 * $h + 22 * $l) / 451);
-        $month = floor(($h + $l - 7 * $m + 114) / 31);
-        $day   = (($h + $l - 7 * $m + 114) % 31) + 1;
+        $l     = ( 32 + 2 * $e + 2 * $i - $h - $k ) % 7;
+        $m     = floor(( $a + 11 * $h + 22 * $l ) / 451);
+        $month = floor(( $h + $l - 7 * $m + 114 ) / 31);
+        $day   = ( ( $h + $l - 7 * $m + 114 ) % 31 ) + 1;
 
         $dateObj = DateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new \DateTimeZone('UTC'));
         if ($dateObj === false) {
@@ -227,10 +227,10 @@ class Utilities
         $a     = $Y % 4;
         $b     = $Y % 7;
         $c     = $Y % 19;
-        $d     = (19 * $c + 15) % 30;
-        $e     = (2 * $a + 4 * $b - $d + 34) % 7;
-        $month = floor(($d + $e + 114) / 31);
-        $day   = ( ($d + $e + 114) % 31 ) + 1;
+        $d     = ( 19 * $c + 15 ) % 30;
+        $e     = ( 2 * $a + 4 * $b - $d + 34 ) % 7;
+        $month = floor(( $d + $e + 114 ) / 31);
+        $day   = ( ( $d + $e + 114 ) % 31 ) + 1;
 
         $dateObj = DateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new \DateTimeZone('UTC'));
         if ($dateObj === false) {
@@ -359,11 +359,11 @@ class Utilities
     public static function ordSuffix(int $ord): string
     {
         $ord_suffix = ''; //st, nd, rd, th
-        if ($ord === 1 || ($ord % 10 === 1  && $ord <> 11)) {
+        if ($ord === 1 || ( $ord % 10 === 1  && $ord <> 11 )) {
             $ord_suffix = 'st';
-        } elseif ($ord === 2 || ($ord % 10 === 2  && $ord <> 12)) {
+        } elseif ($ord === 2 || ( $ord % 10 === 2  && $ord <> 12 )) {
             $ord_suffix = 'nd';
-        } elseif ($ord === 3 || ($ord % 10 === 3  && $ord <> 13)) {
+        } elseif ($ord === 3 || ( $ord % 10 === 3  && $ord <> 13 )) {
             $ord_suffix = 'rd';
         } else {
             $ord_suffix = 'th';
@@ -417,7 +417,7 @@ class Utilities
 
     /**
      * @param string $filename
-     * @return array
+     * @return array<string|int,mixed>
      * @throws \Exception
      */
     public static function jsonFileToArray(string $filename): array
@@ -429,7 +429,7 @@ class Utilities
             throw new \Exception('Unable to decode JSON from file ' . $filename . ' as an array: ' . json_last_error_msg());
         }
 
-        /** @var array $jsonArr */
+        /** @var array<string|int,mixed> $jsonArr */
         return $jsonArr;
     }
 
@@ -449,7 +449,7 @@ class Utilities
             throw new \Exception('Unable to decode JSON from file ' . $filename . ' as an object: ' . json_last_error_msg());
         }
 
-        /** @var \stdClass|\stdClass[] $jsonArr */
+        /** @var \stdClass|\stdClass[] $jsonObj */
         return $jsonObj;
     }
 
@@ -457,9 +457,10 @@ class Utilities
      * Converts an object to an array.
      *
      * The object should contain public properties.
+     * This method is useful for a deep conversion of an object to an array.
      *
      * @param \stdClass $object The object to convert.
-     * @return array The array representation of the object.
+     * @return array<string|int,mixed> The array representation of the object.
      * @throws \Exception If unable to encode or decode the object.
      */
     public static function objectToArray(\stdClass $object): array
@@ -472,6 +473,7 @@ class Utilities
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \Exception('Unable to decode json to array');
         }
+        /** @var array<string|int,mixed> $decoded */
         return $decoded;
     }
 

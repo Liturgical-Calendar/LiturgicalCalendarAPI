@@ -2,7 +2,7 @@
 
 namespace LiturgicalCalendar\Api\Models;
 
-abstract class AbstractJsonSrcData
+abstract class AbstractJsonSrcDataArray
 {
     private bool $locked = false;
 
@@ -60,10 +60,10 @@ abstract class AbstractJsonSrcData
      *
      * The object is locked after creation.
      *
-     * @param \stdClass $data The stdClass object containing the properties of the class.
+     * @param \stdClass[] $data The stdClass object containing the properties of the class.
      * @return static The newly created instance.
      */
-    public static function fromObject(\stdClass $data): static
+    public static function fromObject(array $data): static
     {
         $obj = static::fromObjectInternal($data);
         $obj->lock();
@@ -71,18 +71,17 @@ abstract class AbstractJsonSrcData
     }
 
     /**
-     * Creates an instance of a class that implements AbstractJsonSrcData from a stdClass object.
+     * Creates an instance of a class that implements AbstractJsonSrcData from an array of stdClass objects.
      *
-     * @param \stdClass $data
+     * @param \stdClass[] $data
      * @return static
      */
-    abstract protected static function fromObjectInternal(\stdClass $data): static;
+    abstract protected static function fromObjectInternal(array $data): static;
 
     /**
      * Locks the object, preventing any further modifications to its properties.
      *
      * Once locked, any attempt to set a property will result in a LogicException.
-     * TODO: if this is never needed by a child class, make it private
      */
     protected function lock(): void
     {
@@ -95,7 +94,6 @@ abstract class AbstractJsonSrcData
      * Note that this should generally only be used internally by the class
      * or its subclasses, as it can be used to bypass the immutability
      * guarantee.
-     * TODO: if this is never needed by a child class, make it private
      */
     protected function unlock(): void
     {

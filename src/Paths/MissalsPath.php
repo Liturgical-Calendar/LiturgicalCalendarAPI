@@ -60,7 +60,7 @@ final class MissalsPath
                 $payload = self::$Core->readYamlBody($required);
                 break;
             case RequestContentType::FORMDATA:
-                $payload = (object)$_POST;
+                $payload = (object) $_POST;
                 break;
             default:
                 if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
@@ -153,7 +153,7 @@ final class MissalsPath
                 $params['PAYLOAD'] = $payload;
             }
         } elseif (self::$Core->getRequestMethod() === RequestMethod::GET) {
-            $params = self::initGetPostParams((object)$_GET);
+            $params = self::initGetPostParams((object) $_GET);
         }
         return $params;
     }

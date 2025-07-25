@@ -533,7 +533,7 @@ class Core
     {
         $data    = null;
         $rawData = file_get_contents('php://input');
-        if ((false === $rawData || '' === $rawData) && $required) {
+        if (( false === $rawData || '' === $rawData ) && $required) {
             header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', true, 400);
             die('{"error":"No JSON data received in the request"}');
         }

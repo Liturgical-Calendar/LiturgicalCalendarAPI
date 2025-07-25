@@ -1,15 +1,14 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Models\RegionalData\DiocesanData;
+namespace LiturgicalCalendar\Api\Models\Decrees;
 
 use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitColor;
 use LiturgicalCalendar\Api\Enum\LitEventType;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
-use LiturgicalCalendar\Api\Models\LiturgicalEventData;
 
-final class LitCalItemCreateNewFixed extends LiturgicalEventData
+final class DecreeItemCreateNewFixed extends DecreeEventData
 {
     public readonly int $day;
 
@@ -32,6 +31,8 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
      * The provided arguments must be valid. The object will be created with the provided values.
      *
      * @param string $event_key The key of the event.
+     * @param string $name The name of the event.
+     * @param string $calendar The calendar of the event.
      * @param int $day The day of the event.
      * @param int $month The month of the event.
      * @param LitColor[] $color The liturgical color(s) of the event.
@@ -40,7 +41,7 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
      *
      * @throws \ValueError If the provided arguments are invalid.
      */
-    private function __construct(string $event_key, int $day, int $month, array $color, LitGrade $grade, LitCommons $common)
+    private function __construct(string $event_key, string $name, string $calendar, int $day, int $month, array $color, LitGrade $grade, LitCommons $common)
     {
         if (false === self::isValidMonthValue($month)) {
             throw new \ValueError('`$month` must be an integer between 1 and 12');
@@ -60,7 +61,9 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
             }
         }
 
-        parent::__construct($event_key);
+        parent::__construct($event_key, $calendar);
+
+        $this->name   = $name;
         $this->day    = $day;
         $this->month  = $month;
         $this->color  = $color;
@@ -112,8 +115,22 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
+        $required_properties = ['event_key', 'name', 'calendar', 'day', 'month', 'color', 'grade', 'common'];
+        $current_properties  = array_keys(get_object_vars($data));
+        $missing_properties  = array_diff($required_properties, $current_properties);
+
+        if (!empty($missing_properties)) {
+            throw new \ValueError(sprintf(
+                'The following properties are required: %s. Found properties: %s',
+                implode(', ', $missing_properties),
+                implode(', ', $current_properties)
+            ));
+        }
+
         return new static(
             $data->event_key,
+            $data->name,
+            $data->calendar,
             $data->day,
             $data->month,
             array_map(fn($color) => LitColor::from($color), $data->color),
@@ -133,14 +150,28 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
      * - grade (int): the liturgical grade of the event
      * - common (string[]): the liturgical common of the event, as an array of strings
      *
-     * @param array{event_key:string,day:int,month:int,color:string[],grade:int,common:string[]} $data The associative array containing the properties of the class.
+     * @param array{event_key:string,name:string,calendar:string,day:int,month:int,color:string[],grade:int,common:string[]} $data The associative array containing the properties of the class.
      * @return static The newly created instance.
      * @throws \ValueError if the keys of the data parameter do not match the expected keys.
      */
     protected static function fromArrayInternal(array $data): static
     {
+        $required_properties = ['event_key', 'name', 'calendar', 'day', 'month', 'color', 'grade', 'common'];
+        $current_properties  = array_keys($data);
+        $missing_properties  = array_diff($required_properties, $current_properties);
+
+        if (!empty($missing_properties)) {
+            throw new \ValueError(sprintf(
+                'The following properties are required: %s. Found properties: %s',
+                implode(', ', $missing_properties),
+                implode(', ', $current_properties)
+            ));
+        }
+
         return new static(
             $data['event_key'],
+            $data['name'],
+            $data['calendar'],
             $data['day'],
             $data['month'],
             array_map(fn($color) => LitColor::from($color), $data['color']),

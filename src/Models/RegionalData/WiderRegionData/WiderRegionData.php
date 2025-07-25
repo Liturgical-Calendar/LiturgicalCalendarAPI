@@ -3,7 +3,7 @@
 namespace LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData;
 
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
-use LiturgicalCalendar\Api\Models\RegionalData\LitCalItemCollection;
+use LiturgicalCalendar\Api\Models\LitCalItemCollection;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemMakePatron;

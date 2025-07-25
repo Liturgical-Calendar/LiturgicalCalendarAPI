@@ -6,7 +6,14 @@
         <exclude name="Squiz.Functions.FunctionDeclarationArgumentSpacing.SpaceBeforeEquals"/>
     </rule>
     <rule ref="Generic.Formatting.MultipleStatementAlignment"/>
+    <rule ref="Generic.WhiteSpace.ArbitraryParenthesesSpacing">
+        <properties>
+            <property name="ignoreNewlines" value="true" />
+            <property name="spacing" value="1" />
+        </properties>
+    </rule>
     <rule ref="Generic.Arrays.DisallowLongArraySyntax" />
+    <rule ref="Squiz.Arrays.ArrayBracketSpacing"/>
     <rule ref="Squiz.Arrays.ArrayDeclaration">
         <!-- …but suppress bits we don’t want -->
         <exclude name="Squiz.Arrays.ArrayDeclaration.NoComma"/>
@@ -23,7 +30,10 @@
         </properties>
     </rule>
     <rule ref="Squiz.Strings.DoubleQuoteUsage.NotRequired"/>
-    <rule ref="Squiz.Arrays.ArrayBracketSpacing"/>
+    <rule ref="Generic.PHP.ForbiddenFunctions"/>
+    <rule ref="Generic.WhiteSpace.SpreadOperatorSpacingAfter"/>
+    <rule ref="Generic.ControlStructures.InlineControlStructure"/>
+    <rule ref="Generic.Formatting.SpaceAfterCast"/>
     <file>./</file> <!-- directory you want to analyze -->
     <exclude-pattern>/vendor/</exclude-pattern>
     <exclude-pattern>allowedOrigins.php</exclude-pattern>
