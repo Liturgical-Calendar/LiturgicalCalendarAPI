@@ -20,16 +20,7 @@ final class ReadingsFestive extends ReadingsAbstract
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
-        $current_properties = array_keys(get_object_vars($data));
-        $missing_properties = array_diff(self::REQUIRED_PROPS, $current_properties);
-
-        if (!empty($missing_properties)) {
-            throw new \ValueError(sprintf(
-                'The following properties are required: %s. Found properties: %s',
-                implode(', ', $missing_properties),
-                implode(', ', $current_properties)
-            ));
-        }
+        static::validateRequiredProps($data, self::REQUIRED_PROPS);
 
         return new static(
             $data->first_reading,
@@ -55,16 +46,7 @@ final class ReadingsFestive extends ReadingsAbstract
      */
     protected static function fromArrayInternal(array $data): static
     {
-        $current_properties = array_keys($data);
-        $missing_properties = array_diff(self::REQUIRED_PROPS, $current_properties);
-
-        if (!empty($missing_properties)) {
-            throw new \ValueError(sprintf(
-                'The following properties are required: %s. Found properties: %s',
-                implode(', ', $missing_properties),
-                implode(', ', $current_properties)
-            ));
-        }
+        static::validateRequiredKeys($data, self::REQUIRED_PROPS);
 
         if (reset($data) instanceof \stdClass) {
             throw new \InvalidArgumentException('Please use fromObject instead.');

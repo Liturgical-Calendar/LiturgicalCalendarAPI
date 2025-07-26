@@ -164,7 +164,7 @@ final class NationalData extends AbstractJsonSrcData
     protected static function fromObjectInternal(\stdClass $data): static
     {
         return new static(
-            LitCalItemCollection::fromArray($data->litcal),
+            LitCalItemCollection::fromObject($data->litcal),
             MetadataNationalCalendarSettings::fromObject($data->settings),
             NationalMetadata::fromObject($data->metadata),
             property_exists($data, 'i18n') ? $data->i18n : null

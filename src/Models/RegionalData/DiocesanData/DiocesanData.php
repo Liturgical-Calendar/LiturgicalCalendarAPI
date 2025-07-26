@@ -156,7 +156,7 @@ final class DiocesanData extends AbstractJsonSrcData
     protected static function fromObjectInternal(\stdClass $data): static
     {
         return new static(
-            DiocesanLitCalItemCollection::fromArray($data->litcal),
+            DiocesanLitCalItemCollection::fromObject($data->litcal),
             DiocesanMetadata::fromObject($data->metadata),
             property_exists($data, 'settings') && $data->settings instanceof \stdClass ? MetadataDiocesanCalendarSettings::fromObject($data->settings) : null,
             $data->i18n ?? null

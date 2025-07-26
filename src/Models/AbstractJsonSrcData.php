@@ -101,4 +101,50 @@ abstract class AbstractJsonSrcData
     {
         $this->locked = false;
     }
+
+    /**
+     * Checks if all required properties are present in a stdClass object.
+     *
+     * @param \stdClass $data The stdClass object to check.
+     * @param string[] $required_properties The list of required property names.
+     *
+     * @throws \ValueError if any of the required properties is missing from the stdClass object.
+     */
+    protected static function validateRequiredProps(\stdClass $data, array $required_properties): void
+    {
+        $current_properties = array_keys(get_object_vars($data));
+        $missing_properties = array_diff($required_properties, $current_properties);
+
+        if (!empty($missing_properties)) {
+            throw new \ValueError(sprintf(
+                'The following properties are missing: %s. Found properties: %s, but required properties are: %s.',
+                implode(', ', $missing_properties),
+                implode(', ', $current_properties),
+                implode(', ', $required_properties)
+            ));
+        }
+    }
+
+    /**
+     * Validates that all required keys are present in an associative array.
+     *
+     * @param array<string,mixed> $data The associative array to validate.
+     * @param string[] $required_keys The keys that must be present in the array.
+     *
+     * @throws \ValueError if any of the required keys is missing from the array.
+     */
+    protected static function validateRequiredKeys(array $data, array $required_keys): void
+    {
+        $current_keys = array_keys($data);
+        $missing_keys = array_diff($required_keys, $current_keys);
+
+        if (!empty($missing_keys)) {
+            throw new \ValueError(sprintf(
+                'The following keys are missing: %s. Found keys: %s, but required keys are: %s.',
+                implode(', ', $missing_keys),
+                implode(', ', $current_keys),
+                implode(', ', $required_keys)
+            ));
+        }
+    }
 }

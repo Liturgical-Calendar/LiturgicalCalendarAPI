@@ -3,12 +3,11 @@
 namespace LiturgicalCalendar\Api\Models;
 
 use LiturgicalCalendar\Api\Enum\DateRelation;
-use LiturgicalCalendar\Api\Enum\LitLocale;
-use LiturgicalCalendar\Api\LatinUtils;
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 
 final class RelativeLiturgicalDate extends AbstractJsonSrcData
 {
+    private const REQUIRED_PROPS = ['day_of_the_week', 'relative_time', 'event_key'];
     public string $day_of_the_week;
     public DateRelation $relative_time;
     public string $event_key;
@@ -46,17 +45,13 @@ final class RelativeLiturgicalDate extends AbstractJsonSrcData
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
-        if (
-            false === property_exists($data, 'day_of_the_week')
-            || false === property_exists($data, 'relative_time')
-            || false === property_exists($data, 'event_key')
-        ) {
-            throw new \ValueError('`$data->day_of_the_week`, `$data->relative_time`, and `$data->event_key` properties are required');
-        }
+        static::validateRequiredProps($data, self::REQUIRED_PROPS);
 
-        $dateRelation = DateRelation::from($data->relative_time);
-
-        return new static($data->day_of_the_week, $dateRelation, $data->event_key);
+        return new static(
+            $data->day_of_the_week,
+            DateRelation::from($data->relative_time),
+            $data->event_key
+        );
     }
 
     /**
@@ -73,43 +68,25 @@ final class RelativeLiturgicalDate extends AbstractJsonSrcData
      */
     protected static function fromArrayInternal(array $data): static
     {
-        if (
-            false === array_key_exists('day_of_the_week', $data)
-            || false === array_key_exists('relative_time', $data)
-            || false === array_key_exists('event_key', $data)
-        ) {
-            throw new \ValueError('`$data[\'day_of_the_week\']`, `$data[\'relative_time\']`, and `$data[\'event_key\']` keys are required');
-        }
+        static::validateRequiredKeys($data, self::REQUIRED_PROPS);
 
-        $dateRelation = DateRelation::from($data['relative_time']);
-
-        return new static($data['day_of_the_week'], $dateRelation, $data['event_key']);
+        return new static(
+            $data['day_of_the_week'],
+            DateRelation::from($data['relative_time']),
+            $data['event_key']
+        );
     }
 
+    /**
+     * Returns a string representation of the RelativeLiturgicalDate object.
+     *
+     * The string is formatted as "{day_of_the_week} {relative_time} {event_key}",
+     * where each placeholder is replaced by the corresponding property value.
+     *
+     * @return string A string representation of the object.
+     */
     public function __toString(): string
     {
-        /*
-        $dayOfTheWeekFmt = \IntlDateFormatter::create(
-            LitLocale::$PRIMARY_LANGUAGE,
-            \IntlDateFormatter::FULL,
-            \IntlDateFormatter::NONE,
-            'UTC',
-            \IntlDateFormatter::GREGORIAN,
-            'EEEE'
-        );
-        */
-        //$relString = $this->relative_time === DateRelation::Before
-        //    /**translators: e.g. 'Monday before PalmSunday' */
-        //    ? _('before')
-        //    /**translators: e.g. 'Monday after Pentecost' */
-        //    : _('after');
-
-        /*
-        $dayOfTheWeek = LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE
-            ? LatinUtils::LATIN_DAYOFTHEWEEK[$liturgicalEvent->date->format('w')]
-            : ucfirst($dayOfTheWeekFmt->format($liturgicalEvent->date->format('U')));
-        */
-        //return sprintf('%s %s %s', $dayOfTheWeek, $relString, $litEvent->name);
         return sprintf('%s %s %s', $this->day_of_the_week, $this->relative_time->value, $this->event_key);
     }
 }

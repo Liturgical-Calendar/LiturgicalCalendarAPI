@@ -131,7 +131,7 @@ final class WiderRegionData extends AbstractJsonSrcData
         }
 
         return new static(
-            LitCalItemCollection::fromArray($data->litcal),
+            LitCalItemCollection::fromObject($data->litcal),
             $nationalCalendarsArray,
             WiderRegionMetadata::fromObject($data->metadata),
             $data->i18n ?? null

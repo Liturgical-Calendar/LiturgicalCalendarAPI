@@ -12,6 +12,7 @@ use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\PropriumDeTemporeEvent;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewFixed as DiocesanLitCalItemCreateNewFixed;
@@ -311,11 +312,11 @@ final class LiturgicalEvent implements \JsonSerializable
      *   If not provided, defaults to LitEventType::FIXED.
      * - grade_display: The grade display of the liturgical event, as a string. If not provided, defaults to null.
      *
-     * @param \stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile|DecreeItemCreateNewFixed|DecreeItemCreateNewMobile $obj
+     * @param \stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile|DecreeItemCreateNewFixed|DecreeItemCreateNewMobile|PropriumDeTemporeEvent $obj
      * @return LiturgicalEvent A new LiturgicalEvent object.
      * @throws \InvalidArgumentException If the provided object does not contain the required properties or if the properties have invalid types.
      */
-    public static function fromObject(\stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile|DecreeItemCreateNewFixed|DecreeItemCreateNewMobile $obj): LiturgicalEvent
+    public static function fromObject(\stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile|DecreeItemCreateNewFixed|DecreeItemCreateNewMobile|PropriumDeTemporeEvent $obj): LiturgicalEvent
     {
         $requiredProps = ['name', 'date', 'grade'];
         $rowProps      = get_object_vars($obj);
@@ -395,7 +396,12 @@ final class LiturgicalEvent implements \JsonSerializable
                 $commons = LitCommons::create([]);
             }
         } else {
-            $commons = $obj->common;
+            if (property_exists($obj, 'common')) {
+                $commons = $obj->common;
+            } else {
+                // We ensure a default value
+                $commons = LitCommons::create([]);
+            }
         }
 
         if (false === isset($obj->date)) {
