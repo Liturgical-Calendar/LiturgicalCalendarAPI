@@ -14,7 +14,6 @@
         "readings": {
             "first_reading": "Ef 4, 1-7.11-13",
             "responsorial_psalm": "Salmo 23",
-            "second_reading": "",
             "alleluia_verse": "Mt 23, 9b.10b",
             "gospel": "Mt 23, 8-12"
         }
@@ -34,7 +33,6 @@
         "readings": {
             "first_reading": "2 Cor 5, 14-20",
             "responsorial_psalm": "Salmo 103",
-            "second_reading": "",
             "alleluia_verse": "Mt 24, 42a.44",
             "gospel": "Lc 12, 35-40"
         }
@@ -55,7 +53,6 @@
         "readings": {
             "first_reading": "1Gv 2, 18-25",
             "responsorial_psalm": "Salmo 110",
-            "second_reading": "",
             "alleluia_verse": "Mt 5, 16",
             "gospel": "Mt 5, 13-19"
         }
@@ -75,7 +72,6 @@
         "readings": {
             "first_reading": "Ef 6, 10-13.18",
             "responsorial_psalm": "Salmo 16",
-            "second_reading": "",
             "alleluia_verse": "Gv 8, 31b-32",
             "gospel": "Mt 19, 16-26"
         }
@@ -97,7 +93,6 @@
         "readings": {
             "first_reading": "1 Pt 5, 1-4",
             "responsorial_psalm": "Salmo 40",
-            "second_reading": "",
             "alleluia_verse": "Gv 10, 14",
             "gospel": "Gv 21, 15-17"
         }
@@ -117,9 +112,8 @@
         "readings": {
             "first_reading": "1 Pt 3, 14-17",
             "responsorial_psalm": "Salmo 34",
-            "second_reading": "",
             "alleluia_verse": "2 Cor 1, 3b-4a",
-            "gospel": "Mt 10, 28-33 "
+            "gospel": "Mt 10, 28-33"
         }
     },
     {
@@ -139,7 +133,6 @@
         "readings": {
             "first_reading": "1Cor 1, 26-31",
             "responsorial_psalm": "Salmo 23",
-            "second_reading": "",
             "alleluia_verse": "Gv 15, 9b.5b",
             "gospel": "Mt 13, 44-46"
         }
@@ -158,8 +151,7 @@
         ],
         "readings": {
             "first_reading": "2 Cor 4, 7-15",
-            "responsorial_psalm": "Salmo 34",
-            "second_reading": "",
+            "responsorial_psalm": "Salmo 33 (34)",
             "alleluia_verse": "",
             "gospel": "Mt 10, 17-22"
         }
@@ -180,7 +172,6 @@
         "readings": {
             "first_reading": "Ef 3, 8-12",
             "responsorial_psalm": "Salmo 37",
-            "second_reading": "",
             "alleluia_verse": "Gv 13, 34",
             "gospel": "Gv 15, 9-17"
         }
@@ -198,9 +189,8 @@
             "white"
         ],
         "readings": {
-            "first_reading": "At 22, 3-16|At 9, 1-22",
+            "first_reading": "At 22 3-16|At 9, 1-22",
             "responsorial_psalm": "Salmo 117",
-            "second_reading": "",
             "alleluia_verse": "Gv 15, 16",
             "gospel": "Mc 16, 15-18"
         }
@@ -220,7 +210,6 @@
         "readings": {
             "first_reading": "2Tim 1, 1-8|Tito 1, 1-5",
             "responsorial_psalm": "Salmo 96",
-            "second_reading": "",
             "alleluia_verse": "Lc 4, 18",
             "gospel": "Lc 10, 1-9"
         }
@@ -241,7 +230,6 @@
         "readings": {
             "first_reading": "1 Pt 4, 7-11",
             "responsorial_psalm": "Salmo 148",
-            "second_reading": "",
             "alleluia_verse": "Mt 23, 11.12b",
             "gospel": "Mc 9, 33-37"
         }
@@ -262,7 +250,6 @@
         "readings": {
             "first_reading": "Sap 7, 7-10.15-16",
             "responsorial_psalm": "Salmo 119",
-            "second_reading": "",
             "alleluia_verse": "Mt 23, 9b.10b",
             "gospel": "Mt 23, 8-12"
         }
@@ -283,7 +270,6 @@
         "readings": {
             "first_reading": "Fil 4, 4-9",
             "responsorial_psalm": "Salmo 103",
-            "second_reading": "",
             "alleluia_verse": "Mt 11, 25",
             "gospel": "Mt 18, 1-5"
         }
@@ -325,8 +311,7 @@
         "readings": {
             "first_reading": "Rm 5, 1-5",
             "responsorial_psalm": "Salmo 117",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Mt 28, 19a.20b",
             "gospel": "Mc 16, 15-20"
         }
     },
@@ -346,8 +331,7 @@
         "readings": {
             "first_reading": "Is 52, 7-10",
             "responsorial_psalm": "Salmo 96",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Mc 1, 17",
             "gospel": "Mc 1, 14-20"
         }
     },
@@ -368,7 +352,6 @@
         "readings": {
             "first_reading": "1Cor 1, 26-31",
             "responsorial_psalm": "Salmo 31",
-            "second_reading": "",
             "alleluia_verse": "1 Pt 4, 14",
             "gospel": "Lc 9, 23-26"
         }
@@ -388,7 +371,6 @@
         "readings": {
             "first_reading": "Gal 2, 19-20",
             "responsorial_psalm": "Salmo 126",
-            "second_reading": "",
             "alleluia_verse": "Mt 28, 19a.20b",
             "gospel": "Mt 28, 16-20"
         }
@@ -408,8 +390,7 @@
         "readings": {
             "first_reading": "Tb 12, 6-13",
             "responsorial_psalm": "Salmo 34",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Mt 5,3",
             "gospel": "Mc 10, 17-30"
         }
     },
@@ -429,7 +410,6 @@
         "readings": {
             "first_reading": "Ct 8, 6-7",
             "responsorial_psalm": "Salmo 148",
-            "second_reading": "",
             "alleluia_verse": "Gv 14, 23",
             "gospel": "Lc 10, 38-42"
         }
@@ -449,7 +429,6 @@
         "readings": {
             "first_reading": "Is 66, 10-14c",
             "responsorial_psalm": "Gdt Gdt 13, 18-19",
-            "second_reading": "",
             "alleluia_verse": "Lc 1, 45",
             "gospel": "Gv 2, 1-11"
         }
@@ -469,7 +448,6 @@
         "readings": {
             "first_reading": "At 13, 46-49|Is 52, 7-10",
             "responsorial_psalm": "Salmo 117",
-            "second_reading": "",
             "alleluia_verse": "Lc 4, 18cd",
             "gospel": "Lc 10, 1-9"
         }
@@ -489,8 +467,7 @@
         "readings": {
             "first_reading": "Rm 8, 26-30",
             "responsorial_psalm": "Salmo 34",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Mt 5, 3",
             "gospel": "Mt 19, 27-29"
         }
     },
@@ -510,8 +487,7 @@
         "readings": {
             "first_reading": "2 Tm 4, 1-5",
             "responsorial_psalm": "Salmo 16",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Gv 15, 4a.5b",
             "gospel": "Gv 15, 1-8"
         }
     },
@@ -530,7 +506,6 @@
         "readings": {
             "first_reading": "1Pt 5, 1-4",
             "responsorial_psalm": "Salmo 23",
-            "second_reading": "",
             "alleluia_verse": "Mt 16, 18",
             "gospel": "Mt 16, 13-19"
         }
@@ -552,7 +527,6 @@
         "readings": {
             "first_reading": "Ap 2, 8-11",
             "responsorial_psalm": "Salmo 31",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": "Gv 15, 18-21"
         }
@@ -572,8 +546,7 @@
         "readings": {
             "first_reading": "Fil 3, 8-14",
             "responsorial_psalm": "Salmo 15",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Gv 14, 23",
             "gospel": "Gv 15, 9-17"
         }
     },
@@ -592,8 +565,7 @@
         "readings": {
             "first_reading": "Rm 8, 31b-39",
             "responsorial_psalm": "Salmo 124",
-            "second_reading": "",
-            "alleluia_verse": "Mt 5, 10 ",
+            "alleluia_verse": "Mt 5, 10",
             "gospel": "Mt 10, 34-39"
         }
     },
@@ -612,9 +584,8 @@
         ],
         "readings": {
             "first_reading": "1 Gv 3, 14-18",
-            "responsorial_psalm": "Salmo 112",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "responsorial_psalm": "Salmo 111 (112)",
+            "alleluia_verse": "Cf. Gv 13, 34",
             "gospel": "Mt 25, 31-40"
         }
     },
@@ -633,9 +604,8 @@
         ],
         "readings": {
             "first_reading": "Pr 31, 10-13.19-20.30-31",
-            "responsorial_psalm": "Salmo 34",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "responsorial_psalm": "Salmo 33 (34)",
+            "alleluia_verse": "Gv 14, 23",
             "gospel": "Mt 22, 34-40"
         }
     },
@@ -655,8 +625,7 @@
         "readings": {
             "first_reading": "1 Pt 4, 7-11",
             "responsorial_psalm": "Salmo 96",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Mc 1, 17",
             "gospel": "Lc 5, 1-11"
         }
     },
@@ -676,8 +645,7 @@
         "readings": {
             "first_reading": "1 Gv 5, 1-5",
             "responsorial_psalm": "Salmo 19",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Gv 15, 4a.5b",
             "gospel": "Gv 15, 1-8"
         }
     },
@@ -716,8 +684,7 @@
         "readings": {
             "first_reading": "2 Tm 1, 13-14; 2, 1-3",
             "responsorial_psalm": "Salmo 96",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Gv 10, 14",
             "gospel": "Mt 9, 35-38"
         }
     },
@@ -756,8 +723,7 @@
         "readings": {
             "first_reading": "Fil 3, 8-14",
             "responsorial_psalm": "Salmo 16",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Cf. Mt 6, 19a.21",
             "gospel": "Lc 12, 32-34"
         }
     },
@@ -777,8 +743,7 @@
         "readings": {
             "first_reading": "2 Cor 4, 1-2.5-7",
             "responsorial_psalm": "Salmo 37",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Gv 15, 5",
             "gospel": "Lc 6, 43-45"
         }
     },
@@ -797,8 +762,7 @@
         "readings": {
             "first_reading": "2 Tm 4, 1-5",
             "responsorial_psalm": "Salmo 40",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Mt 24, 42a.44",
             "gospel": "Lc 12, 35-40"
         }
     },
@@ -818,7 +782,6 @@
         "readings": {
             "first_reading": "1Tim 1, 13-14; 2, 1-3",
             "responsorial_psalm": "Salmo 1",
-            "second_reading": "",
             "alleluia_verse": "Mt 23, 11.12b",
             "gospel": "Mt 18, 1-5"
         }
@@ -840,8 +803,7 @@
         "readings": {
             "first_reading": "Ap 12, 10-12a",
             "responsorial_psalm": "Salmo 34",
-            "second_reading": "",
-            "alleluia_verse": "2 Cor 1, 3b-4a ",
+            "alleluia_verse": "2 Cor 1, 3b-4a",
             "gospel": "Gv 17, 11b-19"
         }
     },
@@ -862,9 +824,8 @@
         "readings": {
             "first_reading": "2 Tm 2, 8-13; 3, 10-12",
             "responsorial_psalm": "Salmo 126",
-            "second_reading": "",
-            "alleluia_verse": "",
-            "gospel": "Gv 15, 18-21 "
+            "alleluia_verse": "Mt 5, 10",
+            "gospel": "Gv 15, 18-21"
         }
     },
     {
@@ -883,8 +844,7 @@
         "readings": {
             "first_reading": "Ef 3, 14-19",
             "responsorial_psalm": "Salmo 34",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Cf. Gv 6, 63c.68c",
             "gospel": "Mt 7, 21-29"
         }
     },
@@ -903,8 +863,7 @@
         "readings": {
             "first_reading": "Ap 21, 5-7",
             "responsorial_psalm": "Salmo 126",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "1 Pt 4, 14",
             "gospel": "Lc 9, 23-26"
         }
     },
@@ -925,8 +884,7 @@
         "readings": {
             "first_reading": "Col 1, 24-29",
             "responsorial_psalm": "Salmo 34",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Mt 11, 28",
             "gospel": "Gv 17, 20-26"
         }
     },
@@ -945,7 +903,6 @@
         "readings": {
             "first_reading": "1Pt 5, 5b-14",
             "responsorial_psalm": "Salmo 89",
-            "second_reading": "",
             "alleluia_verse": "1 Cor 1, 23a.24b",
             "gospel": "Mc 16, 15-20"
         }
@@ -967,8 +924,7 @@
         "readings": {
             "first_reading": "1 Cor 1, 18-25",
             "responsorial_psalm": "Salmo 117",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Mc 1, 17",
             "gospel": "Mc 1, 14-20"
         }
     },
@@ -987,7 +943,6 @@
         "readings": {
             "first_reading": "1Gv 1, 5 – 2, 2",
             "responsorial_psalm": "Salmo 103",
-            "second_reading": "",
             "alleluia_verse": "Mt 11, 25",
             "gospel": "Mt 11, 25-30"
         }
@@ -1007,8 +962,7 @@
         "readings": {
             "first_reading": "1 Cor 4, 1-5",
             "responsorial_psalm": "Salmo 110",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Gv 10, 14",
             "gospel": "Gv 21, 15-17"
         }
     },
@@ -1027,7 +981,6 @@
         "readings": {
             "first_reading": "Gen 1, 26 – 2, 3|Col 3, 14-15.17.23-24",
             "responsorial_psalm": "Salmo 90",
-            "second_reading": "",
             "alleluia_verse": "Salmo 68, 20",
             "gospel": "Mt 13, 54-58"
         }
@@ -1047,7 +1000,6 @@
         "readings": {
             "first_reading": "1Gv 5, 1-5",
             "responsorial_psalm": "Salmo 37",
-            "second_reading": "",
             "alleluia_verse": "Mt 5, 10",
             "gospel": "Mt 10, 22-25a"
         }
@@ -1067,7 +1019,6 @@
         "readings": {
             "first_reading": "1Cor 15, 1-8a",
             "responsorial_psalm": "Salmo 19",
-            "second_reading": "",
             "alleluia_verse": "Gv 14, 6b.9c",
             "gospel": "Gv 14, 6-14"
         }
@@ -1087,7 +1038,6 @@
         "readings": {
             "first_reading": "Ap 7, 9-17",
             "responsorial_psalm": "Salmo 124",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": "Mt 10, 17-22"
         }
@@ -1107,8 +1057,7 @@
         "readings": {
             "first_reading": "Ap 19, 1.5-9a",
             "responsorial_psalm": "Salmo 103",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Cf. Mt 11, 25",
             "gospel": "Mt 11, 25-30"
         }
     },
@@ -1127,7 +1076,6 @@
         "readings": {
             "first_reading": "At 1, 15-17.20-26",
             "responsorial_psalm": "Salmo 113",
-            "second_reading": "",
             "alleluia_verse": "Gv 15, 16",
             "gospel": "Gv 15, 9-17"
         }
@@ -1149,8 +1097,7 @@
         "readings": {
             "first_reading": "Ap 3, 14b.20-22",
             "responsorial_psalm": "Salmo 23",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Gv 15, 15b",
             "gospel": "Lc 22, 24-30"
         }
     },
@@ -1170,7 +1117,6 @@
         "readings": {
             "first_reading": "At 4, 8-12",
             "responsorial_psalm": "Salmo 40",
-            "second_reading": "",
             "alleluia_verse": "Gv 8, 12",
             "gospel": "Lc 9, 57-62"
         }
@@ -1191,8 +1137,7 @@
         "readings": {
             "first_reading": "1 Cor 2, 10b-16",
             "responsorial_psalm": "Salmo 119",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Cf. Gv 6, 63c.68c",
             "gospel": "Mt 7, 21-29"
         }
     },
@@ -1211,8 +1156,7 @@
         "readings": {
             "first_reading": "At 20, 17-18a.28-32.36",
             "responsorial_psalm": "Salmo 110",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Gv 10, 14",
             "gospel": "Mt 16, 13-19"
         }
     },
@@ -1232,8 +1176,7 @@
         "readings": {
             "first_reading": "1 Cor 7, 25-35",
             "responsorial_psalm": "Salmo 148",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Cf. Gv 8, 31b-32",
             "gospel": "Mc 3, 31-35"
         }
     },
@@ -1252,7 +1195,6 @@
         "readings": {
             "first_reading": "Fil 4, 4-9",
             "responsorial_psalm": "Salmo 34",
-            "second_reading": "",
             "alleluia_verse": "Gv 15, 9b.5b",
             "gospel": "Gv 17, 20-26"
         }
@@ -1273,8 +1215,7 @@
         "readings": {
             "first_reading": "1 Ts 2, 2b-8",
             "responsorial_psalm": "Salmo 96",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Gv 10, 14",
             "gospel": "Mt 9, 35-38"
         }
     },
@@ -1293,7 +1234,6 @@
         "readings": {
             "first_reading": "Sof 3, 14-18|Rm 12, 9-16b",
             "responsorial_psalm": "Is 12, 2-6",
-            "second_reading": "",
             "alleluia_verse": "Lc 1, 45",
             "gospel": "Lc 1, 39-56"
         }
@@ -1313,8 +1253,7 @@
         "readings": {
             "first_reading": "1Cor 1, 18-25",
             "responsorial_psalm": "Salmo 34",
-            "second_reading": "",
-            "alleluia_verse": "Mt 5, 16 ",
+            "alleluia_verse": "Mt 5, 16",
             "gospel": "Mt 5, 13-19"
         }
     },
@@ -1333,8 +1272,7 @@
         "readings": {
             "first_reading": "2 Cor 6, 4-10",
             "responsorial_psalm": "Salmo 124",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Gv 17, 19",
             "gospel": "Gv 17, 11b-19"
         }
     },
@@ -1353,7 +1291,6 @@
         "readings": {
             "first_reading": "Macc 7, 1-2.9-14",
             "responsorial_psalm": "Salmo 124",
-            "second_reading": "",
             "alleluia_verse": "Mt 5, 3",
             "gospel": "Mt 5, 1-12a"
         }
@@ -1375,7 +1312,6 @@
         "readings": {
             "first_reading": "At 26, 19-23",
             "responsorial_psalm": "Salmo 117",
-            "second_reading": "",
             "alleluia_verse": "Gv 10, 14",
             "gospel": "Gv 10, 11-16"
         }
@@ -1396,8 +1332,7 @@
         "readings": {
             "first_reading": "Ez 34, 11-16",
             "responsorial_psalm": "Salmo 23",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Gv 15, 9b.5b",
             "gospel": "Lc 14, 25-33"
         }
     },
@@ -1416,8 +1351,7 @@
         "readings": {
             "first_reading": "Col 3, 12-17",
             "responsorial_psalm": "Salmo 37",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Gv 15, 5",
             "gospel": "Lc 6, 43-45"
         }
     },
@@ -1436,7 +1370,6 @@
         "readings": {
             "first_reading": "At 11, 21b-26; 13, 1-3",
             "responsorial_psalm": "Salmo 98",
-            "second_reading": "",
             "alleluia_verse": "Mt 28, 19a.20b",
             "gospel": "Mt 10, 7-13"
         }
@@ -1458,7 +1391,6 @@
         "readings": {
             "first_reading": "Is 61, 1-3a",
             "responsorial_psalm": "Salmo 89",
-            "second_reading": "",
             "alleluia_verse": "Lc 4, 18cd",
             "gospel": "Lc 10, 1-9"
         }
@@ -1478,8 +1410,7 @@
         "readings": {
             "first_reading": "Fil 3, 8-10",
             "responsorial_psalm": "Salmo 131",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Gv 15, 9b.5b",
             "gospel": "Lc 14, 25-33"
         }
     },
@@ -1498,7 +1429,6 @@
         "readings": {
             "first_reading": "1Gv 5, 1-5",
             "responsorial_psalm": "Salmo 16",
-            "second_reading": "",
             "alleluia_verse": "Gv 13, 34",
             "gospel": "Mt 22, 34-40"
         }
@@ -1518,7 +1448,6 @@
         "readings": {
             "first_reading": "2Cor 8, 9-15",
             "responsorial_psalm": "Salmo 40",
-            "second_reading": "",
             "alleluia_verse": "Mt 5,3",
             "gospel": "Lc 12, 32-34"
         }
@@ -1538,8 +1467,7 @@
         "readings": {
             "first_reading": "1 Pt 4, 12-19",
             "responsorial_psalm": "Salmo 126",
-            "second_reading": "",
-            "alleluia_verse": "",
+            "alleluia_verse": "Lc 9, 24",
             "gospel": "Mt 10, 34-39"
         }
     },
@@ -1560,14 +1488,14 @@
                 "first_reading": "Ger 1, 4-10",
                 "responsorial_psalm": "Salmo 71",
                 "second_reading": "1Pt 1, 8-12",
-                "alleluia_verse": " Gv 1, 7; Lc 1, 17 ",
+                "alleluia_verse": " Gv 1, 7; Lc 1, 17",
                 "gospel": "Lc 1, 5-17"
             },
             "day": {
                 "first_reading": "Ger 1, 4-10",
                 "responsorial_psalm": "Salmo 71",
                 "second_reading": "1Pt 1, 8-12",
-                "alleluia_verse": " Gv 1, 7; Lc 1, 17 ",
+                "alleluia_verse": " Gv 1, 7; Lc 1, 17",
                 "gospel": "Lc 1, 5-17"
             }
         }
@@ -1586,11 +1514,10 @@
             "white"
         ],
         "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "second_reading": "",
-            "alleluia_verse": "",
-            "gospel": ""
+            "first_reading": "2 Tm 4, 1-5",
+            "responsorial_psalm": "Salmo 88 (89)",
+            "alleluia_verse": "Mt 5, 16",
+            "gospel": "Mt 5, 13-19"
         }
     },
     {
@@ -1607,11 +1534,10 @@
             "red"
         ],
         "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "second_reading": "",
-            "alleluia_verse": "",
-            "gospel": ""
+            "first_reading": "2 Tm 2, 22b-26",
+            "responsorial_psalm": "Salmo 36 (37)",
+            "alleluia_verse": "Gv 15, 9b.5b",
+            "gospel": "Gv 17, 20-26"
         }
     },
     {
@@ -1627,11 +1553,20 @@
             "red"
         ],
         "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "second_reading": "",
-            "alleluia_verse": "",
-            "gospel": ""
+            "vigil": {
+                "first_reading": "At 3, 1-10",
+                "responsorial_psalm": "Salmo 18 (19)",
+                "second_reading": "Gal 1, 11-20",
+                "alleluia_verse": "Gv 21, 17d",
+                "gospel": "Gv 21, 15-19"
+            },
+            "day": {
+                "first_reading": "At 12, 1-11",
+                "responsorial_psalm": "Salmo 33 (34)",
+                "second_reading": "2 Tm 4, 6-8.17-18",
+                "alleluia_verse": "Mt 16, 18",
+                "gospel": "Mt 16, 13-19"
+            }
         }
     },
     {
@@ -1647,11 +1582,10 @@
             "red"
         ],
         "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "second_reading": "",
-            "alleluia_verse": "",
-            "gospel": ""
+            "first_reading": "Rm 8, 31b-39",
+            "responsorial_psalm": "Salmo 123 (124)",
+            "alleluia_verse": "Mt 5, 10",
+            "gospel": "Mt 24, 4-13"
         }
     },
     {
@@ -1667,11 +1601,10 @@
             "red"
         ],
         "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "second_reading": "",
-            "alleluia_verse": "",
-            "gospel": ""
+            "first_reading": "Ef 2, 19-22",
+            "responsorial_psalm": "Salmo 116 (117)",
+            "alleluia_verse": "Gv 20, 29",
+            "gospel": "Gv 20, 24-29"
         }
     },
     {
@@ -1687,11 +1620,10 @@
             "white"
         ],
         "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "second_reading": "",
-            "alleluia_verse": "",
-            "gospel": ""
+            "first_reading": "1 Gv 3, 14-18",
+            "responsorial_psalm": "Salmo 111 (112)",
+            "alleluia_verse": "Cf. Gv 13, 34",
+            "gospel": "Mt 25, 31-46"
         }
     },
     {
@@ -1711,7 +1643,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -1733,7 +1664,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -1753,7 +1683,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -1773,7 +1702,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -1793,7 +1721,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -1814,7 +1741,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -1834,7 +1760,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -1856,7 +1781,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -1876,7 +1800,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -1897,7 +1820,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -1917,7 +1839,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -1937,7 +1858,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -1957,7 +1877,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -1978,7 +1897,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -1998,7 +1916,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2019,7 +1936,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2039,7 +1955,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2059,7 +1974,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2079,7 +1993,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2099,7 +2012,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2119,7 +2031,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2140,7 +2051,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2160,7 +2070,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2181,7 +2090,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2202,7 +2110,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2222,7 +2129,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2244,7 +2150,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2264,7 +2169,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2284,7 +2188,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2305,7 +2208,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2325,7 +2227,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2345,7 +2246,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2365,7 +2265,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2385,7 +2284,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2405,7 +2303,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2425,7 +2322,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2446,7 +2342,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2466,7 +2361,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2486,7 +2380,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2506,7 +2399,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2526,7 +2418,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2546,7 +2437,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2566,7 +2456,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2586,7 +2475,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2606,7 +2494,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2628,7 +2515,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2649,7 +2535,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2671,7 +2556,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2691,7 +2575,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2711,7 +2594,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2731,7 +2613,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2751,7 +2632,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2771,7 +2651,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2791,7 +2670,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2811,7 +2689,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2831,7 +2708,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2851,7 +2727,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2872,7 +2747,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2892,7 +2766,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2912,7 +2785,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2933,7 +2805,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2955,7 +2826,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2975,7 +2845,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -2996,7 +2865,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3016,7 +2884,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3037,7 +2904,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3057,7 +2923,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3077,7 +2942,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3097,7 +2961,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3118,7 +2981,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3139,7 +3001,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3159,7 +3020,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3179,7 +3039,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3199,7 +3058,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3219,7 +3077,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3239,7 +3096,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3259,7 +3115,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3279,7 +3134,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3299,7 +3153,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3320,7 +3173,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3341,7 +3193,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3361,7 +3212,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3382,7 +3232,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3402,7 +3251,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3422,7 +3270,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3442,7 +3289,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3464,7 +3310,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3486,7 +3331,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3507,7 +3351,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3527,7 +3370,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3547,7 +3389,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3568,7 +3409,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3588,7 +3428,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3608,7 +3447,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3628,7 +3466,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3648,7 +3485,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3670,7 +3506,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3690,7 +3525,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3711,7 +3545,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3732,7 +3565,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3752,7 +3584,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3772,7 +3603,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3792,7 +3622,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3814,7 +3643,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }
@@ -3834,7 +3662,6 @@
         "readings": {
             "first_reading": "",
             "responsorial_psalm": "",
-            "second_reading": "",
             "alleluia_verse": "",
             "gospel": ""
         }

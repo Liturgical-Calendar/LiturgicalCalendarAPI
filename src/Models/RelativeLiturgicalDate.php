@@ -45,7 +45,7 @@ final class RelativeLiturgicalDate extends AbstractJsonSrcData
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
-        static::validateRequiredProps($data, self::REQUIRED_PROPS);
+        static::validateRequiredProps($data, static::REQUIRED_PROPS);
 
         return new static(
             $data->day_of_the_week,
@@ -68,7 +68,7 @@ final class RelativeLiturgicalDate extends AbstractJsonSrcData
      */
     protected static function fromArrayInternal(array $data): static
     {
-        static::validateRequiredKeys($data, self::REQUIRED_PROPS);
+        static::validateRequiredKeys($data, static::REQUIRED_PROPS);
 
         return new static(
             $data['day_of_the_week'],

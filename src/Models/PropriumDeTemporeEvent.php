@@ -20,15 +20,24 @@ final class PropriumDeTemporeEvent extends AbstractJsonSrcData
         'readings'
     ];
 
-    public string $event_key;
+    public readonly string $event_key;
     public private(set) string $name;
-    public LitGrade $grade;
-    public LitEventType $type;
-    /** @var LitColor[] */
-    public array $color;
-    public ReadingsEaster|ReadingsPalmSunday|ReadingsFestive $readings;
+    public readonly LitGrade $grade;
+    public readonly LitEventType $type;
+    /** @var LitColor[] $color */
+    public readonly array $color;
+    public readonly ReadingsEaster|ReadingsPalmSunday|ReadingsFestive $readings;
     public private(set) DateTime $date;
 
+    /**
+     * Constructor for the PropriumDeTemporeEvent class.
+     *
+     * @param string $event_key The key of the event.
+     * @param LitGrade $grade The grade of the event.
+     * @param LitEventType $type The type of the event.
+     * @param LitColor[] $color The color of the event.
+     * @param ReadingsEaster|ReadingsPalmSunday|ReadingsFestive $readings The readings for the event.
+     */
     public function __construct(
         string $event_key,
         LitGrade $grade,
@@ -51,7 +60,7 @@ final class PropriumDeTemporeEvent extends AbstractJsonSrcData
      */
     protected static function fromArrayInternal(array $data): static
     {
-        static::validateRequiredKeys($data, self::REQUIRED_PROPS);
+        static::validateRequiredKeys($data, static::REQUIRED_PROPS);
 
         if (array_key_exists('palm_gospel', $data['readings'])) {
             $readings = ReadingsPalmSunday::fromArray($data['readings']);
@@ -88,15 +97,15 @@ final class PropriumDeTemporeEvent extends AbstractJsonSrcData
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
-        static::validateRequiredProps($data, self::REQUIRED_PROPS);
+        static::validateRequiredProps($data, static::REQUIRED_PROPS);
 
         $readings = null;
         if (property_exists($data->readings, 'palm_gospel')) {
-            $readings = ReadingsPalmSunday::fromArray($data->readings);
+            $readings = ReadingsPalmSunday::fromObject($data->readings);
         } elseif (property_exists($data->readings, 'responsorial_psalm_2')) {
-            $readings = ReadingsEaster::fromArray($data->readings);
+            $readings = ReadingsEaster::fromObject($data->readings);
         } else {
-            $readings = ReadingsFestive::fromArray($data->readings);
+            $readings = ReadingsFestive::fromObject($data->readings);
         }
 
         return new static(

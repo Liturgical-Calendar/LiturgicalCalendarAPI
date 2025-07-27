@@ -1063,6 +1063,7 @@ final class LiturgicalEventCollection
         $litEvent->is_vigil_for      = $key;
         $litEvent->liturgical_year   = $eventForWhichIsVigilMass->liturgical_year;
         $litEvent->liturgical_season = $eventForWhichIsVigilMass->liturgical_season;
+        $litEvent->readings          = VigilReadingsMap::get($key) ?? $eventForWhichIsVigilMass->readings;
         $this->liturgicalEvents->addEvent($litEvent);
 
         $eventForWhichIsVigilMass->has_vigil_mass = true;

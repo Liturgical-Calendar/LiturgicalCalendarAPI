@@ -2,6 +2,7 @@
 
 namespace LiturgicalCalendar\Api\Paths;
 
+use Avifinfo\Prop;
 use LiturgicalCalendar\Api\Core;
 use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\LatinUtils;
@@ -38,7 +39,10 @@ use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyName;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyNameMetadata;
 use LiturgicalCalendar\Api\Models\LitCalItem;
 use LiturgicalCalendar\Api\Models\LitCalItemCollection;
-use LiturgicalCalendar\Api\Models\PropriumDeTemporeCollection;
+use LiturgicalCalendar\Api\Models\MissalsMap;
+use LiturgicalCalendar\Api\Models\PropriumDeSanctisEvent;
+use LiturgicalCalendar\Api\Models\PropriumDeSanctisMap;
+use LiturgicalCalendar\Api\Models\PropriumDeTemporeMap;
 use LiturgicalCalendar\Api\Models\PropriumDeTemporeEvent;
 use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
@@ -57,8 +61,6 @@ use LiturgicalCalendar\Api\Params\CalendarParams;
  *
  * This class is responsible for generating the Liturgical Calendar.
  *
- * @phpstan-type MissalItem array<string,object>
- * @phpstan-type TempCalMap array<string,MissalItem>
  * @phpstan-type CatholicDioceseLatinRiteItem object{
  *      diocese_name: string,
  *      diocese_id: string,
@@ -96,10 +98,11 @@ final class CalendarPath
     private ?NationalData $NationalData       = null;
     private ?WiderRegionData $WiderRegionData = null;
 
-    private PropriumDeTemporeCollection $PropriumDeTempore;
-    /** @var string[]                  */ private array $Messages = [];
-    /** @var TempCalMap                */ private array $tempCal  = [];
+    private PropriumDeTemporeMap $PropriumDeTempore;
+    private MissalsMap $missalsMap;
     private DecreeItemCollection $decreeItems;
+    /** @var string[] */
+    private array $Messages = [];
 
 
     /**
@@ -818,13 +821,17 @@ final class CalendarPath
      */
     private function loadPropriumDeTemporeData(): void
     {
-        $propriumDeTemporeFile   = strtr(
+        $propriumDeTemporeFile = strtr(
             JsonData::MISSALS_FILE,
             ['{missal_folder}' => 'propriumdetempore']
         );
-        $PropriumDeTempore       = Utilities::jsonFileToArray($propriumDeTemporeFile);
+
+        $PropriumDeTempore = Utilities::jsonFileToObject($propriumDeTemporeFile);
+        if (false === is_array($PropriumDeTempore)) {
+            throw new \Exception('We expected the Proprium de Tempore data to be an array of Proprium de Tempore objects.');
+        }
         $PropriumDeTemporeI18n   = $this->loadPropriumDeTemporeI18nData();
-        $this->PropriumDeTempore = PropriumDeTemporeCollection::fromArray($PropriumDeTempore);
+        $this->PropriumDeTempore = PropriumDeTemporeMap::fromObject($PropriumDeTempore);
         $this->PropriumDeTempore->setNames($PropriumDeTemporeI18n);
     }
 
@@ -863,19 +870,32 @@ final class CalendarPath
             return;
         }
 
+
+        $propriumDeSanctis = Utilities::jsonFileToObject($propriumdesanctisFile);
+        if (false === is_array($propriumDeSanctis)) {
+            throw new \Exception('We expected the Proprium de Sanctis data to be an array of Proprium de Sanctis objects.');
+        }
+        if (false === isset($this->missalsMap)) {
+            $missalsMap          = [];
+            $missalsMap[$missal] = PropriumDeSanctisMap::fromObject($propriumDeSanctis);
+            $this->missalsMap    = MissalsMap::initWithMissals($missalsMap);
+        } else {
+            $this->missalsMap[$missal] = PropriumDeSanctisMap::fromObject($propriumDeSanctis);
+        }
+
+
         if ($propriumdesanctisI18nPath !== false) {
             $locale                    = LitLocale::$PRIMARY_LANGUAGE;
             $propriumdesanctisI18nFile = $propriumdesanctisI18nPath . $locale . '.json';
             $i18nData                  = Utilities::jsonFileToArray($propriumdesanctisI18nFile);
-        }
-
-        $PropriumDeSanctis      = Utilities::jsonFileToObject($propriumdesanctisFile);
-        $this->tempCal[$missal] = [];
-        foreach ($PropriumDeSanctis as $row) {
-            if ($propriumdesanctisI18nPath !== false && $i18nData !== null) {
-                $row->name = $i18nData[$row->event_key];
+            if (array_filter(array_keys($i18nData), 'is_string') !== array_keys($i18nData)) {
+                throw new \Exception('We expected all the keys of the array to be strings.');
             }
-            $this->tempCal[$missal][$row->event_key] = $row;
+            if (array_filter($i18nData, 'is_string') !== $i18nData) {
+                throw new \Exception('We expected all the values of the array to be strings.');
+            }
+            /** @var array<string,string> $i18nData */
+            $this->missalsMap[$missal]->setNames($i18nData);
         }
     }
 
@@ -896,8 +916,18 @@ final class CalendarPath
 
         $names   = Utilities::jsonFileToArray($decreesI18nFile);
         $decrees = Utilities::jsonFileToObject(JsonData::DECREES_FILE);
+        if (false === is_array($decrees)) {
+            throw new \Exception('We expected the Decrees data to be an array of Decree objects.');
+        }
+        if (array_filter(array_keys($names), 'is_string') !== array_keys($names)) {
+            throw new \Exception('We expected all the keys of the array to be strings.');
+        }
+        if (array_filter($names, 'is_string') !== $names) {
+            throw new \Exception('We expected all the values of the array to be strings.');
+        }
+        /** @var array<string,string> $names */
         DecreeItemCollection::setNames($decrees, $names);
-        $this->decreeItems = DecreeItemCollection::fromObject($decrees, $names);
+        $this->decreeItems = DecreeItemCollection::fromObject($decrees);
     }
 
     /**
@@ -1029,7 +1059,11 @@ final class CalendarPath
                     $name,
                     $dateTime,
                     LitColor::WHITE,
-                    LitEventType::MOBILE
+                    LitEventType::MOBILE,
+                    LitGrade::WEEKDAY,
+                    LitCommon::NONE,
+                    null,
+                    null
                 );
                 $this->Cal->addLiturgicalEvent('DayBeforeEpiphany' . $nth, $litEvent);
             }
@@ -1080,7 +1114,11 @@ final class CalendarPath
                     $name,
                     $dateTime,
                     LitColor::WHITE,
-                    LitEventType::MOBILE
+                    LitEventType::MOBILE,
+                    LitGrade::WEEKDAY,
+                    LitCommon::NONE,
+                    null,
+                    null
                 );
                 $this->Cal->addLiturgicalEvent('DayAfterEpiphany' . $nth, $litEvent);
             }
@@ -1309,18 +1347,16 @@ final class CalendarPath
         ));
         $this->createPropriumDeTemporeLiturgicalEventByKey('MotherGod');
 
-        $tempCalSolemnities = array_filter($this->tempCal[RomanMissal::EDITIO_TYPICA_1970], function ($el) {
-            return $el->grade === LitGrade::SOLEMNITY->value;
-        });
+        $propriumDeSanctisSolemnities = $this->missalsMap[RomanMissal::EDITIO_TYPICA_1970]->filterByGrade(LitGrade::SOLEMNITY);
 
-        foreach ($tempCalSolemnities as $row) {
+        foreach ($propriumDeSanctisSolemnities as $propriumDeSanctisEvent) {
             $currentLitEventDate = DateTime::createFromFormat(
                 '!j-n-Y',
-                $row->day . '-' . $row->month . '-' . $this->CalendarParams->Year,
+                $propriumDeSanctisEvent->day . '-' . $propriumDeSanctisEvent->month . '-' . $this->CalendarParams->Year,
                 new \DateTimeZone('UTC')
             );
-            $row->date           = $currentLitEventDate;
-            $tempLiturgicalEvent = LiturgicalEvent::fromObject($row);
+            $propriumDeSanctisEvent->setDate($currentLitEventDate);
+            $tempLiturgicalEvent = LiturgicalEvent::fromObject($propriumDeSanctisEvent);
 
             /**
              * A Solemnity impeded in any given year is transferred to the nearest day following designated in nn. 1-8 of the Tables given above ( LY 60 )
@@ -1365,7 +1401,7 @@ final class CalendarPath
                  */
                 $locale = LitLocale::$PRIMARY_LANGUAGE;
                 if (
-                    $row->event_key === 'StJoseph'
+                    $propriumDeSanctisEvent->event_key === 'StJoseph'
                     && $currentLitEventDate >= $this->Cal->getLiturgicalEvent('PalmSun')->date
                     && $currentLitEventDate <= $this->Cal->getLiturgicalEvent('Easter')->date
                 ) {
@@ -1387,7 +1423,7 @@ final class CalendarPath
                             . _('Decree of the Congregation for Divine Worship')
                         . '</a>'
                     );
-                } elseif ($row->event_key === 'Annunciation' && $currentLitEventDate >= $this->Cal->getLiturgicalEvent('PalmSun')->date && $currentLitEventDate <= $this->Cal->getLiturgicalEvent('Easter2')->date) {
+                } elseif ($propriumDeSanctisEvent->event_key === 'Annunciation' && $currentLitEventDate >= $this->Cal->getLiturgicalEvent('PalmSun')->date && $currentLitEventDate <= $this->Cal->getLiturgicalEvent('Easter2')->date) {
                     //if the Annunciation falls during Holy Week or within the Octave of Easter, it is transferred to the Monday after the Second Sunday of Easter.
                     $tempLiturgicalEvent->date = Utilities::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P8D'));
                     $this->Messages[]          = sprintf(
@@ -1418,12 +1454,12 @@ final class CalendarPath
                             }
                     */
                 } elseif (
-                    in_array($row->event_key, [ 'Annunciation', 'StJoseph', 'ImmaculateConception' ])
+                    in_array($propriumDeSanctisEvent->event_key, [ 'Annunciation', 'StJoseph', 'ImmaculateConception' ])
                     && $this->Cal->isSundayAdventLentEaster($currentLitEventDate)
                 ) {
                     // Take into account the exemption made for Italy since 2024, when the Immaculate Conception coincides with the Second Sunday of Advent
                     // TODO: Should this be handled in an automated fashion?
-                    if ($this->CalendarParams->Year >= 2024 && $row->event_key === 'ImmaculateConception' && $this->CalendarParams->NationalCalendar === 'IT') {
+                    if ($this->CalendarParams->Year >= 2024 && $propriumDeSanctisEvent->event_key === 'ImmaculateConception' && $this->CalendarParams->NationalCalendar === 'IT') {
                         // We actually suppress the Second Sunday of Advent in this case
                         $this->Cal->removeLiturgicalEvent('Advent2');
                         $this->Messages[] = sprintf(
@@ -1462,7 +1498,7 @@ final class CalendarPath
                     $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                         /**translators: 1: LiturgicalEvent name, 2: Coinciding LiturgicalEvent name, 3: Requested calendar year */
                         _('The Solemnity \'%1$s\' coincides with the Solemnity \'%2$s\' in the year %3$d. We should ask the Congregation for Divine Worship what to do about this!'),
-                        $row->name,
+                        $propriumDeSanctisEvent->name,
                         $this->Cal->solemnityFromDate($currentLitEventDate)->name,
                         $this->CalendarParams->Year
                     );
@@ -1475,7 +1511,7 @@ final class CalendarPath
                 // http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html
                 // https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf
                 // This will happen again in 2033 and 2044
-                if ($row->event_key === 'NativityJohnBaptist' && $this->Cal->solemnityKeyFromDate($currentLitEventDate) === 'SacredHeart') {
+                if ($propriumDeSanctisEvent->event_key === 'NativityJohnBaptist' && $this->Cal->solemnityKeyFromDate($currentLitEventDate) === 'SacredHeart') {
                     $NativityJohnBaptistNewDate = clone( $this->Cal->getLiturgicalEvent('SacredHeart')->date );
                     $SacredHeart                = $this->Cal->solemnityFromDate($currentLitEventDate);
                     if (!$this->Cal->inSolemnities($NativityJohnBaptistNewDate->sub(new \DateInterval('P1D')))) {
@@ -1505,7 +1541,7 @@ final class CalendarPath
                     }
                 }
             }
-            $this->Cal->addLiturgicalEvent($row->event_key, $tempLiturgicalEvent);
+            $this->Cal->addLiturgicalEvent($propriumDeSanctisEvent->event_key, $tempLiturgicalEvent);
         }
 
         //let's add a displayGrade property for AllSouls so applications don't have to worry about fixing it
@@ -1558,19 +1594,17 @@ final class CalendarPath
         // :DedicationLateran is a specific case, we consider it a Feast of the Lord even though it is displayed as FEAST
         //  source: in the Missale Romanum, in the section Index Alphabeticus Celebrationum,
         //    under Iesus Christus D. N., the Dedicatio Basilicae Lateranensis is also listed
-        $tempCal = array_filter($this->tempCal[RomanMissal::EDITIO_TYPICA_1970], function ($el) {
-            return $el->grade === LitGrade::FEAST_LORD->value;
-        });
+        $propriumDeSanctisEvents = $this->missalsMap[RomanMissal::EDITIO_TYPICA_1970]->filterByGrade(LitGrade::FEAST_LORD);
 
-        foreach ($tempCal as $row) {
-            $row->date = DateTime::createFromFormat('!j-n-Y', $row->day . '-' . $row->month . '-' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
-            $row->type = LitEventType::FIXED;
-            $litEvent  = LiturgicalEvent::fromObject($row);
-            if ($row->event_key === 'DedicationLateran') {
+        foreach ($propriumDeSanctisEvents as $propriumDeSanctisEvent) {
+            $propriumDeSanctisEvent->setDate(DateTime::createFromFormat('!j-n-Y', $propriumDeSanctisEvent->day . '-' . $propriumDeSanctisEvent->month . '-' . $this->CalendarParams->Year, new \DateTimeZone('UTC')));
+            // $propriumDeSanctisEvent->type = LitEventType::FIXED;
+            $litEvent = LiturgicalEvent::fromObject($propriumDeSanctisEvent);
+            if ($propriumDeSanctisEvent->event_key === 'DedicationLateran') {
                 $litEvent->grade_display = LitGrade::i18n(LitGrade::FEAST, $this->CalendarParams->Locale, false);
                 $litEvent->setGradeAbbreviation(LitGrade::i18n(LitGrade::FEAST, $this->CalendarParams->Locale, false, true));
             }
-            $this->Cal->addLiturgicalEvent($row->event_key, $litEvent);
+            $this->Cal->addLiturgicalEvent($propriumDeSanctisEvent->event_key, $litEvent);
         }
 
         //Holy Family is celebrated the Sunday after Christmas, unless Christmas falls on a Sunday, in which case it is celebrated Dec. 30
@@ -1617,7 +1651,16 @@ final class CalendarPath
                 ? 'Domini Nostri Iesu Christi Summi et Aeterni Sacerdotis'
                 /**translators: You can ignore this translation if the Feast has not been inserted by the Episcopal Conference */
                 : _('Our Lord Jesus Christ, The Eternal High Priest');
-            $litEvent = new LiturgicalEvent($EternalHighPriestName, $EternalHighPriestDate, LitColor::WHITE, LitEventType::FIXED, LitGrade::FEAST_LORD, LitCommon::PROPRIO);
+            $litEvent = new LiturgicalEvent(
+                $EternalHighPriestName,
+                $EternalHighPriestDate,
+                LitColor::WHITE,
+                LitEventType::FIXED,
+                LitGrade::FEAST_LORD,
+                LitCommon::PROPRIO,
+                null,
+                null
+            );
             $this->Cal->addLiturgicalEvent('JesusChristEternalHighPriest', $litEvent);
             $this->Messages[] = sprintf(
                 /**translators: 1: National Calendar, 2: Requested calendar year, 3: source of the rule */
@@ -1668,7 +1711,8 @@ final class CalendarPath
                     LitEventType::MOBILE,
                     LitGrade::FEAST_LORD,
                     LitCommon::NONE,
-                    ''
+                    '',
+                    $this->PropriumDeTempore['OrdSunday' . $ordSun]->readings
                 ));
             } else {
                 $this->Messages[] = sprintf(
@@ -1711,7 +1755,8 @@ final class CalendarPath
                     LitEventType::MOBILE,
                     LitGrade::FEAST_LORD,
                     LitCommon::NONE,
-                    ''
+                    '',
+                    $this->PropriumDeTempore['OrdSunday' . $ordSun]->readings
                 ));
             } else {
                 $this->Messages[] = sprintf(
@@ -1743,12 +1788,10 @@ final class CalendarPath
      */
     private function calculateFeastsMarySaints(): void
     {
-        $tempCal = array_filter($this->tempCal[RomanMissal::EDITIO_TYPICA_1970], function ($el) {
-            return $el->grade === LitGrade::FEAST->value;
-        });
+        $propriumDeSanctisEvents = $this->missalsMap[RomanMissal::EDITIO_TYPICA_1970]->filterByGrade(LitGrade::FEAST);
 
-        foreach ($tempCal as $row) {
-            $row->date = DateTime::createFromFormat('!j-n-Y', $row->day . '-' . $row->month . '-' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
+        foreach ($propriumDeSanctisEvents as $propriumDeSanctisEvent) {
+            $propriumDeSanctisEvent->setDate(DateTime::createFromFormat('!j-n-Y', $propriumDeSanctisEvent->day . '-' . $propriumDeSanctisEvent->month . '-' . $this->CalendarParams->Year, new \DateTimeZone('UTC')));
             // If a Feast ( not of the Lord ) occurs on a Sunday in Ordinary Time, the Sunday is celebrated.  ( e.g., St. Luke, 1992 )
             // obviously solemnities also have precedence
             // The Dedication of the Lateran Basilica is an exceptional case, where it is treated as a Feast of the Lord, even if it is displayed as a Feast
@@ -1756,12 +1799,12 @@ final class CalendarPath
             //    under Iesus Christus D. N., the Dedicatio Basilicae Lateranensis is also listed
             //  so we give it a grade of 5 === FEAST_LORD but a displayGrade of FEAST
             //  It should therefore have already been handled in $this->calculateFeastsOfTheLord(), see :DedicationLateran
-            if (self::dateIsNotSunday($row->date) && !$this->Cal->inSolemnitiesOrFeasts($row->date)) {
-                $row->type = LitEventType::FIXED;
-                $litEvent  = LiturgicalEvent::fromObject($row);
-                $this->Cal->addLiturgicalEvent($row->event_key, $litEvent);
+            if (self::dateIsNotSunday($propriumDeSanctisEvent->date) && !$this->Cal->inSolemnitiesOrFeasts($propriumDeSanctisEvent->date)) {
+                //$propriumDeSanctisEvent->type = LitEventType::FIXED;
+                $litEvent = LiturgicalEvent::fromObject($propriumDeSanctisEvent);
+                $this->Cal->addLiturgicalEvent($propriumDeSanctisEvent->event_key, $litEvent);
             } else {
-                $this->handleCoincidence($row, RomanMissal::EDITIO_TYPICA_1970);
+                $this->handleCoincidence($propriumDeSanctisEvent, RomanMissal::EDITIO_TYPICA_1970);
             }
         }
 
@@ -1795,14 +1838,13 @@ final class CalendarPath
                 $upper          = (int) $weekdayAdvent->format('z');
                 $diff           = $upper - (int) $this->Cal->getLiturgicalEvent('Advent1')->date->format('z'); //day count between current day and First Sunday of Advent
                 $currentAdvWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1; //week count between current day and First Sunday of Advent
-
-                $dayOfTheWeek = $this->CalendarParams->Locale === LitLocale::LATIN
+                $dayOfTheWeek   = $this->CalendarParams->Locale === LitLocale::LATIN
                     ? LatinUtils::LATIN_DAYOFTHEWEEK[$weekdayAdvent->format('w')]
                     : ucfirst($this->dayOfTheWeek->format($weekdayAdvent->format('U')));
-                $ordinal      = ucfirst(
+                $ordinal        = ucfirst(
                     Utilities::getOrdinal($currentAdvWeek, $this->CalendarParams->Locale, $this->formatterFem, LatinUtils::LATIN_ORDINAL_FEM_GEN)
                 );
-                $nthStr       = $this->CalendarParams->Locale === LitLocale::LATIN
+                $nthStr         = $this->CalendarParams->Locale === LitLocale::LATIN
                     ? sprintf('Hebdomadæ %s Adventus', $ordinal)
                     : sprintf(
                         /**translators: %s is an ordinal number (first, second...) */
@@ -1810,7 +1852,16 @@ final class CalendarPath
                         $ordinal
                     );
                 $name                   = $dayOfTheWeek . ' ' . $nthStr;
-                $litEvent               = new LiturgicalEvent($name, $weekdayAdvent, LitColor::PURPLE, LitEventType::MOBILE, LitGrade::WEEKDAY);
+                $litEvent               = new LiturgicalEvent(
+                    $name,
+                    $weekdayAdvent,
+                    LitColor::PURPLE,
+                    LitEventType::MOBILE,
+                    LitGrade::WEEKDAY,
+                    LitCommon::NONE,
+                    null,
+                    null
+                );
                 $litEvent->psalter_week = $this->Cal::psalterWeek($currentAdvWeek);
                 $this->Cal->addLiturgicalEvent('AdventWeekday' . $weekdayAdventCnt, $litEvent);
             }
@@ -1848,7 +1899,16 @@ final class CalendarPath
                         _('%s Day of the Octave of Christmas'),
                         $ordinal
                     );
-                $litEvent = new LiturgicalEvent($name, $weekdayChristmas, LitColor::WHITE, LitEventType::MOBILE, LitGrade::WEEKDAY);
+                $litEvent = new LiturgicalEvent(
+                    $name,
+                    $weekdayChristmas,
+                    LitColor::WHITE,
+                    LitEventType::MOBILE,
+                    LitGrade::WEEKDAY,
+                    LitCommon::NONE,
+                    null,
+                    null
+                );
                 $this->Cal->addLiturgicalEvent('ChristmasWeekday' . $weekdayChristmasCnt, $litEvent);
             }
             $weekdayChristmasCnt++;
@@ -1892,7 +1952,16 @@ final class CalendarPath
                             $ordinal
                         );
                     $name                   = $dayOfTheWeek . ' ' .  $nthStr;
-                    $litEvent               = new LiturgicalEvent($name, $weekdayLent, LitColor::PURPLE, LitEventType::MOBILE, LitGrade::WEEKDAY);
+                    $litEvent               = new LiturgicalEvent(
+                        $name,
+                        $weekdayLent,
+                        LitColor::PURPLE,
+                        LitEventType::MOBILE,
+                        LitGrade::WEEKDAY,
+                        LitCommon::NONE,
+                        null,
+                        null
+                    );
                     $litEvent->psalter_week = $this->Cal::psalterWeek($currentLentWeek);
                 } else {
                     $dayOfTheWeek = $this->CalendarParams->Locale == LitLocale::LATIN
@@ -1900,7 +1969,16 @@ final class CalendarPath
                         : ucfirst($this->dayOfTheWeek->format($weekdayLent->format('U')));
                     $postStr      = $this->CalendarParams->Locale === LitLocale::LATIN ? 'post Feria IV Cinerum' : _('after Ash Wednesday');
                     $name         = $dayOfTheWeek . ' ' . $postStr;
-                    $litEvent     = new LiturgicalEvent($name, $weekdayLent, LitColor::PURPLE, LitEventType::MOBILE, LitGrade::WEEKDAY);
+                    $litEvent     = new LiturgicalEvent(
+                        $name,
+                        $weekdayLent,
+                        LitColor::PURPLE,
+                        LitEventType::MOBILE,
+                        LitGrade::WEEKDAY,
+                        LitCommon::NONE,
+                        null,
+                        null
+                    );
                 }
                 $this->Cal->addLiturgicalEvent('LentWeekday' . $weekdayLentCnt, $litEvent);
             }
@@ -1911,20 +1989,14 @@ final class CalendarPath
     /**
      * Adds a message to the API response indicating that a given memorial has been added to the calendar
      *
-     * @param object{
-     *      grade: int,
-     *      name: string,
-     *      date: DateTime,
-     *      since_year: int,
-     *      decree: string
-     * } $row A JSON object representing data for the liturgical event in question
+     * @param PrpriumDeSanctisEvent $propriumDeSanctisEvent A JSON object representing data for the liturgical event in question
      */
-    private function addMissalMemorialMessage(object $row): void
+    private function addMissalMemorialMessage(PropriumDeSanctisEvent $propriumDeSanctisEvent): void
     {
         $locale = LitLocale::$PRIMARY_LANGUAGE;
-        $grade  = is_int($row->grade)
-            ? LitGrade::from($row->grade)
-            : ( $row->grade instanceof LitGrade ? $row->grade : LitGrade::INVALID );
+        $grade  = is_int($propriumDeSanctisEvent->grade)
+            ? LitGrade::from($propriumDeSanctisEvent->grade)
+            : ( $propriumDeSanctisEvent->grade instanceof LitGrade ? $propriumDeSanctisEvent->grade : LitGrade::INVALID );
 
         /**translators:
          * 1. Grade or rank of the liturgical event
@@ -1938,15 +2010,15 @@ final class CalendarPath
         $this->Messages[] = sprintf(
             $message,
             LitGrade::i18n($grade, $this->CalendarParams->Locale, false),
-            $row->name,
+            $propriumDeSanctisEvent->name,
             $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                ? ( $row->date->format('j') . ' ' . LatinUtils::LATIN_MONTHS[(int) $row->date->format('n')] )
+                ? ( $propriumDeSanctisEvent->date->format('j') . ' ' . LatinUtils::LATIN_MONTHS[(int) $propriumDeSanctisEvent->date->format('n')] )
                 : ( $locale === 'en'
-                    ? $row->date->format('F jS')
-                    : $this->dayAndMonth->format($row->date->format('U'))
+                    ? $propriumDeSanctisEvent->date->format('F jS')
+                    : $this->dayAndMonth->format($propriumDeSanctisEvent->date->format('U'))
                 ),
-            $row->since_year,
-            $row->decree,
+            $propriumDeSanctisEvent->since_year,
+            $propriumDeSanctisEvent->decree,
             $this->CalendarParams->Year
         );
     }
@@ -1963,55 +2035,58 @@ final class CalendarPath
             $this->createImmaculateHeart();
         }
 
-        $tempCal = array_filter($this->tempCal[$missal], function ($el) use ($grade) {
-            return $el->grade === $grade->value;
-        });
+        $propriumDeSanctisEvents = $this->missalsMap[$missal]->filterByGrade($grade);
 
-        foreach ($tempCal as $row) {
+        foreach ($propriumDeSanctisEvents as $propriumDeSanctisEvent) {
             //If it doesn't occur on a Sunday or a Solemnity or a Feast of the Lord or a Feast, then go ahead and create the memorial
-            $row->date = DateTime::createFromFormat('!j-n-Y', $row->day . '-' . $row->month . '-' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
-            if (self::dateIsNotSunday($row->date) && $this->Cal->notInSolemnitiesFeastsOrMemorials($row->date)) {
-                $row->type          = LitEventType::FIXED;
-                $newLiturgicalEvent = LiturgicalEvent::fromObject($row);
-                //Calendar::debugWrite( "adding new memorial '$row->name', common vartype = " . gettype( $row->common ) . ", common = " . implode(', ', $row->common) );
+            $propriumDeSanctisEvent->setDate(DateTime::createFromFormat('!j-n-Y', $propriumDeSanctisEvent->day . '-' . $propriumDeSanctisEvent->month . '-' . $this->CalendarParams->Year, new \DateTimeZone('UTC')));
+            if (self::dateIsNotSunday($propriumDeSanctisEvent->date) && $this->Cal->notInSolemnitiesFeastsOrMemorials($propriumDeSanctisEvent->date)) {
+                //$propriumDeSanctisEvent->type          = LitEventType::FIXED;
+                $newLiturgicalEvent = LiturgicalEvent::fromObject($propriumDeSanctisEvent);
+                //Calendar::debugWrite( "adding new memorial '$propriumDeSanctisEvent->name', common vartype = " . gettype( $propriumDeSanctisEvent->common ) . ", common = " . implode(', ', $propriumDeSanctisEvent->common) );
                 //Calendar::debugWrite( ">>> added new memorial '$newLiturgicalEvent->name', common vartype = " . gettype( $newLiturgicalEvent->common ) . ", common = " . implode(', ', $newLiturgicalEvent->common) );
 
-                $this->Cal->addLiturgicalEvent($row->event_key, $newLiturgicalEvent);
+                $this->Cal->addLiturgicalEvent($propriumDeSanctisEvent->event_key, $newLiturgicalEvent);
 
-                $this->reduceMemorialsInAdventLentToCommemoration($row->date, $row);
+                $this->reduceMemorialsInAdventLentToCommemoration($propriumDeSanctisEvent);
 
                 if ($missal === RomanMissal::EDITIO_TYPICA_TERTIA_2002) {
-                    $row->since_year = 2002;
-                    $row->decree     = '<a href="https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2002/03/22/0150/00449.html" target="_blank">'
+                    $propriumDeSanctisEvent->setSinceYear(2002);
+                    $propriumDeSanctisEvent->setDecree(
+                        '<a href="https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2002/03/22/0150/00449.html" target="_blank">'
                         . _('Vatican Press conference: Presentation of the Editio Typica Tertia of the Roman Missal')
-                        . '</a>';
-                    $this->addMissalMemorialMessage($row);
+                        . '</a>'
+                    );
+                    $this->addMissalMemorialMessage($propriumDeSanctisEvent);
                 } elseif ($missal === RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008) {
-                    $row->since_year = 2008;
-                    switch ($row->event_key) {
+                    $propriumDeSanctisEvent->setSinceYear(2008);
+                    switch ($propriumDeSanctisEvent->event_key) {
                         case 'StPioPietrelcina':
-                            $row->decree = RomanMissal::getName($missal);
+                            $propriumDeSanctisEvent->setDecree(RomanMissal::getName($missal));
                             break;
                         /**both of the following event keys refer to the same decree, no need for a break between them */
                         case 'LadyGuadalupe':
                         case 'JuanDiego':
-                            $langs       = ['la' => 'lt', 'es' => 'es'];
-                            $lang        = in_array(LitLocale::$PRIMARY_LANGUAGE, array_keys($langs)) ? $langs[LitLocale::$PRIMARY_LANGUAGE] : 'lt';
-                            $row->decree = "<a href=\"https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\" target=\"_blank\">"
+                            $langs = ['la' => 'lt', 'es' => 'es'];
+                            $lang  = in_array(LitLocale::$PRIMARY_LANGUAGE, array_keys($langs)) ? $langs[LitLocale::$PRIMARY_LANGUAGE] : 'lt';
+
+                            $propriumDeSanctisEvent->setDecree(
+                                "<a href=\"https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\" target=\"_blank\">"
                                 . _('Decree of the Congregation for Divine Worship')
-                                . '</a>';
+                                . '</a>'
+                            );
                             break;
                     }
-                    $this->addMissalMemorialMessage($row);
+                    $this->addMissalMemorialMessage($propriumDeSanctisEvent);
                 }
-                if ($grade === LitGrade::MEMORIAL && $this->Cal->getLiturgicalEvent($row->event_key)->grade->value > LitGrade::MEMORIAL_OPT->value) {
-                    $this->removeWeekdaysEpiphanyOverridenByMemorials($row->event_key);
-                    $this->removeWeekdaysAdventOverridenByMemorials($row->event_key);
+                if ($grade === LitGrade::MEMORIAL && $this->Cal->getLiturgicalEvent($propriumDeSanctisEvent->event_key)->grade->value > LitGrade::MEMORIAL_OPT->value) {
+                    $this->removeWeekdaysEpiphanyOverridenByMemorials($propriumDeSanctisEvent->event_key);
+                    $this->removeWeekdaysAdventOverridenByMemorials($propriumDeSanctisEvent->event_key);
                 }
             } else {
                 // checkImmaculateHeartCoincidence will take care of the case of the Immaculate Heart, reducing both memorials to optional memorials in case of coincidence
-                if (false === $this->checkImmaculateHeartCoincidence($row)) {
-                    $this->handleCoincidence($row, $missal);
+                if (false === $this->checkImmaculateHeartCoincidence($propriumDeSanctisEvent)) {
+                    $this->handleCoincidence($propriumDeSanctisEvent, $missal);
                 }
             }
         }
@@ -2026,14 +2101,14 @@ final class CalendarPath
      * it is reduced in rank to a Commemoration ( only the collect can be used )
      *
      * @param DateTime $currentLitEventDate the date of the liturgical event to be checked
-     * @param \stdClass $row the row of data comprising the event_key and grade of the memorial
+     * @param PropriumDeSanctisEvent $row the row of data comprising the event_key and grade of the memorial
      */
-    private function reduceMemorialsInAdventLentToCommemoration(DateTime $currentLitEventDate, \stdClass $row): void
+    private function reduceMemorialsInAdventLentToCommemoration(PropriumDeSanctisEvent $propriumDeSanctisEvent): void
     {
         //If a fixed date optional memorial falls between 17 Dec. to 24 Dec., the Octave of Christmas or weekdays of the Lenten season,
         //it is reduced in rank to a Commemoration ( only the collect can be used )
-        if ($this->Cal->inWeekdaysAdventChristmasLent($currentLitEventDate)) {
-            $this->Cal->setProperty($row->event_key, 'grade', LitGrade::COMMEMORATION);
+        if ($this->Cal->inWeekdaysAdventChristmasLent($propriumDeSanctisEvent->date)) {
+            $this->Cal->setProperty($propriumDeSanctisEvent->event_key, 'grade', LitGrade::COMMEMORATION);
             /**translators:
              * 1. Grade or rank of the liturgical event
              * 2. Name of the liturgical event
@@ -2044,8 +2119,8 @@ final class CalendarPath
             );
             $this->Messages[] = sprintf(
                 $message,
-                LitGrade::i18n($row->grade, $this->CalendarParams->Locale, false),
-                $row->name,
+                LitGrade::i18n($propriumDeSanctisEvent->grade, $this->CalendarParams->Locale, false),
+                $propriumDeSanctisEvent->name,
                 $this->CalendarParams->Year
             );
         }
@@ -2130,10 +2205,10 @@ final class CalendarPath
     /**
      * Handles a coincidence of a liturgical event with a Sunday Solemnity or Feast.
      *
-     * @param \stdClass|PropriumDeTemporeEvent $potentialEvent the liturgical event that may be coinciding with a Sunday Solemnity or Feast
+     * @param \stdClass|PropriumDeTemporeEvent|PropriumDeSanctisEvent $potentialEvent the liturgical event that may be coinciding with a Sunday Solemnity or Feast
      * @param string $missal the edition of the Roman Missal to check against
      */
-    private function handleCoincidence(\stdClass|PropriumDeTemporeEvent $potentialEvent, string $missal = RomanMissal::EDITIO_TYPICA_1970): void
+    private function handleCoincidence(\stdClass|PropriumDeTemporeEvent|PropriumDeSanctisEvent $potentialEvent, string $missal = RomanMissal::EDITIO_TYPICA_1970): void
     {
         $coincidingLiturgicalEvent = $this->Cal->determineSundaySolemnityOrFeast($potentialEvent->date, $potentialEvent->event_key);
         switch ($missal) {
@@ -2194,7 +2269,6 @@ final class CalendarPath
         );
 
         // Add the celebration to LiturgicalEventCollection::suppressedEvents
-        $potentialEvent->type       = LitEventType::FIXED;
         $suppressedEvent            = LiturgicalEvent::fromObject($potentialEvent);
         $suppressedEvent->event_key = $potentialEvent->event_key;
         $this->Cal->addSuppressedEvent($suppressedEvent);
@@ -2247,10 +2321,10 @@ final class CalendarPath
      * Checks if the liturgical event in $row coincides with the Immaculate Heart of Mary.
      * If it does, it reduces both in rank to optional memorials.
      *
-     * @param \stdClass $row The row of data of the liturgical event to check
+     * @param PropriumDeSanctisEvent $propriumDeSanctisEvent The row of data of the liturgical event to check
      * @return bool True if the liturgical event coincides with the Immaculate Heart of Mary, false otherwise
      */
-    private function checkImmaculateHeartCoincidence(\stdClass $row): bool
+    private function checkImmaculateHeartCoincidence(PropriumDeSanctisEvent $propriumDeSanctisEvent): bool
     {
         $coincidence = false;
         //IMMACULATEHEART: in years when the memorial of the Immaculate Heart of Mary coincides with another obligatory memorial,
@@ -2258,17 +2332,19 @@ final class CalendarPath
         //source: https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html
         $ImmaculateHeart = $this->Cal->getLiturgicalEvent('ImmaculateHeart');
         if ($ImmaculateHeart !== null) {
-            if ((int) $row->grade === LitGrade::MEMORIAL) {
-                if ($row->date->format('U') === $ImmaculateHeart->date->format('U')) {
+            if ($propriumDeSanctisEvent->grade === LitGrade::MEMORIAL) {
+                if ($propriumDeSanctisEvent->date->format('U') === $ImmaculateHeart->date->format('U')) {
                     $this->Cal->setProperty('ImmaculateHeart', 'grade', LitGrade::MEMORIAL_OPT);
-                    $litEvent = $this->Cal->getLiturgicalEvent($row->event_key);
+                    $litEvent = $this->Cal->getLiturgicalEvent($propriumDeSanctisEvent->event_key);
                     if ($litEvent === null) {
-                        $row->grade = LitGrade::MEMORIAL_OPT;
-                        $row->type  = LitEventType::FIXED;
-                        $litEvent   = LiturgicalEvent::fromObject($row->name);
-                        $this->Cal->addLiturgicalEvent($row->event_key, $litEvent);
+                        $propriumDeSanctisEvent->setGrade(LitGrade::MEMORIAL_OPT);
+                        //$propriumDeSanctisEvent->type  = LitEventType::FIXED;
+                        $this->Cal->addLiturgicalEvent(
+                            $propriumDeSanctisEvent->event_key,
+                            LiturgicalEvent::fromObject($propriumDeSanctisEvent)
+                        );
                     } else {
-                        $this->Cal->setProperty($row->event_key, 'grade', LitGrade::MEMORIAL_OPT);
+                        $this->Cal->setProperty($propriumDeSanctisEvent->event_key, 'grade', LitGrade::MEMORIAL_OPT);
                     }
                     $this->Messages[] = sprintf(
                         /**translators:
@@ -2279,7 +2355,7 @@ final class CalendarPath
                          */
                         _('The Memorial \'%1$s\' coincides with another Memorial \'%2$s\' in the year %3$d. They are both reduced in rank to optional memorials (%4$s).'),
                         $ImmaculateHeart->name,
-                        $litEvent->name,
+                        $propriumDeSanctisEvent->name,
                         $this->CalendarParams->Year,
                         '<a href="https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html" target="_blank">'
                             . _('Decree of the Congregation for Divine Worship')
@@ -2798,9 +2874,9 @@ final class CalendarPath
             } else {
                 //perhaps it wasn't created on December 12th because it was superseded by a Sunday, Solemnity or Feast
                 //but seeing that there is no problem for August 12th, let's go ahead and try creating it again
-                $row       = $this->tempCal[RomanMissal::EDITIO_TYPICA_1970]['StJaneFrancesDeChantal'];
-                $row->date = $StJaneFrancesNewDate;
-                $litEvent  = LiturgicalEvent::fromObject($row);
+                $propriumDeSanctisEvent = $this->missalsMap[RomanMissal::EDITIO_TYPICA_1970]['StJaneFrancesDeChantal'];
+                $propriumDeSanctisEvent->setDate($StJaneFrancesNewDate);
+                $litEvent = LiturgicalEvent::fromObject($propriumDeSanctisEvent);
                 $this->Cal->addLiturgicalEvent('StJaneFrancesDeChantal', $litEvent);
                 $this->Messages[] = sprintf(
                     /**translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year  */
@@ -2819,7 +2895,7 @@ final class CalendarPath
             if ($litEvent !== null) {
                 $this->Cal->removeLiturgicalEvent('StJaneFrancesDeChantal');
             }
-            $row              = $this->tempCal[RomanMissal::EDITIO_TYPICA_1970]['StJaneFrancesDeChantal'];
+            $row              = $this->missalsMap[RomanMissal::EDITIO_TYPICA_1970]['StJaneFrancesDeChantal'];
             $this->Messages[] = sprintf(
                 /**translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year, 4: Coinciding LiturgicalEvent grade, 5: Coinciding LiturgicalEvent name */
                 _('The optional memorial \'%1$s\' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d. However, it is superseded by the %4$s \'%5$s\' in the year %3$d.'),
@@ -2846,9 +2922,9 @@ final class CalendarPath
     {
         $litEvent = $this->Cal->getLiturgicalEvent('ConversionStPaul');
         if ($litEvent === null) {
-            $row      = $this->tempCal[RomanMissal::EDITIO_TYPICA_1970]['ConversionStPaul'];
-            $litEvent = new LiturgicalEvent(
-                $row->name,
+            $propriumDeSanctisEvent = $this->missalsMap[RomanMissal::EDITIO_TYPICA_1970]['ConversionStPaul'];
+            $litEvent               = new LiturgicalEvent(
+                $propriumDeSanctisEvent->name,
                 DateTime::createFromFormat(
                     '!j-n-Y',
                     '25-1-2009',
@@ -2857,7 +2933,9 @@ final class CalendarPath
                 LitColor::WHITE,
                 LitEventType::FIXED,
                 LitGrade::MEMORIAL_OPT,
-                LitCommon::PROPRIO
+                LitCommon::PROPRIO,
+                null,
+                $propriumDeSanctisEvent->readings
             );
             $this->Cal->addLiturgicalEvent('ConversionStPaul', $litEvent);
             $langs            = ['fr' => 'fr', 'en' => 'en', 'it' => 'it', 'la' => 'lt', 'pt' => 'pt', 'es' => 'sp', 'de' => 'ge'];
@@ -2865,7 +2943,7 @@ final class CalendarPath
             $this->Messages[] = sprintf(
                 /**translators: 1: LiturgicalEvent name, 2: Source of the information  */
                 _('The Feast \'%1$s\' would have been suppressed this year ( 2009 ) since it falls on a Sunday, however being the Year of the Apostle Paul, as per the %2$s it has been reinstated so that local churches can optionally celebrate the memorial.'),
-                '<i>' . $row->name . '</i>',
+                '<i>' . $propriumDeSanctisEvent->name . '</i>',
                 "<a href=\"https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_$lang.html\" target=\"_blank\">"
                     . _('Decree of the Congregation for Divine Worship')
                     . '</a>'
@@ -2901,7 +2979,16 @@ final class CalendarPath
                     ? sprintf('Hebdomadæ %s Temporis Paschali', $ordinal)
                     : sprintf(_('of the %s Week of Easter'), $ordinal);
                 $name                   = $dayOfTheWeek . ' ' . $t;
-                $litEvent               = new LiturgicalEvent($name, $weekdayEasterDate, LitColor::WHITE, LitEventType::MOBILE);
+                $litEvent               = new LiturgicalEvent(
+                    $name,
+                    $weekdayEasterDate,
+                    LitColor::WHITE,
+                    LitEventType::MOBILE,
+                    LitGrade::WEEKDAY,
+                    LitCommon::NONE,
+                    null,
+                    null
+                );
                 $litEvent->psalter_week = $this->Cal::psalterWeek($currentEasterWeek);
                 $this->Cal->addLiturgicalEvent('EasterWeekday' . $weekdayEasterCnt, $litEvent);
             }
@@ -2946,7 +3033,16 @@ final class CalendarPath
                     ? sprintf('Hebdomadæ %s Temporis Ordinarii', $ordinal)
                     : sprintf(_('of the %s Week of Ordinary Time'), $ordinal);
                 $name                   = $dayOfTheWeek . ' ' . $nthStr;
-                $litEvent               = new LiturgicalEvent($name, $firstOrdinaryDate, LitColor::GREEN, LitEventType::MOBILE);
+                $litEvent               = new LiturgicalEvent(
+                    $name,
+                    $firstOrdinaryDate,
+                    LitColor::GREEN,
+                    LitEventType::MOBILE,
+                    LitGrade::WEEKDAY,
+                    LitCommon::NONE,
+                    null,
+                    null
+                );
                 $litEvent->psalter_week = $this->Cal::psalterWeek($currentOrdWeek);
                 $this->Cal->addLiturgicalEvent('FirstOrdWeekday' . $ordWeekday, $litEvent);
             }
@@ -2986,7 +3082,16 @@ final class CalendarPath
                     ? sprintf('Hebdomadæ %s Temporis Ordinarii', $ordinal)
                     : sprintf(_('of the %s Week of Ordinary Time'), $ordinal);
                 $name           = $dayOfTheWeek . ' ' . $nthStr;
-                $litEvent       = new LiturgicalEvent($name, $lastOrdinaryDate, LitColor::GREEN, LitEventType::MOBILE);
+                $litEvent       = new LiturgicalEvent(
+                    $name,
+                    $lastOrdinaryDate,
+                    LitColor::GREEN,
+                    LitEventType::MOBILE,
+                    LitGrade::WEEKDAY,
+                    LitCommon::NONE,
+                    null,
+                    null
+                );
 
                 $litEvent->psalter_week = $this->Cal::psalterWeek($currentOrdWeek);
                 $this->Cal->addLiturgicalEvent('LastOrdWeekday' . $ordWeekday, $litEvent);
@@ -3012,7 +3117,16 @@ final class CalendarPath
                 $name     = $this->CalendarParams->Locale === LitLocale::LATIN
                     ? 'Memoria Sanctæ Mariæ in Sabbato'
                     : _('Saturday Memorial of the Blessed Virgin Mary');
-                $litEvent = new LiturgicalEvent($name, $currentSaturdayDate, LitColor::WHITE, LitEventType::MOBILE, LitGrade::MEMORIAL_OPT, LitCommon::BEATAE_MARIAE_VIRGINIS);
+                $litEvent = new LiturgicalEvent(
+                    $name,
+                    $currentSaturdayDate,
+                    LitColor::WHITE,
+                    LitEventType::MOBILE,
+                    LitGrade::MEMORIAL_OPT,
+                    LitCommon::BEATAE_MARIAE_VIRGINIS,
+                    null,
+                    null
+                );
                 $this->Cal->addLiturgicalEvent($memID, $litEvent);
             }
         }
@@ -3091,29 +3205,33 @@ final class CalendarPath
      * If the liturgical event coincides with another liturgical event, it is added to the calendar,
      * but the message is still added to the Messages array.
      *
-     * @param object $row the row of data from the JSON file containing the information about the liturgical event
+     * @param LitCalItem $litCalItem the litCalItem of data from the JSON file containing the information about the liturgical event
      * @return void
      */
-    private function handleMissingLiturgicalEvent(object $row): void
+    private function handleMissingPatronEvent(LitCalItem $litCalItem): void
     {
-        if ($this->Cal->isSuppressed($row->liturgical_event->event_key)) {
-            $suppressedEvent = $this->Cal->getSuppressedEventByKey($row->liturgical_event->event_key);
+        if ($this->Cal->isSuppressed($litCalItem->liturgical_event->event_key)) {
+            $suppressedEvent = $this->Cal->getSuppressedEventByKey($litCalItem->liturgical_event->event_key);
             // Let's check if it was suppressed by a Solemnity, Feast, Memorial or Sunday,
             // so we can give some feedback and maybe even recreate the liturgical event if applicable
             if ($this->Cal->inSolemnitiesFeastsOrMemorials($suppressedEvent->date) || self::dateIsSunday($suppressedEvent->date)) {
-                $coincidingLiturgicalEvent = $this->Cal->determineSundaySolemnityOrFeast($suppressedEvent->date, $row->liturgical_event->event_key);
+                /** @var LitCalItemMakePatron $liturgicalEvent  */
+                $liturgicalEvent           = $litCalItem->liturgical_event;
+                $coincidingLiturgicalEvent = $this->Cal->determineSundaySolemnityOrFeast($suppressedEvent->date, $liturgicalEvent->event_key);
                 // If it was suppressed by a Feast or Memorial, we should be able to create it
                 // so we'll get the required properties back from the suppressed event
                 if ($this->Cal->inFeastsOrMemorials($suppressedEvent->date)) {
                     $this->Cal->addLiturgicalEvent(
-                        $row->liturgical_event->event_key,
+                        $liturgicalEvent->event_key,
                         new LiturgicalEvent(
-                            $row->liturgical_event->name,
+                            $liturgicalEvent->name,
                             $suppressedEvent->date,
                             $suppressedEvent->color,
                             LitEventType::FIXED,
-                            $row->liturgical_event->grade,
-                            LitCommon::PROPRIO
+                            $liturgicalEvent->grade,
+                            LitCommon::PROPRIO,
+                            null,
+                            null
                         )
                     );
                     $this->Messages[] =  '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
@@ -3127,8 +3245,8 @@ final class CalendarPath
                          * 7. National or wider region calendar
                          */
                         _('The %1$s \'%2$s\', usually celebrated on %3$s, was suppressed by the %4$s \'%5$s\' in the year %6$d, however being elevated to a Patronal festivity for the Calendar %7$s, it has been reinstated.'),
-                        LitGrade::i18n($row->liturgical_event->grade, $this->CalendarParams->Locale, false),
-                        $row->liturgical_event->name,
+                        LitGrade::i18n($liturgicalEvent->grade, $this->CalendarParams->Locale, false),
+                        $liturgicalEvent->name,
                         $this->dayAndMonth->format($suppressedEvent->date->format('U')),
                         $coincidingLiturgicalEvent->grade_lcl,
                         $coincidingLiturgicalEvent->event->name,
@@ -3147,8 +3265,8 @@ final class CalendarPath
                          * 7. National or wider region calendar
                          */
                         _('The %1$s \'%2$s\', usually celebrated on %3$s, was suppressed by the %4$s \'%5$s\' in the year %6$d, and though it would be elevated to a Patronal festivity for the Calendar %7$s, it has not been reinstated.'),
-                        LitGrade::i18n($row->liturgical_event->grade, $this->CalendarParams->Locale, false),
-                        $row->liturgical_event->name,
+                        LitGrade::i18n($liturgicalEvent->grade, $this->CalendarParams->Locale, false),
+                        $liturgicalEvent->name,
                         $this->dayAndMonth->format($suppressedEvent->date->format('U')),
                         $coincidingLiturgicalEvent->grade_lcl,
                         $coincidingLiturgicalEvent->event->name,
@@ -3439,7 +3557,7 @@ final class CalendarPath
                             }
                             $this->Cal->setProperty($liturgicalEvent->event_key, 'name', $liturgicalEvent->name);
                         } else {
-                            $this->handleMissingLiturgicalEvent($litEventItem);
+                            $this->handleMissingPatronEvent($litEventItem);
                         }
                         break;
                     case CalEventAction::CreateNew:
@@ -3654,40 +3772,40 @@ final class CalendarPath
                         RomanMissal::getName($missal)
                     );
                     $this->loadPropriumDeSanctisData($missal);
-                    foreach ($this->tempCal[$missal] as $row) {
-                        $rowProps      = get_object_vars($row);
-                        $arrayDiffKeys = array_keys(array_diff_key(array_flip($requiredProps), $rowProps));
-                        if (count($arrayDiffKeys) > 0) {
+                    foreach ($this->missalsMap[$missal] as $propriumDeSanctisEvent) {
+                        $keys        = array_keys(get_object_vars($propriumDeSanctisEvent));
+                        $missingKeys = array_diff($requiredProps, $keys);
+                        if (count($missingKeys) > 0) {
                             self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, sprintf(
                                 'The sanctorale data file for %1$s does not contain the required fields to create a liturgical event: missing keys %2$s.',
                                 RomanMissal::getName($missal),
-                                implode(', ', $arrayDiffKeys)
+                                implode(', ', $missingKeys)
                             ));
                         }
                         $currentLitEventDate = DateTime::createFromFormat(
                             '!j-n-Y',
-                            $row->day . '-' . $row->month . '-' . $this->CalendarParams->Year,
+                            $propriumDeSanctisEvent->day . '-' . $propriumDeSanctisEvent->month . '-' . $this->CalendarParams->Year,
                             new \DateTimeZone('UTC')
                         );
                         if (!$this->Cal->inSolemnitiesOrFeasts($currentLitEventDate)) {
-                            $row->name = "[ {$this->NationalData->metadata->nation} ] " . $row->name;
-                            $row->date = $currentLitEventDate;
-                            $row->type = LitEventType::FIXED;
-                            $litEvent  = LiturgicalEvent::fromObject($row);
-                            $this->Cal->addLiturgicalEvent($row->event_key, $litEvent);
+                            $propriumDeSanctisEvent->setName("[ {$this->NationalData->metadata->nation} ] " . $propriumDeSanctisEvent->name);
+                            $propriumDeSanctisEvent->setDate($currentLitEventDate);
+                            //$propriumDeSanctisEvent->type = LitEventType::FIXED;
+                            $litEvent = LiturgicalEvent::fromObject($propriumDeSanctisEvent);
+                            $this->Cal->addLiturgicalEvent($propriumDeSanctisEvent->event_key, $litEvent);
                         } else {
-                            if (self::dateIsSunday($currentLitEventDate) && $row->event_key === 'PrayerUnborn') {
-                                $row->name = '[ USA ] ' . $row->name;
-                                $row->date = $currentLitEventDate->add(new \DateInterval('P1D'));
-                                $row->type = LitEventType::FIXED;
-                                $litEvent  = LiturgicalEvent::fromObject($row);
-                                $this->Cal->addLiturgicalEvent($row->event_key, $litEvent);
+                            if (self::dateIsSunday($currentLitEventDate) && $propriumDeSanctisEvent->event_key === 'PrayerUnborn') {
+                                $propriumDeSanctisEvent->setName('[ USA ] ' . $propriumDeSanctisEvent->name);
+                                $propriumDeSanctisEvent->setDate($currentLitEventDate->add(new \DateInterval('P1D')));
+                                //$propriumDeSanctisEvent->type = LitEventType::FIXED;
+                                $litEvent = LiturgicalEvent::fromObject($propriumDeSanctisEvent);
+                                $this->Cal->addLiturgicalEvent($propriumDeSanctisEvent->event_key, $litEvent);
                                 $this->Messages[] = sprintf(
                                     'USA: The National Day of Prayer for the Unborn is set to Jan 22 as per the 2011 Roman Missal issued by the USCCB, however since it coincides with a Sunday or a Solemnity in the year %d, it has been moved to Jan 23',
                                     $this->CalendarParams->Year
                                 );
                             } else {
-                                $coincidingLiturgicalEvent = $this->Cal->determineSundaySolemnityOrFeast($currentLitEventDate, $row->event_key);
+                                $coincidingLiturgicalEvent = $this->Cal->determineSundaySolemnityOrFeast($currentLitEventDate, $propriumDeSanctisEvent->event_key);
                                 $this->Messages[]          = sprintf(
                                     /**translators:
                                      * 1. LiturgicalEvent grade
@@ -3699,8 +3817,8 @@ final class CalendarPath
                                      * 7. Requested calendar year
                                      */
                                     $this->NationalData->metadata->nation . ': ' . _('The %1$s \'%2$s\' (%3$s), added to the national calendar in the %4$s, is superseded by the %5$s \'%6$s\' in the year %7$d'),
-                                    $row->grade_display !== null && $row->grade_display !== '' ? $row->grade_display : LitGrade::i18n(LitGrade::from($row->grade), $this->CalendarParams->Locale, false),
-                                    '<i>' . $row->name . '</i>',
+                                    LitGrade::i18n($propriumDeSanctisEvent->grade, $this->CalendarParams->Locale, false),
+                                    '<i>' . $propriumDeSanctisEvent->name . '</i>',
                                     $this->dayAndMonth->format($currentLitEventDate->format('U')),
                                     RomanMissal::getName($missal),
                                     $coincidingLiturgicalEvent->grade_lcl,
@@ -4700,6 +4818,13 @@ final class CalendarPath
             );
 
             $DiocesanDataI18nJson = Utilities::jsonFileToArray($DiocesanDataI18nFile);
+            if (array_filter(array_keys($DiocesanDataI18nJson), 'is_string') !== array_keys($DiocesanDataI18nJson)) {
+                throw new \Exception('We expected all the keys of the array to be strings.');
+            }
+            if (array_filter($DiocesanDataI18nJson, 'is_string') !== $DiocesanDataI18nJson) {
+                throw new \Exception('We expected all the values of the array to be strings.');
+            }
+            /** @var array<string,string> $DiocesanDataI18nJson */
             $this->DiocesanData->setNames($DiocesanDataI18nJson);
         }
 
@@ -4713,6 +4838,13 @@ final class CalendarPath
             );
 
             $NationalDataI18nJson = Utilities::jsonFileToArray($NationalDataI18nFile);
+            if (array_filter(array_keys($NationalDataI18nJson), 'is_string') !== array_keys($NationalDataI18nJson)) {
+                throw new \Exception('We expected all the keys of the array to be strings.');
+            }
+            if (array_filter($NationalDataI18nJson, 'is_string') !== $NationalDataI18nJson) {
+                throw new \Exception('We expected all the values of the array to be strings.');
+            }
+            /** @var array<string,string> $NationalDataI18nJson */
             $this->NationalData->setNames($NationalDataI18nJson);
         }
 
@@ -4726,6 +4858,13 @@ final class CalendarPath
             );
 
             $WiderRegionDataI18nJson = Utilities::jsonFileToArray($WiderRegionDataI18nFile);
+            if (array_filter(array_keys($WiderRegionDataI18nJson), 'is_string') !== array_keys($WiderRegionDataI18nJson)) {
+                throw new \Exception('We expected all the keys of the array to be strings.');
+            }
+            if (array_filter($WiderRegionDataI18nJson, 'is_string') !== $WiderRegionDataI18nJson) {
+                throw new \Exception('We expected all the values of the array to be strings.');
+            }
+            /** @var array<string,string> $WiderRegionDataI18nJson */
             $this->WiderRegionData->setNames($WiderRegionDataI18nJson);
         }
     }

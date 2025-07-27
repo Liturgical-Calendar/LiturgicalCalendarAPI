@@ -12,6 +12,7 @@ use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\PropriumDeSanctisEvent;
 use LiturgicalCalendar\Api\Models\PropriumDeTemporeEvent;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile;
@@ -33,6 +34,7 @@ final class LiturgicalEvent implements \JsonSerializable
     public ?string $grade_display;
     /** @var LitCommons|LitMassVariousNeeds[] */
     public LitCommons|array $common;  //["Proper"] or one or more Commons
+    public ?ReadingsAbstract $readings;
 
     /** The following properties are set externally, but may be optional and therefore may remain null */
     public ?int $psalter_week            = null;
@@ -74,7 +76,8 @@ final class LiturgicalEvent implements \JsonSerializable
         LitEventType $type = LitEventType::FIXED,
         LitGrade $grade = LitGrade::WEEKDAY,
         LitCommons|LitCommon|LitMassVariousNeeds|array $common = LitCommon::NONE,
-        ?string $displayGrade = null
+        ?string $displayGrade = null,
+        ?ReadingsAbstract $readings = null
     ) {
         $litMassVariousNeedsArray = false;
         if (is_array($common)) {
@@ -114,6 +117,7 @@ final class LiturgicalEvent implements \JsonSerializable
             $this->common_lcl = '???';
             $this->common     = LitCommons::create([LitCommon::NONE]);
         }
+        $this->readings = $readings;
         //LiturgicalEvent::debugWrite( "*** LiturgicalEvent.php *** common vartype = " . gettype( $common ) );
         //LiturgicalEvent::debugWrite( "*** LiturgicalEvent.php *** common vartype is array, value = " . implode( ', ', $common ) );
     }
@@ -274,6 +278,10 @@ final class LiturgicalEvent implements \JsonSerializable
             $returnArr['liturgical_season_lcl'] = LitSeason::i18n($this->liturgical_season, self::$locale);
         }
 
+        if ($this->readings !== null) {
+            $returnArr['readings'] = $this->readings->jsonSerialize();
+        }
+
         return $returnArr;
     }
 
@@ -311,19 +319,20 @@ final class LiturgicalEvent implements \JsonSerializable
      * - type: The type of the liturgical event, as a LitEventType object or as a string.
      *   If not provided, defaults to LitEventType::FIXED.
      * - grade_display: The grade display of the liturgical event, as a string. If not provided, defaults to null.
+     * - readings: The lectionary readings for the Liturgical Event
      *
-     * @param \stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile|DecreeItemCreateNewFixed|DecreeItemCreateNewMobile|PropriumDeTemporeEvent $obj
+     * @param \stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile|DecreeItemCreateNewFixed|DecreeItemCreateNewMobile|PropriumDeTemporeEvent|PropriumDeSanctisEvent $obj
      * @return LiturgicalEvent A new LiturgicalEvent object.
      * @throws \InvalidArgumentException If the provided object does not contain the required properties or if the properties have invalid types.
      */
-    public static function fromObject(\stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile|DecreeItemCreateNewFixed|DecreeItemCreateNewMobile|PropriumDeTemporeEvent $obj): LiturgicalEvent
+    public static function fromObject(\stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile|DecreeItemCreateNewFixed|DecreeItemCreateNewMobile|PropriumDeTemporeEvent|PropriumDeSanctisEvent $obj): LiturgicalEvent
     {
         $requiredProps = ['name', 'date', 'grade'];
-        $rowProps      = get_object_vars($obj);
-        $arrayDiffKeys = array_keys(array_diff_key(array_flip($requiredProps), $rowProps));
+        $currentProps  = array_keys(get_object_vars($obj));
+        $missingKeys   = array_diff($requiredProps, $currentProps);
 
-        if (count($arrayDiffKeys) > 0) {
-            throw new \InvalidArgumentException('Invalid object provided to create LiturgicalEvent, missing required keys: ' . implode(', ', $arrayDiffKeys));
+        if (count($missingKeys) > 0) {
+            throw new \InvalidArgumentException('Invalid object provided to create LiturgicalEvent, missing required keys: ' . implode(', ', $missingKeys));
         }
 
         if (!isset($obj->name) || !isset($obj->date) || !isset($obj->grade)) {
@@ -423,7 +432,8 @@ final class LiturgicalEvent implements \JsonSerializable
             $obj->type,
             $obj->grade,
             $commons,
-            $obj->grade_display ?? null
+            $obj->grade_display ?? null,
+            isset($obj->readings) ? $obj->readings : null
         );
     }
 
@@ -443,6 +453,7 @@ final class LiturgicalEvent implements \JsonSerializable
      * - common: The liturgical common of the liturgical event, as an array of strings or LitCommon cases, or as a single string or single LitCommon case.
      *   If not provided, defaults to LitCommon::NONE.
      * - grade_display: The grade display of the liturgical event, as a string. If not provided, defaults to null.
+     * - readings: The lectionary readings of the liturgical event, as a ReadingsAbstract object.
      *
      * @param array{
      *     name: string,
@@ -451,7 +462,8 @@ final class LiturgicalEvent implements \JsonSerializable
      *     color?: LitColor|LitColor[]|string|string[],
      *     type?: LitEventType|string,
      *     common?: LitCommons|LitCommon[]|LitMassVariousNeeds[]|string[],
-     *     grade_display?: string
+     *     grade_display?: string,
+     *     readings?: ReadingsAbstract
      * } $arr The associative array containing the required properties.
      * @return LiturgicalEvent A new LiturgicalEvent object.
      * @throws \InvalidArgumentException If the provided array does not contain the required properties or if the properties have invalid types.
@@ -533,7 +545,8 @@ final class LiturgicalEvent implements \JsonSerializable
             $arr['type'],
             $arr['grade'],
             $commons,
-            $arr['grade_display'] ?? null
+            isset($arr['grade_display']) ? $arr['grade_display'] : null,
+            isset($arr['readings']) ? $arr['readings'] : null
         );
     }
 

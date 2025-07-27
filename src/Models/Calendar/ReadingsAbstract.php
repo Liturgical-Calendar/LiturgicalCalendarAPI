@@ -24,14 +24,7 @@ abstract class ReadingsAbstract extends AbstractJsonRepresentation
     abstract protected static function fromArrayInternal(array $data): static;
 
     /**
-     * Json Serialize
-     *
-     * When json encoding a ReadingsFerial object, serialize it as the object vars
-     *
-     * @return array<string,mixed>
+     * @return array<string,string>
      */
-    public function jsonSerialize(): mixed
-    {
-        return get_object_vars($this);
-    }
+    abstract public function jsonSerialize(): array;
 }

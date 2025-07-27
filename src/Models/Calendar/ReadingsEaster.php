@@ -89,7 +89,7 @@ final class ReadingsEaster extends ReadingsAbstract
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
-        static::validateRequiredProps($data, self::REQUIRED_PROPS);
+        static::validateRequiredProps($data, static::REQUIRED_PROPS);
 
         return new static(
             $data->first_reading,
@@ -125,7 +125,7 @@ final class ReadingsEaster extends ReadingsAbstract
             throw new \InvalidArgumentException('Please use fromObject instead.');
         }
 
-        static::validateRequiredKeys($data, self::REQUIRED_PROPS);
+        static::validateRequiredKeys($data, static::REQUIRED_PROPS);
 
         return new static(
             $data['first_reading'],
@@ -147,5 +147,54 @@ final class ReadingsEaster extends ReadingsAbstract
             $data['epistle'],
             $data['responsorial_psalm_epistle']
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Returns an associative array containing the properties of this object,
+     * with the following keys:
+     * - first_reading (string): The first reading for the Easter Vigil
+     * - responsorial_psalm (string): The responsorial psalm for the Easter Vigil
+     * - second_reading (string): The second reading for the Easter Vigil
+     * - responsorial_psalm_2 (string): The responsorial psalm for the second reading for the Easter Vigil
+     * - third_reading (string): The third reading for the Easter Vigil
+     * - responsorial_psalm_3 (string): The responsorial psalm for the third reading for the Easter Vigil
+     * - fourth_reading (string): The fourth reading for the Easter Vigil
+     * - responsorial_psalm_4 (string): The responsorial psalm for the fourth reading for the Easter Vigil
+     * - fifth_reading (string): The fifth reading for the Easter Vigil
+     * - responsorial_psalm_5 (string): The responsorial psalm for the fifth reading for the Easter Vigil
+     * - sixth_reading (string): The sixth reading for the Easter Vigil
+     * - responsorial_psalm_6 (string): The responsorial psalm for the sixth reading for the Easter Vigil
+     * - seventh_reading (string): The seventh reading for the Easter Vigil
+     * - responsorial_psalm_7 (string): The responsorial psalm for the seventh reading for the Easter Vigil
+     * - epistle (string): The epistle for the Easter Vigil
+     * - responsorial_psalm_epistle (string): The responsorial psalm for the epistle for the Easter Vigil
+     * - alleluia_verse (string): The alleluia verse for the Easter Vigil
+     * - gospel (string): The gospel for the Easter Vigil
+     * @return array{first_reading:string,responsorial_psalm:string,second_reading:string,responsorial_psalm_2:string,third_reading:string,responsorial_psalm_3:string,fourth_reading:string,responsorial_psalm_4:string,fifth_reading:string,responsorial_psalm_5:string,sixth_reading:string,responsorial_psalm_6:string,seventh_reading:string,responsorial_psalm_7:string,epistle:string,responsorial_psalm_epistle:string,alleluia_verse:string,gospel:string}
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'first_reading'              => $this->first_reading,
+            'responsorial_psalm'         => $this->responsorial_psalm,
+            'second_reading'             => $this->second_reading,
+            'responsorial_psalm_2'       => $this->responsorial_psalm_2,
+            'third_reading'              => $this->third_reading,
+            'responsorial_psalm_3'       => $this->responsorial_psalm_3,
+            'fourth_reading'             => $this->fourth_reading,
+            'responsorial_psalm_4'       => $this->responsorial_psalm_4,
+            'fifth_reading'              => $this->fifth_reading,
+            'responsorial_psalm_5'       => $this->responsorial_psalm_5,
+            'sixth_reading'              => $this->sixth_reading,
+            'responsorial_psalm_6'       => $this->responsorial_psalm_6,
+            'seventh_reading'            => $this->seventh_reading,
+            'responsorial_psalm_7'       => $this->responsorial_psalm_7,
+            'epistle'                    => $this->epistle,
+            'responsorial_psalm_epistle' => $this->responsorial_psalm_epistle,
+            'alleluia_verse'             => $this->alleluia_verse,
+            'gospel'                     => $this->gospel
+        ];
     }
 }

@@ -83,11 +83,11 @@
         "type": "fixed",
         "color": [ "white" ],
         "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "second_reading": "",
-            "alleluia_verse": "",
-            "gospel": ""
+            "first_reading": "Numbers 6:22-27",
+            "responsorial_psalm": "Psalm 66 (67)",
+            "second_reading": "Galatians 4:4-7",
+            "alleluia_verse": "Hebrews 1:1-2",
+            "gospel": "Luke 2:16-21"
         }
     },
     {

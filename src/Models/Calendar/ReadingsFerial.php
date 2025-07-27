@@ -12,7 +12,7 @@ final class ReadingsFerial extends ReadingsAbstract
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
-        static::validateRequiredProps($data, self::REQUIRED_PROPS);
+        static::validateRequiredProps($data, static::REQUIRED_PROPS);
 
         return new static(
             $data->first_reading,
@@ -40,7 +40,7 @@ final class ReadingsFerial extends ReadingsAbstract
             throw new \InvalidArgumentException('Please use fromObject instead.');
         }
 
-        static::validateRequiredKeys($data, self::REQUIRED_PROPS);
+        static::validateRequiredKeys($data, static::REQUIRED_PROPS);
 
         return new static(
             $data['first_reading'],
@@ -48,5 +48,26 @@ final class ReadingsFerial extends ReadingsAbstract
             $data['alleluia_verse'],
             $data['gospel']
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Returns an associative array containing the properties of this object,
+     * with the following keys:
+     * - first_reading (string): The first reading for a ferial day
+     * - responsorial_psalm (string): The responsorial psalm for a ferial day
+     * - alleluia_verse (string): The alleluia verse for a ferial day
+     * - gospel (string): The gospel for a ferial day
+     * @return array{first_reading:string,responsorial_psalm:string,alleluia_verse:string,gospel:string}
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'first_reading'      => $this->first_reading,
+            'responsorial_psalm' => $this->responsorial_psalm,
+            'alleluia_verse'     => $this->alleluia_verse,
+            'gospel'             => $this->gospel
+        ];
     }
 }

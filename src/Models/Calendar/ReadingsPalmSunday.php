@@ -22,7 +22,7 @@ final class ReadingsPalmSunday extends ReadingsAbstract
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
-        static::validateRequiredProps($data, self::REQUIRED_PROPS);
+        static::validateRequiredProps($data, static::REQUIRED_PROPS);
 
         return new static(
             $data->first_reading,
@@ -54,7 +54,7 @@ final class ReadingsPalmSunday extends ReadingsAbstract
             throw new \InvalidArgumentException('Please use fromObject instead.');
         }
 
-        static::validateRequiredKeys($data, self::REQUIRED_PROPS);
+        static::validateRequiredKeys($data, static::REQUIRED_PROPS);
 
         return new static(
             $data['first_reading'],
@@ -64,5 +64,30 @@ final class ReadingsPalmSunday extends ReadingsAbstract
             $data['gospel'],
             $data['palm_gospel']
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Returns an associative array containing the properties of this object,
+     * with the following keys:
+     * - palm_gospel (string): The gospel for the procession of the palms
+     * - first_reading (string): The first reading for Palm Sunday
+     * - second_reading (string): The second reading for Palm Sunday
+     * - responsorial_psalm (string): The responsorial psalm for Palm Sunday
+     * - alleluia_verse (string): The alleluia verse for Palm Sunday
+     * - gospel (string): The gospel for Palm Sunday
+     * @return array{palm_gospel:string,first_reading:string,second_reading:string,responsorial_psalm:string,alleluia_verse:string,gospel:string}
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'palm_gospel'        => $this->palm_gospel,
+            'first_reading'      => $this->first_reading,
+            'second_reading'     => $this->second_reading,
+            'responsorial_psalm' => $this->responsorial_psalm,
+            'alleluia_verse'     => $this->alleluia_verse,
+            'gospel'             => $this->gospel
+        ];
     }
 }
