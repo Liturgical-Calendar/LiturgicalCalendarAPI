@@ -796,7 +796,7 @@ final class RegionalDataPath
         }
 
         $response          = new \stdClass();
-        $response->success = "Calendar data created or updated for Diocese \"{$dioceseEntry[0]->diocese}\" (Nation: \"{$dioceseEntry[0]->nation}\")";
+        $response->success = "Calendar data created or updated for Diocese \"{$dioceseEntry->diocese}\" (Nation: \"{$dioceseEntry->nation}\")";
         $response->data    = $this->params->payload;
         self::produceResponse(json_encode($response));
     }
