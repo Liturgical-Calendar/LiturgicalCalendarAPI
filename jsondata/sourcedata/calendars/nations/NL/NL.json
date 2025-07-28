@@ -70,7 +70,13 @@
                 "month": 7,
                 "common": [
                     "Martyrs"
-                ]
+                ],
+                "readings": {
+                    "first_reading": "",
+                    "responsorial_psalm": "",
+                    "alleluia_verse": "",
+                    "gospel": ""
+                }
             },
             "metadata": {
                 "action": "createNew",
@@ -92,6 +98,7 @@
                 "readings": {
                     "first_reading": "",
                     "responsorial_psalm": "",
+                    "second_reading": "",
                     "alleluia_verse": "",
                     "gospel": ""
                 }
@@ -140,6 +147,7 @@
                 "readings": {
                     "first_reading": "",
                     "responsorial_psalm": "",
+                    "second_reading": "",
                     "alleluia_verse": "",
                     "gospel": ""
                 }

@@ -85,7 +85,8 @@
                         "grade",
                         "day",
                         "month",
-                        "common"
+                        "common",
+                        "readings"
                     ],
                     "title": "LiturgicalEvent"
                 },
@@ -97,7 +98,7 @@
                 "liturgical_event",
                 "metadata"
             ],
-            "title": "LitCalCreateNew"
+            "title": "LitCalCreateNewFixed"
         },
         "LitCalCreateNewMobile": {
             "type": "object",
@@ -136,7 +137,8 @@
                         "event_key",
                         "common",
                         "grade",
-                        "color"
+                        "color",
+                        "readings"
                     ],
                     "title": "LiturgicalEventCreateNewMobile"
                 },
@@ -148,7 +150,7 @@
                 "liturgical_event",
                 "metadata"
             ],
-            "title": "LitCalCreateNew"
+            "title": "LitCalCreateNewMobile"
         },
         "LitCalMetadataCreateNew": {
             "type": "object",

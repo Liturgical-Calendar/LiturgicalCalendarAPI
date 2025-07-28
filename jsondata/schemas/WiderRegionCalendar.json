@@ -29,22 +29,50 @@
     "definitions": {
         "LitCal": {
             "type": "object",
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/LitCalCreateNew"
+                },
+                {
+                    "$ref": "#/definitions/LitCalMakePatron"
+                }
+            ]
+        },
+        "LitCalCreateNew": {
+            "type": "object",
             "additionalProperties": false,
             "properties": {
                 "liturgical_event": {
-                    "$ref": "#/definitions/LiturgicalEvent"
+                    "$ref": "#/definitions/LiturgicalEventCreateNew"
                 },
                 "metadata": {
-                    "$ref": "#/definitions/Metadata"
+                    "$ref": "#/definitions/MetadataCreateNew"
                 }
             },
             "required": [
                 "liturgical_event",
                 "metadata"
             ],
-            "title": "LitCal"
+            "title": "LitCalCreateNew"
         },
-        "LiturgicalEvent": {
+        "LitCalMakePatron": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "liturgical_event": {
+                    "$ref": "#/definitions/LiturgicalEventMakePatron"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/MetadataMakePatron"
+                }
+            },
+            "required": [
+                "liturgical_event",
+                "metadata"
+            ],
+            "title": "LitCalMakePatron"
+        },
+        "LiturgicalEventCreateNew": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -75,16 +103,42 @@
             },
             "required": [
                 "event_key",
+                "color",
+                "day",
+                "month",
+                "common",
+                "readings",
                 "grade"
             ],
-            "title": "LiturgicalEvent"
+            "title": "LiturgicalEventCreateNew"
         },
-        "Metadata": {
+        "LiturgicalEventMakePatron": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "event_key": {
+                    "type": "string"
+                },
+                "grade": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "event_key",
+                "grade"
+            ],
+            "title": "LiturgicalEventMakePatron"
+        },
+        "MetadataCreateNew": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
                 "action": {
-                    "$ref": "#/definitions/WiderRegionCalendarAction"
+                    "type": "string",
+                    "const": "createNew"
                 },
                 "since_year": {
                     "type": "integer"
@@ -94,76 +148,7 @@
                     "format": "uri"
                 },
                 "url_lang_map": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                        "de": {
-                            "type": "string",
-                            "description": "German",
-                            "enum": [
-                                "de",
-                                "ge"
-                            ]
-                        },
-                        "en": {
-                            "type": "string",
-                            "description": "English",
-                            "enum": [
-                                "en"
-                            ]
-                        },
-                        "es": {
-                            "type": "string",
-                            "description": "Spanish",
-                            "enum": [
-                                "es",
-                                "sp"
-                            ]
-                        },
-                        "fr": {
-                            "type": "string",
-                            "description": "French",
-                            "enum": [
-                                "fr"
-                            ]
-                        },
-                        "it": {
-                            "type": "string",
-                            "description": "Italian",
-                            "enum": [
-                                "it"
-                            ]
-                        },
-                        "la": {
-                            "type": "string",
-                            "description": "Latin",
-                            "enum": [
-                                "la"
-                            ]
-                        },
-                        "pl": {
-                            "type": "string",
-                            "description": "Polish",
-                            "enum": [
-                                "pl"
-                            ]
-                        },
-                        "pt": {
-                            "type": "string",
-                            "description": "Portuguese",
-                            "enum": [
-                                "po",
-                                "pt"
-                            ]
-                        },
-                        "zh": {
-                            "type": "string",
-                            "description": "Chinese",
-                            "enum": [
-                                "zh"
-                            ]
-                        }
-                    }
+                    "$ref": "#/definitions/UrlLangMap"
                 },
                 "until_year": {
                     "type": "integer"
@@ -171,11 +156,113 @@
             },
             "required": [
                 "action",
-                "url_lang_map",
+                "since_year",
                 "url",
-                "since_year"
+                "url_lang_map"
             ],
             "title": "Metadata"
+        },
+        "MetadataMakePatron": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "const": "makePatron"
+                },
+                "since_year": {
+                    "type": "integer"
+                },
+                "url": {
+                    "type": "string",
+                    "format": "uri"
+                },
+                "url_lang_map": {
+                    "$ref": "#/definitions/UrlLangMap"
+                },
+                "until_year": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "action",
+                "since_year",
+                "url",
+                "url_lang_map"
+            ],
+            "title": "Metadata"
+        },
+        "UrlLangMap": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "de": {
+                    "type": "string",
+                    "description": "German",
+                    "enum": [
+                        "de",
+                        "ge"
+                    ]
+                },
+                "en": {
+                    "type": "string",
+                    "description": "English",
+                    "enum": [
+                        "en"
+                    ]
+                },
+                "es": {
+                    "type": "string",
+                    "description": "Spanish",
+                    "enum": [
+                        "es",
+                        "sp"
+                    ]
+                },
+                "fr": {
+                    "type": "string",
+                    "description": "French",
+                    "enum": [
+                        "fr"
+                    ]
+                },
+                "it": {
+                    "type": "string",
+                    "description": "Italian",
+                    "enum": [
+                        "it"
+                    ]
+                },
+                "la": {
+                    "type": "string",
+                    "description": "Latin",
+                    "enum": [
+                        "la"
+                    ]
+                },
+                "pl": {
+                    "type": "string",
+                    "description": "Polish",
+                    "enum": [
+                        "pl"
+                    ]
+                },
+                "pt": {
+                    "type": "string",
+                    "description": "Portuguese",
+                    "enum": [
+                        "po",
+                        "pt"
+                    ]
+                },
+                "zh": {
+                    "type": "string",
+                    "description": "Chinese",
+                    "enum": [
+                        "zh"
+                    ]
+                }
+            }
         },
         "NationalCalendars": {
             "type": "object",
@@ -469,14 +556,6 @@
                 "locales"
             ],
             "title": "CalendarMetadata"
-        },
-        "WiderRegionCalendarAction": {
-            "type": "string",
-            "enum": [
-                "createNew",
-                "makePatron"
-            ],
-            "title": "WiderRegionCalendarAction"
         },
         "CalendarI18n": {
             "type": "object",

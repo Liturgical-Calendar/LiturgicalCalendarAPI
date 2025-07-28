@@ -40,7 +40,7 @@
                 "readings": {
                     "oneOf": [
                         {
-                            "$ref": "#/definitions/LiturgicalEventWithVigilMass"
+                            "$ref": "#/definitions/ReadingsWithVigil"
                         },
                         {
                             "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
@@ -60,7 +60,7 @@
             ],
             "title": "PropriumDeSanctis"
         },
-        "LiturgicalEventWithVigilMass": {
+        "ReadingsWithVigil": {
             "type": "object",
             "additionalProperties": false,
             "properties": {

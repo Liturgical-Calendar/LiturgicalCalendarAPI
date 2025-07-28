@@ -449,6 +449,9 @@
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 4
+                },
+                "readings": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
                 }
             },
             "required": [
@@ -476,7 +479,8 @@
                 "is_vigil_for",
                 "liturgical_season",
                 "liturgical_season_lcl",
-                "psalter_week"
+                "psalter_week",
+                "readings"
             ],
             "additionalProperties": false
         },
@@ -588,6 +592,9 @@
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 4
+                },
+                "readings": {
+                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
                 }
             },
             "required": [
@@ -613,7 +620,8 @@
                 "day_of_the_week_long",
                 "liturgical_season",
                 "liturgical_season_lcl",
-                "psalter_week"
+                "psalter_week",
+                "readings"
             ],
             "additionalProperties": false
         },

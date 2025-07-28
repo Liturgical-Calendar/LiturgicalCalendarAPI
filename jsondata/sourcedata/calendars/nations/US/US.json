@@ -55,7 +55,13 @@
                 ],
                 "grade": 3,
                 "strtotime": "fourth thursday of november",
-                "common": []
+                "common": [],
+                "readings": {
+                    "first_reading": "",
+                    "responsorial_psalm": "",
+                    "alleluia_verse": "",
+                    "gospel": ""
+                }
             },
             "metadata": {
                 "action": "createNew",

@@ -87,12 +87,113 @@
             "title": "LitGrade"
         },
         "Readings": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/ReadingsFerial"
+                },
+                {
+                    "$ref": "#/definitions/ReadingsFestive"
+                },
+                {
+                    "$ref": "#/definitions/ReadingsPalmSunday"
+                },
+                {
+                    "$ref": "#/definitions/ReadingsEasterVigil"
+                }
+            ],
+            "title": "Readings"
+        },
+        "ReadingsFerial": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "first_reading": {
+                    "type": "string"
+                },
+                "responsorial_psalm": {
+                    "type": "string"
+                },
+                "alleluia_verse": {
+                    "type": "string"
+                },
+                "gospel": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "first_reading",
+                "responsorial_psalm",
+                "alleluia_verse",
+                "gospel"
+            ],
+            "title": "ReadingsFerial"
+        },
+        "ReadingsFestive": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "first_reading": {
+                    "type": "string"
+                },
+                "responsorial_psalm": {
+                    "type": "string"
+                },
+                "second_reading": {
+                    "type": "string"
+                },
+                "alleluia_verse": {
+                    "type": "string"
+                },
+                "gospel": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "first_reading",
+                "responsorial_psalm",
+                "second_reading",
+                "alleluia_verse",
+                "gospel"
+            ],
+            "title": "ReadingsFestive"
+        },
+        "ReadingsPalmSunday": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
                 "palm_gospel": {
                     "type": "string"
                 },
+                "first_reading": {
+                    "type": "string"
+                },
+                "responsorial_psalm": {
+                    "type": "string"
+                },
+                "second_reading": {
+                    "type": "string"
+                },
+                "alleluia_verse": {
+                    "type": "string"
+                },
+                "gospel": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "palm_gospel",
+                "first_reading",
+                "responsorial_psalm",
+                "second_reading",
+                "alleluia_verse",
+                "gospel"
+            ],
+            "title": "ReadingsPalmSunday"
+        },
+        "ReadingsEasterVigil": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
                 "first_reading": {
                     "type": "string"
                 },
@@ -151,10 +252,23 @@
             "required": [
                 "first_reading",
                 "responsorial_psalm",
+                "second_reading",
+                "responsorial_psalm_2",
+                "third_reading",
+                "responsorial_psalm_3",
+                "fourth_reading",
+                "responsorial_psalm_4",
+                "fifth_reading",
+                "responsorial_psalm_5",
+                "sixth_reading",
+                "responsorial_psalm_6",
+                "seventh_reading",
+                "responsorial_psalm_7",
+                "epistle",
+                "responsorial_psalm_epistle",
                 "alleluia_verse",
                 "gospel"
-            ],
-            "title": "Readings"
+            ]
         },
         "Day": {
             "type": "integer",
