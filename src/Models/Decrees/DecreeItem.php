@@ -93,7 +93,7 @@ final class DecreeItem extends AbstractJsonSrcData
      * - `metadata`: The metadata for the liturgical event.
      *
      * The `metadata` key must have an `action` key with a valid value of one of the following:
-     * - `moveFestivity`
+     * - `moveEvent`
      * - `createNew`
      * - `setProperty`
      * - `makePatron`

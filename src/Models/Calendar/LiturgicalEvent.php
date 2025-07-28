@@ -154,7 +154,7 @@ final class LiturgicalEvent implements \JsonSerializable
      * This function is used to finalize the output of the object for serialization as a JSON string.
      * It returns an associative array with the following keys:
      * - event_key: a unique key for the liturgical event
-     * - event_idx: the index of the event in the array of festivities
+     * - event_idx: the index of the event in the array of liturgical events
      * - name: the name of the liturgical event
      * - date: a PHP timestamp (seconds since the Unix Epoch) for the date of the liturgical event
      * - color: the liturgical color of the liturgical event

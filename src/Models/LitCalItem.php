@@ -73,7 +73,7 @@ final class LitCalItem extends AbstractJsonSrcData
                 $this->metadata         = LitCalItemMakePatronMetadata::fromObject($metadata);
                 break;
             default:
-                throw new \ValueError('metadata.action must be one of `moveFestivity`, `createNew`, `setProperty` or `makePatron`');
+                throw new \ValueError('metadata.action must be one of `moveEvent`, `createNew`, `setProperty` or `makePatron`');
         }
     }
 
@@ -85,7 +85,7 @@ final class LitCalItem extends AbstractJsonSrcData
      * - `metadata`: The metadata for the liturgical event.
      *
      * The `metadata` key must have an `action` key with a valid value of one of the following:
-     * - `moveFestivity`
+     * - `moveEvent`
      * - `createNew`
      * - `setProperty`
      * - `makePatron`

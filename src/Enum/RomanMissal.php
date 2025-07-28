@@ -143,7 +143,7 @@ class RomanMissal
         self::EDITIO_TYPICA_TERTIA_2002          => [ 'since_year' => 2002 ],
         self::EDITIO_TYPICA_TERTIA_EMENDATA_2008 => [ 'since_year' => 2008 ],
         self::USA_EDITION_2011                   => [ 'since_year' => 2011 ],
-        //the festivities applied in the '83 edition were incorporated into the Latin 2002 edition,
+        //the liturgical events applied in the '83 edition were incorporated into the Latin 2002 edition,
         //therefore we no longer need to apply them after the year 2002 since the Latin edition takes precedence
         self::ITALY_EDITION_1983                 => [ 'since_year' => 1983, 'until_year' => 2002 ],
         self::ITALY_EDITION_2020                 => [ 'since_year' => 2020 ],
