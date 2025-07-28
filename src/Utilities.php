@@ -203,11 +203,7 @@ class Utilities
         $month = floor(( $h + $l - 7 * $m + 114 ) / 31);
         $day   = ( ( $h + $l - 7 * $m + 114 ) % 31 ) + 1;
 
-        $dateObj = DateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new \DateTimeZone('UTC'));
-        if ($dateObj === false) {
-            throw new \Exception('Failed to create DateTime object');
-        }
-        return $dateObj;
+        return DateTime::fromFormat($day . '-' . $month . '-' . $Y);
     }
 
 
@@ -232,10 +228,7 @@ class Utilities
         $month = floor(( $d + $e + 114 ) / 31);
         $day   = ( ( $d + $e + 114 ) % 31 ) + 1;
 
-        $dateObj = DateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new \DateTimeZone('UTC'));
-        if ($dateObj === false) {
-            throw new \Exception(__METHOD__ . 'Failed to create DateTime object, on line' . __LINE__);
-        }
+        $dateObj = DateTime::fromFormat($day . '-' . $month . '-' . $Y);
         if ($gregCal) {
             //from February 29th 2100 Julian (March 14th 2100 Gregorian),
             //the difference between the Julian and Gregorian calendars will increase to 14 days
@@ -243,20 +236,14 @@ class Utilities
             $dateDiff = 'P' . floor((intval(substr($Y,0,2)) / .75) - 1.25) . 'D';
             $dateObj->add(new DateInterval($dateDiff));
             */
-            $GregDateDiff = [];
-            $gregDateObj  = DateTime::createFromFormat('!j-n-Y', '4-10-1582', new \DateTimeZone('UTC'));
-            if ($gregDateObj === false) {
-                throw new \Exception(__METHOD__ . 'Failed to create DateTime object, on line' . __LINE__);
-            }
+            $GregDateDiff    = [];
+            $gregDateObj     = DateTime::fromFormat('4-10-1582');
             $GregDateDiff[0] = [$gregDateObj, 'P10D']; //add 10 = GREGORIAN CUTOVER DATE
             $idx             = 0;
             $cc              = 10;
             for ($cent = 17; $cent <= 99; $cent++) {
                 if ($cent % 4 > 0) {
-                    $gregDateObj = DateTime::createFromFormat('!j-n-Y', '28-2-' . $cent . '00', new \DateTimeZone('UTC'));
-                    if ($gregDateObj === false) {
-                        throw new \Exception(__METHOD__ . 'Failed to create DateTime object, on line' . __LINE__);
-                    }
+                    $gregDateObj          = DateTime::fromFormat('28-2-' . $cent . '00');
                     $GregDateDiff[++$idx] = [$gregDateObj, 'P' . ++$cc . 'D'];
                 }
             }
@@ -475,6 +462,14 @@ class Utilities
         }
         /** @var array<string|int,mixed> $decoded */
         return $decoded;
+    }
+
+    public static function ucfirst(string|false $str): string
+    {
+        if (false === $str) {
+            throw new \InvalidArgumentException('value is false, cannot capitalize the first letter');
+        }
+        return \ucfirst($str);
     }
 
     /**

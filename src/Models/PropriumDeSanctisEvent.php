@@ -6,6 +6,7 @@ use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitColor;
 use LiturgicalCalendar\Api\Enum\LitEventType;
 use LiturgicalCalendar\Api\Enum\LitGrade;
+use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
 use LiturgicalCalendar\Api\Models\Calendar\ReadingsFerial;
 use LiturgicalCalendar\Api\Models\Calendar\ReadingsFestive;
@@ -28,8 +29,10 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
     public readonly int $month;
     /** @var LitColor[] $color */
     public readonly array $color;
-    public readonly LitCommons $common;
+    /** @var LitCommons|LitMassVariousNeeds[] $common */
+    public readonly LitCommons|array $common;
     public private(set) LitGrade $grade;
+    public readonly ?string $grade_display;
     public readonly LitEventType $type;
     public readonly ReadingsFerial|ReadingsFestive $readings;
     public readonly string $calendar;
@@ -45,7 +48,7 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
      * @param int $day The day of the month when the event occurs.
      * @param int $month The month when the event occurs.
      * @param LitColor[] $color An array of liturgical colors associated with the event.
-     * @param LitCommons $common The liturgical common for the event.
+     * @param LitCommons|LitMassVariousNeeds[] $common The liturgical common for the event.
      * @param LitGrade $grade The liturgical grade of the event.
      * @param ReadingsFerial|ReadingsFestive $readings The readings for the event.
      * @param LitEventType $type The type of the event, with a default value of LitEventType::FIXED.
@@ -56,21 +59,23 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
         int $day,
         int $month,
         array $color,
-        LitCommons $common,
+        LitCommons|array $common,
         LitGrade $grade,
+        ?string $grade_display,
         ReadingsFerial|ReadingsFestive $readings,
         LitEventType $type = LitEventType::FIXED,
         string $calendar = 'GENERAL ROMAN'
     ) {
-        $this->event_key = $event_key;
-        $this->day       = $day;
-        $this->month     = $month;
-        $this->color     = $color;
-        $this->common    = $common;
-        $this->grade     = $grade;
-        $this->type      = $type;
-        $this->readings  = $readings;
-        $this->calendar  = $calendar;
+        $this->event_key     = $event_key;
+        $this->day           = $day;
+        $this->month         = $month;
+        $this->color         = $color;
+        $this->common        = $common;
+        $this->grade         = $grade;
+        $this->grade_display = $grade_display;
+        $this->type          = $type;
+        $this->readings      = $readings;
+        $this->calendar      = $calendar;
     }
 
     /**
@@ -147,7 +152,7 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
      *      - gospel (string): The gospel for the event
      *      - optional second_reading (string): The second reading for the event
      *
-     * @param array{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,readings:array{first_reading:string,responsorial_psalm:string,second_reading?:string,alleluia_verse:string,gospel:string}} $data
+     * @param array{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,grade_display:?string,readings:array{first_reading:string,responsorial_psalm:string,second_reading?:string,alleluia_verse:string,gospel:string}} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -170,8 +175,9 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
             $data['day'],
             $data['month'],
             array_map(fn (string $color): LitColor => LitColor::from($color), $data['color']),
-            LitCommons::create($data['common']),
+            LitCommons::create($data['common']) ?? array_values(array_map(fn(string $value) => LitMassVariousNeeds::from($value), $data['common'])),
             LitGrade::from($data['grade']),
+            isset($data['grade_display']) ? $data['grade_display'] : null,
             $readings,
             isset($data['type']) ? LitEventType::from($data['type']) : LitEventType::FIXED,
             isset($data['calendar']) ? $data['calendar'] : 'GENERAL ROMAN'
@@ -189,6 +195,7 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
      * - color (array): The liturgical colors for the event.
      * - common (array): The liturgical common for the event.
      * - grade (int): The liturgical grade of the event.
+     * - grade_display (string): The liturgical grade display of the event.
      * - readings (stdClass): The readings for the event, which may contain:
      *   -> first_reading (string): The first reading.
      *   -> responsorial_psalm (string): The responsorial psalm.
@@ -218,8 +225,9 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
             $data->day,
             $data->month,
             array_map(fn (string $color): LitColor => LitColor::from($color), $data->color),
-            LitCommons::create($data->common),
+            LitCommons::create($data->common) ?? array_values(array_map(fn(string $value) => LitMassVariousNeeds::from($value), $data->common)),
             LitGrade::from($data->grade),
+            isset($data->grade_display) ? $data->grade_display : null,
             $readings,
             isset($data->type) ? LitEventType::from($data->type) : LitEventType::FIXED,
             isset($data->calendar) ? $data->calendar : 'GENERAL ROMAN'

@@ -9,7 +9,7 @@ use LiturgicalCalendar\Api\DateTime;
  * Abstract class for liturgical event maps.
  *
  * Maps event keys to LiturgicalEvent objects.
- * @phpstan-implements \IteratorAggregate<string, LiturgicalEvent>
+ * @implements \IteratorAggregate<string,LiturgicalEvent>
  */
 abstract class AbstractLiturgicalEventMap implements \IteratorAggregate
 {
@@ -256,7 +256,7 @@ abstract class AbstractLiturgicalEventMap implements \IteratorAggregate
     /**
      * Returns an iterator for the events in the map.
      *
-     * @return \Traversable<string, LiturgicalEvent> An iterator for the events in the map.
+     * @return \Traversable<string,LiturgicalEvent> An iterator for the events in the map.
      */
     public function getIterator(): \Traversable
     {

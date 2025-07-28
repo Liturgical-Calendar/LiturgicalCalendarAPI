@@ -36,4 +36,13 @@ class DateTime extends \DateTime implements \JsonSerializable
             ...$tz
         ];
     }
+
+    public static function fromFormat(string $time): DateTime
+    {
+        $dateTime = DateTime::createFromFormat('!j-n-Y', $time, new \DateTimeZone('UTC'));
+        if ($dateTime === false) {
+            throw new \InvalidArgumentException('Failed to create DateTime from ' . $time);
+        }
+        return $dateTime;
+    }
 }

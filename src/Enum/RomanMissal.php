@@ -120,8 +120,8 @@ class RomanMissal
         self::EDITIO_TYPICA_SECUNDA_1975         => false,
         self::EDITIO_TYPICA_TERTIA_2002          => JsonData::MISSALS_FOLDER . '/propriumdesanctis_2002/i18n/',
         self::EDITIO_TYPICA_TERTIA_EMENDATA_2008 => JsonData::MISSALS_FOLDER . '/propriumdesanctis_2008/i18n/',
-        self::USA_EDITION_2011                   => false,
-        self::ITALY_EDITION_1983                 => false,
+        self::USA_EDITION_2011                   => JsonData::MISSALS_FOLDER . '/propriumdesanctis_US_2011/i18n/',
+        self::ITALY_EDITION_1983                 => JsonData::MISSALS_FOLDER . '/propriumdesanctis_IT_1983/i18n/',
         self::ITALY_EDITION_2020                 => false,
         self::NETHERLANDS_EDITION_1978           => false,
         self::CANADA_EDITION_2011                => false,
@@ -212,12 +212,13 @@ class RomanMissal
      * Gets the year limits for the given Roman Missal.
      *
      * @param string $missal_id the id of the Roman Missal
-     * @return ?object an object containing the year limits for the Roman Missal,
-     *   with properties named 'since_year' and 'until_year', or null if missal_id not valid
+     * @return ?array{since_year:int,until_year?:int} an associative array of the year limits
+     *   for the given Roman Missal, with properties named 'since_year' and optionally 'until_year',
+     *   or null if missal_id not valid
      */
-    public static function getYearLimits(string $missal_id): ?object
+    public static function getYearLimits(string $missal_id): ?array
     {
-        return isset(self::$yearLimits[$missal_id]) ? (object) self::$yearLimits[$missal_id] : null;
+        return isset(self::$yearLimits[$missal_id]) ? self::$yearLimits[$missal_id] : null;
     }
 
     /**

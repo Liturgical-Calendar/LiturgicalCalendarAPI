@@ -3,7 +3,6 @@
         "month": 4,
         "day": 23,
         "event_key": "StAdalbert",
-        "name": "Sant'Adalberto, vescovo e martire",
         "grade": 2,
         "grade_display": null,
         "common": [
@@ -26,7 +25,6 @@
         "month": 4,
         "day": 28,
         "event_key": "StLouisGrignonMontfort",
-        "name": "San Luigi Grignon de Montfort",
         "grade": 2,
         "grade_display": null,
         "common": [
@@ -47,7 +45,6 @@
         "month": 8,
         "day": 2,
         "event_key": "StPeterJulianEymard",
-        "name": "San Pietro Giuliani, sacerdote",
         "grade": 2,
         "grade_display": null,
         "common": [
@@ -69,7 +66,6 @@
         "month": 8,
         "day": 14,
         "event_key": "StMaximilianKolbe",
-        "name": "San Massimiliano Kolbe, sacerdote e martire",
         "grade": 3,
         "grade_display": null,
         "common": [
@@ -91,7 +87,6 @@
         "month": 9,
         "day": 9,
         "event_key": "StPeterClaver",
-        "name": "San Pietro Claver, sacerdote",
         "grade": 2,
         "grade_display": null,
         "common": [
@@ -113,7 +108,6 @@
         "month": 9,
         "day": 20,
         "event_key": "StAndrewKimTaegon",
-        "name": "Santi Andrea Kim Taegon, sacerdote, Paolo Chong Hasang e compagni martiri",
         "grade": 3,
         "grade_display": null,
         "common": [
@@ -134,7 +128,6 @@
         "month": 9,
         "day": 28,
         "event_key": "StsLawrenceRuiz",
-        "name": "Santi Lorenzo Ruiz e compagni martiri",
         "grade": 2,
         "grade_display": null,
         "common": [
@@ -155,7 +148,6 @@
         "month": 11,
         "day": 24,
         "event_key": "StAndrewDungLac",
-        "name": "Sant'Andrea Dung-Lac e compagni martiri",
         "grade": 3,
         "grade_display": null,
         "common": [

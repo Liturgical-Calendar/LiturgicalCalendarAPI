@@ -591,7 +591,10 @@ final class LiturgicalEvent implements \JsonSerializable
         throw new \InvalidArgumentException('Invalid common value type provided to create LiturgicalEvent: expected an array of string, of LitCommon cases, or of LitMassVariousNeeds cases');
     }
 
-
+    public function getCommonLcl(): string
+    {
+        return $this->common_lcl;
+    }
 /**
  * The following functions might be somehow useful
  * Leaving them commented for the time being since we aren't actually using them
