@@ -6,7 +6,8 @@ use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitColor;
 use LiturgicalCalendar\Api\Enum\LitEventType;
 use LiturgicalCalendar\Api\Enum\LitGrade;
-use LiturgicalCalendar\Api\Models\Calendar\ReadingsEaster;
+use LiturgicalCalendar\Api\Models\Calendar\ReadingsEasterVigil;
+use LiturgicalCalendar\Api\Models\Calendar\ReadingsFerial;
 use LiturgicalCalendar\Api\Models\Calendar\ReadingsFestive;
 use LiturgicalCalendar\Api\Models\Calendar\ReadingsPalmSunday;
 
@@ -26,7 +27,7 @@ final class PropriumDeTemporeEvent extends AbstractJsonSrcData
     public readonly LitEventType $type;
     /** @var LitColor[] $color */
     public readonly array $color;
-    public readonly ReadingsEaster|ReadingsPalmSunday|ReadingsFestive $readings;
+    public readonly ReadingsEasterVigil|ReadingsPalmSunday|ReadingsFestive|ReadingsFerial $readings;
     public private(set) DateTime $date;
 
     /**
@@ -36,14 +37,14 @@ final class PropriumDeTemporeEvent extends AbstractJsonSrcData
      * @param LitGrade $grade The grade of the event.
      * @param LitEventType $type The type of the event.
      * @param LitColor[] $color The color of the event.
-     * @param ReadingsEaster|ReadingsPalmSunday|ReadingsFestive $readings The readings for the event.
+     * @param ReadingsEasterVigil|ReadingsPalmSunday|ReadingsFestive|ReadingsFerial $readings The readings for the event.
      */
     public function __construct(
         string $event_key,
         LitGrade $grade,
         LitEventType $type,
         array $color,
-        ReadingsEaster|ReadingsPalmSunday|ReadingsFestive $readings
+        ReadingsEasterVigil|ReadingsPalmSunday|ReadingsFestive|ReadingsFerial $readings
     ) {
         $this->event_key = $event_key;
         $this->grade     = $grade;
@@ -63,11 +64,25 @@ final class PropriumDeTemporeEvent extends AbstractJsonSrcData
         static::validateRequiredKeys($data, static::REQUIRED_PROPS);
 
         if (array_key_exists('palm_gospel', $data['readings'])) {
+            if ($data['grade'] !== LitGrade::HIGHER_SOLEMNITY->value) {
+                throw new \InvalidArgumentException('Palm Sunday is a higher solemnity, should have grade 7!');
+            }
             $readings = ReadingsPalmSunday::fromArray($data['readings']);
         } elseif (array_key_exists('responsorial_psalm_2', $data['readings'])) {
-            $readings = ReadingsEaster::fromArray($data['readings']);
-        } else {
+            if ($data['grade'] !== LitGrade::HIGHER_SOLEMNITY->value) {
+                throw new \InvalidArgumentException('Easter is a higher solemnity, should have grade 7!');
+            }
+            $readings = ReadingsEasterVigil::fromArray($data['readings']);
+        } elseif (array_key_exists('second_reading', $data['readings'])) {
+            if ($data['grade'] <= LitGrade::FEAST->value) {
+                throw new \InvalidArgumentException('Events with a second reading should have grade 5 (Feast of the Lord) or higher!');
+            }
             $readings = ReadingsFestive::fromArray($data['readings']);
+        } else {
+            if ($data['grade'] > LitGrade::FEAST->value) {
+                throw new \InvalidArgumentException('Events higher than Feasts (grade 4) should have a second reading!');
+            }
+            $readings = ReadingsFerial::fromArray($data['readings']);
         }
 
         return new static(
@@ -99,13 +114,26 @@ final class PropriumDeTemporeEvent extends AbstractJsonSrcData
     {
         static::validateRequiredProps($data, static::REQUIRED_PROPS);
 
-        $readings = null;
         if (property_exists($data->readings, 'palm_gospel')) {
+            if ($data->grade !== LitGrade::HIGHER_SOLEMNITY->value) {
+                throw new \InvalidArgumentException('Palm Sunday is a higher solemnity, should have grade 7!');
+            }
             $readings = ReadingsPalmSunday::fromObject($data->readings);
         } elseif (property_exists($data->readings, 'responsorial_psalm_2')) {
-            $readings = ReadingsEaster::fromObject($data->readings);
-        } else {
+            if ($data->grade !== LitGrade::HIGHER_SOLEMNITY->value) {
+                throw new \InvalidArgumentException('Easter is a higher solemnity, should have grade 7!');
+            }
+            $readings = ReadingsEasterVigil::fromObject($data->readings);
+        } elseif (property_exists($data->readings, 'second_reading')) {
+            if ($data->grade <= LitGrade::FEAST->value) {
+                throw new \InvalidArgumentException('Events with a second reading should have grade 5 (Feast of the Lord) or higher!');
+            }
             $readings = ReadingsFestive::fromObject($data->readings);
+        } else {
+            if ($data->grade > LitGrade::FEAST->value) {
+                throw new \InvalidArgumentException('Events higher than Feasts (grade 4) should have a second reading!');
+            }
+            $readings = ReadingsFerial::fromObject($data->readings);
         }
 
         return new static(

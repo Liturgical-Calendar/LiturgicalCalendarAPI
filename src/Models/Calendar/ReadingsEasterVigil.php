@@ -2,7 +2,7 @@
 
 namespace LiturgicalCalendar\Api\Models\Calendar;
 
-final class ReadingsEaster extends ReadingsAbstract
+final class ReadingsEasterVigil extends ReadingsAbstract
 {
     private const REQUIRED_PROPS = [
         'first_reading',

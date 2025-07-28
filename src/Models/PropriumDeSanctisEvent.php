@@ -7,10 +7,8 @@ use LiturgicalCalendar\Api\Enum\LitColor;
 use LiturgicalCalendar\Api\Enum\LitEventType;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
-use LiturgicalCalendar\Api\Models\Calendar\ReadingsEaster;
 use LiturgicalCalendar\Api\Models\Calendar\ReadingsFerial;
 use LiturgicalCalendar\Api\Models\Calendar\ReadingsFestive;
-use LiturgicalCalendar\Api\Models\Calendar\ReadingsPalmSunday;
 use LiturgicalCalendar\Api\Models\Calendar\VigilReadingsMap;
 
 final class PropriumDeSanctisEvent extends AbstractJsonSrcData
