@@ -129,6 +129,27 @@ class RomanMissal
     ];
 
     /**
+     * An associative array of the lectionary file paths, where the key is the value of a Roman Missal constant.
+     * This array is used to get the path to the JSON file containing the lectionary data for a Roman Missal.
+     * @static
+     * @var array<string,string|false>
+     * @see RomanMissal::getLectionaryFilePath()
+     */
+    public static array $lectionaryPath = [
+        self::EDITIO_TYPICA_1970                 => false,
+        self::REIMPRESSIO_EMENDATA_1971          => false,
+        self::EDITIO_TYPICA_SECUNDA_1975         => false,
+        self::EDITIO_TYPICA_TERTIA_2002          => false,
+        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008 => false,
+        self::USA_EDITION_2011                   => JsonData::MISSALS_FOLDER . '/propriumdesanctis_US_2011/lectionary/',
+        self::ITALY_EDITION_1983                 => JsonData::MISSALS_FOLDER . '/propriumdesanctis_IT_1983/lectionary/',
+        self::ITALY_EDITION_2020                 => false,
+        self::NETHERLANDS_EDITION_1978           => false,
+        self::CANADA_EDITION_2011                => false,
+        self::CANADA_EDITION_2016                => false
+    ];
+
+    /**
      * An associative array of the year limits, where the key is the value of a Roman Missal constant
      * and the value is an associative array with the properties 'since_year' and optionally 'until_year'.
      * This array is used to get the year limits for a Roman Missal.
@@ -206,6 +227,17 @@ class RomanMissal
     public static function getSanctoraleI18nFilePath(string $missal_id): string|false|null
     {
         return isset(self::$i18nPath[$missal_id]) ? self::$i18nPath[$missal_id] : null;
+    }
+
+    /**
+     * Gets the path to the lectionary directory for the given Roman Missal.
+     *
+     * @param string $missal_id the id of the Roman Missal
+     * @return string|false|null the path to the lectionary directory, or false if the Roman Missal does not have any lectionary data, or null if missal_id not valid
+     */
+    public static function getLectionaryFilePath(string $missal_id): string|false|null
+    {
+        return isset(self::$lectionaryPath[$missal_id]) ? self::$lectionaryPath[$missal_id] : null;
     }
 
     /**

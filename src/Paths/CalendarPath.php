@@ -866,9 +866,10 @@ final class CalendarPath
      */
     private function loadPropriumDeSanctisData(string $missal): void
     {
-        $propriumdesanctisFile     = RomanMissal::getSanctoraleFileName($missal);
-        $propriumdesanctisI18nPath = RomanMissal::getSanctoraleI18nFilePath($missal);
-        $i18nData                  = null;
+        $propriumdesanctisFile           = RomanMissal::getSanctoraleFileName($missal);
+        $propriumdesanctisI18nPath       = RomanMissal::getSanctoraleI18nFilePath($missal);
+        $propriumdesanctisLectionaryPath = RomanMissal::getLectionaryFilePath($missal);
+        $i18nData                        = null;
 
         if (null === $propriumdesanctisFile || null === $propriumdesanctisI18nPath) {
             throw new \InvalidArgumentException('Invalid Roman Missal id: ' . $missal);
@@ -933,15 +934,11 @@ final class CalendarPath
          * Therefore we can safely use the fully identified locale (primary language with country identifier)
          * when looking up the lectionary file.
          */
-        $lectionary = strtr(
-            JsonData::MISSAL_LECTIONARY_FILE,
-            [
-                '{missal}' => $missal,
-                '{locale}' => $this->CalendarParams->Locale
-            ]
-        );
-        if (file_exists($lectionary)) {
-            $this->Cal::$lectionary->addSanctoraleReadingsFromFile($lectionary);
+        if ($propriumdesanctisLectionaryPath !== false) {
+            $lectionary = $propriumdesanctisLectionaryPath . $this->CalendarParams->Locale . '.json';
+            if (file_exists($lectionary)) {
+                $this->Cal::$lectionary->addSanctoraleReadingsFromFile($lectionary);
+            }
         }
     }
 
