@@ -7,7 +7,6 @@ use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
-use LiturgicalCalendar\Api\Models\Metadata\DiocesanGroup;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
@@ -36,6 +35,26 @@ final class MetadataPath
      */
     private static function buildNationalCalendarData(): void
     {
+        // We add the General Roman Calendar as used in the Vatican to the list of "national" calendars
+        $metadataNationalCalendarItem = MetadataNationalCalendarItem::fromArray([
+            'calendar_id' => 'VA',
+            'locales'     => [ 'la_VA' ],
+            'missals'     => [
+                'EDITIO_TYPICA_1970',
+                'EDITIO_TYPICA_1971',
+                'EDITIO_TYPICA_1975',
+                'EDITIO_TYPICA_2002',
+                'EDITIO_TYPICA_2008'
+            ],
+            'settings'    => [
+                'epiphany'            => Epiphany::JAN6->value,
+                'ascension'           => Ascension::THURSDAY->value,
+                'corpus_christi'      => Ascension::THURSDAY->value,
+                'eternal_high_priest' => false
+            ]
+        ]);
+        self::$metadataCalendars->pushNationalCalendarMetadata($metadataNationalCalendarItem);
+
         $directories = array_map('basename', glob(JsonData::NATIONAL_CALENDARS_FOLDER . '/*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
             $nationalCalendarDataFile                 = JsonData::NATIONAL_CALENDARS_FOLDER . "/$directory/$directory.json";
@@ -120,13 +139,13 @@ final class MetadataPath
         $directories = array_map('basename', glob(JsonData::WIDER_REGIONS_FOLDER . '/*', GLOB_ONLYDIR));
         foreach ($directories as $directory) {
             $WiderRegionFile = strtr(
-                JsonData::WIDER_REGIONS_FILE,
+                JsonData::WIDER_REGION_FILE,
                 ['{wider_region}' => $directory]
             );
 
             if (file_exists($WiderRegionFile)) {
                 $widerRegionI18nFolder   = strtr(
-                    JsonData::WIDER_REGIONS_I18N_FOLDER,
+                    JsonData::WIDER_REGION_I18N_FOLDER,
                     [ '{wider_region}' => $directory ]
                 );
                 $locales                 = array_map(
@@ -180,25 +199,6 @@ final class MetadataPath
 
     public static function response(): void
     {
-        // We add the General Roman Calendar as used in the Vatican to the list of "national" calendars
-        $metadataNationalCalendarItem = MetadataNationalCalendarItem::fromArray([
-            'calendar_id' => 'VA',
-            'locales'     => [ 'la_VA' ],
-            'missals'     => [
-                'EDITIO_TYPICA_1970',
-                'EDITIO_TYPICA_1971',
-                'EDITIO_TYPICA_1975',
-                'EDITIO_TYPICA_2002',
-                'EDITIO_TYPICA_2008'
-            ],
-            'settings'    => [
-                'epiphany'            => Epiphany::JAN6->value,
-                'ascension'           => Ascension::THURSDAY->value,
-                'corpus_christi'      => Ascension::THURSDAY->value,
-                'eternal_high_priest' => false
-            ]
-        ]);
-
         $response     = json_encode([
             'litcal_metadata' => self::$metadataCalendars
         ], JSON_PRETTY_PRINT);

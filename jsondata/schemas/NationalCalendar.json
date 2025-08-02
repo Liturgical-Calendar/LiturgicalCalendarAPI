@@ -71,9 +71,6 @@
                         "common": {
                             "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitCommon"
                         },
-                        "readings": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
-                        },
                         "name": {
                             "type": "string",
                             "description": "should only be present on /events path, not in original resource where it will be present in the i18n file"
@@ -85,8 +82,7 @@
                         "grade",
                         "day",
                         "month",
-                        "common",
-                        "readings"
+                        "common"
                     ],
                     "title": "LiturgicalEvent"
                 },
@@ -120,9 +116,6 @@
                         "common": {
                             "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitCommon"
                         },
-                        "readings": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
-                        },
                         "strtotime": {
                             "type": "string",
                             "description": "supports PHP strtotime string format"
@@ -137,8 +130,7 @@
                         "event_key",
                         "common",
                         "grade",
-                        "color",
-                        "readings"
+                        "color"
                     ],
                     "title": "LiturgicalEventCreateNewMobile"
                 },

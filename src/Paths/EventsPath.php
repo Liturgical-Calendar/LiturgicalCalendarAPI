@@ -242,7 +242,7 @@ final class EventsPath
                 $this->EventsParams->NationalCalendar = $DiocesanData->nation;
 
                 $diocesanDataFile = strtr(
-                    JsonData::DIOCESAN_CALENDARS_FILE,
+                    JsonData::DIOCESAN_CALENDAR_FILE,
                     [
                         '{nation}'       => $this->EventsParams->NationalCalendar,
                         '{diocese}'      => $this->EventsParams->DiocesanCalendar,
@@ -274,7 +274,7 @@ final class EventsPath
     {
         if ($this->EventsParams->NationalCalendar !== null) {
             $nationalDataFile = strtr(
-                JsonData::NATIONAL_CALENDARS_FILE,
+                JsonData::NATIONAL_CALENDAR_FILE,
                 [
                     '{nation}' => $this->EventsParams->NationalCalendar
                 ]
@@ -294,14 +294,14 @@ final class EventsPath
 
             if (property_exists(self::$NationalData, 'metadata') && property_exists(self::$NationalData->metadata, 'wider_region')) {
                 $widerRegionDataFile = strtr(
-                    JsonData::WIDER_REGIONS_FILE,
+                    JsonData::WIDER_REGION_FILE,
                     [
                         '{wider_region}' => self::$NationalData->metadata->wider_region
                     ]
                 );
 
                 $widerRegionI18nFile = strtr(
-                    JsonData::WIDER_REGIONS_I18N_FILE,
+                    JsonData::WIDER_REGION_I18N_FILE,
                     [
                         '{wider_region}' => self::$NationalData->metadata->wider_region,
                         '{locale}'       => $this->EventsParams->Locale
@@ -639,7 +639,7 @@ final class EventsPath
             }
 
             $NationalCalendarI18nFile = strtr(
-                JsonData::NATIONAL_CALENDARS_I18N_FILE,
+                JsonData::NATIONAL_CALENDAR_I18N_FILE,
                 [
                     '{nation}' => $this->EventsParams->NationalCalendar,
                     '{locale}' => $this->EventsParams->Locale
@@ -727,7 +727,7 @@ final class EventsPath
     {
         if ($this->EventsParams->DiocesanCalendar !== null && self::$DiocesanData !== null) {
             $DiocesanCalendarI18nFile = strtr(
-                JsonData::DIOCESAN_CALENDARS_I18N_FILE,
+                JsonData::DIOCESAN_CALENDAR_I18N_FILE,
                 [
                     '{nation}'  => $this->EventsParams->NationalCalendar,
                     '{diocese}' => $this->EventsParams->DiocesanCalendar,

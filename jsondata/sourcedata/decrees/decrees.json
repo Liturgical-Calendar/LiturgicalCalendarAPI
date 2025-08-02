@@ -48,13 +48,6 @@
             "calendar": "GENERAL ROMAN",
             "color": ["white"],
             "type": "mobile",
-            "readings": {
-                "first_reading": "",
-                "responsorial_psalm": "",
-                "second_reading": "",
-                "alleluia_verse": "",
-                "gospel": ""
-            },
             "strtotime": {
                 "day_of_the_week": "Monday",
                 "relative_time": "after",
@@ -133,14 +126,7 @@
             "common": ["Pastors:For a Pope"],
             "calendar": "GENERAL ROMAN",
             "color": ["white"],
-            "type": "fixed",
-            "readings": {
-                "first_reading": "",
-                "responsorial_psalm": "",
-                "second_reading": "",
-                "alleluia_verse": "",
-                "gospel": ""
-            }
+            "type": "fixed"
         },
         "metadata": {
             "action": "createNew",
@@ -221,14 +207,7 @@
             "common": ["Blessed Virgin Mary"],
             "calendar": "GENERAL ROMAN",
             "color": ["white"],
-            "type": "fixed",
-            "readings": {
-                "first_reading": "",
-                "responsorial_psalm": "",
-                "second_reading": "",
-                "alleluia_verse": "",
-                "gospel": ""
-            }
+            "type": "fixed"
         },
         "metadata": {
             "action": "createNew",
@@ -265,14 +244,7 @@
             "common": ["Pastors:For a Pope"],
             "calendar": "GENERAL ROMAN",
             "color": ["white"],
-            "type": "fixed",
-            "readings": {
-                "first_reading": "",
-                "responsorial_psalm": "",
-                "second_reading": "",
-                "alleluia_verse": "",
-                "gospel": ""
-            }
+            "type": "fixed"
         },
         "metadata": {
             "action": "createNew",
@@ -311,14 +283,7 @@
             "common": ["Holy Men and Women:For Religious"],
             "calendar": "GENERAL ROMAN",
             "color": ["white"],
-            "type": "fixed",
-            "readings": {
-                "first_reading": "",
-                "responsorial_psalm": "",
-                "second_reading": "",
-                "alleluia_verse": "",
-                "gospel": ""
-            }
+            "type": "fixed"
         },
         "metadata": {
             "action": "createNew",
@@ -355,14 +320,7 @@
             "common": ["Holy Men and Women:For an Abbot", "Doctors"],
             "calendar": "GENERAL ROMAN",
             "color": ["white"],
-            "type": "fixed",
-            "readings": {
-                "first_reading": "",
-                "responsorial_psalm": "",
-                "second_reading": "",
-                "alleluia_verse": "",
-                "gospel": ""
-            }
+            "type": "fixed"
         },
         "metadata": {
             "action": "createNew",
@@ -401,14 +359,7 @@
             "common": ["Pastors:For One Pastor", "Doctors"],
             "calendar": "GENERAL ROMAN",
             "color": ["white"],
-            "type": "fixed",
-            "readings": {
-                "first_reading": "",
-                "responsorial_psalm": "",
-                "second_reading": "",
-                "alleluia_verse": "",
-                "gospel": ""
-            }
+            "type": "fixed"
         },
         "metadata": {
             "action": "createNew",
@@ -447,14 +398,7 @@
             "common": ["Virgins:For One Virgin", "Doctors"],
             "calendar": "GENERAL ROMAN",
             "color": ["white"],
-            "type": "fixed",
-            "readings": {
-                "first_reading": "",
-                "responsorial_psalm": "",
-                "second_reading": "",
-                "alleluia_verse": "",
-                "gospel": ""
-            }
+            "type": "fixed"
         },
         "metadata": {
             "action": "createNew",

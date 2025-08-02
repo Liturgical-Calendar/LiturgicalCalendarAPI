@@ -3,6 +3,7 @@
 namespace LiturgicalCalendar\Api\Models\Decrees;
 
 use LiturgicalCalendar\Api\Enum\CalEventAction;
+use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 
 final class DecreeItem extends AbstractJsonSrcData
@@ -13,6 +14,7 @@ final class DecreeItem extends AbstractJsonSrcData
     public readonly string $description;
     public readonly DecreeEventData $liturgical_event;
     public readonly DecreeEventMetadata $metadata;
+    public readonly string $api_path;
 
     private function __construct(
         string $decree_id,
@@ -83,6 +85,8 @@ final class DecreeItem extends AbstractJsonSrcData
             default:
                 throw new \ValueError('metadata.action must be one of `createNew`, `setProperty` or `makeDoctor`'); //`moveEvent`,
         }
+
+        $this->api_path = API_BASE_PATH . Route::DECREES->value . '/' . $this->decree_id;
     }
 
     /**

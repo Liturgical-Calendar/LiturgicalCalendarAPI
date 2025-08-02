@@ -8,9 +8,6 @@ use LiturgicalCalendar\Api\Enum\LitEventType;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
-use LiturgicalCalendar\Api\Models\Calendar\ReadingsFerial;
-use LiturgicalCalendar\Api\Models\Calendar\ReadingsFestive;
-use LiturgicalCalendar\Api\Models\Calendar\VigilReadingsMap;
 
 final class PropriumDeSanctisEvent extends AbstractJsonSrcData
 {
@@ -20,8 +17,7 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
         'month',
         'color',
         'common',
-        'grade',
-        'readings'
+        'grade'
     ];
 
     public readonly string $event_key;
@@ -34,7 +30,6 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
     public private(set) LitGrade $grade;
     public readonly ?string $grade_display;
     public readonly LitEventType $type;
-    public readonly ReadingsFerial|ReadingsFestive $readings;
     public readonly string $calendar;
     public private(set) DateTime $date;
     public private(set) string $name;
@@ -50,7 +45,6 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
      * @param LitColor[] $color An array of liturgical colors associated with the event.
      * @param LitCommons|LitMassVariousNeeds[] $common The liturgical common for the event.
      * @param LitGrade $grade The liturgical grade of the event.
-     * @param ReadingsFerial|ReadingsFestive $readings The readings for the event.
      * @param LitEventType $type The type of the event, with a default value of LitEventType::FIXED.
      * @param string $calendar The calendar for the event, with a default value of 'GENERAL ROMAN'.
      */
@@ -62,7 +56,6 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
         LitCommons|array $common,
         LitGrade $grade,
         ?string $grade_display,
-        ReadingsFerial|ReadingsFestive $readings,
         LitEventType $type = LitEventType::FIXED,
         string $calendar = 'GENERAL ROMAN'
     ) {
@@ -74,7 +67,6 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
         $this->grade         = $grade;
         $this->grade_display = $grade_display;
         $this->type          = $type;
-        $this->readings      = $readings;
         $this->calendar      = $calendar;
     }
 
@@ -145,30 +137,13 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
      * - color (string[]): The liturgical color(s) of the event, as an array of strings
      * - common (string[]): The liturgical common of the event, as an array of strings
      * - grade (int): The liturgical grade of the event
-     * - readings (array): The readings for the event. The array should have the keys
-     *      - first_reading (string): The first reading for the event
-     *      - responsorial_psalm (string): The responsorial psalm for the event
-     *      - alleluia_verse (string): The alleluia verse for the event
-     *      - gospel (string): The gospel for the event
-     *      - optional second_reading (string): The second reading for the event
      *
-     * @param array{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,grade_display:?string,readings:array{first_reading:string,responsorial_psalm:string,second_reading?:string,alleluia_verse:string,gospel:string}} $data
+     * @param array{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,grade_display:?string} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
     {
         static::validateRequiredKeys($data, static::REQUIRED_PROPS);
-
-        if (array_key_exists('vigil', $data['readings']) && array_key_exists('day', $data['readings'])) {
-            $readingsVigil = ReadingsFestive::fromArray($data['readings']['vigil']);
-            $readings      = ReadingsFestive::fromArray($data['readings']['day']);
-            VigilReadingsMap::add($data['event_key'], $readingsVigil);
-        }
-        elseif (array_key_exists('second_reading', $data['readings'])) {
-            $readings = ReadingsFestive::fromArray($data['readings']);
-        } else {
-            $readings = ReadingsFerial::fromArray($data['readings']);
-        }
 
         return new static(
             $data['event_key'],
@@ -178,7 +153,6 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
             LitCommons::create($data['common']) ?? array_values(array_map(fn(string $value) => LitMassVariousNeeds::from($value), $data['common'])),
             LitGrade::from($data['grade']),
             isset($data['grade_display']) ? $data['grade_display'] : null,
-            $readings,
             isset($data['type']) ? LitEventType::from($data['type']) : LitEventType::FIXED,
             isset($data['calendar']) ? $data['calendar'] : 'GENERAL ROMAN'
         );
@@ -196,12 +170,6 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
      * - common (array): The liturgical common for the event.
      * - grade (int): The liturgical grade of the event.
      * - grade_display (string): The liturgical grade display of the event.
-     * - readings (stdClass): The readings for the event, which may contain:
-     *   -> first_reading (string): The first reading.
-     *   -> responsorial_psalm (string): The responsorial psalm.
-     *   -> alleluia_verse (string): The alleluia verse.
-     *   -> gospel (string): The gospel.
-     *   -> second_reading (string, optional): The second reading.
      *
      * @param \stdClass $data The stdClass object or array containing event data.
      * @return static The newly created instance(s).
@@ -209,16 +177,6 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
     protected static function fromObjectInternal(\stdClass $data): static
     {
         static::validateRequiredProps($data, static::REQUIRED_PROPS);
-
-        if (property_exists($data->readings, 'vigil') && property_exists($data->readings, 'day')) {
-            $readingsVigil = ReadingsFestive::fromObject($data->readings->vigil);
-            $readings      = ReadingsFestive::fromObject($data->readings->day);
-            VigilReadingsMap::add($data->event_key, $readingsVigil);
-        } elseif (property_exists($data->readings, 'second_reading')) {
-            $readings = ReadingsFestive::fromObject($data->readings);
-        } else {
-            $readings = ReadingsFerial::fromObject($data->readings);
-        }
 
         return new static(
             $data->event_key,
@@ -228,7 +186,6 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
             LitCommons::create($data->common) ?? array_values(array_map(fn(string $value) => LitMassVariousNeeds::from($value), $data->common)),
             LitGrade::from($data->grade),
             isset($data->grade_display) ? $data->grade_display : null,
-            $readings,
             isset($data->type) ? LitEventType::from($data->type) : LitEventType::FIXED,
             isset($data->calendar) ? $data->calendar : 'GENERAL ROMAN'
         );

@@ -3,6 +3,7 @@
 namespace LiturgicalCalendar\Api\Models\Calendar;
 
 use LiturgicalCalendar\Api\DateTime;
+use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\LitSeason;
@@ -19,13 +20,17 @@ use LiturgicalCalendar\Api\Map\SundaysEasterMap;
 use LiturgicalCalendar\Api\Map\SundaysOrdinaryMap;
 use LiturgicalCalendar\Api\Map\WeekdaysOrdinaryMap;
 use LiturgicalCalendar\Api\Map\WeekdaysAdventBeforeDec17Map;
-use LiturgicalCalendar\Api\Map\WeekdaysAdventMap;
+use LiturgicalCalendar\Api\Map\WeekdaysAdventAfterDec17Map;
 use LiturgicalCalendar\Api\Map\WeekdaysChristmasMap;
+use LiturgicalCalendar\Api\Map\WeekdaysEpiphanyMap;
 use LiturgicalCalendar\Api\Map\WeekdaysLentMap;
 use LiturgicalCalendar\Api\Map\WeekdaysEasterMap;
-use LiturgicalCalendar\Api\Map\WeekdaysEpiphanyMap;
 use LiturgicalCalendar\Api\Map\SuppressedEventsMap;
 use LiturgicalCalendar\Api\Map\ReinstatedEventsMap;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsChristmas;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsCommons;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsFestiveWithVigil;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsGeneralRoman;
 
 /**
  * Represents the collections of liturgical events that will be output in a final liturgical calendar.
@@ -65,8 +70,8 @@ final class LiturgicalEventCollection
     /** @var WeekdaysAdventBeforeDec17Map<string, LiturgicalEvent> */
     private WeekdaysAdventBeforeDec17Map $weekdaysAdventBeforeDec17;
 
-    /** @var WeekdaysAdventMap<string, LiturgicalEvent> */
-    private WeekdaysAdventMap $weekdaysAdvent;
+    /** @var WeekdaysAdventAfterDec17Map<string, LiturgicalEvent> */
+    private WeekdaysAdventAfterDec17Map $weekdaysAdventAfterDec17;
 
     /** @var WeekdaysChristmasMap<string, LiturgicalEvent> */
     private WeekdaysChristmasMap $weekdaysChristmas;
@@ -97,6 +102,9 @@ final class LiturgicalEventCollection
 
     private \IntlDateFormatter $dayOfTheWeek;
     private CalendarParams $CalendarParams;
+
+    public static ReadingsGeneralRoman $lectionary;
+
 
     /** @var string[] */
     public const array SUNDAY_CYCLE = [ 'A', 'B', 'C' ];
@@ -144,7 +152,7 @@ final class LiturgicalEventCollection
             'EEEE'
         );
 
-        if ($this->CalendarParams->Locale === LitLocale::LATIN) {
+        if (LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE) {
             $this->T = [
                 'YEAR'       => 'ANNUM',
                 'Vigil Mass' => 'Missa in Vigilia'
@@ -168,7 +176,7 @@ final class LiturgicalEventCollection
         $this->sundaysEaster             = new SundaysEasterMap();
         $this->sundaysOrdinary           = new SundaysOrdinaryMap();
         $this->weekdaysAdventBeforeDec17 = new WeekdaysAdventBeforeDec17Map();
-        $this->weekdaysAdvent            = new WeekdaysAdventMap();
+        $this->weekdaysAdventAfterDec17  = new WeekdaysAdventAfterDec17Map();
         $this->weekdaysChristmas         = new WeekdaysChristmasMap();
         $this->weekdaysLent              = new WeekdaysLentMap();
         $this->weekdaysEaster            = new WeekdaysEasterMap();
@@ -177,6 +185,9 @@ final class LiturgicalEventCollection
         $this->suppressedEvents          = new SuppressedEventsMap();
         $this->reinstatedEvents          = new ReinstatedEventsMap();
         $this->Messages                  = [];
+        if (!isset(self::$lectionary)) {
+            self::$lectionary = new ReadingsGeneralRoman(LitLocale::$PRIMARY_LANGUAGE);
+        }
     }
 
     /**
@@ -256,25 +267,24 @@ final class LiturgicalEventCollection
 
         // Weekdays of Advent, Christmas, Lent, Epiphany, Easter, and Ordinary Time
         if (str_starts_with($key, 'AdventWeekday')) {
-            if ($litEvent->date->format('j') >= 17 && $litEvent->date->format('j') <= 24) {
-                // from 17 to 24 Dec.
-                $this->weekdaysAdvent->addEvent($litEvent);
-            } else {
+            if ($litEvent->date->format('j') < 17) {
                 // before 17 Dec
                 $this->weekdaysAdventBeforeDec17->addEvent($litEvent);
+            } else {
+                // from 17 to 24 Dec.
+                $this->weekdaysAdventAfterDec17->addEvent($litEvent);
             }
         } elseif (str_starts_with($key, 'ChristmasWeekday')) {
             $this->weekdaysChristmas->addEvent($litEvent);
+        } elseif (str_starts_with($key, 'DayAfterEpiphany')) {
+            $this->weekdaysEpiphany->addEvent($litEvent);
         } elseif (str_starts_with($key, 'LentWeekday')) {
             $this->weekdaysLent->addEvent($litEvent);
-        } elseif (str_starts_with($key, 'DayBeforeEpiphany') || str_starts_with($key, 'DayAfterEpiphany')) {
-            $this->weekdaysEpiphany->addEvent($litEvent);
         } elseif (str_starts_with($key, 'EasterWeekday')) {
             $this->weekdaysEaster->addEvent($litEvent);
-        } elseif (str_starts_with($key, 'FirstOrdWeekday') || str_starts_with($key, 'LastOrdWeekday')) {
+        } elseif (str_starts_with($key, 'OrdWeekday')) {
             $this->weekdaysOrdinary->addEvent($litEvent);
         }
-
         $this->liturgicalEvents->addEvent($litEvent);
     }
 
@@ -543,6 +553,28 @@ final class LiturgicalEventCollection
     }
 
     /**
+     * Checks if a given date is in the map of weekdays in the season of Advent on or after December 17th.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if a weekday in Advent on or after December 17th falls on the given date, otherwise false.
+     */
+    public function inWeekdaysAdventAfterDec17(DateTime $date): bool
+    {
+        return $this->weekdaysAdventAfterDec17->hasDate($date);
+    }
+
+    /**
+     * Checks if a given date is in the map of weekdays in the season of Advent (whether before or after December 17th).
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if a weekday in Advent (on or after December 17th) falls on the given date, otherwise false.
+     */
+    public function inWeekdaysAdvent(DateTime $date): bool
+    {
+        return $this->weekdaysAdventBeforeDec17->hasDate($date) || $this->weekdaysAdventAfterDec17->hasDate($date);
+    }
+
+    /**
      * Checks if a given date is in the map of weekdays in the seasons of Advent (on or after December 17th), Christmas, or Lent.
      *
      * @param DateTime $date The date to check.
@@ -550,7 +582,12 @@ final class LiturgicalEventCollection
      */
     public function inWeekdaysAdventChristmasLent(DateTime $date): bool
     {
-        return $this->weekdaysAdvent->hasDate($date) || $this->weekdaysChristmas->hasDate($date) || $this->weekdaysLent->hasDate($date);
+        return $this->weekdaysAdventAfterDec17->hasDate($date) || $this->weekdaysChristmas->hasDate($date) || $this->weekdaysLent->hasDate($date);
+    }
+
+    public function inWeekdaysChristmas(DateTime $date): bool
+    {
+        return $this->weekdaysChristmas->hasDate($date) || $this->weekdaysEpiphany->hasDate($date);
     }
 
     /**
@@ -562,6 +599,22 @@ final class LiturgicalEventCollection
     public function inWeekdaysEpiphany(DateTime $date): bool
     {
         return $this->weekdaysEpiphany->hasDate($date);
+    }
+
+    public function inWeekdaysLent(DateTime $date): bool
+    {
+        return $this->weekdaysLent->hasDate($date);
+    }
+
+    /**
+     * Checks if a given date is in the map of weekdays in the season of Easter.
+     *
+     * @param DateTime $date The date to check.
+     * @return bool True if a weekday in Easter falls on the given date, otherwise false.
+     */
+    public function inWeekdaysEaster(DateTime $date): bool
+    {
+        return $this->weekdaysEaster->hasDate($date);
     }
 
     /**
@@ -659,7 +712,7 @@ final class LiturgicalEventCollection
      */
     public function weekdayAdventChristmasLentKeyFromDate(DateTime $date): ?string
     {
-        return $this->weekdaysAdvent->getEventKeyByDate($date) ?? $this->weekdaysChristmas->getEventKeyByDate($date) ?? $this->weekdaysLent->getEventKeyByDate($date);
+        return $this->weekdaysAdventAfterDec17->getEventKeyByDate($date) ?? $this->weekdaysChristmas->getEventKeyByDate($date) ?? $this->weekdaysLent->getEventKeyByDate($date);
     }
 
     /**
@@ -983,25 +1036,137 @@ final class LiturgicalEventCollection
             }
         }
 
-        // DEFINE YEAR CYCLES (except for Holy Week and Easter Octave) and VIGIL MASSES
-        // This has to be a separate cycle, because in order to correctly create Vigil Masses, we need to have already set the liturgical seasons
+        // DEFINE YEAR CYCLES, LECTIONARY READINGS, and VIGIL MASSES
+        // This has to be a separate cycle, because in order to correctly create Vigil Masses, we need to have already set the liturgical seasons,
+        // seeing that Vigil Masses inherit the season and the year cycle from their "parent" events
         foreach ($this->liturgicalEvents as $litEvent) {
-            if ($litEvent->date <= $this->liturgicalEvents->getEvent('PalmSun')->date || $litEvent->date >= $this->liturgicalEvents->getEvent('Easter2')->date) {
-                if (self::dateIsNotSunday($litEvent->date) && $litEvent->grade === LitGrade::WEEKDAY) {
-                    if ($this->inOrdinaryTime($litEvent->date)) {
-                        $litEvent->liturgical_year = $this->T['YEAR'] . ' ' . ( self::WEEKDAY_CYCLE[( $this->CalendarParams->Year - 1 ) % 2] );
-                    }
-                } elseif (self::dateIsSunday($litEvent->date) || $litEvent->grade->value > LitGrade::FEAST->value) {
-                    //if we're dealing with a Sunday or a Solemnity or a Feast of the Lord, then we calculate the Sunday/Festive Cycle
-                    if ($litEvent->date < $this->liturgicalEvents->getEvent('Advent1')->date) {
-                        $litEvent->liturgical_year = $this->T['YEAR'] . ' ' . ( self::SUNDAY_CYCLE[( $this->CalendarParams->Year - 1 ) % 3] );
-                    } elseif ($litEvent->date >= $this->liturgicalEvents->getEvent('Advent1')->date) {
-                        $litEvent->liturgical_year = $this->T['YEAR'] . ' ' . ( self::SUNDAY_CYCLE[$this->CalendarParams->Year % 3] );
+            if (self::dateIsNotSunday($litEvent->date) && $litEvent->grade === LitGrade::WEEKDAY) {
+                // STEP 1: First we deal with weekdays
+                if ($this->inOrdinaryTime($litEvent->date)) {
+                    // We only need to set the weekday cycle for weekdays of Ordinary Time;
+                    // weekdays of Advent, Christmas, Lent and Easter don't follow a cycle
+                    $weekdayCycle              = self::WEEKDAY_CYCLE[( $this->CalendarParams->Year - 1 ) % 2];
+                    $litEvent->liturgical_year = $this->T['YEAR'] . ' ' . $weekdayCycle;
+                    $litEvent->setReadings(self::$lectionary->getCycle($weekdayCycle)->getReadings($litEvent->event_key));
+                } elseif (
+                    // However we do need to set the lectionary readings for weekdays of Advent, Christmas, Lent and Easter
+                    $this->inWeekdaysAdvent($litEvent->date)
+                ) {
+                    $litEvent->setReadings(self::$lectionary->getWeekdaysAdventReadings($litEvent->event_key));
+                } elseif ($this->inWeekdaysChristmas($litEvent->date)) {
+                    $litEvent->setReadings(self::$lectionary->getWeekdaysChristmasReadings($litEvent->event_key));
+                } elseif ($this->inWeekdaysLent($litEvent->date)) {
+                    $litEvent->setReadings(self::$lectionary->getWeekdaysLentReadings($litEvent->event_key));
+                } elseif ($this->inWeekdaysEaster($litEvent->date)) {
+                    $litEvent->setReadings(self::$lectionary->getWeekdaysEasterReadings($litEvent->event_key));
+                }
+            } elseif (self::dateIsSunday($litEvent->date) || $litEvent->grade->value > LitGrade::FEAST->value) {
+                // STEP 2: Then we deal with Sundays and Feasts of the Lord and Solemnities
+                $firstSundayOfAdvent = $this->liturgicalEvents->getEvent('Advent1')->date;
+                $liturgicalCycle     = '';
+                $festiveCycle        = '';
+                if ($litEvent->date < $firstSundayOfAdvent) {
+                    $festiveCycle    = self::SUNDAY_CYCLE[( $this->CalendarParams->Year - 1 ) % 3];
+                    $liturgicalCycle = $this->T['YEAR'] . ' ' . $festiveCycle;
+                } elseif ($litEvent->date >= $firstSundayOfAdvent) {
+                    $festiveCycle    = self::SUNDAY_CYCLE[$this->CalendarParams->Year % 3];
+                    $liturgicalCycle = $this->T['YEAR'] . ' ' . $festiveCycle;
+                }
+
+                // According to the Lectionary for Sundays and Solemnities, we calculate the festive liturgical cycle for:
+                //   - Sundays of Advent, Christmas, Lent, and Easter, and Ordinary Time
+                //
+                // We do not calculate the festive liturgical cycle for:
+                //   - Christmas (but we do calculate a Vigil Mass)
+                //   - Mother of God (but we do calculate a Vigil Mass)
+                //   - Second Sunday of Christmas (but we do calculate a Vigil Mass)
+                //   - Epiphany (but we do calculate a Vigil MAss)
+                //   - Easter Triduum (we also exclude Vigil Masses)
+                //   - Easter Sunday (we also exclude Vigil Mass, Easter Vigil already defined in it's own right)
+                //   - Easter Octave (we also exclude Vigil Masses)
+                //   - Ash Wednesday (we also exclude Vigil Masses)
+                //   - celebrations from the Sanctorale
+                // In any case, for all of the above except the Sanctorale, we can still use the liturgical cycle to retrieve the readings,
+                //   seeing that the readings are found in all three lectionaries even if they're the same
+                if (
+                    $litEvent->date < $this->liturgicalEvents->getEvent('HolyThurs')->date
+                    || $litEvent->date >= $this->liturgicalEvents->getEvent('Easter2')->date
+                ) {
+                    if (in_array($litEvent->event_key, self::$lectionary->getSanctoraleKeys())) {
+                        // If the event is from the Sanctorale (this includes national and diocesan created events),
+                        // we get the readings from the Sanctorale
+                        $litEvent->setReadings(self::$lectionary->getSanctoraleReadings($litEvent->event_key));
+                    } else {
+                        // We set the liturgical cycle for all Temporale events except for:
+                        // Christmas, Mother of God, Second Sunday of Christmas, Epiphany, Ash Wednesday.
+                        // These liturgical events have the same readings every year and do not follow a cycle,
+                        // so the liturgical cycle should not be set / displayed on the final event output
+                        if (false === in_array($litEvent->event_key, ['Christmas', 'MotherGod', 'Christmas2', 'Epiphany', 'AshWednesday'])) {
+                            $litEvent->liturgical_year = $liturgicalCycle;
+                        }
+
+                        // We do however use the liturgical cycle to retrieve the readings for Temporale events,
+                        // even for Christmas, Mother of God, Second Sunday of Christmas and Epiphany,
+                        // seeing that the readings are found in the lectionaries for Sundays and Solemnities
+                        // even if they're the same in all three lectionaries.
+                        if (in_array($litEvent->event_key, ['AshWednesday', 'MonHolyWeek', 'TueHolyWeek', 'WedHolyWeek'])) {
+                            // However for Ash Wednesday, the weekdays of Holy Week, and the weekdays of the Octave of Easter,
+                            // the lectionary readings are taken from the Lectionary for Weekdays of 'Tempi Forti' (Advent, Christmas, Lent, and Easter).
+                            // We don't explicitly check against the Octave of Easter because it's already excluded.
+                            $litEvent->setReadings(self::$lectionary->getWeekdaysLentReadings($litEvent->event_key));
+                        } else {
+                            // In all other cases we retrieve the Temporale event readings from the Lectionary for Sundays and Solemnities,
+                            // using the liturgical cycle (kind of redundant, but that's where the readings are found in the lectionaries).
+                            if ($litEvent->common instanceof LitCommons && $litEvent->common->has(LitCommon::DEDICATIONIS_ECCLESIAE)) {
+                                // Some national or diocesan celebrations might fall into this section of logic, if they have a rank of Solemnity,
+                                // and they don't have specific lectionary readings (e.g. the anniversary of the Dedication of the Church).
+                                $commonsReadings = new ReadingsCommons($litEvent->common);
+                                $litEvent->setReadings($commonsReadings);
+                            } else {
+                                // N.B. Diocesan calendar events will have the diocese id prepended to them, we should remove it
+                                //      since the lectionary event_key does not have the diocese id preprended
+                                if (preg_match('/^[a-z]{6}_[a-z]{2}_/', $litEvent->event_key)) {
+                                    $event_key = substr($litEvent->event_key, 10);
+                                    $litEvent->setReadings(self::$lectionary->getSanctoraleReadings($event_key));
+                                } else {
+                                    $litEvent->setReadings(self::$lectionary->getCycle($festiveCycle)->getReadings($litEvent->event_key));
+                                }
+                            }
+                        }
                     }
 
-                    // DEFINE VIGIL MASSES within the same cycle, to avoid having to create/run yet another cycle
-                    $this->calculateVigilMass($litEvent);
+                    // We calculate Vigil Masses for all solemnities and Sundays
+                    // except for Ash Wednesday (Easter Triduum, Easter Sunday, and Easter Octave are already excluded)
+                    if ($litEvent->event_key !== 'AshWednesday') {
+                        $this->calculateVigilMass($litEvent);
+                    }
+                } else {
+                    // Here we deal with anything that falls within the Easter Triduum, Easter Sunday, and Easter Octave
+                    if (in_array($litEvent->event_key, ['MonOctaveEaster', 'TueOctaveEaster', 'WedOctaveEaster', 'ThuOctaveEaster', 'FriOctaveEaster', 'SatOctaveEaster'])) {
+                        // The weekdays of the Octave of Easter are not found in the Lectionaries for Sundays and Solemnities,
+                        // even if they have a liturgical rank of Solemnity (they share the liturgical importance of Easter itself),
+                        // so we have to retrieve their readings from the Lectionary for Weekdays of 'Tempi Forti' (Advent, Christmas, Lent, and Easter).
+                        $litEvent->setReadings(self::$lectionary->getWeekdaysEasterReadings($litEvent->event_key));
+                    } else {
+                        // The readings for the Easter Triduum, Easter Vigil and Easter Sunday are found in the Lectionary for Sundays and Solemnities,
+                        // so we use the liturgical cycle to retrieve them from one of the three lectionaries.
+                        // Again, the readings are the same in all three lectionaries, but we have to choose one to get the readings.
+                        $litEvent->setReadings(self::$lectionary->getCycle($festiveCycle)->getReadings($litEvent->event_key));
+                    }
                 }
+            } elseif (in_array($litEvent->event_key, self::$lectionary->getSanctoraleKeys())) {
+                // STEP 3: If it's not a weekday or a Sunday or a Feast or the Lord or a Solemnity,
+                //         then it's probably a Sanctorale event; if so we retrieve the lectionary readings
+                //         from the Lectionary for the Sanctorale
+                $litEvent->setReadings(self::$lectionary->getSanctoraleReadings($litEvent->event_key));
+            }
+
+            // STEP 4: If the readings haven't been set from all of the above logic, and the liturgical event
+            //         is only a memorial or optional memorial (or even a Feast), we take the readings from the Commons
+            //         that the liturgical event is associated with
+            if (false === isset($litEvent->readings) && $litEvent->grade->value <= LitGrade::FEAST->value && $litEvent->common instanceof LitCommons) {
+                $commonsReadings = new ReadingsCommons($litEvent->common);
+                $litEvent->setReadings($commonsReadings);
             }
         }
     }
@@ -1063,7 +1228,10 @@ final class LiturgicalEventCollection
         $litEvent->is_vigil_for      = $key;
         $litEvent->liturgical_year   = $eventForWhichIsVigilMass->liturgical_year;
         $litEvent->liturgical_season = $eventForWhichIsVigilMass->liturgical_season;
-        $litEvent->readings          = VigilReadingsMap::get($key) ?? $eventForWhichIsVigilMass->readings;
+        $readings                    = ( $eventForWhichIsVigilMass->readings instanceof ReadingsFestiveWithVigil || $eventForWhichIsVigilMass->readings instanceof ReadingsChristmas )
+                                        ? $eventForWhichIsVigilMass->readings->vigil
+                                        : $eventForWhichIsVigilMass->readings;
+        $litEvent->setReadings($readings);
         $this->liturgicalEvents->addEvent($litEvent);
 
         $eventForWhichIsVigilMass->has_vigil_mass = true;
@@ -1562,7 +1730,8 @@ final class LiturgicalEventCollection
                 $this->memorials->removeEvent($key);
                 $this->sundaysAdvent->removeEvent($key);
                 $this->sundaysOrdinary->removeEvent($key);
-                $this->weekdaysAdvent->removeEvent($key);
+                $this->weekdaysAdventBeforeDec17->removeEvent($key);
+                $this->weekdaysAdventAfterDec17->removeEvent($key);
                 $this->weekdaysChristmas->removeEvent($key);
                 $this->weekdaysOrdinary->removeEvent($key);
                 $this->reinstatedEvents->removeEvent($key);
@@ -1608,7 +1777,7 @@ final class LiturgicalEventCollection
         $this->sundaysEaster->merge($litEvents->sundaysEaster);
         $this->sundaysOrdinary->merge($litEvents->sundaysOrdinary);
         $this->weekdaysAdventBeforeDec17->merge($litEvents->weekdaysAdventBeforeDec17);
-        $this->weekdaysAdvent->merge($litEvents->weekdaysAdvent);
+        $this->weekdaysAdventAfterDec17->merge($litEvents->weekdaysAdventAfterDec17);
         $this->weekdaysChristmas->merge($litEvents->weekdaysChristmas);
         $this->weekdaysLent->merge($litEvents->weekdaysLent);
         $this->weekdaysEpiphany->merge($litEvents->weekdaysEpiphany);

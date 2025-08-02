@@ -153,20 +153,20 @@ final class RegionalDataPath
                 if (null === $dioceseEntry) {
                     self::produceErrorResponse(StatusCode::NOT_FOUND, "The requested resource {$this->params->key} was not found in the index");
                 }
-                $i18nDataFile = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FILE, [
+                $i18nDataFile = strtr(JsonData::DIOCESAN_CALENDAR_I18N_FILE, [
                     '{nation}'  => $dioceseEntry->nation,
                     '{diocese}' => $this->params->key,
                     '{locale}'  => $this->params->i18nRequest
                 ]);
                 break;
             case 'WIDERREGIONCALENDAR':
-                $i18nDataFile = strtr(JsonData::WIDER_REGIONS_I18N_FILE, [
+                $i18nDataFile = strtr(JsonData::WIDER_REGION_I18N_FILE, [
                     '{wider_region}' => $this->params->key,
                     '{locale}'       => $this->params->i18nRequest
                 ]);
                 break;
             case 'NATIONALCALENDAR':
-                $i18nDataFile = strtr(JsonData::NATIONAL_CALENDARS_I18N_FILE, [
+                $i18nDataFile = strtr(JsonData::NATIONAL_CALENDAR_I18N_FILE, [
                     '{nation}' => $this->params->key,
                     '{locale}' => $this->params->i18nRequest
                 ]);
@@ -220,19 +220,19 @@ final class RegionalDataPath
                     self::produceErrorResponse(StatusCode::NOT_FOUND, "The requested resource {$this->params->key} was not found in the index");
                 }
 
-                $calendarDataFile = strtr(JsonData::DIOCESAN_CALENDARS_FILE, [
+                $calendarDataFile = strtr(JsonData::DIOCESAN_CALENDAR_FILE, [
                     '{nation}'       => $dioceseEntry->nation,
                     '{diocese}'      => $this->params->key,
                     '{diocese_name}' => $dioceseEntry->diocese
                 ]);
                 break;
             case 'WIDERREGIONCALENDAR':
-                $calendarDataFile = strtr(JsonData::WIDER_REGIONS_FILE, [
+                $calendarDataFile = strtr(JsonData::WIDER_REGION_FILE, [
                     '{wider_region}' => $this->params->key
                 ]);
                 break;
             case 'NATIONALCALENDAR':
-                $calendarDataFile = strtr(JsonData::NATIONAL_CALENDARS_FILE, [
+                $calendarDataFile = strtr(JsonData::NATIONAL_CALENDAR_FILE, [
                     '{nation}' => $this->params->key
                 ]);
                 break;
@@ -262,20 +262,20 @@ final class RegionalDataPath
             // Based on the locale requested, retrieve the appropriate locale data
             switch ($this->params->category) {
                 case 'DIOCESANCALENDAR':
-                    $CalendarDataI18nFile = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FILE, [
+                    $CalendarDataI18nFile = strtr(JsonData::DIOCESAN_CALENDAR_I18N_FILE, [
                         '{nation}'  => $dioceseEntry->nation,
                         '{diocese}' => $this->params->key,
                         '{locale}'  => $this->params->locale
                     ]);
                     break;
                 case 'WIDERREGIONCALENDAR':
-                    $CalendarDataI18nFile = strtr(JsonData::WIDER_REGIONS_I18N_FILE, [
+                    $CalendarDataI18nFile = strtr(JsonData::WIDER_REGION_I18N_FILE, [
                         '{wider_region}' => $this->params->key,
                         '{locale}'       => $this->params->locale
                     ]);
                     break;
                 case 'NATIONALCALENDAR':
-                    $CalendarDataI18nFile = strtr(JsonData::NATIONAL_CALENDARS_I18N_FILE, [
+                    $CalendarDataI18nFile = strtr(JsonData::NATIONAL_CALENDAR_I18N_FILE, [
                         '{nation}' => $this->params->key,
                         '{locale}' => $this->params->locale
                     ]);
@@ -325,7 +325,7 @@ final class RegionalDataPath
         // Ensure we have all the necessary folders in place
         // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
         // so we don't have to worry about manually checking and creating each one individually
-        $diocesanCalendarI18nFolder = strtr(JsonData::DIOCESAN_CALENDARS_I18N_FOLDER, [
+        $diocesanCalendarI18nFolder = strtr(JsonData::DIOCESAN_CALENDAR_I18N_FOLDER, [
             '{nation}'  => $this->params->payload->metadata->nation,
             '{diocese}' => $this->params->payload->metadata->diocese_id
         ]);
@@ -335,7 +335,7 @@ final class RegionalDataPath
 
         foreach ($this->params->payload->i18n as $locale => $litCalEventsI18n) {
             $diocesanCalendarI18nFile = strtr(
-                JsonData::DIOCESAN_CALENDARS_I18N_FILE,
+                JsonData::DIOCESAN_CALENDAR_I18N_FILE,
                 [
                     '{nation}'  => $this->params->payload->metadata->nation,
                     '{diocese}' => $this->params->payload->metadata->diocese_id,
@@ -359,7 +359,7 @@ final class RegionalDataPath
         unset($this->params->payload->i18n);
 
         $diocesanCalendarFile = strtr(
-            JsonData::DIOCESAN_CALENDARS_FILE,
+            JsonData::DIOCESAN_CALENDAR_FILE,
             [
                 '{nation}'       => $this->params->payload->metadata->nation,
                 '{diocese}'      => $this->params->payload->metadata->diocese_id,
@@ -408,7 +408,7 @@ final class RegionalDataPath
         // Ensure we have all the necessary folders in place
         // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
         // so we don't have to worry about manually checking and creating each one individually
-        $nationalCalendarI18nFolder = strtr(JsonData::NATIONAL_CALENDARS_I18N_FOLDER, [
+        $nationalCalendarI18nFolder = strtr(JsonData::NATIONAL_CALENDAR_I18N_FOLDER, [
             '{nation}' => $this->params->payload->metadata->nation
         ]);
         if (!file_exists($nationalCalendarI18nFolder)) {
@@ -417,7 +417,7 @@ final class RegionalDataPath
 
         foreach ($this->params->payload->i18n as $locale => $litCalEventsI18n) {
             $nationalCalendarI18nFile = strtr(
-                JsonData::NATIONAL_CALENDARS_I18N_FILE,
+                JsonData::NATIONAL_CALENDAR_I18N_FILE,
                 [
                     '{nation}' => $this->params->payload->metadata->nation,
                     '{locale}' => $locale
@@ -430,7 +430,7 @@ final class RegionalDataPath
         unset($this->params->payload->i18n);
 
         $nationalCalendarFile = strtr(
-            JsonData::NATIONAL_CALENDARS_FILE,
+            JsonData::NATIONAL_CALENDAR_FILE,
             [
                 '{nation}' => $this->params->payload->metadata->nation
             ]
@@ -530,7 +530,7 @@ final class RegionalDataPath
 
         foreach ($this->params->payload->i18n as $locale => $i18nData) {
             $calendarI18nFile = strtr(
-                JsonData::NATIONAL_CALENDARS_I18N_FILE,
+                JsonData::NATIONAL_CALENDAR_I18N_FILE,
                 [
                     '{nation}' => $this->params->key,
                     '{locale}' => $locale
@@ -555,7 +555,7 @@ final class RegionalDataPath
 
         // We also want to clean up any unneeded locale files, if a locale was removed
         $calendarI18nFolder = strtr(
-            JsonData::NATIONAL_CALENDARS_I18N_FOLDER,
+            JsonData::NATIONAL_CALENDAR_I18N_FOLDER,
             [
                 '{nation}' => $this->params->key
             ]
@@ -573,7 +573,7 @@ final class RegionalDataPath
         unset($this->params->payload->i18n);
 
         $calendarFile = strtr(
-            JsonData::NATIONAL_CALENDARS_FILE,
+            JsonData::NATIONAL_CALENDAR_FILE,
             [
                 '{nation}' => $this->params->key
             ]
@@ -627,7 +627,7 @@ final class RegionalDataPath
 
         foreach ($this->params->payload->i18n as $locale => $i18nData) {
             $widerRegionI18nFile = strtr(
-                JsonData::WIDER_REGIONS_I18N_FILE,
+                JsonData::WIDER_REGION_I18N_FILE,
                 [
                     '{wider_region}' => $this->params->key,
                     '{locale}'       => $locale
@@ -652,7 +652,7 @@ final class RegionalDataPath
 
         // We also want to clean up any unneeded locale files, if a locale has been removed
         $widerRegionI18nFolder = strtr(
-            JsonData::WIDER_REGIONS_I18N_FOLDER,
+            JsonData::WIDER_REGION_I18N_FOLDER,
             [
                 '{wider_region}' => $this->params->key
             ]
@@ -670,7 +670,7 @@ final class RegionalDataPath
         unset($this->params->payload->i18n);
 
         $widerRegionFile = strtr(
-            JsonData::WIDER_REGIONS_FILE,
+            JsonData::WIDER_REGION_FILE,
             [
                 '{wider_region}' => $this->params->key
             ]
@@ -724,7 +724,7 @@ final class RegionalDataPath
 
         foreach ($this->params->payload->i18n as $locale => $i18nData) {
             $DiocesanCalendarI18nFile = strtr(
-                JsonData::DIOCESAN_CALENDARS_I18N_FILE,
+                JsonData::DIOCESAN_CALENDAR_I18N_FILE,
                 [
                     '{nation}'  => $dioceseEntry->nation,
                     '{diocese}' => $this->params->key,
@@ -750,7 +750,7 @@ final class RegionalDataPath
 
         // We also want to clean up any unneeded locale files, if a locale has been removed
         $diocesanCalendarI18nFolder = strtr(
-            JsonData::DIOCESAN_CALENDARS_I18N_FOLDER,
+            JsonData::DIOCESAN_CALENDAR_I18N_FOLDER,
             [
                 '{nation}'  => $dioceseEntry->nation,
                 '{diocese}' => $this->params->key
@@ -769,7 +769,7 @@ final class RegionalDataPath
         unset($this->params->payload->i18n);
 
         $DiocesanCalendarFile = strtr(
-            JsonData::DIOCESAN_CALENDARS_FILE,
+            JsonData::DIOCESAN_CALENDAR_FILE,
             [
                 '{nation}'       => $dioceseEntry->nation,
                 '{diocese}'      => $this->params->key,
@@ -869,7 +869,7 @@ final class RegionalDataPath
                     self::produceErrorResponse(StatusCode::NOT_FOUND, "The resource requested for deletion {$this->params->key} is not known.");
                 }
                 $calendarDataFile   = strtr(
-                    JsonData::DIOCESAN_CALENDARS_FILE,
+                    JsonData::DIOCESAN_CALENDAR_FILE,
                     [
                         '{nation}'       => $dioceseEntry->nation,
                         '{diocese}'      => $dioceseEntry->calendar_id,
@@ -877,7 +877,7 @@ final class RegionalDataPath
                     ]
                 );
                 $calendarI18nFolder = strtr(
-                    JsonData::DIOCESAN_CALENDARS_I18N_FOLDER,
+                    JsonData::DIOCESAN_CALENDAR_I18N_FOLDER,
                     [
                         '{nation}'  => $dioceseEntry->nation,
                         '{diocese}' => $dioceseEntry->calendar_id
@@ -886,13 +886,13 @@ final class RegionalDataPath
                 break;
             case 'WIDERREGIONCALENDAR':
                 $calendarDataFile   = strtr(
-                    JsonData::WIDER_REGIONS_FILE,
+                    JsonData::WIDER_REGION_FILE,
                     [
                         '{wider_region}' => $this->params->key
                     ]
                 );
                 $calendarI18nFolder = strtr(
-                    JsonData::WIDER_REGIONS_I18N_FOLDER,
+                    JsonData::WIDER_REGION_I18N_FOLDER,
                     [
                         '{wider_region}' => $this->params->key
                     ]
@@ -900,13 +900,13 @@ final class RegionalDataPath
                 break;
             case 'NATIONALCALENDAR':
                 $calendarDataFile   = strtr(
-                    JsonData::NATIONAL_CALENDARS_FILE,
+                    JsonData::NATIONAL_CALENDAR_FILE,
                     [
                         '{nation}' => $this->params->key
                     ]
                 );
                 $calendarI18nFolder = strtr(
-                    JsonData::NATIONAL_CALENDARS_I18N_FOLDER,
+                    JsonData::NATIONAL_CALENDAR_I18N_FOLDER,
                     [
                         '{nation}' => $this->params->key
                     ]

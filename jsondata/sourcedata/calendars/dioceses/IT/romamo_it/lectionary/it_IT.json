@@ -1,0 +1,124 @@
+{
+    "SanVincenzoPallotti": {
+        "first_reading": "1 Tessalonicesi 2, 2B-8|1 Giovanni 4, 7-16",
+        "responsorial_psalm": "Salmo 95 (96)|Salmo 102 (103)",
+        "alleluia_verse": "Giovanni 14, 23",
+        "gospel": "Giovanni 15, 9-17"
+    },
+    "BeataLudovicaAlbertoni": {
+        "first_reading": "Isaia 58, 6-11",
+        "responsorial_psalm": "Salmo 145 (146)",
+        "alleluia_verse": "Giovanni 13, 34",
+        "gospel": "Giovanni 25, 31-46|Giovanni 25, 31-40"
+    },
+    "SanBenedettoGiuseppeLabre": {
+        "first_reading": "Filippesi 3,8-14",
+        "responsorial_psalm": "Salmo 15 (16)",
+        "alleluia_verse": "Matteo 5, 12a",
+        "gospel": "Luca 6, 20-23"
+    },
+    "SanFelicedaCantalice": {
+        "first_reading": "Apocalisse 3, 14b.20-22",
+        "responsorial_psalm": "Salmo 1",
+        "alleluia_verse": "Matteo 5, 3",
+        "gospel": "Matteo 19, 27-29"
+    },
+    "SanGiovanniBattistadeRossi": {
+        "first_reading": "1 Timoteo 1, 13-14; 2, 1-3",
+        "responsorial_psalm": "Salmo 88 (89)",
+        "alleluia_verse": "Matteo 28, 19a.20b",
+        "gospel": "Matteo 28, 16-20"
+    },
+    "BeataAnnaMariaTaigi": {
+        "first_reading": "Proverbi 31, 10-13.19-20.30-31",
+        "responsorial_psalm": "Salmo 127 (128)",
+        "alleluia_verse": "Lc 8, 15",
+        "gospel": "Luca 10, 38-42"
+    },
+    "SantiPietroePaoloApostoliPatroniChiesaRomana": {
+        "vigil": {
+            "first_reading": "At 3, 1-10",
+            "responsorial_psalm": "Salmo 18 (19)",
+            "second_reading": "Gal 1, 11-20",
+            "alleluia_verse": "Gv 21, 17d",
+            "gospel": "Gv 21, 15-19"
+        },
+        "day": {
+            "first_reading": "At 12, 1-11",
+            "responsorial_psalm": "Salmo 33 (34)",
+            "second_reading": "2 Tm 4, 6-8.17-18",
+            "alleluia_verse": "Mt 16, 18",
+            "gospel": "Mt 16, 13-19"
+        }
+    },
+    "BeataVergineMariaSalusPopuliRomani": {
+        "outside_easter_season": {
+            "first_reading": "Isaia 11, 1-5.10",
+            "responsorial_psalm": "Salmo 44 (45)",
+            "alleluia_verse": "",
+            "gospel": "Giovanni 2, 1-11"
+        },
+        "easter_season": {
+            "first_reading": "Apocalisse 11, 19; 12, 1.3-6a.10ab",
+            "responsorial_psalm": "Salmo 44 (45)",
+            "alleluia_verse": "",
+            "gospel": "Giovanni 2, 1-11"
+        }
+    },
+    "SanJosemariaEscrivaBalaguer": {
+        "first_reading": "Romani 12, 3-13",
+        "responsorial_psalm": "Salmo 14 (15)",
+        "alleluia_verse": "Marco 1, 17",
+        "gospel": "Luca 5, 1-11"
+    },
+    "SantiVescoviChiesaRomana": {
+        "first_reading": "Sapienza 1, 1-7|Ebrei 13, 7-17",
+        "responsorial_psalm": "Salmo 143 (142)",
+        "alleluia_verse": "Marco 1,17",
+        "gospel": "Giovanni 21, 15-17"
+    },
+    "SantiPrimiMartiriChiesaRomana": {
+        "first_reading": "Rm 8, 31b-39",
+        "responsorial_psalm": "Salmo 123 (124)",
+        "alleluia_verse": "Mt 5, 10",
+        "gospel": "Mt 24, 4-13"
+    },
+    "SanGaspareBufalo": {
+        "first_reading": "Corinzi 3,2-6a",
+        "responsorial_psalm": "Salmo 15 (16)",
+        "alleluia_verse": "Luca 4, 18",
+        "gospel": "Luca 4, 16-21"
+    },
+    "AnniversarioDedicazionePropriaChiesa": {
+        "first_reading": "Isaia 56, 1.6-7",
+        "responsorial_psalm": "Salmo 83 (84)",
+        "second_reading": "Efesini 2, 19-22",
+        "alleluia_verse": "Matteo 7, 8",
+        "gospel": "Giovanni 4, 19-24"
+    },
+    "TuttiSantiChiesaRomana": {
+        "first_reading": "Efesini 1, 3-6.11-12",
+        "responsorial_psalm": "Salmo 23 (24)",
+        "alleluia_verse": "Giovanni 15, 4-5b",
+        "gospel": "Giovanni 12, 23-26"
+    },
+    "DedicazioneBasilicaLateranense": {
+        "first_reading": "Ezekiele 47, 1-2.8-9.12",
+        "responsorial_psalm": "Salmo 45 (46)",
+        "second_reading": "1 Corinzi 3, 9c-11.16-17",
+        "alleluia_verse": "2 Cronache 7, 16",
+        "gospel": "Giovanni 2, 13-22"
+    },
+    "BeatiLuigieMariaBeltrameQuattrocchi": {
+        "first_reading": "Siracide 26, 1-4.16-21 [gr. 26, 1-4.13-16]",
+        "responsorial_psalm": "Salmo 127 (128)",
+        "alleluia_verse": "Luca 11, 28",
+        "gospel": "Matteo 19, 3-6"
+    },
+    "SanLeonardodaPortoMaurizio": {
+        "first_reading": "Galati 6, 14-16",
+        "responsorial_psalm": "Salmo 39 (40)",
+        "alleluia_verse": "Matteo 24, 42a.44",
+        "gospel": "Luca 12, 35-40"
+    }
+}

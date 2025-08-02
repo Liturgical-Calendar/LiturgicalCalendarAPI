@@ -1,6 +1,6 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Models\Calendar;
+namespace LiturgicalCalendar\Api\Models\Lectionary;
 
 final class ReadingsFerial extends ReadingsAbstract
 {

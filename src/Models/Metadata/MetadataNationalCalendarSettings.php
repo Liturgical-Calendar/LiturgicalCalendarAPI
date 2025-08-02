@@ -27,7 +27,7 @@ final class MetadataNationalCalendarSettings extends AbstractJsonRepresentation
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      *
      * @return array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool}
      */

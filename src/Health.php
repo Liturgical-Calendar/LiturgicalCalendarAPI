@@ -122,7 +122,7 @@ class Health implements MessageComponentInterface
                 echo "Metadata was already loaded and has required diocesan_calendars property\n";
             } else {
                 echo "Error loading metadata: missing diocesan_calendars property\n";
-                echo json_encode(self::$metadata);
+                echo json_encode(self::$metadata, JSON_PRETTY_PRINT);
             }
         }
     }
@@ -261,7 +261,7 @@ class Health implements MessageComponentInterface
     private function sendMessage(ConnectionInterface $from, string|\stdClass $msg): void
     {
         if (gettype($msg) !== 'string') {
-            $msg = json_encode($msg);
+            $msg = json_encode($msg, JSON_PRETTY_PRINT);
         }
         foreach ($this->clients as $client) {
             if ($from === $client) {
@@ -426,13 +426,13 @@ class Health implements MessageComponentInterface
                     switch ($matches[1]) {
                         case 'wider-region':
                             $dataPath = strtr(
-                                JsonData::WIDER_REGIONS_I18N_FOLDER,
+                                JsonData::WIDER_REGION_I18N_FOLDER,
                                 ['{wider_region}' => $matches[2]]
                             );
                             break;
                         case 'national-calendar':
                             $dataPath = strtr(
-                                JsonData::NATIONAL_CALENDARS_I18N_FOLDER,
+                                JsonData::NATIONAL_CALENDAR_I18N_FOLDER,
                                 ['{nation}' => $matches[2]]
                             );
                             break;
@@ -440,7 +440,7 @@ class Health implements MessageComponentInterface
                             $diocese  = array_find(self::$metadata->litcal_metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]);
                             $nation   = $diocese->nation;
                             $dataPath = strtr(
-                                JsonData::DIOCESAN_CALENDARS_I18N_FOLDER,
+                                JsonData::DIOCESAN_CALENDAR_I18N_FOLDER,
                                 [
                                     '{diocese}' => $matches[2],
                                     '{nation}'  => $nation
@@ -463,13 +463,13 @@ class Health implements MessageComponentInterface
                         switch ($matches[1]) {
                             case 'wider-region':
                                 $dataPath = strtr(
-                                    JsonData::WIDER_REGIONS_FILE,
+                                    JsonData::WIDER_REGION_FILE,
                                     ['{wider_region}' => $matches[2]]
                                 );
                                 break;
                             case 'national-calendar':
                                 $dataPath = strtr(
-                                    JsonData::NATIONAL_CALENDARS_FILE,
+                                    JsonData::NATIONAL_CALENDAR_FILE,
                                     ['{nation}' => $matches[2]]
                                 );
                                 break;
@@ -478,7 +478,7 @@ class Health implements MessageComponentInterface
                                 $nation      = $diocese->nation;
                                 $dioceseName = $diocese->diocese;
                                 $dataPath    = strtr(
-                                    JsonData::DIOCESAN_CALENDARS_FILE,
+                                    JsonData::DIOCESAN_CALENDAR_FILE,
                                     [
                                         '{diocese}'      => $matches[2],
                                         '{nation}'       => $nation,
@@ -598,14 +598,14 @@ class Health implements MessageComponentInterface
                 $dioceseData = array_find(self::$metadata->litcal_metadata->diocesan_calendars, fn ($diocesan_calendar) => $diocesan_calendar->calendar_id === $dioceseId);
                 $nation      = $dioceseData->nation;
                 $dioceseName = $dioceseData->diocese;
-                $dataPath    = strtr(JsonData::DIOCESAN_CALENDARS_FILE, [
+                $dataPath    = strtr(JsonData::DIOCESAN_CALENDAR_FILE, [
                     '{nation}'       => $nation,
                     '{diocese}'      => $dioceseId,
                     '{diocese_name}' => $dioceseName
                 ]);
             } elseif (preg_match('/^national-calendar-([A-Z]{2})$/', $pathForSchema, $matches)) {
                 $nation   = $matches[1];
-                $dataPath = strtr(JsonData::NATIONAL_CALENDARS_FILE, [
+                $dataPath = strtr(JsonData::NATIONAL_CALENDAR_FILE, [
                     '{nation}' => $nation
                 ]);
             }
@@ -767,7 +767,7 @@ class Health implements MessageComponentInterface
                         } else {
                             $message          = new \stdClass();
                             $message->type    = 'error';
-                            $message->text    = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . " :: Raw data = <<<JSON\n$data\n>>>";
+                            $message->text    = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . ". Raw data = &lt;&lt;&lt;JSON\n" . $data . "\n&gt;&gt;&gt;";
                             $message->classes = ".$validation->validate.json-valid";
                             $this->sendMessage($to, $message);
                         }

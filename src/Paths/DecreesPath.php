@@ -7,16 +7,19 @@ use LiturgicalCalendar\Api\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCollection;
 use LiturgicalCalendar\Api\Utilities;
+use stdClass;
 
-/**
- * @property object{litcal_decrees: array<object{decree_id:string,api_path:string}>} $decreesIndex
- */
 final class DecreesPath
 {
     public static Core $Core;
-    public static object $decreesIndex;
-    /** @var array<string|int> */ private static array $requestPathParts = [];
+
+    public static DecreeItemCollection $decreesIndex;
+
+    /** @var array<string|int> */
+    private static array $requestPathParts = [];
 
     /*
     private static function initRequestParams(): array
@@ -68,22 +71,21 @@ final class DecreesPath
         if ($numPathParts > 0) {
             switch ($numPathParts) {
                 case 1:
-                    $decreeIds = [];
-                    foreach (self::$decreesIndex->litcal_decrees as $idx => $decree) {
-                        if ($decree->decree_id === self::$requestPathParts[0]) {
-                            $response = json_encode(self::$decreesIndex->litcal_decrees[$idx]);
-                            if ($response === false) {
-                                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Failed to encode decree to JSON');
-                            }
+                    $decree = array_find(self::$decreesIndex->decreeItems, fn ($decree) => $decree->decree_id === self::$requestPathParts[0]);
+                    if (null === $decree) {
+                        $decreeIDs = array_column(self::$decreesIndex->decreeItems, 'decree_id');
+                        $error     = 'No Decree of the Congregation for Divine Worship found corresponding to '
+                            . self::$requestPathParts[0]
+                            . ', valid values are found in the `decree_id` properties of the `litcal_decrees` collection: ' . implode(', ', $decreeIDs);
+                        self::produceErrorResponse(StatusCode::NOT_FOUND, $error);
+                    } else {
+                        $response = json_encode($decree);
+                        if ($response === false) {
+                            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Failed to encode decree to JSON');
+                        } else {
                             self::produceResponse($response);
                         }
-                        $decreeIds[] = $decree->decree_id;
                     }
-
-                    $error = 'No Decree of the Congregation for Divine Worship found corresponding to '
-                        . self::$requestPathParts[0]
-                        . ', valid values are found in the `decree_id` properties of the `litcal_decrees` collection: ' . implode(', ', $decreeIds);
-                    self::produceErrorResponse(StatusCode::NOT_FOUND, $error);
                     break;
                 default:
                     self::produceErrorResponse(StatusCode::BAD_REQUEST, "Only one path parameter expected on the `/decrees` path, instead $numPathParts found");
@@ -162,10 +164,34 @@ final class DecreesPath
         if (count($requestPathParts)) {
             self::$requestPathParts = $requestPathParts;
         }
-        self::$decreesIndex                 = new \stdClass();
-        $decreesFile                        = JsonData::DECREES_FILE;
-        self::$decreesIndex->litcal_decrees = Utilities::jsonFileToObject($decreesFile);
-        self::$Core                         = new Core();
+
+        $locale = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']) : LitLocale::LATIN_PRIMARY_LANGUAGE;
+        if (false === $locale) {
+            $locale = LitLocale::LATIN_PRIMARY_LANGUAGE;
+        } else {
+            $locale = \Locale::getPrimaryLanguage($locale);
+        }
+        $decreesI18nFile = strtr(
+            JsonData::DECREES_I18N_FILE,
+            ['{locale}' => $locale]
+        );
+
+        $names   = Utilities::jsonFileToArray($decreesI18nFile);
+        $decrees = Utilities::jsonFileToObject(JsonData::DECREES_FILE);
+        if (false === is_array($decrees)) {
+            throw new \Exception('We expected the Decrees data to be an array of Decree objects.');
+        }
+        if (array_filter(array_keys($names), 'is_string') !== array_keys($names)) {
+            throw new \Exception('We expected all the keys of the array to be strings.');
+        }
+        if (array_filter($names, 'is_string') !== $names) {
+            throw new \Exception('We expected all the values of the array to be strings.');
+        }
+        /** @var array<string,string> $names */
+        DecreeItemCollection::setNames($decrees, $names);
+
+        self::$decreesIndex = DecreeItemCollection::fromObject($decrees);
+        self::$Core         = new Core();
     }
 
     public static function handleRequest(): void
@@ -178,11 +204,14 @@ final class DecreesPath
         }
         self::$Core->setResponseContentTypeHeader();
         if (count(self::$requestPathParts) === 0) {
-            $response = json_encode(self::$decreesIndex);
+            $decreesIndex                 = new \stdClass();
+            $decreesIndex->litcal_decrees = self::$decreesIndex->decreeItems;
+            $response                     = json_encode($decreesIndex);
             if ($response === false) {
                 self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Failed to encode decrees index to JSON');
+            } else {
+                self::produceResponse($response);
             }
-            self::produceResponse($response);
         }
         self::handlePathParams();
     }

@@ -4,10 +4,10 @@ namespace LiturgicalCalendar\Api\Models\Decrees;
 
 use LiturgicalCalendar\Api\Enum\CalEventAction;
 use LiturgicalCalendar\Api\Enum\LitLocale;
-use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
+use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
 use LiturgicalCalendar\Api\Models\RegionalData\UrlLangMap;
 
-abstract class DecreeEventMetadata extends AbstractJsonSrcData
+abstract class DecreeEventMetadata extends AbstractJsonRepresentation
 {
     public readonly int $since_year;
 
@@ -52,6 +52,24 @@ abstract class DecreeEventMetadata extends AbstractJsonSrcData
             $url             = sprintf($this->url, $vaticanLangCode);
         }
         return '<a href="' . $url . '" target="_blank">' . _('Decree of the Congregation for Divine Worship') . '</a>';
+    }
+
+    /**
+     * Returns an associative array representing the object.
+     *
+     * @return array<string,string|int|array<string,string>> The associative array containing the properties of the object.
+     */
+    public function jsonSerialize(): array
+    {
+        $returnArray = [
+            'since_year' => $this->since_year,
+            'action'     => $this->action->value,
+            'url'        => $this->url
+        ];
+        if (null !== $this->url_lang_map && !empty($this->url_lang_map->url_lang_map)) {
+            $returnArray['url_lang_map'] = $this->url_lang_map->url_lang_map;
+        }
+        return $returnArray;
     }
 
     abstract protected static function fromArrayInternal(array $data): static;

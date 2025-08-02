@@ -99,6 +99,18 @@
                 },
                 {
                     "$ref": "#/definitions/ReadingsEasterVigil"
+                },
+                {
+                    "$ref": "#/definitions/ReadingsChristmas"
+                },
+                {
+                    "$ref": "#/definitions/ReadingsWithEvening"
+                },
+                {
+                    "$ref": "#/definitions/ReadingsMultipleSchemas"
+                },
+                {
+                    "$ref": "#/definitions/ReadingsCommons"
                 }
             ],
             "title": "Readings"
@@ -269,6 +281,72 @@
                 "alleluia_verse",
                 "gospel"
             ]
+        },
+        "ReadingsChristmas": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "night": {
+                    "$ref": "#/definitions/ReadingsFestive"
+                },
+                "dawn": {
+                    "$ref": "#/definitions/ReadingsFestive"
+                },
+                "day": {
+                    "$ref": "#/definitions/ReadingsFestive"
+                }
+            },
+            "required": [
+                "night",
+                "dawn",
+                "day"
+            ],
+            "title": "ReadingsChristmas"
+        },
+        "ReadingsWithEvening": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "day": {
+                    "$ref": "#/definitions/ReadingsFestive"
+                },
+                "evening": {
+                    "$ref": "#/definitions/ReadingsFestive"
+                }
+            },
+            "required": [
+                "day",
+                "evening"
+            ],
+            "title": "ReadingsWithEvening",
+            "description": "This schema is used for Easter Sunday, which also both a daytime and an evening Mass each with proper readings"
+        },
+        "ReadingsMultipleSchemas": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "schema_one": {
+                    "$ref": "#/definitions/ReadingsFestive"
+                },
+                "schema_two": {
+                    "$ref": "#/definitions/ReadingsFestive"
+                },
+                "schema_three": {
+                    "$ref": "#/definitions/ReadingsFestive"
+                }
+            },
+            "required": [
+                "schema_one",
+                "schema_two",
+                "schema_three"
+            ],
+            "title": "ReadingsMultipleSchemas",
+            "description": "This schemas is used by All Souls Day (Commemoration of the Faithful Departed)"
+        },
+        "ReadingsCommons": {
+            "type": "string",
+            "title": "ReadingsCommons",
+            "description": "This schema is used for memorials and optional memorials that do not have a Proper lectionary"
         },
         "Day": {
             "type": "integer",

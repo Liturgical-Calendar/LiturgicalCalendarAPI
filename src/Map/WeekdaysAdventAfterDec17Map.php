@@ -7,6 +7,6 @@ namespace LiturgicalCalendar\Api\Map;
  *
  * {@inheritDoc}
  */
-final class WeekdaysAdventMap extends AbstractEventKeyDateMap
+final class WeekdaysAdventAfterDec17Map extends AbstractEventKeyDateMap
 {
 }

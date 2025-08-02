@@ -148,7 +148,7 @@ final class LitCommons implements \JsonSerializable
      * @param LitCommon $litCommon
      * @return bool
      */
-    private function has(LitCommon $litCommon): bool
+    public function has(LitCommon $litCommon): bool
     {
         foreach ($this->commons as $litCommonItem) {
             if ($litCommonItem->commonGeneral === $litCommon) {
@@ -168,7 +168,7 @@ final class LitCommons implements \JsonSerializable
      * @param string $locale the locale to translate to
      * @return string the translated human readable string
      */
-    public function fullTranslate(string $locale = LitLocale::LATIN): string
+    public function fullTranslate(string $locale = LitLocale::LATIN_PRIMARY_LANGUAGE): string
     {
         if (count($this->commons) === 0) {
             return '';
@@ -191,7 +191,7 @@ final class LitCommons implements \JsonSerializable
         }
         */
 
-        $fromTheCommon = $locale === LitLocale::LATIN ? 'De Commune' : _('From the Common');
+        $fromTheCommon = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'De Commune' : _('From the Common');
 
         /** @var string[] $commonsLcl */
         $commonsLcl = array_map(function ($litCommonItem) use ($locale, $fromTheCommon): string {

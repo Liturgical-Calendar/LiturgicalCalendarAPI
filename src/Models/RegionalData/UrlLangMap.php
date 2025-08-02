@@ -7,13 +7,11 @@ use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 /**
  * Represents a map from ISO 639-1 language codes to custom Vatican website language codes
  * as used in the Vatican URLs.
- *
- * @implements \ArrayAccess<string,string>
  */
-final class UrlLangMap extends AbstractJsonSrcData implements \ArrayAccess
+final class UrlLangMap extends AbstractJsonSrcData
 {
     /** @var array<string,string> */
-    public array $url_lang_map;
+    public readonly array $url_lang_map;
 
     /**
      * A locale code mapping for dealing with Vatican URLs that use non standard
@@ -26,34 +24,29 @@ final class UrlLangMap extends AbstractJsonSrcData implements \ArrayAccess
      */
     private function __construct(array $url_lang_map)
     {
+        if (empty($url_lang_map)) {
+            throw new \InvalidArgumentException('UrlLangMap must not be empty.');
+        }
         $this->url_lang_map = $url_lang_map;
     }
 
-    public function offsetExists($offset): bool
-    {
-        return array_key_exists($offset, $this->url_lang_map);
-    }
-
-    public function offsetGet($offset): string
-    {
-        return $this->url_lang_map[$offset];
-    }
-
-    public function offsetSet($offset, $value): void
-    {
-        $this->url_lang_map[$offset] = $value;
-    }
-
-    public function offsetUnset($offset): void
-    {
-        unset($this->url_lang_map[$offset]);
-    }
-
+    /**
+     * Creates a new instance from an associative array.
+     *
+     * @param array<string,string> $data The associative array containing the map of ISO 639-1 language codes to custom Vatican website language codes.
+     * @return static A new instance of the class.
+     */
     protected static function fromArrayInternal(array $data): static
     {
         return new static($data);
     }
 
+    /**
+     * Creates a new instance from an object.
+     *
+     * @param \stdClass $data The object to create an instance from.
+     * @return static A new instance of the class.
+     */
     protected static function fromObjectInternal(\stdClass $data): static
     {
         return new static((array) $data);
@@ -85,8 +78,8 @@ final class UrlLangMap extends AbstractJsonSrcData implements \ArrayAccess
         } elseif (array_key_exists('en', $this->url_lang_map)) {
             return $this->url_lang_map['en'];
         } else {
-            $firstLang = reset($this->url_lang_map);
-            return is_string($firstLang) ? $firstLang : $baseLocale;
+            $firstLang = array_values($this->url_lang_map)[0];
+            return $firstLang;
         }
     }
 }

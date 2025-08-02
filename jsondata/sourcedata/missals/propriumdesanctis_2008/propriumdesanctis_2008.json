@@ -11,13 +11,7 @@
         "calendar": "GENERAL ROMAN",
         "color": [
             "white"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 12,
@@ -30,13 +24,7 @@
         "calendar": "GENERAL ROMAN",
         "color": [
             "white"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 12,
@@ -49,12 +37,6 @@
         "calendar": "GENERAL ROMAN",
         "color": [
             "white"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     }
 ]

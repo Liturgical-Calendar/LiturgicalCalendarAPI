@@ -10,13 +10,7 @@
         "calendar": "GENERAL ROMAN",
         "color": [
             "white"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 2,
@@ -29,13 +23,7 @@
         "calendar": "GENERAL ROMAN",
         "color": [
             "white"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 4,
@@ -50,13 +38,7 @@
         "color": [
             "white",
             "red"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 4,
@@ -69,13 +51,7 @@
         "calendar": "GENERAL ROMAN",
         "color": [
             "white"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 5,
@@ -88,13 +64,7 @@
         "calendar": "GENERAL ROMAN",
         "color": [
             "white"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 5,
@@ -107,13 +77,7 @@
         "calendar": "GENERAL ROMAN",
         "color": [
             "red"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 5,
@@ -126,13 +90,7 @@
         "calendar": "GENERAL ROMAN",
         "color": [
             "white"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 7,
@@ -145,13 +103,7 @@
         "calendar": "GENERAL ROMAN",
         "color": [
             "red"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 7,
@@ -166,13 +118,7 @@
         "color": [
             "white",
             "red"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 7,
@@ -186,13 +132,7 @@
         "calendar": "GENERAL ROMAN",
         "color": [
             "white"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 8,
@@ -206,13 +146,7 @@
         "calendar": "GENERAL ROMAN",
         "color": [
             "white"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 8,
@@ -227,13 +161,7 @@
         "color": [
             "white",
             "red"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 8,
@@ -247,13 +175,7 @@
         "color": [
             "white",
             "red"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 9,
@@ -267,13 +189,7 @@
         "calendar": "GENERAL ROMAN",
         "color": [
             "white"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 9,
@@ -286,13 +202,7 @@
         "calendar": "GENERAL ROMAN",
         "color": [
             "white"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 9,
@@ -305,13 +215,7 @@
         "calendar": "GENERAL ROMAN",
         "color": [
             "white"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 9,
@@ -324,13 +228,7 @@
         "calendar": "GENERAL ROMAN",
         "color": [
             "red"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 11,
@@ -343,13 +241,7 @@
         "calendar": "GENERAL ROMAN",
         "color": [
             "red"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     },
     {
         "month": 11,
@@ -364,12 +256,6 @@
         "color": [
             "white",
             "red"
-        ],
-        "readings": {
-            "first_reading": "",
-            "responsorial_psalm": "",
-            "alleluia_verse": "",
-            "gospel": ""
-        }
+        ]
     }
 ]

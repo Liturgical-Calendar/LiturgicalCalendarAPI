@@ -51,7 +51,7 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      *
      * Converts the object to an array that can be json encoded,
      * containing the following keys:

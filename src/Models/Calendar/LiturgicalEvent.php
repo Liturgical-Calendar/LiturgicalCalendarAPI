@@ -12,6 +12,12 @@ use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsAbstract;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsChristmas;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsCommons;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsFestiveWithVigil;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsMultipleSchemas;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsWithEvening;
 use LiturgicalCalendar\Api\Models\PropriumDeSanctisEvent;
 use LiturgicalCalendar\Api\Models\PropriumDeTemporeEvent;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
@@ -34,7 +40,7 @@ final class LiturgicalEvent implements \JsonSerializable
     public ?string $grade_display;
     /** @var LitCommons|LitMassVariousNeeds[] */
     public LitCommons|array $common;  //["Proper"] or one or more Commons
-    public ?ReadingsAbstract $readings;
+    public private(set) ReadingsAbstract|ReadingsMultipleSchemas|ReadingsChristmas|ReadingsWithEvening|ReadingsFestiveWithVigil|ReadingsCommons $readings;
 
     /** The following properties are set externally, but may be optional and therefore may remain null */
     public ?int $psalter_week            = null;
@@ -53,7 +59,7 @@ final class LiturgicalEvent implements \JsonSerializable
     private string $grade_abbr;
     private string $common_lcl;
 
-    private static string $locale = LitLocale::LATIN;
+    private static string $locale = LitLocale::LATIN_PRIMARY_LANGUAGE;
     private static \IntlDateFormatter $dayOfTheWeekShort;
     private static \IntlDateFormatter $dayOfTheWeekLong;
     private static \IntlDateFormatter $monthShort;
@@ -76,8 +82,7 @@ final class LiturgicalEvent implements \JsonSerializable
         LitEventType $type = LitEventType::FIXED,
         LitGrade $grade = LitGrade::WEEKDAY,
         LitCommons|LitCommon|LitMassVariousNeeds|array $common = LitCommon::NONE,
-        ?string $displayGrade = null,
-        ?ReadingsAbstract $readings = null
+        ?string $displayGrade = null
     ) {
         $litMassVariousNeedsArray = false;
         if (is_array($common)) {
@@ -106,20 +111,17 @@ final class LiturgicalEvent implements \JsonSerializable
             $this->common     = $commons;
         } elseif ($commons instanceof LitMassVariousNeeds) {
             /** @var LitMassVariousNeeds $commons */
-            $this->common_lcl = $commons->fullTranslate(self::$locale === LitLocale::LATIN || self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE);
+            $this->common_lcl = $commons->fullTranslate(self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE);
             $this->common     = [$commons];
         } elseif ($litMassVariousNeedsArray) {
             /** @var LitMassVariousNeeds[] $commons */
-            $commonsLcl       = array_map(fn($item) => $item->fullTranslate(self::$locale === LitLocale::LATIN || self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE), $commons);
+            $commonsLcl       = array_map(fn($item) => $item->fullTranslate(self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE), $commons);
             $this->common_lcl = implode('; ' . _('or') . ' ', $commonsLcl);
             $this->common     = $commons;
         } else {
             $this->common_lcl = '???';
             $this->common     = LitCommons::create([LitCommon::NONE]);
         }
-        $this->readings = $readings;
-        //LiturgicalEvent::debugWrite( "*** LiturgicalEvent.php *** common vartype = " . gettype( $common ) );
-        //LiturgicalEvent::debugWrite( "*** LiturgicalEvent.php *** common vartype is array, value = " . implode( ', ', $common ) );
     }
 
     /**
@@ -142,6 +144,17 @@ final class LiturgicalEvent implements \JsonSerializable
     public function setGradeLocalization(string $grade_lcl): void
     {
         $this->grade_lcl = $grade_lcl;
+    }
+
+    /**
+     * Sets the readings for this liturgical event.
+     *
+     * @param ReadingsAbstract|ReadingsMultipleSchemas|ReadingsChristmas|ReadingsWithEvening|ReadingsFestiveWithVigil|ReadingsCommons $readings The readings for this liturgical event.
+     * @return void
+     */
+    public function setReadings(ReadingsAbstract|ReadingsMultipleSchemas|ReadingsChristmas|ReadingsWithEvening|ReadingsFestiveWithVigil|ReadingsCommons $readings): void
+    {
+        $this->readings = $readings;
     }
 
     /*
@@ -174,6 +187,7 @@ final class LiturgicalEvent implements \JsonSerializable
      * - month_long: the long month name for the liturgical event, translated according to the current locale
      * - day_of_the_week_short: the short day of the week name for the liturgical event, translated according to the current locale
      * - day_of_the_week_long: the long day of the week name for the liturgical event, translated according to the current locale
+     * - readings: the lectionary readings associated with the liturgical event
      * - liturgical_year: the liturgical year of the liturgical event, if applicable
      * - is_vigil_mass: a boolean indicating whether the liturgical event is a vigil mass, if applicable
      * - is_vigil_for: the liturgical event that the current liturgical event is a vigil for, if applicable
@@ -218,6 +232,9 @@ final class LiturgicalEvent implements \JsonSerializable
      */
     public function jsonSerialize(): array
     {
+        if (false === isset($this->readings)) {
+            throw new \RuntimeException('Readings not set for liturgical event `' . $this->name . '` with event_key: ' . $this->event_key);
+        }
         $returnArr = [
             'event_key'               => $this->event_key,
             'event_idx'               => $this->event_idx,
@@ -242,7 +259,8 @@ final class LiturgicalEvent implements \JsonSerializable
             'month_short'             => self::$monthShort->format($this->date->format('U')),
             'month_long'              => self::$monthLong->format($this->date->format('U')),
             'day_of_the_week_short'   => self::$dayOfTheWeekShort->format($this->date->format('U')),
-            'day_of_the_week_long'    => self::$dayOfTheWeekLong->format($this->date->format('U'))
+            'day_of_the_week_long'    => self::$dayOfTheWeekLong->format($this->date->format('U')),
+            'readings'                => $this->readings->jsonSerialize()
         ];
 
         if ($this->liturgical_year !== null) {
@@ -276,10 +294,6 @@ final class LiturgicalEvent implements \JsonSerializable
         if ($this->liturgical_season !== null) {
             $returnArr['liturgical_season']     = $this->liturgical_season->value;
             $returnArr['liturgical_season_lcl'] = LitSeason::i18n($this->liturgical_season, self::$locale);
-        }
-
-        if ($this->readings !== null) {
-            $returnArr['readings'] = $this->readings->jsonSerialize();
         }
 
         return $returnArr;
@@ -319,7 +333,6 @@ final class LiturgicalEvent implements \JsonSerializable
      * - type: The type of the liturgical event, as a LitEventType object or as a string.
      *   If not provided, defaults to LitEventType::FIXED.
      * - grade_display: The grade display of the liturgical event, as a string. If not provided, defaults to null.
-     * - readings: The lectionary readings for the Liturgical Event
      *
      * @param \stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile|DecreeItemCreateNewFixed|DecreeItemCreateNewMobile|PropriumDeTemporeEvent|PropriumDeSanctisEvent $obj
      * @return LiturgicalEvent A new LiturgicalEvent object.
@@ -432,8 +445,7 @@ final class LiturgicalEvent implements \JsonSerializable
             $obj->type,
             $obj->grade,
             $commons,
-            $obj->grade_display ?? null,
-            isset($obj->readings) ? $obj->readings : null
+            $obj->grade_display ?? null
         );
     }
 
@@ -453,7 +465,6 @@ final class LiturgicalEvent implements \JsonSerializable
      * - common: The liturgical common of the liturgical event, as an array of strings or LitCommon cases, or as a single string or single LitCommon case.
      *   If not provided, defaults to LitCommon::NONE.
      * - grade_display: The grade display of the liturgical event, as a string. If not provided, defaults to null.
-     * - readings: The lectionary readings of the liturgical event, as a ReadingsAbstract object.
      *
      * @param array{
      *     name: string,
@@ -463,7 +474,6 @@ final class LiturgicalEvent implements \JsonSerializable
      *     type?: LitEventType|string,
      *     common?: LitCommons|LitCommon[]|LitMassVariousNeeds[]|string[],
      *     grade_display?: string,
-     *     readings?: ReadingsAbstract
      * } $arr The associative array containing the required properties.
      * @return LiturgicalEvent A new LiturgicalEvent object.
      * @throws \InvalidArgumentException If the provided array does not contain the required properties or if the properties have invalid types.
@@ -545,8 +555,7 @@ final class LiturgicalEvent implements \JsonSerializable
             $arr['type'],
             $arr['grade'],
             $commons,
-            isset($arr['grade_display']) ? $arr['grade_display'] : null,
-            isset($arr['readings']) ? $arr['readings'] : null
+            isset($arr['grade_display']) ? $arr['grade_display'] : null
         );
     }
 

@@ -29,7 +29,7 @@ final class MetadataDiocesanCalendarSettings extends AbstractJsonRepresentation 
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @return array{epiphany?:string,ascension?:string,corpus_christi?:string}
      */
     public function jsonSerialize(): array

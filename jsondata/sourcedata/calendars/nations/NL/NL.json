@@ -22,13 +22,7 @@
                 "month": 6,
                 "common": [
                     "Proper"
-                ],
-                "readings": {
-                    "first_reading": "",
-                    "responsorial_psalm": "",
-                    "alleluia_verse": "",
-                    "gospel": ""
-                }
+                ]
             },
             "metadata": {
                 "action": "createNew",
@@ -46,13 +40,7 @@
                 "month": 7,
                 "common": [
                     "Proper"
-                ],
-                "readings": {
-                    "first_reading": "",
-                    "responsorial_psalm": "",
-                    "alleluia_verse": "",
-                    "gospel": ""
-                }
+                ]
             },
             "metadata": {
                 "action": "createNew",
@@ -70,13 +58,7 @@
                 "month": 7,
                 "common": [
                     "Martyrs"
-                ],
-                "readings": {
-                    "first_reading": "",
-                    "responsorial_psalm": "",
-                    "alleluia_verse": "",
-                    "gospel": ""
-                }
+                ]
             },
             "metadata": {
                 "action": "createNew",
@@ -94,14 +76,7 @@
                 "month": 10,
                 "common": [
                     "Proper"
-                ],
-                "readings": {
-                    "first_reading": "",
-                    "responsorial_psalm": "",
-                    "second_reading": "",
-                    "alleluia_verse": "",
-                    "gospel": ""
-                }
+                ]
             },
             "metadata": {
                 "action": "createNew",
@@ -119,13 +94,7 @@
                 "month": 11,
                 "common": [
                     "Proper"
-                ],
-                "readings": {
-                    "first_reading": "",
-                    "responsorial_psalm": "",
-                    "alleluia_verse": "",
-                    "gospel": ""
-                }
+                ]
             },
             "metadata": {
                 "action": "createNew",
@@ -143,14 +112,7 @@
                 "month": 11,
                 "common": [
                     "Proper"
-                ],
-                "readings": {
-                    "first_reading": "",
-                    "responsorial_psalm": "",
-                    "second_reading": "",
-                    "alleluia_verse": "",
-                    "gospel": ""
-                }
+                ]
             },
             "metadata": {
                 "action": "createNew",

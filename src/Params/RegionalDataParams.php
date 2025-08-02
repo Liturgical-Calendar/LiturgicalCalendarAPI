@@ -25,6 +25,8 @@ class RegionalDataParams implements ParamsInterface
 
     /**
      * An array of expected values for the category parameter of requests to the /data API path.
+     *
+     * @var array{nation:'NATIONALCALENDAR',diocese:'DIOCESANCALENDAR',widerregion:'WIDERREGIONCALENDAR'}
      */
     public const array EXPECTED_CATEGORIES = [
         'nation'      => 'NATIONALCALENDAR',
@@ -55,7 +57,7 @@ class RegionalDataParams implements ParamsInterface
         if ($metadataRaw) {
             $metadata = json_decode($metadataRaw);
             if (JSON_ERROR_NONE === json_last_error() && property_exists($metadata, 'litcal_metadata')) {
-                //let's remove the Vatican calendar from the list
+                // let's remove the Vatican calendar from the list
                 array_shift($metadata->litcal_metadata->national_calendars);
                 $this->calendars = MetadataCalendars::fromObject($metadata->litcal_metadata);
             } else {
@@ -144,9 +146,8 @@ class RegionalDataParams implements ParamsInterface
                 if (null === $currentNation) {
                     RegionalDataPath::produceErrorResponse(
                         StatusCode::BAD_REQUEST,
-                        "Invalid value {$params['key']} for param `key`, valid values are: "
-                            . implode(', ', $this->calendars->national_calendars_keys) . "\n\n"
-                            . json_encode($this->calendars->national_calendars, JSON_PRETTY_PRINT)
+                        "Invalid value '{$params['key']}' for param `key`, valid values are: "
+                            . implode(', ', $this->calendars->national_calendars_keys)
                     );
                 }
             }

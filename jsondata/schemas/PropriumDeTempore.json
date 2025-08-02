@@ -21,14 +21,10 @@
                 },
                 "color": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
-                },
-                "readings": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
                 }
             },
             "required": [
-                "event_key",
-                "readings"
+                "event_key"
             ]
         }
     }
