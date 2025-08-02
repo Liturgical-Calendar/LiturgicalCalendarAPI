@@ -35,7 +35,6 @@
     "minimum-stability": "dev",
     "scripts": {
         "post-install-cmd": [
-            "@install-codestandards",
             "LiturgicalCalendar\\Api\\Utilities::postInstall"
         ],
         "post-update-cmd": [
@@ -44,10 +43,7 @@
         "lint": "phpcs src || echo 'Linting failed. Please run composer lint:fix to fix the linting issues.'",
         "lint:fix": "phpcbf src || echo 'Lint fixing failed. Please check the linting failures and fix them manually.'",
         "analyse": "phpstan analyse -c phpstan.neon",
-        "parallel-lint": "parallel-lint --exclude .git --exclude vendor .",
-        "install-codestandards": [
-            "PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run"
-        ]
+        "parallel-lint": "parallel-lint --exclude .git --exclude vendor ."
     },
     "config": {
         "allow-plugins": {
