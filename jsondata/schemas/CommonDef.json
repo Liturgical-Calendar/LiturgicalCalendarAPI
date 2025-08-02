@@ -111,6 +111,9 @@
                 },
                 {
                     "$ref": "#/definitions/ReadingsCommons"
+                },
+                {
+                    "$ref": "#/definitions/ReadingsSeasonal"
                 }
             ],
             "title": "Readings"
@@ -347,6 +350,24 @@
             "type": "string",
             "title": "ReadingsCommons",
             "description": "This schema is used for memorials and optional memorials that do not have a Proper lectionary"
+        },
+        "ReadingsSeasonal": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "easter_season": {
+                    "$ref": "#/definitions/ReadingsFerial"
+                },
+                "outside_easter_season": {
+                    "$ref": "#/definitions/ReadingsFerial"
+                }
+            },
+            "required": [
+                "easter_season",
+                "outside_easter_season"
+            ],
+            "title": "ReadingsSeasonal",
+            "description": "Lectionary readings that change depending on whether the liturgical event falls within the Easter season"
         },
         "Day": {
             "type": "integer",
