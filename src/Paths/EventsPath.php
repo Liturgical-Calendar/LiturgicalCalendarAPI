@@ -688,7 +688,7 @@ final class EventsPath
                         $names    = null;
                         $I18nPath = RomanMissal::getSanctoraleI18nFilePath($missal);
                         if ($I18nPath !== false) {
-                            $I18nFile = $I18nPath . '/' . $this->EventsParams->baseLocale . '.json';
+                            $I18nFile = $I18nPath . $this->EventsParams->Locale . '.json';
                             $names    = Utilities::jsonFileToArray($I18nFile);
                         }
 
