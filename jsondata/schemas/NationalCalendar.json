@@ -126,11 +126,11 @@
                         }
                     },
                     "required": [
-                        "strtotime",
                         "event_key",
-                        "common",
+                        "color",
                         "grade",
-                        "color"
+                        "common",
+                        "strtotime"
                     ],
                     "title": "LiturgicalEventCreateNewMobile"
                 },
