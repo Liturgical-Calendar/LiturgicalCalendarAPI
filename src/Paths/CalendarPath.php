@@ -2371,8 +2371,7 @@ final class CalendarPath
         $decreeItemLiturgicalEvent = $decreeItem->liturgical_event;
 
         if (is_string($decreeItemLiturgicalEvent->strtotime)) {
-            $litEventDateTS = strtotime($decreeItemLiturgicalEvent->strtotime . ' ' . $this->CalendarParams->Year . ' UTC');
-            $decreeItemLiturgicalEvent->setDate(new DateTime("@$litEventDateTS", new \DateTimeZone('UTC')));
+            $decreeItemLiturgicalEvent->setDate(new DateTime($decreeItemLiturgicalEvent->strtotime . ' ' . $this->CalendarParams->Year, new \DateTimeZone('UTC')));
             if (true === $this->canCreateNewMobileDecreeEvent($decreeItem)) {
                 $this->createMobileLiturgicalEvent($decreeItem);
             }
@@ -3361,8 +3360,8 @@ final class CalendarPath
             && $liturgicalEvent->strtotime !== ''
         ) {
             /** @var LitCalItemCreateNewMobile $liturgicalEvent */
-            $litEventDateTS = strtotime($liturgicalEvent->strtotime . ' ' . $this->CalendarParams->Year . ' UTC');
-            $liturgicalEvent->setDate(new DateTime("@$litEventDateTS", new \DateTimeZone('UTC')));
+            $strtotime = $liturgicalEvent->strtotime . ' ' . $this->CalendarParams->Year;
+            $liturgicalEvent->setDate(new DateTime($strtotime, new \DateTimeZone('UTC')));
         } elseif (
             property_exists($liturgicalEvent, 'month')
             && property_exists($liturgicalEvent, 'day')
@@ -4133,36 +4132,16 @@ final class CalendarPath
                 return false;
             }
 
-            $mobileEventTimestamp = strtotime($match[2] . ' ' . $this->CalendarParams->Year . ' UTC');
-            if (false === $mobileEventTimestamp) {
-                $this->Messages[] = sprintf(
-                    /**translators: Do not translate 'strtotime'. 1. The value of the 'strtotime' property */
-                    'Could not interpret the \'strtotime\' property with value %1$s into a timestamp',
-                    $strtotime
-                );
-                return false;
-            }
-
-            $mobileEventDate = new DateTime("@$mobileEventTimestamp", new \DateTimeZone('UTC'));
-            if ($match[1] === 'before') {
+            $mobileEventDate = new DateTime($match[2] . ' ' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
+            if ($match[1] === DateRelation::Before->value) {
                 $mobileEventDate->modify("previous {$match[0]}");
-            } elseif ($match[1] === 'after') {
+            } elseif ($match[1] === DateRelation::After->value) {
                 $mobileEventDate->modify("next {$match[0]}");
             }
             return $mobileEventDate;
         } else {
             // Example: "fourth thursday of November" (for Thanksgiving in the United States)
-            $mobileEventTimestamp = strtotime($strtotime . ' ' . $this->CalendarParams->Year . ' UTC');
-            if (false === $mobileEventTimestamp) {
-                $this->Messages[] = sprintf(
-                    /**translators: Do not translate 'strtotime'. 1. The value of the 'strtotime' property */
-                    'Could not parse the \'strtotime\' property with value %1$s into a timestamp',
-                    $strtotime
-                );
-                return false;
-            }
-
-            return new DateTime("@$mobileEventTimestamp", new \DateTimeZone('UTC'));
+            return new DateTime($strtotime . ' ' . $this->CalendarParams->Year, new \DateTimeZone('UTC'));
         }
     }
 
