@@ -36,19 +36,6 @@
                 },
                 "color": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
-                },
-                "readings": {
-                    "oneOf": [
-                        {
-                            "$ref": "#/definitions/ReadingsWithVigil"
-                        },
-                        {
-                            "$ref": "#/definitions/ReadingsChristmas"
-                        },
-                        {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
-                        }
-                    ]
                 }
             },
             "required": [
@@ -58,7 +45,6 @@
                 "day",
                 "grade",
                 "month",
-                "readings",
                 "event_key"
             ],
             "title": "PropriumDeSanctis"
