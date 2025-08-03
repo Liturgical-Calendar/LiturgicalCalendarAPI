@@ -198,21 +198,36 @@ final class ReadingsGeneralRoman
      * and is of type ReadingsMultipleSchemas.
      *
      * @param string $offset The offset to retrieve the readings for.
-     * @return ReadingsAbstract|ReadingsMultipleSchemas The readings for the specified sanctorale offset.
+     * @return ReadingsAbstract|ReadingsSeasonal|ReadingsMultipleSchemas The readings for the specified sanctorale offset.
      */
-    public function getSanctoraleReadings(string $offset): ReadingsAbstract|ReadingsMultipleSchemas
+    public function getSanctoraleReadings(string $offset): ReadingsAbstract|ReadingsSeasonal|ReadingsMultipleSchemas
     {
         $readings = $this->sanctorale->getReadings($offset);
 
-        if (false === $readings instanceof ReadingsAbstract && false === $readings instanceof ReadingsMultipleSchemas) {
-            throw new \UnexpectedValueException('The readings for the sanctorale are expected to be an instance that extends ReadingsAbstract or ReadingsMultipleSchemas');
+        if (
+            false === $readings instanceof ReadingsAbstract
+            && false === $readings instanceof ReadingsSeasonal
+            && false === $readings instanceof ReadingsMultipleSchemas
+        ) {
+            throw new \UnexpectedValueException('The readings for the sanctorale are expected to be an instance of ReadingsSeasonal, of ReadingsMultipleSchemas, or an instance that extends ReadingsAbstract');
         }
 
         return $readings;
     }
 
     /**
-     * @param array<string,ReadingsFerialArray|ReadingsFestiveArray|ReadingsFestiveWithVigilArray|ReadingsMultipleSchemasArray> $readings
+     * Checks if the sanctorale readings contain the specified offset.
+     *
+     * @param string $offset The offset to check for.
+     * @return bool True if the sanctorale readings contain the specified offset, false otherwise.
+     */
+    public function hasSanctoraleReadings(string $offset): bool
+    {
+        return $this->sanctorale->offsetExists($offset);
+    }
+
+    /**
+     * @param array<string,ReadingsFerialArray|ReadingsFestiveArray|ReadingsFestiveWithVigilArray|ReadingsSeasonalArray|ReadingsMultipleSchemasArray> $readings
      */
     public function addSanctoraleReadings(array $readings): void
     {
