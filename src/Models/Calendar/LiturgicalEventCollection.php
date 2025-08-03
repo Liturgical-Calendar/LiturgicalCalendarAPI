@@ -1093,7 +1093,7 @@ final class LiturgicalEventCollection
                     $litEvent->date < $this->liturgicalEvents->getEvent('HolyThurs')->date
                     || $litEvent->date >= $this->liturgicalEvents->getEvent('Easter2')->date
                 ) {
-                    if (in_array($litEvent->event_key, self::$lectionary->getSanctoraleKeys())) {
+                    if (self::$lectionary->hasSanctoraleReadings($litEvent->event_key)) {
                         // If the event is from the Sanctorale (this includes national and diocesan created events),
                         // we get the readings from the Sanctorale
                         $readings = self::$lectionary->getSanctoraleReadings($litEvent->event_key);
@@ -1136,7 +1136,11 @@ final class LiturgicalEventCollection
                                 //      since the lectionary event_key does not have the diocese id preprended
                                 if (preg_match('/^[a-z]{6}_[a-z]{2}_/', $litEvent->event_key)) {
                                     $event_key = substr($litEvent->event_key, 10);
-                                    $litEvent->setReadings(self::$lectionary->getSanctoraleReadings($event_key));
+                                    if (self::$lectionary->hasSanctoraleReadings($event_key)) {
+                                        $litEvent->setReadings(self::$lectionary->getSanctoraleReadings($event_key));
+                                    } else {
+                                        throw new \InvalidArgumentException('event_key: ' . $litEvent->event_key . ' not found in Sanctorale, valid keys are: ' . implode(', ', self::$lectionary->getSanctoraleKeys()));
+                                    }
                                 } else {
                                     $litEvent->setReadings(self::$lectionary->getCycle($festiveCycle)->getReadings($litEvent->event_key));
                                 }
@@ -1163,7 +1167,7 @@ final class LiturgicalEventCollection
                         $litEvent->setReadings(self::$lectionary->getCycle($festiveCycle)->getReadings($litEvent->event_key));
                     }
                 }
-            } elseif (in_array($litEvent->event_key, self::$lectionary->getSanctoraleKeys())) {
+            } elseif (self::$lectionary->hasSanctoraleReadings($litEvent->event_key)) {
                 // STEP 3: If it's not a weekday or a Sunday or a Feast or the Lord or a Solemnity,
                 //         then it's probably a Sanctorale event; if so we retrieve the lectionary readings
                 //         from the Lectionary for the Sanctorale
