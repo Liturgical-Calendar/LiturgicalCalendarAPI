@@ -31,6 +31,7 @@ use LiturgicalCalendar\Api\Models\Lectionary\ReadingsChristmas;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsCommons;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsFestiveWithVigil;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsGeneralRoman;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsSeasonal;
 
 /**
  * Represents the collections of liturgical events that will be output in a final liturgical calendar.
@@ -1095,7 +1096,15 @@ final class LiturgicalEventCollection
                     if (in_array($litEvent->event_key, self::$lectionary->getSanctoraleKeys())) {
                         // If the event is from the Sanctorale (this includes national and diocesan created events),
                         // we get the readings from the Sanctorale
-                        $litEvent->setReadings(self::$lectionary->getSanctoraleReadings($litEvent->event_key));
+                        $readings = self::$lectionary->getSanctoraleReadings($litEvent->event_key);
+                        if ($readings instanceof ReadingsSeasonal) {
+                            if ($litEvent->liturgical_season === LitSeason::EASTER) {
+                                $readings = $readings->easter_season;
+                            } else {
+                                $readings = $readings->outside_easter_season;
+                            }
+                        }
+                        $litEvent->setReadings($readings);
                     } else {
                         // We set the liturgical cycle for all Temporale events except for:
                         // Christmas, Mother of God, Second Sunday of Christmas, Epiphany, Ash Wednesday.
@@ -1162,11 +1171,34 @@ final class LiturgicalEventCollection
             }
 
             // STEP 4: If the readings haven't been set from all of the above logic, and the liturgical event
-            //         is only a memorial or optional memorial (or even a Feast), we take the readings from the Commons
-            //         that the liturgical event is associated with
-            if (false === isset($litEvent->readings) && $litEvent->grade->value <= LitGrade::FEAST->value && $litEvent->common instanceof LitCommons) {
-                $commonsReadings = new ReadingsCommons($litEvent->common);
-                $litEvent->setReadings($commonsReadings);
+            //         is only a memorial or optional memorial (or even a Feast)
+            //         and there are no lectionary readings available in the Sanctorale,
+            //         then we take the readings from the Commons that the liturgical event is associated with
+            if (false === isset($litEvent->readings) && $litEvent->grade->value <= LitGrade::FEAST->value) {
+                if (preg_match('/^[a-z]{6}_[a-z]{2}_/', $litEvent->event_key)) {
+                    $event_key = substr($litEvent->event_key, 10);
+                } else {
+                    $event_key = $litEvent->event_key;
+                }
+
+                if (self::$lectionary->hasSanctoraleReadings($event_key)) {
+                    $readings = self::$lectionary->getSanctoraleReadings($event_key);
+                    if ($readings instanceof ReadingsSeasonal) {
+                        if ($litEvent->liturgical_season === LitSeason::EASTER) {
+                            $readings = $readings->easter_season;
+                        } else {
+                            $readings = $readings->outside_easter_season;
+                        }
+                        $litEvent->setReadings($readings);
+                    } else {
+                        $litEvent->setReadings($readings);
+                    }
+                } elseif ($litEvent->common instanceof LitCommons) {
+                    $commonsReadings = new ReadingsCommons($litEvent->common);
+                    $litEvent->setReadings($commonsReadings);
+                } else {
+                    throw new \InvalidArgumentException('No readings found or able to be set for liturgical event: ' . $litEvent->event_key);
+                }
             }
         }
     }
@@ -1308,7 +1340,7 @@ final class LiturgicalEventCollection
                     $coincidingEvent->grade_lcl,
                     $coincidingEvent->event->name,
                     $this->CalendarParams->Year,
-                    '<a href="http://www.cultodivino.va/content/cultodivino/it/documenti/responsa-ad-dubia/2020/de-calendario-liturgico-2022.html" target="_blank">' . _('Decree of the Congregation for Divine Worship') . '</a>'
+                    '<a href="https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf" target="_blank">' . _('Decree of the Congregation for Divine Worship') . '</a>'
                 );
             }
         } else {
@@ -1340,6 +1372,7 @@ final class LiturgicalEventCollection
 
     /**
      * Given a liturgical event, calculate whether it should have a vigil or not, and eventually create the Vigil Mass liturgical event.
+     *
      * If the Vigil coincides with another Solemnity, make a note of it and handle it accordingly.
      *
      * @param LiturgicalEvent $litEvent The liturgical event object.
