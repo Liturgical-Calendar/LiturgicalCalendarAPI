@@ -29,6 +29,7 @@ use LiturgicalCalendar\Api\Map\SuppressedEventsMap;
 use LiturgicalCalendar\Api\Map\ReinstatedEventsMap;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsChristmas;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsCommons;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsFestive;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsFestiveWithVigil;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsGeneralRoman;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsSeasonal;
@@ -1159,6 +1160,12 @@ final class LiturgicalEventCollection
                                 $readings = $readings->outside_easter_season;
                             }
                         }
+                        elseif (self::dateIsNotSunday($litEvent->date) && $litEvent->grade === LitGrade::FEAST_LORD && $readings instanceof ReadingsFestive) {
+                            // When Feasts of the Lord fall on weekdays, the Festive readings are reduced to Ferial readings
+                            // (the second reading is appended as a second option for the first reading).
+                            /** @var ReadingsFerial */
+                            $readings = $readings->reduceToFerial();
+                        }
                         $litEvent->setReadings($readings);
                     } else {
                         // We set the liturgical cycle for all Temporale events except for:
@@ -1188,7 +1195,9 @@ final class LiturgicalEventCollection
                                 $litEvent->setReadings($commonsReadings);
                             } else {
                                 // N.B. Diocesan calendar events will have the diocese id prepended to them, we should remove it
-                                //      since the lectionary event_key does not have the diocese id preprended
+                                //      since the lectionary event_key does not have the diocese id preprended.
+                                //      All diocesan calendar events' lectionary readings are pushed to the Sanctorale map,
+                                //      so we retrieve the readings from there.
                                 if (preg_match('/^[a-z]{6}_[a-z]{2}_/', $litEvent->event_key)) {
                                     $event_key = substr($litEvent->event_key, 10);
                                     if (self::$lectionary->hasSanctoraleReadings($event_key)) {

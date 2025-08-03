@@ -61,6 +61,27 @@ final class ReadingsFestive extends ReadingsAbstract
     }
 
     /**
+     * Reduces the current festive readings to ferial readings.
+     *
+     * This method creates a new `ReadingsFerial` object using the properties
+     * of the current festive readings, excluding the second reading,
+     * which is however appended as a second option for the first reading.
+     *
+     * This is useful for Feasts of the Lord that fall on weekdays.
+     *
+     * @return ReadingsFerial An instance containing ferial readings.
+     */
+    public function reduceToFerial(): ReadingsFerial
+    {
+        return new ReadingsFerial(
+            $this->first_reading . '|' . $this->second_reading,
+            $this->responsorial_psalm,
+            $this->alleluia_verse,
+            $this->gospel
+        );
+    }
+
+    /**
      * {@inheritDoc}
      *
      * Returns an associative array containing the properties of this object,
