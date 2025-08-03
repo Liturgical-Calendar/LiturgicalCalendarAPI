@@ -4,6 +4,7 @@ namespace LiturgicalCalendar\Api;
 
 use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitColor;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsMap;
 
 /**
  * Class Utilities
@@ -38,7 +39,15 @@ class Utilities
         'request_headers',
         'color',
         'color_lcl',
-        'common'
+        'common',
+        'readings',
+        'schema_one',
+        'schema_two',
+        'schema_three',
+        'night',
+        'dawn',
+        'day',
+        'evening'
     ];
 
     // EVENT_KEY_ELS are keys whose value is an array of LitCalEvents, and should become <Key> elements rather than <Option> elements
@@ -71,9 +80,15 @@ class Utilities
         'solemnities_lord_bvm_keys' => 'SolemnitiesLordBVMKeys'
     ];
 
+    private const READINGS_CHRISTMAS_KEYS = [
+        'night',
+        'dawn',
+        'day'
+    ];
+
     /**
      * Used to keep track of the current request hash value.
-     * The value is set from the Calendar.php class representing the `/calendar` API path.
+     * The value is set from the CalendarPath.php class representing the `/calendar` API path.
      * @var string
      */
     public static string $HASH_REQUEST = '';
@@ -118,6 +133,87 @@ class Utilities
     }
 
     /**
+     * Calculates the xsi type of the lectionary readings object, based on its keys.
+     *
+     * This function is used when generating the XML representation of the Readings for a LitCalEvent.
+     *
+     * @param array $value
+     * @return array<string,string>
+     */
+    private static function getReadingsType(array $value): array
+    {
+        $itemKeys     = array_keys($value);
+        $itemKeyCount = count($itemKeys);
+
+        // First we test for the two dimensional readings instances,
+        // starting from the most complex to the most simple.
+        // This is important to calculate correctly the diff between the keys!
+        // e.g. READINGS_CHRISTMAS_KEYS has more values than READINGS_WITH_VIGIL_KEYS
+
+        if ($itemKeyCount === count(ReadingsMap::READINGS_MULTIPLE_SCHEMAS_KEYS) && array_diff(ReadingsMap::READINGS_MULTIPLE_SCHEMAS_KEYS, $itemKeys) === []) {
+            return [
+                'attribute' => 'multipleSchemas',
+                'xsi'       => 'cl:ReadingsMultipleSchemasType'
+            ];
+        }
+
+        if ($itemKeyCount === count(self::READINGS_CHRISTMAS_KEYS) && array_diff(self::READINGS_CHRISTMAS_KEYS, $itemKeys) === []) {
+            return [
+                'attribute' => 'christmas',
+                'xsi'       => 'cl:ReadingsChristmasType'
+            ];
+        }
+
+        if ($itemKeyCount === count(ReadingsMap::READINGS_WITH_EVENING_MASS_KEYS) && array_diff(ReadingsMap::READINGS_WITH_EVENING_MASS_KEYS, $itemKeys) === []) {
+            return [
+                'attribute' => 'withEveningMass',
+                'xsi'       => 'cl:ReadingsWithEveningMassType'
+            ];
+        }
+
+        if ($itemKeyCount === count(ReadingsMap::READINGS_SEASONAL_KEYS) && array_diff(ReadingsMap::READINGS_SEASONAL_KEYS, $itemKeys) === []) {
+            return [
+                'attribute' => 'seasonal',
+                'xsi'       => 'cl:ReadingsSeasonalType'
+            ];
+        }
+
+        // Then we test for the one dimensional readings instances,
+        // starting from the most complex to the most simple.
+        // This is important to calculate correctly the diff between the keys!
+        // e.g. EASTER_VIGIL_KEYS has more values than PALM_SUNDAY_KEYS, and so on.
+
+        if ($itemKeyCount === count(ReadingsMap::EASTER_VIGIL_KEYS) && array_diff(ReadingsMap::EASTER_VIGIL_KEYS, $itemKeys) === []) {
+            return [
+                'attribute' => 'easterVigil',
+                'xsi'       => 'cl:ReadingsEasterVigilType'
+            ];
+        }
+        if ($itemKeyCount === count(ReadingsMap::PALM_SUNDAY_KEYS) && array_diff(ReadingsMap::PALM_SUNDAY_KEYS, $itemKeys) === []) {
+            return [
+                'attribute' => 'palmSunday',
+                'xsi'       => 'cl:ReadingsPalmSundayType'
+            ];
+        }
+        if ($itemKeyCount === count(ReadingsMap::FESTIVE_KEYS) && array_diff(ReadingsMap::FESTIVE_KEYS, $itemKeys) === []) {
+            return [
+                'attribute' => 'festive',
+                'xsi'       => 'cl:ReadingsFestiveType'
+            ];
+        }
+        if ($itemKeyCount === count(ReadingsMap::FERIAL_KEYS) && array_diff(ReadingsMap::FERIAL_KEYS, $itemKeys) === []) {
+            return [
+                'attribute' => 'ferial',
+                'xsi'       => 'cl:ReadingsFerialType'
+            ];
+        }
+        return [
+            'attribute' => '???',
+            'xsi'       => 'cl:ReadingsType'
+        ];
+    }
+
+    /**
      * Recursively convert an associative array to an XML object
      * @param array<string|int,mixed> $data
      * @param \SimpleXMLElement $xml
@@ -135,6 +231,11 @@ class Utilities
                     // which expects a string, to make phpstan happy
                     $key        = self::transformKey($key . '');
                     $new_object = $xml->addChild($key);
+                    if (in_array($key, ['Readings', 'Night', 'Day', 'Dawn', 'Evening', 'SchemaOne', 'SchemaTwo', 'SchemaThree'])) {
+                        ['attribute' => $attribute, 'xsi' => $xsi] = self::getReadingsType($value);
+                        $new_object->addAttribute('readingsType', $attribute);
+                        $new_object->addAttribute('xsi:type', $xsi, 'http://www.w3.org/2001/XMLSchema-instance');
+                    }
                 } else {
                     //self::debugWrite( "key <$key> is a LitCalEvent" );
                     $new_object = $xml->addChild('LitCalEvent');
@@ -170,6 +271,10 @@ class Utilities
                     }
                     elseif (gettype($value) === 'string') {
                         $xml->addChild($key, htmlspecialchars($value));
+                        if ('Readings' === $key) {
+                            $xml->Readings->addAttribute('readingsType', 'fromCommons');
+                            $xml->Readings->addAttribute('xsi:type', 'cl:ReadingsCommonsType', 'http://www.w3.org/2001/XMLSchema-instance');
+                        }
                     } else {
                         $xml->addChild($key, $value);
                     }
@@ -272,12 +377,13 @@ class Utilities
         }
         return $dateObj;
     }
-    /**
-    private static function debugWrite( string $string ) {
-      $debugFile = "UtilitiesDebug_" . Utilities::$HASH_REQUEST . ".log";
-      file_put_contents( $debugFile, date('c') . "\t" . $string . PHP_EOL, FILE_APPEND );
+
+    private static function debugWrite(string $string): void
+    {
+        $debugFile = 'UtilitiesDebug_' . Utilities::$HASH_REQUEST . '.log';
+        file_put_contents($debugFile, date('c') . "\t" . $string . PHP_EOL, FILE_APPEND);
     }
-    */
+
 
     /**
      * Convert a color name to its corresponding hexadecimal value.
