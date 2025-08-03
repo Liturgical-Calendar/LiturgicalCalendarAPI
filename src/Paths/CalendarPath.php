@@ -1751,14 +1751,15 @@ final class CalendarPath
                     ''
                 ));
             } else {
+                $litEvent         = $this->Cal->solemnityFromDate($firstOrdinaryDate) ?? $this->Cal->feastLordFromDate($firstOrdinaryDate);
                 $this->Messages[] = sprintf(
                     /**translators: 1: LiturgicalEvent name, 2: Superseding LiturgicalEvent grade, 3: Superseding LiturgicalEvent name, 4: Requested calendar year */
                     _('\'%1$s\' is superseded by the %2$s \'%3$s\' in the year %4$d.'),
                     $this->PropriumDeTempore['OrdSunday' . $ordSun]->name,
-                    $this->Cal->solemnityFromDate($firstOrdinaryDate)->grade->value > LitGrade::SOLEMNITY->value
-                        ? '<i>' . LitGrade::i18n($this->Cal->solemnityFromDate($firstOrdinaryDate)->grade, $this->CalendarParams->Locale, false) . '</i>'
-                        : LitGrade::i18n($this->Cal->solemnityFromDate($firstOrdinaryDate)->grade, $this->CalendarParams->Locale, false),
-                    $this->Cal->solemnityFromDate($firstOrdinaryDate)->name,
+                    $litEvent->grade->value > LitGrade::SOLEMNITY->value
+                        ? '<i>' . LitGrade::i18n($litEvent->grade, $this->CalendarParams->Locale, false) . '</i>'
+                        : LitGrade::i18n($litEvent->grade, $this->CalendarParams->Locale, false),
+                    $litEvent->name,
                     $this->CalendarParams->Year
                 );
             }
@@ -1786,14 +1787,15 @@ final class CalendarPath
                     ''
                 ));
             } else {
+                $litEvent         = $this->Cal->solemnityFromDate($firstOrdinaryDate) ?? $this->Cal->feastLordFromDate($firstOrdinaryDate);
                 $this->Messages[] = sprintf(
                     /**translators: 1: LiturgicalEvent name, 2: Superseding LiturgicalEvent grade, 3: Superseding LiturgicalEvent name, 4: Requested calendar year */
                     _('\'%1$s\' is superseded by the %2$s \'%3$s\' in the year %4$d.'),
                     $this->PropriumDeTempore['OrdSunday' . $ordSun]->name,
-                    $this->Cal->solemnityFromDate($lastOrdinary)->grade->value > LitGrade::SOLEMNITY->value
-                        ? '<i>' . LitGrade::i18n($this->Cal->solemnityFromDate($lastOrdinary)->grade, $this->CalendarParams->Locale, false) . '</i>'
-                        : LitGrade::i18n($this->Cal->solemnityFromDate($lastOrdinary)->grade, $this->CalendarParams->Locale, false),
-                    $this->Cal->solemnityFromDate($lastOrdinary)->name,
+                    $litEvent->grade->value > LitGrade::SOLEMNITY->value
+                        ? '<i>' . LitGrade::i18n($litEvent->grade, $this->CalendarParams->Locale, false) . '</i>'
+                        : LitGrade::i18n($litEvent->grade, $this->CalendarParams->Locale, false),
+                    $litEvent->name,
                     $this->CalendarParams->Year
                 );
             }
