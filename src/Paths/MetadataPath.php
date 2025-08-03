@@ -124,7 +124,7 @@ final class MetadataPath
 
 
     /**
-     * Scans the {@see JsonData::WIDER_REGIONS_FOLDER} directory and build an index of all Wider regions,
+     * Scans the {@see \LiturgicalCalendar\Api\Enum\JsonData::WIDER_REGIONS_FOLDER} directory and build an index of all Wider regions,
      * their supported locales and their data files.
      *
      * Each Wider region is identified by a folder name and a JSON file of the same name within that folder.

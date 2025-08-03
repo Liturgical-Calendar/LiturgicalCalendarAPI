@@ -15,7 +15,7 @@ use LiturgicalCalendar\Api\Paths\CalendarPath;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 
 /**
- * This class is responsible for handling the parameters provided to the {@see LiturgicalCalendar\Api\Paths\CalendarPath} class.
+ * This class is responsible for handling the parameters provided to the {@see \LiturgicalCalendar\Api\Paths\CalendarPath} class.
  *
  * The class is initialized with a set of parameters passed in from the API request.
  * Some parameters come from the path itself, while others come either from the URL query parameters (GET) or from the request body (POST).
@@ -238,7 +238,7 @@ class CalendarParams implements ParamsInterface
      * Validate the year parameter.
      *
      * The year parameter must be a 4 digit numeric string or an integer
-     * between {@see CalendarParams::YEAR_LOWER_LIMIT} and {@see CalendarParams::YEAR_UPPER_LIMIT}.
+     * between {@see \LiturgicalCalendar\Api\Params\CalendarParams::YEAR_LOWER_LIMIT} and {@see \LiturgicalCalendar\Api\Params\CalendarParams::YEAR_UPPER_LIMIT}.
      * If the year parameter is invalid, a 400 Bad Request error will be produced.
      *
      * @param int|string $value the value of the year parameter
@@ -269,7 +269,7 @@ class CalendarParams implements ParamsInterface
      *
      * @param string $value a string indicating whether Epiphany should be calculated on Jan 6th or on the Sunday between Jan 2nd and Jan 8th.
      *
-     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see Epiphany::values()}.
+     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see \LiturgicalCalendar\Api\Enum\Epiphany}::values().
      */
     private function validateEpiphanyParam(string $value): void
     {
@@ -284,7 +284,7 @@ class CalendarParams implements ParamsInterface
      *
      * @param string $value a string indicating whether Ascension should be calculated on a Thursday or on a Sunday.
      *
-     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see Ascension::values()}.
+     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see \LiturgicalCalendar\Api\Enum\Ascension}::values().
      */
     private function validateAscensionParam(string $value): void
     {
@@ -299,7 +299,7 @@ class CalendarParams implements ParamsInterface
      *
      * @param string $value a string indicating whether Corpus Christi should be calculated on a Sunday or on a Thursday.
      *
-     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see CorpusChristi::values()}.
+     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see \LiturgicalCalendar\Api\Enum\CorpusChristi}::values().
      */
     private function validateCorpusChristiParam(string $value): void
     {
@@ -332,7 +332,7 @@ class CalendarParams implements ParamsInterface
      *
      * @param string $value a string indicating the desired MIME type of the Response.
      *
-     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see ReturnType::values()}.
+     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see \LiturgicalCalendar\Api\Enum\ReturnType}::values().
      */
     private function validateReturnTypeParam(string $value): void
     {
@@ -345,7 +345,7 @@ class CalendarParams implements ParamsInterface
     /**
      * Validate the national_calendar parameter.
      *
-     * @param string $value a valid national calendar key as listed in {@see CalendarParams::$calendars::$national_calendars_keys}
+     * @param string $value a valid national calendar key as listed in {@see \LiturgicalCalendar\Api\Params\CalendarParams::$calendars}::$national_calendars_keys
      *
      * Produces a 400 Bad Request error if the value of the national_calendar parameter is invalid
      */
@@ -366,7 +366,7 @@ class CalendarParams implements ParamsInterface
     /**
      * Validate the diocesan_calendar parameter.
      *
-     * @param string $value a valid diocesan calendar key as listed in {@see CalendarParams::$calendars::$diocesan_calendars_keys}
+     * @param string $value a valid diocesan calendar key as listed in {@see \LiturgicalCalendar\Api\Params\CalendarParams::$calendars}::$diocesan_calendars_keys
      *
      * Produces a 400 Bad Request error if the value of the diocesan_calendar parameter is invalid
      */
@@ -386,7 +386,7 @@ class CalendarParams implements ParamsInterface
      *
      * @param string $value a string indicating whether the calendar should be calculated for a civil or liturgical year.
      *
-     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see YearType::values()}.
+     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see \LiturgicalCalendar\Api\Enum\YearType}::values().
      */
     private function validateYearTypeParam(string $value): void
     {

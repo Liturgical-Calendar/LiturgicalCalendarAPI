@@ -376,7 +376,7 @@ final class MissalsPath
      *   self::$missalsIndex->litcal_missals array.
      * - Finally, it will set the request parameters using the initRequestParams method.
      *
-     * @see \LiturgicalCalendar\Api\Paths\Missals::initRequestParams()
+     * @see \LiturgicalCalendar\Api\Paths\MissalsPath::initRequestParams()
      */
     public static function init(array $requestPathParts = []): void
     {

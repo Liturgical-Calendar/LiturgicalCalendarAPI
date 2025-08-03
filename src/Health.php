@@ -957,7 +957,7 @@ class Health implements MessageComponentInterface
                     try {
                         /**
                          * TODO: perhaps we need to register a custom Exception handler, since yaml_parse() throws a warning instead of an exception
-                         *       and we need to catch that warning as an exception {@see LiturgicalCalendar\Api\Core::warningHandler()}
+                         *       and we need to catch that warning as an exception {@see \LiturgicalCalendar\Api\Core::warningHandler()}
                          */
                         $yamlParsed = yaml_parse($data);
                         if (false === $yamlParsed) {

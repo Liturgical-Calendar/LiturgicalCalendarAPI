@@ -430,7 +430,7 @@ class RegionalDataParams implements ParamsInterface
      * Validates and sets the parameters for the RegionalData class.
      *
      * The method expects the following keys in the `$params` array:
-     * - `category`: one of the values in {@see RegionalDataParams::EXPECTED_CATEGORIES}
+     * - `category`: one of the values in {@see \LiturgicalCalendar\Api\Params\RegionalDataParams::EXPECTED_CATEGORIES}
      * - `key`: a valid key for the given category
      *
      * The method will produce a 400 error if either of the above keys are missing or invalid.

@@ -5,7 +5,7 @@ namespace LiturgicalCalendar\Api\Test;
 use LiturgicalCalendar\Api\Test\AssertionItem;
 
 /**
- * A collection of {@see AssertionItem} objects, representing AssertionItem assertions for a TestItem.
+ * A collection of {@see \LiturgicalCalendar\Api\Test\AssertionItem} objects, representing AssertionItem assertions for a TestItem.
  *
  * @phpstan-implements \IteratorAggregate<AssertionItem>
  */
@@ -21,7 +21,7 @@ class AssertionCollection implements \IteratorAggregate
      *
      * @param array<object{year:int,expected_value:int,assert:string,assertion:string,comment:string}> $assertions The assertions to include in the collection.
      *
-     * @see AssertionItem::__construct() for the required properties of each assertion.
+     * See {@see \LiturgicalCalendar\Api\Test\AssertionItem::__construct()} for the required properties of each assertion.
      */
     public function __construct(array $assertions)
     {

@@ -14,7 +14,7 @@ class TestsMap
      *
      * @param string $testName the name of the test
      * @param \stdClass $testData the test data, which must be an object with the properties
-     *                            expected by the {@see TestItem} constructor.
+     *                            expected by the {@see \LiturgicalCalendar\Api\Test\TestItem::__construct()} constructor.
      */
     public function add(string $testName, \stdClass $testData): void
     {

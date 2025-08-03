@@ -228,7 +228,7 @@ final class EventsPath
     /**
      * Loads the JSON data for the specified diocesan calendar.
      *
-     * If the payload is not valid according to {@see LitSchema::DIOCESAN}, the response will be a JSON error response with a status code of 422 Unprocessable Content.
+     * If the payload is not valid according to {@see \LiturgicalCalendar\Api\Enum\LitSchema::DIOCESAN}, the response will be a JSON error response with a status code of 422 Unprocessable Content.
      *
      * @return void
      */

@@ -233,7 +233,7 @@ class LitTestRunner
     }
 
     /**
-     * Sets the message details based on the provided type and optional text. Called by {@see setError()} and {@see setSuccess()}.
+     * Sets the message details based on the provided type and optional text. Called by {@see \LiturgicalCalendar\Api\Test\LitTestRunner::setError()} and {@see \LiturgicalCalendar\Api\Test\LitTestRunner::setSuccess()}.
      *
      * @param string $type The type of the message ('success' or 'error').
      * @param string|null $text The optional text to include in the message.
@@ -257,7 +257,10 @@ class LitTestRunner
     }
 
     /**
-     * Sets the message to be an error message with the provided text. Called in {@see __construct()} and in {@see runTest()}.
+     * Sets the message to be an error message with the provided text. Called in
+     * {@see \LiturgicalCalendar\Api\Test\LitTestRunner::__construct()}
+     * and in {@see \LiturgicalCalendar\Api\Test\LitTestRunner::runTest()}
+     * and in {@see \LiturgicalCalendar\Api\Test\LitTestRunner::getMessage()}.
      *
      * @param string $text The text of the error message.
      */
@@ -267,7 +270,7 @@ class LitTestRunner
     }
 
     /**
-     * Sets the message to be a success message with the provided text. Called in {@see runTest()}.
+     * Sets the message to be a success message with the provided text. Called in {@see \LiturgicalCalendar\Api\Test\LitTestRunner::runTest()}.
      *
      * @param string|null $text The optional text to include in the message.
      */

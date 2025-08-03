@@ -991,6 +991,12 @@ final class CalendarPath
     /**
      * Calculates the dates for Holy Thursday, Good Friday, Easter Vigil and Easter Sunday
      * and creates the corresponding LiturgicalEvents in the calendar
+     *
+     * **General Norms for the Liturgical Year and the Calendar**
+     *
+     * I.
+     * 1. ***Easter Triduum of the Lord's Passion and Resurrection***
+     * 2. Christmas, Epiphany, Ascension, and Pentecost
      */
     private function calculateEasterTriduum(): void
     {
@@ -1006,11 +1012,14 @@ final class CalendarPath
 
 
     /**
-     * Calculates the dates for Christmas and Epiphany and creates the corresponding LiturgicalEvents in the calendar
+     * Calculates the dates for Christmas and Epiphany
+     * and creates the corresponding LiturgicalEvents in the calendar
      *
-     * Christmas is a fixed date, but Epiphany depends on the calendar settings (JAN6 or SUNDAY_JAN2_JAN8).
+     * **General Norms for the Liturgical Year and the Calendar**
      *
-     * @return void
+     * I.
+     * 1. Easter Triduum of the Lord's Passion and Resurrection
+     * 2. ***Christmas, Epiphany, Ascension, and Pentecost***
      */
     private function calculateChristmasEpiphany(): void
     {
@@ -1163,6 +1172,12 @@ final class CalendarPath
      *
      * Pentecost is fixed date, so just create a LiturgicalEvent
      *
+     * **General Norms for the Liturgical Year and the Calendar**
+     *
+     * I.
+     * 1. Easter Triduum of the Lord's Passion and Resurrection
+     * 2. ***Christmas, Epiphany, Ascension, and Pentecost***
+     *
      * @return void
      */
     private function calculateAscensionPentecost(): void
@@ -1187,6 +1202,13 @@ final class CalendarPath
     /**
      * Calculates the dates for Sundays of Advent, Lent, Easter, Ordinary Time, and special Sundays like Palm Sunday, Corpus Christi, and Trinity Sunday
      * and creates the corresponding LiturgicalEvents in the calendar
+     *
+     * **General Norms for the Liturgical Year and the Calendar**
+     *
+     * I.
+     * 1. Easter Triduum of the Lord's Passion and Resurrection
+     * 2. Christmas, Epiphany, Ascension, and Pentecost;
+     *    ***Sundays of Advent, Lent and Easter***
      *
      * @return void
      */
@@ -1339,6 +1361,13 @@ final class CalendarPath
     /**
      * Calculates the dates for Sacred Heart and Christ the King and creates the corresponding LiturgicalEvents in the calendar
      *
+     * **General Norms for the Liturgical Year and the Calendar**
+     *
+     * I.
+     * 1. Easter Triduum of the Lord's Passion and Resurrection
+     * 2. Christmas, Epiphany, Ascension, and Pentecost
+     * 3. ***Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar***
+     *
      * @return void
      */
     private function calculateMobileSolemnitiesOfTheLord(): void
@@ -1358,6 +1387,13 @@ final class CalendarPath
      * Solemnities are celebrations of the highest rank in the Liturgical Calendar. They are days of special importance
      * in the Roman Rite, and are usually observed with a Vigil, proper readings, and a special Mass formulary.
      * Fixed date Solemnities, as the name implies, are Solemnities that fall on the same date every year.
+     *
+     * **General Norms for the Liturgical Year and the Calendar**
+     *
+     * I.
+     * 1. Easter Triduum of the Lord's Passion and Resurrection
+     * 2. Christmas, Epiphany, Ascension, and Pentecost
+     * 3. ***Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar***
      *
      * @return void
      */
@@ -1572,6 +1608,15 @@ final class CalendarPath
      * and creates the corresponding LiturgicalEvents in the calendar.
      *
      * Also creates the LiturgicalEvent for Christ the Eternal High Priest for those areas that have adopted this liturgical event
+     *
+     * **General Norms for the Liturgical Year and the Calendar**
+     *
+     * I.
+     * 1. Easter Triduum of the Lord's Passion and Resurrection
+     * 2. Christmas, Epiphany, Ascension, and Pentecost
+     * 3. Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar
+     * II.
+     * 5. ***Feasts of the Lord***
      *
      * @return void
      */
@@ -2569,6 +2614,7 @@ final class CalendarPath
         if (count($doctorDecrees) === 0) {
             throw new \InvalidArgumentException('There are no Decrees of the Congregation for Divine Worship for Doctors of the Church.');
         }
+
         foreach ($doctorDecrees as $doctorDecree) {
             /** @var DecreeItemMakeDoctor $doctorDecreeLiturgicalEvent */
             $doctorDecreeLiturgicalEvent = $doctorDecree->liturgical_event;
@@ -2902,9 +2948,22 @@ final class CalendarPath
         }
     }
 
-    //13. Weekdays of Advent up until Dec. 16 included ( already calculated and defined together with weekdays 17 Dec. - 24 Dec., @see calculateWeekdaysAdvent() )
-    //    Weekdays of Christmas season from 2 Jan. until the Saturday after Epiphany (@see calculateWeekdaysChristmasOctave())
-    //    Weekdays of the Easter season, from the Monday after the Octave of Easter to the Saturday before Pentecost
+    /**
+     * Calculates the liturgical events for Weekdays of Easter, from the Monday of the Octave of Easter to the Saturday before Pentecost.
+     *
+     * The events are keyed as "EasterWeekdayXMonday" where X is the week number (1, 2, 3, etc.) and Monday is the day of the week (Monday, Tuesday, Wednesday, etc.).
+     *
+     * The dates for the Weekdays of Easter are calculated starting from Easter Sunday itself, and then counting up one day at a time until the Saturday before Pentecost.
+     * For each weekday, the event name is generated as follows:
+     * - For the Latin locale, the name is in the format "feria secunda Hebdomadæ X Temporis Paschali", where X is the week number in ordinal form (Primæ, Secundæ, etc.).
+     * - For all other locales, the name is in the format "Monday of the X Week of Easter", where X is the week number in ordinal form, according to the current locale.
+     * - The event color is always white.
+     * - The event type is always MOBILE.
+     * - The event grade is always WEEKDAY.
+     * - The event psalter_week is set to the week number.
+     *
+     * @return void
+     */
     private function calculateWeekdaysEaster(): void
     {
         $DoMEaster   = $this->Cal->getLiturgicalEvent('Easter')->date->format('j');      //day of the month of Easter
@@ -2945,10 +3004,24 @@ final class CalendarPath
         }
     }
 
-    //    Weekdays of Ordinary time
+    /**
+     * Calculates the dates for weekdays of Ordinary Time throughout the liturgical year
+     * and creates the corresponding LiturgicalEvents in the calendar.
+     *
+     * Weekdays of Ordinary Time are divided into two parts:
+     * - The first part begins the day after the Baptism of the Lord and ends with Ash Wednesday.
+     * - The second part begins the day after Pentecost and ends with the Feast of Christ the King.
+     *
+     * For each weekday, the event name is generated in the format:
+     * - For the Latin locale, "feria Hebdomadæ X Temporis Ordinarii", where X is the week number in ordinal form (Primæ, Secundæ, etc).
+     * - For all other locales, "Monday of the X Week of Ordinary Time", where X is the week number in ordinal form according to the current locale.
+     *
+     * The event color is green, and the event type is MOBILE, with a grade of WEEKDAY.
+     *
+     * @return void
+     */
     private function calculateWeekdaysOrdinaryTime(): void
     {
-
         // In the first part of the year, weekdays of ordinary time begin the day after the Baptism of the Lord
         $FirstWeekdaysLowerLimit = $this->Cal->getLiturgicalEvent('BaptismLord')->date;
         // and end with Ash Wednesday
@@ -3041,11 +3114,14 @@ final class CalendarPath
         }
     }
 
-    //On Saturdays in Ordinary Time when there is no obligatory memorial, an optional memorial of the Blessed Virgin Mary is allowed.
-    //So we have to cycle through all Saturdays of the year checking if there isn't an obligatory memorial
-    //First we'll find the first Saturday of the year ( to do this we actually have to find the last Saturday of the previous year,
-    // so that our cycle using "next Saturday" logic will actually start from the first Saturday of the year ),
-    // and then continue for every next Saturday until we reach the last Saturday of the year
+    /**
+     * On Saturdays in Ordinary Time when there is no obligatory memorial, an optional memorial of the Blessed Virgin Mary is allowed.
+     *
+     * We cycle through all Saturdays of the year checking that it falls in Ordinary Time and that there isn't an obligatory memorial.
+     * First we find the first Saturday of the civil year ( to do this we actually have to find the last Saturday of the previous year,
+     * so that our cycle using "next Saturday" logic will actually start from the first Saturday of the year ),
+     * and then continue for every next Saturday until we reach the last Saturday of the year.
+     */
     private function calculateSaturdayMemorialBVM(): void
     {
         $currentSaturdayDate = new DateTime("previous Saturday January {$this->CalendarParams->Year}", new \DateTimeZone('UTC'));
@@ -3985,7 +4061,7 @@ final class CalendarPath
         //d ) feast of the titular, of the founder, of the principal patron of an Order or Congregation and of the religious province, without prejudice to the prescriptions of n. 4 d
         //e ) other feasts proper to an individual church
         //f ) other feasts inscribed in the calendar of a diocese or of a religious order or congregation
-        //these will be dealt with later when loading Local Calendar Data, {@see Calendar::applyNationalCalendarData()}
+        //these will be dealt with later when loading Local Calendar Data, {@see \LiturgicalCalendar\Api\PAths\CalendarPath::applyNationalCalendarData()}
 
         //9. WEEKDAYS of ADVENT FROM 17 DECEMBER TO 24 DECEMBER INCLUSIVE
         $this->calculateWeekdaysAdvent();

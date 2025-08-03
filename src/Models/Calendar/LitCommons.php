@@ -258,7 +258,7 @@ final class LitCommons implements \JsonSerializable
      * If the current locale is Latin, returns an empty string,
      * since the possessive is already indicated in the translated liturgical common.
      * For all other locales, returns the appropriate possessive form for the given liturgical common,
-     * according to the rules defined in the {@see LitCommon::possessive()} method.
+     * according to the rules defined in the {@see \LiturgicalCalendar\Api\Enum\LitCommon::possessive()} method.
      * @param LitCommon $litCommon the liturgical common for which we want to get the possessive form
      * @param string $locale the locale in which to get the possessive form
      * @return string the possessive form for the given liturgical common

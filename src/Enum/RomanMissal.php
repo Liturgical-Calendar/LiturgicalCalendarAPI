@@ -49,7 +49,7 @@ class RomanMissal
      * This array is used to check if a given missal_id is a valid Roman Missal enumeration constant.
      * @static
      * @var array<string>
-     * @see RomanMissal::isValid()
+     * @see \LiturgicalCalendar\Api\Enum\RomanMissal::isValid()
      */
     public static array $values = [
         'EDITIO_TYPICA_1970',
@@ -70,7 +70,7 @@ class RomanMissal
      * This array is used to get the name of a Roman Missal given its id.
      * @static
      * @var array<string,string>
-     * @see RomanMissal::getName()
+     * @see \LiturgicalCalendar\Api\Enum\RomanMissal::getName()
      */
     public static array $names = [
         self::EDITIO_TYPICA_1970                 => 'Editio Typica 1970',
@@ -91,7 +91,7 @@ class RomanMissal
      * This array is used to get the path to the JSON file containing the sanctorale data for a Roman Missal.
      * @static
      * @var array<string,string|false>
-     * @see RomanMissal::getSanctoraleFileName()
+     * @see \LiturgicalCalendar\Api\Enum\RomanMissal::getSanctoraleFileName()
      */
     public static array $jsonFiles = [
         self::EDITIO_TYPICA_1970                 => JsonData::MISSALS_FOLDER . '/propriumdesanctis_1970/propriumdesanctis_1970.json',
@@ -112,7 +112,7 @@ class RomanMissal
      * This array is used to get the path to the i18n directory for the sanctorale of a Roman Missal.
      * @static
      * @var array<string,string|false>
-     * @see RomanMissal::getSanctoraleI18nFilePath()
+     * @see \LiturgicalCalendar\Api\Enum\RomanMissal::getSanctoraleI18nFilePath()
      */
     public static array $i18nPath = [
         self::EDITIO_TYPICA_1970                 => JsonData::MISSALS_FOLDER . '/propriumdesanctis_1970/i18n/',
@@ -133,7 +133,7 @@ class RomanMissal
      * This array is used to get the path to the JSON file containing the lectionary data for a Roman Missal.
      * @static
      * @var array<string,string|false>
-     * @see RomanMissal::getLectionaryFilePath()
+     * @see \LiturgicalCalendar\Api\Enum\RomanMissal::getLectionaryFilePath()
      */
     public static array $lectionaryPath = [
         self::EDITIO_TYPICA_1970                 => false,
@@ -155,7 +155,7 @@ class RomanMissal
      * This array is used to get the year limits for a Roman Missal.
      * @static
      * @var array<string,array{since_year:int,until_year?:int}>
-     * @see RomanMissal::getYearLimits()
+     * @see \LiturgicalCalendar\Api\Enum\RomanMissal::getYearLimits()
      */
     public static array $yearLimits = [
         self::EDITIO_TYPICA_1970                 => [ 'since_year' => 1970 ],

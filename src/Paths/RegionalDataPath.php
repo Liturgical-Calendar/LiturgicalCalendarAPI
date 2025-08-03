@@ -190,7 +190,7 @@ final class RegionalDataPath
     /**
      * Handle GET and POST requests to retrieve a Regional Calendar data resource.
      *
-     * This is a private method and should only be called from {@see handleRequestMethod}.
+     * This is a private method and should only be called from {@see \LiturgicalCalendar\Api\Paths\RegionalDataPath::handleRequestMethod()}.
      *
      * The `category` parameter is required and must be one of the following values:
      * - DIOCESANCALENDAR
@@ -302,7 +302,7 @@ final class RegionalDataPath
     /**
      * Handle PUT requests to create a diocesan calendar data resource.
      *
-     * This is a private method and should only be called from {@see createCalendar}.
+     * This is a private method and should only be called from {@see \LiturgicalCalendar\Api\Paths\RegionalDataPath::createCalendar()}.
      *
      * The diocesan calendar data resource is created in the `JsonData::DIOCESAN_CALENDARS_FOLDER` directory.
      *
@@ -388,7 +388,7 @@ final class RegionalDataPath
     /**
      * Handle PUT requests to create or update a national calendar data resource.
      *
-     * This is a private method and should only be called from {@see createCalendar}.
+     * This is a private method and should only be called from {@see \LiturgicalCalendar\Api\Paths\RegionalDataPath::createCalendar()}.
      *
      * The national calendar data resource is created in the `jsondata/sourcedata/calendars/nations/` directory.
      *
@@ -451,7 +451,7 @@ final class RegionalDataPath
     /**
      * Handle PUT requests to create a wider region calendar data resource.
      *
-     * This is a private method and should only be called from {@see createCalendar}.
+     * This is a private method and should only be called from {@see \LiturgicalCalendar\Api\Paths\RegionalDataPath::createCalendar()}.
      *
      * The resource is created in the `jsondata/sourcedata/calendars/wider_regions/` directory.
      * TODO: implement
@@ -466,7 +466,7 @@ final class RegionalDataPath
     /**
      * Handle PUT requests to create or update a regional calendar data resource.
      *
-     * This is a private method and should only be called from {@see handleRequestMethod}.
+     * This is a private method and should only be called from {@see \LiturgicalCalendar\Api\Paths\RegionalDataPath::handleRequestMethod()}.
      *
      * The resource is created or updated in the `jsondata/sourcedata/calendars/` directory.
      *
@@ -509,7 +509,7 @@ final class RegionalDataPath
     /**
      * Handle PATCH requests to create or update a national calendar data resource.
      *
-     * It is private as it is called from {@see updateCalendar}.
+     * It is private as it is called from {@see \LiturgicalCalendar\Api\Paths\RegionalDataPath::updateCalendar()}.
      *
      * The resource is updated in the `jsondata/sourcedata/calendars/nations/` directory.
      *
@@ -606,7 +606,7 @@ final class RegionalDataPath
     /**
      * Handle PATCH requests to update a wider region calendar data resource.
      *
-     * It is private as it is called from {@see updateCalendar}.
+     * It is private as it is called from {@see \LiturgicalCalendar\Api\Paths\RegionalDataPath::updateCalendar()}.
      *
      * The resource is updated in the `jsondata/sourcedata/wider_regions/` directory.
      *
@@ -703,9 +703,9 @@ final class RegionalDataPath
     /**
      * Handle PATCH requests to update a diocesan calendar data resource.
      *
-     * It is private as it is called from {@see updateCalendar}.
+     * It is private as it is called from {@see \LiturgicalCalendar\Api\Paths\RegionalDataPath::updateCalendar()}.
      *
-     * The resource is updated in the `jsondata/sourcedata/calendars/dioceses/` directory.
+     * The resource is updated in the {@see \LiturgicalCalendar\Api\Enum\JsonData::DIOCESAN_CALENDARS_FOLDER} folder.
      *
      * If the resource to update is not found in the diocesan calendars index, the response will be a JSON error response with a status code of 404 Not Found.
      * If the resource to update is not writable or the write was not successful, the response will be a JSON error response with a status code of 503 Service Unavailable.
@@ -804,9 +804,7 @@ final class RegionalDataPath
     /**
      * Handle PATCH requests to create or update a regional calendar data resource.
      *
-     * This is a private method and should only be called from {@see handleRequestMethod}.
-     *
-     * The resource is updated in the `jsondata/sourcedata/` directory.
+     * This is a private method and should only be called from {@see \LiturgicalCalendar\Api\Paths\RegionalDataPath::handleRequestMethod()}.
      *
      * If the payload is invalid, the response will be a JSON error response with a 422 Unprocessable Content status code.
      *
@@ -850,7 +848,7 @@ final class RegionalDataPath
      * - The first element is the path to the JSON file containing the calendar data.
      * - The second element is the path to the folder containing the i18n data for the calendar.
      *
-     * This is a private method and should only be called from {@see deleteCalendar}.
+     * This is a private method and should only be called from {@see \LiturgicalCalendar\Api\Paths\RegionalDataPath::deleteCalendar()}.
      *
      * If the calendar for which deletion is requested is a diocesan calendar,
      * but a correponding entry is not found in the `/calendars` metadata index,
@@ -923,7 +921,7 @@ final class RegionalDataPath
     /**
      * Handle DELETE requests to delete a regional calendar data resource.
      *
-     * This is a private method and should only be called from {@see handleRequestMethod}.
+     * This is a private method and should only be called from {@see \LiturgicalCalendar\Api\Paths\RegionalDataPath::handleRequestMethod()}.
      *
      * The resource is deleted from the `jsondata/sourcedata/calendars/` directory.
      *
