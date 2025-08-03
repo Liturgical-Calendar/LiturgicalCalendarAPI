@@ -11,3 +11,4 @@ testYaml.php
 .env
 .env.*
 !.env.example
+php-error.log

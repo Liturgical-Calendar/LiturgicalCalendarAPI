@@ -1,5 +1,6 @@
 <?php
 
+// phpcs:disable PSR1.Files.SideEffects
 /**
  * Liturgical Calendar API main script
  * PHP version 8.3
@@ -9,13 +10,27 @@
  * @version 4.5
  * Date Created: 27 December 2017
  */
+require_once 'vendor/autoload.php';
 
 use LiturgicalCalendar\Api\Router;
+use Dotenv\Dotenv;
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-ini_set("log_errors", 1);
-ini_set("error_log", "/tmp/php-error.log");
+$dotenv = Dotenv::createImmutable(__DIR__, ['.env', '.env.local', '.env.development', '.env.production'], false);
+$dotenv->ifPresent(['APP_ENV'])->notEmpty()->allowedValues(['development', 'production']);
+$dotenv->safeLoad();
+
+if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development') {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    ini_set('log_errors', 1);
+    ini_set('error_log', 'php-error.log');
+    error_reporting(E_ALL);
+} else {
+    ini_set('display_errors', 0);
+    ini_set('display_startup_errors', 0);
+    ini_set('log_errors', 1);
+    error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
+}
 
 ini_set('date.timezone', 'Europe/Vatican');
 require_once 'vendor/autoload.php';
