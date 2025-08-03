@@ -28,7 +28,6 @@ use LiturgicalCalendar\Api\Enum\YearType;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
-use LiturgicalCalendar\Api\Models\Lectionary\ReadingsMap;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItem;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCollection;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewFixed;
@@ -1067,6 +1066,7 @@ final class CalendarPath
      *
      * We have to make sure to skip any Sunday that might fall between Jan. 2 and Epiphany when Epiphany is on Jan 6
      *
+     * III. 13. ***Weekdays of Christmas season from 2 Jan. until the Saturday after Epiphany***
      * @return void
      */
     private function calculateChristmasWeekdaysThroughEpiphany(): void
@@ -1117,6 +1117,7 @@ final class CalendarPath
      *   in English "Monday - Christmas Weekday",
      *   in Italian "Feria propria del 3 gennaio" etc.
      *
+     * III. 13. ***Weekdays of Christmas season from 2 Jan. until the Saturday after Epiphany***
      * @return void
      */
     private function calculateChristmasWeekdaysAfterEpiphany(): void
@@ -1611,10 +1612,6 @@ final class CalendarPath
      *
      * **General Norms for the Liturgical Year and the Calendar**
      *
-     * I.
-     * 1. Easter Triduum of the Lord's Passion and Resurrection
-     * 2. Christmas, Epiphany, Ascension, and Pentecost
-     * 3. Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar
      * II.
      * 5. ***Feasts of the Lord***
      *
@@ -1724,6 +1721,7 @@ final class CalendarPath
      * ( which begins the 1st week of Ordinary Time ) until Ash Wednesday
      * Sundays of Ordinary Time in the Latter part of the year are numbered backwards from Christ the King ( 34th ) to Pentecost
      *
+     * II. 6. ***Sundays of Christmas Time and Sundays of Ordinary Time***
      * @return void
      */
     private function calculateSundaysChristmasOrdinaryTime(): void
@@ -1742,7 +1740,7 @@ final class CalendarPath
         while ($firstOrdinaryDate >= $this->Cal->getLiturgicalEvent('BaptismLord')->date && $firstOrdinaryDate < $firstOrdinaryLimit) {
             $firstOrdinaryDate = DateTime::fromFormat($this->BaptismLordFmt)->modify($this->BaptismLordMod)->modify('next Sunday')->add(new \DateInterval('P' . ( ( $ordSun - 1 ) * 7 ) . 'D'));
             $ordSun++;
-            if (!$this->Cal->inSolemnities($firstOrdinaryDate)) {
+            if (!$this->Cal->inSolemnities($firstOrdinaryDate) && !$this->Cal->inFeastsLord($firstOrdinaryDate)) {
                 $this->Cal->addLiturgicalEvent('OrdSunday' . $ordSun, new LiturgicalEvent(
                     $this->PropriumDeTempore['OrdSunday' . $ordSun]->name,
                     $firstOrdinaryDate,
@@ -1777,7 +1775,7 @@ final class CalendarPath
         while ($lastOrdinary <= $this->Cal->getLiturgicalEvent('ChristKing')->date && $lastOrdinary > $lastOrdinaryLowerLimit) {
             $lastOrdinary = DateTime::fromFormat('25-12-' . $this->CalendarParams->Year)->modify('last Sunday')->sub(new \DateInterval('P' . ( ++$ordSunCycle * 7 ) . 'D'));
             $ordSun--;
-            if (!$this->Cal->inSolemnities($lastOrdinary)) {
+            if (!$this->Cal->inSolemnities($lastOrdinary) && !$this->Cal->inFeastsLord($lastOrdinary)) {
                 $this->Cal->addLiturgicalEvent('OrdSunday' . $ordSun, new LiturgicalEvent(
                     $this->PropriumDeTempore['OrdSunday' . $ordSun]->name,
                     $lastOrdinary,
@@ -1813,6 +1811,7 @@ final class CalendarPath
      *  so we give it a grade of 5 === FEAST_LORD but a displayGrade of FEAST
      *  it should therefore have already been handled in $this->calculateFeastsOfTheLord(), see :DedicationLateran
      *
+     * II. 7. ***Feasts of the Blessed Virgin Mary and of the Saints in the General Calendar***
      * @return void
      */
     private function calculateFeastsMarySaints(): void
@@ -1846,8 +1845,11 @@ final class CalendarPath
 
     /**
      * Calculates all weekdays of Advent, but gives a certain importance to the weekdays of Advent from 17 Dec. to 24 Dec.
-     * ( the same will be true of the Octave of Christmas and weekdays of Lent )
+     *
+     * The same will be true of the Octave of Christmas and weekdays of Lent,
      * on which days obligatory memorials can only be celebrated in partial form
+     *
+     * II. 9. ***Weekdays of Advent from 17 December to 24 December inclusive***
      */
     private function calculateWeekdaysAdvent(): void
     {
@@ -1917,8 +1919,10 @@ final class CalendarPath
 
     /**
      * Calculates all weekdays of the Octave of Christmas, but gives a certain importance to the weekdays of Christmas from 25 Dec. to 31 Dec.
-     * (the same will be true of the Octave of Easter and weekdays of Advent)
      *
+     * The same will be true of the Octave of Easter and weekdays of Advent.
+     *
+     * II. 9. ***Weekdays of the Octave of Christmas***
      * @return void
      */
     private function calculateWeekdaysChristmasOctave(): void
@@ -1957,9 +1961,11 @@ final class CalendarPath
     }
 
     /**
-     * Calculates all weekdays of Lent, but gives a certain importance to the weekdays of Lent from Ash Wednesday to the day before Palm Sunday
-     * (the same will be true of the Octave of Christmas and weekdays of Advent)
+     * Calculates all weekdays of Lent, but gives a certain importance to the weekdays of Lent from Ash Wednesday to the day before Palm Sunday.
      *
+     * The same will be true of the Octave of Christmas and weekdays of Advent from 17 Dec. to 24 Dec.
+     *
+     * II. 9. ***Weekdays of Lent***
      * @return void
      */
     private function calculateWeekdaysLent(): void
@@ -2063,6 +2069,10 @@ final class CalendarPath
 
     /**
      * Calculates memorials to add to the calendar, following the rules of the Roman Missal.
+     *
+     * III. 10. ***Obligatory memorials in the General Calendar***
+     *
+     * III. 12. ***Optional memorials in the General Calendar***
      *
      * @param LitGrade $grade the grade of the liturgical event (e.g. 'memorial', 'feast', etc.)
      * @param string $missal the edition of the Roman Missal
@@ -2962,6 +2972,7 @@ final class CalendarPath
      * - The event grade is always WEEKDAY.
      * - The event psalter_week is set to the week number.
      *
+     * III. 13. ***Weekdays of the Easter season, from the Monday after the Octave of Easter to the Saturday before Pentecost***
      * @return void
      */
     private function calculateWeekdaysEaster(): void
@@ -3018,6 +3029,7 @@ final class CalendarPath
      *
      * The event color is green, and the event type is MOBILE, with a grade of WEEKDAY.
      *
+     * III. 13. ***Weekdays of Ordinary time***
      * @return void
      */
     private function calculateWeekdaysOrdinaryTime(): void
@@ -3121,6 +3133,8 @@ final class CalendarPath
      * First we find the first Saturday of the civil year ( to do this we actually have to find the last Saturday of the previous year,
      * so that our cycle using "next Saturday" logic will actually start from the first Saturday of the year ),
      * and then continue for every next Saturday until we reach the last Saturday of the year.
+     *
+     * III. 15. ***Saturday Memorial of the Blessed Virgin Mary: On Saturdays in Ordinary Time when there is no obligatory memorial, an optional memorial of the Blessed Virgin Mary is allowed.***
      */
     private function calculateSaturdayMemorialBVM(): void
     {
@@ -5010,6 +5024,8 @@ final class CalendarPath
                 $this->CalendarParams->Year++;
 
                 // Append the messages from the backup calendar (current year) to the current messages (previous year)
+                // Unfortunately, we don't have a way of purging messages that regard events from the civil year calculations
+                //   that fall outside of the range of the current liturgical year.
                 array_push($this->Messages, ...$Messages);
 
                 $this->generateResponse();
