@@ -63,12 +63,12 @@ final class ReadingsGeneralRoman
                 JsonData::LECTIONARY_WEEKDAYS_CHRISTMAS_FILE,
                 [ '{locale}' => $locale ]
             ),
-            'weekdaysEaster'           => strtr(
-                JsonData::LECTIONARY_WEEKDAYS_EASTER_FILE,
-                [ '{locale}' => $locale ]
-            ),
             'weekdaysLent'             => strtr(
                 JsonData::LECTIONARY_WEEKDAYS_LENT_FILE,
+                [ '{locale}' => $locale ]
+            ),
+            'weekdaysEaster'           => strtr(
+                JsonData::LECTIONARY_WEEKDAYS_EASTER_FILE,
                 [ '{locale}' => $locale ]
             ),
             'decreeReadings'           => strtr(

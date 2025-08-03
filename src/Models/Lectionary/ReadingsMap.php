@@ -89,7 +89,7 @@ final class ReadingsMap implements \ArrayAccess
     /**
      * @var array{0:'first_reading',1:'responsorial_psalm',2:'second_reading',3:'responsorial_psalm_2',4:'third_reading',5:'responsorial_psalm_3',6:'fourth_reading',7:'responsorial_psalm_4',8:'fifth_reading',9:'responsorial_psalm_5',10:'sixth_reading',11:'responsorial_psalm_6',12:'seventh_reading',13:'responsorial_psalm_7',14:'epistle',15:'responsorial_psalm_epistle',16:'alleluia_verse',17:'gospel'}
      */
-    private const EASTER_VIGIL_KEYS = [
+    public const EASTER_VIGIL_KEYS = [
         'first_reading',
         'responsorial_psalm',
         'second_reading',
@@ -113,7 +113,7 @@ final class ReadingsMap implements \ArrayAccess
     /**
      * @var array{0:'first_reading',1:'responsorial_psalm',2:'alleluia_verse',3:'gospel'}
      */
-    private const FERIAL_KEYS = [
+    public const FERIAL_KEYS = [
         'first_reading',
         'responsorial_psalm',
         'alleluia_verse',
@@ -123,7 +123,7 @@ final class ReadingsMap implements \ArrayAccess
     /**
      * @var array{0:'first_reading',1:'responsorial_psalm',2:'alleluia_verse',3:'gospel',4:'second_reading'}
      */
-    private const FESTIVE_KEYS = [
+    public const FESTIVE_KEYS = [
         ...self::FERIAL_KEYS,
         'second_reading'
     ];
@@ -131,7 +131,7 @@ final class ReadingsMap implements \ArrayAccess
     /**
      * @var array{0:'first_reading',1:'responsorial_psalm',2:'alleluia_verse',3:'gospel',4:'second_reading',5:'palm_gospel'}
      */
-    private const PALM_SUNDAY_KEYS = [
+    public const PALM_SUNDAY_KEYS = [
         ...self::FESTIVE_KEYS,
         'palm_gospel'
     ];
@@ -139,7 +139,7 @@ final class ReadingsMap implements \ArrayAccess
     /**
      * @var array{0:'vigil',1:'day'}
      */
-    private const READINGS_WITH_VIGIL_KEYS = [
+    public const READINGS_WITH_VIGIL_KEYS = [
         'vigil',
         'day'
     ];
@@ -147,7 +147,7 @@ final class ReadingsMap implements \ArrayAccess
     /**
      * @var array{0:'vigil',1:'night',2:'dawn',3:'day'}
      */
-    private const READINGS_CHRISTMAS_KEYS = [
+    public const READINGS_CHRISTMAS_KEYS = [
         'vigil',
         'night',
         'dawn',
@@ -157,7 +157,7 @@ final class ReadingsMap implements \ArrayAccess
     /**
      * @var array{0:'schema_one',1:'schema_two',2:'schema_three'}
      */
-    private const READINGS_MULTIPLE_SCHEMAS_KEYS = [
+    public const READINGS_MULTIPLE_SCHEMAS_KEYS = [
         'schema_one',
         'schema_two',
         'schema_three'
@@ -166,7 +166,7 @@ final class ReadingsMap implements \ArrayAccess
     /**
      * @var array{0:'day',1:'evening'}
      */
-    private const READINGS_WITH_EVENING_MASS_KEYS = [
+    public const READINGS_WITH_EVENING_MASS_KEYS = [
         'day',
         'evening'
     ];
@@ -174,7 +174,7 @@ final class ReadingsMap implements \ArrayAccess
     /**
      * @var array{0:'easter_season',1:'outside_easter_season'}
      */
-    private const READINGS_SEASONAL_KEYS = [
+    public const READINGS_SEASONAL_KEYS = [
         'easter_season',
         'outside_easter_season'
     ];

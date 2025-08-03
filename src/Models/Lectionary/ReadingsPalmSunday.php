@@ -9,7 +9,7 @@ final class ReadingsPalmSunday extends ReadingsAbstract
     public readonly string $second_reading;
     public readonly string $palm_gospel;
 
-    private function __construct(string $first_reading, string $second_reading, string $responsorial_psalm, string $alleluia_verse, string $gospel, string $palm_gospel)
+    private function __construct(string $first_reading, string $responsorial_psalm, string $second_reading, string $alleluia_verse, string $gospel, string $palm_gospel)
     {
         parent::__construct($first_reading, $responsorial_psalm, $alleluia_verse, $gospel);
         $this->second_reading = $second_reading;
@@ -26,8 +26,8 @@ final class ReadingsPalmSunday extends ReadingsAbstract
 
         return new static(
             $data->first_reading,
-            $data->second_reading,
             $data->responsorial_psalm,
+            $data->second_reading,
             $data->alleluia_verse,
             $data->gospel,
             $data->palm_gospel
@@ -45,7 +45,7 @@ final class ReadingsPalmSunday extends ReadingsAbstract
      * - gospel (string): The gospel for Palm Sunday
      * - palm_gospel (string): The gospel for the procession of the palms
      *
-     * @param array{first_reading:string,second_reading:string,responsorial_psalm:string,alleluia_verse:string,gospel:string,palm_gospel:string} $data
+     * @param array{first_reading:string,responsorial_psalm:string,second_reading:string,alleluia_verse:string,gospel:string,palm_gospel:string} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -58,8 +58,8 @@ final class ReadingsPalmSunday extends ReadingsAbstract
 
         return new static(
             $data['first_reading'],
-            $data['second_reading'],
             $data['responsorial_psalm'],
+            $data['second_reading'],
             $data['alleluia_verse'],
             $data['gospel'],
             $data['palm_gospel']
@@ -84,8 +84,8 @@ final class ReadingsPalmSunday extends ReadingsAbstract
         return [
             'palm_gospel'        => $this->palm_gospel,
             'first_reading'      => $this->first_reading,
-            'second_reading'     => $this->second_reading,
             'responsorial_psalm' => $this->responsorial_psalm,
+            'second_reading'     => $this->second_reading,
             'alleluia_verse'     => $this->alleluia_verse,
             'gospel'             => $this->gospel
         ];
