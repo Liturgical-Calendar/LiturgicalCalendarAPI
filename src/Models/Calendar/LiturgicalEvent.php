@@ -240,24 +240,24 @@ final class LiturgicalEvent implements \JsonSerializable
             'event_idx'               => $this->event_idx,
             'name'                    => $this->name,
             //serialize the DateTime   object as a PHP timestamp (seconds since the Unix Epoch)
-            'date'                    => (int) $this->date->format('U'),
             'color'                   => array_map(fn ($color) => $color->value, $this->color),
             'color_lcl'               => $this->color_lcl,
-            'type'                    => $this->type->value,
             'grade'                   => $this->grade->value,
             'grade_lcl'               => $this->grade_lcl,
             'grade_abbr'              => $this->grade_abbr,
             'grade_display'           => $this->grade_display,
             'common'                  => $this->common instanceof LitCommons
-                                        ? $this->common->jsonSerialize()
-                                        : array_map(fn (LitMassVariousNeeds $litMassVariousNeeds) => $litMassVariousNeeds->value, $this->common),
+                                            ? $this->common->jsonSerialize()
+                                            : array_map(fn (LitMassVariousNeeds $litMassVariousNeeds) => $litMassVariousNeeds->value, $this->common),
             'common_lcl'              => $this->common_lcl,
-            'day_of_the_week_iso8601' => (int) $this->date->format('N'), //1 for Monday, 7 for Sunday
-            'month'                   => (int) $this->date->format('n'), //1 for January, 12 for December
-            'day'                     => (int) $this->date->format('j'),
+            'type'                    => $this->type->value,
+            'date'                    => (int) $this->date->format('U'),
             'year'                    => (int) $this->date->format('Y'),
+            'month'                   => (int) $this->date->format('n'), //1 for January, 12 for December
             'month_short'             => self::$monthShort->format($this->date->format('U')),
             'month_long'              => self::$monthLong->format($this->date->format('U')),
+            'day'                     => (int) $this->date->format('j'),
+            'day_of_the_week_iso8601' => (int) $this->date->format('N'), //1 for Monday, 7 for Sunday
             'day_of_the_week_short'   => self::$dayOfTheWeekShort->format($this->date->format('U')),
             'day_of_the_week_long'    => self::$dayOfTheWeekLong->format($this->date->format('U')),
             'readings'                => $this->readings->jsonSerialize()
