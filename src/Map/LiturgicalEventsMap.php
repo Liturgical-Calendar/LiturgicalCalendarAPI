@@ -7,7 +7,7 @@ use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 
 /**
- * A map of liturgical events.
+ * A map of liturgical event `event_key`s to event data.
  *
  * {@inheritDoc}
  */

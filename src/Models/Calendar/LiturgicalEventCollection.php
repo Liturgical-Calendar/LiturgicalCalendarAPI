@@ -1048,7 +1048,11 @@ final class LiturgicalEventCollection
                     // weekdays of Advent, Christmas, Lent and Easter don't follow a cycle
                     $weekdayCycle              = self::WEEKDAY_CYCLE[( $this->CalendarParams->Year - 1 ) % 2];
                     $litEvent->liturgical_year = $this->T['YEAR'] . ' ' . $weekdayCycle;
-                    $litEvent->setReadings(self::$lectionary->getCycle($weekdayCycle)->getReadings($litEvent->event_key));
+                    $readings                  = self::$lectionary->getCycle($weekdayCycle)->getReadings($litEvent->event_key);
+                    if ($readings instanceof ReadingsSeasonal) {
+                        throw new \Exception('we would not expect a readings object from the Sundays and Solemnities of Ordinary Time to be of type seasonal');
+                    }
+                    $litEvent->setReadings($readings);
                 } elseif (
                     // However we do need to set the lectionary readings for weekdays of Advent, Christmas, Lent and Easter
                     $this->inWeekdaysAdvent($litEvent->date)
@@ -1137,12 +1141,24 @@ final class LiturgicalEventCollection
                                 if (preg_match('/^[a-z]{6}_[a-z]{2}_/', $litEvent->event_key)) {
                                     $event_key = substr($litEvent->event_key, 10);
                                     if (self::$lectionary->hasSanctoraleReadings($event_key)) {
-                                        $litEvent->setReadings(self::$lectionary->getSanctoraleReadings($event_key));
+                                        $readings = self::$lectionary->getSanctoraleReadings($event_key);
+                                        if ($readings instanceof ReadingsSeasonal) {
+                                            if ($litEvent->liturgical_season === LitSeason::EASTER) {
+                                                $readings = $readings->easter_season;
+                                            } else {
+                                                $readings = $readings->outside_easter_season;
+                                            }
+                                        }
+                                        $litEvent->setReadings($readings);
                                     } else {
                                         throw new \InvalidArgumentException('event_key: ' . $litEvent->event_key . ' not found in Sanctorale, valid keys are: ' . implode(', ', self::$lectionary->getSanctoraleKeys()));
                                     }
                                 } else {
-                                    $litEvent->setReadings(self::$lectionary->getCycle($festiveCycle)->getReadings($litEvent->event_key));
+                                    $readings = self::$lectionary->getCycle($festiveCycle)->getReadings($litEvent->event_key);
+                                    if ($readings instanceof ReadingsSeasonal) {
+                                        throw new \Exception('we would not expect a readings object from the Sundays and Solemnities of Ordinary Time to be of type seasonal');
+                                    }
+                                    $litEvent->setReadings($readings);
                                 }
                             }
                         }
@@ -1164,14 +1180,26 @@ final class LiturgicalEventCollection
                         // The readings for the Easter Triduum, Easter Vigil and Easter Sunday are found in the Lectionary for Sundays and Solemnities,
                         // so we use the liturgical cycle to retrieve them from one of the three lectionaries.
                         // Again, the readings are the same in all three lectionaries, but we have to choose one to get the readings.
-                        $litEvent->setReadings(self::$lectionary->getCycle($festiveCycle)->getReadings($litEvent->event_key));
+                        $readings = self::$lectionary->getCycle($festiveCycle)->getReadings($litEvent->event_key);
+                        if ($readings instanceof ReadingsSeasonal) {
+                            throw new \Exception('we would not expect a readings object from the Sundays and Solemnities of Ordinary Time to be of type seasonal');
+                        }
+                        $litEvent->setReadings($readings);
                     }
                 }
             } elseif (self::$lectionary->hasSanctoraleReadings($litEvent->event_key)) {
                 // STEP 3: If it's not a weekday or a Sunday or a Feast or the Lord or a Solemnity,
                 //         then it's probably a Sanctorale event; if so we retrieve the lectionary readings
                 //         from the Lectionary for the Sanctorale
-                $litEvent->setReadings(self::$lectionary->getSanctoraleReadings($litEvent->event_key));
+                $readings = self::$lectionary->getSanctoraleReadings($litEvent->event_key);
+                if ($readings instanceof ReadingsSeasonal) {
+                    if ($litEvent->liturgical_season === LitSeason::EASTER) {
+                        $readings = $readings->easter_season;
+                    } else {
+                        $readings = $readings->outside_easter_season;
+                    }
+                }
+                $litEvent->setReadings($readings);
             }
 
             // STEP 4: If the readings haven't been set from all of the above logic, and the liturgical event

@@ -7,8 +7,8 @@ use LiturgicalCalendar\Api\Models\AbstractJsonSrcDataArray;
 /**
  * Represents a collection of liturgical calendar items.
  *
+ * @phpstan-import-type LiturgicalEventItem from \LiturgicalCalendar\Api\Models\LitCalItemCollection
  * @implements \IteratorAggregate<DiocesanLitCalItem>
- * @phpstan-import-type LiturgicalEventItem from \LiturgicalCalendar\Api\Paths\EventsPath
  */
 final class DiocesanLitCalItemCollection extends AbstractJsonSrcDataArray implements \IteratorAggregate
 {

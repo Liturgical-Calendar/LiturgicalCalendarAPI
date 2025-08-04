@@ -13,6 +13,7 @@ use LiturgicalCalendar\Api\Enum\JsonData;
  * @phpstan-import-type ReadingsFestiveWithVigilArray from ReadingsMap
  * @phpstan-import-type ReadingsEasterVigilArray from ReadingsMap
  * @phpstan-import-type ReadingsWithEveningArray from ReadingsMap
+ * @phpstan-import-type ReadingsSeasonalArray from ReadingsMap
  */
 final class ReadingsGeneralRoman
 {

@@ -6,10 +6,6 @@ use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitColor;
 use LiturgicalCalendar\Api\Enum\LitEventType;
 use LiturgicalCalendar\Api\Enum\LitGrade;
-use LiturgicalCalendar\Api\Models\Calendar\ReadingsEasterVigil;
-use LiturgicalCalendar\Api\Models\Calendar\ReadingsFerial;
-use LiturgicalCalendar\Api\Models\Calendar\ReadingsFestive;
-use LiturgicalCalendar\Api\Models\Calendar\ReadingsPalmSunday;
 
 final class PropriumDeTemporeEvent extends AbstractJsonSrcData
 {

@@ -95,6 +95,13 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
         $this->lock();
     }
 
+    public function setKey(string $key): void
+    {
+        $this->unlock();
+        $this->event_key = $key;
+        $this->lock();
+    }
+
     /**
      * Creates an instance of LitCalItemCreateNewFixed from an object containing the required properties.
      *

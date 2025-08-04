@@ -82,6 +82,13 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
         $this->lock();
     }
 
+    public function setKey(string $key): void
+    {
+        $this->unlock();
+        $this->event_key = $key;
+        $this->lock();
+    }
+
     /**
      * Creates an instance of LitCalItemCreateNewMobile from an object containing the required properties.
      *

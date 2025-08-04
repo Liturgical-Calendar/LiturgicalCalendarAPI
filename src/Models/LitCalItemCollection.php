@@ -7,8 +7,19 @@ namespace LiturgicalCalendar\Api\Models;
  *
  * This class extends AbstractJsonSrcData and implements IteratorAggregate to provide iteration over the items in the collection.
  *
+ * @phpstan-type LiturgicalEventItem array{
+ *      event_key: string,
+ *      missal: string,
+ *      grade_lcl: string,
+ *      common_lcl: string,
+ *      name: string,
+ *      common: string[],
+ *      calendar: string,
+ *      decree?: string,
+ *      grade: int
+ * }
+ *
  * @implements \IteratorAggregate<LitCalItem>
- * @phpstan-import-type LiturgicalEventItem from \LiturgicalCalendar\Api\Paths\EventsPath
  */
 final class LitCalItemCollection extends AbstractJsonSrcDataArray implements \IteratorAggregate
 {

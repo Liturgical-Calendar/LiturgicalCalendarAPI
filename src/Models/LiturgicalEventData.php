@@ -6,7 +6,7 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewM
 
 abstract class LiturgicalEventData extends AbstractJsonSrcData
 {
-    public readonly string $event_key;
+    public protected(set) string $event_key;
 
     public string $name;
 

@@ -579,23 +579,27 @@ class Core
     public function readYamlBody(bool $required = false, bool $assoc = false): object|array|null
     {
         $rawData = file_get_contents('php://input');
-        if ('' === $rawData && $required) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', true, 400);
-            die('{"error":"No YAML data received in the request"}');
-        }
+
         if (false !== $rawData) {
-            set_error_handler([self::class, 'warningHandler'], E_WARNING);
-            try {
-                $data = yaml_parse($rawData);
-                if (false === $data) {
-                    header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', true, 400);
-                    $response        = new \stdClass();
-                    $response->error = 'Malformed YAML data received in the request';
-                    die(json_encode($response));
-                } else {
+            if ('' === $rawData && $required) {
+                header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', true, 400);
+                die('{"error":"No YAML data received in the request"}');
+            }
+
+            if ('' !== $rawData) {
+                set_error_handler([self::class, 'warningHandler'], E_WARNING);
+
+                // @phpstan-ignore deadCode.unreachable
+                try {
+                    $data = yaml_parse($rawData);
+                    // since we are converting the E_WARNING to an exception, and an Exception is thrown when the result is false,
+                    // and we are catching the Exception, then we can assume that when no Exception is thrown,
+                    // the $data variable is not false
                     if ($assoc) {
+                        /** @var array<string,string> $data */
                         return $data;
                     } else {
+                        /** @var object|array<mixed> $data */
                         $jsonData = json_encode($data);
                         if (false === $jsonData || json_last_error() !== JSON_ERROR_NONE) {
                             header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', true, 400);
@@ -603,21 +607,24 @@ class Core
                         }
                         return json_decode($jsonData);
                     }
+                } catch (\ErrorException $e) {
+                    header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', true, 400);
+                    $response          = new \stdClass();
+                    $response->status  = 'error';
+                    $response->message = 'Malformed YAML data received in the request';
+                    $response->error   = $e->getMessage();
+                    $response->line    = $e->getLine();
+                    $response->code    = $e->getCode();
+                    die(json_encode($response));
+                } finally {
+                    restore_error_handler();
                 }
-            } catch (\ErrorException $e) {
-                header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', true, 400);
-                $response          = new \stdClass();
-                $response->status  = 'error';
-                $response->message = 'Malformed YAML data received in the request';
-                $response->error   = $e->getMessage();
-                $response->line    = $e->getLine();
-                $response->code    = $e->getCode();
-                die(json_encode($response));
-            } finally {
-                restore_error_handler();
+            } else {
+                return null;
             }
+        } else {
+            throw new \RuntimeException('The request body is empty.');
         }
-        return null;
     }
 
     /**

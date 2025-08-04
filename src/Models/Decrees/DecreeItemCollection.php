@@ -11,8 +11,8 @@ use LiturgicalCalendar\Api\Models\AbstractJsonSrcDataArray;
  *
  * This class extends AbstractJsonSrcData and implements IteratorAggregate to provide iteration over the items in the collection.
  *
+ * @phpstan-import-type LiturgicalEventItem from \LiturgicalCalendar\Api\Models\LitCalItemCollection
  * @implements \IteratorAggregate<DecreeItem>
- * @phpstan-import-type LiturgicalEventItem from \LiturgicalCalendar\Api\Paths\EventsPath
  */
 final class DecreeItemCollection extends AbstractJsonSrcDataArray implements \IteratorAggregate, \Countable
 {

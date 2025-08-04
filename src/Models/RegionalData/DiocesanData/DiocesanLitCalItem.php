@@ -96,4 +96,11 @@ final class DiocesanLitCalItem extends AbstractJsonSrcData
     {
         return $this->liturgical_event->event_key;
     }
+
+    public function setKey(string $key): void
+    {
+        $this->unlock();
+        $this->liturgical_event->setKey($key);
+        $this->lock();
+    }
 }

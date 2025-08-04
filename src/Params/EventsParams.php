@@ -26,8 +26,8 @@ use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 class EventsParams implements ParamsInterface
 {
     public int $Year;
+    public string $Locale;
     public bool $EternalHighPriest            = false;
-    public ?string $Locale                    = null;
     public ?string $baseLocale                = null;
     public ?string $NationalCalendar          = null;
     public ?string $DiocesanCalendar          = null;

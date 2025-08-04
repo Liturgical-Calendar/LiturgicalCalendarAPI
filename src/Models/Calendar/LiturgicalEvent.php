@@ -604,32 +604,4 @@ final class LiturgicalEvent implements \JsonSerializable
     {
         return $this->common_lcl;
     }
-/**
- * The following functions might be somehow useful
- * Leaving them commented for the time being since we aren't actually using them
- *
-    public static function isAdventSeason( LiturgicalEvent $litEvent ) {
-        return $litEvent->liturgical_season !== null && $litEvent->liturgical_season === LitSeason::ADVENT;
-    }
-
-    public static function isChristmasSeason( LiturgicalEvent $litEvent ) {
-        return $litEvent->liturgical_season !== null && $litEvent->liturgical_season === LitSeason::CHRISTMAS;
-    }
-
-    public static function isLentSeason( LiturgicalEvent $litEvent ) {
-        return $litEvent->liturgical_season !== null && $litEvent->liturgical_season === LitSeason::LENT;
-    }
-
-    public static function isEasterTriduum( LiturgicalEvent $litEvent ) {
-        return $litEvent->liturgical_season !== null && $litEvent->liturgical_season === LitSeason::EASTER_TRIDUUM;
-    }
-
-    public static function isEasterSeason( LiturgicalEvent $litEvent ) {
-        return $litEvent->liturgical_season !== null && $litEvent->liturgical_season === LitSeason::EASTER;
-    }
-
-    public static function isOrdinaryTime( LiturgicalEvent $litEvent ) {
-        return $litEvent->liturgical_season !== null && $litEvent->liturgical_season === LitSeason::ORDINARY_TIME;
-    }
- */
 }
