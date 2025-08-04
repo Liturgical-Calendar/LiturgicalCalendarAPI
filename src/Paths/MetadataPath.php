@@ -12,6 +12,9 @@ use LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
 use LiturgicalCalendar\Api\Utilities;
 
+/**
+ * @phpstan-import-type CatholicDiocesesLatinRite from \LiturgicalCalendar\Api\Paths\CalendarPath
+ */
 final class MetadataPath
 {
     private static MetadataCalendars $metadataCalendars;
@@ -55,10 +58,20 @@ final class MetadataPath
         ]);
         self::$metadataCalendars->pushNationalCalendarMetadata($metadataNationalCalendarItem);
 
-        $directories = array_map('basename', glob(JsonData::NATIONAL_CALENDARS_FOLDER . '/*', GLOB_ONLYDIR));
+        $folderGlob = glob(JsonData::NATIONAL_CALENDARS_FOLDER . '/*', GLOB_ONLYDIR);
+        if (false === $folderGlob) {
+            throw new \RuntimeException('MetadataPath::buildNationalCalendarData: glob failed');
+        }
+
+        /** @var string[] $directories */
+        $directories = array_map('basename', $folderGlob);
         foreach ($directories as $directory) {
-            $nationalCalendarDataFile                 = JsonData::NATIONAL_CALENDARS_FOLDER . "/$directory/$directory.json";
-            $nationalCalendarData                     = Utilities::jsonFileToObject($nationalCalendarDataFile);
+            $nationalCalendarDataFile = JsonData::NATIONAL_CALENDARS_FOLDER . "/$directory/$directory.json";
+            $nationalCalendarData     = Utilities::jsonFileToObject($nationalCalendarDataFile);
+            if (false === $nationalCalendarData instanceof \stdClass) {
+                throw new \RuntimeException('MetadataPath::buildNationalCalendarData: we expected national calendar data to be of type stdClass');
+            }
+
             $nationalCalendarData->metadata->settings = $nationalCalendarData->settings;
             $nationalCalendarData->metadata->dioceses = [];
             $metadataNationalCalendarItem             = MetadataNationalCalendarItem::fromObject($nationalCalendarData->metadata);
@@ -76,10 +89,14 @@ final class MetadataPath
     private static function dioceseIdToName(string $id): ?string
     {
         if (empty(MetadataPath::$worldDiocesesLatinRite)) {
-            $worldDiocesesFile                    = JsonData::FOLDER . '/world_dioceses.json';
-            $worldDiocesesData                    = Utilities::jsonFileToObject($worldDiocesesFile);
+            $worldDiocesesFile = JsonData::FOLDER . '/world_dioceses.json';
+            $worldDiocesesData = Utilities::jsonFileToObject($worldDiocesesFile);
+            if (false === $worldDiocesesData instanceof \stdClass) {
+                throw new \RuntimeException('MetadataPath::dioceseIdToName: we expected world dioceses data to be of type stdClass');
+            }
             MetadataPath::$worldDiocesesLatinRite = $worldDiocesesData->catholic_dioceses_latin_rite;
         }
+
         $dioceseName = null;
         // Search for the diocese by its ID in the worldDioceseLatinRite data
         foreach (MetadataPath::$worldDiocesesLatinRite as $country) {
@@ -103,14 +120,27 @@ final class MetadataPath
      */
     private static function buildDiocesanCalendarData(): void
     {
-        foreach (glob(JsonData::DIOCESAN_CALENDARS_FOLDER . '/*', GLOB_ONLYDIR) as $countryFolder) {
-            $nation = basename($countryFolder);
+        $folderGlob = glob(JsonData::DIOCESAN_CALENDARS_FOLDER . '/*', GLOB_ONLYDIR);
+        if (false === $folderGlob) {
+            throw new \RuntimeException('MetadataPath::buildDiocesanCalendarData: diocesan calendars folder glob failed');
+        }
+
+        foreach ($folderGlob as $countryFolder) {
+            $nation     = basename($countryFolder);
+            $folderGlob = glob($countryFolder . '/*', GLOB_ONLYDIR);
+            if (false === $folderGlob) {
+                throw new \RuntimeException('MetadataPath::buildDiocesanCalendarData: countryFolder glob failed');
+            }
+
             /** @var string[] $directories */
-            $directories = array_map('basename', glob($countryFolder . '/*', GLOB_ONLYDIR));
+            $directories = array_map('basename', $folderGlob);
             foreach ($directories as $calendar_id) {
                 $dioceseName          = MetadataPath::dioceseIdToName($calendar_id) ?? $calendar_id;
                 $diocesanCalendarFile = JsonData::DIOCESAN_CALENDARS_FOLDER . "/$nation/$calendar_id/$dioceseName.json";
                 $diocesanCalendarData = Utilities::jsonFileToObject($diocesanCalendarFile);
+                if (false === $diocesanCalendarData instanceof \stdClass) {
+                    throw new \RuntimeException('MetadataPath::buildDiocesanCalendarData: we expected diocesan calendar data to be of type stdClass');
+                }
 
                 $diocesanCalendarData->metadata->diocese = $dioceseName;
                 if (property_exists($diocesanCalendarData, 'settings')) {
@@ -136,7 +166,13 @@ final class MetadataPath
      */
     private static function buildWiderRegionData(): void
     {
-        $directories = array_map('basename', glob(JsonData::WIDER_REGIONS_FOLDER . '/*', GLOB_ONLYDIR));
+        $folderGlob = glob(JsonData::WIDER_REGIONS_FOLDER . '/*', GLOB_ONLYDIR);
+        if (false === $folderGlob) {
+            throw new \RuntimeException('MetadataPath::buildWiderRegionData: wider regions folder glob failed');
+        }
+
+        /** @var string[] $directories */
+        $directories = array_map('basename', $folderGlob);
         foreach ($directories as $directory) {
             $WiderRegionFile = strtr(
                 JsonData::WIDER_REGION_FILE,
@@ -144,13 +180,19 @@ final class MetadataPath
             );
 
             if (file_exists($WiderRegionFile)) {
-                $widerRegionI18nFolder   = strtr(
+                $widerRegionI18nFolder = strtr(
                     JsonData::WIDER_REGION_I18N_FOLDER,
                     [ '{wider_region}' => $directory ]
                 );
+
+                $folderGlob = glob($widerRegionI18nFolder . '/*', GLOB_ONLYDIR);
+                if (false === $folderGlob) {
+                    throw new \RuntimeException('MetadataPath::buildWiderRegionData: wider region i18n folder glob failed');
+                }
+
                 $locales                 = array_map(
                     fn ($filename) => pathinfo($filename, PATHINFO_FILENAME),
-                    glob($widerRegionI18nFolder . '/*.json')
+                    $folderGlob
                 );
                 $metadataWiderRegionItem = MetadataWiderRegionItem::fromArray([
                     'name'     => $directory,
@@ -175,8 +217,13 @@ final class MetadataPath
     {
         // Since we can't actually request the General Roman Calendar for locales that are not fully translated,
         // we remove those locales from the list of supported locales
+        $folderGlob = glob('i18n/*', GLOB_ONLYDIR);
+        if (false === $folderGlob) {
+            throw new \RuntimeException('MetadataPath::buildLocales: i18n folder glob failed');
+        }
+
         self::$metadataCalendars->locales = array_values(array_intersect(
-            array_merge(['en'], array_map('basename', glob('i18n/*', GLOB_ONLYDIR))),
+            array_merge(['en'], array_map('basename', $folderGlob)),
             MetadataPath::FULLY_TRANSLATED_LOCALES
         ));
     }
@@ -199,9 +246,11 @@ final class MetadataPath
 
     public static function response(): void
     {
-        $response     = json_encode([
-            'litcal_metadata' => self::$metadataCalendars
-        ], JSON_PRETTY_PRINT);
+        $response = json_encode(['litcal_metadata' => self::$metadataCalendars], JSON_PRETTY_PRINT);
+        if (JSON_ERROR_NONE !== json_last_error() || false === $response) {
+            throw new \ValueError('JSON error: ' . json_last_error_msg());
+        }
+
         $responseHash = md5($response);
 
         header("Etag: \"{$responseHash}\"");
