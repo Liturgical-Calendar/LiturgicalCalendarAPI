@@ -3,6 +3,7 @@
 namespace LiturgicalCalendar\Api\Enum;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadata;
 
 /**
  * Enum class for the different Roman Missals that are used in the Liturgical Calendar API.
@@ -17,15 +18,6 @@ use LiturgicalCalendar\Api\Enum\JsonData;
  *     region:string,
  *     locales:string[],
  *     year_limits:array{since_year:int,until_year?:int},
- *     year_published:int
- * }
- *
- * @phpstan-type RomanMissalMetadataObject object{
- *     missal_id:string,
- *     name:string,
- *     region:string,
- *     locales:string[],
- *     year_limits:object{since_year:int,until_year?:int},
  *     year_published:int
  * }
  */
@@ -193,7 +185,7 @@ class RomanMissal
      */
     public static function isLatinMissal(string $value): bool
     {
-        return in_array($value, self::$values) && strpos($value, 'EDITIO_TYPICA_');
+        return in_array($value, self::$values) && str_starts_with($value, 'EDITIO_TYPICA_');
     }
 
     /**
@@ -265,7 +257,7 @@ class RomanMissal
      *
      * @param bool $obj whether to return an array of metadata objects or an array of associative arrays
      *
-     * @return array<RomanMissalMetadataObject|RomanMissalMetadata> an array of metadata objects or associative arrays each describing a Roman Missal,
+     * @return array<string,MissalMetadata|RomanMissalMetadata> an array of metadata objects or associative arrays each describing a Roman Missal,
      *      with the following properties:
      *      - `missal_id`: the value of the enumeration constant for the Roman Missal
      *      - `name`: the name of the Roman Missal
@@ -285,9 +277,9 @@ class RomanMissal
             $i18n_path = self::getSanctoraleI18nFilePath($missal_id);
             $locales   = [];
             if ($i18n_path) {
-                $it = new \DirectoryIterator("glob://$i18n_path*.json");
-                foreach ($it as $f) {
-                    $locales[] = $f->getBasename('.json');
+                $iterator = new \DirectoryIterator("glob://$i18n_path*.json");
+                foreach ($iterator as $file) {
+                    $locales[] = $file->getBasename('.json');
                 }
             }
 
@@ -306,15 +298,12 @@ class RomanMissal
                 //"i18n_path"      => self::getSanctoraleI18nFilePath($missal_id),
                 'locales'        => $locales,
                 'year_limits'    => self::$yearLimits[$missal_id],
-                'year_published' => self::$yearLimits[$missal_id]['since_year']
+                'year_published' => self::$yearLimits[$missal_id]['since_year'],
+                'api_path'       => self::getSanctoraleFileName($missal_id) ? API_BASE_PATH . "/missals/$missal_id" : null
             ];
 
             if ($obj) {
-                $json = json_encode($metadata[$key]);
-                if ($json === false) {
-                    throw new \RuntimeException('Failed to encode metadata to JSON: ' . json_last_error_msg());
-                }
-                $metadata[$key] = json_decode($json);
+                $metadata[$key] = MissalMetadata::fromArray($metadata[$key]);
             }
         }
         return $metadata;

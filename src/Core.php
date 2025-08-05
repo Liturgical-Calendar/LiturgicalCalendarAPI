@@ -527,9 +527,9 @@ class Core
      * @param bool $required Whether the request body is required or not.
      * @param bool $assoc Whether to return the object as an associative array or a stdClass object.
      *
-     * @return object|array<string,mixed>|null The request parameters, either as a stdClass object or an associative array, or null if the request body was not required and is empty.
+     * @return \stdClass|array<string,mixed>|null The request parameters, either as a stdClass object or an associative array, or null if the request body was not required and is empty.
      */
-    public function readJsonBody(bool $required = false, bool $assoc = false): object|array|null
+    public function readJsonBody(bool $required = false, bool $assoc = false): \stdClass|array|null
     {
         $data    = null;
         $rawData = file_get_contents('php://input');
@@ -574,9 +574,9 @@ class Core
      * @param bool $required Whether the request body is required or not.
      * @param bool $assoc Whether to return the object as an associative array or a stdClass object.
      *
-     * @return object|array<string,mixed>|null The request parameters, either as a stdClass object or an associative array, or null if the request body was not required and is empty.
+     * @return \stdClass|array<string,mixed>|null The request parameters, either as a stdClass object or an associative array, or null if the request body was not required and is empty.
      */
-    public function readYamlBody(bool $required = false, bool $assoc = false): object|array|null
+    public function readYamlBody(bool $required = false, bool $assoc = false): \stdClass|array|null
     {
         $rawData = file_get_contents('php://input');
 
