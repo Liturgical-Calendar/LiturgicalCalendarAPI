@@ -98,7 +98,11 @@ final class TestsPath
                     $testSuite[] = json_decode($testContents, true);
                 }
                 $response->litcal_tests = $testSuite;
-                return json_encode($response, JSON_PRETTY_PRINT);
+                $jsonEncodedResponse    = json_encode($response, JSON_PRETTY_PRINT);
+                if (JSON_ERROR_NONE !== json_last_error() || false === $jsonEncodedResponse) {
+                    throw new \ValueError('JSON error: ' . json_last_error_msg());
+                }
+                return $jsonEncodedResponse;
             } catch (\UnexpectedValueException $e) {
                 return self::produceErrorResponse(StatusCode::NOT_FOUND, 'Tests folder path cannot be opened: ' . $e->getMessage());
             }
@@ -136,10 +140,14 @@ final class TestsPath
             $testName = self::$requestPathParts[0];
             if (file_exists(JsonData::TESTS_FOLDER . "/{$testName}.json")) {
                 if (unlink(JsonData::TESTS_FOLDER . "/{$testName}.json")) {
-                    $message           = new \stdClass();
-                    $message->status   = 'OK';
-                    $message->response = 'Resource Deleted';
-                    return json_encode($message, JSON_PRETTY_PRINT);
+                    $message             = new \stdClass();
+                    $message->status     = 'OK';
+                    $message->response   = 'Resource Deleted';
+                    $jsonEncodedResponse = json_encode($message, JSON_PRETTY_PRINT);
+                    if (JSON_ERROR_NONE !== json_last_error() || false === $jsonEncodedResponse) {
+                        throw new \ValueError('JSON error: ' . json_last_error_msg());
+                    }
+                    return $jsonEncodedResponse;
                 } else {
                     return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "For some reason the server did not succeed in deleting the Test $testName");
                 }
@@ -206,10 +214,14 @@ final class TestsPath
             return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.');
         } else {
             header($_SERVER['SERVER_PROTOCOL'] . ' 201 Created', true, 201);
-            $message           = new \stdClass();
-            $message->status   = 'OK';
-            $message->response = self::$Core->getRequestMethod() === RequestMethod::PUT ? 'Resource Created' : 'Resource Updated';
-            return json_encode($message, JSON_PRETTY_PRINT);
+            $message             = new \stdClass();
+            $message->status     = 'OK';
+            $message->response   = self::$Core->getRequestMethod() === RequestMethod::PUT ? 'Resource Created' : 'Resource Updated';
+            $jsonEncodedResponse = json_encode($message, JSON_PRETTY_PRINT);
+            if (JSON_ERROR_NONE !== json_last_error() || false === $jsonEncodedResponse) {
+                throw new \ValueError('JSON error: ' . json_last_error_msg());
+            }
+            return $jsonEncodedResponse;
         }
     }
 
@@ -286,7 +298,11 @@ final class TestsPath
         }
         $message->response    = $statusCode === 404 ? 'Resource not Found' : $statusMessage;
         $message->description = $description;
-        return json_encode($message, JSON_PRETTY_PRINT);
+        $jsonEncodedResponse  = json_encode($message, JSON_PRETTY_PRINT);
+        if (JSON_ERROR_NONE !== json_last_error() || false === $jsonEncodedResponse) {
+            throw new \ValueError('JSON error: ' . json_last_error_msg());
+        }
+        return $jsonEncodedResponse;
     }
 
     /**

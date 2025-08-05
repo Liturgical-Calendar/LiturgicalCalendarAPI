@@ -137,7 +137,7 @@ class Utilities
      *
      * This function is used when generating the XML representation of the Readings for a LitCalEvent.
      *
-     * @param array $value
+     * @param array<string,string> $value
      * @return array<string,string>
      */
     private static function getReadingsType(array $value): array
@@ -378,12 +378,13 @@ class Utilities
         return $dateObj;
     }
 
+/**
     private static function debugWrite(string $string): void
     {
         $debugFile = 'UtilitiesDebug_' . Utilities::$HASH_REQUEST . '.log';
         file_put_contents($debugFile, date('c') . "\t" . $string . PHP_EOL, FILE_APPEND);
     }
-
+ */
 
     /**
      * Convert a color name to its corresponding hexadecimal value.
