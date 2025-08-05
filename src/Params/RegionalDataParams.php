@@ -6,8 +6,12 @@ use LiturgicalCalendar\Api\Paths\RegionalDataPath;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\PathCategory;
 use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
+use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 
 /**
  * Class RegionalDataParams
@@ -23,21 +27,11 @@ class RegionalDataParams implements ParamsInterface
 {
     private readonly ?MetadataCalendars $calendars;
 
-    /**
-     * An array of expected values for the category parameter of requests to the /data API path.
-     *
-     * @var array{nation:'NATIONALCALENDAR',diocese:'DIOCESANCALENDAR',widerregion:'WIDERREGIONCALENDAR'}
-     */
-    public const array EXPECTED_CATEGORIES = [
-        'nation'      => 'NATIONALCALENDAR',
-        'diocese'     => 'DIOCESANCALENDAR',
-        'widerregion' => 'WIDERREGIONCALENDAR'
-    ];
-    public ?string $category               = null;
-    public ?string $key                    = null;
-    public ?string $locale                 = null;
-    public ?object $payload                = null;
-    public ?string $i18nRequest            = null;
+    public PathCategory $category;
+    public ?string $key         = null;
+    public ?string $locale      = null;
+    public ?string $i18nRequest = null;
+    public DiocesanData|NationalData|WiderRegionData $payload;
 
     /**
      * Constructor for RegionalDataParams
@@ -83,7 +77,7 @@ class RegionalDataParams implements ParamsInterface
      * If any of the checks fail, the method will produce an error response with a 400 status code.
      *
      * @param array{
-     *      category: string,
+     *      category: PathCategory,
      *      key: string,
      *      i18n?: string,
      *      payload?: object,
@@ -200,7 +194,7 @@ class RegionalDataParams implements ParamsInterface
      * If any of the checks fail, the method will produce an error response with a 400 status code.
      *
      * @param array{
-     *      category: string,
+     *      category: PathCategory,
      *      key: string,
      *      i18n?: string,
      *      payload?: object,
@@ -279,7 +273,7 @@ class RegionalDataParams implements ParamsInterface
      * If any of the checks fail, the method will produce an error response with a 400 status code.
      *
      * @param array{
-     *      category: string,
+     *      category: PathCategory,
      *      key: string,
      *      i18n?: string,
      *      payload?: object,
@@ -349,82 +343,6 @@ class RegionalDataParams implements ParamsInterface
         return $params['key'];
     }
 
-    /**
-     * Validate the payload for the RegionalDataParams class.
-     *
-     * This method checks whether the payload has the required properties
-     * for the given category of Regional Calendar data.
-     *
-     * If the payload is invalid, the method will produce an error response
-     * with a 400 status code.
-     *
-     * @param object $payload
-     *      The payload to validate.
-     * @return bool
-     *      Whether the payload is valid or not.
-     */
-    private function validatePayload(object $payload): bool
-    {
-        switch ($this->category) {
-            case 'NATIONALCALENDAR':
-                if (
-                    false === property_exists($payload, 'litcal')
-                    || false === property_exists($payload, 'settings')
-                    || false === property_exists($payload, 'metadata')
-                    || false === property_exists($payload->metadata, 'locales')
-                ) {
-                    $message = "Cannot create or update National calendar data when the payload does not have required properties `litcal`, `settings`, `metadata` or `metadata.locales` . Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
-                    RegionalDataPath::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
-                }
-                break;
-            case 'DIOCESANCALENDAR':
-                switch (RegionalDataPath::$Core->getRequestMethod()) {
-                    case RequestMethod::PUT:
-                        if (
-                            false === property_exists($payload, 'litcal')
-                            || false === property_exists($payload, 'i18n')
-                            || false === property_exists($payload, 'metadata')
-                            || false === property_exists($payload->metadata, 'locales')
-                            || false === property_exists($payload->metadata, 'timezone')
-                            || false === property_exists($payload->metadata, 'nation')
-                            || false === property_exists($payload->metadata, 'diocese_id')
-                            || false === property_exists($payload->metadata, 'diocese_name')
-                        ) {
-                            $message = "Cannot create Diocesan calendar data when the payload does not have required properties `litcal`, `i18n`, `metadata`, `metadata.locales`, `metadata.timezone`, `metadata.nation`, `metadata.diocese_id` or `metadata.diocese_name`. Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
-                            RegionalDataPath::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
-                        }
-                        break;
-                    case RequestMethod::PATCH:
-                        if (
-                            false === property_exists($payload, 'litcal')
-                            || false === property_exists($payload, 'i18n')
-                            || false === property_exists($payload, 'metadata')
-                            || false === property_exists($payload->metadata, 'locales')
-                            || false === property_exists($payload->metadata, 'timezone')
-                        ) {
-                            $message = "Cannot update Diocesan calendar data when the payload does not have required properties `litcal`, `i18n`, `metadata`, `metadata.locales` or `metadata.timezone`. Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
-                            RegionalDataPath::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
-                        }
-                        break;
-                }
-                break;
-            case 'WIDERREGIONCALENDAR':
-                if (
-                    false === property_exists($payload, 'litcal')
-                    || false === property_exists($payload, 'national_calendars')
-                    || false === property_exists($payload, 'metadata')
-                    || false === property_exists($payload->metadata, 'wider_region')
-                    || false === property_exists($payload->metadata, 'locales')
-                ) {
-                    $message = "Cannot create or update Wider Region calendar data when the payload does not have required properties `litcal`, `national_calendars`, `metadata`, `metadata->wider_region`, `metadata->locales`. Payload was:\n" . json_encode($payload, JSON_PRETTY_PRINT);
-                    RegionalDataPath::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
-                }
-                break;
-            default:
-                return false;
-        }
-        return true;
-    }
 
     /**
      * Validates and sets the parameters for the RegionalData class.
@@ -438,14 +356,15 @@ class RegionalDataParams implements ParamsInterface
      * If the request method is GET or POST and the `i18n` property is present in the `$params` array,
      * it will be used to set the `i18nRequest` property (meaning the request is for i18n data, not calendar data).
      *
-     * If the request method is PUT or PATCH, we validate the payload and set the `payload` property.
+     * If the request method is PUT or PATCH, we expect the payload to be of type DiocesanData, NationalData, or WiderRegionData,
+     *   and if so we set the `payload` property; if not an error is produced.
      *
      * @param array{
-     *      category: string,
+     *      category: PathCategory,
      *      key: string,
      *      i18n?: ?string,
-     *      payload?: object,
-     *      locale?: string
+     *      locale?: string,
+     *      payload?: NationalData|DiocesanData|WiderRegionData
      * } $params The parameters to validate and set.
      *
      */
@@ -458,13 +377,6 @@ class RegionalDataParams implements ParamsInterface
             );
         }
 
-        if (false === in_array($params['category'], self::EXPECTED_CATEGORIES)) {
-            RegionalDataPath::produceErrorResponse(
-                StatusCode::BAD_REQUEST,
-                "Unexpected value '{$params['category']}' for param `category`, acceptable values are: " . implode(', ', array_keys(self::EXPECTED_CATEGORIES))
-            );
-        }
-
         if (in_array(RegionalDataPath::$Core->getRequestMethod(), [RequestMethod::GET, RequestMethod::POST], true)) {
             if (array_key_exists('i18n', $params)) {
                 $this->i18nRequest = $params['i18n'];
@@ -473,13 +385,13 @@ class RegionalDataParams implements ParamsInterface
 
         $this->category = $params['category'];
         switch ($this->category) {
-            case 'NATIONALCALENDAR':
+            case PathCategory::NATION:
                 $this->key = $this->checkNationalCalendarConditions($params);
                 break;
-            case 'DIOCESANCALENDAR':
+            case PathCategory::DIOCESE:
                 $this->key = $this->checkDiocesanCalendarConditions($params);
                 break;
-            case 'WIDERREGIONCALENDAR':
+            case PathCategory::WIDERREGION:
                 $this->key = $this->checkWiderRegionCalendarConditions($params);
                 break;
             default:
@@ -487,9 +399,12 @@ class RegionalDataParams implements ParamsInterface
         }
 
         if (in_array(RegionalDataPath::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH], true)) {
-            if (false === array_key_exists('payload', $params) || false === $params['payload'] instanceof \stdClass) {
+            if (
+                false === array_key_exists('payload', $params)
+                || ( false === $params['payload'] instanceof DiocesanData && false === $params['payload'] instanceof NationalData && false === $params['payload'] instanceof WiderRegionData )
+            ) {
                 RegionalDataPath::produceErrorResponse(StatusCode::BAD_REQUEST, 'Cannot create or update Calendar data without a payload');
-            } elseif ($this->validatePayload($params['payload'])) {
+            } else {
                 $this->payload = $params['payload'];
             }
         }

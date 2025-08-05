@@ -28,7 +28,7 @@
                     }
                 ],
                 "config": {
-                    "allow-failure": true
+                    "allow-failure": false
                 }
             }
         ]
