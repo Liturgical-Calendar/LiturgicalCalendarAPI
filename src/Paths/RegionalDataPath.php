@@ -13,11 +13,13 @@ use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\PathCategory;
 use LiturgicalCalendar\Api\Enum\RequestContentType;
+use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 use LiturgicalCalendar\Api\Params\RegionalDataParams;
+use LiturgicalCalendar\Api\Utilities;
 
 /**
  * Handles the `/data` path of the API
@@ -146,10 +148,7 @@ final class RegionalDataPath
      *
      * This is a private method and should only be called from {@see \LiturgicalCalendar\Api\Paths\RegionalDataPath::handleRequestMethod()}.
      *
-     * The `category` parameter is required and must be one of the following values:
-     * - DIOCESANCALENDAR
-     * - WIDERREGIONCALENDAR
-     * - NATIONALCALENDAR
+     * The `category` parameter is required and must be a valid case from the `PathCategory` enum.
      *
      * The `key` parameter is required and must be a valid key for the requested category.
      *
@@ -281,18 +280,44 @@ final class RegionalDataPath
      */
     private function createDiocesanCalendar(): void
     {
-        $response = new \stdClass();
-        $payload  = $this->params->payload;
+        $payload = $this->params->payload;
         if (false === $payload instanceof DiocesanData) {
             throw new \Exception('Payload is not an instance of DiocesanData');
+        }
+
+        // Before creating a diocesan calendar, we verify that the diocese_id is a valid diocese identifier
+        //  from our JSON database of Catholic dioceses of Latin Rite
+        $diocese_id            = $payload->metadata->diocese_id;
+        $nation                = $payload->metadata->nation;
+        $diocese_name          = $payload->metadata->diocese_name;
+        $rawDiocesesCollection = Utilities::jsonFileToObject(JsonData::CATHOLIC_DIOCESES_LATIN_RITE);
+        if (is_array($rawDiocesesCollection)) {
+            throw new \Exception('We expected an object, but we got an array when reading ' . JsonData::CATHOLIC_DIOCESES_LATIN_RITE);
+        }
+        $catholicDiocesesLatinRite = CatholicDiocesesMap::fromObject($rawDiocesesCollection);
+
+        // Verify that the country ISO is valid
+        if (false === $catholicDiocesesLatinRite->hasKey($nation)) {
+            self::produceErrorResponse(
+                StatusCode::BAD_REQUEST,
+                "Invalid nation identifier $nation. Valid identifiers are: " . implode(', ', $catholicDiocesesLatinRite->getKeys())
+            );
+        }
+
+        // Verify that the diocese identifier is valid for the given country ISO
+        if (false === $catholicDiocesesLatinRite->isValidDioceseIdForCountry($nation, $diocese_id)) {
+            self::produceErrorResponse(
+                StatusCode::BAD_REQUEST,
+                "Invalid diocese identifier: $diocese_id for diocese $diocese_name in nation $nation. Valid identifiers are: " . implode(', ', $catholicDiocesesLatinRite->getValidDioceseIdsForCountry($nation))
+            );
         }
 
         // Ensure we have all the necessary folders in place
         // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
         // so we don't have to worry about manually checking and creating each one individually
         $diocesanCalendarI18nFolder = strtr(JsonData::DIOCESAN_CALENDAR_I18N_FOLDER, [
-            '{nation}'  => $payload->metadata->nation,
-            '{diocese}' => $payload->metadata->diocese_id
+            '{nation}'  => $nation,
+            '{diocese}' => $diocese_id
         ]);
         if (!file_exists($diocesanCalendarI18nFolder)) {
             mkdir($diocesanCalendarI18nFolder, 0755, true);
@@ -302,8 +327,8 @@ final class RegionalDataPath
             $diocesanCalendarI18nFile = strtr(
                 JsonData::DIOCESAN_CALENDAR_I18N_FILE,
                 [
-                    '{nation}'  => $payload->metadata->nation,
-                    '{diocese}' => $payload->metadata->diocese_id,
+                    '{nation}'  => $nation,
+                    '{diocese}' => $diocese_id,
                     '{locale}'  => $locale
                 ]
             );
@@ -326,9 +351,9 @@ final class RegionalDataPath
         $diocesanCalendarFile = strtr(
             JsonData::DIOCESAN_CALENDAR_FILE,
             [
-                '{nation}'       => $payload->metadata->nation,
-                '{diocese}'      => $payload->metadata->diocese_id,
-                '{diocese_name}' => $payload->metadata->diocese_name
+                '{nation}'       => $nation,
+                '{diocese}'      => $diocese_id,
+                '{diocese_name}' => $diocese_name
             ]
         );
 
@@ -345,7 +370,8 @@ final class RegionalDataPath
             );
         }
 
-        $response->success = "Calendar data created or updated for Diocese \"{$payload->metadata->diocese_name}\" (Nation: \"{$payload->metadata->nation}\")";
+        $response          = new \stdClass();
+        $response->success = "Calendar data created or updated for Diocese \"{$diocese_name}\" (Nation: \"{$payload->metadata->nation}\")";
         $response->data    = $payload;
         self::produceResponse(json_encode($response));
     }

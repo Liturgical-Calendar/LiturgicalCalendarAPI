@@ -364,5 +364,5 @@ class JsonData
      * The file containing the data for the world dioceses of the Latin Rite.
      * Evaluates to 'jsondata/world_dioceses.json'.
      */
-    public const WORLD_DIOCESES_LATIN_RITE = JsonData::FOLDER . '/world_dioceses.json';
+    public const CATHOLIC_DIOCESES_LATIN_RITE = JsonData::FOLDER . '/world_dioceses.json';
 }

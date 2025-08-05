@@ -9,6 +9,7 @@ use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\PathCategory;
 use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
@@ -102,7 +103,7 @@ class RegionalDataParams implements ParamsInterface
             if (in_array($params['key'], $this->calendars->national_calendars_keys)) {
                 RegionalDataPath::produceErrorResponse(
                     StatusCode::BAD_REQUEST,
-                    'Cannot PUT National Calendar data if it already exists.'
+                    'Cannot PUT National Calendar data for nation with ID: ' . $params['key'] . ' since it already exists. Perhaps you meant to use PATCH?'
                 );
             }
 
@@ -110,7 +111,7 @@ class RegionalDataParams implements ParamsInterface
             if (false === in_array($params['key'], $uniqueRegions)) {
                 RegionalDataPath::produceErrorResponse(
                     StatusCode::BAD_REQUEST,
-                    'Cannot PUT National Calendar data for an invalid nation. Valid nations are: ' . implode(', ', $uniqueRegions) . '.'
+                    'Cannot PUT National Calendar data for an invalid nation. Valid nation IDs are: ' . implode(', ', $uniqueRegions) . '.'
                 );
             }
         } elseif (RegionalDataPath::$Core->getRequestMethod() === RequestMethod::DELETE) {
@@ -256,6 +257,14 @@ class RegionalDataParams implements ParamsInterface
                     RegionalDataPath::produceErrorResponse(StatusCode::BAD_REQUEST, '`locale` param or `Accept-Language` header required for Diocesan calendar data when request method is GET, POST, or PATCH');
                 }
             }
+        } else {
+            // For PUT requests, we expect the diocese_id to not exist
+            if (in_array($params['key'], $this->calendars->diocesan_calendars_keys)) {
+                RegionalDataPath::produceErrorResponse(
+                    StatusCode::BAD_REQUEST,
+                    "Cannot create diocesan calendar with id: {$params['key']}, since there is already a resource with that id. Perhaps you meant to use PATCH?"
+                );
+            }
         }
 
         return $params['key'];
@@ -295,7 +304,7 @@ class RegionalDataParams implements ParamsInterface
         }
 
         // The locale parameter can be supplied by the Accept-Language header or by a `locale` property in the payload.
-        $currentWiderRegion = array_find($this->calendars->wider_regions, fn ($el) => $el->name === $params['key']);
+        $currentWiderRegion = array_find($this->calendars->wider_regions, fn (MetadataWiderRegionItem $el) => $el->name === $params['key']);
         $validLangs         = $currentWiderRegion->locales;
         if (array_key_exists('locale', $params)) {
             $params['locale'] = \Locale::canonicalize($params['locale']);
