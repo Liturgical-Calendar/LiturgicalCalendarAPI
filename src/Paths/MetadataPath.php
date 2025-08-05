@@ -63,10 +63,10 @@ final class MetadataPath
             throw new \RuntimeException('MetadataPath::buildNationalCalendarData: glob failed');
         }
 
-        /** @var string[] $directories */
-        $directories = array_map('basename', $folderGlob);
-        foreach ($directories as $directory) {
-            $nationalCalendarDataFile = JsonData::NATIONAL_CALENDARS_FOLDER . "/$directory/$directory.json";
+        /** @var string[] $countryISOs */
+        $countryISOs = array_map('basename', $folderGlob);
+        foreach ($countryISOs as $countryISO) {
+            $nationalCalendarDataFile = JsonData::NATIONAL_CALENDARS_FOLDER . "/$countryISO/$countryISO.json";
             $nationalCalendarData     = Utilities::jsonFileToObject($nationalCalendarDataFile);
             if (false === $nationalCalendarData instanceof \stdClass) {
                 throw new \RuntimeException('MetadataPath::buildNationalCalendarData: we expected national calendar data to be of type stdClass');
@@ -171,33 +171,34 @@ final class MetadataPath
             throw new \RuntimeException('MetadataPath::buildWiderRegionData: wider regions folder glob failed');
         }
 
-        /** @var string[] $directories */
-        $directories = array_map('basename', $folderGlob);
-        foreach ($directories as $directory) {
+        /** @var string[] $widerRegionIDs */
+        $widerRegionIDs = array_map('basename', $folderGlob);
+        foreach ($widerRegionIDs as $widerRegionId) {
             $WiderRegionFile = strtr(
                 JsonData::WIDER_REGION_FILE,
-                ['{wider_region}' => $directory]
+                ['{wider_region}' => $widerRegionId]
             );
 
             if (file_exists($WiderRegionFile)) {
                 $widerRegionI18nFolder = strtr(
                     JsonData::WIDER_REGION_I18N_FOLDER,
-                    [ '{wider_region}' => $directory ]
+                    [ '{wider_region}' => $widerRegionId ]
                 );
 
-                $folderGlob = glob($widerRegionI18nFolder . '/*', GLOB_ONLYDIR);
+                $folderGlob = glob($widerRegionI18nFolder . '/*.json');
                 if (false === $folderGlob) {
                     throw new \RuntimeException('MetadataPath::buildWiderRegionData: wider region i18n folder glob failed');
                 }
 
-                $locales                 = array_map(
-                    fn ($filename) => pathinfo($filename, PATHINFO_FILENAME),
+                $locales = array_map(
+                    fn (string $filename) => pathinfo($filename, PATHINFO_FILENAME),
                     $folderGlob
                 );
+
                 $metadataWiderRegionItem = MetadataWiderRegionItem::fromArray([
-                    'name'     => $directory,
+                    'name'     => $widerRegionId,
                     'locales'  => $locales,
-                    'api_path' => API_BASE_PATH . Route::DATA_WIDERREGION->value . '/' . $directory . '?locale={language}'
+                    'api_path' => API_BASE_PATH . Route::DATA_WIDERREGION->value . '/' . $widerRegionId . '?locale={locale}'
                 ]);
                 self::$metadataCalendars->pushWiderRegionMetadata($metadataWiderRegionItem);
             }
