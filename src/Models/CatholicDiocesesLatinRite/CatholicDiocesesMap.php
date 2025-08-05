@@ -62,6 +62,41 @@ final class CatholicDiocesesMap extends AbstractJsonSrcData
     }
 
     /**
+     * Returns the name of a diocese given its ID and country code.
+     *
+     * @param string $countryIso The ISO 3166-1 alpha-2 code of the country.
+     * @param string $dioceseId The ID of the diocese.
+     * @return string|null The name of the diocese or null if the country or diocese ID is not found.
+     */
+    public function dioceseNameFromId(string $countryIso, string $dioceseId): ?string
+    {
+        $countryWithDiocesesItem = $this->getCountryWithDiocesesItem($countryIso);
+        if ($countryWithDiocesesItem === null) {
+            return null;
+        }
+        return $countryWithDiocesesItem->dioceseNameFromId($dioceseId);
+    }
+
+    /**
+     * Given a diocese ID, returns an associative array with the keys 'country_iso' and 'diocese_name',
+     * or null if the diocese ID is not found.
+     * The value of 'country_iso' is the ISO 3166-1 alpha-2 code of the country where the diocese is located,
+     * and the value of 'diocese_name' is the name of the diocese.
+     *
+     * @param string $dioceseId The diocese ID.
+     * @return array{country_iso: string, diocese_name: string}|null
+     */
+    public function dioceseNameAndNationFromId(string $dioceseId): ?array
+    {
+        foreach ($this->diocesesByCountry as $countryIso => $countryWithDiocesesItem) {
+            if ($countryWithDiocesesItem->isValidDioceseId($dioceseId)) {
+                return ['country_iso' => $countryIso, 'diocese_name' => $countryWithDiocesesItem->dioceseNameFromId($dioceseId)];
+            }
+        }
+        return null;
+    }
+
+    /**
      * Creates a new CatholicDiocesesCollection from an associative array.
      *
      * The array must have the following key:

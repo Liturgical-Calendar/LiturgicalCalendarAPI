@@ -28,6 +28,7 @@ use LiturgicalCalendar\Api\Enum\YearType;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
+use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItem;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCollection;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewFixed;
@@ -85,7 +86,7 @@ final class CalendarPath
 {
     public static Core $Core;
     /** @var ReturnType[] */ private array $AllowedReturnTypes; // can only be set once, after which it will be read-only
-    /** @var CatholicDiocesesLatinRite */ private array $worldDiocesesLatinRite; // can only be set once, after which it will be read-only
+    private static CatholicDiocesesMap $worldDiocesesLatinRite; // can only be set once, after which it will be read-only
     private CalendarParams $CalendarParams;
     private \NumberFormatter $formatter;
     private \NumberFormatter $formatterFem;
@@ -624,44 +625,6 @@ final class CalendarPath
         }
     }
 
-    /**
-     * Takes a diocese ID and returns the corresponding diocese name.
-     * If the diocese ID is not found, returns null.
-     *
-     * @param string $id The diocese ID.
-     * @return array{diocese_name:string,nation:string}|null The diocese name and nation, or null if not found.
-     */
-    private function dioceseIdToName(string $id): ?array
-    {
-        if (empty($this->worldDiocesesLatinRite)) {
-            $worldDiocesesFile = JsonData::FOLDER . '/world_dioceses.json';
-            $worldDiocesesRaw  = file_get_contents($worldDiocesesFile);
-            if ($worldDiocesesRaw === false) {
-                return null;
-            }
-            $worldDiocesesJson = json_decode($worldDiocesesRaw);
-            if (JSON_ERROR_NONE !== json_last_error()) {
-                return null;
-            }
-            $this->worldDiocesesLatinRite = $worldDiocesesJson->catholic_dioceses_latin_rite;
-        }
-        $dioceseName = null;
-        $nation      = null;
-        // Search for the diocese by its ID in the worldDioceseLatinRite data
-        foreach ($this->worldDiocesesLatinRite as $country) {
-            foreach ($country->dioceses as $diocese) {
-                if ($diocese->diocese_id === $id) {
-                    $dioceseName = $diocese->diocese_name;
-                    if (property_exists($diocese, 'province')) {
-                        $dioceseName .= ' (' . $diocese->province . ')';
-                    }
-                    $nation = $country->country_iso;
-                    break 2; // Break out of both loops
-                }
-            }
-        }
-        return $dioceseName !== null && $nation !== null ? [ 'diocese_name' => $dioceseName, 'nation' => $nation] : null;
-    }
 
     /**
      * Loads the JSON data for the specified Diocesan calendar.
@@ -674,17 +637,23 @@ final class CalendarPath
             return;
         }
 
-        $idTransform = CalendarPath::dioceseIdToName($this->CalendarParams->DiocesanCalendar);
+        if (false === isset(self::$worldDiocesesLatinRite)) {
+            $worldDiocesesFile            = JsonData::FOLDER . '/world_dioceses.json';
+            $worldDiocesesData            = Utilities::jsonFileToObject($worldDiocesesFile);
+            self::$worldDiocesesLatinRite = CatholicDiocesesMap::fromObject($worldDiocesesData);
+        }
+
+        $idTransform = self::$worldDiocesesLatinRite->dioceseNameAndNationFromId($this->CalendarParams->DiocesanCalendar);
         if (null === $idTransform) {
             $this->Messages[] = sprintf(
                 _('The name of the diocese could not be derived from the diocese ID "%s".'),
                 $this->CalendarParams->DiocesanCalendar
             );
         } else {
-            ['diocese_name' => $dioceseName, 'nation' => $nation] = $idTransform;
-            $this->DioceseName                                    = $dioceseName;
-            $this->CalendarParams->NationalCalendar               = strtoupper($nation);
-            $diocesanDataFile                                     = strtr(
+            ['diocese_name' => $dioceseName, 'country_iso' => $nation] = $idTransform;
+            $this->DioceseName                                         = $dioceseName;
+            $this->CalendarParams->NationalCalendar                    = strtoupper($nation);
+            $diocesanDataFile                                          = strtr(
                 JsonData::DIOCESAN_CALENDAR_FILE,
                 [
                     '{nation}'       => $this->CalendarParams->NationalCalendar,
@@ -693,10 +662,7 @@ final class CalendarPath
                 ]
             );
 
-            $diocesanDataJson = Utilities::jsonFileToObject($diocesanDataFile);
-            if (is_array($diocesanDataJson)) {
-                throw new \Error('The diocesan calendar data file ' . $diocesanDataFile . ' should have produced an object, but instead produced an array.');
-            }
+            $diocesanDataJson   = Utilities::jsonFileToObject($diocesanDataFile);
             $this->DiocesanData = DiocesanData::fromObject($diocesanDataJson);
         }
     }
@@ -845,10 +811,7 @@ final class CalendarPath
             ['{missal_folder}' => 'propriumdetempore']
         );
 
-        $PropriumDeTempore = Utilities::jsonFileToObject($propriumDeTemporeFile);
-        if (false === is_array($PropriumDeTempore)) {
-            throw new \Exception('We expected the Proprium de Tempore data to be an array of Proprium de Tempore objects.');
-        }
+        $PropriumDeTempore       = Utilities::jsonFileToObjectArray($propriumDeTemporeFile);
         $PropriumDeTemporeI18n   = $this->loadPropriumDeTemporeI18nData();
         $this->PropriumDeTempore = PropriumDeTemporeMap::fromObject($PropriumDeTempore);
         $this->PropriumDeTempore->setNames($PropriumDeTemporeI18n);
@@ -886,10 +849,7 @@ final class CalendarPath
         /**
          * Load the Sanctorale data for the Roman Missal
          */
-        $propriumDeSanctis = Utilities::jsonFileToObject($propriumdesanctisFile);
-        if (false === is_array($propriumDeSanctis)) {
-            throw new \Exception('We expected the Proprium de Sanctis data to be an array of Proprium de Sanctis objects.');
-        }
+        $propriumDeSanctis = Utilities::jsonFileToObjectArray($propriumdesanctisFile);
 
         if (false === isset($this->missalsMap)) {
             // Initialize this->missalsMap if not yet initialized
@@ -957,10 +917,7 @@ final class CalendarPath
         );
 
         $names   = Utilities::jsonFileToArray($decreesI18nFile);
-        $decrees = Utilities::jsonFileToObject(JsonData::DECREES_FILE);
-        if (false === is_array($decrees)) {
-            throw new \Exception('We expected the Decrees data to be an array of Decree objects.');
-        }
+        $decrees = Utilities::jsonFileToObjectArray(JsonData::DECREES_FILE);
         if (array_filter(array_keys($names), 'is_string') !== array_keys($names)) {
             throw new \Exception('We expected all the keys of the array to be strings.');
         }
@@ -3177,10 +3134,7 @@ final class CalendarPath
             ['{wider_region}' => $this->NationalData->metadata->wider_region]
         );
 
-        $widerRegionDataJson = Utilities::jsonFileToObject($widerRegionDataFile);
-        if (is_array($widerRegionDataJson)) {
-            throw new \Exception('Expected wider region data to be an object, got an array');
-        }
+        $widerRegionDataJson   = Utilities::jsonFileToObject($widerRegionDataFile);
         $this->WiderRegionData = WiderRegionData::fromObject($widerRegionDataJson);
     }
 
@@ -3204,10 +3158,7 @@ final class CalendarPath
             [ '{nation}' => $this->CalendarParams->NationalCalendar ]
         );
 
-        $nationalDataJson = Utilities::jsonFileToObject($NationalDataFile);
-        if (is_array($nationalDataJson)) {
-            throw new \Exception('Expected national data to be an object, got an array');
-        }
+        $nationalDataJson   = Utilities::jsonFileToObject($NationalDataFile);
         $this->NationalData = NationalData::fromObject($nationalDataJson);
 
         if (count($this->NationalData->metadata->locales) === 1) {
@@ -4937,14 +4888,11 @@ final class CalendarPath
         $this->CachePath = 'engineCache/v' . str_replace('.', '_', self::API_VERSION) . '/';
 
         if (false === Router::isLocalhost() && $this->cacheFileIsAvailable()) {
-            //If we already have done the calculation
-            //and stored the results in a cache file
-            //then we're done, just output this and die
-            //or better, make the client use it's own cache copy!
-            $response = file_get_contents($this->CacheFile);
-            if ($response === false) {
-                throw new \Exception('Could not read file: ' . $this->CacheFile);
-            }
+            // If we already have done the calculation
+            //  and stored the results in a cache file
+            //  then we're done, just output this and die;
+            //  or even better, make the client use it's own cache copy!
+            $response      = Utilities::rawContentsFromFile($this->CacheFile);
             $responseHash  = md5($response);
             $this->endTime = hrtime(true);
             $executionTime = $this->endTime - $this->startTime;
@@ -4964,7 +4912,7 @@ final class CalendarPath
             die();
         } else {
             $this->dieIfBeforeMinYear();
-            $localeThatWasSet = $this->prepareL10N();
+            $this->prepareL10N(); // the result could be stored in a variable $localeThatWasSet if it were to prove useful
             LiturgicalEvent::setLocale($this->CalendarParams->Locale === LitLocale::LATIN ? LitLocale::LATIN_PRIMARY_LANGUAGE : $this->CalendarParams->Locale);
 
             $this->calculateUniversalCalendar();

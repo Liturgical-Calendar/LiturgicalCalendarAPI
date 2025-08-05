@@ -20,16 +20,9 @@ class DateTime extends \DateTime implements \JsonSerializable
             throw new \RuntimeException('Failed to get timezone from DateTime object');
         }
 
-        $tzJson = json_encode($timezone);
-        if ($tzJson === false) {
-            throw new \RuntimeException('Failed to encode timezone to JSON: ' . json_last_error_msg());
-        }
-
+        $tzJson = json_encode($timezone, JSON_THROW_ON_ERROR);
         /** @var array{timezone:string,timezone_type:int} */
-        $tz = json_decode($tzJson, true);
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new \RuntimeException('Failed to decode timezone JSON: ' . json_last_error_msg());
-        }
+        $tz = json_decode($tzJson, true, 512, JSON_THROW_ON_ERROR);
 
         return [
             'date' => $this->format('c'), //serialize the DateTime object as a PHP timestamp

@@ -70,6 +70,14 @@
             "items": {
               "type": "object",
               "properties": {
+                "event_key": {
+                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                },
+                "event_idx": {
+                  "type": "integer",
+                  "format": "int32",
+                  "minimum": 0
+                },
                 "month": {
                   "type": "integer",
                   "format": "int32",
@@ -82,13 +90,13 @@
                   "minimum": 1,
                   "maximum": 31
                 },
-                "event_key": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
-                },
                 "grade": {
                   "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
                 },
                 "grade_lcl": {
+                  "type": "string"
+                },
+                "grade_abbr": {
                   "type": "string"
                 },
                 "grade_display": {
@@ -105,6 +113,13 @@
                 },
                 "color": {
                   "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
+                },
+                "color_lcl": {
+                  "type": "array",
+                  "items": {
+                      "type": "string"
+                  },
+                  "minItems": 1
                 },
                 "readings": {
                   "anyOf": [
@@ -183,7 +198,7 @@
                 }
               },
               "additionalProperties": false,
-              "required": [ "event_key", "grade", "common", "common_lcl", "color", "name", "grade_lcl" ]
+              "required": [ "event_key", "event_idx", "grade", "grade_lcl", "grade_abbr", "grade_display", "common", "common_lcl", "color", "color_lcl", "name" ]
             }
         }
     }

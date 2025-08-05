@@ -13,6 +13,7 @@ use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
+use LiturgicalCalendar\Api\Utilities;
 
 /**
  * Class RegionalDataParams
@@ -48,16 +49,11 @@ class RegionalDataParams implements ParamsInterface
      */
     public function __construct()
     {
-        $metadataRaw = file_get_contents(API_BASE_PATH . Route::CALENDARS->value);
-        if ($metadataRaw) {
-            $metadata = json_decode($metadataRaw);
-            if (JSON_ERROR_NONE === json_last_error() && property_exists($metadata, 'litcal_metadata')) {
-                // let's remove the Vatican calendar from the list
-                array_shift($metadata->litcal_metadata->national_calendars);
-                $this->calendars = MetadataCalendars::fromObject($metadata->litcal_metadata);
-            } else {
-                $this->calendars = null;
-            }
+        $metadata = Utilities::jsonUrlToObject(API_BASE_PATH . Route::CALENDARS->value);
+        if (property_exists($metadata, 'litcal_metadata')) {
+            // let's remove the Vatican calendar from the list
+            array_shift($metadata->litcal_metadata->national_calendars);
+            $this->calendars = MetadataCalendars::fromObject($metadata->litcal_metadata);
         } else {
             $this->calendars = null;
         }

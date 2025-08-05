@@ -173,23 +173,14 @@ final class DecreeItem extends AbstractJsonSrcData
             throw new \ValueError('metadata must have an `action` property');
         }
 
-        $liturgicalEvent = json_encode($data['liturgical_event']);
-        $metadata        = json_encode($data['metadata']);
-        if (false === $liturgicalEvent || false === $metadata) {
-            throw new \ValueError('`liturgical_event` or `metadata` parameter could not be re-encoded to JSON');
-        }
+        $liturgicalEvent = json_encode($data['liturgical_event'], JSON_THROW_ON_ERROR);
+        $metadata        = json_encode($data['metadata'], JSON_THROW_ON_ERROR);
 
         /** @var \stdClass */
-        $liturgicalEvent = json_decode($liturgicalEvent);
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new \ValueError('`liturgical_event` parameter could not be re-encoded to JSON: ' . json_last_error_msg());
-        }
+        $liturgicalEvent = json_decode($liturgicalEvent, false, 512, JSON_THROW_ON_ERROR);
 
         /** @var \stdClass */
-        $metadata = json_decode($metadata);
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new \ValueError('`metadata` parameter could not be re-encoded to JSON: ' . json_last_error_msg());
-        }
+        $metadata = json_decode($metadata, false, 512, JSON_THROW_ON_ERROR);
         return new static(
             $data['decree_id'],
             $data['decree_date'],

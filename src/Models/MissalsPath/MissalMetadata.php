@@ -13,6 +13,7 @@ final class MissalMetadata extends AbstractJsonRepresentation
     public readonly array $locales;
     public readonly ?string $api_path;
     public readonly int $year_published;
+    public readonly MissalYearLimits $year_limits;
 
     /**
      * Creates an instance of Missal from the given parameters.
@@ -23,6 +24,7 @@ final class MissalMetadata extends AbstractJsonRepresentation
      * @param string[] $locales The locales supported by the missal.
      * @param string|null $api_path The API path for the missal.
      * @param int $year_published The year the missal was published.
+     * @param MissalYearLimits $year_limits The year limits for the missal.
      */
     private function __construct(
         string $missal_id,
@@ -30,7 +32,8 @@ final class MissalMetadata extends AbstractJsonRepresentation
         string $region,
         array $locales,
         ?string $api_path,
-        int $year_published
+        int $year_published,
+        MissalYearLimits $year_limits
     ) {
         $this->missal_id      = $missal_id;
         $this->name           = $name;
@@ -38,6 +41,7 @@ final class MissalMetadata extends AbstractJsonRepresentation
         $this->locales        = $locales;
         $this->api_path       = $api_path;
         $this->year_published = $year_published;
+        $this->year_limits    = $year_limits;
     }
 
     /**
@@ -50,6 +54,7 @@ final class MissalMetadata extends AbstractJsonRepresentation
      * - locales (array<string>): The locales supported by the missal.
      * - api_path (string): The API path for the missal.
      * - year_published (int): The year the missal was published.
+     * - year_limits (MissalYearLimits): The year limits for the missal.
      *
      * @param \stdClass $data The object containing the properties of the Missal.
      * @return static A new instance of Missal initialized with the provided data.
@@ -62,7 +67,8 @@ final class MissalMetadata extends AbstractJsonRepresentation
             $data->region,
             $data->locales,
             $data->api_path,
-            $data->year_published
+            $data->year_published,
+            MissalYearLimits::fromObject($data->year_limits)
         );
     }
 
@@ -76,8 +82,9 @@ final class MissalMetadata extends AbstractJsonRepresentation
      * - locales (array<string>): The locales supported by the missal.
      * - api_path (string): The API path for the missal.
      * - year_published (int): The year the missal was published.
+     * - year_limits (array{since_year:int,until_year:?int}): The year limits for the missal.
      *
-     * @param array{missal_id:string,name:string,region:string,locales:array<string>,api_path:?string,year_published:int} $data
+     * @param array{missal_id:string,name:string,region:string,locales:array<string>,api_path:?string,year_published:int,year_limits:array{since_year:int,until_year:?int}} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -88,7 +95,8 @@ final class MissalMetadata extends AbstractJsonRepresentation
             $data['region'],
             $data['locales'],
             $data['api_path'],
-            $data['year_published']
+            $data['year_published'],
+            MissalYearLimits::fromArray($data['year_limits'])
         );
     }
 
@@ -103,7 +111,7 @@ final class MissalMetadata extends AbstractJsonRepresentation
      * - api_path (string): The API path for the missal.
      * - year_published (int): The year the missal was published.
      *
-     * @return array{missal_id:string,name:string,region:string,locales:string[],api_path:string,year_published:int}
+     * @return array{missal_id:string,name:string,region:string,locales:string[],api_path:string,year_published:int,year_limits:array{since_year:int,until_year?:int}}
      */
     public function jsonSerialize(): array
     {
@@ -113,7 +121,8 @@ final class MissalMetadata extends AbstractJsonRepresentation
             'region'         => $this->region,
             'locales'        => $this->locales,
             'api_path'       => $this->api_path,
-            'year_published' => $this->year_published
+            'year_published' => $this->year_published,
+            'year_limits'    => $this->year_limits->jsonSerialize()
         ];
     }
 }

@@ -45,13 +45,8 @@ final class RegionalDataPath
     {
         self::$Core              = new Core();
         $this->params            = new RegionalDataParams();
-        $rawMetadata             = file_get_contents(API_BASE_PATH . Route::CALENDARS->value);
-        $metadataObj             = $rawMetadata
-                                    ? json_decode($rawMetadata)
-                                    : null;
-        $this->CalendarsMetadata = $metadataObj
-                                    ? MetadataCalendars::fromObject($metadataObj->litcal_metadata)
-                                    : null;
+        $metadataObj             = Utilities::jsonUrlToObject(API_BASE_PATH . Route::CALENDARS->value);
+        $this->CalendarsMetadata = MetadataCalendars::fromObject($metadataObj->litcal_metadata);
     }
 
     /**
@@ -133,10 +128,7 @@ final class RegionalDataPath
                 break;
         }
         if (file_exists($i18nDataFile)) {
-            $i18nDataFileContents = file_get_contents($i18nDataFile);
-            if (false === $i18nDataFileContents) {
-                throw new \Exception('Unable to read file ' . $i18nDataFile);
-            }
+            $i18nDataFileContents = Utilities::rawContentsFromFile($i18nDataFile);
             self::produceResponse($i18nDataFileContents);
         } else {
             self::produceErrorResponse(StatusCode::NOT_FOUND, "RegionalData::getI18nData: file $i18nDataFile does not exist");
@@ -192,11 +184,7 @@ final class RegionalDataPath
         }
 
         if (file_exists($calendarDataFile)) {
-            $calendarDataFileContents = file_get_contents($calendarDataFile);
-            if (false === $calendarDataFileContents) {
-                throw new \Exception('Unable to read file ' . $calendarDataFile);
-            }
-            $CalendarData = json_decode($calendarDataFileContents);
+            $CalendarData = Utilities::jsonFileToObject($calendarDataFile);
 
             // If a locale was not requested, use the first valid locale for the current requested calendar data
             // Else if a locale was requested, make sure it is a valid locale for the current requested calendar data
@@ -234,15 +222,11 @@ final class RegionalDataPath
                 default:
                     $CalendarDataI18nFile = null;
             }
-            if (null !== $CalendarDataI18nFile && file_exists($CalendarDataI18nFile)) {
-                $CalendarDataI18nFileContents = file_get_contents($CalendarDataI18nFile);
-                if (false === $CalendarDataI18nFileContents) {
-                    throw new \Exception('Unable to read file ' . $CalendarDataI18nFile);
-                }
-                $localeData = json_decode($CalendarDataI18nFileContents);
-                foreach ($CalendarData->litcal as $idx => $el) {
-                    if (property_exists($localeData, $CalendarData->litcal[$idx]->liturgical_event->event_key)) {
-                        $CalendarData->litcal[$idx]->liturgical_event->name = $localeData->{$CalendarData->litcal[$idx]->liturgical_event->event_key};
+            if (null !== $CalendarDataI18nFile) {
+                $localeData = Utilities::jsonFileToObject($CalendarDataI18nFile);
+                foreach ($CalendarData->litcal as $litCalItem) {
+                    if (property_exists($localeData, $litCalItem->liturgical_event->event_key)) {
+                        $litCalItem->liturgical_event->name = $localeData->{$litCalItem->liturgical_event->event_key};
                     }
                 }
             } else {
@@ -287,13 +271,10 @@ final class RegionalDataPath
 
         // Before creating a diocesan calendar, we verify that the diocese_id is a valid diocese identifier
         //  from our JSON database of Catholic dioceses of Latin Rite
-        $diocese_id            = $payload->metadata->diocese_id;
-        $nation                = $payload->metadata->nation;
-        $diocese_name          = $payload->metadata->diocese_name;
-        $rawDiocesesCollection = Utilities::jsonFileToObject(JsonData::CATHOLIC_DIOCESES_LATIN_RITE);
-        if (is_array($rawDiocesesCollection)) {
-            throw new \Exception('We expected an object, but we got an array when reading ' . JsonData::CATHOLIC_DIOCESES_LATIN_RITE);
-        }
+        $diocese_id                = $payload->metadata->diocese_id;
+        $nation                    = $payload->metadata->nation;
+        $diocese_name              = $payload->metadata->diocese_name;
+        $rawDiocesesCollection     = Utilities::jsonFileToObject(JsonData::CATHOLIC_DIOCESES_LATIN_RITE);
         $catholicDiocesesLatinRite = CatholicDiocesesMap::fromObject($rawDiocesesCollection);
 
         // Verify that the country ISO is valid
@@ -1277,10 +1258,7 @@ final class RegionalDataPath
         }
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
-                $responseObj = json_decode($response, true);
-                if (false === is_array($responseObj)) {
-                    throw new \Exception('Failed to decode error message to array');
-                }
+                $responseObj = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
                 break;
             case AcceptHeader::JSON:
@@ -1310,7 +1288,7 @@ final class RegionalDataPath
         }
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
-                $responseObj = json_decode($jsonEncodedResponse, true);
+                $responseObj = json_decode($jsonEncodedResponse, true, 512, JSON_THROW_ON_ERROR);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
                 break;
             case AcceptHeader::JSON:

@@ -13,6 +13,7 @@ use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadata;
 use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadataMap;
+use LiturgicalCalendar\Api\Utilities;
 
 final class MissalsPath
 {
@@ -195,59 +196,31 @@ final class MissalsPath
                     throw new \Exception("Unable to find JSON file for missal $missalId");
                 }
 
-                $missalData = file_get_contents($missalJsonFile);
-                if ($missalData) {
-                    $locale = RomanMissal::isLatinMissal($missalId)
-                                ? ( in_array(self::$params->baseLocale, $missal->locales) ? self::$params->baseLocale : LitLocale::LATIN_PRIMARY_LANGUAGE )
-                                : ( in_array(self::$params->Locale, $missal->locales) ? self::$params->Locale : $missal->locales[0] );
-                    if (in_array($locale, $missal->locales)) {
-                        $i18nFile = RomanMissal::$i18nPath[$missalId] . $locale . '.json';
-                        $i18nData = file_get_contents($i18nFile);
-                        if (false === $i18nData) {
-                            throw new \Exception("Unable to find i18n file for missal $missalId");
-                        }
-
-                        $i18nObj = json_decode($i18nData);
-                        if (json_last_error() !== JSON_ERROR_NONE) {
-                            $error = "Error while processing localized data from file {$i18nFile}: " . json_last_error_msg();
-                            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $error);
-                        }
-
-                        $missalRows = json_decode($missalData);
-                        if (json_last_error() !== JSON_ERROR_NONE) {
-                            $error = "Error while processing Missal data from file '{$missalData}': " . json_last_error_msg();
-                            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $error);
-                        }
-
-                        foreach ($missalRows as $idx => $row) {
-                            $key = $row->event_key;
-                            if (property_exists($i18nObj, $key)) {
-                                $missalRows[$idx]->name = $i18nObj->{$key};
-                            }
-                        }
-
-                        $jsonEncodedResponse = json_encode($missalRows);
-                        if (json_last_error() !== JSON_ERROR_NONE || false === $jsonEncodedResponse) {
-                            $error = "Error while processing localized data from file {$i18nFile}: " . json_last_error_msg();
-                            throw new \Exception($error);
-                        }
-                        self::produceResponse($jsonEncodedResponse);
-                    } else {
-                        self::produceErrorResponse(
-                            StatusCode::NOT_FOUND,
-                            "Could not find a localized version of the missal with id '$missalId' for locale '$locale'" . (
-                                RomanMissal::isLatinMissal($missalId)
-                                    ? ' (this missal is a General Roman Missal, available in the following locales: ' . implode(', ', $missal->locales) . ')'
-                                    : ' (this missal is a language edition Roman Missal, available in the following locales: ' . implode(', ', $missal->locales) . ')'
-                            )
-                        );
-                    }
-                } else {
-                    self::produceErrorResponse(
-                        StatusCode::SERVICE_UNAVAILABLE,
-                        "Unable to retrieve the Missal for region $missal->region published in the year $missal->year_published"
-                    );
+                $missalData = Utilities::rawContentsFromFile($missalJsonFile);
+                $locale     = RomanMissal::isLatinMissal($missalId)
+                            ? ( in_array(self::$params->baseLocale, $missal->locales) ? self::$params->baseLocale : LitLocale::LATIN_PRIMARY_LANGUAGE )
+                            : ( in_array(self::$params->Locale, $missal->locales) ? self::$params->Locale : $missal->locales[0] );
+                $i18nFile   = RomanMissal::$i18nPath[$missalId] . $locale . '.json';
+                $i18nObj    = Utilities::jsonFileToObject($i18nFile);
+                $missalRows = json_decode($missalData);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    $error = "Error while processing Missal data from file '{$missalData}': " . json_last_error_msg();
+                    self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $error);
                 }
+
+                foreach ($missalRows as $idx => $row) {
+                    $key = $row->event_key;
+                    if (property_exists($i18nObj, $key)) {
+                        $missalRows[$idx]->name = $i18nObj->{$key};
+                    }
+                }
+
+                $jsonEncodedResponse = json_encode($missalRows);
+                if (json_last_error() !== JSON_ERROR_NONE || false === $jsonEncodedResponse) {
+                    $error = "Error while processing localized data from file {$i18nFile}: " . json_last_error_msg();
+                    throw new \Exception($error);
+                }
+                self::produceResponse($jsonEncodedResponse);
             }
             self::produceErrorResponse(
                 StatusCode::NOT_FOUND,
@@ -294,10 +267,7 @@ final class MissalsPath
         }
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
-                $responseObj = json_decode($response, true);
-                if (json_last_error() !== JSON_ERROR_NONE || false === $responseObj) {
-                    throw new \Exception('Could not decode error response as an associative array: ' . json_last_error_msg());
-                }
+                $responseObj = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
                 break;
             case AcceptHeader::JSON:
@@ -323,7 +293,7 @@ final class MissalsPath
         }
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
-                $responseObj = json_decode($jsonEncodedResponse, true);
+                $responseObj = json_decode($jsonEncodedResponse, true, 512, JSON_THROW_ON_ERROR);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
                 break;
             case AcceptHeader::JSON:
@@ -367,6 +337,7 @@ final class MissalsPath
             }
 
             if (null === self::$params->Region && null === self::$params->Year) {
+                // if not filters are set, just encode the whole missals index as is
                 $jsonEncodedResponse = json_encode(self::$missalsIndex);
                 if (false === $jsonEncodedResponse) {
                     throw new \Exception('Could not encode missals index as JSON: ' . json_last_error_msg());
@@ -382,6 +353,9 @@ final class MissalsPath
                     self::$missalsIndex->setYearFilter(self::$params->Year);
                     header('X-Litcal-Missals-Year: ' . self::$params->Year, false);
                 }
+
+                // if filters are set, the results are internally filtered by the jsonSerializer
+                // of the MissalMetadataMap instance
                 $jsonEncodedResponse = json_encode(self::$missalsIndex);
                 if (false === $jsonEncodedResponse) {
                     throw new \Exception('Could not encode missals index as JSON: ' . json_last_error_msg());
@@ -436,14 +410,16 @@ final class MissalsPath
         $missalFolderNames = array_map('basename', $missalFolderPaths);
         foreach ($missalFolderNames as $missalFolderName) {
             if (file_exists(JsonData::MISSALS_FOLDER . "/$missalFolderName/$missalFolderName.json")) {
-                $missal = new \stdClass();
+                $missal = [];
 
                 if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
-                    $missal->missal_id = "EDITIO_TYPICA_{$matches[1]}";
-                    $missal->region    = 'VA';
+                    $missal['missal_id'] = "EDITIO_TYPICA_{$matches[1]}";
+                    $missal['region']    = 'VA';
                 } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
-                    $missal->missal_id = "{$matches[1]}_{$matches[2]}";
-                    $missal->region    = $matches[1];
+                    $missal['missal_id'] = "{$matches[1]}_{$matches[2]}";
+                    $missal['region']    = $matches[1];
+                } else {
+                    throw new \RuntimeException('Unable to parse missal folder name: ' . $missalFolderName);
                 }
 
                 if (is_readable(JsonData::MISSALS_FOLDER . "/$missalFolderName/i18n")) {
@@ -452,18 +428,18 @@ final class MissalsPath
                     foreach ($iterator as $f) {
                         $locales[] = $f->getBasename('.json');
                     }
-                    $missal->locales = $locales;
+                    $missal['locales'] = $locales;
                 } else {
-                    $missal->locales = null;
+                    $missal['locales'] = null;
                 }
 
-                $missal->name           = RomanMissal::getName($missal->missal_id);
-                $missal->year_limits    = RomanMissal::$yearLimits[$missal->missal_id];
-                $missal->year_published = RomanMissal::$yearLimits[$missal->missal_id]['since_year'];
-                $missal->api_path       = API_BASE_PATH . "/missals/$missal->missal_id";
-                self::$missalsIndex->addMissal(MissalMetadata::fromObject($missal));
-                self::$params->addMissalRegion($missal->region);
-                self::$params->addMissalYear($missal->year_published);
+                $missal['name']           = RomanMissal::getName($missal['missal_id']);
+                $missal['year_limits']    = RomanMissal::$yearLimits[$missal['missal_id']];
+                $missal['year_published'] = RomanMissal::$yearLimits[$missal['missal_id']]['since_year'];
+                $missal['api_path']       = API_BASE_PATH . "/missals/{$missal['missal_id']}";
+                self::$missalsIndex->addMissal(MissalMetadata::fromArray($missal));
+                self::$params->addMissalRegion($missal['region']);
+                self::$params->addMissalYear($missal['year_published']);
             }
         }
         // we only set the request parameters after we have collected the MissalRegions and MissalYears

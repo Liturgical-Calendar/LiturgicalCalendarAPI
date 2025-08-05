@@ -491,38 +491,57 @@ class Utilities
         return $ordinal;
     }
 
-    private static function rawContentsFromFile(string $filename, bool $associative): string
+    /**
+     * Returns the raw contents of a file, or throws a RuntimeException if the file does not exist, is not readable, or
+     * could not be read.
+     *
+     * @param string $filename The path to the file to read.
+     * @return string The contents of the file.
+     * @throws \RuntimeException If the file does not exist, is not readable, or could not be read.
+     */
+    public static function rawContentsFromFile(string $filename): string
     {
         if (false === file_exists($filename)) {
-            throw new \Exception('File ' . $filename . ' does not exist');
+            throw new \RuntimeException('File ' . $filename . ' does not exist');
         }
 
         if (false === is_readable($filename)) {
-            throw new \Exception('File ' . $filename . ' is not readable');
+            throw new \RuntimeException('File ' . $filename . ' is not readable');
         }
 
         $rawContents = file_get_contents($filename);
         if (false === $rawContents) {
-            throw new \Exception('Unable to read file ' . $filename);
+            throw new \RuntimeException('Unable to read file ' . $filename);
         }
 
         return $rawContents;
     }
 
     /**
+     * Returns the raw contents of a URL, or throws a RuntimeException if the URL could not be read.
+     *
+     * @param string $url The URL to read.
+     * @return string The contents of the URL.
+     * @throws \RuntimeException If the URL could not be read.
+     */
+    public static function rawContentsFromUrl(string $url): string
+    {
+        $rawContents = file_get_contents($url);
+        if (false === $rawContents) {
+            throw new \RuntimeException('Unable to read URL ' . $url);
+        }
+        return $rawContents;
+    }
+
+    /**
      * @param string $filename
      * @return array<string|int,mixed>
-     * @throws \Exception
+     * @throws \JsonException
      */
     public static function jsonFileToArray(string $filename): array
     {
-        $rawContents = self::rawContentsFromFile($filename, true);
-        $jsonArr     = json_decode($rawContents, true);
-
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new \Exception('Unable to decode JSON from file ' . $filename . ' as an array: ' . json_last_error_msg());
-        }
-
+        $rawContents = self::rawContentsFromFile($filename);
+        $jsonArr     = json_decode($rawContents, true, 512, JSON_THROW_ON_ERROR);
         /** @var array<string|int,mixed> $jsonArr */
         return $jsonArr;
     }
@@ -531,19 +550,56 @@ class Utilities
      * Reads a JSON file and converts its contents to an object.
      *
      * @param string $filename The path to the JSON file.
-     * @return \stdClass|\stdClass[] The decoded JSON data as an object.
-     * @throws \Exception If the file does not exist, is not readable, or contains invalid JSON.
+     * @return \stdClass The decoded JSON data as an object.
+     * @throws \JsonException If the file does not exist, is not readable, contains invalid JSON, or does not contain an object.
      */
-    public static function jsonFileToObject(string $filename): \stdClass|array
+    public static function jsonFileToObject(string $filename): \stdClass
     {
-        $rawContents = self::rawContentsFromFile($filename, true);
-        $jsonObj     = json_decode($rawContents, false);
-
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new \Exception('Unable to decode JSON from file ' . $filename . ' as an object: ' . json_last_error_msg());
+        $rawContents = self::rawContentsFromFile($filename);
+        $jsonObj     = json_decode($rawContents, false, 512, JSON_THROW_ON_ERROR);
+        if (false === $jsonObj instanceof \stdClass) {
+            throw new \JsonException('JSON file ' . $filename . ' does not contain an object');
         }
+        return $jsonObj;
+    }
 
-        /** @var \stdClass|\stdClass[] $jsonObj */
+    /**
+     * Reads a JSON file and converts its contents to an array of objects.
+     *
+     * @param string $filename The path to the JSON file.
+     * @return \stdClass[] The decoded JSON data as an array of objects.
+     * @throws \JsonException If the file does not exist, is not readable, contains invalid JSON, or does not contain an array of objects.
+     */
+    public static function jsonFileToObjectArray(string $filename): array
+    {
+        $rawContents = self::rawContentsFromFile($filename);
+        $jsonArr     = json_decode($rawContents, false, 512, JSON_THROW_ON_ERROR);
+        if (false === is_array($jsonArr)) {
+            throw new \JsonException('JSON file ' . $filename . ' does not contain an array of objects');
+        }
+        foreach ($jsonArr as $item) {
+            if (!$item instanceof \stdClass) {
+                throw new \JsonException('The decoded JSON is not an array of objects: we found an instance of ' . gettype($item) . ' for item ' . json_encode($item) . '.');
+            }
+        }
+        /** @var \stdClass[] $jsonArr */
+        return $jsonArr;
+    }
+
+    /**
+     * Reads a JSON URL and converts its contents to an object.
+     *
+     * @param string $url The URL to the JSON data.
+     * @return \stdClass The decoded JSON data as an object.
+     * @throws \JsonException If the URL does not exist, is not readable, contains invalid JSON, or does not contain an object.
+     */
+    public static function jsonUrlToObject(string $url): \stdClass
+    {
+        $rawContents = self::rawContentsFromUrl($url);
+        $jsonObj     = json_decode($rawContents, false, 512, JSON_THROW_ON_ERROR);
+        if (false === $jsonObj instanceof \stdClass) {
+            throw new \JsonException('JSON URL ' . $url . ' does not contain an object');
+        }
         return $jsonObj;
     }
 
@@ -559,14 +615,8 @@ class Utilities
      */
     public static function objectToArray(\stdClass $object): array
     {
-        $encoded = json_encode($object);
-        if (false === $encoded) {
-            throw new \Exception('Unable to encode object to array');
-        }
-        $decoded = json_decode($encoded, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception('Unable to decode json to array');
-        }
+        $encoded = json_encode($object, JSON_THROW_ON_ERROR);
+        $decoded = json_decode($encoded, true, 512, JSON_THROW_ON_ERROR);
         /** @var array<string|int,mixed> $decoded */
         return $decoded;
     }

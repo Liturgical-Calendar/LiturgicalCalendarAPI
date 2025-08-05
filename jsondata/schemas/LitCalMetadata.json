@@ -607,7 +607,7 @@
                 },
                 "api_path": {
                     "type": "string",
-                    "pattern": "^https?:\\\/\\\/(?:litcal\\.johnromanodorazio\\.com\\\/api\\\/(?:dev|v[3-9])|localhost(?:\\:\\d{4}))\\\/data\\\/widerregion\\\/[ACEINOSW][flmnsueoc][rseatindo][a-zA-Z\\s]+\\?locale=\\{language\\}$"
+                    "pattern": "^https?:\\\/\\\/(?:litcal\\.johnromanodorazio\\.com\\\/api\\\/(?:dev|v[3-9])|localhost(?:\\:\\d{4}))\\\/data\\\/widerregion\\\/[ACEINOSW][flmnsueoc][rseatindo][a-zA-Z\\s]+\\?locale=\\{locale\\}$"
                 }
             },
             "required": ["name", "locales", "api_path"]

@@ -2,6 +2,8 @@
 
 namespace LiturgicalCalendar\Api\Models\Lectionary;
 
+use LiturgicalCalendar\Api\Utilities;
+
 /**
  * @phpstan-type ReadingsFerialArray array{
  *     first_reading:string,
@@ -285,26 +287,12 @@ final class ReadingsMap implements \ArrayAccess
      */
     public function addFromFile(string $path): void
     {
-        if (!file_exists($path)) {
-            throw new \InvalidArgumentException("File not found: $path");
-        }
-
-        if (!is_readable($path)) {
-            throw new \InvalidArgumentException("File not readable: $path");
-        }
-
-        $rawContents = file_get_contents($path);
-        if ($rawContents === false) {
-            throw new \InvalidArgumentException("Failed to read file: $path");
-        }
+        $rawContents = Utilities::rawContentsFromFile($path);
 
         /**
          * @var array<string,ReadingsFerialArray|ReadingsFestiveArray|ReadingsPalmSundayArray|ReadingsEasterVigilArray|ReadingsFestiveWithVigilArray|ReadingsChristmasArray|ReadingsMultipleSchemasArray|ReadingsWithEveningArray|ReadingsSeasonalArray> $readings
          */
-        $readings = json_decode($rawContents, true);
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new \InvalidArgumentException('Failed to decode JSON: ' . json_last_error_msg());
-        }
+        $readings = json_decode($rawContents, true, 512, JSON_THROW_ON_ERROR);
 
         $this->addFromArray($readings);
     }
@@ -411,25 +399,12 @@ final class ReadingsMap implements \ArrayAccess
      */
     public static function fromFile(string $file): ReadingsMap
     {
-        if (false === file_exists($file)) {
-            throw new \InvalidArgumentException("File not found: $file");
-        }
-        if (false === is_readable($file)) {
-            throw new \InvalidArgumentException("File not readable: $file");
-        }
-
-        $dataRaw = file_get_contents($file);
-        if (false === $dataRaw) {
-            throw new \InvalidArgumentException("Error reading file: $file");
-        }
+        $dataRaw = Utilities::rawContentsFromFile($file);
 
         /**
          * @var array<string,ReadingsFerialArray|ReadingsFestiveArray|ReadingsPalmSundayArray|ReadingsEasterVigilArray|ReadingsFestiveWithVigilArray|ReadingsChristmasArray|ReadingsMultipleSchemasArray|ReadingsWithEveningArray|ReadingsSeasonalArray> $dataJson
          */
-        $dataJson = json_decode($dataRaw, true);
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new \InvalidArgumentException("Error decoding file: $file");
-        }
+        $dataJson = json_decode($dataRaw, true, 512, JSON_THROW_ON_ERROR);
 
         $readingsMap = new self();
         $readingsMap->addFromArray($dataJson);

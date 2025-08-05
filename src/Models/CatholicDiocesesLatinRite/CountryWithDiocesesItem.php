@@ -10,6 +10,8 @@ final class CountryWithDiocesesItem extends AbstractJsonSrcData
     public readonly string $country_name_english;
     /** @var DioceseItem[] */
     public readonly array $dioceses;
+    /** @var string[] */
+    private readonly array $dioceseIDs;
 
     /**
      * @param string $country_iso
@@ -24,11 +26,26 @@ final class CountryWithDiocesesItem extends AbstractJsonSrcData
         $this->country_iso          = $country_iso;
         $this->country_name_english = $country_name_english;
         $this->dioceses             = $dioceses;
+        $this->dioceseIDs           = array_map(fn (DioceseItem $diocese): string => $diocese->diocese_id, $dioceses);
     }
 
     public function isValidDioceseId(string $dioceseId): bool
     {
-        return in_array($dioceseId, array_map(fn (DioceseItem $diocese): string => $diocese->diocese_id, $this->dioceses), true);
+        return in_array($dioceseId, $this->dioceseIDs, true);
+    }
+
+    public function dioceseNameFromId(string $dioceseId): ?string
+    {
+        foreach ($this->dioceses as $diocese) {
+            if ($diocese->diocese_id === $dioceseId) {
+                $dioceseName = $diocese->diocese_name;
+                if ($diocese->province !== null) {
+                    $dioceseName .= ' (' . $diocese->province . ')';
+                }
+                return $dioceseName;
+            }
+        }
+        return null;
     }
 
     /**

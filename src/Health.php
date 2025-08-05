@@ -694,11 +694,8 @@ class Health implements MessageComponentInterface
                             if (false === $yamlParsed) {
                                 throw new \Exception('YAML parsing failed');
                             }
-                            $jsonEncoded = json_encode($yamlParsed);
-                            if (false === $jsonEncoded) {
-                                throw new \Exception('YAML parsing resulted in invalid JSON: ' . json_last_error_msg());
-                            }
-                            $yamlData = json_decode($jsonEncoded);
+                            $jsonEncoded = json_encode($yamlParsed, JSON_THROW_ON_ERROR);
+                            $yamlData    = json_decode($jsonEncoded);
                             if ($yamlData) {
                                 $message          = new \stdClass();
                                 $message->type    = 'success';
@@ -964,12 +961,8 @@ class Health implements MessageComponentInterface
                             throw new \Exception('YAML parsing failed');
                         }
 
-                        $jsonEncoded = json_encode($yamlParsed);
-                        if (false === $jsonEncoded) {
-                            throw new \Exception('YAML parsing resulted in invalid JSON: ' . json_last_error_msg());
-                        }
-
-                        $yamlData = json_decode($jsonEncoded);
+                        $jsonEncoded = json_encode($yamlParsed, JSON_THROW_ON_ERROR);
+                        $yamlData    = json_decode($jsonEncoded);
                         if ($yamlData) {
                             $message          = new \stdClass();
                             $message->type    = 'success';

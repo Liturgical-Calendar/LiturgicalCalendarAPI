@@ -177,10 +177,7 @@ final class DecreesPath
         );
 
         $names   = Utilities::jsonFileToArray($decreesI18nFile);
-        $decrees = Utilities::jsonFileToObject(JsonData::DECREES_FILE);
-        if (false === is_array($decrees)) {
-            throw new \Exception('We expected the Decrees data to be an array of Decree objects.');
-        }
+        $decrees = Utilities::jsonFileToObjectArray(JsonData::DECREES_FILE);
         if (array_filter(array_keys($names), 'is_string') !== array_keys($names)) {
             throw new \Exception('We expected all the keys of the array to be strings.');
         }

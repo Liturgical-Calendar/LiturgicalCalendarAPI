@@ -47,11 +47,13 @@
                     "properties": {
                         "since_year": {
                             "type": "integer",
-                            "minimum": 1970
+                            "minimum": 1970,
+                            "maximum": 9999
                         },
                         "until_year": {
                             "type": "integer",
-                            "minimum": 1970
+                            "minimum": 1970,
+                            "maximum": 9999
                         }
                     },
                     "required": [ "since_year" ]

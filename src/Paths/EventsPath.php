@@ -28,6 +28,7 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropert
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewFixed as DiocesanLitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewMobile as DiocesanLitCalItemCreateNewMobile;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemMakePatron;
+use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemMoveEvent;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 use LiturgicalCalendar\Api\Params\EventsParams;
@@ -127,11 +128,11 @@ final class EventsPath
     private function validatePostParams(): void
     {
         if (self::$Core->getRequestContentType() === RequestContentType::JSON) {
-            $json = file_get_contents('php://input');
-            if (false !== $json && '' !== $json) {
-                $params = json_decode($json, true);
+            $rawJson = file_get_contents('php://input');
+            if (false !== $rawJson && '' !== $rawJson) {
+                $params = json_decode($rawJson, true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
-                    $description = "Malformed JSON data received in the request: <$json>, " . json_last_error_msg();
+                    $description = "Malformed JSON data received in the request: <$rawJson>, " . json_last_error_msg();
                     echo self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                     die();
                 } else {
@@ -238,10 +239,7 @@ final class EventsPath
                     ]
                 );
 
-                $diocesanDataJson = Utilities::jsonFileToObject($diocesanDataFile);
-                if (is_array($diocesanDataJson)) {
-                    throw new \Error('The diocesan calendar data file ' . $diocesanDataFile . ' should have produced an object, but instead produced an array.');
-                }
+                $diocesanDataJson   = Utilities::jsonFileToObject($diocesanDataFile);
                 self::$DiocesanData = DiocesanData::fromObject($diocesanDataJson);
                 if (
                     !in_array($this->EventsParams->Locale, self::$DiocesanData->metadata->locales)
@@ -278,10 +276,7 @@ final class EventsPath
                 ]
             );
 
-            $nationalDataJson = Utilities::jsonFileToObject($NationalDataFile);
-            if (is_array($nationalDataJson)) {
-                throw new \Exception('Expected national data to be an object, got an array');
-            }
+            $nationalDataJson   = Utilities::jsonFileToObject($NationalDataFile);
             self::$NationalData = NationalData::fromObject($nationalDataJson);
 
             if (
@@ -307,11 +302,8 @@ final class EventsPath
                     ]
                 );
 
-                $widerRegionI18nData = Utilities::jsonFileToArray($widerRegionI18nFile);
-                $widerRegionDataJson = Utilities::jsonFileToObject($widerRegionDataFile);
-                if (is_array($widerRegionDataJson)) {
-                    throw new \Exception('Expected wider region data to be an object, got an array');
-                }
+                $widerRegionI18nData   = Utilities::jsonFileToArray($widerRegionI18nFile);
+                $widerRegionDataJson   = Utilities::jsonFileToObject($widerRegionDataFile);
                 self::$WiderRegionData = WiderRegionData::fromObject($widerRegionDataJson);
 
                 foreach (self::$WiderRegionData->litcal as $litCalItem) {
@@ -452,11 +444,8 @@ final class EventsPath
     {
         $decreesFile = JsonData::DECREES_FILE;
         $I18nFile    = JsonData::DECREES_I18N_FOLDER . "/{$this->EventsParams->baseLocale}.json";
-        $decrees     = Utilities::jsonFileToObject($decreesFile);
+        $decrees     = Utilities::jsonFileToObjectArray($decreesFile);
         $names       = Utilities::jsonFileToArray($I18nFile);
-        if (false === is_array($decrees)) {
-            throw new \Exception('We expected the Decrees data to be an array of Decree objects.');
-        }
         /** @var array<string,string> $names */
         DecreeItemCollection::setNames($decrees, $names);
         $decreeItems = DecreeItemCollection::fromObject($decrees);
@@ -575,10 +564,10 @@ final class EventsPath
                 } elseif ($litCalItem->liturgical_event instanceof LitCalItemSetPropertyGrade) {
                     self::$liturgicalEvents->getEvent($key)->grade = $litCalItem->liturgical_event->grade;
                 } elseif ($litCalItem->liturgical_event instanceof LitCalItemMakePatron) {
-                    self::$liturgicalEvents->getEvent($key)->name = $NationalCalendarI18nData[$key];
-                    if (property_exists($litCalItem->liturgical_event, 'grade')) {
-                        self::$liturgicalEvents->getEvent($key)->grade = $litCalItem->liturgical_event->grade;
-                    }
+                    self::$liturgicalEvents->getEvent($key)->name  = $NationalCalendarI18nData[$key];
+                    self::$liturgicalEvents->getEvent($key)->grade = $litCalItem->liturgical_event->grade;
+                } elseif ($litCalItem->liturgical_event instanceof LitCalItemMoveEvent) {
+                    // Do nothing
                 } else {
                     throw new \ValueError('Unknown LitCalItem->liturgical_event type: ' . get_class($litCalItem->liturgical_event));
                 }
@@ -651,7 +640,7 @@ final class EventsPath
         }
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
-                $response = json_decode($errResponse, true);
+                $response = json_decode($errResponse, true, 512, JSON_THROW_ON_ERROR);
                 return yaml_emit($response, YAML_UTF8_ENCODING);
             case AcceptHeader::JSON:
             default:
@@ -692,10 +681,7 @@ final class EventsPath
             switch (self::$Core->getResponseContentType()) {
                 case AcceptHeader::YAML:
                     // We must make sure that any nested stdClass objects are converted to associative arrays
-                    $responseStr = json_encode($responseObj);
-                    if (JSON_ERROR_NONE !== json_last_error() || false === $responseStr) {
-                        throw new \ValueError('JSON error: ' . json_last_error_msg());
-                    }
+                    $responseStr = json_encode($responseObj, JSON_THROW_ON_ERROR);
                     $responseObj = json_decode($responseStr, true);
                     echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
                     break;

@@ -6,6 +6,7 @@ use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\Route;
+use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem;
@@ -19,8 +20,7 @@ final class MetadataPath
 {
     private static MetadataCalendars $metadataCalendars;
 
-    /** @var CatholicDiocesesLatinRite */
-    private static array $worldDiocesesLatinRite = [];
+    private static CatholicDiocesesMap $worldDiocesesLatinRite;
 
     private const array FULLY_TRANSLATED_LOCALES = ['en', 'fr', 'it', 'nl', 'la'];
 
@@ -66,12 +66,8 @@ final class MetadataPath
         /** @var string[] $countryISOs */
         $countryISOs = array_map('basename', $folderGlob);
         foreach ($countryISOs as $countryISO) {
-            $nationalCalendarDataFile = JsonData::NATIONAL_CALENDARS_FOLDER . "/$countryISO/$countryISO.json";
-            $nationalCalendarData     = Utilities::jsonFileToObject($nationalCalendarDataFile);
-            if (false === $nationalCalendarData instanceof \stdClass) {
-                throw new \RuntimeException('MetadataPath::buildNationalCalendarData: we expected national calendar data to be of type stdClass');
-            }
-
+            $nationalCalendarDataFile                 = JsonData::NATIONAL_CALENDARS_FOLDER . "/$countryISO/$countryISO.json";
+            $nationalCalendarData                     = Utilities::jsonFileToObject($nationalCalendarDataFile);
             $nationalCalendarData->metadata->settings = $nationalCalendarData->settings;
             $nationalCalendarData->metadata->dioceses = [];
             $metadataNationalCalendarItem             = MetadataNationalCalendarItem::fromObject($nationalCalendarData->metadata);
@@ -86,31 +82,14 @@ final class MetadataPath
      * @param string $id The diocese ID.
      * @return string|null The diocese name or null if not found.
      */
-    private static function dioceseIdToName(string $id): ?string
+    private static function dioceseIdToName(string $nation, string $id): ?string
     {
-        if (empty(MetadataPath::$worldDiocesesLatinRite)) {
-            $worldDiocesesFile = JsonData::FOLDER . '/world_dioceses.json';
-            $worldDiocesesData = Utilities::jsonFileToObject($worldDiocesesFile);
-            if (false === $worldDiocesesData instanceof \stdClass) {
-                throw new \RuntimeException('MetadataPath::dioceseIdToName: we expected world dioceses data to be of type stdClass');
-            }
-            MetadataPath::$worldDiocesesLatinRite = $worldDiocesesData->catholic_dioceses_latin_rite;
+        if (false === isset(MetadataPath::$worldDiocesesLatinRite)) {
+            $worldDiocesesFile                    = JsonData::FOLDER . '/world_dioceses.json';
+            $worldDiocesesData                    = Utilities::jsonFileToObject($worldDiocesesFile);
+            MetadataPath::$worldDiocesesLatinRite = CatholicDiocesesMap::fromObject($worldDiocesesData);
         }
-
-        $dioceseName = null;
-        // Search for the diocese by its ID in the worldDioceseLatinRite data
-        foreach (MetadataPath::$worldDiocesesLatinRite as $country) {
-            foreach ($country->dioceses as $diocese) {
-                if ($diocese->diocese_id === $id) {
-                    $dioceseName = $diocese->diocese_name;
-                    if (property_exists($diocese, 'province')) {
-                        $dioceseName .= ' (' . $diocese->province . ')';
-                    }
-                    break 2; // Break out of both loops
-                }
-            }
-        }
-        return $dioceseName;
+        return MetadataPath::$worldDiocesesLatinRite->dioceseNameFromId($nation, $id);
     }
 
     /**
@@ -120,27 +99,27 @@ final class MetadataPath
      */
     private static function buildDiocesanCalendarData(): void
     {
-        $folderGlob = glob(JsonData::DIOCESAN_CALENDARS_FOLDER . '/*', GLOB_ONLYDIR);
-        if (false === $folderGlob) {
+        $countryFolders = glob(JsonData::DIOCESAN_CALENDARS_FOLDER . '/*', GLOB_ONLYDIR);
+        if (false === $countryFolders) {
             throw new \RuntimeException('MetadataPath::buildDiocesanCalendarData: diocesan calendars folder glob failed');
         }
 
-        foreach ($folderGlob as $countryFolder) {
-            $nation     = basename($countryFolder);
-            $folderGlob = glob($countryFolder . '/*', GLOB_ONLYDIR);
-            if (false === $folderGlob) {
+        foreach ($countryFolders as $countryFolder) {
+            $nation         = basename($countryFolder);
+            $dioceseFolders = glob($countryFolder . '/*', GLOB_ONLYDIR);
+            if (false === $dioceseFolders) {
                 throw new \RuntimeException('MetadataPath::buildDiocesanCalendarData: countryFolder glob failed');
             }
 
-            /** @var string[] $directories */
-            $directories = array_map('basename', $folderGlob);
-            foreach ($directories as $calendar_id) {
-                $dioceseName          = MetadataPath::dioceseIdToName($calendar_id) ?? $calendar_id;
+            /** @var string[] $dioceseIDs */
+            $dioceseIDs = array_map('basename', $dioceseFolders);
+            foreach ($dioceseIDs as $calendar_id) {
+                $dioceseName = MetadataPath::dioceseIdToName($nation, $calendar_id);
+                if (null === $dioceseName) {
+                    throw new \RuntimeException("MetadataPath::buildDiocesanCalendarData: diocese name not found for nation = `{$nation}` and calendar_id = `{$calendar_id}`");
+                }
                 $diocesanCalendarFile = JsonData::DIOCESAN_CALENDARS_FOLDER . "/$nation/$calendar_id/$dioceseName.json";
                 $diocesanCalendarData = Utilities::jsonFileToObject($diocesanCalendarFile);
-                if (false === $diocesanCalendarData instanceof \stdClass) {
-                    throw new \RuntimeException('MetadataPath::buildDiocesanCalendarData: we expected diocesan calendar data to be of type stdClass');
-                }
 
                 $diocesanCalendarData->metadata->diocese = $dioceseName;
                 if (property_exists($diocesanCalendarData, 'settings')) {

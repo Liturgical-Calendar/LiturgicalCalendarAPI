@@ -88,20 +88,17 @@ final class TestsPath
             try {
                 $response  = new \stdClass();
                 $testSuite = [];
-                $it        = new \DirectoryIterator('glob://' . JsonData::TESTS_FOLDER . '/*Test.json');
-                foreach ($it as $f) {
+                $testFiles = new \DirectoryIterator('glob://' . JsonData::TESTS_FOLDER . '/*Test.json');
+                foreach ($testFiles as $f) {
                     $fileName     = $f->getFilename();
                     $testContents = file_get_contents(JsonData::TESTS_FOLDER . "/$fileName");
                     if ($testContents === false) {
                         return self::produceErrorResponse(StatusCode::NOT_FOUND, "Test {$fileName} was not readable");
                     }
-                    $testSuite[] = json_decode($testContents, true);
+                    $testSuite[] = json_decode($testContents, true, 512, JSON_THROW_ON_ERROR);
                 }
                 $response->litcal_tests = $testSuite;
-                $jsonEncodedResponse    = json_encode($response, JSON_PRETTY_PRINT);
-                if (JSON_ERROR_NONE !== json_last_error() || false === $jsonEncodedResponse) {
-                    throw new \ValueError('JSON error: ' . json_last_error_msg());
-                }
+                $jsonEncodedResponse    = json_encode($response, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
                 return $jsonEncodedResponse;
             } catch (\UnexpectedValueException $e) {
                 return self::produceErrorResponse(StatusCode::NOT_FOUND, 'Tests folder path cannot be opened: ' . $e->getMessage());
@@ -320,7 +317,7 @@ final class TestsPath
     {
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
-                $responseObj = json_decode($response, true);
+                $responseObj = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
                 break;
             case AcceptHeader::JSON:

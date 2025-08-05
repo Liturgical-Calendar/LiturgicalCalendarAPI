@@ -13,6 +13,7 @@ use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Paths\CalendarPath;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Utilities;
 
 /**
  * This class is responsible for handling the parameters provided to the {@see \LiturgicalCalendar\Api\Paths\CalendarPath} class.
@@ -129,16 +130,12 @@ class CalendarParams implements ParamsInterface
             }
         }
 
-        $metadataRaw = file_get_contents($calendarsRoute);
-        if ($metadataRaw) {
-            $metadata = json_decode($metadataRaw);
-            if (JSON_ERROR_NONE === json_last_error() && property_exists($metadata, 'litcal_metadata')) {
-                $this->calendars = MetadataCalendars::fromObject($metadata->litcal_metadata);
-            } else {
-                CalendarPath::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'The API was unable to initialize calendars metadata: ' . json_last_error_msg());
-            }
+        $metadataRaw = Utilities::rawContentsFromUrl($calendarsRoute);
+        $metadata    = json_decode($metadataRaw, false, 512, JSON_THROW_ON_ERROR);
+        if (property_exists($metadata, 'litcal_metadata')) {
+            $this->calendars = MetadataCalendars::fromObject($metadata->litcal_metadata);
         } else {
-            CalendarPath::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The API was unable to load calendars metadata from {$calendarsRoute}");
+            CalendarPath::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'The API was unable to initialize calendars metadata: ' . json_last_error_msg());
         }
 
         $this->Year = (int) date('Y');

@@ -33,7 +33,7 @@ final class EasterPath
     {
         if (file_exists('engineCache/easter/' . self::$baseLocale . '.json')) {
             header('Content-Type: application/json');
-            echo file_get_contents('engineCache/easter/' . self::$baseLocale . '.json');
+            echo Utilities::rawContentsFromFile('engineCache/easter/' . self::$baseLocale . '.json');
             die();
         }
     }
