@@ -29,6 +29,7 @@ use LiturgicalCalendar\Api\Map\SuppressedEventsMap;
 use LiturgicalCalendar\Api\Map\ReinstatedEventsMap;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsChristmas;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsCommons;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsFerial;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsFestive;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsFestiveWithVigil;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsGeneralRoman;
