@@ -77,8 +77,14 @@ class Router
         $requestPath = explode('?', $_SERVER['REQUEST_URI'])[0];
         // 3) remove the API base path (/api/dev/ or /api/v3/ or whatever it is)
         $requestPath = preg_replace('/^' . preg_quote($apiBasePath, '/') . '/', '', $requestPath);
+        if (null === $requestPath) {
+            throw new \RuntimeException('Upon Matthias the lot was cast by the college of the apostles, but where did Matthias go?');
+        }
         // 4) remove any trailing slashes from the request path
         $requestPath = preg_replace('/\/$/', '', $requestPath);
+        if (null === $requestPath) {
+            throw new \RuntimeException('We started with Esau and expected Jacob: where did Jacob go?');
+        }
         return explode('/', $requestPath);
     }
 
@@ -101,9 +107,9 @@ class Router
      * endpoint is being requested and delegates the request to the appropriate
      * class.
      *
-     * @return void
+     * @return never
      */
-    public static function route(): void
+    public static function route(): never
     {
         if (false === defined('API_BASE_PATH')) {
             define('API_BASE_PATH', Router::determineBasePath());
@@ -118,6 +124,7 @@ class Router
          */
         switch ($route) {
             case '':
+                // no break (intentional fallthrough)
             case 'calendar':
                 $LitCalEngine = new CalendarPath();
                 // CalendarPath::$Core will not exist until the Calendar class is instantiated!
@@ -131,11 +138,12 @@ class Router
                 $LitCalEngine->setAllowedReturnTypes([ ReturnType::JSON, ReturnType::XML, ReturnType::ICS, ReturnType::YAML ]);
                 $LitCalEngine->setCacheDuration(CacheDuration::MONTH);
                 $LitCalEngine->init($requestPathParts);
-                break;
+                // no break (always terminates)
             case 'metadata':
+                // no break (intentional fallthrough)
             case 'calendars':
                 MetadataPath::init();
-                break;
+                // no break (always terminates)
             case 'tests':
                 TestsPath::init($requestPathParts);
                 TestsPath::$Core->setAllowedRequestMethods([
@@ -155,7 +163,7 @@ class Router
                 TestsPath::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML ]);
                 TestsPath::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 TestsPath::handleRequest();
-                break;
+                // no break (always terminates)
             case 'events':
                 $Events = new EventsPath();
                 EventsPath::$Core->setAllowedRequestMethods([
@@ -180,7 +188,7 @@ class Router
                 EventsPath::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
                 EventsPath::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 $Events->init($requestPathParts);
-                break;
+                // no break (always terminates)
             case 'data':
                 $RegionalData = new RegionalDataPath();
                 RegionalDataPath::$Core->setAllowedRequestMethods([
@@ -215,7 +223,7 @@ class Router
                     AcceptHeader::YAML
                 ]);
                 $RegionalData->init($requestPathParts);
-                break;
+                // no break (always terminates)
             case 'missals':
                 MissalsPath::init($requestPathParts);
                 MissalsPath::$Core->setAllowedRequestMethods([
@@ -243,13 +251,13 @@ class Router
                 MissalsPath::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
                 MissalsPath::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 MissalsPath::handleRequest();
-                break;
+                // no break (always terminates)
             case 'easter':
                 EasterPath::init();
-                break;
+                // no break (always terminates)
             case 'schemas':
                 SchemasPath::retrieve($requestPathParts);
-                break;
+                // no break (always terminates)
             case 'decrees':
                 DecreesPath::init($requestPathParts);
                 DecreesPath::$Core->setAllowedRequestMethods([
@@ -277,9 +285,10 @@ class Router
                 DecreesPath::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA ]);
                 DecreesPath::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 DecreesPath::handleRequest();
-                break;
+                // no break (always terminates)
             default:
                 http_response_code(404);
+                die();
         }
     }
 

@@ -111,7 +111,7 @@ final class MissalMetadata extends AbstractJsonRepresentation
      * - api_path (string): The API path for the missal.
      * - year_published (int): The year the missal was published.
      *
-     * @return array{missal_id:string,name:string,region:string,locales:string[],api_path:string,year_published:int,year_limits:array{since_year:int,until_year?:int}}
+     * @return array{missal_id:string,name:string,region:string,locales:string[],api_path:?string,year_published:int,year_limits:array{since_year:int,until_year?:int}}
      */
     public function jsonSerialize(): array
     {

@@ -65,8 +65,7 @@ final class EventsPath
         self::$requestPathParts = $requestPathParts;
         $this->EventsParams     = new EventsParams();
         if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
-            echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
-            die();
+            self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
         }
         self::$liturgicalEvents = new LiturgicalEventMap();
     }
@@ -88,29 +87,25 @@ final class EventsPath
     {
         $params = null;
         if (false === in_array(self::$requestPathParts[0], ['nation', 'diocese'])) {
-            echo self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'unknown resource path: ' . self::$requestPathParts[0]);
-            die();
+            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'unknown resource path: ' . self::$requestPathParts[0]);
         }
         if (count(self::$requestPathParts) === 2) {
             if (self::$requestPathParts[0] === 'nation') {
                 $params = [ 'national_calendar' => self::$requestPathParts[1] ];
                 $this->EventsParams->setParams($params);
                 if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
-                    echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
-                    die();
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
                 }
             } else {
                 $params = [ 'diocesan_calendar' => self::$requestPathParts[1] ];
                 $this->EventsParams->setParams($params);
                 if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
-                    echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
-                    die();
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
                 }
             }
         } else {
             $description = 'wrong number of path parameters, needed two but got ' . count(self::$requestPathParts) . ': [' . implode(',', self::$requestPathParts) . ']';
-            echo self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $description);
-            die();
+            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $description);
         }
     }
 
@@ -133,13 +128,11 @@ final class EventsPath
                 $params = json_decode($rawJson, true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     $description = "Malformed JSON data received in the request: <$rawJson>, " . json_last_error_msg();
-                    echo self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-                    die();
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                 } else {
                     $this->EventsParams->setParams($params);
                     if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
-                        echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
-                        die();
+                        self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
                     }
                 }
             }
@@ -147,8 +140,7 @@ final class EventsPath
             if (count($_POST)) {
                 $this->EventsParams->setParams($_POST);
                 if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
-                    echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
-                    die();
+                    self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
                 }
             }
         }
@@ -169,8 +161,7 @@ final class EventsPath
         if (count($_GET)) {
             $this->EventsParams->setParams($_GET);
             if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
-                echo self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
-                die();
+                self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
             }
         }
     }
@@ -208,8 +199,7 @@ final class EventsPath
                     . implode(' and ', array_column(self::$Core->getAllowedRequestMethods(), 'value'))
                     . ', but your Request Method was '
                     . self::$Core->getRequestMethod()->value;
-                echo self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, $description);
-                die();
+                self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, $description);
         }
     }
 
@@ -244,14 +234,22 @@ final class EventsPath
                 if (
                     !in_array($this->EventsParams->Locale, self::$DiocesanData->metadata->locales)
                 ) {
-                    $this->EventsParams->Locale     = self::$DiocesanData->metadata->locales[0];
-                    $this->EventsParams->baseLocale = \Locale::getPrimaryLanguage($this->EventsParams->Locale);
+                    $this->EventsParams->Locale = self::$DiocesanData->metadata->locales[0];
+                    $baseLocale                 = \Locale::getPrimaryLanguage($this->EventsParams->Locale);
+                    if (null === $baseLocale) {
+                        throw new \RuntimeException(
+                            '"Names are not always the same among all men, but differ in each language;'
+                            . ' yet all are trying to express the nature of things."'
+                            . ' — Plato, Cratylus, 383a'
+                        );
+                    }
+
+                    $this->EventsParams->baseLocale = $baseLocale;
                 }
             } else {
                 $description = "unknown diocese `{$this->EventsParams->DiocesanCalendar}`, supported values are: ["
                     . implode(',', $this->EventsParams->calendarsMetadata->diocesan_calendars_keys) . ']';
-                echo self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-                die();
+                self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
             }
         }
     }
@@ -282,8 +280,18 @@ final class EventsPath
             if (
                 !in_array($this->EventsParams->Locale, self::$NationalData->metadata->locales)
             ) {
-                $this->EventsParams->Locale     = self::$NationalData->metadata->locales[0];
-                $this->EventsParams->baseLocale = \Locale::getPrimaryLanguage($this->EventsParams->Locale);
+                $this->EventsParams->Locale = self::$NationalData->metadata->locales[0];
+                $baseLocale                 = \Locale::getPrimaryLanguage($this->EventsParams->Locale);
+                if (null === $baseLocale) {
+                    throw new \RuntimeException(
+                        '"Spoken words are the symbols of mental experience, and written words are the symbols of spoken words.'
+                        . ' Just as all men have not the same speech sounds, so do they not all have the same written symbols.'
+                        . ' But the mental experiences, which these directly symbolize, are the same for all."'
+                        . ' — Aristotle, De Interpretatione, 1.16a'
+                    );
+                }
+
+                $this->EventsParams->baseLocale = $baseLocale;
             }
 
             if (self::$NationalData->hasWiderRegion()) {
@@ -458,11 +466,23 @@ final class EventsPath
                     self::$liturgicalEvents->addEvent(LiturgicalEventMobile::fromObject($decreeItem->liturgical_event));
                 }
             } elseif ($decreeItem->liturgical_event instanceof DecreeItemSetPropertyName) {
-                self::$liturgicalEvents->getEvent($key)->name = $names[$key];
+                $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($key);
+                if (null === $existingLiturgicalEvent) {
+                    throw new \RuntimeException('Thomas, called Didymus, one of the Twelve, was not with them when Jesus came. - John 20:24');
+                }
+                $existingLiturgicalEvent->name = $names[$key];
             } elseif ($decreeItem->liturgical_event instanceof DecreeItemSetPropertyGrade) {
-                self::$liturgicalEvents->getEvent($key)->grade = $decreeItem->liturgical_event->grade;
+                $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($key);
+                if (null === $existingLiturgicalEvent) {
+                    throw new \RuntimeException('It would seem that Jonah has been swallowed by the whale.');
+                }
+                $existingLiturgicalEvent->grade = $decreeItem->liturgical_event->grade;
             } elseif ($decreeItem->liturgical_event instanceof DecreeItemMakeDoctor) {
-                self::$liturgicalEvents->getEvent($key)->name = $names[$key];
+                $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($key);
+                if (null === $existingLiturgicalEvent) {
+                    throw new \RuntimeException('Is Ishmael lost in the desert again?');
+                }
+                $existingLiturgicalEvent->name = $names[$key];
             }
         }
     }
@@ -527,13 +547,25 @@ final class EventsPath
                         $event = LiturgicalEventMobile::fromObject($litCalItem->liturgical_event);
                         self::$liturgicalEvents->addEvent($event);
                     } elseif ($litCalItem->liturgical_event instanceof LitCalItemSetPropertyGrade) {
-                        self::$liturgicalEvents->getEvent($litCalItem->liturgical_event->event_key)->grade = $litCalItem->liturgical_event->grade;
+                        $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($litCalItem->liturgical_event->event_key);
+                        if (null === $existingLiturgicalEvent) {
+                            throw new \RuntimeException('“The goat that was sent away presented a type of Him who takes away the sins of men.” – Justin Martyr');
+                        }
+                        $existingLiturgicalEvent->grade = $litCalItem->liturgical_event->grade;
                     } elseif ($litCalItem->liturgical_event instanceof LitCalItemSetPropertyName) {
-                        self::$liturgicalEvents->getEvent($litCalItem->liturgical_event->event_key)->name = $litCalItem->liturgical_event->name;
+                        $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($litCalItem->liturgical_event->event_key);
+                        if (null === $existingLiturgicalEvent) {
+                            throw new \RuntimeException('No dove on this ark, did Noah already set it out?');
+                        }
+                        $existingLiturgicalEvent->name = $litCalItem->liturgical_event->name;
                     } elseif ($litCalItem->liturgical_event instanceof LitCalItemMakePatron) {
-                        self::$liturgicalEvents->getEvent($litCalItem->liturgical_event->event_key)->name = $litCalItem->liturgical_event->name;
+                        $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($litCalItem->liturgical_event->event_key);
+                        if (null === $existingLiturgicalEvent) {
+                            throw new \RuntimeException('“Son, why have you done this to us? Your father and I have been looking for you with great anxiety.” – Luke 2:48');
+                        }
+                        $existingLiturgicalEvent->name = $litCalItem->liturgical_event->name;
                         if (property_exists($litCalItem->liturgical_event, 'grade')) {
-                            self::$liturgicalEvents->getEvent($litCalItem->liturgical_event->event_key)->grade = $litCalItem->liturgical_event->grade;
+                            $existingLiturgicalEvent->grade = $litCalItem->liturgical_event->grade;
                         }
                     } else {
                         throw new \ValueError('Unknown LitCalItem->liturgical_event type: ' . get_class($litCalItem->liturgical_event));
@@ -560,12 +592,24 @@ final class EventsPath
                     $litCalItem->setName($NationalCalendarI18nData[$key]);
                     self::$liturgicalEvents->addEvent(LiturgicalEventMobile::fromObject($litCalItem->liturgical_event));
                 } elseif ($litCalItem->liturgical_event instanceof LitCalItemSetPropertyName) {
-                    self::$liturgicalEvents->getEvent($key)->name = $NationalCalendarI18nData[$key];
+                    $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($key);
+                    if (null === $existingLiturgicalEvent) {
+                        throw new \RuntimeException('');
+                    }
+                    $existingLiturgicalEvent->name = $NationalCalendarI18nData[$key];
                 } elseif ($litCalItem->liturgical_event instanceof LitCalItemSetPropertyGrade) {
-                    self::$liturgicalEvents->getEvent($key)->grade = $litCalItem->liturgical_event->grade;
+                    $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($key);
+                    if (null === $existingLiturgicalEvent) {
+                        throw new \RuntimeException('');
+                    }
+                    $existingLiturgicalEvent->grade = $litCalItem->liturgical_event->grade;
                 } elseif ($litCalItem->liturgical_event instanceof LitCalItemMakePatron) {
-                    self::$liturgicalEvents->getEvent($key)->name  = $NationalCalendarI18nData[$key];
-                    self::$liturgicalEvents->getEvent($key)->grade = $litCalItem->liturgical_event->grade;
+                    $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($key);
+                    if (null === $existingLiturgicalEvent) {
+                        throw new \RuntimeException('Rising very early before dawn, he left and went off to a deserted place, where he prayed. Simon and those who were with him pursued him and on finding him said, “Everyone is looking for you.” - Mark 1:35-37');
+                    }
+                    $existingLiturgicalEvent->name  = $NationalCalendarI18nData[$key];
+                    $existingLiturgicalEvent->grade = $litCalItem->liturgical_event->grade;
                 } elseif ($litCalItem->liturgical_event instanceof LitCalItemMoveEvent) {
                     // Do nothing
                 } else {
@@ -625,9 +669,9 @@ final class EventsPath
      *
      * @param int $statusCode the HTTP status code to return
      * @param string $description a short description of the error
-     * @return string the error response in the specified format
+     * @return never
      */
-    private static function produceErrorResponse(int $statusCode, string $description): string
+    private static function produceErrorResponse(int $statusCode, string $description): never
     {
         header($_SERVER['SERVER_PROTOCOL'] . StatusCode::toString($statusCode), true, $statusCode);
         $message              = new \stdClass();
@@ -641,11 +685,13 @@ final class EventsPath
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
                 $response = json_decode($errResponse, true, 512, JSON_THROW_ON_ERROR);
-                return yaml_emit($response, YAML_UTF8_ENCODING);
+                echo yaml_emit($response, YAML_UTF8_ENCODING);
+                break;
             case AcceptHeader::JSON:
             default:
-                return $errResponse;
+                echo $errResponse;
         }
+        die();
     }
 
     /**
@@ -654,9 +700,9 @@ final class EventsPath
      * The function will output the response in the response format specified by the Accept header
      * of the request (JSON or YAML) and terminate the script execution with a call to die().
      *
-     * @return void
+     * @return never
      */
-    private function produceResponse(): void
+    private function produceResponse(): never
     {
         $responseObj = [
             'litcal_events' => self::$liturgicalEvents->toCollection(),
@@ -691,6 +737,7 @@ final class EventsPath
                     break;
             }
         }
+        die();
     }
 
     /**
@@ -709,8 +756,10 @@ final class EventsPath
      *   such as Missal, Proprium De Tempore, Memorials from Decrees, National,
      *   and Diocesan calendars.
      * - Produces and sends the response to the client.
+     *
+     * @return never
      */
-    public function init(array $requestPathParts = []): void
+    public function init(array $requestPathParts = []): never
     {
         self::$Core->init();
         self::$Core->validateAcceptHeader(true);

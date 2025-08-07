@@ -54,10 +54,10 @@ final class SchemasPath
      *                                   If containing one element, it attempts to return the
      *                                   specified schema file's content.
      *
-     * @return void Outputs the JSON schema index or the contents of a specific schema.
-     *              If the schema file is not found, it responds with a 404 error.
+     * @return never Outputs the JSON schema index or the contents of a specific schema.
+     *               If the schema file is not found, it responds with a 404 error.
      */
-    public static function retrieve(array $requestPathParts = []): void
+    public static function retrieve(array $requestPathParts = []): never
     {
         self::enforceOrigin();
         self::enforceRequestMethod();
@@ -82,6 +82,8 @@ final class SchemasPath
                     header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found', true, 404);
                     die("Schema file '{$requestPathParts[0]}' not found");
                 }
+            default:
+                throw new \InvalidArgumentException('Invalid number of path parameters');
         }
     }
 }

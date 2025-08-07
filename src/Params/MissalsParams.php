@@ -72,6 +72,10 @@ class MissalsParams implements ParamsInterface
             switch ($key) {
                 case 'locale':
                     $value = \Locale::canonicalize($value);
+                    if (null === $value) {
+                        throw new \ValueError('Invalid locale string: ' . $value);
+                    }
+
                     if (LitLocale::isValid($value)) {
                         $this->Locale     = $value;
                         $this->baseLocale = \Locale::getPrimaryLanguage($value);
@@ -81,6 +85,7 @@ class MissalsParams implements ParamsInterface
                         //$this->setLastError(StatusCode::BAD_REQUEST, $error);
                         MissalsPath::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
                     }
+
                     if (count($this->availableLangs) && false === in_array($this->baseLocale, $this->availableLangs)) {
                         $message = "Locale `$value` ({$this->baseLocale}) set in param `locale` is not a valid locale for the requested Missal, valid locales are: "
                                 . implode(', ', $this->availableLangs);

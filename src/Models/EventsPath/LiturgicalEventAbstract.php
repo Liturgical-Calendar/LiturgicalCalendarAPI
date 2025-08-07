@@ -80,20 +80,22 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
                                 : ( is_array($common) ? LitCommons::create($common) : LitCommons::create([$common]) );
         if ($commons instanceof LitCommons) {
             /** @var LitCommons $commons */
-            $this->common_lcl = $commons->fullTranslate(self::$locale);
             $this->common     = $commons;
+            $this->common_lcl = $commons->fullTranslate(self::$locale);
         } elseif ($commons instanceof LitMassVariousNeeds) {
             /** @var LitMassVariousNeeds $commons */
-            $this->common_lcl = $commons->fullTranslate(self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE);
             $this->common     = [$commons];
+            $this->common_lcl = $commons->fullTranslate(self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE);
         } elseif ($litMassVariousNeedsArray) {
             /** @var LitMassVariousNeeds[] $commons */
+            $this->common     = $commons;
             $commonsLcl       = array_map(fn($item) => $item->fullTranslate(self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE), $commons);
             $this->common_lcl = implode('; ' . _('or') . ' ', $commonsLcl);
-            $this->common     = $commons;
         } else {
+            /** @var LitCommons $commons */
+            $commons          = LitCommons::create([LitCommon::NONE]);
+            $this->common     = $commons;
             $this->common_lcl = '???';
-            $this->common     = LitCommons::create([LitCommon::NONE]);
         }
     }
 
@@ -144,7 +146,9 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
         }
 
         if (count($common) === 0) {
-            return LitCommons::create([LitCommon::NONE]);
+            /** @var LitCommons $commons */
+            $commons = LitCommons::create([LitCommon::NONE]);
+            return $commons;
         }
 
         $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $common)));
@@ -155,18 +159,27 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
 
         if ($valueTypes[0] === 'string') {
             /** @var string[] $common */
-            return LitCommons::create($common)
+            $commons = LitCommons::create($common)
                     ?? array_values(array_map(
                         fn(string $value): LitMassVariousNeeds => LitMassVariousNeeds::from($value),
                         $common
                     ));
+            if (false === $commons instanceof LitCommons && false === static::allInstancesOf($commons, LitMassVariousNeeds::class)) {
+                throw new \InvalidArgumentException('Invalid common value type provided to create LiturgicalEvent: expected an array of string, of LitCommon cases, or of LitMassVariousNeeds cases');
+            }
+            return $commons;
         }
 
-        if ($common[0] instanceof LitCommon) {
-            return LitCommons::create($common);
+        if (static::allInstancesOf($common, LitCommon::class)) {
+            /** @var LitCommon[] $common */
+            $commons = LitCommons::create($common);
+            if (false === $commons instanceof LitCommons) {
+                throw new \InvalidArgumentException('Invalid common value type provided to create LiturgicalEvent: expected an array of string, of LitCommon cases, or of LitMassVariousNeeds cases');
+            }
+            return $commons;
         }
 
-        if ($common[0] instanceof LitMassVariousNeeds) {
+        if (static::allInstancesOf($common, LitMassVariousNeeds::class)) {
             /** @var LitMassVariousNeeds[] $common */
             return $common;
         }
@@ -174,6 +187,25 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
         throw new \InvalidArgumentException('Invalid common value type provided to create LiturgicalEvent: expected an array of string, of LitCommon cases, or of LitMassVariousNeeds cases');
     }
 
+    /**
+     * @template T
+     * @param array<mixed> $array
+     * @param class-string<T> $className
+     * @return bool
+     */
+    protected static function allInstancesOf(array $array, string $className): bool
+    {
+        foreach ($array as $item) {
+            if (!$item instanceof $className) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @return string The liturgical commons localized for the current locale.
+     */
     public function getCommonLcl(): string
     {
         return $this->common_lcl;
@@ -181,7 +213,9 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
 
     /** @param array{event_key:string,day?:int,month?:int,strotime?:string,color:string[],type:string,grade:int,common?:string[],grade_display?:?string} $arr */
     abstract public static function fromArray(array $arr): static;
+
     abstract public static function fromObject(\stdClass|LiturgicalEventData|DecreeEventData|PropriumDeSanctisEvent $obj): static;
+
     /** @return array{event_key:string,name:string,day?:int,month?:int,strotime?:string,color:string[],type:string,grade:int,grade_lcl:string,grade_abbr:string,common?:string[],common_lcl:string,grade_display?:?string} */
     abstract public function jsonSerialize(): array;
 }

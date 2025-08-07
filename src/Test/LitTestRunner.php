@@ -163,6 +163,14 @@ class LitTestRunner
     public function runTest(): void
     {
         if ($this->readyState) {
+            if (null === self::$testCache) {
+                $this->setError('Test cache is not initialized');
+                return;
+            }
+            if (null === $this->Test) {
+                $this->setError('Test name is not set');
+                return;
+            }
             $assertion = self::$testCache->retrieveAssertionForYear($this->Test, $this->dataToTest->settings->year);
             if (is_null($assertion)) {
                 $this->setError("Out of bounds error: {$this->Test} only supports calendar years [ " . implode(', ', self::$testCache->getYearsSupported($this->Test)) . ' ]');
@@ -177,13 +185,12 @@ class LitTestRunner
 
             switch ($assertion->assert) {
                 case LitEventTestAssertion::EVENT_NOT_EXISTS:
-                    $errorMessage = is_null($assertion->expected_value)
-                        ? " The event {$eventKey} should not exist, instead the event has a timestamp of {$eventBeingTested->date}"
-                        : " What is going on here? We expected the event not to exist, and in fact it doesn't. We should never get here!";
-
                     if (null === $eventBeingTested) {
                         $this->setSuccess();
                     } else {
+                        $errorMessage = is_null($assertion->expected_value)
+                            ? " The event {$eventKey} should not exist, instead the event has a timestamp of {$eventBeingTested->date}"
+                            : " What is going on here? We expected the event not to exist, and in fact it doesn't. We should never get here!";
                         $this->setError($messageIfError . $errorMessage);
                     }
                     break;
@@ -291,6 +298,10 @@ class LitTestRunner
         if (is_null($this->Message)) {
             $this->setError('An unknown error occurred while trying to run the test');
         }
-        return $this->Message;
+        $message = $this->Message;
+        if (null === $message) {
+            throw new \RuntimeException('An unknown error occurred while trying to run the test: an error message should have been set but apparently it was not?');
+        }
+        return $message;
     }
 }

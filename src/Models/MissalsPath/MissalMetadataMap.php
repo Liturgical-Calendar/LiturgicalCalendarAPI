@@ -33,7 +33,7 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
      *
      * The resulting array will have a single key, 'litcal_missals', which will contain an array of MissalMetadata objects.
      *
-     * @return array{litcal_missals:list<array{missal_id:string,name:string,region:string,locales:string[],api_path:string,year_published:int}>} An associative array containing the collection of missals as 'litcal_missals' key.
+     * @return array{litcal_missals:list<array{missal_id:string,name:string,region:string,locales:string[],api_path:?string,year_published:int}>} An associative array containing the collection of missals as 'litcal_missals' key.
      */
     public function jsonSerialize(): array
     {
@@ -86,7 +86,7 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
      * @param string $missal_id The identifier of the MissalMetadata to retrieve.
      * @return ?MissalMetadata The MissalMetadata object if found, or null if it does not exist.
      */
-    public function getMissal(string $missal_id): ?MissalMetadata
+    public function getMissalMetadata(string $missal_id): ?MissalMetadata
     {
         return $this->missals[$missal_id] ?? null;
     }

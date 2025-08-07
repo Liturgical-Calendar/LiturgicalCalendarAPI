@@ -106,21 +106,21 @@ final class LiturgicalEvent implements \JsonSerializable
                                 ? $common
                                 : ( is_array($common) ? LitCommons::create($common) : LitCommons::create([$common]) );
         if ($commons instanceof LitCommons) {
-            /** @var LitCommons $commons */
-            $this->common_lcl = $commons->fullTranslate(self::$locale);
             $this->common     = $commons;
+            $this->common_lcl = $commons->fullTranslate(self::$locale);
         } elseif ($commons instanceof LitMassVariousNeeds) {
-            /** @var LitMassVariousNeeds $commons */
-            $this->common_lcl = $commons->fullTranslate(self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE);
             $this->common     = [$commons];
+            $this->common_lcl = $commons->fullTranslate(self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE);
         } elseif ($litMassVariousNeedsArray) {
             /** @var LitMassVariousNeeds[] $commons */
+            $this->common     = $commons;
             $commonsLcl       = array_map(fn($item) => $item->fullTranslate(self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE), $commons);
             $this->common_lcl = implode('; ' . _('or') . ' ', $commonsLcl);
-            $this->common     = $commons;
         } else {
+            /** @var LitCommons $commons */
+            $commons          = LitCommons::create([LitCommon::NONE]);
+            $this->common     = $commons;
             $this->common_lcl = '???';
-            $this->common     = LitCommons::create([LitCommon::NONE]);
         }
     }
 
@@ -309,11 +309,23 @@ final class LiturgicalEvent implements \JsonSerializable
     public static function setLocale(string $locale): void
     {
         if (LitLocale::isValid($locale)) {
-            self::$locale            = $locale;
-            self::$dayOfTheWeekShort = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, 'EEE');
-            self::$dayOfTheWeekLong  = \IntlDateFormatter::create($locale, \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, 'EEEE');
-            self::$monthShort        = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, 'MMM');
-            self::$monthLong         = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, 'MMMM');
+            self::$locale     = $locale;
+            $dowShortFormat   = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, 'EEE');
+            $dowLongFormat    = \IntlDateFormatter::create($locale, \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, 'EEEE');
+            $monthShortFormat = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, 'MMM');
+            $monthLongFormat  = \IntlDateFormatter::create($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, 'MMMM');
+            if (
+                false === $dowShortFormat instanceof \IntlDateFormatter
+                || false === $dowLongFormat instanceof \IntlDateFormatter
+                || false === $monthShortFormat instanceof \IntlDateFormatter
+                || false === $monthLongFormat instanceof \IntlDateFormatter
+            ) {
+                throw new \InvalidArgumentException('The provided locale could not be used to format the day of the week or the month: ' . $locale . '.');
+            }
+            self::$dayOfTheWeekShort = $dowShortFormat;
+            self::$dayOfTheWeekLong  = $dowLongFormat;
+            self::$monthShort        = $monthShortFormat;
+            self::$monthLong         = $monthLongFormat;
         }
     }
 
@@ -415,6 +427,7 @@ final class LiturgicalEvent implements \JsonSerializable
                 $commons = self::transformCommons($obj->common);
             } else {
                 // We ensure a default value
+                /** @var LitCommons $commons */
                 $commons = LitCommons::create([]);
             }
         } else {
@@ -422,6 +435,7 @@ final class LiturgicalEvent implements \JsonSerializable
                 $commons = $obj->common;
             } else {
                 // We ensure a default value
+                /** @var LitCommons $commons */
                 $commons = LitCommons::create([]);
             }
         }
@@ -438,6 +452,10 @@ final class LiturgicalEvent implements \JsonSerializable
             throw new \Exception('Invalid object provided to create LiturgicalEvent: grade is not an instance of LitGrade');
         }
 
+        if (false === self::isValidCommonsConstructorValue($commons)) {
+            throw new \Exception('Invalid object provided to create LiturgicalEvent...');
+        }
+
         return new self(
             $obj->name,
             $obj->date,
@@ -448,6 +466,56 @@ final class LiturgicalEvent implements \JsonSerializable
             $obj->grade_display ?? null
         );
     }
+
+    /**
+     * @template T
+     * @param array<mixed> $array
+     * @param class-string<T> $className
+     * @return bool
+     */
+    private static function allInstancesOf(array $array, string $className): bool
+    {
+        foreach ($array as $item) {
+            if (!$item instanceof $className) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks if the given value is a valid "Commons" value for construction of a LiturgicalEvent.
+     * A valid "Commons" value is one of the following:
+     * - An instance of LitCommons
+     * - An instance of LitCommon
+     * - An instance of LitMassVariousNeeds
+     * - An array containing one or more LitCommon and/or LitMassVariousNeeds instances
+     * If the value is not valid, an exception is thrown.
+     * @param mixed $commons The value to test.
+     * @return bool True if the value is valid, otherwise false.
+     */
+    private static function isValidCommonsConstructorValue(mixed $commons): bool
+    {
+        $isValid =
+            $commons instanceof LitCommons
+            || $commons instanceof LitCommon
+            || $commons instanceof LitMassVariousNeeds
+            || (
+                is_array($commons)
+                && array_is_list($commons)
+                && count($commons) > 0
+                && (
+                    self::allInstancesOf($commons, LitCommon::class)
+                    || self::allInstancesOf($commons, LitMassVariousNeeds::class)
+                )
+            );
+
+        if (false === $isValid) {
+            throw new \Exception('Invalid object provided to create LiturgicalEvent...');
+        }
+        return $isValid;
+    }
+
 
     /**
      * Create a new LiturgicalEvent object from an associative array.
@@ -545,7 +613,12 @@ final class LiturgicalEvent implements \JsonSerializable
         if (array_key_exists('common', $arr)) {
             $commons = self::transformCommons($arr['common']);
         } else {
+            /** @var LitCommons $commons */
             $commons = LitCommons::create([LitCommon::NONE]);
+        }
+
+        if (false === self::isValidCommonsConstructorValue($commons)) {
+            throw new \Exception('Invalid object provided to create LiturgicalEvent...');
         }
 
         return new self(
@@ -570,7 +643,9 @@ final class LiturgicalEvent implements \JsonSerializable
         }
 
         if (count($common) === 0) {
-            return LitCommons::create([LitCommon::NONE]);
+            /** @var LitCommons $commons */
+            $commons = LitCommons::create([LitCommon::NONE]);
+            return $commons;
         }
 
         $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $common)));
@@ -588,11 +663,13 @@ final class LiturgicalEvent implements \JsonSerializable
                     ));
         }
 
-        if ($common[0] instanceof LitCommon) {
-            return LitCommons::create($common);
+        if (self::allInstancesOf($common, LitCommon::class)) {
+            /** @var LitCommons $commons */
+            $commons = LitCommons::create($common);
+            return $commons;
         }
 
-        if ($common[0] instanceof LitMassVariousNeeds) {
+        if (self::allInstancesOf($common, LitMassVariousNeeds::class)) {
             /** @var LitMassVariousNeeds[] $common */
             return $common;
         }

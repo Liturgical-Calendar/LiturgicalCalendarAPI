@@ -41,6 +41,7 @@ use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyName;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyNameMetadata;
 use LiturgicalCalendar\Api\Models\LitCalItem;
 use LiturgicalCalendar\Api\Models\LitCalItemCollection;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarSettings;
 use LiturgicalCalendar\Api\Models\MissalsMap;
 use LiturgicalCalendar\Api\Models\PropriumDeSanctisEvent;
 use LiturgicalCalendar\Api\Models\PropriumDeSanctisMap;
@@ -304,9 +305,9 @@ final class CalendarPath
      *
      * @param int $statusCode the HTTP status code to return
      * @param string $description a short description of the error
-     * @return void
+     * @return never
      */
-    public static function produceErrorResponse(int $statusCode, string $description): void
+    public static function produceErrorResponse(int $statusCode, string $description): never
     {
         if (self::$Core->getResponseContentType() === null) {
             // set a default response content type that can be overriden by a parameter or an accept header
@@ -574,6 +575,12 @@ final class CalendarPath
             $this->CalendarParams->Locale            = LitLocale::LATIN;
             $this->CalendarParams->EternalHighPriest = false;
         } else {
+            if ($this->NationalData === null) {
+                throw new \RuntimeException(
+                    '“Leave behind the senses and the operations of the intellect, and all things sensible and intelligible, and all things in the realm of being and non-being, and be raised up to the divine ray of the darkness that surpasses being.”'
+                    . ' — Pseudo-Dionysius the Areopagite, Mystical Theology, Chapter 1'
+                );
+            }
             $this->CalendarParams->Epiphany          = $this->NationalData->settings->epiphany;
             $this->CalendarParams->Ascension         = $this->NationalData->settings->ascension;
             $this->CalendarParams->CorpusChristi     = $this->NationalData->settings->corpus_christi;
@@ -594,7 +601,9 @@ final class CalendarPath
         }
 
         if ($this->DiocesanData->hasSettings()) {
-            foreach ($this->DiocesanData->settings as $key => $value) {
+            /** @var MetadataDiocesanCalendarSettings $settings */
+            $settings = $this->DiocesanData->settings;
+            foreach ($settings as $key => $value) {
                 switch ($key) {
                     case 'epiphany':
                         /** @var Epiphany $value */
@@ -679,7 +688,10 @@ final class CalendarPath
      */
     private function cacheFileIsAvailable(): bool
     {
-        //LitCommon::$HASH_REQUEST = $paramsHash;
+        if (null === $this->CalendarParams->ReturnType) {
+            throw new \InvalidArgumentException('CalendarParams->ReturnType is null.');
+        }
+
         $paramsHash              = md5(serialize($this->CalendarParams));
         Utilities::$HASH_REQUEST = $paramsHash;
         $cacheFileName           = $paramsHash . $this->CacheDuration . '.' . strtolower($this->CalendarParams->ReturnType->value);
@@ -698,7 +710,7 @@ final class CalendarPath
      */
     private function createFormatters(): void
     {
-        $this->dayAndMonth = \IntlDateFormatter::create(
+        $dayAndMonth = \IntlDateFormatter::create(
             LitLocale::$PRIMARY_LANGUAGE,
             \IntlDateFormatter::FULL,
             \IntlDateFormatter::NONE,
@@ -707,7 +719,7 @@ final class CalendarPath
             'd MMMM'
         );
 
-        $this->dayOfTheWeek = \IntlDateFormatter::create(
+        $dayOfTheWeek = \IntlDateFormatter::create(
             LitLocale::$PRIMARY_LANGUAGE,
             \IntlDateFormatter::FULL,
             \IntlDateFormatter::NONE,
@@ -716,7 +728,7 @@ final class CalendarPath
             'EEEE'
         );
 
-        $this->dayOfTheWeekEnglish = \IntlDateFormatter::create(
+        $dayOfTheWeekEnglish = \IntlDateFormatter::create(
             'en',
             \IntlDateFormatter::FULL,
             \IntlDateFormatter::NONE,
@@ -729,6 +741,22 @@ final class CalendarPath
             LitLocale::$PRIMARY_LANGUAGE,
             \NumberFormatter::SPELLOUT
         );
+
+        if (
+            null === $dayAndMonth
+            || null === $dayOfTheWeek
+            || null === $dayOfTheWeekEnglish
+        ) {
+            throw new \RuntimeException(
+                '"Time is like a river made up of the events which happen, and a violent stream;'
+                . ' for as soon as a thing has been seen, it is carried away, and another comes in its place, and this will be carried away too."'
+                . ' — Marcus Aurelius, Meditations 4.43'
+            );
+        }
+
+        $this->dayAndMonth         = $dayAndMonth;
+        $this->dayOfTheWeek        = $dayOfTheWeek;
+        $this->dayOfTheWeekEnglish = $dayOfTheWeekEnglish;
 
         //follow rules as indicated here:
         // https://www.saxonica.com/html/documentation11/extensibility/localizing/ICU-numbering-dates/ICU-numbering.html
@@ -1028,8 +1056,12 @@ final class CalendarPath
      */
     private function calculateChristmasWeekdaysThroughEpiphany(): void
     {
-        $nth           = 0;
-        $Epiphany      = $this->Cal->getLiturgicalEvent('Epiphany');
+        $nth      = 0;
+        $Epiphany = $this->Cal->getLiturgicalEvent('Epiphany');
+        if (null === $Epiphany) {
+            throw new \RuntimeException('The liturgical event "Epiphany" is missing');
+        }
+
         $DayOfEpiphany = (int) $Epiphany->date->format('j');
         for ($i = 2; $i < $DayOfEpiphany; $i++) {
             $dateTime = DateTime::fromFormat($i . '-1-' . $this->CalendarParams->Year);
@@ -1079,9 +1111,13 @@ final class CalendarPath
      */
     private function calculateChristmasWeekdaysAfterEpiphany(): void
     {
-        $Epiphany         = $this->Cal->getLiturgicalEvent('Epiphany');
+        $Epiphany    = $this->Cal->getLiturgicalEvent('Epiphany');
+        $BaptismLord = $this->Cal->getLiturgicalEvent('BaptismLord');
+        if (null === $Epiphany || null === $BaptismLord) {
+            throw new \RuntimeException('The liturgical events "Epiphany" and/or the liturgical event "Baptism of the Lord" is/are missing');
+        }
+
         $DayOfEpiphany    = (int) $Epiphany->date->format('j');
-        $BaptismLord      = $this->Cal->getLiturgicalEvent('BaptismLord');
         $DayOfBaptismLord = (int) $BaptismLord->date->format('j');
         $nth              = 0;
         for ($i = $DayOfEpiphany + 1; $i < $DayOfBaptismLord; $i++) {
@@ -1410,18 +1446,30 @@ final class CalendarPath
                  * http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/2006/475-476.html
                  * https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-42-(2006)/Notitiae-475-476-2006.pdf
                  */
-                $locale = LitLocale::$PRIMARY_LANGUAGE;
+                $locale  = LitLocale::$PRIMARY_LANGUAGE;
+                $PalmSun = $this->Cal->getLiturgicalEvent('PalmSun');
+                $Easter  = $this->Cal->getLiturgicalEvent('Easter');
+                $Easter2 = $this->Cal->getLiturgicalEvent('Easter2');
+                if (null === $PalmSun || null === $Easter || null === $Easter2) {
+                    throw new \Exception('Palm Sunday, Easter, and/or Second Sunday of Easter are not defined');
+                }
+
                 if (
                     $propriumDeSanctisEvent->event_key === 'StJoseph'
-                    && $currentLitEventDate >= $this->Cal->getLiturgicalEvent('PalmSun')->date
-                    && $currentLitEventDate <= $this->Cal->getLiturgicalEvent('Easter')->date
+                    && $currentLitEventDate >= $PalmSun->date
+                    && $currentLitEventDate <= $Easter->date
                 ) {
                     $tempLiturgicalEvent->date = Utilities::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P8D'));
-                    $this->Messages[]          = sprintf(
-                        /**translators: 1: LiturgicalEvent name, 2: LiturgicalEvent date, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship  */
+                    $coincidingSolemnity       = $this->Cal->solemnityFromDate($currentLitEventDate);
+                    if (null === $coincidingSolemnity) {
+                        throw new \RuntimeException('No coinciding Solemnity found for ' . $currentLitEventDate->format('Y-m-d'));
+                    }
+
+                    $this->Messages[] = sprintf(
+                        /**translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship  */
                         _('The Solemnity \'%1$s\' falls on %2$s in the year %3$d, the celebration has been transferred to %4$s (%5$s) as per the %6$s.'),
                         $tempLiturgicalEvent->name,
-                        $this->Cal->solemnityFromDate($currentLitEventDate)->name,
+                        $coincidingSolemnity->name,
                         $this->CalendarParams->Year,
                         _('the Saturday preceding Palm Sunday'),
                         $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
@@ -1434,14 +1482,19 @@ final class CalendarPath
                             . _('Decree of the Congregation for Divine Worship')
                         . '</a>'
                     );
-                } elseif ($propriumDeSanctisEvent->event_key === 'Annunciation' && $currentLitEventDate >= $this->Cal->getLiturgicalEvent('PalmSun')->date && $currentLitEventDate <= $this->Cal->getLiturgicalEvent('Easter2')->date) {
+                } elseif ($propriumDeSanctisEvent->event_key === 'Annunciation' && $currentLitEventDate >= $PalmSun->date && $currentLitEventDate <= $Easter2->date) {
                     //if the Annunciation falls during Holy Week or within the Octave of Easter, it is transferred to the Monday after the Second Sunday of Easter.
                     $tempLiturgicalEvent->date = Utilities::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P8D'));
-                    $this->Messages[]          = sprintf(
-                        /**translators: 1: LiturgicalEvent name, 2: LiturgicalEvent date, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship */
+                    $coincidingSolemnity       = $this->Cal->solemnityFromDate($currentLitEventDate);
+                    if (null === $coincidingSolemnity) {
+                        throw new \RuntimeException('No coinciding Solemnity found for ' . $currentLitEventDate->format('Y-m-d'));
+                    }
+
+                    $this->Messages[] = sprintf(
+                        /**translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship */
                         _('The Solemnity \'%1$s\' falls on %2$s in the year %3$d, the celebration has been transferred to %4$s (%5$s) as per the %6$s.'),
                         $tempLiturgicalEvent->name,
-                        $this->Cal->solemnityFromDate($currentLitEventDate)->name,
+                        $coincidingSolemnity->name,
                         $this->CalendarParams->Year,
                         _('the Monday following the Second Sunday of Easter'),
                         $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
@@ -1481,10 +1534,15 @@ final class CalendarPath
                     } else {
                         $tempLiturgicalEvent->date = clone( $currentLitEventDate );
                         $tempLiturgicalEvent->date->add(new \DateInterval('P1D'));
+                        $coincidingSolemnity = $this->Cal->solemnityFromDate($currentLitEventDate);
+                        if (null === $coincidingSolemnity) {
+                            throw new \RuntimeException('No Solemnity found for ' . $currentLitEventDate->format('Y-m-d'));
+                        }
+
                         $this->Messages[] = sprintf(
                             /**translators:
-                             * 1: LiturgicalEvent name,
-                             * 2: LiturgicalEvent date,
+                             * 1: Solemnity name,
+                             * 2: Coinciding Solemnity name,
                              * 3: Requested calendar year,
                              * 4: Explicatory string for the transferral,
                              * 5: actual date for the transferral,
@@ -1492,7 +1550,7 @@ final class CalendarPath
                              */
                             _('The Solemnity \'%1$s\' falls on %2$s in the year %3$d, the celebration has been transferred to %4$s (%5$s) as per the %6$s.'),
                             $tempLiturgicalEvent->name,
-                            $this->Cal->solemnityFromDate($currentLitEventDate)->name,
+                            $coincidingSolemnity->name,
                             $this->CalendarParams->Year,
                             _('the following Monday'),
                             $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
@@ -1506,11 +1564,16 @@ final class CalendarPath
                     }
                 } else {
                     //In all other cases, let's make a note of what's happening and ask the Congegation for Divine Worship
+                    $coincidingSolemnity = $this->Cal->solemnityFromDate($currentLitEventDate);
+                    if (null === $coincidingSolemnity) {
+                        throw new \RuntimeException('No Solemnity found for ' . $currentLitEventDate->format('Y-m-d'));
+                    }
+
                     $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                        /**translators: 1: LiturgicalEvent name, 2: Coinciding LiturgicalEvent name, 3: Requested calendar year */
+                        /**translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year */
                         _('The Solemnity \'%1$s\' coincides with the Solemnity \'%2$s\' in the year %3$d. We should ask the Congregation for Divine Worship what to do about this!'),
                         $propriumDeSanctisEvent->name,
-                        $this->Cal->solemnityFromDate($currentLitEventDate)->name,
+                        $coincidingSolemnity->name,
                         $this->CalendarParams->Year
                     );
                 }
@@ -1523,8 +1586,12 @@ final class CalendarPath
                 // https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf
                 // This will happen again in 2033 and 2044
                 if ($propriumDeSanctisEvent->event_key === 'NativityJohnBaptist' && $this->Cal->solemnityKeyFromDate($currentLitEventDate) === 'SacredHeart') {
-                    $NativityJohnBaptistNewDate = clone( $this->Cal->getLiturgicalEvent('SacredHeart')->date );
-                    $SacredHeart                = $this->Cal->solemnityFromDate($currentLitEventDate);
+                    $SacredHeart = $this->Cal->getLiturgicalEvent('SacredHeart');
+                    if (null === $SacredHeart) {
+                        throw new \RuntimeException('The Solemnity of the Sacred Heart was not found');
+                    }
+
+                    $NativityJohnBaptistNewDate = clone( $SacredHeart->date );
                     if (!$this->Cal->inSolemnities($NativityJohnBaptistNewDate->sub(new \DateInterval('P1D')))) {
                         $tempLiturgicalEvent->date->sub(new \DateInterval('P1D'));
                         $decree = '<a href="'
@@ -1616,15 +1683,20 @@ final class CalendarPath
         }
 
         //Holy Family is celebrated the Sunday after Christmas, unless Christmas falls on a Sunday, in which case it is celebrated Dec. 30
-        $locale = LitLocale::$PRIMARY_LANGUAGE;
-        if (self::dateIsSunday($this->Cal->getLiturgicalEvent('Christmas')->date)) {
+        $locale    = LitLocale::$PRIMARY_LANGUAGE;
+        $Christmas = $this->Cal->getLiturgicalEvent('Christmas');
+        if (null === $Christmas) {
+            throw new \RuntimeException('Christmas was not found among the LiturgicalEvents');
+        }
+
+        if (self::dateIsSunday($Christmas->date)) {
             $this->PropriumDeTempore['HolyFamily']->setDate(DateTime::fromFormat('30-12-' . $this->CalendarParams->Year));
 
             $HolyFamily       = $this->createPropriumDeTemporeLiturgicalEventByKey('HolyFamily');
             $this->Messages[] = sprintf(
                 /**translators: 1: LiturgicalEvent name (Christmas), 2: Requested calendar year, 3: LiturgicalEvent name (Holy Family), 4: New date for Holy Family */
                 _('\'%1$s\' falls on a Sunday in the year %2$d, therefore the Feast \'%3$s\' is celebrated on %4$s rather than on the Sunday after Christmas.'),
-                $this->Cal->getLiturgicalEvent('Christmas')->name,
+                $Christmas->name,
                 $this->CalendarParams->Year,
                 $HolyFamily->name,
                 $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
@@ -1644,7 +1716,12 @@ final class CalendarPath
         //  in their own liturgical calendars on the Thursday after Pentecost,
         //  see https://notitiae.ipsissima-verba.org/pdf/notitiae-2012-335-368.pdf
         if ($this->CalendarParams->Year >= 2012 && true === $this->CalendarParams->EternalHighPriest) {
-            $EternalHighPriestDate = clone( $this->Cal->getLiturgicalEvent('Pentecost')->date );
+            $Pentecost = $this->Cal->getLiturgicalEvent('Pentecost');
+            if (null === $Pentecost) {
+                throw new \RuntimeException('Pentecost was not found among the LiturgicalEvents');
+            }
+
+            $EternalHighPriestDate = clone( $Pentecost->date );
             $EternalHighPriestDate->modify('next Thursday');
             $EternalHighPriestName = ( LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE )
                 ? 'Domini Nostri Iesu Christi Summi et Aeterni Sacerdotis'
@@ -1694,7 +1771,12 @@ final class CalendarPath
         // Here is ( Ash Wednesday - 7 ) since one more cycle will complete...
         $firstOrdinaryLimit = Utilities::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P53D'));
         $ordSun             = 1;
-        while ($firstOrdinaryDate >= $this->Cal->getLiturgicalEvent('BaptismLord')->date && $firstOrdinaryDate < $firstOrdinaryLimit) {
+        $BaptismLord        = $this->Cal->getLiturgicalEvent('BaptismLord');
+        if (null === $BaptismLord) {
+            throw new \RuntimeException('Baptism of the Lord was not found among the LiturgicalEvents');
+        }
+
+        while ($firstOrdinaryDate >= $BaptismLord->date && $firstOrdinaryDate < $firstOrdinaryLimit) {
             $firstOrdinaryDate = DateTime::fromFormat($this->BaptismLordFmt)->modify($this->BaptismLordMod)->modify('next Sunday')->add(new \DateInterval('P' . ( ( $ordSun - 1 ) * 7 ) . 'D'));
             $ordSun++;
             if (!$this->Cal->inSolemnities($firstOrdinaryDate) && !$this->Cal->inFeastsLord($firstOrdinaryDate)) {
@@ -1708,7 +1790,11 @@ final class CalendarPath
                     ''
                 ));
             } else {
-                $litEvent         = $this->Cal->solemnityFromDate($firstOrdinaryDate) ?? $this->Cal->feastLordFromDate($firstOrdinaryDate);
+                $litEvent = $this->Cal->solemnityFromDate($firstOrdinaryDate) ?? $this->Cal->feastLordFromDate($firstOrdinaryDate);
+                if (null === $litEvent) {
+                    throw new \RuntimeException('We were expecting to find either a Solemnity or a Feast of the Lord on ' . $firstOrdinaryDate->format('Y-m-d') . ' but no LiturgicalEvent was not found');
+                }
+
                 $this->Messages[] = sprintf(
                     /**translators: 1: LiturgicalEvent name, 2: Superseding LiturgicalEvent grade, 3: Superseding LiturgicalEvent name, 4: Requested calendar year */
                     _('\'%1$s\' is superseded by the %2$s \'%3$s\' in the year %4$d.'),
@@ -1729,8 +1815,12 @@ final class CalendarPath
         $lastOrdinaryLowerLimit = Utilities::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P' . ( 7 * 9 ) . 'D'));
         $ordSun                 = 34;
         $ordSunCycle            = 4;
+        $ChristKing             = $this->Cal->getLiturgicalEvent('ChristKing');
+        if (null === $ChristKing) {
+            throw new \RuntimeException('Christ the King was not found among the LiturgicalEvents');
+        }
 
-        while ($lastOrdinary <= $this->Cal->getLiturgicalEvent('ChristKing')->date && $lastOrdinary > $lastOrdinaryLowerLimit) {
+        while ($lastOrdinary <= $ChristKing->date && $lastOrdinary > $lastOrdinaryLowerLimit) {
             $lastOrdinary = DateTime::fromFormat('25-12-' . $this->CalendarParams->Year)->modify('last Sunday')->sub(new \DateInterval('P' . ( ++$ordSunCycle * 7 ) . 'D'));
             $ordSun--;
             if (!$this->Cal->inSolemnities($lastOrdinary) && !$this->Cal->inFeastsLord($lastOrdinary)) {
@@ -1744,7 +1834,11 @@ final class CalendarPath
                     ''
                 ));
             } else {
-                $litEvent         = $this->Cal->solemnityFromDate($firstOrdinaryDate) ?? $this->Cal->feastLordFromDate($firstOrdinaryDate);
+                $litEvent = $this->Cal->solemnityFromDate($firstOrdinaryDate) ?? $this->Cal->feastLordFromDate($firstOrdinaryDate);
+                if (null === $litEvent) {
+                    throw new \RuntimeException('We were expecting to find either a Solemnity or a Feast of the Lord on ' . $lastOrdinary->format('Y-m-d') . ' but no LiturgicalEvent was not found');
+                }
+
                 $this->Messages[] = sprintf(
                     /**translators: 1: LiturgicalEvent name, 2: Superseding LiturgicalEvent grade, 3: Superseding LiturgicalEvent name, 4: Requested calendar year */
                     _('\'%1$s\' is superseded by the %2$s \'%3$s\' in the year %4$d.'),
@@ -1813,12 +1907,18 @@ final class CalendarPath
     private function calculateWeekdaysAdvent(): void
     {
         // We start calculating the weekdays of Advent from the First Sunday of Advent
-        $DoMAdvent1       = $this->Cal->getLiturgicalEvent('Advent1')->date->format('j'); // j = Day of the Month (DoM) on which the first Sunday of Advent falls
-        $MonthAdvent1     = $this->Cal->getLiturgicalEvent('Advent1')->date->format('n'); // n = Month in which the first Sunday of Advent falls
+        $Advent1   = $this->Cal->getLiturgicalEvent('Advent1');
+        $Christmas = $this->Cal->getLiturgicalEvent('Christmas');
+        if (null === $Advent1 || null === $Christmas) {
+            throw new \RuntimeException('The First Sunday of Advent and/or Christmas were not found among the Liturgical Events');
+        }
+
+        $DoMAdvent1       = $Advent1->date->format('j'); // j = Day of the Month (DoM) on which the first Sunday of Advent falls
+        $MonthAdvent1     = $Advent1->date->format('n'); // n = Month in which the first Sunday of Advent falls
         $weekdayAdvent    = DateTime::fromFormat($DoMAdvent1 . '-' . $MonthAdvent1 . '-' . $this->CalendarParams->Year);
         $weekdayAdventCnt = 1;
 
-        while ($weekdayAdvent >= $this->Cal->getLiturgicalEvent('Advent1')->date && $weekdayAdvent < $this->Cal->getLiturgicalEvent('Christmas')->date) {
+        while ($weekdayAdvent >= $Advent1->date && $weekdayAdvent < $Christmas->date) {
             // We start calculating from the First Sunday of Advent, but incrementally adding a day
             $weekdayAdvent = DateTime::fromFormat($DoMAdvent1 . '-' . $MonthAdvent1 . '-' . $this->CalendarParams->Year)->add(new \DateInterval('P' . $weekdayAdventCnt . 'D'));
 
@@ -1831,7 +1931,7 @@ final class CalendarPath
             //if we're not dealing with a sunday or a solemnity or an obligatory memorial, then create the weekday
             if ($this->Cal->notInSolemnitiesFeastsOrMemorials($weekdayAdvent) && self::dateIsNotSunday($weekdayAdvent)) {
                 $upper          = (int) $weekdayAdvent->format('z');
-                $diff           = $upper - (int) $this->Cal->getLiturgicalEvent('Advent1')->date->format('z'); //day count between current day and First Sunday of Advent
+                $diff           = $upper - (int) $Advent1->date->format('z'); //day count between current day and First Sunday of Advent
                 $currentAdvWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1; //week count between current day and First Sunday of Advent
                 $dayOfTheWeek   = LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE
                     ? LatinUtils::LATIN_DAYOFTHEWEEK[$weekdayAdvent->format('w')]
@@ -1888,8 +1988,13 @@ final class CalendarPath
     {
         $weekdayChristmas    = DateTime::fromFormat('25-12-' . $this->CalendarParams->Year);
         $weekdayChristmasCnt = 1;
+        $Christmas           = $this->Cal->getLiturgicalEvent('Christmas');
+        if (null === $Christmas) {
+            throw new \Exception('There is no Santa Claus');
+        }
+
         while (
-            $weekdayChristmas >= $this->Cal->getLiturgicalEvent('Christmas')->date
+            $weekdayChristmas >= $Christmas->date
             && $weekdayChristmas < DateTime::fromFormat('31-12-' . $this->CalendarParams->Year)
         ) {
             $weekdayChristmas = DateTime::fromFormat('25-12-' . $this->CalendarParams->Year)->add(new \DateInterval('P' . $weekdayChristmasCnt . 'D'));
@@ -1929,18 +2034,24 @@ final class CalendarPath
      */
     private function calculateWeekdaysLent(): void
     {
+        $AshWednesday = $this->Cal->getLiturgicalEvent('AshWednesday');
+        $Lent1        = $this->Cal->getLiturgicalEvent('Lent1');
+        $PalmSun      = $this->Cal->getLiturgicalEvent('PalmSun');
+        if (null === $AshWednesday || null === $Lent1 || null === $PalmSun) {
+            throw new \Exception('It seems that for this year, the ashes of Ash Wednesday have vanished into thin air, and so has Lent. No Lenten fast for you this year! And sorry, folks, but nobody is getting a palm branch, either. I guess you could say that Christ\'s triumphal entry into Jerusalem is going to have to wait another year...');
+        }
 
         //Day of the Month of Ash Wednesday
-        $DoMAshWednesday   = $this->Cal->getLiturgicalEvent('AshWednesday')->date->format('j');
-        $MonthAshWednesday = $this->Cal->getLiturgicalEvent('AshWednesday')->date->format('n');
+        $DoMAshWednesday   = $AshWednesday->date->format('j');
+        $MonthAshWednesday = $AshWednesday->date->format('n');
         $weekdayLent       = DateTime::fromFormat($DoMAshWednesday . '-' . $MonthAshWednesday . '-' . $this->CalendarParams->Year);
         $weekdayLentCnt    = 1;
-        while ($weekdayLent >= $this->Cal->getLiturgicalEvent('AshWednesday')->date && $weekdayLent < $this->Cal->getLiturgicalEvent('PalmSun')->date) {
+        while ($weekdayLent >= $AshWednesday->date && $weekdayLent < $PalmSun->date) {
             $weekdayLent = DateTime::fromFormat($DoMAshWednesday . '-' . $MonthAshWednesday . '-' . $this->CalendarParams->Year)->add(new \DateInterval('P' . $weekdayLentCnt . 'D'));
             if (!$this->Cal->inSolemnities($weekdayLent) && self::dateIsNotSunday($weekdayLent)) {
-                if ($weekdayLent > $this->Cal->getLiturgicalEvent('Lent1')->date) {
+                if ($weekdayLent > $Lent1->date) {
                     $upper           =  (int) $weekdayLent->format('z');
-                    $diff            = $upper -  (int) $this->Cal->getLiturgicalEvent('Lent1')->date->format('z'); //day count between current day and First Sunday of Lent
+                    $diff            = $upper -  (int) $Lent1->date->format('z'); //day count between current day and First Sunday of Lent
                     $currentLentWeek = ( ( $diff - $diff % 7 ) / 7 ) + 1; //week count between current day and First Sunday of Lent
                     $ordinal         = ucfirst(Utilities::getOrdinal($currentLentWeek, $this->CalendarParams->Locale, $this->formatterFem, LatinUtils::LATIN_ORDINAL_FEM_GEN));
                     $locale          = LitLocale::$PRIMARY_LANGUAGE;
@@ -2086,7 +2197,12 @@ final class CalendarPath
                     }
                     $this->addMissalMemorialMessage($propriumDeSanctisEvent);
                 }
-                if ($grade === LitGrade::MEMORIAL && $this->Cal->getLiturgicalEvent($propriumDeSanctisEvent->event_key)->grade->value > LitGrade::MEMORIAL_OPT->value) {
+                $sanctoraleLiturgicalEvent = $this->Cal->getLiturgicalEvent($propriumDeSanctisEvent->event_key);
+                if (null === $sanctoraleLiturgicalEvent) {
+                    throw new \Exception('Liturgical event ' . $propriumDeSanctisEvent->event_key . ' not found');
+                }
+
+                if ($grade === LitGrade::MEMORIAL && $sanctoraleLiturgicalEvent->grade->value > LitGrade::MEMORIAL_OPT->value) {
                     $this->removeWeekdaysEpiphanyOverridenByMemorials($propriumDeSanctisEvent->event_key);
                     $this->removeWeekdaysAdventOverridenByMemorials($propriumDeSanctisEvent->event_key);
                 }
@@ -2140,9 +2256,18 @@ final class CalendarPath
     private function removeWeekdaysEpiphanyOverridenByMemorials(string $event_key): void
     {
         $litEvent = $this->Cal->getLiturgicalEvent($event_key);
+        if (null === $litEvent) {
+            throw new \Exception('Liturgical event ' . $event_key . ' seems to have been beamed up by Scotty');
+        }
+
         if ($this->Cal->inWeekdaysEpiphany($litEvent->date)) {
             $key = $this->Cal->weekdayEpiphanyKeyFromDate($litEvent->date);
             if (null !== $key) {
+                $weekdayEpiphany = $this->Cal->getLiturgicalEvent($key);
+                if (null === $weekdayEpiphany) {
+                    throw new \RuntimeException('The weekday of Epihany ' . $key . ' has been lost; as long as Paradise has not we will survive');
+                }
+
                 /**translators:
                  * 1. Grade or rank of the liturgical event that has been superseded
                  * 2. Name of the liturgical event that has been superseded
@@ -2153,8 +2278,8 @@ final class CalendarPath
                 $message          = _('The %1$s \'%2$s\' is superseded by the %3$s \'%4$s\' in the year %5$d.');
                 $this->Messages[] = sprintf(
                     $message,
-                    LitGrade::i18n($this->Cal->getLiturgicalEvent($key)->grade, $this->CalendarParams->Locale),
-                    $this->Cal->getLiturgicalEvent($key)->name,
+                    LitGrade::i18n($weekdayEpiphany->grade, $this->CalendarParams->Locale),
+                    $weekdayEpiphany->name,
                     LitGrade::i18n($litEvent->grade, $this->CalendarParams->Locale, false),
                     $litEvent->name,
                     $this->CalendarParams->Year
@@ -2174,13 +2299,23 @@ final class CalendarPath
     private function removeWeekdaysAdventOverridenByMemorials(string $event_key): void
     {
         $litEvent = $this->Cal->getLiturgicalEvent($event_key);
-        $Dec17    = DateTime::fromFormat('17-12-' . $this->CalendarParams->Year);
+        $Advent1  = $this->Cal->getLiturgicalEvent('Advent1');
+        if (null === $litEvent || null === $Advent1) {
+            throw new \Exception($event_key . ' and/or First Sunday of Advent where are you? Said God to the man in the garden. But he was ashamed and he hid himself.');
+        }
+
+        $Dec17Date = DateTime::fromFormat('17-12-' . $this->CalendarParams->Year);
         if (
-            $litEvent->date > $this->Cal->getLiturgicalEvent('Advent1')->date
-            && $litEvent->date < $Dec17
+            $litEvent->date > $Advent1->date
+            && $litEvent->date < $Dec17Date
         ) {
             $key = $this->Cal->weekdayAdventBeforeDec17KeyFromDate($litEvent->date);
             if (null !== $key) {
+                $weekdayAdvent = $this->Cal->getLiturgicalEvent($key);
+                if (null === $weekdayAdvent) {
+                    throw new \RuntimeException('The weekday of Advent ' . $key . ' was nowhere to be found; perhaps it ascended like Elijah.');
+                }
+
                 /**translators:
                  * 1. Grade or rank of the liturgical event that has been superseded
                  * 2. Name of the liturgical event that has been superseded
@@ -2191,13 +2326,16 @@ final class CalendarPath
                 $message          = _('The %1$s \'%2$s\' is superseded by the %3$s \'%4$s\' in the year %5$d.');
                 $this->Messages[] = sprintf(
                     $message,
-                    LitGrade::i18n($this->Cal->getLiturgicalEvent($key)->grade, $this->CalendarParams->Locale),
-                    $this->Cal->getLiturgicalEvent($key)->name,
+                    LitGrade::i18n($weekdayAdvent->grade, $this->CalendarParams->Locale),
+                    $weekdayAdvent->name,
                     LitGrade::i18n($litEvent->grade, $this->CalendarParams->Locale, false),
                     $litEvent->name,
                     $this->CalendarParams->Year
                 );
-                $psalter_week     = $this->Cal->getLiturgicalEvent($key)->psalter_week;
+                $psalter_week     = $weekdayAdvent->psalter_week;
+                if (null === $psalter_week) {
+                    throw new \RuntimeException('No psalter week for the weekday of Advent ' . $key . ', you will just have to figure out for yourself which breviary to use.');
+                }
                 $this->Cal->setProperty($event_key, 'psalter_week', $psalter_week);
                 $this->Cal->removeLiturgicalEvent($key);
             }
@@ -2504,7 +2642,7 @@ final class CalendarPath
 
         $existingLiturgicalEvent = $this->Cal->getLiturgicalEvent($decreeLiturgicalEvent->event_key);
         if ($existingLiturgicalEvent !== null) {
-            if ($decreeMetadata instanceof DecreeItemSetPropertyNameMetadata) {
+            if ($decreeLiturgicalEvent instanceof DecreeItemSetPropertyName) {
                 //example: StMartha becomes Martha, Mary and Lazarus in 2021
                 $this->Cal->setProperty($decreeLiturgicalEvent->event_key, 'name', $decreeLiturgicalEvent->name);
                 /**translators:
@@ -2725,6 +2863,10 @@ final class CalendarPath
                     $coincidingLiturgicalEvent = $this->Cal->feastFromDate($decreeItemLiturgicalEvent->date);
                 }
 
+                if (null === $coincidingLiturgicalEvent) {
+                    throw new \UnexpectedValueException('Whatever happened to the solemnity or feast that we were expecting to find for the date ' . $decreeItemLiturgicalEvent->date->format('Y-m-d') . '?');
+                }
+
                 $this->Messages[] = sprintf(
                     /**translators:
                      * 1. Grade or rank of the liturgical event being created
@@ -2936,16 +3078,22 @@ final class CalendarPath
      */
     private function calculateWeekdaysEaster(): void
     {
-        $DoMEaster   = $this->Cal->getLiturgicalEvent('Easter')->date->format('j');      //day of the month of Easter
-        $MonthEaster = $this->Cal->getLiturgicalEvent('Easter')->date->format('n');    //month of Easter
+        $Easter    = $this->Cal->getLiturgicalEvent('Easter');
+        $Pentecost = $this->Cal->getLiturgicalEvent('Pentecost');
+        if (null === $Easter || null === $Pentecost) {
+            throw new \RuntimeException('For had He not died, He would not have risen again; and had He not risen again, no one would have believed in Him; and had no one believed in Him, no one would have been redeemed. (St. Augustine, Sermon 213)');
+        }
+
+        $DoMEaster   = $Easter->date->format('j');    // day of the month of Easter
+        $MonthEaster = $Easter->date->format('n');    // month of Easter
         //let's start cycling dates one at a time starting from Easter itself
         $weekdayEasterDate = DateTime::fromFormat($DoMEaster . '-' . $MonthEaster . '-' . $this->CalendarParams->Year);
         $weekdayEasterCnt  = 1;
-        while ($weekdayEasterDate >= $this->Cal->getLiturgicalEvent('Easter')->date && $weekdayEasterDate < $this->Cal->getLiturgicalEvent('Pentecost')->date) {
+        while ($weekdayEasterDate >= $Easter->date && $weekdayEasterDate < $Pentecost->date) {
             $weekdayEasterDate = DateTime::fromFormat($DoMEaster . '-' . $MonthEaster . '-' . $this->CalendarParams->Year)->add(new \DateInterval('P' . $weekdayEasterCnt . 'D'));
             if ($this->Cal->notInSolemnitiesFeastsOrMemorials($weekdayEasterDate) && self::dateIsNotSunday($weekdayEasterDate)) {
                 $upper                  = (int) $weekdayEasterDate->format('z');
-                $diff                   = $upper - (int) $this->Cal->getLiturgicalEvent('Easter')->date->format('z'); //day count between current day and Easter Sunday
+                $diff                   = $upper - (int) $Easter->date->format('z'); //day count between current day and Easter Sunday
                 $currentEasterWeek      = ( ( $diff - $diff % 7 ) / 7 ) + 1; //week count between current day and Easter Sunday
                 $ordinal                = ucfirst(Utilities::getOrdinal($currentEasterWeek, $this->CalendarParams->Locale, $this->formatterFem, LatinUtils::LATIN_ORDINAL_FEM_GEN));
                 $locale                 = LitLocale::$PRIMARY_LANGUAGE;
@@ -2993,10 +3141,15 @@ final class CalendarPath
      */
     private function calculateWeekdaysOrdinaryTime(): void
     {
+        $BaptismLord  = $this->Cal->getLiturgicalEvent('BaptismLord');
+        $AshWednesday = $this->Cal->getLiturgicalEvent('AshWednesday');
+        if (null === $BaptismLord || null === $AshWednesday) {
+            throw new \RuntimeException('The Lord was baptized, not to be cleansed Himself, but to cleanse the waters, so that those waters, cleansed by the flesh of Christ who knew no sin, might have the power of baptism. (St. Ambrose of Milan - On the Mysteries, 4.20)');
+        }
         // In the first part of the year, weekdays of ordinary time begin the day after the Baptism of the Lord
-        $FirstWeekdaysLowerLimit = $this->Cal->getLiturgicalEvent('BaptismLord')->date;
+        $FirstWeekdaysLowerLimit = $BaptismLord->date;
         // and end with Ash Wednesday
-        $FirstWeekdaysUpperLimit = $this->Cal->getLiturgicalEvent('AshWednesday')->date;
+        $FirstWeekdaysUpperLimit = $AshWednesday->date;
 
         $ordWeekday        = 1;
         $currentOrdWeek    = 1;
@@ -3040,17 +3193,22 @@ final class CalendarPath
             $ordWeekday++;
         }
 
+        $Pentecost = $this->Cal->getLiturgicalEvent('Pentecost');
+        if (null === $Pentecost) {
+            throw new \RuntimeException('Where the Church is, there is the Spirit of God; and where the Spirit of God is, there is the Church and every kind of grace. (St. Irenaeus of Lyons - Against Heresies III.17.2)');
+        }
+
         // In the second part of the year, weekdays of ordinary time begin the day after Pentecost
-        $SecondWeekdaysLowerLimit = $this->Cal->getLiturgicalEvent('Pentecost')->date;
+        $secondWeekdaysLowerLimit = $Pentecost->date;
         // and end with the Feast of Christ the King (four Sundays before Christmas)
-        $SecondWeekdaysUpperLimit = DateTime::fromFormat('25-12-' . $this->CalendarParams->Year)->modify('last Sunday')->sub(new \DateInterval('P' . ( 3 * 7 ) . 'D'));
+        $secondWeekdaysUpperLimit = DateTime::fromFormat('25-12-' . $this->CalendarParams->Year)->modify('last Sunday')->sub(new \DateInterval('P' . ( 3 * 7 ) . 'D'));
 
         //$currentOrdWeek = 1;
         $ordWeekday       = 1;
         $lastOrdinaryDate = Utilities::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P' . ( 7 * 7 ) . 'D'));
         $dayLastSunday    = (int) DateTime::fromFormat('25-12-' . $this->CalendarParams->Year)->modify('last Sunday')->sub(new \DateInterval('P' . ( 3 * 7 ) . 'D'))->format('z');
 
-        while ($lastOrdinaryDate >= $SecondWeekdaysLowerLimit && $lastOrdinaryDate < $SecondWeekdaysUpperLimit) {
+        while ($lastOrdinaryDate >= $secondWeekdaysLowerLimit && $lastOrdinaryDate < $secondWeekdaysUpperLimit) {
             $lastOrdinaryDate = Utilities::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P' . ( 7 * 7 + $ordWeekday ) . 'D'));
             if ($this->Cal->notInSolemnitiesFeastsOrMemorials($lastOrdinaryDate)) {
                 $lower               = (int) $lastOrdinaryDate->format('z');
@@ -3129,6 +3287,10 @@ final class CalendarPath
      */
     private function loadWiderRegionData(): void
     {
+        if (null === $this->NationalData) {
+            throw new \RuntimeException('loadNationalCalendarData() seems to not have produces results?');
+        }
+
         $widerRegionDataFile = strtr(
             JsonData::WIDER_REGION_FILE,
             ['{wider_region}' => $this->NationalData->metadata->wider_region]
@@ -3201,6 +3363,10 @@ final class CalendarPath
     {
         if ($this->Cal->isSuppressed($litCalItem->liturgical_event->event_key)) {
             $suppressedEvent = $this->Cal->getSuppressedEventByKey($litCalItem->liturgical_event->event_key);
+            if (null === $suppressedEvent) {
+                throw new \RuntimeException('Suppressed event not found, we expected to find it by its key ' . $litCalItem->liturgical_event->event_key . '.');
+            }
+
             // Let's check if it was suppressed by a Solemnity, Feast, Memorial or Sunday,
             // so we can give some feedback and maybe even recreate the liturgical event if applicable
             if ($this->Cal->inSolemnitiesFeastsOrMemorials($suppressedEvent->date) || self::dateIsSunday($suppressedEvent->date)) {
@@ -3369,6 +3535,11 @@ final class CalendarPath
             case LitGrade::SOLEMNITY:
                 //there seems to be a coincidence with a different Solemnity on the same day!
                 //should we attempt to move to the next open slot?
+                $coincidingEvent = $this->Cal->solemnityFromDate($liturgicalEvent->date);
+                if (null === $coincidingEvent) {
+                    throw new \RuntimeException('No Solemnity found for ' . $liturgicalEvent->date->format('Y-m-d') . '; this was not expected, where did it go?');
+                }
+
                 $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> '
                     . $this->CalendarParams->NationalCalendar . ': '
                     . sprintf(
@@ -3376,7 +3547,7 @@ final class CalendarPath
                         _('The Solemnity \'%1$s\', usually celebrated on %2$s, coincides with the Sunday or Solemnity \'%3$s\' in the year %4$d! Does something need to be done about this?'),
                         '<i>' . $liturgicalEvent->name . '</i>',
                         '<b>' . $this->dayAndMonth->format($liturgicalEvent->date->format('U')) . '</b>',
-                        '<i>' . $this->Cal->solemnityFromDate($liturgicalEvent->date)->name . '</i>',
+                        '<i>' . $coincidingEvent->name . '</i>',
                         $this->CalendarParams->Year
                     );
                 break;
@@ -3649,6 +3820,9 @@ final class CalendarPath
                             if (null === $existingLitEvent) {
                                 if ($this->Cal->isSuppressed($liturgicalEvent->event_key)) {
                                     $existingLitEvent = $this->Cal->getSuppressedEventByKey($liturgicalEvent->event_key);
+                                    if (null === $existingLitEvent) {
+                                        throw new \RuntimeException('eh daje. Hemo provato a recuperare l\'evento dal calendario, e non c\'era. Hemo provato a recuperarlo dagli eventi soppressi, e non c\'era. Ma \'ndo è andato a fini\'?');
+                                    }
                                     $this->Messages[] = sprintf(
                                         /**translators:
                                          * 1. Liturgical grade
@@ -3725,24 +3899,29 @@ final class CalendarPath
         // Apply any new celebrations that the National Calendar introduces via it's Missals
         $requiredProps = ['calendar', 'day', 'month', 'name', 'color', 'grade', 'common', 'grade_display', 'event_key'];
         if ($this->NationalData !== null) {
-            if (count($this->NationalData->metadata->missals) === 0) {
-                $this->Messages[] = 'Did not find any Missals for region ' . $this->NationalData->metadata->nation;
+            $NationalMetadata = $this->NationalData->metadata;
+            $Nation           = $NationalMetadata->nation;
+            if (count($NationalMetadata->missals) === 0) {
+                $this->Messages[] = 'Did not find any Missals for region ' . $Nation;
             } else {
                 // Since we have no way of localizing the country name in Latin, we'll just use English for now
                 $countryName      = LitLocale::LATIN_PRIMARY_LANGUAGE === LitLocale::$PRIMARY_LANGUAGE
-                                    ? \Locale::getDisplayRegion('-' . $this->NationalData->metadata->nation, 'en')
-                                    : \Locale::getDisplayRegion('-' . $this->NationalData->metadata->nation, $this->CalendarParams->Locale);
+                                    ? \Locale::getDisplayRegion('-' . $Nation, 'en')
+                                    : \Locale::getDisplayRegion('-' . $Nation, $this->CalendarParams->Locale);
                 $this->Messages[] = sprintf(
                     /**translators: 1. Country name, 2. List of missals */
                     _('Found Missals for region %1$s: %2$s.'),
                     $countryName,
-                    implode(', ', $this->NationalData->metadata->missals)
+                    implode(', ', $NationalMetadata->missals)
                 );
 
                 // If the national calendar has any proper language edition Roman Missals,
                 // we get the sanctorale data for those Missals (if defined)
-                foreach ($this->NationalData->metadata->missals as $missal) {
+                foreach ($NationalMetadata->missals as $missal) {
                     $yearLimits = RomanMissal::getYearLimits($missal);
+                    if (null === $yearLimits) {
+                        throw new \RuntimeException('Roman Missal ' . $missal . ' has no year limits! We expected at least a non null since_year value.');
+                    }
 
                     // Skip missals that only apply to years after the current requested year
                     if ($this->CalendarParams->Year < $yearLimits['since_year']) {
@@ -3776,8 +3955,8 @@ final class CalendarPath
                                 ));
                             }
                             $currentLitEventDate = DateTime::fromFormat($propriumDeSanctisEvent->day . '-' . $propriumDeSanctisEvent->month . '-' . $this->CalendarParams->Year);
-                            if (!$this->Cal->inSolemnitiesOrFeasts($currentLitEventDate)) {
-                                $propriumDeSanctisEvent->setName("[ {$this->NationalData->metadata->nation} ] " . $propriumDeSanctisEvent->name);
+                            if (false === $this->Cal->inSolemnitiesOrFeasts($currentLitEventDate)) {
+                                $propriumDeSanctisEvent->setName("[ {$Nation} ] " . $propriumDeSanctisEvent->name);
                                 $propriumDeSanctisEvent->setDate($currentLitEventDate);
                                 //$propriumDeSanctisEvent->type = LitEventType::FIXED;
                                 $litEvent = LiturgicalEvent::fromObject($propriumDeSanctisEvent);
@@ -3805,7 +3984,7 @@ final class CalendarPath
                                          * 6. Superseding liturgical event name
                                          * 7. Requested calendar year
                                          */
-                                        $this->NationalData->metadata->nation . ': ' . _('The %1$s \'%2$s\' (%3$s), added to the national calendar in the %4$s, is superseded by the %5$s \'%6$s\' in the year %7$d'),
+                                        $Nation . ': ' . _('The %1$s \'%2$s\' (%3$s), added to the national calendar in the %4$s, is superseded by the %5$s \'%6$s\' in the year %7$d'),
                                         LitGrade::i18n($propriumDeSanctisEvent->grade, $this->CalendarParams->Locale, false),
                                         '<i>' . $propriumDeSanctisEvent->name . '</i>',
                                         $this->dayAndMonth->format($currentLitEventDate->format('U')),
@@ -3882,7 +4061,12 @@ final class CalendarPath
                 //       and needs to be automated from the national calendar JSON file
                 if ($event_key !== 'StVincentDeacon' || $missal !== RomanMissal::USA_EDITION_2011) {
                     if ($this->Cal->isSuppressed($event_key)) {
-                        $suppressedEvent       = $this->Cal->getSuppressedEventByKey($event_key);
+                        $suppressedEvent = $this->Cal->getSuppressedEventByKey($event_key);
+                        if (null === $suppressedEvent) {
+                            throw new \RuntimeException('Would you please make up your mind? First you tell me that the liturgical event ' . $event_key . ' is suppressed, ' .
+                                'then you go on to tell me that it is nowhere to be found among the suppressed events?');
+                        }
+
                         $suppressedEvent->date = $newDate;
                         $suppressedEvent->type = LitEventType::FIXED;
                         $this->Cal->addLiturgicalEvent($event_key, $suppressedEvent);
@@ -4237,6 +4421,10 @@ final class CalendarPath
      */
     private function applyDiocesanCalendar(): void
     {
+        if ($this->DiocesanData === null) {
+            throw new \RuntimeException('Don\'t go asking me to apply a diocesan calendar if I don\'t have one!');
+        }
+
         foreach ($this->DiocesanData->litcal as $litCalItem) {
             // If sinceYear is undefined or null or empty, let's go ahead and create the event in any case.
             // Creation will be restricted only if explicitly defined by the sinceYear property.
@@ -4268,6 +4456,10 @@ final class CalendarPath
                         if ($this->Cal->inSolemnities($currentLitEventDate) && $liturgicalEvent->event_key !== $this->Cal->solemnityKeyFromDate($currentLitEventDate)) {
                             // There seems to be a coincidence with a different Solemnity on the same day!
                             // Should we attempt to move to the next open slot?
+                            $coincidingSolemnity = $this->Cal->solemnityFromDate($currentLitEventDate);
+                            if (null === $coincidingSolemnity) {
+                                throw new \RuntimeException('You tell me there\'s a solemnity on ' . $currentLitEventDate->format('Y-m-d') . ', but alas, no solemnity to be found! “What we see is merely a shadow of what is hidden.” (Plato, The Republic)');
+                            }
                             $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> '
                                 . $this->CalendarParams->DiocesanCalendar . ': '
                                 .  sprintf(
@@ -4276,7 +4468,7 @@ final class CalendarPath
                                     '<i>' . $liturgicalEvent->name . '</i>',
                                     $this->DioceseName,
                                     '<b>' . $this->dayAndMonth->format($currentLitEventDate->format('U')) . '</b>',
-                                    '<i>' . $this->Cal->solemnityFromDate($currentLitEventDate)->name . '</i>',
+                                    '<i>' . $coincidingSolemnity->name . '</i>',
                                     $this->CalendarParams->Year
                                 );
                         }
@@ -4423,11 +4615,11 @@ final class CalendarPath
             $displayGrade     = '';
             $displayGradeHTML = '';
 
-            if (property_exists($liturgicalEvent, 'grade_display') && $liturgicalEvent->grade_display !== null) {
+            if ($liturgicalEvent->grade_display !== null) {
                 $displayGrade = $liturgicalEvent->grade_display;
             }
 
-            if (property_exists($liturgicalEvent, 'event_key') && ( $liturgicalEvent->event_key === 'DedicationLateran' || $liturgicalEvent->event_key === 'DedicationLateran_vigil' )) {
+            if ($liturgicalEvent->event_key === 'DedicationLateran' || $liturgicalEvent->event_key === 'DedicationLateran_vigil') {
                 $displayGradeHTML = LitGrade::i18n(LitGrade::FEAST, $this->CalendarParams->Locale, true);
             } elseif ($liturgicalEvent->grade_display === null) {
                 $displayGradeHTML = LitGrade::i18n($liturgicalEvent->grade, $this->CalendarParams->Locale, true);
@@ -4475,11 +4667,13 @@ final class CalendarPath
             //$liturgicalEvent->date->add( new \DateInterval( 'P1D' ) );
             //$ical .= "DTEND:" . $liturgicalEvent->date->format( 'Ymd' ) . "T" . $liturgicalEvent->date->format( 'His' ) . "Z\r\n";
             $ical .= 'DTSTAMP:' . date('Ymd') . 'T' . date('His') . "Z\r\n";
-            /** The event created in the calendar is specific to this year, next year it may be different.
-             *  So UID must take into account the year
-             *  Next year's event should not cancel this year's event, they are different events.
-             *  We will never have the same event_key twice in the same year.
-             **/
+            /**
+             * The event created in the calendar is specific to this civil year, next year it may be different.
+             * So UID must take into account the civil year.
+             * Next civil year's event should not cancel this civil year's event, they are different events.
+             * We will never have the same event_key twice in the same civil year.
+             * The event could occur twice in the same liturgical year, but will be treated as a separate event since we have identified it with the civil year.
+             */
             $ical .= 'UID:' . md5('LITCAL-' . $liturgicalEvent->event_key . '-' . $liturgicalEvent->date->format('Y')) . "\r\n";
             $ical .= 'CREATED:' . str_replace(':', '', str_replace('-', '', $publishDate)) . "\r\n";
 
@@ -4487,8 +4681,9 @@ final class CalendarPath
             $ical .= strlen($desc) > 75 ? rtrim(chunk_split($desc, 71, "\r\n\t")) . "\r\n" : "$desc\r\n";
             $ical .= 'LAST-MODIFIED:' . str_replace(':', '', str_replace('-', '', $publishDate)) . "\r\n";
 
-            $summaryLang = ';LANGUAGE=' . strtolower(preg_replace('/_/', '-', $this->CalendarParams->Locale));
-            $summary     = 'SUMMARY' . $summaryLang . ':' . str_replace(',', '\,', str_replace("\r\n", ' ', $liturgicalEvent->name));
+            $normalizedLocale = str_replace('_', '-', $this->CalendarParams->Locale);
+            $summaryLang      = ';LANGUAGE=' . $normalizedLocale;
+            $summary          = 'SUMMARY' . $summaryLang . ':' . str_replace(',', '\,', str_replace("\r\n", ' ', $liturgicalEvent->name));
 
             $ical .= strlen($summary) > 75 ? rtrim(chunk_split($summary, 75, "\r\n\t")) . "\r\n" : $summary . "\r\n";
             $ical .= "TRANSP:TRANSPARENT\r\n";
@@ -4517,8 +4712,10 @@ final class CalendarPath
      * same Liturgical Calendar within this time period, the cached response is returned instead of re-calculating
      * the Liturgical Calendar. If the file does not exist or is stale, the function will re-calculate the Liturgical
      * Calendar and cache the response.
+     *
+     * @return never
      */
-    private function generateResponse(): void
+    private function generateResponse(): never
     {
         $SerializeableLitCal                                = new \stdClass();
         $SerializeableLitCal->litcal                        = $this->Cal->getLiturgicalEventsCollection();
@@ -4680,7 +4877,11 @@ final class CalendarPath
      */
     private function prepareL10N(): string|false
     {
-        $baseLocale                  = \Locale::getPrimaryLanguage($this->CalendarParams->Locale);
+        $baseLocale = \Locale::getPrimaryLanguage($this->CalendarParams->Locale);
+        if (null === $baseLocale) {
+            throw new \RuntimeException('“Pride was the reason for the division of tongues, humility the reason they were reunited.” - St. Augustine, The City of God, Book XVI, Chapter 4');
+        }
+
         LitLocale::$PRIMARY_LANGUAGE = $baseLocale;
         $localeArray                 = [
             $this->CalendarParams->Locale . '.utf8',
@@ -4832,37 +5033,37 @@ final class CalendarPath
             if (file_exists($nationalLectionaryFile) && is_readable($nationalLectionaryFile)) {
                 $this->Cal::$lectionary->addSanctoraleReadingsFromFile($nationalLectionaryFile);
             }
-        }
 
-        if ($this->WiderRegionData !== null && property_exists($this->WiderRegionData, 'litcal')) {
-            $WiderRegionDataI18nFile = strtr(
-                JsonData::WIDER_REGION_I18N_FILE,
-                [
-                    '{wider_region}' => $this->NationalData->metadata->wider_region,
-                    '{locale}'       => $this->CalendarParams->Locale
-                ]
-            );
+            if ($this->WiderRegionData !== null) {
+                $WiderRegionDataI18nFile = strtr(
+                    JsonData::WIDER_REGION_I18N_FILE,
+                    [
+                        '{wider_region}' => $this->NationalData->metadata->wider_region,
+                        '{locale}'       => $this->CalendarParams->Locale
+                    ]
+                );
 
-            $WiderRegionDataI18nJson = Utilities::jsonFileToArray($WiderRegionDataI18nFile);
-            if (array_filter(array_keys($WiderRegionDataI18nJson), 'is_string') !== array_keys($WiderRegionDataI18nJson)) {
-                throw new \Exception('We expected all the keys of the array to be strings.');
-            }
-            if (array_filter($WiderRegionDataI18nJson, 'is_string') !== $WiderRegionDataI18nJson) {
-                throw new \Exception('We expected all the values of the array to be strings.');
-            }
-            /** @var array<string,string> $WiderRegionDataI18nJson */
-            $this->WiderRegionData->setNames($WiderRegionDataI18nJson);
+                $WiderRegionDataI18nJson = Utilities::jsonFileToArray($WiderRegionDataI18nFile);
+                if (array_filter(array_keys($WiderRegionDataI18nJson), 'is_string') !== array_keys($WiderRegionDataI18nJson)) {
+                    throw new \Exception('We expected all the keys of the array to be strings.');
+                }
+                if (array_filter($WiderRegionDataI18nJson, 'is_string') !== $WiderRegionDataI18nJson) {
+                    throw new \Exception('We expected all the values of the array to be strings.');
+                }
+                /** @var array<string,string> $WiderRegionDataI18nJson */
+                $this->WiderRegionData->setNames($WiderRegionDataI18nJson);
 
-            $widerRegionLectionaryFile = strtr(
-                JsonData::NATIONAL_CALENDAR_LECTIONARY_FILE,
-                [
-                    '{nation}' => $this->CalendarParams->NationalCalendar,
-                    '{locale}' => $this->CalendarParams->Locale
-                ]
-            );
+                $widerRegionLectionaryFile = strtr(
+                    JsonData::NATIONAL_CALENDAR_LECTIONARY_FILE,
+                    [
+                        '{nation}' => $this->CalendarParams->NationalCalendar,
+                        '{locale}' => $this->CalendarParams->Locale
+                    ]
+                );
 
-            if (file_exists($widerRegionLectionaryFile) && is_readable($widerRegionLectionaryFile)) {
-                $this->Cal::$lectionary->addSanctoraleReadingsFromFile($widerRegionLectionaryFile);
+                if (file_exists($widerRegionLectionaryFile) && is_readable($widerRegionLectionaryFile)) {
+                    $this->Cal::$lectionary->addSanctoraleReadingsFromFile($widerRegionLectionaryFile);
+                }
             }
         }
     }
@@ -4872,8 +5073,9 @@ final class CalendarPath
      * Do not change the order of the methods that follow,
      * each one can depend on the one before it in order to function correctly!
      * @param array<string|int> $requestPathParts
+     * @return never
      */
-    public function init(array $requestPathParts = []): void
+    public function init(array $requestPathParts = []): never
     {
         self::$Core->init();
         if (self::$Core->getRequestMethod() === RequestMethod::OPTIONS) {

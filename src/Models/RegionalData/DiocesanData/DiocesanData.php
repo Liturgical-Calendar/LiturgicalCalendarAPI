@@ -92,7 +92,11 @@ final class DiocesanData extends AbstractJsonSrcData
     public function applyTranslations(string $locale): void
     {
         foreach ($this->litcal as $litcalItem) {
-            $litcalItem->setName($this->i18n->getTranslation($litcalItem->getEventKey(), $locale));
+            $name = $this->i18n->getTranslation($litcalItem->getEventKey(), $locale);
+            if (null === $name) {
+                throw new \ValueError('translation not found for event key: ' . $litcalItem->getEventKey());
+            }
+            $litcalItem->setName($name);
         }
     }
 
@@ -113,7 +117,11 @@ final class DiocesanData extends AbstractJsonSrcData
     public function setNames(array $translations): void
     {
         foreach ($this->litcal as $litcalItem) {
-            $litcalItem->setName($translations[$litcalItem->getEventKey()] ?? null);
+            $name = $translations[$litcalItem->getEventKey()] ?? null;
+            if (null === $name) {
+                throw new \ValueError('translation not found for event key: ' . $litcalItem->getEventKey());
+            }
+            $litcalItem->setName($name);
         }
     }
 

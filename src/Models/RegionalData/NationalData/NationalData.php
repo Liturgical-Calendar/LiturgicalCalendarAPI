@@ -88,7 +88,11 @@ final class NationalData extends AbstractJsonSrcData
     public function applyTranslations(string $locale): void
     {
         foreach ($this->litcal as $litcalItem) {
-            $litcalItem->setName($this->i18n->getTranslation($litcalItem->getEventKey(), $locale));
+            $translation = $this->i18n->getTranslation($litcalItem->getEventKey(), $locale);
+            if (null === $translation) {
+                throw new \ValueError('translation not found for event key: ' . $litcalItem->getEventKey());
+            }
+            $litcalItem->setName($translation);
         }
     }
 

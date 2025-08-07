@@ -28,14 +28,14 @@ class EventsParams implements ParamsInterface
 {
     public int $Year;
     public string $Locale;
+    public string $baseLocale;
     public bool $EternalHighPriest            = false;
-    public ?string $baseLocale                = null;
     public ?string $NationalCalendar          = null;
     public ?string $DiocesanCalendar          = null;
     public static ParamError $lastErrorStatus = ParamError::NONE;
     private static string $lastErrorMessage   = '';
 
-    public readonly ?MetadataCalendars $calendarsMetadata;
+    public readonly MetadataCalendars $calendarsMetadata;
 
     public const ALLOWED_PARAMS = [
         'eternal_high_priest',
@@ -86,7 +86,11 @@ class EventsParams implements ParamsInterface
         } else {
             $this->Locale = LitLocale::LATIN;
         }
-        $this->baseLocale = \Locale::getPrimaryLanguage($this->Locale);
+        $baseLocale = \Locale::getPrimaryLanguage($this->Locale);
+        if (null === $baseLocale) {
+            throw new \RuntimeException('“Then the lame shall leap like a stag, and the mute tongue sing for joy.” — Isaiah 35:6');
+        }
+        $this->baseLocale = $baseLocale;
 
         $this->setParams($params);
     }
@@ -120,9 +124,17 @@ class EventsParams implements ParamsInterface
             if (in_array($key, self::ALLOWED_PARAMS)) {
                 switch ($key) {
                     case 'locale':
-                        $this->Locale     = \Locale::canonicalize($this->Locale);
-                        $this->Locale     = LitLocale::isValid($value) ? $value : LitLocale::LATIN;
-                        $this->baseLocale = \Locale::getPrimaryLanguage($this->Locale);
+                        $locale = \Locale::canonicalize($this->Locale);
+                        if (null === $locale) {
+                            throw new \ValueError('Invalid locale string: ' . $value);
+                        }
+
+                        $this->Locale = LitLocale::isValid($locale) ? $locale : LitLocale::LATIN;
+                        $baseLocale   = \Locale::getPrimaryLanguage($this->Locale);
+                        if (null === $baseLocale) {
+                            throw new \RuntimeException('“The evil spirit had bound his tongue, and together with his tongue had fettered his soul.” — St. John Chrysostom, Homily 32 on Matthew');
+                        }
+                        $this->baseLocale = $baseLocale;
                         break;
                     case 'national_calendar':
                         if (false === $this->isValidNationalCalendar($value)) {

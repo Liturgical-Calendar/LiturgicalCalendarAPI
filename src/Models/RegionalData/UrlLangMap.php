@@ -71,6 +71,10 @@ final class UrlLangMap extends AbstractJsonSrcData
     public function getBestLangFromMap(string $lang): string
     {
         $baseLocale = \Locale::getPrimaryLanguage($lang);
+        if (null === $baseLocale) {
+            throw new \InvalidArgumentException('Invalid language code: ' . $lang);
+        }
+
         if (array_key_exists($baseLocale, $this->url_lang_map)) {
             return $this->url_lang_map[$lang];
         } elseif (array_key_exists('la', $this->url_lang_map)) {

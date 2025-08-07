@@ -224,7 +224,21 @@ final class MetadataPath
         return 200;
     }
 
-    public static function response(): void
+    /**
+     * Generates the HTTP Response for the /calendars path.
+     *
+     * The response is a JSON object containing the list of supported National and Diocesan calendars,
+     * and the list of locales supported for the General Roman Calendar.
+     * The response is cached by the client and by the server (if the server is configured to do so).
+     * The response also includes an Etag header containing the MD5 hash of the response.
+     * If the client sends an If-None-Match header with the same value as the Etag,
+     * the response is a 304 Not Modified response with a Content-Length of 0,
+     * indicating that the client can use its cached copy of the response.
+     * Otherwise, the response is the full JSON object.
+     *
+     * @return never
+     */
+    public static function response(): never
     {
         $response = json_encode(['litcal_metadata' => self::$metadataCalendars], JSON_PRETTY_PRINT);
         if (JSON_ERROR_NONE !== json_last_error() || false === $response) {
@@ -248,9 +262,9 @@ final class MetadataPath
      *
      * It sets the appropriate CORS headers and calls the `buildIndex` and `response` methods.
      *
-     * @return void
+     * @return never
      */
-    public static function init()
+    public static function init(): never
     {
         if (isset($_SERVER['REQUEST_METHOD'])) {
             if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
@@ -281,6 +295,7 @@ final class MetadataPath
             MetadataPath::response();
         } else {
             http_response_code($indexResult);
+            die();
         }
     }
 }

@@ -192,11 +192,15 @@ class RomanMissal
      * Gets the name of the Roman Missal corresponding to the given Missal id.
      *
      * @param string $missal_id the id of the Roman Missal
-     * @return ?string the name of the Roman Missal, or null if missal_id not valid
+     * @return string the name of the Roman Missal, or null if missal_id not valid
+     * @throws \InvalidArgumentException if missal_id is not valid
      */
-    public static function getName(string $missal_id): ?string
+    public static function getName(string $missal_id): string
     {
-        return self::$names[$missal_id] ?? null;
+        if (false === RomanMissal::isValid($missal_id)) {
+            throw new \InvalidArgumentException('Invalid missal_id: ' . $missal_id);
+        }
+        return self::$names[$missal_id];
     }
 
     /**
@@ -271,8 +275,9 @@ class RomanMissal
     public static function produceMetadata($obj = true): array
     {
         $reflectionClass = new \ReflectionClass(static::class);
-        $missal_ids      = $reflectionClass->getConstants();
-        $metadata        = [];
+        /** @var array<string,string> */
+        $missal_ids = $reflectionClass->getConstants();
+        $metadata   = [];
         foreach ($missal_ids as $key => $missal_id) {
             $i18n_path = self::getSanctoraleI18nFilePath($missal_id);
             $locales   = [];
@@ -294,8 +299,6 @@ class RomanMissal
                 'missal_id'      => $missal_id,
                 'name'           => self::getName($missal_id),
                 'region'         => $region,
-                //"data_path"      => self::getSanctoraleFileName($missal_id),
-                //"i18n_path"      => self::getSanctoraleI18nFilePath($missal_id),
                 'locales'        => $locales,
                 'year_limits'    => self::$yearLimits[$missal_id],
                 'year_published' => self::$yearLimits[$missal_id]['since_year'],

@@ -90,7 +90,11 @@ final class CatholicDiocesesMap extends AbstractJsonSrcData
     {
         foreach ($this->diocesesByCountry as $countryIso => $countryWithDiocesesItem) {
             if ($countryWithDiocesesItem->isValidDioceseId($dioceseId)) {
-                return ['country_iso' => $countryIso, 'diocese_name' => $countryWithDiocesesItem->dioceseNameFromId($dioceseId)];
+                $dioceseName = $countryWithDiocesesItem->dioceseNameFromId($dioceseId);
+                if (null === $dioceseName) {
+                    throw new \InvalidArgumentException('Missing diocese name for diocese id: ' . $dioceseId . ' in country: ' . $countryIso . '.');
+                }
+                return ['country_iso' => $countryIso, 'diocese_name' => $dioceseName];
             }
         }
         return null;

@@ -144,7 +144,7 @@ final class LiturgicalEventCollection
     public function __construct(CalendarParams $CalendarParams)
     {
         $this->CalendarParams = $CalendarParams;
-        $this->dayOfTheWeek   = \IntlDateFormatter::create(
+        $dowFormatter         = \IntlDateFormatter::create(
             $this->CalendarParams->Locale,
             \IntlDateFormatter::FULL,
             \IntlDateFormatter::NONE,
@@ -152,6 +152,10 @@ final class LiturgicalEventCollection
             \IntlDateFormatter::GREGORIAN,
             'EEEE'
         );
+        if (false === $dowFormatter instanceof \IntlDateFormatter) {
+            throw new \InvalidArgumentException('Failed to create IntlDateFormatter');
+        }
+        $this->dayOfTheWeek = $dowFormatter;
 
         if (LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE) {
             $this->T = [
@@ -771,6 +775,9 @@ final class LiturgicalEventCollection
     private function handleGradeProperty(string $key, LitGrade $newGradeValue, LitGrade $oldGradeValue): void
     {
         $litEvent = $this->liturgicalEvents->getEvent($key);
+        if (null === $litEvent) {
+            throw new \InvalidArgumentException('Invalid key: ' . $key . ' for LiturgicalEvents, valid keys are: ' . implode(', ', $this->liturgicalEvents->getKeys()));
+        }
         // Update the grade_lcl and grade_abbr properties
         $litEvent->setGradeLocalization(LitGrade::i18n($newGradeValue, $this->CalendarParams->Locale, false, false));
         $litEvent->setGradeAbbreviation(LitGrade::i18n($newGradeValue, $this->CalendarParams->Locale, false, true));
@@ -875,14 +882,21 @@ final class LiturgicalEventCollection
         if ($this->solemnities->hasKey($key)) {
             $this->solemnities->removeEvent($key);
         }
+
         if ($this->feasts->hasKey($key)) {
             $this->feasts->removeEvent($key);
         }
+
         if ($this->memorials->hasKey($key)) {
             $this->memorials->removeEvent($key);
         }
-        $this->suppressedEvents->addEvent($this->liturgicalEvents->getEvent($key));
-        $this->liturgicalEvents->removeEvent($key);
+
+        if ($this->liturgicalEvents->hasKey($key)) {
+            /** @var LiturgicalEvent $event */
+            $event = $this->liturgicalEvents->getEvent($key);
+            $this->suppressedEvents->addEvent($event);
+            $this->liturgicalEvents->removeEvent($key);
+        }
     }
 
     /**
@@ -930,8 +944,14 @@ final class LiturgicalEventCollection
      */
     public function reinstateEvent(string $key): void
     {
-        $this->reinstatedEvents->addEvent($this->suppressedEvents->getEvent($key));
-        $this->suppressedEvents->removeEvent($key);
+        if ($this->suppressedEvents->hasKey($key)) {
+            /** @var LiturgicalEvent $event */
+            $event = $this->suppressedEvents->getEvent($key);
+            $this->reinstatedEvents->addEvent($event);
+            $this->suppressedEvents->removeEvent($key);
+        } else {
+            throw new \InvalidArgumentException(__METHOD__ . ": key `{$key}` does not exist in the suppressedEvents collection.");
+        }
     }
 
     /**
@@ -991,10 +1011,19 @@ final class LiturgicalEventCollection
      */
     public function inOrdinaryTime(DateTime $date): bool
     {
+        $BaptismLord  = $this->liturgicalEvents->getEvent('BaptismLord');
+        $AshWednesday = $this->liturgicalEvents->getEvent('AshWednesday');
+        $Pentecost    = $this->liturgicalEvents->getEvent('Pentecost');
+        $Advent1      = $this->liturgicalEvents->getEvent('Advent1');
+
+        if (null === $BaptismLord || null === $AshWednesday || null === $Pentecost || null === $Advent1) {
+            throw new \InvalidArgumentException('Missing liturgical events: Baptism of the Lord, Ash Wednesday, Pentecost, or Advent1.');
+        }
+
         return (
-            ( $date > $this->liturgicalEvents->getEvent('BaptismLord')->date && $date < $this->liturgicalEvents->getEvent('AshWednesday')->date )
+            ( $date > $BaptismLord->date && $date < $AshWednesday->date )
             ||
-            ( $date > $this->liturgicalEvents->getEvent('Pentecost')->date && $date < $this->liturgicalEvents->getEvent('Advent1')->date )
+            ( $date > $Pentecost->date && $date < $Advent1->date )
         );
     }
 
@@ -1020,17 +1049,29 @@ final class LiturgicalEventCollection
      */
     public function setCyclesVigilsSeasons()
     {
+        $Advent1      = $this->liturgicalEvents->getEvent('Advent1');
+        $Christmas    = $this->liturgicalEvents->getEvent('Christmas');
+        $BaptismLord  = $this->liturgicalEvents->getEvent('BaptismLord');
+        $AshWednesday = $this->liturgicalEvents->getEvent('AshWednesday');
+        $HolyThurs    = $this->liturgicalEvents->getEvent('HolyThurs');
+        $Easter       = $this->liturgicalEvents->getEvent('Easter');
+        $Pentecost    = $this->liturgicalEvents->getEvent('Pentecost');
+
+        if (null === $Advent1 || null === $Christmas || null === $BaptismLord || null === $AshWednesday || null === $HolyThurs || null === $Easter || null === $Pentecost) {
+            throw new \InvalidArgumentException('Missing liturgical events: Advent1, Christmas, Baptism of the Lord, Ash Wednesday, Holy Thursday, Easter, or Pentecost.');
+        }
+
         // DEFINE LITURGICAL SEASONS
         foreach ($this->liturgicalEvents as $litEvent) {
-            if ($litEvent->date >= $this->liturgicalEvents->getEvent('Advent1')->date && $litEvent->date < $this->liturgicalEvents->getEvent('Christmas')->date) {
+            if ($litEvent->date >= $Advent1->date && $litEvent->date < $Christmas->date) {
                 $litEvent->liturgical_season = LitSeason::ADVENT;
-            } elseif ($litEvent->date >= $this->liturgicalEvents->getEvent('Christmas')->date || $litEvent->date <= $this->liturgicalEvents->getEvent('BaptismLord')->date) {
+            } elseif ($litEvent->date >= $Christmas->date || $litEvent->date <= $BaptismLord->date) {
                 $litEvent->liturgical_season = LitSeason::CHRISTMAS;
-            } elseif ($litEvent->date >= $this->liturgicalEvents->getEvent('AshWednesday')->date && $litEvent->date < $this->liturgicalEvents->getEvent('HolyThurs')->date) {
+            } elseif ($litEvent->date >= $AshWednesday->date && $litEvent->date < $HolyThurs->date) {
                 $litEvent->liturgical_season = LitSeason::LENT;
-            } elseif ($litEvent->date >= $this->liturgicalEvents->getEvent('HolyThurs')->date && $litEvent->date < $this->liturgicalEvents->getEvent('Easter')->date) {
+            } elseif ($litEvent->date >= $HolyThurs->date && $litEvent->date < $Easter->date) {
                 $litEvent->liturgical_season = LitSeason::EASTER_TRIDUUM;
-            } elseif ($litEvent->date >= $this->liturgicalEvents->getEvent('Easter')->date && $litEvent->date <= $this->liturgicalEvents->getEvent('Pentecost')->date) {
+            } elseif ($litEvent->date >= $Easter->date && $litEvent->date <= $Pentecost->date) {
                 $litEvent->liturgical_season = LitSeason::EASTER;
             } else {
                 $litEvent->liturgical_season = LitSeason::ORDINARY_TIME;
@@ -1067,13 +1108,16 @@ final class LiturgicalEventCollection
                 }
             } elseif (self::dateIsSunday($litEvent->date) || $litEvent->grade->value > LitGrade::FEAST->value) {
                 // STEP 2: Then we deal with Sundays and Feasts of the Lord and Solemnities
-                $firstSundayOfAdvent = $this->liturgicalEvents->getEvent('Advent1')->date;
-                $liturgicalCycle     = '';
-                $festiveCycle        = '';
-                if ($litEvent->date < $firstSundayOfAdvent) {
+                $firstSundayOfAdvent = $this->liturgicalEvents->getEvent('Advent1');
+                if (null === $firstSundayOfAdvent) {
+                    throw new \Exception('we would not expect the first Sunday of Advent to be null');
+                }
+                $liturgicalCycle = '';
+                $festiveCycle    = '';
+                if ($litEvent->date < $firstSundayOfAdvent->date) {
                     $festiveCycle    = self::SUNDAY_CYCLE[( $this->CalendarParams->Year - 1 ) % 3];
                     $liturgicalCycle = $this->T['YEAR'] . ' ' . $festiveCycle;
-                } elseif ($litEvent->date >= $firstSundayOfAdvent) {
+                } elseif ($litEvent->date >= $firstSundayOfAdvent->date) {
                     $festiveCycle    = self::SUNDAY_CYCLE[$this->CalendarParams->Year % 3];
                     $liturgicalCycle = $this->T['YEAR'] . ' ' . $festiveCycle;
                 }
@@ -1093,9 +1137,16 @@ final class LiturgicalEventCollection
                 //   - celebrations from the Sanctorale
                 // In any case, for all of the above except the Sanctorale, we can still use the liturgical cycle to retrieve the readings,
                 //   seeing that the readings are found in all three lectionaries even if they're the same
+                $HolyThurs = $this->liturgicalEvents->getEvent('HolyThurs');
+                $Easter2   = $this->liturgicalEvents->getEvent('Easter2');
+
+                if (null === $HolyThurs || null === $Easter2) {
+                    throw new \Exception('we would not expect either the Holy Thursday or the second Sunday of Easter to be null');
+                }
+
                 if (
-                    $litEvent->date < $this->liturgicalEvents->getEvent('HolyThurs')->date
-                    || $litEvent->date >= $this->liturgicalEvents->getEvent('Easter2')->date
+                    $litEvent->date < $HolyThurs->date
+                    || $litEvent->date >= $Easter2->date
                 ) {
                     if (self::$lectionary->hasSanctoraleReadings($litEvent->event_key)) {
                         // If the event is from the Sanctorale (this includes national and diocesan created events),
@@ -1247,18 +1298,26 @@ final class LiturgicalEventCollection
      */
     private function liturgicalEventCanHaveVigil(LiturgicalEvent|\stdClass $litEvent): bool
     {
+        $PalmSun = $this->liturgicalEvents->getEvent('PalmSun');
+        $Easter  = $this->liturgicalEvents->getEvent('Easter');
+        $Easter2 = $this->liturgicalEvents->getEvent('Easter2');
+
+        if (null === $PalmSun || null === $Easter || null === $Easter2) {
+            throw new \InvalidArgumentException('Missing liturgical events: Palm Sunday, Easter, or Easter2.');
+        }
+
         if ($litEvent instanceof LiturgicalEvent) {
             return (
                 false === ( $litEvent->event_key === 'AllSouls' )
                 && false === ( $litEvent->event_key === 'AshWednesday' )
-                && false === ( $litEvent->date > $this->liturgicalEvents->getEvent('PalmSun')->date && $litEvent->date < $this->liturgicalEvents->getEvent('Easter')->date )
-                && false === ( $litEvent->date > $this->liturgicalEvents->getEvent('Easter')->date && $litEvent->date < $this->liturgicalEvents->getEvent('Easter2')->date )
+                && false === ( $litEvent->date > $PalmSun->date && $litEvent->date < $Easter->date )
+                && false === ( $litEvent->date > $Easter->date && $litEvent->date < $Easter2->date )
             );
         }
         else {
             return (
-                false === ( $litEvent->event->date > $this->liturgicalEvents->getEvent('PalmSun')->date && $litEvent->event->date < $this->liturgicalEvents->getEvent('Easter')->date )
-                && false === ( $litEvent->event->date > $this->liturgicalEvents->getEvent('Easter')->date && $litEvent->event->date < $this->liturgicalEvents->getEvent('Easter2')->date )
+                false === ( $litEvent->event->date > $PalmSun->date && $litEvent->event->date < $Easter->date )
+                && false === ( $litEvent->event->date > $Easter->date && $litEvent->event->date < $Easter2->date )
             );
         }
     }
@@ -1437,7 +1496,19 @@ final class LiturgicalEventCollection
                     $coincidingEvent            = new \stdClass();
                     $coincidingEvent->grade_lcl = '';
                     $coincidingEvent->key       = $this->solemnityKeyFromDate($VigilDate);
-                    $coincidingEvent->event     = $this->liturgicalEvents->getEvent($coincidingEvent->key);
+                    if (null === $coincidingEvent->key) {
+                        throw new \Exception('Could not find the Solemnity key that seems to coincide with the Vigil Mass for ' . $litEvent->event_key);
+                    }
+
+                    $coincidingLitEvent = $this->liturgicalEvents->getEvent($coincidingEvent->key);
+
+                    if (null === $coincidingLitEvent) {
+                        throw new \Exception(
+                            'Could not find the Solemnity ' . $coincidingEvent->key . ' that seems to coincide with the Vigil Mass for ' . $litEvent->event_key
+                        );
+                    }
+
+                    $coincidingEvent->event = $coincidingLitEvent;
                     if (self::dateIsSunday($VigilDate) && $coincidingEvent->event->grade->value < LitGrade::SOLEMNITY->value) {
                         //it's a Sunday
                         $dayOfTheWeek               = $this->dayOfTheWeek->format($VigilDate->format('U')) ?: 'N/A';
@@ -1642,19 +1713,31 @@ final class LiturgicalEventCollection
         $coincidingEvent->grade_lcl = '';
         if (self::dateIsSunday($currentLitEventDate) && $this->inFeastsLord($currentLitEventDate)) {
             //it's a Sunday (which is also considered a Feast of the Lord)
-            $dayOfTheWeek               = $this->dayOfTheWeek->format($currentLitEventDate->format('U')) ?: 'N/A';
-            $coincidingEvent->event     = $this->feastLordFromDate($currentLitEventDate);
+            $dayOfTheWeek    = $this->dayOfTheWeek->format($currentLitEventDate->format('U')) ?: 'N/A';
+            $liturgicalEvent = $this->feastLordFromDate($currentLitEventDate);
+            if (null === $liturgicalEvent) {
+                throw new \RuntimeException('No Feast of the Lord found for ' . $currentLitEventDate->format('Y-m-d'));
+            }
+            $coincidingEvent->event     = $liturgicalEvent;
             $coincidingEvent->grade_lcl = $this->CalendarParams->Locale === LitLocale::LATIN
                 ? 'Die Domini'
                 : ucfirst($dayOfTheWeek);
         } elseif ($this->inSolemnities($currentLitEventDate) || $this->inFeastsLord($currentLitEventDate)) {
             //it's a Feast of the Lord or a Solemnity (that may or may not fall on a Sunday)
-            $coincidingEvent->event     = $this->solemnityFromDate($currentLitEventDate) ?? $this->feastLordFromDate($currentLitEventDate);
+            $liturgicalEvent = $this->solemnityFromDate($currentLitEventDate) ?? $this->feastLordFromDate($currentLitEventDate);
+            if (null === $liturgicalEvent) {
+                throw new \RuntimeException('No Solemnity or Feast of the Lord found for ' . $currentLitEventDate->format('Y-m-d'));
+            }
+            $coincidingEvent->event     = $liturgicalEvent;
             $coincidingEvent->grade_lcl = ( $coincidingEvent->event->grade->value > LitGrade::SOLEMNITY->value
                 ? '<i>' . LitGrade::i18n($coincidingEvent->event->grade, $this->CalendarParams->Locale, false) . '</i>'
                 : LitGrade::i18n($coincidingEvent->event->grade, $this->CalendarParams->Locale, false) );
         } elseif ($this->inFeastsOrMemorials($currentLitEventDate)) {
-            $coincidingEvent->event     = $this->feastOrMemorialFromDate($currentLitEventDate);
+            $liturgicalEvent = $this->feastOrMemorialFromDate($currentLitEventDate);
+            if (null === $liturgicalEvent) {
+                throw new \RuntimeException('No Feast or Memorial found for ' . $currentLitEventDate->format('Y-m-d'));
+            }
+            $coincidingEvent->event     = $liturgicalEvent;
             $coincidingEvent->grade_lcl = LitGrade::i18n($coincidingEvent->event->grade, $this->CalendarParams->Locale, false);
         } else {
             // DEBUG START
@@ -1701,8 +1784,14 @@ final class LiturgicalEventCollection
 
                 if ($litEvent->is_vigil_mass) {
                     // Vigils can inherit the value from the corresponding event for which they are vigils
-                    //$messages[] = "!!!!! The {$litEvent->grade_lcl} of {$litEvent->name} is a Vigil Mass and does not have a psalter_week property !!!!!";
-                    $eventForWhichIsVigil = $this->liturgicalEvents->getEvent($litEvent->is_vigil_for);
+                    $vigilFor = $litEvent->is_vigil_for;
+                    if (null === $vigilFor) {
+                        throw new \RuntimeException('No corresponding event found for Vigil Mass ' . $litEvent->event_key);
+                    }
+                    $eventForWhichIsVigil = $this->liturgicalEvents->getEvent($vigilFor);
+                    if (null === $eventForWhichIsVigil) {
+                        throw new \RuntimeException('No corresponding event found for Vigil Mass ' . $litEvent->event_key);
+                    }
                     if (null !== $eventForWhichIsVigil->psalter_week) {
                         //$messages[] = "The {$eventForWhichIsVigil->grade_lcl} of {$eventForWhichIsVigil->name} for which it is a Vigil Mass DOES have a psalter_week property with value {$eventForWhichIsVigil->psalter_week}";
                         $litEvent->psalter_week = $eventForWhichIsVigil->psalter_week;
@@ -1744,8 +1833,12 @@ final class LiturgicalEventCollection
      */
     public function purgeDataBeforeAdvent(): void
     {
+        $Advent1 = $this->liturgicalEvents->getEvent('Advent1');
+        if (null === $Advent1) {
+            throw new \InvalidArgumentException('Missing liturgical event: Advent1.');
+        }
         foreach ($this->liturgicalEvents as $key => $litEvent) {
-            if ($litEvent->date < $this->liturgicalEvents->getEvent('Advent1')->date) {
+            if ($litEvent->date < $Advent1->date) {
                 //remove all except the Vigil Mass for the first Sunday of Advent
                 if (
                     ( null === $litEvent->is_vigil_mass )
@@ -1784,8 +1877,12 @@ final class LiturgicalEventCollection
      */
     public function purgeDataAdventChristmas(): void
     {
+        $Advent1 = $this->liturgicalEvents->getEvent('Advent1');
+        if (null === $Advent1) {
+            throw new \InvalidArgumentException('Missing liturgical event: Advent1.');
+        }
         foreach ($this->liturgicalEvents as $key => $litEvent) {
-            if ($litEvent->date > $this->liturgicalEvents->getEvent('Advent1')->date) {
+            if ($litEvent->date > $Advent1->date) {
                 $this->liturgicalEvents->removeEvent($key);
                 // make sure it isn't still contained in another collection
                 $this->solemnitiesLordBVM->removeEvent($key);

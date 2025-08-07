@@ -115,12 +115,19 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
         } elseif ($data->strtotime instanceof \stdClass) {
             $strToTime = RelativeLiturgicalDate::fromObject($data->strtotime);
         }
+
+        $commons = LitCommons::create($data->common);
+
+        if (null === $commons) {
+            throw new \ValueError('invalid common: expected an array of LitCommon enum cases, LitCommon enum values, or LitMassVariousNeeds instances');
+        }
+
         return new static(
             $data->event_key,
             $strToTime,
             array_map(fn($color) => LitColor::from($color), $data->color),
             LitGrade::from($data->grade),
-            LitCommons::create($data->common)
+            $commons
         );
     }
 
@@ -150,12 +157,19 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
         } elseif (is_array($data['strtotime'])) {
             $strToTime = RelativeLiturgicalDate::fromArray($data['strtotime']);
         }
+
+        $commons = LitCommons::create($data['common']);
+
+        if (null === $commons) {
+            throw new \ValueError('invalid common: expected an array of LitCommon enum cases, LitCommon enum values, or LitMassVariousNeeds instances');
+        }
+
         return new static(
             $data['event_key'],
             $strToTime,
             array_map(fn($color) => LitColor::from($color), $data['color']),
             LitGrade::from($data['grade']),
-            LitCommons::create($data['common'])
+            $commons
         );
     }
 }

@@ -14,6 +14,7 @@ use LiturgicalCalendar\Api\Enum\ReturnType;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Test\LitTestRunner;
 
 /**
@@ -62,12 +63,7 @@ class Health implements MessageComponentInterface
         'executeUnitTest'   => ['calendar', 'year', 'category', 'test']
     ];
 
-    /** @var null|object{
-     *      litcal_metadata: object{
-     *          diocesan_calendars: DiocesanCalendarCollectionItem[]
-     *      }
-     * } $metadata */
-    private static ?object $metadata = null;
+    private static MetadataCalendars $metadata;
 
     /**
      * Mapping of data file paths to the LitSchema constants that their JSON data should validate against.
@@ -104,21 +100,22 @@ class Health implements MessageComponentInterface
         $this->clients->attach($conn);
         echo "New connection! ({$conn->resourceId})\n";
 
-        if (null === self::$metadata) {
+        if (false === isset(self::$metadata)) {
             $rawData = file_get_contents(API_BASE_PATH . '/calendars');
             if ($rawData === false) {
                 echo 'Error reading metadata: could not read data from ' . API_BASE_PATH . "/calendars\n";
                 return;
             }
-            self::$metadata = json_decode($rawData);
+            $metadataObj = json_decode($rawData);
             if (JSON_ERROR_NONE === json_last_error()) {
                 echo "Loaded metadata\n";
             } else {
                 echo 'Error loading metadata: ' . json_last_error_msg() . "\n";
                 return;
             }
+            self::$metadata = MetadataCalendars::fromObject($metadataObj->litcal_metadata);
         } else {
-            if (property_exists(self::$metadata, 'litcal_metadata') && property_exists(self::$metadata->litcal_metadata, 'diocesan_calendars')) {
+            if (isset(self::$metadata->diocesan_calendars) && false === empty(self::$metadata->diocesan_calendars)) {
                 echo "Metadata was already loaded and has required diocesan_calendars property\n";
             } else {
                 echo "Error loading metadata: missing diocesan_calendars property\n";
@@ -294,10 +291,10 @@ class Health implements MessageComponentInterface
      * If the category is not recognized, it will return null.
      *
      * @param string $category The category of the data.
-     * @param string|null $dataPath The path to the data.
+     * @param string $dataPath The path to the data.
      * @return string|null The schema for the given category and dataPath, or null if the category is not recognized.
      */
-    private static function retrieveSchemaForCategory(string $category, ?string $dataPath = null): ?string
+    private static function retrieveSchemaForCategory(string $category, string $dataPath): ?string
     {
         $versionedPattern     = '/\/api\/v[4-9]\//';
         $versionedReplacement = '/api/dev/';
@@ -306,6 +303,10 @@ class Health implements MessageComponentInterface
             case 'universalcalendar':
                 if ($isVersionedDataPath) {
                     $versionedDataPath = preg_replace($versionedPattern, $versionedReplacement, $dataPath);
+                    if (null === $versionedDataPath) {
+                        throw new \InvalidArgumentException('Invalid dataPath: ' . $dataPath . ', expected to match ' . $versionedPattern);
+                    }
+                    /** @var string $versionedDataPath */
                     if (array_key_exists($versionedDataPath, Health::DATA_PATH_TO_SCHEMA)) {
                         $tempSchemaPath = Health::DATA_PATH_TO_SCHEMA[$versionedDataPath];
                         return preg_replace($versionedPattern, $versionedReplacement, $tempSchemaPath);
@@ -355,6 +356,10 @@ class Health implements MessageComponentInterface
                 }
                 if ($isVersionedDataPath) {
                     $versionedDataPath = preg_replace($versionedPattern, $versionedReplacement, $dataPath);
+                    if (null === $versionedDataPath) {
+                        throw new \InvalidArgumentException('Invalid dataPath: ' . $dataPath . ', expected to match ' . $versionedPattern);
+                    }
+                    /** @var string $versionedDataPath */
                     if (array_key_exists($versionedDataPath, Health::DATA_PATH_TO_SCHEMA)) {
                         $tempSchemaPath = Health::DATA_PATH_TO_SCHEMA[$versionedDataPath];
                         return preg_replace($versionedPattern, $versionedReplacement, $tempSchemaPath);
@@ -397,12 +402,16 @@ class Health implements MessageComponentInterface
     /**
      * Validate a data file by checking that it exists and that it is valid JSON that conforms to a specific schema.
      *
-     * @param object{category:string,sourceFolder?:string,sourceFile?:string,validate:string} $validation The validation object. It should have the following properties:
-     * - sourceFile: a string, the path to the data file
-     * - validate: an object with the following properties:
-     *   - file-exists: a string, the class name to add to the message if the file exists
-     *   - json-valid: a string, the class name to add to the message if the file is valid JSON
-     *   - schema-valid: a string, the class name to add to the message if the file is valid against the schema
+     * @param object{category:'sourceDataCheck',sourceFolder:string,validate:string}|object{category:'sourceDataCheck',sourceFile:string,validate:string}|object{category:'resourceDataCheck',sourceFile:string,validate:string} $validation The validation object. It should have the following properties:
+     * - category: with a value of `sourceDataCheck` or `resourceDataCheck`
+     * - sourceFile|sourceFolder: a string, the path to the data file or folder
+     * - validate: a string with the identifier of the resource that we are validating;
+     *             this corresponds to the CSS class in the Unit Test frontend
+     *             that identifies the cell that will show the results of the validation;
+     *             a further CSS class will be appended to identify the specific check being performed:
+     *             1. `.file-exists`: a string, the class name to add to the message if the file exists
+     *             2. `.json-valid`: a string, the class name to add to the message if the file is valid JSON
+     *             3. `.schema-valid`: a string, the class name to add to the message if the file is valid against the schema
      * @param ConnectionInterface $to The connection to send the validation message to
      */
     private function executeValidation(object $validation, ConnectionInterface $to): void
@@ -437,8 +446,11 @@ class Health implements MessageComponentInterface
                             );
                             break;
                         case 'diocesan-calendar':
-                            $diocese  = array_find(self::$metadata->litcal_metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]);
-                            $nation   = $diocese->nation;
+                            $dioceseMetadata = array_find(self::$metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]);
+                            if ($dioceseMetadata === null) {
+                                throw new \Exception("No diocese found for calendar id: {$matches[2]}");
+                            }
+                            $nation   = $dioceseMetadata->nation;
                             $dataPath = strtr(
                                 JsonData::DIOCESAN_CALENDAR_I18N_FOLDER,
                                 [
@@ -474,9 +486,12 @@ class Health implements MessageComponentInterface
                                 );
                                 break;
                             case 'diocesan-calendar':
-                                $diocese     = array_find(self::$metadata->litcal_metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]);
-                                $nation      = $diocese->nation;
-                                $dioceseName = $diocese->diocese;
+                                $dioceseMetadata = array_find(self::$metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]);
+                                if ($dioceseMetadata === null) {
+                                    throw new \Exception("No diocese found for calendar id: {$matches[2]}");
+                                }
+                                $nation      = $dioceseMetadata->nation;
+                                $dioceseName = $dioceseMetadata->diocese;
                                 $dataPath    = strtr(
                                     JsonData::DIOCESAN_CALENDAR_FILE,
                                     [
@@ -492,14 +507,18 @@ class Health implements MessageComponentInterface
                         $year     = $matches[2];
                         $dataPath = RomanMissal::$jsonFiles["{$region}_{$year}"];
                     }
+                } else {
+                    throw new \InvalidArgumentException('sourceFile property is required for sourceDataCheck');
                 }
             }
         } else {
             // If it's not a sourceDataCheck, it's probably a resourceDataCheck
-            // That is to say, an API path
+            // That is to say, an API path, and the 'sourceFile' property is required
             if (property_exists($validation, 'sourceFile')) {
                 $pathForSchema = $validation->sourceFile;
                 $dataPath      = $validation->sourceFile;
+            } else {
+                throw new \InvalidArgumentException('sourceFile property is required for resourceDataCheck');
             }
         }
 
@@ -594,10 +613,13 @@ class Health implements MessageComponentInterface
             // If the 'sourceFolder' property is not set, then we are validating a single source file or API path
             $matches = null;
             if (preg_match('/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/', $pathForSchema, $matches)) {
-                $dioceseId   = $matches[1];
-                $dioceseData = array_find(self::$metadata->litcal_metadata->diocesan_calendars, fn ($diocesan_calendar) => $diocesan_calendar->calendar_id === $dioceseId);
-                $nation      = $dioceseData->nation;
-                $dioceseName = $dioceseData->diocese;
+                $dioceseId       = $matches[1];
+                $dioceseMetadata = array_find(self::$metadata->diocesan_calendars, fn ($diocesan_calendar) => $diocesan_calendar->calendar_id === $dioceseId);
+                if (null === $dioceseMetadata) {
+                    throw new \InvalidArgumentException("Invalid diocese ID $dioceseId");
+                }
+                $nation      = $dioceseMetadata->nation;
+                $dioceseName = $dioceseMetadata->diocese;
                 $dataPath    = strtr(JsonData::DIOCESAN_CALENDAR_FILE, [
                     '{nation}'       => $nation,
                     '{diocese}'      => $dioceseId,

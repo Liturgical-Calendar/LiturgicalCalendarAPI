@@ -123,6 +123,12 @@ final class DecreeItemCreateNewMobile extends DecreeEventData
             $strToTime = RelativeLiturgicalDate::fromObject($data->strtotime);
         }
 
+        $commons = LitCommons::create($data->common);
+
+        if (false === $commons instanceof LitCommons) {
+            throw new \ValueError('`$common` must be an array of LitCommon enum cases, of LitCommon values, or of LitMassVariousNeeds instances');
+        }
+
         return new static(
             $data->event_key,
             $data->name,
@@ -130,7 +136,7 @@ final class DecreeItemCreateNewMobile extends DecreeEventData
             $strToTime,
             array_map(fn($color) => LitColor::from($color), $data->color),
             LitGrade::from($data->grade),
-            LitCommons::create($data->common)
+            $commons
         );
     }
 
@@ -175,6 +181,12 @@ final class DecreeItemCreateNewMobile extends DecreeEventData
             $strToTime = RelativeLiturgicalDate::fromArray($data['strtotime']);
         }
 
+        $commons = LitCommons::create($data['common']);
+
+        if (false === $commons instanceof LitCommons) {
+            throw new \ValueError('`$common` must be an array of LitCommon enum cases, of LitCommon values, or of LitMassVariousNeeds instances');
+        }
+
         return new static(
             $data['event_key'],
             $data['name'],
@@ -182,7 +194,7 @@ final class DecreeItemCreateNewMobile extends DecreeEventData
             $strToTime,
             array_map(fn($color) => LitColor::from($color), $data['color']),
             LitGrade::from($data['grade']),
-            LitCommons::create($data['common'])
+            $commons
         );
     }
 }

@@ -112,13 +112,19 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
+        $commons = LitCommons::create($data->common);
+
+        if (null === $commons) {
+            throw new \ValueError('invalid common: expected an array of LitCommon enum cases, LitCommon enum values, or LitMassVariousNeeds instances');
+        }
+
         return new static(
             $data->event_key,
             $data->day,
             $data->month,
             array_map(fn($color) => LitColor::from($color), $data->color),
             LitGrade::from($data->grade),
-            LitCommons::create($data->common)
+            $commons
         );
     }
 
@@ -139,13 +145,19 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
      */
     protected static function fromArrayInternal(array $data): static
     {
+        $commons = LitCommons::create($data['common']);
+
+        if (null === $commons) {
+            throw new \ValueError('invalid common: expected an array of LitCommon enum cases, LitCommon enum values, or LitMassVariousNeeds instances');
+        }
+
         return new static(
             $data['event_key'],
             $data['day'],
             $data['month'],
             array_map(fn($color) => LitColor::from($color), $data['color']),
             LitGrade::from($data['grade']),
-            LitCommons::create($data['common'])
+            $commons
         );
     }
 }

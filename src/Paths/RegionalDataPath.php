@@ -15,6 +15,7 @@ use LiturgicalCalendar\Api\Enum\PathCategory;
 use LiturgicalCalendar\Api\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
@@ -54,12 +55,13 @@ final class RegionalDataPath
      *
      * Depending on the request method, it will call the appropriate class method to handle the request.
      *
-     * @return void
+     * @return never
      */
-    private function handleRequestMethod()
+    private function handleRequestMethod(): never
     {
         switch (self::$Core->getRequestMethod()) {
             case RequestMethod::GET:
+                // no break (intentional fallthrough)
             case RequestMethod::POST:
                 if (null !== $this->params->i18nRequest) {
                     // If a simple i18n data request was made, retrieve the i18n data
@@ -68,16 +70,16 @@ final class RegionalDataPath
                     // Else retrieve the calendar data
                     $this->getCalendar();
                 }
-                break;
+                // no break (always terminates)
             case RequestMethod::PUT:
                 $this->createCalendar();
-                break;
+                // no break (always terminates)
             case RequestMethod::PATCH:
                 $this->updateCalendar();
-                break;
+                // no break (always terminates)
             case RequestMethod::DELETE:
                 $this->deleteCalendar();
-                break;
+                // no break (always terminates)
             default:
                 self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, 'The method ' . $_SERVER['REQUEST_METHOD'] . ' cannot be handled by this endpoint');
         }
@@ -95,9 +97,9 @@ final class RegionalDataPath
      * If the requested resource exists, it will be returned as JSON.
      * If the resource does not exist, a 404 error will be returned.
      *
-     * @return void
+     * @return never
      */
-    private function getI18nData(): void
+    private function getI18nData(): never
     {
         $i18nDataFile = null;
         switch ($this->params->category) {
@@ -151,8 +153,10 @@ final class RegionalDataPath
      * If the requested resource exists, it will be returned as JSON.
      * If the resource does not exist, a 404 error will be returned.
      * If the `category` or `locale` parameters are invalid, a 400 error will be returned.
+     *
+     * @return never
      */
-    private function getCalendar(): void
+    private function getCalendar(): never
     {
         $calendarDataFile = null;
         $dioceseEntry     = null;
@@ -201,6 +205,7 @@ final class RegionalDataPath
             // Based on the locale requested, retrieve the appropriate locale data
             switch ($this->params->category) {
                 case PathCategory::DIOCESE:
+                    /** @var MetadataDiocesanCalendarItem $dioceseEntry */
                     $CalendarDataI18nFile = strtr(JsonData::DIOCESAN_CALENDAR_I18N_FILE, [
                         '{nation}'  => $dioceseEntry->nation,
                         '{diocese}' => $this->params->key,
@@ -261,8 +266,10 @@ final class RegionalDataPath
      * a 503 Service Unavailable response is sent.
      *
      * On success, a 201 Created response is sent containing a success message.
+     *
+     * @return never
      */
-    private function createDiocesanCalendar(): void
+    private function createDiocesanCalendar(): never
     {
         $payload = $this->params->payload;
         if (false === $payload instanceof DiocesanData) {
@@ -373,8 +380,10 @@ final class RegionalDataPath
      *
      * On successful creation of the national calendar data,
      * a 201 Created response is sent containing a success message.
+     *
+     * @return never
      */
-    private function createNationalCalendar(): void
+    private function createNationalCalendar(): never
     {
         $response = new \stdClass();
         $payload  = $this->params->payload;
@@ -432,8 +441,10 @@ final class RegionalDataPath
      *
      * The resource is created in the `jsondata/sourcedata/calendars/wider_regions/` directory.
      * TODO: implement
+     *
+     * @return never
      */
-    private function createWiderRegionCalendar(): void
+    private function createWiderRegionCalendar(): never
     {
         $response = new \stdClass();
         $payload  = $this->params->payload;
@@ -457,18 +468,18 @@ final class RegionalDataPath
      * If the payload is valid according to the associated schema,
      * the resource creation will continue according to the calendar type.
      */
-    private function createCalendar(): void
+    private function createCalendar(): never
     {
         switch ($this->params->category) {
             case PathCategory::DIOCESE:
                 $this->createDiocesanCalendar();
-                break;
+                // no break (always terminates)
             case PathCategory::NATION:
                 $this->createNationalCalendar();
-                break;
+                // no break (always terminates)
             case PathCategory::WIDERREGION:
                 $this->createWiderRegionCalendar();
-                break;
+                // no break (always terminates)
             default:
                 self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "Unknown calendar category \"{$this->params->category}\"");
         }
@@ -485,8 +496,10 @@ final class RegionalDataPath
      * If the resource to update is not writable or the write was not successful, the response will be a JSON error response with a status code of 503 Service Unavailable.
      *
      * If the update is successful, the response will be a JSON success response with a status code of 201 Created.
+     *
+     * @return never
      */
-    private function updateNationalCalendar(): void
+    private function updateNationalCalendar(): never
     {
         $payload = $this->params->payload;
         if (false === $payload instanceof NationalData) {
@@ -591,8 +604,10 @@ final class RegionalDataPath
      * If the resource to update is not writable or the write was not successful, the response will be a JSON error response with a status code of 503 Service Unavailable.
      *
      * If the update is successful, the response will be a JSON success response with a status code of 201 Created.
+     *
+     * @return never
      */
-    private function updateWiderRegionCalendar(): void
+    private function updateWiderRegionCalendar(): never
     {
         $payload = $this->params->payload;
         if (false === $payload instanceof WiderRegionData) {
@@ -697,8 +712,10 @@ final class RegionalDataPath
      * If the resource to update is not writable or the write was not successful, the response will be a JSON error response with a status code of 503 Service Unavailable.
      *
      * If the update is successful, the response will be a JSON success response with a status code of 201 Created.
+     *
+     * @return never
      */
-    private function updateDiocesanCalendar(): void
+    private function updateDiocesanCalendar(): never
     {
         $payload = $this->params->payload;
         if (false === $payload instanceof DiocesanData) {
@@ -804,19 +821,21 @@ final class RegionalDataPath
      * If the payload is invalid, the response will be a JSON error response with a 422 Unprocessable Content status code.
      *
      * If the payload is valid, the update process will continue according to the calendar type.
+     *
+     * @return never
      */
-    private function updateCalendar(): void
+    private function updateCalendar(): never
     {
         switch ($this->params->category) {
             case PathCategory::DIOCESE:
                 $this->updateDiocesanCalendar();
-                break;
+                // no break (always terminates)
             case PathCategory::NATION:
                 $this->updateNationalCalendar();
-                break;
+                // no break (always terminates)
             case PathCategory::WIDERREGION:
                 $this->updateWiderRegionCalendar();
-                break;
+                // no break (always terminates)
             default:
                 self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "Unknown calendar category \"{$this->params->category}\"");
         }
@@ -892,8 +911,7 @@ final class RegionalDataPath
                 );
                 break;
             default:
-                $calendarDataFile   = null;
-                $calendarI18nFolder = null;
+                throw new \RuntimeException('Stupefy yourselves and stay stupid; blind yourselves and stay blind! - Isaiah 29:9');
         }
 
         return [$calendarDataFile, $calendarI18nFolder];
@@ -910,8 +928,10 @@ final class RegionalDataPath
      * containing a success message.
      *
      * If the resource does not exist, a 404 error will be returned.
+     *
+     * @return never
      */
-    private function deleteCalendar(): void
+    private function deleteCalendar(): never
     {
         $response            = new \stdClass();
         $dioceseNationFolder = null;
@@ -987,9 +1007,6 @@ final class RegionalDataPath
             return true;
         } catch (InvalidValue | \Exception $e) {
             self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, LitSchema::ERROR_MESSAGES[$schemaUrl] . PHP_EOL . $e->getMessage());
-            // the return here is superfluous, because produceErrorResponse terminates the script
-            // it's only here to make intelephense happy
-            return false;
         }
     }
 
@@ -1230,8 +1247,9 @@ final class RegionalDataPath
      *
      * @param int $statusCode the HTTP status code to return
      * @param string $description a short description of the error
+     * @return never
      */
-    public static function produceErrorResponse(int $statusCode, string $description): void
+    public static function produceErrorResponse(int $statusCode, string $description): never
     {
         header($_SERVER['SERVER_PROTOCOL'] . StatusCode::toString($statusCode), true, $statusCode);
         $message         = new \stdClass();
@@ -1276,8 +1294,9 @@ final class RegionalDataPath
      * PATCH, it also sets a 201 Created status code.
      *
      * @param string $jsonEncodedResponse the response as a JSON encoded string
+     * @return never
      */
-    private static function produceResponse(string|false $jsonEncodedResponse): void
+    private static function produceResponse(string|false $jsonEncodedResponse): never
     {
         if (false === $jsonEncodedResponse) {
             throw new \Exception('Failed to produce response');
@@ -1295,7 +1314,7 @@ final class RegionalDataPath
             default:
                 echo $jsonEncodedResponse;
         }
-        //die();
+        die();
     }
 
     /**
@@ -1309,9 +1328,10 @@ final class RegionalDataPath
      * - It will validate the request content type
      * - It will set the request headers
      * - It will load the Diocesan Calendars index
-     * - It will handle the request method
+     * - It will handle the request method (terminates)
+     * @return never
      */
-    public function init(array $requestPathParts = []): void
+    public function init(array $requestPathParts = []): never
     {
         self::$Core->init();
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::GET, RequestMethod::OPTIONS], true)) {

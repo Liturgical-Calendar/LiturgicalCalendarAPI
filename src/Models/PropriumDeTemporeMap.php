@@ -34,7 +34,7 @@ final class PropriumDeTemporeMap extends AbstractJsonSrcDataArray implements \It
         $missingKeys           = array_diff($propriumDeTemporeKeys, $translationKeys);
         if (count($missingKeys) > 0) {
             throw new \InvalidArgumentException(sprintf(
-                'The following event keys from the collection are missing from the translations: %s',
+                'The following temporale event keys were lost in translation: %s',
                 implode(', ', $missingKeys)
             ));
         }

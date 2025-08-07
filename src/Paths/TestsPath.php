@@ -43,13 +43,12 @@ final class TestsPath
      * If a property value is an array, it iterates over the array and sanitizes each element.
      * If a property value is a string, it sanitizes the string by removing HTML tags and converting special characters to HTML entities.
      *
-     * @param object $data The object whose properties need to be sanitized. Passed as reference to allow recursive calls.
+     * @param \stdClass $data The object whose properties need to be sanitized. Passed as reference to allow recursive calls.
      * @return void
      */
-    private static function sanitizeObjectValues(object &$data): void
+    private static function sanitizeObjectValues(\stdClass &$data): void
     {
-        /** @phpstan-ignore foreach.nonIterable */
-        foreach ($data as $prop => $value) {
+        foreach (get_object_vars($data) as $prop => $value) {
             if (in_array($prop, self::$propsToSanitize)) {
                 if (is_object($value)) {
                     self::sanitizeObjectValues($data->{$prop});
@@ -205,7 +204,6 @@ final class TestsPath
         // Sanitize data to avoid any possibility of script injection
         self::sanitizeObjectValues($data);
 
-        /** @var object{name:string} $data */
         $bytesWritten = file_put_contents(JsonData::TESTS_FOLDER . '/' . $data->name . '.json', json_encode($data, JSON_PRETTY_PRINT));
         if (false === $bytesWritten) {
             return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.');
@@ -232,9 +230,9 @@ final class TestsPath
      * - OPTIONS: handled by the LiturgicalCalendar\Core class
      * - any other method: will return a 405 Method Not Allowed status code
      *
-     * @throws \Exception
+     * @return never
      */
-    public static function handleRequest(): void
+    public static function handleRequest(): never
     {
         self::$Core->init();
         self::$Core->validateAcceptHeader(true);
@@ -311,9 +309,9 @@ final class TestsPath
      *
      * @param string $response the response as a JSON encoded string
      *
-     * @return void
+     * @return never
      */
-    private static function produceResponse(string $response): void
+    private static function produceResponse(string $response): never
     {
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
@@ -325,6 +323,7 @@ final class TestsPath
                 echo $response;
                 break;
         }
+        die();
     }
 
     /**

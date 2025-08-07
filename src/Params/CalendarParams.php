@@ -39,13 +39,13 @@ use LiturgicalCalendar\Api\Utilities;
 class CalendarParams implements ParamsInterface
 {
     public int $Year;
+    public string $Locale;
     public YearType $YearType             = YearType::LITURGICAL;
     public Epiphany $Epiphany             = Epiphany::JAN6;
     public Ascension $Ascension           = Ascension::THURSDAY;
     public CorpusChristi $CorpusChristi   = CorpusChristi::THURSDAY;
     public bool $EternalHighPriest        = false;
     public ?ReturnType $ReturnType        = null;
-    public ?string $Locale                = null;
     public ?string $NationalCalendar      = null;
     public ?string $DiocesanCalendar      = null;
     private ?MetadataCalendars $calendars = null;
@@ -316,6 +316,11 @@ class CalendarParams implements ParamsInterface
     private function validateLocaleParam(string $value): void
     {
         $value = \Locale::canonicalize($value);
+        if (null === $value) {
+            throw new \ValueError('Invalid locale string: ' . $value . '. “If they were scattered abroad into foreign tongues, it was because their intention was profane. But now, by the distribution of tongues, the impiety is dissolved and the unity of the Spirit is restored.”
+— St. Gregory of Nazianzus, Oration 41 (On Pentecost), §11');
+        }
+
         if (LitLocale::isValid($value)) {
             $this->Locale = $value;
         } else {
@@ -348,6 +353,10 @@ class CalendarParams implements ParamsInterface
      */
     private function validateNationalCalendarParam(string $value): void
     {
+        if (null === $this->calendars) {
+            throw new \ValueError('CalendarParams::$calendars is not initialized.');
+        }
+
         if (
             in_array($value, $this->calendars->national_calendars_keys)
             || $value === 'VA'
@@ -369,6 +378,10 @@ class CalendarParams implements ParamsInterface
      */
     private function validateDiocesanCalendarParam(string $value): void
     {
+        if (null === $this->calendars) {
+            throw new \ValueError('CalendarParams::$calendars is not initialized.');
+        }
+
         if (in_array($value, $this->calendars->diocesan_calendars_keys)) {
             $this->DiocesanCalendar = $value;
         } else {
@@ -409,6 +422,7 @@ class CalendarParams implements ParamsInterface
                 CalendarPath::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
             }
         }
+        /** @var boolean $value */
         $this->EternalHighPriest = $value;
     }
 }

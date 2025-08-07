@@ -9,7 +9,7 @@ abstract class DecreeEventData extends AbstractJsonSrcData
 {
     public readonly string $event_key;
 
-    public ?string $name;
+    public string $name; // could be unset, for example in LitCalItemSetPropertyGrade
 
     public string $calendar = 'GENERAL ROMAN';
 

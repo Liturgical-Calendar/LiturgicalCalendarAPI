@@ -1,9 +1,5 @@
+includes:
+    - phpstan.neon.dist
+
 parameters:
-    level: 7
-    paths:
-        - src
-    bootstrapFiles:
-        - tools/phpstan-stubs/constants.php
-    universalObjectCratesClasses:
-        - Ratchet\ConnectionInterface
-    treatPhpDocTypesAsCertain: false
+    editorUrl: 'vscode://vscode-remote/wsl+Ubuntu-24.04/%%file%%:%%line%%'

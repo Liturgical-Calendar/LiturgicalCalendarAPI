@@ -38,6 +38,7 @@ final class LitCommons implements \JsonSerializable
      *
      * @throws \ValueError
      * @param array<string|LitCommon|LitMassVariousNeeds> $litCommons
+     * @return ?LitCommons
      */
     public static function create(array $litCommons): ?static
     {

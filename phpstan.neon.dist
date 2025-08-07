@@ -1,0 +1,9 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    bootstrapFiles:
+        - tools/phpstan-stubs/constants.php
+    universalObjectCratesClasses:
+        - Ratchet\ConnectionInterface
+    treatPhpDocTypesAsCertain: false

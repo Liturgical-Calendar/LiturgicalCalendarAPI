@@ -12,3 +12,4 @@ testYaml.php
 .env.*
 !.env.example
 php-error.log
+phpstan.neon

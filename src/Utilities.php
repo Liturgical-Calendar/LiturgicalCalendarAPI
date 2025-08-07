@@ -219,7 +219,7 @@ class Utilities
      * @param \SimpleXMLElement $xml
      * @return void
      */
-    public static function convertArray2XML(array $data, ?\SimpleXMLElement &$xml): void
+    public static function convertArray2XML(array $data, \SimpleXMLElement &$xml): void
     {
         foreach ($data as $key => $value) {
             if (is_array($value)) {

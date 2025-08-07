@@ -36,7 +36,7 @@ final class PropriumDeSanctisMap extends AbstractJsonSrcDataArray implements \It
         $missingKeys           = array_diff($propriumDeTemporeKeys, $translationKeys);
         if (count($missingKeys) > 0) {
             throw new \InvalidArgumentException(sprintf(
-                'The following event keys from the collection are missing from the translations: %s',
+                'The following sanctorale liturgical event keys were lost in translation: %s',
                 implode(', ', $missingKeys)
             ));
         }

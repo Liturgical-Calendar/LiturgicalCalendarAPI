@@ -41,11 +41,17 @@ final class DecreeItemMakeDoctor extends DecreeEventData
             ));
         }
 
+        $commons = LitCommons::create($data->common);
+
+        if (false === $commons instanceof LitCommons) {
+            throw new \ValueError('`$common` must be an array of LitCommon enum cases, of LitCommon values, or of LitMassVariousNeeds instances');
+        }
+
         return new static(
             $data->event_key,
             $data->name,
             $data->calendar,
-            LitCommons::create($data->common)
+            $commons
         );
     }
 
@@ -76,11 +82,17 @@ final class DecreeItemMakeDoctor extends DecreeEventData
             ));
         }
 
+        $commons = LitCommons::create($data['common']);
+
+        if (false === $commons instanceof LitCommons) {
+            throw new \ValueError('`$common` must be an array of LitCommon enum cases, of LitCommon values, or of LitMassVariousNeeds instances');
+        }
+
         return new static(
             $data['event_key'],
             $data['name'],
             $data['calendar'],
-            LitCommons::create($data['common'])
+            $commons
         );
     }
 }

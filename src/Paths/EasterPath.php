@@ -8,13 +8,13 @@ use LiturgicalCalendar\Api\Enum\LitLocale;
 
 final class EasterPath
 {
-    private static string $Locale                                = LitLocale::LATIN;
-    private static ?string $baseLocale                           = null;
-    private static ?\IntlDateFormatter $dayOfTheWeekDayMonthYear = null;
-    private static ?\IntlDateFormatter $dayMonthYear             = null;
-    private static ?\IntlDateFormatter $dayOfTheWeek             = null;
-    private static ?object $EasterDates                          = null;
-    private const ALLOWED_METHODS                                = [ 'GET', 'OPTIONS' ];
+    private static string $Locale     = LitLocale::LATIN;
+    private static string $baseLocale = LitLocale::LATIN_PRIMARY_LANGUAGE;
+    private static \IntlDateFormatter $dayOfTheWeekDayMonthYear;
+    private static \IntlDateFormatter $dayMonthYear;
+    private static \IntlDateFormatter $dayOfTheWeek;
+    private static object $EasterDates;
+    private const ALLOWED_METHODS = [ 'GET', 'OPTIONS' ];
 
     private static function enforceAllowedMethods(): void
     {
@@ -40,8 +40,17 @@ final class EasterPath
 
     private static function setLocale(): void
     {
-        self::$baseLocale = self::$Locale !== LitLocale::LATIN ? \Locale::getPrimaryLanguage(self::$Locale) : LitLocale::LATIN;
-        $localeArray      = [
+        $baseLocale = self::$Locale !== LitLocale::LATIN ? \Locale::getPrimaryLanguage(self::$Locale) : LitLocale::LATIN_PRIMARY_LANGUAGE;
+        if (null === $baseLocale) {
+            throw new \RuntimeException(
+                '“It is therefore a very appropriate punishment that falls on Zacharias.'
+                . ' For his want of faith with regard to the birth of the voice, he is himself deprived of his voice.”'
+                . ' — Origen of Alexandria, Commentary on the Gospel of John'
+            );
+        }
+        self::$baseLocale = $baseLocale;
+
+        $localeArray = [
             self::$Locale . '.utf8',
             self::$Locale . '.UTF-8',
             self::$Locale,
@@ -53,7 +62,8 @@ final class EasterPath
             self::$baseLocale
         ];
         setlocale(LC_ALL, $localeArray);
-        self::$dayOfTheWeekDayMonthYear = \IntlDateFormatter::create(
+
+        $dayOfTheWeekDayMonthYear = \IntlDateFormatter::create(
             self::$Locale,
             \IntlDateFormatter::FULL,
             \IntlDateFormatter::NONE,
@@ -61,7 +71,7 @@ final class EasterPath
             \IntlDateFormatter::GREGORIAN,
             'EEEE d MMMM yyyy'
         );
-        self::$dayMonthYear             = \IntlDateFormatter::create(
+        $dayMonthYear             = \IntlDateFormatter::create(
             self::$Locale,
             \IntlDateFormatter::FULL,
             \IntlDateFormatter::NONE,
@@ -69,7 +79,7 @@ final class EasterPath
             \IntlDateFormatter::GREGORIAN,
             'd MMMM yyyy'
         );
-        self::$dayOfTheWeek             = \IntlDateFormatter::create(
+        $dayOfTheWeek             = \IntlDateFormatter::create(
             self::$Locale,
             \IntlDateFormatter::FULL,
             \IntlDateFormatter::NONE,
@@ -77,6 +87,18 @@ final class EasterPath
             \IntlDateFormatter::GREGORIAN,
             'EEEE'
         );
+
+        if (
+            null === $dayOfTheWeekDayMonthYear
+            || null === $dayMonthYear
+            || null === $dayOfTheWeek
+        ) {
+            throw new \RuntimeException('"Fugit irreparabile tempus." — Virgil, Georgics, Book III');
+        }
+
+        self::$dayOfTheWeekDayMonthYear = $dayOfTheWeekDayMonthYear;
+        self::$dayMonthYear             = $dayMonthYear;
+        self::$dayOfTheWeek             = $dayOfTheWeek;
     }
 
     private static function calculateEasterDates(): void
@@ -100,8 +122,8 @@ final class EasterPath
                 $dateLastCoincidence = $gregorian_easter;
             }
 
-            switch (strtoupper(self::$baseLocale)) {
-                case LitLocale::LATIN:
+            switch (self::$baseLocale) {
+                case LitLocale::LATIN_PRIMARY_LANGUAGE:
                     $month                   = (int) $gregorian_easter->format('n'); //n      = 1-January to 12-December
                     $monthLatin              = LatinUtils::LATIN_MONTHS[$month];
                     $gregDateString          = 'Dies Domini, ' . $gregorian_easter->format('j') . ' ' . $monthLatin . ' ' . $gregorian_easter->format('Y');
@@ -112,7 +134,7 @@ final class EasterPath
                     $monthLatin              = LatinUtils::LATIN_MONTHS[$month];
                     $westernJulianDateString = 'Dies Domini, ' . $western_julian_easter->format('j') . ' ' . $monthLatin . ' ' . $western_julian_easter->format('Y');
                     break;
-                case 'EN':
+                case 'en':
                     $gregDateString          = $gregorian_easter->format('l, F jS, Y');
                     $julianDateString        = 'Sunday' . $julian_easter->format(', F jS, Y');
                     $westernJulianDateString = $western_julian_easter->format('l, F jS, Y');
@@ -133,11 +155,25 @@ final class EasterPath
             self::$EasterDates->litcal_easter[$i - 1583]->westernJulianDateString = $westernJulianDateString;
         }
 
+        if (null === $dateLastCoincidence) {
+            throw new \RuntimeException(
+                'Although all events, even the most trifling, are disposed according to God’s plan, as we have shown,'
+                . ' there is nothing to prevent some things from happening by chance or accident.'
+                . ' An occurrence may be accidental or fortuitous with respect to a lower cause when an effect not intended is brought about,'
+                . ' and yet not be accidental or fortuitous with respect to a higher cause, inasmuch as the effect does not take place apart from the latter’s intention.'
+                . ' — St. Thomas Aquinas, Opuscula I Treatises Compendium Theologiæ, Book I On Faith, Chapter 137'
+            );
+        }
         self::$EasterDates->lastCoincidenceString = $dateLastCoincidence->format('l, F jS, Y');
         self::$EasterDates->lastCoincidence       = (int) $dateLastCoincidence->format('U');
     }
 
-    private static function produceResponse(): void
+    /**
+     * Save the calculated dates of Easter to cache and return them in JSON format.
+     * This function is never intended to return normally, so it's marked with a never return type.
+     * @return never
+     */
+    private static function produceResponse(): never
     {
         if (!is_dir('engineCache/easter/')) {
             mkdir('engineCache/easter/', 0774, true);
@@ -146,9 +182,23 @@ final class EasterPath
 
         header('Content-Type: application/json');
         echo json_encode(self::$EasterDates);
+        die();
     }
 
-    public static function init(): void
+    /**
+     * Initialize the EasterPath process.
+     *
+     * This method performs the following steps:
+     * 1. Enforces that the HTTP request method is allowed.
+     * 2. Handles request parameters to set the appropriate locale.
+     * 3. Serves cached Easter date data if available.
+     * 4. Sets the locale for date formatting.
+     * 5. Calculates the dates of Easter for the specified range.
+     * 6. Produces a JSON response with the calculated data.
+     *
+     * @return never
+     */
+    public static function init(): never
     {
         self::enforceAllowedMethods();
         self::handleRequestParams();

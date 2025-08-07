@@ -50,6 +50,10 @@ class DecreesParams implements ParamsInterface
             switch ($key) {
                 case 'locale':
                     $value = \Locale::canonicalize($value);
+                    if (null === $value) {
+                        throw new \ValueError('Invalid locale string: ' . $value);
+                    }
+
                     if (LitLocale::isValid($value)) {
                         $this->Locale = $value;
                     } else {

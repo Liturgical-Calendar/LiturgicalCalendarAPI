@@ -36,7 +36,11 @@ final class LitCalItemMakePatronMetadata extends LiturgicalEventMetadata
      */
     public function getUrl(string $lang): string
     {
-        if (null !== $this->url_lang_map && str_contains($this->url, '%s')) {
+        if (
+            null !== $this->url_lang_map
+            && null !== $this->url
+            && str_contains($this->url, '%s')
+        ) {
             $vaticanLangCode = $this->url_lang_map->getBestLangFromMap($lang);
             $url             = sprintf($this->url, $vaticanLangCode);
         } else {

@@ -195,7 +195,11 @@ final class WiderRegionData extends AbstractJsonSrcData
     public function applyTranslations(string $locale): void
     {
         foreach ($this->litcal as $litcalItem) {
-            $litcalItem->setName($this->i18n->getTranslation($litcalItem->getEventKey(), $locale));
+            $translation = $this->i18n->getTranslation($litcalItem->getEventKey(), $locale);
+            if (null === $translation) {
+                throw new \ValueError('translation not found for event key: ' . $litcalItem->getEventKey());
+            }
+            $litcalItem->setName($translation);
         }
     }
 
@@ -223,7 +227,7 @@ final class WiderRegionData extends AbstractJsonSrcData
                 || $litcalItem->liturgical_event instanceof LitCalItemSetPropertyName
             ) {
                 $eventKey = $litcalItem->getEventKey();
-                if (false === array_key_exists($eventKey, $translations)) {
+                if (false === array_key_exists($eventKey, $translations) || null === $translations[$eventKey]) {
                     throw new \ValueError('translation for event key ' . $eventKey . ' not found, available translations: ' . implode(',', array_keys($translations)));
                 }
                 $litcalItem->setName($translations[$eventKey]);

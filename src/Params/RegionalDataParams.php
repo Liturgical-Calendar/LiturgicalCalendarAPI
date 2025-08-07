@@ -9,6 +9,8 @@ use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\PathCategory;
 use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
@@ -77,14 +79,18 @@ class RegionalDataParams implements ParamsInterface
      *      category: PathCategory,
      *      key: string,
      *      i18n?: string,
-     *      payload?: object,
-     *      locale?: string
+     *      locale?: string,
+     *      payload?: DiocesanData|NationalData|WiderRegionData
      * } $params The parameters to validate.
      * @return string
      *      The validated nation value.
      */
     private function checkNationalCalendarConditions(array $params): string
     {
+        if (null === $this->calendars) {
+            throw new \RuntimeException('Failed to load calendar metadata or calendar metadata not initialized.');
+        }
+
         $requiredKeys = ['key', 'category'];
         $givenKeys    = array_keys($params);
         if (count(array_intersect($requiredKeys, $givenKeys)) !== count($requiredKeys)) {
@@ -133,7 +139,7 @@ class RegionalDataParams implements ParamsInterface
                     "Invalid value {$params['key']} for param `key`, valid values are: {$validVals}"
                 );
             } else {
-                $currentNation = array_find($this->calendars->national_calendars, fn ($el) => $el->calendar_id === $params['key']);
+                $currentNation = array_find($this->calendars->national_calendars, fn (MetadataNationalCalendarItem $el) => $el->calendar_id === $params['key']);
                 if (null === $currentNation) {
                     RegionalDataPath::produceErrorResponse(
                         StatusCode::BAD_REQUEST,
@@ -147,6 +153,7 @@ class RegionalDataParams implements ParamsInterface
 
         // we don't care about locale for DELETE or PUT requests
         if (false === in_array(RegionalDataPath::$Core->getRequestMethod(), [RequestMethod::DELETE, RequestMethod::PUT], true)) {
+            /** @var MetadataNationalCalendarItem $currentNation */
             $validLangs = $currentNation->locales;
             if (array_key_exists('locale', $params)) {
                 $params['locale'] = \Locale::canonicalize($params['locale']);
@@ -211,6 +218,10 @@ class RegionalDataParams implements ParamsInterface
             );
         }
 
+        if (null === $this->calendars) {
+            throw new \RuntimeException('Calendars metadata not loaded or not initialized.');
+        }
+
         // For all requests other than PUT, we expect the diocese_id to exist
         if (RegionalDataPath::$Core->getRequestMethod() !== RequestMethod::PUT) {
             if (false === in_array($params['key'], $this->calendars->diocesan_calendars_keys)) {
@@ -223,8 +234,12 @@ class RegionalDataParams implements ParamsInterface
 
             // For all requests other than PUT and DELETE, we expect a valid locale parameter
             if (RegionalDataPath::$Core->getRequestMethod() !== RequestMethod::DELETE) {
-                $currentDiocese = array_find($this->calendars->diocesan_calendars, fn ($el) => $el->calendar_id === $params['key']);
-                $validLangs     = $currentDiocese->locales;
+                $currentDiocese = array_find($this->calendars->diocesan_calendars, fn (MetadataDiocesanCalendarItem $el) => $el->calendar_id === $params['key']);
+                if (null === $currentDiocese) {
+                    throw new \RuntimeException('Could not find Diocese metadata for diocese ' . $params['key'] . '.');
+                }
+
+                $validLangs = $currentDiocese->locales;
                 if (array_key_exists('locale', $params)) {
                     $params['locale'] = \Locale::canonicalize($params['locale']);
                     if (
@@ -290,6 +305,10 @@ class RegionalDataParams implements ParamsInterface
      */
     private function checkWiderRegionCalendarConditions(array $params)
     {
+        if (null === $this->calendars) {
+            throw new \RuntimeException('Calendars metadata not loaded or not initialized.');
+        }
+
         if (
             false === in_array($params['key'], $this->calendars->wider_regions_keys, true)
             && RegionalDataPath::$Core->getRequestMethod() !== RequestMethod::PUT
@@ -301,7 +320,11 @@ class RegionalDataParams implements ParamsInterface
 
         // The locale parameter can be supplied by the Accept-Language header or by a `locale` property in the payload.
         $currentWiderRegion = array_find($this->calendars->wider_regions, fn (MetadataWiderRegionItem $el) => $el->name === $params['key']);
-        $validLangs         = $currentWiderRegion->locales;
+        if (null === $currentWiderRegion) {
+            throw new \RuntimeException('Could not find Wider Region metadata for wider region ' . $params['key'] . '.');
+        }
+
+        $validLangs = $currentWiderRegion->locales;
         if (array_key_exists('locale', $params)) {
             $params['locale'] = \Locale::canonicalize($params['locale']);
             if (
@@ -367,7 +390,7 @@ class RegionalDataParams implements ParamsInterface
      * @param array{
      *      category: PathCategory,
      *      key: string,
-     *      i18n?: ?string,
+     *      i18n?: string,
      *      locale?: string,
      *      payload?: NationalData|DiocesanData|WiderRegionData
      * } $params The parameters to validate and set.

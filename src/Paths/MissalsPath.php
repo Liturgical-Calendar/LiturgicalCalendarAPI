@@ -74,6 +74,9 @@ final class MissalsPath
         if (is_array($payload)) {
             throw new \InvalidArgumentException('Payload should have been cast to a stdClass object, instead we found an array');
         }
+        if ($required &&  ( $payload === null || count(array_keys(get_object_vars($payload))) === 0 )) {
+            throw new \InvalidArgumentException('Payload does not contain any data');
+        }
         return $payload;
     }
 
@@ -115,14 +118,16 @@ final class MissalsPath
                 $params['locale'] = LitLocale::LATIN;
             }
         }
-        if (property_exists($payload, 'region')) {
-            $params['region'] = $payload->region;
-        }
-        if (property_exists($payload, 'year')) {
-            $params['year'] = $payload->year;
-        }
-        if (property_exists($payload, 'include_empty')) {
-            $params['include_empty'] = $payload->include_empty;
+        if ($payload !== null) {
+            if (property_exists($payload, 'region')) {
+                $params['region'] = $payload->region;
+            }
+            if (property_exists($payload, 'year')) {
+                $params['year'] = $payload->year;
+            }
+            if (property_exists($payload, 'include_empty')) {
+                $params['include_empty'] = $payload->include_empty;
+            }
         }
         return $params;
     }
@@ -140,13 +145,7 @@ final class MissalsPath
      *
      * When the request method is GET, the query parameters are expected to have the same structure as the request body in the previous case.
      *
-     * @return array{
-     *      locale?: string,
-     *      region?: string,
-     *      year?: int,
-     *      include_empty?: bool,
-     *      PAYLOAD?: object
-     * } The initialized request parameters
+     * @return array{locale?:string,region?:string,year?:int,include_empty?:bool}|array{PAYLOAD:\stdClass} The initialized request parameters
      */
     private static function initRequestParams(): array
     {
@@ -156,6 +155,7 @@ final class MissalsPath
             if (self::$Core->getRequestMethod() === RequestMethod::POST) {
                 $params = self::initGetPostParams($payload);
             } else {
+                /** @var \stdClass $payload */
                 $params['PAYLOAD'] = $payload;
             }
         } elseif (self::$Core->getRequestMethod() === RequestMethod::GET) {
@@ -176,9 +176,9 @@ final class MissalsPath
      * If the Missal was not found, it will produce an error response with a status code of 404, listing the available
      * Missal IDs.
      *
-     * @return void
+     * @return never
      */
-    private static function handlePathParams()
+    private static function handlePathParams(): never
     {
         $numPathParts = count(self::$requestPathParts);
         if ($numPathParts > 1) {
@@ -190,16 +190,20 @@ final class MissalsPath
             // the only path parameter we expect is the ID of the Missal
             $missalId = self::$requestPathParts[0];
             if (self::$missalsIndex->hasMissal($missalId)) {
-                $missal         = self::$missalsIndex->getMissal($missalId);
+                $missalMetadata = self::$missalsIndex->getMissalMetadata($missalId);
+                if (null === $missalMetadata) {
+                    throw new \RuntimeException('Unable to find missal metadata for missal ' . $missalId);
+                }
+
                 $missalJsonFile = RomanMissal::$jsonFiles[$missalId];
                 if (false === $missalJsonFile) {
-                    throw new \Exception("Unable to find JSON file for missal $missalId");
+                    throw new \RuntimeException("Unable to retrieve metadata for missal $missalId. Now the disciples had forgotten to bring any bread. - Mark 8:14");
                 }
 
                 $missalData = Utilities::rawContentsFromFile($missalJsonFile);
                 $locale     = RomanMissal::isLatinMissal($missalId)
-                            ? ( in_array(self::$params->baseLocale, $missal->locales) ? self::$params->baseLocale : LitLocale::LATIN_PRIMARY_LANGUAGE )
-                            : ( in_array(self::$params->Locale, $missal->locales) ? self::$params->Locale : $missal->locales[0] );
+                            ? ( in_array(self::$params->baseLocale, $missalMetadata->locales) ? self::$params->baseLocale : LitLocale::LATIN_PRIMARY_LANGUAGE )
+                            : ( in_array(self::$params->Locale, $missalMetadata->locales) ? self::$params->Locale : $missalMetadata->locales[0] );
                 $i18nFile   = RomanMissal::$i18nPath[$missalId] . $locale . '.json';
                 $i18nObj    = Utilities::jsonFileToObject($i18nFile);
                 $missalRows = json_decode($missalData);
@@ -239,8 +243,9 @@ final class MissalsPath
      *
      * @param int $statusCode the HTTP status code to return
      * @param string $description a short description of the error
+     * @return never
      */
-    public static function produceErrorResponse(int $statusCode, string $description): void
+    public static function produceErrorResponse(int $statusCode, string $description): never
     {
         header($_SERVER['SERVER_PROTOCOL'] . StatusCode::toString($statusCode), true, $statusCode);
         $message         = new \stdClass();
@@ -285,8 +290,9 @@ final class MissalsPath
      * PATCH, it also sets a 201 Created status code.
      *
      * @param string $jsonEncodedResponse the response as a JSON encoded string
+     * @return never
      */
-    private static function produceResponse(string $jsonEncodedResponse): void
+    private static function produceResponse(string $jsonEncodedResponse): never
     {
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
             header($_SERVER['SERVER_PROTOCOL'] . ' 201 Created', true, 201);
@@ -319,8 +325,10 @@ final class MissalsPath
      *   base locale was not found, it will return the Missal data.
      * If the Missal was not found, it will produce an error response with a status code
      * of 404, listing the available Missal IDs.
+     *
+     * @return never
      */
-    public static function handleRequest(): void
+    public static function handleRequest(): never
     {
         self::$Core->init();
         if (self::$Core->getRequestMethod() === RequestMethod::GET) {

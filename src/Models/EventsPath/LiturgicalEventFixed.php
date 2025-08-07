@@ -209,13 +209,16 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
                 $commons = self::transformCommons($obj->common);
             } else {
                 // We ensure a default value
+                /** @var LitCommons */
                 $commons = LitCommons::create([]);
             }
         } else {
             if (property_exists($obj, 'common')) {
+                /** @var LitCommons */
                 $commons = $obj->common;
             } else {
                 // We ensure a default value
+                /** @var LitCommons */
                 $commons = LitCommons::create([]);
             }
         }
@@ -333,6 +336,7 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
         if (array_key_exists('common', $arr)) {
             $commons = self::transformCommons($arr['common']);
         } else {
+            /** @var LitCommons $commons */
             $commons = LitCommons::create([LitCommon::NONE]);
         }
 

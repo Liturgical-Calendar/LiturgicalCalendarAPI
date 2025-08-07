@@ -65,35 +65,57 @@ final class DecreesPath
     }
     */
 
-    private static function handlePathParams(): void
+    /**
+     * Handle the path parameters on the `/decrees` endpoint.
+     *
+     * If there is more than one path parameter, a 400 Bad Request error response is produced.
+     * If there is exactly one path parameter, this function will attempt to find the Decree of the Congregation for Divine Worship
+     * corresponding to the given path parameter. If the decree is not found, a 404 Not Found error response is produced.
+     * If the decree is found, it is encoded to JSON and sent in the response body.
+     *
+     * @return never
+     */
+    private static function handlePathParams(): never
     {
         $numPathParts = count(self::$requestPathParts);
+        if ($numPathParts > 1) {
+            self::produceErrorResponse(StatusCode::BAD_REQUEST, "Only one path parameter expected on the `/decrees` path, instead $numPathParts found");
+        }
+
         if ($numPathParts > 0) {
-            switch ($numPathParts) {
-                case 1:
-                    $decree = array_find(self::$decreesIndex->decreeItems, fn ($decree) => $decree->decree_id === self::$requestPathParts[0]);
-                    if (null === $decree) {
-                        $decreeIDs = array_column(self::$decreesIndex->decreeItems, 'decree_id');
-                        $error     = 'No Decree of the Congregation for Divine Worship found corresponding to '
-                            . self::$requestPathParts[0]
-                            . ', valid values are found in the `decree_id` properties of the `litcal_decrees` collection: ' . implode(', ', $decreeIDs);
-                        self::produceErrorResponse(StatusCode::NOT_FOUND, $error);
-                    } else {
-                        $response = json_encode($decree);
-                        if ($response === false) {
-                            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Failed to encode decree to JSON');
-                        } else {
-                            self::produceResponse($response);
-                        }
-                    }
-                    break;
-                default:
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, "Only one path parameter expected on the `/decrees` path, instead $numPathParts found");
+            $decree = array_find(self::$decreesIndex->decreeItems, fn ($decree) => $decree->decree_id === self::$requestPathParts[0]);
+            if (null === $decree) {
+                $decreeIDs = array_column(self::$decreesIndex->decreeItems, 'decree_id');
+                $error     = 'No Decree of the Congregation for Divine Worship found corresponding to '
+                    . self::$requestPathParts[0]
+                    . ', valid values are found in the `decree_id` properties of the `litcal_decrees` collection: ' . implode(', ', $decreeIDs);
+                self::produceErrorResponse(StatusCode::NOT_FOUND, $error);
+            } else {
+                $response = json_encode($decree);
+                if ($response === false) {
+                    self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Failed to encode decree to JSON');
+                } else {
+                    self::produceResponse($response);
+                }
             }
+        } else {
+            self::produceErrorResponse(StatusCode::BAD_REQUEST, 'No path parameter found on the `/decrees` path, that should have been handled elsewhere?');
         }
     }
 
-    public static function produceErrorResponse(int $statusCode, string $description): void
+    /**
+     * Produce an error response with the given HTTP status code and description.
+     *
+     * The description is a short string that should be used to give more context to the error.
+     *
+     * The function will output the error in the response format specified by the Accept header
+     * of the request (JSON or YAML) and terminate the script execution with a call to die().
+     *
+     * @param int $statusCode the HTTP status code to return
+     * @param string $description a short description of the error
+     * @return never
+     */
+    public static function produceErrorResponse(int $statusCode, string $description): never
     {
         header($_SERVER['SERVER_PROTOCOL'] . StatusCode::toString($statusCode), true, $statusCode);
         $message         = new \stdClass();
@@ -130,7 +152,18 @@ final class DecreesPath
         die();
     }
 
-    private static function produceResponse(string $jsonEncodedResponse): void
+    /**
+     * Output the response for the /decrees endpoint.
+     *
+     * Outputs the response as either JSON or YAML, depending on the value of
+     * self::$Core->getResponseContentType(). If the request method was PUT or
+     * PATCH, it also sets a 201 Created status code.
+     *
+     * @param string $jsonEncodedResponse the response as a JSON encoded string
+     *
+     * @return never
+     */
+    private static function produceResponse(string $jsonEncodedResponse): never
     {
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
             header($_SERVER['SERVER_PROTOCOL'] . ' 201 Created', true, 201);
@@ -191,7 +224,19 @@ final class DecreesPath
         self::$Core         = new Core();
     }
 
-    public static function handleRequest(): void
+    /**
+     * Handles the request for the Decrees endpoint.
+     *
+     * This function:
+     *  - Initializes the Core component.
+     *  - Validates the Accept header if the request method is GET.
+     *  - Sets the response content type header.
+     *  - Encodes the decrees index to JSON and outputs the response if the request path is empty.
+     *  - Otherwise, handles the path parameters.
+     *
+     * @return never
+     */
+    public static function handleRequest(): never
     {
         self::$Core->init();
         if (self::$Core->getRequestMethod() === RequestMethod::GET) {
