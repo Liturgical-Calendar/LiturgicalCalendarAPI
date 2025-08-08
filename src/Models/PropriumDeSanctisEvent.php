@@ -171,7 +171,7 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
      * - grade (int): The liturgical grade of the event.
      * - grade_display (string): The liturgical grade display of the event.
      *
-     * @param \stdClass $data The stdClass object or array containing event data.
+     * @param \stdClass&object{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,grade_display:?string} $data The stdClass object or array containing event data.
      * @return static The newly created instance(s).
      */
     protected static function fromObjectInternal(\stdClass $data): static

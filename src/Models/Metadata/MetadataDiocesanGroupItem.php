@@ -33,7 +33,7 @@ final class MetadataDiocesanGroupItem extends AbstractJsonRepresentation
      * - group_name: The unique identifier for the group of dioceses.
      * - dioceses: The dioceses that belong to the group.
      *
-     * @return array{group_name:string,dioceses:array<string>} The associative array containing the metadata about a group of dioceses.
+     * @return array{group_name:string,dioceses:string[]} The associative array containing the metadata about a group of dioceses.
      */
     public function jsonSerialize(): array
     {
@@ -48,12 +48,9 @@ final class MetadataDiocesanGroupItem extends AbstractJsonRepresentation
      *
      * The array should have the following keys:
      * - group_name (string): The unique identifier for the group of dioceses.
-     * - dioceses (array<string>): The dioceses that belong to the group.
+     * - dioceses (string[]): The dioceses that belong to the group.
      *
-     * @param array{
-     *      group_name: string,
-     *      dioceses: array<string>
-     * } $data
+     * @param array{group_name:string,dioceses:string[]} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -69,9 +66,9 @@ final class MetadataDiocesanGroupItem extends AbstractJsonRepresentation
      *
      * The object should have the following properties:
      * - group_name (string): The unique identifier for the group of dioceses.
-     * - dioceses (array<string>): The dioceses that belong to the group.
+     * - dioceses (string[]): The dioceses that belong to the group.
      *
-     * @param \stdClass $data
+     * @param \stdClass&object{group_name:string,dioceses:string[]} $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static

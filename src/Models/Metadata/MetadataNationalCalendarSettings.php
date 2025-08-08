@@ -7,6 +7,9 @@ use LiturgicalCalendar\Api\Enum\CorpusChristi;
 use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
 
+/**
+ * @phpstan-type NationalCalendarSettings \stdClass&object{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool}
+ */
 final class MetadataNationalCalendarSettings extends AbstractJsonRepresentation
 {
     public Epiphany $epiphany;
@@ -72,7 +75,7 @@ final class MetadataNationalCalendarSettings extends AbstractJsonRepresentation
      * - corpus_christi (string): when Corpus Christi is celebrated
      * - eternal_high_priest (bool): whether the Eternal High Priest is celebrated
      *
-     * @param \stdClass $data
+     * @param NationalCalendarSettings $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static

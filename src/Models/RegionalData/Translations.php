@@ -9,6 +9,7 @@ use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
  *
  * @implements \IteratorAggregate<string,TranslationMap>
  * @implements \ArrayAccess<string,TranslationMap>
+ * @phpstan-type TranslationObject \stdClass&object<string,string>
  */
 final class Translations extends AbstractJsonSrcData implements \IteratorAggregate, \Countable, \ArrayAccess
 {
@@ -113,7 +114,7 @@ final class Translations extends AbstractJsonSrcData implements \IteratorAggrega
      *
      * The object should have the same structure as the i18nData property.
      *
-     * @param \stdClass $i18nData The object to create the instance from.
+     * @param \stdClass&object<string,\stdClass&object<string,string>> $i18nData The object to create the instance from.
      * @return static A new instance of this class.
      */
     protected static function fromObjectInternal(\stdClass $i18nData): static

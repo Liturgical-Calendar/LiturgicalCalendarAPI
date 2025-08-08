@@ -24,7 +24,7 @@ final class LitCalItemMakePatron extends LiturgicalEventData
      * - event_key (string): The key of the event.
      * - grade (integer): The liturgical grade of the event.
      *
-     * @param \stdClass $data The stdClass object containing the properties of the class.
+     * @param \stdClass&object{event_key:string,grade:int} $data The stdClass object containing the properties of the class.
      * @return static The newly created instance.
      * @throws \ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
      */

@@ -12,6 +12,8 @@ use LiturgicalCalendar\Api\Models\RegionalData\Translations;
 
 /**
  * @phpstan-import-type LiturgicalEventItem from \LiturgicalCalendar\Api\Models\LitCalItemCollection
+ * @phpstan-import-type LiturgicalEventObject from \LiturgicalCalendar\Api\Models\LitCalItemCollection
+ * @phpstan-import-type TranslationMapObject from \LiturgicalCalendar\Api\Models\RegionalData\TranslationMap
  */
 final class WiderRegionData extends AbstractJsonSrcData
 {
@@ -101,7 +103,7 @@ final class WiderRegionData extends AbstractJsonSrcData
      * - metadata (object): The metadata for the wider region, with locales and wider_region properties.
      * - i18n (object|null): The translations for the wider region. If not provided, it will default to null.
      *
-     * @param \stdClass $data The object containing the properties of the wider region.
+     * @param \stdClass&object{litcal:LiturgicalEventObject[],national_calendars:\stdClass&object<string,string>,metadata:\stdClass&object{locales:string[],wider_region:string},i18n?:\stdClass} $data The object containing the properties of the wider region.
      * @return static A new instance of WiderRegionData initialized with the provided data.
      *
      * @throws \ValueError If any of the required keys ('litcal', 'national_calendars', 'metadata') are not present.
@@ -145,7 +147,7 @@ final class WiderRegionData extends AbstractJsonSrcData
      * values of metadata.locales, and then sets the $this->i18n property
      * to a Translations object constructed from the validated i18n parameter.
      *
-     * @param \stdClass $i18n The object containing the translations to apply.
+     * @param TranslationMapObject $i18n The object containing the translations to apply.
      *                        The keys of the object must be the same as the
      *                        values of metadata.locales.
      *
@@ -167,7 +169,7 @@ final class WiderRegionData extends AbstractJsonSrcData
      * and compares them to the sorted values of the metadata.locales. If they do
      * not match, a ValueError is thrown.
      *
-     * @param \stdClass $i18n The translations object whose keys need to be validated.
+     * @param TranslationMapObject $i18n The translations object whose keys need to be validated.
      *
      * @throws \ValueError If the keys of the i18n parameter do not match the values
      *                     of metadata.locales.

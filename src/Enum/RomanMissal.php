@@ -40,7 +40,7 @@ class RomanMissal
      * The values of the Roman Missal enumeration constants.
      * This array is used to check if a given missal_id is a valid Roman Missal enumeration constant.
      * @static
-     * @var array<string>
+     * @var string[]
      * @see \LiturgicalCalendar\Api\Enum\RomanMissal::isValid()
      */
     public static array $values = [

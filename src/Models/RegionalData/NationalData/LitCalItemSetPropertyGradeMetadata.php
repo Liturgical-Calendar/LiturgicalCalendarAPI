@@ -32,7 +32,7 @@ final class LitCalItemSetPropertyGradeMetadata extends LiturgicalEventMetadata
      * - until_year (int|null): The year until when the metadata is applied.
      * - url (string|null): The URL associated with the metadata. It will be sanitized.
      *
-     * @param \stdClass $data The stdClass object containing the properties of the class.
+     * @param \stdClass&object{since_year:int,until_year?:int,url?:string} $data The stdClass object containing the properties of the class.
      * @return static The newly created instance.
      * @throws \ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
      */

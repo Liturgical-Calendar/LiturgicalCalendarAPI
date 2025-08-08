@@ -52,7 +52,7 @@ final class LitCalItemMakePatronMetadata extends LiturgicalEventMetadata
     /**
      * Creates a new instance from an associative array.
      *
-     * @param \stdClass $data The data to use to create the new instance.
+     * @param \stdClass&object{since_year:int,url?:string,url_lang_map?:\stdClass&object<string,string>,until_year?:int} $data The data to use to create the new instance.
      *
      * @throws \ValueError If `metadata.since_year` parameter is missing.
      * @throws \ValueError If `data.url` parameter is not a string or is not a valid url.

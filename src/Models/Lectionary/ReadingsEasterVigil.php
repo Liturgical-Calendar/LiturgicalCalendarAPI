@@ -84,7 +84,7 @@ final class ReadingsEasterVigil extends ReadingsAbstract
     }
 
     /**
-     * @param \stdClass $data
+     * @param \stdClass&object{first_reading:string,second_reading:string,responsorial_psalm:string,alleluia_verse:string,gospel:string,responsorial_psalm_2:string,third_reading:string,responsorial_psalm_3:string,fourth_reading:string,responsorial_psalm_4:string,fifth_reading:string,responsorial_psalm_5:string,sixth_reading:string,responsorial_psalm_6:string,seventh_reading:string,responsorial_psalm_7:string,epistle:string,responsorial_psalm_epistle:string} $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static

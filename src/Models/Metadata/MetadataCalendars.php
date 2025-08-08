@@ -78,18 +78,18 @@ final class MetadataCalendars extends AbstractJsonRepresentation
      * @return array{
      *      national_calendars:array<array{
      *          calendar_id:string,
-     *          locales:array<string>,
-     *          missals:array<string>,
+     *          locales:string[],
+     *          missals:string[],
      *          settings:array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool},
      *          wider_region?:string,
-     *          dioceses?:array<string>
+     *          dioceses?:string[]
      *      }>,
      *      national_calendars_keys:string[],
      *      diocesan_calendars:array<array{
      *          calendar_id:string,
      *          diocese:string,
      *          nation:string,
-     *          locales:array<string>,
+     *          locales:string[],
      *          timezone:string,
      *          group?:string,
      *          settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool}
@@ -97,11 +97,11 @@ final class MetadataCalendars extends AbstractJsonRepresentation
      *      diocesan_calendars_keys:string[],
      *      diocesan_groups:array<array{
      *          group_name:string,
-     *          dioceses:array<string>
+     *          dioceses:string[]
      *      }>,
      *      wider_regions:array<array{
      *          name:string,
-     *          locales:array<string>,
+     *          locales:string[],
      *          api_path:string
      *      }>,
      *      wider_regions_keys:string[],
@@ -139,18 +139,18 @@ final class MetadataCalendars extends AbstractJsonRepresentation
      * @param array{
      *      national_calendars:array<array{
      *          calendar_id:string,
-     *          locales:array<string>,
-     *          missals:array<string>,
+     *          locales:string[],
+     *          missals:string[],
      *          settings:array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest?:bool},
      *          wider_region?:string,
-     *          dioceses?:array<string>
+     *          dioceses?:string[]
      *      }>,
      *      national_calendars_keys:string[],
      *      diocesan_calendars:array<array{
      *          calendar_id:string,
      *          diocese:string,
      *          nation:string,
-     *          locales:array<string>,
+     *          locales:string[],
      *          timezone:string,
      *          group?:string,
      *          settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool}
@@ -158,11 +158,11 @@ final class MetadataCalendars extends AbstractJsonRepresentation
      *      diocesan_calendars_keys:string[],
      *      diocesan_groups:array<array{
      *          group_name:string,
-     *          dioceses:array<string>
+     *          dioceses:string[]
      *      }>,
      *      wider_regions:array<array{
      *          name:string,
-     *          locales:array<string>,
+     *          locales:string[],
      *          api_path:string
      *      }>,
      *      wider_regions_keys:string[],
@@ -197,7 +197,38 @@ final class MetadataCalendars extends AbstractJsonRepresentation
      * - wider_regions_keys: The keys for the wider regions.
      * - locales: The locales supported by the national calendars.
      *
-     * @param \stdClass $data The associative array containing the metadata or index of all available calendars (whether General Roman, national, or diocesan), diocesan groups, wider regions, and locales.
+     * @param \stdClass&object{
+     *      national_calendars:array<\stdClass&object{
+     *          calendar_id:string,
+     *          locales:string[],
+     *          missals:string[],
+     *          settings:\stdClass&object{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest?:bool},
+     *          wider_region?:string,
+     *          dioceses?:string[]
+     *      }>,
+     *      national_calendars_keys:string[],
+     *      diocesan_calendars:array<\stdClass&object{
+     *          calendar_id:string,
+     *          diocese:string,
+     *          nation:string,
+     *          locales:string[],
+     *          timezone:string,
+     *          group?:string,
+     *          settings?:\stdClass&object{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool}
+     *      }>,
+     *      diocesan_calendars_keys:string[],
+     *      diocesan_groups:array<\stdClass&object{
+     *          group_name:string,
+     *          dioceses:string[]
+     *      }>,
+     *      wider_regions:array<\stdClass&object{
+     *          name:string,
+     *          locales:string[],
+     *          api_path:string
+     *      }>,
+     *      wider_regions_keys:string[],
+     *      locales:string[]
+     * } $data The \stdClass object containing the metadata or index of all available calendars (whether General Roman, national, or diocesan), diocesan groups, wider regions, and locales.
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static

@@ -26,7 +26,7 @@ final class DecreeItemSetPropertyGradeMetadata extends DecreeEventMetadata
      * Optional property:
      * - url_lang_map (object): Maps ISO 639-1 language codes to Vatican website language codes.
      *
-     * @param \stdClass $data The stdClass object containing the properties of the class.
+     * @param \stdClass&object{since_year:int,url:string,url_lang_map?:\stdClass&object<string,string>} $data The stdClass object containing the properties of the class.
      * @return static The newly created instance(s).
      * @throws \ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
      */

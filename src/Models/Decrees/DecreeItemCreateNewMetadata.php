@@ -15,7 +15,7 @@ final class DecreeItemCreateNewMetadata extends DecreeEventMetadata
     /**
      * Creates an instance from a StdClass object.
      *
-     * @param \stdClass $data The StdClass object(s) to create an instance from.
+     * @param \stdClass&object{since_year:int,url:string,url_lang_map?:\stdClass&object<string,string>} $data The StdClass object(s) to create an instance from.
      * It (they) must have the following properties:
      * - since_year (int): The year since when the liturgical event was added.
      * - url (string): The URL of the liturgical event.

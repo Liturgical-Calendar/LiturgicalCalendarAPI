@@ -4,6 +4,10 @@ namespace LiturgicalCalendar\Api\Models\Metadata;
 
 use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
 
+/**
+ * @phpstan-type DiocesanCalendarMetadata \stdClass&object{diocese_id:string,diocese_name:string,nation:string,locales:string[],timezone:string,group?:string}
+ * @phpstan-import-type DiocesanCalendarSettings from MetadataDiocesanCalendarSettings
+ */
 final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
 {
     public string $calendar_id;
@@ -27,7 +31,7 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
      * @param string $calendar_id The unique identifier for the Diocesan Calendar.
      * @param string $diocese The diocese name.
      * @param string $nation The nation name.
-     * @param array<string> $locales The locales supported by the Diocesan Calendar.
+     * @param string[] $locales The locales supported by the Diocesan Calendar.
      * @param string $timezone The timezone for the Diocesan Calendar.
      * @param string|null $group The group name for the Diocesan Calendar, or null if none.
      * @param MetadataDiocesanCalendarSettings|null $settings The settings for the Diocesan Calendar, or null if none.
@@ -63,7 +67,7 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
      * - group: The group name for the Diocesan Calendar, if applicable.
      * - settings: The settings for the Diocesan Calendar, if applicable.
      *
-     * @return array{calendar_id:string,diocese:string,nation:string,locales:array<string>,timezone:string,group?:string,settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool}} The associative array containing the Diocesan Calendar's metadata.
+     * @return array{calendar_id:string,diocese:string,nation:string,locales:string[],timezone:string,group?:string,settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool}} The associative array containing the Diocesan Calendar's metadata.
      */
     public function jsonSerialize(): array
     {
@@ -90,22 +94,14 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
      * - calendar_id (string): The unique identifier for the Diocesan Calendar.
      * - diocese (string): The diocese name.
      * - nation (string): The nation name.
-     * - locales (array<string>): The locales supported by the Diocesan Calendar.
+     * - locales (string[]): The locales supported by the Diocesan Calendar.
      * - timezone (string): The timezone for the Diocesan Calendar.
      *
      * The array may also have the following optional keys:
      * - group (string|null): The group name for the Diocesan Calendar, if applicable.
-     * - settings (array<string>|null): The settings for the Diocesan Calendar, if applicable.
+     * - settings (string[]|null): The settings for the Diocesan Calendar, if applicable.
      *
-     * @param array{
-     *      calendar_id: string,
-     *      diocese: string,
-     *      nation: string,
-     *      locales: array<string>,
-     *      timezone: string,
-     *      group?: string,
-     *      settings?: array<string>
-     * } $data
+     * @param array{calendar_id:string,diocese:string,nation:string,locales:string[],timezone:string,group?:string,settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string}} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -131,20 +127,21 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
      * - calendar_id (string): The unique identifier for the Diocesan Calendar.
      * - diocese (string): The diocese name.
      * - nation (string): The nation name.
-     * - locales (array<string>): The locales supported by the Diocesan Calendar.
+     * - locales (string[]): The locales supported by the Diocesan Calendar.
      * - timezone (string): The timezone for the Diocesan Calendar.
      *
      * The object may also have the following optional properties:
      * - group (string|null): The group name for the Diocesan Calendar, if applicable.
-     * - settings (array<string>|null): The settings for the Diocesan Calendar, if applicable.
+     * - settings (string[]|null): The settings for the Diocesan Calendar, if applicable.
      *
-     * @param \stdClass $data
+     * @param \stdClass&object{calendar_id:string,diocese:string,nation:string,locales:string[],timezone:string,group?:string,settings?:DiocesanCalendarSettings} $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
+        $settings = null;
         if (property_exists($data, 'settings')) {
-            $data->settings = MetadataDiocesanCalendarSettings::fromObject($data->settings);
+            $settings = MetadataDiocesanCalendarSettings::fromObject($data->settings);
         }
         return new static(
             $data->calendar_id ?? $data->diocese_id, // in the calendar source file, the calendar_id is called diocese_id
@@ -153,7 +150,7 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
             $data->locales,
             $data->timezone,
             $data->group ?? null,
-            $data->settings ?? null
+            $settings
         );
     }
 }

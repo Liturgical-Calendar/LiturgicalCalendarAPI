@@ -115,7 +115,7 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
     /**
      * Retrieves an array of missal_ids of the MissalMetadata objects in the collection.
      *
-     * @return array<string> An array of missal_ids.
+     * @return string[] An array of missal_ids.
      */
     public function getMissalIDs(): array
     {

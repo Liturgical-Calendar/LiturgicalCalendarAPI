@@ -25,14 +25,22 @@ use LiturgicalCalendar\Api\Test\LitTestRunner;
  * @author  John Romano D'Orazio <priest@johnromanodorazio.com>
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link    https://litcal.johnromanodorazio.com
- * @phpstan-type DiocesanCalendarCollectionItem object{
+ * @phpstan-type DiocesanCalendarCollectionItem \stdClass&object{
  *      calendar_id: string,
  *      diocese: string,
  *      nation: string,
- *      locales: array<string>,
+ *      locales: string[],
  *      timezone: string,
  *      group?: string
  * }
+ *
+ * @phpstan-type ExecuteValidationSourceFolder \stdClass&object{action:'executeValidation',category:'sourceDataCheck',validate:string,sourceFolder:string}
+ * @phpstan-type ExecuteValidationSourceFile \stdClass&object{action:'executeValidation',category:'sourceDataCheck',validate:string,sourceFile:string}
+ * @phpstan-type ExecuteValidationResource \stdClass&object{action:'executeValidation',category:'resourceDataCheck',validate:string,sourceFile:string}
+ * @phpstan-type ValidateCalendar \stdClass&object{action:'validateCalendar',calendar:string,year:int,category:'sourceDataCheck',responsetype:'JSON'|'XML'|'ICS'|'YML'}
+ * @phpstan-type ExecuteUnitTest \stdClass&object{action:'executeUnitTest',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar',test:string}
+ *
+ * @phpstan-import-type LiturgicalEvent from \LiturgicalCalendar\Api\Test\LitTestRunner
  */
 class Health implements MessageComponentInterface
 {
@@ -58,9 +66,9 @@ class Health implements MessageComponentInterface
      * @var array<string,string[]> $ACTION_PROPERTIES
      */
     private const ACTION_PROPERTIES = [
-        'executeValidation' => ['validate', 'sourceFile', 'category'],
-        'validateCalendar'  => ['calendar', 'year', 'category', 'responsetype'],
-        'executeUnitTest'   => ['calendar', 'year', 'category', 'test']
+        'executeValidation' => ['category', 'validate', 'sourceFile'],
+        'validateCalendar'  => ['category', 'calendar', 'year', 'responsetype'],
+        'executeUnitTest'   => ['category', 'calendar', 'year', 'test']
     ];
 
     private static MetadataCalendars $metadata;
@@ -107,10 +115,14 @@ class Health implements MessageComponentInterface
                 return;
             }
             $metadataObj = json_decode($rawData);
-            if (JSON_ERROR_NONE === json_last_error()) {
-                echo "Loaded metadata\n";
-            } else {
+            if (JSON_ERROR_NONE !== json_last_error()) {
                 echo 'Error loading metadata: ' . json_last_error_msg() . "\n";
+                return;
+            } else {
+                echo "Loaded metadata\n";
+            }
+            if (false === $metadataObj instanceof \stdClass) {
+                echo 'Error loading metadata: expected stdClass, got ' . gettype($metadataObj) . "\n";
                 return;
             }
             self::$metadata = MetadataCalendars::fromObject($metadataObj->litcal_metadata);
@@ -132,10 +144,10 @@ class Health implements MessageComponentInterface
      * specified action. If any expected property is missing from the message
      * object, the function returns false, indicating the message is invalid.
      *
-     * @param object{action:string} $message The message object to validate.
+     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest $message The message object to validate.
      * @return bool True if all required properties are present, false otherwise.
      */
-    private static function validateMessageProperties(object $message): bool
+    private static function validateMessageProperties(\stdClass $message): bool
     {
         $valid = true;
         foreach (Health::ACTION_PROPERTIES[$message->action] as $prop) {
@@ -162,9 +174,11 @@ class Health implements MessageComponentInterface
     public function onMessage(ConnectionInterface $from, $msg): void
     {
         echo sprintf('Receiving message from connection %d: %s', $from->resourceId, $msg);
+        /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest $messageReceived */
         $messageReceived = json_decode($msg);
         if (
             json_last_error() === JSON_ERROR_NONE
+            && $messageReceived instanceof \stdClass
             && property_exists($messageReceived, 'action')
             && self::validateMessageProperties($messageReceived)
         ) {
@@ -199,6 +213,8 @@ class Health implements MessageComponentInterface
         } else {
             if (json_last_error() !== JSON_ERROR_NONE) {
                 $errorMsg = json_last_error_msg();
+            } elseif (!$messageReceived instanceof \stdClass) {
+                $errorMsg = 'Message is not an object';
             } elseif (!property_exists($messageReceived, 'action')) {
                 $errorMsg = 'No action specified';
             } elseif (!self::validateMessageProperties($messageReceived)) {
@@ -402,7 +418,7 @@ class Health implements MessageComponentInterface
     /**
      * Validate a data file by checking that it exists and that it is valid JSON that conforms to a specific schema.
      *
-     * @param object{category:'sourceDataCheck',sourceFolder:string,validate:string}|object{category:'sourceDataCheck',sourceFile:string,validate:string}|object{category:'resourceDataCheck',sourceFile:string,validate:string} $validation The validation object. It should have the following properties:
+     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest $validation The validation object. It should have the following properties:
      * - category: with a value of `sourceDataCheck` or `resourceDataCheck`
      * - sourceFile|sourceFolder: a string, the path to the data file or folder
      * - validate: a string with the identifier of the resource that we are validating;
@@ -414,7 +430,7 @@ class Health implements MessageComponentInterface
      *             3. `.schema-valid`: a string, the class name to add to the message if the file is valid against the schema
      * @param ConnectionInterface $to The connection to send the validation message to
      */
-    private function executeValidation(object $validation, ConnectionInterface $to): void
+    private function executeValidation(\stdClass $validation, ConnectionInterface $to): void
     {
         // First thing is try to determine the schema that we will be validating against,
         // and the path to the source file or folder that we will be validating against the schema.
@@ -1095,6 +1111,7 @@ class Health implements MessageComponentInterface
         // We don't really need to check whether file_get_contents succeeded
         //  because this check already takes place in the validateCalendar test phase
         assert(is_string($data), 'Data should be a string for executeUnitTest method');
+        /** @var \stdClass&object{settings:object{year:int,national_calendar?:string,diocesan_calendar?:string},litcal:LiturgicalEvent[]} $jsonData */
         $jsonData = json_decode($data);
         if (json_last_error() === JSON_ERROR_NONE) {
             $UnitTest = new LitTestRunner($test, $jsonData);

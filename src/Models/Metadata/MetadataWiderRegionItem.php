@@ -39,7 +39,7 @@ final class MetadataWiderRegionItem extends AbstractJsonRepresentation
      * - locales: An array of locales supported by the wider region.
      * - api_path: The API path for accessing the wider region data.
      *
-     * @return array{name:string,locales:array<string>,api_path:string} The associative array representation of the object.
+     * @return array{name:string,locales:string[],api_path:string} The associative array representation of the object.
      */
     public function jsonSerialize(): array
     {
@@ -55,10 +55,10 @@ final class MetadataWiderRegionItem extends AbstractJsonRepresentation
      *
      * The array must have the following keys:
      * - name (string): The name of the wider region.
-     * - locales (array<string>): The locales supported by the wider region.
+     * - locales (string[]): The locales supported by the wider region.
      * - api_path (string): The API path for accessing the wider region data.
      *
-     * @param array{name:string,locales:array<string>,api_path:string} $data
+     * @param array{name:string,locales:string[],api_path:string} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -75,10 +75,10 @@ final class MetadataWiderRegionItem extends AbstractJsonRepresentation
      *
      * The object should have the following properties:
      * - name (string): The name of the wider region.
-     * - locales (array<string>): The locales supported by the wider region.
+     * - locales (string[]): The locales supported by the wider region.
      * - api_path (string): The API path for accessing the wider region data.
      *
-     * @param \stdClass $data
+     * @param \stdClass&object{name:string,locales:string[],api_path:string} $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static

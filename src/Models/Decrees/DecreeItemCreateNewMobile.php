@@ -9,6 +9,9 @@ use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
 use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
 
+/**
+ * @phpstan-import-type StrToTime from \LiturgicalCalendar\Api\Models\RelativeLiturgicalDate
+ */
 final class DecreeItemCreateNewMobile extends DecreeEventData
 {
     public readonly string|RelativeLiturgicalDate $strtotime;
@@ -94,7 +97,7 @@ final class DecreeItemCreateNewMobile extends DecreeEventData
      * - grade (integer): the liturgical grade of the event
      * - common (array): the liturgical common of the event, as an array of strings
      *
-     * @param \stdClass $data The stdClass object containing the properties of the class.
+     * @param \stdClass&object{event_key:string,name:string,calendar:string,strtotime:string|StrToTime,color:string[],grade:int,common:string[]} $data The stdClass object containing the properties of the class.
      * @return static The newly created instance.
      * @throws \ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
      */

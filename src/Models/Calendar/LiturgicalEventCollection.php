@@ -1370,7 +1370,7 @@ final class LiturgicalEventCollection
      * the Lord or the Blessed Virgin Mary, while the given liturgical event is not.
      *
      * @param LiturgicalEvent $litEvent The LiturgicalEvent object for which precedence is being evaluated.
-     * @param \stdClass $coincidingEvent The coinciding liturgical event object.
+     * @param \stdClass&object{event:LiturgicalEvent,key:string,grade_lcl:string} $coincidingEvent The coinciding liturgical event object.
      * @return bool True if the coinciding event takes precedence, false otherwise.
      */
     private function coincidingLiturgicalEventTakesPrecedenceOverVigil(LiturgicalEvent $litEvent, \stdClass $coincidingEvent): bool
@@ -1389,7 +1389,7 @@ final class LiturgicalEventCollection
      * the Lord or the Blessed Virgin Mary, while the coinciding event is not.
      *
      * @param LiturgicalEvent $litEvent The LiturgicalEvent object of the vigil event.
-     * @param \stdClass $coincidingEvent The coinciding event object.
+     * @param \stdClass&object{event:LiturgicalEvent,key:string,grade_lcl:string} $coincidingEvent The coinciding event object.
      * @return bool True if the vigil event takes precedence, false otherwise.
      */
     private function vigilTakesPrecedenceOverCoincidingLiturgicalEvent(LiturgicalEvent $litEvent, \stdClass $coincidingEvent): bool
@@ -1412,7 +1412,7 @@ final class LiturgicalEventCollection
      *
      * @param LiturgicalEvent $litEvent The LiturgicalEvent object being evaluated.
      * @param string $litEventGradeLcl The grade of the liturgical event.
-     * @param \stdClass $coincidingEvent The coinciding liturgical event object.
+     * @param \stdClass&object{event:LiturgicalEvent,grade_lcl:string} $coincidingEvent The coinciding liturgical event object.
      * @param bool|string $vigilTakesPrecedence Indicates if the vigil takes precedence or a special case string.
      * @return void
      */
@@ -1493,6 +1493,7 @@ final class LiturgicalEventCollection
                 $this->createVigilMassFor($litEvent, $VigilDate);
                 //if however the Vigil coincides with another Solemnity let's make a note of it!
                 if ($this->inSolemnities($VigilDate)) {
+                    /** @var \stdClass&object{key:string,grade_lcl:string,event:LiturgicalEvent} $coincidingEvent */
                     $coincidingEvent            = new \stdClass();
                     $coincidingEvent->grade_lcl = '';
                     $coincidingEvent->key       = $this->solemnityKeyFromDate($VigilDate);

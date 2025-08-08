@@ -54,7 +54,7 @@ final class LitCalItemMoveEvent extends LiturgicalEventData
      * - day (int): the day of the event
      * - month (int): the month of the event
      *
-     * @param \stdClass $data The stdClass object containing the properties of the class.
+     * @param \stdClass&object{event_key:string,day:int,month:int} $data The stdClass object containing the properties of the class.
      * @return static The newly created instance(s).
      * @throws \ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
      */

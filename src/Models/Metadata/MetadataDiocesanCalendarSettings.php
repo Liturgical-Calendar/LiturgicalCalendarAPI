@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
 
 /**
+ * @phpstan-type DiocesanCalendarSettings \stdClass&object{epiphany?:string,ascension?:string,corpus_christi?:string}
  * @implements \IteratorAggregate<string,Epiphany|Ascension|CorpusChristi>
  */
 final class MetadataDiocesanCalendarSettings extends AbstractJsonRepresentation implements \IteratorAggregate
@@ -70,7 +71,7 @@ final class MetadataDiocesanCalendarSettings extends AbstractJsonRepresentation 
      * - ascension (string|null): when Ascension is celebrated
      * - corpus_christi (string|null): when Corpus Christi is celebrated
      *
-     * @param \stdClass $data
+     * @param DiocesanCalendarSettings $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static

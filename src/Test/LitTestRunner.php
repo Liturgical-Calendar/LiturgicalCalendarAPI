@@ -82,7 +82,7 @@ class LitTestRunner
      * Updates the ready state based on successful initialization.
      *
      * @param string $Test The name of the test.
-     * @param object{settings:object{year:int,national_calendar?:string,diocesan_calendar?:string},litcal:LiturgicalEvent[]} $testData The test data object.
+     * @param \stdClass&object{settings:object{year:int,national_calendar?:string,diocesan_calendar?:string},litcal:LiturgicalEvent[]} $testData The test data object.
      */
     public function __construct(string $Test, object $testData)
     {

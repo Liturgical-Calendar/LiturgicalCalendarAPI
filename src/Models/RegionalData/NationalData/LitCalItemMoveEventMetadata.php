@@ -48,7 +48,7 @@ final class LitCalItemMoveEventMetadata extends LiturgicalEventMetadata
      * - missal (string): the name of the missal
      * - reason (string): the reason for the move
      *
-     * @param \stdClass $data The stdClass object containing the properties of the class.
+     * @param \stdClass&object{since_year:int,until_year:int|null,missal:string,reason:string} $data The stdClass object containing the properties of the class.
      * @return static The newly created instance.
      * @throws \ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
      */
@@ -77,7 +77,7 @@ final class LitCalItemMoveEventMetadata extends LiturgicalEventMetadata
      * Optional keys:
      * - until_year (int|null): The year until when the metadata is applied.
      *
-     * @param array{since_year:int,until_year:int|null,missal:string,reason: string} $data The associative array containing the properties of the class.
+     * @param array{since_year:int,until_year:int|null,missal:string,reason:string} $data The associative array containing the properties of the class.
      * @return static A new instance of the class.
      * @throws \ValueError If the required keys are not present in the array.
      */

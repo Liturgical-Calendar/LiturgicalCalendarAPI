@@ -51,15 +51,7 @@ final class CountryWithDiocesesItem extends AbstractJsonSrcData
     /**
      * Creates a new CountryWithDioceses from an associative array.
      *
-     * @param array{
-     *     country_iso: string,
-     *     country_name_english: string,
-     *     dioceses: array<array{
-     *         diocese_name: string,
-     *         diocese_id: string,
-     *         province?: string
-     *     }>
-     * } $data
+     * @param array{country_iso:string,country_name_english:string,dioceses:array<array{diocese_name:string,diocese_id:string,province?:string}>} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -79,7 +71,7 @@ final class CountryWithDiocesesItem extends AbstractJsonSrcData
      * - country_name_english (string): The name of the country in English.
      * - dioceses (array<object>): The dioceses. Each object must have the same properties as DioceseItem.
      *
-     * @param \stdClass $data
+     * @param \stdClass&object{country_iso:string,country_name_english:string,dioceses:array<\stdClass&object{diocese_name:string,diocese_id:string,province?:string}>} $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static

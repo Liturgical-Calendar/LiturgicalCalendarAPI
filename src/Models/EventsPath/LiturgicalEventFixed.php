@@ -81,13 +81,13 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
      *      month: int,
      *      day: int,
      *      color: array<'green'|'pink'|'purple'|'red'|'white'>,
-     *      color_lcl: array<string>,
+     *      color_lcl: string[],
      *      type: 'fixed'|'mobile',
      *      grade: -1|0|1|2|3|4|5|6|7,
      *      grade_lcl: string,
      *      grade_abbr: string,
      *      grade_display: ?string,
-     *      common: array<string>,
+     *      common: string[],
      *      common_lcl: string,
      * }
      */

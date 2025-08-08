@@ -30,7 +30,7 @@ final class DiocesanLitCalItem extends AbstractJsonSrcData
      * - liturgical_event (object): The liturgical event data.
      * - metadata (object): The metadata for the liturgical event.
      *
-     * @param \stdClass $data The object containing the properties of the class.
+     * @param \stdClass&object{liturgical_event:\stdClass&object{event_key?:string,name?:string,grade?:int,color?:string[],common?:string[],day?:int,month?:int,strtotime?:string},metadata:\stdClass&object{action?:string,since_year?:int|null,until_year?:int|null}} $data The object containing the properties of the class.
      * @return static A new instance of the class.
      */
     protected static function fromObjectInternal(\stdClass $data): static
@@ -49,7 +49,7 @@ final class DiocesanLitCalItem extends AbstractJsonSrcData
      * - liturgical_event (array): The liturgical event data.
      * - metadata (array): The metadata for the liturgical event.
      *
-     * @param array{liturgical_event:array{event_key?:string,name?:string,grade?:int,color?:string[],common?:string[],day?:int,month?:int,strtotime?:string},metadata:array{action?:string,since_year?:int|null,until_year?:int|null} } $data
+     * @param array{liturgical_event:array{event_key?:string,name?:string,grade?:int,color?:string[],common?:string[],day?:int,month?:int,strtotime?:string},metadata:array{action?:string,since_year?:int|null,until_year?:int|null}} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static

@@ -12,7 +12,7 @@ trait EnumToArrayTrait
     /**
      * Retrieves an array of the names of all enum cases.
      *
-     * @return array<string> An array containing the names of the enum cases.
+     * @return string[] An array containing the names of the enum cases.
      */
     public static function names(): array
     {
@@ -63,7 +63,7 @@ trait EnumToArrayTrait
     /**
      * Checks if all of the given values are valid enum values.
      *
-     * @param array<string> $values The array of values to check.
+     * @param string[] $values The array of values to check.
      * @return bool True if all of the values are valid, otherwise false.
      */
     public static function areValid(array $values): bool

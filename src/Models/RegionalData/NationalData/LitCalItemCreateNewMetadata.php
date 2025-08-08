@@ -18,7 +18,7 @@ final class LitCalItemCreateNewMetadata extends LiturgicalEventMetadata
     /**
      * Creates an instance from a StdClass object.
      *
-     * @param \stdClass $data The StdClass object to create an instance from.
+     * @param \stdClass&object{since_year:int,until_year?:int} $data The StdClass object to create an instance from.
      * It must have the following properties:
      * - since_year (int): The year since when the liturgical event was added.
      * - until_year (int|null): The year until when the liturgical event was added.

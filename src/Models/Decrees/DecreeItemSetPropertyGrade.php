@@ -21,7 +21,7 @@ final class DecreeItemSetPropertyGrade extends DecreeEventData
      * - event_key (string): The key of the event.
      * - grade (int|string): The liturgical grade of the event.
      *
-     * @param \stdClass $data The stdClass object containing the properties of the class.
+     * @param \stdClass&object{event_key:string,calendar:string,grade:string} $data The stdClass object containing the properties of the class.
      * @return static The newly created instance(s).
      * @throws \ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
      */

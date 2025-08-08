@@ -7,6 +7,11 @@ use LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarSettings;
 use LiturgicalCalendar\Api\Models\LitCalItemCollection;
 use LiturgicalCalendar\Api\Models\RegionalData\Translations;
 
+/**
+ * @phpstan-import-type NationalCalendarSettings from \LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarSettings
+ * @phpstan-import-type NationalCalendarMetadataObject from \LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem
+ * @phpstan-type LiturgicalEventObjectFixed \stdClass&object{event_key:string,day:int,month:int,color:string[],grade:int,common:string[]}
+ */
 final class NationalData extends AbstractJsonSrcData
 {
     public readonly LitCalItemCollection $litcal;
@@ -38,7 +43,7 @@ final class NationalData extends AbstractJsonSrcData
      * values of metadata.locales, and then sets the $this->i18n property
      * to a Translations object constructed from the validated i18n parameter.
      *
-     * @param \stdClass $i18n The object containing the translations to apply.
+     * @param \stdClass&object<string,\stdClass&object<string,string>> $i18n The object containing the translations to apply.
      *                        The keys of the object must be the same as the
      *                        values of metadata.locales.
      *
@@ -60,7 +65,7 @@ final class NationalData extends AbstractJsonSrcData
      * and compares them to the sorted values of the metadata.locales. If they do
      * not match, a ValueError is thrown.
      *
-     * @param \stdClass $i18n The translations object whose keys need to be validated.
+     * @param \stdClass&object<string,\stdClass&object<string,string>> $i18n The translations object whose keys need to be validated.
      *
      * @throws \ValueError If the keys of the i18n parameter do not match the values
      *                     of metadata.locales.
@@ -105,7 +110,7 @@ final class NationalData extends AbstractJsonSrcData
      * calendar items and sets their name based on the translations available
      * for the specified event key.
      *
-     * @param array<string, string> $translations The translations to use for setting the names.
+     * @param array<string,string> $translations The translations to use for setting the names.
      */
     public function setNames(array $translations): void
     {
@@ -162,7 +167,7 @@ final class NationalData extends AbstractJsonSrcData
      * - metadata (\stdClass): The metadata for the national calendar.
      * - i18n (\stdClass|unset): The translations for the national calendar.
      *
-     * @param \stdClass $data The stdClass object containing the properties of the national calendar.
+     * @param \stdClass&object{litcal:LiturgicalEventObjectFixed[],settings:NationalCalendarSettings,metadata:NationalCalendarMetadataObject,i18n?:\stdClass&object<string,string>} $data The stdClass object containing the properties of the national calendar.
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static

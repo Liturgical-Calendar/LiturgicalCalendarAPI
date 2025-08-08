@@ -68,7 +68,7 @@ final class MissalYearLimits extends AbstractJsonRepresentation
      * The object may have the following optional property:
      * - until_year (int|null): The year until when the Missal is applicable.
      *
-     * @param \stdClass $object The object containing the properties of the class.
+     * @param \stdClass&object{since_year:int,until_year?:int} $object The object containing the properties of the class.
      * @return static A new instance of the MissalYearLimits class.
      */
     protected static function fromObjectInternal(\stdClass $object): static

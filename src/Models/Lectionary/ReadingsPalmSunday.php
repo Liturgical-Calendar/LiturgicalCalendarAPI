@@ -17,7 +17,7 @@ final class ReadingsPalmSunday extends ReadingsAbstract
     }
 
     /**
-     * @param \stdClass $data
+     * @param \stdClass&object{first_reading:string,responsorial_psalm:string,second_reading:string,alleluia_verse:string,gospel:string,palm_gospel:string} $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static

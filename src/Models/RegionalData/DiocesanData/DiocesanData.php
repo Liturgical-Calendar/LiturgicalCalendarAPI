@@ -8,6 +8,11 @@ use LiturgicalCalendar\Api\Models\RegionalData\Translations;
 
 /**
  * @phpstan-import-type LiturgicalEventItem from \LiturgicalCalendar\Api\Models\LitCalItemCollection
+ * @phpstan-import-type LiturgicalEventObject from \LiturgicalCalendar\Api\Models\LitCalItemCollection
+ * @phpstan-import-type DiocesanCalendarSettings from \LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarSettings
+ * @phpstan-import-type DiocesanCalendarMetadata from \LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem
+ * @phpstan-import-type TranslationMapObject from \LiturgicalCalendar\Api\Models\RegionalData\TranslationMap
+ * @phpstan-import-type TranslationObject from \LiturgicalCalendar\Api\Models\RegionalData\Translations
  */
 final class DiocesanData extends AbstractJsonSrcData
 {
@@ -42,7 +47,7 @@ final class DiocesanData extends AbstractJsonSrcData
      * values of metadata.locales, and then sets the $this->i18n property
      * to a Translations object constructed from the validated i18n parameter.
      *
-     * @param \stdClass $i18n The object containing the translations to apply.
+     * @param TranslationMapObject $i18n The object containing the translations to apply.
      *                        The keys of the object must be the same as the
      *                        values of metadata.locales.
      *
@@ -64,7 +69,7 @@ final class DiocesanData extends AbstractJsonSrcData
      * and compares them to the sorted values of the metadata.locales. If they do
      * not match, a ValueError is thrown.
      *
-     * @param \stdClass $i18n The translations object whose keys need to be validated.
+     * @param TranslationMapObject $i18n The translations object whose keys need to be validated.
      *
      * @throws \ValueError If the keys of the i18n parameter do not match the values
      *                     of metadata.locales.
@@ -112,7 +117,7 @@ final class DiocesanData extends AbstractJsonSrcData
      * If a translation is not available for a given event key, the method will
      * set the name of the liturgical item to null.
      *
-     * @param array<string, string|null> $translations The translations to use for setting the names.
+     * @param array<string,string|null> $translations The translations to use for setting the names.
      */
     public function setNames(array $translations): void
     {
@@ -134,17 +139,17 @@ final class DiocesanData extends AbstractJsonSrcData
      * - settings (array|null): The settings for the diocesan calendar.
      * - i18n (array|null): The translations for the diocesan calendar.
      *
-     * @param array{litcal:LiturgicalEventItem[],metadata:array{diocese_id:string,diocese_name:string,nation:string,locales:string[],timezone:string,group?:string},settings:array<string,string>|null,i18n:array<string,string>|null} $data
+     * @param array{litcal:LiturgicalEventItem[],metadata:array{diocese_id:string,diocese_name:string,nation:string,locales:string[],timezone:string,group?:string},settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string},i18n?:array<string,string>} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
     {
         /** @var \stdClass|null $i18n */
-        $i18n = is_null($data['i18n']) ? null : (object) $data['i18n'];
+        $i18n = isset($data['i18n']) ? (object) $data['i18n'] : null;
         return new static(
             DiocesanLitCalItemCollection::fromArray($data['litcal']),
             DiocesanMetadata::fromArray($data['metadata']),
-            null !== $data['settings'] ? MetadataDiocesanCalendarSettings::fromArray($data['settings']) : null,
+            isset($data['settings']) ? MetadataDiocesanCalendarSettings::fromArray($data['settings']) : null,
             $i18n
         );
     }
@@ -158,7 +163,7 @@ final class DiocesanData extends AbstractJsonSrcData
      * - settings (\stdClass|null): The settings for the diocesan calendar.
      * - i18n (\stdClass|null): The translations for the diocesan calendar.
      *
-     * @param \stdClass $data The stdClass object containing the properties of the diocesan calendar.
+     * @param \stdClass&object{litcal:LiturgicalEventObject[],metadata:DiocesanCalendarMetadata,settings?:DiocesanCalendarSettings,i18n?:TranslationObject} $data The stdClass object containing the properties of the diocesan calendar.
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static

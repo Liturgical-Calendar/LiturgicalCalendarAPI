@@ -71,7 +71,7 @@ final class PropriumDeTemporeEvent extends AbstractJsonSrcData
      * - grade (int): The liturgical grade of the event.
      * - color (array): The liturgical colors for the event.
      *
-     * @param \stdClass $data The stdClass object or array containing event data.
+     * @param \stdClass&object{event_key:string,grade:int,type:int,color:string[]} $data The stdClass object or array containing event data.
      * @return static The newly created instance(s).
      */
     protected static function fromObjectInternal(\stdClass $data): static

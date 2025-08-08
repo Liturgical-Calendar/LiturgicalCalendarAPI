@@ -102,7 +102,7 @@ final class DecreeItem extends AbstractJsonSrcData
      * - `setProperty`
      * - `makePatron`
      *
-     * @param \stdClass $data
+     * @param \stdClass&object{liturgical_event:\stdClass&object{event_key:string,name:string,grade:int,color:string[],common:string[],day?:int,month?:int,strtotime?:string},metadata:\stdClass&object{action:string,since_year:int|null,until_year?:int|null,url?:string|null,reason?:string|null,property?:string|null,url_lang_map?:\stdClass&object<string,string>}} $data
      * @return static A new instance of DecreeItem.
      * @throws \ValueError If the required properties are not present in the associative array or if the properties have invalid types.
      */

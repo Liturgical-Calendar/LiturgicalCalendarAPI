@@ -18,7 +18,7 @@ final class DecreeItemSetPropertyNameMetadata extends DecreeEventMetadata
     /**
      * Create a new instance of the class from an object containing the required properties.
      *
-     * @param \stdClass $data
+     * @param \stdClass&object{since_year:int,property:string,url:string,url_lang_map?:\stdClass&object<string,string>} $data
      *     The object containing the required properties.
      *
      * @return static The newly created instance of the class.

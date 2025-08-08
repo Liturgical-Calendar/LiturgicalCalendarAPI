@@ -7,7 +7,7 @@ final class ReadingsFerial extends ReadingsAbstract
     private const REQUIRED_PROPS = ['first_reading', 'responsorial_psalm', 'alleluia_verse', 'gospel'];
 
     /**
-     * @param \stdClass $data
+     * @param \stdClass&object{first_reading:string,responsorial_psalm:string,alleluia_verse:string,gospel:string} $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static

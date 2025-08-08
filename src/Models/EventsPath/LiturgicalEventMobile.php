@@ -76,12 +76,12 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
      *      name: string,
      *      strtotime: string|array{day_of_the_week:string,relative_time:string,event_key:string},
      *      color: array<'green'|'pink'|'purple'|'red'|'white'>,
-     *      color_lcl: array<string>,
+     *      color_lcl: string[],
      *      grade: -1|0|1|2|3|4|5|6|7,
      *      grade_lcl: string,
      *      grade_abbr: string,
      *      grade_display: ?string,
-     *      common: array<string>,
+     *      common: string[],
      *      common_lcl: string,
      *      type: 'fixed'|'mobile'
      * }

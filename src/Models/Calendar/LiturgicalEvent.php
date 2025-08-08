@@ -203,13 +203,13 @@ final class LiturgicalEvent implements \JsonSerializable
      *      name: string,
      *      date: int,
      *      color: array<'green'|'pink'|'purple'|'red'|'white'>,
-     *      color_lcl: array<string>,
+     *      color_lcl: string[],
      *      type: 'fixed'|'mobile',
      *      grade: -1|0|1|2|3|4|5|6|7,
      *      grade_lcl: string,
      *      grade_abbr: string,
      *      grade_display: ?string,
-     *      common: array<string>,
+     *      common: string[],
      *      common_lcl: string,
      *      day_of_the_week_iso8601: int,
      *      month: int,
@@ -390,21 +390,20 @@ final class LiturgicalEvent implements \JsonSerializable
                         throw new \InvalidArgumentException('Incoherent color value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
                     }
                     if ($valueTypes[0] === 'string') {
-                        $obj->color = array_map(fn($value) => LitColor::from($value), $obj->color);
-                    } elseif (false === $obj->color[0] instanceof LitColor) {
+                        /** @var string[] $colors */
+                        $colors = $obj->color;
+                        $color  = array_values(array_map(fn(string $value): LitColor => LitColor::from($value), $colors));
+                    } else {
                         throw new \InvalidArgumentException('Invalid color value types provided to create LiturgicalEvent. Expected type string or LitColor, found ' . $valueTypes[0]);
                     }
                 } elseif (is_string($obj->color)) {
-                    $obj->color = LitColor::from($obj->color);
-                } elseif ($obj->color instanceof LitColor) {
-                    // if it's already an instance of LitColor, we don't need to do anything,
-                    // however this should probably never be the case with a stdClass object?
+                    $color = [LitColor::from($obj->color)];
                 } else {
                     throw new \InvalidArgumentException('Invalid color value type provided to create LiturgicalEvent');
                 }
             } else {
                 // We ensure a default value
-                $obj->color = LitColor::GREEN;
+                $color = [LitColor::GREEN];
             }
 
             if (property_exists($obj, 'type')) {
@@ -431,12 +430,18 @@ final class LiturgicalEvent implements \JsonSerializable
                 $commons = LitCommons::create([]);
             }
         } else {
-            if (property_exists($obj, 'common')) {
+            if (isset($obj->common)) {
                 $commons = $obj->common;
             } else {
                 // We ensure a default value
                 /** @var LitCommons $commons */
                 $commons = LitCommons::create([]);
+            }
+            if (isset($obj->color)) {
+                $color = $obj->color;
+            } else {
+                // We ensure a default value
+                $color = [LitColor::GREEN];
             }
         }
 
@@ -459,7 +464,7 @@ final class LiturgicalEvent implements \JsonSerializable
         return new self(
             $obj->name,
             $obj->date,
-            $obj->color,
+            $color,
             $obj->type,
             $obj->grade,
             $commons,

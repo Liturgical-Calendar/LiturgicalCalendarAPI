@@ -38,7 +38,7 @@ final class LitCalItemSetPropertyName extends LiturgicalEventData
      * - `event_key` (string): The key of the event.
      * - `name` (string): The new name of the liturgical event.
      *
-     * @param \stdClass $data The stdClass object containing the properties of the class.
+     * @param \stdClass&object{event_key:string,name:string} $data The stdClass object containing the properties of the class.
      * @return static The newly created instance.
      * @throws \ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
      */

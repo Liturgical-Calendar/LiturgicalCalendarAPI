@@ -22,7 +22,7 @@ final class LitCalItemSetPropertyNameMetadata extends LiturgicalEventMetadata
     /**
      * Create a new instance of the class from an object containing the required properties.
      *
-     * @param \stdClass $data The object containing the required properties.
+     * @param \stdClass&object{since_year:int,until_year?:int} $data The object containing the required properties.
      *
      * @return static A new instance of the class.
      *

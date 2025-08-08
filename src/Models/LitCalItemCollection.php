@@ -19,6 +19,18 @@ namespace LiturgicalCalendar\Api\Models;
  *      grade: int
  * }
  *
+ * @phpstan-type LiturgicalEventObject \stdClass&object{
+ *      event_key: string,
+ *      missal: string,
+ *      grade_lcl: string,
+ *      common_lcl: string,
+ *      name: string,
+ *      common: string[],
+ *      calendar: string,
+ *      decree?: string,
+ *      grade: int
+ * }
+ *
  * @implements \IteratorAggregate<LitCalItem>
  */
 final class LitCalItemCollection extends AbstractJsonSrcDataArray implements \IteratorAggregate
@@ -81,7 +93,7 @@ final class LitCalItemCollection extends AbstractJsonSrcDataArray implements \It
      * The input array must be non-empty and contain stdClass objects that can be
      * converted into LitCalItem instances.
      *
-     * @param \stdClass[] $data An array of stdClass objects containing the properties of the class.
+     * @param LiturgicalEventObject[] $data An array of stdClass objects containing the properties of the class.
      * @return static The newly created instance.
      * @throws \TypeError If the array is empty.
      * @throws \InvalidArgumentException If the elements are not stdClass objects.

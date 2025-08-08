@@ -7,13 +7,14 @@ use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 /**
  * @implements \IteratorAggregate<string, string>
  * @implements \ArrayAccess<string, string>
+ * @phpstan-type TranslationMapObject \stdClass&object<string,TranslationObject>
  */
 final class TranslationMap extends AbstractJsonSrcData implements \IteratorAggregate, \ArrayAccess, \Countable
 {
     /** @var array<string, string> */
     private array $translations;
 
-    /** @var array<string> */
+    /** @var string[] */
     private array $keys;
 
     /**
@@ -110,7 +111,7 @@ final class TranslationMap extends AbstractJsonSrcData implements \IteratorAggre
     /**
      * Create a new instance from an object.
      *
-     * @param \stdClass $i18nData The object to create the instance from.
+     * @param \stdClass&object<string,string> $i18nData The object to create the instance from.
      * @return static A new instance of this class.
      */
     public static function fromObjectInternal(\stdClass $i18nData): static

@@ -51,12 +51,12 @@ final class MissalMetadata extends AbstractJsonRepresentation
      * - missal_id (string): The identifier of the missal.
      * - name (string): The name of the missal.
      * - region (string): The region of the missal.
-     * - locales (array<string>): The locales supported by the missal.
+     * - locales (string[]): The locales supported by the missal.
      * - api_path (string): The API path for the missal.
      * - year_published (int): The year the missal was published.
      * - year_limits (MissalYearLimits): The year limits for the missal.
      *
-     * @param \stdClass $data The object containing the properties of the Missal.
+     * @param \stdClass&object{missal_id:string,name:string,region:string,locales:string[],api_path:?string,year_published:int,year_limits:\stdClass&object{since_year:int,until_year:?int}} $data The object containing the properties of the Missal.
      * @return static A new instance of Missal initialized with the provided data.
      */
     protected static function fromObjectInternal(\stdClass $data): static
@@ -79,12 +79,12 @@ final class MissalMetadata extends AbstractJsonRepresentation
      * - missal_id (string): The identifier of the missal.
      * - name (string): The name of the missal.
      * - region (string): The region of the missal.
-     * - locales (array<string>): The locales supported by the missal.
+     * - locales (string[]): The locales supported by the missal.
      * - api_path (string): The API path for the missal.
      * - year_published (int): The year the missal was published.
      * - year_limits (array{since_year:int,until_year:?int}): The year limits for the missal.
      *
-     * @param array{missal_id:string,name:string,region:string,locales:array<string>,api_path:?string,year_published:int,year_limits:array{since_year:int,until_year:?int}} $data
+     * @param array{missal_id:string,name:string,region:string,locales:string[],api_path:?string,year_published:int,year_limits:array{since_year:int,until_year:?int}} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -107,7 +107,7 @@ final class MissalMetadata extends AbstractJsonRepresentation
      * - missal_id (string): The identifier of the missal.
      * - name (string): The name of the missal.
      * - region (string): The region of the missal.
-     * - locales (array<string>): The locales supported by the missal.
+     * - locales (string[]): The locales supported by the missal.
      * - api_path (string): The API path for the missal.
      * - year_published (int): The year the missal was published.
      *

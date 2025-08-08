@@ -29,7 +29,7 @@ class LitLocale
     /**
      * Check if the given array of locales is valid.
      *
-     * @param array<string> $values The array of locale values to validate.
+     * @param string[] $values The array of locale values to validate.
      * @return bool True if all locales are valid, false otherwise.
      */
     public static function areValid(array $values): bool

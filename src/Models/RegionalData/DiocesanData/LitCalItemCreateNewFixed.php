@@ -113,7 +113,7 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
      * - grade (int): the liturgical grade of the event
      * - common (string[]): the liturgical common of the event, as an array of strings
      *
-     * @param \stdClass $data The stdClass object containing the properties of the class.
+     * @param \stdClass&object{event_key:string,day:int,month:int,color:string[],grade:int,common:string[]} $data The stdClass object containing the properties of the class.
      * @return static The newly created instance.
      * @throws \ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
      */

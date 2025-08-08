@@ -44,7 +44,7 @@ final class UrlLangMap extends AbstractJsonSrcData
     /**
      * Creates a new instance from an object.
      *
-     * @param \stdClass $data The object to create an instance from.
+     * @param \stdClass&object<string,string> $data The object to create an instance from.
      * @return static A new instance of the class.
      */
     protected static function fromObjectInternal(\stdClass $data): static

@@ -75,7 +75,7 @@ final class WiderRegionMetadata extends AbstractJsonRepresentation
      * any property is missing or does not meet the criteria, an appropriate
      * error is thrown.
      *
-     * @param \stdClass $data The object containing the data for the
+     * @param \stdClass&object{locales:string[],wider_region:string} $data The object containing the data for the
      *                     WiderRegionMetadata instance. It must include:
      *                     - 'locales': An array of locales supported by the Wider region.
      *                     - 'wider_region': A string representing the identifier of the Wider region.

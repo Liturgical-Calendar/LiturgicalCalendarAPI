@@ -20,7 +20,7 @@ final class DiocesanLitCalItemMetadata extends LiturgicalEventMetadata
      * The object may have the following optional properties:
      * - until_year (int|null): The year until when the liturgical event was added.
      *
-     * @param \stdClass $data The object containing the properties of the class.
+     * @param \stdClass&object{since_year:int,until_year?:int} $data The object containing the properties of the class.
      * @return static A new instance of the class.
      */
     protected static function fromObjectInternal(\stdClass $data): static

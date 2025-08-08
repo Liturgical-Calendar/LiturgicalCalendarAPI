@@ -132,7 +132,7 @@ final class CatholicDiocesesMap extends AbstractJsonSrcData
      * The object must have the following property:
      * - catholic_dioceses_latin_rite (array<object>): The dioceses. Each object must have the same properties as CountryWithDioceses.
      *
-     * @param \stdClass $data
+     * @param \stdClass&object{catholic_dioceses_latin_rite:\stdClass[]} $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static

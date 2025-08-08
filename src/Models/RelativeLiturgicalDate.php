@@ -5,6 +5,9 @@ namespace LiturgicalCalendar\Api\Models;
 use LiturgicalCalendar\Api\Enum\DateRelation;
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 
+/**
+ * @phpstan-type StrToTime \stdClass&object{day_of_the_week:string,relative_time:string,event_key:string}
+ */
 final class RelativeLiturgicalDate extends AbstractJsonSrcData
 {
     private const REQUIRED_PROPS = ['day_of_the_week', 'relative_time', 'event_key'];
@@ -39,7 +42,7 @@ final class RelativeLiturgicalDate extends AbstractJsonSrcData
      * - relative_time (string): whether the event is before or after the relative event (e.g. 'before' or 'after')
      * - event_key (string): the key of the relative event (e.g. 'Pentecost')
      *
-     * @param \stdClass $data The stdClass object containing the properties of the class.
+     * @param StrToTime $data The stdClass object containing the properties of the class.
      * @return static The newly created instance.
      * @throws \ValueError if the required properties are not present in the stdClass object.
      */

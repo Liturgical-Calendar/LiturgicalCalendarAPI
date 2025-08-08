@@ -22,7 +22,7 @@ final class DiocesanMetadata extends AbstractJsonSrcData
      * @param string $nation The nation that the diocese is located in.
      * @param string $diocese_id The unique identifier for the diocese.
      * @param string $diocese_name The name of the diocese.
-     * @param array<string> $locales The locales supported by the diocese.
+     * @param string[] $locales The locales supported by the diocese.
      * @param string $timezone The timezone for the diocese.
      */
     private function __construct(string $nation, string $diocese_id, string $diocese_name, array $locales, string $timezone)
@@ -42,16 +42,10 @@ final class DiocesanMetadata extends AbstractJsonSrcData
      * - nation (string): The nation that the diocese is located in.
      * - diocese_id (string): The unique identifier for the diocese.
      * - diocese_name (string): The name of the diocese.
-     * - locales (array<string>): The locales supported by the diocese.
+     * - locales (string[]): The locales supported by the diocese.
      * - timezone (string): The timezone for the diocese.
      *
-     * @param array{
-     *      nation: string,
-     *      diocese_id: string,
-     *      diocese_name: string,
-     *      locales: array<string>,
-     *      timezone: string
-     * } $data
+     * @param array{nation:string,diocese_id:string,diocese_name:string,locales:string[],timezone:string} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -96,10 +90,10 @@ final class DiocesanMetadata extends AbstractJsonSrcData
      * - nation (string): The nation that the diocese is located in.
      * - diocese_id (string): The unique identifier for the diocese.
      * - diocese_name (string): The name of the diocese.
-     * - locales (array<string>): The locales supported by the diocese.
+     * - locales (string[]): The locales supported by the diocese.
      * - timezone (string): The timezone for the diocese.
      *
-     * @param \stdClass $data The object containing the properties of the diocesan calendar.
+     * @param \stdClass&object{nation:string,diocese_id:string,diocese_name:string,locales:string[],timezone:string} $data The object containing the properties of the diocesan calendar.
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static
