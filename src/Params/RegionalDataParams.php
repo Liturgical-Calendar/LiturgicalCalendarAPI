@@ -167,7 +167,7 @@ class RegionalDataParams implements ParamsInterface
                                 . implode(', ', $validLangs);
                     RegionalDataPath::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                 }
-            } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && is_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
                 $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
                 if (
                     null !== $this->i18nRequest // short circuit for i18n requests
@@ -252,7 +252,7 @@ class RegionalDataParams implements ParamsInterface
                                     . implode(', ', $validLangs);
                         RegionalDataPath::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
                     }
-                } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+                } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && is_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
                     $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
                     if (
                         null !== $this->i18nRequest // short circuit for i18n requests
@@ -338,7 +338,7 @@ class RegionalDataParams implements ParamsInterface
                             . implode(', ', $validLangs);
                 RegionalDataPath::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
             }
-        } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+        } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && is_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $value = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
             if (
                 RegionalDataPath::$Core->getRequestMethod() === RequestMethod::PUT // short circuit for PUT requests that don't need to validate against existing locales

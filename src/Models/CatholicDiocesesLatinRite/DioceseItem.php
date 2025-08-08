@@ -20,6 +20,19 @@ final class DioceseItem extends AbstractJsonSrcData
         $this->province     = $province;
     }
 
+    /**
+     * Creates a new DioceseItem from an associative array.
+     *
+     * The array must have the following keys:
+     * - diocese_name (string): The name of the diocese.
+     * - diocese_id (string): The unique identifier for the diocese.
+     *
+     * Optional keys:
+     * - province (string|null): The ecclesiastical province that the diocese belongs to, if applicable.
+     *
+     * @param array{diocese_name:string,diocese_id:string,province?:string|null} $data The associative array containing the properties of the class.
+     * @return static A new instance of the class.
+     */
     protected static function fromArrayInternal(array $data): static
     {
         return new static(
@@ -29,6 +42,17 @@ final class DioceseItem extends AbstractJsonSrcData
         );
     }
 
+    /**
+     * Creates a new DioceseItem from an object.
+     *
+     * The object should have the following properties:
+     * - diocese_name (string): The name of the diocese.
+     * - diocese_id (string): The unique identifier for the diocese.
+     * - province (string|null): The ecclesiastical province that the diocese belongs to, if applicable.
+     *
+     * @param \stdClass&object{diocese_name:string,diocese_id:string,province?:string|null} $data The object containing the properties of the class.
+     * @return static A new instance of the class.
+     */
     protected static function fromObjectInternal(\stdClass $data): static
     {
         return new static(

@@ -3,6 +3,7 @@
 namespace LiturgicalCalendar\Api\Models\RegionalData;
 
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
+use LiturgicalCalendar\Api\Utilities;
 
 /**
  * A class representing a collection of translations for different locales.
@@ -66,6 +67,9 @@ final class Translations extends AbstractJsonSrcData implements \IteratorAggrega
      */
     public function offsetSet($offset, $value): void
     {
+        if (false === is_string($offset) || false === is_string($value)) {
+            throw new \InvalidArgumentException('Translation keys and values must be strings.');
+        }
         $this->i18nData[$offset] = $value;
         if (!in_array($offset, $this->keys)) {
             $this->keys[] = $offset;
@@ -119,7 +123,9 @@ final class Translations extends AbstractJsonSrcData implements \IteratorAggrega
      */
     protected static function fromObjectInternal(\stdClass $i18nData): static
     {
-        return new static(get_object_vars($i18nData));
+        /** @var array<string,array<string,string>> */
+        $objVars = Utilities::objectToArray($i18nData);
+        return new static($objVars);
     }
 
     /**

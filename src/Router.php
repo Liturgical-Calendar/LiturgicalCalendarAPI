@@ -44,14 +44,18 @@ class Router
         }
 
         // ALLOWED_ORIGINS should be defined in the $originsFile
-        if (defined('ALLOWED_ORIGINS') && is_array(ALLOWED_ORIGINS)) {
+        if (defined('ALLOWED_ORIGINS') && is_array(ALLOWED_ORIGINS) && Utilities::allStrings(ALLOWED_ORIGINS)) {
             if (null !== $origins) {
-                self::$allowedOrigins = array_merge(
+                /** @var string[] $allowedOrigins */
+                $allowedOrigins       = array_merge(
                     $origins,
                     ALLOWED_ORIGINS
                 );
+                self::$allowedOrigins = $allowedOrigins;
             } else {
-                self::$allowedOrigins = ALLOWED_ORIGINS;
+                /** @var string[] $allowedOrigins */
+                $allowedOrigins       = ALLOWED_ORIGINS;
+                self::$allowedOrigins = $allowedOrigins;
             }
         } elseif (null !== $origins) {
             self::$allowedOrigins = $origins;
@@ -72,20 +76,55 @@ class Router
     {
         // 1) The script name will actually include the base path of the API (e.g. /api/{apiVersion}/index.php),
         //      so in order to obtain the base path we remove index.php and are left with /api/{apiVersion}/
-        $apiBasePath = str_replace('index.php', '', $_SERVER['SCRIPT_NAME']); //can also use $_SERVER['DOCUMENT_URI'] or $_SERVER['PHP_SELF']
+        $scriptName = self::getScriptName();
+        $requestURI = isset($_SERVER['REQUEST_URI']) && is_string($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+        if ('' === $scriptName || '' === $requestURI) {
+            throw new \RuntimeException('Each one must examine his own work, and then he will have reason to boast with regard to himself alone, and not with regard to someone else. (Galatians 6:4)');
+        }
+
+        $apiBasePath = str_replace('index.php', '', $scriptName);
+
         // 2) remove any request params from the REQUEST_URI
-        $requestPath = explode('?', $_SERVER['REQUEST_URI'])[0];
+        $requestPath = explode('?', $requestURI)[0];
+
         // 3) remove the API base path (/api/dev/ or /api/v3/ or whatever it is)
         $requestPath = preg_replace('/^' . preg_quote($apiBasePath, '/') . '/', '', $requestPath);
         if (null === $requestPath) {
             throw new \RuntimeException('Upon Matthias the lot was cast by the college of the apostles, but where did Matthias go?');
         }
+
         // 4) remove any trailing slashes from the request path
         $requestPath = preg_replace('/\/$/', '', $requestPath);
         if (null === $requestPath) {
             throw new \RuntimeException('We started with Esau and expected Jacob: where did Jacob go?');
         }
+
         return explode('/', $requestPath);
+    }
+
+    private static function getScriptName(): string
+    {
+        $scriptName = isset($_SERVER['SCRIPT_NAME']) && is_string($_SERVER['SCRIPT_NAME'])
+                        ? $_SERVER['SCRIPT_NAME']
+                        : (
+                            isset($_SERVER['PHP_SELF']) && is_string($_SERVER['PHP_SELF'])
+                                ? $_SERVER['PHP_SELF']
+                                : ( isset($_SERVER['DOCUMENT_URI']) && is_string($_SERVER['DOCUMENT_URI']) ? $_SERVER['DOCUMENT_URI'] : '' )
+                        );
+
+        return $scriptName;
+    }
+
+    private static function getServerName(): string
+    {
+        $server_name = isset($_SERVER['SERVER_NAME']) && is_string($_SERVER['SERVER_NAME'])
+            ? $_SERVER['SERVER_NAME']
+            : (
+                isset($_SERVER['SERVER_ADDR']) && is_string($_SERVER['SERVER_ADDR'])
+                ? $_SERVER['SERVER_ADDR']
+                : 'localhost'
+            );
+        return $server_name;
     }
 
     /**
@@ -310,18 +349,12 @@ class Router
         /**
          * Detect server name or server address if name is not available
          */
-        $server_name = isset($_SERVER['SERVER_NAME'])
-            ? $_SERVER['SERVER_NAME']
-            : (
-                isset($_SERVER['SERVER_ADDR'])
-                ? $_SERVER['SERVER_ADDR']
-                : 'localhost'
-            );
+        $server_name = self::getServerName();
 
         /**
          * Add port to server name when port is not 80 or 443
          */
-        if (false === in_array($_SERVER['SERVER_PORT'], ['80', '443'])) {
+        if (isset($_SERVER['SERVER_PORT']) && is_string($_SERVER['SERVER_PORT']) && false === in_array($_SERVER['SERVER_PORT'], ['80', '443'])) {
             $server_name .= ':' . $_SERVER['SERVER_PORT'];
         }
 
@@ -338,10 +371,12 @@ class Router
             }
         } else {
             $apiVersion = 'dev';
-            if (preg_match('/^\/api\/(.*?)\/index.php$/', $_SERVER['SCRIPT_NAME'], $matches)) {
+            $scriptName = self::getScriptName();
+            if (preg_match('/^\/api\/(.*?)\/index.php$/', $scriptName, $matches)) {
                 $apiVersion = $matches[1];
             }
-            $server_name = "{$_SERVER['SERVER_NAME']}/api/{$apiVersion}";
+            $serverName  = self::getServerName();
+            $server_name = "{$serverName}/api/{$apiVersion}";
         }
 
         return "{$server_request_scheme}://{$server_name}";

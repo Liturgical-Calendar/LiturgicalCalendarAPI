@@ -117,7 +117,8 @@ final class DecreesPath
      */
     public static function produceErrorResponse(int $statusCode, string $description): never
     {
-        header($_SERVER['SERVER_PROTOCOL'] . StatusCode::toString($statusCode), true, $statusCode);
+        $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1 ';
+        header($serverProtocol . StatusCode::toString($statusCode), true, $statusCode);
         $message         = new \stdClass();
         $message->status = 'ERROR';
         $statusMessage   = '';
@@ -166,7 +167,8 @@ final class DecreesPath
     private static function produceResponse(string $jsonEncodedResponse): never
     {
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 201 Created', true, 201);
+            $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+            header($serverProtocol . ' 201 Created', true, 201);
         }
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
@@ -198,15 +200,15 @@ final class DecreesPath
             self::$requestPathParts = $requestPathParts;
         }
 
-        $locale = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']) : LitLocale::LATIN_PRIMARY_LANGUAGE;
+        $locale = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && is_string($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']) : LitLocale::LATIN_PRIMARY_LANGUAGE;
         if (false === $locale) {
-            $locale = LitLocale::LATIN_PRIMARY_LANGUAGE;
+            $baseLocale = LitLocale::LATIN_PRIMARY_LANGUAGE;
         } else {
-            $locale = \Locale::getPrimaryLanguage($locale);
+            $baseLocale = \Locale::getPrimaryLanguage($locale);
         }
         $decreesI18nFile = strtr(
             JsonData::DECREES_I18N_FILE,
-            ['{locale}' => $locale]
+            ['{locale}' => $baseLocale]
         );
 
         $names   = Utilities::jsonFileToArray($decreesI18nFile);

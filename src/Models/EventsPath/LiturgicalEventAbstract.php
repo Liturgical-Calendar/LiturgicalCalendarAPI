@@ -211,6 +211,24 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
         return $this->common_lcl;
     }
 
+    /**
+     * Takes an array of string values representing colors, and returns an array of LitColor objects.
+     *
+     * @param string[] $colorStrArr An array of string values representing colors.
+     * @return LitColor[] An array of LitColor objects.
+     */
+    public static function colorStringArrayToLitColorArray(array $colorStrArr): array
+    {
+        /** @var LitColor[] */
+        $colors = array_map(
+            static function (string $value): LitColor {
+                return LitColor::from($value);
+            },
+            $colorStrArr
+        );
+        return $colors;
+    }
+
     /** @param array{event_key:string,day?:int,month?:int,strotime?:string,color:string[],type:string,grade:int,common?:string[],grade_display?:?string} $arr */
     abstract public static function fromArray(array $arr): static;
 

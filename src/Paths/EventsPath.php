@@ -130,6 +130,7 @@ final class EventsPath
                     $description = "Malformed JSON data received in the request: <$rawJson>, " . json_last_error_msg();
                     self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
                 } else {
+                    /** @var array{locale?:string,national_calendar?:string,diocesan_calendar?:string,eternal_high_priest?:bool} $params */
                     $this->EventsParams->setParams($params);
                     if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
                         self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
@@ -138,6 +139,7 @@ final class EventsPath
             }
         } elseif (self::$Core->getRequestContentType() === RequestContentType::FORMDATA) {
             if (count($_POST)) {
+                /** @var array{locale?:string,national_calendar?:string,diocesan_calendar?:string,eternal_high_priest?:bool} $_POST */
                 $this->EventsParams->setParams($_POST);
                 if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
                     self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
@@ -159,6 +161,7 @@ final class EventsPath
     private function validateGetParams(): void
     {
         if (count($_GET)) {
+            /** @var array{locale?:string,national_calendar?:string,diocesan_calendar?:string,eternal_high_priest?:bool} $_GET */
             $this->EventsParams->setParams($_GET);
             if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
                 self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
@@ -310,6 +313,7 @@ final class EventsPath
                     ]
                 );
 
+                /** @var array<string,string> $widerRegionI18nData */
                 $widerRegionI18nData   = Utilities::jsonFileToArray($widerRegionI18nFile);
                 $widerRegionDataJson   = Utilities::jsonFileToObject($widerRegionDataFile);
                 self::$WiderRegionData = WiderRegionData::fromObject($widerRegionDataJson);
@@ -581,6 +585,7 @@ final class EventsPath
                 ]
             );
 
+            /** @var array<string,string> $NationalCalendarI18nData */
             $NationalCalendarI18nData = Utilities::jsonFileToArray($NationalCalendarI18nFile);
 
             foreach (self::$NationalData->litcal as $litCalItem) {
@@ -641,6 +646,7 @@ final class EventsPath
                 ]
             );
 
+            /** @var array<string,string> $DiocesanCalendarI18nData */
             $DiocesanCalendarI18nData = Utilities::jsonFileToArray($DiocesanCalendarI18nFile);
 
             foreach (self::$DiocesanData->litcal as $diocesanLitCalItem) {
@@ -673,7 +679,8 @@ final class EventsPath
      */
     private static function produceErrorResponse(int $statusCode, string $description): never
     {
-        header($_SERVER['SERVER_PROTOCOL'] . StatusCode::toString($statusCode), true, $statusCode);
+        $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1 ';
+        header($serverProtocol . StatusCode::toString($statusCode), true, $statusCode);
         $message              = new \stdClass();
         $message->status      = 'ERROR';
         $message->response    = StatusCode::toString($statusCode);

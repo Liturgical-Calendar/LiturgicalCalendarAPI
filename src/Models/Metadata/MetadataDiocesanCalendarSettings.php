@@ -96,8 +96,9 @@ final class MetadataDiocesanCalendarSettings extends AbstractJsonRepresentation 
      */
     public function getIterator(): \Traversable
     {
-        /** @var array<string,Epiphany|Ascension|CorpusChristi> */
-        $nonNull = array_filter(get_object_vars($this), fn (Epiphany|Ascension|CorpusChristi|null $value) => $value !== null);
+        /** @var array<string,Epiphany|Ascension|CorpusChristi> $objVars */
+        $objVars = get_object_vars($this);
+        $nonNull = array_filter($objVars, fn (Epiphany|Ascension|CorpusChristi|null $value): bool => $value !== null);
         return new \ArrayIterator($nonNull);
     }
 }

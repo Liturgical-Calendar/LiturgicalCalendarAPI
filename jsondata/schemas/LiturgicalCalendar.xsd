@@ -95,7 +95,7 @@
                       </xs:simpleType>
                     </xs:element>
                     <xs:element name="GradeAbbr" type="xs:string" />
-                    <xs:element name="GradeDisplay" type="xs:string" />
+                    <xs:element name="GradeDisplay" type="xs:string" nillable="true" />
                     <xs:element name="GradeLcl" type="xs:string" />
                     <xs:element name="Readings" type="cl:ReadingsType" />
                     <xs:element name="HasVesperI" minOccurs="0" type="xs:boolean" />

@@ -16,6 +16,18 @@ use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewM
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewMobile;
 use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
 
+/**
+ * @phpstan-type LiturgicalEventObj \stdClass&object{
+ *     event_key: string,
+ *     name: string,
+ *     strtotime: string|RelativeLiturgicalDate,
+ *     grade: LitGrade|integer,
+ *     color?: LitColor|LitColor[]|string|string[],
+ *     type?: LitEventType|string,
+ *     common?: LitCommons|LitCommon[]|LitMassVariousNeeds[]|string[],
+ *     grade_display?: string,
+ * }
+ */
 final class LiturgicalEventMobile extends LiturgicalEventAbstract
 {
     public string|RelativeLiturgicalDate $strtotime;
@@ -130,7 +142,7 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
      *   If not provided, defaults to LitEventType::FIXED.
      * - grade_display: The grade display of the liturgical event, as a string. If not provided, defaults to null.
      *
-     * @param \stdClass|LiturgicalEventData|DecreeEventData|AbstractJsonSrcData $obj
+     * @param LiturgicalEventObj|LiturgicalEventData|DecreeEventData|AbstractJsonSrcData $obj
      * @return LiturgicalEventMobile A new LiturgicalEventMobile object.
      * @throws \InvalidArgumentException If the provided object does not contain the required properties or if the properties have invalid types.
      */
@@ -171,7 +183,9 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
                         throw new \InvalidArgumentException('Incoherent color value types provided to create LiturgicalEventMobile: found multiple types ' . implode(', ', $valueTypes));
                     }
                     if ($valueTypes[0] === 'string') {
-                        $obj->color = array_map(fn($value) => LitColor::from($value), $obj->color);
+                        /** @var string[] */
+                        $color      = $obj->color;
+                        $obj->color = static::colorStringArrayToLitColorArray($color);
                     } elseif (false === $obj->color[0] instanceof LitColor) {
                         throw new \InvalidArgumentException('Invalid color value types provided to create LiturgicalEventMobile. Expected type string or LitColor, found ' . $valueTypes[0]);
                     }
@@ -304,15 +318,9 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
                     throw new \InvalidArgumentException('Incoherent color value types provided to create LiturgicalEventMobile: found multiple types ' . implode(', ', $valueTypes));
                 }
                 if ($valueTypes[0] === 'string') {
-                    /** @var string[] */
-                    $colorStrArr = $arr['color'];
-                    /** @var LitColor[] */
-                    $colors = array_map(
-                        static function (string $value): LitColor {
-                            return LitColor::from($value);
-                        },
-                        $colorStrArr
-                    );
+                    /** @var string[] $color */
+                    $color  = $arr['color'];
+                    $colors = static::colorStringArrayToLitColorArray($color);
                 } elseif (false === $arr['color'][0] instanceof LitColor) {
                     throw new \InvalidArgumentException('Invalid color value types provided to create LiturgicalEventMobile. Expected type string or LitColor, found ' . $valueTypes[0]);
                 }

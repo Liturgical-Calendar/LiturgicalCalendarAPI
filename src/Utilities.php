@@ -232,6 +232,7 @@ class Utilities
                     $key        = self::transformKey($key . '');
                     $new_object = $xml->addChild($key);
                     if (in_array($key, ['Readings', 'Night', 'Day', 'Dawn', 'Evening', 'SchemaOne', 'SchemaTwo', 'SchemaThree'])) {
+                        /** @var array<string, string> $value */
                         ['attribute' => $attribute, 'xsi' => $xsi] = self::getReadingsType($value);
                         $new_object->addAttribute('readingsType', $attribute);
                         $new_object->addAttribute('xsi:type', $xsi, 'http://www.w3.org/2001/XMLSchema-instance');
@@ -253,13 +254,22 @@ class Utilities
                 // so we determine the item element name based on the array to which the item belongs
                 if (is_numeric($key)) {
                     if (self::$LAST_ARRAY_KEY === 'messages') {
+                        if (false === is_string($value)) {
+                            throw new \UnexpectedValueException('Value of key ' . $key . ' must be a string');
+                        }
                         $el = $xml->addChild('Message', htmlspecialchars($value));
                         $el->addAttribute('idx', $key . '');
                     } elseif (in_array(self::$LAST_ARRAY_KEY, self::EVENT_KEY_ELS, true)) {
+                        if (false === is_string($value)) {
+                            throw new \UnexpectedValueException('Value of key ' . $key . ' must be a string');
+                        }
                         $el = $xml->addChild('Key', $value);
                         $el->addAttribute('idx', $key . '');
                     } else {
                         // color, color_lcl, and common array items will be converted to Option elements
+                        if (false === is_string($value)) {
+                            throw new \UnexpectedValueException('Value of key ' . $key . ' must be a string');
+                        }
                         $el = $xml->addChild('Option', $value);
                         $el->addAttribute('idx', $key . '');
                     }
@@ -275,8 +285,16 @@ class Utilities
                             $xml->Readings->addAttribute('readingsType', 'fromCommons');
                             $xml->Readings->addAttribute('xsi:type', 'cl:ReadingsCommonsType', 'http://www.w3.org/2001/XMLSchema-instance');
                         }
-                    } else {
-                        $xml->addChild($key, $value);
+                    }
+                    elseif (is_int($value)) {
+                        $xml->addChild($key, (string) $value);
+                    }
+                    elseif (is_null($value)) {
+                        $xml->addChild($key);
+                        $xml->{$key}->addAttribute('xsi:nil', 'true', 'http://www.w3.org/2001/XMLSchema-instance');
+                    }
+                    else {
+                        throw new \UnexpectedValueException('Key ' . $key . ' has an unexpected type: ' . gettype($value));
                     }
                 }
             }
@@ -627,6 +645,19 @@ class Utilities
             throw new \InvalidArgumentException('value is false, cannot capitalize the first letter');
         }
         return \ucfirst($str);
+    }
+
+    /**
+     * @param mixed[] $arr
+     */
+    public static function allStrings(array $arr): bool
+    {
+        foreach ($arr as $v) {
+            if (!is_string($v)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

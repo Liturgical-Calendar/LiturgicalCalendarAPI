@@ -125,14 +125,17 @@ class CalendarParams implements ParamsInterface
         if (Router::isLocalhost()) {
             $concurrentServiceWorkers = getenv('PHP_CLI_SERVER_WORKERS');
             if ((int) $concurrentServiceWorkers < 2) {
-                $server_name = $_SERVER['SERVER_NAME'] ?? $_SERVER['SERVER_ADDR'];
+                $server_name = isset($_SERVER['SERVER_NAME']) && is_string($_SERVER['SERVER_NAME'])
+                                ? $_SERVER['SERVER_NAME']
+                                : (
+                                    isset($_SERVER['SERVER_ADDR']) && is_string($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : 'localhost'
+                                );
                 CalendarPath::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The API will be unable to load calendars metadata from {$calendarsRoute}, because there are not enough concurrent service workers. Perhaps set the `PHP_CLI_SERVER_WORKERS` environment variable to a value greater than 1? E.g. `PHP_CLI_SERVER_WORKERS=2 php -S $server_name`.");
             }
         }
 
-        $metadataRaw = Utilities::rawContentsFromUrl($calendarsRoute);
-        $metadata    = json_decode($metadataRaw, false, 512, JSON_THROW_ON_ERROR);
-        if (property_exists($metadata, 'litcal_metadata')) {
+        $metadata = Utilities::jsonUrlToObject($calendarsRoute);
+        if (property_exists($metadata, 'litcal_metadata') && $metadata->litcal_metadata instanceof \stdClass) {
             $this->calendars = MetadataCalendars::fromObject($metadata->litcal_metadata);
         } else {
             CalendarPath::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'The API was unable to initialize calendars metadata: ' . json_last_error_msg());
@@ -140,7 +143,7 @@ class CalendarParams implements ParamsInterface
 
         $this->Year = (int) date('Y');
 
-        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && is_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $value        = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
             $this->Locale = $value && LitLocale::isValid($value) ? $value : LitLocale::LATIN;
         } else {

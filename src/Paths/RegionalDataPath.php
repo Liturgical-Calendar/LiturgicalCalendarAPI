@@ -81,7 +81,8 @@ final class RegionalDataPath
                 $this->deleteCalendar();
                 // no break (always terminates)
             default:
-                self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, 'The method ' . $_SERVER['REQUEST_METHOD'] . ' cannot be handled by this endpoint');
+                $serverRequestMethod = isset($_SERVER['REQUEST_METHOD']) && is_string($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : '???';
+                self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, 'The method ' . $serverRequestMethod . ' cannot be handled by this endpoint');
         }
     }
 
@@ -1115,7 +1116,7 @@ final class RegionalDataPath
                 $params['i18n'] = $requestPathParts[2];
             }
             // For GET requests, we attempt to retrieve the locale from the query string if present
-            if (self::$Core->getRequestMethod() === RequestMethod::GET && isset($_GET['locale'])) {
+            if (self::$Core->getRequestMethod() === RequestMethod::GET && isset($_GET['locale']) && is_string($_GET['locale'])) {
                 $locale = \Locale::canonicalize($_GET['locale']);
                 if ($locale !== null) {
                     $params['locale'] = $locale;
@@ -1251,7 +1252,8 @@ final class RegionalDataPath
      */
     public static function produceErrorResponse(int $statusCode, string $description): never
     {
-        header($_SERVER['SERVER_PROTOCOL'] . StatusCode::toString($statusCode), true, $statusCode);
+        $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1 ';
+        header($serverProtocol . StatusCode::toString($statusCode), true, $statusCode);
         $message         = new \stdClass();
         $message->status = 'ERROR';
         $statusMessage   = '';
@@ -1303,7 +1305,8 @@ final class RegionalDataPath
         }
 
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH], true)) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 201 Created', true, 201);
+            $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+            header($serverProtocol . ' 201 Created', true, 201);
         }
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:

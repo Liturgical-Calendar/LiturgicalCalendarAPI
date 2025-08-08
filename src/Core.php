@@ -59,12 +59,7 @@ class Core
             }
         }
         $this->JsonEncodedRequestHeaders = json_encode($this->RequestHeaders);
-        if (
-            isset($_SERVER['CONTENT_TYPE'])
-            && in_array($_SERVER['CONTENT_TYPE'], array_column($this->AllowedRequestContentTypes, 'value'))
-        ) {
-            $this->RequestContentType = RequestContentType::from($_SERVER['CONTENT_TYPE']);
-        }
+         $this->validateRequestContentType();
     }
 
     /**
@@ -84,7 +79,14 @@ class Core
         } elseif ($this->isAllowedOrigin()) {
             header('Access-Control-Allow-Origin: ' . $this->RequestHeaders['Origin']);
         } else {
-            header("Access-Control-Allow-Origin: {$_SERVER['SERVER_NAME']}");
+            $serverName = isset($_SERVER['SERVER_NAME']) && is_string($_SERVER['SERVER_NAME'])
+                            ? $_SERVER['SERVER_NAME']
+                            : (
+                                isset($_SERVER['HTTP_HOST']) && is_string($_SERVER['HTTP_HOST'])
+                                    ? $_SERVER['HTTP_HOST'] // on localhost this should already include the port in typical setups / default PHP internal server
+                                    : 'localhost' // might need to include the PORT? REMOTE_PORT or SERVER_PORT?
+                            );
+            header("Access-Control-Allow-Origin: {$serverName}");
         }
         header('Access-Control-Allow-Credentials: true');
         header('Access-Control-Max-Age: 86400');    // cache for 1 day
@@ -119,22 +121,26 @@ class Core
      */
     private function validateRequestContentType(): void
     {
+        /** @var string[] $allowedRequestContentTypeValues */
         $allowedRequestContentTypeValues = array_column($this->AllowedRequestContentTypes, 'value');
+
         if (
             isset($_SERVER['CONTENT_TYPE'])
+            && is_string($_SERVER['CONTENT_TYPE'])
             && $_SERVER['CONTENT_TYPE'] !== ''
-            && !in_array(
-                explode(';', $_SERVER['CONTENT_TYPE'])[0],
-                $allowedRequestContentTypeValues
-            )
         ) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 415 Unsupported Media Type', true, 415);
-            $response        = new \stdClass();
-            $response->error = 'You seem to be forming a strange kind of request? Allowed Content Types are '
-            . implode(' and ', $allowedRequestContentTypeValues)
-            . ', but your Content Type was '
-            . $_SERVER['CONTENT_TYPE'];
-            die(json_encode($response));
+            $requestContentType = explode(';', $_SERVER['CONTENT_TYPE'])[0];
+
+            if (false === in_array($requestContentType, $allowedRequestContentTypeValues)) {
+                header($_SERVER['SERVER_PROTOCOL'] . ' 415 Unsupported Media Type', true, 415);
+                $response        = new \stdClass();
+                $response->error = 'You seem to be forming a strange kind of request? Allowed Content Types are '
+                                    . implode(' and ', $allowedRequestContentTypeValues)
+                                    . ', but your Content Type was ' . $requestContentType;
+                die(json_encode($response));
+            } else {
+                $this->RequestContentType = RequestContentType::from($requestContentType);
+            }
         }
     }
 
@@ -145,7 +151,8 @@ class Core
      */
     private function sendHeaderNotAcceptable(): void
     {
-        header($_SERVER['SERVER_PROTOCOL'] . ' 406 Not Acceptable', true, 406);
+        $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+        header($serverProtocol . ' 406 Not Acceptable', true, 406);
         $response        = new \stdClass();
         $response->error = 'You are requesting a content type which this API cannot produce. Allowed Accept headers are '
             . implode(' and ', array_column($this->AllowedAcceptHeaders, 'value'))
@@ -373,7 +380,7 @@ class Core
         return false === (
             !isset($_SERVER['HTTP_X_REQUESTED_WITH'])
             || empty($_SERVER['HTTP_X_REQUESTED_WITH'])
-            || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest'
+            || ( is_string($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest' )
         );
     }
 
@@ -389,8 +396,10 @@ class Core
     public function enforceAjaxRequest(): void
     {
         if (false === $this->isAjaxRequest()) {
-            header($_SERVER['SERVER_PROTOCOL'] . " 418 I'm a teapot", true, 418);
-            $errorMessage = '{"error":"Request was not made via AJAX. When using Request Method ' . strtoupper($_SERVER['REQUEST_METHOD']) . ', only AJAX requests from authorized Origins and Referers are processable."}';
+            $serverProtocol      = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+            $serverRequestMethod = isset($_SERVER['REQUEST_METHOD']) && is_string($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
+            header($serverProtocol . " 418 I'm a teapot", true, 418);
+            $errorMessage = '{"error":"Request was not made via AJAX. When using Request Method ' . $serverRequestMethod . ', only AJAX requests from authorized Origins and Referers are processable."}';
             die($errorMessage);
         }
     }
@@ -448,7 +457,8 @@ class Core
      */
     public function getRequestMethod(): RequestMethod
     {
-        return RequestMethod::from(strtoupper($_SERVER['REQUEST_METHOD']));
+        $serverRequestMethod = isset($_SERVER['REQUEST_METHOD']) && is_string($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
+        return RequestMethod::from($serverRequestMethod);
     }
 
     /**
@@ -511,8 +521,10 @@ class Core
     public function enforceReferer(): void
     {
         if (false === $this->isAllowedReferer()) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 401 Unauthorized', true, 401);
-            $errorMessage = '{"error":"Request is coming from unauthorized referer ' . $_SERVER['HTTP_REFERER'] . '. Only AJAX requests from authorized Origins and Referers are processable."}';
+            $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+            $serverReferer  = isset($_SERVER['HTTP_REFERER']) && is_string($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+            header($serverProtocol . ' 401 Unauthorized', true, 401);
+            $errorMessage = '{"error":"Request is coming from unauthorized referer ' . $serverReferer . '. Only AJAX requests from authorized Origins and Referers are processable."}';
             die($errorMessage);
         }
     }
@@ -527,21 +539,26 @@ class Core
      * @param bool $required Whether the request body is required or not.
      * @param bool $assoc Whether to return the object as an associative array or a stdClass object.
      *
-     * @return \stdClass|array<string,mixed>|null The request parameters, either as a stdClass object or an associative array, or null if the request body was not required and is empty.
+     * @return \stdClass|array<mixed,mixed>|null The request parameters, either as a stdClass object or an associative array, or null if the request body was not required and is empty.
      */
     public function readJsonBody(bool $required = false, bool $assoc = false): \stdClass|array|null
     {
-        $data    = null;
-        $rawData = file_get_contents('php://input');
+        $data           = null;
+        $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+        $rawData        = file_get_contents('php://input');
         if (( false === $rawData || '' === $rawData ) && $required) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', true, 400);
+            header($serverProtocol . ' 400 Bad Request', true, 400);
             die('{"error":"No JSON data received in the request"}');
         }
         if (false !== $rawData) {
             $data = json_decode($rawData, $assoc);
             if (json_last_error() !== JSON_ERROR_NONE) {
-                header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', true, 400);
+                header($serverProtocol . ' 400 Bad Request', true, 400);
                 die('{"error":"Malformed JSON data received in the request: <' . $rawData . '>, ' . json_last_error_msg() . '"}');
+            }
+            if (false === $data instanceof \stdClass && false === is_array($data)) {
+                header($serverProtocol . ' 400 Bad Request', true, 400);
+                die('{"error":"Malformed JSON data received in the request, expected an object or an array: <' . $rawData . '>, ' . json_last_error_msg() . '"}');
             }
         }
         return $data;
@@ -578,11 +595,12 @@ class Core
      */
     public function readYamlBody(bool $required = false, bool $assoc = false): \stdClass|array|null
     {
-        $rawData = file_get_contents('php://input');
+        $rawData        = file_get_contents('php://input');
+        $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
 
         if (false !== $rawData) {
             if ('' === $rawData && $required) {
-                header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', true, 400);
+                header($serverProtocol . ' 400 Bad Request', true, 400);
                 die('{"error":"No YAML data received in the request"}');
             }
 
@@ -602,13 +620,13 @@ class Core
                         /** @var object|array<mixed> $data */
                         $jsonData = json_encode($data);
                         if (false === $jsonData || json_last_error() !== JSON_ERROR_NONE) {
-                            header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', true, 400);
+                            header($serverProtocol . ' 400 Bad Request', true, 400);
                             die('{"error":"Malformed YAML data received in the request: <' . $rawData . '>, ' . json_last_error_msg() . '"}');
                         }
                         return json_decode($jsonData);
                     }
                 } catch (\ErrorException $e) {
-                    header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request', true, 400);
+                    header($serverProtocol . ' 400 Bad Request', true, 400);
                     $response          = new \stdClass();
                     $response->status  = 'error';
                     $response->message = 'Malformed YAML data received in the request';
@@ -623,7 +641,7 @@ class Core
                 return null;
             }
         } else {
-            throw new \RuntimeException('The request body is empty.');
+            throw new \RuntimeException('The body of this request sure is not the widow\'s oil jar: it is quite empty.');
         }
     }
 
@@ -637,6 +655,5 @@ class Core
     {
         $this->setAllowedOriginHeader();
         $this->setAccessControlAllowMethods();
-        $this->validateRequestContentType();
     }
 }

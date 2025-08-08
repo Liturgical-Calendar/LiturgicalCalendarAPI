@@ -30,11 +30,11 @@ final class TestsPath
     /**
      * Sanitizes a given string by removing all HTML tags and converting special characters to HTML entities.
      * @param string $str The string to be sanitized.
-     * @return string The sanitized string.
+     * @return void
      */
-    private static function sanitizeString(string $str): string
+    private static function sanitizeString(string &$str): void
     {
-        return htmlspecialchars(strip_tags($str));
+        $str = htmlspecialchars(strip_tags($str));
     }
 
     /**
@@ -50,22 +50,24 @@ final class TestsPath
     {
         foreach (get_object_vars($data) as $prop => $value) {
             if (in_array($prop, self::$propsToSanitize)) {
-                if (is_object($value)) {
-                    self::sanitizeObjectValues($data->{$prop});
+                if ($value instanceof \stdClass) {
+                    self::sanitizeObjectValues($value);
                 } elseif (is_array($value)) {
-                    foreach ($value as $idx => $item) {
-                        if (is_object($item)) {
-                            self::sanitizeObjectValues($data->{$prop}[$idx]);
+                    foreach ($value as $item) {
+                        if ($item instanceof \stdClass) {
+                            self::sanitizeObjectValues($item);
                         } elseif (is_array($item)) {
-                            foreach ($item as $idx2 => $item2) {
-                                $data->{$prop}[$idx][$idx2] = self::sanitizeString($item2);
+                            foreach ($item as $item2) {
+                                if (is_string($item2)) {
+                                    self::sanitizeString($item2);
+                                }
                             }
                         } elseif (is_string($item)) {
-                            $data->{$prop}[$idx] = self::sanitizeString($item);
+                            self::sanitizeString($item);
                         }
                     }
                 } elseif (is_string($value)) {
-                    $data->{$prop} = self::sanitizeString($value);
+                    self::sanitizeString($value);
                 }
             }
         }
@@ -172,12 +174,12 @@ final class TestsPath
         if (count(self::$requestPathParts)) {
             return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'Path parameters not acceptable, please use the base path `/tests` for PUT or PATCH requests');
         }
-        $json = file_get_contents('php://input');
-        if ($json === false) {
+        $rawJsonBody = file_get_contents('php://input');
+        if ($rawJsonBody === false) {
             return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'Could not read the body of the request.');
         }
-        $data = json_decode($json);
 
+        $data = json_decode($rawJsonBody);
         if (json_last_error() !== JSON_ERROR_NONE) {
             return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'The Unit Test you are attempting to create was not valid JSON:' . json_last_error_msg());
         }
@@ -202,13 +204,21 @@ final class TestsPath
         }
 
         // Sanitize data to avoid any possibility of script injection
-        self::sanitizeObjectValues($data);
+        if (false === $data instanceof \stdClass) {
+            return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'The Unit Test you are attempting to create must be an object.');
+        } else {
+            self::sanitizeObjectValues($data);
+        }
 
+        if (false === property_exists($data, 'name') || false === is_string($data->name)) {
+            return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'The Unit Test you are attempting to create must have a valid name.');
+        }
         $bytesWritten = file_put_contents(JsonData::TESTS_FOLDER . '/' . $data->name . '.json', json_encode($data, JSON_PRETTY_PRINT));
         if (false === $bytesWritten) {
             return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.');
         } else {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 201 Created', true, 201);
+            $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+            header($serverProtocol . ' 201 Created', true, 201);
             $message             = new \stdClass();
             $message->status     = 'OK';
             $message->response   = self::$Core->getRequestMethod() === RequestMethod::PUT ? 'Resource Created' : 'Resource Updated';
@@ -255,7 +265,8 @@ final class TestsPath
                 // nothing to do here, should be handled by Core
                 break;
             default:
-                $response = self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, 'The method ' . $_SERVER['REQUEST_METHOD'] . ' cannot be handled by this endpoint');
+                $serverRequestMethod = isset($_SERVER['REQUEST_METHOD']) && is_string($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : '???';
+                $response            = self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, 'The method ' . $serverRequestMethod . ' cannot be handled by this endpoint');
         }
         self::produceResponse($response);
     }
@@ -274,7 +285,8 @@ final class TestsPath
      */
     private static function produceErrorResponse(int $statusCode, string $description): string
     {
-        header($_SERVER['SERVER_PROTOCOL'] . StatusCode::toString($statusCode), true, $statusCode);
+        $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1 ';
+        header($serverProtocol . StatusCode::toString($statusCode), true, $statusCode);
         $message         = new \stdClass();
         $message->status = 'ERROR';
         $statusMessage   = '';

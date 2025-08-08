@@ -12,10 +12,22 @@ use LiturgicalCalendar\Api\Models\Decrees\DecreeEventData;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\LiturgicalEventData;
 use LiturgicalCalendar\Api\Models\PropriumDeSanctisEvent;
-use LiturgicalCalendar\Api\Models\PropriumDeTemporeEvent;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewFixed as DiocesanLitCalItemCreateNewFixed;
 
+/**
+ * @phpstan-type LiturgicalEventObject \stdClass&object{
+ *     event_key: string,
+ *     name: string,
+ *     month: integer,
+ *     day: integer,
+ *     grade: LitGrade|integer,
+ *     color?: LitColor|LitColor[]|string|string[],
+ *     type?: LitEventType|string,
+ *     common?: LitCommons|LitCommon[]|LitMassVariousNeeds[]|string[],
+ *     grade_display?: string,
+ * }
+ */
 final class LiturgicalEventFixed extends LiturgicalEventAbstract
 {
     public int $month;
@@ -130,7 +142,7 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
      *   If not provided, defaults to LitEventType::FIXED.
      * - grade_display: The grade display of the liturgical event, as a string. If not provided, defaults to null.
      *
-     * @param \stdClass|LiturgicalEventData|DecreeEventData|PropriumDeSanctisEvent $obj
+     * @param LiturgicalEventObject|LiturgicalEventData|DecreeEventData|PropriumDeSanctisEvent $obj
      * @return LiturgicalEventFixed A new LiturgicalEventFixed object.
      * @throws \InvalidArgumentException If the provided object does not contain the required properties or if the properties have invalid types.
      */
@@ -162,6 +174,13 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
             throw new \InvalidArgumentException('Invalid grade provided to create LiturgicalEventFixed');
         }
 
+        // set some default values
+        /** @var LitCommons */
+        $commons = LitCommons::create([]);
+        $colors  = [LitColor::GREEN];
+        $type    = LitEventType::FIXED;
+        $grade   = LitGrade::WEEKDAY;
+
         // When we read data from a JSON file, $obj will be an instance of stdClass,
         // and we need to cast the values to types that will be accepted by the LiturgicalEventFixed constructor
         if ($obj instanceof \stdClass) {
@@ -172,21 +191,19 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
                         throw new \InvalidArgumentException('Incoherent color value types provided to create LiturgicalEventFixed: found multiple types ' . implode(', ', $valueTypes));
                     }
                     if ($valueTypes[0] === 'string') {
-                        $obj->color = array_map(fn($value) => LitColor::from($value), $obj->color);
+                        /** @var string[] $color */
+                        $color  = $obj->color;
+                        $colors = static::colorStringArrayToLitColorArray($color);
                     } elseif (false === $obj->color[0] instanceof LitColor) {
                         throw new \InvalidArgumentException('Invalid color value types provided to create LiturgicalEventFixed. Expected type string or LitColor, found ' . $valueTypes[0]);
                     }
                 } elseif (is_string($obj->color)) {
-                    $obj->color = LitColor::from($obj->color);
+                    $colors = [LitColor::from($obj->color)];
                 } elseif ($obj->color instanceof LitColor) {
-                    // if it's already an instance of LitColor, we don't need to do anything,
-                    // however this should probably never be the case with a stdClass object?
+                    $colors = [$obj->color];
                 } else {
                     throw new \InvalidArgumentException('Invalid color value type provided to create LiturgicalEventFixed');
                 }
-            } else {
-                // We ensure a default value
-                $obj->color = LitColor::GREEN;
             }
 
             if (property_exists($obj, 'type')) {
@@ -194,37 +211,35 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
                     throw new \InvalidArgumentException('Invalid type provided to create LiturgicalEventFixed');
                 }
                 if (is_string($obj->type)) {
-                    $obj->type = LitEventType::from($obj->type);
+                    $type = LitEventType::from($obj->type);
                 }
-            } else {
-                // We ensure a default value
-                $obj->type = LitEventType::FIXED;
             }
 
             if (is_int($obj->grade)) {
-                $obj->grade = LitGrade::tryFrom($obj->grade) ?? LitGrade::WEEKDAY;
+                $grade = LitGrade::tryFrom($obj->grade) ?? LitGrade::WEEKDAY;
             }
 
             if (property_exists($obj, 'common')) {
                 $commons = self::transformCommons($obj->common);
-            } else {
-                // We ensure a default value
-                /** @var LitCommons */
-                $commons = LitCommons::create([]);
             }
         } else {
-            if (property_exists($obj, 'common')) {
+            if (isset($obj->common)) {
                 /** @var LitCommons */
                 $commons = $obj->common;
-            } else {
-                // We ensure a default value
-                /** @var LitCommons */
-                $commons = LitCommons::create([]);
+            }
+            if (isset($obj->color)) {
+                $colors = $obj->color;
+            }
+            if (isset($obj->type)) {
+                $type = $obj->type;
+            }
+            if (isset($obj->grade)) {
+                $grade = $obj->grade;
             }
         }
 
-        if (false === $obj->grade instanceof LitGrade) {
-            throw new \Exception('Invalid object provided to create LiturgicalEventFixed: grade is not an instance of LitGrade');
+        if (false === $grade instanceof LitGrade) {
+            throw new \Exception('“Examine yourselves to see whether you are living in faith. Test yourselves. Do you not realize that Jesus Christ is in you?—unless, of course, you fail the test.” (1 Corinthians 13:5)');
         }
 
         return new self(
@@ -232,9 +247,9 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
             $obj->name,
             $obj->month,
             $obj->day,
-            $obj->color,
-            $obj->type,
-            $obj->grade,
+            $colors,
+            $type,
+            $grade,
             $commons,
             $obj->grade_display ?? null
         );
@@ -300,14 +315,8 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
                 }
                 if ($valueTypes[0] === 'string') {
                     /** @var string[] */
-                    $colorStrArr = $arr['color'];
-                    /** @var LitColor[] */
-                    $colors = array_map(
-                        static function (string $value): LitColor {
-                            return LitColor::from($value);
-                        },
-                        $colorStrArr
-                    );
+                    $color  = $arr['color'];
+                    $colors = static::colorStringArrayToLitColorArray($color);
                 } elseif (false === $arr['color'][0] instanceof LitColor) {
                     throw new \InvalidArgumentException('Invalid color value types provided to create LiturgicalEventFixed. Expected type string or LitColor, found ' . $valueTypes[0]);
                 }

@@ -20,6 +20,7 @@ final class SchemasPath
     {
         if (
             isset($_SERVER['HTTP_ORIGIN'])
+            && is_string($_SERVER['HTTP_ORIGIN'])
             && in_array($_SERVER['HTTP_ORIGIN'], Router::$allowedOrigins)
         ) {
             header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
@@ -79,7 +80,8 @@ final class SchemasPath
                     echo file_get_contents(JsonData::SCHEMAS_FOLDER . '/' . $requestPathParts[0]);
                     die();
                 } else {
-                    header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found', true, 404);
+                    $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+                    header($serverProtocol . ' 404 Not Found', true, 404);
                     die("Schema file '{$requestPathParts[0]}' not found");
                 }
             default:

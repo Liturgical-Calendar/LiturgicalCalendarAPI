@@ -82,6 +82,7 @@ use LiturgicalCalendar\Api\Params\CalendarParams;
  *      dioceses: CatholicDioceseLatinRiteItem[]
  * }
  * @phpstan-type CatholicDiocesesLatinRite CatholicDioceseLatinRiteCountryItem[]
+ * @phpstan-import-type CalendarParamsData from CalendarParams
  */
 final class CalendarPath
 {
@@ -314,7 +315,8 @@ final class CalendarPath
             self::$Core->setResponseContentType(self::$Core->getAllowedAcceptHeaders()[0]);
             self::$Core->setResponseContentTypeHeader();
         }
-        header($_SERVER['SERVER_PROTOCOL'] . StatusCode::toString($statusCode), true, $statusCode);
+        $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1 ';
+        header($serverProtocol . StatusCode::toString($statusCode), true, $statusCode);
         $message              = new \stdClass();
         $message->status      = 'ERROR';
         $message->description = $description;
@@ -410,7 +412,7 @@ final class CalendarPath
                 );
             }
         }
-        /** @var array<string,mixed> $params */
+        /** @var CalendarParamsData $params */
         $this->CalendarParams = new CalendarParams($params);
     }
 

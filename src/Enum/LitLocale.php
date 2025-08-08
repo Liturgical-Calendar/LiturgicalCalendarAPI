@@ -20,7 +20,7 @@ class LitLocale
      * @param string $value The locale value to validate.
      * @return bool True if the locale is valid, false otherwise.
      */
-    public static function isValid($value): bool
+    public static function isValid(string $value): bool
     {
         self::init();
         return in_array($value, self::$values) || in_array($value, self::$AllAvailableLocales);
@@ -61,7 +61,8 @@ class LitLocale
     /**
      * Initializes the list of available locales.
      *
-     * This method loads the list of locales from the ICU data available in PHP.
+     * This method loads the list of locales from the ICU data available in PHP,
+     * if they have not yet been loaded.
      * It then filters out the "POSIX" locale, which is not a valid regional locale.
      */
     public static function init(): void

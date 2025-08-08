@@ -19,14 +19,15 @@ final class EasterPath
     private static function enforceAllowedMethods(): void
     {
         if (!in_array($_SERVER['REQUEST_METHOD'], self::ALLOWED_METHODS)) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed', true, 405);
+            $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+            header($serverProtocol . ' 405 Method Not Allowed', true, 405);
             die();
         }
     }
 
     private static function handleRequestParams(): void
     {
-        self::$Locale = isset($_GET['locale']) && LitLocale::isValid($_GET['locale']) ? $_GET['locale'] : LitLocale::LATIN;
+        self::$Locale = isset($_GET['locale']) && is_string($_GET['locale']) && LitLocale::isValid($_GET['locale']) ? $_GET['locale'] : LitLocale::LATIN;
     }
 
     private static function serveCachedFileIfExists(): void

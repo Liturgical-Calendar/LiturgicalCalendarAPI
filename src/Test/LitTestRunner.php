@@ -97,7 +97,7 @@ class LitTestRunner
                 $testInstructionsRaw = file_get_contents($testPath);
                 if ($testInstructionsRaw) {
                     $testInstructions = json_decode($testInstructionsRaw);
-                    if (JSON_ERROR_NONE === json_last_error()) {
+                    if (JSON_ERROR_NONE === json_last_error() && $testInstructions instanceof \stdClass) {
                         $schemaFile     = JsonData::SCHEMAS_FOLDER . '/LitCalTest.json';
                         $schemaContents = file_get_contents($schemaFile);
                         if (false === $schemaContents) {

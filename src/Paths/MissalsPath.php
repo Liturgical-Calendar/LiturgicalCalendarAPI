@@ -110,7 +110,7 @@ final class MissalsPath
         $params = [];
         if ($payload !== null && property_exists($payload, 'locale')) {
             $params['locale'] = $payload->locale;
-        } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+        } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && is_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
             if ($locale && LitLocale::isValid($locale)) {
                 $params['locale'] = $locale;
@@ -200,17 +200,12 @@ final class MissalsPath
                     throw new \RuntimeException("Unable to retrieve metadata for missal $missalId. Now the disciples had forgotten to bring any bread. - Mark 8:14");
                 }
 
-                $missalData = Utilities::rawContentsFromFile($missalJsonFile);
                 $locale     = RomanMissal::isLatinMissal($missalId)
                             ? ( in_array(self::$params->baseLocale, $missalMetadata->locales) ? self::$params->baseLocale : LitLocale::LATIN_PRIMARY_LANGUAGE )
                             : ( in_array(self::$params->Locale, $missalMetadata->locales) ? self::$params->Locale : $missalMetadata->locales[0] );
                 $i18nFile   = RomanMissal::$i18nPath[$missalId] . $locale . '.json';
                 $i18nObj    = Utilities::jsonFileToObject($i18nFile);
-                $missalRows = json_decode($missalData);
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    $error = "Error while processing Missal data from file '{$missalData}': " . json_last_error_msg();
-                    self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, $error);
-                }
+                $missalRows = Utilities::jsonFileToObjectArray($missalJsonFile);
 
                 foreach ($missalRows as $idx => $row) {
                     $key = $row->event_key;
@@ -247,7 +242,8 @@ final class MissalsPath
      */
     public static function produceErrorResponse(int $statusCode, string $description): never
     {
-        header($_SERVER['SERVER_PROTOCOL'] . StatusCode::toString($statusCode), true, $statusCode);
+        $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1 ';
+        header($serverProtocol . StatusCode::toString($statusCode), true, $statusCode);
         $message         = new \stdClass();
         $message->status = 'ERROR';
         $statusMessage   = '';
@@ -295,7 +291,8 @@ final class MissalsPath
     private static function produceResponse(string $jsonEncodedResponse): never
     {
         if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH])) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 201 Created', true, 201);
+            $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+            header($serverProtocol . ' 201 Created', true, 201);
         }
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
